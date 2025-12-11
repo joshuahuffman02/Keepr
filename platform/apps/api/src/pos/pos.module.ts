@@ -8,11 +8,12 @@ import { StoredValueModule } from "../stored-value/stored-value.module";
 import { StripeService } from "../payments/stripe.service";
 import { TillService } from "./till.service";
 import { TillController } from "./till.controller";
+import { AuditService } from "../audit/audit.service";
 
 @Module({
   imports: [StoredValueModule],
   controllers: [PosController, TillController],
-  providers: [PosService, PrismaService, IdempotencyService, StoredValueService, StripeService, TillService],
+  providers: [PosService, PrismaService, IdempotencyService, StoredValueService, StripeService, TillService, AuditService],
   exports: [PosService, TillService]
 })
 export class PosModule {}
