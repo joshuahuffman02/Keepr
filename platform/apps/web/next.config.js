@@ -31,11 +31,7 @@ const nextConfig = {
       },
     ];
   },
-  // Turbopack options (Next.js 16+)
-  turbopack: {
-    // Explicitly set the app root for Turbopack in this monorepo
-    root: path.resolve(__dirname, "../../.."),
-  },
+
   // Ensure external workspace packages are bundled correctly
   transpilePackages: ["@campreserv/shared"],
 };

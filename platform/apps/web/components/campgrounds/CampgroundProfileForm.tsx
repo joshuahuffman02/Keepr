@@ -44,11 +44,11 @@ export function CampgroundProfileForm({ campground }: CampgroundProfileFormProps
     checkInTime: campground.checkInTime || "",
     checkOutTime: campground.checkOutTime || "",
     timezone: campground.timezone || "",
-    slaMinutes: (campground as any).slaMinutes?.toString() || "30",
-    senderDomain: (campground as any).senderDomain || "",
-    quietHoursStart: (campground as any).quietHoursStart || "",
-    quietHoursEnd: (campground as any).quietHoursEnd || "",
-    routingAssigneeId: (campground as any).routingAssigneeId || "",
+    slaMinutes: campground.slaMinutes?.toString() || "30",
+    senderDomain: campground.senderDomain || "",
+    quietHoursStart: campground.quietHoursStart || "",
+    quietHoursEnd: campground.quietHoursEnd || "",
+    routingAssigneeId: campground.routingAssigneeId || "",
     isPublished: campground.isPublished ?? true
   });
 
@@ -431,12 +431,12 @@ export function CampgroundProfileForm({ campground }: CampgroundProfileFormProps
               aria-label="Sender domain"
             />
             <div className="flex items-center gap-2">
-              <Badge variant={(campground as any).senderDomainStatus === "verified" ? "default" : "secondary"}>
-                {(campground as any).senderDomainStatus || "unknown"}
+              <Badge variant={campground.senderDomainStatus === "verified" ? "default" : "secondary"}>
+                {campground.senderDomainStatus || "unknown"}
               </Badge>
-              {(campground as any).senderDomainCheckedAt && (
+              {campground.senderDomainCheckedAt && (
                 <span className="text-xs text-slate-500">
-                  Checked {(campground as any).senderDomainCheckedAt}
+                  Checked {campground.senderDomainCheckedAt}
                 </span>
               )}
             </div>
