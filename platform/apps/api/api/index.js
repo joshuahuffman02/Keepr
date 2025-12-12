@@ -1,12 +1,12 @@
 // Vercel Serverless Function - NestJS Integration
-// This loads the pre-built NestJS serverless handler from dist/
+// Loads the bundled NestJS app from the api/ folder (copied during build)
 
 const serverlessExpress = require('@codegenie/serverless-express');
 let cachedApp;
 
 async function bootstrap() {
-    // Import the NestJS bootstrap function from our bundled serverless.js
-    const { createApp } = require('../dist/app.bootstrap.js');
+    // Import the NestJS bootstrap function - now in same folder
+    const { createApp } = require('./app.bootstrap.js');
     const app = await createApp();
     await app.init();
 

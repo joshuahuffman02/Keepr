@@ -1,17 +1,12 @@
 {
     "$schema": "https://openapi.vercel.sh/vercel.json",
     "version": 2,
-    "buildCommand": "pnpm run build && pnpm prisma generate",
+    "buildCommand": "pnpm run build && pnpm prisma generate && cp dist/app.bootstrap.js api/app.bootstrap.js",
     "installCommand": "pnpm install",
     "builds": [
         {
             "src": "api/**/*.js",
-            "use": "@vercel/node",
-            "config": {
-                "includeFiles": [
-                    "dist/**"
-                ]
-            }
+            "use": "@vercel/node"
         }
     ],
     "routes": [
