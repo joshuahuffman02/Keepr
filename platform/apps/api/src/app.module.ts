@@ -35,7 +35,6 @@ import { MembershipsModule } from './memberships/memberships.module';
 import { OperationsModule } from './operations/operations.module';
 import { IncidentsModule } from './incidents/incidents.module';
 import { InternalConversationsModule } from './internal-conversations/internal-conversations.module';
-import { ReportsModule } from './reports/reports.module';
 import { HoldsModule } from './holds/holds.module';
 import { AuditModule } from './audit/audit.module';
 import { CommunicationsModule } from './communications/communications.module';
@@ -131,7 +130,6 @@ import { SignaturesModule } from "./signatures/signatures.module";
     IncidentsModule,
     OperationsModule,
     InternalConversationsModule,
-    ReportsModule,
     HoldsModule,
     AuditModule,
     CommunicationsModule,
