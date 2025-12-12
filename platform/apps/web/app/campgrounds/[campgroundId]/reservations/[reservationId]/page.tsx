@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import { DashboardShell } from "../../../../../components/ui/layout/DashboardShell";
 import { Breadcrumbs } from "../../../../../components/breadcrumbs";
 import { apiClient } from "../../../../../lib/api-client";
+import { computeDepositDue } from "@campreserv/shared";
 import { Card, CardContent, CardHeader, CardTitle } from "../../../../../components/ui/card";
 import { Badge } from "../../../../../components/ui/badge";
 import { Button } from "../../../../../components/ui/button";
@@ -263,15 +264,19 @@ export default function ReservationDetailPage() {
   const total = (reservation.totalAmount ?? 0) / 100;
   const paid = (reservation.paidAmount ?? 0) / 100;
   const balance = Math.max(0, total - paid);
+  const depositRule = (reservation as any).depositRule ?? (reservation as any).depositConfig?.rule ?? null;
+  const depositPercentage =
+    (reservation as any).depositPercentage ?? (reservation as any).depositConfig?.depositPercentage ?? null;
+  const depositConfig = (reservation as any).depositConfig ?? null;
   const requiredDeposit =
     quote?.totalCents && quote?.nights
       ? computeDepositDue({
           total: (quote?.totalCents ?? 0) / 100,
           nights: quote?.nights ?? 1,
           arrivalDate: reservation.arrivalDate,
-          depositRule: reservation.depositRule || (reservation as any).depositRule || (reservation as any).depositConfig?.rule || null,
-          depositPercentage: reservation.depositPercentage ?? (reservation as any).depositConfig?.depositPercentage ?? null,
-          depositConfig: (reservation as any).depositConfig ?? null
+          depositRule,
+          depositPercentage,
+          depositConfig
         })
       : 0;
   const signatureRequests = Array.isArray(signaturesQuery.data)
@@ -538,9 +543,9 @@ export default function ReservationDetailPage() {
                     size="sm"
                     className="w-full md:w-auto"
                     onClick={() => createSignatureMutation.mutate()}
-                    disabled={createSignatureMutation.isLoading}
+                    disabled={createSignatureMutation.status === "loading"}
                   >
-                    {createSignatureMutation.isLoading ? "Sending…" : "Send signature request"}
+                    {createSignatureMutation.status === "loading" ? "Sending…" : "Send signature request"}
                   </Button>
                 </div>
                 <p className="text-xs text-slate-500">
@@ -1177,4 +1182,3 @@ export default function ReservationDetailPage() {
     </DashboardShell>
   );
 }
-

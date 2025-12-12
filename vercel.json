@@ -5,17 +5,17 @@
     "installCommand": "pnpm install",
     "buildCommand": "pnpm --dir platform/packages/shared build && pnpm --dir platform/apps/api prisma:generate && pnpm --dir platform/apps/api build && pnpm --dir platform/apps/web build",
     "functions": {
-        "platform/apps/api/dist/serverless.js": {
+        "platform/apps/api/api/index.js": {
             "runtime": "nodejs20.x",
             "maxDuration": 30,
             "memory": 1024,
-            "includeFiles": "{platform/apps/api/dist/**,platform/apps/api/prisma/**,platform/packages/shared/dist/**,node_modules/.prisma/**,node_modules/@prisma/**}"
+            "includeFiles": "{platform/apps/api/api/**,platform/apps/api/dist/**,platform/packages/shared/dist/**,node_modules/.prisma/**,node_modules/@prisma/**}"
         }
     },
     "routes": [
         {
             "src": "/api/(.*)",
-            "dest": "platform/apps/api/dist/serverless.js"
+            "dest": "platform/apps/api/api/index.js"
         },
         {
             "handle": "filesystem"

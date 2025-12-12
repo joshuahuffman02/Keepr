@@ -61,7 +61,7 @@ export function ReservationPill({
                 <div className="ml-2 flex gap-1 items-center">
                     {hasMaintenance && <Wrench className="h-3 w-3 text-amber-100" />}
                     {needsCleaning && <Sparkles className="h-3 w-3 text-cyan-100" />}
-                    {hasConflict && <AlertTriangle className="h-3 w-3 text-amber-100" title="Conflict in date range" />}
+                    {hasConflict && <AlertTriangle className="h-3 w-3 text-amber-100" aria-label="Conflict in date range" />}
                 </div>
             )}
         </div>

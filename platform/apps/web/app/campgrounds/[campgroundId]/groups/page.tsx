@@ -214,7 +214,7 @@ export default function GroupsPage() {
                   </CardTitle>
                   <Button
                     size="sm"
-                    variant="destructive"
+                    variant="default"
                     onClick={() => {
                       if (confirm("Delete this group? Reservations will be unlinked.")) {
                         deleteGroupMutation.mutate(selectedGroupId);
@@ -589,4 +589,3 @@ export default function GroupsPage() {
     </DashboardShell>
   );
 }
-

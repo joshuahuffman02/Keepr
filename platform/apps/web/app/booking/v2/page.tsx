@@ -148,7 +148,9 @@ export default function BookingV2() {
   });
 
   const availableSites: Site[] = useMemo(() => {
-    return (siteStatusQuery.data ?? []).filter((s: any) => s.status === "available");
+    return (siteStatusQuery.data ?? [])
+        .map((s: any) => ({ ...s, siteClassId: s.siteClassId ?? undefined }))
+        .filter((s: any) => s.status === "available");
   }, [siteStatusQuery.data]);
 
   const filteredGuests = useMemo(() => {
@@ -163,8 +165,8 @@ export default function BookingV2() {
     });
   }, [guestsQuery.data, guestSearch]);
 
-  const createReservation = useMutation({
-    mutationFn: (data: ReservationPayload) => apiClient.createReservation(data),
+    const createReservation = useMutation({
+        mutationFn: (data: ReservationPayload) => apiClient.createReservation(data as unknown as any),
     onSuccess: (res) => {
       toast({ title: "Reservation created", description: "Guest has been booked." });
       queryClient.invalidateQueries({ queryKey: ["reservations"] });
@@ -195,7 +197,7 @@ export default function BookingV2() {
   const nights =
     arrivalDate && departureDate ? Math.max(1, Math.round((departureDate.getTime() - arrivalDate.getTime()) / (1000 * 60 * 60 * 24))) : 0;
 
-  const selectedGuest: Guest | undefined = guestsQuery.data?.find((g: Guest) => g.id === form.guestId);
+    const selectedGuest: Guest | undefined = ((guestsQuery.data ?? []) as Guest[]).find((g) => g.id === form.guestId);
   const selectedSite: Site | undefined = availableSites.find((s) => s.id === form.siteId);
   const selectedClass: SiteClass | undefined = siteClassesQuery.data?.find((sc: SiteClass) => sc.id === form.siteClassId);
   const selectedGuestName = selectedGuest ? `${selectedGuest.primaryFirstName} ${selectedGuest.primaryLastName}` : "";
@@ -543,4 +545,3 @@ export default function BookingV2() {
     </DashboardShell>
   );
 }
-

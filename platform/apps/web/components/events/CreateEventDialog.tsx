@@ -13,7 +13,6 @@ import { CreateEventSchema, EventTypeSchema } from "@campreserv/shared";
 import { useToast } from "@/components/ui/use-toast";
 import { Loader2 } from "lucide-react";
 import { z } from "zod";
-import { useState } from "react";
 
 interface CreateEventDialogProps {
     open: boolean;

@@ -44,8 +44,8 @@ export function CampgroundV2Client({ slug, initialData }: { slug: string; initia
 
   const events = campground?.events ?? [];
   const promotions = campground?.promotions ?? [];
-  const reviews = campground?.reviews ?? [];
-  const faq = campground?.faqs ?? [];
+    const reviews = (campground as { reviews?: unknown[] })?.reviews ?? [];
+    const faq = (campground as { faqs?: unknown[] })?.faqs ?? [];
   const siteClasses = campground?.siteClasses ?? [];
   const photos = campground?.photos ?? [];
   const hero = campground?.heroImageUrl || photos[0];
@@ -421,4 +421,3 @@ export function CampgroundV2Client({ slug, initialData }: { slug: string; initia
     </div>
   );
 }
-

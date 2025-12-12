@@ -598,8 +598,8 @@ function SiteStep({
                                             {site.siteClass?.hookupsWater && <Badge variant="outline">Water</Badge>}
                                             {site.siteClass?.hookupsSewer && <Badge variant="outline">Sewer</Badge>}
                                             {site.siteClass?.petFriendly && <Badge variant="outline">Pet friendly</Badge>}
-                                            {(site.rigMaxLength || site.siteClass?.rigMaxLength) && (
-                                                <Badge variant="outline">Max {site.rigMaxLength || site.siteClass?.rigMaxLength}ft rig</Badge>
+                                            {site.rigMaxLength && (
+                                                <Badge variant="outline">Max {site.rigMaxLength}ft rig</Badge>
                                             )}
                                             {(site.accessible || site.siteClass?.accessible) && (
                                                 <Badge variant="outline" className="border-emerald-200 text-emerald-700">
@@ -1210,6 +1210,7 @@ function ReviewStep({
     guestInfo,
     onBack,
     holdExpiresAt,
+    onHoldExpiresAtChange,
     onComplete,
     promoCodeFromUrl
 }: {
@@ -1223,6 +1224,7 @@ function ReviewStep({
     guestInfo: GuestInfo;
     onBack: () => void;
     holdExpiresAt?: Date | null;
+    onHoldExpiresAtChange?: (value: Date | null) => void;
     onComplete: (reservation?: any) => void;
     promoCodeFromUrl?: string | null;
 }) {
@@ -1262,27 +1264,6 @@ function ReviewStep({
         return () => clearInterval(timer);
     }, [holdExpiresAt]);
 
-    // Auto-apply promo code from URL on mount
-    useEffect(() => {
-        if (promoCodeFromUrl && !promoApplied && quote && campgroundId) {
-            setPromoInput(promoCodeFromUrl);
-            // Auto-validate
-            (async () => {
-                setPromoValidating(true);
-                try {
-                    const result = await apiClient.validatePromoCode(campgroundId, promoCodeFromUrl, quote.totalCents);
-                    setPromoCode(result.code);
-                    setPromoDiscount(result.discountCents);
-                    setPromoApplied(true);
-                } catch (err: any) {
-                    setPromoError(err.message || "Invalid promo code");
-                } finally {
-                    setPromoValidating(false);
-                }
-            })();
-        }
-    }, [promoCodeFromUrl, quote, campgroundId, promoApplied]);
-
     // Tax waiver state
     const [taxWaiverSigned, setTaxWaiverSigned] = useState(false);
 
@@ -1312,6 +1293,27 @@ function ReviewStep({
             }),
         enabled: !!slug && !!selectedSite?.id && !!arrivalDate && !!departureDate
     });
+
+    // Auto-apply promo code from URL on mount
+    useEffect(() => {
+        if (promoCodeFromUrl && !promoApplied && quote && campgroundId) {
+            setPromoInput(promoCodeFromUrl);
+            // Auto-validate
+            (async () => {
+                setPromoValidating(true);
+                try {
+                    const result = await apiClient.validatePromoCode(campgroundId, promoCodeFromUrl, quote.totalCents);
+                    setPromoCode(result.code);
+                    setPromoDiscount(result.discountCents);
+                    setPromoApplied(true);
+                } catch (err: any) {
+                    setPromoError(err.message || "Invalid promo code");
+                } finally {
+                    setPromoValidating(false);
+                }
+            })();
+        }
+    }, [promoCodeFromUrl, quote, campgroundId, promoApplied]);
 
     const handleApplyPromo = async () => {
         if (!promoInput.trim() || !campgroundId || !quote) return;
@@ -1402,6 +1404,9 @@ function ReviewStep({
     const paymentMethodsLabel = showAch || showWallets
         ? `We accept cards${showAch ? ", ACH bank payments" : ""}${showWallets ? ", and wallets (Apple Pay / Google Pay where supported)" : ""}.`
         : "We accept cards. Connect Stripe to enable ACH and wallets once capabilities are active.";
+    const updateHoldExpiresAt = (value: Date | null) => {
+        if (onHoldExpiresAtChange) onHoldExpiresAtChange(value);
+    };
     const reasonLabels: Record<string, string> = {
         vacation: "Vacation / getaway",
         family_visit: "Visiting family or friends",
@@ -1428,15 +1433,15 @@ function ReviewStep({
                     });
                     holdId = (hold as any)?.id;
                     if ((hold as any)?.expiresAt) {
-                        setHoldExpiresAt(new Date((hold as any).expiresAt));
+                        updateHoldExpiresAt(new Date((hold as any).expiresAt));
                     } else {
                         const defaultExpiry = new Date();
                         defaultExpiry.setMinutes(defaultExpiry.getMinutes() + 10);
-                        setHoldExpiresAt(defaultExpiry);
+                        updateHoldExpiresAt(defaultExpiry);
                     }
                 } catch {
                     // proceed without hold
-                    setHoldExpiresAt(null);
+                    updateHoldExpiresAt(null);
                 }
             }
 
@@ -2298,6 +2303,7 @@ export default function BookingPage() {
                                 guestInfo={guestInfo}
                                 onBack={() => setStep(3)}
                                 holdExpiresAt={holdExpiresAt}
+                                onHoldExpiresAtChange={setHoldExpiresAt}
                                 onComplete={(reservation) => {
                                     if (reservation) setConfirmedReservation(reservation);
                                     setIsComplete(true);

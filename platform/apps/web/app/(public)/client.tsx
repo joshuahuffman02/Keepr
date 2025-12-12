@@ -114,7 +114,7 @@ export function HomeClient() {
                 isInternal: true,
                 rating,
                 reviewCount,
-                pricePerNight: cg.pricePerNight ?? undefined,
+                pricePerNight: undefined,
                 ratingBadge: badge
             };
         });

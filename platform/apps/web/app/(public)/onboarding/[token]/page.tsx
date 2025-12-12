@@ -15,7 +15,7 @@ import { Switch } from "@/components/ui/switch";
 import { useToast } from "@/components/ui/use-toast";
 import { cn } from "@/lib/utils";
 
-type StepData = Record<OnboardingStepKey, any>;
+type StepData = Partial<Record<OnboardingStepKey, any>>;
 
 export default function OnboardingPage() {
   const params = useParams();

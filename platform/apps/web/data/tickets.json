@@ -1878,5 +1878,614 @@
       "language": "en-US",
       "deviceType": "desktop"
     }
+  },
+  {
+    "id": "0cf1802a-4f89-4f6c-aee3-8f69fbb5defc",
+    "createdAt": "2025-12-12T07:15:10.752Z",
+    "status": "open",
+    "votes": 0,
+    "submitter": {
+      "id": "cmj2hvk2i000119y3xtzc4c7k",
+      "name": "josh@campeveryday.com",
+      "email": "josh@campeveryday.com"
+    },
+    "upvoters": [],
+    "title": "click and drag",
+    "notes": "click and drag doesn' work o selec a sie on he booking char",
+    "url": "http://localhost:3000/calendar?campgroundId=cmj2hvp7t01xh19y3uweosswl",
+    "path": "/calendar",
+    "pageTitle": "Camp Everyday - Find your perfect camping adventure",
+    "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36",
+    "selection": "\n",
+    "extra": {
+      "viewport": {
+        "width": 1000,
+        "height": 966
+      },
+      "referrer": "http://localhost:3000/dashboard"
+    },
+    "category": "issue",
+    "client": {
+      "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36",
+      "platform": "MacIntel",
+      "language": "en-US",
+      "deviceType": "desktop"
+    }
+  },
+  {
+    "id": "e95cc132-9622-4871-b4e1-80c8010050ad",
+    "createdAt": "2025-12-12T07:16:41.982Z",
+    "status": "open",
+    "votes": 0,
+    "submitter": {
+      "id": "cmj2hvk2i000119y3xtzc4c7k",
+      "name": "josh@campeveryday.com",
+      "email": "josh@campeveryday.com"
+    },
+    "upvoters": [],
+    "title": "add on desn't refeclt in price",
+    "notes": "i got an add on firewood bundle and I see it in the notes but it doesn't reflelct on the price",
+    "url": "http://localhost:3000/booking",
+    "path": "/booking",
+    "pageTitle": "Camp Everyday - Find your perfect camping adventure",
+    "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36",
+    "extra": {
+      "viewport": {
+        "width": 1000,
+        "height": 966
+      },
+      "referrer": "http://localhost:3000/dashboard"
+    },
+    "category": "issue",
+    "client": {
+      "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36",
+      "platform": "MacIntel",
+      "language": "en-US",
+      "deviceType": "desktop"
+    }
+  },
+  {
+    "id": "6552c0fb-076f-48b1-918a-6acfe6ba0534",
+    "createdAt": "2025-12-12T07:17:37.012Z",
+    "status": "open",
+    "votes": 0,
+    "submitter": {
+      "id": "cmj2hvk2i000119y3xtzc4c7k",
+      "name": "josh@campeveryday.com",
+      "email": "josh@campeveryday.com"
+    },
+    "upvoters": [],
+    "title": "cash payment",
+    "notes": "i hit chash payment, pay in full. and got this error when i hit pay: balanceAmount must not be less than 0\nCall Stack\n2\n\nparseResponse\nfile:///Users/josh/Documents/GitHub/Campreserv%20(broken)%20copy/platform/apps/web/.next/dev/static/chunks/platform_ffa0cf44._.js (2578:17)\nasync Object.createReservation\nfile:///Users/josh/Documents/GitHub/Campreserv%20(broken)%20copy/platform/apps/web/.next/dev/static/chunks/platform_ffa0cf44._.js (4577:22",
+    "url": "http://localhost:3000/booking",
+    "path": "/booking",
+    "pageTitle": "Camp Everyday - Find your perfect camping adventure",
+    "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36",
+    "extra": {
+      "viewport": {
+        "width": 1207,
+        "height": 966
+      },
+      "referrer": "http://localhost:3000/dashboard"
+    },
+    "category": "issue",
+    "client": {
+      "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36",
+      "platform": "MacIntel",
+      "language": "en-US",
+      "deviceType": "desktop"
+    }
+  },
+  {
+    "id": "3aa75f51-4e18-4111-b2c6-2d8b6324da1c",
+    "createdAt": "2025-12-12T07:18:21.813Z",
+    "status": "open",
+    "votes": 0,
+    "submitter": {
+      "id": "cmj2hvk2i000119y3xtzc4c7k",
+      "name": "josh@campeveryday.com",
+      "email": "josh@campeveryday.com"
+    },
+    "upvoters": [],
+    "title": "guest page sort",
+    "notes": "this page needs to reflect the same sort layout ui we have on ther eservatin page now",
+    "url": "http://localhost:3000/guests",
+    "path": "/guests",
+    "pageTitle": "Camp Everyday - Find your perfect camping adventure",
+    "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36",
+    "extra": {
+      "viewport": {
+        "width": 1207,
+        "height": 966
+      },
+      "referrer": "http://localhost:3000/dashboard"
+    },
+    "category": "issue",
+    "client": {
+      "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36",
+      "platform": "MacIntel",
+      "language": "en-US",
+      "deviceType": "desktop"
+    }
+  },
+  {
+    "id": "4599d582-f57c-4744-abde-570973aaa0b1",
+    "createdAt": "2025-12-12T07:19:20.810Z",
+    "status": "open",
+    "votes": 0,
+    "submitter": {
+      "id": "cmj2hvk2i000119y3xtzc4c7k",
+      "name": "josh@campeveryday.com",
+      "email": "josh@campeveryday.com"
+    },
+    "upvoters": [],
+    "title": "firewood upsel",
+    "notes": "there was fire wood up sells on the booking page, but on this upsell it's not an item?",
+    "url": "http://localhost:3000/settings/upsells",
+    "path": "/settings/upsells",
+    "pageTitle": "Camp Everyday - Find your perfect camping adventure",
+    "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36",
+    "extra": {
+      "viewport": {
+        "width": 1207,
+        "height": 966
+      },
+      "referrer": "http://localhost:3000/dashboard"
+    },
+    "category": "issue",
+    "client": {
+      "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36",
+      "platform": "MacIntel",
+      "language": "en-US",
+      "deviceType": "desktop"
+    }
+  },
+  {
+    "id": "1fb73457-3c15-4aaf-a470-14c931d36a90",
+    "createdAt": "2025-12-12T07:20:31.132Z",
+    "status": "open",
+    "votes": 0,
+    "submitter": {
+      "id": "cmj2hvk2i000119y3xtzc4c7k",
+      "name": "josh@campeveryday.com",
+      "email": "josh@campeveryday.com"
+    },
+    "upvoters": [],
+    "title": "taged to sites",
+    "notes": "this needs to get automaticaly taged to site.custimoation. option: as soon as someone check outs site or cabin is marked as dirty and then you add the clean up instructions",
+    "url": "http://localhost:3000/campgrounds/cmj2hvp7t01xh19y3uweosswl/housekeeping",
+    "path": "/campgrounds/cmj2hvp7t01xh19y3uweosswl/housekeeping",
+    "pageTitle": "Camp Everyday - Find your perfect camping adventure",
+    "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36",
+    "extra": {
+      "viewport": {
+        "width": 1207,
+        "height": 966
+      },
+      "referrer": "http://localhost:3000/dashboard"
+    },
+    "category": "issue",
+    "client": {
+      "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36",
+      "platform": "MacIntel",
+      "language": "en-US",
+      "deviceType": "desktop"
+    }
+  },
+  {
+    "id": "4829acc9-e6c2-4582-8ae9-a04d3026ab79",
+    "createdAt": "2025-12-12T07:21:23.278Z",
+    "status": "open",
+    "votes": 0,
+    "submitter": {
+      "id": "cmj2hvk2i000119y3xtzc4c7k",
+      "name": "josh@campeveryday.com",
+      "email": "josh@campeveryday.com"
+    },
+    "upvoters": [],
+    "title": "adding task",
+    "notes": "adding a task caused an error. also, confusing that we have this page, housekeeping page, and maintance page. should all be in one.",
+    "url": "http://localhost:3000/operations",
+    "path": "/operations",
+    "pageTitle": "Camp Everyday - Find your perfect camping adventure",
+    "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36",
+    "extra": {
+      "viewport": {
+        "width": 1207,
+        "height": 966
+      },
+      "referrer": "http://localhost:3000/dashboard"
+    },
+    "category": "issue",
+    "client": {
+      "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36",
+      "platform": "MacIntel",
+      "language": "en-US",
+      "deviceType": "desktop"
+    }
+  },
+  {
+    "id": "1cfbfc69-3fb9-42ac-a3e7-ea7443024870",
+    "createdAt": "2025-12-12T07:23:04.833Z",
+    "status": "open",
+    "votes": 0,
+    "submitter": {
+      "id": "cmj2hvk2i000119y3xtzc4c7k",
+      "name": "josh@campeveryday.com",
+      "email": "josh@campeveryday.com"
+    },
+    "upvoters": [],
+    "title": "tax",
+    "notes": "why do we have a currency and tax page as well as a tax page, and at mininum why doesn't it reflect the same data?lets make sure theres only on page, and whichever is active is applied to pos, upsells, bookings, etc",
+    "url": "http://localhost:3000/settings/currency-tax",
+    "path": "/settings/currency-tax",
+    "pageTitle": "Camp Everyday - Find your perfect camping adventure",
+    "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36",
+    "extra": {
+      "viewport": {
+        "width": 1207,
+        "height": 966
+      },
+      "referrer": "http://localhost:3000/dashboard"
+    },
+    "category": "issue",
+    "client": {
+      "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36",
+      "platform": "MacIntel",
+      "language": "en-US",
+      "deviceType": "desktop"
+    }
+  },
+  {
+    "id": "083da17d-17e6-4374-b100-632e50c0b458",
+    "createdAt": "2025-12-12T07:24:27.526Z",
+    "status": "open",
+    "votes": 0,
+    "submitter": {
+      "id": "cmj2hvk2i000119y3xtzc4c7k",
+      "name": "josh@campeveryday.com",
+      "email": "josh@campeveryday.com"
+    },
+    "upvoters": [],
+    "title": "saved reports",
+    "notes": "how do you actually save a report?",
+    "url": "http://localhost:3000/reports",
+    "path": "/reports",
+    "pageTitle": "Camp Everyday - Find your perfect camping adventure",
+    "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36",
+    "extra": {
+      "viewport": {
+        "width": 1207,
+        "height": 966
+      },
+      "referrer": "http://localhost:3000/dashboard"
+    },
+    "category": "issue",
+    "client": {
+      "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36",
+      "platform": "MacIntel",
+      "language": "en-US",
+      "deviceType": "desktop"
+    }
+  },
+  {
+    "id": "0e99c89a-7c1b-4d18-ac48-4663ff649bc4",
+    "createdAt": "2025-12-12T07:25:16.997Z",
+    "status": "open",
+    "votes": 0,
+    "submitter": {
+      "id": "cmj2hvk2i000119y3xtzc4c7k",
+      "name": "josh@campeveryday.com",
+      "email": "josh@campeveryday.com"
+    },
+    "upvoters": [],
+    "title": "reports",
+    "notes": "reports need more break downs. need to see everything at large, and as granular as site level, etc",
+    "url": "http://localhost:3000/reports",
+    "path": "/reports",
+    "pageTitle": "Camp Everyday - Find your perfect camping adventure",
+    "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36",
+    "extra": {
+      "viewport": {
+        "width": 1207,
+        "height": 966
+      },
+      "referrer": "http://localhost:3000/dashboard"
+    },
+    "category": "feature",
+    "client": {
+      "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36",
+      "platform": "MacIntel",
+      "language": "en-US",
+      "deviceType": "desktop"
+    }
+  },
+  {
+    "id": "f286caa1-0ec1-4ec9-b0f5-1057054f91fd",
+    "createdAt": "2025-12-12T07:27:21.115Z",
+    "status": "open",
+    "votes": 0,
+    "submitter": {
+      "id": "cmj2hvk2i000119y3xtzc4c7k",
+      "name": "josh@campeveryday.com",
+      "email": "josh@campeveryday.com"
+    },
+    "upvoters": [],
+    "title": "bell notications",
+    "notes": "when i hit the bell for notications and to mark as read, that only works as long until I hit a new page, then the notications are back",
+    "url": "http://localhost:3000/messages",
+    "path": "/messages",
+    "pageTitle": "Camp Everyday - Find your perfect camping adventure",
+    "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36",
+    "extra": {
+      "viewport": {
+        "width": 1207,
+        "height": 966
+      },
+      "referrer": "http://localhost:3000/dashboard"
+    },
+    "category": "issue",
+    "client": {
+      "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36",
+      "platform": "MacIntel",
+      "language": "en-US",
+      "deviceType": "desktop"
+    }
+  },
+  {
+    "id": "c76cb4dc-9e94-4cbc-bd70-b81408b36637",
+    "createdAt": "2025-12-12T07:29:09.811Z",
+    "status": "open",
+    "votes": 0,
+    "submitter": {
+      "id": "cmj2hvk2i000119y3xtzc4c7k",
+      "name": "josh@campeveryday.com",
+      "email": "josh@campeveryday.com"
+    },
+    "upvoters": [],
+    "title": "/reviews",
+    "notes": "theres not a review page",
+    "url": "http://localhost:3000/reviews",
+    "path": "/reviews",
+    "pageTitle": "Camp Everyday - Find your perfect camping adventure",
+    "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36",
+    "extra": {
+      "viewport": {
+        "width": 1207,
+        "height": 966
+      },
+      "referrer": "http://localhost:3000/park/camp-everyday-riverbend"
+    },
+    "category": "issue",
+    "client": {
+      "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36",
+      "platform": "MacIntel",
+      "language": "en-US",
+      "deviceType": "desktop"
+    }
+  },
+  {
+    "id": "934497bb-4c0a-4ede-b8d4-10aedb2a917f",
+    "createdAt": "2025-12-12T07:29:33.247Z",
+    "status": "open",
+    "votes": 0,
+    "submitter": {
+      "id": "cmj2hvk2i000119y3xtzc4c7k",
+      "name": "josh@campeveryday.com",
+      "email": "josh@campeveryday.com"
+    },
+    "upvoters": [],
+    "title": "FAQS",
+    "notes": "theres no way for an owner currently to add FAQS",
+    "url": "http://localhost:3000/park/camp-everyday-riverbend",
+    "path": "/park/camp-everyday-riverbend",
+    "pageTitle": "Camp Everyday – Riverbend | Book stays, events, deals | Camp Everyday",
+    "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36",
+    "extra": {
+      "viewport": {
+        "width": 1207,
+        "height": 966
+      },
+      "referrer": ""
+    },
+    "category": "issue",
+    "client": {
+      "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36",
+      "platform": "MacIntel",
+      "language": "en-US",
+      "deviceType": "desktop"
+    }
+  },
+  {
+    "id": "733f9979-086d-46a3-ae59-45620799525d",
+    "createdAt": "2025-12-12T07:29:56.645Z",
+    "status": "open",
+    "votes": 0,
+    "submitter": {
+      "id": "cmj2hvk2i000119y3xtzc4c7k",
+      "name": "josh@campeveryday.com",
+      "email": "josh@campeveryday.com"
+    },
+    "upvoters": [],
+    "title": "guest reviews",
+    "notes": "there is two guest reviews on the top of the page...",
+    "url": "http://localhost:3000/park/camp-everyday-riverbend",
+    "path": "/park/camp-everyday-riverbend",
+    "pageTitle": "Camp Everyday – Riverbend | Book stays, events, deals | Camp Everyday",
+    "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36",
+    "extra": {
+      "viewport": {
+        "width": 1207,
+        "height": 966
+      },
+      "referrer": ""
+    },
+    "category": "issue",
+    "client": {
+      "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36",
+      "platform": "MacIntel",
+      "language": "en-US",
+      "deviceType": "desktop"
+    }
+  },
+  {
+    "id": "46e11b03-bada-44eb-9efb-44341daf121d",
+    "createdAt": "2025-12-12T07:31:43.636Z",
+    "status": "open",
+    "votes": 0,
+    "submitter": {
+      "id": "cmj2hvk2i000119y3xtzc4c7k",
+      "name": "josh@campeveryday.com",
+      "email": "josh@campeveryday.com"
+    },
+    "upvoters": [],
+    "title": "inaccurant error",
+    "notes": "on the marketing pages. /owners. there isn't 500+ campgorunds.. there's not even 1.. make sure all info is actually accurate on these pages...",
+    "url": "http://localhost:3000/owners",
+    "path": "/owners",
+    "pageTitle": "Camp Everyday Host - Campground Management Software | Camp Everyday",
+    "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36",
+    "extra": {
+      "viewport": {
+        "width": 1207,
+        "height": 966
+      },
+      "referrer": "http://localhost:3000/"
+    },
+    "category": "issue",
+    "client": {
+      "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36",
+      "platform": "MacIntel",
+      "language": "en-US",
+      "deviceType": "desktop"
+    }
+  },
+  {
+    "id": "43a8434f-745d-482b-af55-7cde2804cb8c",
+    "createdAt": "2025-12-12T07:33:01.671Z",
+    "status": "open",
+    "votes": 0,
+    "submitter": {
+      "id": "cmj2hvk2i000119y3xtzc4c7k",
+      "name": "josh@campeveryday.com",
+      "email": "josh@campeveryday.com"
+    },
+    "upvoters": [],
+    "title": "better hybird pricig",
+    "notes": "lets do a more hybrid pricing. a monthy fee plus per booking that can be passed to guests, or eaten, campground dependant. and something more affordable then the big names.",
+    "url": "http://localhost:3000/owners#pricing",
+    "path": "/owners",
+    "pageTitle": "Camp Everyday Host - Campground Management Software | Camp Everyday",
+    "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36",
+    "extra": {
+      "viewport": {
+        "width": 1207,
+        "height": 966
+      },
+      "referrer": "http://localhost:3000/"
+    },
+    "category": "issue",
+    "client": {
+      "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36",
+      "platform": "MacIntel",
+      "language": "en-US",
+      "deviceType": "desktop"
+    }
+  },
+  {
+    "id": "64c4ce01-0aee-47e3-9ff2-6710429d02b0",
+    "createdAt": "2025-12-12T07:33:58.348Z",
+    "status": "open",
+    "votes": 0,
+    "submitter": {
+      "id": "cmj2hvk2i000119y3xtzc4c7k",
+      "name": "josh@campeveryday.com",
+      "email": "josh@campeveryday.com"
+    },
+    "upvoters": [],
+    "title": "request demo",
+    "notes": "where does the request demo go to>",
+    "url": "http://localhost:3000/owners#pricing",
+    "path": "/owners",
+    "pageTitle": "Camp Everyday Host - Campground Management Software | Camp Everyday",
+    "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36",
+    "extra": {
+      "viewport": {
+        "width": 1207,
+        "height": 966
+      },
+      "referrer": "http://localhost:3000/"
+    },
+    "category": "issue",
+    "client": {
+      "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36",
+      "platform": "MacIntel",
+      "language": "en-US",
+      "deviceType": "desktop"
+    }
+  },
+  {
+    "id": "b9c429b2-f15b-492a-8fc1-73ad74ce3a1a",
+    "createdAt": "2025-12-12T15:16:52.641Z",
+    "status": "open",
+    "votes": 0,
+    "submitter": {
+      "id": "cmj2hvk2i000119y3xtzc4c7k",
+      "name": "josh@campeveryday.com",
+      "email": "josh@campeveryday.com"
+    },
+    "upvoters": [],
+    "title": "kiosk, select a site",
+    "notes": "when selecting a site it would be nice to filter by cabin, tent, tv, then by amendities, 50 amps, 30 amps, sewer, etc",
+    "url": "http://localhost:3000/kiosk",
+    "path": "/kiosk",
+    "pageTitle": "Camp Everyday - Find your perfect camping adventure",
+    "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36",
+    "extra": {
+      "viewport": {
+        "width": 1207,
+        "height": 966
+      },
+      "referrer": ""
+    },
+    "category": "issue",
+    "client": {
+      "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36",
+      "platform": "MacIntel",
+      "language": "en-US",
+      "deviceType": "desktop"
+    }
+  },
+  {
+    "id": "11826caa-2f8e-49ae-85ef-53ad7e9e1269",
+    "createdAt": "2025-12-12T15:17:51.110Z",
+    "status": "open",
+    "votes": 0,
+    "submitter": {
+      "id": "cmj2hvk2i000119y3xtzc4c7k",
+      "name": "josh@campeveryday.com",
+      "email": "josh@campeveryday.com"
+    },
+    "upvoters": [],
+    "title": "guest info",
+    "notes": "after i put in the guest infi, i hit enter and got an error: Console Error\n\n\nInternal server error\nCall Stack\n3\n\nparseResponse\nfile:///Users/josh/Documents/GitHub/Campreserv%20(broken)%20copy/platform/apps/web/.next/dev/static/chunks/platform_ffa0cf44._.js (2578:17)\nasync Object.createPublicReservation\nfile:///Users/josh/Documents/GitHub/Campreserv%20(broken)%20copy/platform/apps/web/.next/dev/static/chunks/platform_ffa0cf44._.js (5924:22)\nasync handleWalkInSubmit\nfile:///Users/josh/Documents/GitHub/Campreserv%20(broken)%20copy/platform/apps/web/.next/dev/static/chunks/platform_apps_web_4bf9e58e._.js (965:28)",
+    "url": "http://localhost:3000/kiosk",
+    "path": "/kiosk",
+    "pageTitle": "Camp Everyday - Find your perfect camping adventure",
+    "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36",
+    "extra": {
+      "viewport": {
+        "width": 1207,
+        "height": 966
+      },
+      "referrer": ""
+    },
+    "category": "issue",
+    "client": {
+      "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36",
+      "platform": "MacIntel",
+      "language": "en-US",
+      "deviceType": "desktop"
+    }
   }
 ]
