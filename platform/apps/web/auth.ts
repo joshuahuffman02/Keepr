@@ -2,7 +2,10 @@ import NextAuth from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 import type { User } from "next-auth";
 
+
+
 const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "http://localhost:4000/api";
+
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
   providers: [
