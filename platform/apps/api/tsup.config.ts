@@ -24,7 +24,7 @@ export default defineConfig([
     format: ["cjs"],
     platform: "node",
     target: "node20",
-    outDir: "../../api",
+    outDir: "../../../api",
     sourcemap: false,
     clean: false,
     splitting: false,
