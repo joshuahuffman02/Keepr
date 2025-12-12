@@ -13,6 +13,7 @@ import { CreateEventSchema, EventTypeSchema } from "@campreserv/shared";
 import { useToast } from "@/components/ui/use-toast";
 import { Loader2 } from "lucide-react";
 import { z } from "zod";
+import { useState } from "react";
 
 interface CreateEventDialogProps {
     open: boolean;
@@ -29,8 +30,10 @@ export function CreateEventDialog({ open, onOpenChange, onSuccess, campgroundId 
         isAllDay: false,
         isGuestOnly: true,
         isPublished: true,
-        priceCents: 0
+        priceCents: 0,
+        imageUrl: ""
     });
+    const [uploading, setUploading] = useState(false);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -50,7 +53,8 @@ export function CreateEventDialog({ open, onOpenChange, onSuccess, campgroundId 
                 priceCents: formData.priceCents,
                 isGuestOnly: formData.isGuestOnly,
                 isPublished: formData.isPublished,
-                isAllDay: formData.isAllDay
+                isAllDay: formData.isAllDay,
+                imageUrl: formData.imageUrl || undefined
             });
 
             toast({
@@ -64,7 +68,8 @@ export function CreateEventDialog({ open, onOpenChange, onSuccess, campgroundId 
                 isAllDay: false,
                 isGuestOnly: true,
                 isPublished: true,
-                priceCents: 0
+                priceCents: 0,
+                imageUrl: ""
             });
         } catch (error) {
             console.error(error);
@@ -191,6 +196,38 @@ export function CreateEventDialog({ open, onOpenChange, onSuccess, campgroundId 
                             onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                             placeholder="Details about the event..."
                         />
+                    </div>
+
+                    <div className="space-y-2">
+                        <Label htmlFor="imageUrl">Image URL (optional)</Label>
+                        <Input
+                            id="imageUrl"
+                            type="url"
+                            value={formData.imageUrl || ""}
+                            onChange={(e) => setFormData({ ...formData, imageUrl: e.target.value })}
+                            placeholder="https://images.example.com/event.jpg"
+                        />
+                        <div className="flex items-center gap-2">
+                            <input
+                                type="file"
+                                accept="image/*"
+                                onChange={async (e) => {
+                                    const file = e.target.files?.[0];
+                                    if (!file) return;
+                                    setUploading(true);
+                                    try {
+                                        const signed = await apiClient.signUpload({ filename: file.name, contentType: file.type });
+                                        await fetch(signed.uploadUrl, { method: "PUT", body: file, headers: { "Content-Type": file.type } });
+                                        setFormData((s) => ({ ...s, imageUrl: signed.publicUrl }));
+                                    } catch (err) {
+                                        toast({ title: "Upload failed", description: (err as Error).message, variant: "destructive" });
+                                    } finally {
+                                        setUploading(false);
+                                    }
+                                }}
+                            />
+                            {uploading && <Loader2 className="h-4 w-4 animate-spin text-slate-500" />}
+                        </div>
                     </div>
 
                     <div className="grid grid-cols-2 gap-4">

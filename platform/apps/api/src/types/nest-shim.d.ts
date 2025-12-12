@@ -27,6 +27,7 @@ declare module "@nestjs/common" {
   export const UnauthorizedException: any;
   export const ForbiddenException: any;
   export const ConflictException: any;
+  export const TooManyRequestsException: any;
   export const SetMetadata: any;
   export const Logger: any;
   export const Global: any;

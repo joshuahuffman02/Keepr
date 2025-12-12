@@ -385,6 +385,9 @@ export default function PricingRulesV2Page() {
                     value={formData.priority}
                     onChange={(e) => setFormData({ ...formData, priority: parseInt(e.target.value) || 0 })}
                   />
+                  <p className="text-xs text-slate-500 mt-1">
+                    Lower numbers run first. If rules overlap, priority decides which wins (e.g., 1 beats 10).
+                  </p>
                 </div>
               </div>
 

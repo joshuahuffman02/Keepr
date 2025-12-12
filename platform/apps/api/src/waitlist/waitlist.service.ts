@@ -1,8 +1,10 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { ConflictException, Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { EmailService } from '../email/email.service';
 import { CreateWaitlistEntryDto } from '@campreserv/shared';
-import { WaitlistStatus, WaitlistType } from '@prisma/client';
+import { IdempotencyStatus, WaitlistStatus, WaitlistType } from '@prisma/client';
+import { IdempotencyService } from '../payments/idempotency.service';
+import { ObservabilityService } from '../observability/observability.service';
 
 interface CreateStaffWaitlistDto {
     campgroundId: string;
@@ -35,6 +37,8 @@ export class WaitlistService {
     constructor(
         private readonly prisma: PrismaService,
         private readonly emailService: EmailService,
+        private readonly idempotency: IdempotencyService,
+        private readonly observability: ObservabilityService,
     ) { }
 
     /**
@@ -100,17 +104,58 @@ export class WaitlistService {
         return { score, reasons };
     }
 
-    async create(dto: CreateWaitlistEntryDto) {
-        return this.prisma.waitlistEntry.create({
+    async create(dto: CreateWaitlistEntryDto, idempotencyKey?: string, sequence?: string | number | null, actor?: any) {
+        const scope = { campgroundId: (dto as any).campgroundId ?? actor?.campgroundId ?? null, tenantId: (dto as any).tenantId ?? actor?.tenantId ?? null };
+        const scopeKey = this.scopeKey(scope);
+        if (sequence) {
+            const seqExisting = await this.idempotency.findBySequence(scopeKey, "waitlist/create", sequence);
+            if (seqExisting?.responseJson) {
+                this.logger.warn(`Duplicate waitlist create seq ${sequence} scope ${scopeKey}`);
+                return seqExisting.responseJson;
+            }
+            if (seqExisting) {
+                this.logger.warn(`Waitlist create seq ${sequence} already processed without snapshot for scope ${scopeKey}`);
+                throw new ConflictException("Waitlist request already processed");
+            }
+        }
+        const existing = await this.guardIdempotency(idempotencyKey, dto, scope, "waitlist/create", sequence);
+        if (existing?.status === IdempotencyStatus.succeeded && existing.responseJson) return existing.responseJson;
+        if (existing?.status === IdempotencyStatus.inflight && existing.createdAt && Date.now() - new Date(existing.createdAt).getTime() < 60000) {
+            throw new ConflictException("Request already in progress");
+        }
+
+        const result = await this.prisma.waitlistEntry.create({
             data: {
                 ...dto,
                 status: WaitlistStatus.active,
             },
         });
+
+        if (idempotencyKey) await this.idempotency.complete(idempotencyKey, result);
+        return result;
     }
 
-    async createStaffEntry(dto: CreateStaffWaitlistDto) {
-        return this.prisma.waitlistEntry.create({
+    async createStaffEntry(dto: CreateStaffWaitlistDto, idempotencyKey?: string, sequence?: string | number | null, actor?: any) {
+        const scope = { campgroundId: dto.campgroundId ?? actor?.campgroundId ?? null, tenantId: actor?.tenantId ?? null };
+        const scopeKey = this.scopeKey(scope);
+        if (sequence) {
+            const seqExisting = await this.idempotency.findBySequence(scopeKey, "waitlist/staff", sequence);
+            if (seqExisting?.responseJson) {
+                this.logger.warn(`Duplicate staff waitlist create seq ${sequence} scope ${scopeKey}`);
+                return seqExisting.responseJson;
+            }
+            if (seqExisting) {
+                this.logger.warn(`Staff waitlist create seq ${sequence} already processed for scope ${scopeKey}`);
+                throw new ConflictException("Waitlist request already processed");
+            }
+        }
+        const existing = await this.guardIdempotency(idempotencyKey, dto, scope, "waitlist/staff", sequence);
+        if (existing?.status === IdempotencyStatus.succeeded && existing.responseJson) return existing.responseJson;
+        if (existing?.status === IdempotencyStatus.inflight && existing.createdAt && Date.now() - new Date(existing.createdAt).getTime() < 60000) {
+            throw new ConflictException("Request already in progress");
+        }
+
+        const result = await this.prisma.waitlistEntry.create({
             data: {
                 campgroundId: dto.campgroundId,
                 type: dto.type as WaitlistType,
@@ -131,6 +176,9 @@ export class WaitlistService {
             },
             include: { site: true, siteClass: true },
         });
+
+        if (idempotencyKey) await this.idempotency.complete(idempotencyKey, result);
+        return result;
     }
 
     async updateEntry(id: string, updates: Partial<CreateStaffWaitlistDto>) {
@@ -182,6 +230,50 @@ export class WaitlistService {
         });
     }
 
+    async accept(id: string, idempotencyKey?: string, sequence?: string | number | null, actor?: any) {
+        const scope = { campgroundId: actor?.campgroundId ?? null, tenantId: actor?.tenantId ?? null };
+        const scopeKey = this.scopeKey(scope);
+        if (sequence) {
+            const seqExisting = await this.idempotency.findBySequence(scopeKey, "waitlist/accept", sequence);
+            if (seqExisting?.responseJson) {
+                this.logger.warn(`Duplicate waitlist accept seq ${sequence} scope ${scopeKey}`);
+                return seqExisting.responseJson;
+            }
+            if (seqExisting) {
+                this.logger.warn(`Waitlist accept seq ${sequence} already processed for scope ${scopeKey}`);
+                throw new ConflictException("Waitlist accept already processed");
+            }
+        }
+        const existing = await this.guardIdempotency(idempotencyKey, { entryId: id }, scope, "waitlist/accept", sequence);
+        if (existing?.status === IdempotencyStatus.succeeded && existing.responseJson) return existing.responseJson;
+        if (existing?.status === IdempotencyStatus.inflight && existing.createdAt && Date.now() - new Date(existing.createdAt).getTime() < 60000) {
+            throw new ConflictException("Request already in progress");
+        }
+
+        const entry = await this.prisma.waitlistEntry.findUnique({ where: { id } });
+        if (!entry) {
+            if (idempotencyKey) await this.idempotency.fail(idempotencyKey);
+            throw new NotFoundException("Waitlist entry not found");
+        }
+        if (entry.status === WaitlistStatus.fulfilled) {
+            if (idempotencyKey) await this.idempotency.fail(idempotencyKey);
+            throw new ConflictException("Waitlist entry already accepted");
+        }
+        if (entry.status !== WaitlistStatus.active) {
+            if (idempotencyKey) await this.idempotency.fail(idempotencyKey);
+            throw new ConflictException("Waitlist entry not active");
+        }
+
+        const response = await this.prisma.waitlistEntry.update({
+            where: { id },
+            data: { status: WaitlistStatus.fulfilled }
+        });
+
+        const snapshot = { entryId: id, status: "accepted" as const };
+        if (idempotencyKey) await this.idempotency.complete(idempotencyKey, snapshot);
+        return snapshot;
+    }
+
     /**
      * Check waitlist for matches after a cancellation.
      * Returns prioritized matches sorted by score.
@@ -216,10 +308,10 @@ export class WaitlistService {
         });
 
         // Calculate priority scores and sort
-        const scoredMatches: WaitlistMatch[] = entries.map(entry => {
+        const scoredMatches: WaitlistMatch[] = entries.map((entry: any) => {
             const { score, reasons } = this.calculatePriorityScore(entry, arrival, departure);
             return { entry, score, reasons };
-        }).sort((a, b) => b.score - a.score);
+        }).sort((a: WaitlistMatch, b: WaitlistMatch) => b.score - a.score);
 
         this.logger.log(`Found ${scoredMatches.length} waitlist matches, sorted by priority.`);
         return scoredMatches;
@@ -293,6 +385,16 @@ export class WaitlistService {
                     }
                 });
 
+                // Record offer lag for observability (time from entry creation to notification)
+                const createdAt = entry.createdAt ? new Date(entry.createdAt).getTime() : Date.now();
+                const lagSeconds = Math.max(0, (Date.now() - createdAt) / 1000);
+                this.observability.recordOfferLag(lagSeconds, {
+                    entryId: entry.id,
+                    campgroundId: entry.campgroundId,
+                    autoOffer: isAutoOffer,
+                    status: isAutoOffer ? 'auto_offer' : 'notify'
+                });
+
                 notified++;
                 if (isAutoOffer) autoOffered++;
 
@@ -337,5 +439,25 @@ export class WaitlistService {
 
         this.logger.log(`Expired ${result.count} old waitlist entries for campground ${campgroundId}`);
         return result.count;
+    }
+
+    private scopeKey(scope: { campgroundId?: string | null; tenantId?: string | null }) {
+        return scope.tenantId ?? scope.campgroundId ?? "global";
+    }
+
+    private async guardIdempotency(
+        key: string | undefined,
+        body: any,
+        scope: { campgroundId?: string | null; tenantId?: string | null },
+        endpoint: string,
+        sequence?: string | number | null
+    ) {
+        if (!key) return null;
+        return this.idempotency.start(key, body ?? {}, scope.campgroundId ?? null, {
+            tenantId: scope.tenantId ?? null,
+            endpoint,
+            sequence,
+            rateAction: "apply"
+        });
     }
 }

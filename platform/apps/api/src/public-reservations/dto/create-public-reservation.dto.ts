@@ -1,5 +1,6 @@
 import { Type } from "class-transformer";
-import { IsArray, IsBoolean, IsDateString, IsEmail, IsInt, IsNotEmpty, IsOptional, IsString, Length, Matches, Min, ValidateNested } from "class-validator";
+import { IsArray, IsBoolean, IsDateString, IsEmail, IsEnum, IsInt, IsNotEmpty, IsOptional, IsString, Length, Matches, Min, ValidateNested } from "class-validator";
+import { StayReasonPreset } from "@prisma/client";
 
 export class PublicGuestDto {
     @IsString()
@@ -140,9 +141,33 @@ export class CreatePublicReservationDto {
     taxWaiverSigned?: boolean;
 
     @IsOptional()
+    @IsString()
+    stayReasonPreset?: StayReasonPreset;
+
+    @IsOptional()
+    @IsString()
+    stayReasonOther?: string;
+
+    @IsOptional()
+    @IsString()
+    referralCode?: string;
+
+    @IsOptional()
+    @IsString()
+    referralSource?: string;
+
+    @IsOptional()
+    @IsString()
+    referralChannel?: string;
+
+    @IsOptional()
     @ValidateNested()
     @Type(() => PublicEquipmentDto)
     equipment?: PublicEquipmentDto;
+
+    @IsOptional()
+    @IsBoolean()
+    needsAccessible?: boolean;
 
     @IsOptional()
     @IsString()
@@ -208,4 +233,12 @@ export class PublicQuoteDto {
     @IsOptional()
     @IsString()
     membershipId?: string;
+
+    @IsOptional()
+    @IsString()
+    referralCode?: string;
+
+    @IsOptional()
+    @IsString()
+    stayReasonPreset?: StayReasonPreset;
 }

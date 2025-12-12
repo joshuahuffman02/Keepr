@@ -31,7 +31,7 @@ export function SearchBar({ onSearch }: SearchBarProps) {
     return (
         <div className="w-full max-w-4xl mx-auto px-4 sm:px-0">
             {/* Main search bar */}
-            <div className="relative">
+            <div className="relative z-30">
                 <div className="flex flex-col gap-2 sm:flex-row sm:items-center bg-white rounded-2xl shadow-2xl shadow-slate-900/10 border border-slate-200/50 overflow-hidden p-3 sm:p-0">
                     {/* Search icon */}
                     <div className="pl-1 sm:pl-5 pr-2 sm:pr-3 self-start sm:self-center">
@@ -73,7 +73,7 @@ export function SearchBar({ onSearch }: SearchBarProps) {
 
                 {/* Expanded filters */}
                 {isExpanded && (
-                    <div className="absolute top-full left-0 right-0 mt-3 p-6 bg-white rounded-2xl shadow-2xl shadow-slate-900/10 border border-slate-200/50 z-10">
+                    <div className="absolute top-full left-0 right-0 mt-3 p-6 bg-white rounded-2xl shadow-2xl shadow-slate-900/10 border border-slate-200/50 z-50">
                         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                             {/* Location */}
                             <div className="space-y-2">

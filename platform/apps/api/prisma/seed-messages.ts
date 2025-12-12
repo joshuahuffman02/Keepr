@@ -1,11 +1,16 @@
 import { PrismaClient, SenderType } from '@prisma/client';
 import * as dotenv from 'dotenv';
 import * as path from 'path';
+import { PrismaPg } from '@prisma/adapter-pg';
 
 // Load env from root
 dotenv.config({ path: path.resolve(__dirname, '../../../../.env') });
 
-const prisma = new PrismaClient();
+const adapter = new PrismaPg({
+  connectionString: process.env.DATABASE_URL || process.env.PLATFORM_DATABASE_URL
+});
+// @ts-ignore Prisma 7 adapter signature
+const prisma = new PrismaClient({ adapter });
 
 // Helper to generate random dates in the past
 function randomPastDate(daysAgo: number): Date {

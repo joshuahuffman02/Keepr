@@ -93,12 +93,19 @@ export class SmsService {
     } catch (err) {
       this.logger.warn(`Twilio send attempt 1 failed, retrying: ${err}`);
       try {
-        await new Promise((resolve) => setTimeout(resolve, 250));
+        await new Promise((resolve) => setTimeout(resolve, 500));
         return await attemptSend();
       } catch (err2) {
         this.telemetry.failed++;
         this.logger.error(`Twilio retry failed for ${opts.to}: ${err2}`);
-        return { provider: "twilio", fallback: "send_failed", success: false };
+        // Backoff and final attempt before failing closed
+        try {
+          await new Promise((resolve) => setTimeout(resolve, 1200));
+          return await attemptSend();
+        } catch (err3) {
+          this.logger.error(`Twilio final attempt failed for ${opts.to}: ${err3}`);
+          return { provider: "twilio", fallback: "send_failed", success: false };
+        }
       }
     }
   }

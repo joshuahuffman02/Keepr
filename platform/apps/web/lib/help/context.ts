@@ -8,6 +8,7 @@ export const helpContextMap: { match: RegExp; topicIds: string[] }[] = [
   { match: /^\/campgrounds\/[^/]+\/sites/, topicIds: ["sites-management", "site-classes", "maintenance-work-orders"] },
   { match: /^\/campgrounds\/[^/]+\/classes/, topicIds: ["site-classes", "pricing-rules"] },
   { match: /^\/campgrounds(\/|$)/, topicIds: ["campground-setup", "sites-management", "site-classes"] },
+  { match: /^\/settings\/pricing-rules/, topicIds: ["pricing-rules", "site-classes"] },
   { match: /^\/pricing/, topicIds: ["pricing-rules", "site-classes"] },
   { match: /^\/maintenance/, topicIds: ["maintenance-work-orders", "maintenance-cleaning", "blackout-dates"] },
   { match: /^\/ledger/, topicIds: ["ledger-close-day", "payments-collect", "payments-refund"] },

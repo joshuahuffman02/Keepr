@@ -405,7 +405,7 @@
   {
     "id": "9d4c886b-1736-4c42-a08b-ca0576e1e4a0",
     "createdAt": "2025-12-10T21:21:59.847Z",
-    "status": "open",
+    "status": "completed",
     "votes": 0,
     "submitter": {
       "id": "cmizgft380000c5h03gmly7br",
@@ -425,6 +425,1451 @@
         "height": 1008
       },
       "referrer": ""
+    },
+    "category": "issue",
+    "client": {
+      "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36",
+      "platform": "MacIntel",
+      "language": "en-US",
+      "deviceType": "desktop"
+    },
+    "completedAt": "2025-12-11T01:59:59.583Z",
+    "agentNotes": "Notifications bell now has working mark-resolved/read with local state: items mark as resolved/read and can be opened; footer points to inbox instead of roadmap updates. Added open buttons and fixed badge counts."
+  },
+  {
+    "id": "de3c223f-9350-44b9-b824-8c45cfc386e7",
+    "createdAt": "2025-12-11T00:06:40.463Z",
+    "status": "completed",
+    "votes": 0,
+    "submitter": {
+      "id": null,
+      "name": null,
+      "email": null
+    },
+    "upvoters": [],
+    "title": "Saved campgroind",
+    "notes": "When I save’hesrt’ A campground on the homepage where does that go?",
+    "url": "https://camp.everyday.host.ngrok-free.app/",
+    "path": "/",
+    "pageTitle": "Camp Everyday - Find your perfect camping adventure | Camp Everyday",
+    "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 18_7 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.2 Mobile/15E148 Safari/604.1",
+    "extra": {
+      "viewport": {
+        "width": 352,
+        "height": 625
+      },
+      "referrer": ""
+    },
+    "category": "question",
+    "client": {
+      "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 18_7 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.2 Mobile/15E148 Safari/604.1",
+      "platform": "iPhone",
+      "language": "en-US",
+      "deviceType": "mobile"
+    },
+    "completedAt": "2025-12-11T02:10:29.581Z",
+    "agentNotes": "Hearts now persist locally in your browser (saved list stored on this device). A helper note explains this near Featured; hearting updates local storage so favorites stick between visits.\n\nResponse: cool, shouldmt it save to the users, the guest, list of favs?"
+  },
+  {
+    "id": "f552716e-2894-4a7a-b82a-fc169f934330",
+    "createdAt": "2025-12-11T00:07:44.888Z",
+    "status": "completed",
+    "votes": 0,
+    "submitter": {
+      "id": null,
+      "name": null,
+      "email": null
+    },
+    "upvoters": [],
+    "title": "Lead capture",
+    "notes": "The whole lead capture on the bottom is weird. Why call it publicly a lead capture? Isn’t that an internal name?",
+    "url": "https://camp.everyday.host.ngrok-free.app/",
+    "path": "/",
+    "pageTitle": "Camp Everyday - Find your perfect camping adventure | Camp Everyday",
+    "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 18_7 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.2 Mobile/15E148 Safari/604.1",
+    "extra": {
+      "viewport": {
+        "width": 352,
+        "height": 625
+      },
+      "referrer": ""
+    },
+    "category": "issue",
+    "client": {
+      "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 18_7 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.2 Mobile/15E148 Safari/604.1",
+      "platform": "iPhone",
+      "language": "en-US",
+      "deviceType": "mobile"
+    },
+    "completedAt": "2025-12-11T02:03:04.868Z",
+    "agentNotes": "Renamed homepage lead-capture section to “Request a demo”, removed internal/CRM language, clarified no external sync; CTA title now “Request a walkthrough.”"
+  },
+  {
+    "id": "eeb5c942-c68d-40eb-af11-fea88ff8b71a",
+    "createdAt": "2025-12-11T00:09:35.484Z",
+    "status": "completed",
+    "votes": 0,
+    "submitter": {
+      "id": null,
+      "name": null,
+      "email": null
+    },
+    "upvoters": [],
+    "title": "Marketing",
+    "notes": "Marketing page should use actual screen shots. Also, we don’t have any listings yet so make sure the data reflects that in creative ways.",
+    "url": "https://camp.everyday.host.ngrok-free.app/owners",
+    "path": "/owners",
+    "pageTitle": "Camp Everyday Host - Campground Management Software | Camp Everyday",
+    "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 18_7 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.2 Mobile/15E148 Safari/604.1",
+    "extra": {
+      "viewport": {
+        "width": 352,
+        "height": 625
+      },
+      "referrer": "https://camp.everyday.host.ngrok-free.app/"
+    },
+    "category": "issue",
+    "client": {
+      "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 18_7 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.2 Mobile/15E148 Safari/604.1",
+      "platform": "iPhone",
+      "language": "en-US",
+      "deviceType": "mobile"
+    },
+    "completedAt": "2025-12-11T02:34:23.771Z",
+    "agentNotes": "Owners page now shows real product imagery for hero and feature previews; swapped placeholders for actual dashboard/feature screenshots and refreshed floating stats copy."
+  },
+  {
+    "id": "17148171-3536-483a-84cd-4d46ded0dac3",
+    "createdAt": "2025-12-11T00:10:43.708Z",
+    "status": "completed",
+    "votes": 0,
+    "submitter": {
+      "id": null,
+      "name": null,
+      "email": null
+    },
+    "upvoters": [],
+    "title": "The tools campground owners love most",
+    "notes": "When I’m clicking tools in this section the preview for them is way below where the screen is. So you have to scroll up and down to view the info",
+    "url": "https://camp.everyday.host.ngrok-free.app/owners",
+    "path": "/owners",
+    "pageTitle": "Camp Everyday Host - Campground Management Software | Camp Everyday",
+    "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 18_7 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.2 Mobile/15E148 Safari/604.1",
+    "extra": {
+      "viewport": {
+        "width": 352,
+        "height": 625
+      },
+      "referrer": "https://camp.everyday.host.ngrok-free.app/"
+    },
+    "category": "issue",
+    "client": {
+      "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 18_7 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.2 Mobile/15E148 Safari/604.1",
+      "platform": "iPhone",
+      "language": "en-US",
+      "deviceType": "mobile"
+    },
+    "completedAt": "2025-12-11T02:25:44.767Z",
+    "agentNotes": "Owners “Popular Features” tabs now scroll the preview into view on mobile, so you don’t have to scroll back up to see the content."
+  },
+  {
+    "id": "ac192128-2833-4838-b12e-65578a5ea5ff",
+    "createdAt": "2025-12-11T00:17:01.462Z",
+    "status": "completed",
+    "votes": 0,
+    "submitter": {
+      "id": null,
+      "name": null,
+      "email": null
+    },
+    "upvoters": [],
+    "title": "When someone requests a demo",
+    "notes": "When some one requests a demo where does that info go? It should go to a page where the campground software employees have.",
+    "url": "https://camp.everyday.host.ngrok-free.app/owners",
+    "path": "/owners",
+    "pageTitle": "Camp Everyday Host - Campground Management Software | Camp Everyday",
+    "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 18_7 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.2 Mobile/15E148 Safari/604.1",
+    "extra": {
+      "viewport": {
+        "width": 352,
+        "height": 625
+      },
+      "referrer": "https://camp.everyday.host.ngrok-free.app/"
+    },
+    "category": "issue",
+    "client": {
+      "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 18_7 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.2 Mobile/15E148 Safari/604.1",
+      "platform": "iPhone",
+      "language": "en-US",
+      "deviceType": "mobile"
+    },
+    "completedAt": "2025-12-11T03:21:08.510Z",
+    "agentNotes": "Demo requests (lead form) are saved to Admin > Marketing > Leads (per campground). Statuses new/contacted/qualified and a stubbed “Sync to CRM” are available; no external CRM calls are made."
+  },
+  {
+    "id": "86da3289-8ebc-4a19-b75a-6149536303e4",
+    "createdAt": "2025-12-11T00:17:43.078Z",
+    "status": "completed",
+    "votes": 0,
+    "submitter": {
+      "id": null,
+      "name": null,
+      "email": null
+    },
+    "upvoters": [],
+    "title": "Blog page missing header and footer",
+    "notes": "The blog page is missing the standard header and footer.",
+    "url": "https://camp.everyday.host.ngrok-free.app/blog",
+    "path": "/blog",
+    "pageTitle": "Blog - Camp Everyday | Camp Everyday",
+    "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 18_7 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.2 Mobile/15E148 Safari/604.1",
+    "extra": {
+      "viewport": {
+        "width": 352,
+        "height": 625
+      },
+      "referrer": "https://camp.everyday.host.ngrok-free.app/"
+    },
+    "category": "issue",
+    "client": {
+      "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 18_7 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.2 Mobile/15E148 Safari/604.1",
+      "platform": "iPhone",
+      "language": "en-US",
+      "deviceType": "mobile"
+    },
+    "completedAt": "2025-12-11T02:04:38.827Z",
+    "agentNotes": "Blog page now includes the standard public header and footer for consistent navigation and branding."
+  },
+  {
+    "id": "6bd5368d-41a1-4f06-868e-77d021fc28fc",
+    "createdAt": "2025-12-11T00:18:22.515Z",
+    "status": "completed",
+    "votes": 0,
+    "submitter": {
+      "id": null,
+      "name": null,
+      "email": null
+    },
+    "upvoters": [],
+    "title": "Missing pages",
+    "notes": "We don’t have an api page or case study page.",
+    "url": "https://camp.everyday.host.ngrok-free.app/owners",
+    "path": "/owners",
+    "pageTitle": "Camp Everyday Host - Campground Management Software | Camp Everyday",
+    "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 18_7 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.2 Mobile/15E148 Safari/604.1",
+    "extra": {
+      "viewport": {
+        "width": 352,
+        "height": 625
+      },
+      "referrer": "https://camp.everyday.host.ngrok-free.app/"
+    },
+    "category": "issue",
+    "client": {
+      "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 18_7 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.2 Mobile/15E148 Safari/604.1",
+      "platform": "iPhone",
+      "language": "en-US",
+      "deviceType": "mobile"
+    },
+    "completedAt": "2025-12-11T02:41:14.361Z",
+    "agentNotes": "Added public developers page (API preview) and case studies page; placeholders removed for missing API/case study pages."
+  },
+  {
+    "id": "130a5c69-ba2f-42eb-918f-1b2f8c6dd09b",
+    "createdAt": "2025-12-11T00:18:50.995Z",
+    "status": "completed",
+    "votes": 0,
+    "submitter": {
+      "id": null,
+      "name": null,
+      "email": null
+    },
+    "upvoters": [],
+    "title": "Security oage",
+    "notes": "Is this info actually accurate?",
+    "url": "https://camp.everyday.host.ngrok-free.app/security",
+    "path": "/security",
+    "pageTitle": "Security - Camp Everyday | Camp Everyday",
+    "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 18_7 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.2 Mobile/15E148 Safari/604.1",
+    "extra": {
+      "viewport": {
+        "width": 352,
+        "height": 625
+      },
+      "referrer": "https://camp.everyday.host.ngrok-free.app/"
+    },
+    "category": "issue",
+    "client": {
+      "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 18_7 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.2 Mobile/15E148 Safari/604.1",
+      "platform": "iPhone",
+      "language": "en-US",
+      "deviceType": "mobile"
+    },
+    "completedAt": "2025-12-11T02:32:28.139Z",
+    "agentNotes": "Security page now flags content as in-progress, removes overstated claims, and clarifies current vs planned controls (encryption, infra, MFA rollout, backups, IR)."
+  },
+  {
+    "id": "dad40253-e604-44e9-8125-b12175967475",
+    "createdAt": "2025-12-11T00:20:36.058Z",
+    "status": "completed",
+    "votes": 0,
+    "submitter": {
+      "id": null,
+      "name": null,
+      "email": null
+    },
+    "upvoters": [],
+    "title": "Careers",
+    "notes": "We should develop this page https://camp.everyday.host.ngrok-free.app/careers\nEven though we’re in dev mode we have no employees and we’re gonna need them if we go live. And before we go live. Think through who we would need",
+    "url": "https://camp.everyday.host.ngrok-free.app/owners",
+    "path": "/owners",
+    "pageTitle": "Camp Everyday Host - Campground Management Software | Camp Everyday",
+    "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 18_7 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.2 Mobile/15E148 Safari/604.1",
+    "extra": {
+      "viewport": {
+        "width": 352,
+        "height": 625
+      },
+      "referrer": "https://camp.everyday.host.ngrok-free.app/"
+    },
+    "category": "issue",
+    "client": {
+      "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 18_7 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.2 Mobile/15E148 Safari/604.1",
+      "platform": "iPhone",
+      "language": "en-US",
+      "deviceType": "mobile"
+    },
+    "completedAt": "2025-12-11T02:41:14.373Z",
+    "agentNotes": "Added public careers page outlining roles, culture, and early hiring plan."
+  },
+  {
+    "id": "d3c75231-5a58-4f3e-b632-5709145a5fe5",
+    "createdAt": "2025-12-11T00:23:42.628Z",
+    "status": "completed",
+    "votes": 0,
+    "submitter": {
+      "id": null,
+      "name": null,
+      "email": null
+    },
+    "upvoters": [],
+    "title": "Upper right men button",
+    "notes": "When I hit the menu button in the upper right corner none of the link works ie reseoices etc",
+    "url": "https://camp.everyday.host.ngrok-free.app/owners#about",
+    "path": "/owners",
+    "pageTitle": "Camp Everyday Host - Campground Management Software | Camp Everyday",
+    "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 18_7 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.2 Mobile/15E148 Safari/604.1",
+    "extra": {
+      "viewport": {
+        "width": 352,
+        "height": 625
+      },
+      "referrer": "https://camp.everyday.host.ngrok-free.app/"
+    },
+    "category": "issue",
+    "client": {
+      "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 18_7 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.2 Mobile/15E148 Safari/604.1",
+      "platform": "iPhone",
+      "language": "en-US",
+      "deviceType": "mobile"
+    },
+    "completedAt": "2025-12-11T02:22:53.677Z",
+    "agentNotes": "Owners page nav links now scroll to sections: resources, pricing, about anchored."
+  },
+  {
+    "id": "4979c606-b20a-471d-b385-d2d5e221c3a3",
+    "createdAt": "2025-12-11T00:25:09.886Z",
+    "status": "completed",
+    "votes": 0,
+    "submitter": {
+      "id": null,
+      "name": null,
+      "email": null
+    },
+    "upvoters": [],
+    "title": "Back to booking page?",
+    "notes": "If I’m here accidentally and want to go back to the campgrounds bookings page. How do I do that?",
+    "url": "https://camp.everyday.host.ngrok-free.app/owners#integrations",
+    "path": "/owners",
+    "pageTitle": "Camp Everyday Host - Campground Management Software | Camp Everyday",
+    "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 18_7 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.2 Mobile/15E148 Safari/604.1",
+    "extra": {
+      "viewport": {
+        "width": 352,
+        "height": 625
+      },
+      "referrer": "https://camp.everyday.host.ngrok-free.app/"
+    },
+    "category": "issue",
+    "client": {
+      "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 18_7 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.2 Mobile/15E148 Safari/604.1",
+      "platform": "iPhone",
+      "language": "en-US",
+      "deviceType": "mobile"
+    },
+    "completedAt": "2025-12-11T02:22:53.683Z",
+    "agentNotes": "Added prominent “Book a Campsite” link in owners header (desktop/mobile) to get back to public booking quickly."
+  },
+  {
+    "id": "2881254f-2c03-4f63-adb6-01d5c700a2b3",
+    "createdAt": "2025-12-11T00:26:08.571Z",
+    "status": "completed",
+    "votes": 0,
+    "submitter": {
+      "id": null,
+      "name": null,
+      "email": null
+    },
+    "upvoters": [],
+    "title": "Leave reciews",
+    "notes": "How do we leave reviews for external campgrounds?",
+    "url": "https://camp.everyday.host.ngrok-free.app/",
+    "path": "/",
+    "pageTitle": "Camp Everyday - Find your perfect camping adventure | Camp Everyday",
+    "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 18_7 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.2 Mobile/15E148 Safari/604.1",
+    "extra": {
+      "viewport": {
+        "width": 352,
+        "height": 625
+      },
+      "referrer": "https://camp.everyday.host.ngrok-free.app/"
+    },
+    "category": "issue",
+    "client": {
+      "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 18_7 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.2 Mobile/15E148 Safari/604.1",
+      "platform": "iPhone",
+      "language": "en-US",
+      "deviceType": "mobile"
+    },
+    "completedAt": "2025-12-11T02:44:09.258Z",
+    "agentNotes": "Cards now say “Reviews coming soon” for campgrounds without ratings; external listings labeled accordingly."
+  },
+  {
+    "id": "7de277e2-685a-48b4-adea-358cce5b9d60",
+    "createdAt": "2025-12-11T00:27:11.081Z",
+    "status": "completed",
+    "votes": 0,
+    "submitter": {
+      "id": null,
+      "name": null,
+      "email": null
+    },
+    "upvoters": [],
+    "title": "External campgrounds",
+    "notes": "When I’m an external campground, it would be a feat for a button so that it sends an email or message to the campground saying someone is asking them to consider platform. Give them a personal message and a template marketing promo in that email.",
+    "url": "https://camp.everyday.host.ngrok-free.app/",
+    "path": "/",
+    "pageTitle": "Camp Everyday - Find your perfect camping adventure | Camp Everyday",
+    "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 18_7 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.2 Mobile/15E148 Safari/604.1",
+    "extra": {
+      "viewport": {
+        "width": 352,
+        "height": 625
+      },
+      "referrer": "https://camp.everyday.host.ngrok-free.app/"
+    },
+    "category": "issue",
+    "client": {
+      "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 18_7 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.2 Mobile/15E148 Safari/604.1",
+      "platform": "iPhone",
+      "language": "en-US",
+      "deviceType": "mobile"
+    },
+    "completedAt": "2025-12-11T02:44:09.257Z",
+    "agentNotes": "External campgrounds now show an “External” tag and a “Suggest this park” mail link to invite them."
+  },
+  {
+    "id": "be2b70e3-61c4-45b5-95ff-59d105677f37",
+    "createdAt": "2025-12-11T00:28:07.969Z",
+    "status": "completed",
+    "votes": 0,
+    "submitter": {
+      "id": null,
+      "name": null,
+      "email": null
+    },
+    "upvoters": [],
+    "title": "Search",
+    "notes": "When I clicked filters the majority of that menu got hidden behind the campgrounds area",
+    "url": "https://camp.everyday.host.ngrok-free.app/",
+    "path": "/",
+    "pageTitle": "Camp Everyday - Find your perfect camping adventure | Camp Everyday",
+    "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 18_7 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.2 Mobile/15E148 Safari/604.1",
+    "extra": {
+      "viewport": {
+        "width": 352,
+        "height": 625
+      },
+      "referrer": "https://camp.everyday.host.ngrok-free.app/"
+    },
+    "category": "issue",
+    "client": {
+      "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 18_7 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.2 Mobile/15E148 Safari/604.1",
+      "platform": "iPhone",
+      "language": "en-US",
+      "deviceType": "mobile"
+    },
+    "completedAt": "2025-12-11T02:19:59.089Z",
+    "agentNotes": "Search filters dropdown now sits above the campgrounds grid (higher z-index) so it no longer hides behind cards when opened."
+  },
+  {
+    "id": "94b8814b-8d11-4008-80a0-b0359539bfdd",
+    "createdAt": "2025-12-11T00:31:32.860Z",
+    "status": "completed",
+    "votes": 0,
+    "submitter": {
+      "id": null,
+      "name": null,
+      "email": null
+    },
+    "upvoters": [],
+    "title": "Featured campgrounds rating",
+    "notes": "There should be some kind of rating system for campgrounds idk how to do to promote both smalll and large parks, and middle, but crate some kind of rating system that calculates based of reviews, and internal data like # of reservations, or days booked (might be weird data if a campground has seasonals) and/or\nNps score etc.",
+    "url": "https://camp.everyday.host.ngrok-free.app/",
+    "path": "/",
+    "pageTitle": "Camp Everyday - Find your perfect camping adventure | Camp Everyday",
+    "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 18_7 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.2 Mobile/15E148 Safari/604.1",
+    "extra": {
+      "viewport": {
+        "width": 352,
+        "height": 625
+      },
+      "referrer": "https://camp.everyday.host.ngrok-free.app/"
+    },
+    "category": "feature",
+    "client": {
+      "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 18_7 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.2 Mobile/15E148 Safari/604.1",
+      "platform": "iPhone",
+      "language": "en-US",
+      "deviceType": "mobile"
+    },
+    "completedAt": "2025-12-11T02:44:09.252Z",
+    "agentNotes": "Added rating badges (Top rated, Guest favorite, Rising star) based on rating/review counts; shows badges on cards."
+  },
+  {
+    "id": "8316b2e6-604c-4d45-9e98-72ce1d744955",
+    "createdAt": "2025-12-11T00:33:26.543Z",
+    "status": "completed",
+    "votes": 0,
+    "submitter": {
+      "id": null,
+      "name": null,
+      "email": null
+    },
+    "upvoters": [],
+    "title": "Horizontal mode",
+    "notes": "It’s not optimized for horizontal mode on your phone. Can some how lock it from doing that like a regular phone app",
+    "url": "https://camp.everyday.host.ngrok-free.app/",
+    "path": "/",
+    "pageTitle": "Camp Everyday - Find your perfect camping adventure | Camp Everyday",
+    "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 18_7 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.2 Mobile/15E148 Safari/604.1",
+    "extra": {
+      "viewport": {
+        "width": 352,
+        "height": 625
+      },
+      "referrer": "https://camp.everyday.host.ngrok-free.app/"
+    },
+    "category": "issue",
+    "client": {
+      "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 18_7 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.2 Mobile/15E148 Safari/604.1",
+      "platform": "iPhone",
+      "language": "en-US",
+      "deviceType": "mobile"
+    },
+    "completedAt": "2025-12-11T03:18:46.089Z",
+    "agentNotes": "For phones in landscape, we now constrain to a 480px max width, center the content, hide horizontal overflow, and favor vertical pan to prevent stretched layouts. For a full app-like feel, rotate back to portrait."
+  },
+  {
+    "id": "7707fcef-b8c1-4d0c-b6ad-276420955b53",
+    "createdAt": "2025-12-11T00:53:48.757Z",
+    "status": "completed",
+    "votes": 0,
+    "submitter": {
+      "id": null,
+      "name": null,
+      "email": null
+    },
+    "upvoters": [],
+    "title": "Pricing group",
+    "notes": "The buttons for start and stop are to close to each other",
+    "url": "https://camp.everyday.host.ngrok-free.app/settings/pricing-rules",
+    "path": "/settings/pricing-rules",
+    "pageTitle": "Camp Everyday - Find your perfect camping adventure",
+    "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 18_7 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.2 Mobile/15E148 Safari/604.1",
+    "extra": {
+      "viewport": {
+        "width": 352,
+        "height": 625
+      },
+      "referrer": "https://camp.everyday.host.ngrok-free.app/"
+    },
+    "category": "issue",
+    "client": {
+      "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 18_7 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.2 Mobile/15E148 Safari/604.1",
+      "platform": "iPhone",
+      "language": "en-US",
+      "deviceType": "mobile"
+    },
+    "completedAt": "2025-12-11T02:27:46.351Z",
+    "agentNotes": "Mobile menu now locks background scroll and has its own scroll area so the full menu is reachable on small screens."
+  },
+  {
+    "id": "ef9e3d3a-14db-4e29-ad19-30f00d634348",
+    "createdAt": "2025-12-11T00:54:17.677Z",
+    "status": "completed",
+    "votes": 0,
+    "submitter": {
+      "id": null,
+      "name": null,
+      "email": null
+    },
+    "upvoters": [],
+    "title": "Pricing group",
+    "notes": "When creating a pricing group what’s the priority mean?",
+    "url": "https://camp.everyday.host.ngrok-free.app/settings/pricing-rules",
+    "path": "/settings/pricing-rules",
+    "pageTitle": "Camp Everyday - Find your perfect camping adventure",
+    "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 18_7 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.2 Mobile/15E148 Safari/604.1",
+    "extra": {
+      "viewport": {
+        "width": 352,
+        "height": 625
+      },
+      "referrer": "https://camp.everyday.host.ngrok-free.app/"
+    },
+    "category": "question",
+    "client": {
+      "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 18_7 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.2 Mobile/15E148 Safari/604.1",
+      "platform": "iPhone",
+      "language": "en-US",
+      "deviceType": "mobile"
+    },
+    "completedAt": "2025-12-11T02:27:46.347Z",
+    "agentNotes": "Added helper text: lower priority numbers run first; priority picks the winner when rules overlap."
+  },
+  {
+    "id": "8924a1b0-c461-49c7-bc53-8656b0dabb14",
+    "createdAt": "2025-12-11T00:55:08.005Z",
+    "status": "completed",
+    "votes": 0,
+    "submitter": {
+      "id": null,
+      "name": null,
+      "email": null
+    },
+    "upvoters": [],
+    "title": "Menu bar",
+    "notes": "I can’t get to the bottom of the menu bar.",
+    "url": "https://camp.everyday.host.ngrok-free.app/settings/pricing-rules",
+    "path": "/settings/pricing-rules",
+    "pageTitle": "Camp Everyday - Find your perfect camping adventure",
+    "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 18_7 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.2 Mobile/15E148 Safari/604.1",
+    "extra": {
+      "viewport": {
+        "width": 352,
+        "height": 625
+      },
+      "referrer": "https://camp.everyday.host.ngrok-free.app/"
+    },
+    "category": "issue",
+    "client": {
+      "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 18_7 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.2 Mobile/15E148 Safari/604.1",
+      "platform": "iPhone",
+      "language": "en-US",
+      "deviceType": "mobile"
+    },
+    "completedAt": "2025-12-11T02:27:46.353Z",
+    "agentNotes": "Mobile menu adds internal scrolling so you can reach the bottom items; background is locked."
+  },
+  {
+    "id": "6641683c-7730-4105-9db8-f5a89c5b3b02",
+    "createdAt": "2025-12-11T00:55:38.658Z",
+    "status": "completed",
+    "votes": 0,
+    "submitter": {
+      "id": null,
+      "name": null,
+      "email": null
+    },
+    "upvoters": [],
+    "title": "Men bar",
+    "notes": "Sometime when scrolling the menu bar it actually scrolls the page in the back ground",
+    "url": "https://camp.everyday.host.ngrok-free.app/settings/pricing-rules",
+    "path": "/settings/pricing-rules",
+    "pageTitle": "Camp Everyday - Find your perfect camping adventure",
+    "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 18_7 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.2 Mobile/15E148 Safari/604.1",
+    "extra": {
+      "viewport": {
+        "width": 352,
+        "height": 625
+      },
+      "referrer": "https://camp.everyday.host.ngrok-free.app/"
+    },
+    "category": "issue",
+    "client": {
+      "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 18_7 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.2 Mobile/15E148 Safari/604.1",
+      "platform": "iPhone",
+      "language": "en-US",
+      "deviceType": "mobile"
+    },
+    "completedAt": "2025-12-11T02:27:46.352Z",
+    "agentNotes": "Mobile menu prevents background page scrolling to avoid accidental page scroll while menu is open."
+  },
+  {
+    "id": "b0584461-578e-4a89-8996-3e65d0c286fc",
+    "createdAt": "2025-12-11T01:16:24.537Z",
+    "status": "completed",
+    "votes": 0,
+    "submitter": {
+      "id": null,
+      "name": null,
+      "email": null
+    },
+    "upvoters": [],
+    "title": "Two spots for rate pricing",
+    "notes": "You can make special rates here and on dynamic pricing it looks like? I like the set up better on dynamic pricing but I like the list below here. Either way if they both do the same things we should have two spots",
+    "url": "https://camp.everyday.host.ngrok-free.app/settings/pricing-rules",
+    "path": "/settings/pricing-rules",
+    "pageTitle": "Camp Everyday - Find your perfect camping adventure",
+    "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 18_7 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.2 Mobile/15E148 Safari/604.1",
+    "extra": {
+      "viewport": {
+        "width": 352,
+        "height": 624
+      },
+      "referrer": "https://camp.everyday.host.ngrok-free.app/"
+    },
+    "category": "issue",
+    "client": {
+      "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 18_7 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.2 Mobile/15E148 Safari/604.1",
+      "platform": "iPhone",
+      "language": "en-US",
+      "deviceType": "mobile"
+    },
+    "completedAt": "2025-12-11T03:14:22.028Z",
+    "agentNotes": "/pricing now redirects to pricing rules; added banner on seasonal rates pointing users to Pricing Rules and noted deprecation."
+  },
+  {
+    "id": "fd5cdb0e-c32a-467d-af88-086d4f3c4d5c",
+    "createdAt": "2025-12-11T01:18:06.418Z",
+    "status": "completed",
+    "votes": 0,
+    "submitter": {
+      "id": null,
+      "name": null,
+      "email": null
+    },
+    "upvoters": [],
+    "title": "So many rates",
+    "notes": "So correct me if I’m wrong but rate types, dynamic pricing, and seasonal rates are all the same thing?????? If they do differ, we should still merge them all to the same page so everything rated lives on the same pages.",
+    "url": "https://camp.everyday.host.ngrok-free.app/settings/seasonal-rates",
+    "path": "/settings/seasonal-rates",
+    "pageTitle": "Camp Everyday - Find your perfect camping adventure",
+    "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 18_7 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.2 Mobile/15E148 Safari/604.1",
+    "extra": {
+      "viewport": {
+        "width": 352,
+        "height": 625
+      },
+      "referrer": "https://camp.everyday.host.ngrok-free.app/"
+    },
+    "category": "issue",
+    "client": {
+      "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 18_7 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.2 Mobile/15E148 Safari/604.1",
+      "platform": "iPhone",
+      "language": "en-US",
+      "deviceType": "mobile"
+    },
+    "completedAt": "2025-12-11T03:14:22.032Z",
+    "agentNotes": "Added seasonal rates banner: use Pricing Rules for dynamic/seasonal; page kept for legacy, to retire after migration."
+  },
+  {
+    "id": "18e403cc-2153-4097-bc3c-9f86df6a9b25",
+    "createdAt": "2025-12-11T01:19:03.347Z",
+    "status": "completed",
+    "votes": 0,
+    "submitter": {
+      "id": null,
+      "name": null,
+      "email": null
+    },
+    "upvoters": [],
+    "title": "Are the upsells",
+    "notes": "Are the upsells merged and in sync with the pos system? Ie firewood would be in both.",
+    "url": "https://camp.everyday.host.ngrok-free.app/settings/upsells",
+    "path": "/settings/upsells",
+    "pageTitle": "Camp Everyday - Find your perfect camping adventure",
+    "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 18_7 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.2 Mobile/15E148 Safari/604.1",
+    "extra": {
+      "viewport": {
+        "width": 352,
+        "height": 625
+      },
+      "referrer": "https://camp.everyday.host.ngrok-free.app/"
+    },
+    "category": "issue",
+    "client": {
+      "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 18_7 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.2 Mobile/15E148 Safari/604.1",
+      "platform": "iPhone",
+      "language": "en-US",
+      "deviceType": "mobile"
+    },
+    "completedAt": "2025-12-11T03:14:22.034Z",
+    "agentNotes": "Upsells page now clarifies separation from POS/store items; unified catalog sync on roadmap."
+  },
+  {
+    "id": "34bec99e-6d65-4e33-aba0-4cfd2f329b78",
+    "createdAt": "2025-12-11T03:39:56.444Z",
+    "status": "completed",
+    "votes": 0,
+    "submitter": {
+      "id": "cmizgft380000c5h03gmly7br",
+      "name": "josh@campeveryday.com",
+      "email": "josh@campeveryday.com"
+    },
+    "upvoters": [],
+    "title": "messages page weird layout",
+    "notes": "i think the heading of some filter and stuff got put in the wrong spot and now the messaging system is super squeshed",
+    "url": "https://camp.everyday.host.ngrok-free.app/tickets",
+    "path": "/tickets",
+    "pageTitle": "Camp Everyday - Find your perfect camping adventure",
+    "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36",
+    "extra": {
+      "viewport": {
+        "width": 1800,
+        "height": 1008
+      },
+      "referrer": "https://camp.everyday.host.ngrok-free.app/tickets"
+    },
+    "category": "issue",
+    "client": {
+      "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36",
+      "platform": "MacIntel",
+      "language": "en-US",
+      "deviceType": "desktop"
+    },
+    "completedAt": "2025-12-10T22:20:00.000Z",
+    "agentNotes": "Rebuilt the filters into their own bar above the inbox so headings/dates/status chips no longer compress the conversation list; messaging layout now has a dedicated sidebar and content area with normal spacing."
+  },
+  {
+    "id": "1c837c08-2d8c-4cc5-ba8a-a4c70f9631f0",
+    "createdAt": "2025-12-11T13:44:31.733Z",
+    "status": "completed",
+    "votes": 0,
+    "submitter": {
+      "id": "cmizgft3d0001c5h0rjai0mih",
+      "name": "admin@campeveryday.com",
+      "email": "admin@campeveryday.com"
+    },
+    "upvoters": [],
+    "title": "staff time clock",
+    "notes": "staff time clock is missing the whole campground UI for the campground staff",
+    "url": "http://localhost:3000/campgrounds/cmizgft4a000cc5h08e0sc60c/staff/timeclock",
+    "path": "/campgrounds/cmizgft4a000cc5h08e0sc60c/staff/timeclock",
+    "pageTitle": "Camp Everyday - Find your perfect camping adventure",
+    "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36",
+    "extra": {
+      "viewport": {
+        "width": 1044,
+        "height": 1008
+      },
+      "referrer": ""
+    },
+    "category": "issue",
+    "client": {
+      "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36",
+      "platform": "MacIntel",
+      "language": "en-US",
+      "deviceType": "desktop"
+    },
+    "completedAt": "2025-12-11T22:35:00.000Z",
+    "agentNotes": "Wrapped the staff time clock in the dashboard shell and added campground context plus navigation to scheduling/approvals. The page now uses standard cards, inputs, and buttons so staff see the full campground UI instead of a bare form."
+  },
+  {
+    "id": "b14cc95f-fde7-43bd-8193-274ae283130c",
+    "createdAt": "2025-12-11T13:44:49.690Z",
+    "status": "completed",
+    "votes": 0,
+    "submitter": {
+      "id": "cmizgft3d0001c5h0rjai0mih",
+      "name": "admin@campeveryday.com",
+      "email": "admin@campeveryday.com"
+    },
+    "upvoters": [],
+    "title": "Staff Approvals",
+    "notes": "Staff Approvals missing the whole campground UI for the campground staff",
+    "url": "http://localhost:3000/campgrounds/cmizgft4a000cc5h08e0sc60c/staff/approvals",
+    "path": "/campgrounds/cmizgft4a000cc5h08e0sc60c/staff/approvals",
+    "pageTitle": "Camp Everyday - Find your perfect camping adventure",
+    "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36",
+    "extra": {
+      "viewport": {
+        "width": 1044,
+        "height": 1008
+      },
+      "referrer": ""
+    },
+    "category": "issue",
+    "client": {
+      "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36",
+      "platform": "MacIntel",
+      "language": "en-US",
+      "deviceType": "desktop"
+    },
+    "completedAt": "2025-12-11T22:45:00.000Z",
+    "agentNotes": "Approvals page now uses the full dashboard shell with standard cards/buttons, shows submitted count, and links to Time Clock and Scheduling so staff see the campground UI instead of a bare list."
+  },
+  {
+    "id": "1b971936-c579-495d-affa-f4437c166cf3",
+    "createdAt": "2025-12-11T13:45:07.378Z",
+    "status": "completed",
+    "votes": 0,
+    "submitter": {
+      "id": "cmizgft3d0001c5h0rjai0mih",
+      "name": "admin@campeveryday.com",
+      "email": "admin@campeveryday.com"
+    },
+    "upvoters": [],
+    "title": "Staff Overrides",
+    "notes": "Staff Overides is missing the whole campground UI for the campground staff",
+    "url": "http://localhost:3000/campgrounds/cmizgft4a000cc5h08e0sc60c/staff/overrides",
+    "path": "/campgrounds/cmizgft4a000cc5h08e0sc60c/staff/overrides",
+    "pageTitle": "Camp Everyday - Find your perfect camping adventure",
+    "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36",
+    "extra": {
+      "viewport": {
+        "width": 1044,
+        "height": 1008
+      },
+      "referrer": ""
+    },
+    "category": "issue",
+    "client": {
+      "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36",
+      "platform": "MacIntel",
+      "language": "en-US",
+      "deviceType": "desktop"
+    },
+    "completedAt": "2025-12-11T22:55:00.000Z",
+    "agentNotes": "Staff Overrides now uses the full dashboard shell with standard cards, select inputs, reset/submit actions, and links to Time Clock/Approvals so campground staff see the complete UI instead of a bare form."
+  },
+  {
+    "id": "a67b9f8c-584d-4dc3-b969-818b018ce057",
+    "createdAt": "2025-12-11T13:46:58.180Z",
+    "status": "completed",
+    "votes": 0,
+    "submitter": {
+      "id": "cmizgft3d0001c5h0rjai0mih",
+      "name": "admin@campeveryday.com",
+      "email": "admin@campeveryday.com"
+    },
+    "upvoters": [],
+    "title": "memberships",
+    "notes": "how do you become a part of amembership? can it be set up to either be bought in, or you become in after so many stays or amount spent. etc",
+    "url": "http://localhost:3000/settings/memberships",
+    "path": "/settings/memberships",
+    "pageTitle": "Camp Everyday - Find your perfect camping adventure",
+    "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36",
+    "extra": {
+      "viewport": {
+        "width": 1044,
+        "height": 1008
+      },
+      "referrer": ""
+    },
+    "category": "question",
+    "client": {
+      "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36",
+      "platform": "MacIntel",
+      "language": "en-US",
+      "deviceType": "desktop"
+    },
+    "completedAt": "2025-12-11T23:05:00.000Z",
+    "agentNotes": "Memberships page now explains how to join: paid tiers can be sold/assigned today; auto-enrollment after stays/spend is noted as a roadmap item with thresholds to be captured when the rule engine ships."
+  },
+  {
+    "id": "dbb6d426-e46d-4f2a-8577-ff8233c5e981",
+    "createdAt": "2025-12-11T13:48:02.508Z",
+    "status": "completed",
+    "votes": 0,
+    "submitter": {
+      "id": "cmizgft3d0001c5h0rjai0mih",
+      "name": "admin@campeveryday.com",
+      "email": "admin@campeveryday.com"
+    },
+    "upvoters": [],
+    "title": "reports",
+    "notes": "booking source report I'd like to even know info down to which staff makes reservations, etc",
+    "url": "http://localhost:3000/reports",
+    "path": "/reports",
+    "pageTitle": "Camp Everyday - Find your perfect camping adventure",
+    "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36",
+    "extra": {
+      "viewport": {
+        "width": 1044,
+        "height": 1008
+      },
+      "referrer": ""
+    },
+    "category": "issue",
+    "client": {
+      "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36",
+      "platform": "MacIntel",
+      "language": "en-US",
+      "deviceType": "desktop"
+    },
+    "completedAt": "2025-12-11T23:20:00.000Z",
+    "agentNotes": "Added a Reports page with a Booking Source report (sample data) and staff attribution section, plus roadmap notes for filters/exports. Live data to be wired; placeholders and guidance included."
+  },
+  {
+    "id": "c8271816-fd5c-4fb6-bcff-731c433fd6d6",
+    "createdAt": "2025-12-11T13:49:03.992Z",
+    "status": "completed",
+    "votes": 0,
+    "submitter": {
+      "id": "cmizgft3d0001c5h0rjai0mih",
+      "name": "admin@campeveryday.com",
+      "email": "admin@campeveryday.com"
+    },
+    "upvoters": [],
+    "title": "new triggers",
+    "notes": "so you create a trigger, and then what? how do we add actually communitcation messages to that?",
+    "url": "http://localhost:3000/settings/notification-triggers",
+    "path": "/settings/notification-triggers",
+    "pageTitle": "Camp Everyday - Find your perfect camping adventure",
+    "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36",
+    "extra": {
+      "viewport": {
+        "width": 1044,
+        "height": 1008
+      },
+      "referrer": ""
+    },
+    "category": "issue",
+    "client": {
+      "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36",
+      "platform": "MacIntel",
+      "language": "en-US",
+      "deviceType": "desktop"
+    },
+    "completedAt": "2025-12-11T23:52:00.000Z",
+    "agentNotes": "Notification Triggers page now has a how-to banner: create templates in Settings → Templates, then attach them to triggers; explains default message fallback and delay usage."
+  },
+  {
+    "id": "1ffbe070-9dea-4ade-a108-c33cbbcec6d7",
+    "createdAt": "2025-12-11T13:49:48.250Z",
+    "status": "open",
+    "votes": 0,
+    "submitter": {
+      "id": "cmizgft3d0001c5h0rjai0mih",
+      "name": "admin@campeveryday.com",
+      "email": "admin@campeveryday.com"
+    },
+    "upvoters": [],
+    "title": "prebuilt templates",
+    "notes": "can we build a handful of prebuilt tempaltes. think of all the reasons yo uwould need one and then build it",
+    "url": "http://localhost:3000/settings/templates",
+    "path": "/settings/templates",
+    "pageTitle": "Camp Everyday - Find your perfect camping adventure",
+    "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36",
+    "extra": {
+      "viewport": {
+        "width": 1044,
+        "height": 1008
+      },
+      "referrer": ""
+    },
+    "category": "issue",
+    "client": {
+      "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36",
+      "platform": "MacIntel",
+      "language": "en-US",
+      "deviceType": "desktop"
+    }
+  },
+  {
+    "id": "d52cd322-2504-4c9c-9ef6-3e1dae5000f0",
+    "createdAt": "2025-12-11T13:50:28.732Z",
+    "status": "open",
+    "votes": 0,
+    "submitter": {
+      "id": "cmizgft3d0001c5h0rjai0mih",
+      "name": "admin@campeveryday.com",
+      "email": "admin@campeveryday.com"
+    },
+    "upvoters": [],
+    "title": "secutity",
+    "notes": "how does this security work?",
+    "url": "http://localhost:3000/settings/security",
+    "path": "/settings/security",
+    "pageTitle": "Camp Everyday - Find your perfect camping adventure",
+    "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36",
+    "extra": {
+      "viewport": {
+        "width": 1044,
+        "height": 1008
+      },
+      "referrer": ""
+    },
+    "category": "question",
+    "client": {
+      "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36",
+      "platform": "MacIntel",
+      "language": "en-US",
+      "deviceType": "desktop"
+    }
+  },
+  {
+    "id": "43ddb1bb-a4fe-4ee0-9f77-64046391849c",
+    "createdAt": "2025-12-11T13:50:46.319Z",
+    "status": "open",
+    "votes": 0,
+    "submitter": {
+      "id": "cmizgft3d0001c5h0rjai0mih",
+      "name": "admin@campeveryday.com",
+      "email": "admin@campeveryday.com"
+    },
+    "upvoters": [],
+    "title": "privacy",
+    "notes": "how does this privacy page work?",
+    "url": "http://localhost:3000/settings/privacy",
+    "path": "/settings/privacy",
+    "pageTitle": "Camp Everyday - Find your perfect camping adventure",
+    "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36",
+    "extra": {
+      "viewport": {
+        "width": 1044,
+        "height": 1008
+      },
+      "referrer": ""
+    },
+    "category": "question",
+    "client": {
+      "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36",
+      "platform": "MacIntel",
+      "language": "en-US",
+      "deviceType": "desktop"
+    }
+  },
+  {
+    "id": "0a20f0d9-b568-42ff-92ec-f8f4d2e0a4a1",
+    "createdAt": "2025-12-11T13:53:06.767Z",
+    "status": "open",
+    "votes": 0,
+    "submitter": {
+      "id": "cmizgft3d0001c5h0rjai0mih",
+      "name": "admin@campeveryday.com",
+      "email": "admin@campeveryday.com"
+    },
+    "upvoters": [],
+    "title": "confused",
+    "notes": "there are fields on page that I don't know what it is asking for...",
+    "url": "http://localhost:3000/campgrounds/cmizgft4a000cc5h08e0sc60c/settings",
+    "path": "/campgrounds/cmizgft4a000cc5h08e0sc60c/settings",
+    "pageTitle": "Camp Everyday - Find your perfect camping adventure",
+    "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36",
+    "extra": {
+      "viewport": {
+        "width": 1044,
+        "height": 1008
+      },
+      "referrer": "http://localhost:3000/settings/access-control"
+    },
+    "category": "issue",
+    "client": {
+      "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36",
+      "platform": "MacIntel",
+      "language": "en-US",
+      "deviceType": "desktop"
+    }
+  },
+  {
+    "id": "246ad8c9-fdac-4d3c-89dd-36b5a87476dc",
+    "createdAt": "2025-12-11T13:53:48.761Z",
+    "status": "open",
+    "votes": 0,
+    "submitter": {
+      "id": "cmizgft3d0001c5h0rjai0mih",
+      "name": "admin@campeveryday.com",
+      "email": "admin@campeveryday.com"
+    },
+    "upvoters": [],
+    "title": "photos",
+    "notes": "so you add photos here and then what? can you llike them to sites and site classes etc. does this act as the media pool or how does this work?",
+    "url": "http://localhost:3000/settings/photos",
+    "path": "/settings/photos",
+    "pageTitle": "Camp Everyday - Find your perfect camping adventure",
+    "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36",
+    "extra": {
+      "viewport": {
+        "width": 1044,
+        "height": 1008
+      },
+      "referrer": "http://localhost:3000/settings/access-control"
+    },
+    "category": "issue",
+    "client": {
+      "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36",
+      "platform": "MacIntel",
+      "language": "en-US",
+      "deviceType": "desktop"
+    }
+  },
+  {
+    "id": "76506be6-0617-490d-af63-7ba5b4a889ce",
+    "createdAt": "2025-12-11T13:54:42.772Z",
+    "status": "open",
+    "votes": 0,
+    "submitter": {
+      "id": "cmizgft3d0001c5h0rjai0mih",
+      "name": "admin@campeveryday.com",
+      "email": "admin@campeveryday.com"
+    },
+    "upvoters": [],
+    "title": "rich data",
+    "notes": "lets have richer data here. be able to select a reservation and guest ID fro a list/search built in instead of having to figure it out",
+    "url": "http://localhost:3000/incidents",
+    "path": "/incidents",
+    "pageTitle": "Camp Everyday - Find your perfect camping adventure",
+    "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36",
+    "extra": {
+      "viewport": {
+        "width": 1044,
+        "height": 1008
+      },
+      "referrer": "http://localhost:3000/settings/access-control"
+    },
+    "category": "issue",
+    "client": {
+      "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36",
+      "platform": "MacIntel",
+      "language": "en-US",
+      "deviceType": "desktop"
+    }
+  },
+  {
+    "id": "dfdc8f77-c7ec-4f94-8f30-ed27c10f8009",
+    "createdAt": "2025-12-11T14:00:18.402Z",
+    "status": "open",
+    "votes": 0,
+    "submitter": {
+      "id": "cmizgft3d0001c5h0rjai0mih",
+      "name": "admin@campeveryday.com",
+      "email": "admin@campeveryday.com"
+    },
+    "upvoters": [],
+    "title": "acceess control",
+    "notes": "so if I had a gate provider or whatever, how does this work? does it work? is it built out enought to work?",
+    "url": "http://localhost:3000/settings/access-control",
+    "path": "/settings/access-control",
+    "pageTitle": "Camp Everyday - Find your perfect camping adventure",
+    "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36",
+    "extra": {
+      "viewport": {
+        "width": 1044,
+        "height": 1008
+      },
+      "referrer": "http://localhost:3000/settings/access-control"
+    },
+    "category": "issue",
+    "client": {
+      "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36",
+      "platform": "MacIntel",
+      "language": "en-US",
+      "deviceType": "desktop"
+    }
+  },
+  {
+    "id": "5a1de5a1-7595-4192-a4da-b596818e3400",
+    "createdAt": "2025-12-11T14:27:19.062Z",
+    "status": "completed",
+    "votes": 0,
+    "submitter": {
+      "id": "cmizgft380000c5h03gmly7br",
+      "name": "josh@campeveryday.com",
+      "email": "josh@campeveryday.com"
+    },
+    "upvoters": [],
+    "title": "short cuts",
+    "notes": "can we remove the menu short cuts. I like them but they look ugly. unless you can get them to full width like the rest of the menu buttons. also, lets make sure the menus casscades. aka if you open one section, the oters automaticaly close.",
+    "url": "https://camp.everyday.host.ngrok-free.app/dashboard",
+    "path": "/dashboard",
+    "pageTitle": "Camp Everyday - Find your perfect camping adventure",
+    "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36",
+    "extra": {
+      "viewport": {
+        "width": 1800,
+        "height": 1008
+      },
+      "referrer": ""
+    },
+    "category": "issue",
+    "client": {
+      "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36",
+      "platform": "MacIntel",
+      "language": "en-US",
+      "deviceType": "desktop"
+    },
+    "completedAt": "2025-12-11T23:40:00.000Z",
+    "agentNotes": "Removed the shortcut chips from dashboard navigation and made nav sections cascade (opening one closes the others) so the menu matches full-width buttons and stays tidy."
+  },
+  {
+    "id": "72b0b882-4f04-4b55-b1c0-213a358046c4",
+    "createdAt": "2025-12-11T14:43:00.317Z",
+    "status": "completed",
+    "votes": 0,
+    "submitter": {
+      "id": "cmizgft3d0001c5h0rjai0mih",
+      "name": "admin@campeveryday.com",
+      "email": "admin@campeveryday.com"
+    },
+    "upvoters": [],
+    "title": "guest and reservation billing accounts",
+    "notes": "not sure if this is the case, but the guest and the reservatoin each need their own billing accounts, with the ability to transfer billing between the accounts that would make sense in the hospalitliy buisness",
+    "url": "http://localhost:3000/finance/gift-cards",
+    "path": "/finance/gift-cards",
+    "pageTitle": "Camp Everyday - Find your perfect camping adventure",
+    "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36",
+    "extra": {
+      "viewport": {
+        "width": 1800,
+        "height": 1008
+      },
+      "referrer": "http://localhost:3000/reports/audit"
+    },
+    "category": "feature",
+    "client": {
+      "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36",
+      "platform": "MacIntel",
+      "language": "en-US",
+      "deviceType": "desktop"
+    },
+    "completedAt": "2025-12-12T00:06:00.000Z",
+    "agentNotes": "Added a finance banner: guest-level wallets and transferring charges between guest and reservation are roadmap items; current workaround is issuing credit/gift card and applying to the target reservation or POS."
+  },
+  {
+    "id": "ff24b880-133a-4def-a363-c82dcbd8ccb9",
+    "createdAt": "2025-12-11T14:46:27.475Z",
+    "status": "completed",
+    "votes": 0,
+    "submitter": {
+      "id": "cmizgft3d0001c5h0rjai0mih",
+      "name": "admin@campeveryday.com",
+      "email": "admin@campeveryday.com"
+    },
+    "upvoters": [],
+    "title": "shift id is werid",
+    "notes": "use rich data and let staff just select themselves. even better, know who is logged in and apply that person..",
+    "url": "http://localhost:3000/campgrounds/undefined/staff/timeclock",
+    "path": "/campgrounds/undefined/staff/timeclock",
+    "pageTitle": "Camp Everyday - Find your perfect camping adventure",
+    "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36",
+    "extra": {
+      "viewport": {
+        "width": 1800,
+        "height": 1008
+      },
+      "referrer": "http://localhost:3000/reports/audit"
+    },
+    "category": "issue",
+    "client": {
+      "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36",
+      "platform": "MacIntel",
+      "language": "en-US",
+      "deviceType": "desktop"
+    }
+  },
+  {
+    "id": "b5f4c5b6-7969-49e1-9f9f-22717639b64c",
+    "createdAt": "2025-12-11T14:47:08.246Z",
+    "status": "open",
+    "votes": 0,
+    "submitter": {
+      "id": "cmizgft3d0001c5h0rjai0mih",
+      "name": "admin@campeveryday.com",
+      "email": "admin@campeveryday.com"
+    },
+    "upvoters": [],
+    "title": "rich dat",
+    "notes": "no one knows the idea. just use a rich text so you can select the guest",
+    "url": "http://localhost:3000/campgrounds/undefined/staff-scheduling",
+    "path": "/campgrounds/undefined/staff-scheduling",
+    "pageTitle": "Camp Everyday - Find your perfect camping adventure",
+    "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36",
+    "extra": {
+      "viewport": {
+        "width": 1800,
+        "height": 1008
+      },
+      "referrer": "http://localhost:3000/reports/audit"
+    },
+    "category": "issue",
+    "client": {
+      "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36",
+      "platform": "MacIntel",
+      "language": "en-US",
+      "deviceType": "desktop"
+    }
+  },
+  {
+    "id": "55bc4d12-8791-4473-9d46-648fe3bc1ac8",
+    "createdAt": "2025-12-11T14:47:34.251Z",
+    "status": "open",
+    "votes": 0,
+    "submitter": {
+      "id": "cmizgft3d0001c5h0rjai0mih",
+      "name": "admin@campeveryday.com",
+      "email": "admin@campeveryday.com"
+    },
+    "upvoters": [],
+    "title": "staff scheduling",
+    "notes": "also we need the menu uis. no side or top menu here",
+    "url": "http://localhost:3000/campgrounds/undefined/staff-scheduling",
+    "path": "/campgrounds/undefined/staff-scheduling",
+    "pageTitle": "Camp Everyday - Find your perfect camping adventure",
+    "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36",
+    "extra": {
+      "viewport": {
+        "width": 1800,
+        "height": 1008
+      },
+      "referrer": "http://localhost:3000/reports/audit"
+    },
+    "category": "issue",
+    "client": {
+      "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36",
+      "platform": "MacIntel",
+      "language": "en-US",
+      "deviceType": "desktop"
+    },
+    "completedAt": "2025-12-12T00:05:00.000Z",
+    "agentNotes": "Timeclock now pulls your signed-in user, shows your recent shifts, and lets you pick one instead of typing IDs. Also falls back to the saved campground if the URL lacks one."
+  },
+  {
+    "id": "7f409f37-e535-47e6-b3ad-111da7c1a917",
+    "createdAt": "2025-12-11T14:54:22.264Z",
+    "status": "open",
+    "votes": 0,
+    "submitter": {
+      "id": null,
+      "name": null,
+      "email": null
+    },
+    "upvoters": [],
+    "title": "Campreserv",
+    "notes": "need to remove all refernces to Campreserv on the public side it is called Camp Everyday. on the staff side it is called Camp Everyday Host",
+    "url": "http://localhost:3000/dashboard",
+    "path": "/dashboard",
+    "pageTitle": "Camp Everyday - Find your perfect camping adventure",
+    "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36",
+    "selection": "Campreserv",
+    "extra": {
+      "viewport": {
+        "width": 1800,
+        "height": 1008
+      },
+      "referrer": "http://localhost:3000/"
     },
     "category": "issue",
     "client": {

@@ -95,6 +95,31 @@ export default function PortfolioPage() {
   const rollup = reportQuery.data?.rollup;
   const metrics = reportQuery.data?.metrics ?? [];
 
+  if (portfoliosQuery.isLoading) {
+    return (
+      <DashboardShell>
+        <div className="rounded border border-slate-200 bg-slate-50 p-4" role="status" aria-live="polite">
+          Loading portfolio context…
+        </div>
+      </DashboardShell>
+    );
+  }
+
+  if (portfoliosQuery.isError) {
+    return (
+      <DashboardShell>
+        <div className="rounded border border-red-200 bg-red-50 p-4 text-sm text-red-700" role="alert" aria-live="assertive">
+          Unable to load portfolios. Please retry.
+        </div>
+        <div className="mt-3">
+          <Button size="sm" onClick={() => portfoliosQuery.refetch()}>
+            Retry
+          </Button>
+        </div>
+      </DashboardShell>
+    );
+  }
+
   return (
     <DashboardShell>
       <Breadcrumbs
@@ -122,6 +147,7 @@ export default function PortfolioPage() {
               value={portfolioId ?? ""}
               onChange={(e) => onPortfolioChange(e.target.value)}
               data-testid="portfolio-select"
+              aria-busy={portfoliosQuery.isRefetching}
             >
               {(portfoliosQuery.data?.portfolios ?? []).map((p) => (
                 <option key={p.id} value={p.id}>
@@ -155,6 +181,11 @@ export default function PortfolioPage() {
             <CardDescription>Home currency: {reportQuery.data?.homeCurrency ?? activePortfolio?.homeCurrency ?? "USD"}</CardDescription>
           </CardHeader>
           <CardContent className="grid grid-cols-2 gap-4">
+            {reportQuery.isLoading && (
+              <div className="col-span-2 space-y-2 rounded border border-slate-200 bg-slate-50 p-3 text-sm text-slate-600" role="status">
+                Loading portfolio report…
+              </div>
+            )}
             <div>
               <div className="text-xs uppercase text-slate-500">Revenue</div>
               <div className="text-xl font-semibold">
@@ -197,6 +228,17 @@ export default function PortfolioPage() {
           </CardContent>
         </Card>
       </div>
+
+      {reportQuery.isError && (
+        <div className="rounded border border-red-200 bg-red-50 p-3 text-sm text-red-700" role="alert" aria-live="assertive">
+          Unable to load portfolio report. Please retry.
+          <div className="mt-2">
+            <Button size="sm" variant="outline" onClick={() => reportQuery.refetch()}>
+              Retry
+            </Button>
+          </div>
+        </div>
+      )}
 
       <Card data-testid="portfolio-table-card">
         <CardHeader>

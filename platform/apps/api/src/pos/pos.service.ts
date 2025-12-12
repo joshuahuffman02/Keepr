@@ -1,4 +1,4 @@
-import { BadRequestException, ConflictException, Injectable, NotFoundException } from "@nestjs/common";
+import { BadRequestException, ConflictException, Injectable, Logger, NotFoundException } from "@nestjs/common";
 import { PrismaService } from "../prisma/prisma.service";
 import { IdempotencyService } from "../payments/idempotency.service";
 import { CheckoutCartDto, CreateCartDto, OfflineReplayDto, UpdateCartDto, CreateReturnDto } from "./pos.dto";
@@ -7,15 +7,25 @@ import { StoredValueService } from "../stored-value/stored-value.service";
 import { StripeService } from "../payments/stripe.service";
 import crypto from "crypto";
 import { TillService } from "./till.service";
+import { ObservabilityService } from "../observability/observability.service";
+import { PosProviderService } from "./pos-provider.service";
+import { AuditService } from "../audit/audit.service";
+import { EmailService } from "../email/email.service";
 
 @Injectable()
 export class PosService {
+  private readonly logger = new Logger(PosService.name);
+
   constructor(
     private readonly prisma: PrismaService,
     private readonly idempotency: IdempotencyService,
     private readonly storedValue: StoredValueService,
     private readonly stripe: StripeService,
-    private readonly till: TillService
+    private readonly till: TillService,
+    private readonly observability: ObservabilityService,
+    private readonly providerIntegrations: PosProviderService,
+    private readonly audit: AuditService,
+    private readonly email: EmailService
   ) {}
 
   async createCart(dto: CreateCartDto, actor: any) {
@@ -73,14 +83,17 @@ export class PosService {
   }
 
   async checkout(cartId: string, dto: CheckoutCartDto, idempotencyKey?: string, actor?: any) {
-    const existing = await this.guardIdempotency(idempotencyKey, { cartId, dto }, actor?.campgroundId);
+    const existing = await this.guardIdempotency(idempotencyKey, { cartId, dto }, actor, "pos/checkout");
     if (existing?.status === IdempotencyStatus.succeeded && existing.responseJson) return existing.responseJson;
     if (existing?.status === IdempotencyStatus.inflight && existing.createdAt && Date.now() - new Date(existing.createdAt).getTime() < 60000) {
       throw new ConflictException("Request already in progress");
     }
 
     // Basic reprice: TODO replace with real pricing/tax engines
-    const cart = await this.prisma.posCart.findUnique({ where: { id: cartId }, include: { items: true, payments: true } });
+    const cart = await this.prisma.posCart.findUnique({
+      where: { id: cartId },
+      include: { items: { include: { product: true } }, payments: true }
+    });
     if (!cart) throw new NotFoundException("Cart not found");
     if (cart.status !== PosCartStatus.open) throw new ConflictException("Cart not open");
 
@@ -156,6 +169,51 @@ export class PosService {
           }
 
           if (p.method === "card") {
+            const providerPayment = await this.providerIntegrations.routePayment(
+              actor?.campgroundId ?? null,
+              cart.terminalId ?? null,
+              {
+                amountCents: p.amountCents,
+                currency: p.currency,
+                idempotencyKey: p.idempotencyKey,
+                cartId,
+                metadata: { referenceType: p.referenceType, referenceId: p.referenceId }
+              }
+            );
+
+            if (providerPayment) {
+              const status =
+                providerPayment.status === "succeeded"
+                  ? PosPaymentStatus.succeeded
+                  : providerPayment.status === "failed"
+                  ? PosPaymentStatus.failed
+                  : PosPaymentStatus.pending;
+
+              await tx.posPayment.create({
+                data: {
+                  cartId,
+                  method: p.method,
+                  amountCents: p.amountCents,
+                  currency: p.currency.toLowerCase(),
+                  status,
+                  idempotencyKey: p.idempotencyKey,
+                  referenceType: p.referenceType,
+                  referenceId: p.referenceId,
+                  processorIds: providerPayment.processorIds ?? { provider: providerPayment.provider }
+                }
+              });
+
+              await this.audit.record({
+                campgroundId: actor?.campgroundId ?? cart.campgroundId,
+                actorId: actor?.id ?? null,
+                action: "pos.payment.external",
+                entity: "pos_cart",
+                entityId: cartId,
+                after: { provider: providerPayment.provider, status }
+              });
+              continue;
+            }
+
             const stripeAccountId = process.env.STRIPE_ACCOUNT_ID;
             if (!this.stripe.isConfigured() || !stripeAccountId) {
               throw new BadRequestException("Card processing not configured");
@@ -235,6 +293,31 @@ export class PosService {
         };
       });
 
+      const receiptEmail = actor?.email ?? actor?.guestEmail ?? null;
+      if (receiptEmail) {
+        try {
+          const lineItems = (cart.items ?? []).map((i: any) => ({
+            label: i?.product?.name ?? i.productId,
+            amountCents: i.totalCents ?? 0
+          }));
+          await this.email.sendPaymentReceipt({
+            guestEmail: receiptEmail,
+            guestName: actor?.name ?? actor?.displayName ?? "Guest",
+            campgroundName: actor?.campgroundName ?? "Campground",
+            amountCents: expected.totalCents,
+            paymentMethod: dto.payments.map((p) => p.method).join(", "),
+            source: "pos",
+            lineItems,
+            taxCents: expected.taxCents,
+            feeCents: expected.feeCents,
+            totalCents: expected.totalCents,
+            kind: "pos"
+          });
+        } catch (emailErr) {
+          this.logger.warn(`POS receipt email failed for cart ${cartId}: ${emailErr}`);
+        }
+      }
+
       if (idempotencyKey) await this.idempotency.complete(idempotencyKey, result);
       return result;
     } catch (err) {
@@ -244,7 +327,24 @@ export class PosService {
   }
 
   async replayOffline(dto: OfflineReplayDto, idempotencyKey?: string, actor?: any) {
-    const existing = await this.guardIdempotency(idempotencyKey, dto, actor?.campgroundId);
+    const started = Date.now();
+    const scope = this.scopeKey(actor);
+
+    if (dto.clientTxId) {
+      const seqExisting = await this.idempotency.findBySequence(scope, "pos/offline/replay", dto.clientTxId);
+      if (seqExisting?.responseJson) {
+        this.logger.warn(`Duplicate offline replay detected for seq ${dto.clientTxId} scope ${scope}`);
+        return seqExisting.responseJson;
+      }
+      if (seqExisting?.status === IdempotencyStatus.inflight) {
+        throw new ConflictException("Replay already in progress");
+      }
+      if (seqExisting) {
+        this.logger.warn(`Replay seq ${dto.clientTxId} already processed without snapshot for scope ${scope}`);
+      }
+    }
+
+    const existing = await this.guardIdempotency(idempotencyKey, dto, actor, "pos/offline/replay", dto.clientTxId, dto.recordedTotalsHash);
     if (existing?.status === IdempotencyStatus.succeeded && existing.responseJson) return existing.responseJson;
     if (existing?.status === IdempotencyStatus.inflight && existing.createdAt && Date.now() - new Date(existing.createdAt).getTime() < 60000) {
       throw new ConflictException("Request already in progress");
@@ -307,12 +407,79 @@ export class PosService {
           recordedTotalsHash: dto.recordedTotalsHash
         };
 
+    const payloadHash = dto.payload ? crypto.createHash("sha256").update(JSON.stringify(dto.payload)).digest("hex") : undefined;
+    const tender = this.extractTender(dto.payload);
+    const items = this.extractItems(dto.payload);
+
+    // Persist offline replay for reconciliation / review
+    try {
+      const offlineId = dto.clientTxId ? `offline_${dto.clientTxId}` : undefined;
+      if (offlineId) {
+        await this.prisma.posOfflineReplay.upsert({
+          where: { id: offlineId },
+          update: {
+            recordedTotalsHash: dto.recordedTotalsHash ?? null,
+            expectedHash,
+            payloadHash,
+            status: response.status,
+            reason: (response as any).reason ?? null,
+            payload: dto.payload as any,
+            tender: tender as any,
+            items: items as any,
+            expectedBreakdown: expected as any,
+            campgroundId: actor?.campgroundId ?? null,
+            cartId
+          },
+          create: {
+            id: offlineId,
+            clientTxId: dto.clientTxId ?? null,
+            cartId,
+            campgroundId: actor?.campgroundId ?? null,
+            recordedTotalsHash: dto.recordedTotalsHash ?? null,
+            expectedHash,
+            payloadHash,
+            status: response.status,
+            reason: (response as any).reason ?? null,
+            payload: dto.payload as any,
+            tender: tender as any,
+            items: items as any,
+            expectedBreakdown: expected as any
+          }
+        } as any);
+      } else {
+        await this.prisma.posOfflineReplay.create({
+          data: {
+            clientTxId: dto.clientTxId ?? null,
+            cartId,
+            campgroundId: actor?.campgroundId ?? null,
+            recordedTotalsHash: dto.recordedTotalsHash ?? null,
+            expectedHash,
+            payloadHash,
+            status: response.status,
+            reason: (response as any).reason ?? null,
+            payload: dto.payload as any,
+            tender: tender as any,
+            items: items as any,
+            expectedBreakdown: expected as any
+          }
+        } as any);
+      }
+    } catch (persistErr) {
+      this.logger.warn(`Failed to persist offline replay ${dto.clientTxId ?? "unknown"}: ${persistErr}`);
+    }
+
     if (idempotencyKey) await this.idempotency.complete(idempotencyKey, response);
+    this.observability.recordOfflineReplay(response.status === "accepted", Date.now() - started, {
+      clientTxId: dto.clientTxId,
+      cartId,
+      status: response.status,
+      campgroundId: actor?.campgroundId ?? null
+    });
     return response;
   }
 
   async createReturn(dto: CreateReturnDto, idempotencyKey?: string, actor?: any) {
-    const existing = await this.guardIdempotency(idempotencyKey, dto, actor?.campgroundId);
+    const existing = await this.guardIdempotency(idempotencyKey, dto, actor, "pos/returns");
     if (existing?.status === IdempotencyStatus.succeeded && existing.responseJson) return existing.responseJson;
     if (existing?.status === IdempotencyStatus.inflight && existing.createdAt && Date.now() - new Date(existing.createdAt).getTime() < 60000) {
       throw new ConflictException("Request already in progress");
@@ -386,9 +553,27 @@ export class PosService {
     return response;
   }
 
-  private async guardIdempotency(key?: string, body?: any, campgroundId?: string | null) {
+  private scopeKey(actor?: any) {
+    return actor?.tenantId ?? actor?.campgroundId ?? "global";
+  }
+
+  private async guardIdempotency(
+    key?: string,
+    body?: any,
+    actor?: any,
+    endpoint?: string,
+    sequence?: string | number | null,
+    checksum?: string | null
+  ) {
     if (!key) return null;
-    return this.idempotency.start(key, body ?? {}, campgroundId ?? null);
+    return this.idempotency.start(key, body ?? {}, actor?.campgroundId ?? null, {
+      tenantId: actor?.tenantId ?? null,
+      endpoint,
+      sequence,
+      rateAction: "apply",
+      checksum: checksum ?? undefined,
+      requestBody: body ?? {}
+    });
   }
 
   // TODO: Replace with full pricing/tax/fee engine
@@ -403,6 +588,29 @@ export class PosService {
       fee += i.feeCents ?? 0;
     }
     return { netCents: net, taxCents: tax, feeCents: fee, totalCents: net + tax + fee };
+  }
+
+  private extractTender(payload: any) {
+    const payments = Array.isArray(payload?.payments) ? payload.payments : [];
+    return payments.map((p: any) => ({
+      method: p?.method ?? p?.type ?? "unknown",
+      amountCents: p?.amountCents ?? p?.amount ?? 0,
+      referenceId: p?.referenceId ?? p?.id ?? null,
+      tipCents: p?.tipCents ?? 0
+    }));
+  }
+
+  private extractItems(payload: any) {
+    const items = Array.isArray(payload?.items) ? payload.items : [];
+    return items.map((i: any) => ({
+      productId: i?.productId ?? i?.id ?? null,
+      qty: i?.qty ?? 1,
+      unitPriceCents: i?.unitPriceCents ?? null,
+      taxCents: i?.taxCents ?? 0,
+      feeCents: i?.feeCents ?? 0,
+      totalCents: i?.totalCents ?? i?.amountCents ?? 0,
+      description: i?.name ?? i?.description ?? null
+    }));
   }
 
   private hashTotals(breakdown: { netCents: number; taxCents: number; feeCents: number; totalCents: number }) {

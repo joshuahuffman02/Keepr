@@ -126,6 +126,7 @@ export default function SiteClassesPage() {
           ]}
         />
         <h2 className="text-xl font-semibold text-slate-900">Site classes</h2>
+        <p className="text-sm text-slate-600">Add photos to classes to share gallery images across sites in that class.</p>
         <div className="card p-4">
           <h3 className="text-lg font-semibold text-slate-900 mb-2">Add site class</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
@@ -170,6 +171,28 @@ export default function SiteClassesPage() {
               value={form.description}
               onChange={(e) => setForm((s) => ({ ...s, description: e.target.value }))}
             />
+            <div className="md:col-span-2 space-y-1">
+              <label className="text-xs font-semibold text-slate-700">Photos (comma-separated URLs)</label>
+              <textarea
+                className="rounded-md border border-slate-200 px-3 py-2 w-full"
+                placeholder="https://img1.jpg, https://img2.jpg"
+                value={form.photos}
+                onChange={(e) => setForm((s) => ({ ...s, photos: e.target.value }))}
+              />
+              {form.photos && form.photos.split(",").map((p) => p.trim()).filter(Boolean).length > 0 && (
+                <div className="mt-2 grid grid-cols-2 sm:grid-cols-3 gap-2">
+                  {form.photos
+                    .split(",")
+                    .map((p) => p.trim())
+                    .filter(Boolean)
+                    .map((url) => (
+                      <div key={url} className="text-[10px] truncate rounded border border-slate-200 bg-slate-50 p-1">
+                        {url}
+                      </div>
+                    ))}
+                </div>
+              )}
+            </div>
             <div className="flex flex-wrap gap-3 md:col-span-2">
               <label className="flex items-center gap-2 text-sm text-slate-700">
                 <input
@@ -269,7 +292,16 @@ export default function SiteClassesPage() {
                     </div>
                     {cls.description && <div className="text-xs text-slate-500">{cls.description}</div>}
                     {cls.photos && cls.photos.length > 0 && (
-                      <div className="text-xs text-slate-500">Photos: {cls.photos.length}</div>
+                      <div className="space-y-1">
+                        <div className="text-xs text-slate-500">Photos: {cls.photos.length}</div>
+                        <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                          {cls.photos.map((url) => (
+                            <div key={url} className="relative h-20 w-full overflow-hidden rounded border border-slate-200 bg-slate-50">
+                              <img src={url} alt="Class photo" className="h-full w-full object-cover" />
+                            </div>
+                          ))}
+                        </div>
+                      </div>
                     )}
                   </div>
                 <div className="text-right text-xs text-slate-500 space-y-2 min-w-[150px]">
@@ -433,12 +465,29 @@ export default function SiteClassesPage() {
                           setEditForm((s) => (s ? { ...s, maxNights: e.target.value === "" ? "" : Number(e.target.value) } : s))
                         }
                       />
-                      <input
-                        className="rounded-md border border-slate-200 px-3 py-2 md:col-span-2"
-                        placeholder="Photos (comma-separated URLs)"
-                        value={editForm.photos}
-                        onChange={(e) => setEditForm((s) => (s ? { ...s, photos: e.target.value } : s))}
-                      />
+                      <div className="md:col-span-2 space-y-1">
+                        <label className="text-xs font-semibold text-slate-700">Photos (comma-separated URLs)</label>
+                        <textarea
+                          className="rounded-md border border-slate-200 px-3 py-2 w-full"
+                          placeholder="https://img1.jpg, https://img2.jpg"
+                          value={editForm.photos}
+                          onChange={(e) => setEditForm((s) => (s ? { ...s, photos: e.target.value } : s))}
+                        />
+                        {editForm.photos &&
+                          editForm.photos.split(",").map((p) => p.trim()).filter(Boolean).length > 0 && (
+                            <div className="mt-2 grid grid-cols-2 sm:grid-cols-3 gap-2">
+                              {editForm.photos
+                                .split(",")
+                                .map((p) => p.trim())
+                                .filter(Boolean)
+                                .map((url) => (
+                                  <div key={url} className="text-[10px] truncate rounded border border-slate-200 bg-slate-50 p-1">
+                                    {url}
+                                  </div>
+                                ))}
+                            </div>
+                          )}
+                      </div>
                       <input
                         className="rounded-md border border-slate-200 px-3 py-2 md:col-span-2"
                         placeholder="Policy version (snapshot id)"

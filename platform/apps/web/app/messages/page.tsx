@@ -162,7 +162,37 @@ export default function MessagesPage() {
                 return bTime - aTime;
             });
 
+            if (convs.length === 0) {
+                const now = new Date().toISOString();
+                const demoConv: Conversation = {
+                    reservationId: "demo-reservation",
+                    guestName: "Demo Guest",
+                    siteName: "Site A-1",
+                    status: "confirmed",
+                    unreadCount: 0,
+                    messages: [
+                        {
+                            id: "demo-msg-1",
+                            content: "Hey! Just testing the inbox. Everything looks good.",
+                            senderType: "guest",
+                            createdAt: now,
+                            readAt: now,
+                            guest: { id: "demo-guest", primaryFirstName: "Demo", primaryLastName: "Guest" }
+                        }
+                    ],
+                    lastMessage: {
+                        id: "demo-msg-1",
+                        content: "Hey! Just testing the inbox. Everything looks good.",
+                        senderType: "guest",
+                        createdAt: now,
+                        readAt: now,
+                        guest: { id: "demo-guest", primaryFirstName: "Demo", primaryLastName: "Guest" }
+                    }
+                };
+                setConversations([demoConv]);
+            } else {
             setConversations(convs);
+            }
             setLoadingConversations(false);
         };
 
@@ -418,15 +448,16 @@ export default function MessagesPage() {
                     </div>
                 </div>
 
-                <div className="flex flex-col gap-4 lg:flex-row lg:h-[calc(100vh-12rem)]">
-                        <div className="flex items-center gap-2 text-xs text-slate-600 px-1">
+                <div className="rounded-2xl border bg-white shadow-sm p-3 flex flex-col gap-2 lg:flex-row lg:items-center lg:justify-between">
+                    <div className="flex items-center gap-2 text-xs text-slate-600">
+                        <span className="font-semibold text-slate-700">Filters</span>
                             {activeFilterCount > 0 && (
                                 <span className="rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 px-2 py-0.5 text-[11px] font-semibold">
-                                    {activeFilterCount} filters
+                                {activeFilterCount} active
                                 </span>
                             )}
                         </div>
-                    <div className="flex flex-wrap items-center gap-2 px-1">
+                    <div className="flex flex-wrap items-center gap-2">
                         <div className="flex gap-1">
                             {(["all", "failed"] as const).map((f) => (
                                 <button
@@ -438,7 +469,7 @@ export default function MessagesPage() {
                                 </button>
                             ))}
                         </div>
-                        <div className="flex items-center gap-2 text-xs text-slate-600">
+                        <div className="flex flex-wrap items-center gap-2 text-xs text-slate-600">
                             <input
                                 type="date"
                                 className="rounded border border-slate-200 px-2 py-1"
@@ -491,6 +522,9 @@ export default function MessagesPage() {
                             </Button>
                         </div>
                     </div>
+                </div>
+
+                <div className="flex flex-col gap-4 lg:flex-row lg:h-[calc(100vh-12rem)]">
                 {/* Sidebar */}
                 <Card className="w-full lg:w-80 flex flex-col">
                     <CardHeader className="pb-3">

@@ -94,15 +94,38 @@ export function HomeClient() {
 
     // Combine and filter campgrounds
     const allCampgrounds = useMemo(() => {
-        const internal = internalCampgrounds.map((cg) => ({
+        const internal = internalCampgrounds.map((cg) => {
+            const rating = cg.reviewScore ?? undefined;
+            const reviewCount = cg.reviewCount ?? undefined;
+
+            let badge: string | undefined;
+            if (typeof rating === "number" && typeof reviewCount === "number") {
+                if (rating >= 4.7 && reviewCount >= 100) {
+                    badge = "Top rated";
+                } else if (rating >= 4.5 && reviewCount >= 20) {
+                    badge = "Guest favorite";
+                } else if (reviewCount < 10) {
+                    badge = "Rising star";
+                }
+            }
+
+            return {
+                ...cg,
+                isInternal: true,
+                rating,
+                reviewCount,
+                pricePerNight: cg.pricePerNight ?? undefined,
+                ratingBadge: badge
+            };
+        });
+
+        const externalWithBadges = externalCampgrounds.map((cg) => ({
             ...cg,
-            isInternal: true,
-            rating: cg.reviewScore ?? undefined,
-            reviewCount: cg.reviewCount ?? undefined,
-            pricePerNight: cg.pricePerNight ?? undefined
+            isInternal: false,
+            ratingBadge: cg.reviewCount && cg.reviewCount > 150 ? "Popular pick" : undefined
         }));
 
-        const combined = [...internal, ...externalCampgrounds.map((cg) => ({ ...cg, isInternal: false }))];
+        const combined = [...internal, ...externalWithBadges];
 
         // Build search terms from query and location filter
         const searchTerms: string[] = [];
@@ -203,6 +226,9 @@ export function HomeClient() {
                             {searchQuery
                                 ? `${allCampgrounds.length} campgrounds found`
                                 : "Discover top-rated destinations"}
+                        </p>
+                        <p className="text-xs text-slate-500 mt-2">
+                            Tap the heart to save a campground. Saved lists stay on this device for now.
                         </p>
                     </div>
                     <div className="w-full sm:w-auto flex items-center gap-2">
@@ -320,27 +346,27 @@ export function HomeClient() {
                 </div>
             </section>
 
-            {/* Lead capture */}
+            {/* Demo request */}
             <section className="bg-white py-16 border-y border-slate-100">
                 <div className="max-w-6xl mx-auto px-6 grid md:grid-cols-2 gap-12 items-center">
                     <div className="space-y-4">
-                        <div className="text-xs font-semibold uppercase tracking-[0.08em] text-emerald-700">Lead capture</div>
+                        <div className="text-xs font-semibold uppercase tracking-[0.08em] text-emerald-700">Request a demo</div>
                         <h2 className="text-2xl md:text-3xl font-bold text-slate-900">
                             Want more bookings or a smoother operation?
                         </h2>
                         <p className="text-slate-600">
-                            Share your email and what you want to improve. We log it per campground and keep the sync stubbed — no live CRM calls.
+                            Tell us what you want to improve. We’ll follow up with a tailored walkthrough—no spam, no auto-sync to external tools.
                         </p>
                         <ul className="space-y-2 text-sm text-slate-700">
-                            <li>• Name + email + interest captured internally</li>
+                            <li>• Name + email + interest captured securely</li>
                             <li>• Scoped to your selected campground (or the public demo)</li>
-                            <li>• One-click “Sync now” stays in-app for safety</li>
+                            <li>• No third-party sync—stays inside Camp Everyday</li>
                         </ul>
                     </div>
                     <LeadCaptureForm
                         defaultCampgroundId="public-site"
                         defaultCampgroundName="Camp Everyday demo"
-                        title="Raise your hand"
+                        title="Request a walkthrough"
                     />
                 </div>
             </section>

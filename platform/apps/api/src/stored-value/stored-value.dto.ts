@@ -32,6 +32,22 @@ export class IssueStoredValueDto {
   codeOptions?: { pin?: string; generatePin?: boolean };
 
   @IsOptional()
+  @IsBoolean()
+  taxableLoad?: boolean;
+
+  @IsOptional()
+  @IsString()
+  reloadAccountId?: string;
+
+  @IsOptional()
+  @IsString()
+  referenceType?: string;
+
+  @IsOptional()
+  @IsString()
+  referenceId?: string;
+
+  @IsOptional()
   metadata?: Record<string, any>;
 }
 
@@ -69,6 +85,65 @@ export class RedeemStoredValueDto {
   @IsOptional()
   @IsString()
   channel?: string;
+}
+
+export class ReloadStoredValueDto {
+  @IsString()
+  accountId!: string;
+
+  @Type(() => Number)
+  @IsInt()
+  @IsPositive()
+  amountCents!: number;
+
+  @IsString()
+  currency!: string;
+
+  @IsOptional()
+  @IsString()
+  referenceType?: string;
+
+  @IsOptional()
+  @IsString()
+  referenceId?: string;
+
+  @IsOptional()
+  @IsBoolean()
+  taxableLoad?: boolean;
+}
+
+export class RefundStoredValueDto {
+  @IsString()
+  accountId!: string;
+
+  @Type(() => Number)
+  @IsInt()
+  @IsPositive()
+  amountCents!: number;
+
+  @IsString()
+  currency!: string;
+
+  @IsOptional()
+  @IsString()
+  referenceType?: string;
+
+  @IsOptional()
+  @IsString()
+  referenceId?: string;
+}
+
+export class VoidStoredValueDto {
+  @IsString()
+  accountId!: string;
+
+  @IsOptional()
+  @IsString()
+  reason?: string;
+
+  @IsOptional()
+  @IsString()
+  referenceId?: string;
 }
 
 export class AdjustStoredValueDto {

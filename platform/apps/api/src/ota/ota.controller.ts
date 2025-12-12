@@ -93,5 +93,15 @@ export class OtaController {
     const raw = (req as any).rawBody ? (req as any).rawBody.toString() : JSON.stringify(body);
     return this.ota.handleWebhook(provider, body, raw, signature, timestamp);
   }
+
+  @Get("monitor")
+  monitor() {
+    return this.ota.monitor();
+  }
+
+  @Get("alerts")
+  alerts() {
+    return this.ota.alerts();
+  }
 }
 

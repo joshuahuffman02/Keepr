@@ -23,8 +23,13 @@ import {
   StayType
 } from "@prisma/client";
 import * as bcrypt from "bcryptjs";
+import { PrismaPg } from "@prisma/adapter-pg";
 
-const prisma = new PrismaClient();
+const adapter = new PrismaPg({
+  connectionString: process.env.DATABASE_URL || process.env.PLATFORM_DATABASE_URL
+});
+// @ts-ignore Prisma 7 adapter signature
+const prisma = new PrismaClient({ adapter });
 
 const randomBetween = (min: number, max: number) => Math.floor(Math.random() * (max - min + 1)) + min;
 const pick = <T>(arr: T[]) => arr[Math.floor(Math.random() * arr.length)];
@@ -1696,7 +1701,13 @@ async function seedCampground(
 
   const guestCount = config.size === "resort" ? 420 : config.size === "mom_pop" ? 180 : 260;
   const guests = await prisma.$transaction(
-    generateGuests(guestCount, config.guestOffset, config.slug).map((data) => prisma.guest.create({ data }))
+    generateGuests(guestCount, config.guestOffset, config.slug).map((data) =>
+      prisma.guest.upsert({
+        where: { email: data.email },
+        update: {},
+        create: data
+      })
+    )
   );
   console.log(`  Created ${guests.length} guests`);
 
@@ -1783,4 +1794,3 @@ main()
   .finally(async () => {
     await prisma.$disconnect();
   });
-

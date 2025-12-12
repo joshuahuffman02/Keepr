@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Headers, Param, Post, RawBodyRequest, Req, BadRequestException, UseGuards, NotFoundException, Query, Res, Logger, ForbiddenException, ConflictException } from "@nestjs/common";
+import { Body, Controller, Get, Headers, Param, Post, RawBodyRequest, Req, BadRequestException, UseGuards, NotFoundException, Query, Res, Logger, ForbiddenException, ConflictException, ServiceUnavailableException } from "@nestjs/common";
 import Stripe from "stripe";
 import { Response } from "express";
 import { ReservationsService } from "../reservations/reservations.service";
@@ -19,6 +19,7 @@ import { PaymentsReconciliationService } from "./reconciliation.service";
 import { IsInt, IsOptional, Min } from "class-validator";
 import { Type } from "class-transformer";
 import { IdempotencyService } from "./idempotency.service";
+import { GatewayConfigService } from "./gateway-config.service";
 
 // DTO for public payment intent creation
 class CreatePublicPaymentIntentDto {
@@ -73,7 +74,8 @@ export class PaymentsController {
     private readonly stripeService: StripeService,
     private readonly prisma: PrismaService,
     private readonly recon: PaymentsReconciliationService,
-    private readonly idempotency: IdempotencyService
+    private readonly idempotency: IdempotencyService,
+    private readonly gatewayConfigService: GatewayConfigService
   ) { }
 
   private readonly logger = new Logger(PaymentsController.name);
@@ -141,6 +143,17 @@ export class PaymentsController {
     if (!reservation) {
       throw new BadRequestException("Reservation not found for payment");
     }
+    const gatewayConfig = await this.gatewayConfigService.getConfig(reservation.campgroundId);
+    if (!gatewayConfig) {
+      throw new BadRequestException("Payment gateway configuration is missing for this campground.");
+    }
+    if (gatewayConfig.mode === "prod" && !gatewayConfig.hasProductionCredentials) {
+      throw new BadRequestException("Payment gateway is in production mode but credentials are not configured.");
+    }
+    if (gatewayConfig.gateway !== "stripe") {
+      throw new BadRequestException(`Gateway ${gatewayConfig.gateway} is not yet supported.`);
+    }
+
     const campground = await this.prisma.campground.findUnique({
       where: { id: reservation.campgroundId },
       select: {
@@ -169,7 +182,9 @@ export class PaymentsController {
       (campground as any)?.perBookingFeeCents ??
       (campground as any)?.applicationFeeFlatCents ??
       Number(process.env.PAYMENT_PLATFORM_FEE_CENTS ?? planDefaultFee);
-    const feeMode = ((campground as any)?.feeMode as PaymentFeeMode | undefined) ?? "absorb";
+    const feeMode = (gatewayConfig?.feeMode as PaymentFeeMode | undefined) ?? ((campground as any)?.feeMode as PaymentFeeMode | undefined) ?? "absorb";
+    const gatewayFeePercentBasisPoints = gatewayConfig?.effectiveFee?.percentBasisPoints ?? 0;
+    const gatewayFeeFlatCents = gatewayConfig?.effectiveFee?.flatFeeCents ?? 0;
     const refreshed = await this.refreshCapabilitiesIfNeeded({
       campgroundId: reservation.campgroundId,
       stripeAccountId,
@@ -181,6 +196,9 @@ export class PaymentsController {
       applicationFeeCents,
       campgroundId: reservation.campgroundId,
       feeMode,
+      gatewayConfig,
+      gatewayFeePercentBasisPoints,
+      gatewayFeeFlatCents,
       reservation,
       capabilities: refreshed.capabilities ?? ((campground as any)?.stripeCapabilities as Record<string, string> | undefined),
       capabilitiesFetchedAt: refreshed.fetchedAt ?? ((campground as any)?.stripeCapabilitiesFetchedAt as Date | undefined)
@@ -196,20 +214,33 @@ export class PaymentsController {
     return types.length ? types : ["card"];
   }
 
+  private calculateGatewayFee(amountCents: number, percentBasisPoints: number, flatFeeCents: number) {
+    const percentPortion = Math.round((amountCents * (percentBasisPoints ?? 0)) / 10000);
+    const flatPortion = flatFeeCents ?? 0;
+    return Math.max(0, percentPortion + flatPortion);
+  }
+
   private computeChargeAmounts(opts: {
     reservation: { balanceAmount?: number | null; totalAmount?: number | null; paidAmount?: number | null };
-    feeMode: PaymentFeeMode | string;
+    platformFeeMode: PaymentFeeMode | string;
     applicationFeeCents: number;
+    gatewayFeeMode: PaymentFeeMode | string;
+    gatewayFeePercentBasisPoints: number;
+    gatewayFeeFlatCents: number;
     requestedAmountCents?: number;
   }) {
     const baseDue =
       opts.reservation.balanceAmount ??
       Math.max(0, (opts.reservation.totalAmount ?? 0) - (opts.reservation.paidAmount ?? 0));
-    const passThroughFee = opts.feeMode === "pass_through" ? opts.applicationFeeCents : 0;
-    const maxCharge = Math.max(0, baseDue + passThroughFee);
+    const platformPassThroughFeeCents = opts.platformFeeMode === "pass_through" ? opts.applicationFeeCents : 0;
+    const gatewayPassThroughFeeCents =
+      opts.gatewayFeeMode === "pass_through"
+        ? this.calculateGatewayFee(baseDue, opts.gatewayFeePercentBasisPoints, opts.gatewayFeeFlatCents)
+        : 0;
+    const maxCharge = Math.max(0, baseDue + platformPassThroughFeeCents + gatewayPassThroughFeeCents);
     const desired = opts.requestedAmountCents ?? maxCharge;
     const amountCents = Math.min(Math.max(desired, 0), maxCharge);
-    return { amountCents, passThroughFeeCents: passThroughFee };
+    return { amountCents, platformPassThroughFeeCents, gatewayPassThroughFeeCents, baseDue };
   }
 
   private ensureCampgroundMembership(user: any, campgroundId: string | null | undefined) {
@@ -236,13 +267,35 @@ export class PaymentsController {
 
     const ctx = await this.getPaymentContext(body.reservationId);
     this.ensureCampgroundMembership(req?.user, ctx.campgroundId);
-    const { stripeAccountId, applicationFeeCents, feeMode, reservation, campgroundId, capabilities } = ctx;
-    const { amountCents, passThroughFeeCents } = this.computeChargeAmounts({
-      reservation,
-      feeMode,
+    const {
+      stripeAccountId,
       applicationFeeCents,
+      feeMode,
+      reservation,
+      campgroundId,
+      capabilities,
+      gatewayConfig,
+      gatewayFeePercentBasisPoints,
+      gatewayFeeFlatCents
+    } = ctx;
+    const { amountCents, platformPassThroughFeeCents, gatewayPassThroughFeeCents, baseDue } = this.computeChargeAmounts({
+      reservation,
+      platformFeeMode: feeMode,
+      applicationFeeCents,
+      gatewayFeeMode: gatewayConfig?.feeMode ?? feeMode,
+      gatewayFeePercentBasisPoints,
+      gatewayFeeFlatCents,
       requestedAmountCents: body.amountCents
     });
+    const feeBreakdown = {
+      platformFeeMode: feeMode,
+      platformPassThroughFeeCents,
+      gatewayFeeMode: gatewayConfig?.feeMode ?? feeMode,
+      gatewayPassThroughFeeCents,
+      gatewayPercentBasisPoints: gatewayFeePercentBasisPoints,
+      gatewayFlatFeeCents: gatewayFeeFlatCents,
+      baseAmountCents: baseDue
+    };
 
     // Check idempotency if key provided
     if (idempotencyKey) {
@@ -268,7 +321,12 @@ export class PaymentsController {
           source: 'staff_checkout',
           feeMode,
           applicationFeeCents: String(applicationFeeCents),
-          passThroughFeeCents: String(passThroughFeeCents)
+          platformPassThroughFeeCents: String(platformPassThroughFeeCents),
+          gatewayPassThroughFeeCents: String(gatewayPassThroughFeeCents),
+          gatewayProvider: gatewayConfig?.gateway ?? "stripe",
+          gatewayMode: gatewayConfig?.mode ?? "test",
+          gatewayFeePercentBasisPoints: String(gatewayFeePercentBasisPoints),
+          gatewayFeeFlatCents: String(gatewayFeeFlatCents)
         },
         stripeAccountId,
         applicationFeeCents,
@@ -283,7 +341,8 @@ export class PaymentsController {
         amountCents,
         currency,
         reservationId: body.reservationId,
-        status: intent.status
+        status: intent.status,
+        fees: feeBreakdown
       };
 
       if (idempotencyKey) {
@@ -345,19 +404,44 @@ export class PaymentsController {
    * Create a payment intent for public/guest checkout (no authentication required)
    */
   @Post("public/payments/intents")
-  async createPublicIntent(@Body() body: CreatePublicPaymentIntentDto) {
+  async createPublicIntent(
+    @Body() body: CreatePublicPaymentIntentDto,
+    @Headers("idempotency-key") idempotencyKey?: string
+  ) {
     const currency = (body.currency || "usd").toLowerCase();
 
     if (!body.reservationId) {
       throw new BadRequestException("reservationId is required for payment");
     }
 
-    const { stripeAccountId, applicationFeeCents, feeMode, reservation, campgroundId, capabilities } = await this.getPaymentContext(body.reservationId);
-    const { amountCents, passThroughFeeCents } = this.computeChargeAmounts({
-      reservation,
+    const {
+      stripeAccountId,
+      applicationFeeCents,
       feeMode,
-      applicationFeeCents
+      reservation,
+      campgroundId,
+      capabilities,
+      gatewayConfig,
+      gatewayFeePercentBasisPoints,
+      gatewayFeeFlatCents
+    } = await this.getPaymentContext(body.reservationId);
+    const { amountCents, platformPassThroughFeeCents, gatewayPassThroughFeeCents, baseDue } = this.computeChargeAmounts({
+      reservation,
+      platformFeeMode: feeMode,
+      applicationFeeCents,
+      gatewayFeeMode: gatewayConfig?.feeMode ?? feeMode,
+      gatewayFeePercentBasisPoints,
+      gatewayFeeFlatCents
     });
+    const feeBreakdown = {
+      platformFeeMode: feeMode,
+      platformPassThroughFeeCents,
+      gatewayFeeMode: gatewayConfig?.feeMode ?? feeMode,
+      gatewayPassThroughFeeCents,
+      gatewayPercentBasisPoints: gatewayFeePercentBasisPoints,
+      gatewayFlatFeeCents: gatewayFeeFlatCents,
+      baseAmountCents: baseDue
+    };
 
     const metadata: Record<string, string> = {
       reservationId: body.reservationId,
@@ -365,29 +449,74 @@ export class PaymentsController {
       source: 'public_checkout',
       feeMode,
       applicationFeeCents: String(applicationFeeCents),
-      passThroughFeeCents: String(passThroughFeeCents)
+      platformPassThroughFeeCents: String(platformPassThroughFeeCents),
+      gatewayPassThroughFeeCents: String(gatewayPassThroughFeeCents),
+      gatewayProvider: gatewayConfig?.gateway ?? "stripe",
+      gatewayMode: gatewayConfig?.mode ?? "test",
+      gatewayFeePercentBasisPoints: String(gatewayFeePercentBasisPoints),
+      gatewayFeeFlatCents: String(gatewayFeeFlatCents)
     };
     if (body.guestEmail) {
       metadata.guestEmail = body.guestEmail;
     }
 
-    const intent = await this.stripeService.createPaymentIntent(
-      amountCents,
-      currency,
-      metadata,
-      stripeAccountId,
-      applicationFeeCents,
-      body.captureMethod === 'manual' ? 'manual' : 'automatic',
-      this.getPaymentMethodTypes(capabilities)
-    );
+    const threeDsPolicy = this.buildThreeDsPolicy(currency, gatewayConfig);
 
-    return {
-      id: intent.id,
-      clientSecret: intent.client_secret,
-      amountCents,
-      currency,
-      status: intent.status
-    };
+    const existing = idempotencyKey
+      ? await this.idempotency.start(idempotencyKey, body, campgroundId, {
+          endpoint: "public/payments/intents",
+          requestBody: body,
+          metadata: { reservationId: body.reservationId, threeDsPolicy },
+          rateAction: "apply"
+        })
+      : null;
+    if (existing?.status === IdempotencyStatus.succeeded && existing.responseJson) {
+      return existing.responseJson;
+    }
+    if (existing?.status === IdempotencyStatus.inflight && existing.createdAt && Date.now() - new Date(existing.createdAt).getTime() < 60000) {
+      throw new ConflictException({
+        message: "Payment intent creation already in progress; retry with backoff",
+        retryAfterMs: 500,
+        reason: "inflight"
+      });
+    }
+
+    try {
+      const intent = await this.withGatewayFailover(async () =>
+        this.stripeService.createPaymentIntent(
+          amountCents,
+          currency,
+          metadata,
+          stripeAccountId,
+          applicationFeeCents,
+          body.captureMethod === 'manual' ? 'manual' : 'automatic',
+          this.getPaymentMethodTypes(capabilities),
+          idempotencyKey,
+          threeDsPolicy
+        )
+      );
+
+      const response = {
+        id: intent.id,
+        clientSecret: intent.client_secret,
+        amountCents,
+        currency,
+        status: intent.status,
+        fees: feeBreakdown,
+        threeDsPolicy
+      };
+
+      if (idempotencyKey) {
+        await this.idempotency.complete(idempotencyKey, response);
+      }
+
+      return response;
+    } catch (error) {
+      if (idempotencyKey) {
+        await this.idempotency.fail(idempotencyKey);
+      }
+      throw error;
+    }
   }
 
   /**
@@ -432,6 +561,39 @@ export class PaymentsController {
     } catch { /* noop */ }
 
     return { accountId, onboardingUrl: link.url };
+  }
+
+  /**
+   * Determine 3DS policy based on currency/region and gateway config.
+   * EU/UK currencies default to "any" while others stay "automatic".
+   */
+  private buildThreeDsPolicy(currency: string, gatewayConfig?: any): "any" | "automatic" {
+    const cur = currency?.toLowerCase?.() ?? "usd";
+    const region = gatewayConfig?.additionalConfig?.region ?? gatewayConfig?.region ?? null;
+    const euLikeCurrencies = ["eur", "gbp", "chf", "sek", "nok"];
+    if (euLikeCurrencies.includes(cur) || region === "eu" || region === "uk") {
+      return "any";
+    }
+    return "automatic";
+  }
+
+  /**
+   * Stubbed secondary-gateway failover hook. Logs the failure and preserves the
+   * original error so callers can backoff/retry or switch providers when wired.
+   */
+  private async withGatewayFailover<T>(fn: () => Promise<T>): Promise<T> {
+    try {
+      return await fn();
+    } catch (err) {
+      this.logger.error(`Primary gateway failed: ${(err as any)?.message ?? err}`, err as any);
+      this.logger.warn("Secondary gateway failover stub invoked (no secondary configured)");
+      const fallback = new ServiceUnavailableException({
+        message: "Payment processor unavailable; retry with backoff or alternate gateway",
+        reason: "gateway_unavailable"
+      });
+      (fallback as any).cause = err;
+      throw fallback;
+    }
   }
 
   /**
@@ -583,13 +745,28 @@ export class PaymentsController {
       // Record the payment in the reservation if applicable
       const reservationId = intent.metadata?.reservationId;
       if (reservationId) {
+        const toNumber = (v: any) => (v === undefined || v === null || Number.isNaN(Number(v)) ? 0 : Number(v));
+        const lineItems = [
+          { label: "Reservation charge", amountCents: toNumber(intent.metadata?.baseAmountCents ?? intent.amount_received ?? intent.amount) }
+        ];
+        const platformFee = toNumber(intent.metadata?.platformPassThroughFeeCents ?? intent.metadata?.applicationFeeCents);
+        const gatewayFee = toNumber(intent.metadata?.gatewayPassThroughFeeCents);
+        if (platformFee > 0) lineItems.push({ label: "Platform fee", amountCents: platformFee });
+        if (gatewayFee > 0) lineItems.push({ label: "Gateway fee", amountCents: gatewayFee });
+        const taxCents = toNumber((intent.metadata as any)?.taxCents);
+
         await this.reservations.recordPayment(reservationId, intent.amount_received, {
           transactionId: intent.id,
           paymentMethod: intent.payment_method_types?.[0] || 'card',
           source: intent.metadata?.source || 'staff_checkout',
           stripePaymentIntentId: intent.id,
           stripeChargeId: (intent as any)?.latest_charge as any,
-          capturedAt: new Date()
+          capturedAt: new Date(),
+          lineItems,
+          taxCents: taxCents || undefined,
+          feeCents: platformFee + gatewayFee > 0 ? platformFee + gatewayFee : undefined,
+          totalCents: intent.amount_received,
+          receiptKind: "payment"
         });
       }
 
@@ -695,6 +872,16 @@ export class PaymentsController {
       const amountCents = paymentIntent.amount;
 
       if (reservationId) {
+        const toNumber = (v: any) => (v === undefined || v === null || Number.isNaN(Number(v)) ? 0 : Number(v));
+        const lineItems = [
+          { label: "Reservation charge", amountCents: toNumber(paymentIntent.metadata?.baseAmountCents ?? amountCents) }
+        ];
+        const platformFee = toNumber(paymentIntent.metadata?.platformPassThroughFeeCents ?? paymentIntent.metadata?.applicationFeeCents);
+        const gatewayFee = toNumber(paymentIntent.metadata?.gatewayPassThroughFeeCents);
+        if (platformFee > 0) lineItems.push({ label: "Platform fee", amountCents: platformFee });
+        if (gatewayFee > 0) lineItems.push({ label: "Gateway fee", amountCents: gatewayFee });
+        const taxCents = toNumber((paymentIntent.metadata as any)?.taxCents);
+
         await this.reservations.recordPayment(reservationId, amountCents, {
           transactionId: paymentIntent.id,
           paymentMethod: paymentIntent.payment_method_types?.[0] || 'card',
@@ -704,7 +891,12 @@ export class PaymentsController {
           stripeBalanceTransactionId: paymentIntent.charges?.data?.[0]?.balance_transaction,
           applicationFeeCents: paymentIntent.application_fee_amount ?? undefined,
           methodType: paymentIntent.payment_method_types?.[0],
-          capturedAt: paymentIntent.status === 'succeeded' ? new Date(paymentIntent.created * 1000) : undefined
+          capturedAt: paymentIntent.status === 'succeeded' ? new Date(paymentIntent.created * 1000) : undefined,
+          lineItems,
+          taxCents: taxCents || undefined,
+          feeCents: platformFee + gatewayFee > 0 ? platformFee + gatewayFee : undefined,
+          totalCents: amountCents,
+          receiptKind: "payment"
         });
       }
     }

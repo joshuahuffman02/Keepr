@@ -1,5 +1,5 @@
-import { IsDateString, IsEnum, IsInt, IsNotEmpty, IsOptional, IsString, Min } from "class-validator";
-import { ReservationStatus } from "@prisma/client";
+import { IsArray, IsBoolean, IsDateString, IsEnum, IsInt, IsNotEmpty, IsOptional, IsString, Min } from "class-validator";
+import { ReservationStatus, StayReasonPreset } from "@prisma/client";
 
 export class CreateReservationDto {
   @IsString()
@@ -111,6 +111,39 @@ export class CreateReservationDto {
   @IsInt()
   @Min(0)
   rigLength?: number;
+
+  @IsOptional()
+  @IsBoolean()
+  requiresAccessible?: boolean;
+
+  @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
+  requiredAmenities?: string[];
+
+  @IsOptional()
+  @IsString()
+  stayReasonPreset?: StayReasonPreset;
+
+  @IsOptional()
+  @IsString()
+  stayReasonOther?: string;
+
+  @IsOptional()
+  @IsString()
+  referralCode?: string;
+
+  @IsOptional()
+  @IsString()
+  referralProgramId?: string;
+
+  @IsOptional()
+  @IsString()
+  referralSource?: string;
+
+  @IsOptional()
+  @IsString()
+  referralChannel?: string;
 
   @IsOptional()
   @IsString()

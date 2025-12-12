@@ -22,9 +22,26 @@ type OtaConfig = {
   pendingSyncs?: number;
 };
 
+type OtaStats = {
+  provider: string;
+  campgroundId: string;
+  lastSuccessAt?: number;
+  lastFailureAt?: number;
+  success: number;
+  failure: number;
+  lastWebhookSuccessAt?: number;
+  lastWebhookFailureAt?: number;
+  webhookSuccess: number;
+  webhookFailure: number;
+};
+
 @Injectable()
 export class OtaService {
   private readonly configStore = new Map<string, OtaConfig>();
+  private readonly stats = new Map<string, OtaStats>();
+  private readonly freshnessMinutes = Number(process.env.OTA_SYNC_MAX_AGE_MINUTES ?? 15);
+  private readonly webhookErrorRateTarget = Number(process.env.OTA_WEBHOOK_ERROR_RATE ?? 0.01);
+  private readonly successRateTarget = Number(process.env.OTA_SUCCESS_RATE ?? 0.95);
 
   constructor(private readonly prisma: PrismaService) {}
 
@@ -333,6 +350,7 @@ export class OtaService {
     }
 
     await this.logSync(mapping.channelId, { imported: events.length }, "pull", "availability", "success", "iCal import");
+    this.recordSync("ical", campgroundId, true, "pull");
     return { ok: true, imported: events.length };
   }
 
@@ -347,6 +365,7 @@ export class OtaService {
     }
 
     this.verifyHmac(rawBody, channel.webhookSecret || "", signature, timestamp);
+    this.recordWebhook(provider, channel.campgroundId, true);
 
     // Idempotent import record
     const externalReservationId = body?.id || body?.reservationId || body?.externalId || "unknown";
@@ -398,6 +417,7 @@ export class OtaService {
             data: { status: "imported", message: "Cancelled", updatedAt: new Date() },
           });
           await this.logSync(channel.id, body, "pull", "reservation", "success", "Cancelled reservation");
+          this.recordSync(provider, channel.campgroundId, true, "pull");
           return { ok: true, importId: importRecord.id, reservationId: importRecord.reservationId, cancelled: true };
         } else {
           await (this.prisma as any).otaReservationImport.update({
@@ -597,7 +617,7 @@ export class OtaService {
   async pushAvailability(channelId: string) {
     const channel = await (this.prisma as any).otaChannel.findUnique({
       where: { id: channelId },
-      select: { id: true, campgroundId: true, name: true, status: true },
+      select: { id: true, campgroundId: true, name: true, status: true, provider: true },
     });
     if (!channel) throw new NotFoundException("Channel not found");
 
@@ -656,7 +676,100 @@ export class OtaService {
       errorCount > 0 ? "failed" : "success",
       errorCount > 0 ? `Pushed with ${errorCount} errors` : "Availability/pricing push succeeded"
     );
+    this.recordSync(channel.provider ?? "unknown", channel.campgroundId, errorCount === 0, "push");
     return { ok: true, total: mappings.length, successCount, errorCount };
+  }
+
+  monitor() {
+    return Array.from(this.stats.values()).map((s) => {
+      const successTotal = s.success + s.failure;
+      const successRate = successTotal === 0 ? 1 : s.success / successTotal;
+      const webhookTotal = s.webhookSuccess + s.webhookFailure;
+      const webhookErrorRate = webhookTotal === 0 ? 0 : s.webhookFailure / webhookTotal;
+      const ageMinutes = s.lastSuccessAt ? (Date.now() - s.lastSuccessAt) / 60000 : Infinity;
+      return {
+        provider: s.provider,
+        campgroundId: s.campgroundId,
+        lastSuccessAt: s.lastSuccessAt ?? null,
+        lastFailureAt: s.lastFailureAt ?? null,
+        successRate,
+        ageMinutes,
+        webhookErrorRate,
+        webhookLastFailureAt: s.lastWebhookFailureAt ?? null,
+      };
+    });
+  }
+
+  alerts() {
+    const monitors = this.monitor();
+    const freshnessBreaches = monitors
+      .filter((m) => m.ageMinutes === Infinity || m.ageMinutes > this.freshnessMinutes)
+      .map((m) => ({ provider: m.provider, campgroundId: m.campgroundId, ageMinutes: m.ageMinutes }));
+    const webhookBreaches = monitors
+      .filter((m) => m.webhookErrorRate > this.webhookErrorRateTarget)
+      .map((m) => ({
+        provider: m.provider,
+        campgroundId: m.campgroundId,
+        webhookErrorRate: m.webhookErrorRate,
+      }));
+    const successBreaches = monitors
+      .filter((m) => (m.successRate ?? 1) < this.successRateTarget)
+      .map((m) => ({
+        provider: m.provider,
+        campgroundId: m.campgroundId,
+        successRate: m.successRate ?? 1,
+      }));
+
+    return {
+      thresholds: {
+        freshnessMinutes: this.freshnessMinutes,
+        webhookErrorRate: this.webhookErrorRateTarget,
+        successRate: this.successRateTarget,
+      },
+      freshnessBreaches,
+      webhookBreaches,
+      successBreaches,
+    };
+  }
+
+  private recordSync(provider: string, campgroundId: string, ok: boolean, _direction: "push" | "pull") {
+    const key = `${provider}:${campgroundId}`;
+    const s = this.stats.get(key) ?? {
+      provider,
+      campgroundId,
+      success: 0,
+      failure: 0,
+      webhookFailure: 0,
+      webhookSuccess: 0,
+    };
+    if (ok) {
+      s.success += 1;
+      s.lastSuccessAt = Date.now();
+    } else {
+      s.failure += 1;
+      s.lastFailureAt = Date.now();
+    }
+    this.stats.set(key, s);
+  }
+
+  private recordWebhook(provider: string, campgroundId: string, ok: boolean) {
+    const key = `${provider}:${campgroundId}`;
+    const s = this.stats.get(key) ?? {
+      provider,
+      campgroundId,
+      success: 0,
+      failure: 0,
+      webhookFailure: 0,
+      webhookSuccess: 0,
+    };
+    if (ok) {
+      s.webhookSuccess += 1;
+      s.lastWebhookSuccessAt = Date.now();
+    } else {
+      s.webhookFailure += 1;
+      s.lastWebhookFailureAt = Date.now();
+    }
+    this.stats.set(key, s);
   }
 }
 

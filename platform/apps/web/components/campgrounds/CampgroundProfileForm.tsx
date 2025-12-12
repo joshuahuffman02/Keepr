@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiClient } from "@/lib/api-client";
 import { Campground } from "@campreserv/shared";
@@ -11,6 +11,7 @@ import { Textarea } from "../ui/textarea";
 import { Switch } from "../ui/switch";
 import { Badge } from "../ui/badge";
 import { Label } from "../ui/label";
+import Image from "next/image";
 
 interface CampgroundProfileFormProps {
   campground: Campground;
@@ -37,6 +38,7 @@ export function CampgroundProfileForm({ campground }: CampgroundProfileFormProps
     description: campground.description || "",
     tagline: campground.tagline || "",
     heroImageUrl: campground.heroImageUrl || "",
+    photos: campground.photos?.join(", ") || "",
     seasonStart: campground.seasonStart || "",
     seasonEnd: campground.seasonEnd || "",
     checkInTime: campground.checkInTime || "",
@@ -71,6 +73,7 @@ export function CampgroundProfileForm({ campground }: CampgroundProfileFormProps
         description: form.description || null,
         tagline: form.tagline || null,
         heroImageUrl: form.heroImageUrl || null,
+        photos: photoList && photoList.length > 0 ? photoList : [],
         seasonStart: form.seasonStart || null,
         seasonEnd: form.seasonEnd || null,
         checkInTime: form.checkInTime || null,
@@ -97,7 +100,11 @@ export function CampgroundProfileForm({ campground }: CampgroundProfileFormProps
     }
   });
 
-  const heroPreview = useMemo(() => form.heroImageUrl?.trim(), [form.heroImageUrl]);
+  const heroPreview = form.heroImageUrl?.trim();
+  const photoList = form.photos
+    ?.split(",")
+    .map((p) => p.trim())
+    .filter(Boolean);
 
   return (
     <div className="grid gap-6">
@@ -254,6 +261,47 @@ export function CampgroundProfileForm({ campground }: CampgroundProfileFormProps
               />
               <p className="text-xs text-slate-500">IANA format for emails and arrivals.</p>
             </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-lg">Hero & gallery</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="space-y-1">
+            <label className="text-xs font-semibold text-slate-700">Hero image URL</label>
+            <Input
+              value={form.heroImageUrl}
+              onChange={(e) => setForm((s) => ({ ...s, heroImageUrl: e.target.value }))}
+              placeholder="https://..."
+              aria-label="Hero image URL"
+            />
+            {heroPreview && (
+              <div className="relative mt-2 h-40 w-full overflow-hidden rounded-lg border border-slate-200">
+                <Image src={heroPreview} alt="Hero preview" fill className="object-cover" />
+              </div>
+            )}
+          </div>
+
+          <div className="space-y-2">
+            <label className="text-xs font-semibold text-slate-700">Gallery photos (comma-separated URLs)</label>
+            <Textarea
+              value={form.photos}
+              onChange={(e) => setForm((s) => ({ ...s, photos: e.target.value }))}
+              placeholder="https://img1.jpg, https://img2.jpg"
+              aria-label="Gallery photos"
+            />
+            {photoList && photoList.length > 0 && (
+              <div className="mt-2 grid grid-cols-2 sm:grid-cols-3 gap-2">
+                {photoList.map((url) => (
+                  <div key={url} className="relative h-24 w-full overflow-hidden rounded border border-slate-200 bg-slate-50">
+                    <Image src={url} alt="Photo" fill className="object-cover" />
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         </CardContent>
       </Card>

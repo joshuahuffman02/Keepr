@@ -7,8 +7,13 @@
  *  - All camps: SEED_CAMP_ID=all pnpm ts-node --project tsconfig.json platform/apps/api/scripts/seed-trust-defaults.ts
  */
 import { PrismaClient, PermissionEffect, UserRole } from "@prisma/client";
+import { PrismaPg } from "@prisma/adapter-pg";
 
-const prisma = new PrismaClient();
+const adapter = new PrismaPg({
+  connectionString: process.env.DATABASE_URL || process.env.PLATFORM_DATABASE_URL
+});
+// @ts-ignore Prisma 7 adapter signature
+const prisma = new PrismaClient({ adapter });
 const SEED_CAMP_ID = process.env.SEED_CAMP_ID ?? null; // null = global defaults; "all" = every campground; or a specific campground id
 
 async function main() {
@@ -92,5 +97,4 @@ main()
   .finally(async () => {
     await prisma.$disconnect();
   });
-
 

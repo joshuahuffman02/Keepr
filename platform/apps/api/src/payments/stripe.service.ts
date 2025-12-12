@@ -36,7 +36,8 @@ export class StripeService {
         applicationFeeCents: number,
         captureMethod: 'automatic' | 'manual' = 'automatic',
         paymentMethodTypes?: string[],
-        idempotencyKey?: string
+        idempotencyKey?: string,
+        threeDsPolicy: 'automatic' | 'any' = 'automatic'
     ) {
         this.assertConfigured("create payment intents");
         const requestOptions: Stripe.RequestOptions = {};
@@ -50,6 +51,12 @@ export class StripeService {
             capture_method: captureMethod,
             automatic_payment_methods: {
                 enabled: true,
+                allow_redirects: "always",
+            },
+            payment_method_options: {
+                card: {
+                    request_three_d_secure: threeDsPolicy,
+                },
             },
             payment_method_types: paymentMethodTypes,
             application_fee_amount: applicationFeeCents,

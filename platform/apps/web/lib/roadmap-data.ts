@@ -537,6 +537,16 @@ export const roadmapPhases: RoadmapPhase[] = [
 
 export const updates: Update[] = [
     {
+        id: 'update-2025-12-11-hardening-alerts-payments-pos',
+        title: 'Reliability, payments, POS/stored value hardening shipped',
+        date: '2025-12-11',
+        body: 'Shipped alerting + synthetics with /ready split, idempotency store and rate limits, POS till open/close with needs-review on tender mismatch, stored value safeguards (taxable-load, liability snapshot), report export guard with resumable tokens, and consent/quiet-hour enforcement for email/SMS. Next: gateway choice + fee pass-through, big reports library, POS integrations, onboarding/import/export, e-sign/waivers/COI, utilities/late fees, access automation, referrals.',
+        tags: ['reliability', 'payments', 'pos', 'alerts', 'exports', 'comms'],
+        category: 'improvement',
+        phaseId: 'ship-readiness',
+        milestoneIds: [],
+    },
+    {
         id: 'update-2025-12-10-phase1-pricing-complete',
         title: 'Phase 1 (pricing, deposits, add-ons) completed',
         date: '2025-12-10',

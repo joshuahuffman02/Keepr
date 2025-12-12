@@ -12,6 +12,7 @@ type QueueState = {
     reject: (err: unknown) => void;
     jobName?: string;
     timeoutMs?: number;
+    enqueuedAt: number;
   }>;
 };
 
@@ -30,9 +31,10 @@ export class JobQueueService {
     fn: () => Promise<T>,
     opts?: { jobName?: string; timeoutMs?: number; concurrency?: number; maxQueue?: number }
   ): Promise<T> {
-    const state = this.ensureQueue(queueName, opts);
+    const normalizedName = queueName.toLowerCase();
+    const state = this.ensureQueue(normalizedName, opts);
     if (state.pending.length >= state.maxQueue) {
-      const err = new Error(`Queue ${queueName} is saturated (${state.maxQueue} pending)`);
+      const err = new Error(`Queue ${normalizedName} is saturated (${state.maxQueue} pending)`);
       this.logger.warn(err.message);
       throw err;
     }
@@ -44,6 +46,7 @@ export class JobQueueService {
         reject: (err) => reject(err),
         jobName: opts?.jobName ?? queueName,
         timeoutMs: opts?.timeoutMs,
+        enqueuedAt: Date.now(),
       });
       this.drain(state);
     });
@@ -63,7 +66,8 @@ export class JobQueueService {
     // Allow runtime tuning if env changes
     state.concurrency = opts?.concurrency ?? this.defaultConcurrency;
     state.maxQueue = opts?.maxQueue ?? this.defaultMaxQueue;
-    this.observability.setQueueState(queueName, state.running, state.pending.length);
+    const oldest = state.pending[0]?.enqueuedAt ? Date.now() - state.pending[0].enqueuedAt : 0;
+    this.observability.setQueueState(queueName, state.running, state.pending.length, oldest);
     return state;
   }
 
@@ -72,7 +76,8 @@ export class JobQueueService {
       const job = state.pending.shift();
       if (!job) break;
       state.running += 1;
-      this.observability.setQueueState(state.name, state.running, state.pending.length);
+      const oldest = state.pending[0]?.enqueuedAt ? Date.now() - state.pending[0].enqueuedAt : 0;
+      this.observability.setQueueState(state.name, state.running, state.pending.length, oldest);
 
       const started = Date.now();
       const timeoutMs = job.timeoutMs ?? this.defaultTimeoutMs;
@@ -86,7 +91,8 @@ export class JobQueueService {
           queueDepth: state.pending.length,
         });
         state.running = Math.max(0, state.running - 1);
-        this.observability.setQueueState(state.name, state.running, state.pending.length);
+        const oldestRemaining = state.pending[0]?.enqueuedAt ? Date.now() - state.pending[0].enqueuedAt : 0;
+        this.observability.setQueueState(state.name, state.running, state.pending.length, oldestRemaining);
         // Continue draining if more work remains
         setImmediate(() => this.drain(state));
       };
@@ -110,6 +116,24 @@ export class JobQueueService {
     const result = await Promise.race([fn(), timeoutPromise]);
     clearTimeout(timeoutHandle!);
     return result as T;
+  }
+
+  /**
+   * Lightweight read of queue state for capacity guards/observability.
+   * Returns undefined if queue not yet created.
+   */
+  getQueueState(queueName: string) {
+    const state = this.queues.get(queueName.toLowerCase());
+    if (!state) return undefined;
+    const oldest = state.pending[0]?.enqueuedAt ? Date.now() - state.pending[0].enqueuedAt : 0;
+    return {
+      name: state.name,
+      running: state.running,
+      pending: state.pending.length,
+      concurrency: state.concurrency,
+      maxQueue: state.maxQueue,
+      oldestMs: oldest,
+    };
   }
 }
 

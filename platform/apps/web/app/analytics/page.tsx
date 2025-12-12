@@ -10,6 +10,10 @@ export default function AnalyticsPage() {
   const [selectedCampgroundId, setSelectedCampgroundId] = useState<string | null>(null);
   const [selectedCampgroundName, setSelectedCampgroundName] = useState<string | null>(null);
   const [period, setPeriod] = useState<7 | 30 | 90>(30);
+  const [exportJobId, setExportJobId] = useState<string | null>(null);
+  const [exportStatus, setExportStatus] = useState<"idle" | "queued" | "processing" | "ready" | "error">("idle");
+  const [exportUrl, setExportUrl] = useState<string | null>(null);
+  const [exportError, setExportError] = useState<string | null>(null);
 
   // Read selected campground from localStorage (set by the dashboard switcher)
   useEffect(() => {
@@ -24,6 +28,36 @@ export default function AnalyticsPage() {
     window.addEventListener("storage", readSelection);
     return () => window.removeEventListener("storage", readSelection);
   }, []);
+
+  useEffect(() => {
+    if (!exportJobId || !selectedCampgroundId) return;
+    const interval = setInterval(async () => {
+      try {
+        const job = await apiClient.getReportExport(selectedCampgroundId, exportJobId);
+        if (job.downloadUrl) {
+          setExportUrl(job.downloadUrl);
+        }
+        if (job.status === "success") {
+          setExportStatus("ready");
+          if (job.downloadUrl) {
+            setExportUrl(job.downloadUrl);
+          }
+          clearInterval(interval);
+        } else if (job.status === "failed") {
+          setExportStatus("error");
+          setExportError(job.lastError ?? "Export failed");
+          clearInterval(interval);
+        } else {
+          setExportStatus(job.status as any);
+        }
+      } catch (err: any) {
+        setExportStatus("error");
+        setExportError(err?.message ?? "Failed to fetch export");
+        clearInterval(interval);
+      }
+    }, 1500);
+    return () => clearInterval(interval);
+  }, [exportJobId, selectedCampgroundId]);
 
   const metricsQuery = useQuery({
     queryKey: ["dashboard-metrics", selectedCampgroundId, period],
@@ -87,7 +121,7 @@ export default function AnalyticsPage() {
               Real-time performance metrics for {selectedCampgroundName ?? "your selected campground"}
             </p>
           </div>
-          <div className="flex gap-2">
+          <div className="flex gap-2 items-center">
             {[7, 30, 90].map(d => (
               <button
                 key={d}
@@ -101,8 +135,45 @@ export default function AnalyticsPage() {
                 {d}d
               </button>
             ))}
+            <button
+              onClick={async () => {
+                if (!selectedCampgroundId) return;
+                try {
+                  setExportStatus("queued");
+                  setExportError(null);
+                  setExportUrl(null);
+                  const job = await apiClient.queueReportExport(selectedCampgroundId, {
+                    format: "csv",
+                    filters: { range: `last_${period}_days`, days: period }
+                  });
+                  setExportJobId(job.id);
+                } catch (err: any) {
+                  setExportStatus("error");
+                  setExportError(err?.message ?? "Failed to start export");
+                }
+              }}
+              className="px-3 py-1.5 rounded-lg text-sm font-medium bg-emerald-600 text-white hover:bg-emerald-700 transition-colors disabled:opacity-60"
+              disabled={!selectedCampgroundId || exportStatus === "processing" || exportStatus === "queued"}
+            >
+              {exportStatus === "processing" || exportStatus === "queued" ? "Exporting..." : "Export CSV"}
+            </button>
           </div>
         </div>
+
+        {exportStatus !== "idle" && (
+          <div className="text-sm text-slate-600 flex items-center gap-3">
+            {exportStatus === "ready" && exportUrl && (
+              <a
+                href={exportUrl}
+                className="text-emerald-700 underline font-medium"
+              >
+                Download CSV
+              </a>
+            )}
+            {exportStatus === "error" && <span className="text-red-600">{exportError ?? "Export failed"}</span>}
+            {(exportStatus === "queued" || exportStatus === "processing") && <span>Preparing export…</span>}
+          </div>
+        )}
 
         {/* KPI Cards */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">

@@ -34,6 +34,7 @@ export default function TicketsPage() {
   const [updatingId, setUpdatingId] = useState<string | null>(null);
   const [upvotingId, setUpvotingId] = useState<string | null>(null);
   const [statusFilter, setStatusFilter] = useState<"all" | "open" | "completed">("all");
+  const [categoryFilter, setCategoryFilter] = useState<"all" | "issue" | "question" | "feature" | "other">("all");
   const [detailTicket, setDetailTicket] = useState<Ticket | null>(null);
   const [response, setResponse] = useState("");
   const [responding, setResponding] = useState(false);
@@ -61,8 +62,15 @@ export default function TicketsPage() {
     loadTickets();
   }, []);
 
+  const openCount = tickets.filter((t) => t.status === "open").length;
+  const completedCount = tickets.filter((t) => t.status === "completed").length;
+  const issueCount = tickets.filter((t) => (t.category ?? "issue") === "issue").length;
+  const questionCount = tickets.filter((t) => t.category === "question").length;
+  const featureCount = tickets.filter((t) => t.category === "feature").length;
+
   const filteredTickets = tickets
     .filter((t) => (statusFilter === "all" ? true : t.status === statusFilter))
+    .filter((t) => (categoryFilter === "all" ? true : (t.category ?? "issue") === categoryFilter))
     .filter((t) => {
       const q = search.trim().toLowerCase();
       if (!q) return true;
@@ -198,11 +206,15 @@ export default function TicketsPage() {
   };
 
   return (
-    <div className="mx-auto flex w-full max-w-6xl flex-col gap-4 px-4 md:px-6 py-6 lg:max-w-6xl sm:max-w-5xl">
-      <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
+    <div className="w-full">
+      <div className="flex w-full flex-col gap-5 px-4 md:px-8 py-6">
+      <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
         <div>
-          <h1 className="text-2xl font-semibold text-slate-900">Tickets</h1>
-          <p className="text-sm text-slate-600">Track issues, triage, and respond quickly.</p>
+          <div className="inline-flex items-center gap-2 rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-700 border border-emerald-100">
+            Ticket desk <span className="text-[11px] text-emerald-600">with context capture</span>
+          </div>
+          <h1 className="mt-2 text-2xl font-semibold text-slate-900">Tickets</h1>
+          <p className="text-sm text-slate-600">Track issues, questions, and ideas—then respond fast.</p>
         </div>
         <div className="flex flex-wrap gap-2">
           <div className="flex items-center gap-1 rounded-full border border-slate-200 bg-white p-1 shadow-sm">
@@ -214,6 +226,26 @@ export default function TicketsPage() {
                 onClick={() => setStatusFilter(key)}
               >
                 {key === "all" ? "All" : key === "open" ? "Open" : "Completed"}
+              </Button>
+            ))}
+          </div>
+          <div className="flex items-center gap-1 rounded-full border border-slate-200 bg-white p-1 shadow-sm">
+            {(["all", "issue", "question", "feature", "other"] as const).map((key) => (
+              <Button
+                key={key}
+                size="sm"
+                variant={categoryFilter === key ? "default" : "ghost"}
+                onClick={() => setCategoryFilter(key)}
+              >
+                {key === "issue"
+                  ? "Issues"
+                  : key === "question"
+                  ? "Questions"
+                  : key === "feature"
+                  ? "Features"
+                  : key === "other"
+                  ? "Other"
+                  : "All types"}
               </Button>
             ))}
           </div>
@@ -236,6 +268,51 @@ export default function TicketsPage() {
         </div>
       </div>
 
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="rounded-xl border border-emerald-100 bg-emerald-50 px-4 py-3 shadow-sm">
+          <div className="flex items-center gap-2 text-xs font-semibold text-emerald-700">
+            <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <path d="M5 12h14M12 5l7 7-7 7" />
+            </svg>
+            Open
+          </div>
+          <div className="text-2xl font-bold text-emerald-900">{openCount}</div>
+          <div className="text-xs text-emerald-700/80">In flight</div>
+        </div>
+        <div className="rounded-xl border border-slate-200 bg-white px-4 py-3 shadow-sm">
+          <div className="flex items-center gap-2 text-xs font-semibold text-slate-600">
+            <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <path d="M5 13l4 4L19 7" />
+            </svg>
+            Completed
+          </div>
+          <div className="text-2xl font-bold text-slate-900">{completedCount}</div>
+          <div className="text-xs text-slate-500">Shipped & done</div>
+        </div>
+        <div className="rounded-xl border border-amber-100 bg-amber-50 px-4 py-3 shadow-sm">
+          <div className="flex items-center gap-2 text-xs font-semibold text-amber-700">
+            <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <path d="M12 3v18M5 9l7-6 7 6M5 15l7 6 7-6" />
+            </svg>
+            Features
+          </div>
+          <div className="text-2xl font-bold text-amber-900">{featureCount}</div>
+          <div className="text-xs text-amber-700/80">Requests</div>
+        </div>
+        <div className="rounded-xl border border-sky-100 bg-sky-50 px-4 py-3 shadow-sm">
+          <div className="flex items-center gap-2 text-xs font-semibold text-sky-700">
+            <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <path d="M9.5 9a2.5 2.5 0 1 1 4.9.5c0 1.5-1.5 2-2.4 2.9-.3.3-.5.8-.5 1.3" />
+              <path d="M12 17h.01" />
+              <circle cx="12" cy="12" r="9" />
+            </svg>
+            Questions
+          </div>
+          <div className="text-2xl font-bold text-sky-900">{questionCount}</div>
+          <div className="text-xs text-sky-700/80">Need answers</div>
+        </div>
+      </div>
+
       {error && <div className="rounded-md bg-red-50 px-3 py-2 text-sm text-red-700">{error}</div>}
 
       {loading ? (
@@ -247,7 +324,7 @@ export default function TicketsPage() {
           {/* Desktop table */}
           <div className="hidden rounded-lg border border-slate-200 bg-white shadow-sm md:block">
             <table className="min-w-full divide-y divide-slate-200">
-              <thead className="bg-slate-50">
+              <thead className="bg-slate-50 sticky top-0 z-10">
                 <tr>
                   <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-600">Votes</th>
                   <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-600">Status</th>
@@ -261,8 +338,8 @@ export default function TicketsPage() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-200">
-                {filteredTickets.map((ticket) => (
-                  <tr key={ticket.id} className="hover:bg-slate-50 bg-white">
+                {filteredTickets.map((ticket, idx) => (
+                  <tr key={ticket.id} className={`bg-white hover:bg-slate-50 ${idx % 2 === 1 ? "bg-slate-50/40" : ""}`}>
                     <td className="px-4 py-4 align-top text-sm text-slate-700">
                       <div className="flex items-center gap-2">
                         <Button
@@ -292,7 +369,7 @@ export default function TicketsPage() {
                         </div>
                       )}
                     </td>
-                    <td className="px-4 py-4 align-top text-sm font-semibold text-slate-900">
+              <td className="px-4 py-4 align-top text-sm font-semibold text-slate-900">
                       <div className="flex items-center gap-2">
                         {categoryBadge(ticket)}
                         <span className="truncate">{ticket.title}</span>
@@ -359,6 +436,13 @@ export default function TicketsPage() {
                       <Button size="sm" variant="ghost" className="justify-start px-0 text-emerald-700" onClick={() => setDetailTicket(ticket)}>
                         Details
                       </Button>
+                        {ticket.url && (
+                          <Button size="sm" variant="ghost" className="justify-start px-0 text-emerald-700" asChild>
+                            <a href={ticket.url} target="_blank" rel="noreferrer">
+                              Review page →
+                            </a>
+                          </Button>
+                        )}
                       {ticket.status === "completed" ? (
                         <span className="text-xs text-slate-500">Done</span>
                       ) : (
@@ -441,6 +525,13 @@ export default function TicketsPage() {
                   <Button size="sm" variant="ghost" className="px-0 text-emerald-700" onClick={() => setDetailTicket(ticket)}>
                     Details
                   </Button>
+                  {ticket.url && (
+                    <Button size="sm" variant="ghost" className="px-0 text-emerald-700" asChild>
+                      <a href={ticket.url} target="_blank" rel="noreferrer">
+                        Review page →
+                      </a>
+                    </Button>
+                  )}
                   {ticket.status === "completed" ? (
                     <span className="text-xs text-slate-500 self-center">Done</span>
                   ) : (
@@ -498,6 +589,7 @@ export default function TicketsPage() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+      </div>
     </div>
   );
 }

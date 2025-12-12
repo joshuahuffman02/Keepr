@@ -1,4 +1,5 @@
 import { PrismaClient } from "@prisma/client";
+import { PrismaPg } from "@prisma/adapter-pg";
 import { randomUUID } from "crypto";
 
 /**
@@ -6,7 +7,11 @@ import { randomUUID } from "crypto";
  * Safe to run in dev/staging. Idempotent-ish: uses fixed IDs to avoid dupes.
  */
 async function main() {
-  const prisma = new PrismaClient();
+  const adapter = new PrismaPg({
+    connectionString: process.env.DATABASE_URL || process.env.PLATFORM_DATABASE_URL
+  });
+  // @ts-ignore Prisma 7 adapter signature
+  const prisma = new PrismaClient({ adapter });
   const campgroundId = process.env.SEED_CAMPGROUND_ID || "camp-finance-ui";
 
   // Sample payout with one line
@@ -95,5 +100,4 @@ main().catch((e) => {
   console.error(e);
   process.exit(1);
 });
-
 

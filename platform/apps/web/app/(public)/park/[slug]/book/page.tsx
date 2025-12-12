@@ -43,6 +43,10 @@ interface GuestInfo {
     children: number;
     additionalGuests: AdditionalGuest[];
     childrenDetails: ChildDetails[];
+    stayReasonPreset: string;
+    stayReasonOther: string;
+    referralCode: string;
+    needsAccessible: boolean;
     equipment: {
         type: string;
         length: string;
@@ -516,7 +520,12 @@ function SiteStep({
     return (
         <div>
             <h2 className="text-2xl font-bold text-slate-900 mb-6 text-center">Choose Your Site</h2>
-            <p className="text-center text-slate-600 mb-6">{sites.length} sites found</p>
+            <p className="text-center text-slate-600 mb-2">{sites.length} sites found</p>
+            {sites.length > 0 && sites.length <= 3 && (
+                <p className="text-center text-amber-600 text-sm font-semibold mb-4">
+                    Only {sites.length} left for these dates. Sites are held for a short time during checkout.
+                </p>
+            )}
 
             {Object.entries(sitesByClass).map(([className, classSites]) => (
                 <div key={className} className="mb-10">
@@ -589,6 +598,14 @@ function SiteStep({
                                             {site.siteClass?.hookupsWater && <Badge variant="outline">Water</Badge>}
                                             {site.siteClass?.hookupsSewer && <Badge variant="outline">Sewer</Badge>}
                                             {site.siteClass?.petFriendly && <Badge variant="outline">Pet friendly</Badge>}
+                                            {(site.rigMaxLength || site.siteClass?.rigMaxLength) && (
+                                                <Badge variant="outline">Max {site.rigMaxLength || site.siteClass?.rigMaxLength}ft rig</Badge>
+                                            )}
+                                            {(site.accessible || site.siteClass?.accessible) && (
+                                                <Badge variant="outline" className="border-emerald-200 text-emerald-700">
+                                                    ADA Accessible
+                                                </Badge>
+                                            )}
                                         </div>
                                         {selected && (
                                             <div className="mt-3 flex flex-col gap-2">
@@ -677,6 +694,8 @@ function GuestStep({
         guestInfo.phone.trim() &&
         guestInfo.zipCode.trim().length >= 5 &&
         guestInfo.adults >= 1 &&
+        guestInfo.stayReasonPreset &&
+        (guestInfo.stayReasonPreset !== "other" || guestInfo.stayReasonOther.trim()) &&
         (guestInfo.equipment.type === "tent" || guestInfo.equipment.type === "car" || (guestInfo.equipment.length && Number(guestInfo.equipment.length) > 0));
 
     const lengthError = maxRigLength && guestInfo.equipment.length && Number(guestInfo.equipment.length) > maxRigLength
@@ -774,6 +793,43 @@ function GuestStep({
                             ))}
                         </select>
                     </div>
+                </div>
+
+                <div>
+                    <label className="block text-sm font-medium text-slate-700 mb-1">Reason for stay</label>
+                    <select
+                        value={guestInfo.stayReasonPreset}
+                        onChange={(e) => onChange({ ...guestInfo, stayReasonPreset: e.target.value, stayReasonOther: e.target.value === "other" ? guestInfo.stayReasonOther : "" })}
+                        className="w-full px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                    >
+                        <option value="vacation">Vacation / getaway</option>
+                        <option value="family_visit">Visiting family or friends</option>
+                        <option value="event">Event or festival</option>
+                        <option value="work_remote">Working remotely</option>
+                        <option value="stopover">Road-trip stopover</option>
+                        <option value="relocation">Relocation / temporary housing</option>
+                        <option value="other">Other</option>
+                    </select>
+                    {guestInfo.stayReasonPreset === "other" && (
+                        <input
+                            type="text"
+                            value={guestInfo.stayReasonOther}
+                            onChange={(e) => onChange({ ...guestInfo, stayReasonOther: e.target.value })}
+                            className="mt-2 w-full px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                            placeholder="Tell us more"
+                        />
+                    )}
+                </div>
+
+                <div>
+                    <label className="block text-sm font-medium text-slate-700 mb-1">Referral code (optional)</label>
+                    <input
+                        type="text"
+                        value={guestInfo.referralCode}
+                        onChange={(e) => onChange({ ...guestInfo, referralCode: e.target.value.trim() })}
+                        className="w-full px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                        placeholder="Enter a friend’s code or link code"
+                    />
                 </div>
 
                 {/* Additional Guests Section */}
@@ -984,6 +1040,18 @@ function GuestStep({
                     {lengthError && (
                         <p className="text-red-600 text-sm font-medium">{lengthError}</p>
                     )}
+                    <div className="flex items-start gap-3 p-3 bg-emerald-50 border border-emerald-100 rounded-xl">
+                        <input
+                            id="needs-accessible"
+                            type="checkbox"
+                            checked={guestInfo.needsAccessible}
+                            onChange={(e) => onChange({ ...guestInfo, needsAccessible: e.target.checked })}
+                            className="mt-1 h-4 w-4 text-emerald-600 border-slate-300 rounded focus:ring-emerald-500"
+                        />
+                        <label htmlFor="needs-accessible" className="text-sm text-slate-700 leading-5">
+                            I need an ADA-accessible site (level pad, accessible route, proximity to facilities). We’ll filter and flag sites that don’t meet this.
+                        </label>
+                    </div>
                     <div className="grid grid-cols-2 gap-3">
                         <div>
                             <label className="block text-sm font-medium text-slate-700 mb-1">Plate Number (Optional)</label>
@@ -1143,6 +1211,7 @@ function ReviewStep({
     quote,
     isLoadingQuote,
     onBack,
+    holdExpiresAt,
     onComplete,
     promoCodeFromUrl
 }: {
@@ -1157,6 +1226,7 @@ function ReviewStep({
     quote: Quote | null;
     isLoadingQuote: boolean;
     onBack: () => void;
+    holdExpiresAt?: Date | null;
     onComplete: (reservation?: any) => void;
     promoCodeFromUrl?: string | null;
 }) {
@@ -1165,6 +1235,7 @@ function ReviewStep({
     const [reservation, setReservation] = useState<any>(null);
     const [isProcessing, setIsProcessing] = useState(false);
     const [bookingError, setBookingError] = useState<string | null>(null);
+    const [holdCountdown, setHoldCountdown] = useState<string | null>(null);
     const selectedTypeLabel = selectedSite?.siteClass?.name || siteTypeLabel(selectedSite?.siteClass?.siteType || "site");
 
     // Promo code state
@@ -1174,6 +1245,26 @@ function ReviewStep({
     const [promoValidating, setPromoValidating] = useState(false);
     const [promoError, setPromoError] = useState<string | null>(null);
     const [promoApplied, setPromoApplied] = useState(false);
+
+    useEffect(() => {
+        if (!holdExpiresAt) {
+            setHoldCountdown(null);
+            return;
+        }
+        const refresh = () => {
+            const diff = holdExpiresAt.getTime() - Date.now();
+            if (diff <= 0) {
+                setHoldCountdown("Expired");
+                return;
+            }
+            const minutes = Math.floor(diff / 60000);
+            const seconds = Math.floor((diff % 60000) / 1000);
+            setHoldCountdown(`${minutes}:${seconds.toString().padStart(2, "0")}`);
+        };
+        refresh();
+        const timer = setInterval(refresh, 1000);
+        return () => clearInterval(timer);
+    }, [holdExpiresAt]);
 
     // Auto-apply promo code from URL on mount
     useEffect(() => {
@@ -1258,11 +1349,24 @@ function ReviewStep({
 
     const passThroughFeeCents = paymentSettings?.feeMode === "pass_through" ? perBookingFeeCents : 0;
 
-    const finalTotal = quote ? Math.max(0, quote.totalCents - promoDiscount) : 0;
-    const finalTotalWithFees = finalTotal + passThroughFeeCents;
+    const appliedDiscountCents = useMemo(() => {
+        if (!quote) return 0;
+        const discountFromQuote = quote.discountCents ?? 0;
+        if (promoApplied) {
+            return discountFromQuote || promoDiscount;
+        }
+        return discountFromQuote;
+    }, [promoApplied, promoDiscount, quote]);
+
+    const taxesCents = quote?.taxesCents ?? 0;
+    const totalAfterDiscount = quote
+        ? quote.totalAfterDiscountCents ?? Math.max(0, (quote.totalCents ?? 0) - appliedDiscountCents)
+        : 0;
+    const totalWithTaxes = quote?.totalWithTaxesCents ?? totalAfterDiscount + taxesCents;
+    const finalTotalWithFees = Math.max(0, totalWithTaxes) + passThroughFeeCents;
 
     // Check if waiver is required but not signed
-    const waiverRequired = quote?.taxExemptionEligible && quote?.requiresWaiver;
+    const waiverRequired = quote?.taxWaiverRequired ?? false;
     const waiverBlocking = waiverRequired && !taxWaiverSigned;
 
     const capabilities = paymentSettings?.stripeCapabilities || {};
@@ -1275,6 +1379,18 @@ function ReviewStep({
     const paymentMethodsLabel = showAch || showWallets
         ? `We accept cards${showAch ? ", ACH bank payments" : ""}${showWallets ? ", and wallets (Apple Pay / Google Pay where supported)" : ""}.`
         : "We accept cards. Connect Stripe to enable ACH and wallets once capabilities are active.";
+    const reasonLabels: Record<string, string> = {
+        vacation: "Vacation / getaway",
+        family_visit: "Visiting family or friends",
+        event: "Event or festival",
+        work_remote: "Working remotely",
+        stopover: "Road-trip stopover",
+        relocation: "Relocation / temporary housing",
+        other: "Other"
+    };
+    const stayReasonLabel = guestInfo.stayReasonPreset === "other"
+        ? (guestInfo.stayReasonOther || "Other")
+        : (reasonLabels[guestInfo.stayReasonPreset] || guestInfo.stayReasonPreset);
 
     const createReservationMutation = useMutation({
         mutationFn: async () => {
@@ -1288,8 +1404,16 @@ function ReviewStep({
                         departureDate
                     });
                     holdId = (hold as any)?.id;
+                    if ((hold as any)?.expiresAt) {
+                        setHoldExpiresAt(new Date((hold as any).expiresAt));
+                    } else {
+                        const defaultExpiry = new Date();
+                        defaultExpiry.setMinutes(defaultExpiry.getMinutes() + 10);
+                        setHoldExpiresAt(defaultExpiry);
+                    }
                 } catch {
                     // proceed without hold
+                    setHoldExpiresAt(null);
                 }
             }
 
@@ -1324,7 +1448,11 @@ function ReviewStep({
                     }))
                     : undefined,
                 promoCode: promoApplied ? promoCode : undefined,
+                referralCode: guestInfo.referralCode || undefined,
+                stayReasonPreset: guestInfo.stayReasonPreset,
+                stayReasonOther: guestInfo.stayReasonPreset === "other" ? guestInfo.stayReasonOther : undefined,
                 taxWaiverSigned: waiverRequired ? taxWaiverSigned : undefined,
+                needsAccessible: guestInfo.needsAccessible || undefined,
                 equipment: guestInfo.equipment.type !== "tent" && guestInfo.equipment.type !== "car" ? {
                     type: guestInfo.equipment.type,
                     length: Number(guestInfo.equipment.length),
@@ -1434,6 +1562,18 @@ function ReviewStep({
                             {guestInfo.adults} adults{guestInfo.children > 0 && `, ${guestInfo.children} children`}
                         </span>
                     </div>
+                    {guestInfo.stayReasonPreset && (
+                        <div className="flex justify-between text-sm">
+                            <span className="text-slate-600">Reason</span>
+                            <span className="font-medium text-slate-900">{stayReasonLabel}</span>
+                        </div>
+                    )}
+                    {guestInfo.referralCode && (
+                        <div className="flex justify-between text-sm">
+                            <span className="text-slate-600">Referral</span>
+                            <span className="font-medium text-slate-900">{guestInfo.referralCode}</span>
+                        </div>
+                    )}
                 </div>
 
                 <div className="py-4 border-b border-slate-200 space-y-2">
@@ -1450,7 +1590,7 @@ function ReviewStep({
                 </div>
 
                 {quote && (
-                    <div className="pt-4 space-y-2">
+                    <div className="pt-4 space-y-2" aria-live="polite">
                         <div className="flex justify-between text-sm">
                             <span className="text-slate-600">
                                 ${(quote.perNightCents / 100).toFixed(2)} × {quote.nights} nights
@@ -1465,26 +1605,43 @@ function ReviewStep({
                                 </span>
                             </div>
                         )}
-                        {promoApplied && promoDiscount > 0 && (
-                            <div className="flex justify-between text-sm">
-                                <span className="text-green-600 flex items-center gap-1">
-                                    <span>🏷️</span> Promo: {promoCode}
+                        {appliedDiscountCents > 0 && (
+                            <div className="flex justify-between text-sm text-green-600">
+                                <span className="flex items-center gap-1">
+                                    <span aria-hidden>🏷️</span>
+                                    {promoApplied ? `Promo: ${promoCode}` : "Discounts"}
                                 </span>
-                                <span className="font-medium text-green-600">-${(promoDiscount / 100).toFixed(2)}</span>
+                                <span className="font-medium">-${(appliedDiscountCents / 100).toFixed(2)}</span>
+                            </div>
+                        )}
+                        <div className="flex justify-between text-sm">
+                            <span className="text-slate-600">Subtotal after discounts</span>
+                            <span className="font-medium text-slate-900">${(totalAfterDiscount / 100).toFixed(2)}</span>
+                        </div>
+                        <div className="flex justify-between text-sm">
+                            <span className="text-slate-600">Taxes</span>
+                            <span className="font-medium text-slate-900">${(taxesCents / 100).toFixed(2)}</span>
+                        </div>
+                        {passThroughFeeCents > 0 ? (
+                            <div className="flex justify-between text-sm">
+                                <span className="text-slate-600">Service fee (guest pays)</span>
+                                <span className="font-medium text-slate-900">${(passThroughFeeCents / 100).toFixed(2)}</span>
+                            </div>
+                        ) : (
+                            <div className="flex justify-between text-xs text-slate-500">
+                                <span>Service fee absorbed by campground</span>
+                                <span aria-hidden="true">—</span>
                             </div>
                         )}
                         <div className="flex justify-between text-lg font-bold pt-2 border-t border-slate-300">
-                            <span className="text-slate-900">Total</span>
+                            <span className="text-slate-900">Total due</span>
                             <span className="text-emerald-600">${(finalTotalWithFees / 100).toFixed(2)}</span>
                         </div>
-                        {passThroughFeeCents > 0 && (
-                            <div className="flex justify-between text-xs text-slate-500">
-                                <span>Includes platform fee</span>
-                                <span>${(passThroughFeeCents / 100).toFixed(2)}</span>
-                            </div>
-                        )}
-                        <div className="rounded-md border border-slate-200 bg-slate-50 p-3 text-xs text-slate-700">
-                            {paymentMethodsLabel}
+                        <div className="rounded-md border border-slate-200 bg-slate-50 p-3 text-xs text-slate-700 space-y-1">
+                            <p>{paymentMethodsLabel}</p>
+                            <p className="text-slate-500">
+                                Fees and taxes are itemized above. When fee pass-through is enabled, guests see the service fee as a separate line.
+                            </p>
                         </div>
                     </div>
                 )}
@@ -1532,14 +1689,14 @@ function ReviewStep({
             </div>
 
             {/* Tax Exemption Waiver Section */}
-            {quote?.taxExemptionEligible && quote?.requiresWaiver && (
+            {waiverRequired && (
                 <div className="mb-6 p-4 bg-amber-50 border border-amber-200 rounded-xl">
                     <div className="flex items-start gap-3">
                         <span className="text-2xl">📋</span>
                         <div className="flex-1">
                             <h4 className="font-semibold text-amber-900 mb-2">Tax Exemption Waiver</h4>
                             <p className="text-sm text-amber-800 mb-4 whitespace-pre-wrap">
-                                {quote.waiverText || "By checking this box, I certify that I qualify for the tax exemption as described and agree to provide any required documentation upon check-in."}
+                                {quote?.taxWaiverText || "By checking this box, I certify that I qualify for the tax exemption as described and agree to provide any required documentation upon check-in."}
                             </p>
                             <label className="flex items-center gap-3 cursor-pointer">
                                 <input
@@ -1566,6 +1723,14 @@ function ReviewStep({
             {/* Payment Section */}
             {clientSecret ? (
                 <Elements stripe={stripePromise} options={{ clientSecret }}>
+                    {holdCountdown && (
+                        <div className="mb-3 flex items-center gap-2 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-800">
+                            <span>⏳</span>
+                            <span>
+                                We’re holding this site for you {holdCountdown === "Expired" ? "(hold expired — try again)" : `for ${holdCountdown} more`} before it releases.
+                            </span>
+                        </div>
+                    )}
                     <PaymentForm
                         amountCents={finalTotalWithFees}
                         onSuccess={() => onComplete(reservation)}
@@ -1691,6 +1856,10 @@ export default function BookingPage() {
         children: 0,
         additionalGuests: [],
         childrenDetails: [],
+        stayReasonPreset: "vacation",
+        stayReasonOther: "",
+        referralCode: "",
+        needsAccessible: false,
         equipment: {
             type: mapSiteTypeToEquipmentType(initialSiteType),
             length: "",
@@ -1699,8 +1868,46 @@ export default function BookingPage() {
         }
     });
 
+    // Prefill guest info from localStorage to speed repeat bookings
+    useEffect(() => {
+        if (typeof window === "undefined") return;
+        try {
+            const raw = window.localStorage.getItem("publicGuestInfo");
+            if (raw) {
+                const parsed = JSON.parse(raw);
+                setGuestInfo((prev) => ({ ...prev, ...parsed }));
+            }
+        } catch {
+            // ignore
+        }
+    }, []);
+
+    useEffect(() => {
+        if (typeof window === "undefined") return;
+        const payload = {
+            firstName: guestInfo.firstName,
+            lastName: guestInfo.lastName,
+            email: guestInfo.email,
+            phone: guestInfo.phone,
+            zipCode: guestInfo.zipCode,
+            adults: guestInfo.adults,
+            children: guestInfo.children,
+            stayReasonPreset: guestInfo.stayReasonPreset,
+            stayReasonOther: guestInfo.stayReasonOther,
+            referralCode: guestInfo.referralCode,
+            needsAccessible: guestInfo.needsAccessible,
+            equipment: guestInfo.equipment
+        };
+        try {
+            window.localStorage.setItem("publicGuestInfo", JSON.stringify(payload));
+        } catch {
+            // ignore
+        }
+    }, [guestInfo]);
+
     const [isComplete, setIsComplete] = useState(false);
     const [confirmedReservation, setConfirmedReservation] = useState<any>(null);
+    const [holdExpiresAt, setHoldExpiresAt] = useState<Date | null>(null);
     const lastAvailabilityKey = useRef<string | null>(null);
     const reservationStartLogged = useRef<boolean>(false);
     const [askQuestion, setAskQuestion] = useState("");
@@ -1748,7 +1955,9 @@ export default function BookingPage() {
     const { data: campground, isLoading: isLoadingCampground, error: campgroundError } = useQuery({
         queryKey: ["public-campground", slug],
         queryFn: () => apiClient.getPublicCampground(slug),
-        enabled: !!slug
+        enabled: !!slug,
+        retry: 2,
+        retryDelay: (attempt) => Math.min(500 * (attempt + 1), 4000)
     });
 
     const siteSelectionFeeCents = useMemo(() => {
@@ -1757,16 +1966,19 @@ export default function BookingPage() {
     }, [campground]);
 
     // Fetch availability when dates are selected
-    const { data: availableSites, isLoading: isLoadingSites } = useQuery({
-        queryKey: ["public-availability", slug, arrivalDate, departureDate, guestInfo.equipment.type, guestInfo.equipment.length],
+    const { data: availableSites, isLoading: isLoadingSites, error: availabilityError, refetch: refetchAvailability } = useQuery({
+        queryKey: ["public-availability", slug, arrivalDate, departureDate, guestInfo.equipment.type, guestInfo.equipment.length, guestInfo.needsAccessible],
         queryFn: () =>
             apiClient.getPublicAvailability(slug, {
                 arrivalDate,
                 departureDate,
                 rigType: guestInfo.equipment.type,
-                rigLength: guestInfo.equipment.length
+                rigLength: guestInfo.equipment.length,
+                needsAccessible: guestInfo.needsAccessible
             }),
-        enabled: !!slug && !!arrivalDate && !!departureDate && step >= 2
+        enabled: !!slug && !!arrivalDate && !!departureDate && step >= 2,
+        retry: 2,
+        retryDelay: (attempt) => Math.min(750 * (attempt + 1), 5000)
     });
 
     // Filter sites based on selected site type
@@ -1803,7 +2015,8 @@ export default function BookingPage() {
                         arrivalDate: formatDateInput(nextArrivalDate),
                         departureDate: formatDateInput(nextDepartureDate),
                         rigType: guestInfo.equipment.type,
-                        rigLength: guestInfo.equipment.length
+                        rigLength: guestInfo.equipment.length,
+                        needsAccessible: guestInfo.needsAccessible
                     });
                     const available = res.filter((s) => s.status === "available");
                     if (available.length > 0) {
@@ -1832,9 +2045,29 @@ export default function BookingPage() {
 
     // Fetch quote when site is selected
     const { data: quote, isLoading: isLoadingQuote } = useQuery({
-        queryKey: ["public-quote", slug, selectedSiteId, arrivalDate, departureDate],
+        queryKey: [
+            "public-quote",
+            slug,
+            selectedSiteId,
+            arrivalDate,
+            departureDate,
+            promoApplied ? promoCode : null,
+            taxWaiverSigned,
+            guestInfo.referralCode || null,
+            guestInfo.stayReasonPreset,
+            guestInfo.stayReasonOther
+        ],
         queryFn: () =>
-            apiClient.getPublicQuote(slug, { siteId: selectedSiteId!, arrivalDate, departureDate }),
+            apiClient.getPublicQuote(slug, {
+                siteId: selectedSiteId!,
+                arrivalDate,
+                departureDate,
+                promoCode: promoApplied ? promoCode : undefined,
+                taxWaiverSigned,
+                referralCode: guestInfo.referralCode || undefined,
+                stayReasonPreset: guestInfo.stayReasonPreset || undefined,
+                stayReasonOther: guestInfo.stayReasonPreset === "other" ? guestInfo.stayReasonOther : undefined
+            }),
         enabled: !!slug && !!selectedSiteId && !!arrivalDate && !!departureDate && step >= 4
     });
 
@@ -2028,6 +2261,7 @@ export default function BookingPage() {
                                 quote={quote || null}
                                 isLoadingQuote={isLoadingQuote}
                                 onBack={() => setStep(3)}
+                                holdExpiresAt={holdExpiresAt}
                                 onComplete={(reservation) => {
                                     if (reservation) setConfirmedReservation(reservation);
                                     setIsComplete(true);

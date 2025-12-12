@@ -1,4 +1,4 @@
-import { Controller, Get, Param, Query, Res, UseGuards } from "@nestjs/common";
+import { Body, Controller, Get, Param, Post, Query, Req, Res, UseGuards } from "@nestjs/common";
 import { LedgerService } from "./ledger.service";
 import type { Response } from "express";
 import { JwtAuthGuard } from "../auth/guards";
@@ -71,5 +71,35 @@ export class LedgerController {
     @Query("end") end?: string
   ) {
     return this.ledger.summaryByGl(campgroundId, start ? new Date(start) : undefined, end ? new Date(end) : undefined);
+  }
+
+  @Roles(UserRole.owner, UserRole.manager, UserRole.finance)
+  @Get("campgrounds/:campgroundId/gl-periods")
+  async listPeriods(@Param("campgroundId") campgroundId: string) {
+    return this.ledger.listPeriods(campgroundId);
+  }
+
+  @Roles(UserRole.owner, UserRole.manager, UserRole.finance)
+  @Post("campgrounds/:campgroundId/gl-periods")
+  async createPeriod(
+    @Param("campgroundId") campgroundId: string,
+    @Body() body: { startDate: string; endDate: string; name?: string }
+  ) {
+    const startDate = new Date(body.startDate);
+    const endDate = new Date(body.endDate);
+    return this.ledger.createPeriod(campgroundId, startDate, endDate, body.name);
+  }
+
+  @Roles(UserRole.owner, UserRole.manager, UserRole.finance)
+  @Post("campgrounds/:campgroundId/gl-periods/:id/close")
+  async closePeriod(@Param("campgroundId") campgroundId: string, @Param("id") id: string, @Req() req?: any) {
+    // campgroundId path param for scoping; service checks id existence
+    return this.ledger.closePeriod(id, req?.user?.id);
+  }
+
+  @Roles(UserRole.owner, UserRole.manager, UserRole.finance)
+  @Post("campgrounds/:campgroundId/gl-periods/:id/lock")
+  async lockPeriod(@Param("campgroundId") campgroundId: string, @Param("id") id: string, @Req() req?: any) {
+    return this.ledger.lockPeriod(id, req?.user?.id);
   }
 }

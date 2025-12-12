@@ -26,6 +26,7 @@ export function FinancialSummary({ reservation }: FinancialSummaryProps) {
     const taxCents = reservation.taxesAmount ?? 0;
     const feesCents = reservation.feesAmount ?? 0;
     const discountsCents = reservation.discountsAmount ?? 0;
+    const feeMode = (reservation as any)?.feeMode ?? (reservation as any)?.metadata?.feeMode ?? null;
 
     const isPaid = balanceCents <= 0;
 
@@ -77,6 +78,13 @@ export function FinancialSummary({ reservation }: FinancialSummaryProps) {
                         <div className="flex justify-between text-sm text-slate-500">
                             <span>Fees</span>
                             <span>{formatCurrency(feesCents)}</span>
+                        </div>
+                        <div className="text-xs text-slate-500 leading-relaxed" aria-live="polite">
+                            {feeMode === "pass_through"
+                                ? "Guest paid service fees on this booking."
+                                : feeMode === "absorb"
+                                    ? "Service fees were absorbed by the property."
+                                    : "Fees are itemized separately from taxes for clarity."}
                         </div>
                         {discountsCents > 0 && (
                             <div className="flex justify-between text-sm text-emerald-600">

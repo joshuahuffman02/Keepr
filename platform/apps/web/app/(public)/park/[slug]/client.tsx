@@ -253,6 +253,11 @@ function EventCard({ event, slug }: { event: PublicCampgroundDetail["events"][0]
     if (isParentEvent) {
         return (
             <div className="bg-gradient-to-br from-slate-50 to-slate-100 rounded-xl border-2 border-slate-200 p-6 hover:shadow-lg transition-all">
+                {event.imageUrl && (
+                    <div className="relative mb-4 h-44 w-full overflow-hidden rounded-lg">
+                        <Image src={event.imageUrl} alt={event.title} fill className="object-cover" />
+                    </div>
+                )}
                 <div className="flex items-start justify-between mb-4">
                     <div>
                         <span
@@ -318,6 +323,11 @@ function EventCard({ event, slug }: { event: PublicCampgroundDetail["events"][0]
     if (isOngoing) {
         return (
             <div className="bg-gradient-to-r from-amber-50 to-orange-50 rounded-xl border-2 border-amber-200 p-5 hover:shadow-md transition-all">
+                {event.imageUrl && (
+                    <div className="relative mb-3 h-36 w-full overflow-hidden rounded-lg">
+                        <Image src={event.imageUrl} alt={event.title} fill className="object-cover" />
+                    </div>
+                )}
                 <div className="flex items-center gap-2 mb-2">
                     <span className="text-2xl">🎨</span>
                     <span className="text-xs px-2 py-1 bg-amber-500 text-white rounded-full font-bold uppercase">
@@ -349,6 +359,11 @@ function EventCard({ event, slug }: { event: PublicCampgroundDetail["events"][0]
     // Standard event card (with recurring badge if applicable)
     return (
         <div className="bg-white rounded-xl border border-slate-200 p-5 hover:shadow-md transition-shadow">
+            {event.imageUrl && (
+                <div className="relative mb-3 h-44 w-full overflow-hidden rounded-lg">
+                    <Image src={event.imageUrl} alt={event.title} fill className="object-cover" />
+                </div>
+            )}
             <div className="flex items-start justify-between">
                 <div>
                     <div className="flex items-center gap-2 flex-wrap">

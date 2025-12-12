@@ -178,7 +178,7 @@ function UpdatesPageInner() {
           <p className="text-slate-600">
             A changelog of what&apos;s new, improved, and fixed in Campreserv.
           </p>
-          <p className="text-xs text-slate-500">Last updated: Dec 10, 2025 (Phase 1/2/3 completion updates)</p>
+          <p className="text-xs text-slate-500">Last updated: Dec 11, 2025 (alerts/idempotency/POS/stored value/report export/comms hardening)</p>
         </div>
 
         {/* Stats bar */}

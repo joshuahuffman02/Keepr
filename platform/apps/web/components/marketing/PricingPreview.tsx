@@ -5,55 +5,67 @@ import { Button } from '@/components/ui/button';
 
 const plans = [
   {
-    name: 'Starter',
-    description: 'Perfect for small campgrounds',
-    price: '199',
-    period: '/month',
+    name: 'Essential',
+    description: 'Core bookings and payments',
+    price: '49',
+    period: '/mo + 1.9% + $0.20/txn',
     features: [
-      'Up to 50 sites',
-      'Online booking engine',
-      'Reservation management',
-      'Basic reporting',
-      'Email support',
-      'Mobile check-in',
+      'Online bookings with itemized taxes/fees',
+      'Calendar + availability grid',
+      'Basic reporting & exports',
+      'Standard support (email/chat)',
+      'Fee pass-through toggle for guests',
+      'Messaging add-on available ($49/mo)',
     ],
-    cta: 'Start Free Trial',
+    cta: 'Start free trial',
     popular: false,
   },
   {
-    name: 'Professional',
-    description: 'Most popular for growing campgrounds',
-    price: '399',
-    period: '/month',
+    name: 'Pro',
+    description: 'Revenue and marketing tools',
+    price: '129',
+    period: '/mo + 1.5% + $0.15/txn',
     features: [
-      'Up to 150 sites',
-      'Everything in Starter',
-      'Advanced grid management',
-      'Point-of-Sale system',
-      'Inventory management',
-      'Custom reporting',
-      'SMS & email automation',
+      'Everything in Essential',
+      'Dynamic pricing & rules',
+      'Waitlist + abandoned cart nudges',
+      'CRM + marketing campaigns',
       'Priority support',
+      'Fee pass-through or absorb (configurable)',
     ],
-    cta: 'Start Free Trial',
+    cta: 'Book a demo',
     popular: true,
   },
   {
+    name: 'Business',
+    description: 'Operations at scale',
+    price: '289',
+    period: '/mo + 1.3% + $0.10/txn',
+    features: [
+      'Everything in Pro',
+      'OTA sync + channel rules',
+      'Staff scheduling & workflows',
+      'Custom reports & dashboards',
+      'Phone support included',
+      'Messaging bundle included',
+    ],
+    cta: 'Talk to sales',
+    popular: false,
+  },
+  {
     name: 'Enterprise',
-    description: 'For large parks and multi-property groups',
+    description: 'Multi-park and high volume',
     price: 'Custom',
     period: '',
     features: [
-      'Unlimited sites',
-      'Everything in Professional',
-      'Multi-property management',
-      'Custom integrations',
-      'API access',
-      'Dedicated account manager',
-      'Custom training',
-      '24/7 phone support',
+      'Volume pricing & SLAs',
+      'SSO + audit logging',
+      'Custom integrations & API access',
+      'Premium onboarding',
+      'Dedicated TAM & 24/7 support',
+      'Fee strategy guidance (pass-through vs absorb)',
     ],
-    cta: 'Contact Sales',
+    cta: 'Contact sales',
     popular: false,
   },
 ];
@@ -76,7 +88,7 @@ export function PricingPreview() {
         </div>
 
         {/* Pricing Cards */}
-        <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8 max-w-6xl mx-auto">
           {plans.map((plan) => (
             <div
               key={plan.name}
@@ -140,7 +152,7 @@ export function PricingPreview() {
         {/* Additional Info */}
         <div className="mt-16 text-center">
           <p className="text-slate-600 mb-4">
-            All plans include free data migration, onboarding, and training.
+            All plans include free data migration, onboarding, and training. Toggle guest fee pass-through or absorption on every plan.
           </p>
           <div className="flex flex-wrap items-center justify-center gap-8 text-sm text-slate-500">
             <div className="flex items-center gap-2">
@@ -149,7 +161,7 @@ export function PricingPreview() {
             </div>
             <div className="flex items-center gap-2">
               <Check className="h-4 w-4 text-emerald-500" />
-              <span>Cancel anytime</span>
+              <span>Messaging add-on for Essential/Pro</span>
             </div>
             <div className="flex items-center gap-2">
               <Check className="h-4 w-4 text-emerald-500" />

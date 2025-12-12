@@ -57,6 +57,13 @@ const PROTECTED_PREFIXES = [
 export async function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
 
+  // Redirect legacy pricing route to new dynamic pricing rules
+  if (pathname === "/pricing" || pathname.startsWith("/pricing/")) {
+    const target = new URL("/settings/pricing-rules", req.url);
+    target.search = req.nextUrl.search;
+    return NextResponse.redirect(target);
+  }
+
   // Allow public paths and assets
   if (PUBLIC_PATHS.includes(pathname) || PUBLIC_PREFIXES.some((p) => pathname.startsWith(p))) {
     return NextResponse.next();

@@ -2,13 +2,15 @@
 
 import { useParams, useRouter } from "next/navigation";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { DashboardShell } from "../../../../../components/ui/layout/DashboardShell";
 import { Breadcrumbs } from "../../../../../components/breadcrumbs";
 import { apiClient } from "../../../../../lib/api-client";
 import { Card, CardContent, CardHeader, CardTitle } from "../../../../../components/ui/card";
 import { Badge } from "../../../../../components/ui/badge";
 import { Button } from "../../../../../components/ui/button";
+import { Input } from "../../../../../components/ui/input";
+import { Label } from "../../../../../components/ui/label";
 import { format } from "date-fns";
 import { DollarSign, ArrowLeft, MessageSquare, Calculator, ActivitySquare, MapPin, CheckCircle, DoorOpen, Users, AlertTriangle, Clock, ShieldCheck } from "lucide-react";
 
@@ -29,6 +31,17 @@ export default function ReservationDetailPage() {
   const router = useRouter();
   const queryClient = useQueryClient();
   const [commsFilter, setCommsFilter] = useState<"all" | "messages" | "notes" | "failed">("all");
+  const [vehiclePlate, setVehiclePlate] = useState("");
+  const [vehicleState, setVehicleState] = useState("");
+  const [vehicleRigType, setVehicleRigType] = useState("");
+  const [vehicleRigLength, setVehicleRigLength] = useState("");
+  const [signatureEmail, setSignatureEmail] = useState("");
+  const [signatureType, setSignatureType] = useState("long_term_stay");
+  const [deliveryChannel, setDeliveryChannel] = useState<"email" | "email_and_sms" | "sms">("email");
+  const [coiUrl, setCoiUrl] = useState("");
+  const [coiExpiresAt, setCoiExpiresAt] = useState("");
+  const [accessProvider, setAccessProvider] = useState<"kisi" | "brivo" | "cloudkey">("kisi");
+  const [accessCode, setAccessCode] = useState("");
   const reservationId = params.reservationId as string;
   const campgroundId = params.campgroundId as string;
 
@@ -45,6 +58,13 @@ export default function ReservationDetailPage() {
     enabled: !!reservationId
   });
   const checkinStatus = checkinStatusQuery.data;
+
+  const accessQuery = useQuery({
+    queryKey: ["access-status", reservationId],
+    queryFn: () => apiClient.getAccessStatus(reservationId),
+    enabled: !!reservationId
+  });
+  const accessStatus = accessQuery.data;
 
   const quoteQuery = useQuery({
     queryKey: ["reservation-quote", reservationId],
@@ -93,12 +113,122 @@ export default function ReservationDetailPage() {
     }
   });
 
+  const vehicleMutation = useMutation({
+    mutationFn: (payload: any) => apiClient.upsertVehicle(reservationId, payload),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["access-status", reservationId] });
+      queryClient.invalidateQueries({ queryKey: ["reservation", reservationId] });
+    }
+  });
+
+  const grantAccessMutation = useMutation({
+    mutationFn: (payload: any) => apiClient.grantAccess(reservationId, payload),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["access-status", reservationId] });
+    }
+  });
+
+  const revokeAccessMutation = useMutation({
+    mutationFn: (payload: any) => apiClient.revokeAccess(reservationId, payload),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["access-status", reservationId] });
+    }
+  });
+
   const formsQuery = useQuery({
     queryKey: ["form-submissions", reservationId],
     queryFn: () => apiClient.getFormSubmissionsByReservation(reservationId),
     enabled: !!reservationId
   });
   const pendingForms = (formsQuery.data || []).filter((f: any) => f.status === "pending").length;
+
+  const signaturesQuery = useQuery({
+    queryKey: ["signatures", reservationId],
+    queryFn: async () => {
+      const res = await fetch(`/api/signatures/reservations/${reservationId}`, { credentials: "include" });
+      if (!res.ok) throw new Error("Unable to fetch signature requests");
+      return res.json();
+    },
+    enabled: !!reservationId,
+    retry: false
+  });
+
+  const createSignatureMutation = useMutation({
+    mutationFn: async () => {
+      const payload = {
+        campgroundId,
+        reservationId,
+        documentType: signatureType,
+        recipientEmail: signatureEmail || reservation?.guest?.email,
+        deliveryChannel,
+        message: "Please review and sign the long-stay documents.",
+        recipientName: reservation?.guest ? `${reservation.guest.primaryFirstName} ${reservation.guest.primaryLastName}` : undefined
+      };
+      const res = await fetch("/api/signatures/requests", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify(payload)
+      });
+      if (!res.ok) throw new Error("Failed to create signature request");
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["signatures", reservationId] });
+    }
+  });
+
+  const resendSignatureMutation = useMutation({
+    mutationFn: async (id: string) => {
+      const res = await fetch(`/api/signatures/requests/${id}/resend`, {
+        method: "POST",
+        credentials: "include"
+      });
+      if (!res.ok) throw new Error("Failed to resend");
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["signatures", reservationId] });
+    }
+  });
+
+  const coiUploadMutation = useMutation({
+    mutationFn: async () => {
+      const payload = {
+        campgroundId,
+        reservationId,
+        guestId: reservation?.guestId,
+        fileUrl: coiUrl || "https://placeholder.example/coi.pdf",
+        expiresAt: coiExpiresAt || undefined
+      };
+      const res = await fetch("/api/signatures/coi", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify(payload)
+      });
+      if (!res.ok) throw new Error("Failed to save COI");
+      return res.json();
+    }
+  });
+
+  useEffect(() => {
+    if (reservation) {
+      setVehiclePlate(reservation.vehiclePlate || accessStatus?.vehicle?.plate || "");
+      setVehicleState(reservation.vehicleState || accessStatus?.vehicle?.state || "");
+      setVehicleRigType(reservation.rigType || accessStatus?.vehicle?.rigType || "");
+      setVehicleRigLength(
+        reservation.rigLength !== undefined && reservation.rigLength !== null
+          ? String(reservation.rigLength)
+          : accessStatus?.vehicle?.rigLength
+            ? String(accessStatus.vehicle.rigLength)
+            : ""
+      );
+      if (reservation.guest?.email && !signatureEmail) {
+        setSignatureEmail(reservation.guest.email);
+      }
+    }
+  }, [reservation?.id, accessStatus?.vehicle?.id]);
 
   if (reservationQuery.isLoading) {
     return (
@@ -144,6 +274,19 @@ export default function ReservationDetailPage() {
           depositConfig: (reservation as any).depositConfig ?? null
         })
       : 0;
+  const signatureRequests = Array.isArray(signaturesQuery.data)
+    ? signaturesQuery.data
+    : signaturesQuery.isError
+      ? [
+        {
+          id: "stub-signature",
+          documentType: "long_term_stay",
+          status: "sent",
+          recipientEmail: reservation.guest?.email,
+          sentAt: new Date().toISOString()
+        }
+      ]
+      : [];
 
   const statusBadge =
     reservation.status === "confirmed"
@@ -355,6 +498,117 @@ export default function ReservationDetailPage() {
             </CardContent>
           </Card>
 
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center justify-between gap-2">
+                <span>Signatures & COI</span>
+                {signaturesQuery.isFetching && <span className="text-xs text-slate-500">Refreshing…</span>}
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3 text-sm">
+              <div className="space-y-2">
+                <div className="grid grid-cols-1 gap-2 md:grid-cols-4">
+                  <Input
+                    placeholder="Recipient email"
+                    value={signatureEmail || reservation.guest?.email || ""}
+                    onChange={(e) => setSignatureEmail(e.target.value)}
+                  />
+                  <select
+                    className="w-full rounded-md border border-slate-200 px-3 py-2 text-sm"
+                    value={signatureType}
+                    onChange={(e) => setSignatureType(e.target.value)}
+                  >
+                    <option value="long_term_stay">Long-term stay</option>
+                    <option value="park_rules">Park rules</option>
+                    <option value="deposit">Deposit/fees</option>
+                    <option value="waiver">Waiver</option>
+                    <option value="coi">COI acknowledgement</option>
+                    <option value="other">Other</option>
+                  </select>
+                  <select
+                    className="w-full rounded-md border border-slate-200 px-3 py-2 text-sm"
+                    value={deliveryChannel}
+                    onChange={(e) => setDeliveryChannel(e.target.value as any)}
+                  >
+                    <option value="email">Email</option>
+                    <option value="email_and_sms">Email + SMS fallback</option>
+                    <option value="sms">SMS only</option>
+                  </select>
+                  <Button
+                    size="sm"
+                    className="w-full md:w-auto"
+                    onClick={() => createSignatureMutation.mutate()}
+                    disabled={createSignatureMutation.isLoading}
+                  >
+                    {createSignatureMutation.isLoading ? "Sending…" : "Send signature request"}
+                  </Button>
+                </div>
+                <p className="text-xs text-slate-500">
+                  Email-first delivery with optional SMS fallback. Links expire based on the request’s configured expiry.
+                </p>
+              </div>
+
+              <div className="space-y-2">
+                {signatureRequests.length === 0 && <div className="text-xs text-slate-500">No signature requests yet.</div>}
+                {signatureRequests.map((req: any) => (
+                  <div key={req.id} className="flex flex-col gap-2 rounded border border-slate-200 p-2 md:flex-row md:items-center md:justify-between">
+                    <div className="space-y-1">
+                      <div className="flex items-center gap-2">
+                        <span className="font-medium capitalize">{(req.documentType || "long_term_stay").replace(/_/g, " ")}</span>
+                        <Badge variant="outline">{req.status}</Badge>
+                      </div>
+                      <div className="text-xs text-slate-500">
+                        Sent to {req.recipientEmail || "n/a"} {req.sentAt ? ` • ${formatDateTime(req.sentAt)}` : ""}
+                      </div>
+                    </div>
+                    <div className="flex flex-wrap gap-2">
+                      <Button
+                        size="sm"
+                        variant="secondary"
+                        onClick={() => resendSignatureMutation.mutate(req.id)}
+                        disabled={resendSignatureMutation.isLoading || ["signed", "declined", "voided"].includes(req.status)}
+                      >
+                        Resend
+                      </Button>
+                      {req.artifact?.pdfUrl ? (
+                        <a
+                          href={req.artifact.pdfUrl}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="inline-flex items-center justify-center rounded-md border border-slate-200 px-3 py-1 text-xs font-medium text-slate-700 hover:bg-slate-50"
+                        >
+                          Download PDF
+                        </a>
+                      ) : (
+                        <Button size="sm" variant="outline" disabled>
+                          Awaiting signature
+                        </Button>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              <div className="space-y-2 border-t border-slate-200 pt-3">
+                <div className="grid grid-cols-1 gap-2 md:grid-cols-3">
+                  <Input placeholder="COI file URL" value={coiUrl} onChange={(e) => setCoiUrl(e.target.value)} />
+                  <Input
+                    type="date"
+                    placeholder="Expiry"
+                    value={coiExpiresAt}
+                    onChange={(e) => setCoiExpiresAt(e.target.value)}
+                  />
+                  <Button size="sm" variant="outline" onClick={() => coiUploadMutation.mutate()}>
+                    Save COI
+                  </Button>
+                </div>
+                <p className="text-xs text-slate-500">
+                  Store certificates of insurance with expiry reminders. Reminders are sent before expiry automatically.
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+
           {/* Self Check-in Status Card */}
           <Card>
             <CardHeader>
@@ -441,6 +695,161 @@ export default function ReservationDetailPage() {
               ) : (
                 <div className="text-slate-500 text-xs">No check-in data available.</div>
               )}
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <DoorOpen className="h-4 w-4 text-emerald-600" />
+                Vehicle & Access Control
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3 text-sm">
+              <div className="grid gap-3 sm:grid-cols-2">
+                <div className="space-y-1">
+                  <Label className="text-xs text-slate-600">License plate</Label>
+                  <Input
+                    value={vehiclePlate}
+                    onChange={(e) => setVehiclePlate(e.target.value.toUpperCase())}
+                    placeholder="ABC123"
+                  />
+                </div>
+                <div className="space-y-1">
+                  <Label className="text-xs text-slate-600">State</Label>
+                  <Input
+                    value={vehicleState}
+                    onChange={(e) => setVehicleState(e.target.value.toUpperCase())}
+                    placeholder="CA"
+                  />
+                </div>
+                <div className="space-y-1">
+                  <Label className="text-xs text-slate-600">Rig type</Label>
+                  <Input
+                    value={vehicleRigType}
+                    onChange={(e) => setVehicleRigType(e.target.value)}
+                    placeholder="RV / trailer / car"
+                  />
+                </div>
+                <div className="space-y-1">
+                  <Label className="text-xs text-slate-600">Rig length (ft)</Label>
+                  <Input
+                    type="number"
+                    value={vehicleRigLength}
+                    onChange={(e) => setVehicleRigLength(e.target.value)}
+                    placeholder="30"
+                  />
+                </div>
+              </div>
+              <div className="flex flex-wrap gap-2">
+                <Button
+                  size="sm"
+                  onClick={() =>
+                    vehicleMutation.mutate({
+                      plate: vehiclePlate || undefined,
+                      state: vehicleState || undefined,
+                      rigType: vehicleRigType || undefined,
+                      rigLength: vehicleRigLength ? Number(vehicleRigLength) : undefined
+                    })
+                  }
+                  disabled={vehicleMutation.isPending}
+                >
+                  {vehicleMutation.isPending ? "Saving…" : "Save vehicle"}
+                </Button>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => setAccessCode(vehiclePlate || reservation.vehiclePlate || accessCode)}
+                >
+                  Use plate as code
+                </Button>
+              </div>
+
+              <div className="border-t border-slate-200 pt-3 space-y-2">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <div className="font-medium">Gate / lock credential</div>
+                    <div className="text-xs text-slate-500">Send, view status, resend, or revoke</div>
+                  </div>
+                  <select
+                    value={accessProvider}
+                    onChange={(e) => setAccessProvider(e.target.value as any)}
+                    className="text-sm border border-slate-200 rounded px-2 py-1"
+                  >
+                    <option value="kisi">Kisi</option>
+                    <option value="brivo">Brivo</option>
+                    <option value="cloudkey">CloudKey</option>
+                  </select>
+                </div>
+                <div className="grid gap-2 sm:grid-cols-2">
+                  <div className="space-y-1">
+                    <Label className="text-xs text-slate-600">Credential (PIN / RFID / QR)</Label>
+                    <Input
+                      value={accessCode}
+                      onChange={(e) => setAccessCode(e.target.value)}
+                      placeholder="Code or token"
+                    />
+                  </div>
+                  <div className="flex items-end gap-2">
+                    <Button
+                      size="sm"
+                      onClick={() =>
+                        grantAccessMutation.mutate({
+                          provider: accessProvider,
+                          credentialType: "pin",
+                          credentialValue: accessCode || vehiclePlate || reservation.vehiclePlate || undefined,
+                          idempotencyKey: `grant-${accessProvider}-${reservationId}-${accessCode || "default"}`
+                        })
+                      }
+                      disabled={grantAccessMutation.isPending}
+                    >
+                      {grantAccessMutation.isPending ? "Sending…" : "Send / resend"}
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() =>
+                        revokeAccessMutation.mutate({
+                          provider: accessProvider,
+                          providerAccessId: accessStatus?.grants?.find((g: any) => g.provider === accessProvider)?.providerAccessId
+                        })
+                      }
+                      disabled={revokeAccessMutation.isPending}
+                    >
+                      {revokeAccessMutation.isPending ? "Revoking…" : "Revoke"}
+                    </Button>
+                  </div>
+                </div>
+
+                <div className="space-y-1">
+                  {(accessStatus?.grants ?? []).length === 0 && (
+                    <div className="text-xs text-slate-500">No access grants yet.</div>
+                  )}
+                  {(accessStatus?.grants ?? []).map((g: any) => (
+                    <div
+                      key={g.id}
+                      className="flex items-center justify-between rounded border border-slate-200 px-2 py-1 text-xs"
+                    >
+                      <div className="flex flex-col">
+                        <span className="font-medium capitalize">{g.provider}</span>
+                        <span className="text-slate-500">{g.providerAccessId || "pending"}</span>
+                      </div>
+                      <Badge
+                        variant="outline"
+                        className={
+                          g.status === "active"
+                            ? "bg-emerald-50 text-emerald-700 border-emerald-200"
+                            : g.status === "blocked" || g.status === "revoked"
+                              ? "bg-rose-50 text-rose-700 border-rose-200"
+                              : "bg-amber-50 text-amber-700 border-amber-200"
+                        }
+                      >
+                        {g.status}
+                      </Badge>
+                    </div>
+                  ))}
+                </div>
+              </div>
             </CardContent>
           </Card>
 

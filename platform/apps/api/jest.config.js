@@ -28,6 +28,12 @@ module.exports = {
     "^@/prisma$": "<rootDir>/prisma",
     "^@/shared$": "<rootDir>/../../../packages/shared/src"
   },
+  globals: {
+    "ts-jest": {
+      tsconfig: "<rootDir>/tsconfig.json",
+      diagnostics: false
+    }
+  },
   collectCoverageFrom: [
     "src/**/*.ts",
     "!src/main.ts",

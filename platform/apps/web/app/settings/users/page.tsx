@@ -48,6 +48,9 @@ export default function UsersPage() {
   const qc = useQueryClient();
   const [campgroundId, setCampgroundId] = useState<string | null>(null);
   const [invite, setInvite] = useState({ email: "", firstName: "", lastName: "", role: "manager" as Role });
+  const [onboardingEmail, setOnboardingEmail] = useState("");
+  const [onboardingExpiresHours, setOnboardingExpiresHours] = useState(72);
+  const [onboardingLink, setOnboardingLink] = useState<string | null>(null);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -110,6 +113,28 @@ export default function UsersPage() {
       toast({ title: "Invite resent" });
     },
     onError: (err: Error) => toast({ title: "Failed to resend invite", description: err.message, variant: "destructive" })
+  });
+
+  const createOnboardingInvite = useMutation({
+    mutationFn: async () => {
+      if (!campgroundId) throw new Error("No campground selected");
+      return apiClient.createOnboardingInvite({
+        email: onboardingEmail,
+        campgroundId,
+        expiresInHours: onboardingExpiresHours || undefined,
+      });
+    },
+    onSuccess: (res) => {
+      const base =
+        typeof window !== "undefined"
+          ? `${window.location.origin}`
+          : process.env.NEXT_PUBLIC_APP_URL || "https://app.campreserv.com";
+      const link = `${base}/onboarding/${res.token}`;
+      setOnboardingLink(link);
+      setOnboardingEmail("");
+      toast({ title: "Onboarding invite sent", description: "Share the link with the new campground contact." });
+    },
+    onError: (err: Error) => toast({ title: "Failed to send onboarding invite", description: err.message, variant: "destructive" })
   });
 
   return (
@@ -192,6 +217,54 @@ export default function UsersPage() {
                 Add member
               </Button>
             </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Shield className="h-4 w-4 text-emerald-600" />
+              Onboarding invite (campground setup)
+            </CardTitle>
+            <CardDescription>Send the guided onboarding link to the campground owner/manager.</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+              <div className="space-y-2">
+                <Label>Recipient email</Label>
+                <Input
+                  value={onboardingEmail}
+                  onChange={(e) => setOnboardingEmail(e.target.value)}
+                  placeholder="owner@camp.com"
+                  type="email"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label>Expires in (hours)</Label>
+                <Input
+                  type="number"
+                  value={onboardingExpiresHours}
+                  min={1}
+                  onChange={(e) => setOnboardingExpiresHours(Number(e.target.value) || 0)}
+                />
+              </div>
+              <div className="flex items-end">
+                <Button
+                  onClick={() => createOnboardingInvite.mutate()}
+                  disabled={!onboardingEmail || createOnboardingInvite.isPending}
+                  className="w-full md:w-auto"
+                >
+                  {createOnboardingInvite.isPending ? "Sending..." : "Send onboarding invite"}
+                </Button>
+              </div>
+            </div>
+            {onboardingLink && (
+              <div className="space-y-2">
+                <Label>Onboarding link</Label>
+                <Input value={onboardingLink} readOnly onFocus={(e) => e.target.select()} />
+                <p className="text-xs text-muted-foreground">Share this link with the campground to start setup. A new resend generates a fresh link.</p>
+              </div>
+            )}
           </CardContent>
         </Card>
 

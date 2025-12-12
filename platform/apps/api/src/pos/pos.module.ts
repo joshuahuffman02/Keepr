@@ -9,11 +9,30 @@ import { StripeService } from "../payments/stripe.service";
 import { TillService } from "./till.service";
 import { TillController } from "./till.controller";
 import { AuditService } from "../audit/audit.service";
+import { PosProviderController } from "./pos-provider.controller";
+import { PosProviderService } from "./pos-provider.service";
+import { PosProviderRegistry } from "./pos-provider.registry";
+import { CloverAdapter, SquareAdapter, ToastAdapter } from "./pos-provider.adapters";
+import { EmailService } from "../email/email.service";
 
 @Module({
   imports: [StoredValueModule],
-  controllers: [PosController, TillController],
-  providers: [PosService, PrismaService, IdempotencyService, StoredValueService, StripeService, TillService, AuditService],
-  exports: [PosService, TillService]
+  controllers: [PosController, TillController, PosProviderController],
+  providers: [
+    PosService,
+    PrismaService,
+    IdempotencyService,
+    StoredValueService,
+    StripeService,
+    TillService,
+    AuditService,
+    PosProviderService,
+    PosProviderRegistry,
+    CloverAdapter,
+    SquareAdapter,
+    ToastAdapter,
+    EmailService
+  ],
+  exports: [PosService, TillService, PosProviderService]
 })
 export class PosModule {}

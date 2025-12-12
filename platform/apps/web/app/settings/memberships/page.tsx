@@ -155,6 +155,28 @@ export default function MembershipSettingsPage() {
                     </Dialog>
                 </div>
 
+                <Card>
+                    <CardHeader className="pb-2">
+                        <CardTitle className="text-base">How membership works</CardTitle>
+                        <CardDescription>Current setup supports paid tiers; auto-enrollment thresholds are roadmap items.</CardDescription>
+                    </CardHeader>
+                    <CardContent className="grid gap-4 md:grid-cols-2">
+                        <div className="space-y-1">
+                            <div className="font-semibold text-slate-900">Buy-in</div>
+                            <p className="text-sm text-slate-600">
+                                Sell a membership tier by charging the price above (e.g., via POS or a manual charge), then assign the member to that tier in CRM.
+                                Discounts/benefits are determined by the tier’s settings here.
+                            </p>
+                        </div>
+                        <div className="space-y-1">
+                            <div className="font-semibold text-slate-900">Auto-earn (planned)</div>
+                            <p className="text-sm text-slate-600">
+                                Auto-enrollment after X stays or Y spend is not wired yet. If you need this, capture the target thresholds and we’ll add the trigger once the rule engine ships.
+                            </p>
+                        </div>
+                    </CardContent>
+                </Card>
+
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {types?.map((type) => (
                         <Card key={type.id}>

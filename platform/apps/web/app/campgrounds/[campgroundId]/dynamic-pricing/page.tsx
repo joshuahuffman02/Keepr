@@ -14,6 +14,7 @@ type Rule = {
 export default function DynamicPricingPage({ params }: { params: { campgroundId: string } }) {
   const [rules, setRules] = useState<Rule[]>([]);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [form, setForm] = useState({
     name: "",
     trigger: "occupancy_high",
@@ -23,12 +24,15 @@ export default function DynamicPricingPage({ params }: { params: { campgroundId:
 
   const load = async () => {
     setLoading(true);
+    setError(null);
     try {
       const res = await fetch(`/api/dynamic-pricing/rules?campgroundId=${params.campgroundId}`);
+      if (!res.ok) throw new Error("Failed to load rules");
       const data = await res.json();
       setRules(data || []);
     } catch (err) {
       console.error(err);
+      setError("Unable to load rules. Please retry.");
     } finally {
       setLoading(false);
     }
@@ -39,7 +43,8 @@ export default function DynamicPricingPage({ params }: { params: { campgroundId:
   }, []);
 
   const createRule = async () => {
-    await fetch(`/api/dynamic-pricing/rules`, {
+    setError(null);
+    const res = await fetch(`/api/dynamic-pricing/rules`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -48,6 +53,10 @@ export default function DynamicPricingPage({ params }: { params: { campgroundId:
         adjustmentValue: Number(form.adjustmentValue),
       }),
     });
+    if (!res.ok) {
+      setError("Could not save rule. Try again.");
+      return;
+    }
     await load();
   };
 
@@ -112,19 +121,32 @@ export default function DynamicPricingPage({ params }: { params: { campgroundId:
             <h2 className="text-lg font-medium">Rules</h2>
             {loading && <span className="text-sm text-slate-500">Loading…</span>}
           </div>
-          <div className="space-y-2">
-            {rules.map((r) => (
-              <div key={r.id} className="rounded border px-3 py-2 flex justify-between">
-                <div>
-                  <div className="font-semibold">{r.name}</div>
-                  <div className="text-xs text-slate-500">
-                    {r.trigger} · {r.adjustmentType} {r.adjustmentValue}
-                  </div>
-                </div>
-                <div className="text-xs text-emerald-700">{r.isActive ? "Active" : "Inactive"}</div>
+          {error && (
+            <div className="rounded border border-red-200 bg-red-50 p-2 text-sm text-red-700" role="alert" aria-live="polite">
+              {error}
+            </div>
+          )}
+          <div className="space-y-2" aria-busy={loading}>
+            {loading && (
+              <div className="space-y-2 animate-pulse" data-testid="dynamic-pricing-skeleton">
+                <div className="h-4 rounded bg-slate-200" />
+                <div className="h-4 w-3/4 rounded bg-slate-200" />
+                <div className="h-4 w-2/3 rounded bg-slate-200" />
               </div>
-            ))}
-            {!rules.length && <div className="text-sm text-slate-500">No rules yet.</div>}
+            )}
+            {!loading &&
+              rules.map((r) => (
+                <div key={r.id} className="rounded border px-3 py-2 flex justify-between">
+                  <div>
+                    <div className="font-semibold">{r.name}</div>
+                    <div className="text-xs text-slate-500">
+                      {r.trigger} · {r.adjustmentType} {r.adjustmentValue}
+                    </div>
+                  </div>
+                  <div className="text-xs text-emerald-700">{r.isActive ? "Active" : "Inactive"}</div>
+                </div>
+              ))}
+            {!loading && !rules.length && <div className="text-sm text-slate-500">No rules yet.</div>}
           </div>
         </div>
       </div>

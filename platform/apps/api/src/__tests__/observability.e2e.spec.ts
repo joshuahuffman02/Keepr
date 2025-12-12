@@ -6,14 +6,22 @@ import { ObservabilityModule } from "../observability/observability.module";
 import { PerfService } from "../perf/perf.service";
 import { ObservabilityService } from "../observability/observability.service";
 import { PerfInterceptor } from "../perf/perf.interceptor";
+import { ScheduleModule } from "@nestjs/schedule";
+import { PrismaService } from "../prisma/prisma.service";
+import { OtaService } from "../ota/ota.service";
 
 describe("Perf/Observability smoke", () => {
   let app: INestApplication;
 
   beforeAll(async () => {
     const moduleRef = await Test.createTestingModule({
-      imports: [PerfModule, ObservabilityModule],
-    }).compile();
+      imports: [ScheduleModule.forRoot(), PerfModule, ObservabilityModule],
+    })
+      .overrideProvider(PrismaService)
+      .useValue({ $connect: jest.fn(), $on: jest.fn(), reportRun: { count: jest.fn().mockResolvedValue(0) } })
+      .overrideProvider(OtaService)
+      .useValue({ alerts: () => ({ thresholds: {}, freshnessBreaches: [], webhookBreaches: [], successBreaches: [] }) })
+      .compile();
 
     app = moduleRef.createNestApplication();
     const perfService = app.get(PerfService);
@@ -75,6 +83,33 @@ describe("Perf/Observability smoke", () => {
         queues: expect.any(Object),
       })
     );
+  });
+
+  it("GET /observability/alerts returns breaches shape", async () => {
+    const res = await request(app.getHttpServer()).get("/observability/alerts").expect(200);
+    expect(res.body).toMatchObject({
+      captured: expect.any(Number),
+      targets: expect.objectContaining({
+        apiP95Ms: expect.any(Number),
+        apiErrorRate: expect.any(Number),
+        jobP95Ms: expect.any(Number),
+        jobFailureRate: expect.any(Number),
+      }),
+      api: expect.objectContaining({
+        p95: expect.any(Number),
+        errorRate: expect.any(Number),
+        breaches: expect.any(Object),
+      }),
+      jobs: expect.objectContaining({
+        p95: expect.any(Number),
+        failureRate: expect.any(Number),
+        breaches: expect.any(Object),
+      }),
+      queues: expect.objectContaining({
+        maxDepth: expect.any(Number),
+        depthBreaches: expect.any(Array),
+      }),
+    });
   });
 });
 

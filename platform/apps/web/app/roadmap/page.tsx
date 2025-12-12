@@ -3,9 +3,10 @@
 import { DashboardShell } from "../../components/ui/layout/DashboardShell";
 import { Breadcrumbs } from "../../components/breadcrumbs";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import { useWhoami } from "@/hooks/use-whoami";
 import {
     roadmapPhases,
     getPhaseProgress,
@@ -119,16 +120,16 @@ function PhaseCard({ phase, index }: { phase: RoadmapPhase; index: number }) {
     };
 
     return (
-        <div className="group relative">
+        <div className="group relative pl-10">
             {/* Phase number indicator */}
             <div
-                className={`absolute -left-4 top-6 w-8 h-8 rounded-full shadow-lg flex items-center justify-center text-white font-bold text-sm z-10 bg-gradient-to-br ${colorGradients[phase.color]}`}
+                className={`absolute left-0 top-6 w-8 h-8 rounded-full shadow-lg flex items-center justify-center text-white font-bold text-sm z-10 bg-gradient-to-br ${colorGradients[phase.color]}`}
             >
                 {index + 1}
             </div>
 
             {/* Card */}
-            <div className="ml-6 bg-white rounded-xl border border-slate-200 shadow-sm hover:shadow-md transition-shadow overflow-hidden">
+            <div className="bg-white rounded-xl border border-slate-200 shadow-sm hover:shadow-md transition-shadow overflow-hidden">
                 {/* Header with gradient accent */}
                 <div className={`h-1.5 bg-gradient-to-r ${colorGradients[phase.color]}`} />
 
@@ -192,16 +193,25 @@ function PhaseCard({ phase, index }: { phase: RoadmapPhase; index: number }) {
 export default function RoadmapPage() {
     const { status } = useSession();
     const router = useRouter();
-    const [redirecting, setRedirecting] = useState(false);
+    const { data: whoami, isLoading: whoamiLoading } = useWhoami();
+
+    const isStaff =
+        !!(whoami?.user as any)?.platformRole ||
+        (whoami?.user?.memberships && whoami.user.memberships.length > 0);
 
     useEffect(() => {
         if (status === "unauthenticated") {
-            setRedirecting(true);
             router.replace("/roadmap/public");
         }
     }, [status, router]);
 
-    if (status === "loading" || redirecting) {
+    useEffect(() => {
+        if (status === "authenticated" && !whoamiLoading && !isStaff) {
+            router.replace("/roadmap/public");
+        }
+    }, [status, whoamiLoading, isStaff, router]);
+
+    if (status === "loading" || whoamiLoading) {
         return (
             <div className="min-h-screen flex items-center justify-center">
                 <div className="flex flex-col items-center gap-3 text-slate-600">
@@ -212,6 +222,10 @@ export default function RoadmapPage() {
         );
     }
 
+    if (status === "unauthenticated" || !isStaff) {
+        return null;
+    }
+
     const sortedPhases = [...roadmapPhases].sort((a, b) => a.order - b.order);
 
     const totalMilestones = sortedPhases.reduce((acc, p) => acc + p.milestones.length, 0);
@@ -219,7 +233,9 @@ export default function RoadmapPage() {
         (acc, p) => acc + p.milestones.filter(m => m.status === 'completed').length,
         0
     );
-    const overallPercentage = Math.round((completedMilestones / totalMilestones) * 100);
+    const overallPercentage = totalMilestones === 0 ? 0 : Math.round((completedMilestones / totalMilestones) * 100);
+    const formattedCompleted = completedMilestones.toLocaleString();
+    const formattedTotal = totalMilestones.toLocaleString();
 
     return (
         <DashboardShell>
@@ -232,6 +248,28 @@ export default function RoadmapPage() {
                     <p className="text-slate-600 max-w-2xl mx-auto">
                         Our living roadmap showing what we&apos;ve built, what we&apos;re building, and what&apos;s coming next.
                     </p>
+                </div>
+
+                {/* Top-level progress snapshot */}
+                <div className="bg-white border border-slate-200 rounded-xl p-5 shadow-sm">
+                    <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                        <div>
+                            <div className="text-sm font-semibold text-slate-900">Overall progress</div>
+                            <p className="text-sm text-slate-600">
+                                {formattedCompleted} of {formattedTotal} tasks finished
+                            </p>
+                        </div>
+                        <div className="text-3xl font-bold text-emerald-600">{overallPercentage}%</div>
+                    </div>
+                    <div className="mt-3">
+                        <ProgressBar percentage={overallPercentage} />
+                    </div>
+                    <div className="mt-2 flex flex-wrap items-center justify-between text-xs text-slate-500 gap-2">
+                        <span>Stay oriented as you scroll the timeline below.</span>
+                        <Link href="/updates" className="text-blue-600 hover:text-blue-700 font-medium">
+                            View all updates →
+                        </Link>
+                    </div>
                 </div>
 
                 {/* Planning snapshot */}
@@ -320,33 +358,10 @@ export default function RoadmapPage() {
                     </div>
                 </div>
 
-                {/* Overall progress card */}
-                <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-xl p-6 text-white">
-                    <div className="flex items-center justify-between mb-4">
-                        <div>
-                            <h2 className="text-lg font-semibold">Overall Progress</h2>
-                            <p className="text-slate-300 text-sm">{completedMilestones} of {totalMilestones} milestones shipped</p>
-                        </div>
-                        <div className="text-4xl font-bold">{overallPercentage}%</div>
-                    </div>
-                    <div className="w-full bg-slate-700 rounded-full h-3 overflow-hidden">
-                        <div
-                            className="h-full rounded-full bg-gradient-to-r from-emerald-400 via-blue-400 to-violet-400 transition-all duration-500"
-                            style={{ width: `${overallPercentage}%` }}
-                        />
-                    </div>
-                    <div className="flex justify-between mt-4 text-sm">
-                        <Link href="/updates" className="text-slate-300 hover:text-white transition-colors">
-                            View all updates →
-                        </Link>
-                        <span className="text-slate-400">Last updated: Dec 09, 2025 (roadmap refresh & planning snapshot)</span>
-                    </div>
-                </div>
-
                 {/* Phase timeline */}
                 <div className="relative">
                     {/* Vertical line */}
-                    <div className="absolute left-0 top-8 bottom-8 w-px bg-gradient-to-b from-emerald-300 via-blue-300 to-violet-300" />
+                    <div className="absolute left-1 top-4 bottom-4 w-px bg-gradient-to-b from-emerald-300 via-blue-300 to-violet-300" />
 
                     {/* Phase cards */}
                     <div className="space-y-6">

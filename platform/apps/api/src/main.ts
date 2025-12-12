@@ -11,11 +11,13 @@ import { PerfService } from "./perf/perf.service";
 import { RateLimitService } from "./perf/rate-limit.service";
 import { ObservabilityService } from "./observability/observability.service";
 import { RedactingLogger } from "./logger/redacting.logger";
+import * as bodyParser from "body-parser";
 
 async function bootstrap() {
   dotenv.config();
   const app = await NestFactory.create(AppModule, {
     logger: new RedactingLogger(),
+    bodyParser: false
   });
 
   // Explicit CORS allowlist for web dev / ngrok
@@ -24,15 +26,19 @@ async function bootstrap() {
     origin: true,
     credentials: true,
     methods: "GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS",
-    allowedHeaders: [
-      "Content-Type",
-      "Authorization",
-      "X-Campground-Id",
-      "X-Organization-Id",
-      "X-Client",
-      "Accept",
-      "X-Requested-With",
-    ],
+	    allowedHeaders: [
+	      "Content-Type",
+	      "Authorization",
+	      "X-Campground-Id",
+	      "X-Organization-Id",
+	      "X-Portfolio-Id",
+	      "X-Park-Id",
+	      "X-Locale",
+	      "X-Currency",
+	      "X-Client",
+	      "Accept",
+	      "X-Requested-With",
+	    ],
     optionsSuccessStatus: 204,
     preflightContinue: false,
   });
@@ -43,10 +49,10 @@ async function bootstrap() {
     res.header("Access-Control-Allow-Origin", origin);
     res.header("Vary", "Origin");
     res.header(
-      "Access-Control-Allow-Headers",
-      req.headers["access-control-request-headers"] ||
-        "Content-Type, Authorization, X-Campground-Id, X-Organization-Id, X-Client, Accept, X-Requested-With"
-    );
+	      "Access-Control-Allow-Headers",
+	      req.headers["access-control-request-headers"] ||
+	        "Content-Type, Authorization, X-Campground-Id, X-Organization-Id, X-Portfolio-Id, X-Park-Id, X-Locale, X-Currency, X-Client, Accept, X-Requested-With"
+	    );
     res.header(
       "Access-Control-Allow-Methods",
       req.headers["access-control-request-method"] || "GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS"
@@ -70,6 +76,23 @@ async function bootstrap() {
     (req as any).organizationId = Array.isArray(orgHeader) ? orgHeader[0] : orgHeader || null;
     next();
   });
+
+  // Preserve raw body for webhook signature verification
+  app.use(
+    bodyParser.json({
+      verify: (req: any, _res, buf) => {
+        req.rawBody = buf;
+      }
+    })
+  );
+  app.use(
+    bodyParser.urlencoded({
+      extended: true,
+      verify: (req: any, _res, buf) => {
+        req.rawBody = buf;
+      }
+    })
+  );
 
   const prismaService = app.get(PrismaService);
   await prismaService.enableShutdownHooks(app);

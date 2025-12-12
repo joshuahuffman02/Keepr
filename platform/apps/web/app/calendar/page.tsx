@@ -13,21 +13,23 @@ import { useWhoami } from "@/hooks/use-whoami";
 import { CalendarRow } from "./CalendarRow";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../../components/ui/dialog";
 import { HelpAnchor } from "../../components/help/HelpAnchor";
-import {
-  CheckCircle,
-  Clock,
-  XCircle,
-  Calendar,
-  ChevronLeft,
-  ChevronRight,
-  Tent,
-  Home,
-  Caravan,
-  RefreshCw,
-  Wrench,
-  Sparkles,
-  AlertTriangle
-} from "lucide-react";
+  import {
+    CheckCircle,
+    Clock,
+    XCircle,
+    Calendar,
+    ChevronLeft,
+    ChevronRight,
+    Tent,
+    Home,
+    Caravan,
+    RefreshCw,
+    Wrench,
+    Sparkles,
+    AlertTriangle,
+    Mail,
+    CreditCard
+  } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { computeDepositDue } from "@campreserv/shared";
 
@@ -112,6 +114,10 @@ export default function CalendarPage() {
   const [resolveNote, setResolveNote] = useState<string>("");
   const [quickActionRes, setQuickActionRes] = useState<string | null>(null);
   const [quickActionAnchor, setQuickActionAnchor] = useState<string | null>(null);
+  const [quickActionLoading, setQuickActionLoading] = useState(false);
+  const [filtersLoaded, setFiltersLoaded] = useState(false);
+  const quickActionsEnabled = !!quickActionRes && !!quickActionAnchor;
+  const [showPopover, setShowPopover] = useState<string | null>(null);
   const [selectedReservation, setSelectedReservation] = useState<any>(null);
   const [holdStatus, setHoldStatus] = useState<{ state: "idle" | "loading" | "success" | "error"; message?: string }>({
     state: "idle"
@@ -269,6 +275,43 @@ export default function CalendarPage() {
       setDayCount(30);
     }
   }, [viewMode]);
+
+  // Load saved filters/view
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    try {
+      const saved = localStorage.getItem("campreserv:calendar:viewstate");
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (parsed.statusFilter) setStatusFilter(parsed.statusFilter);
+        if (parsed.siteTypeFilter) setSiteTypeFilter(parsed.siteTypeFilter);
+        if (parsed.channelFilter) setChannelFilter(parsed.channelFilter);
+        if (parsed.assignmentFilter) setAssignmentFilter(parsed.assignmentFilter);
+        if (parsed.arrivalsNowOnly) setArrivalsNowOnly(parsed.arrivalsNowOnly);
+        if (parsed.viewMode) setViewMode(parsed.viewMode);
+      }
+    } catch {
+      // ignore
+    } finally {
+      setFiltersLoaded(true);
+    }
+  }, []);
+
+  // Persist filters/view
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    if (!filtersLoaded) return;
+    const payload = {
+      statusFilter,
+      siteTypeFilter,
+      channelFilter,
+      assignmentFilter,
+      arrivalsNowOnly,
+      viewMode
+    };
+    localStorage.setItem("campreserv:calendar:viewstate", JSON.stringify(payload));
+  }, [statusFilter, siteTypeFilter, channelFilter, assignmentFilter, arrivalsNowOnly, viewMode, filtersLoaded]);
+
 
   const createMaintenanceMutation = useMutation({
     mutationFn: (payload: Parameters<typeof apiClient.createMaintenanceTicket>[0]) =>
@@ -496,6 +539,75 @@ export default function CalendarPage() {
     end.setDate(end.getDate() + dayCount);
     return end;
   }, [start, dayCount]);
+
+  const qaRes = useMemo(() => {
+    if (!quickActionAnchor) return null;
+    return filteredReservations.find((r) => r.id === quickActionAnchor) || selectedReservation || null;
+  }, [filteredReservations, quickActionAnchor, selectedReservation]);
+  const [payModalOpen, setPayModalOpen] = useState(false);
+  const [payAmount, setPayAmount] = useState<number>(0);
+
+  // Keyboard shortcuts for quick actions
+  // eslint-disable-next-line @typescript-eslint/no-use-before-define
+  // @ts-ignore
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      if (!quickActionsEnabled || !qaRes) return;
+      const target = e.target as HTMLElement | null;
+      const isTyping =
+        target &&
+        (target.tagName === "INPUT" ||
+          target.tagName === "TEXTAREA" ||
+          (target as any).isContentEditable);
+      if (isTyping) return;
+      if (e.key === "Escape") {
+        setQuickActionAnchor(null);
+        setQuickActionRes(null);
+        return;
+      }
+      // r: highlight/reassign
+      if (e.key.toLowerCase() === "r") {
+        setSelection({
+          siteId: qaRes.siteId,
+          arrival: qaRes.arrivalDate,
+          departure: qaRes.departureDate
+        });
+        setStoreSelection({ highlightedId: qaRes.id, openDetailsId: qaRes.id });
+        setQuickActionAnchor(null);
+        return;
+      }
+      // o: open
+      if (e.key.toLowerCase() === "o" || e.key === "Enter") {
+        setSelectedReservation(qaRes);
+        return;
+      }
+      // m: messages
+      if (e.key.toLowerCase() === "m") {
+        localStorage.setItem("campreserv:openReservationId", qaRes.id);
+        window.location.href = "/messages";
+        return;
+      }
+      // p: payments/collect
+      if (e.key.toLowerCase() === "p") {
+        window.location.href = "/billing/repeat-charges";
+        return;
+      }
+      // c: check-in/out
+      if (e.key.toLowerCase() === "c") {
+        setQuickActionLoading(true);
+        const action =
+          qaRes.status === "checked_in"
+            ? apiClient.checkOutReservation(qaRes.id)
+            : apiClient.checkInReservation(qaRes.id);
+        action.finally(async () => {
+          await queryClient.invalidateQueries({ queryKey: ["calendar-reservations", selectedCampground] });
+          setQuickActionLoading(false);
+        });
+      }
+    };
+    document.addEventListener("keydown", handler);
+    return () => document.removeEventListener("keydown", handler);
+  }, [quickActionsEnabled, qaRes, setSelection, setStoreSelection, selectedCampground, queryClient]);
 
   const conflicts = useMemo(() => {
     const bySite: Record<string, any[]> = {};
@@ -1302,6 +1414,7 @@ export default function CalendarPage() {
                   setChannelFilter("all");
                   setAssignmentFilter("all");
                   setArrivalsNowOnly(false);
+                  setViewMode("week");
                 }}
               >
                 Clear filters
@@ -1465,6 +1578,200 @@ export default function CalendarPage() {
               <li>• See real-time availability and pricing</li>
               <li>• Navigate by day, week, or month</li>
             </ul>
+          </div>
+        )}
+
+        {/* Day View */}
+        {selectedCampground && !sitesQuery.isLoading && !reservationsQuery.isLoading && viewMode === "day" && (
+          <div className="rounded-xl border border-slate-200 bg-white shadow-sm">
+            <div className="px-4 py-3 border-b border-slate-100 flex items-center justify-between">
+              <div className="text-sm font-semibold text-slate-900">
+                Day view · {start.toLocaleDateString()}
+              </div>
+              <span className="text-xs text-slate-500">Hours 6a–10p</span>
+            </div>
+            <div className="divide-y divide-slate-100">
+              {filteredReservations
+                .filter((res: any) => {
+                  const arr = toLocalDate(res.arrivalDate);
+                  const dep = toLocalDate(res.departureDate);
+                  return dep > start && arr <= visibleEnd;
+                })
+                .sort((a: any, b: any) => new Date(a.arrivalDate).getTime() - new Date(b.arrivalDate).getTime())
+                .map((res: any) => {
+                  const site = (sitesQuery.data || []).find((s: any) => s.id === res.siteId);
+                  return (
+                    <div key={res.id} className="p-4 flex flex-col gap-2">
+                      <div className="flex items-center justify-between gap-2">
+                        <div className="font-semibold text-slate-900">
+                          {res.guest?.primaryFirstName} {res.guest?.primaryLastName}
+                        </div>
+                        <Badge variant="outline" className="capitalize text-[11px]">
+                          {res.status?.replace("_", " ")}
+                        </Badge>
+                      </div>
+                      <div className="flex items-center gap-2 text-sm text-slate-600 flex-wrap">
+                        <span>{site?.name || "Unassigned"}</span>
+                        <span>•</span>
+                        <span>{res.arrivalDate?.slice(11, 16) || res.arrivalDate?.slice(0, 10)} → {res.departureDate?.slice(11, 16) || res.departureDate?.slice(0, 10)}</span>
+                        <span>•</span>
+                        <span>{(res.channel || res.bookingChannel || res.source) ?? "direct"}</span>
+                      </div>
+                      <div className="flex gap-2 flex-wrap">
+                        <Button size="sm" variant="secondary" onClick={() => setSelectedReservation(res)}>
+                          Open
+                        </Button>
+                        <Button size="sm" variant="outline" onClick={() => {
+                          setSelection({
+                            siteId: res.siteId,
+                            arrival: res.arrivalDate,
+                            departure: res.departureDate
+                          });
+                          setStoreSelection({ highlightedId: res.id, openDetailsId: res.id });
+                        }}>
+                          Highlight
+                        </Button>
+                        <Button size="sm" variant="ghost" onClick={() => setShowPopover(res.id)}>
+                          Quick actions
+                        </Button>
+                      </div>
+                    </div>
+                  );
+                })}
+              {filteredReservations.length === 0 && (
+                <div className="p-6 text-center text-sm text-slate-500">No reservations for this day.</div>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* Week View */}
+        {selectedCampground && !sitesQuery.isLoading && !reservationsQuery.isLoading && viewMode === "week" && (
+          <div className="rounded-xl border border-slate-200 bg-white shadow-sm overflow-auto">
+            <div className="grid grid-cols-8 text-xs font-semibold text-slate-700 border-b border-slate-200 min-w-[960px]">
+              <div className="px-3 py-2 sticky left-0 z-30 bg-slate-100 border-r border-slate-200 text-left text-sm">
+                Site
+              </div>
+              {days.slice(0, 7).map((d, idx) => (
+                <div
+                  key={idx}
+                  className={`px-2 py-2 text-center border-r border-slate-200 relative ${d.isToday ? "bg-blue-100 font-bold text-blue-900" : d.weekend ? "bg-slate-100" : "bg-slate-50"}`}
+                >
+                  {d.label}
+                  {d.isToday && <div className="text-[10px] text-blue-600 font-normal">Today</div>}
+                </div>
+              ))}
+            </div>
+
+            <div className="divide-y divide-slate-200 min-w-[960px]">
+              {(sitesQuery.data || []).map((site, rowIdx) => {
+                const zebra = rowIdx % 2 === 0 ? "bg-white" : "bg-slate-50";
+                const siteReservations = filteredReservations.filter((r) => r.siteId === site.id);
+                return (
+                  <div key={site.id} className={`grid grid-cols-8 ${zebra}`}>
+                    <div className="px-3 py-2 sticky left-0 z-20 border-r border-slate-200 flex flex-col gap-1">
+                      <div className="text-sm font-semibold text-slate-900">{site.name}</div>
+                      <div className="text-xs text-slate-500">{site.siteType}</div>
+                    </div>
+                    {days.slice(0, 7).map((d, idx) => {
+                      const res = siteReservations.find((r) => {
+                        const resStart = toLocalDate(r.arrivalDate);
+                        const resEnd = toLocalDate(r.departureDate);
+                        return resStart <= d.date && resEnd > d.date;
+                      });
+                      const conflictHit = res
+                        ? conflicts.some((c) => c.a?.id === res.id || c.b?.id === res.id)
+                        : false;
+                      return (
+                        <div key={idx} className="border-r border-slate-200 min-h-[72px] relative px-2 py-1">
+                          {res && (
+                            <div
+                              className={`rounded-md text-[11px] text-white px-2 py-1 flex items-center gap-1 ${res.status === "checked_in"
+                                ? "bg-blue-600"
+                                : res.status === "confirmed"
+                                  ? "bg-emerald-600"
+                                  : "bg-amber-500"
+                                }`}
+                              onClick={() => {
+                                setSelectedReservation(res);
+                                setQuickActionRes(res.id);
+                                setQuickActionAnchor(res.id);
+                                setShowPopover(res.id);
+                              }}
+                            >
+                              <span className="truncate">{res.guest?.primaryFirstName} {res.guest?.primaryLastName}</span>
+                              {conflictHit && <AlertTriangle className="h-3 w-3 text-amber-100" />}
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
+        {/* Month View (condensed) */}
+        {selectedCampground && !sitesQuery.isLoading && !reservationsQuery.isLoading && viewMode === "month" && (
+          <div className="rounded-xl border border-slate-200 bg-white shadow-sm">
+            <div className="grid grid-cols-7 border-b border-slate-200 text-xs font-semibold text-slate-700">
+              {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((d) => (
+                <div key={d} className="px-3 py-2 text-center bg-slate-50">{d}</div>
+              ))}
+            </div>
+            <div className="grid grid-cols-7 gap-px bg-slate-200">
+              {days.slice(0, 30).map((d, idx) => {
+                const dayReservations = filteredReservations.filter((res) => {
+                  const resStart = toLocalDate(res.arrivalDate);
+                  const resEnd = toLocalDate(res.departureDate);
+                  return resStart <= d.date && resEnd > d.date;
+                });
+                return (
+                  <div key={idx} className="min-h-[120px] bg-white px-2 py-2 flex flex-col gap-2">
+                    <div className={`flex items-center justify-between text-xs ${d.isToday ? "text-blue-700 font-semibold" : "text-slate-700"}`}>
+                      <span>{d.label}</span>
+                      {d.isToday && <span className="text-[10px] bg-blue-100 text-blue-700 px-1.5 py-0.5 rounded">Today</span>}
+                    </div>
+                    <div className="space-y-1">
+                      {dayReservations.slice(0, 3).map((res) => {
+                        const site = (sitesQuery.data || []).find((s: any) => s.id === res.siteId);
+                        const conflictHit = conflicts.some((c) => c.a?.id === res.id || c.b?.id === res.id);
+                        const statusColor =
+                          res.status === "checked_in"
+                            ? "bg-blue-600"
+                            : res.status === "confirmed"
+                              ? "bg-emerald-600"
+                              : "bg-amber-500";
+                        return (
+                          <button
+                            key={res.id}
+                            className={`w-full text-left rounded px-2 py-1 text-[11px] text-white flex items-center gap-1 ${statusColor}`}
+                            onClick={() => {
+                              setSelectedReservation(res);
+                              setQuickActionRes(res.id);
+                              setQuickActionAnchor(res.id);
+                              setShowPopover(res.id);
+                            }}
+                          >
+                            <span className="truncate">{res.guest?.primaryFirstName} {res.guest?.primaryLastName}</span>
+                            {conflictHit && <AlertTriangle className="h-3 w-3 text-amber-100" />}
+                            <span className="text-[10px] opacity-90 ml-auto">{site?.name || "Unassigned"}</span>
+                          </button>
+                        );
+                      })}
+                      {dayReservations.length > 3 && (
+                        <div className="text-[10px] text-slate-500">+{dayReservations.length - 3} more</div>
+                      )}
+                      {dayReservations.length === 0 && (
+                        <div className="text-[11px] text-slate-400">No stays</div>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
           </div>
         )}
 
@@ -1896,9 +2203,10 @@ export default function CalendarPage() {
                                 }}
                                 onClick={(e) => {
                                   e.stopPropagation();
-                                setSelectedReservation(res);
-                                setQuickActionRes(res.id);
-                                setQuickActionAnchor(res.id);
+                                  setSelectedReservation(res);
+                                  setQuickActionRes(res.id);
+                                  setQuickActionAnchor(res.id);
+                                  setShowPopover(res.id);
                                 }}
                                 data-res-id={res.id}
                               >
@@ -2628,6 +2936,245 @@ export default function CalendarPage() {
             })()}
           </DialogContent>
         </Dialog>
+
+        {qaRes && (
+          <div className="fixed bottom-6 right-6 z-40 max-w-sm rounded-lg border border-slate-200 bg-white shadow-xl p-4 space-y-3">
+            <div className="flex items-center justify-between">
+              <div>
+                <div className="text-sm font-semibold text-slate-900">
+                  {qaRes.guest?.primaryFirstName} {qaRes.guest?.primaryLastName}
+                </div>
+                <div className="text-xs text-slate-500">
+                  {qaRes.arrivalDate?.slice(0, 10)} → {qaRes.departureDate?.slice(0, 10)}
+                </div>
+              </div>
+              <button
+                className="text-slate-400 hover:text-slate-600"
+                onClick={() => {
+                  setQuickActionAnchor(null);
+                  setQuickActionRes(null);
+                }}
+                aria-label="Close quick actions"
+              >
+                ×
+              </button>
+            </div>
+            <div className="grid grid-cols-2 gap-2">
+              <Button
+                size="sm"
+                variant="secondary"
+                disabled={quickActionLoading}
+                onClick={() => setSelectedReservation(qaRes)}
+              >
+                Open
+              </Button>
+              {qaRes.status === "checked_in" ? (
+                <Button
+                  size="sm"
+                  disabled={quickActionLoading}
+                  onClick={async () => {
+                    setQuickActionLoading(true);
+                    try {
+                      await apiClient.checkOutReservation(qaRes.id);
+                      await queryClient.invalidateQueries({ queryKey: ["calendar-reservations", selectedCampground] });
+                    } finally {
+                      setQuickActionLoading(false);
+                    }
+                  }}
+                >
+                  Check Out
+                </Button>
+              ) : (
+                <Button
+                  size="sm"
+                  className="bg-blue-600 hover:bg-blue-700"
+                  disabled={quickActionLoading}
+                  onClick={async () => {
+                    setQuickActionLoading(true);
+                    try {
+                      await apiClient.checkInReservation(qaRes.id);
+                      await queryClient.invalidateQueries({ queryKey: ["calendar-reservations", selectedCampground] });
+                    } finally {
+                      setQuickActionLoading(false);
+                    }
+                  }}
+                >
+                  Check In
+                </Button>
+              )}
+              <Button
+                size="sm"
+                variant="outline"
+                className="flex items-center gap-2"
+                onClick={() => {
+                  localStorage.setItem("campreserv:openReservationId", qaRes.id);
+                  window.location.href = "/messages";
+                }}
+              >
+                <Mail className="h-4 w-4" />
+                Message
+              </Button>
+              <Button
+                size="sm"
+                variant="outline"
+                className="flex items-center gap-2"
+                onClick={() => {
+                  setPayAmount(Math.max(0, (qaRes.balanceAmount ?? 0) / 100));
+                  setPayModalOpen(true);
+                }}
+              >
+                <CreditCard className="h-4 w-4" />
+                Collect
+              </Button>
+              <Button
+                size="sm"
+                variant="ghost"
+                className="col-span-2"
+                onClick={() => {
+                  setSelection({
+                    siteId: qaRes.siteId,
+                    arrival: qaRes.arrivalDate,
+                    departure: qaRes.departureDate
+                  });
+                  setStoreSelection({ highlightedId: qaRes.id, openDetailsId: qaRes.id });
+                  setQuickActionAnchor(null);
+                }}
+              >
+                Highlight / Reassign
+              </Button>
+            </div>
+          </div>
+        )}
+
+        <Dialog open={payModalOpen} onOpenChange={setPayModalOpen}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Collect Payment</DialogTitle>
+            </DialogHeader>
+            {qaRes ? (
+              <div className="space-y-3">
+                <div className="text-sm text-slate-600">
+                  {qaRes.guest?.primaryFirstName} {qaRes.guest?.primaryLastName} · Balance ${(qaRes.balanceAmount ?? 0) / 100}
+                </div>
+                <div className="space-y-1">
+                  <label className="text-xs text-slate-500">Amount</label>
+                  <input
+                    type="number"
+                    className="w-full rounded border border-slate-200 px-3 py-2 text-sm"
+                    min={0}
+                    step={1}
+                    value={payAmount}
+                    onChange={(e) => setPayAmount(Number(e.target.value))}
+                  />
+                </div>
+                <Button
+                  size="sm"
+                  className="w-full"
+                  onClick={async () => {
+                    await apiClient.recordReservationPayment(qaRes.id, Math.round(payAmount * 100));
+                    await queryClient.invalidateQueries({ queryKey: ["calendar-reservations", selectedCampground] });
+                    setPayModalOpen(false);
+                  }}
+                >
+                  Collect
+                </Button>
+              </div>
+            ) : (
+              <div className="text-sm text-slate-500">No reservation selected.</div>
+            )}
+          </DialogContent>
+        </Dialog>
+
+        {showPopover && qaRes && (
+          <div className="fixed bottom-28 right-6 z-50 max-w-sm rounded-lg border border-slate-200 bg-white shadow-xl p-3 space-y-3">
+            <div className="flex items-center justify-between">
+              <div className="text-sm font-semibold text-slate-900">Quick actions</div>
+              <button
+                className="text-slate-400 hover:text-slate-600"
+                onClick={() => setShowPopover(null)}
+                aria-label="Close popover"
+              >
+                ×
+              </button>
+            </div>
+            <div className="grid grid-cols-2 gap-2">
+              <Button
+                size="sm"
+                variant="secondary"
+                onClick={() => {
+                  setSelectedReservation(qaRes);
+                  setShowPopover(null);
+                }}
+              >
+                Open
+              </Button>
+              {qaRes.status === "checked_in" ? (
+                <Button
+                  size="sm"
+                  onClick={async () => {
+                    await apiClient.checkOutReservation(qaRes.id);
+                    await queryClient.invalidateQueries({ queryKey: ["calendar-reservations", selectedCampground] });
+                    setShowPopover(null);
+                  }}
+                >
+                  Check Out
+                </Button>
+              ) : (
+                <Button
+                  size="sm"
+                  className="bg-blue-600 hover:bg-blue-700"
+                  onClick={async () => {
+                    await apiClient.checkInReservation(qaRes.id);
+                    await queryClient.invalidateQueries({ queryKey: ["calendar-reservations", selectedCampground] });
+                    setShowPopover(null);
+                  }}
+                >
+                  Check In
+                </Button>
+              )}
+              <Button
+                size="sm"
+                variant="outline"
+                className="flex items-center gap-2"
+                onClick={() => {
+                  localStorage.setItem("campreserv:openReservationId", qaRes.id);
+                  window.location.href = "/messages";
+                }}
+              >
+                <Mail className="h-4 w-4" />
+                Message
+              </Button>
+              <Button
+                size="sm"
+                variant="outline"
+                className="flex items-center gap-2"
+                onClick={() => {
+                  setPayAmount(Math.max(0, (qaRes.balanceAmount ?? 0) / 100));
+                  setPayModalOpen(true);
+                }}
+              >
+                <CreditCard className="h-4 w-4" />
+                Collect
+              </Button>
+              <Button
+                size="sm"
+                variant="ghost"
+                className="col-span-2"
+                onClick={() => {
+                  setSelection({
+                    siteId: qaRes.siteId,
+                    arrival: qaRes.arrivalDate,
+                    departure: qaRes.departureDate
+                  });
+                  setStoreSelection({ highlightedId: qaRes.id, openDetailsId: qaRes.id });
+                  setShowPopover(null);
+                }}
+              >
+                Highlight / Reassign
+              </Button>
+            </div>
+          </div>
+        )}
       </div>
     </DashboardShell>
   );

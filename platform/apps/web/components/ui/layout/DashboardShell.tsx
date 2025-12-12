@@ -35,7 +35,8 @@ type IconName =
   | "star"
   | "plus"
   | "clock"
-  | "alert";
+  | "alert"
+  | "lock";
 
 type NavItem = {
   label: string;
@@ -227,6 +228,13 @@ const Icon = ({ name, active }: { name: IconName; active?: boolean }) => {
           <path d="M12 9v4M12 17h.01" />
         </svg>
       );
+    case "lock":
+      return (
+        <svg {...common} viewBox="0 0 24 24">
+          <rect x="5" y="11" width="14" height="10" rx="2" />
+          <path d="M8 11V8a4 4 0 0 1 8 0v3" />
+        </svg>
+      );
     default:
       return null;
   }
@@ -249,6 +257,15 @@ export function DashboardShell({ children, className }: { children: ReactNode; c
   const [favorites, setFavorites] = useState<string[]>([]);
   const [visitCounts, setVisitCounts] = useState<Record<string, number>>({});
   const [pinEditMode, setPinEditMode] = useState(false);
+
+  // Permission helpers
+  const memberships = whoami?.user?.memberships ?? [];
+  const hasCampgroundAccess = memberships.length > 0;
+  const platformRole = (whoami?.user as any)?.platformRole as string | null;
+  const supportAllowed =
+    whoami?.allowed?.supportRead || whoami?.allowed?.supportAssign || whoami?.allowed?.supportAnalytics;
+  const allowSupport = !!supportAllowed && (platformRole ? true : hasCampgroundAccess);
+  const allowOps = (whoami?.allowed?.operationsWrite ?? false) && (platformRole ? true : hasCampgroundAccess);
 
   // Sync API token from session to localStorage
   useEffect(() => {
@@ -358,6 +375,18 @@ export function DashboardShell({ children, className }: { children: ReactNode; c
     }
   }, []);
 
+  // Seed default favorites for ops users with a selected campground
+  useEffect(() => {
+    if (!allowOps || !selected) return;
+    if (favorites.length) return;
+    setFavorites([
+      "/check-in-out",
+      `/campgrounds/${selected}/staff/timeclock`,
+      `/campgrounds/${selected}/staff/approvals`,
+      `/campgrounds/${selected}/staff/overrides`
+    ]);
+  }, [allowOps, selected, favorites.length]);
+
   // Persist personalization
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -381,18 +410,8 @@ export function DashboardShell({ children, className }: { children: ReactNode; c
   const currentPath = useMemo(() => pathname || "", [pathname]);
   const cgScopedPath = selected ? `/campgrounds/${selected}` : "/campgrounds";
   const cgSitesPath = selected ? `/campgrounds/${selected}/sites` : "/campgrounds";
-  const cgClassesPath = selected ? `/campgrounds/${selected}/classes` : "/pricing";
+  const cgClassesPath = selected ? `/campgrounds/${selected}/classes` : "/campgrounds";
   const cgReservationsPath = selected ? `/campgrounds/${selected}/reservations` : "/reservations";
-  const memberships = whoami?.user?.memberships ?? [];
-  const hasCampgroundAccess = memberships.length > 0;
-  const platformRole = (whoami?.user as any)?.platformRole as string | null;
-  const supportAllowed =
-    whoami?.allowed?.supportRead ||
-    whoami?.allowed?.supportAssign ||
-    whoami?.allowed?.supportAnalytics;
-  const allowSupport = !!supportAllowed && (platformRole ? true : hasCampgroundAccess);
-  const allowOps = (whoami?.allowed?.operationsWrite ?? false) && (platformRole ? true : hasCampgroundAccess);
-
   const navSections = useMemo(() => {
     const todayItems: NavItem[] = [
       { label: "Today", href: "/dashboard", icon: "dashboard" },
@@ -421,9 +440,8 @@ export function DashboardShell({ children, className }: { children: ReactNode; c
     }
 
     const pricingItems: NavItem[] = [
-      { label: "Rates & Pricing", href: "/pricing", icon: "pricing" },
-      { label: "Dynamic Pricing", href: "/settings/pricing-rules", icon: "pricing" },
-      { label: "Seasonal Rates", href: "/settings/seasonal-rates", icon: "calendar" },
+      { label: "Dynamic Pricing", href: "/settings/pricing-rules", icon: "pricing", tooltip: "Primary pricing UI (legacy /pricing now redirects here)" },
+      { label: "Seasonal Rates", href: "/settings/seasonal-rates", icon: "calendar", tooltip: "Long-stay and package rates" },
       { label: "Deposit Policies", href: "/settings/deposit-policies", icon: "payments" },
       { label: "Upsells & Add-ons", href: "/settings/upsells", icon: "tag" },
       { label: "Blackout Dates", href: "/settings/blackout-dates", icon: "calendar" },
@@ -471,6 +489,14 @@ export function DashboardShell({ children, className }: { children: ReactNode; c
       { label: "Email & SMS Templates", href: "/settings/templates", icon: "message" },
       { label: "Privacy & Consent", href: "/settings/privacy", icon: "audit" },
       { label: "Security", href: "/settings/security", icon: "audit" },
+      { label: "Access Control", href: "/settings/access-control", icon: "lock" },
+      {
+        label: "Utilities & Billing",
+        href: selected ? `/campgrounds/${selected}/utilities-billing` : "/campgrounds",
+        icon: "payments",
+        tooltip: "Long-stay metered utilities, invoices, late fees"
+      },
+      { label: "Incidents & COIs", href: "/incidents", icon: "alert" },
       { label: "Photos", href: "/settings/photos", icon: "brand" },
       { label: "Localization & Language", href: "/settings/localization", icon: "brand" },
       {
@@ -480,6 +506,28 @@ export function DashboardShell({ children, className }: { children: ReactNode; c
       },
       { label: "Roadmap", href: "/roadmap", icon: "sparkles" }
     ];
+
+    if (allowOps) {
+      settingsItems.splice(
+        settingsItems.length - 1,
+        0,
+        {
+          label: "Staff Timeclock",
+          href: selected ? `/campgrounds/${selected}/staff/timeclock` : "/campgrounds",
+          icon: "clock"
+        },
+        {
+          label: "Shift Approvals",
+          href: selected ? `/campgrounds/${selected}/staff/approvals` : "/campgrounds",
+          icon: "users"
+        },
+        {
+          label: "Override Requests",
+          href: selected ? `/campgrounds/${selected}/staff/overrides` : "/campgrounds",
+          icon: "alert"
+        }
+      );
+    }
 
     return [
       {
@@ -540,20 +588,34 @@ export function DashboardShell({ children, className }: { children: ReactNode; c
   }, [cgReservationsPath, cgScopedPath, unreadMessages, allowOps, allowSupport, selected, platformRole]);
 
   const frontDeskShortcuts = useMemo<NavItem[]>(() => {
-    return [
+    const items: NavItem[] = [
       { label: "Arrivals/Departures", href: "/check-in-out", icon: "reservation" },
       { label: "New Booking", href: "/booking", icon: "plus" },
       { label: "Calendar", href: "/calendar", icon: "calendar" },
       { label: "POS", href: "/pos", icon: "payments" },
       { label: "Messages", href: "/messages", icon: "message", badge: unreadMessages }
     ];
-  }, [unreadMessages]);
+
+    if (allowOps && selected) {
+      items.push(
+        { label: "Timeclock", href: `/campgrounds/${selected}/staff/timeclock`, icon: "clock" },
+        { label: "Shift Approvals", href: `/campgrounds/${selected}/staff/approvals`, icon: "users" },
+        { label: "Override Requests", href: `/campgrounds/${selected}/staff/overrides`, icon: "alert" }
+      );
+    }
+
+    return items;
+  }, [unreadMessages, allowOps, selected]);
 
   const toggleSection = useCallback(
     (heading: string) => {
       setOpenSections((prev) => {
         const current = prev[heading] ?? navSections.find((s) => s.heading === heading)?.defaultOpen ?? false;
-        return { ...prev, [heading]: !current };
+        const next: Record<string, boolean> = {};
+        navSections.forEach((section) => {
+          next[section.heading] = section.heading === heading ? !current : false;
+        });
+        return next;
       });
     },
     [navSections]
@@ -761,36 +823,6 @@ export function DashboardShell({ children, className }: { children: ReactNode; c
                 </div>
               </div>
             )}
-
-            <div className="space-y-2">
-              <div className="text-[11px] uppercase tracking-wide text-slate-400">Front desk shortcuts</div>
-              <div className="grid grid-cols-2 gap-2">
-                {frontDeskShortcuts.map((item) => {
-                  const isActive = currentPath === item.href || currentPath.startsWith(item.href + "/");
-                  return (
-                    <Link
-                      key={`m-fd-${item.href}`}
-                      href={item.href}
-                      title={item.tooltip ?? item.label}
-                      aria-current={isActive ? "page" : undefined}
-                      className={cn(
-                        "flex items-center gap-2 rounded-lg px-3 py-3 text-sm bg-slate-800/40 text-slate-100 hover:bg-slate-800 transition-colors",
-                        isActive && "bg-slate-800 text-white font-semibold"
-                      )}
-                      onClick={() => setMobileNavOpen(false)}
-                    >
-                      <Icon name={(item.icon as IconName) ?? "sparkles"} active={isActive} />
-                      <span className="flex-1">{item.label}</span>
-                      {(item as any).badge && (item as any).badge > 0 && (
-                        <span className="ml-2 rounded-full bg-red-500 px-2 py-0.5 text-[10px] font-semibold text-white">
-                          {(item as any).badge > 99 ? "99+" : (item as any).badge}
-                        </span>
-                      )}
-                    </Link>
-                  );
-                })}
-              </div>
-            </div>
 
             {navSections.map((section) => {
               const isOpen = openSections[section.heading] ?? section.defaultOpen ?? true;
@@ -1014,39 +1046,6 @@ export function DashboardShell({ children, className }: { children: ReactNode; c
                               toggleFavorite(item.href);
                             }}
                           />
-                        )}
-                      </Link>
-                    );
-                  })}
-                </div>
-              </div>
-            )}
-
-            {!collapsed && (
-              <div className="space-y-2 pt-1">
-                <div className="px-3 text-[11px] font-semibold uppercase tracking-wide text-slate-500">
-                  Front Desk Shortcuts
-                </div>
-                <div className="flex flex-wrap gap-2 px-2">
-                  {frontDeskShortcuts.map((item) => {
-                    const isActive = currentPath === item.href || currentPath.startsWith(item.href + "/");
-                    return (
-                      <Link
-                        key={`fd-${item.href}`}
-                        className={cn(
-                          "flex items-center gap-2 rounded-md border border-slate-800 bg-slate-900 px-3 py-2 text-xs font-semibold text-slate-200 hover:bg-slate-800 hover:text-white transition-colors",
-                          isActive && "border-emerald-400/60 bg-emerald-900/20 text-white"
-                        )}
-                        href={item.href}
-                        aria-current={isActive ? "page" : undefined}
-                        title={item.tooltip ?? item.label}
-                      >
-                        <Icon name={(item.icon as IconName) ?? "sparkles"} active={isActive} />
-                        <span>{item.label}</span>
-                        {(item as any).badge && (item as any).badge > 0 && (
-                          <span className="ml-auto rounded-full bg-red-500 px-2 py-0.5 text-[10px] font-semibold text-white">
-                            {(item as any).badge > 99 ? "99+" : (item as any).badge}
-                          </span>
                         )}
                       </Link>
                     );

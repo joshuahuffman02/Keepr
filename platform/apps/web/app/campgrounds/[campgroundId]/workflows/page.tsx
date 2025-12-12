@@ -13,6 +13,7 @@ type Workflow = {
 export default function WorkflowsPage({ params }: { params: { campgroundId: string } }) {
   const [workflows, setWorkflows] = useState<Workflow[]>([]);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [form, setForm] = useState({
     name: "",
     trigger: "reservation_created",
@@ -21,12 +22,15 @@ export default function WorkflowsPage({ params }: { params: { campgroundId: stri
 
   const load = async () => {
     setLoading(true);
+    setError(null);
     try {
       const res = await fetch(`/api/workflows?campgroundId=${params.campgroundId}`);
+      if (!res.ok) throw new Error("Failed to load workflows");
       const data = await res.json();
       setWorkflows(data || []);
     } catch (err) {
       console.error(err);
+      setError("Unable to load workflows. Please retry.");
     } finally {
       setLoading(false);
     }
@@ -37,7 +41,8 @@ export default function WorkflowsPage({ params }: { params: { campgroundId: stri
   }, []);
 
   const create = async () => {
-    await fetch(`/api/workflows`, {
+    setError(null);
+    const res = await fetch(`/api/workflows`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -47,6 +52,10 @@ export default function WorkflowsPage({ params }: { params: { campgroundId: stri
         priority: Number(form.priority),
       }),
     });
+    if (!res.ok) {
+      setError("Could not save workflow. Try again.");
+      return;
+    }
     await load();
   };
 
@@ -102,19 +111,32 @@ export default function WorkflowsPage({ params }: { params: { campgroundId: stri
             <h2 className="text-lg font-medium">Workflows</h2>
             {loading && <span className="text-sm text-slate-500" data-testid="workflow-loading">Loading…</span>}
           </div>
-          <div className="space-y-2">
-            {workflows.map((wf) => (
-              <div key={wf.id} className="rounded border px-3 py-2 flex justify-between" data-testid="workflow-step-row">
-                <div>
-                  <div className="font-semibold">{wf.name}</div>
-                  <div className="text-xs text-slate-500">
-                    {wf.trigger} · priority {wf.priority}
-                  </div>
-                </div>
-                <div className="text-xs text-emerald-700" data-testid="workflow-run-status">{wf.status}</div>
+          {error && (
+            <div className="rounded border border-red-200 bg-red-50 p-2 text-sm text-red-700" role="alert" aria-live="polite">
+              {error}
+            </div>
+          )}
+          <div className="space-y-2" aria-busy={loading}>
+            {loading && (
+              <div className="space-y-2 animate-pulse" data-testid="workflow-skeleton">
+                <div className="h-4 rounded bg-slate-200" />
+                <div className="h-4 w-2/3 rounded bg-slate-200" />
+                <div className="h-4 w-1/2 rounded bg-slate-200" />
               </div>
-            ))}
-            {!workflows.length && <div className="text-sm text-slate-500" data-testid="workflow-empty">No workflows yet.</div>}
+            )}
+            {!loading &&
+              workflows.map((wf) => (
+                <div key={wf.id} className="rounded border px-3 py-2 flex justify-between" data-testid="workflow-step-row">
+                  <div>
+                    <div className="font-semibold">{wf.name}</div>
+                    <div className="text-xs text-slate-500">
+                      {wf.trigger} · priority {wf.priority}
+                    </div>
+                  </div>
+                  <div className="text-xs text-emerald-700" data-testid="workflow-run-status">{wf.status}</div>
+                </div>
+              ))}
+            {!loading && !workflows.length && <div className="text-sm text-slate-500" data-testid="workflow-empty">No workflows yet.</div>}
           </div>
         </div>
       </div>

@@ -31,13 +31,19 @@ export default function OwnersPage() {
       <FeaturePillars />
 
       {/* Popular Features Showcase */}
+      <section id="resources">
       <PopularFeatures />
+      </section>
 
       {/* Testimonials */}
+      <section id="about">
       <Testimonials />
+      </section>
 
       {/* Pricing Preview */}
+      <section id="pricing">
       <PricingPreview />
+      </section>
 
       {/* Demo CTA */}
       <DemoCTA />

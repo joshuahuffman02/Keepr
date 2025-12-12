@@ -42,6 +42,35 @@ export class CreateSiteClassDto {
   @IsBoolean()
   hookupsSewer?: boolean;
 
+  // Metered utility defaults
+  @IsOptional()
+  @IsBoolean()
+  meteredEnabled?: boolean;
+
+  @IsOptional()
+  @IsString()
+  meteredType?: string;
+
+  @IsOptional()
+  @IsString()
+  meteredBillingMode?: string;
+
+  @IsOptional()
+  @IsString()
+  meteredBillTo?: string;
+
+  @IsOptional()
+  @IsInt()
+  meteredMultiplier?: number;
+
+  @IsOptional()
+  @IsString()
+  meteredRatePlanId?: string;
+
+  @IsOptional()
+  @IsBoolean()
+  meteredAutoEmail?: boolean;
+
   @IsOptional()
   @IsString({ each: true })
   tags?: string[];

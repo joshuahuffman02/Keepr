@@ -80,6 +80,15 @@ export default function UpsellsPage() {
     enabled: !!campgroundId,
   });
 
+  const infoBanner = (
+    <div className="rounded-lg border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900 mb-4">
+      <div className="font-semibold">Upsells vs POS</div>
+      <p className="mt-1">
+        Upsells here power booking extras and guest portal add-ons. Store/POS items are separate today; unified catalog and sync are on the roadmap.
+      </p>
+    </div>
+  );
+
   const createMutation = useMutation({
     mutationFn: (data: Parameters<typeof apiClient.createUpsellItem>[1]) =>
       apiClient.createUpsellItem(campgroundId!, data),
@@ -214,6 +223,7 @@ export default function UpsellsPage() {
   return (
     <DashboardShell>
       <div className="space-y-6">
+        {infoBanner}
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-2xl font-bold text-slate-900">Upsells & Add-ons</h1>

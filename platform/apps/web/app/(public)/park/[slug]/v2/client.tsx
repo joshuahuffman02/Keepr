@@ -259,7 +259,7 @@ export function CampgroundV2Client({ slug, initialData }: { slug: string; initia
                   return (
                     <Card key={event.id} className="overflow-hidden border-slate-200 hover:shadow-md transition">
                       <div className="relative h-40 w-full bg-slate-100">
-                        <Image src={event.photoUrl || hero || "/placeholder.png"} alt={event.title} fill className="object-cover" />
+                        <Image src={event.imageUrl || event.photoUrl || hero || "/placeholder.png"} alt={event.title} fill className="object-cover" />
                         <div className="absolute top-3 left-3 flex gap-2">
                           <Badge variant="secondary" className="bg-black/60 text-white border-white/10">
                             {event.eventType || "Event"}

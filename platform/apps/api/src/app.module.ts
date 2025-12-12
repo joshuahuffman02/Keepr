@@ -33,6 +33,7 @@ import { RepeatChargesModule } from './repeat-charges/repeat-charges.module';
 import { ActivitiesModule } from './activities/activities.module';
 import { MembershipsModule } from './memberships/memberships.module';
 import { OperationsModule } from './operations/operations.module';
+import { IncidentsModule } from './incidents/incidents.module';
 import { InternalConversationsModule } from './internal-conversations/internal-conversations.module';
 import { ReportsModule } from './reports/reports.module';
 import { HoldsModule } from './holds/holds.module';
@@ -40,6 +41,7 @@ import { AuditModule } from './audit/audit.module';
 import { CommunicationsModule } from './communications/communications.module';
 import { CampaignsModule } from './campaigns/campaigns.module';
 import { OtaModule } from './ota/ota.module';
+import { SiteMapModule } from './site-map/site-map.module';
 import { SupportModule } from './support/support.module';
 import { NpsModule } from './nps/nps.module';
 import { ReviewsModule } from './reviews/reviews.module';
@@ -78,7 +80,14 @@ import { DynamicPricingModule } from "./dynamic-pricing/dynamic-pricing.module";
 import { WorkflowsModule } from "./workflows/workflows.module";
 import { StaffModule } from "./staff/staff.module";
 import { PortfolioModule } from "./portfolio/portfolio.module";
+import { UploadsModule } from "./uploads/uploads.module";
 import { WaiversModule } from "./waivers/waivers.module";
+import { HealthModule } from "./health/health.module";
+import { OnboardingModule } from "./onboarding/onboarding.module";
+import { AccessControlModule } from "./access-control/access-control.module";
+import { BillingModule } from "./billing/billing.module";
+import { ReferralsModule } from "./referrals/referrals.module";
+import { SignaturesModule } from "./signatures/signatures.module";
 
 @Module({
   imports: [
@@ -93,6 +102,7 @@ import { WaiversModule } from "./waivers/waivers.module";
     GuestsModule,
     ReservationsModule,
     SiteClassesModule,
+    SiteMapModule,
     DashboardModule,
     MaintenanceModule,
     PricingModule,
@@ -118,6 +128,7 @@ import { WaiversModule } from "./waivers/waivers.module";
     GuestEquipmentModule,
     RepeatChargesModule,
     ActivitiesModule,
+    IncidentsModule,
     OperationsModule,
     InternalConversationsModule,
     ReportsModule,
@@ -138,6 +149,7 @@ import { WaiversModule } from "./waivers/waivers.module";
     PerfModule,
     IntegrationsModule,
     ObservabilityModule,
+    HealthModule,
     DeveloperApiModule,
     PrivacyModule,
     PermissionsModule,
@@ -155,12 +167,18 @@ import { WaiversModule } from "./waivers/waivers.module";
     NotificationTriggersModule,
     StoredValueModule,
     PosModule,
+    AccessControlModule,
+    BillingModule,
     // Phase 3 modules
     DynamicPricingModule,
     WorkflowsModule,
     StaffModule,
     PortfolioModule,
+    UploadsModule,
     WaiversModule,
+    SignaturesModule,
+    OnboardingModule,
+    ReferralsModule,
   ],
   providers: [PrismaService]
 })

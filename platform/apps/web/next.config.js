@@ -1,4 +1,6 @@
 /** @type {import('next').NextConfig} */
+const path = require("path");
+
 const nextConfig = {
   // App Router is enabled by default in Next.js 15
   // Allow additional origins during dev if needed
@@ -29,15 +31,13 @@ const nextConfig = {
       },
     ];
   },
-  experimental: {
-    turbo: {
-      // Explicitly set the app root for Turbopack in this monorepo
-      rootDir: __dirname,
-    },
+  // Turbopack options (Next.js 16+)
+  turbopack: {
+    // Explicitly set the app root for Turbopack in this monorepo
+    root: path.resolve(__dirname, "../../.."),
   },
   // Ensure external workspace packages are bundled correctly
   transpilePackages: ["@campreserv/shared"],
 };
 
 module.exports = nextConfig;
-

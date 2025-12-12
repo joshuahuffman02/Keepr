@@ -7,12 +7,24 @@ Living view of what’s shipping for RV hospitality operators and guests. Themes
   - Phase 1: Dynamic pricing/seasonal rate plans; deposits/auto-collect; add-ons/upsells; automated comms; audit/RBAC hardening.
   - Phase 2: Housekeeping/turnover tasking; maintenance tickets with site-out-of-order; self-service check-in/express checkout; group/linked bookings and blocks.
   - Phase 3: OTA/channel manager sync; memberships/discount plans and promo codes; public website/SEO tools.
-  - Phase 4: Gift cards/store credit; POS for on-site store/activities; reporting/analytics (ADR, revenue, channel mix); waitlist with auto-offers.
+  - Phase 4: Gift cards/store credit; point of sale (POS) for on-site store/activities; reporting/analytics (average daily rate/ADR, revenue, channel mix); waitlist with auto-offers.
 - Quick wins: add-ons at checkout; deposits/auto-collect; comms templates for confirmations/mods/cancellations; lightweight occupancy/ADR dashboard; waitlist capture UI (manual convert).
 - Update (Dec 10, 2025): Phase 1 (pricing/deposits/upsells/audit/RBAC) marked complete; remaining items shift to later-phase polish.
 - Update (Dec 10, 2025): Phase 2 feature track marked complete; remaining work will roll into next-phase tracks and polish.
 - Update (Dec 10, 2025): Phase 3 (OTA/channel sync, memberships/discounts, public website/SEO) marked complete; further polish will follow in future tracks.
-- Update (Dec 10, 2025): Phase 4 is underway — foundation added for gift cards/store credit and POS (data models and API stubs), including code issuance with optional PINs and basic POS checkout scaffolding. Next steps: on-site POS capture, reporting, and waitlist auto-offers.
+- Update (Dec 10, 2025): Phase 4 is underway — gift card issuance/redemption and POS checkout scaffolds are in place, and waitlist automation/reporting builds have started.
+- Update (Dec 10, 2025): Phase 4 remaining work: on-site POS/till handling, revenue and channel reporting, waitlist auto-offers, and guardrails/alerts for cash and reconciliation.
+- Update (Dec 11, 2025): Reliability/payments/POS hardening shipped — live alerts + synthetic checks, stronger idempotency/rate limits, POS till open/close with needs-review on tender mismatch, stored value safeguards, export guard with resumable tokens, and consent/quiet-hour enforcement for email/SMS.
+
+### Coming next
+- Payment gateway choice with fee pass-through, big reports library with charts/email, POS integrations, onboarding/import/export, e-sign/waivers, utilities/late fees, access control automation, referrals/reason-for-stay polish.
+
+### Milestones & how to follow
+- Dec 17: lock scope and payments/comms choices for gift cards and POS.
+- Dec 20: approve POS hardware/offline guardrails and guest/staff UX for gift cards, POS, and waitlist.
+- Dec 24: stage reliability, observability, and idempotent flows for Phase 4 in non-prod.
+- Jan 3: Phase 4 Go/No-Go targeting gift cards, POS, waitlist, and reporting readiness.
+- Roadmap lives here; release notes ship via Updates in-app.
 
 ## Now (in progress)
 - Resilient operations: offline-ready PWA with service worker caching + queued actions, POS/check-in that syncs safely when back online.
@@ -23,6 +35,11 @@ Living view of what’s shipping for RV hospitality operators and guests. Themes
 - Integrations wave 1 (shipped): accounting (QuickBooks/Xero), CRM/helpdesk, access control, and API/SFTP export paths with webhook guards, admin UI, and a starter SDK. Sandbox QBO path is live; production QBO/Xero and some vendor creds remain pending approval.
 - Native app placeholder: wrap the guest/staff PWA slices in a store-listed shell with push-ready registration toggles and the same offline caching/queues for parity while we plan deeper native UX.
 - Hardening pass: post-completion polish in flight (observability alerts, PII-redacted logging, UX states, and tagged smoke/E2E coverage for pricing, workflows, staff scheduling, portfolio, OTA sync).
+
+## Readiness snapshot
+- Target Go/No-Go: Jan 3 for gift cards, POS, waitlist, and reporting, with launch-readiness gates in review.
+- Reliability: API Service Level Objectives (SLOs) with live dashboards and a published Disaster Recovery (DR) runbook; monitors cover Phase 4 flows.
+- Privacy & consent: Personally identifiable information (PII) is masked in logs; consent-aware communications, quiet-hour routing, and bounce/complaint handling are live.
 
 ## Next
 - Arrival automation: self check-in, gate/lock/RFID options, late-arrival flow, “site ready” status.

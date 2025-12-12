@@ -1,11 +1,15 @@
 import { Injectable, BadRequestException } from '@nestjs/common';
-import { PrismaService } from '../prisma/prisma.service';
 import { CheckInStatus, CheckOutStatus } from '@prisma/client';
+import { PrismaService } from '../prisma/prisma.service';
+import { SignaturesService } from '../signatures/signatures.service';
+import { AuditService } from '../audit/audit.service';
+import { AccessControlService } from '../access-control/access-control.service';
 
 export type CheckinResult = {
   status: 'completed' | 'failed';
   reason?: string;
   selfCheckInAt?: Date;
+  signingUrl?: string;
 };
 
 export type CheckoutResult = {
@@ -16,7 +20,43 @@ export type CheckoutResult = {
 
 @Injectable()
 export class SelfCheckinService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly signatures: SignaturesService,
+    private readonly audit: AuditService,
+    private readonly accessControl: AccessControlService
+  ) { }
+
+  private async hasSignedWaiver(reservationId: string, guestId: string) {
+    const [signedSignature, signedArtifact, digitalWaiver] = await Promise.all([
+      (this.prisma as any).signatureRequest.findFirst?.({
+        where: { reservationId, documentType: "waiver", status: "signed" }
+      }),
+      (this.prisma as any).signatureArtifact.findFirst?.({
+        where: { reservationId, pdfUrl: { not: null } }
+      }),
+      (this.prisma as any).digitalWaiver.findFirst?.({
+        where: {
+          OR: [{ reservationId }, { reservationId: null, guestId }],
+          status: "signed"
+        }
+      })
+    ]);
+    return Boolean(signedSignature || signedArtifact || digitalWaiver);
+  }
+
+  private async hasVerifiedId(reservationId: string, guestId: string) {
+    const now = new Date();
+    const match = await (this.prisma as any).idVerification.findFirst?.({
+      where: {
+        OR: [
+          { reservationId, status: "verified" },
+          { guestId, status: "verified", expiresAt: { gt: now } }
+        ]
+      }
+    });
+    return Boolean(match);
+  }
 
   /**
    * Validate prerequisites for self check-in
@@ -24,39 +64,38 @@ export class SelfCheckinService {
   async validateCheckinPrerequisites(reservationId: string): Promise<{
     valid: boolean;
     reason?: string;
+    reasons?: string[];
+    reservation?: any;
   }> {
     const reservation = await this.prisma.reservation.findUnique({
       where: { id: reservationId },
-      include: { site: true },
+      include: { site: true, guest: true, campground: true },
     });
 
     if (!reservation) {
-      return { valid: false, reason: 'reservation_not_found' };
+      return { valid: false, reason: 'reservation_not_found', reasons: ['reservation_not_found'] };
     }
 
-    // Check payment if required
+    const reasons: string[] = [];
+
     if (reservation.paymentRequired && reservation.paymentStatus !== 'paid') {
-      return { valid: false, reason: 'payment_required' };
+      reasons.push('payment_required');
     }
 
-    // Check ID verification if required
     if (reservation.idVerificationRequired) {
-      // TODO: Check if ID verification completed via external service
-      // For now, assume it's handled elsewhere or skip
+      const verified = await this.hasVerifiedId(reservation.id, reservation.guestId);
+      if (!verified) reasons.push('id_verification_required');
     }
 
-    // Check waiver if required
     if (reservation.waiverRequired) {
-      // TODO: Check if waiver signed
-      // For now, assume it's handled elsewhere or skip
+      const signed = await this.hasSignedWaiver(reservation.id, reservation.guestId);
+      if (!signed) reasons.push('waiver_required');
     }
 
-    // Check site ready
     if (!reservation.siteReady) {
-      return { valid: false, reason: 'site_not_ready' };
+      reasons.push('site_not_ready');
     }
 
-    // Check if site is out of order (via maintenance)
     const outOfOrderTicket = await this.prisma.maintenanceTicket.findFirst({
       where: {
         siteId: reservation.siteId,
@@ -66,10 +105,14 @@ export class SelfCheckinService {
     });
 
     if (outOfOrderTicket) {
-      return { valid: false, reason: 'site_out_of_order' };
+      reasons.push('site_out_of_order');
     }
 
-    return { valid: true };
+    if (reasons.length) {
+      return { valid: false, reason: reasons[0], reasons, reservation };
+    }
+
+    return { valid: true, reservation };
   }
 
   /**
@@ -77,37 +120,76 @@ export class SelfCheckinService {
    */
   async selfCheckin(
     reservationId: string,
-    options?: { lateArrival?: boolean; override?: boolean },
+    options?: { lateArrival?: boolean; override?: boolean; overrideReason?: string; actorId?: string | null },
   ): Promise<CheckinResult> {
-    // Validate prerequisites unless override
-    if (!options?.override) {
-      const validation = await this.validateCheckinPrerequisites(reservationId);
-      if (!validation.valid) {
-        const reservation = await this.prisma.reservation.update({
-          where: { id: reservationId },
-          data: { checkInStatus: 'failed' },
-          include: { campground: true, guest: true },
-        });
+    const validation = await this.validateCheckinPrerequisites(reservationId);
+    const isOverride = Boolean(options?.override);
 
-        // Emit check-in failed communication
-        try {
+    if (!validation.valid && !isOverride) {
+      const reservation = validation.reservation ?? await this.prisma.reservation.findUnique({
+        where: { id: reservationId },
+        include: { campground: true, guest: true },
+      });
+
+      const checkInStatus =
+        validation.reason === "waiver_required"
+          ? CheckInStatus.pending_waiver
+          : validation.reason === "id_verification_required"
+            ? CheckInStatus.pending_id
+            : validation.reason === "payment_required"
+              ? CheckInStatus.pending_payment
+              : CheckInStatus.failed;
+
+      const updatedReservation = reservation
+        ? await this.prisma.reservation.update({
+          where: { id: reservationId },
+          data: { checkInStatus },
+          include: { campground: true, guest: true },
+        })
+        : null;
+
+      let signingUrl: string | undefined;
+      if (validation.reason === "waiver_required" && validation.reservation) {
+        const signatureResult = await this.signatures.autoSendForReservation(validation.reservation);
+        signingUrl = (signatureResult as any)?.signingUrl;
+      }
+
+      // Emit check-in failed communication
+      try {
+        if (updatedReservation) {
           await this.prisma.communication.create({
             data: {
-              campgroundId: reservation.campgroundId,
-              guestId: reservation.guestId,
-              reservationId: reservation.id,
+              campgroundId: updatedReservation.campgroundId,
+              guestId: updatedReservation.guestId,
+              reservationId: updatedReservation.id,
               type: 'email',
-              subject: `Check-in issue at ${reservation.campground.name}`,
+              subject: `Check-in issue at ${updatedReservation.campground.name}`,
               body: `We couldn't complete your check-in. Reason: ${validation.reason?.replace('_', ' ')}. Please contact the front desk.`,
               status: 'queued',
               direction: 'outbound',
             },
           });
-        } catch (err) {
-          console.error('Failed to create checkin-failed communication:', err);
         }
+      } catch (err) {
+        console.error('Failed to create checkin-failed communication:', err);
+      }
 
-        return { status: 'failed', reason: validation.reason };
+      return { status: 'failed', reason: validation.reason, signingUrl };
+    }
+
+    if (isOverride && !validation.valid && validation.reservation) {
+      try {
+        await this.audit.record({
+          campgroundId: validation.reservation.campgroundId,
+          actorId: options?.actorId ?? null,
+          action: "checkin.override",
+          entity: "Reservation",
+          entityId: reservationId,
+          before: { unmet: validation.reasons ?? [] },
+          after: { override: true, reason: options?.overrideReason ?? null }
+        });
+      } catch (err) {
+        console.error("Failed to audit check-in override", err);
       }
     }
 
@@ -115,13 +197,19 @@ export class SelfCheckinService {
     const reservation = await this.prisma.reservation.update({
       where: { id: reservationId },
       data: {
-        checkInStatus: 'completed',
+        checkInStatus: CheckInStatus.completed,
         selfCheckInAt: now,
         lateArrivalFlag: options?.lateArrival ?? false,
         status: 'checked_in',
       },
       include: { campground: true, guest: true, site: true },
     });
+
+    try {
+      await this.accessControl.autoGrantForReservation(reservationId, options?.actorId ?? null);
+    } catch (err) {
+      console.error("Failed to auto-grant access on self-checkin", err);
+    }
 
     // Emit check-in success communication
     try {
@@ -153,6 +241,7 @@ export class SelfCheckinService {
       damageNotes?: string;
       damagePhotos?: string[];
       override?: boolean;
+      actorId?: string | null;
     },
   ): Promise<CheckoutResult> {
     const reservation = await this.prisma.reservation.findUnique({
@@ -185,6 +274,12 @@ export class SelfCheckinService {
       },
       include: { campground: true, guest: true, site: true },
     });
+
+    try {
+      await this.accessControl.revokeAllForReservation(reservationId, "checked_out", options?.actorId ?? null);
+    } catch (err) {
+      console.error("Failed to revoke access on self-checkout", err);
+    }
 
     // Emit checkout success communication with receipt
     try {

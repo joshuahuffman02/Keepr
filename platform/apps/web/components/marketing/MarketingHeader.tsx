@@ -1,12 +1,24 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { Menu, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 export function MarketingHeader() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  // Prevent background scroll when mobile menu is open
+  useEffect(() => {
+    if (typeof document === "undefined") return;
+    if (mobileMenuOpen) {
+      const original = document.body.style.overflow;
+      document.body.style.overflow = "hidden";
+      return () => {
+        document.body.style.overflow = original;
+      };
+    }
+  }, [mobileMenuOpen]);
 
   const navigation = [
     { name: 'Features', href: '#features' },
@@ -48,6 +60,11 @@ export function MarketingHeader() {
 
           {/* CTA Buttons */}
           <div className="hidden md:flex md:items-center md:space-x-4">
+            <Link href="/">
+              <Button variant="ghost" className="text-slate-700">
+                Book a Campsite
+              </Button>
+            </Link>
             <Link href="/auth/signin">
               <Button variant="ghost" className="text-slate-700">
                 Sign In
@@ -72,7 +89,10 @@ export function MarketingHeader() {
 
         {/* Mobile Navigation */}
         {mobileMenuOpen && (
-          <div className="md:hidden py-4 space-y-2">
+          <div className="md:hidden py-4 space-y-2 max-h-[70vh] overflow-y-auto">
+            <Link href="/" className="block px-3 py-2 rounded-md text-base font-medium text-emerald-700 bg-emerald-50">
+              Book a Campsite
+            </Link>
             {navigation.map((item) => (
               <a
                 key={item.name}

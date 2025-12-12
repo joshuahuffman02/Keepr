@@ -21,9 +21,11 @@ export default function SecurityPage() {
             Security at Camp Everyday
           </h1>
           <p className="text-lg text-slate-600 max-w-2xl mx-auto">
-            Your trust is our priority. We implement industry-leading security measures 
-            to protect your data and privacy.
+            Your trust is our priority. We are building toward industry-standard security and will update this page as controls roll out.
           </p>
+          <div className="mt-4 inline-flex items-center gap-2 px-4 py-2 rounded-full bg-amber-50 text-amber-700 text-sm border border-amber-200">
+            This page describes planned and in-progress controls while we are in development.
+          </div>
         </div>
 
         {/* Security Features */}
@@ -34,7 +36,7 @@ export default function SecurityPage() {
             </div>
             <h3 className="text-lg font-bold text-slate-900 mb-2">Encryption</h3>
             <p className="text-slate-600 text-sm">
-              All data is encrypted in transit using TLS 1.3 and at rest using AES-256 encryption.
+              In transit: TLS (latest supported). At rest: modern cloud-managed encryption for storage and databases.
             </p>
           </div>
 
@@ -54,7 +56,7 @@ export default function SecurityPage() {
             </div>
             <h3 className="text-lg font-bold text-slate-900 mb-2">Secure Infrastructure</h3>
             <p className="text-slate-600 text-sm">
-              Our systems are hosted on SOC 2 certified cloud infrastructure with 24/7 monitoring.
+              Hosted on major cloud providers with managed networking, secrets, and monitoring. Formal SOC 2 attestation is planned post-GA.
             </p>
           </div>
 
@@ -77,32 +79,28 @@ export default function SecurityPage() {
             <div>
               <h3 className="text-lg font-semibold text-slate-900 mb-2">Payment Security</h3>
               <p className="text-slate-600">
-                We partner with industry-leading payment processors and never store your complete 
-                credit card information on our servers. All payment transactions are PCI DSS compliant.
+                We partner with PCI-compliant processors and do not store full card numbers. Card data handling remains with the processor.
               </p>
             </div>
 
             <div>
               <h3 className="text-lg font-semibold text-slate-900 mb-2">Access Controls</h3>
               <p className="text-slate-600">
-                We implement strict access controls including multi-factor authentication, 
-                role-based permissions, and regular access reviews for all employees.
+                MFA for staff accounts is being rolled out. RBAC is enforced in-app; we run periodic access reviews for internal tools.
               </p>
             </div>
 
             <div>
               <h3 className="text-lg font-semibold text-slate-900 mb-2">Data Backup & Recovery</h3>
               <p className="text-slate-600">
-                Your data is automatically backed up daily with geographic redundancy. 
-                Our disaster recovery procedures ensure business continuity.
+                We maintain scheduled backups with cloud-managed redundancy. DR playbooks are being exercised as part of GA readiness.
               </p>
             </div>
 
             <div>
               <h3 className="text-lg font-semibold text-slate-900 mb-2">Incident Response</h3>
               <p className="text-slate-600">
-                We maintain a comprehensive incident response plan and commit to notifying 
-                affected users within 72 hours of any confirmed data breach.
+                We maintain an incident response playbook and commit to timely notification of any confirmed breach. SLAs will be published at GA.
               </p>
             </div>
           </div>

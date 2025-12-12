@@ -1,4 +1,4 @@
-import { IsEmail, IsOptional, IsString, IsIn } from "class-validator";
+import { IsEmail, IsOptional, IsString, IsIn, IsBoolean } from "class-validator";
 
 export class SendCommunicationDto {
   @IsString()
@@ -47,5 +47,25 @@ export class SendCommunicationDto {
   @IsOptional()
   @IsString()
   providerMessageId?: string;
+
+  @IsOptional()
+  @IsBoolean()
+  consentGranted?: boolean;
+
+  @IsOptional()
+  @IsString()
+  consentSource?: string;
+
+  @IsOptional()
+  @IsBoolean()
+  quietHoursOverride?: boolean;
+
+  @IsOptional()
+  @IsString()
+  templateId?: string;
+
+  @IsOptional()
+  @IsString()
+  toPhone?: string;
 }
 

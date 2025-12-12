@@ -1,45 +1,66 @@
 import { BadRequestException, ConflictException, ForbiddenException, Injectable, NotFoundException } from "@nestjs/common";
 import { PrismaService } from "../prisma/prisma.service";
 import { IdempotencyService } from "../payments/idempotency.service";
-import { IssueStoredValueDto, RedeemStoredValueDto, AdjustStoredValueDto } from "./stored-value.dto";
-import { IdempotencyStatus, StoredValueDirection, StoredValueStatus } from "@prisma/client";
+import { IssueStoredValueDto, RedeemStoredValueDto, AdjustStoredValueDto, ReloadStoredValueDto, RefundStoredValueDto, VoidStoredValueDto } from "./stored-value.dto";
+import { IdempotencyStatus, StoredValueDirection, StoredValueStatus, TaxRuleType } from "@prisma/client";
 import crypto from "crypto";
+import { ObservabilityService } from "../observability/observability.service";
 
 @Injectable()
 export class StoredValueService {
   constructor(
     private readonly prisma: PrismaService,
-    private readonly idempotency: IdempotencyService
+    private readonly idempotency: IdempotencyService,
+    private readonly observability: ObservabilityService
   ) {}
 
   async issue(dto: IssueStoredValueDto, idempotencyKey?: string, actor?: any) {
-    const existing = await this.guardIdempotency(idempotencyKey, dto, actor?.campgroundId);
+    const scope = { campgroundId: actor?.campgroundId ?? dto.tenantId ?? null, tenantId: actor?.tenantId ?? dto.tenantId ?? null };
+    const existing = await this.guardIdempotency(
+      idempotencyKey,
+      dto,
+      scope,
+      "stored-value/issue",
+      dto.referenceId ?? dto.code ?? dto.customerId ?? null
+    );
     if (existing?.status === IdempotencyStatus.succeeded && existing.responseJson) return existing.responseJson;
     if (existing?.status === IdempotencyStatus.inflight && existing.createdAt && Date.now() - new Date(existing.createdAt).getTime() < 60000) {
       throw new ConflictException("Request already in progress");
     }
 
-    const campgroundId = actor?.campgroundId ?? null;
+    const campgroundId = scope.campgroundId ?? null;
     const now = new Date();
 
     try {
-      const result = await this.prisma.$transaction(async (tx) => {
+      await this.validateTaxableLoad(campgroundId, dto.taxableLoad);
+      const result = await this.prisma.$transaction(async (tx: any) => {
         const codeValue = dto.code || this.generateCode();
         const pinValue = dto.codeOptions?.pin || this.generatePinIfRequested(dto.codeOptions);
 
-        const account = await tx.storedValueAccount.create({
-          data: {
-            campgroundId: campgroundId ?? dto.tenantId,
-            type: dto.type,
-            currency: dto.currency.toLowerCase(),
-            status: StoredValueStatus.active,
-            issuedAt: now,
-            expiresAt: dto.expiresAt ? new Date(dto.expiresAt) : null,
-            createdBy: actor?.id,
-            createdVia: "api",
-            metadata: dto.metadata
-          }
-        });
+        const existingAccount = dto.reloadAccountId
+          ? await tx.storedValueAccount.findUnique({ where: { id: dto.reloadAccountId } })
+          : null;
+        if (existingAccount) {
+          this.ensureActive(existingAccount);
+          this.ensureCurrency(existingAccount, dto.currency);
+          this.ensureTaxableFlag(existingAccount.metadata, dto.taxableLoad);
+        }
+
+        const account =
+          existingAccount ??
+          (await tx.storedValueAccount.create({
+            data: {
+              campgroundId: campgroundId ?? dto.tenantId,
+              type: dto.type,
+              currency: dto.currency.toLowerCase(),
+              status: StoredValueStatus.active,
+              issuedAt: now,
+              expiresAt: dto.expiresAt ? new Date(dto.expiresAt) : null,
+              createdBy: actor?.id,
+              createdVia: "api",
+              metadata: this.mergeMetadata(dto.metadata, dto.taxableLoad)
+            }
+          }));
 
         if (codeValue) {
           await tx.storedValueCode.create({
@@ -51,7 +72,8 @@ export class StoredValueService {
           });
         }
 
-        const before = 0;
+        const { balanceCents: currentBalance } = await this.getBalances(tx, account.id);
+        const before = currentBalance;
         const after = before + dto.amountCents;
 
         await tx.storedValueLedger.create({
@@ -68,7 +90,8 @@ export class StoredValueService {
             idempotencyKey: idempotencyKey ?? `issue-${account.id}-${now.getTime()}`,
             actorType: actor?.role,
             actorId: actor?.id,
-            channel: dto.metadata?.channel ?? "staff"
+            channel: dto.metadata?.channel ?? "staff",
+            reason: dto.taxableLoad ? "taxable_load" : "nontaxable_load"
           }
         });
 
@@ -90,8 +113,68 @@ export class StoredValueService {
     }
   }
 
+  async reload(dto: ReloadStoredValueDto, idempotencyKey?: string, actor?: any) {
+    const scope = { campgroundId: actor?.campgroundId ?? null, tenantId: actor?.tenantId ?? null };
+    const existing = await this.guardIdempotency(
+      idempotencyKey,
+      dto,
+      scope,
+      "stored-value/reload",
+      dto.referenceId ?? dto.accountId
+    );
+    if (existing?.status === IdempotencyStatus.succeeded && existing.responseJson) return existing.responseJson;
+    if (existing?.status === IdempotencyStatus.inflight && existing.createdAt && Date.now() - new Date(existing.createdAt).getTime() < 60000) {
+      throw new ConflictException("Request already in progress");
+    }
+
+    const account = await this.prisma.storedValueAccount.findUnique({ where: { id: dto.accountId } });
+    if (!account) throw new NotFoundException("Account not found");
+    this.ensureActive(account);
+    this.ensureCurrency(account, dto.currency);
+    this.ensureTaxableFlag(account.metadata, dto.taxableLoad);
+
+    const now = new Date();
+
+    try {
+      await this.validateTaxableLoad(scope.campgroundId ?? account.campgroundId ?? null, dto.taxableLoad);
+      const result = await this.prisma.$transaction(async (tx: any) => {
+        const { balanceCents } = await this.getBalances(tx, account.id);
+        const after = balanceCents + dto.amountCents;
+
+        await tx.storedValueLedger.create({
+          data: {
+            campgroundId: account.campgroundId,
+            accountId: account.id,
+            direction: StoredValueDirection.issue,
+            amountCents: dto.amountCents,
+            currency: account.currency,
+            beforeBalanceCents: balanceCents,
+            afterBalanceCents: after,
+            referenceType: dto.referenceType ?? "stored_value_reload",
+            referenceId: dto.referenceId ?? dto.accountId,
+            idempotencyKey: idempotencyKey ?? `reload-${account.id}-${now.getTime()}`,
+            actorType: actor?.role,
+            actorId: actor?.id,
+            channel: "staff",
+            reason: dto.taxableLoad ? "taxable_load" : "nontaxable_load"
+          }
+        });
+
+        return { accountId: account.id, balanceCents: after };
+      });
+
+      if (idempotencyKey) await this.idempotency.complete(idempotencyKey, result);
+      return result;
+    } catch (err) {
+      if (idempotencyKey) await this.idempotency.fail(idempotencyKey);
+      throw err;
+    }
+  }
+
   async redeem(dto: RedeemStoredValueDto, idempotencyKey?: string, actor?: any) {
-    const existing = await this.guardIdempotency(idempotencyKey, dto, actor?.campgroundId);
+    const started = Date.now();
+    const scope = { campgroundId: actor?.campgroundId ?? null, tenantId: actor?.tenantId ?? null };
+    const existing = await this.guardIdempotency(idempotencyKey, dto, scope, "stored-value/redeem", `${dto.referenceType}:${dto.referenceId}`);
     if (existing?.status === IdempotencyStatus.succeeded && existing.responseJson) return existing.responseJson;
     if (existing?.status === IdempotencyStatus.inflight && existing.createdAt && Date.now() - new Date(existing.createdAt).getTime() < 60000) {
       throw new ConflictException("Request already in progress");
@@ -102,11 +185,25 @@ export class StoredValueService {
     this.ensureCurrency(account, dto.currency);
 
     try {
-      const result = await this.prisma.$transaction(async (tx) => {
+      const result = await this.prisma.$transaction(async (tx: any) => {
         const { balanceCents, availableCents } = await this.getBalances(tx, account.id);
 
         if (!dto.holdOnly && availableCents < dto.amountCents) {
           throw new BadRequestException("Insufficient balance");
+        }
+
+        if (!dto.holdOnly) {
+          const alreadyRedeemed = await tx.storedValueLedger.findFirst({
+            where: {
+              accountId: account.id,
+              referenceType: dto.referenceType,
+              referenceId: dto.referenceId,
+              direction: StoredValueDirection.redeem
+            }
+          });
+          if (alreadyRedeemed) {
+            throw new ConflictException("Gift card already redeemed for this reference");
+          }
         }
 
         if (dto.holdOnly) {
@@ -149,15 +246,24 @@ export class StoredValueService {
       });
 
       if (idempotencyKey) await this.idempotency.complete(idempotencyKey, result);
+      this.observability.recordRedeemOutcome(true, Date.now() - started, {
+        campgroundId: actor?.campgroundId ?? dto.referenceId,
+        referenceType: dto.referenceType,
+      });
       return result;
     } catch (err) {
       if (idempotencyKey) await this.idempotency.fail(idempotencyKey);
+      this.observability.recordRedeemOutcome(false, Date.now() - started, {
+        error: (err as any)?.message ?? "redeem_failed",
+        campgroundId: actor?.campgroundId ?? dto.referenceId,
+      });
       throw err;
     }
   }
 
   async captureHold(holdId: string, idempotencyKey?: string, actor?: any) {
-    const existing = await this.guardIdempotency(idempotencyKey, { holdId }, actor?.campgroundId);
+    const scope = { campgroundId: actor?.campgroundId ?? null, tenantId: actor?.tenantId ?? null };
+    const existing = await this.guardIdempotency(idempotencyKey, { holdId }, scope, "stored-value/hold-capture");
     if (existing?.status === IdempotencyStatus.succeeded && existing.responseJson) return existing.responseJson;
     if (existing?.status === IdempotencyStatus.inflight && existing.createdAt && Date.now() - new Date(existing.createdAt).getTime() < 60000) {
       throw new ConflictException("Request already in progress");
@@ -173,7 +279,7 @@ export class StoredValueService {
     this.ensureActive(account);
 
     try {
-      const result = await this.prisma.$transaction(async (tx) => {
+      const result = await this.prisma.$transaction(async (tx: any) => {
         const { balanceCents, availableCents } = await this.getBalances(tx, account.id);
         // hold already counted as open; available excludes it. Capture should not double subtract.
         if (availableCents < 0) throw new BadRequestException("Insufficient available balance");
@@ -214,8 +320,112 @@ export class StoredValueService {
     }
   }
 
+  async refundToCredit(dto: RefundStoredValueDto, idempotencyKey?: string, actor?: any) {
+    const scope = { campgroundId: actor?.campgroundId ?? null, tenantId: actor?.tenantId ?? null };
+    const existing = await this.guardIdempotency(
+      idempotencyKey,
+      dto,
+      scope,
+      "stored-value/refund",
+      dto.referenceId ?? `${dto.accountId}:${dto.amountCents}`
+    );
+    if (existing?.status === IdempotencyStatus.succeeded && existing.responseJson) return existing.responseJson;
+    if (existing?.status === IdempotencyStatus.inflight && existing.createdAt && Date.now() - new Date(existing.createdAt).getTime() < 60000) {
+      throw new ConflictException("Request already in progress");
+    }
+
+    const account = await this.prisma.storedValueAccount.findUnique({ where: { id: dto.accountId } });
+    if (!account) throw new NotFoundException("Account not found");
+    this.ensureActive(account);
+    this.ensureCurrency(account, dto.currency);
+
+    try {
+      const result = await this.prisma.$transaction(async (tx: any) => {
+        const { balanceCents } = await this.getBalances(tx, account.id);
+        const after = balanceCents + dto.amountCents;
+        await tx.storedValueLedger.create({
+          data: {
+            campgroundId: account.campgroundId,
+            accountId: account.id,
+            direction: StoredValueDirection.refund,
+            amountCents: dto.amountCents,
+            currency: account.currency,
+            beforeBalanceCents: balanceCents,
+            afterBalanceCents: after,
+            referenceType: dto.referenceType ?? "stored_value_refund",
+            referenceId: dto.referenceId ?? dto.accountId,
+            idempotencyKey: idempotencyKey ?? `refund-${account.id}-${Date.now()}`,
+            actorType: actor?.role,
+            actorId: actor?.id,
+            reason: "refund_to_credit"
+          }
+        });
+        return { accountId: account.id, balanceCents: after };
+      });
+      if (idempotencyKey) await this.idempotency.complete(idempotencyKey, result);
+      return result;
+    } catch (err) {
+      if (idempotencyKey) await this.idempotency.fail(idempotencyKey);
+      throw err;
+    }
+  }
+
+  async voidOrChargeback(dto: VoidStoredValueDto, idempotencyKey?: string, actor?: any) {
+    const scope = { campgroundId: actor?.campgroundId ?? null, tenantId: actor?.tenantId ?? null };
+    const existing = await this.guardIdempotency(idempotencyKey, dto, scope, "stored-value/void", dto.referenceId ?? dto.accountId);
+    if (existing?.status === IdempotencyStatus.succeeded && existing.responseJson) return existing.responseJson;
+    if (existing?.status === IdempotencyStatus.inflight && existing.createdAt && Date.now() - new Date(existing.createdAt).getTime() < 60000) {
+      throw new ConflictException("Request already in progress");
+    }
+
+    const account = await this.prisma.storedValueAccount.findUnique({ where: { id: dto.accountId } });
+    if (!account) throw new NotFoundException("Account not found");
+
+    try {
+      const result = await this.prisma.$transaction(async (tx: any) => {
+        const { balanceCents } = await this.getBalances(tx, account.id);
+        if (balanceCents <= 0) {
+          await tx.storedValueAccount.update({ where: { id: account.id }, data: { status: StoredValueStatus.frozen } });
+          return { accountId: account.id, balanceCents };
+        }
+
+        await tx.storedValueLedger.create({
+          data: {
+            campgroundId: account.campgroundId,
+            accountId: account.id,
+            direction: StoredValueDirection.expire,
+            amountCents: balanceCents,
+            currency: account.currency,
+            beforeBalanceCents: balanceCents,
+            afterBalanceCents: 0,
+            referenceType: "void_or_chargeback",
+            referenceId: dto.referenceId ?? account.id,
+            idempotencyKey: idempotencyKey ?? `void-${account.id}-${Date.now()}`,
+            actorType: actor?.role,
+            actorId: actor?.id,
+            reason: dto.reason ?? "void"
+          }
+        });
+
+        await tx.storedValueAccount.update({
+          where: { id: account.id },
+          data: { status: StoredValueStatus.frozen }
+        });
+
+        return { accountId: account.id, balanceCents: 0, status: "frozen" };
+      });
+
+      if (idempotencyKey) await this.idempotency.complete(idempotencyKey, result);
+      return result;
+    } catch (err) {
+      if (idempotencyKey) await this.idempotency.fail(idempotencyKey);
+      throw err;
+    }
+  }
+
   async releaseHold(holdId: string, idempotencyKey?: string, actor?: any) {
-    const existing = await this.guardIdempotency(idempotencyKey, { holdId }, actor?.campgroundId);
+    const scope = { campgroundId: actor?.campgroundId ?? null, tenantId: actor?.tenantId ?? null };
+    const existing = await this.guardIdempotency(idempotencyKey, { holdId }, scope, "stored-value/hold-release");
     if (existing?.status === IdempotencyStatus.succeeded && existing.responseJson) return existing.responseJson;
     if (existing?.status === IdempotencyStatus.inflight && existing.createdAt && Date.now() - new Date(existing.createdAt).getTime() < 60000) {
       throw new ConflictException("Request already in progress");
@@ -226,7 +436,7 @@ export class StoredValueService {
     if (hold.status !== "open") throw new ConflictException("Hold not open");
 
     try {
-      const result = await this.prisma.$transaction(async (tx) => {
+      const result = await this.prisma.$transaction(async (tx: any) => {
         await tx.storedValueHold.update({
           where: { id: hold.id },
           data: { status: "released" }
@@ -253,7 +463,7 @@ export class StoredValueService {
     });
     if (!expiredIds.length) return { released: 0 };
     await this.prisma.storedValueHold.updateMany({
-      where: { id: { in: expiredIds.map((h) => h.id) } },
+      where: { id: { in: expiredIds.map((h: any) => h.id) } },
       data: { status: "expired" }
     });
     return { released: expiredIds.length };
@@ -274,7 +484,7 @@ export class StoredValueService {
     let zeroedCount = 0;
 
     for (const acc of accounts) {
-      await this.prisma.$transaction(async (tx) => {
+      await this.prisma.$transaction(async (tx: any) => {
         const { balanceCents } = await this.getBalances(tx, acc.id);
         if (balanceCents <= 0) {
           await tx.storedValueAccount.update({
@@ -312,7 +522,8 @@ export class StoredValueService {
   }
 
   async adjust(dto: AdjustStoredValueDto, idempotencyKey?: string, actor?: any) {
-    const existing = await this.guardIdempotency(idempotencyKey, dto, actor?.campgroundId);
+    const scope = { campgroundId: actor?.campgroundId ?? null, tenantId: actor?.tenantId ?? null };
+    const existing = await this.guardIdempotency(idempotencyKey, dto, scope, "stored-value/adjust");
     if (existing?.status === IdempotencyStatus.succeeded && existing.responseJson) return existing.responseJson;
     if (existing?.status === IdempotencyStatus.inflight && existing.createdAt && Date.now() - new Date(existing.createdAt).getTime() < 60000) {
       throw new ConflictException("Request already in progress");
@@ -323,7 +534,7 @@ export class StoredValueService {
     this.ensureActive(account);
 
     try {
-      const result = await this.prisma.$transaction(async (tx) => {
+      const result = await this.prisma.$transaction(async (tx: any) => {
         const { balanceCents } = await this.getBalances(tx, account.id);
         const after = balanceCents + dto.deltaCents;
         if (after < 0) throw new BadRequestException("Adjustment would result in negative balance");
@@ -358,18 +569,66 @@ export class StoredValueService {
   }
 
   async balanceByAccount(accountId: string) {
+    await this.idempotency.throttleScope(undefined, undefined, "lookup").catch((err) => {
+      this.observability.recordRedeemOutcome(false, undefined, { error: err?.message ?? "throttled_lookup", accountId });
+      throw err;
+    });
     // Computes balance from ledger for now
     const { balanceCents, availableCents } = await this.getBalances(this.prisma, accountId);
     return { accountId, balanceCents, availableCents };
   }
 
   async balanceByCode(code: string) {
+    await this.idempotency.throttleScope(undefined, undefined, "lookup").catch((err) => {
+      this.observability.recordRedeemOutcome(false, undefined, { error: err?.message ?? "throttled_lookup", code });
+      throw err;
+    });
     const account = await this.prisma.storedValueCode.findUnique({
       where: { code },
       select: { accountId: true }
     });
     if (!account) return { code, balanceCents: 0 };
     return this.balanceByAccount(account.accountId);
+  }
+
+  async liabilitySnapshot(campgroundId: string) {
+    const accounts = await this.prisma.storedValueAccount.findMany({
+      where: { campgroundId },
+      select: { id: true, metadata: true }
+    });
+    if (!accounts.length) return { campgroundId, taxableCents: 0, nonTaxableCents: 0, totalCents: 0 };
+
+    const accountIds = accounts.map((a: any) => a.id);
+    const ledger = await this.prisma.storedValueLedger.findMany({
+      where: { accountId: { in: accountIds } },
+      select: { accountId: true, direction: true, amountCents: true }
+    });
+
+    const balancesByAccount = new Map<string, number>();
+    for (const row of ledger) {
+      const current = balancesByAccount.get(row.accountId) ?? 0;
+      balancesByAccount.set(row.accountId, current + this.directionToSigned(row.direction, row.amountCents));
+    }
+
+    let taxableCents = 0;
+    let nonTaxableCents = 0;
+    for (const acc of accounts) {
+      const bal = balancesByAccount.get(acc.id) ?? 0;
+      if (this.isTaxable(acc.metadata)) {
+        taxableCents += bal;
+      } else {
+        nonTaxableCents += bal;
+      }
+    }
+
+    const rollForwardCents = ledger.reduce(
+      (sum: number, row: any) => sum + this.directionToSigned(row.direction, row.amountCents),
+      0
+    );
+    const totalCents = taxableCents + nonTaxableCents;
+    const driftCents = rollForwardCents - totalCents;
+
+    return { campgroundId, taxableCents, nonTaxableCents, totalCents, rollForwardCents, driftCents };
   }
 
   private directionToSigned(direction: StoredValueDirection, amount: number) {
@@ -383,7 +642,10 @@ export class StoredValueService {
       where: { accountId },
       select: { direction: true, amountCents: true }
     });
-    const balanceCents = ledger.reduce((sum, row) => sum + this.directionToSigned(row.direction, row.amountCents), 0);
+    const balanceCents = ledger.reduce(
+      (sum: number, row: any) => sum + this.directionToSigned(row.direction, row.amountCents),
+      0
+    );
     const openHolds = await tx.storedValueHold.aggregate({
       where: { accountId, status: "open" },
       _sum: { amountCents: true }
@@ -392,9 +654,20 @@ export class StoredValueService {
     return { balanceCents, availableCents: balanceCents - held };
   }
 
-  private async guardIdempotency(key?: string, body?: any, campgroundId?: string | null) {
+  private async guardIdempotency(
+    key: string | undefined,
+    body: any,
+    scope: { campgroundId?: string | null; tenantId?: string | null },
+    endpoint: string,
+    sequence?: string | number | null
+  ) {
     if (!key) return null;
-    return this.idempotency.start(key, body ?? {}, campgroundId ?? null);
+    return this.idempotency.start(key, body ?? {}, scope.campgroundId ?? null, {
+      tenantId: scope.tenantId ?? null,
+      endpoint,
+      sequence,
+      rateAction: "apply"
+    });
   }
 
   private ensureActive(account: any) {
@@ -412,6 +685,40 @@ export class StoredValueService {
     }
   }
 
+  private ensureTaxableFlag(metadata: any, incoming?: boolean) {
+    if (incoming === undefined || incoming === null) return;
+    const existing = this.isTaxable(metadata);
+    if (existing !== incoming) {
+      throw new ConflictException("Taxable load flag mismatch");
+    }
+  }
+
+  private async validateTaxableLoad(campgroundId: string | null, taxableLoad?: boolean) {
+    if (!taxableLoad) return;
+    if (!campgroundId) {
+      throw new BadRequestException("taxable_load requires campground context");
+    }
+    const activeRate = await this.prisma.taxRule.findFirst({
+      where: { campgroundId, type: TaxRuleType.rate, isActive: true }
+    });
+    if (!activeRate) {
+      throw new BadRequestException("Taxable load requires an active tax rule");
+    }
+  }
+
+  private isTaxable(metadata: any) {
+    if (!metadata) return false;
+    return Boolean((metadata as any).taxableLoad);
+  }
+
+  private mergeMetadata(metadata: any, taxableLoad?: boolean) {
+    const merged = { ...(metadata ?? {}) };
+    if (taxableLoad !== undefined) {
+      merged.taxableLoad = taxableLoad;
+    }
+    return merged;
+  }
+
   private async getAccount(dto: RedeemStoredValueDto) {
     if (!dto.accountId && !dto.code) {
       throw new BadRequestException("accountId or code required");
@@ -419,6 +726,14 @@ export class StoredValueService {
     if (dto.accountId) {
       const acc = await this.prisma.storedValueAccount.findUnique({ where: { id: dto.accountId } });
       if (!acc) throw new NotFoundException("Account not found");
+      const pinCode = await this.prisma.storedValueCode.findFirst({
+        where: { accountId: dto.accountId, pinHash: { not: null } },
+        select: { pinHash: true }
+      });
+      if (pinCode?.pinHash) {
+        if (!dto.pin) throw new ForbiddenException("PIN required");
+        if (!this.verifyPin(dto.pin, pinCode.pinHash)) throw new ForbiddenException("Invalid PIN");
+      }
       return acc;
     }
     const code = await this.prisma.storedValueCode.findUnique({

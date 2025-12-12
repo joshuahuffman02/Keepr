@@ -252,12 +252,28 @@ export default function SitesPage() {
               value={formState.maxNights}
               onChange={(e) => setFormState((s) => ({ ...s, maxNights: e.target.value === "" ? "" : Number(e.target.value) }))}
             />
-            <input
-              className="rounded-md border border-slate-200 px-3 py-2 md:col-span-2"
-              placeholder="Photos (comma-separated URLs)"
-              value={formState.photos}
-              onChange={(e) => setFormState((s) => ({ ...s, photos: e.target.value }))}
-            />
+            <div className="md:col-span-2 space-y-1">
+              <label className="text-xs font-semibold text-slate-700">Photos (comma-separated URLs)</label>
+              <textarea
+                className="rounded-md border border-slate-200 px-3 py-2 w-full"
+                placeholder="https://img1.jpg, https://img2.jpg"
+                value={formState.photos}
+                onChange={(e) => setFormState((s) => ({ ...s, photos: e.target.value }))}
+              />
+              {formState.photos && formState.photos.split(",").map((p) => p.trim()).filter(Boolean).length > 0 && (
+                <div className="mt-2 grid grid-cols-2 sm:grid-cols-3 gap-2">
+                  {formState.photos
+                    .split(",")
+                    .map((p) => p.trim())
+                    .filter(Boolean)
+                    .map((url) => (
+                      <div key={url} className="text-[10px] truncate rounded border border-slate-200 bg-slate-50 p-1">
+                        {url}
+                      </div>
+                    ))}
+                </div>
+              )}
+            </div>
             <input
               className="rounded-md border border-slate-200 px-3 py-2 md:col-span-2"
               placeholder="Tags (comma-separated)"
@@ -471,12 +487,29 @@ export default function SitesPage() {
                         value={editForm.maxNights}
                         onChange={(e) => setEditForm((s) => (s ? { ...s, maxNights: e.target.value === "" ? "" : Number(e.target.value) } : s))}
                       />
-                      <input
-                        className="rounded-md border border-slate-200 px-3 py-2 md:col-span-2"
-                        placeholder="Photos (comma-separated URLs)"
-                        value={editForm.photos}
-                        onChange={(e) => setEditForm((s) => (s ? { ...s, photos: e.target.value } : s))}
-                      />
+                      <div className="md:col-span-2 space-y-1">
+                        <label className="text-xs font-semibold text-slate-700">Photos (comma-separated URLs)</label>
+                        <textarea
+                          className="rounded-md border border-slate-200 px-3 py-2 w-full"
+                          placeholder="https://img1.jpg, https://img2.jpg"
+                          value={editForm.photos}
+                          onChange={(e) => setEditForm((s) => (s ? { ...s, photos: e.target.value } : s))}
+                        />
+                        {editForm.photos &&
+                          editForm.photos.split(",").map((p) => p.trim()).filter(Boolean).length > 0 && (
+                            <div className="mt-2 grid grid-cols-2 sm:grid-cols-3 gap-2">
+                              {editForm.photos
+                                .split(",")
+                                .map((p) => p.trim())
+                                .filter(Boolean)
+                                .map((url) => (
+                                  <div key={url} className="text-[10px] truncate rounded border border-slate-200 bg-slate-50 p-1">
+                                    {url}
+                                  </div>
+                                ))}
+                            </div>
+                          )}
+                      </div>
                       <input
                         className="rounded-md border border-slate-200 px-3 py-2 md:col-span-2"
                         placeholder="Tags (comma-separated)"

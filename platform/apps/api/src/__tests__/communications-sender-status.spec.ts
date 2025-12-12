@@ -7,6 +7,7 @@ import { PrismaService } from "../prisma/prisma.service";
 import { EmailService } from "../email/email.service";
 import { SmsService } from "../sms/sms.service";
 import { NpsService } from "../nps/nps.service";
+import { ObservabilityService } from "../observability/observability.service";
 import { JwtAuthGuard } from "../auth/guards";
 import { RolesGuard } from "../auth/guards/roles.guard";
 import { ScopeGuard } from "../permissions/scope.guard";
@@ -25,7 +26,8 @@ describe("Communications sender status", () => {
         { provide: PrismaService, useValue: {} },
         { provide: EmailService, useValue: {} },
         { provide: SmsService, useValue: {} },
-        { provide: NpsService, useValue: {} }
+        { provide: NpsService, useValue: {} },
+        { provide: ObservabilityService, useValue: { recordCommsStatus: () => undefined } }
       ]
     })
       .overrideGuard(JwtAuthGuard)

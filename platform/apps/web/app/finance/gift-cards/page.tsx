@@ -187,6 +187,21 @@ export default function GiftCardsPage() {
     setCards((prev) => prev.map((card) => (card.code === code ? updater(card) : card)));
   };
 
+  const billingExplainer = (
+    <Card className="border-amber-200 bg-amber-50">
+      <CardHeader className="pb-2">
+        <CardTitle className="text-base text-amber-900">Guest vs reservation billing</CardTitle>
+        <CardDescription className="text-amber-800">
+          Guest wallets and transferring charges between guest and reservation are on the roadmap; today balances live on the reservation.
+        </CardDescription>
+      </CardHeader>
+      <CardContent className="text-sm text-amber-900 space-y-1">
+        <p>Planned: per-guest wallets and move/merge tools between guest and their reservations.</p>
+        <p>Current workaround: issue a gift card/credit and apply it to the needed reservation or POS order.</p>
+      </CardContent>
+    </Card>
+  );
+
   const handleIssue = (event: React.FormEvent) => {
     event.preventDefault();
     const amount = parseFloat(issueForm.amount);
@@ -293,6 +308,7 @@ export default function GiftCardsPage() {
 
   return (
     <DashboardShell>
+      {billingExplainer}
       <Breadcrumbs
         items={[
           { label: "Finance", href: "/finance" },

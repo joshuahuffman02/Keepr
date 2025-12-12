@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, BadRequestException, UseGuards, Query, InternalServerErrorException, Patch, Param } from "@nestjs/common";
+import { Body, Controller, Get, Post, BadRequestException, UseGuards, Query, InternalServerErrorException, Patch, Param, HttpCode } from "@nestjs/common";
 import { Cron } from "@nestjs/schedule";
 import { PrismaService } from "../prisma/prisma.service";
 import { CreateCommunicationDto } from "./dto/create-communication.dto";
@@ -14,6 +14,8 @@ import { SmsService } from "../sms/sms.service";
 import { Prisma } from "@prisma/client";
 import { BadRequestException as NestBadRequestException } from "@nestjs/common";
 import { NpsService } from "../nps/nps.service";
+import { ObservabilityService } from "../observability/observability.service";
+import { AlertingService } from "../observability/alerting.service";
 
 @Controller()
 export class CommunicationsController {
@@ -21,8 +23,13 @@ export class CommunicationsController {
     private readonly prisma: PrismaService,
     private readonly emailService: EmailService,
     private readonly smsService: SmsService,
-    private readonly npsService: NpsService
+    private readonly npsService: NpsService,
+    private readonly observability: ObservabilityService,
+    private readonly alerting: AlertingService
   ) { }
+
+  private readonly commsMetricsEnabled =
+    (process.env.ENABLE_COMMS_METRICS ?? process.env.comms_alerts_enabled ?? "true").toString().toLowerCase() === "true";
 
   private normalizePostmarkStatus(recordType?: string) {
     const rt = (recordType || "").toLowerCase();
@@ -68,7 +75,7 @@ export class CommunicationsController {
         `Unverified sender domain ${domain}. Configure SPF/DKIM/DMARC and add to EMAIL_SENDER_DOMAINS.`
       );
     }
-    if (!verifiedList.includes(domain)) {
+    if (verifiedList.length > 0 && !verifiedList.includes(domain)) {
       throw new BadRequestException(
         `Sender domain ${domain} is not verified (SPF/DKIM/DMARC). Add to EMAIL_VERIFIED_DOMAINS after provider verification.`
       );
@@ -85,6 +92,117 @@ export class CommunicationsController {
 
   private normalizeEmail(email?: string) {
     return email?.trim().toLowerCase() || "";
+  }
+
+  private getLocalTimeParts(date: Date, timeZone: string) {
+    const dtf = new Intl.DateTimeFormat("en-US", {
+      timeZone,
+      hour12: false,
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit"
+    });
+    const parts = dtf.formatToParts(date).reduce((acc: any, p) => {
+      if (p.type !== "literal") acc[p.type] = p.value;
+      return acc;
+    }, {} as Record<string, string>);
+    return {
+      year: Number(parts.year),
+      month: Number(parts.month),
+      day: Number(parts.day),
+      hour: Number(parts.hour),
+      minute: Number(parts.minute),
+      second: Number(parts.second)
+    };
+  }
+
+  private getTimezoneOffsetMinutes(date: Date, timeZone: string) {
+    const parts = this.getLocalTimeParts(date, timeZone);
+    const asUTC = Date.UTC(parts.year, parts.month - 1, parts.day, parts.hour, parts.minute, parts.second);
+    return (asUTC - date.getTime()) / 60000;
+  }
+
+  private buildZonedDate(parts: { year: number; month: number; day: number }, time: { hour: number; minute: number }, timeZone: string) {
+    const baseUtc = Date.UTC(parts.year, parts.month - 1, parts.day, time.hour, time.minute, 0, 0);
+    const offsetMinutes = this.getTimezoneOffsetMinutes(new Date(baseUtc), timeZone);
+    return new Date(baseUtc - offsetMinutes * 60000);
+  }
+
+  private campgroundTz(campground: any) {
+    return campground?.parkTimeZone || campground?.timezone || "UTC";
+  }
+
+  private async ensureChannelConsent(
+    channel: "email" | "sms",
+    recipient: string | null,
+    _body: SendCommunicationDto,
+    campgroundId: string
+  ) {
+    const normalized = channel === "email" ? this.normalizeEmail(recipient ?? "") : this.normalizePhone(recipient ?? "");
+    const consentRequiredSetting = await this.prisma.privacySetting.findUnique({ where: { campgroundId } });
+    const consentRequired = consentRequiredSetting?.consentRequired !== false;
+    if (!consentRequired) {
+      return { consentOk: true, consentSource: "disabled", consentCheckedAt: new Date().toISOString() };
+    }
+
+    if (!normalized) {
+      throw new BadRequestException(`${channel} recipient missing, unable to verify consent`);
+    }
+
+    const latest = await this.prisma.consentLog.findFirst({
+      where: { campgroundId, subject: normalized, consentType: channel },
+      orderBy: { grantedAt: "desc" }
+    });
+
+    if (!latest || latest.revokedAt || (latest.expiresAt && latest.expiresAt < new Date())) {
+      throw new BadRequestException(`Consent required for ${channel}; none on file or revoked`);
+    }
+
+    return {
+      consentOk: true,
+      consentSource: "consent_log",
+      consentCheckedAt: new Date().toISOString(),
+      consentSubject: normalized,
+      consentGrantedAt: latest.grantedAt
+    };
+  }
+
+  private async requireTemplateApproval(templateId: string, campgroundId: string) {
+    const tpl = await (this.prisma as any).communicationTemplate.findUnique({ where: { id: templateId } });
+    if (!tpl || tpl.campgroundId !== campgroundId) {
+      throw new BadRequestException("Template not found for campground");
+    }
+    if (tpl.status !== "approved") {
+      throw new BadRequestException("Template not approved");
+    }
+    return tpl;
+  }
+
+  private requireTemplateForOutbound(body: SendCommunicationDto, channel: "email" | "sms") {
+    const allowRaw = (process.env.ALLOW_RAW_COMMUNICATIONS ?? "false").toString().toLowerCase() === "true";
+    if (allowRaw) return;
+    if (!body.templateId) {
+      throw new BadRequestException(
+        `Template is required for outbound ${channel}. Set ALLOW_RAW_COMMUNICATIONS=true to override (not recommended).`
+      );
+    }
+  }
+
+  private isQuietHours(campground: any, date: Date) {
+    if (!campground?.quietHoursStart || !campground?.quietHoursEnd) return false;
+    const timeZone = this.campgroundTz(campground);
+    const parts = this.getLocalTimeParts(date, timeZone);
+    const minutes = parts.hour * 60 + parts.minute;
+    const [sh, sm] = campground.quietHoursStart.split(":").map((n: string) => Number(n));
+    const [eh, em] = campground.quietHoursEnd.split(":").map((n: string) => Number(n));
+    const start = sh * 60 + (sm || 0);
+    const end = eh * 60 + (em || 0);
+    if (start === end) return false;
+    if (start < end) return minutes >= start && minutes < end;
+    return minutes >= start || minutes < end;
   }
 
   private async resolveGuestAndReservationByPhone(phone: string) {
@@ -117,6 +235,11 @@ export class CommunicationsController {
     const expected = process.env.POSTMARK_WEBHOOK_TOKEN;
     if (!expected) return true;
     return token === expected;
+  }
+
+  private recordComms(status: "delivered" | "sent" | "bounced" | "spam_complaint" | "failed", meta?: Record<string, any>) {
+    if (!this.commsMetricsEnabled) return;
+    this.observability.recordCommsStatus(status, meta);
   }
 
   @UseGuards(JwtAuthGuard, RolesGuard, ScopeGuard)
@@ -188,11 +311,25 @@ export class CommunicationsController {
   async send(@Body() body: SendCommunicationDto) {
     if (!body.campgroundId) throw new BadRequestException("campgroundId is required");
     const prisma = this.prisma as any;
+    const campground = await this.prisma.campground.findUnique({
+      where: { id: body.campgroundId },
+      select: { id: true, quietHoursStart: true, quietHoursEnd: true, timezone: true, parkTimeZone: true }
+    });
+    if (!campground) throw new BadRequestException("Invalid campgroundId");
+
     if (body.type === "email") {
       if (!body.toAddress) throw new BadRequestException("toAddress is required for email");
-      // Enforce verified sender domain before attempting send
+      this.requireTemplateForOutbound(body, "email");
+      const template = body.templateId ? await this.requireTemplateApproval(body.templateId, body.campgroundId) : null;
+      const consentMeta = await this.ensureChannelConsent("email", body.toAddress, body, body.campgroundId);
+      if (this.isQuietHours(campground, new Date()) && !body.quietHoursOverride) {
+        throw new BadRequestException("Quiet hours in effect; try again later or override");
+      }
       const senderAddress = body.fromAddress || process.env.SMTP_FROM || "no-reply@campreserv.com";
       const senderDomain = this.ensureVerifiedSenderDomain(senderAddress);
+      const html = template?.bodyHtml ?? body.body ?? "";
+      const subject = template?.subject ?? body.subject ?? "Message from campground";
+
       const comm = await prisma.communication.create({
         data: {
           campgroundId: body.campgroundId,
@@ -201,9 +338,9 @@ export class CommunicationsController {
           reservationId: body.reservationId ?? null,
           type: "email",
           direction: "outbound",
-          subject: body.subject ?? null,
-          body: body.body ?? null,
-          preview: body.body ? body.body.slice(0, 280) : body.subject ?? null,
+          subject,
+          body: html,
+          preview: html ? html.slice(0, 280) : subject ?? null,
           status: "queued",
           provider: "postmark",
           providerMessageId: null,
@@ -211,7 +348,12 @@ export class CommunicationsController {
           fromAddress: senderAddress,
           metadata: {
             senderDomain,
-            senderDomainAllowed: true
+            senderDomainAllowed: true,
+            templateId: template?.id ?? null,
+            consentSource: consentMeta.consentSource,
+            consentCheckedAt: consentMeta.consentCheckedAt,
+            consentSubject: consentMeta.consentSubject ?? null,
+            consentGrantedAt: consentMeta.consentGrantedAt ?? null
           }
         }
       });
@@ -219,8 +361,8 @@ export class CommunicationsController {
       try {
         const result = await this.emailService.sendEmail({
           to: body.toAddress,
-          subject: body.subject || "Message from campground",
-          html: body.body || ""
+          subject,
+          html
         });
         const updated = await prisma.communication.update({
           where: { id: comm.id },
@@ -232,17 +374,95 @@ export class CommunicationsController {
             metadata: { ...(comm as any).metadata, provider: result.provider, fallback: result.fallback }
           }
         });
+        this.recordComms("sent", { campgroundId: body.campgroundId, provider: result.provider });
         return updated;
       } catch (err) {
         await prisma.communication.update({
           where: { id: comm.id },
           data: { status: "failed", metadata: { ...(comm as any).metadata, error: (err as any)?.message } }
         });
+        this.recordComms("failed", { campgroundId: body.campgroundId, error: (err as any)?.message });
         throw new InternalServerErrorException("Failed to send email");
       }
     }
 
-    // For now, other types just create a note record
+    if (body.type === "sms") {
+      const toPhone = body.toPhone || body.toAddress;
+      if (!toPhone) throw new BadRequestException("toPhone is required for sms");
+      this.requireTemplateForOutbound(body, "sms");
+      const consentMeta = await this.ensureChannelConsent("sms", toPhone, body, body.campgroundId);
+      if (this.isQuietHours(campground, new Date()) && !body.quietHoursOverride) {
+        throw new BadRequestException("Quiet hours in effect; try again later or override");
+      }
+      const normalizedPhone = this.normalizePhone(toPhone);
+      const comm = await prisma.communication.create({
+        data: {
+          campgroundId: body.campgroundId,
+          organizationId: body.organizationId ?? null,
+          guestId: body.guestId ?? null,
+          reservationId: body.reservationId ?? null,
+          type: "sms",
+          direction: "outbound",
+          subject: null,
+          body: body.body ?? null,
+          preview: body.body ? body.body.slice(0, 280) : null,
+          status: "queued",
+          provider: "twilio",
+          providerMessageId: null,
+          toAddress: normalizedPhone,
+          fromAddress: body.fromAddress ?? null,
+          metadata: {
+            consentSource: consentMeta.consentSource,
+            consentCheckedAt: consentMeta.consentCheckedAt,
+            consentSubject: consentMeta.consentSubject ?? null,
+            consentGrantedAt: consentMeta.consentGrantedAt ?? null
+          }
+        }
+      });
+
+      try {
+        const result = await this.smsService.sendSms({ to: normalizedPhone, body: body.body ?? "" });
+        const updated = await prisma.communication.update({
+          where: { id: comm.id },
+          data: {
+            status: result.success ? "sent" : "failed",
+            provider: result.provider,
+            providerMessageId: result.providerMessageId ?? null,
+            metadata: { ...(comm as any).metadata, fallback: result.fallback }
+          }
+        });
+        if (result.success) {
+          this.recordComms("sent", { campgroundId: body.campgroundId, provider: result.provider });
+        } else {
+          this.recordComms("failed", { campgroundId: body.campgroundId, provider: result.provider });
+          await this.alerting.dispatch(
+            "SMS send failure",
+            `Failed to send SMS via ${result.provider} to ${normalizedPhone}`,
+            "error",
+            `sms-send-failure-${comm.id}`,
+            { campgroundId: body.campgroundId, provider: result.provider, fallback: result.fallback }
+          ).catch(() => undefined);
+        }
+        if (!result.success) throw new InternalServerErrorException("Failed to send sms");
+        return updated;
+      } catch (err) {
+        await prisma.communication.update({
+          where: { id: comm.id },
+          data: { status: "failed", metadata: { ...(comm as any).metadata, error: (err as any)?.message } }
+        });
+        this.recordComms("failed", { campgroundId: body.campgroundId, error: (err as any)?.message });
+        await this.alerting.dispatch(
+          "SMS send failure",
+          `SMS send errored for ${normalizedPhone}`,
+          "error",
+          `sms-send-error-${comm.id}`,
+          { campgroundId: body.campgroundId, error: (err as any)?.message }
+        ).catch(() => undefined);
+        throw new InternalServerErrorException("Failed to send sms");
+      }
+    }
+
+    // For other types just create a note record
     const comm = await prisma.communication.create({
       data: {
         campgroundId: body.campgroundId,
@@ -285,6 +505,7 @@ export class CommunicationsController {
       issues: verifiedList.includes(d) ? [] : ["Domain not in EMAIL_VERIFIED_DOMAINS (SPF/DKIM/DMARC not confirmed)"]
     }));
     const smsConfigured = Boolean(process.env.TWILIO_WEBHOOK_TOKEN);
+    const commsAlertsEnabled = this.commsMetricsEnabled;
     return {
       allowedDomains: allowedList,
       verifiedDomains: verifiedList,
@@ -292,6 +513,7 @@ export class CommunicationsController {
       defaultFrom,
       configured: allowedList.length > 0,
       smsWebhookConfigured: smsConfigured,
+      commsAlertsEnabled,
       enforcement: "fail_closed",
       note: "Domains must be listed in EMAIL_SENDER_DOMAINS and EMAIL_VERIFIED_DOMAINS after provider verification (SPF/DKIM/DMARC)."
     };
@@ -357,6 +579,20 @@ export class CommunicationsController {
       data: { status, metadata: body }
     });
 
+    if (status === "failed") {
+      this.recordComms("failed", { provider: "twilio" });
+      await this.alerting.dispatch(
+        "SMS delivery failure",
+        `Twilio reported failure for message ${messageSid}`,
+        "error",
+        `sms-delivery-failure-${messageSid}`,
+        { status: body.MessageStatus || body.SmsStatus, to: body.To, from: body.From }
+      ).catch(() => undefined);
+    } else if (status === "delivered") {
+      this.recordComms("delivered", { provider: "twilio" });
+    } else if (status === "sent" || status === "queued") {
+      this.recordComms("sent", { provider: "twilio" });
+    }
     return { ok: true };
   }
 
@@ -421,6 +657,7 @@ export class CommunicationsController {
   /**
    * Postmark delivery/bounce webhook
    */
+  @HttpCode(200)
   @Post("communications/webhook/postmark/status")
   async postmarkStatus(@Body() body: any, @Query("token") token?: string) {
     if (!this.ensurePostmarkToken(token)) {
@@ -431,13 +668,14 @@ export class CommunicationsController {
       throw new BadRequestException("Missing MessageID");
     }
     const status = this.normalizePostmarkStatus(body.RecordType);
-    const bounceType = (body.BounceType || "").toString().toLowerCase();
+    const bounceTypeRaw = body.BounceType;
+    const bounceType = (bounceTypeRaw || "").toString().toLowerCase();
     const isHardFail = status === "bounced" || status === "spam_complaint" || bounceType === "hardbounce";
     const finalStatus = isHardFail ? "failed" : status;
     const metadata = {
       ...body,
       normalizedStatus: status,
-      bounceType: body.BounceType,
+      bounceType: bounceTypeRaw,
       bounceSubType: body.BounceSubType,
       description: body.Description
     };
@@ -447,6 +685,27 @@ export class CommunicationsController {
       data: { status: finalStatus, metadata }
     });
 
+    if (finalStatus === "failed" || finalStatus === "bounced") {
+      this.recordComms("bounced", { provider: "postmark", bounceType });
+      await this.alerting.dispatch(
+        "Email bounced",
+        `Postmark message ${messageId} bounced (${bounceType || status})`,
+        "warning",
+        `postmark-bounce-${messageId}`,
+        { bounceType: bounceTypeRaw || body.BounceType, description: body.Description }
+      );
+    } else if (finalStatus === "spam_complaint") {
+      this.recordComms("spam_complaint", { provider: "postmark" });
+      await this.alerting.dispatch(
+        "Spam complaint",
+        `Postmark complaint for message ${messageId}`,
+        "error",
+        `postmark-complaint-${messageId}`,
+        { bounceType, description: body.Description }
+      );
+    } else if (finalStatus === "delivered" || finalStatus === "sent") {
+      this.recordComms("delivered", { provider: "postmark" });
+    }
     return { ok: true };
   }
 
@@ -540,18 +799,6 @@ export class CommunicationsController {
     });
   }
 
-  private isQuietHours(campground: any, date: Date) {
-    if (!campground?.quietHoursStart || !campground?.quietHoursEnd) return false;
-    const [sh, sm] = campground.quietHoursStart.split(":").map((n: string) => Number(n));
-    const [eh, em] = campground.quietHoursEnd.split(":").map((n: string) => Number(n));
-    const minutes = date.getUTCHours() * 60 + date.getUTCMinutes();
-    const start = sh * 60 + (sm || 0);
-    const end = eh * 60 + (em || 0);
-    if (start === end) return false;
-    if (start < end) return minutes >= start && minutes < end;
-    return minutes >= start || minutes < end;
-  }
-
   private async processJob(job: any) {
     const playbook = await (this.prisma as any).communicationPlaybook.findUnique({
       where: { id: job.playbookId },
@@ -567,10 +814,26 @@ export class CommunicationsController {
     }
     const now = new Date();
     if (this.isQuietHours(playbook.campground, now)) {
-      // reschedule to quietHoursEnd
+      // reschedule to quietHoursEnd in campground timezone
       const [eh, em] = (playbook.campground.quietHoursEnd || "08:00").split(":").map((n: string) => Number(n));
-      const next = new Date(now);
-      next.setUTCHours(eh || 8, em || 0, 0, 0);
+      const tz = this.campgroundTz(playbook.campground);
+      const localParts = this.getLocalTimeParts(now, tz);
+      const next = this.buildZonedDate(
+        { year: localParts.year, month: localParts.month, day: localParts.day },
+        { hour: eh || 8, minute: em || 0 },
+        tz
+      );
+      if (next <= now) {
+        const tomorrow = new Date(next.getTime() + 24 * 60 * 60 * 1000);
+        const tomorrowParts = this.getLocalTimeParts(tomorrow, tz);
+        next.setTime(
+          this.buildZonedDate(
+            { year: tomorrowParts.year, month: tomorrowParts.month, day: tomorrowParts.day },
+            { hour: eh || 8, minute: em || 0 },
+            tz
+          ).getTime()
+        );
+      }
       await (this.prisma as any).communicationPlaybookJob.update({
         where: { id: job.id },
         data: { scheduledAt: next, attempts: job.attempts + 1 }

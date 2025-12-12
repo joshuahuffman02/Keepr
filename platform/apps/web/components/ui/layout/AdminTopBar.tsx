@@ -58,7 +58,7 @@ export function AdminTopBar({ onToggleNav, mobileNavOpen }: AdminTopBarProps) {
                 c: "/calendar",
                 r: "/reservations",
                 i: "/campgrounds",
-                p: "/pricing",
+                p: "/settings/pricing-rules",
                 f: "/finance",
                 m: "/messages",
                 s: "/settings"
@@ -168,14 +168,26 @@ export function AdminTopBar({ onToggleNav, mobileNavOpen }: AdminTopBarProps) {
         }
     };
 
-    // Sample notifications
-    const notifications = [
-        { id: 1, title: "New booking received", subtitle: "Site A-12, Dec 15-20", time: "5m ago", unread: true },
-        { id: 2, title: "System update available", subtitle: "Version 2.1.0 is ready", time: "1h ago", unread: true },
-        { id: 3, title: "Payment received", subtitle: "$150.00 from John Smith", time: "3h ago", unread: false }
-    ];
+    // Sample notifications (local state with links and resolved flag)
+    const [notifications, setNotifications] = useState<
+        { id: number; title: string; subtitle: string; time: string; unread: boolean; resolved?: boolean; href?: string }[]
+    >([
+        { id: 1, title: "New booking received", subtitle: "Site A-12, Dec 15-20", time: "5m ago", unread: true, href: "/reservations" },
+        { id: 2, title: "System update available", subtitle: "Version 2.1.0 is ready", time: "1h ago", unread: true, href: "/updates" },
+        { id: 3, title: "Payment received", subtitle: "$150.00 from John Smith", time: "3h ago", unread: false, href: "/finance/payouts" }
+    ]);
 
-    const unreadCount = notifications.filter((n) => n.unread).length;
+    const unreadCount = notifications.filter((n) => n.unread && !n.resolved).length;
+
+    const markAllRead = () => {
+        setNotifications((prev) => prev.map((n) => ({ ...n, unread: false })));
+    };
+
+    const markResolved = (id: number) => {
+        setNotifications((prev) =>
+            prev.map((n) => (n.id === id ? { ...n, unread: false, resolved: true } : n))
+        );
+    };
 
     return (
         <>
@@ -258,28 +270,58 @@ export function AdminTopBar({ onToggleNav, mobileNavOpen }: AdminTopBarProps) {
                             <div className="absolute right-0 top-full mt-2 w-80 bg-white rounded-xl shadow-xl border border-slate-200 py-2 z-50">
                                 <div className="px-4 py-2 border-b border-slate-100 flex items-center justify-between">
                                     <div className="font-semibold text-slate-900 text-sm">Notifications</div>
-                                    <button className="text-xs text-emerald-600 hover:text-emerald-700 font-medium">
+                                    <button
+                                        className="text-xs text-emerald-600 hover:text-emerald-700 font-medium"
+                                        onClick={markAllRead}
+                                    >
                                         Mark all read
                                     </button>
                                 </div>
                                 <div className="max-h-80 overflow-y-auto">
                                     {notifications.map((notif) => (
-                                        <button
+                                        <div
                                             key={notif.id}
-                                            className={`w-full flex items-start gap-3 px-4 py-3 hover:bg-slate-50 text-left ${notif.unread ? "bg-emerald-50/50" : ""}`}
+                                            className={`w-full flex items-start gap-3 px-4 py-3 ${
+                                                notif.unread && !notif.resolved ? "bg-emerald-50/50" : "hover:bg-slate-50"
+                                            }`}
                                         >
-                                            <div className={`w-2 h-2 rounded-full mt-2 ${notif.unread ? "bg-emerald-500" : "bg-transparent"}`} />
+                                            <div className={`w-2 h-2 rounded-full mt-2 ${notif.unread && !notif.resolved ? "bg-emerald-500" : "bg-transparent"}`} />
                                             <div className="flex-1 min-w-0">
                                                 <div className="text-sm font-medium text-slate-900">{notif.title}</div>
                                                 <div className="text-xs text-slate-500 truncate">{notif.subtitle}</div>
+                                                <div className="flex items-center gap-2 mt-1 text-xs text-slate-500">
+                                                    <span>{notif.time}</span>
+                                                    {notif.resolved && <span className="text-emerald-600 font-semibold">Resolved</span>}
+                                                </div>
+                                                <div className="flex items-center gap-3 mt-2">
+                                                    <button
+                                                        className="text-xs font-semibold text-emerald-600 hover:text-emerald-700"
+                                                        onClick={() => {
+                                                            markResolved(notif.id);
+                                                            if (notif.href) router.push(notif.href);
+                                                        }}
+                                                    >
+                                                        Mark resolved
+                                                    </button>
+                                                    {notif.href && (
+                                                        <button
+                                                            className="text-xs text-slate-600 hover:text-slate-800"
+                                                            onClick={() => {
+                                                                setIsNotificationsOpen(false);
+                                                                router.push(notif.href as string);
+                                                            }}
+                                                        >
+                                                            Open
+                                                        </button>
+                                                    )}
+                                                </div>
                                             </div>
-                                            <div className="text-xs text-slate-400">{notif.time}</div>
-                                        </button>
+                                        </div>
                                     ))}
                                 </div>
                                 <div className="border-t border-slate-100 px-4 py-2">
-                                    <Link href="/updates" className="text-sm text-emerald-600 hover:text-emerald-700 font-medium">
-                                        View all updates →
+                                    <Link href="/messages" className="text-sm text-emerald-600 hover:text-emerald-700 font-medium">
+                                        Open inbox →
                                     </Link>
                                 </div>
                             </div>

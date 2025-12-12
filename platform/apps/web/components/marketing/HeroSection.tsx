@@ -92,7 +92,7 @@ export function HeroSection() {
             <div className="relative rounded-2xl overflow-hidden shadow-2xl border-8 border-white">
               <div className="aspect-[4/3] relative bg-slate-100">
                 <Image
-                  src="/images/dashboard-preview.jpg"
+                  src="/images/owners/dashboard-preview.png"
                   alt="Camp Everyday Host Dashboard"
                   fill
                   className="object-cover"
@@ -110,8 +110,8 @@ export function HeroSection() {
                   </svg>
                 </div>
                 <div>
-                  <div className="text-2xl font-bold text-slate-900">+32%</div>
-                  <div className="text-xs text-slate-600">Revenue Growth</div>
+                  <div className="text-2xl font-bold text-slate-900">Unified ops</div>
+                  <div className="text-xs text-slate-600">Grid + POS + Comms</div>
                 </div>
               </div>
             </div>
@@ -120,12 +120,13 @@ export function HeroSection() {
               <div className="flex items-center gap-3">
                 <div className="h-12 w-12 rounded-lg bg-teal-100 flex items-center justify-center">
                   <svg className="h-6 w-6 text-teal-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 13l8 8 8-8" />
                   </svg>
                 </div>
                 <div>
-                  <div className="text-2xl font-bold text-slate-900">-45%</div>
-                  <div className="text-xs text-slate-600">Time Saved</div>
+                  <div className="text-2xl font-bold text-slate-900">Guest-ready</div>
+                  <div className="text-xs text-slate-600">Self-serve check-in</div>
                 </div>
               </div>
             </div>

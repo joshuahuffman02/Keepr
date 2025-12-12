@@ -88,6 +88,7 @@ export default function SiteClassDetailPage() {
 
   const sitesInClass = (sitesQuery.data || []).filter((s) => s.siteClassId === classId);
   const statusBySite = Object.fromEntries((statusQuery.data || []).map((s) => [s.id, s]));
+  const photoList = (siteClass.photos || []).filter(Boolean);
 
   const upcomingReservations = (reservationsQuery.data || [])
     .filter((res: any) => {
@@ -128,6 +129,24 @@ export default function SiteClassDetailPage() {
         </div>
 
         <div className="grid gap-4 md:grid-cols-2">
+          <Card>
+            <CardHeader>
+              <CardTitle>Photos</CardTitle>
+            </CardHeader>
+            <CardContent>
+              {photoList.length === 0 && <div className="text-xs text-slate-500">No photos for this class.</div>}
+              {photoList.length > 0 && (
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                  {photoList.map((url) => (
+                    <div key={url} className="relative h-24 w-full overflow-hidden rounded border border-slate-200 bg-slate-50">
+                      <img src={url} alt="Class photo" className="h-full w-full object-cover" />
+                    </div>
+                  ))}
+                </div>
+              )}
+            </CardContent>
+          </Card>
+
           <Card>
             <CardHeader>
               <CardTitle>Defaults</CardTitle>

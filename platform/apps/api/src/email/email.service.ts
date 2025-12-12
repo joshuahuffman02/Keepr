@@ -11,6 +11,11 @@ interface EmailOptions {
     campgroundId?: string;
 }
 
+interface ReceiptLineItem {
+    label: string;
+    amountCents: number;
+}
+
 interface PaymentReceiptOptions {
     guestEmail: string;
     guestName: string;
@@ -23,6 +28,11 @@ interface PaymentReceiptOptions {
     arrivalDate?: Date;
     departureDate?: Date;
     source?: string; // 'online' | 'admin' | 'kiosk' | 'pos'
+    lineItems?: ReceiptLineItem[];
+    taxCents?: number;
+    feeCents?: number;
+    totalCents?: number;
+    kind?: "payment" | "refund" | "pos";
 }
 
 @Injectable()
@@ -121,7 +131,9 @@ ${options.html}
      * Send a payment receipt email to the guest
      */
     async sendPaymentReceipt(options: PaymentReceiptOptions): Promise<void> {
-        const formattedAmount = `$${(options.amountCents / 100).toFixed(2)}`;
+        const sign = options.kind === "refund" ? -1 : 1;
+        const amountDisplayCents = (options.totalCents ?? options.amountCents) * sign;
+        const formattedAmount = `$${(amountDisplayCents / 100).toFixed(2)}`;
         const transactionDate = new Date().toLocaleDateString("en-US", {
             weekday: "long",
             year: "numeric",
@@ -130,6 +142,47 @@ ${options.html}
             hour: "2-digit",
             minute: "2-digit"
         });
+
+        const lineItems = options.lineItems ?? [];
+        const hasLines = lineItems.length > 0 || options.taxCents !== undefined || options.feeCents !== undefined;
+        const totalCents = options.totalCents ?? (lineItems.length
+            ? lineItems.reduce((sum, i) => sum + i.amountCents, 0) + (options.taxCents ?? 0) + (options.feeCents ?? 0)
+            : options.amountCents);
+
+        const linesTable = hasLines ? `
+            <table style="width: 100%; border-collapse: collapse; margin-top: 12px;">
+                <thead>
+                    <tr>
+                        <th style="text-align: left; padding: 6px 0; color: #64748b; border-bottom: 1px solid #e2e8f0;">Item</th>
+                        <th style="text-align: right; padding: 6px 0; color: #64748b; border-bottom: 1px solid #e2e8f0;">Amount</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${lineItems.map((li) => `
+                        <tr>
+                            <td style="padding: 6px 0; color: #0f172a;">${li.label}</td>
+                            <td style="padding: 6px 0; color: #0f172a; text-align: right;">$${(li.amountCents / 100).toFixed(2)}</td>
+                        </tr>
+                    `).join("")}
+                    ${options.taxCents !== undefined ? `
+                        <tr>
+                            <td style="padding: 6px 0; color: #0f172a;">Tax</td>
+                            <td style="padding: 6px 0; color: #0f172a; text-align: right;">$${((options.taxCents * sign) / 100).toFixed(2)}</td>
+                        </tr>
+                    ` : ""}
+                    ${options.feeCents !== undefined ? `
+                        <tr>
+                            <td style="padding: 6px 0; color: #0f172a;">Fees</td>
+                            <td style="padding: 6px 0; color: #0f172a; text-align: right;">$${((options.feeCents * sign) / 100).toFixed(2)}</td>
+                        </tr>
+                    ` : ""}
+                    <tr>
+                        <td style="padding: 8px 0; color: #0f172a; font-weight: 600; border-top: 1px solid #e2e8f0;">Total</td>
+                        <td style="padding: 8px 0; color: #0f172a; text-align: right; font-weight: 600; border-top: 1px solid #e2e8f0;">$${((totalCents * sign) / 100).toFixed(2)}</td>
+                    </tr>
+                </tbody>
+            </table>
+        ` : "";
 
         let stayDetails = "";
         if (options.siteNumber || options.arrivalDate) {
@@ -146,12 +199,12 @@ ${options.html}
         const html = `
             <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
                 <div style="text-align: center; margin-bottom: 30px;">
-                    <h1 style="color: #10b981; margin: 0;">Payment Received</h1>
-                    <p style="color: #64748b; margin-top: 8px;">Thank you for your payment!</p>
+                    <h1 style="color: ${options.kind === "refund" ? "#f59e0b" : "#10b981"}; margin: 0;">${options.kind === "refund" ? "Refund Issued" : "Payment Received"}</h1>
+                    <p style="color: #64748b; margin-top: 8px;">${options.kind === "refund" ? "We have processed your refund." : "Thank you for your payment!"}</p>
                 </div>
                 
-                <div style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); border-radius: 12px; padding: 24px; text-align: center; margin-bottom: 24px;">
-                    <p style="color: rgba(255,255,255,0.8); margin: 0 0 8px 0; font-size: 14px;">Amount Paid</p>
+                <div style="background: linear-gradient(135deg, ${options.kind === "refund" ? "#fbbf24 0%, #f59e0b 100%" : "#10b981 0%, #059669 100%"}); border-radius: 12px; padding: 24px; text-align: center; margin-bottom: 24px;">
+                    <p style="color: rgba(255,255,255,0.8); margin: 0 0 8px 0; font-size: 14px;">${options.kind === "refund" ? "Amount Refunded" : "Amount Paid"}</p>
                     <p style="color: white; margin: 0; font-size: 36px; font-weight: bold;">${formattedAmount}</p>
                 </div>
 
@@ -185,6 +238,8 @@ ${options.html}
                         ` : ""}
                     </table>
                 </div>
+
+                ${linesTable}
 
                 ${stayDetails}
 

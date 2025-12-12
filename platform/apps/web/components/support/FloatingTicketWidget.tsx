@@ -188,7 +188,16 @@ export function FloatingTicketWidget() {
           }}
         >
           <DialogHeader>
-            <DialogTitle>Submit a ticket</DialogTitle>
+            <div className="flex items-start justify-between gap-3">
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-wide text-emerald-700">Fast lane</p>
+                <DialogTitle className="text-xl">Report, ask, or request ✨</DialogTitle>
+                <p className="text-sm text-slate-600">We auto-capture URL, device, and page context for you.</p>
+              </div>
+              <div className="rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-700 border border-emerald-100">
+                {form.category === "issue" ? "Bug" : form.category === "feature" ? "Feature" : form.category === "question" ? "Question" : "Other"}
+              </div>
+            </div>
           </DialogHeader>
           <div className="space-y-3">
             <div className="space-y-1">
@@ -228,21 +237,26 @@ export function FloatingTicketWidget() {
               </div>
             </div>
             <div className="space-y-1">
-              <label className="text-sm font-medium text-slate-900">Title</label>
+              <label className="text-sm font-medium text-slate-900">What happened? (title)</label>
               <Input
-                placeholder="What went wrong?"
+                placeholder="e.g., “Filter drawer won't open on mobile”"
                 value={form.title}
                 onChange={(e) => setForm((prev) => ({ ...prev, title: e.target.value }))}
               />
             </div>
             <div className="space-y-1">
-              <label className="text-sm font-medium text-slate-900">Details</label>
+              <label className="text-sm font-medium text-slate-900">
+                Steps / details <span className="text-slate-500 text-xs">(optional)</span>
+              </label>
               <Textarea
-                placeholder="Steps to reproduce, expected vs actual, etc."
+                placeholder="Steps to reproduce, expected vs actual, error text, or your idea. Add any quick notes."
                 rows={4}
                 value={form.notes}
                 onChange={(e) => setForm((prev) => ({ ...prev, notes: e.target.value }))}
               />
+              <div className="text-[11px] text-slate-500">
+                We’ll auto-attach: URL, page title, device, selection, viewport. Paste links or repro GIFs if helpful.
+              </div>
             </div>
             <div className="grid grid-cols-1 gap-2 text-xs text-slate-600">
               {form.url && (
@@ -268,13 +282,16 @@ export function FloatingTicketWidget() {
             </div>
           </div>
           <DialogFooter>
-            <div className="flex w-full justify-end gap-2">
-              <Button variant="ghost" onClick={() => setOpen(false)} disabled={isSubmitting}>
-                Cancel
-              </Button>
-              <Button onClick={handleSubmit} disabled={isSubmitting || !form.title.trim()}>
-                {isSubmitting ? "Submitting..." : "Submit"}
-              </Button>
+            <div className="flex w-full justify-between items-center gap-3">
+              <div className="text-xs text-slate-500">Your report keeps working—even if you close this page.</div>
+              <div className="flex gap-2">
+                <Button variant="ghost" onClick={() => setOpen(false)} disabled={isSubmitting}>
+                  Cancel
+                </Button>
+                <Button onClick={handleSubmit} disabled={isSubmitting || !form.title.trim()}>
+                  {isSubmitting ? "Submitting..." : "Submit"}
+                </Button>
+              </div>
             </div>
           </DialogFooter>
         </DialogContent>

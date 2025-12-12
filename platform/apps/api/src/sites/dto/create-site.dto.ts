@@ -31,6 +31,20 @@ export class CreateSiteDto {
   rigMaxLength?: number;
 
   @IsOptional()
+  @IsInt()
+  @Min(0)
+  rigMaxWidth?: number;
+
+  @IsOptional()
+  @IsInt()
+  @Min(0)
+  rigMaxHeight?: number;
+
+  @IsOptional()
+  @IsBoolean()
+  pullThrough?: boolean;
+
+  @IsOptional()
   @IsBoolean()
   hookupsPower?: boolean;
 
@@ -59,6 +73,18 @@ export class CreateSiteDto {
   accessible?: boolean;
 
   @IsOptional()
+  @IsString()
+  surfaceType?: string;
+
+  @IsOptional()
+  @IsInt()
+  padSlopePercent?: number;
+
+  @IsOptional()
+  @IsString()
+  mapLabel?: string;
+
+  @IsOptional()
   @IsNumber()
   latitude?: number;
 
@@ -83,4 +109,7 @@ export class CreateSiteDto {
 
   @IsOptional()
   tags?: string[];
+
+  @IsOptional()
+  amenityTags?: string[];
 }

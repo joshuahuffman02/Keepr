@@ -1,7 +1,9 @@
 import { Injectable, Logger } from "@nestjs/common";
+import { GlAccountType } from "@prisma/client";
 import { PrismaService } from "../prisma/prisma.service";
 import { StripeService } from "./stripe.service";
 import fetch from "node-fetch";
+import { LedgerService } from "../ledger/ledger.service";
 
 @Injectable()
 export class PaymentsReconciliationService {
@@ -9,7 +11,8 @@ export class PaymentsReconciliationService {
 
   constructor(
     private readonly prisma: PrismaService,
-    private readonly stripeService: StripeService
+    private readonly stripeService: StripeService,
+    private readonly ledger: LedgerService
   ) { }
 
   async sendAlert(message: string) {
@@ -38,38 +41,48 @@ export class PaymentsReconciliationService {
     return cg?.id ?? '';
   }
 
-  private async createLedgerEntryOnce(opts: {
+  private async postDoubleEntry(opts: {
     campgroundId: string;
     reservationId?: string | null;
-    glCode: string;
-    account: string;
-    description: string;
+    glDebit: { code: string; name: string; type: GlAccountType };
+    glCredit: { code: string; name: string; type: GlAccountType };
     amountCents: number;
-    direction: "debit" | "credit";
+    description: string;
+    sourceTxId?: string | null;
     occurredAt?: Date;
+    reconciliationKey?: string | null;
   }) {
-    const exists = await (this.prisma as any).ledgerEntry.findFirst({
-      where: {
-        campgroundId: opts.campgroundId,
-        reservationId: opts.reservationId || undefined,
-        description: opts.description,
-        amountCents: opts.amountCents,
-        direction: opts.direction
-      },
-      select: { id: true }
-    });
-    if (exists) return exists;
-    return (this.prisma as any).ledgerEntry.create({
-      data: {
-        campgroundId: opts.campgroundId,
-        reservationId: opts.reservationId || null,
-        glCode: opts.glCode,
-        account: opts.account,
-        description: opts.description,
-        amountCents: opts.amountCents,
-        direction: opts.direction,
-        occurredAt: opts.occurredAt ?? new Date()
-      }
+    const occurredAt = opts.occurredAt ?? new Date();
+    const debitId = await this.ledger.ensureAccount(opts.campgroundId, opts.glDebit.code, opts.glDebit.name, opts.glDebit.type);
+    const creditId = await this.ledger.ensureAccount(opts.campgroundId, opts.glCredit.code, opts.glCredit.name, opts.glCredit.type);
+    return this.ledger.postEntries({
+      campgroundId: opts.campgroundId,
+      reservationId: opts.reservationId ?? null,
+      description: opts.description,
+      occurredAt,
+      sourceType: "payout_recon",
+      sourceTxId: opts.sourceTxId ?? null,
+      dedupeKey: `payout_recon:${opts.sourceTxId ?? ""}:${opts.description}:${opts.amountCents}`,
+      lines: [
+        {
+          glAccountId: debitId,
+          side: "debit",
+          amountCents: opts.amountCents,
+          memo: opts.description,
+          glCode: opts.glDebit.code,
+          accountName: opts.glDebit.name,
+          reconciliationKey: opts.reconciliationKey ?? opts.sourceTxId ?? undefined
+        },
+        {
+          glAccountId: creditId,
+          side: "credit",
+          amountCents: opts.amountCents,
+          memo: `${opts.description} (offset)`,
+          glCode: opts.glCredit.code,
+          accountName: opts.glCredit.name,
+          reconciliationKey: opts.reconciliationKey ?? opts.sourceTxId ?? undefined
+        }
+      ]
     });
   }
 
@@ -95,6 +108,70 @@ export class PaymentsReconciliationService {
         paymentIntentId: opts.paymentIntentId || null,
         chargeId: opts.chargeId || null,
         balanceTransactionId: opts.balanceTransactionId || null
+      }
+    });
+  }
+
+  private mapReconLineType(tx: any): "payout" | "fee" | "chargeback" | "reserve" | "adjustment" | "other" {
+    const txType = (tx as any).type;
+    if (txType === "payout") return "payout";
+    if (txType === "application_fee" || tx.reporting_category === "fee") return "fee";
+    if (tx.reporting_category === "charge_dispute" || txType === "dispute") return "chargeback";
+    if (txType === "reserve_transaction") return "reserve";
+    if (txType === "adjustment") return "adjustment";
+    return "other";
+  }
+
+  private async createPayoutReconLine(opts: {
+    payoutReconId: string;
+    type: "payout" | "fee" | "chargeback" | "reserve" | "adjustment" | "other";
+    amountCents: number;
+    currency?: string;
+    sourceTxId?: string | null;
+    sourceTs?: Date | null;
+    glEntryId?: string | null;
+    notes?: string | null;
+  }) {
+    return (this.prisma as any).payoutReconLine.create({
+      data: {
+        payoutReconId: opts.payoutReconId,
+        type: opts.type,
+        status: "matched",
+        sourceTxId: opts.sourceTxId ?? null,
+        sourceTs: opts.sourceTs ?? null,
+        amountCents: opts.amountCents,
+        currency: opts.currency ?? "usd",
+        glEntryId: opts.glEntryId ?? null,
+        notes: opts.notes ?? null
+      }
+    });
+  }
+
+  private async upsertPayoutReconEnvelope(payoutRecord: any, payout: any) {
+    const payoutDate = payout.arrival_date ? new Date(payout.arrival_date * 1000) : null;
+    const expected = payout.amount ?? 0;
+    const actual = (payout.amount ?? 0) - (payout.fee ?? 0);
+    return (this.prisma as any).payoutRecon.upsert({
+      where: { id: payoutRecord.id },
+      update: {
+        provider: "stripe",
+        status: "matched",
+        expectedAmountCents: expected,
+        actualAmountCents: actual,
+        varianceCents: actual - expected,
+        currency: payout.currency || "usd",
+        payoutDate
+      },
+      create: {
+        id: payoutRecord.id,
+        campgroundId: payoutRecord.campgroundId,
+        provider: "stripe",
+        status: "matched",
+        expectedAmountCents: expected,
+        actualAmountCents: actual,
+        varianceCents: actual - expected,
+        currency: payout.currency || "usd",
+        payoutDate
       }
     });
   }
@@ -159,6 +236,7 @@ export class PaymentsReconciliationService {
     const stripeAccountId = payout.destination || payout.stripe_account;
     if (!stripeAccountId) return;
 
+    const recon = await this.upsertPayoutReconEnvelope(payoutRecord, payout);
     const txns = await this.stripeService.listBalanceTransactionsForPayout(payout.id, stripeAccountId);
     for (const tx of txns.data) {
       const chargeId = tx.source as any;
@@ -185,85 +263,74 @@ export class PaymentsReconciliationService {
 
       const createdAt = new Date((tx as any).created * 1000);
       const amountAbs = Math.abs(tx.amount);
+      let glEntryId: string | undefined;
 
       // Stripe processing fees: debit expense, credit cash
       if (tx.fee && tx.fee > 0) {
-        await this.createLedgerEntryOnce({
+        const feeLedger = await this.postDoubleEntry({
           campgroundId,
           reservationId,
-          glCode: "STRIPE_FEES",
-          account: "Stripe Fees",
+          glDebit: { code: "STRIPE_FEES", name: "Stripe Fees", type: GlAccountType.expense },
+          glCredit: { code: "CASH", name: "Cash", type: GlAccountType.asset },
+          amountCents: tx.fee,
           description: `Stripe fee BTX ${tx.id}`,
-          amountCents: tx.fee,
-          direction: "debit",
-          occurredAt: createdAt
+          sourceTxId: tx.id,
+          occurredAt: createdAt,
+          reconciliationKey: tx.id
         });
-        await this.createLedgerEntryOnce({
-          campgroundId,
-          reservationId,
-          glCode: "CASH",
-          account: "Cash",
-          description: `Stripe fee BTX ${tx.id} (offset)`,
-          amountCents: tx.fee,
-          direction: "credit",
-          occurredAt: createdAt
-        });
+        glEntryId = feeLedger?.entryIds?.[0] ?? glEntryId;
       }
 
       // Chargebacks/disputes: debit chargebacks, credit cash
       const txType = (tx as any).type;
       if (tx.reporting_category === "charge_dispute" || txType === "dispute") {
-        await this.createLedgerEntryOnce({
+        const cbLedger = await this.postDoubleEntry({
           campgroundId,
           reservationId,
-          glCode: "CHARGEBACK",
-          account: "Chargebacks",
+          glDebit: { code: "CHARGEBACK", name: "Chargebacks", type: GlAccountType.expense },
+          glCredit: { code: "CASH", name: "Cash", type: GlAccountType.asset },
+          amountCents: amountAbs,
           description: `Chargeback BTX ${tx.id}`,
-          amountCents: amountAbs,
-          direction: "debit",
-          occurredAt: createdAt
+          sourceTxId: tx.id,
+          occurredAt: createdAt,
+          reconciliationKey: tx.id
         });
-        await this.createLedgerEntryOnce({
-          campgroundId,
-          reservationId,
-          glCode: "CASH",
-          account: "Cash",
-          description: `Chargeback BTX ${tx.id} (offset)`,
-          amountCents: amountAbs,
-          direction: "credit",
-          occurredAt: createdAt
-        });
+        glEntryId = glEntryId ?? cbLedger?.entryIds?.[0];
       }
 
       // Platform/application fees withheld from payout (treat as expense for tie-out)
       if (txType === "application_fee" || tx.reporting_category === "fee") {
-        await this.createLedgerEntryOnce({
+        const platformLedger = await this.postDoubleEntry({
           campgroundId,
           reservationId,
-          glCode: "PLATFORM_FEE",
-          account: "Platform Fees",
+          glDebit: { code: "PLATFORM_FEE", name: "Platform Fees", type: GlAccountType.expense },
+          glCredit: { code: "CASH", name: "Cash", type: GlAccountType.asset },
+          amountCents: amountAbs,
           description: `Platform fee BTX ${tx.id}`,
-          amountCents: amountAbs,
-          direction: "debit",
-          occurredAt: createdAt
+          sourceTxId: tx.id,
+          occurredAt: createdAt,
+          reconciliationKey: tx.id
         });
-        await this.createLedgerEntryOnce({
-          campgroundId,
-          reservationId,
-          glCode: "CASH",
-          account: "Cash",
-          description: `Platform fee BTX ${tx.id} (offset)`,
-          amountCents: amountAbs,
-          direction: "credit",
-          occurredAt: createdAt
-        });
+        glEntryId = glEntryId ?? platformLedger?.entryIds?.[0];
       }
+
+      await this.createPayoutReconLine({
+        payoutReconId: recon.id,
+        type: this.mapReconLineType(tx),
+        amountCents: tx.amount,
+        currency: tx.currency,
+        sourceTxId: tx.id,
+        sourceTs: createdAt,
+        glEntryId: glEntryId ?? null,
+        notes: `BTX ${tx.id} (${(tx as any).type})`
+      });
     }
   }
 
   async reconcilePayout(payout: any) {
     const payoutRecord = await this.upsertPayoutFromStripe(payout);
     await this.ingestPayoutTransactions(payout, payoutRecord);
+    await this.postNetCashMovement(payoutRecord);
     return this.computeReconSummary(payoutRecord.id, payoutRecord.campgroundId);
   }
 
@@ -290,6 +357,24 @@ export class PaymentsReconciliationService {
     const driftVsLedger = payoutNet - ledgerNet;
 
     const driftThreshold = Number(process.env.PAYOUT_DRIFT_THRESHOLD_CENTS ?? 100);
+    const status =
+      Math.abs(driftVsLedger) === 0 && Math.abs(driftVsLines) === 0
+        ? "matched"
+        : Math.abs(driftVsLedger) > driftThreshold
+          ? "drift"
+          : "pending";
+
+    await (this.prisma as any).payout.update({
+      where: { id: payoutId },
+      data: {
+        reconStatus: status,
+        reconDriftCents: driftVsLedger,
+        reconLedgerNetCents: ledgerNet,
+        reconLineSumCents: lineSum,
+        reconAt: new Date()
+      }
+    });
+
     if (Math.abs(driftVsLedger) > driftThreshold) {
       await this.sendAlert(
         `Payout drift detected: payout ${payout.stripePayoutId} camp ${campgroundId} drift_vs_ledger=${driftVsLedger} cents`
@@ -307,6 +392,36 @@ export class PaymentsReconciliationService {
       driftVsLinesCents: driftVsLines,
       driftVsLedgerCents: driftVsLedger,
     };
+  }
+
+  private async postNetCashMovement(payoutRecord: any) {
+    const net = (payoutRecord?.amountCents ?? 0) - (payoutRecord?.feeCents ?? 0);
+    if (!payoutRecord?.campgroundId || net === 0) return;
+    const externalRef = payoutRecord.stripePayoutId ?? payoutRecord.id;
+    const occurredAt = payoutRecord.paidAt ?? payoutRecord.arrivalDate ?? new Date();
+
+    // Skip if already posted
+    const existing = await (this.prisma as any).ledgerEntry.findFirst({
+      where: { externalRef, glCode: "BANK" },
+      select: { id: true }
+    });
+    if (existing) return;
+
+    await this.postDoubleEntry({
+      campgroundId: payoutRecord.campgroundId,
+      glDebit: { code: "BANK", name: "Operating Bank", type: GlAccountType.asset },
+      glCredit: { code: "CASH", name: "Cash", type: GlAccountType.asset },
+      amountCents: Math.abs(net),
+      description: `Payout ${externalRef} transfer`,
+      sourceTxId: externalRef,
+      occurredAt,
+      reconciliationKey: externalRef
+    });
+
+    await (this.prisma as any).payout.update({
+      where: { id: payoutRecord.id },
+      data: { cashPostedAt: new Date() }
+    });
   }
 
   async reconcileRecentPayouts(stripeAccountId: string, sinceSeconds: number = 7 * 24 * 3600) {

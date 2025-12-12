@@ -1,10 +1,11 @@
 generator client {
   provider = "prisma-client-js"
+  // Generate into workspace root .prisma/client so hoisted @prisma/client resolves.
+  output   = "../../../../node_modules/.prisma/client"
 }
 
 datasource db {
   provider = "postgresql"
-  url      = env("PLATFORM_DATABASE_URL")
 }
 
 enum ReservationStatus {
@@ -100,6 +101,22 @@ enum StayType {
   seasonal
 }
 
+enum StayReasonPreset {
+  vacation
+  family_visit
+  event
+  work_remote
+  stopover
+  relocation
+  other
+}
+
+enum ReferralIncentiveType {
+  percent_discount
+  amount_discount
+  credit
+}
+
 enum PaymentSchedule {
   single
   weekly
@@ -174,6 +191,39 @@ enum CheckOutStatus {
   pending_review
   completed
   failed
+}
+
+enum IncidentStatus {
+  open
+  investigating
+  resolved
+  closed
+}
+
+enum IncidentType {
+  injury
+  property_damage
+  safety
+  security
+  near_miss
+  environmental
+  other
+}
+
+enum IncidentTaskStatus {
+  pending
+  in_progress
+  done
+  cancelled
+}
+
+enum EvidenceType {
+  photo
+  document
+  note
+  audio
+  video
+  other
 }
 
 enum GroupRole {
@@ -293,6 +343,26 @@ enum SocialAlertCategory {
   inventory
 }
 
+enum OnboardingStatus {
+  pending
+  in_progress
+  completed
+  expired
+  cancelled
+}
+
+enum OnboardingStep {
+  account_profile
+  payment_gateway
+  taxes_and_fees
+  inventory_sites
+  rates_and_fees
+  policies
+  communications_templates
+  pos_hardware
+  imports
+}
+
 model User {
   id             String        @id @default(cuid())
   email          String        @unique
@@ -328,6 +398,14 @@ model User {
   approvalPolicies                 ApprovalPolicy[]
   permissionRules                  PermissionRule[]
   approvedCommunicationTemplates   CommunicationTemplate[]           @relation("CommunicationTemplateApprovedBy")
+  onboardingInvites                OnboardingInvite[]
+  staffTimeEntries                 StaffTimeEntry[]                  @relation("StaffTimeEntries")
+  staffTimeEntriesApproved         StaffTimeEntry[]                  @relation("StaffTimeEntryApprover")
+  shiftApprovals                   ShiftApproval[]                   @relation("ShiftApprover")
+  overrideRequestsRequested        OverrideRequest[]                 @relation("OverrideRequester")
+  overrideRequestsApproved         OverrideRequest[]                 @relation("OverrideApprover")
+  payrollExportsRequested          PayrollExport[]                   @relation("PayrollExportRequester")
+  payrollExportLines               PayrollExportLine[]               @relation("PayrollExportUser")
 
   // Phase 3 relations
   staffShifts         StaffShift[]         @relation("StaffShifts")
@@ -336,6 +414,9 @@ model User {
   staffPerformance    StaffPerformance[]   @relation("StaffPerformance")
   savedReports        SavedReport[]        @relation("SavedReports")
   portfolioDashboards PortfolioDashboard[] @relation("PortfolioDashboards")
+  tillSessionsOpened  TillSession[]        @relation("TillSessionOpenedBy")
+  tillSessionsClosed  TillSession[]        @relation("TillSessionClosedBy")
+  tillMovements       TillMovement[]       @relation("TillMovementActor")
 }
 
 model GuestEquipment {
@@ -408,6 +489,14 @@ model SiteClass {
   hookupsPower      Boolean  @default(false)
   hookupsWater      Boolean  @default(false)
   hookupsSewer      Boolean  @default(false)
+  // Metered utilities defaults for sites in this class
+  meteredEnabled    Boolean  @default(false)
+  meteredType       String?  // power|water|sewer
+  meteredBillingMode String? // cycle|per_reading|annual|manual
+  meteredBillTo     String?  // reservation|guest
+  meteredMultiplier Decimal? @default(1.0)
+  meteredRatePlanId String?
+  meteredAutoEmail  Boolean  @default(false)
   tags              String[] @default([])
   glCode            String?
   clientAccount     String?
@@ -433,6 +522,7 @@ model SiteClass {
   upsellItems     UpsellItem[]
   depositPolicies DepositPolicy[]
   waitlistEntries WaitlistEntry[]
+  documentTemplates DocumentTemplate[]
 
   @@index([campgroundId])
 }
@@ -453,6 +543,18 @@ enum BillingPlan {
 enum PaymentFeeMode {
   absorb // Platform fee is absorbed by campground (reduces payout)
   pass_through // Platform fee added to guest total
+}
+
+enum PaymentGatewayProvider {
+  stripe
+  adyen
+  authorize_net
+  other
+}
+
+enum PaymentGatewayMode {
+  test
+  prod
 }
 
 enum NpsSurveyStatus {
@@ -688,6 +790,8 @@ model Organization {
   abTests                  AbTest[]
   abEnrollments            AbEnrollment[]
   integrationConnections   IntegrationConnection[]
+  onboardingInvites        OnboardingInvite[]
+  onboardingSessions       OnboardingSession[]
 
   // Phase 3 relations
   portfolioDashboards   PortfolioDashboard[]
@@ -814,12 +918,22 @@ model Campground {
   sites                     Site[]
   reservations              Reservation[]
   maintenance               MaintenanceTicket[]
+  incidents                 Incident[]
+  certificatesOfInsurance   CertificateOfInsurance[]
+  documentTemplates         DocumentTemplate[]
+  billingCycles             BillingCycle[]
+  invoices                  Invoice[]
+  signatureRequests         SignatureRequest[]
+  signatureArtifacts        SignatureArtifact[]
+  coiUploads                CoiUpload[]
   pricingRules              PricingRule[]
   pricingRulesV2            PricingRuleV2[]
   demandBands               DemandBand[]               @relation("CampgroundDemandBands")
   depositPolicies           DepositPolicy[]            @relation("CampgroundDepositPolicies")
   payments                  Payment[]
+  paymentGatewayConfig      CampgroundPaymentGatewayConfig?
   ledgerEntries             LedgerEntry[]
+  glPeriods                 GlPeriod[]
   memberships               CampgroundMembership[]
   events                    Event[]
   productCategories         ProductCategory[]
@@ -839,6 +953,8 @@ model Campground {
   operationalTasks          OperationalTask[]
   internalConversations     InternalConversation[]
   siteHolds                 SiteHold[]
+  siteMapLayouts            SiteMapLayout[]
+  mapConfig                 CampgroundMapConfig?
   inviteTokens              InviteToken[]
   auditLogs                 AuditLog[]
   campaigns                 Campaign[]
@@ -855,10 +971,16 @@ model Campground {
   formTemplates             FormTemplate[]
   payouts                   Payout[]
   disputes                  Dispute[]
+  utilityRatePlans          UtilityRatePlan[]
+  utilityMeters             UtilityMeter[]
+  lateFeeRules              LateFeeRule[]
   analyticsEvents           AnalyticsEvent[]
   analyticsDailyAggregates  AnalyticsDailyAggregate[]
   abTests                   AbTest[]
   abEnrollments             AbEnrollment[]
+  referralPrograms          ReferralProgram[]
+  onboardingInvites         OnboardingInvite[]
+  onboardingSessions        OnboardingSession[]
   socialPosts               SocialPost[]
   socialTemplates           SocialTemplate[]
   socialContentAssets       SocialContentAsset[]
@@ -891,6 +1013,15 @@ model Campground {
   storedValueLedgers        StoredValueLedger[]
   posTerminals              PosTerminal[]
   posCarts                  PosCart[]
+  tillSessions              TillSession[]
+  vehicles                  Vehicle[]
+  accessIntegrations        AccessIntegration[]
+  accessGrants              AccessGrant[]
+  accessCredentials         AccessCredential[]
+  payrollExports            PayrollExport[]
+  posProviderIntegrations   PosProviderIntegration[]
+  overrideRequests          OverrideRequest[]
+  staffRoles                StaffRole[]
   factReservationsDaily     FactReservationsDaily[]
   factPosDaily              FactPosDaily[]
   factStoredValueDaily      FactStoredValueDaily[]
@@ -977,6 +1108,30 @@ enum FormSubmissionStatus {
   pending
   completed
   void
+}
+
+// Access control providers and credential types
+enum AccessProviderType {
+  kisi
+  brivo
+  cloudkey
+}
+
+enum AccessGrantStatus {
+  pending
+  active
+  revoked
+  blocked
+  expired
+  failed
+}
+
+enum AccessCredentialType {
+  pin
+  card
+  fob
+  mobile
+  qr
 }
 
 model Campaign {
@@ -1273,6 +1428,9 @@ model Site {
   siteType          SiteType
   maxOccupancy      Int
   rigMaxLength      Int?
+  rigMaxWidth       Int?
+  rigMaxHeight      Int?
+  pullThrough       Boolean  @default(false)
   hookupsPower      Boolean  @default(false)
   powerAmps         Int?
   hookupsWater      Boolean  @default(false)
@@ -1285,12 +1443,16 @@ model Site {
   photoAttributions Json?
   description       String?
   tags              String[] @default([])
+  amenityTags       String[] @default([])
   vibeTags          String[] @default([])
   popularityScore   Int      @default(0)
   isActive          Boolean  @default(true)
   status            String? // e.g., available, out_of_service
   latitude          Decimal? @db.Decimal(12, 8)
   longitude         Decimal? @db.Decimal(12, 8)
+  surfaceType       String?
+  padSlopePercent   Int?
+  mapLabel          String?
   createdAt         DateTime @default(now())
   updatedAt         DateTime @default(now()) @updatedAt
 
@@ -1305,6 +1467,10 @@ model Site {
   otaMappings        OtaListingMapping[] @relation("SiteOtaMappings")
   analyticsEvents    AnalyticsEvent[]
   waitlistEntries    WaitlistEntry[]
+  mapLayout          SiteMapLayout?
+  utilityMeters      UtilityMeter[]
+  accessGrants       AccessGrant[]
+  documentTemplates  DocumentTemplate[]
 
   @@unique([campgroundId, name])
   @@index([campgroundId])
@@ -1330,6 +1496,37 @@ model SiteHold {
   @@index([campgroundId])
   @@index([siteId])
   @@index([expiresAt])
+}
+
+model SiteMapLayout {
+  id           String   @id @default(cuid())
+  campgroundId String
+  siteId       String   @unique
+  geometry     Json
+  centroid     Json?
+  label        String?
+  rotation     Float?
+  metadata     Json?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @default(now()) @updatedAt
+
+  campground Campground @relation(fields: [campgroundId], references: [id], onDelete: Cascade)
+  site       Site       @relation(fields: [siteId], references: [id], onDelete: Cascade)
+
+  @@index([campgroundId])
+}
+
+model CampgroundMapConfig {
+  campgroundId String   @id
+  bounds       Json?
+  defaultCenter Json?
+  defaultZoom  Float?
+  layers       Json?
+  legend       Json?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @default(now()) @updatedAt
+
+  campground Campground @relation(fields: [campgroundId], references: [id], onDelete: Cascade)
 }
 
 model Guest {
@@ -1365,6 +1562,8 @@ model Guest {
   updatedAt         DateTime         @default(now()) @updatedAt
 
   reservations              Reservation[]
+  incidents                 Incident[]
+  certificatesOfInsurance   CertificateOfInsurance[]
   storeOrders               StoreOrder[]
   account                   GuestAccount?
   messages                  Message[]
@@ -1378,10 +1577,14 @@ model Guest {
   formSubmissions           FormSubmission[]
   communicationPlaybookJobs CommunicationPlaybookJob[] @relation("GuestCommunicationPlaybookJobs")
   waitlistEntries           WaitlistEntry[]
+  signatureRequests         SignatureRequest[]
+  signatureArtifacts        SignatureArtifact[]
+  coiUploads                CoiUpload[]
   storedValueCodes          StoredValueCode[]
   loyaltyProfile            LoyaltyProfile?
   activityBookings          ActivityBooking[]
   memberships               GuestMembership[]
+  vehicles                  Vehicle[]
 
   // Phase 3 relations
   digitalWaivers  DigitalWaiver[]
@@ -1466,6 +1669,14 @@ model Reservation {
   vehicleState             String?
   rigType                  String?
   rigLength                Int?
+  stayReasonPreset         StayReasonPreset?
+  stayReasonOther          String?
+  referralProgramId        String?
+  referralCode             String?
+  referralSource           String?
+  referralChannel          String?
+  referralIncentiveType    ReferralIncentiveType?
+  referralIncentiveValue   Int?              @default(0)
   createdBy                String?
   updatedBy                String?
   checkInAt                DateTime?
@@ -1476,6 +1687,9 @@ model Reservation {
   taxWaiverSigned          Boolean           @default(false)
   taxWaiverDate            DateTime?
   seasonalRateId           String?
+  billingCadence           String            @default("monthly") // weekly|monthly
+  billingAnchorDate        DateTime?
+  utilityMeterIds          Json?
 
   // Booking metadata
   leadTimeDays     Int? // Days between booking date and arrival date
@@ -1502,6 +1716,7 @@ model Reservation {
   campground     Campground      @relation(fields: [campgroundId], references: [id], onDelete: Cascade)
   site           Site            @relation(fields: [siteId], references: [id], onDelete: Cascade)
   guest          Guest           @relation(fields: [guestId], references: [id], onDelete: Cascade)
+  referralProgram ReferralProgram? @relation(fields: [referralProgramId], references: [id], onDelete: SetNull)
   payments       Payment[]
   ledger         LedgerEntry[]
   storeOrders    StoreOrder[]
@@ -1522,16 +1737,28 @@ model Reservation {
   analyticsEvents           AnalyticsEvent[]
   communicationPlaybookJobs CommunicationPlaybookJob[] @relation("ReservationCommunicationPlaybookJobs")
   upsells                   ReservationUpsell[]
+  vehicles                  Vehicle[]
+  accessGrants              AccessGrant[]
+  accessCredentials         AccessCredential[]
+  incidents                 Incident[]
+  certificatesOfInsurance   CertificateOfInsurance[]
+  billingCycles             BillingCycle[]
+  invoices                  Invoice[]
 
   // Phase 3 relations
   digitalWaivers  DigitalWaiver[]
   idVerifications IdVerification[]
+  signatureRequests SignatureRequest[]
+  signatureArtifacts SignatureArtifact[]
+  coiUploads CoiUpload[]
 
   @@index([campgroundId])
   @@index([siteId])
   @@index([guestId])
   @@index([seasonalRateId])
   @@index([groupId])
+  @@index([referralCode])
+  @@index([referralProgramId])
 }
 
 model MaintenanceTicket {
@@ -1568,6 +1795,104 @@ model MaintenanceTicket {
   @@index([assignedTo])
 }
 
+model Incident {
+  id            String         @id @default(cuid())
+  campgroundId  String
+  reservationId String?
+  guestId       String?
+  type          IncidentType
+  status        IncidentStatus @default(open)
+  severity      Severity?
+  notes         String?
+  photos        Json?
+  witnesses     Json? // [{ name, contact, statement }]
+  occurredAt    DateTime?
+  closedAt      DateTime?
+  claimId       String?
+  reminderAt    DateTime?
+  metadata      Json?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @default(now()) @updatedAt
+
+  campground Campground @relation(fields: [campgroundId], references: [id], onDelete: Cascade)
+  reservation Reservation? @relation(fields: [reservationId], references: [id], onDelete: SetNull)
+  guest       Guest? @relation(fields: [guestId], references: [id], onDelete: SetNull)
+  tasks       IncidentTask[]
+  evidence    IncidentEvidence[]
+  cois        CertificateOfInsurance[]
+
+  @@index([campgroundId])
+  @@index([reservationId])
+  @@index([guestId])
+  @@index([status])
+  @@index([type])
+}
+
+model IncidentTask {
+  id          String            @id @default(cuid())
+  incidentId  String
+  title       String
+  status      IncidentTaskStatus @default(pending)
+  dueAt       DateTime?
+  reminderAt  DateTime?
+  assignedTo  String?
+  completedAt DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @default(now()) @updatedAt
+
+  incident Incident @relation(fields: [incidentId], references: [id], onDelete: Cascade)
+
+  @@index([incidentId])
+  @@index([status])
+  @@index([dueAt])
+}
+
+model IncidentEvidence {
+  id         String       @id @default(cuid())
+  incidentId String
+  type       EvidenceType @default(photo)
+  url        String?
+  storageKey String?
+  description String?
+  uploadedBy String?
+  uploadedAt DateTime     @default(now())
+  metadata   Json?
+
+  incident Incident @relation(fields: [incidentId], references: [id], onDelete: Cascade)
+
+  @@index([incidentId])
+  @@index([type])
+}
+
+model CertificateOfInsurance {
+  id             String     @id @default(cuid())
+  campgroundId   String
+  guestId        String?
+  reservationId  String?
+  incidentId     String?
+  provider       String?
+  policyNumber   String?
+  coverageType   String?
+  fileUrl        String
+  effectiveDate  DateTime?
+  expiresAt      DateTime?
+  uploadedBy     String?
+  uploadedAt     DateTime   @default(now())
+  createdAt      DateTime   @default(now())
+  updatedAt      DateTime   @default(now()) @updatedAt
+
+  campground Campground @relation(fields: [campgroundId], references: [id], onDelete: Cascade)
+  guest       Guest? @relation(fields: [guestId], references: [id], onDelete: SetNull)
+  reservation Reservation? @relation(fields: [reservationId], references: [id], onDelete: SetNull)
+  incident    Incident? @relation(fields: [incidentId], references: [id], onDelete: SetNull)
+
+  @@index([campgroundId])
+  @@index([guestId])
+  @@index([reservationId])
+  @@index([incidentId])
+  @@index([expiresAt])
+}
+
 model PricingRule {
   id            String    @id @default(cuid())
   campgroundId  String
@@ -1589,6 +1914,46 @@ model PricingRule {
 
   @@index([campgroundId])
   @@index([siteClassId])
+}
+
+model GatewayFeePreset {
+  id                  String                 @id @default(cuid())
+  gateway             PaymentGatewayProvider
+  mode                PaymentGatewayMode
+  percentBasisPoints  Int                    @default(0)
+  flatFeeCents        Int                    @default(0)
+  label               String?
+  createdAt           DateTime               @default(now())
+  updatedAt           DateTime               @default(now()) @updatedAt
+
+  campgroundConfigs CampgroundPaymentGatewayConfig[]
+
+  @@unique([gateway, mode])
+  @@index([gateway, mode])
+}
+
+model CampgroundPaymentGatewayConfig {
+  id                        String                 @id @default(cuid())
+  campgroundId              String                 @unique
+  gateway                   PaymentGatewayProvider
+  mode                      PaymentGatewayMode     @default(test)
+  feeMode                   PaymentFeeMode         @default(absorb)
+  feePercentBasisPoints     Int?
+  feeFlatCents              Int?
+  feePresetId               String?
+  publishableKeySecretId    String?
+  secretKeySecretId         String?
+  merchantAccountIdSecretId String?
+  webhookSecretId           String?
+  additionalConfig          Json?
+  createdAt                 DateTime               @default(now())
+  updatedAt                 DateTime               @default(now()) @updatedAt
+
+  campground Campground         @relation(fields: [campgroundId], references: [id], onDelete: Cascade)
+  feePreset  GatewayFeePreset?  @relation(fields: [feePresetId], references: [id], onDelete: SetNull)
+
+  @@index([campgroundId])
+  @@index([gateway, mode])
 }
 
 model Payment {
@@ -1638,10 +2003,167 @@ model RepeatCharge {
   @@index([dueDate])
 }
 
+// ---------------------------------------------------------------------------
+// Billing cycles, invoices, utilities, late fees
+// ---------------------------------------------------------------------------
+
+model BillingCycle {
+  id             String   @id @default(cuid())
+  campgroundId   String
+  reservationId  String
+  cadence        String   // weekly|monthly
+  periodStart    DateTime
+  periodEnd      DateTime
+  status         String   @default("open") // open|closed
+  generatedAt    DateTime?
+  closedAt       DateTime?
+
+  invoices     Invoice[]
+  reservation  Reservation @relation(fields: [reservationId], references: [id], onDelete: Cascade)
+  campground   Campground  @relation(fields: [campgroundId], references: [id], onDelete: Cascade)
+
+  @@index([campgroundId, reservationId, periodStart, periodEnd])
+}
+
+model Invoice {
+  id             String   @id @default(cuid())
+  billingCycleId String
+  campgroundId   String
+  reservationId  String
+  number         String   @unique
+  dueDate        DateTime
+  status         String   @default("open") // open|paid|void|written_off
+  subtotalCents  Int      @default(0)
+  taxCents       Int      @default(0)
+  totalCents     Int      @default(0)
+  balanceCents   Int      @default(0)
+  createdAt      DateTime @default(now())
+  closedAt       DateTime?
+
+  lines        InvoiceLine[]
+  billingCycle BillingCycle @relation(fields: [billingCycleId], references: [id], onDelete: Cascade)
+  reservation  Reservation  @relation(fields: [reservationId], references: [id], onDelete: Cascade)
+  campground   Campground   @relation(fields: [campgroundId], references: [id], onDelete: Cascade)
+  arLedger     ArLedgerEntry[]
+
+  @@index([reservationId, status])
+  @@index([campgroundId])
+}
+
+model InvoiceLine {
+  id          String   @id @default(cuid())
+  invoiceId   String
+  type        String   // rent|utility|late_fee|adjustment
+  description String
+  quantity    Decimal  @default(1)
+  unitCents   Int
+  amountCents Int
+  meta        Json?
+
+  invoice Invoice @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+  arLedger ArLedgerEntry[]
+
+  @@index([invoiceId, type])
+}
+
+model UtilityRatePlan {
+  id             String   @id @default(cuid())
+  campgroundId   String
+  type           String   // power|water|sewer
+  pricingMode    String   // flat|tiered|time_of_use
+  baseRateCents  Int
+  tiers          Json?
+  demandFeeCents Int?
+  minimumCents   Int?
+  effectiveFrom  DateTime
+  effectiveTo    DateTime?
+
+  meters      UtilityMeter[]
+  campground  Campground @relation(fields: [campgroundId], references: [id], onDelete: Cascade)
+
+  @@index([campgroundId, type, effectiveFrom])
+}
+
+model UtilityMeter {
+  id             String   @id @default(cuid())
+  campgroundId   String
+  siteId         String
+  type           String   // power|water|sewer
+  serialNumber   String?
+  active         Boolean  @default(true)
+  installedAt    DateTime @default(now())
+  removedAt      DateTime?
+  ratePlanId     String?
+  billingMode    String   @default("cycle") // cycle|per_reading|annual|manual
+  billTo         String   @default("reservation") // reservation|guest
+  multiplier     Decimal  @default(1.0)
+  autoEmail      Boolean  @default(false)
+  lastBilledReadAt DateTime?
+
+  reads     UtilityMeterRead[]
+  ratePlan  UtilityRatePlan? @relation(fields: [ratePlanId], references: [id], onDelete: SetNull)
+  campground Campground @relation(fields: [campgroundId], references: [id], onDelete: Cascade)
+  site        Site       @relation(fields: [siteId], references: [id], onDelete: Cascade)
+
+  @@index([campgroundId])
+  @@index([siteId, type])
+}
+
+model UtilityMeterRead {
+  id           String   @id @default(cuid())
+  meterId      String
+  readingValue Decimal
+  readAt       DateTime
+  source       String   // manual|import|api
+  note         String?
+  readBy       String?
+  createdAt    DateTime @default(now())
+
+  meter UtilityMeter @relation(fields: [meterId], references: [id], onDelete: Cascade)
+
+  @@index([meterId, readAt])
+}
+
+model LateFeeRule {
+  id              String   @id @default(cuid())
+  campgroundId    String
+  cadence         String   // weekly|monthly
+  graceDays       Int      @default(3)
+  feeType         String   // flat|percent
+  feeCents        Int?
+  feePercentBp    Int?
+  applyPerInvoice Boolean  @default(true)
+  maxOccurrences  Int?
+  active          Boolean  @default(true)
+  effectiveFrom   DateTime
+  effectiveTo     DateTime?
+
+  campground Campground @relation(fields: [campgroundId], references: [id], onDelete: Cascade)
+
+  @@index([campgroundId, cadence, active])
+}
+
+model ArLedgerEntry {
+  id            String   @id @default(cuid())
+  ledgerEntryId String   @unique
+  invoiceId     String?
+  invoiceLineId String?
+  type          String   // ar_open|ar_settlement|writeoff|reclass
+  createdAt     DateTime @default(now())
+
+  ledgerEntry LedgerEntry  @relation(fields: [ledgerEntryId], references: [id], onDelete: Cascade)
+  invoice     Invoice?     @relation(fields: [invoiceId], references: [id], onDelete: SetNull)
+  invoiceLine InvoiceLine? @relation(fields: [invoiceLineId], references: [id], onDelete: SetNull)
+
+  @@index([invoiceId])
+  @@index([invoiceLineId])
+}
+
 model LedgerEntry {
   id            String   @id @default(cuid())
   campgroundId  String
   reservationId String?
+  periodId      String?
   glCode        String?
   account       String?
   description   String?
@@ -1649,13 +2171,46 @@ model LedgerEntry {
   direction     String   @default("debit")
   occurredAt    DateTime @default(now())
   createdAt     DateTime @default(now())
+  externalRef   String?
+  dedupeKey     String?
 
   reservation Reservation? @relation(fields: [reservationId], references: [id], onDelete: SetNull)
   campground  Campground   @relation(fields: [campgroundId], references: [id], onDelete: Cascade)
+  arLedgerEntry ArLedgerEntry?
+  glPeriod    GlPeriod?    @relation(fields: [periodId], references: [id], onDelete: SetNull)
 
   @@index([campgroundId])
   @@index([reservationId])
   @@index([glCode])
+  @@index([periodId])
+  @@index([dedupeKey])
+}
+
+enum GlPeriodStatus {
+  open
+  closed
+  locked
+}
+
+model GlPeriod {
+  id           String         @id @default(cuid())
+  campgroundId String
+  name         String?
+  startDate    DateTime
+  endDate      DateTime
+  status       GlPeriodStatus @default(open)
+  closedAt     DateTime?
+  lockedAt     DateTime?
+  closedBy     String?
+  lockedBy     String?
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @default(now()) @updatedAt
+
+  campground  Campground   @relation(fields: [campgroundId], references: [id], onDelete: Cascade)
+  ledgerPosts LedgerEntry[]
+
+  @@index([campgroundId, startDate, endDate])
+  @@index([campgroundId, status])
 }
 
 enum PayoutStatus {
@@ -2034,6 +2589,28 @@ model Promotion {
   @@index([code])
 }
 
+model ReferralProgram {
+  id             String                @id @default(cuid())
+  campgroundId   String
+  code           String
+  linkSlug       String?
+  source         String?
+  channel        String?
+  incentiveType  ReferralIncentiveType @default(percent_discount)
+  incentiveValue Int                   @default(0) // percent or cents depending on type
+  isActive       Boolean               @default(true)
+  notes          String?
+  createdAt      DateTime              @default(now())
+  updatedAt      DateTime              @default(now()) @updatedAt
+
+  campground   Campground    @relation(fields: [campgroundId], references: [id], onDelete: Cascade)
+  reservations Reservation[]
+
+  @@unique([campgroundId, code])
+  @@unique([campgroundId, linkSlug])
+  @@index([campgroundId, isActive])
+}
+
 model Message {
   id            String     @id @default(cuid())
   campgroundId  String
@@ -2406,6 +2983,51 @@ model InviteToken {
 
   @@index([userId, campgroundId])
   @@index([campgroundId, createdAt])
+}
+
+model OnboardingInvite {
+  id              String   @id @default(cuid())
+  token           String   @unique
+  email           String
+  organizationId  String?
+  campgroundId    String?
+  invitedById     String?
+  expiresAt       DateTime
+  redeemedAt      DateTime?
+  lastSentAt      DateTime?
+  createdAt       DateTime @default(now())
+
+  session      OnboardingSession? @relation("InviteSessions")
+  organization Organization?      @relation(fields: [organizationId], references: [id], onDelete: SetNull)
+  campground   Campground?        @relation(fields: [campgroundId], references: [id], onDelete: SetNull)
+  invitedBy    User?              @relation(fields: [invitedById], references: [id], onDelete: SetNull)
+
+  @@index([token])
+  @@index([organizationId, createdAt])
+  @@index([campgroundId, createdAt])
+}
+
+model OnboardingSession {
+  id              String           @id @default(cuid())
+  inviteId        String           @unique
+  organizationId  String?
+  campgroundId    String?
+  status          OnboardingStatus @default(pending)
+  currentStep     OnboardingStep   @default(account_profile)
+  completedSteps  OnboardingStep[] @default([])
+  data            Json?
+  progress        Json?
+  expiresAt       DateTime?
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+
+  invite       OnboardingInvite @relation("InviteSessions", fields: [inviteId], references: [id], onDelete: Cascade)
+  organization Organization?    @relation(fields: [organizationId], references: [id], onDelete: SetNull)
+  campground   Campground?      @relation(fields: [campgroundId], references: [id], onDelete: SetNull)
+
+  @@index([inviteId])
+  @@index([organizationId])
+  @@index([campgroundId])
 }
 
 model Activity {
@@ -3397,6 +4019,136 @@ model IdempotencyKey {
   createdAt    DateTime          @default(now())
 }
 
+// Phase 4: shared idempotency records for POST/replay dedupe
+model IdempotencyRecord {
+  id             String            @id @default(cuid())
+  scope          String
+  tenantId       String?
+  campgroundId   String?
+  endpoint       String
+  idempotencyKey String
+  requestHash    String
+  checksum       String?
+  requestBody    Json?
+  responseJson   Json?
+  status         IdempotencyStatus @default(pending)
+  sequence       String?
+  expiresAt      DateTime?
+  lastSeenAt     DateTime          @default(now())
+  createdAt      DateTime          @default(now())
+  updatedAt      DateTime          @updatedAt
+  metadata       Json?
+
+  @@unique([scope, idempotencyKey])
+  @@index([scope, endpoint, sequence])
+  @@index([expiresAt])
+}
+
+model AccessIntegration {
+  id             String            @id @default(cuid())
+  campgroundId   String
+  provider       AccessProviderType
+  displayName    String?
+  status         String?           @default("enabled")
+  credentials    Json
+  webhookSecret  String?
+  createdAt      DateTime          @default(now())
+  updatedAt      DateTime          @updatedAt
+
+  campground        Campground        @relation(fields: [campgroundId], references: [id], onDelete: Cascade)
+  grants            AccessGrant[]
+  credentialsRecord AccessCredential[]
+
+  @@unique([campgroundId, provider])
+  @@index([campgroundId])
+}
+
+model Vehicle {
+  id             String   @id @default(cuid())
+  campgroundId   String
+  reservationId  String?
+  guestId        String?
+  plate          String?
+  state          String?
+  rigType        String?
+  rigLength      Int?
+  description    String?
+  color          String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  campground   Campground   @relation(fields: [campgroundId], references: [id], onDelete: Cascade)
+  reservation  Reservation? @relation(fields: [reservationId], references: [id], onDelete: SetNull)
+  guest        Guest?       @relation(fields: [guestId], references: [id], onDelete: SetNull)
+  credentials  AccessCredential[]
+  accessGrants AccessGrant[]
+
+  @@unique([reservationId])
+  @@index([campgroundId])
+  @@index([plate, state])
+}
+
+model AccessCredential {
+  id             String              @id @default(cuid())
+  campgroundId   String
+  reservationId  String?
+  vehicleId      String?
+  integrationId  String?
+  provider       AccessProviderType
+  type           AccessCredentialType
+  maskedValue    String?
+  secretHash     String?
+  label          String?
+  metadata       Json?
+  status         AccessGrantStatus   @default(pending)
+  createdAt      DateTime            @default(now())
+  updatedAt      DateTime            @updatedAt
+
+  campground  Campground         @relation(fields: [campgroundId], references: [id], onDelete: Cascade)
+  reservation Reservation?       @relation(fields: [reservationId], references: [id], onDelete: SetNull)
+  vehicle     Vehicle?           @relation(fields: [vehicleId], references: [id], onDelete: SetNull)
+  integration AccessIntegration? @relation(fields: [integrationId], references: [id], onDelete: SetNull)
+  grants      AccessGrant[]
+
+  @@index([campgroundId])
+  @@index([reservationId])
+  @@index([vehicleId])
+}
+
+model AccessGrant {
+  id               String             @id @default(cuid())
+  campgroundId     String
+  reservationId    String
+  siteId           String?
+  vehicleId        String?
+  credentialId     String?
+  integrationId    String?
+  provider         AccessProviderType
+  status           AccessGrantStatus  @default(pending)
+  providerAccessId String?
+  startsAt         DateTime?
+  endsAt           DateTime?
+  blockedReason    String?
+  idempotencyKey   String?
+  lastSyncAt       DateTime?
+  createdAt        DateTime           @default(now())
+  updatedAt        DateTime           @updatedAt
+
+  campground  Campground         @relation(fields: [campgroundId], references: [id], onDelete: Cascade)
+  reservation Reservation        @relation(fields: [reservationId], references: [id], onDelete: Cascade)
+  site        Site?              @relation(fields: [siteId], references: [id], onDelete: SetNull)
+  vehicle     Vehicle?           @relation(fields: [vehicleId], references: [id], onDelete: SetNull)
+  credential  AccessCredential?  @relation(fields: [credentialId], references: [id], onDelete: SetNull)
+  integration AccessIntegration? @relation(fields: [integrationId], references: [id], onDelete: SetNull)
+
+  @@index([campgroundId])
+  @@index([reservationId])
+  @@index([siteId])
+  @@unique([reservationId, provider])
+  @@index([provider, idempotencyKey])
+  @@index([endsAt])
+}
+
 // Phase 2: housekeeping/maintenance/groups/blocks
 model Task {
   id               String    @id @default(cuid())
@@ -3653,6 +4405,154 @@ model WaiverTemplate {
   @@index([campgroundId])
 }
 
+// --- Signatures & COI ---
+
+enum SignatureDocumentType {
+  long_term_stay
+  park_rules
+  deposit
+  waiver
+  coi
+  other
+}
+
+enum SignatureRequestStatus {
+  draft
+  sent
+  viewed
+  signed
+  declined
+  voided
+  expired
+}
+
+enum SignatureDeliveryChannel {
+  email
+  sms
+  email_and_sms
+}
+
+enum CoiStatus {
+  pending
+  active
+  expired
+  voided
+}
+
+model DocumentTemplate {
+  id           String                @id @default(cuid())
+  campgroundId String
+  siteClassId  String?
+  siteId       String?
+  name         String
+  type         SignatureDocumentType
+  version      Int                   @default(1)
+  content      String                @db.Text
+  isActive     Boolean               @default(true)
+  autoSend     Boolean               @default(false)
+  createdAt    DateTime              @default(now())
+  updatedAt    DateTime              @updatedAt
+
+  campground Campground       @relation(fields: [campgroundId], references: [id], onDelete: Cascade)
+  siteClass  SiteClass?       @relation(fields: [siteClassId], references: [id], onDelete: SetNull)
+  site       Site?            @relation(fields: [siteId], references: [id], onDelete: SetNull)
+  requests   SignatureRequest[]
+
+  @@index([campgroundId, type])
+  @@index([campgroundId, siteClassId])
+  @@index([campgroundId, siteId])
+  @@unique([campgroundId, name, version])
+}
+
+model SignatureRequest {
+  id                String                   @id @default(cuid())
+  campgroundId      String
+  reservationId     String?
+  guestId           String?
+  templateId        String?
+  documentType      SignatureDocumentType
+  status            SignatureRequestStatus   @default(draft)
+  deliveryChannel   SignatureDeliveryChannel @default(email)
+  token             String                   @unique
+  subject           String?
+  message           String?
+  recipientName     String?
+  recipientEmail    String?
+  recipientPhone    String?
+  sentAt            DateTime?
+  viewedAt          DateTime?
+  signedAt          DateTime?
+  declinedAt        DateTime?
+  voidedAt          DateTime?
+  expiresAt         DateTime?
+  reminderAt        DateTime?
+  reminderCount     Int                      @default(0)
+  metadata          Json?
+  createdAt         DateTime                 @default(now())
+  updatedAt         DateTime                 @updatedAt
+
+  campground Campground      @relation(fields: [campgroundId], references: [id], onDelete: Cascade)
+  reservation Reservation?   @relation(fields: [reservationId], references: [id], onDelete: SetNull)
+  guest       Guest?         @relation(fields: [guestId], references: [id], onDelete: SetNull)
+  template    DocumentTemplate? @relation(fields: [templateId], references: [id], onDelete: SetNull)
+  artifact    SignatureArtifact?
+
+  @@index([campgroundId, status])
+  @@index([reservationId])
+  @@index([guestId])
+  @@index([expiresAt])
+}
+
+model SignatureArtifact {
+  id            String   @id @default(cuid())
+  requestId     String   @unique
+  campgroundId  String
+  reservationId String?
+  guestId       String?
+  pdfUrl        String
+  storageKey    String?
+  checksum      String?
+  metadata      Json?
+  completedAt   DateTime?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  request     SignatureRequest @relation(fields: [requestId], references: [id], onDelete: Cascade)
+  campground  Campground       @relation(fields: [campgroundId], references: [id], onDelete: Cascade)
+  reservation Reservation?     @relation(fields: [reservationId], references: [id], onDelete: SetNull)
+  guest       Guest?           @relation(fields: [guestId], references: [id], onDelete: SetNull)
+
+  @@index([campgroundId])
+  @@index([reservationId])
+  @@index([guestId])
+}
+
+model CoiUpload {
+  id             String    @id @default(cuid())
+  campgroundId   String
+  reservationId  String?
+  guestId        String?
+  fileUrl        String
+  storageKey     String?
+  status         CoiStatus @default(active)
+  expiresAt      DateTime?
+  reminderAt     DateTime?
+  reminderCount  Int       @default(0)
+  uploadedAt     DateTime  @default(now())
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+  notes          String?
+
+  campground  Campground   @relation(fields: [campgroundId], references: [id], onDelete: Cascade)
+  reservation Reservation? @relation(fields: [reservationId], references: [id], onDelete: SetNull)
+  guest       Guest?       @relation(fields: [guestId], references: [id], onDelete: SetNull)
+
+  @@index([campgroundId])
+  @@index([reservationId])
+  @@index([guestId])
+  @@index([expiresAt])
+}
+
 enum IdVerificationStatus {
   pending
   verified
@@ -3686,26 +4586,156 @@ model IdVerification {
 
 // --- Phase 3C: Staff Operations ---
 
+enum ShiftStatus {
+  scheduled
+  in_progress
+  submitted
+  approved
+  rejected
+}
+
+enum ShiftApprovalStatus {
+  pending
+  approved
+  rejected
+}
+
+enum TimeEntryStatus {
+  open
+  submitted
+  approved
+  rejected
+  corrected
+}
+
+enum TimeEntrySource {
+  kiosk
+  mobile
+  web
+  manual
+}
+
+enum OverrideType {
+  comp
+  void
+  discount
+}
+
+enum OverrideStatus {
+  pending
+  approved
+  rejected
+  cancelled
+}
+
+enum PayrollProvider {
+  generic
+  onpay
+}
+
+enum PayrollExportStatus {
+  pending
+  generated
+  failed
+}
+
+enum PayrollExportFormat {
+  csv
+  json
+}
+
 model StaffShift {
   id           String    @id @default(cuid())
   campgroundId String
   userId       String
+  roleId       String?
   shiftDate    DateTime  @db.Date
   startTime    DateTime
   endTime      DateTime
-  role         String? // front_desk, housekeeping, maintenance, etc
+  role         String? // legacy friendly label
+  status       ShiftStatus  @default(scheduled)
+  scheduledMinutes Int?
+  actualMinutes    Int?
   notes        String?
   clockedInAt  DateTime?
   clockedOutAt DateTime?
+  approvedById String?
+  approvedAt   DateTime?
+  approvalNote String?
   createdBy    String?
   createdAt    DateTime  @default(now())
   updatedAt    DateTime  @updatedAt
 
   campground Campground @relation(fields: [campgroundId], references: [id], onDelete: Cascade)
   user       User       @relation("StaffShifts", fields: [userId], references: [id], onDelete: Cascade)
+  roleRef    StaffRole? @relation(fields: [roleId], references: [id], onDelete: SetNull)
+  approvals  ShiftApproval[]
+  timeEntries StaffTimeEntry[]
+  payrollExportLines PayrollExportLine[]
 
   @@index([campgroundId, shiftDate])
   @@index([userId, shiftDate])
+  @@index([roleId])
+  @@index([status])
+}
+
+model StaffRole {
+  id           String   @id @default(cuid())
+  campgroundId String
+  code         String
+  name         String
+  hourlyRate   Decimal? @db.Decimal(10, 2)
+  earningCode  String?
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  campground Campground @relation(fields: [campgroundId], references: [id], onDelete: Cascade)
+  shifts     StaffShift[]
+
+  @@unique([campgroundId, code])
+  @@index([campgroundId, isActive])
+}
+
+model StaffTimeEntry {
+  id             String          @id @default(cuid())
+  shiftId        String
+  campgroundId   String
+  userId         String
+  clockInAt      DateTime
+  clockOutAt     DateTime?
+  source         TimeEntrySource @default(web)
+  status         TimeEntryStatus @default(open)
+  note           String?
+  approvedById   String?
+  approvedAt     DateTime?
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+
+  shift      StaffShift @relation(fields: [shiftId], references: [id], onDelete: Cascade)
+  user       User       @relation("StaffTimeEntries", fields: [userId], references: [id], onDelete: Cascade)
+  approvedBy User?      @relation("StaffTimeEntryApprover", fields: [approvedById], references: [id])
+  payrollExportLines PayrollExportLine[]
+
+  @@index([campgroundId, userId, status])
+  @@index([shiftId])
+}
+
+model ShiftApproval {
+  id          String              @id @default(cuid())
+  shiftId     String
+  approverId  String
+  status      ShiftApprovalStatus @default(pending)
+  note        String?
+  approvedAt  DateTime?
+  createdAt   DateTime            @default(now())
+  updatedAt   DateTime            @updatedAt
+
+  shift     StaffShift @relation(fields: [shiftId], references: [id], onDelete: Cascade)
+  approver  User       @relation("ShiftApprover", fields: [approverId], references: [id])
+
+  @@index([shiftId, status])
+  @@index([approverId])
 }
 
 model StaffAvailability {
@@ -3725,6 +4755,89 @@ model StaffAvailability {
   @@unique([campgroundId, userId, dayOfWeek])
 }
 
+model OverrideRequest {
+  id            String         @id @default(cuid())
+  campgroundId  String
+  userId        String
+  approverId    String?
+  type          OverrideType
+  reason        String?
+  status        OverrideStatus @default(pending)
+  targetEntity  String?
+  targetId      String?
+  deltaAmount   Decimal?       @db.Decimal(10, 2)
+  metadata      Json?
+  approvedAt    DateTime?
+  rejectedAt    DateTime?
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+
+  campground Campground @relation(fields: [campgroundId], references: [id], onDelete: Cascade)
+  user       User       @relation("OverrideRequester", fields: [userId], references: [id])
+  approver   User?      @relation("OverrideApprover", fields: [approverId], references: [id])
+
+  @@index([campgroundId, status, type])
+  @@index([targetEntity, targetId])
+}
+
+model PayrollEarningCode {
+  id           String          @id @default(cuid())
+  campgroundId String
+  roleCode     String
+  provider     PayrollProvider @default(generic)
+  earningCode  String
+  createdAt    DateTime        @default(now())
+  updatedAt    DateTime        @updatedAt
+
+  @@unique([campgroundId, roleCode, provider])
+  @@index([campgroundId, provider])
+}
+
+model PayrollExport {
+  id             String               @id @default(cuid())
+  campgroundId   String
+  periodStart    DateTime             @db.Date
+  periodEnd      DateTime             @db.Date
+  provider       PayrollProvider      @default(generic)
+  format         PayrollExportFormat  @default(csv)
+  status         PayrollExportStatus  @default(pending)
+  requestedById  String
+  rowCount       Int?
+  totalHours     Float?
+  fileKey        String?
+  failureReason  String?
+  createdAt      DateTime             @default(now())
+  completedAt    DateTime?
+
+  campground Campground @relation(fields: [campgroundId], references: [id], onDelete: Cascade)
+  requestedBy User       @relation("PayrollExportRequester", fields: [requestedById], references: [id], onDelete: Cascade)
+  lines       PayrollExportLine[]
+
+  @@index([campgroundId, periodStart, periodEnd])
+  @@index([provider, status])
+}
+
+model PayrollExportLine {
+  id           String    @id @default(cuid())
+  exportId     String
+  userId       String
+  shiftId      String?
+  timeEntryId  String?
+  hours        Float
+  earningCode  String?
+  rate         Decimal?  @db.Decimal(10, 2)
+  roleCode     String?
+  notes        String?
+  createdAt    DateTime  @default(now())
+
+  export    PayrollExport  @relation(fields: [exportId], references: [id], onDelete: Cascade)
+  user      User           @relation("PayrollExportUser", fields: [userId], references: [id], onDelete: Cascade)
+  shift     StaffShift?    @relation(fields: [shiftId], references: [id], onDelete: SetNull)
+  timeEntry StaffTimeEntry? @relation(fields: [timeEntryId], references: [id], onDelete: SetNull)
+
+  @@index([exportId])
+  @@index([userId])
+}
 enum PushNotificationType {
   arrival
   departure
@@ -4051,6 +5164,37 @@ enum TillMovementType {
   adjustment
 }
 
+enum PosProviderType {
+  clover
+  square
+  toast
+}
+
+enum PosProviderCapability {
+  payments
+  items_sync
+  receipts
+}
+
+enum PosIntegrationStatus {
+  enabled
+  disabled
+  error
+}
+
+enum PosSyncTarget {
+  catalog
+  tenders
+  payments
+}
+
+enum PosSyncStatus {
+  idle
+  running
+  succeeded
+  failed
+}
+
 model PosTerminal {
   id             String   @id @default(cuid())
   campgroundId   String
@@ -4060,8 +5204,9 @@ model PosTerminal {
   priceVersion   String?
   createdAt      DateTime @default(now())
 
-  campground Campground @relation(fields: [campgroundId], references: [id], onDelete: Cascade)
-  carts      PosCart[]
+  campground   Campground   @relation(fields: [campgroundId], references: [id], onDelete: Cascade)
+  carts        PosCart[]
+  tillSessions TillSession[]
 
   @@index([campgroundId])
 }
@@ -4082,11 +5227,12 @@ model PosCart {
   createdAt    DateTime       @default(now())
   updatedAt    DateTime       @updatedAt
 
-  campground Campground @relation(fields: [campgroundId], references: [id], onDelete: Cascade)
-  terminal   PosTerminal? @relation(fields: [terminalId], references: [id], onDelete: SetNull)
+  campground Campground      @relation(fields: [campgroundId], references: [id], onDelete: Cascade)
+  terminal   PosTerminal?    @relation(fields: [terminalId], references: [id], onDelete: SetNull)
   items      PosCartItem[]
   payments   PosPayment[]
-  returns    PosReturn[]   @relation("ReturnCart")
+  returns    PosReturn[]     @relation("ReturnCart")
+  movements  TillMovement[]  @relation("TillMovementCart")
 
   @@index([campgroundId, status])
   @@index([terminalId])
@@ -4171,8 +5317,8 @@ model TillMovement {
   createdAt     DateTime @default(now())
 
   session TillSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
-  actor   User        @relation(fields: [actorUserId], references: [id], onDelete: Cascade)
-  cart    PosCart?    @relation(fields: [sourceCartId], references: [id], onDelete: SetNull)
+  actor   User        @relation("TillMovementActor", fields: [actorUserId], references: [id], onDelete: Cascade)
+  cart    PosCart?    @relation("TillMovementCart", fields: [sourceCartId], references: [id], onDelete: SetNull)
 
   @@index([sessionId, type])
   @@index([sourceCartId])
@@ -4200,6 +5346,46 @@ model PosReturn {
   originalCart PosCart @relation("ReturnCart", fields: [originalCartId], references: [id], onDelete: Cascade)
 
   @@index([originalCartId])
+}
+
+model PosProviderIntegration {
+  id             String                @id @default(cuid())
+  campgroundId   String
+  provider       PosProviderType
+  displayName    String?
+  status         PosIntegrationStatus  @default(enabled)
+  capabilities   PosProviderCapability[]
+  credentials    Json
+  locations      Json?
+  devices        Json?
+  webhookSecret  String?
+  lastValidatedAt DateTime?
+  lastSyncAt     DateTime?
+  createdAt      DateTime             @default(now())
+  updatedAt      DateTime             @updatedAt
+
+  campground Campground       @relation(fields: [campgroundId], references: [id], onDelete: Cascade)
+  syncs      PosProviderSync[]
+
+  @@unique([campgroundId, provider])
+  @@index([campgroundId, status])
+}
+
+model PosProviderSync {
+  id             String         @id @default(cuid())
+  integrationId  String
+  type           PosSyncTarget
+  status         PosSyncStatus  @default(idle)
+  lastRunAt      DateTime?
+  lastError      String?
+  metadata       Json?
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+
+  integration PosProviderIntegration @relation(fields: [integrationId], references: [id], onDelete: Cascade)
+
+  @@unique([integrationId, type])
+  @@index([integrationId, type])
 }
 
 // Analytics daily facts

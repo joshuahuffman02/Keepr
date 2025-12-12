@@ -1,0 +1,9 @@
+/* Prevent landscape stretching on small devices; nudge users to portrait */
+@media screen and (max-width: 768px) and (orientation: landscape) {
+  body {
+    max-width: 480px;
+    margin: 0 auto;
+    overflow-x: hidden;
+    touch-action: pan-y;
+  }
+}

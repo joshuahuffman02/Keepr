@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import Image from 'next/image';
 import {
   ShoppingCart,
@@ -25,7 +25,7 @@ const popularFeatures = [
       'Real-time sync with reservations',
       'Staff permissions & reporting',
     ],
-    image: '/images/features/pos.jpg', // Placeholder
+    image: '/images/owners/pos.png',
   },
   {
     id: 'grid',
@@ -38,7 +38,7 @@ const popularFeatures = [
       'Real-time availability',
       'Site type grouping',
     ],
-    image: '/images/features/grid.jpg',
+    image: '/images/owners/grid.png',
   },
   {
     id: 'mobile',
@@ -51,7 +51,7 @@ const popularFeatures = [
       'Mobile payments',
       'Guest messaging',
     ],
-    image: '/images/features/mobile.jpg',
+    image: '/images/owners/mobile-checkin.png',
   },
   {
     id: 'payments',
@@ -64,7 +64,7 @@ const popularFeatures = [
       'Refund management',
       'PCI compliance',
     ],
-    image: '/images/features/payments.jpg',
+    image: '/images/owners/payments.png',
   },
   {
     id: 'booking',
@@ -77,7 +77,7 @@ const popularFeatures = [
       'Add-on selection',
       'Instant confirmation',
     ],
-    image: '/images/features/booking.jpg',
+    image: '/images/owners/booking.png',
   },
   {
     id: 'messaging',
@@ -90,12 +90,20 @@ const popularFeatures = [
       'SMS & email',
       'Custom templates',
     ],
-    image: '/images/features/messaging.jpg',
+    image: '/images/owners/messaging.png',
   },
 ];
 
 export function PopularFeatures() {
   const [activeFeature, setActiveFeature] = useState(popularFeatures[0]);
+  const detailRef = useRef<HTMLDivElement | null>(null);
+
+  const handleSelect = (feature: typeof popularFeatures[number]) => {
+    setActiveFeature(feature);
+    if (typeof window !== "undefined" && window.innerWidth < 1024 && detailRef.current) {
+      detailRef.current.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  };
 
   return (
     <section className="py-24 bg-gradient-to-br from-slate-50 to-white">
@@ -124,7 +132,7 @@ export function PopularFeatures() {
               return (
                 <button
                   key={feature.id}
-                  onClick={() => setActiveFeature(feature)}
+                  onClick={() => handleSelect(feature)}
                   className={`w-full text-left p-6 rounded-xl border-2 transition-all duration-300 ${isActive
                     ? 'border-emerald-500 bg-emerald-50 shadow-lg'
                     : 'border-slate-200 bg-white hover:border-emerald-300 hover:shadow-md'
@@ -155,7 +163,7 @@ export function PopularFeatures() {
           </div>
 
           {/* Right: Feature Details */}
-          <div className="lg:sticky lg:top-24">
+          <div ref={detailRef} className="lg:sticky lg:top-24">
             <div className="bg-white rounded-2xl shadow-xl border border-slate-200 overflow-hidden">
               {/* Feature Image Placeholder */}
               <div className="aspect-[16/10] relative bg-slate-100">

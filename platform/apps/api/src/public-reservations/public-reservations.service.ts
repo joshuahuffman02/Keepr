@@ -1,5 +1,5 @@
 import { Injectable, NotFoundException, ConflictException, BadRequestException } from "@nestjs/common";
-import { ReservationStatus } from "@prisma/client";
+import { ReservationStatus, ReferralIncentiveType } from "@prisma/client";
 import { PrismaService } from "../prisma/prisma.service";
 import { CreatePublicReservationDto, PublicQuoteDto, CreatePublicWaitlistDto } from './dto/create-public-reservation.dto';
 import { LockService } from "../redis/lock.service";
@@ -10,6 +10,8 @@ import { differenceInMinutes } from "date-fns";
 import { resolveDiscounts } from "../pricing-v2/discount-engine";
 import { TaxRuleType } from "@prisma/client";
 import { MembershipsService } from "../memberships/memberships.service";
+import { SignaturesService } from "../signatures/signatures.service";
+import { AccessControlService } from "../access-control/access-control.service";
 
 @Injectable()
 export class PublicReservationsService {
@@ -19,8 +21,41 @@ export class PublicReservationsService {
         private readonly promotionsService: PromotionsService,
         private readonly emailService: EmailService,
         private readonly abandonedCarts: AbandonedCartService,
-        private readonly memberships: MembershipsService
+        private readonly memberships: MembershipsService,
+        private readonly signatures: SignaturesService,
+        private readonly accessControl: AccessControlService
     ) { }
+
+    private async hasSignedWaiver(reservationId: string, guestId: string) {
+        const [signedSignature, signedArtifact, digitalWaiver] = await Promise.all([
+            (this.prisma as any).signatureRequest.findFirst?.({
+                where: { reservationId, documentType: "waiver", status: "signed" }
+            }),
+            (this.prisma as any).signatureArtifact.findFirst?.({
+                where: { reservationId, pdfUrl: { not: null } }
+            }),
+            (this.prisma as any).digitalWaiver.findFirst?.({
+                where: {
+                    OR: [{ reservationId }, { reservationId: null, guestId }],
+                    status: "signed"
+                }
+            })
+        ]);
+        return Boolean(signedSignature || signedArtifact || digitalWaiver);
+    }
+
+    private async hasVerifiedId(reservationId: string, guestId: string) {
+        const now = new Date();
+        const match = await (this.prisma as any).idVerification.findFirst?.({
+            where: {
+                OR: [
+                    { reservationId, status: "verified" },
+                    { guestId, status: "verified", expiresAt: { gt: now } }
+                ]
+            }
+        });
+        return Boolean(match);
+    }
 
     /**
      * Join waitlist publicly (creates guest if needed)
@@ -126,6 +161,53 @@ export class PublicReservationsService {
         return "unpaid";
     }
 
+    private async resolveReferralProgram(
+        campgroundId: string,
+        referralCode?: string | null,
+        referralProgramId?: string | null,
+        basisCents?: number
+    ) {
+        if (!referralCode && !referralProgramId) {
+            return { program: null, discountCents: 0, type: null, value: 0, source: null, channel: null };
+        }
+
+        const program = await (this.prisma as any).referralProgram.findFirst({
+            where: {
+                campgroundId,
+                isActive: true,
+                OR: [
+                    referralProgramId ? { id: referralProgramId } : undefined,
+                    referralCode ? { code: referralCode } : undefined,
+                    referralCode ? { linkSlug: referralCode } : undefined
+                ].filter(Boolean) as any[]
+            }
+        });
+
+        if (!program) {
+            throw new BadRequestException("Invalid or inactive referral code");
+        }
+
+        const type = program.incentiveType as ReferralIncentiveType;
+        const value = program.incentiveValue ?? 0;
+        const basis = Math.max(0, basisCents ?? 0);
+        let discountCents = 0;
+
+        if (type === ReferralIncentiveType.percent_discount) {
+            discountCents = Math.min(basis, Math.floor(basis * (value / 100)));
+        } else {
+            discountCents = Math.min(basis, Math.max(0, value));
+        }
+
+        return {
+            program,
+            discountCents,
+            type,
+            value,
+            source: program.source ?? null,
+            channel: program.channel ?? null
+        };
+    }
+
     /**
      * Compute taxes for a given campground and taxable base (cents).
      * Applies exemption rules (type: 'exemption') if eligible; otherwise sums active tax rates (type: 'tax').
@@ -210,7 +292,14 @@ export class PublicReservationsService {
         return true;
     }
 
-    async getAvailability(slug: string, arrivalDate: string, departureDate: string, rigType?: string, rigLength?: string) {
+    async getAvailability(
+        slug: string,
+        arrivalDate: string,
+        departureDate: string,
+        rigType?: string,
+        rigLength?: string,
+        needsAccessible?: boolean
+    ) {
         const campground = await this.prisma.campground.findUnique({
             where: { slug },
             select: { id: true, isPublished: true, isBookable: true, isExternal: true, nonBookableReason: true }
@@ -257,7 +346,8 @@ export class PublicReservationsService {
                         hookupsSewer: true,
                         petFriendly: true,
                         description: true,
-                        rigMaxLength: true
+                        rigMaxLength: true,
+                        accessible: true
                     }
                 }
             },
@@ -333,6 +423,7 @@ export class PublicReservationsService {
         const rigLengthNum = rigLength ? Number(rigLength) : null;
         const sitesWithStatus = allSites.map((site: any) => {
             let status: 'available' | 'booked' | 'locked' | 'maintenance' = 'available';
+            const accessibleFlag = Boolean(site.accessible || site.siteClass?.accessible);
 
             if (campgroundBlackedOut) {
                 status = 'locked';
@@ -354,6 +445,8 @@ export class PublicReservationsService {
                 )
             ) {
                 status = 'locked';
+            } else if (needsAccessible && !accessibleFlag) {
+                status = 'locked';
             } else if (holdSiteIds.has(site.id)) {
                 status = 'locked';
             }
@@ -365,6 +458,7 @@ export class PublicReservationsService {
                 siteType: site.siteType,
                 maxOccupancy: site.maxOccupancy,
                 rigMaxLength: site.rigMaxLength,
+                accessible: accessibleFlag,
                 siteClass: site.siteClass,
                 status
             };
@@ -490,7 +584,7 @@ export class PublicReservationsService {
         }
 
         const resolved = resolveDiscounts(total, candidates);
-        const discountCents = resolved.totalDiscount;
+        let discountCents = resolved.totalDiscount;
         const discountCapped = resolved.capped;
 
         const appliedDiscounts = resolved.applied.map(d => {
@@ -507,6 +601,22 @@ export class PublicReservationsService {
             id: r.id,
             reason: r.reason
         }));
+
+        const referral = await this.resolveReferralProgram(
+            campground.id,
+            dto.referralCode,
+            undefined,
+            Math.max(0, total - discountCents)
+        );
+        if (referral.program) {
+            discountCents += referral.discountCents;
+            appliedDiscounts.push({
+                id: referral.program.id,
+                type: "referral",
+                amountCents: referral.discountCents,
+                capped: false
+            });
+        }
 
         const totalAfterDiscount = Math.max(0, total - discountCents);
 
@@ -538,7 +648,13 @@ export class PublicReservationsService {
             perNightCents: Math.round(totalWithTaxes / nights),
             taxWaiverRequired: taxResult.waiverRequired,
             taxWaiverText: taxResult.waiverText,
-            taxExemptionApplied: taxResult.exemptionApplied
+            taxExemptionApplied: taxResult.exemptionApplied,
+            referralProgramId: referral.program?.id ?? null,
+            referralDiscountCents: referral.discountCents ?? 0,
+            referralIncentiveType: referral.type ?? null,
+            referralIncentiveValue: referral.discountCents ?? 0,
+            referralSource: referral.source ?? null,
+            referralChannel: referral.channel ?? null
         };
     }
 
@@ -579,12 +695,19 @@ export class PublicReservationsService {
 
         // Resolve siteId - either provided directly or find available site from class
         let siteId = dto.siteId;
+        const requestedRigLength = dto.equipment?.length !== undefined && dto.equipment?.length !== null
+            ? Number(dto.equipment.length)
+            : null;
+
         if (!siteId && dto.siteClassId) {
             const availableSite = await this.findAvailableSiteInClass(
                 campground.id,
                 dto.siteClassId,
                 arrival,
-                departure
+                departure,
+                dto.equipment?.type,
+                requestedRigLength,
+                dto.needsAccessible
             );
             if (!availableSite) {
                 throw new ConflictException("No available sites in the selected class for these dates");
@@ -596,6 +719,37 @@ export class PublicReservationsService {
             throw new BadRequestException("Either siteId or siteClassId must be provided");
         }
 
+        const site = await this.prisma.site.findUnique({
+            where: { id: siteId },
+            include: { siteClass: true }
+        });
+
+        if (!site || site.campgroundId !== campground.id) {
+            throw new NotFoundException("Site not found");
+        }
+
+        const rigCompatible = this.isRigCompatible(
+            {
+                siteType: site.siteType || site.siteClass?.siteType || "rv",
+                rigMaxLength: site.rigMaxLength,
+                siteClassRigMaxLength: site.siteClass?.rigMaxLength ?? null
+            },
+            dto.equipment?.type,
+            requestedRigLength
+        );
+
+        if (!rigCompatible) {
+            throw new BadRequestException(
+                site.siteType !== "rv"
+                    ? "Selected site does not support this equipment type"
+                    : `Rig length exceeds maximum for this site (${site.rigMaxLength ?? site.siteClass?.rigMaxLength ?? "unknown"} ft)`
+            );
+        }
+
+        if (dto.needsAccessible && !(site.accessible || site.siteClass?.accessible)) {
+            throw new BadRequestException("Accessible site required; please choose an ADA-accessible site.");
+        }
+
         // Get price quote (handles promo/membership + cap)
         let quote = await this.getQuote(dto.campgroundSlug, {
             siteId: siteId,
@@ -603,7 +757,10 @@ export class PublicReservationsService {
             departureDate: dto.departureDate,
             promoCode: dto.promoCode,
             membershipId: dto.membershipId,
-            taxWaiverSigned: dto.taxWaiverSigned
+            taxWaiverSigned: dto.taxWaiverSigned,
+            referralCode: dto.referralCode,
+            stayReasonPreset: dto.stayReasonPreset,
+            stayReasonOther: dto.stayReasonOther
         });
 
         const subtotal = quote.totalCents;
@@ -612,6 +769,12 @@ export class PublicReservationsService {
         const taxesCents = quote.taxesCents ?? 0;
         const totalAfterDiscount = quote.totalAfterDiscountCents ?? Math.max(0, subtotal - discountCents);
         const totalAmount = (quote.totalWithTaxesCents ?? totalAfterDiscount + taxesCents);
+        const referralProgramId = (quote as any).referralProgramId ?? null;
+        const referralDiscountCents = (quote as any).referralDiscountCents ?? 0;
+        const referralIncentiveType = (quote as any).referralIncentiveType ?? null;
+        const referralIncentiveValue = (quote as any).referralIncentiveValue ?? referralDiscountCents ?? 0;
+        const referralSource = (quote as any).referralSource ?? dto.referralSource ?? null;
+        const referralChannel = (quote as any).referralChannel ?? dto.referralChannel ?? null;
 
         // Calculate lead time (days between booking and arrival)
         const now = new Date();
@@ -715,7 +878,10 @@ export class PublicReservationsService {
                             departureDate: dto.departureDate,
                             promoCode: dto.promoCode,
                             membershipId: activeMembership.id,
-                            taxWaiverSigned: dto.taxWaiverSigned
+                            taxWaiverSigned: dto.taxWaiverSigned,
+                            referralCode: dto.referralCode,
+                            stayReasonPreset: dto.stayReasonPreset,
+                            stayReasonOther: dto.stayReasonOther
                         });
                     }
                 }
@@ -750,6 +916,12 @@ export class PublicReservationsService {
                         taxesAmount: taxesCents,
                         discountsAmount: discountCents > 0 ? discountCents : (quote.rulesDeltaCents < 0 ? -quote.rulesDeltaCents : 0),
                         promoCode: dto.promoCode || null,
+                        referralProgramId: referralProgramId,
+                        referralCode: dto.referralCode || null,
+                        referralSource: referralSource,
+                        referralChannel: referralChannel,
+                        referralIncentiveType: referralIncentiveType,
+                        referralIncentiveValue: referralIncentiveValue,
                         source: "online",
                         bookedAt: now,
                         leadTimeDays: leadTimeDays,
@@ -757,6 +929,8 @@ export class PublicReservationsService {
                         childrenDetails: dto.childrenDetails ? JSON.parse(JSON.stringify(dto.childrenDetails)) : null,
                         taxWaiverSigned: dto.taxWaiverSigned || false,
                         taxWaiverDate: dto.taxWaiverSigned ? new Date() : null,
+                        stayReasonPreset: dto.stayReasonPreset ?? null,
+                        stayReasonOther: dto.stayReasonOther ?? null,
                         rigType: dto.equipment?.type,
                         rigLength: dto.equipment?.length,
                         vehiclePlate: dto.equipment?.plateNumber,
@@ -926,7 +1100,10 @@ export class PublicReservationsService {
         campgroundId: string,
         siteClassId: string,
         arrival: Date,
-        departure: Date
+        departure: Date,
+        rigType?: string | null,
+        rigLength?: number | null,
+        needsAccessible?: boolean
     ): Promise<string | null> {
         // Get all sites in the class
         const sites = await this.prisma.site.findMany({
@@ -935,7 +1112,19 @@ export class PublicReservationsService {
                 siteClassId,
                 isActive: true
             },
-            select: { id: true }
+            select: {
+                id: true,
+                siteType: true,
+                rigMaxLength: true,
+                accessible: true,
+                siteClass: {
+                    select: {
+                        rigMaxLength: true,
+                        accessible: true,
+                        siteType: true
+                    }
+                }
+            }
         });
 
         // Get conflicting reservations
@@ -954,6 +1143,27 @@ export class PublicReservationsService {
 
         // Find first available site
         for (const site of sites) {
+            if (conflictingSiteIds.has(site.id)) continue;
+
+            if (
+                !this.isRigCompatible(
+                    {
+                        siteType: site.siteType || site.siteClass?.siteType || "rv",
+                        rigMaxLength: site.rigMaxLength,
+                        siteClassRigMaxLength: site.siteClass?.rigMaxLength ?? null
+                    },
+                    rigType,
+                    rigLength ?? null
+                )
+            ) {
+                continue;
+            }
+
+            const accessibleFlag = Boolean(site.accessible || site.siteClass?.accessible);
+            if (needsAccessible && !accessibleFlag) {
+                continue;
+            }
+
             if (!conflictingSiteIds.has(site.id)) {
                 return site.id;
             }
@@ -982,6 +1192,24 @@ export class PublicReservationsService {
         if (reservation.status === ReservationStatus.checked_in) {
             console.warn(`[Kiosk] Reservation ${id} already checked in `);
             throw new ConflictException("Reservation is already checked in");
+        }
+
+        if (reservation.idVerificationRequired) {
+            const verified = await this.hasVerifiedId(reservation.id, reservation.guestId);
+            if (!verified) {
+                throw new ConflictException({ reason: "id_verification_required" });
+            }
+        }
+
+        if (reservation.waiverRequired) {
+            const signed = await this.hasSignedWaiver(reservation.id, reservation.guestId);
+            if (!signed) {
+                const signatureResult = await this.signatures.autoSendForReservation(reservation);
+                throw new ConflictException({
+                    reason: "waiver_required",
+                    signingUrl: (signatureResult as any)?.signingUrl
+                });
+            }
         }
 
         const newTotal = reservation.totalAmount + upsellTotalCents;
@@ -1027,6 +1255,12 @@ export class PublicReservationsService {
                 } catch (emailError) {
                     console.error('[Kiosk] Failed to send payment receipt email:', emailError);
                 }
+            }
+
+            try {
+                await this.accessControl.autoGrantForReservation(id);
+            } catch (err) {
+                console.error(`[Kiosk] Access grant failed for ${id}: `, err);
             }
 
             return updated;
