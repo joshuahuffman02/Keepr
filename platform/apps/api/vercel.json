@@ -1,19 +1,16 @@
 {
     "$schema": "https://openapi.vercel.sh/vercel.json",
     "version": 2,
-    "buildCommand": "pnpm run build && pnpm prisma generate",
-    "outputDirectory": ".",
-    "installCommand": "pnpm install",
-    "functions": {
-        "api/**/*.js": {
-            "maxDuration": 30,
-            "memory": 1024
-        }
-    },
-    "rewrites": [
+    "builds": [
         {
-            "source": "/api/:path*",
-            "destination": "/api/index.js"
+            "src": "api/**/*.js",
+            "use": "@vercel/node"
+        }
+    ],
+    "routes": [
+        {
+            "src": "/(.*)",
+            "dest": "/api/index.js"
         }
     ]
 }
