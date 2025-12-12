@@ -2061,7 +2061,9 @@
   {
     "id": "1fb73457-3c15-4aaf-a470-14c931d36a90",
     "createdAt": "2025-12-12T07:20:31.132Z",
-    "status": "open",
+    "status": "completed",
+    "completedAt": "2025-12-12T17:45:00.000Z",
+    "agentNotes": "Implemented auto-tagging of sites as 'dirty' when a reservation is checked out in ReservationDetailPage.",
     "votes": 0,
     "submitter": {
       "id": "cmj2hvk2i000119y3xtzc4c7k",
@@ -2093,7 +2095,9 @@
   {
     "id": "4829acc9-e6c2-4582-8ae9-a04d3026ab79",
     "createdAt": "2025-12-12T07:21:23.278Z",
-    "status": "open",
+    "status": "completed",
+    "completedAt": "2025-12-12T17:45:00.000Z",
+    "agentNotes": "Fixed task creation form in HousekeepingPage to use 'custom' instead of 'other' for task type and corrected priority value to 'medium', ensuring API validation passes.",
     "votes": 0,
     "submitter": {
       "id": "cmj2hvk2i000119y3xtzc4c7k",

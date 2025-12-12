@@ -108,9 +108,12 @@ export default function ReservationDetailPage() {
 
   const updateReservation = useMutation({
     mutationFn: (data: any) => apiClient.updateReservation(reservationId, data),
-    onSuccess: () => {
+    onSuccess: (data, variables) => {
       queryClient.invalidateQueries({ queryKey: ["reservation", reservationId] });
       queryClient.invalidateQueries({ queryKey: ["reservations", campgroundId] });
+      if (variables.status === "checked_out" && reservation?.siteId) {
+        apiClient.updateSiteHousekeeping(reservation.siteId, "dirty");
+      }
     }
   });
 
@@ -271,13 +274,13 @@ export default function ReservationDetailPage() {
   const requiredDeposit =
     quote?.totalCents && quote?.nights
       ? computeDepositDue({
-          total: (quote?.totalCents ?? 0) / 100,
-          nights: quote?.nights ?? 1,
-          arrivalDate: reservation.arrivalDate,
-          depositRule,
-          depositPercentage,
-          depositConfig
-        })
+        total: (quote?.totalCents ?? 0) / 100,
+        nights: quote?.nights ?? 1,
+        arrivalDate: reservation.arrivalDate,
+        depositRule,
+        depositPercentage,
+        depositConfig
+      })
       : 0;
   const signatureRequests = Array.isArray(signaturesQuery.data)
     ? signaturesQuery.data
@@ -432,11 +435,10 @@ export default function ReservationDetailPage() {
               <div className="flex items-center justify-between">
                 <span className="text-slate-500">Deposit</span>
                 <span
-                  className={`px-2 py-0.5 rounded-full text-[11px] font-semibold ${
-                    paid >= requiredDeposit
+                  className={`px-2 py-0.5 rounded-full text-[11px] font-semibold ${paid >= requiredDeposit
                       ? "bg-emerald-100 text-emerald-800"
                       : "bg-amber-100 text-amber-800"
-                  }`}
+                    }`}
                 >
                   {paid >= requiredDeposit ? "Deposit covered" : `Deposit due $${Math.max(0, requiredDeposit - paid).toFixed(2)}`}
                 </span>
@@ -917,24 +919,23 @@ export default function ReservationDetailPage() {
                     })
                     .slice(0, 5)
                     .map((c: any) => (
-                    <div key={c.id} className="flex items-center justify-between rounded border border-slate-200 px-2 py-1">
-                      <div className="flex flex-col min-w-0">
-                        <span className="font-semibold text-slate-900 truncate">{c.subject || c.type || "Message"}</span>
-                        <span className="text-[11px] text-slate-500 truncate">
-                          {c.createdAt ? new Date(c.createdAt).toLocaleString() : ""}
+                      <div key={c.id} className="flex items-center justify-between rounded border border-slate-200 px-2 py-1">
+                        <div className="flex flex-col min-w-0">
+                          <span className="font-semibold text-slate-900 truncate">{c.subject || c.type || "Message"}</span>
+                          <span className="text-[11px] text-slate-500 truncate">
+                            {c.createdAt ? new Date(c.createdAt).toLocaleString() : ""}
+                          </span>
+                        </div>
+                        <span
+                          className={`text-[11px] uppercase px-2 py-0.5 rounded-full ${(c.status || "").toLowerCase().includes("fail") || (c.status || "").toLowerCase().includes("bounce")
+                              ? "bg-rose-100 text-rose-700 border border-rose-200"
+                              : "bg-emerald-100 text-emerald-700 border border-emerald-200"
+                            }`}
+                        >
+                          {(c.status || "").toString()}
                         </span>
                       </div>
-                      <span
-                        className={`text-[11px] uppercase px-2 py-0.5 rounded-full ${
-                          (c.status || "").toLowerCase().includes("fail") || (c.status || "").toLowerCase().includes("bounce")
-                            ? "bg-rose-100 text-rose-700 border border-rose-200"
-                            : "bg-emerald-100 text-emerald-700 border border-emerald-200"
-                        }`}
-                      >
-                        {(c.status || "").toString()}
-                      </span>
-                    </div>
-                  ))}
+                    ))}
                 </div>
               )}
               <div className="flex gap-2 pt-1">

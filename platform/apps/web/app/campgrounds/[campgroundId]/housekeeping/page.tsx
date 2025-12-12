@@ -91,7 +91,7 @@ export default function HousekeepingPage() {
     siteId: string;
     priority: string;
     notes: string;
-  }>({ type: "turnover", siteId: "", priority: "med", notes: "" });
+  }>({ type: "turnover", siteId: "", priority: "medium", notes: "" });
 
   const tasksQuery = useQuery({
     queryKey: ["tasks", campgroundId, stateFilter, slaFilter, typeFilter],
@@ -123,7 +123,7 @@ export default function HousekeepingPage() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["tasks", campgroundId] });
       setShowCreateModal(false);
-      setNewTask({ type: "turnover", siteId: "", priority: "med", notes: "" });
+      setNewTask({ type: "turnover", siteId: "", priority: "medium", notes: "" });
     },
   });
 
@@ -228,7 +228,7 @@ export default function HousekeepingPage() {
             <option value="all">All Types</option>
             <option value="turnover">Turnover</option>
             <option value="inspection">Inspection</option>
-            <option value="other">Other</option>
+            <option value="custom">Other</option>
           </select>
         </div>
 
@@ -326,7 +326,7 @@ export default function HousekeepingPage() {
                   >
                     <option value="turnover">Turnover</option>
                     <option value="inspection">Inspection</option>
-                    <option value="other">Other</option>
+                    <option value="custom">Other</option>
                   </select>
                 </div>
 
@@ -358,7 +358,7 @@ export default function HousekeepingPage() {
                     className="w-full mt-1 border border-slate-200 rounded px-3 py-2"
                   >
                     <option value="low">Low</option>
-                    <option value="med">Medium</option>
+                    <option value="medium">Medium</option>
                     <option value="high">High</option>
                   </select>
                 </div>
