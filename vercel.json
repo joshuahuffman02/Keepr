@@ -1,28 +1,8 @@
 {
     "$schema": "https://openapi.vercel.sh/vercel.json",
-    "version": 2,
-    "framework": null,
+    "buildCommand": "cd ../.. && pnpm build",
+    "devCommand": "cd ../.. && pnpm web",
     "installCommand": "pnpm install",
-    "buildCommand": "pnpm build",
-    "functions": {
-        "platform/apps/api/dist/serverless.js": {
-            "runtime": "nodejs20.x",
-            "maxDuration": 30,
-            "memory": 1024,
-            "includeFiles": "{platform/apps/api/src/generated/prisma/**,platform/packages/shared/dist/**,node_modules/.prisma/**,node_modules/@prisma/**}"
-        }
-    },
-    "routes": [
-        {
-            "src": "/api/(.*)",
-            "dest": "api/index.js"
-        },
-        {
-            "handle": "filesystem"
-        },
-        {
-            "src": "/(.*)",
-            "dest": "platform/apps/web/$1"
-        }
-    ]
+    "framework": "nextjs",
+    "outputDirectory": ".next"
 }
