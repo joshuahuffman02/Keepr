@@ -14,7 +14,7 @@
     "ci": "pnpm lint:web && pnpm --dir platform/apps/api test:smoke && pnpm ci:sdk && pnpm build && pnpm --dir platform/apps/web budgets && pnpm ci:e2e",
     "prepare": "simple-git-hooks",
     "build:shared": "pnpm --filter @campreserv/shared build",
-    "build:api": "pnpm --dir platform/apps/api build",
+    "build:api": "pnpm --dir platform/apps/api prisma:generate && pnpm --dir platform/apps/api build",
     "build:web": "pnpm --dir platform/apps/web build",
     "build": "pnpm build:shared && pnpm build:api && pnpm build:web",
     "test:api": "pnpm --dir platform/apps/api test",

@@ -39,6 +39,128 @@ const CATEGORIES = [
   "general",
 ];
 
+const PREBUILT_TEMPLATES = [
+  {
+    name: "Booking Confirmation",
+    category: "confirmation",
+    channel: "email" as const,
+    subject: "Your reservation at {{campground_name}} is confirmed!",
+    html: `<h1>Hi {{guest_name}}!</h1>
+<p>Great news! Your reservation has been confirmed.</p>
+<p><strong>Reservation Details:</strong></p>
+<ul>
+  <li>Site: {{site_number}}</li>
+  <li>Check-in: {{arrival_date}}</li>
+  <li>Check-out: {{departure_date}}</li>
+  <li>Confirmation #: {{reservation_id}}</li>
+</ul>
+<p>We can't wait to welcome you!</p>
+<p>— The {{campground_name}} Team</p>`,
+    textBody: null,
+  },
+  {
+    name: "Booking Reminder (3 Days)",
+    category: "reminder",
+    channel: "email" as const,
+    subject: "Your camping trip is almost here!",
+    html: `<h1>Hey {{guest_name}}!</h1>
+<p>Your adventure at {{campground_name}} starts in just 3 days!</p>
+<p><strong>Quick reminder:</strong></p>
+<ul>
+  <li>Site: {{site_number}}</li>
+  <li>Arrival: {{arrival_date}}</li>
+  <li>Departure: {{departure_date}}</li>
+</ul>
+<p>Don't forget to pack the s'mores supplies! 🏕️</p>`,
+    textBody: null,
+  },
+  {
+    name: "Check-In Reminder",
+    category: "reminder",
+    channel: "sms" as const,
+    subject: null,
+    html: null,
+    textBody: "Hi {{guest_name}}! Your check-in at {{campground_name}} is today. Site {{site_number}} is ready for you. See you soon!",
+  },
+  {
+    name: "Payment Received",
+    category: "payment",
+    channel: "email" as const,
+    subject: "Payment received - Thank you!",
+    html: `<h1>Payment Confirmed</h1>
+<p>Hi {{guest_name}},</p>
+<p>We've received your payment of {{amount}}.</p>
+<p><strong>Reservation:</strong> {{reservation_id}}<br/>
+<strong>Remaining balance:</strong> {{balance_due}}</p>
+<p>Thank you for choosing {{campground_name}}!</p>`,
+    textBody: null,
+  },
+  {
+    name: "Payment Due Reminder",
+    category: "payment",
+    channel: "email" as const,
+    subject: "Friendly reminder: Balance due for your upcoming stay",
+    html: `<h1>Balance Reminder</h1>
+<p>Hi {{guest_name}},</p>
+<p>Just a friendly reminder that you have an outstanding balance of <strong>{{balance_due}}</strong> for your reservation at {{campground_name}}.</p>
+<p><strong>Reservation:</strong> {{reservation_id}}<br/>
+<strong>Arrival:</strong> {{arrival_date}}</p>
+<p>Please complete your payment to secure your site.</p>`,
+    textBody: null,
+  },
+  {
+    name: "Check-Out Thank You",
+    category: "confirmation",
+    channel: "email" as const,
+    subject: "Thanks for staying with us!",
+    html: `<h1>Thanks for visiting, {{guest_name}}!</h1>
+<p>We hope you had an amazing time at {{campground_name}}!</p>
+<p>We'd love to hear about your experience. If you have a moment, please leave us a review.</p>
+<p>Safe travels, and we hope to see you again soon! 🌲</p>`,
+    textBody: null,
+  },
+  {
+    name: "Cancellation Confirmation",
+    category: "booking",
+    channel: "email" as const,
+    subject: "Your reservation has been cancelled",
+    html: `<h1>Reservation Cancelled</h1>
+<p>Hi {{guest_name}},</p>
+<p>Your reservation ({{reservation_id}}) at {{campground_name}} has been cancelled as requested.</p>
+<p>If this was a mistake or you'd like to rebook, please contact us.</p>
+<p>We hope to host you another time!</p>`,
+    textBody: null,
+  },
+  {
+    name: "Welcome SMS",
+    category: "operational",
+    channel: "sms" as const,
+    subject: null,
+    html: null,
+    textBody: "Welcome to {{campground_name}}, {{guest_name}}! Your site {{site_number}} is ready. Office hours: 8am-8pm. Enjoy your stay!",
+  },
+  {
+    name: "Seasonal Promotion",
+    category: "marketing",
+    channel: "email" as const,
+    subject: "Special offer just for you! 🏕️",
+    html: `<h1>{{guest_name}}, we miss you!</h1>
+<p>It's been a while since your last visit to {{campground_name}}.</p>
+<p>Book your next adventure and enjoy exclusive returning guest rates!</p>
+<p>Use code <strong>WELCOME10</strong> for 10% off your next stay.</p>
+<p>See you soon under the stars! ⭐</p>`,
+    textBody: null,
+  },
+  {
+    name: "Weather Alert",
+    category: "operational",
+    channel: "sms" as const,
+    subject: null,
+    html: null,
+    textBody: "{{campground_name}} Alert: Weather advisory in effect. Please secure loose items and check in at the office if you need assistance.",
+  },
+];
+
 export default function TemplatesPage() {
   const [campgroundId, setCampgroundId] = useState<string | null>(null);
   const [selectedTemplate, setSelectedTemplate] = useState<Template | null>(null);
@@ -197,6 +319,15 @@ export default function TemplatesPage() {
             </div>
           </div>
         </div>
+
+        {/* Prebuilt Templates Gallery */}
+        <PrebuiltTemplatesGallery
+          campgroundId={campgroundId}
+          existingTemplateNames={templates.map((t: Template) => t.name)}
+          onTemplateAdded={() => {
+            queryClient.invalidateQueries({ queryKey: ["campaign-templates"] });
+          }}
+        />
 
         {/* Create Modal */}
         {showCreateModal && (
@@ -438,8 +569,8 @@ function CreateTemplateModal({
                 type="button"
                 onClick={() => setChannel("email")}
                 className={`flex-1 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${channel === "email"
-                    ? "bg-violet-100 text-violet-700 border-2 border-violet-300"
-                    : "bg-slate-50 text-slate-600 border border-slate-200"
+                  ? "bg-violet-100 text-violet-700 border-2 border-violet-300"
+                  : "bg-slate-50 text-slate-600 border border-slate-200"
                   }`}
               >
                 📧 Email
@@ -448,8 +579,8 @@ function CreateTemplateModal({
                 type="button"
                 onClick={() => setChannel("sms")}
                 className={`flex-1 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${channel === "sms"
-                    ? "bg-violet-100 text-violet-700 border-2 border-violet-300"
-                    : "bg-slate-50 text-slate-600 border border-slate-200"
+                  ? "bg-violet-100 text-violet-700 border-2 border-violet-300"
+                  : "bg-slate-50 text-slate-600 border border-slate-200"
                   }`}
               >
                 📱 SMS
@@ -487,6 +618,103 @@ function CreateTemplateModal({
             </button>
           </div>
         </form>
+      </div>
+    </div>
+  );
+}
+
+function PrebuiltTemplatesGallery({
+  campgroundId,
+  existingTemplateNames,
+  onTemplateAdded,
+}: {
+  campgroundId: string;
+  existingTemplateNames: string[];
+  onTemplateAdded: () => void;
+}) {
+  const [addingTemplate, setAddingTemplate] = useState<string | null>(null);
+
+  const handleAddTemplate = async (template: typeof PREBUILT_TEMPLATES[0]) => {
+    setAddingTemplate(template.name);
+    try {
+      await apiClient.createCampaignTemplate(campgroundId, {
+        name: template.name,
+        channel: template.channel,
+        category: template.category,
+        subject: template.subject || undefined,
+        html: template.html || undefined,
+        textBody: template.textBody || undefined,
+      });
+      onTemplateAdded();
+    } catch (err) {
+      console.error("Failed to add prebuilt template:", err);
+    } finally {
+      setAddingTemplate(null);
+    }
+  };
+
+  const alreadyAdded = (name: string) => existingTemplateNames.includes(name);
+
+  return (
+    <div className="mt-8 bg-white rounded-xl border border-slate-200 p-6">
+      <div className="flex items-center justify-between mb-4">
+        <div>
+          <h3 className="text-lg font-semibold text-slate-900">📋 Prebuilt Templates</h3>
+          <p className="text-sm text-slate-500">One-click add common campground notification templates</p>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        {PREBUILT_TEMPLATES.map(template => {
+          const added = alreadyAdded(template.name);
+          const isAdding = addingTemplate === template.name;
+
+          return (
+            <div
+              key={template.name}
+              className={`border rounded-lg p-4 transition-all ${added
+                  ? "bg-slate-50 border-slate-200 opacity-60"
+                  : "bg-white border-slate-200 hover:border-violet-300 hover:shadow-sm"
+                }`}
+            >
+              <div className="flex items-start justify-between mb-2">
+                <div className="flex items-center gap-2">
+                  <span className="text-lg">{template.channel === "email" ? "📧" : "📱"}</span>
+                  <span className="font-medium text-slate-900 text-sm">{template.name}</span>
+                </div>
+                <span className="text-[10px] uppercase text-slate-500 bg-slate-100 px-2 py-0.5 rounded">
+                  {template.category}
+                </span>
+              </div>
+
+              <p className="text-xs text-slate-500 mb-3 line-clamp-2">
+                {template.channel === "email"
+                  ? template.subject
+                  : template.textBody?.slice(0, 60) + "..."}
+              </p>
+
+              {added ? (
+                <span className="text-xs text-green-600 flex items-center gap-1">
+                  ✓ Already added
+                </span>
+              ) : (
+                <button
+                  onClick={() => handleAddTemplate(template)}
+                  disabled={isAdding}
+                  className="w-full px-3 py-1.5 text-xs font-medium text-violet-600 bg-violet-50 rounded-lg hover:bg-violet-100 transition-colors disabled:opacity-50"
+                >
+                  {isAdding ? "Adding..." : "+ Add Template"}
+                </button>
+              )}
+            </div>
+          );
+        })}
+      </div>
+
+      <div className="mt-4 pt-4 border-t border-slate-100">
+        <p className="text-xs text-slate-400">
+          💡 <strong>Tip:</strong> After adding a template, you can customize the content and attach it to notification triggers in Settings → Notification Triggers.
+        </p>
       </div>
     </div>
   );

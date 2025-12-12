@@ -3,7 +3,7 @@
     "version": 2,
     "framework": null,
     "installCommand": "pnpm install",
-    "buildCommand": "pnpm --dir platform/packages/shared build && pnpm --dir platform/apps/api prisma:generate && pnpm --dir platform/apps/api build && pnpm --dir platform/apps/web build",
+    "buildCommand": "pnpm build",
     "functions": {
         "platform/apps/api/dist/serverless.js": {
             "runtime": "nodejs20.x",

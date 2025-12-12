@@ -139,6 +139,23 @@ export default function PrivacySettingsPage() {
       <div className="space-y-6">
         <Breadcrumbs items={[{ label: "Settings" }, { label: "Privacy & PII" }]} />
 
+        {/* How It Works Section */}
+        <div className="bg-gradient-to-r from-emerald-50 to-teal-50 border border-emerald-200 rounded-lg p-4">
+          <div className="flex items-start gap-3">
+            <div className="text-2xl">🔐</div>
+            <div className="space-y-2">
+              <h4 className="font-semibold text-emerald-900">How Privacy Settings Work</h4>
+              <div className="text-sm text-slate-700 space-y-1">
+                <p><strong>DSR Export:</strong> Generate Data Subject Request exports for GDPR/CCPA compliance. Downloads all PII rules and consent records for a guest or campground.</p>
+                <p><strong>Redaction Dashboard:</strong> Test how your PII rules work by running sample data through the redaction engine. Great for verifying your privacy setup.</p>
+                <p><strong>Privacy Defaults:</strong> Enable/disable PII redaction in logs, require consent for communications, and set backup retention windows.</p>
+                <p><strong>Consent Log:</strong> Track when and how guests gave consent for data processing—required for marketing communications in some regions.</p>
+                <p><strong>PII Tags:</strong> Define which fields contain sensitive data and how they should be handled (masked or removed).</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
         <div className="card p-4 space-y-2">
           <div className="flex items-center justify-between">
             <div>

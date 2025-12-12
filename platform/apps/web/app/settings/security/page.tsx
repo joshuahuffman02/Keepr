@@ -179,6 +179,24 @@ export default function SecuritySettingsPage() {
           </div>
         </div>
 
+        {/* How It Works Section */}
+        <Card className="bg-gradient-to-r from-violet-50 to-indigo-50 border-violet-200">
+          <CardContent className="py-4">
+            <div className="flex items-start gap-3">
+              <Shield className="w-5 h-5 text-violet-600 mt-0.5 flex-shrink-0" />
+              <div className="space-y-2">
+                <h4 className="font-semibold text-violet-900">How Security Settings Work</h4>
+                <div className="text-sm text-slate-700 space-y-1">
+                  <p><strong>Privacy Defaults:</strong> Control how PII (Personally Identifiable Information) is handled across your campground. Toggle redaction to mask sensitive data in logs, and require consent before sending communications.</p>
+                  <p><strong>PII Tags:</strong> Track which data fields contain sensitive information. These tags determine what gets masked or removed when redaction is enabled.</p>
+                  <p><strong>Backup & DR:</strong> View your backup status and retention window. Use "Simulate restore" to run disaster recovery drills (no actual data is moved).</p>
+                  <p><strong>Audit Log:</strong> Review recent security-relevant events like logins, permission changes, and data access.</p>
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
           <Card className="lg:col-span-2">
             <CardHeader className="flex flex-row items-start justify-between space-y-0">
