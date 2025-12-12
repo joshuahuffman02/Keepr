@@ -20,11 +20,11 @@ export default defineConfig([
   },
   // Vercel serverless build (output to api/ folder)
   {
-    entry: { "app.bootstrap": "src/app.bootstrap.ts" },
+    entry: { "index": "src/serverless.ts" },
     format: ["cjs"],
     platform: "node",
     target: "node20",
-    outDir: "api",
+    outDir: "../../api",
     sourcemap: false,
     clean: false,
     splitting: false,

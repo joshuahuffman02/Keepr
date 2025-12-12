@@ -112,7 +112,9 @@ export default function ReservationDetailPage() {
       queryClient.invalidateQueries({ queryKey: ["reservation", reservationId] });
       queryClient.invalidateQueries({ queryKey: ["reservations", campgroundId] });
       if (variables.status === "checked_out" && reservation?.siteId) {
-        apiClient.updateSiteHousekeeping(reservation.siteId, "dirty");
+        apiClient.updateSiteHousekeeping(reservation.siteId, "dirty").catch(err => {
+          console.error("Failed to update site housekeeping status:", err);
+        });
       }
     }
   });
@@ -436,8 +438,8 @@ export default function ReservationDetailPage() {
                 <span className="text-slate-500">Deposit</span>
                 <span
                   className={`px-2 py-0.5 rounded-full text-[11px] font-semibold ${paid >= requiredDeposit
-                      ? "bg-emerald-100 text-emerald-800"
-                      : "bg-amber-100 text-amber-800"
+                    ? "bg-emerald-100 text-emerald-800"
+                    : "bg-amber-100 text-amber-800"
                     }`}
                 >
                   {paid >= requiredDeposit ? "Deposit covered" : `Deposit due $${Math.max(0, requiredDeposit - paid).toFixed(2)}`}
@@ -928,8 +930,8 @@ export default function ReservationDetailPage() {
                         </div>
                         <span
                           className={`text-[11px] uppercase px-2 py-0.5 rounded-full ${(c.status || "").toLowerCase().includes("fail") || (c.status || "").toLowerCase().includes("bounce")
-                              ? "bg-rose-100 text-rose-700 border border-rose-200"
-                              : "bg-emerald-100 text-emerald-700 border border-emerald-200"
+                            ? "bg-rose-100 text-rose-700 border border-rose-200"
+                            : "bg-emerald-100 text-emerald-700 border border-emerald-200"
                             }`}
                         >
                           {(c.status || "").toString()}

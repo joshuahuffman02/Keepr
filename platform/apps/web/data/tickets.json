@@ -2096,8 +2096,8 @@
     "id": "4829acc9-e6c2-4582-8ae9-a04d3026ab79",
     "createdAt": "2025-12-12T07:21:23.278Z",
     "status": "completed",
-    "completedAt": "2025-12-12T17:45:00.000Z",
-    "agentNotes": "Fixed task creation form in HousekeepingPage to use 'custom' instead of 'other' for task type and corrected priority value to 'medium', ensuring API validation passes.",
+    "completedAt": "2025-12-12T17:55:00.000Z",
+    "agentNotes": "Fixed task creation form in HousekeepingPage. Reverted 'other'->'custom' change as API/DB expects 'other'. Corrected priority value to 'medium', ensuring API validation passes.",
     "votes": 0,
     "submitter": {
       "id": "cmj2hvk2i000119y3xtzc4c7k",

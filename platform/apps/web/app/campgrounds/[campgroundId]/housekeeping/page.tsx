@@ -228,7 +228,7 @@ export default function HousekeepingPage() {
             <option value="all">All Types</option>
             <option value="turnover">Turnover</option>
             <option value="inspection">Inspection</option>
-            <option value="custom">Other</option>
+            <option value="other">Other</option>
           </select>
         </div>
 
@@ -326,7 +326,7 @@ export default function HousekeepingPage() {
                   >
                     <option value="turnover">Turnover</option>
                     <option value="inspection">Inspection</option>
-                    <option value="custom">Other</option>
+                    <option value="other">Other</option>
                   </select>
                 </div>
 

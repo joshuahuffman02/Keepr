@@ -9,13 +9,13 @@
             "runtime": "nodejs20.x",
             "maxDuration": 30,
             "memory": 1024,
-            "includeFiles": "platform/apps/api/src/generated/prisma/** platform/packages/shared/dist/** node_modules/.prisma/** node_modules/@prisma/**"
+            "includeFiles": "{platform/apps/api/src/generated/prisma/**,platform/packages/shared/dist/**,node_modules/.prisma/**,node_modules/@prisma/**}"
         }
     },
     "routes": [
         {
             "src": "/api/(.*)",
-            "dest": "platform/apps/api/dist/serverless.js"
+            "dest": "api/index.js"
         },
         {
             "handle": "filesystem"
