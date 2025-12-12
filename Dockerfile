@@ -32,4 +32,4 @@ COPY package.json pnpm-workspace.yaml ./
 
 WORKDIR /app/platform/apps/web
 EXPOSE 3000
-CMD ["node_modules/.bin/next", "start"]
+CMD ["/app/node_modules/.bin/next", "start", "-p", "3000"]
