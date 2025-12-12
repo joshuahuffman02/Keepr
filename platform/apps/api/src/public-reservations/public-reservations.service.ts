@@ -242,7 +242,11 @@ export class PublicReservationsService {
 
         // Tax rules (inclusive vs exclusive)
         const taxRules = await this.prisma.taxRule.findMany({
-            where: { campgroundId, type: "tax" as TaxRuleType, isActive: true }
+            where: {
+                campgroundId,
+                type: { in: [TaxRuleType.percentage, TaxRuleType.flat] },
+                isActive: true
+            }
         });
 
         const inclusiveRules = taxRules.filter((r: any) => Boolean((r as any).inclusive));
@@ -1058,6 +1062,7 @@ export class PublicReservationsService {
             } catch (error: any) {
                 console.error("Error creating reservation:", error);
                 throw new BadRequestException(`Failed to create reservation: ${error.message} `);
+
             }
         });
     }

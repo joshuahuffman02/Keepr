@@ -21,7 +21,7 @@ interface VideoTutorial {
 const tutorials: VideoTutorial[] = [
   {
     id: "getting-started",
-    title: "Getting Started with Campreserv",
+    title: "Getting Started with Camp Everyday",
     description: "Complete overview of the system, navigation, and key features",
     duration: "8:30",
     category: "Getting Started",
@@ -175,7 +175,7 @@ export default function TutorialsPage() {
             <div>
               <h1 className="text-2xl font-bold text-slate-900 mb-2">Video Tutorials</h1>
               <p className="text-slate-600">
-                Step-by-step video guides to master Campreserv features
+                Step-by-step video guides to master Camp Everyday features
               </p>
             </div>
             <div className="px-3 py-1.5 bg-emerald-50 border border-emerald-200 rounded-lg text-sm font-medium text-emerald-700">
@@ -187,11 +187,10 @@ export default function TutorialsPage() {
           <div className="flex items-center gap-2 flex-wrap mt-4">
             <button
               onClick={() => setSelectedCategory("all")}
-              className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                selectedCategory === "all"
+              className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${selectedCategory === "all"
                   ? "bg-emerald-100 text-emerald-700"
                   : "bg-slate-100 text-slate-600 hover:bg-slate-200"
-              }`}
+                }`}
             >
               All Videos ({tutorials.length})
             </button>
@@ -201,11 +200,10 @@ export default function TutorialsPage() {
                 <button
                   key={cat}
                   onClick={() => setSelectedCategory(cat)}
-                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                    selectedCategory === cat
+                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${selectedCategory === cat
                       ? "bg-emerald-100 text-emerald-700"
                       : "bg-slate-100 text-slate-600 hover:bg-slate-200"
-                  }`}
+                    }`}
                 >
                   {cat} ({count})
                 </button>
@@ -217,11 +215,10 @@ export default function TutorialsPage() {
             <span className="text-xs font-semibold text-slate-700 uppercase">Difficulty</span>
             <button
               onClick={() => setSelectedDifficulty("all")}
-              className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors ${
-                selectedDifficulty === "all"
+              className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors ${selectedDifficulty === "all"
                   ? "bg-blue-100 text-blue-700"
                   : "bg-slate-100 text-slate-600 hover:bg-slate-200"
-              }`}
+                }`}
             >
               All
             </button>
@@ -229,11 +226,10 @@ export default function TutorialsPage() {
               <button
                 key={level}
                 onClick={() => setSelectedDifficulty(level)}
-                className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors ${
-                  selectedDifficulty === level
+                className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors ${selectedDifficulty === level
                     ? "bg-blue-100 text-blue-700"
                     : "bg-slate-100 text-slate-600 hover:bg-slate-200"
-                }`}
+                  }`}
               >
                 {level}
               </button>
@@ -259,11 +255,10 @@ export default function TutorialsPage() {
               <div className="p-5 space-y-3">
                 <div className="flex items-center gap-2 text-xs text-slate-500">
                   <span className="px-2 py-0.5 rounded bg-emerald-50 text-emerald-700 font-semibold">{featuredTutorial.category}</span>
-                  <span className={`px-2 py-0.5 rounded ${
-                    featuredTutorial.difficulty === "Beginner" ? "bg-blue-100 text-blue-700" :
-                    featuredTutorial.difficulty === "Intermediate" ? "bg-amber-100 text-amber-700" :
-                    "bg-rose-100 text-rose-700"
-                  }`}>
+                  <span className={`px-2 py-0.5 rounded ${featuredTutorial.difficulty === "Beginner" ? "bg-blue-100 text-blue-700" :
+                      featuredTutorial.difficulty === "Intermediate" ? "bg-amber-100 text-amber-700" :
+                        "bg-rose-100 text-rose-700"
+                    }`}>
                     {featuredTutorial.difficulty}
                   </span>
                 </div>
@@ -325,11 +320,10 @@ export default function TutorialsPage() {
               <div className="p-4">
                 <div className="flex items-center gap-2 mb-2">
                   <span className="text-xs font-medium text-emerald-600">{video.category}</span>
-                  <span className={`text-xs px-2 py-0.5 rounded ${
-                    video.difficulty === "Beginner" ? "bg-blue-100 text-blue-700" :
-                    video.difficulty === "Intermediate" ? "bg-amber-100 text-amber-700" :
-                    "bg-rose-100 text-rose-700"
-                  }`}>
+                  <span className={`text-xs px-2 py-0.5 rounded ${video.difficulty === "Beginner" ? "bg-blue-100 text-blue-700" :
+                      video.difficulty === "Intermediate" ? "bg-amber-100 text-amber-700" :
+                        "bg-rose-100 text-rose-700"
+                    }`}>
                     {video.difficulty}
                   </span>
                 </div>

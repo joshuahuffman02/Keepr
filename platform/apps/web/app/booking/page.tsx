@@ -461,7 +461,12 @@ function NewReservationInner() {
   };
 
   const handleProcessPayment = async () => {
-    const totalInCents = (nights * ratePerNight) + siteLockFee;
+    const upsellTotal = selectedUpsells.reduce((acc, id) => {
+      const item = upsellOptions.find(o => o.id === id);
+      return acc + (item?.price || 0);
+    }, 0);
+
+    const totalInCents = (nights * ratePerNight) + siteLockFee + upsellTotal;
     const paidInCents = Math.round(paymentData.paymentAmount * 100);
     const balanceInCents = Math.max(0, totalInCents - paidInCents);
     const normalizedRigType = formData.rvType || null;
@@ -526,7 +531,13 @@ function NewReservationInner() {
   const sitesInSelectedClass = sitesQuery.data?.filter((s: any) => s.siteClassId === formData.siteClassId) || [];
   const ratePerNight = selectedSiteClass?.defaultRate || 5000;
   const siteLockFee = formData.lockSpecificSite ? SITE_LOCK_FEE : 0;
-  const subtotal = (nights * ratePerNight / 100) + (siteLockFee / 100);
+
+  const upsellTotal = selectedUpsells.reduce((acc, id) => {
+    const item = upsellOptions.find(o => o.id === id);
+    return acc + (item?.price || 0);
+  }, 0);
+
+  const subtotal = (nights * ratePerNight / 100) + (siteLockFee / 100) + (upsellTotal / 100);
   const tax = subtotal * 0.08; // 8% tax
   const total = subtotal + tax;
 

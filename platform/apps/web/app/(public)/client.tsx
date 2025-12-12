@@ -294,7 +294,7 @@ export function HomeClient() {
                 )}
             </section>
 
-            {/* Why Campreserv Section */}
+            {/* Why Camp Everyday Section */}
             <section className="bg-slate-50 py-20">
                 <div className="max-w-7xl mx-auto px-6">
                     <div className="text-center mb-12">

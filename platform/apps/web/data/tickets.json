@@ -26,7 +26,8 @@
       "language": null,
       "deviceType": "unknown"
     },
-    "category": "issue"
+    "category": "issue",
+    "area": "General"
   },
   {
     "id": "2df28c9e-2da1-4f0d-8caf-ca1f3558df80",
@@ -60,7 +61,8 @@
     },
     "completedAt": "2025-12-10T13:18:04.318Z",
     "agentNotes": "Adjusted homepage search bar for mobile: stack layout with extra gap, reduced padding/font sizes, and made filter/search buttons full width so text no longer feels cramped on small screens.",
-    "category": "issue"
+    "category": "issue",
+    "area": "UI/UX"
   },
   {
     "id": "4081fb65-fca8-49d6-ac6c-8991dc6f1c82",
@@ -94,7 +96,8 @@
     },
     "completedAt": "2025-12-10T13:21:25.418Z",
     "agentNotes": "Locked help page to staff: load whoami, show staff-only message with sign-in link when not authorized, and keep skeleton while loading.",
-    "category": "issue"
+    "category": "issue",
+    "area": "Auth"
   },
   {
     "id": "5aed4125-146f-44fb-b903-c58e49d803e1",
@@ -128,7 +131,8 @@
     },
     "completedAt": "2025-12-10T13:21:25.421Z",
     "agentNotes": "Added close-confirm to ticket dialog so drafts aren’t lost; keeps data unless user confirms discard.",
-    "category": "issue"
+    "category": "issue",
+    "area": "General"
   },
   {
     "id": "9b1d4a36-0306-4a9d-8216-606dd798a3d0",
@@ -162,7 +166,8 @@
     },
     "completedAt": "2025-12-10T14:05:00.000Z",
     "agentNotes": "Raised the floating ticket widget z-index to 1200 so it sits above overlays/modals. Please retry; if it still disappears, note the page and screen size.",
-    "category": "issue"
+    "category": "issue",
+    "area": "UI/UX"
   },
   {
     "id": "4937a6ab-c051-462e-a27d-93d757c032f9",
@@ -196,7 +201,8 @@
     },
     "completedAt": "2025-12-10T15:07:19.449Z",
     "agentNotes": "Booking: create-guest now saves rig type/length to the guest record and selects the values immediately; when editing an existing guest, new rig type/length entries are persisted before creating the reservation so RV details stay attached to the guest.",
-    "category": "issue"
+    "category": "issue",
+    "area": "UI/UX"
   },
   {
     "id": "25f54160-8bce-4389-8d28-cc258e8d92fb",
@@ -230,7 +236,8 @@
     },
     "completedAt": "2025-12-10T15:12:36.664Z",
     "agentNotes": "Homepage sort dropdown now stacks and spans full width on mobile to remove squish; heading/sort row uses responsive layout for small screens.",
-    "category": "issue"
+    "category": "issue",
+    "area": "UI/UX"
   },
   {
     "id": "1dd34e41-5209-41df-978f-fe74058f55f3",
@@ -264,7 +271,8 @@
     },
     "completedAt": "2025-12-10T15:13:22.292Z",
     "agentNotes": "Homepage now uses a fixed-width container on mobile (~480px max, centered) to prevent layout resizing and keep a consistent phone-app feel; larger screens remain fluid.",
-    "category": "issue"
+    "category": "issue",
+    "area": "UI/UX"
   },
   {
     "id": "504dcdb5-a0ef-4195-ab94-5e2c5b12ba67",
@@ -298,7 +306,8 @@
     },
     "completedAt": "2025-12-10T15:14:29.843Z",
     "agentNotes": "Dashboard “Resolve” link in Attention list now stays inside a proper button on mobile: row stacks on small screens, adds spacing, and keeps amount/resolve aligned without wrapping out of the button.",
-    "category": "issue"
+    "category": "issue",
+    "area": "General"
   },
   {
     "id": "f1e3ddd6-eaf1-4f8f-841c-3b9f763ed92b",
@@ -332,7 +341,8 @@
     },
     "completedAt": "2025-12-10T15:15:33.977Z",
     "agentNotes": "Dashboard Recent Activity rows now add spacing and stack on small screens; date badge has its own column so the “reservation” info no longer collides on mobile.",
-    "category": "issue"
+    "category": "issue",
+    "area": "UI/UX"
   },
   {
     "id": "75b44e21-00fc-4e4e-9fb1-94680f3cc983",
@@ -366,7 +376,8 @@
     },
     "agentNotes": "I had another agent fix it",
     "category": "issue",
-    "completedAt": "2025-12-10T16:45:40.922Z"
+    "completedAt": "2025-12-10T16:45:40.922Z",
+    "area": "Reservations"
   },
   {
     "id": "4a1c0070-e7fe-4acf-96db-c59139087ed6",
@@ -400,7 +411,8 @@
       "deviceType": "desktop"
     },
     "completedAt": "2025-12-10T16:51:28.284Z",
-    "agentNotes": "Added global auth middleware to gate staff/dashboard routes; unauthenticated users are redirected to sign-in and public pages remain open."
+    "agentNotes": "Added global auth middleware to gate staff/dashboard routes; unauthenticated users are redirected to sign-in and public pages remain open.",
+    "area": "Admin"
   },
   {
     "id": "9d4c886b-1736-4c42-a08b-ca0576e1e4a0",
@@ -434,7 +446,8 @@
       "deviceType": "desktop"
     },
     "completedAt": "2025-12-11T01:59:59.583Z",
-    "agentNotes": "Notifications bell now has working mark-resolved/read with local state: items mark as resolved/read and can be opened; footer points to inbox instead of roadmap updates. Added open buttons and fixed badge counts."
+    "agentNotes": "Notifications bell now has working mark-resolved/read with local state: items mark as resolved/read and can be opened; footer points to inbox instead of roadmap updates. Added open buttons and fixed badge counts.",
+    "area": "General"
   },
   {
     "id": "de3c223f-9350-44b9-b824-8c45cfc386e7",
@@ -468,7 +481,8 @@
       "deviceType": "mobile"
     },
     "completedAt": "2025-12-11T02:10:29.581Z",
-    "agentNotes": "Hearts now persist locally in your browser (saved list stored on this device). A helper note explains this near Featured; hearting updates local storage so favorites stick between visits.\n\nResponse: cool, shouldmt it save to the users, the guest, list of favs?"
+    "agentNotes": "Hearts now persist locally in your browser (saved list stored on this device). A helper note explains this near Featured; hearting updates local storage so favorites stick between visits.\n\nResponse: cool, shouldmt it save to the users, the guest, list of favs?",
+    "area": "General"
   },
   {
     "id": "f552716e-2894-4a7a-b82a-fc169f934330",
@@ -502,7 +516,8 @@
       "deviceType": "mobile"
     },
     "completedAt": "2025-12-11T02:03:04.868Z",
-    "agentNotes": "Renamed homepage lead-capture section to “Request a demo”, removed internal/CRM language, clarified no external sync; CTA title now “Request a walkthrough.”"
+    "agentNotes": "Renamed homepage lead-capture section to “Request a demo”, removed internal/CRM language, clarified no external sync; CTA title now “Request a walkthrough.”",
+    "area": "General"
   },
   {
     "id": "eeb5c942-c68d-40eb-af11-fea88ff8b71a",
@@ -536,7 +551,8 @@
       "deviceType": "mobile"
     },
     "completedAt": "2025-12-11T02:34:23.771Z",
-    "agentNotes": "Owners page now shows real product imagery for hero and feature previews; swapped placeholders for actual dashboard/feature screenshots and refreshed floating stats copy."
+    "agentNotes": "Owners page now shows real product imagery for hero and feature previews; swapped placeholders for actual dashboard/feature screenshots and refreshed floating stats copy.",
+    "area": "General"
   },
   {
     "id": "17148171-3536-483a-84cd-4d46ded0dac3",
@@ -570,7 +586,8 @@
       "deviceType": "mobile"
     },
     "completedAt": "2025-12-11T02:25:44.767Z",
-    "agentNotes": "Owners “Popular Features” tabs now scroll the preview into view on mobile, so you don’t have to scroll back up to see the content."
+    "agentNotes": "Owners “Popular Features” tabs now scroll the preview into view on mobile, so you don’t have to scroll back up to see the content.",
+    "area": "General"
   },
   {
     "id": "ac192128-2833-4838-b12e-65578a5ea5ff",
@@ -604,7 +621,8 @@
       "deviceType": "mobile"
     },
     "completedAt": "2025-12-11T03:21:08.510Z",
-    "agentNotes": "Demo requests (lead form) are saved to Admin > Marketing > Leads (per campground). Statuses new/contacted/qualified and a stubbed “Sync to CRM” are available; no external CRM calls are made."
+    "agentNotes": "Demo requests (lead form) are saved to Admin > Marketing > Leads (per campground). Statuses new/contacted/qualified and a stubbed “Sync to CRM” are available; no external CRM calls are made.",
+    "area": "General"
   },
   {
     "id": "86da3289-8ebc-4a19-b75a-6149536303e4",
@@ -638,7 +656,8 @@
       "deviceType": "mobile"
     },
     "completedAt": "2025-12-11T02:04:38.827Z",
-    "agentNotes": "Blog page now includes the standard public header and footer for consistent navigation and branding."
+    "agentNotes": "Blog page now includes the standard public header and footer for consistent navigation and branding.",
+    "area": "General"
   },
   {
     "id": "6bd5368d-41a1-4f06-868e-77d021fc28fc",
@@ -672,7 +691,8 @@
       "deviceType": "mobile"
     },
     "completedAt": "2025-12-11T02:41:14.361Z",
-    "agentNotes": "Added public developers page (API preview) and case studies page; placeholders removed for missing API/case study pages."
+    "agentNotes": "Added public developers page (API preview) and case studies page; placeholders removed for missing API/case study pages.",
+    "area": "General"
   },
   {
     "id": "130a5c69-ba2f-42eb-918f-1b2f8c6dd09b",
@@ -706,7 +726,8 @@
       "deviceType": "mobile"
     },
     "completedAt": "2025-12-11T02:32:28.139Z",
-    "agentNotes": "Security page now flags content as in-progress, removes overstated claims, and clarifies current vs planned controls (encryption, infra, MFA rollout, backups, IR)."
+    "agentNotes": "Security page now flags content as in-progress, removes overstated claims, and clarifies current vs planned controls (encryption, infra, MFA rollout, backups, IR).",
+    "area": "General"
   },
   {
     "id": "dad40253-e604-44e9-8125-b12175967475",
@@ -740,7 +761,8 @@
       "deviceType": "mobile"
     },
     "completedAt": "2025-12-11T02:41:14.373Z",
-    "agentNotes": "Added public careers page outlining roles, culture, and early hiring plan."
+    "agentNotes": "Added public careers page outlining roles, culture, and early hiring plan.",
+    "area": "General"
   },
   {
     "id": "d3c75231-5a58-4f3e-b632-5709145a5fe5",
@@ -774,7 +796,8 @@
       "deviceType": "mobile"
     },
     "completedAt": "2025-12-11T02:22:53.677Z",
-    "agentNotes": "Owners page nav links now scroll to sections: resources, pricing, about anchored."
+    "agentNotes": "Owners page nav links now scroll to sections: resources, pricing, about anchored.",
+    "area": "General"
   },
   {
     "id": "4979c606-b20a-471d-b385-d2d5e221c3a3",
@@ -808,7 +831,8 @@
       "deviceType": "mobile"
     },
     "completedAt": "2025-12-11T02:22:53.683Z",
-    "agentNotes": "Added prominent “Book a Campsite” link in owners header (desktop/mobile) to get back to public booking quickly."
+    "agentNotes": "Added prominent “Book a Campsite” link in owners header (desktop/mobile) to get back to public booking quickly.",
+    "area": "Reservations"
   },
   {
     "id": "2881254f-2c03-4f63-adb6-01d5c700a2b3",
@@ -842,7 +866,8 @@
       "deviceType": "mobile"
     },
     "completedAt": "2025-12-11T02:44:09.258Z",
-    "agentNotes": "Cards now say “Reviews coming soon” for campgrounds without ratings; external listings labeled accordingly."
+    "agentNotes": "Cards now say “Reviews coming soon” for campgrounds without ratings; external listings labeled accordingly.",
+    "area": "General"
   },
   {
     "id": "7de277e2-685a-48b4-adea-358cce5b9d60",
@@ -876,7 +901,8 @@
       "deviceType": "mobile"
     },
     "completedAt": "2025-12-11T02:44:09.257Z",
-    "agentNotes": "External campgrounds now show an “External” tag and a “Suggest this park” mail link to invite them."
+    "agentNotes": "External campgrounds now show an “External” tag and a “Suggest this park” mail link to invite them.",
+    "area": "General"
   },
   {
     "id": "be2b70e3-61c4-45b5-95ff-59d105677f37",
@@ -910,7 +936,8 @@
       "deviceType": "mobile"
     },
     "completedAt": "2025-12-11T02:19:59.089Z",
-    "agentNotes": "Search filters dropdown now sits above the campgrounds grid (higher z-index) so it no longer hides behind cards when opened."
+    "agentNotes": "Search filters dropdown now sits above the campgrounds grid (higher z-index) so it no longer hides behind cards when opened.",
+    "area": "General"
   },
   {
     "id": "94b8814b-8d11-4008-80a0-b0359539bfdd",
@@ -944,7 +971,8 @@
       "deviceType": "mobile"
     },
     "completedAt": "2025-12-11T02:44:09.252Z",
-    "agentNotes": "Added rating badges (Top rated, Guest favorite, Rising star) based on rating/review counts; shows badges on cards."
+    "agentNotes": "Added rating badges (Top rated, Guest favorite, Rising star) based on rating/review counts; shows badges on cards.",
+    "area": "Reservations"
   },
   {
     "id": "8316b2e6-604c-4d45-9e98-72ce1d744955",
@@ -978,7 +1006,8 @@
       "deviceType": "mobile"
     },
     "completedAt": "2025-12-11T03:18:46.089Z",
-    "agentNotes": "For phones in landscape, we now constrain to a 480px max width, center the content, hide horizontal overflow, and favor vertical pan to prevent stretched layouts. For a full app-like feel, rotate back to portrait."
+    "agentNotes": "For phones in landscape, we now constrain to a 480px max width, center the content, hide horizontal overflow, and favor vertical pan to prevent stretched layouts. For a full app-like feel, rotate back to portrait.",
+    "area": "General"
   },
   {
     "id": "7707fcef-b8c1-4d0c-b6ad-276420955b53",
@@ -1012,7 +1041,8 @@
       "deviceType": "mobile"
     },
     "completedAt": "2025-12-11T02:27:46.351Z",
-    "agentNotes": "Mobile menu now locks background scroll and has its own scroll area so the full menu is reachable on small screens."
+    "agentNotes": "Mobile menu now locks background scroll and has its own scroll area so the full menu is reachable on small screens.",
+    "area": "General"
   },
   {
     "id": "ef9e3d3a-14db-4e29-ad19-30f00d634348",
@@ -1046,7 +1076,8 @@
       "deviceType": "mobile"
     },
     "completedAt": "2025-12-11T02:27:46.347Z",
-    "agentNotes": "Added helper text: lower priority numbers run first; priority picks the winner when rules overlap."
+    "agentNotes": "Added helper text: lower priority numbers run first; priority picks the winner when rules overlap.",
+    "area": "General"
   },
   {
     "id": "8924a1b0-c461-49c7-bc53-8656b0dabb14",
@@ -1080,7 +1111,8 @@
       "deviceType": "mobile"
     },
     "completedAt": "2025-12-11T02:27:46.353Z",
-    "agentNotes": "Mobile menu adds internal scrolling so you can reach the bottom items; background is locked."
+    "agentNotes": "Mobile menu adds internal scrolling so you can reach the bottom items; background is locked.",
+    "area": "General"
   },
   {
     "id": "6641683c-7730-4105-9db8-f5a89c5b3b02",
@@ -1114,7 +1146,8 @@
       "deviceType": "mobile"
     },
     "completedAt": "2025-12-11T02:27:46.352Z",
-    "agentNotes": "Mobile menu prevents background page scrolling to avoid accidental page scroll while menu is open."
+    "agentNotes": "Mobile menu prevents background page scrolling to avoid accidental page scroll while menu is open.",
+    "area": "General"
   },
   {
     "id": "b0584461-578e-4a89-8996-3e65d0c286fc",
@@ -1148,7 +1181,8 @@
       "deviceType": "mobile"
     },
     "completedAt": "2025-12-11T03:14:22.028Z",
-    "agentNotes": "/pricing now redirects to pricing rules; added banner on seasonal rates pointing users to Pricing Rules and noted deprecation."
+    "agentNotes": "/pricing now redirects to pricing rules; added banner on seasonal rates pointing users to Pricing Rules and noted deprecation.",
+    "area": "General"
   },
   {
     "id": "fd5cdb0e-c32a-467d-af88-086d4f3c4d5c",
@@ -1182,7 +1216,8 @@
       "deviceType": "mobile"
     },
     "completedAt": "2025-12-11T03:14:22.032Z",
-    "agentNotes": "Added seasonal rates banner: use Pricing Rules for dynamic/seasonal; page kept for legacy, to retire after migration."
+    "agentNotes": "Added seasonal rates banner: use Pricing Rules for dynamic/seasonal; page kept for legacy, to retire after migration.",
+    "area": "General"
   },
   {
     "id": "18e403cc-2153-4097-bc3c-9f86df6a9b25",
@@ -1216,7 +1251,8 @@
       "deviceType": "mobile"
     },
     "completedAt": "2025-12-11T03:14:22.034Z",
-    "agentNotes": "Upsells page now clarifies separation from POS/store items; unified catalog sync on roadmap."
+    "agentNotes": "Upsells page now clarifies separation from POS/store items; unified catalog sync on roadmap.",
+    "area": "General"
   },
   {
     "id": "34bec99e-6d65-4e33-aba0-4cfd2f329b78",
@@ -1250,7 +1286,8 @@
       "deviceType": "desktop"
     },
     "completedAt": "2025-12-10T22:20:00.000Z",
-    "agentNotes": "Rebuilt the filters into their own bar above the inbox so headings/dates/status chips no longer compress the conversation list; messaging layout now has a dedicated sidebar and content area with normal spacing."
+    "agentNotes": "Rebuilt the filters into their own bar above the inbox so headings/dates/status chips no longer compress the conversation list; messaging layout now has a dedicated sidebar and content area with normal spacing.",
+    "area": "UI/UX"
   },
   {
     "id": "1c837c08-2d8c-4cc5-ba8a-a4c70f9631f0",
@@ -1284,7 +1321,8 @@
       "deviceType": "desktop"
     },
     "completedAt": "2025-12-11T22:35:00.000Z",
-    "agentNotes": "Wrapped the staff time clock in the dashboard shell and added campground context plus navigation to scheduling/approvals. The page now uses standard cards, inputs, and buttons so staff see the full campground UI instead of a bare form."
+    "agentNotes": "Wrapped the staff time clock in the dashboard shell and added campground context plus navigation to scheduling/approvals. The page now uses standard cards, inputs, and buttons so staff see the full campground UI instead of a bare form.",
+    "area": "UI/UX"
   },
   {
     "id": "b14cc95f-fde7-43bd-8193-274ae283130c",
@@ -1318,7 +1356,8 @@
       "deviceType": "desktop"
     },
     "completedAt": "2025-12-11T22:45:00.000Z",
-    "agentNotes": "Approvals page now uses the full dashboard shell with standard cards/buttons, shows submitted count, and links to Time Clock and Scheduling so staff see the campground UI instead of a bare list."
+    "agentNotes": "Approvals page now uses the full dashboard shell with standard cards/buttons, shows submitted count, and links to Time Clock and Scheduling so staff see the campground UI instead of a bare list.",
+    "area": "UI/UX"
   },
   {
     "id": "1b971936-c579-495d-affa-f4437c166cf3",
@@ -1352,7 +1391,8 @@
       "deviceType": "desktop"
     },
     "completedAt": "2025-12-11T22:55:00.000Z",
-    "agentNotes": "Staff Overrides now uses the full dashboard shell with standard cards, select inputs, reset/submit actions, and links to Time Clock/Approvals so campground staff see the complete UI instead of a bare form."
+    "agentNotes": "Staff Overrides now uses the full dashboard shell with standard cards, select inputs, reset/submit actions, and links to Time Clock/Approvals so campground staff see the complete UI instead of a bare form.",
+    "area": "UI/UX"
   },
   {
     "id": "a67b9f8c-584d-4dc3-b969-818b018ce057",
@@ -1386,7 +1426,8 @@
       "deviceType": "desktop"
     },
     "completedAt": "2025-12-11T23:05:00.000Z",
-    "agentNotes": "Memberships page now explains how to join: paid tiers can be sold/assigned today; auto-enrollment after stays/spend is noted as a roadmap item with thresholds to be captured when the rule engine ships."
+    "agentNotes": "Memberships page now explains how to join: paid tiers can be sold/assigned today; auto-enrollment after stays/spend is noted as a roadmap item with thresholds to be captured when the rule engine ships.",
+    "area": "General"
   },
   {
     "id": "dbb6d426-e46d-4f2a-8577-ff8233c5e981",
@@ -1420,7 +1461,8 @@
       "deviceType": "desktop"
     },
     "completedAt": "2025-12-11T23:20:00.000Z",
-    "agentNotes": "Added a Reports page with a Booking Source report (sample data) and staff attribution section, plus roadmap notes for filters/exports. Live data to be wired; placeholders and guidance included."
+    "agentNotes": "Added a Reports page with a Booking Source report (sample data) and staff attribution section, plus roadmap notes for filters/exports. Live data to be wired; placeholders and guidance included.",
+    "area": "Reservations"
   },
   {
     "id": "c8271816-fd5c-4fb6-bcff-731c433fd6d6",
@@ -1454,7 +1496,8 @@
       "deviceType": "desktop"
     },
     "completedAt": "2025-12-11T23:52:00.000Z",
-    "agentNotes": "Notification Triggers page now has a how-to banner: create templates in Settings → Templates, then attach them to triggers; explains default message fallback and delay usage."
+    "agentNotes": "Notification Triggers page now has a how-to banner: create templates in Settings → Templates, then attach them to triggers; explains default message fallback and delay usage.",
+    "area": "General"
   },
   {
     "id": "1ffbe070-9dea-4ade-a108-c33cbbcec6d7",
@@ -1488,7 +1531,8 @@
       "platform": "MacIntel",
       "language": "en-US",
       "deviceType": "desktop"
-    }
+    },
+    "area": "UI/UX"
   },
   {
     "id": "d52cd322-2504-4c9c-9ef6-3e1dae5000f0",
@@ -1522,7 +1566,8 @@
       "platform": "MacIntel",
       "language": "en-US",
       "deviceType": "desktop"
-    }
+    },
+    "area": "General"
   },
   {
     "id": "43ddb1bb-a4fe-4ee0-9f77-64046391849c",
@@ -1556,7 +1601,8 @@
       "platform": "MacIntel",
       "language": "en-US",
       "deviceType": "desktop"
-    }
+    },
+    "area": "General"
   },
   {
     "id": "0a20f0d9-b568-42ff-92ec-f8f4d2e0a4a1",
@@ -1590,7 +1636,8 @@
       "platform": "MacIntel",
       "language": "en-US",
       "deviceType": "desktop"
-    }
+    },
+    "area": "General"
   },
   {
     "id": "246ad8c9-fdac-4d3c-89dd-36b5a87476dc",
@@ -1624,7 +1671,8 @@
       "platform": "MacIntel",
       "language": "en-US",
       "deviceType": "desktop"
-    }
+    },
+    "area": "UI/UX"
   },
   {
     "id": "76506be6-0617-490d-af63-7ba5b4a889ce",
@@ -1656,7 +1704,8 @@
       "platform": "MacIntel",
       "language": "en-US",
       "deviceType": "desktop"
-    }
+    },
+    "area": "UI/UX"
   },
   {
     "id": "dfdc8f77-c7ec-4f94-8f30-ed27c10f8009",
@@ -1690,7 +1739,8 @@
       "platform": "MacIntel",
       "language": "en-US",
       "deviceType": "desktop"
-    }
+    },
+    "area": "UI/UX"
   },
   {
     "id": "5a1de5a1-7595-4192-a4da-b596818e3400",
@@ -1724,7 +1774,8 @@
       "deviceType": "desktop"
     },
     "completedAt": "2025-12-11T23:40:00.000Z",
-    "agentNotes": "Removed the shortcut chips from dashboard navigation and made nav sections cascade (opening one closes the others) so the menu matches full-width buttons and stays tidy."
+    "agentNotes": "Removed the shortcut chips from dashboard navigation and made nav sections cascade (opening one closes the others) so the menu matches full-width buttons and stays tidy.",
+    "area": "UI/UX"
   },
   {
     "id": "72b0b882-4f04-4b55-b1c0-213a358046c4",
@@ -1758,7 +1809,8 @@
       "deviceType": "desktop"
     },
     "completedAt": "2025-12-12T00:06:00.000Z",
-    "agentNotes": "Added a finance banner: guest-level wallets and transferring charges between guest and reservation are roadmap items; current workaround is issuing credit/gift card and applying to the target reservation or POS."
+    "agentNotes": "Added a finance banner: guest-level wallets and transferring charges between guest and reservation are roadmap items; current workaround is issuing credit/gift card and applying to the target reservation or POS.",
+    "area": "UI/UX"
   },
   {
     "id": "ff24b880-133a-4def-a363-c82dcbd8ccb9",
@@ -1790,7 +1842,8 @@
       "platform": "MacIntel",
       "language": "en-US",
       "deviceType": "desktop"
-    }
+    },
+    "area": "General"
   },
   {
     "id": "b5f4c5b6-7969-49e1-9f9f-22717639b64c",
@@ -1822,7 +1875,8 @@
       "platform": "MacIntel",
       "language": "en-US",
       "deviceType": "desktop"
-    }
+    },
+    "area": "Reservations"
   },
   {
     "id": "55bc4d12-8791-4473-9d46-648fe3bc1ac8",
@@ -1856,7 +1910,8 @@
       "deviceType": "desktop"
     },
     "completedAt": "2025-12-12T00:05:00.000Z",
-    "agentNotes": "Timeclock now pulls your signed-in user, shows your recent shifts, and lets you pick one instead of typing IDs. Also falls back to the saved campground if the URL lacks one."
+    "agentNotes": "Timeclock now pulls your signed-in user, shows your recent shifts, and lets you pick one instead of typing IDs. Also falls back to the saved campground if the URL lacks one.",
+    "area": "UI/UX"
   },
   {
     "id": "7f409f37-e535-47e6-b3ad-111da7c1a917",
@@ -1889,7 +1944,8 @@
       "platform": "MacIntel",
       "language": "en-US",
       "deviceType": "desktop"
-    }
+    },
+    "area": "General"
   },
   {
     "id": "0cf1802a-4f89-4f6c-aee3-8f69fbb5defc",
@@ -1922,7 +1978,8 @@
       "platform": "MacIntel",
       "language": "en-US",
       "deviceType": "desktop"
-    }
+    },
+    "area": "Reservations"
   },
   {
     "id": "e95cc132-9622-4871-b4e1-80c8010050ad",
@@ -1954,7 +2011,8 @@
       "platform": "MacIntel",
       "language": "en-US",
       "deviceType": "desktop"
-    }
+    },
+    "area": "Payments"
   },
   {
     "id": "6552c0fb-076f-48b1-918a-6acfe6ba0534",
@@ -1988,7 +2046,8 @@
       "platform": "MacIntel",
       "language": "en-US",
       "deviceType": "desktop"
-    }
+    },
+    "area": "Payments"
   },
   {
     "id": "3aa75f51-4e18-4111-b2c6-2d8b6324da1c",
@@ -2022,7 +2081,8 @@
       "platform": "MacIntel",
       "language": "en-US",
       "deviceType": "desktop"
-    }
+    },
+    "area": "UI/UX"
   },
   {
     "id": "4599d582-f57c-4744-abde-570973aaa0b1",
@@ -2056,7 +2116,8 @@
       "platform": "MacIntel",
       "language": "en-US",
       "deviceType": "desktop"
-    }
+    },
+    "area": "Reservations"
   },
   {
     "id": "1fb73457-3c15-4aaf-a470-14c931d36a90",
@@ -2090,7 +2151,8 @@
       "platform": "MacIntel",
       "language": "en-US",
       "deviceType": "desktop"
-    }
+    },
+    "area": "General"
   },
   {
     "id": "4829acc9-e6c2-4582-8ae9-a04d3026ab79",
@@ -2124,7 +2186,8 @@
       "platform": "MacIntel",
       "language": "en-US",
       "deviceType": "desktop"
-    }
+    },
+    "area": "General"
   },
   {
     "id": "1cfbfc69-3fb9-42ac-a3e7-ea7443024870",
@@ -2156,7 +2219,8 @@
       "platform": "MacIntel",
       "language": "en-US",
       "deviceType": "desktop"
-    }
+    },
+    "area": "Reservations"
   },
   {
     "id": "083da17d-17e6-4374-b100-632e50c0b458",
@@ -2190,7 +2254,8 @@
       "platform": "MacIntel",
       "language": "en-US",
       "deviceType": "desktop"
-    }
+    },
+    "area": "Admin"
   },
   {
     "id": "0e99c89a-7c1b-4d18-ac48-4663ff649bc4",
@@ -2222,7 +2287,8 @@
       "platform": "MacIntel",
       "language": "en-US",
       "deviceType": "desktop"
-    }
+    },
+    "area": "Admin"
   },
   {
     "id": "f286caa1-0ec1-4ec9-b0f5-1057054f91fd",
@@ -2254,7 +2320,8 @@
       "platform": "MacIntel",
       "language": "en-US",
       "deviceType": "desktop"
-    }
+    },
+    "area": "General"
   },
   {
     "id": "c76cb4dc-9e94-4cbc-bd70-b81408b36637",
@@ -2286,7 +2353,8 @@
       "platform": "MacIntel",
       "language": "en-US",
       "deviceType": "desktop"
-    }
+    },
+    "area": "General"
   },
   {
     "id": "934497bb-4c0a-4ede-b8d4-10aedb2a917f",
@@ -2318,7 +2386,8 @@
       "platform": "MacIntel",
       "language": "en-US",
       "deviceType": "desktop"
-    }
+    },
+    "area": "General"
   },
   {
     "id": "733f9979-086d-46a3-ae59-45620799525d",
@@ -2352,7 +2421,8 @@
       "platform": "MacIntel",
       "language": "en-US",
       "deviceType": "desktop"
-    }
+    },
+    "area": "Reservations"
   },
   {
     "id": "46e11b03-bada-44eb-9efb-44341daf121d",
@@ -2386,7 +2456,8 @@
       "platform": "MacIntel",
       "language": "en-US",
       "deviceType": "desktop"
-    }
+    },
+    "area": "General"
   },
   {
     "id": "43a8434f-745d-482b-af55-7cde2804cb8c",
@@ -2418,7 +2489,8 @@
       "platform": "MacIntel",
       "language": "en-US",
       "deviceType": "desktop"
-    }
+    },
+    "area": "Reservations"
   },
   {
     "id": "64c4ce01-0aee-47e3-9ff2-6710429d02b0",
@@ -2452,7 +2524,8 @@
       "platform": "MacIntel",
       "language": "en-US",
       "deviceType": "desktop"
-    }
+    },
+    "area": "General"
   },
   {
     "id": "b9c429b2-f15b-492a-8fc1-73ad74ce3a1a",
@@ -2484,7 +2557,8 @@
       "platform": "MacIntel",
       "language": "en-US",
       "deviceType": "desktop"
-    }
+    },
+    "area": "General"
   },
   {
     "id": "11826caa-2f8e-49ae-85ef-53ad7e9e1269",
@@ -2516,6 +2590,7 @@
       "platform": "MacIntel",
       "language": "en-US",
       "deviceType": "desktop"
-    }
+    },
+    "area": "Auth"
   }
 ]

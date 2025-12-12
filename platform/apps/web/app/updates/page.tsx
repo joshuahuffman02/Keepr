@@ -59,8 +59,8 @@ function UpdateCard({ update, isFirst }: { update: Update; isFirst: boolean }) {
 
       {/* Timeline dot */}
       <div className={`absolute left-0 top-1.5 w-6 h-6 rounded-full border-2 flex items-center justify-center ${isFirst
-          ? "bg-blue-500 border-blue-500 text-white"
-          : "bg-white border-slate-300"
+        ? "bg-blue-500 border-blue-500 text-white"
+        : "bg-white border-slate-300"
         }`}>
         {isFirst && (
           <span className="w-2 h-2 rounded-full bg-white animate-pulse" />
@@ -121,8 +121,8 @@ function FilterButton({
     <button
       onClick={onClick}
       className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${active
-          ? "bg-slate-900 text-white"
-          : "bg-slate-100 text-slate-600 hover:bg-slate-200"
+        ? "bg-slate-900 text-white"
+        : "bg-slate-100 text-slate-600 hover:bg-slate-200"
         }`}
     >
       {children}
@@ -176,7 +176,7 @@ function UpdatesPageInner() {
             </Link>
           </div>
           <p className="text-slate-600">
-            A changelog of what&apos;s new, improved, and fixed in Campreserv.
+            A changelog of what&apos;s new, improved, and fixed in Camp Everyday.
           </p>
           <p className="text-xs text-slate-500">Last updated: Dec 11, 2025 (alerts/idempotency/POS/stored value/report export/comms hardening)</p>
         </div>
