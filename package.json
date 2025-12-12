@@ -3,6 +3,10 @@
   "version": "0.1.0",
   "private": true,
   "packageManager": "pnpm@9.15.9",
+  "engines": {
+    "node": ">=18.0.0",
+    "pnpm": "9.15.9"
+  },
   "scripts": {
     "api": "pnpm --dir platform/apps/api dev",
     "web": "pnpm --dir platform/apps/web dev",
