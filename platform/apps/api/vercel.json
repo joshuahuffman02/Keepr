@@ -3,16 +3,18 @@
     "version": 2,
     "buildCommand": "cd ../../packages/shared && pnpm run build && cd ../../apps/api && pnpm run build && pnpm prisma generate",
     "installCommand": "pnpm install",
-    "builds": [
-        {
-            "src": "api/**/*.js",
-            "use": "@vercel/node"
+    "outputDirectory": ".",
+    "functions": {
+        "api/**/*.js": {
+            "runtime": "@vercel/node@3",
+            "maxDuration": 30,
+            "memory": 1024
         }
-    ],
-    "routes": [
+    },
+    "rewrites": [
         {
-            "src": "/(.*)",
-            "dest": "/api/index.js"
+            "source": "/(.*)",
+            "destination": "/api/index.js"
         }
     ]
 }
