@@ -1208,8 +1208,6 @@ function ReviewStep({
     selectedSiteClassId,
     assignOnArrival,
     guestInfo,
-    quote,
-    isLoadingQuote,
     onBack,
     holdExpiresAt,
     onComplete,
@@ -1223,8 +1221,6 @@ function ReviewStep({
     selectedSiteClassId: string | null;
     assignOnArrival: boolean;
     guestInfo: GuestInfo;
-    quote: Quote | null;
-    isLoadingQuote: boolean;
     onBack: () => void;
     holdExpiresAt?: Date | null;
     onComplete: (reservation?: any) => void;
@@ -1289,6 +1285,33 @@ function ReviewStep({
 
     // Tax waiver state
     const [taxWaiverSigned, setTaxWaiverSigned] = useState(false);
+
+    const { data: quote, isLoading: isLoadingQuote, error: quoteError } = useQuery<Quote>({
+        queryKey: [
+            "public-quote",
+            slug,
+            selectedSite?.id,
+            arrivalDate,
+            departureDate,
+            promoApplied ? promoCode : null,
+            taxWaiverSigned,
+            guestInfo.referralCode || null,
+            guestInfo.stayReasonPreset,
+            guestInfo.stayReasonOther
+        ],
+        queryFn: () =>
+            apiClient.getPublicQuote(slug, {
+                siteId: selectedSite!.id,
+                arrivalDate,
+                departureDate,
+                promoCode: promoApplied ? promoCode : undefined,
+                taxWaiverSigned,
+                referralCode: guestInfo.referralCode || undefined,
+                stayReasonPreset: guestInfo.stayReasonPreset || undefined,
+                stayReasonOther: guestInfo.stayReasonPreset === "other" ? guestInfo.stayReasonOther : undefined
+            }),
+        enabled: !!slug && !!selectedSite?.id && !!arrivalDate && !!departureDate
+    });
 
     const handleApplyPromo = async () => {
         if (!promoInput.trim() || !campgroundId || !quote) return;
@@ -1517,6 +1540,23 @@ function ReviewStep({
             <div className="flex flex-col items-center justify-center py-12">
                 <div className="animate-spin rounded-full h-12 w-12 border-4 border-emerald-500 border-t-transparent mb-4" />
                 <p className="text-slate-600">Calculating your total...</p>
+            </div>
+        );
+    }
+
+    if (quoteError) {
+        return (
+            <div className="flex flex-col items-center justify-center gap-4 py-10 text-center">
+                <p className="text-red-600 font-semibold">We couldn&apos;t calculate your total.</p>
+                <p className="text-sm text-slate-600">
+                    {quoteError instanceof Error ? quoteError.message : "Please try again or pick a different site."}
+                </p>
+                <button
+                    onClick={onBack}
+                    className="px-4 py-2 rounded-lg border border-slate-200 bg-white text-sm font-medium text-slate-700 hover:border-emerald-300 hover:text-emerald-700 transition-colors"
+                >
+                    ← Back
+                </button>
             </div>
         );
     }
@@ -1951,6 +1991,32 @@ export default function BookingPage() {
         }
     }, [initialArrival, initialDeparture]);
 
+    // Keep key selections in the URL for refresh/share
+    useEffect(() => {
+        if (!slug) return;
+        const params = new URLSearchParams(searchParams.toString());
+
+        const apply = (key: string, value: string | null | undefined) => {
+            if (value === null || value === undefined || value === "") {
+                params.delete(key);
+            } else {
+                params.set(key, value);
+            }
+        };
+
+        apply("arrivalDate", arrivalDate);
+        apply("departureDate", departureDate);
+        apply("siteType", selectedSiteType);
+        apply("adults", guestInfo.adults ? String(guestInfo.adults) : "1");
+        apply("children", guestInfo.children !== undefined ? String(guestInfo.children) : "0");
+
+        const nextQuery = params.toString();
+        const currentQuery = searchParams.toString();
+        if (nextQuery === currentQuery) return;
+
+        router.replace(`/park/${slug}/book${nextQuery ? `?${nextQuery}` : ""}`, { scroll: false });
+    }, [arrivalDate, departureDate, selectedSiteType, guestInfo.adults, guestInfo.children, slug, router, searchParams]);
+
     // Fetch campground info
     const { data: campground, isLoading: isLoadingCampground, error: campgroundError } = useQuery({
         queryKey: ["public-campground", slug],
@@ -2042,34 +2108,6 @@ export default function BookingPage() {
             cancelled = true;
         };
     }, [arrivalDate, departureDate, filteredSites.length, guestInfo.equipment.length, guestInfo.equipment.type, isLoadingSites, slug, step]);
-
-    // Fetch quote when site is selected
-    const { data: quote, isLoading: isLoadingQuote } = useQuery({
-        queryKey: [
-            "public-quote",
-            slug,
-            selectedSiteId,
-            arrivalDate,
-            departureDate,
-            promoApplied ? promoCode : null,
-            taxWaiverSigned,
-            guestInfo.referralCode || null,
-            guestInfo.stayReasonPreset,
-            guestInfo.stayReasonOther
-        ],
-        queryFn: () =>
-            apiClient.getPublicQuote(slug, {
-                siteId: selectedSiteId!,
-                arrivalDate,
-                departureDate,
-                promoCode: promoApplied ? promoCode : undefined,
-                taxWaiverSigned,
-                referralCode: guestInfo.referralCode || undefined,
-                stayReasonPreset: guestInfo.stayReasonPreset || undefined,
-                stayReasonOther: guestInfo.stayReasonPreset === "other" ? guestInfo.stayReasonOther : undefined
-            }),
-        enabled: !!slug && !!selectedSiteId && !!arrivalDate && !!departureDate && step >= 4
-    });
 
     const selectedSite = availableSites?.find((s) => s.id === selectedSiteId) || null;
 
@@ -2258,8 +2296,6 @@ export default function BookingPage() {
                             selectedSiteClassId={selectedSiteClassId}
                             assignOnArrival={assignOnArrival}
                                 guestInfo={guestInfo}
-                                quote={quote || null}
-                                isLoadingQuote={isLoadingQuote}
                                 onBack={() => setStep(3)}
                                 holdExpiresAt={holdExpiresAt}
                                 onComplete={(reservation) => {

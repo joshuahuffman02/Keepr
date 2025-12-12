@@ -43,6 +43,24 @@ import {
 } from "@campreserv/shared";
 import { z } from "zod";
 
+const numberish = <T extends z.ZodTypeAny>(schema: T) =>
+  z.preprocess((val) => {
+    if (val === null || val === undefined) return val;
+    if (typeof val === "string") {
+      const trimmed = val.trim();
+      if (!trimmed) return val;
+      const parsed = Number(trimmed);
+      return Number.isNaN(parsed) ? val : parsed;
+    }
+    if (typeof val === "number") return val;
+    if (typeof val === "object" && typeof (val as any)?.toString === "function") {
+      const str = (val as any).toString();
+      const parsed = Number(str);
+      return Number.isNaN(parsed) ? val : parsed;
+    }
+    return val;
+  }, schema);
+
 const CampgroundWithAnalyticsSchema = CampgroundSchema.extend({
   gaMeasurementId: z.string().nullable().optional(),
   metaPixelId: z.string().nullable().optional(),
@@ -59,13 +77,14 @@ const AvailabilitySiteArray = z.array(
     name: z.string(),
     siteNumber: z.string(),
     siteType: z.string(),
-    maxOccupancy: z.number(),
-    rigMaxLength: z.number().int().nonnegative().nullish(),
+    maxOccupancy: numberish(z.number().int().nonnegative()),
+    rigMaxLength: numberish(z.number().int().nonnegative().nullable()).optional(),
     isActive: z.boolean().optional().default(true),
     siteClass: z.object({
       name: z.string(),
-      rigMaxLength: z.number().int().nonnegative().nullish(),
-      defaultRate: z.number().int().nonnegative()
+      rigMaxLength: numberish(z.number().int().nonnegative().nullable()).optional(),
+      defaultRate: numberish(z.number().int().nonnegative()),
+      maxOccupancy: numberish(z.number().int().nonnegative()).optional()
     }).nullable().optional()
   })
 );
@@ -3707,16 +3726,16 @@ export const apiClient = {
       name: z.string(),
       siteNumber: z.string(),
       siteType: z.string(),
-      maxOccupancy: z.number(),
-      rigMaxLength: z.number().nullable(),
+      maxOccupancy: numberish(z.number().int().nonnegative()),
+      rigMaxLength: numberish(z.number().int().nonnegative().nullable()).optional(),
       accessible: z.boolean().optional().default(false),
       status: z.enum(['available', 'booked', 'locked', 'maintenance']),
       siteClass: z.object({
         id: z.string(),
         name: z.string(),
-        defaultRate: z.number(),
+        defaultRate: numberish(z.number().int().nonnegative()),
         siteType: z.string(),
-        maxOccupancy: z.number(),
+        maxOccupancy: numberish(z.number().int().nonnegative()),
         hookupsPower: z.boolean(),
         hookupsWater: z.boolean(),
         hookupsSewer: z.boolean(),
@@ -3750,23 +3769,23 @@ export const apiClient = {
     const data = await parseResponse<unknown>(res);
 
     const QuoteResponseSchema = z.object({
-      nights: z.number(),
-      baseSubtotalCents: z.number(),
-      rulesDeltaCents: z.number(),
-      totalCents: z.number(),
-      perNightCents: z.number(),
-      discountCents: z.number().optional().default(0),
+      nights: numberish(z.number().int().nonnegative()),
+      baseSubtotalCents: numberish(z.number()),
+      rulesDeltaCents: numberish(z.number()),
+      totalCents: numberish(z.number()),
+      perNightCents: numberish(z.number()),
+      discountCents: numberish(z.number()).optional().default(0),
       discountCapped: z.boolean().optional().default(false),
-      totalAfterDiscountCents: z.number().optional(),
-      taxesCents: z.number().optional().default(0),
-      totalWithTaxesCents: z.number().optional(),
+      totalAfterDiscountCents: numberish(z.number()).optional(),
+      taxesCents: numberish(z.number()).optional().default(0),
+      totalWithTaxesCents: numberish(z.number()).optional(),
       promotionId: z.string().nullable().optional(),
       appliedDiscounts: z
         .array(
           z.object({
             id: z.string(),
             type: z.string().optional(),
-            amountCents: z.number(),
+            amountCents: numberish(z.number()),
             capped: z.boolean().optional().default(false)
           })
         )
@@ -3784,10 +3803,10 @@ export const apiClient = {
       taxWaiverRequired: z.boolean().optional().default(false),
       taxWaiverText: z.string().nullable().optional(),
       taxExemptionApplied: z.boolean().optional().default(false),
-      referralDiscountCents: z.number().optional().default(0),
+      referralDiscountCents: numberish(z.number()).optional().default(0),
       referralProgramId: z.string().nullable().optional(),
       referralIncentiveType: z.string().nullable().optional(),
-      referralIncentiveValue: z.number().optional().default(0),
+      referralIncentiveValue: numberish(z.number()).optional().default(0),
       referralSource: z.string().nullable().optional(),
       referralChannel: z.string().nullable().optional()
     });

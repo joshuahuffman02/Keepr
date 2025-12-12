@@ -36,6 +36,12 @@ export class JobQueueService {
     if (state.pending.length >= state.maxQueue) {
       const err = new Error(`Queue ${normalizedName} is saturated (${state.maxQueue} pending)`);
       this.logger.warn(err.message);
+      this.observability.recordJobRun({
+        name: normalizedName,
+        durationMs: 0,
+        success: false,
+        queueDepth: state.pending.length,
+      });
       throw err;
     }
 
@@ -67,7 +73,10 @@ export class JobQueueService {
     state.concurrency = opts?.concurrency ?? this.defaultConcurrency;
     state.maxQueue = opts?.maxQueue ?? this.defaultMaxQueue;
     const oldest = state.pending[0]?.enqueuedAt ? Date.now() - state.pending[0].enqueuedAt : 0;
-    this.observability.setQueueState(queueName, state.running, state.pending.length, oldest);
+    this.observability.setQueueState(queueName, state.running, state.pending.length, oldest, {
+      maxQueue: state.maxQueue,
+      concurrency: state.concurrency,
+    });
     return state;
   }
 
@@ -77,7 +86,10 @@ export class JobQueueService {
       if (!job) break;
       state.running += 1;
       const oldest = state.pending[0]?.enqueuedAt ? Date.now() - state.pending[0].enqueuedAt : 0;
-      this.observability.setQueueState(state.name, state.running, state.pending.length, oldest);
+      this.observability.setQueueState(state.name, state.running, state.pending.length, oldest, {
+        maxQueue: state.maxQueue,
+        concurrency: state.concurrency,
+      });
 
       const started = Date.now();
       const timeoutMs = job.timeoutMs ?? this.defaultTimeoutMs;
@@ -92,7 +104,10 @@ export class JobQueueService {
         });
         state.running = Math.max(0, state.running - 1);
         const oldestRemaining = state.pending[0]?.enqueuedAt ? Date.now() - state.pending[0].enqueuedAt : 0;
-        this.observability.setQueueState(state.name, state.running, state.pending.length, oldestRemaining);
+        this.observability.setQueueState(state.name, state.running, state.pending.length, oldestRemaining, {
+          maxQueue: state.maxQueue,
+          concurrency: state.concurrency,
+        });
         // Continue draining if more work remains
         setImmediate(() => this.drain(state));
       };

@@ -1013,6 +1013,7 @@ model Campground {
   storedValueLedgers        StoredValueLedger[]
   posTerminals              PosTerminal[]
   posCarts                  PosCart[]
+  posOfflineReplays         PosOfflineReplay[]
   tillSessions              TillSession[]
   vehicles                  Vehicle[]
   accessIntegrations        AccessIntegration[]
@@ -5233,6 +5234,7 @@ model PosCart {
   payments   PosPayment[]
   returns    PosReturn[]     @relation("ReturnCart")
   movements  TillMovement[]  @relation("TillMovementCart")
+  offlineReplays PosOfflineReplay[]
 
   @@index([campgroundId, status])
   @@index([terminalId])
@@ -5275,6 +5277,31 @@ model PosPayment {
 
   @@index([cartId])
   @@index([idempotencyKey])
+}
+
+model PosOfflineReplay {
+  id                String   @id @default(cuid())
+  clientTxId        String?
+  cartId            String?
+  campgroundId      String?
+  recordedTotalsHash String?
+  expectedHash      String?
+  payloadHash       String?
+  status            String?
+  reason            String?
+  payload           Json?
+  tender            Json?
+  items             Json?
+  expectedBreakdown Json?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  cart       PosCart?     @relation(fields: [cartId], references: [id], onDelete: SetNull)
+  campground Campground?  @relation(fields: [campgroundId], references: [id], onDelete: SetNull)
+
+  @@index([cartId])
+  @@index([campgroundId])
+  @@index([clientTxId])
 }
 
 model TillSession {

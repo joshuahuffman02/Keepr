@@ -407,6 +407,10 @@ export class PosService {
           recordedTotalsHash: dto.recordedTotalsHash
         };
 
+    if (response.status === "needs_review") {
+      await this.prisma.posCart.update({ where: { id: cartId }, data: { needsReview: true } }).catch(() => null);
+    }
+
     const payloadHash = dto.payload ? crypto.createHash("sha256").update(JSON.stringify(dto.payload)).digest("hex") : undefined;
     const tender = this.extractTender(dto.payload);
     const items = this.extractItems(dto.payload);

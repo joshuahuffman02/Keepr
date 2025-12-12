@@ -161,7 +161,7 @@ ${options.html}
                     ${lineItems.map((li) => `
                         <tr>
                             <td style="padding: 6px 0; color: #0f172a;">${li.label}</td>
-                            <td style="padding: 6px 0; color: #0f172a; text-align: right;">$${(li.amountCents / 100).toFixed(2)}</td>
+                            <td style="padding: 6px 0; color: #0f172a; text-align: right;">$${((li.amountCents * sign) / 100).toFixed(2)}</td>
                         </tr>
                     `).join("")}
                     ${options.taxCents !== undefined ? `

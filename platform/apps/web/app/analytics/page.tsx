@@ -14,6 +14,8 @@ export default function AnalyticsPage() {
   const [exportStatus, setExportStatus] = useState<"idle" | "queued" | "processing" | "ready" | "error">("idle");
   const [exportUrl, setExportUrl] = useState<string | null>(null);
   const [exportError, setExportError] = useState<string | null>(null);
+  const [exportFormat, setExportFormat] = useState<"csv" | "xlsx">("csv");
+  const [exportEmail, setExportEmail] = useState<string>("");
 
   // Read selected campground from localStorage (set by the dashboard switcher)
   useEffect(() => {
@@ -135,6 +137,21 @@ export default function AnalyticsPage() {
                 {d}d
               </button>
             ))}
+            <select
+              value={exportFormat}
+              onChange={(e) => setExportFormat(e.target.value as "csv" | "xlsx")}
+              className="px-2 py-1.5 rounded-lg border border-slate-200 text-sm text-slate-700 bg-white hover:border-emerald-300 focus:border-emerald-400 focus:outline-none"
+            >
+              <option value="csv">CSV</option>
+              <option value="xlsx">Excel</option>
+            </select>
+            <input
+              type="email"
+              placeholder="Email (optional)"
+              value={exportEmail}
+              onChange={(e) => setExportEmail(e.target.value)}
+              className="px-3 py-1.5 rounded-lg border border-slate-200 text-sm text-slate-700 bg-white w-52 focus:border-emerald-400 focus:outline-none"
+            />
             <button
               onClick={async () => {
                 if (!selectedCampgroundId) return;
@@ -142,10 +159,15 @@ export default function AnalyticsPage() {
                   setExportStatus("queued");
                   setExportError(null);
                   setExportUrl(null);
-                  const job = await apiClient.queueReportExport(selectedCampgroundId, {
-                    format: "csv",
+                  const payload: { format: "csv" | "xlsx"; filters: Record<string, any>; emailTo?: string[] } = {
+                    format: exportFormat,
                     filters: { range: `last_${period}_days`, days: period }
-                  });
+                  };
+                  const trimmedEmail = exportEmail.trim();
+                  if (trimmedEmail) {
+                    payload.emailTo = [trimmedEmail];
+                  }
+                  const job = await apiClient.queueReportExport(selectedCampgroundId, payload);
                   setExportJobId(job.id);
                 } catch (err: any) {
                   setExportStatus("error");
@@ -155,7 +177,9 @@ export default function AnalyticsPage() {
               className="px-3 py-1.5 rounded-lg text-sm font-medium bg-emerald-600 text-white hover:bg-emerald-700 transition-colors disabled:opacity-60"
               disabled={!selectedCampgroundId || exportStatus === "processing" || exportStatus === "queued"}
             >
-              {exportStatus === "processing" || exportStatus === "queued" ? "Exporting..." : "Export CSV"}
+              {exportStatus === "processing" || exportStatus === "queued"
+                ? "Exporting..."
+                : `Export ${exportFormat === "xlsx" ? "XLSX" : "CSV"}`}
             </button>
           </div>
         </div>
@@ -167,7 +191,7 @@ export default function AnalyticsPage() {
                 href={exportUrl}
                 className="text-emerald-700 underline font-medium"
               >
-                Download CSV
+                Download export
               </a>
             )}
             {exportStatus === "error" && <span className="text-red-600">{exportError ?? "Export failed"}</span>}

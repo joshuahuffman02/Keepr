@@ -1,5 +1,6 @@
 import { Injectable, Logger } from "@nestjs/common";
 import fetch from "node-fetch";
+import { AlertingService } from "../observability/alerting.service";
 
 interface SmsSendResult {
   providerMessageId?: string;
@@ -16,6 +17,7 @@ export class SmsService {
   private readonly fromNumber = process.env.TWILIO_FROM_NUMBER || "";
   private readonly smsEnabled = process.env.SMS_ENABLED !== "false"; // Feature flag
   private readonly isConfigured: boolean;
+  private readonly backoffScheduleMs = [0, 400, 1200];
 
   // Telemetry counters
   private telemetry = {
@@ -25,7 +27,7 @@ export class SmsService {
     skipped: 0,
   };
 
-  constructor() {
+  constructor(private readonly alerting: AlertingService) {
     this.isConfigured = !!(this.twilioSid && this.twilioToken && this.fromNumber);
     if (this.isConfigured) {
       this.logger.log("SMS service initialized with Twilio credentials");
@@ -62,6 +64,12 @@ export class SmsService {
     if (!this.isConfigured) {
       this.logger.warn(`SMS no-op: Twilio not configured. Would send to ${opts.to}: "${opts.body.substring(0, 50)}..."`);
       this.telemetry.skipped++;
+      this.dispatchAlert("SMS not configured", `Twilio credentials missing; SMS send skipped for ${opts.to}`, "warning", {
+        to: opts.to,
+        campgroundId: opts.campgroundId,
+        reservationId: opts.reservationId,
+        reason: "not_configured",
+      });
       return { provider: "noop", fallback: "not_configured", success: false };
     }
     const url = `https://api.twilio.com/2010-04-01/Accounts/${this.twilioSid}/Messages.json`;
@@ -88,25 +96,44 @@ export class SmsService {
       return { providerMessageId: data.sid, provider: "twilio", success: true };
     };
 
-    try {
-      return await attemptSend();
-    } catch (err) {
-      this.logger.warn(`Twilio send attempt 1 failed, retrying: ${err}`);
-      try {
-        await new Promise((resolve) => setTimeout(resolve, 500));
-        return await attemptSend();
-      } catch (err2) {
-        this.telemetry.failed++;
-        this.logger.error(`Twilio retry failed for ${opts.to}: ${err2}`);
-        // Backoff and final attempt before failing closed
-        try {
-          await new Promise((resolve) => setTimeout(resolve, 1200));
-          return await attemptSend();
-        } catch (err3) {
-          this.logger.error(`Twilio final attempt failed for ${opts.to}: ${err3}`);
-          return { provider: "twilio", fallback: "send_failed", success: false };
-        }
+    let lastError: unknown;
+    for (const delay of this.backoffScheduleMs) {
+      if (delay > 0) {
+        await new Promise((resolve) => setTimeout(resolve, delay));
       }
+      try {
+        return await attemptSend();
+      } catch (err) {
+        lastError = err;
+        this.logger.warn(`Twilio send attempt failed (delay ${delay}ms): ${err}`);
+      }
+    }
+
+    this.telemetry.failed++;
+    this.logger.error(`Twilio failed for ${opts.to} after ${this.backoffScheduleMs.length} attempts: ${lastError}`);
+    await this.dispatchAlert(
+      "SMS send failure",
+      `Twilio failed for ${opts.to} after retries`,
+      "error",
+      `sms-send-failure-${opts.campgroundId ?? "global"}`,
+      { to: opts.to, campgroundId: opts.campgroundId, reservationId: opts.reservationId, error: (lastError as any)?.message }
+    );
+
+    // Final fallback: report failure and let caller decide on follow-up/failover.
+    return { provider: "twilio", fallback: "send_failed", success: false };
+  }
+
+  private async dispatchAlert(
+    title: string,
+    body: string,
+    severity: "info" | "warning" | "error" | "critical",
+    dedupKey?: string,
+    details?: Record<string, any>
+  ) {
+    try {
+      await this.alerting.dispatch(title, body, severity, dedupKey, details);
+    } catch (err) {
+      this.logger.debug(`SMS alert dispatch skipped: ${(err as any)?.message ?? err}`);
     }
   }
 }

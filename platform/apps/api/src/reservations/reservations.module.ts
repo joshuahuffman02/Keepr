@@ -22,9 +22,10 @@ import { MatchScoreService } from "./match-score.service";
 import { PricingV2Service } from "../pricing-v2/pricing-v2.service";
 import { DepositPoliciesService } from "../deposit-policies/deposit-policies.service";
 import { SignaturesModule } from "../signatures/signatures.module";
+import { ApprovalsModule } from "../approvals/approvals.module";
 
 @Module({
-  imports: [WaitlistModule, LoyaltyModule, SeasonalRatesModule, TaxRulesModule, GamificationModule, AuditModule, AccessControlModule, SignaturesModule],
+  imports: [WaitlistModule, LoyaltyModule, SeasonalRatesModule, TaxRulesModule, GamificationModule, AuditModule, AccessControlModule, SignaturesModule, ApprovalsModule],
   controllers: [ReservationsController],
   providers: [
     ReservationsService,

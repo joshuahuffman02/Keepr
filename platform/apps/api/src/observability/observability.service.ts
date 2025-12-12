@@ -25,6 +25,8 @@ type DomainSample = {
   meta?: Record<string, any>;
 };
 
+type DomainKey = "redeem" | "offline" | "offer" | "report" | "comms" | "ota" | "ready";
+
 type Aggregate = {
   count: number;
   errors: number;
@@ -62,7 +64,7 @@ type ObservabilitySnapshot = {
 export class ObservabilityService {
   private readonly apiSamples: ApiSample[] = [];
   private readonly jobSamples: JobSample[] = [];
-  private readonly queues: Record<string, { running: number; queued: number; oldestMs?: number }> = {};
+  private readonly queues: Record<string, { running: number; queued: number; oldestMs?: number; maxQueue?: number; concurrency?: number; updatedAt?: number; rawName?: string }> = {};
   private readonly domainEvents: Record<string, DomainSample[]> = {
     redeem: [],
     offline: [],
@@ -104,33 +106,42 @@ export class ObservabilityService {
     }
   }
 
-  setQueueState(queue: string, running: number, queued: number, oldestMs?: number) {
-    this.queues[queue] = { running, queued, oldestMs };
+  setQueueState(queue: string, running: number, queued: number, oldestMs?: number, meta?: { maxQueue?: number; concurrency?: number }) {
+    const normalized = this.normalizeQueueName(queue);
+    this.queues[normalized] = {
+      running,
+      queued,
+      oldestMs,
+      maxQueue: meta?.maxQueue,
+      concurrency: meta?.concurrency,
+      updatedAt: Date.now(),
+      rawName: queue,
+    };
   }
 
   recordRedeemOutcome(ok: boolean, latencyMs?: number, meta?: Record<string, any>) {
-    this.recordDomainEvent("redeem", { ok, latencyMs, meta });
+    this.emit("redeem", { ok, latencyMs, meta });
   }
 
   recordOfflineReplay(ok: boolean, latencyMs?: number, meta?: Record<string, any>) {
-    this.recordDomainEvent("offline", { ok, latencyMs, meta });
+    this.emit("offline", { ok, latencyMs, meta });
   }
 
   recordOfferLag(seconds: number, meta?: Record<string, any>) {
-    this.recordDomainEvent("offer", { ok: seconds <= 30, latencyMs: seconds * 1000, value: seconds, meta });
+    this.emit("offer", { ok: seconds <= 30, latencyMs: seconds * 1000, value: seconds, meta });
   }
 
   recordReportResult(ok: boolean, latencyMs?: number, meta?: Record<string, any>) {
-    this.recordDomainEvent("report", { ok, latencyMs, meta });
+    this.emit("report", { ok, latencyMs, meta });
   }
 
   recordCommsStatus(status: "delivered" | "sent" | "bounced" | "spam_complaint" | "failed", meta?: Record<string, any>) {
     const ok = status === "delivered" || status === "sent";
-    this.recordDomainEvent("comms", { ok, kind: status, meta });
+    this.emit("comms", { ok, kind: status, meta });
   }
 
   recordOtaStatus(ok: boolean, backlogSeconds?: number, meta?: Record<string, any>) {
-    this.recordDomainEvent("ota", { ok, value: backlogSeconds, meta });
+    this.emit("ota", { ok, value: backlogSeconds, meta });
   }
 
   recordWebMetric(kind: "lcp" | "ttfb", valueMs: number) {
@@ -145,7 +156,11 @@ export class ObservabilityService {
   }
 
   recordReady(ok: boolean, meta?: Record<string, any>) {
-    this.recordDomainEvent("ready", { ok, meta });
+    this.emit("ready", { ok, meta });
+  }
+
+  emit(key: DomainKey, event: Omit<DomainSample, "at"> & { at?: number }) {
+    this.recordDomainEvent(key, event);
   }
 
   snapshot(): ObservabilitySnapshot {
@@ -194,10 +209,10 @@ export class ObservabilityService {
     const queues = snapshot.jobs.queues || {};
     const queueDepthBreaches = Object.entries(queues)
       .filter(([, state]) => (state?.queued ?? 0) > this.queueMaxDepth)
-      .map(([name, state]) => ({ name, queued: state.queued, running: state.running }));
+      .map(([name, state]) => ({ name: state.rawName ?? name, queued: state.queued, running: state.running }));
     const queueLagBreaches = Object.entries(queues)
       .filter(([, state]) => (state?.oldestMs ?? 0) > this.queueLagThresholdMs)
-      .map(([name, state]) => ({ name, oldestMs: state.oldestMs, queued: state.queued }));
+      .map(([name, state]) => ({ name: state.rawName ?? name, oldestMs: state.oldestMs, queued: state.queued }));
 
     const percentile = (values: number[], p: number) => {
       if (!values.length) return 0;
@@ -366,6 +381,14 @@ export class ObservabilityService {
     if (this.domainEvents[key].length > this.maxSamples) {
       this.domainEvents[key].pop();
     }
+  }
+
+  private normalizeQueueName(name: string) {
+    const lower = (name || "").toLowerCase();
+    if (lower.includes("dead") && lower.includes("letter") && !lower.includes("dlq")) {
+      return `${lower}-dlq`;
+    }
+    return lower;
   }
 
   private aggregate(durations: number[]): Aggregate {

@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState, useCallback, useRef } from "react";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient, useQueries } from "@tanstack/react-query";
 import { apiClient } from "../../../../lib/api-client";
 import { Breadcrumbs } from "../../../../components/breadcrumbs";
 import { Button } from "../../../../components/ui/button";
@@ -15,7 +15,10 @@ import type { z } from "zod";
 import { useGanttStore } from "../../../../lib/gantt-store";
 
 type ReservationStatus = z.infer<typeof ReservationSchema>["status"];
-type ReservationUpdate = Partial<z.infer<typeof ReservationSchema>>;
+type ReservationUpdate = Partial<z.infer<typeof ReservationSchema>> & {
+  overrideReason?: string;
+  overrideApprovedBy?: string;
+};
 
 export default function ReservationsPage() {
   const params = useParams();
@@ -82,6 +85,7 @@ export default function ReservationsPage() {
   });
   const [editing, setEditing] = useState<Record<string, ReservationUpdate | undefined>>({});
   const [paymentInputs, setPaymentInputs] = useState<Record<string, number>>({});
+  const [paymentTenders, setPaymentTenders] = useState<Record<string, "card" | "cash" | "check" | "folio">>({});
   const [refundInputs, setRefundInputs] = useState<Record<string, number>>({});
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
@@ -466,8 +470,20 @@ export default function ReservationsPage() {
   );
 
   const recordPayment = useMutation({
-    mutationFn: (payload: { id: string; amount: number }) =>
-      apiClient.recordReservationPayment(payload.id, Math.round(payload.amount * 100)),
+    mutationFn: (payload: { id: string; amount: number; method?: "card" | "cash" | "check" | "folio"; note?: string }) =>
+      apiClient.recordReservationPayment(
+        payload.id,
+        Math.round(payload.amount * 100),
+        payload.method
+          ? [
+            {
+              method: payload.method,
+              amountCents: Math.round(payload.amount * 100),
+              note: payload.note
+            }
+          ]
+          : undefined
+      ),
     onSuccess: () => {
       setPaymentInputs({});
       queryClient.invalidateQueries({ queryKey: ["reservations", campgroundId] });
@@ -581,6 +597,41 @@ export default function ReservationsPage() {
   const hasAvailabilityWindow = !!formState.arrivalDate && !!formState.departureDate;
   const selectedSiteUnavailable = hasAvailabilityWindow && formState.siteId ? !availableSiteIds.has(formState.siteId) : false;
   const overlapConflict = overlapCheckQuery.data?.conflict ?? false;
+  const openDetailIds = useMemo(() => Object.keys(openDetails).filter((id) => openDetails[id]), [openDetails]);
+  const overlapChecks = useQueries<{ conflict: boolean; reasons?: string[] }>({
+    queries: openDetailIds.map((id) => {
+      const res = reservationsQuery.data?.find((r) => r.id === id);
+      const targetSiteId = editing[id]?.siteId ?? res?.siteId;
+      const arrival = editing[id]?.arrivalDate ?? res?.arrivalDate;
+      const departure = editing[id]?.departureDate ?? res?.departureDate;
+      return {
+        queryKey: ["reservation-conflict", id, targetSiteId, arrival, departure],
+        queryFn: () =>
+          apiClient.checkOverlap(campgroundId, {
+            siteId: targetSiteId!,
+            arrivalDate: arrival!,
+            departureDate: departure!,
+            ignoreId: id
+          }),
+        enabled: !!campgroundId && !!targetSiteId && !!arrival && !!departure
+      };
+    })
+  });
+  const conflictByReservation = useMemo(
+    () =>
+      overlapChecks.reduce<Record<string, { conflict: boolean; reasons?: string[] }>>((acc, q, idx) => {
+        const resId = openDetailIds[idx];
+        if (resId) {
+          if (q.data) {
+            acc[resId] = q.data;
+          } else if (q.isError) {
+            acc[resId] = { conflict: false, reasons: ["error"] };
+          }
+        }
+        return acc;
+      }, {}),
+    [overlapChecks, openDetailIds]
+  );
   useEffect(() => {
     if (!flash) return;
     const t = setTimeout(() => setFlash(null), 4000);
@@ -595,6 +646,17 @@ export default function ReservationsPage() {
       setTimeout(() => setSelection({ highlightedId: null }), 3000);
     }
   }, [searchParams, setSelection]);
+  const matchTargetId = useMemo(() => focusId || openDetailIds[0] || null, [focusId, openDetailIds]);
+  const matchTargetReservation = useMemo(
+    () => (matchTargetId ? reservationsQuery.data?.find((r) => r.id === matchTargetId) ?? null : null),
+    [matchTargetId, reservationsQuery.data]
+  );
+  const matchScoresQuery = useQuery({
+    queryKey: ["site-match-score", campgroundId, matchTargetReservation?.guestId],
+    queryFn: () => apiClient.getMatchedSites(campgroundId, matchTargetReservation!.guestId),
+    enabled: !!campgroundId && !!matchTargetReservation?.guestId
+  });
+  const topMatches = useMemo(() => matchScoresQuery.data?.slice(0, 5) ?? [], [matchScoresQuery.data]);
   const summaryText = useMemo(() => {
     const siteName = selectedSite?.name || "Site";
     const className = selectedClass?.name ? ` (${selectedClass.name})` : "";
@@ -1549,6 +1611,29 @@ export default function ReservationsPage() {
                     depositConfig: (campgroundQuery.data as any).depositConfig ?? null
                   })
                   : 0;
+              const editedTotalCents = editing[res.id]?.totalAmount ?? res.totalAmount ?? 0;
+              const editedPaidCents = editing[res.id]?.paidAmount ?? res.paidAmount ?? 0;
+              const editedDepositDue =
+                campgroundQuery.data && editedTotalCents
+                  ? computeDepositDue({
+                    total: editedTotalCents / 100,
+                    nights,
+                    arrivalDate: res.arrivalDate,
+                    depositRule: campgroundQuery.data.depositRule,
+                    depositPercentage: campgroundQuery.data.depositPercentage ?? null,
+                    depositConfig: (campgroundQuery.data as any).depositConfig ?? null
+                  })
+                  : suggestedDeposit;
+              const depositShortfall = Math.max(0, editedDepositDue - editedPaidCents / 100);
+              const paymentAmount = Number(paymentInputs[res.id] ?? balance);
+              const depositPaymentTooLow = depositShortfall > 0 && paymentAmount < depositShortfall;
+              const conflict = conflictByReservation[res.id];
+              const manualOverride =
+                editedTotalCents !== (res.totalAmount ?? 0) || (editing[res.id]?.discountsAmount ?? (res as any).discountsAmount ?? 0) !== ((res as any).discountsAmount ?? 0);
+              const overrideMissing =
+                manualOverride &&
+                (!(editing[res.id]?.overrideReason || "").trim() ||
+                  !(editing[res.id]?.overrideApprovedBy || "").trim());
               const guestName = `${(res as any).guest?.primaryFirstName || ""} ${(res as any).guest?.primaryLastName || ""}`.trim();
               const isOpen = !!openDetails[res.id];
               const wasSkipped =
@@ -1677,6 +1762,19 @@ export default function ReservationsPage() {
 
                   {isOpen && (
                     <div className="space-y-3 border-t border-slate-200 pt-3">
+                      {conflict?.conflict && (
+                        <div className="rounded-md border border-rose-200 bg-rose-50 px-3 py-2 text-xs text-rose-800">
+                          <div className="text-sm font-semibold text-rose-900">Conflict detected</div>
+                          <div className="flex flex-wrap gap-2">
+                            {(conflict.reasons || []).map((r) => (
+                              <span key={r} className="rounded-full border border-rose-200 bg-white px-2 py-0.5">
+                                {r}
+                              </span>
+                            ))}
+                          </div>
+                          <div className="text-[11px] text-rose-700">Resolve conflicts before saving changes.</div>
+                        </div>
+                      )}
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                       <div className="rounded-md border border-slate-200 bg-slate-50 px-3 py-2 text-xs text-slate-700 space-y-1">
                         <div className="text-sm font-semibold text-slate-900">At a glance</div>
@@ -1780,6 +1878,38 @@ export default function ReservationsPage() {
                           </select>
                         </label>
                       </div>
+
+                      {matchTargetReservation?.id === res.id && (
+                        <div className="rounded-md border border-slate-200 bg-slate-50 px-3 py-2 text-xs text-slate-700 space-y-2">
+                          <div className="flex items-center justify-between">
+                            <div className="text-sm font-semibold text-slate-900">Recommended sites</div>
+                            {matchScoresQuery.isLoading && <span className="text-[11px] text-slate-500">Checking matches…</span>}
+                            {matchScoresQuery.isError && <span className="text-[11px] text-rose-600">Match scoring failed</span>}
+                          </div>
+                          {topMatches.length === 0 && !matchScoresQuery.isLoading && (
+                            <div className="text-slate-500">No ranked matches available for this guest.</div>
+                          )}
+                          {topMatches.length > 0 && (
+                            <div className="flex flex-wrap gap-2">
+                              {topMatches.slice(0, 3).map((m) => (
+                                <button
+                                  key={m.site.id}
+                                  className="rounded-md border border-emerald-200 bg-emerald-50 px-2 py-1 text-[11px] text-emerald-800 hover:border-emerald-300"
+                                  onClick={() =>
+                                    setEditing((prev) => ({
+                                      ...prev,
+                                      [res.id]: { ...(prev[res.id] || {}), siteId: m.site.id }
+                                    }))
+                                  }
+                                >
+                                  {m.site.name || m.site.siteNumber} • {m.score}/100
+                                  {m.reasons?.[0] ? ` (${m.reasons[0]})` : ""}
+                                </button>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      )}
 
                       {res.guest && (
                         <div className="flex flex-col gap-1 text-xs text-slate-600">
@@ -1914,16 +2044,32 @@ export default function ReservationsPage() {
                                 setPaymentInputs((prev) => ({ ...prev, [res.id]: Number(e.target.value || 0) }))
                               }
                             />
+                            <select
+                              className="rounded-md border border-slate-200 px-2 py-1 text-xs"
+                              value={paymentTenders[res.id] ?? "card"}
+                              onChange={(e) =>
+                                setPaymentTenders((prev) => ({
+                                  ...prev,
+                                  [res.id]: (e.target.value as "card" | "cash" | "check" | "folio") || "card"
+                                }))
+                              }
+                            >
+                              <option value="card">Card</option>
+                              <option value="cash">Cash</option>
+                              <option value="check">Check</option>
+                              <option value="folio">Folio</option>
+                            </select>
                             <Button
                               variant="secondary"
                               size="sm"
                               onClick={() =>
                                 recordPayment.mutate({
                                   id: res.id,
-                                  amount: Number(paymentInputs[res.id] ?? balance)
+                                  amount: paymentAmount,
+                                  method: paymentTenders[res.id] ?? "card"
                                 })
                               }
-                              disabled={recordPayment.isPending}
+                              disabled={recordPayment.isPending || depositPaymentTooLow}
                             >
                               {recordPayment.isPending ? "Saving…" : "Record"}
                             </Button>
@@ -1940,6 +2086,11 @@ export default function ReservationsPage() {
                               Fill balance
                             </Button>
                           </div>
+                          {depositPaymentTooLow && (
+                            <div className="text-[11px] text-amber-700">
+                              Deposit shortfall ${depositShortfall.toFixed(2)} — collect at least this amount.
+                            </div>
+                          )}
                           <div className="flex flex-wrap gap-2 mt-1">
                             <input
                               type="number"
@@ -2146,6 +2297,36 @@ export default function ReservationsPage() {
                           }
                         />
                       </div>
+                      {manualOverride && (
+                        <div className="rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-xs text-amber-800 space-y-2">
+                          <div className="text-sm font-semibold text-amber-900">Manual pricing override</div>
+                          <div className="text-[11px] text-amber-700">Provide reason and approval to save discount/total changes.</div>
+                          <div className="grid md:grid-cols-2 gap-2">
+                            <input
+                              className="rounded-md border border-amber-300 px-2 py-1 text-xs"
+                              placeholder="Override reason"
+                              value={editing[res.id]?.overrideReason ?? ""}
+                              onChange={(e) =>
+                                setEditing((prev) => ({
+                                  ...prev,
+                                  [res.id]: { ...(prev[res.id] || {}), overrideReason: e.target.value }
+                                }))
+                              }
+                            />
+                            <input
+                              className="rounded-md border border-amber-300 px-2 py-1 text-xs"
+                              placeholder="Approved by"
+                              value={editing[res.id]?.overrideApprovedBy ?? ""}
+                              onChange={(e) =>
+                                setEditing((prev) => ({
+                                  ...prev,
+                                  [res.id]: { ...(prev[res.id] || {}), overrideApprovedBy: e.target.value }
+                                }))
+                              }
+                            />
+                          </div>
+                        </div>
+                      )}
                       <div className="flex gap-2">
                         <Button
                           variant="secondary"
@@ -2187,11 +2368,13 @@ export default function ReservationsPage() {
                                 baseSubtotal: editing[res.id]?.totalAmount ?? res.totalAmount,
                                 feesAmount: (res as any).feesAmount ?? 0,
                                 taxesAmount: (res as any).taxesAmount ?? 0,
-                                discountsAmount: (res as any).discountsAmount ?? 0
+                                discountsAmount: (res as any).discountsAmount ?? 0,
+                                overrideReason: editing[res.id]?.overrideReason ?? undefined,
+                                overrideApprovedBy: editing[res.id]?.overrideApprovedBy ?? undefined
                               }
                             })
                           }
-                          disabled={updateReservation.isPending}
+                          disabled={updateReservation.isPending || conflict?.conflict || overrideMissing || depositShortfall > 0}
                         >
                           {updateReservation.isPending ? "Saving…" : "Save"}
                         </Button>
@@ -2208,6 +2391,13 @@ export default function ReservationsPage() {
                           Cancel
                         </Button>
                       </div>
+                      {(depositShortfall > 0 || overrideMissing || conflict?.conflict) && (
+                        <div className="text-[11px] text-amber-700">
+                          {depositShortfall > 0 && `Deposit shortfall $${depositShortfall.toFixed(2)} — collect before saving. `}
+                          {overrideMissing && "Override reason + approver are required when editing totals. "}
+                          {conflict?.conflict && "Resolve site conflicts before saving."}
+                        </div>
+                      )}
 
                       <div className="mt-2 rounded-lg border border-slate-200 bg-white p-3 space-y-2 text-sm">
                         <div className="flex items-center justify-between">

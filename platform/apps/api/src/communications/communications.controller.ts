@@ -182,11 +182,9 @@ export class CommunicationsController {
   }
 
   private requireTemplateForOutbound(body: SendCommunicationDto, channel: "email" | "sms") {
-    const allowRaw = (process.env.ALLOW_RAW_COMMUNICATIONS ?? "false").toString().toLowerCase() === "true";
-    if (allowRaw) return;
     if (!body.templateId) {
       throw new BadRequestException(
-        `Template is required for outbound ${channel}. Set ALLOW_RAW_COMMUNICATIONS=true to override (not recommended).`
+        `Template is required for outbound ${channel}. Raw bodies are not permitted without an approved template.`
       );
     }
   }
@@ -311,6 +309,12 @@ export class CommunicationsController {
   async send(@Body() body: SendCommunicationDto) {
     if (!body.campgroundId) throw new BadRequestException("campgroundId is required");
     const prisma = this.prisma as any;
+    const clientConsentProvided = body.consentGranted === true || Boolean(body.consentSource);
+    if (clientConsentProvided) {
+      // Do not trust client-provided consent flags; enforce server-side logs only.
+      (body as any).consentGranted = undefined;
+      (body as any).consentSource = undefined;
+    }
     const campground = await this.prisma.campground.findUnique({
       where: { id: body.campgroundId },
       select: { id: true, quietHoursStart: true, quietHoursEnd: true, timezone: true, parkTimeZone: true }
@@ -353,7 +357,8 @@ export class CommunicationsController {
             consentSource: consentMeta.consentSource,
             consentCheckedAt: consentMeta.consentCheckedAt,
             consentSubject: consentMeta.consentSubject ?? null,
-            consentGrantedAt: consentMeta.consentGrantedAt ?? null
+            consentGrantedAt: consentMeta.consentGrantedAt ?? null,
+            clientConsentProvided: clientConsentProvided || undefined
           }
         }
       });
@@ -415,7 +420,8 @@ export class CommunicationsController {
             consentSource: consentMeta.consentSource,
             consentCheckedAt: consentMeta.consentCheckedAt,
             consentSubject: consentMeta.consentSubject ?? null,
-            consentGrantedAt: consentMeta.consentGrantedAt ?? null
+            consentGrantedAt: consentMeta.consentGrantedAt ?? null,
+            clientConsentProvided: clientConsentProvided || undefined
           }
         }
       });

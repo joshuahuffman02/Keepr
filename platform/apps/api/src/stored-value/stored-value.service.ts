@@ -105,6 +105,10 @@ export class StoredValueService {
         };
       });
 
+      if (dto.taxableLoad) {
+        await this.assertLiabilityRollForward(campgroundId);
+      }
+
       if (idempotencyKey) await this.idempotency.complete(idempotencyKey, result);
       return result;
     } catch (err) {
@@ -162,6 +166,10 @@ export class StoredValueService {
 
         return { accountId: account.id, balanceCents: after };
       });
+
+      if (dto.taxableLoad) {
+        await this.assertLiabilityRollForward(scope.campgroundId ?? account.campgroundId ?? null);
+      }
 
       if (idempotencyKey) await this.idempotency.complete(idempotencyKey, result);
       return result;
@@ -591,7 +599,7 @@ export class StoredValueService {
     return this.balanceByAccount(account.accountId);
   }
 
-  async liabilitySnapshot(campgroundId: string) {
+  async liabilitySnapshot(campgroundId: string, opts?: { enforce?: boolean }) {
     const accounts = await this.prisma.storedValueAccount.findMany({
       where: { campgroundId },
       select: { id: true, metadata: true }
@@ -628,7 +636,12 @@ export class StoredValueService {
     const totalCents = taxableCents + nonTaxableCents;
     const driftCents = rollForwardCents - totalCents;
 
-    return { campgroundId, taxableCents, nonTaxableCents, totalCents, rollForwardCents, driftCents };
+    const rollForwardOk = driftCents === 0;
+    if (opts?.enforce && !rollForwardOk) {
+      throw new ConflictException(`Liability roll-forward drift detected (${driftCents} cents)`);
+    }
+
+    return { campgroundId, taxableCents, nonTaxableCents, totalCents, rollForwardCents, driftCents, rollForwardOk };
   }
 
   private directionToSigned(direction: StoredValueDirection, amount: number) {
@@ -717,6 +730,11 @@ export class StoredValueService {
       merged.taxableLoad = taxableLoad;
     }
     return merged;
+  }
+
+  private async assertLiabilityRollForward(campgroundId?: string | null) {
+    if (!campgroundId) return;
+    await this.liabilitySnapshot(campgroundId, { enforce: true });
   }
 
   private async getAccount(dto: RedeemStoredValueDto) {

@@ -175,8 +175,15 @@ export class ReservationsController {
   }
 
   @Post("reservations/:id/kiosk-checkin")
-  kioskCheckIn(@Param("id") id: string, @Body() body: { upsellTotalCents: number }) {
-    return this.reservations.kioskCheckIn(id, body.upsellTotalCents || 0);
+  kioskCheckIn(
+    @Param("id") id: string,
+    @Body() body: { upsellTotalCents: number; override?: boolean; overrideReason?: string; actorId?: string | null }
+  ) {
+    return this.reservations.kioskCheckIn(id, body.upsellTotalCents || 0, {
+      override: body.override,
+      overrideReason: body.overrideReason,
+      actorId: body.actorId ?? null
+    });
   }
 
   @Get("campgrounds/:campgroundId/matches")

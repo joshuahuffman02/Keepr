@@ -66,5 +66,6 @@ describe("StoredValueService liability + taxable loads", () => {
     expect(snapshot.totalCents).toBe(1300);
     expect(snapshot.rollForwardCents).toBe(1300);
     expect(snapshot.driftCents).toBe(0);
+    expect(snapshot.rollForwardOk).toBe(true);
   });
 });

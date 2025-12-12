@@ -186,6 +186,14 @@ export class CreateReservationDto {
   paymentNotes?: string;
 
   @IsOptional()
+  @IsString()
+  overrideReason?: string;
+
+  @IsOptional()
+  @IsString()
+  overrideApprovedBy?: string;
+
+  @IsOptional()
   @IsInt()
   @Min(0)
   pets?: number;

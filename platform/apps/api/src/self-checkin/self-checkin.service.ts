@@ -27,35 +27,133 @@ export class SelfCheckinService {
     private readonly accessControl: AccessControlService
   ) { }
 
+  private async attachWaiverArtifacts(reservationId: string, guestId: string, evidence: { request?: any; artifact?: any; digital?: any }) {
+    const ops: Promise<any>[] = [];
+
+    if (evidence.request && (!evidence.request.reservationId || !evidence.request.guestId)) {
+      ops.push(
+        (this.prisma as any).signatureRequest?.update?.({
+          where: { id: evidence.request.id },
+          data: {
+            reservationId: evidence.request.reservationId ?? reservationId,
+            guestId: evidence.request.guestId ?? guestId
+          }
+        })
+      );
+    }
+
+    if (evidence.artifact && (!evidence.artifact.reservationId || !evidence.artifact.guestId)) {
+      ops.push(
+        (this.prisma as any).signatureArtifact?.update?.({
+          where: { id: evidence.artifact.id },
+          data: {
+            reservationId: evidence.artifact.reservationId ?? reservationId,
+            guestId: evidence.artifact.guestId ?? guestId
+          }
+        })
+      );
+    }
+
+    if (evidence.digital && (!evidence.digital.reservationId || !evidence.digital.guestId)) {
+      ops.push(
+        (this.prisma as any).digitalWaiver?.update?.({
+          where: { id: evidence.digital.id },
+          data: {
+            reservationId: evidence.digital.reservationId ?? reservationId,
+            guestId: evidence.digital.guestId ?? guestId
+          }
+        })
+      );
+    }
+
+    if (ops.length) {
+      try {
+        await Promise.all(ops);
+      } catch (err) {
+        console.warn("Failed to attach waiver artifacts to reservation", err);
+      }
+    }
+  }
+
   private async hasSignedWaiver(reservationId: string, guestId: string) {
-    const [signedSignature, signedArtifact, digitalWaiver] = await Promise.all([
+    const [signedRequest, digitalWaiver] = await Promise.all([
       (this.prisma as any).signatureRequest.findFirst?.({
-        where: { reservationId, documentType: "waiver", status: "signed" }
-      }),
-      (this.prisma as any).signatureArtifact.findFirst?.({
-        where: { reservationId, pdfUrl: { not: null } }
+        where: {
+          documentType: "waiver",
+          status: "signed",
+          OR: [{ reservationId }, { reservationId: null, guestId }]
+        },
+        include: { artifact: true },
+        orderBy: { signedAt: "desc" }
       }),
       (this.prisma as any).digitalWaiver.findFirst?.({
         where: {
           OR: [{ reservationId }, { reservationId: null, guestId }],
           status: "signed"
-        }
+        },
+        orderBy: { signedAt: "desc" }
       })
     ]);
-    return Boolean(signedSignature || signedArtifact || digitalWaiver);
+
+    const signedArtifact =
+      signedRequest?.artifact ??
+      (await (this.prisma as any).signatureArtifact?.findFirst?.({
+        where: {
+          pdfUrl: { not: null },
+          OR: [{ reservationId }, { reservationId: null, guestId }]
+        }
+      }));
+
+    const hasEvidence = Boolean(signedRequest || signedArtifact || digitalWaiver);
+
+    if (hasEvidence) {
+      await this.attachWaiverArtifacts(reservationId, guestId, {
+        request: signedRequest ?? undefined,
+        artifact: signedArtifact ?? undefined,
+        digital: digitalWaiver ?? undefined
+      });
+    }
+
+    return hasEvidence;
+  }
+
+  private async attachIdVerification(reservationId: string, guestId: string, match: any) {
+    if (!match || (match.reservationId && match.guestId)) return;
+    try {
+      await (this.prisma as any).idVerification?.update?.({
+        where: { id: match.id },
+        data: {
+          reservationId: match.reservationId ?? reservationId,
+          guestId: match.guestId ?? guestId
+        }
+      });
+    } catch (err) {
+      console.warn("Failed to attach ID verification to reservation", err);
+    }
   }
 
   private async hasVerifiedId(reservationId: string, guestId: string) {
     const now = new Date();
     const match = await (this.prisma as any).idVerification.findFirst?.({
       where: {
+        status: "verified",
         OR: [
-          { reservationId, status: "verified" },
-          { guestId, status: "verified", expiresAt: { gt: now } }
+          { reservationId },
+          {
+            guestId,
+            OR: [{ expiresAt: null }, { expiresAt: { gt: now } }]
+          }
         ]
-      }
+      },
+      orderBy: { verifiedAt: "desc" }
     });
-    return Boolean(match);
+
+    if (match) {
+      await this.attachIdVerification(reservationId, guestId, match);
+      return true;
+    }
+
+    return false;
   }
 
   /**

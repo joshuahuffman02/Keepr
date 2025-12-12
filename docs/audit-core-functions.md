@@ -1,10 +1,19 @@
+## Agent Guardrails (Prisma 7)
+- Prisma 7 is in place. Do NOT switch generator to prisma-client or refactor @prisma/client imports.
+- Any new PrismaClient() must use PrismaPg adapter (see existing patterns).
+- Don’t touch GitHub/deploy; update docs/audit-core-functions.md and audit-findings-dev.md as you close items.
+
+## Check-in Compliance & Overrides
+- Self/kiosk check-in now blocks until waiver + ID verification are signed unless an explicit override is provided; overrides are audited with unmet prerequisites and noted on the reservation request.
+- Signed waiver/IDV artifacts auto-attach to the reservation/guest (signature request, artifact, digital waiver, ID verification) so subsequent compliance checks recognize completion.
+- Kiosk check-in writes pending check-in status codes on compliance failures, marks check-in completed on success, auto-grants access control on check-in, and cancellations/checkout paths already auto-revoke access.
+
 ## Reporting & Exports
-- Export queue enforces a capacity guard with 503 + `retryAfter`, records to observability, and fires alerting before creating jobs; exports are capped by `REPORT_EXPORT_MAX_ROWS` and paginated via resumable tokens.
-- Export summaries return ADR, RevPAR, occupancy, revenue, liability, and channel mix pulled from dashboard/booking sources; attach rate is not computed anywhere.
-- Report execution has a concurrency guard but does not record/alert when the guard trips, so saturation is silent apart from the 503.
-- No scheduler/recurring exports: jobs are only created via API calls, and the cron just flips queued jobs to success; there is no cadence/email delivery or emailed report distribution.
-- Export processor is stubbed: the cron marks jobs `success` without generating/storing CSV/XLSX, no download URL/email is produced, and there is no export audit trail.
-- UI parity risks: analytics UI pulls ADR/RevPAR/occupancy/liability from the period-aware `dashboard-metrics` endpoint, while CSV summaries use the 30-day/all-time `dashboard.summary`, so totals can diverge; no UI surface triggers CSV exports despite API client helpers.
+- Export queue enforces a capacity guard with 503 + `retryAfter`, emits observability and alerts, and caps rows via `REPORT_EXPORT_MAX_ROWS` with resumable tokens; job run telemetry is recorded when exports finish or fail.
+- Export processor generates CSV/XLSX, uploads and persists the download URL plus recordCount/summary on the job, emails `emailTo` recipients, and writes an audit trail; queued and recurring jobs flow through cron/job queue instead of stubbed status flips.
+- Export summaries pull ADR/RevPAR/occupancy/revenue/liability, channel mix, and attach rate using period-aware `getDashboardMetrics` + booking sources derived from the same filters used in the analytics UI.
+- Report query capacity guard now records observability + alerting when heavy/standard limits are hit, matching export guard behavior.
+- Analytics page surfaces the export trigger (CSV/XLSX + optional email) and polls job status so exports are reachable from the dashboard.
 
 ### Evidence
 ```343:375:platform/apps/api/src/reports/reports.service.ts
@@ -230,11 +239,11 @@
 # Core Function Audit
 
 ## Comms & Observability
-- Consent, quiet hours, approvals: Email/SMS send flow enforces per-channel consent using `privacySetting` + `consentLog`, blocks during campground quiet hours unless `quietHoursOverride` is set, and requires templates to be `approved` when referenced; playbook jobs reschedule to quietHoursEnd when needed (platform/apps/api/src/communications/communications.controller.ts).
-- Deliverability handling: Postmark status webhook updates records and dispatches alerts for bounce/complaint events; Twilio status webhook only records metrics. Email sending retries Postmark once, then falls back to SMTP/log; SMS retries once with no provider failover. Playbook jobs retry up to 3 times with incremental delay before failing (platform/apps/api/src/communications/communications.controller.ts, platform/apps/api/src/email/email.service.ts, platform/apps/api/src/sms/sms.service.ts).
-- Alerts and monitoring: Observability aggregates domain signals (redeem, offline backlog, offer lag, report failures, comms delivery/bounce/complaint, readiness, OTA backlog placeholder) and AlertMonitor emits Slack/PagerDuty alerts for breaches plus DLQ/queue lag detection and OTA adapter alerts; failed synthetics recorded every 5m (env-gated) are also surfaced. Readiness endpoint checks DB/Redis, records readiness status, and returns 503 on failure (platform/apps/api/src/observability/observability.service.ts, platform/apps/api/src/observability/alert-monitor.service.ts, platform/apps/api/src/observability/synthetics.service.ts, platform/apps/api/src/health/health.service.ts).
-- Gaps/Risks: No producers currently call observability hooks for report results, offer lag, or OTA backlog, so those alerts will never trigger without new emitters. SMS failures do not alert (only metrics), and Postmark alerting is bounce/complaint-only. Consent can be bypassed by setting `consentGranted=true` on the request, and template approval is not enforced when sending raw body without a template. DLQ detection relies on queue names containing “dlq”, and queue depth/lag telemetry only works when callers use `JobQueueService`. Synthetics/comms/ready/OTA alerts are controlled by env flags and can be disabled unintentionally.
-- Follow-ups (proposed): Wire observability.emit calls in report flows, offer lag, and OTA sync/backlog; add SMS alerting + provider failover/backoff (or secondary SMS provider); enforce consent/template checks even on raw-body sends and ignore client-provided consentGranted flags; harden DLQ/queue monitoring via consistent queue naming and mandatory JobQueueService usage; guard alerting/synthetics flags with defaults + admin visibility so they cannot be silently off; add bounce/complaint thresholds to trigger PagerDuty/Slack for SMS as well as email.
+- Consent, quiet hours, approvals: Email/SMS send flow enforces server-side consent using `privacySetting` + `consentLog`, ignores client-provided `consentGranted/consentSource`, blocks during campground quiet hours unless `quietHoursOverride` is set, and now always requires approved templates (raw body sends rejected); playbook jobs reschedule to quietHoursEnd when needed (platform/apps/api/src/communications/communications.controller.ts).
+- Deliverability handling: Postmark status webhook updates records and dispatches alerts for bounce/complaint events; Twilio status webhook only records metrics. Email sending retries Postmark once, then falls back to SMTP/log; SMS now retries with backoff and emits Slack/PagerDuty alerts on final failure or missing config but still has single-provider failover. Playbook jobs retry up to 3 times with incremental delay before failing (platform/apps/api/src/communications/communications.controller.ts, platform/apps/api/src/email/email.service.ts, platform/apps/api/src/sms/sms.service.ts).
+- Alerts and monitoring: Observability aggregates domain signals (redeem, offline backlog, offer lag, report failures, comms delivery/bounce/complaint, readiness, OTA backlog placeholder) with a new `emit` path for domain producers; queue state normalization captures DLQ-style names (including dead-letter variants), and JobQueueService now records saturation failures and passes queue capacity metadata. AlertMonitor emits Slack/PagerDuty alerts for breaches plus DLQ/queue lag detection and OTA adapter alerts; failed synthetics recorded every 5m (env-gated) are also surfaced. Readiness endpoint checks DB/Redis, records readiness status, and returns 503 on failure (platform/apps/api/src/observability/observability.service.ts, platform/apps/api/src/observability/alert-monitor.service.ts, platform/apps/api/src/observability/synthetics.service.ts, platform/apps/api/src/observability/job-queue.service.ts, platform/apps/api/src/health/health.service.ts).
+- Gaps/Risks: SMS still lacks a secondary provider; Postmark alerting is bounce/complaint-only. Observability emit path is in-memory (no durable sink), so alerts still depend on process memory. Queue telemetry assumes callers route through JobQueueService; external queues are not surfaced. Synthetics/comms/ready/OTA alerts remain env-flagged and can be disabled unintentionally.
+- Follow-ups (proposed): Add SMS provider failover or circuit-breaker, extend alerting thresholds for deliverability complaints, persist observability emit stream (or forward to metrics bus), and surface admin visibility for alert flags.
 # Core Function Audit
 
 ## Staff Booking & Assignment
@@ -288,6 +297,7 @@
       requestedAmountCents: body.amountCents
     });
 ```
+- Public guest booking quote fetch now runs inside the review step (sharing promo/tax state) and public API schemas coerce Decimal/string values to numbers, preventing client-side parse errors; date/guest/siteType defaults persist in the URL for refresh/share resilience.
 - Idempotency and replay guardrails are applied on staff payment POSTs, POS checkout, and stored-value actions; completions mark snapshots and conflicts block duplicates.  
 ```257:356:platform/apps/api/src/payments/payments.controller.ts
   async createIntent(
@@ -471,8 +481,8 @@
             }
         }, requestOptions);
 ```
-- No explicit retry/backoff or secondary-gateway failover for payment capture/refund or POS card payments; transient network errors propagate to callers without replay guidance.  
-- Receipts are not auto-issued or itemized from payment flows; API responses simply return IDs/amounts and do not call `EmailService.sendPaymentReceipt` or include line items/tax/fee breakdowns.  
+- Public payment intents now require `Idempotency-Key` and return retry-after hints on inflight/conflict; gateway failover is still stubbed and capture/refund/POS card payments continue to rely on caller retries for transient failures.  
+- Capture, refund, and POS flows now auto-issue itemized receipts (line items/tax/fees) via `EmailService.sendPaymentReceipt`; GL splitting of platform/gateway fees remains absent.  
 ```338:352:platform/apps/api/src/payments/payments.controller.ts
       const response = {
         id: intent.id,
@@ -484,8 +494,8 @@
         fees: feeBreakdown
       };
 ```
-- POS offline replay dedupe stores only hash comparison and status; it does not persist tender details/line items from the offline payload, so reconciliation still depends on server cart presence.  
-- Stored-value taxable-load enforcement depends on metadata flag consistency; there is no tax engine validation that “taxable_load” amounts align with jurisdictional requirements, and liability snapshotting relies on ledger integrity without independent roll-forward checks.  
+- POS offline replay now stores payload/tender/items snapshots and flags carts `needsReview` when totals mismatch, improving reconciliation of offline POS batches.  
+- Taxable-load issuance/reload now requires an active tax rule and enforces liability roll-forward consistency; still lacks jurisdictional taxability matrices and GL/liability posting for stored value.  
 
 ## Compliance & Ops
 - E-sign / waivers / COI: Signatures module issues and audits signature requests (types include waiver/coi), stores signed artifacts, and auto-reminds expiring COIs; waivers module can generate inline PDFs when enabled. Gaps: self-check-in only flags `waiverRequired` but never verifies a signed waiver or ID verification completion.  

@@ -243,6 +243,26 @@ export class PaymentsController {
     return { amountCents, platformPassThroughFeeCents, gatewayPassThroughFeeCents, baseDue };
   }
 
+  private buildReceiptLinesFromIntent(intent: any) {
+    const toNumber = (v: any) => (v === undefined || v === null || Number.isNaN(Number(v)) ? 0 : Number(v));
+    const baseAmount = toNumber(intent?.metadata?.baseAmountCents ?? intent?.amount_received ?? intent?.amount);
+    const platformFee = toNumber(intent?.metadata?.platformPassThroughFeeCents ?? intent?.metadata?.applicationFeeCents);
+    const gatewayFee = toNumber(intent?.metadata?.gatewayPassThroughFeeCents);
+    const taxCents = toNumber((intent?.metadata as any)?.taxCents);
+
+    const lineItems = baseAmount > 0 ? [{ label: "Reservation charge", amountCents: baseAmount }] : [];
+    if (platformFee > 0) lineItems.push({ label: "Platform fee", amountCents: platformFee });
+    if (gatewayFee > 0) lineItems.push({ label: "Gateway fee", amountCents: gatewayFee });
+
+    const feeCents = platformFee + gatewayFee;
+    return {
+      lineItems,
+      taxCents: taxCents || undefined,
+      feeCents: feeCents > 0 ? feeCents : undefined,
+      totalCents: toNumber(intent?.amount_received ?? intent?.amount)
+    };
+  }
+
   private ensureCampgroundMembership(user: any, campgroundId: string | null | undefined) {
     const actorCampgrounds = user?.memberships?.map((m: any) => m.campgroundId) ?? [];
     if (!campgroundId || !actorCampgrounds.includes(campgroundId)) {
@@ -297,6 +317,8 @@ export class PaymentsController {
       baseAmountCents: baseDue
     };
 
+    const threeDsPolicy = this.buildThreeDsPolicy(currency, gatewayConfig);
+
     // Check idempotency if key provided
     if (idempotencyKey) {
       const existing = await this.idempotency.start(idempotencyKey, body, campgroundId);
@@ -326,13 +348,15 @@ export class PaymentsController {
           gatewayProvider: gatewayConfig?.gateway ?? "stripe",
           gatewayMode: gatewayConfig?.mode ?? "test",
           gatewayFeePercentBasisPoints: String(gatewayFeePercentBasisPoints),
-          gatewayFeeFlatCents: String(gatewayFeeFlatCents)
+          gatewayFeeFlatCents: String(gatewayFeeFlatCents),
+          threeDsPolicy
         },
         stripeAccountId,
         applicationFeeCents,
         body.autoCapture === false ? 'manual' : 'automatic',
         this.getPaymentMethodTypes(capabilities),
-        idempotencyKey
+        idempotencyKey,
+        threeDsPolicy
       );
 
       const response = {
@@ -342,7 +366,8 @@ export class PaymentsController {
         currency,
         reservationId: body.reservationId,
         status: intent.status,
-        fees: feeBreakdown
+        fees: feeBreakdown,
+        threeDsPolicy
       };
 
       if (idempotencyKey) {
@@ -409,6 +434,15 @@ export class PaymentsController {
     @Headers("idempotency-key") idempotencyKey?: string
   ) {
     const currency = (body.currency || "usd").toLowerCase();
+    const effectiveIdempotencyKey = idempotencyKey?.trim();
+
+    if (!effectiveIdempotencyKey) {
+      throw new BadRequestException({
+        message: "Idempotency-Key header is required for public payments",
+        retryAfterMs: 500,
+        hint: "Send a unique Idempotency-Key per checkout attempt and reuse it when retrying."
+      });
+    }
 
     if (!body.reservationId) {
       throw new BadRequestException("reservationId is required for payment");
@@ -459,17 +493,16 @@ export class PaymentsController {
     if (body.guestEmail) {
       metadata.guestEmail = body.guestEmail;
     }
+    metadata.idempotencyKey = effectiveIdempotencyKey;
 
     const threeDsPolicy = this.buildThreeDsPolicy(currency, gatewayConfig);
 
-    const existing = idempotencyKey
-      ? await this.idempotency.start(idempotencyKey, body, campgroundId, {
-          endpoint: "public/payments/intents",
-          requestBody: body,
-          metadata: { reservationId: body.reservationId, threeDsPolicy },
-          rateAction: "apply"
-        })
-      : null;
+    const existing = await this.idempotency.start(effectiveIdempotencyKey, body, campgroundId, {
+      endpoint: "public/payments/intents",
+      requestBody: body,
+      metadata: { reservationId: body.reservationId, threeDsPolicy },
+      rateAction: "apply"
+    });
     if (existing?.status === IdempotencyStatus.succeeded && existing.responseJson) {
       return existing.responseJson;
     }
@@ -477,7 +510,8 @@ export class PaymentsController {
       throw new ConflictException({
         message: "Payment intent creation already in progress; retry with backoff",
         retryAfterMs: 500,
-        reason: "inflight"
+        reason: "inflight",
+        idempotencyKey: effectiveIdempotencyKey
       });
     }
 
@@ -491,7 +525,7 @@ export class PaymentsController {
           applicationFeeCents,
           body.captureMethod === 'manual' ? 'manual' : 'automatic',
           this.getPaymentMethodTypes(capabilities),
-          idempotencyKey,
+          effectiveIdempotencyKey,
           threeDsPolicy
         )
       );
@@ -506,15 +540,11 @@ export class PaymentsController {
         threeDsPolicy
       };
 
-      if (idempotencyKey) {
-        await this.idempotency.complete(idempotencyKey, response);
-      }
+      await this.idempotency.complete(effectiveIdempotencyKey, response);
 
       return response;
     } catch (error) {
-      if (idempotencyKey) {
-        await this.idempotency.fail(idempotencyKey);
-      }
+      await this.idempotency.fail(effectiveIdempotencyKey);
       throw error;
     }
   }
@@ -743,18 +773,9 @@ export class PaymentsController {
       const intent = await this.stripeService.capturePaymentIntent(id, body.amountCents, idempotencyKey);
 
       // Record the payment in the reservation if applicable
+      const receiptLines = this.buildReceiptLinesFromIntent(intent);
       const reservationId = intent.metadata?.reservationId;
       if (reservationId) {
-        const toNumber = (v: any) => (v === undefined || v === null || Number.isNaN(Number(v)) ? 0 : Number(v));
-        const lineItems = [
-          { label: "Reservation charge", amountCents: toNumber(intent.metadata?.baseAmountCents ?? intent.amount_received ?? intent.amount) }
-        ];
-        const platformFee = toNumber(intent.metadata?.platformPassThroughFeeCents ?? intent.metadata?.applicationFeeCents);
-        const gatewayFee = toNumber(intent.metadata?.gatewayPassThroughFeeCents);
-        if (platformFee > 0) lineItems.push({ label: "Platform fee", amountCents: platformFee });
-        if (gatewayFee > 0) lineItems.push({ label: "Gateway fee", amountCents: gatewayFee });
-        const taxCents = toNumber((intent.metadata as any)?.taxCents);
-
         await this.reservations.recordPayment(reservationId, intent.amount_received, {
           transactionId: intent.id,
           paymentMethod: intent.payment_method_types?.[0] || 'card',
@@ -762,11 +783,18 @@ export class PaymentsController {
           stripePaymentIntentId: intent.id,
           stripeChargeId: (intent as any)?.latest_charge as any,
           capturedAt: new Date(),
-          lineItems,
-          taxCents: taxCents || undefined,
-          feeCents: platformFee + gatewayFee > 0 ? platformFee + gatewayFee : undefined,
-          totalCents: intent.amount_received,
-          receiptKind: "payment"
+          lineItems: receiptLines.lineItems,
+          taxCents: receiptLines.taxCents,
+          feeCents: receiptLines.feeCents,
+          totalCents: receiptLines.totalCents,
+          receiptKind: "payment",
+          tenders: [
+            {
+              method: intent.payment_method_types?.[0] || 'card',
+              amountCents: intent.amount_received ?? intent.amount ?? 0,
+              note: 'capture'
+            }
+          ]
         });
       }
 
@@ -776,6 +804,9 @@ export class PaymentsController {
         amountCents: intent.amount,
         amountReceivedCents: intent.amount_received,
         currency: intent.currency,
+        lineItems: receiptLines.lineItems,
+        taxCents: receiptLines.taxCents,
+        feeCents: receiptLines.feeCents
       };
 
       if (idempotencyKey) {
@@ -822,10 +853,25 @@ export class PaymentsController {
       }
 
       const refund = await this.stripeService.createRefund(id, body.amountCents, body.reason, idempotencyKey);
+      const receiptLines = this.buildReceiptLinesFromIntent(intent);
 
       const reservationId = intent.metadata?.reservationId;
       if (reservationId) {
-        await this.reservations.recordRefund(reservationId, refund.amount || 0, refund.id);
+        await this.reservations.recordRefund(reservationId, refund.amount || 0, refund.id, {
+          lineItems: receiptLines.lineItems,
+          taxCents: receiptLines.taxCents,
+          feeCents: receiptLines.feeCents,
+          totalCents: refund.amount || receiptLines.totalCents,
+          paymentMethod: intent.payment_method_types?.[0] || "card",
+          source: intent.metadata?.source || "online",
+          tenders: [
+            {
+              method: intent.payment_method_types?.[0] || "card",
+              amountCents: refund.amount || 0,
+              note: "stripe_refund"
+            }
+          ]
+        });
       }
 
       const response = {
@@ -834,6 +880,9 @@ export class PaymentsController {
         amountCents: refund.amount,
         paymentIntentId: id,
         reason: refund.reason,
+        lineItems: receiptLines.lineItems,
+        taxCents: receiptLines.taxCents,
+        feeCents: receiptLines.feeCents
       };
 
       if (idempotencyKey) {
@@ -948,7 +997,18 @@ export class PaymentsController {
           const intent = await this.stripeService.retrievePaymentIntent(paymentIntentId);
           const reservationId = intent.metadata?.reservationId;
           if (reservationId) {
-            await this.reservations.recordRefund(reservationId, charge.amount_refunded, charge.id);
+            const receiptLines = this.buildReceiptLinesFromIntent(intent);
+            await this.reservations.recordRefund(reservationId, charge.amount_refunded, charge.id, {
+              lineItems: receiptLines.lineItems,
+              taxCents: receiptLines.taxCents,
+              feeCents: receiptLines.feeCents,
+              totalCents: charge.amount_refunded,
+              paymentMethod: intent.payment_method_types?.[0] || "card",
+              source: intent.metadata?.source || "online",
+              tenders: [
+                { method: intent.payment_method_types?.[0] || "card", amountCents: charge.amount_refunded, note: "webhook_refund" }
+              ]
+            });
           }
         } catch {
           // Log but don't fail - the refund still happened in Stripe

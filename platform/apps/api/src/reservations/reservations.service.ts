@@ -1,5 +1,5 @@
 import { BadRequestException, ConflictException, Injectable, NotFoundException } from "@nestjs/common";
-import { GamificationEventCategory, MaintenanceStatus, Prisma, ReferralIncentiveType, Reservation, ReservationStatus } from "@prisma/client";
+import { CheckInStatus, GamificationEventCategory, MaintenanceStatus, Prisma, ReferralIncentiveType, Reservation, ReservationStatus } from "@prisma/client";
 import { PrismaService } from "../prisma/prisma.service";
 import { CreateReservationDto } from "./dto/create-reservation.dto";
 import { RefundPaymentDto } from "./dto/refund-payment.dto";
@@ -14,6 +14,7 @@ import { LoyaltyService } from '../loyalty/loyalty.service';
 import { SeasonalRatesService } from '../seasonal-rates/seasonal-rates.service';
 import { TaxRulesService } from '../tax-rules/tax-rules.service';
 import { postBalancedLedgerEntries } from "../ledger/ledger-posting.util";
+import { AuditService } from "../audit/audit.service";
 
 import { MatchScoreService } from "./match-score.service";
 import { GamificationService } from "../gamification/gamification.service";
@@ -22,6 +23,8 @@ import { Cron } from "@nestjs/schedule";
 import { PricingV2Service, PricingBreakdown } from "../pricing-v2/pricing-v2.service";
 import { DepositPoliciesService, DepositCalculation } from "../deposit-policies/deposit-policies.service";
 import { SignaturesService } from "../signatures/signatures.service";
+import { AuditService } from "../audit/audit.service";
+import { ApprovalsService } from "../approvals/approvals.service";
 
 @Injectable()
 export class ReservationsService {
@@ -40,7 +43,9 @@ export class ReservationsService {
     private readonly pricingV2Service: PricingV2Service,
     private readonly depositPoliciesService: DepositPoliciesService,
     private readonly accessControl: AccessControlService,
-    private readonly signaturesService: SignaturesService
+    private readonly signaturesService: SignaturesService,
+    private readonly audit: AuditService,
+    private readonly approvals: ApprovalsService
   ) { }
 
   async getMatchedSites(campgroundId: string, guestId: string) {
@@ -94,35 +99,133 @@ export class ReservationsService {
     return 0;
   }
 
+  private async attachWaiverArtifacts(reservationId: string, guestId: string, evidence: { request?: any; artifact?: any; digital?: any }) {
+    const ops: Promise<any>[] = [];
+
+    if (evidence.request && (!evidence.request.reservationId || !evidence.request.guestId)) {
+      ops.push(
+        (this.prisma as any).signatureRequest?.update?.({
+          where: { id: evidence.request.id },
+          data: {
+            reservationId: evidence.request.reservationId ?? reservationId,
+            guestId: evidence.request.guestId ?? guestId
+          }
+        })
+      );
+    }
+
+    if (evidence.artifact && (!evidence.artifact.reservationId || !evidence.artifact.guestId)) {
+      ops.push(
+        (this.prisma as any).signatureArtifact?.update?.({
+          where: { id: evidence.artifact.id },
+          data: {
+            reservationId: evidence.artifact.reservationId ?? reservationId,
+            guestId: evidence.artifact.guestId ?? guestId
+          }
+        })
+      );
+    }
+
+    if (evidence.digital && (!evidence.digital.reservationId || !evidence.digital.guestId)) {
+      ops.push(
+        (this.prisma as any).digitalWaiver?.update?.({
+          where: { id: evidence.digital.id },
+          data: {
+            reservationId: evidence.digital.reservationId ?? reservationId,
+            guestId: evidence.digital.guestId ?? guestId
+          }
+        })
+      );
+    }
+
+    if (ops.length) {
+      try {
+        await Promise.all(ops);
+      } catch (err) {
+        console.warn("Failed to attach waiver artifacts to reservation", err);
+      }
+    }
+  }
+
   private async hasSignedWaiver(reservationId: string, guestId: string) {
-    const [signedSignature, signedArtifact, digitalWaiver] = await Promise.all([
+    const [signedRequest, digitalWaiver] = await Promise.all([
       (this.prisma as any).signatureRequest.findFirst?.({
-        where: { reservationId, documentType: "waiver", status: "signed" }
-      }),
-      (this.prisma as any).signatureArtifact.findFirst?.({
-        where: { reservationId, pdfUrl: { not: null } }
+        where: {
+          documentType: "waiver",
+          status: "signed",
+          OR: [{ reservationId }, { reservationId: null, guestId }]
+        },
+        include: { artifact: true },
+        orderBy: { signedAt: "desc" }
       }),
       (this.prisma as any).digitalWaiver.findFirst?.({
         where: {
           OR: [{ reservationId }, { reservationId: null, guestId }],
           status: "signed"
-        }
+        },
+        orderBy: { signedAt: "desc" }
       })
     ]);
-    return Boolean(signedSignature || signedArtifact || digitalWaiver);
+
+    const signedArtifact =
+      signedRequest?.artifact ??
+      (await (this.prisma as any).signatureArtifact?.findFirst?.({
+        where: {
+          pdfUrl: { not: null },
+          OR: [{ reservationId }, { reservationId: null, guestId }]
+        }
+      }));
+
+    const hasEvidence = Boolean(signedRequest || signedArtifact || digitalWaiver);
+
+    if (hasEvidence) {
+      await this.attachWaiverArtifacts(reservationId, guestId, {
+        request: signedRequest ?? undefined,
+        artifact: signedArtifact ?? undefined,
+        digital: digitalWaiver ?? undefined
+      });
+    }
+
+    return hasEvidence;
+  }
+
+  private async attachIdVerification(reservationId: string, guestId: string, match: any) {
+    if (!match || (match.reservationId && match.guestId)) return;
+    try {
+      await (this.prisma as any).idVerification?.update?.({
+        where: { id: match.id },
+        data: {
+          reservationId: match.reservationId ?? reservationId,
+          guestId: match.guestId ?? guestId
+        }
+      });
+    } catch (err) {
+      console.warn("Failed to attach ID verification to reservation", err);
+    }
   }
 
   private async hasVerifiedId(reservationId: string, guestId: string) {
     const now = new Date();
     const match = await (this.prisma as any).idVerification.findFirst?.({
       where: {
+        status: "verified",
         OR: [
-          { reservationId, status: "verified" },
-          { guestId, status: "verified", expiresAt: { gt: now } }
+          { reservationId },
+          {
+            guestId,
+            OR: [{ expiresAt: null }, { expiresAt: { gt: now } }]
+          }
         ]
-      }
+      },
+      orderBy: { verifiedAt: "desc" }
     });
-    return Boolean(match);
+
+    if (match) {
+      await this.attachIdVerification(reservationId, guestId, match);
+      return true;
+    }
+
+    return false;
   }
 
   private async checkCompliance(reservation: any) {
@@ -1122,16 +1225,25 @@ export class ReservationsService {
           }
         );
 
-        const price =
-          data.totalAmount && data.totalAmount > 0
-            ? {
-              totalCents: data.totalAmount,
-              baseSubtotalCents: 0,
-              rulesDeltaCents: 0,
-              nights: this.computeNights(arrival, departure),
-              pricingRuleVersion: "manual"
-            }
-            : await this.computePriceV2(data.campgroundId, siteId, arrival, departure);
+        const baselinePrice = await this.computePriceV2(data.campgroundId, siteId, arrival, departure);
+        const manualPriceProvided = data.totalAmount !== undefined && data.totalAmount !== null && data.totalAmount > 0;
+        const price = manualPriceProvided
+          ? {
+            totalCents: data.totalAmount,
+            baseSubtotalCents: baselinePrice.baseSubtotalCents,
+            rulesDeltaCents: baselinePrice.rulesDeltaCents,
+            nights: this.computeNights(arrival, departure),
+            pricingRuleVersion: "manual"
+          }
+          : baselinePrice;
+        const manualDiscountProvided = (data.discountsAmount ?? 0) > 0;
+        const manualOverrideDelta = manualPriceProvided ? data.totalAmount - baselinePrice.totalCents : 0;
+        const overrideReason = (data as any).overrideReason as string | undefined;
+        const overrideApprovedBy = (data as any).overrideApprovedBy as string | undefined;
+        const needsOverrideApproval = (manualPriceProvided && manualOverrideDelta !== 0) || manualDiscountProvided;
+        if (needsOverrideApproval && (!overrideReason || !overrideApprovedBy)) {
+          throw new BadRequestException("Manual pricing overrides require overrideReason and overrideApprovedBy.");
+        }
 
         let subtotal = price.totalCents;
         let discountCents = 0;
@@ -1212,6 +1324,8 @@ export class ReservationsService {
           siteClassId,
           rvType,
           pets,
+          overrideReason: _overrideReason,
+          overrideApprovedBy: _overrideApprovedBy,
           ...reservationData
         } = data;
 
@@ -1315,6 +1429,36 @@ export class ReservationsService {
           await this.promotionsService.incrementUsage(promotionId);
         }
 
+        if (needsOverrideApproval) {
+          await this.audit.record({
+            campgroundId: data.campgroundId,
+            actorId: overrideApprovedBy ?? data.updatedBy ?? data.createdBy ?? null,
+            action: "reservation_override",
+            entity: "reservation",
+            entityId: reservation.id,
+            before: null,
+            after: {
+              totalAmount,
+              baselineTotalCents: baselinePrice.totalCents,
+              deltaCents: manualOverrideDelta,
+              discountsAmount: reservation.discountsAmount ?? 0
+            }
+          });
+          await this.approvals.create({
+            type: "config_change",
+            amount: Math.abs(manualOverrideDelta) / 100,
+            currency: "USD",
+            reason: overrideReason || "Manual pricing override",
+            requester: overrideApprovedBy || data.updatedBy || data.createdBy || "unknown",
+            metadata: {
+              reservationId: reservation.id,
+              guestId: reservation.guestId,
+              siteId: reservation.siteId,
+              baselineTotalCents: baselinePrice.totalCents
+            }
+          });
+        }
+
         try {
           await this.signaturesService.autoSendForReservation(reservation);
         } catch (err) {
@@ -1386,18 +1530,25 @@ export class ReservationsService {
           }
         );
 
+        const baselinePrice = await this.computePriceV2(existing.campgroundId, targetSiteId, arrival, departure);
         const shouldReprice = data.totalAmount === undefined || data.totalAmount === null;
-        const price = shouldReprice
-          ? await this.computePriceV2(existing.campgroundId, targetSiteId, arrival, departure)
-          : null;
-        const totalAmount = shouldReprice ? price!.totalCents : data.totalAmount ?? existing.totalAmount;
+        const price = shouldReprice ? baselinePrice : null;
+        const totalAmount = shouldReprice ? baselinePrice.totalCents : data.totalAmount ?? existing.totalAmount;
         const paidAmount = data.paidAmount ?? existing.paidAmount ?? 0;
+        const manualDiscountProvided = data.discountsAmount !== undefined && data.discountsAmount !== null;
+        const manualOverrideDelta = shouldReprice ? 0 : totalAmount - baselinePrice.totalCents;
+        const overrideReason = (data as any).overrideReason as string | undefined;
+        const overrideApprovedBy = (data as any).overrideApprovedBy as string | undefined;
+        const needsOverrideApproval = !shouldReprice && (manualOverrideDelta !== 0 || manualDiscountProvided);
+        if (needsOverrideApproval && (!overrideReason || !overrideApprovedBy)) {
+          throw new BadRequestException("Manual pricing overrides require overrideReason and overrideApprovedBy.");
+        }
 
         const depositCalc = await this.assertDepositV2(
           existing.campgroundId,
           siteInfo?.siteClassId ?? null,
           totalAmount,
-          price?.baseSubtotalCents ?? existing.baseSubtotal ?? 0,
+          price?.baseSubtotalCents ?? data.baseSubtotal ?? existing.baseSubtotal ?? baselinePrice.baseSubtotalCents,
           paidAmount,
           arrival,
           departure
@@ -1408,6 +1559,8 @@ export class ReservationsService {
           paymentMethod,
           transactionId,
           paymentNotes,
+          overrideReason: _overrideReason,
+          overrideApprovedBy: _overrideApprovedBy,
           ...reservationData
         } = data;
 
@@ -1444,7 +1597,7 @@ export class ReservationsService {
             departureDate: data.departureDate ? departure : undefined,
             totalAmount,
             paidAmount,
-            baseSubtotal: data.baseSubtotal ?? (price ? price.baseSubtotalCents : existing.baseSubtotal),
+            baseSubtotal: data.baseSubtotal ?? (price ? price.baseSubtotalCents : baselinePrice.baseSubtotalCents ?? existing.baseSubtotal),
             feesAmount: data.feesAmount ?? existing.feesAmount,
             taxesAmount: data.taxesAmount ?? existing.taxesAmount,
             discountsAmount:
@@ -1465,6 +1618,40 @@ export class ReservationsService {
             siteId: data.siteId ?? undefined
           }
         });
+
+        if (needsOverrideApproval) {
+          await this.audit.record({
+            campgroundId: existing.campgroundId,
+            actorId: overrideApprovedBy ?? data.updatedBy ?? existing.updatedBy ?? null,
+            action: "reservation_override",
+            entity: "reservation",
+            entityId: id,
+            before: {
+              totalAmount: existing.totalAmount,
+              discountsAmount: existing.discountsAmount,
+              baselineTotalCents: baselinePrice.totalCents
+            },
+            after: {
+              totalAmount: updatedReservation.totalAmount,
+              discountsAmount: updatedReservation.discountsAmount,
+              baselineTotalCents: baselinePrice.totalCents,
+              deltaCents: manualOverrideDelta
+            }
+          });
+          await this.approvals.create({
+            type: "config_change",
+            amount: Math.abs(manualOverrideDelta) / 100,
+            currency: "USD",
+            reason: overrideReason || "Manual pricing override",
+            requester: overrideApprovedBy || data.updatedBy || "unknown",
+            metadata: {
+              reservationId: id,
+              guestId: updatedReservation.guestId,
+              siteId: updatedReservation.siteId,
+              baselineTotalCents: baselinePrice.totalCents
+            }
+          });
+        }
 
         // Send cancellation email if status changed to cancelled
         if (data.status === 'cancelled' && existing.status !== 'cancelled') {
@@ -1823,7 +2010,7 @@ export class ReservationsService {
         campgroundName: (reservation as any)?.campground?.name ?? "Campground",
         amountCents,
         paymentMethod: "Card",
-        transactionId: stripeRefundId,
+        transactionId: undefined,
         reservationId: reservation.id,
         siteNumber: (reservation as any)?.site?.siteNumber,
         arrivalDate: (reservation as any)?.arrivalDate,
@@ -1844,12 +2031,30 @@ export class ReservationsService {
    * This is called from webhooks or API endpoints after Stripe confirms the refund.
    * Unlike refundPayment(), this doesn't validate amounts since Stripe already processed it.
    */
-  async recordRefund(id: string, amountCents: number, stripeRefundId?: string) {
+  async recordRefund(
+    id: string,
+    amountCents: number,
+    stripeRefundId?: string,
+    options?: {
+      lineItems?: { label: string; amountCents: number }[];
+      taxCents?: number;
+      feeCents?: number;
+      totalCents?: number;
+      paymentMethod?: string;
+      source?: string;
+      tenders?: { method: string; amountCents: number; note?: string }[];
+      receiptKind?: "refund" | "payment" | "pos";
+    }
+  ) {
     if (amountCents <= 0) return; // Skip zero or negative refunds
 
     const reservation = await this.prisma.reservation.findUnique({
       where: { id },
-      include: { site: { include: { siteClass: true } } }
+      include: {
+        site: { include: { siteClass: true } },
+        guest: true,
+        campground: { select: { name: true } }
+      }
     });
     if (!reservation) {
       console.error(`[Stripe Refund] Reservation ${id} not found for refund recording`);
@@ -1905,6 +2110,30 @@ export class ReservationsService {
         dedupeKey: `${dedupeKeyBase}:debit`
       }
     ]);
+
+    // Send refund receipt
+    try {
+      await this.emailService.sendPaymentReceipt({
+        guestEmail: (reservation as any)?.guest?.email ?? "",
+        guestName: reservation ? `${(reservation as any)?.guest?.primaryFirstName ?? ""} ${(reservation as any)?.guest?.primaryLastName ?? ""}`.trim() : "",
+        campgroundName: (reservation as any)?.campground?.name ?? "Campground",
+        amountCents,
+        paymentMethod: options?.paymentMethod ?? "Card",
+        transactionId: stripeRefundId,
+        reservationId: reservation.id,
+        siteNumber: (reservation as any)?.site?.siteNumber,
+        arrivalDate: (reservation as any)?.arrivalDate,
+        departureDate: (reservation as any)?.departureDate,
+        source: options?.source ?? "admin",
+        kind: options?.receiptKind ?? "refund",
+        lineItems: options?.lineItems,
+        taxCents: options?.taxCents,
+        feeCents: options?.feeCents,
+        totalCents: options?.totalCents ?? amountCents
+      });
+    } catch (err) {
+      console.warn("Failed to send refund receipt email", err);
+    }
 
     return updated;
   }
@@ -2039,7 +2268,11 @@ export class ReservationsService {
     return { conflict: reasons.length > 0, reasons };
   }
 
-  async kioskCheckIn(id: string, upsellTotalCents: number) {
+  async kioskCheckIn(
+    id: string,
+    upsellTotalCents: number,
+    options?: { override?: boolean; overrideReason?: string; actorId?: string | null }
+  ) {
     console.log(`[Kiosk] Check-in request for ${id}, upsell: ${upsellTotalCents}`);
     const reservation = await this.prisma.reservation.findUnique({
       where: { id },
@@ -2070,11 +2303,42 @@ export class ReservationsService {
     }
 
     const compliance = await this.checkCompliance(reservation);
-    if (!compliance.ok) {
+    const isOverride = Boolean(options?.override);
+    if (!compliance.ok && !isOverride) {
+      const checkInStatus =
+        compliance.reason === "waiver_required"
+          ? CheckInStatus.pending_waiver
+          : compliance.reason === "id_verification_required"
+            ? CheckInStatus.pending_id
+            : compliance.reason === "payment_required"
+              ? CheckInStatus.pending_payment
+              : CheckInStatus.failed;
+
+      await this.prisma.reservation.update({
+        where: { id },
+        data: { checkInStatus }
+      });
+
       throw new ConflictException({
         reason: compliance.reason,
         signingUrl: compliance.signingUrl
       });
+    }
+
+    if (isOverride && !compliance.ok) {
+      try {
+        await this.audit.record({
+          campgroundId: reservation.campgroundId,
+          actorId: options?.actorId ?? null,
+          action: "checkin.override",
+          entity: "Reservation",
+          entityId: id,
+          before: { unmet: compliance.reasons ?? [] },
+          after: { override: true, reason: options?.overrideReason ?? null }
+        });
+      } catch (err) {
+        console.error("[Kiosk] Failed to audit check-in override", err);
+      }
     }
 
     const newTotal = reservation.totalAmount + upsellTotalCents;
@@ -2086,24 +2350,30 @@ export class ReservationsService {
     // const charge = await this.stripeService.chargeCustomer(reservation.guestId, balanceDue);
 
     try {
+      const now = new Date();
+      const overrideNote = isOverride
+        ? `[Override ${now.toISOString()}] ${options?.overrideReason ?? "No reason provided"}`
+        : null;
+      const kioskNote = `[Kiosk] Checked in${isOverride ? " (override)" : ""}. Upsell: $${(upsellTotalCents / 100).toFixed(2)}. Charged card on file.`;
+      const notes = [reservation.notes, overrideNote, kioskNote].filter(Boolean).join("\n");
+
       const updated = await this.prisma.reservation.update({
         where: { id },
         data: {
           status: ReservationStatus.checked_in,
-          checkInAt: new Date(),
+          checkInStatus: CheckInStatus.completed,
+          checkInAt: now,
           feesAmount: { increment: upsellTotalCents },
           totalAmount: newTotal,
           paidAmount: newTotal, // Assume full payment successful
           // Add a note about the upsell/kiosk check-in
-          notes: reservation.notes
-            ? `${reservation.notes}\n[Kiosk] Checked in. Upsell: $${(upsellTotalCents / 100).toFixed(2)}. Charged card on file.`
-            : `[Kiosk] Checked in. Upsell: $${(upsellTotalCents / 100).toFixed(2)}. Charged card on file.`
+          notes
         }
       });
       console.log(`[Kiosk] Check-in successful for ${id}`);
 
       try {
-        await this.accessControl.autoGrantForReservation(id);
+        await this.accessControl.autoGrantForReservation(id, options?.actorId ?? null);
       } catch (err) {
         console.error(`[Kiosk] Access grant failed for ${id}:`, err);
       }
