@@ -43,7 +43,7 @@ export default defineConfig([
     tsconfig: "./tsconfig.json",
     skipNodeModulesBundle: true,
     shims: false,
-    noExternal: ["@prisma/client"],
+    noExternal: ["@prisma/client", "@campreserv/shared"],
     esbuildOptions(options) {
       options.alias = prismaAlias;
     }

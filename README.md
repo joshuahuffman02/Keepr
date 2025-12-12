@@ -3,7 +3,7 @@
 pnpm workspace with NestJS API (`platform/apps/api`) and Next.js web (`platform/apps/web`).
 
 ## Prereqs
-- Node 18+ recommended
+- Node 20+ required (Prisma 7)
 - pnpm (install locally if not already: `npm install -g pnpm`)
 
 ## Setup
@@ -22,6 +22,10 @@ pnpm --dir platform/apps/api prisma:generate
 pnpm --dir platform/apps/api prisma:migrate
 pnpm --dir platform/apps/api prisma:seed   # optional sample data
 ```
+If your dev DB gets out of sync, reset + reseed:
+```bash
+pnpm prisma:reset-seed
+```
 
 4) Run dev servers
 - API: `pnpm --dir platform/apps/api dev` (port 4000)
@@ -35,5 +39,7 @@ pnpm --dir platform/apps/api prisma:seed   # optional sample data
 
 ## Notes
 - Prisma schema and seeds live in `platform/apps/api/prisma/`.
+- Prisma 7 uses Postgres driver adapters at runtime; follow existing `PrismaService` patterns for any new DB scripts.
+- Seeds are manual in Prisma 7 (they do not auto-run after migrations).
 - Shared types live in `platform/packages/shared`.
 - SDK lives in `platform/packages/sdk`.
