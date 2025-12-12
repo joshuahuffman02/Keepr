@@ -1,7 +1,7 @@
 import { defineConfig } from "tsup";
 
 export default defineConfig({
-  entry: ["src/main.ts"],
+  entry: ["src/main.ts", "src/serverless.ts"],
   format: ["cjs"],
   platform: "node",
   target: "node18",
@@ -15,3 +15,4 @@ export default defineConfig({
   skipNodeModulesBundle: true,
   shims: false
 });
+
