@@ -6,9 +6,9 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 const prismaAlias = {
-  "@prisma/client": resolve(__dirname, "api/generated/prisma"),
-  "@prisma/client/edge": resolve(__dirname, "api/generated/prisma/edge.js"),
-  "@prisma/client/default": resolve(__dirname, "api/generated/prisma/default.js"),
+  "@prisma/client": resolve(__dirname, "src/generated/prisma"),
+  "@prisma/client/edge": resolve(__dirname, "src/generated/prisma/edge.js"),
+  "@prisma/client/default": resolve(__dirname, "src/generated/prisma/default.js"),
 };
 
 export default defineConfig([

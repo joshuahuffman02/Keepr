@@ -2,6 +2,7 @@
   "name": "campreserv",
   "version": "0.1.0",
   "private": true,
+  "packageManager": "pnpm@9.15.9",
   "scripts": {
     "api": "pnpm --dir platform/apps/api dev",
     "web": "pnpm --dir platform/apps/web dev",
@@ -12,9 +13,10 @@
     "ci:sdk": "pnpm --filter @campreserv/sdk test && pnpm --filter @campreserv/integrations-sdk test",
     "ci": "pnpm lint:web && pnpm --dir platform/apps/api test:smoke && pnpm ci:sdk && pnpm build && pnpm --dir platform/apps/web budgets && pnpm ci:e2e",
     "prepare": "simple-git-hooks",
+    "build:shared": "pnpm --filter @campreserv/shared build",
     "build:api": "pnpm --dir platform/apps/api build",
     "build:web": "pnpm --dir platform/apps/web build",
-    "build": "pnpm build:api && pnpm build:web",
+    "build": "pnpm build:shared && pnpm build:api && pnpm build:web",
     "test:api": "pnpm --dir platform/apps/api test",
     "test:api:path": "pnpm --dir platform/apps/api test -- --runTestsByPath"
   },
