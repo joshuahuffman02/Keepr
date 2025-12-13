@@ -1,8 +1,8 @@
 FROM node:22.12-alpine AS base
-# Build: 2025-12-12 - Railway cache buster v5 - dockerignore fixed
+# Build: 2025-12-12 - Railway cache buster v6 - LATEST
 RUN corepack enable && corepack prepare pnpm@7.33.6 --activate
 WORKDIR /app
-RUN echo "Dockerfile.api v5 - lockfile now included" > /tmp/build-info
+RUN echo "Dockerfile.api v6 - LATEST WITH FIXED DOCKERIGNORE" > /tmp/build-info
 
 # Install dependencies
 FROM base AS deps
