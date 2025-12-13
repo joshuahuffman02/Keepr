@@ -1,5 +1,5 @@
 FROM node:22-alpine AS base
-RUN echo "Build timestamp: $(date)" && corepack enable && corepack prepare pnpm@7.33.6 --activate
+RUN echo "Build timestamp: $(date) - with railway.toml config" && corepack enable && corepack prepare pnpm@7.33.6 --activate
 WORKDIR /app
 
 # Install dependencies
