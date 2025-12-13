@@ -26,6 +26,7 @@ RUN pnpm --filter @campreserv/api build
 # Production image for API
 FROM base AS api
 COPY --from=deps /app/node_modules ./node_modules
+COPY --from=api-builder /app/node_modules/.prisma ./node_modules/.prisma
 COPY --from=deps /app/platform ./platform
 COPY --from=shared /app/platform/packages/shared/dist ./platform/packages/shared/dist
 COPY --from=api-builder /app/platform/apps/api/dist ./platform/apps/api/dist
