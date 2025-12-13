@@ -12,11 +12,10 @@ export class AccessProviderRegistry {
     brivo: BrivoAdapter,
     cloudKey: CloudKeyAdapter
   ) {
-    this.adapters = new Map([
-      [kisi.provider, kisi],
-      [brivo.provider, brivo],
-      [cloudKey.provider, cloudKey]
-    ]);
+    this.adapters = new Map();
+    if (kisi?.provider) this.adapters.set(kisi.provider, kisi);
+    if (brivo?.provider) this.adapters.set(brivo.provider, brivo);
+    if (cloudKey?.provider) this.adapters.set(cloudKey.provider, cloudKey);
   }
 
   getAdapter(provider: AccessProviderType): AccessProviderAdapter | null {
