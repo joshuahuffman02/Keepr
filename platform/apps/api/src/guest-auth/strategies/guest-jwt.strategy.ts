@@ -10,10 +10,11 @@ export class GuestJwtStrategy extends PassportStrategy(Strategy, 'guest-jwt') {
         private readonly config: ConfigService,
         private readonly prisma: PrismaService,
     ) {
+        const jwtSecret = config?.get<string>('JWT_SECRET') || process.env.JWT_SECRET || 'dev-secret-change-me';
         super({
             jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
             ignoreExpiration: false,
-            secretOrKey: config.get<string>('JWT_SECRET') || 'dev-secret-change-me',
+            secretOrKey: jwtSecret,
         });
     }
 
