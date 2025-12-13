@@ -1,7 +1,8 @@
-FROM node:22-alpine AS base
-# Force Railway sync
+FROM node:22.12-alpine AS base
+# Build: 2025-12-12 - Railway cache buster v3
 RUN corepack enable && corepack prepare pnpm@7.33.6 --activate
 WORKDIR /app
+RUN echo "Dockerfile.api v3 - 2025-12-12" > /tmp/build-info
 
 # Install dependencies
 FROM base AS deps
