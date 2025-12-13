@@ -1,8 +1,5 @@
 lockfileVersion: 5.4
 
-overrides:
-  zod: 3.23.8
-
 importers:
 
   .:
@@ -12,11 +9,11 @@ importers:
       concurrently: ^8.2.2
       maplibre-gl: ^4.7.1
       simple-git-hooks: ^2.9.0
-      zod: 3.23.8
+      zod: ^4.0.0
     dependencies:
       '@prisma/client-runtime-utils': 7.1.0
       maplibre-gl: 4.7.1
-      zod: 3.23.8
+      zod: 4.1.13
     devDependencies:
       '@jest/test-sequencer': 29.7.0
       concurrently: 8.2.2
@@ -73,7 +70,7 @@ importers:
       tsup: ^8.5.1
       typescript: ^5.9.3
       xlsx: ^0.18.5
-      zod: 3.23.8
+      zod: ^4.0.0
     dependencies:
       '@aws-sdk/client-s3': 3.948.0
       '@aws-sdk/s3-request-presigner': 3.948.0
@@ -107,7 +104,7 @@ importers:
       rxjs: 7.8.2
       stripe: 20.0.0_@types+node@22.19.2
       xlsx: 0.18.5
-      zod: 3.23.8
+      zod: 4.1.13
     devDependencies:
       '@jest/test-sequencer': 29.7.0
       '@nestjs/testing': 10.4.20_c4rqn6ecrsand7dqymw7vhfquq
@@ -174,7 +171,7 @@ importers:
       tailwindcss-animate: ^1.0.7
       typescript: ^5.6.3
       vitest: ^2.1.5
-      zod: 3.23.8
+      zod: ^3.23.8
     dependencies:
       '@campreserv/shared': link:../../packages/shared
       '@hookform/resolvers': 3.10.0_react-hook-form@7.68.0
@@ -250,7 +247,7 @@ importers:
   platform/packages/shared:
     specifiers:
       typescript: ^5.9.3
-      zod: 3.23.8
+      zod: ^3.23.8
     dependencies:
       zod: 3.23.8
     devDependencies:
@@ -11646,4 +11643,8 @@ packages:
 
   /zod/3.23.8:
     resolution: {integrity: sha512-XBx9AXhXktjUqnepgTiE5flcKIYWi/rme0Eaj+5Y0lftuGBq+jyRu/md4WnuxqgP1ubdpNCsYEYPxrzVHD8d6g==}
+    dev: false
+
+  /zod/4.1.13:
+    resolution: {integrity: sha512-AvvthqfqrAhNH9dnfmrfKzX5upOdjUVJYFqNSlkmGf64gRaTzlPwz99IHYnVs28qYAybvAlBV+H7pn0saFY4Ig==}
     dev: false
