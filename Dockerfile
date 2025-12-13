@@ -17,8 +17,19 @@ RUN pnpm --filter @campreserv/shared build
 
 # Build web app
 FROM shared AS web-builder
+# Accept build arguments for Next.js environment variables
+ARG NEXT_PUBLIC_API_BASE
+ARG AUTH_URL
+ARG AUTH_SECRET
+ARG AUTH_TRUST_HOST
+# Set them as environment variables for the build
+ENV NEXT_PUBLIC_API_BASE=$NEXT_PUBLIC_API_BASE
+ENV AUTH_URL=$AUTH_URL
+ENV AUTH_SECRET=$AUTH_SECRET
+ENV AUTH_TRUST_HOST=$AUTH_TRUST_HOST
 COPY platform/apps/web ./platform/apps/web
-RUN pnpm --filter @campreserv/web build
+RUN echo "Building with NEXT_PUBLIC_API_BASE=$NEXT_PUBLIC_API_BASE" && \
+    pnpm --filter @campreserv/web build
 
 # Production image for web
 FROM base AS web
