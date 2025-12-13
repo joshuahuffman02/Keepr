@@ -5,7 +5,7 @@ import { PrismaService } from "../prisma/prisma.service";
 
 @Module({
   controllers: [SiteMapController],
-  providers: [SiteMapService, PrismaService],
+  providers: [SiteMapService],
   exports: [SiteMapService]
 })
 export class SiteMapModule {}

@@ -7,7 +7,7 @@ import { AuditModule } from "../audit/audit.module";
 @Module({
   imports: [AuditModule],
   controllers: [DepositPoliciesController],
-  providers: [DepositPoliciesService, PrismaService],
+  providers: [DepositPoliciesService],
   exports: [DepositPoliciesService]
 })
 export class DepositPoliciesModule {}

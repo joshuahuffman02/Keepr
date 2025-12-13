@@ -8,7 +8,7 @@ import { SupportModule } from "../support/support.module";
 @Module({
   imports: [EmailModule, SupportModule],
   controllers: [NpsController],
-  providers: [NpsService, PrismaService],
+  providers: [NpsService],
   exports: [NpsService]
 })
 export class NpsModule { }

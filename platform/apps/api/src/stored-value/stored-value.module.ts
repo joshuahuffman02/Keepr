@@ -6,7 +6,7 @@ import { IdempotencyService } from "../payments/idempotency.service";
 
 @Module({
   controllers: [StoredValueController],
-  providers: [StoredValueService, PrismaService, IdempotencyService],
+  providers: [StoredValueService, IdempotencyService],
   exports: [StoredValueService]
 })
 export class StoredValueModule {}

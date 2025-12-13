@@ -5,7 +5,7 @@ import { PrismaService } from '../prisma/prisma.service';
 
 @Module({
     controllers: [TaxRulesController],
-    providers: [TaxRulesService, PrismaService],
+    providers: [TaxRulesService],
     exports: [TaxRulesService],
 })
 export class TaxRulesModule { }

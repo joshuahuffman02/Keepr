@@ -7,7 +7,7 @@ import { PermissionsModule } from "../permissions/permissions.module";
 @Module({
   imports: [PermissionsModule],
   controllers: [SupportController],
-  providers: [SupportService, PrismaService],
+  providers: [SupportService],
   exports: [SupportService]
 })
 export class SupportModule {}

@@ -10,7 +10,7 @@ import { ObservabilityModule } from "../observability/observability.module";
 @Module({
   imports: [SmsModule, NpsModule, PermissionsModule, ObservabilityModule],
   controllers: [CommunicationsController],
-  providers: [PrismaService, EmailService],
+  providers: [EmailService],
   exports: []
 })
 export class CommunicationsModule { }

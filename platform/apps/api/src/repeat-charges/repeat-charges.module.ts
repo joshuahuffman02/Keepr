@@ -8,7 +8,7 @@ import { SeasonalRatesModule } from '../seasonal-rates/seasonal-rates.module';
 @Module({
     imports: [ReservationsModule, SeasonalRatesModule],
     controllers: [RepeatChargesController],
-    providers: [RepeatChargesService, PrismaService],
+    providers: [RepeatChargesService],
     exports: [RepeatChargesService],
 })
 export class RepeatChargesModule { }

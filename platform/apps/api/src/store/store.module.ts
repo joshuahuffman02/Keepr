@@ -6,7 +6,7 @@ import { EmailService } from "../email/email.service";
 
 @Module({
     controllers: [StoreController],
-    providers: [StoreService, PrismaService, EmailService],
+    providers: [StoreService, EmailService],
     exports: [StoreService],
 })
 export class StoreModule { }

@@ -5,7 +5,7 @@ import { AnalyticsController } from "./analytics.controller";
 import { AuditService } from "../audit/audit.service";
 
 @Module({
-  providers: [PrismaService, AnalyticsService, AuditService],
+  providers: [AnalyticsService, AuditService],
   controllers: [AnalyticsController],
   exports: [AnalyticsService],
 })

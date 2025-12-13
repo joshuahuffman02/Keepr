@@ -7,7 +7,7 @@ import { BillingJobs } from "./billing.jobs";
 @Module({
   imports: [],
   controllers: [BillingController],
-  providers: [BillingService, BillingJobs, PrismaService],
+  providers: [BillingService, BillingJobs],
   exports: [BillingService]
 })
 export class BillingModule {}

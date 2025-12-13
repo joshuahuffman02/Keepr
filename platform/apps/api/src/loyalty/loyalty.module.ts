@@ -5,7 +5,7 @@ import { PrismaService } from '../prisma/prisma.service';
 
 @Module({
     controllers: [LoyaltyController],
-    providers: [LoyaltyService, PrismaService],
+    providers: [LoyaltyService],
     exports: [LoyaltyService],
 })
 export class LoyaltyModule { }

@@ -7,7 +7,7 @@ import { WaitlistModule } from "../waitlist/waitlist.module";
 @Module({
   imports: [WaitlistModule],
   controllers: [HoldsController],
-  providers: [HoldsService, PrismaService],
+  providers: [HoldsService],
   exports: [HoldsService]
 })
 export class HoldsModule { }

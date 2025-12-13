@@ -5,7 +5,7 @@ import { PrismaService } from "../prisma/prisma.service";
 
 @Module({
   controllers: [GiftCardsController],
-  providers: [GiftCardsService, PrismaService],
+  providers: [GiftCardsService],
   exports: [GiftCardsService]
 })
 export class GiftCardsModule {}

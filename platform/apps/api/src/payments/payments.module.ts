@@ -15,7 +15,7 @@ import { LedgerModule } from "../ledger/ledger.module";
 @Module({
   imports: [ReservationsModule, PermissionsModule, AuditModule, LedgerModule],
   controllers: [PaymentsController, GatewayConfigController],
-  providers: [StripeService, PrismaService, PaymentsReconciliationService, PaymentsScheduler, IdempotencyService, GatewayConfigService],
+  providers: [StripeService, PaymentsReconciliationService, PaymentsScheduler, IdempotencyService, GatewayConfigService],
   exports: [StripeService, PaymentsReconciliationService, IdempotencyService, GatewayConfigService]
 })
 export class PaymentsModule { }

@@ -5,7 +5,7 @@ import { PrismaService } from '../prisma/prisma.service';
 
 @Module({
     controllers: [SeasonalRatesController],
-    providers: [SeasonalRatesService, PrismaService],
+    providers: [SeasonalRatesService],
     exports: [SeasonalRatesService],
 })
 export class SeasonalRatesModule { }

@@ -5,7 +5,7 @@ import { PrismaService } from "../prisma/prisma.service";
 
 @Module({
   controllers: [PrivacyController],
-  providers: [PrivacyService, PrismaService],
+  providers: [PrivacyService],
   exports: [PrivacyService],
 })
 export class PrivacyModule {}

@@ -6,7 +6,7 @@ import { SocialPlannerScheduler } from './social-planner.scheduler';
 
 @Module({
     controllers: [SocialPlannerController],
-    providers: [SocialPlannerService, SocialPlannerScheduler, PrismaService],
+    providers: [SocialPlannerService, SocialPlannerScheduler],
     exports: [SocialPlannerService],
 })
 export class SocialPlannerModule { }

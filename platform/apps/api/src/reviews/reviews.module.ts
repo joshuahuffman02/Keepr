@@ -8,7 +8,7 @@ import { GamificationModule } from "../gamification/gamification.module";
 @Module({
   imports: [EmailModule, GamificationModule],
   controllers: [ReviewsController],
-  providers: [ReviewsService, PrismaService],
+  providers: [ReviewsService],
   exports: [ReviewsService]
 })
 export class ReviewsModule { }

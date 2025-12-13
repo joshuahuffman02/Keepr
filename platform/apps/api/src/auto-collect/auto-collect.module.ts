@@ -5,7 +5,7 @@ import { IdempotencyService } from "../payments/idempotency.service";
 import { StripeService } from "../payments/stripe.service";
 
 @Module({
-  providers: [AutoCollectService, PrismaService, IdempotencyService, StripeService],
+  providers: [AutoCollectService, IdempotencyService, StripeService],
   exports: [AutoCollectService]
 })
 export class AutoCollectModule {}

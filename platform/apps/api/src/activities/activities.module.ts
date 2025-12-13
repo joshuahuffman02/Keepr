@@ -5,7 +5,7 @@ import { PrismaService } from '../prisma/prisma.service';
 
 @Module({
     controllers: [ActivitiesController],
-    providers: [ActivitiesService, PrismaService],
+    providers: [ActivitiesService],
     exports: [ActivitiesService],
 })
 export class ActivitiesModule { }

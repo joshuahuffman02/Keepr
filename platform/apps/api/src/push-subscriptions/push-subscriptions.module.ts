@@ -7,7 +7,7 @@ import { AuthModule } from "../auth/auth.module";
 @Module({
   imports: [AuthModule],
   controllers: [PushSubscriptionsController],
-  providers: [PushSubscriptionsService, PrismaService],
+  providers: [PushSubscriptionsService],
 })
 export class PushSubscriptionsModule {}
 

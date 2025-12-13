@@ -6,7 +6,7 @@ import { PermissionsModule } from "../permissions/permissions.module";
 
 @Module({
   imports: [PermissionsModule],
-  providers: [AuditService, PrismaService],
+  providers: [AuditService],
   controllers: [AuditController],
   exports: [AuditService]
 })

@@ -7,7 +7,7 @@ import { AuditModule } from "../audit/audit.module";
 @Module({
   imports: [AuditModule],
   controllers: [PricingV2Controller],
-  providers: [PricingV2Service, PrismaService],
+  providers: [PricingV2Service],
   exports: [PricingV2Service]
 })
 export class PricingV2Module {}
