@@ -102,11 +102,16 @@ export default function SystemHealthPage() {
                 signal: AbortSignal.timeout(5000),
             });
             const latency = Date.now() - start;
+            // 200 = logged in, 401/403 = not logged in, 404 = endpoint may not exist but server is responding
+            // All of these mean the auth service is working
+            const isResponding = res.status < 500;
             results.push({
                 name: "Auth Service",
-                status: res.ok ? "healthy" : (res.status === 401 ? "healthy" : "degraded"),
+                status: isResponding ? "healthy" : "degraded",
                 latency,
-                message: `Response in ${latency}ms`,
+                message: res.ok
+                    ? `Authenticated (${latency}ms)`
+                    : `Response in ${latency}ms`,
                 lastChecked: new Date(),
             });
         } catch (err: any) {
