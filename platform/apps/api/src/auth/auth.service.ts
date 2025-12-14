@@ -73,6 +73,7 @@ export class AuthService {
             email: user.email,
             firstName: user.firstName,
             lastName: user.lastName,
+            platformRole: user.platformRole,
             campgrounds: user.memberships.map((m: { campground: { id: string; name: string; slug: string }; role: string }) => ({
                 id: m.campground.id,
                 name: m.campground.name,
@@ -118,44 +119,44 @@ export class AuthService {
         );
     }
 
-  async acceptInvite(dto: AcceptInviteDto) {
-    const invite = await this.prisma.inviteToken.findUnique({
-      where: { token: dto.token },
-      include: { user: true }
-    });
+    async acceptInvite(dto: AcceptInviteDto) {
+        const invite = await this.prisma.inviteToken.findUnique({
+            where: { token: dto.token },
+            include: { user: true }
+        });
 
-    if (!invite || invite.redeemedAt) {
-      throw new UnauthorizedException("Invalid or already used invite");
+        if (!invite || invite.redeemedAt) {
+            throw new UnauthorizedException("Invalid or already used invite");
+        }
+        if (invite.expiresAt < new Date()) {
+            throw new UnauthorizedException("Invite has expired");
+        }
+
+        const passwordHash = await bcrypt.hash(dto.password, 12);
+
+        const user = await this.prisma.user.update({
+            where: { id: invite.userId },
+            data: {
+                passwordHash,
+                firstName: dto.firstName,
+                lastName: dto.lastName,
+                isActive: true
+            }
+        });
+
+        await this.prisma.inviteToken.update({
+            where: { id: invite.id },
+            data: { redeemedAt: new Date() }
+        });
+
+        const token = this.generateToken(user.id, user.email);
+
+        return {
+            id: user.id,
+            email: user.email,
+            firstName: user.firstName,
+            lastName: user.lastName,
+            token
+        };
     }
-    if (invite.expiresAt < new Date()) {
-      throw new UnauthorizedException("Invite has expired");
-    }
-
-    const passwordHash = await bcrypt.hash(dto.password, 12);
-
-    const user = await this.prisma.user.update({
-      where: { id: invite.userId },
-      data: {
-        passwordHash,
-        firstName: dto.firstName,
-        lastName: dto.lastName,
-        isActive: true
-      }
-    });
-
-    await this.prisma.inviteToken.update({
-      where: { id: invite.id },
-      data: { redeemedAt: new Date() }
-    });
-
-    const token = this.generateToken(user.id, user.email);
-
-    return {
-      id: user.id,
-      email: user.email,
-      firstName: user.firstName,
-      lastName: user.lastName,
-      token
-    };
-  }
 }

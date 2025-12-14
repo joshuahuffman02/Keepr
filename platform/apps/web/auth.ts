@@ -42,6 +42,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
             email: data.email,
             name: `${data.firstName} ${data.lastName}`,
             apiToken: data.token,
+            platformRole: data.platformRole,
             campgrounds: data.campgrounds || []
           } as any;
         } catch (error) {
@@ -64,6 +65,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       if (user) {
         token.id = user.id;
         token.apiToken = (user as any).apiToken;
+        token.platformRole = (user as any).platformRole;
         token.campgrounds = (user as any).campgrounds;
       }
       return token;
@@ -72,6 +74,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       if (session.user) {
         session.user.id = token.id as string;
         (session as any).apiToken = token.apiToken;
+        (session.user as any).platformRole = token.platformRole;
         (session as any).campgrounds = token.campgrounds;
       }
       return session;
