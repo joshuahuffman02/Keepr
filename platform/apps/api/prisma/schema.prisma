@@ -369,19 +369,20 @@ enum OnboardingStep {
 }
 
 model User {
-  id             String        @id @default(cuid())
-  email          String        @unique
-  passwordHash   String
-  firstName      String
-  lastName       String
-  region         String?
-  platformRole   PlatformRole?
-  platformRegion String?
-  platformActive Boolean       @default(true)
-  ownershipRoles String[]      @default([])
-  isActive       Boolean       @default(true)
-  createdAt      DateTime      @default(now())
-  updatedAt      DateTime      @default(now()) @updatedAt
+  id                 String        @id @default(cuid())
+  email              String        @unique
+  passwordHash       String
+  firstName          String
+  lastName           String
+  region             String?
+  platformRole       PlatformRole?
+  platformRegion     String?
+  platformActive     Boolean       @default(true)
+  ownershipRoles     String[]      @default([])
+  isActive           Boolean       @default(true)
+  mustChangePassword Boolean       @default(false) // Force password change on first login
+  createdAt          DateTime      @default(now())
+  updatedAt          DateTime      @default(now()) @updatedAt
 
   memberships                      CampgroundMembership[]
   maintenanceTickets               MaintenanceTicket[]
