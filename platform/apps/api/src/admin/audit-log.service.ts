@@ -18,7 +18,7 @@ export class AuditLogService {
         ipAddress?: string;
         userAgent?: string;
     }) {
-        return this.prisma.auditLog.create({
+        return this.prisma.platformAuditLog.create({
             data: params as any,
         });
     }
@@ -45,19 +45,19 @@ export class AuditLogService {
         }
 
         const [items, total] = await Promise.all([
-            this.prisma.auditLog.findMany({
+            this.prisma.platformAuditLog.findMany({
                 where,
                 orderBy: { createdAt: "desc" },
                 take: limit,
                 skip: offset,
             }),
-            this.prisma.auditLog.count({ where }),
+            this.prisma.platformAuditLog.count({ where }),
         ]);
 
         return { items, total, limit, offset };
     }
 
     async findOne(id: string) {
-        return this.prisma.auditLog.findUnique({ where: { id } });
+        return this.prisma.platformAuditLog.findUnique({ where: { id } });
     }
 }

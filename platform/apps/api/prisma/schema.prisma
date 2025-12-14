@@ -5518,7 +5518,7 @@ enum AuditAction {
   IMPORT
 }
 
-model AuditLog {
+model PlatformAuditLog {
   id          String      @id @default(cuid())
   createdAt   DateTime    @default(now())
   userId      String?
