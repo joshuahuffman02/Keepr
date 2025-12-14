@@ -12,7 +12,7 @@ export class SupportService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly email: EmailService
-  ) {}
+  ) { }
 
   create(dto: CreateSupportReportDto, authorId?: string) {
     const {
@@ -63,9 +63,11 @@ export class SupportService {
     });
   }
 
-  findAll(args: { region?: string | null; campgroundId?: string | null }) {
+  async findAll(args: { region?: string | null; campgroundId?: string | null }) {
     const { region, campgroundId } = args;
-    return this.prisma.supportReport.findMany({
+
+    // 1. Fetch scoped SupportReports
+    const reports = await this.prisma.supportReport.findMany({
       where: {
         AND: [
           region ? ({ rawContext: { path: ["region"], equals: region } } as any) : undefined,
@@ -79,6 +81,59 @@ export class SupportService {
         campground: { select: { id: true, name: true } }
       }
     });
+
+    // 2. Fetch global Tickets (only if not strictly filtering by campground, or if we decide tickets are global)
+    // For now, we include tickets in the main list. We can refine filtering later if needed.
+    // If strict campground scoping is on, we might want to skip tickets or check their metadata.
+    // Assuming Tickets are "Global Feedback" and should be visible to support staff.
+    const tickets = await this.prisma.ticket.findMany({
+      orderBy: { createdAt: "desc" }
+    });
+
+    // 3. Map Tickets to SupportReport shape
+    const mappedTickets = tickets.map((t) => {
+      // Map status
+      let status = "new";
+      if (t.status === "closed") status = "closed";
+      if (t.status === "resolved") status = "resolved";
+      if (t.status === "in_progress") status = "in_progress";
+
+      // Parse submitter safely
+      const submitter = t.submitter as any; // { name, email, id }
+      const author = submitter?.email
+        ? { id: submitter.id || "guest", email: submitter.email, firstName: submitter.name || null, lastName: null }
+        : null;
+
+      return {
+        id: t.id,
+        createdAt: t.createdAt,
+        updatedAt: t.updatedAt,
+        description: t.title,
+        steps: t.notes || null,
+        contactEmail: submitter?.email || null,
+        path: t.path || t.url || null,
+        userAgent: (t.client as any)?.userAgent || null,
+        language: (t.client as any)?.language || null,
+        timezone: null,
+        viewportWidth: null,
+        viewportHeight: null,
+        roleFilter: null,
+        pinnedIds: [],
+        recentIds: [],
+        rawContext: { source: "ticket", category: t.category },
+        status,
+        assigneeId: null,
+        assignee: null,
+        authorId: author?.id || null,
+        author,
+        campgroundId: null,
+        campground: { id: "global", name: "Global / Feedback" }
+      };
+    });
+
+    // 4. Merge and Sort
+    const combined = [...reports, ...(mappedTickets as any)];
+    return combined.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
   }
 
   async update(
