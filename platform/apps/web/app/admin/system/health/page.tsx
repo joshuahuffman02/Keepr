@@ -97,7 +97,7 @@ export default function SystemHealthPage() {
         try {
             const start = Date.now();
             const base = process.env.NEXT_PUBLIC_API_BASE || "";
-            const res = await fetch(`${base}/auth/whoami`, {
+            const res = await fetch(`${base}/auth/me`, {
                 headers: getAuthHeaders(),
                 signal: AbortSignal.timeout(5000),
             });
