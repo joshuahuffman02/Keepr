@@ -223,9 +223,9 @@ export default function SupportStaffDirectoryPage() {
                   <div className="flex flex-wrap items-center gap-2 text-xs text-slate-600">
                     <span>Region scope:</span>
                     <Select
-                      value={draft.region}
+                      value={draft.region || "unassigned"}
                       onValueChange={(v) =>
-                        setDrafts((prev) => ({ ...prev, [s.id]: { ...draft, region: v } }))
+                        setDrafts((prev) => ({ ...prev, [s.id]: { ...draft, region: v === "unassigned" ? "" : v } }))
                       }
                       disabled={whoamiLoading}
                     >
@@ -233,7 +233,7 @@ export default function SupportStaffDirectoryPage() {
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="">Unassigned</SelectItem>
+                        <SelectItem value="unassigned">Unassigned</SelectItem>
                         {regionOptions
                           .filter((r) => r.value !== "all")
                           .map((opt) => (
