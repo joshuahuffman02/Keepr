@@ -48,40 +48,55 @@ export class AuthService {
     }
 
     async login(dto: LoginDto) {
-        const user = await this.prisma.user.findUnique({
-            where: { email: dto.email.toLowerCase() },
-            include: {
-                memberships: {
-                    include: { campground: { select: { id: true, name: true, slug: true } } }
+        try {
+            console.log(`[AuthService] Attempting login for ${dto.email}`);
+            const user = await this.prisma.user.findUnique({
+                where: { email: dto.email.toLowerCase() },
+                include: {
+                    memberships: {
+                        include: { campground: { select: { id: true, name: true, slug: true } } }
+                    }
                 }
+            });
+
+            if (!user) {
+                console.log(`[AuthService] User not found: ${dto.email}`);
+                throw new UnauthorizedException('Invalid credentials');
             }
-        });
 
-        if (!user || !user.isActive) {
-            throw new UnauthorizedException('Invalid credentials');
+            if (!user.isActive) {
+                console.log(`[AuthService] User not active: ${dto.email}`);
+                throw new UnauthorizedException('Invalid credentials');
+            }
+
+            console.log(`[AuthService] User found, comparing password hash for ${user.id}`);
+            const passwordValid = await bcrypt.compare(dto.password, user.passwordHash);
+            if (!passwordValid) {
+                console.log(`[AuthService] Invalid password for ${dto.email}`);
+                throw new UnauthorizedException('Invalid credentials');
+            }
+
+            console.log(`[AuthService] Password valid, generating token`);
+            const token = this.generateToken(user.id, user.email);
+
+            return {
+                id: user.id,
+                email: user.email,
+                firstName: user.firstName,
+                lastName: user.lastName,
+                platformRole: user.platformRole,
+                campgrounds: user.memberships.map((m: { campground: { id: string; name: string; slug: string }; role: string }) => ({
+                    id: m.campground.id,
+                    name: m.campground.name,
+                    slug: m.campground.slug,
+                    role: m.role
+                })),
+                token
+            };
+        } catch (error) {
+            console.error(`[AuthService] Login error for ${dto.email}:`, error);
+            throw error;
         }
-
-        const passwordValid = await bcrypt.compare(dto.password, user.passwordHash);
-        if (!passwordValid) {
-            throw new UnauthorizedException('Invalid credentials');
-        }
-
-        const token = this.generateToken(user.id, user.email);
-
-        return {
-            id: user.id,
-            email: user.email,
-            firstName: user.firstName,
-            lastName: user.lastName,
-            platformRole: user.platformRole,
-            campgrounds: user.memberships.map((m: { campground: { id: string; name: string; slug: string }; role: string }) => ({
-                id: m.campground.id,
-                name: m.campground.name,
-                slug: m.campground.slug,
-                role: m.role
-            })),
-            token
-        };
     }
 
     async getProfile(userId: string) {
