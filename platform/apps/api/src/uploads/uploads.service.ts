@@ -20,6 +20,7 @@ export class UploadsService {
     if (this.bucket && this.region && process.env.UPLOADS_S3_ACCESS_KEY && process.env.UPLOADS_S3_SECRET_KEY) {
       this.s3 = new S3Client({
         region: this.region,
+        endpoint: process.env.UPLOADS_S3_ENDPOINT || undefined,
         credentials: {
           accessKeyId: process.env.UPLOADS_S3_ACCESS_KEY!,
           secretAccessKey: process.env.UPLOADS_S3_SECRET_KEY!
