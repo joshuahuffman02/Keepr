@@ -128,25 +128,60 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     // @ts-ignore - platformRole might not be in types
     const isPlatformAdmin = session?.user?.platformRole === "platform_admin";
 
-    if (!session || !isPlatformAdmin) {
+    // Not logged in - show login prompt
+    if (!session) {
         return (
             <div className="min-h-screen bg-slate-900 flex items-center justify-center">
                 <div className="bg-slate-800 p-8 rounded-lg shadow-lg text-center max-w-md border border-slate-700">
-                    <Shield className="h-12 w-12 text-red-400 mx-auto mb-4" />
-                    <h1 className="text-2xl font-bold text-white mb-2">Access Denied</h1>
-                    <p className="text-slate-400 mb-4">
-                        You need platform admin privileges to access this area.
+                    <Shield className="h-12 w-12 text-blue-400 mx-auto mb-4" />
+                    <h1 className="text-2xl font-bold text-white mb-2">Admin Login Required</h1>
+                    <p className="text-slate-400 mb-6">
+                        Please sign in to access the platform admin area.
                     </p>
                     <Link
-                        href="/"
-                        className="inline-flex items-center gap-2 text-blue-400 hover:text-blue-300"
+                        href="/auth/signin?callbackUrl=/admin"
+                        className="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors"
                     >
-                        Return to Home
+                        Sign In
                     </Link>
                 </div>
             </div>
         );
     }
+
+    // Logged in but not platform admin - show Access Denied
+    if (!isPlatformAdmin) {
+        return (
+            <div className="min-h-screen bg-slate-900 flex items-center justify-center">
+                <div className="bg-slate-800 p-8 rounded-lg shadow-lg text-center max-w-md border border-slate-700">
+                    <Shield className="h-12 w-12 text-red-400 mx-auto mb-4" />
+                    <h1 className="text-2xl font-bold text-white mb-2">Access Denied</h1>
+                    <p className="text-slate-400 mb-2">
+                        You need platform admin privileges to access this area.
+                    </p>
+                    <p className="text-slate-500 text-sm mb-4">
+                        Signed in as: {session.user?.email}
+                    </p>
+                    <div className="flex flex-col gap-2">
+                        <Link
+                            href="/"
+                            className="inline-flex items-center justify-center gap-2 text-blue-400 hover:text-blue-300"
+                        >
+                            Return to Home
+                        </Link>
+                        <button
+                            onClick={() => signOut({ callbackUrl: "/admin" })}
+                            className="inline-flex items-center justify-center gap-2 text-slate-400 hover:text-white text-sm"
+                        >
+                            <LogOut className="h-4 w-4" />
+                            Sign in with a different account
+                        </button>
+                    </div>
+                </div>
+            </div>
+        );
+    }
+
 
     return (
         <div className="min-h-screen bg-slate-900 flex">
