@@ -9,6 +9,7 @@ import { CancellationsReport } from "./definitions/CancellationsReport";
 import { OccupancyReport } from "./definitions/OccupancyReport";
 import { LedgerSummaryReport } from "./definitions/LedgerSummaryReport";
 import { MaintenanceDailyReport } from "./definitions/MaintenanceDailyReport";
+import { DailySummaryReport } from "./definitions/DailySummaryReport";
 
 interface ReportRendererProps {
     tab: ReportTab;
@@ -26,6 +27,9 @@ export function ReportRenderer({ tab, subTab, campgroundId, dateRange, reportFil
 
     // 2. Daily Operations Tests
     if (tab === "daily") {
+        if (subTab === "daily-summary") {
+            return <DailySummaryReport campgroundId={campgroundId} dateRange={dateRange} />;
+        }
         if (subTab === "arrivals-list") {
             return <ArrivalsReport campgroundId={campgroundId} dateRange={dateRange} />;
         }
