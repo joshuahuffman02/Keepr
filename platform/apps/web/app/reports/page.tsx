@@ -12,7 +12,7 @@ import { apiClient } from "../../lib/api-client";
 import { saveReport } from "@/components/reports/savedReports";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { FileDown, Calendar, FileSpreadsheet, X, Info, ChevronDown, ChevronUp, LayoutList, TrendingUp, Users, BarChart3, Megaphone, LineChart, Calculator, ClipboardList } from "lucide-react";
+import { FileDown, Calendar, FileSpreadsheet, X, Info, ChevronDown, ChevronUp, LayoutList, TrendingUp, Users, BarChart3, Megaphone, LineChart, Calculator, ClipboardList, ExternalLink } from "lucide-react";
 
 import { BookingSourcesTab } from "../../components/reports/BookingSourcesTab";
 import { GuestOriginsTab } from "../../components/reports/GuestOriginsTab";
@@ -4016,9 +4016,17 @@ function ReportsPageInner() {
                 <HelpAnchor topicId="reports-overview" label="Reports help" />
               </div>
               <p className="text-slate-600 text-sm">Financials, occupancy, marketing, audits—live and exportable.</p>
-              <div className="mt-2 text-xs bg-blue-50 border border-blue-200 rounded-lg px-3 py-2 text-blue-800">
-                <strong>💡 Tip:</strong> Click <em>Save report</em> to bookmark your current view (tab, sub-tab, date range) for quick access later.
-                Find saved reports via the <em>Saved reports</em> button. Reports are stored locally in your browser.
+              <div className="mt-2 text-xs bg-blue-50 border border-blue-200 rounded-lg px-3 py-2 text-blue-800 space-y-1">
+                <div className="flex items-start gap-2">
+                  <Info className="h-4 w-4 text-blue-500 mt-0.5 shrink-0" />
+                  <div>
+                    <strong>Reports are read-only views</strong> of your live data. To edit reservations or billing,
+                    use <a href="/reservations" className="underline font-medium">Reservations</a> or <a href="/billing" className="underline font-medium">Billing</a>.
+                  </div>
+                </div>
+                <div className="pl-6 text-blue-700">
+                  <strong>Tip:</strong> Click <em>Save report</em> to bookmark your current view for quick access later.
+                </div>
               </div>
             </div>
             <div className="flex flex-wrap items-center gap-2">
@@ -4395,8 +4403,8 @@ function ReportsPageInner() {
                         <div
                           key={category.id}
                           className={`rounded-lg border p-3 transition-all cursor-pointer hover:shadow-sm ${isActive
-                              ? 'border-indigo-200 bg-indigo-50 ring-1 ring-indigo-100'
-                              : 'border-slate-200 bg-white hover:border-slate-300'
+                            ? 'border-indigo-200 bg-indigo-50 ring-1 ring-indigo-100'
+                            : 'border-slate-200 bg-white hover:border-slate-300'
                             }`}
                           onClick={() => {
                             setActiveTab(category.id as ReportTab);
@@ -4706,6 +4714,7 @@ function ReportsPageInner() {
                               <th className="text-left py-2 text-slate-600 font-medium">Departure</th>
                               <th className="text-left py-2 text-slate-600 font-medium">Status</th>
                               <th className="text-right py-2 text-slate-600 font-medium">Total</th>
+                              <th className="text-center py-2 text-slate-600 font-medium w-16"></th>
                             </tr>
                           </thead>
                           <tbody>
@@ -4724,6 +4733,11 @@ function ReportsPageInner() {
                                   </span>
                                 </td>
                                 <td className="py-2 text-right">{formatCurrency((r.totalAmount || 0) / 100)}</td>
+                                <td className="py-2 text-center">
+                                  <Link href={`/reservations/${r.id}`} className="text-indigo-600 hover:text-indigo-800 inline-flex items-center gap-1 text-xs">
+                                    View <ExternalLink className="h-3 w-3" />
+                                  </Link>
+                                </td>
                               </tr>
                             ))}
                           </tbody>
@@ -5083,6 +5097,7 @@ function ReportsPageInner() {
                               <th className="text-right py-2 text-slate-600 font-medium">Total</th>
                               <th className="text-right py-2 text-slate-600 font-medium">Paid</th>
                               <th className="text-right py-2 text-slate-600 font-medium">Balance</th>
+                              <th className="text-center py-2 text-slate-600 font-medium w-16"></th>
                             </tr>
                           </thead>
                           <tbody>
@@ -5101,6 +5116,11 @@ function ReportsPageInner() {
                                   <span className={r.balance > 0 ? 'text-amber-700 font-medium' : 'text-slate-600'}>
                                     {formatCurrency(r.balance)}
                                   </span>
+                                </td>
+                                <td className="py-2 text-center">
+                                  <Link href={`/reservations/${r.id}`} className="text-indigo-600 hover:text-indigo-800 inline-flex items-center gap-1 text-xs">
+                                    View <ExternalLink className="h-3 w-3" />
+                                  </Link>
                                 </td>
                               </tr>
                             ))}
