@@ -413,172 +413,105 @@ export function DashboardShell({ children, className, title, subtitle }: { child
   const cgClassesPath = selected ? `/campgrounds/${selected}/classes` : "/campgrounds";
   const cgReservationsPath = selected ? `/campgrounds/${selected}/reservations` : "/reservations";
   const navSections = useMemo(() => {
-    const todayItems: NavItem[] = [
-      { label: "Today", href: "/dashboard", icon: "dashboard" },
-      { label: "Arrivals / Departures", href: "/check-in-out", icon: "reservation" },
-      { label: "New Booking", href: "/booking", icon: "plus" }
-    ];
-
-    const reservationsItems: NavItem[] = [
+    // PRIMARY - Always visible, core daily operations
+    const primaryItems: NavItem[] = [
+      { label: "Dashboard", href: "/dashboard", icon: "dashboard" },
+      { label: "Calendar", href: "/calendar", icon: "calendar" },
       { label: "Reservations", href: cgReservationsPath, icon: "reservation" },
-      { label: "Groups", href: "/groups", icon: "guest" },
-      { label: "Guests", href: "/guests", icon: "guest" }
+      { label: "Guests", href: "/guests", icon: "guest" },
+      { label: "Messages", href: "/messages", icon: "message", badge: unreadMessages },
+      { label: "Reports", href: "/reports", icon: "reports" }
     ];
 
-    const inventoryItems: NavItem[] = [
-      { label: "Sites & Units", href: cgScopedPath, icon: "camp" },
+    // OPERATIONS - Front desk daily tasks
+    const operationsItems: NavItem[] = [
+      { label: "Check In/Out", href: "/check-in-out", icon: "reservation" },
+      { label: "New Booking", href: "/booking", icon: "plus" },
+      { label: "POS", href: "/pos", icon: "payments" },
       { label: "Waitlist", href: "/waitlist", icon: "clock" },
       { label: "Maintenance", href: "/maintenance", icon: "wrench" },
-      { label: "Housekeeping", href: selected ? `/campgrounds/${selected}/housekeeping` : "/campgrounds", icon: "wrench" },
-      { label: "Store", href: "/store", icon: "tag" },
-      { label: "POS", href: "/pos", icon: "payments" }
+      { label: "Housekeeping", href: selected ? `/campgrounds/${selected}/housekeeping` : "/campgrounds", icon: "wrench" }
     ];
 
-    const staffOpsItems: NavItem[] = [
-      { label: "Staff Gamification", href: "/gamification", icon: "sparkles" }
+    // MANAGEMENT - Manager+ level features
+    const managementItems: NavItem[] = [
+      { label: "Sites & Inventory", href: cgScopedPath, icon: "camp" },
+      { label: "Groups", href: "/groups", icon: "guest" },
+      { label: "Store", href: "/store", icon: "tag" },
+      { label: "Ledger", href: "/ledger", icon: "ledger" },
+      { label: "Payouts", href: "/finance/payouts", icon: "payments" },
+      { label: "Gift Cards", href: "/finance/gift-cards", icon: "payments" },
+      { label: "Disputes", href: "/finance/disputes", icon: "alert" }
     ];
 
     if (allowOps) {
-      staffOpsItems.push(
+      managementItems.push(
         { label: "Operations Board", href: "/operations", icon: "wrench" },
         { label: "Equipment Rentals", href: "/operations/rentals", icon: "ticket" },
-        {
-          label: "Staff Timeclock",
-          href: selected ? `/campgrounds/${selected}/staff/timeclock` : "/campgrounds",
-          icon: "clock"
-        },
-        {
-          label: "Shift Approvals",
-          href: selected ? `/campgrounds/${selected}/staff/approvals` : "/campgrounds",
-          icon: "users"
-        },
-        {
-          label: "Override Requests",
-          href: selected ? `/campgrounds/${selected}/staff/overrides` : "/campgrounds",
-          icon: "alert"
-        }
+        { label: "Staff Timeclock", href: selected ? `/campgrounds/${selected}/staff/timeclock` : "/campgrounds", icon: "clock" },
+        { label: "Staff Scheduling", href: selected ? `/campgrounds/${selected}/staff-scheduling` : "/campgrounds", icon: "users" },
+        { label: "Staff Gamification", href: "/gamification", icon: "sparkles" }
       );
     }
 
-    const pricingItems: NavItem[] = [
-      { label: "Dynamic Pricing", href: "/settings/pricing-rules", icon: "pricing", tooltip: "Primary pricing UI (legacy /pricing now redirects here)" },
-      { label: "Seasonal Rates", href: "/settings/seasonal-rates", icon: "calendar", tooltip: "Long-stay and package rates" },
-      { label: "Deposit Policies", href: "/settings/deposit-policies", icon: "payments" },
-      { label: "Upsells & Add-ons", href: "/settings/upsells", icon: "tag" },
-      { label: "Blackout Dates", href: "/settings/blackout-dates", icon: "calendar" },
-      { label: "Tax & Currency", href: "/settings/tax-rules", icon: "pricing" },
-      { label: "Memberships & Programs", href: "/settings/memberships", icon: "star" }
-    ];
-
-    const financeItems: NavItem[] = [
-      { label: "Ledger", href: "/ledger", icon: "ledger" },
-      { label: "Repeat Charges", href: "/billing/repeat-charges", icon: "payments" },
-      { label: "Payouts", href: "/finance/payouts", icon: "payments" },
-      { label: "Gift Cards / Credit", href: "/finance/gift-cards", icon: "payments" },
-      { label: "Approvals", href: "/approvals", icon: "policy" },
-      { label: "Disputes", href: "/finance/disputes", icon: "alert" },
-      { label: "Portfolio Overview", href: "/portfolio", icon: "reports" }
-    ];
-
-    const communicationsItems: NavItem[] = [
-      { label: "Messages", href: "/messages", icon: "message", badge: unreadMessages }
-    ];
-
     if (allowSupport) {
-      communicationsItems.push(
-        { label: "Support queue", href: "/admin/support", icon: "ticket" },
-        { label: "Support analytics", href: "/admin/support/analytics", icon: "reports" },
-        { label: "Support staff", href: "/admin/support/staff", icon: "users" }
+      managementItems.push(
+        { label: "Support Queue", href: "/admin/support", icon: "ticket" },
+        { label: "Support Analytics", href: "/admin/support/analytics", icon: "reports" }
       );
       if (platformRole) {
-        communicationsItems.push({ label: "Platform users", href: "/admin/platform/users", icon: "users" });
+        managementItems.push({ label: "Platform Users", href: "/admin/platform/users", icon: "users" });
       }
     }
 
-    const reportsItems: NavItem[] = [
-      { label: "Reports", href: "/reports", icon: "reports" },
-      { label: "Saved Reports", href: "/reports/saved", icon: "star" },
-      { label: "Audit", href: "/reports/audit", icon: "audit" },
-      { label: "Analytics Dashboard", href: "/analytics", icon: "reports" }
-    ];
-
+    // SETTINGS - Admin configuration
     const settingsItems: NavItem[] = [
+      // Pricing & Revenue
+      { label: "Dynamic Pricing", href: "/settings/pricing-rules", icon: "pricing" },
+      { label: "Seasonal Rates", href: "/settings/seasonal-rates", icon: "calendar" },
+      { label: "Deposit Policies", href: "/settings/deposit-policies", icon: "payments" },
+      { label: "Upsells & Add-ons", href: "/settings/upsells", icon: "tag" },
+      { label: "Tax & Currency", href: "/settings/tax-rules", icon: "pricing" },
+      { label: "Blackout Dates", href: "/settings/blackout-dates", icon: "calendar" },
+      { label: "Memberships", href: "/settings/memberships", icon: "star" },
+      // Communications
+      { label: "Email & SMS Templates", href: "/settings/templates", icon: "message" },
+      { label: "Notification Triggers", href: "/settings/notification-triggers", icon: "message" },
+      // Access & Security
       { label: "Users & Roles", href: "/settings/users", icon: "users" },
       { label: "Permissions", href: "/settings/permissions", icon: "policy" },
-      { label: "Notification Triggers", href: "/settings/notification-triggers", icon: "message" },
-      { label: "Email & SMS Templates", href: "/settings/templates", icon: "message" },
-      { label: "Privacy & Consent", href: "/settings/privacy", icon: "audit" },
-      { label: "Security", href: "/settings/security", icon: "audit" },
       { label: "Access Control", href: "/settings/access-control", icon: "lock" },
-      {
-        label: "Utilities & Billing",
-        href: selected ? `/campgrounds/${selected}/utilities-billing` : "/campgrounds",
-        icon: "payments",
-        tooltip: "Long-stay metered utilities, invoices, late fees"
-      },
-      { label: "Incidents & COIs", href: "/incidents", icon: "alert" },
+      { label: "Security", href: "/settings/security", icon: "audit" },
+      { label: "Privacy & Consent", href: "/settings/privacy", icon: "audit" },
+      // Property Config
+      { label: "Campground Config", href: selected ? `/campgrounds/${selected}/settings` : "/campgrounds", icon: "policy" },
       { label: "Photos", href: "/settings/photos", icon: "brand" },
-      { label: "Localization & Language", href: "/settings/localization", icon: "brand" },
-      {
-        label: "Campground Configuration",
-        href: selected ? `/campgrounds/${selected}/settings` : "/campgrounds",
-        icon: "policy"
-      },
+      { label: "Localization", href: "/settings/localization", icon: "brand" },
+      { label: "Utilities & Billing", href: selected ? `/campgrounds/${selected}/utilities-billing` : "/campgrounds", icon: "payments" },
+      { label: "Incidents & COIs", href: "/incidents", icon: "alert" },
+      // More
+      { label: "Saved Reports", href: "/reports/saved", icon: "star" },
+      { label: "Audit Log", href: "/reports/audit", icon: "audit" },
+      { label: "Analytics", href: "/analytics", icon: "reports" },
       { label: "Roadmap", href: "/roadmap", icon: "sparkles" }
     ];
 
     return [
       {
-        heading: "Today",
-        items: todayItems,
-        collapsible: true,
-        defaultOpen: true
-      },
-      {
-        heading: "Calendar",
-        items: [{ label: "Calendar", href: "/calendar", icon: "calendar" }],
+        heading: "Primary",
+        items: primaryItems,
         collapsible: false,
         defaultOpen: true
       },
       {
-        heading: "Reservations",
-        items: reservationsItems,
+        heading: "Operations",
+        items: operationsItems,
         collapsible: true,
         defaultOpen: true
       },
       {
-        heading: "Inventory",
-        items: inventoryItems,
-        collapsible: true,
-        defaultOpen: false
-      },
-      {
-        heading: "Staff & Operations",
-        items: staffOpsItems,
-        collapsible: true,
-        defaultOpen: false
-      },
-      {
-        heading: "Pricing & Rules",
-        items: pricingItems,
-        collapsible: true,
-        defaultOpen: false
-      },
-      {
-        heading: "Finance",
-        items: financeItems,
-        collapsible: true,
-        defaultOpen: false
-      },
-      {
-        heading: "Communications",
-        items: communicationsItems,
-        collapsible: true,
-        defaultOpen: true
-      },
-      {
-        heading: "Reports",
-        items: reportsItems,
+        heading: "Management",
+        items: managementItems,
         collapsible: true,
         defaultOpen: false
       },
