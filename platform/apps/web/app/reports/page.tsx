@@ -2643,7 +2643,7 @@ function ReportsPageInner() {
     const siteMap = new Map(sitesQuery.data.map(s => [s.id, s]));
     const now = new Date();
     const currentMonth = now.getMonth();
-    const months = [];
+    const months: { name: string; total: number; paid: number; bookings: number; isCurrent: boolean }[] = [];
 
     const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
@@ -2684,7 +2684,7 @@ function ReportsPageInner() {
 
     const now = new Date();
     const currentYear = now.getFullYear();
-    const years = [];
+    const years: { year: number; bookings: number; revenue: number; isCurrent: boolean }[] = [];
 
     for (let y = currentYear - 2; y <= currentYear; y++) {
       const yearStart = new Date(y, 0, 1);
