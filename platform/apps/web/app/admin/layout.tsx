@@ -45,7 +45,8 @@ const adminNavItems = [
         title: "Platform",
         icon: Users,
         children: [
-            { title: "Users", href: "/admin/platform/users" },
+            { title: "Staff", href: "/admin/platform/users" },
+            { title: "Directory", href: "/admin/users" },
         ],
     },
     {
