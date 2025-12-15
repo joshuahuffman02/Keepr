@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { DashboardShell } from "@/components/ui/layout/DashboardShell";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -8,10 +9,11 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { useToast } from "@/components/ui/use-toast";
 import { apiClient } from "@/lib/api-client";
-import { Plus, Pencil, Trash2, Loader2, Percent, DollarSign, FileX } from "lucide-react";
+import { Plus, Pencil, Trash2, Loader2, Percent, DollarSign, FileX, ArrowRightLeft, Settings } from "lucide-react";
 
 type TaxRule = {
     id: string;
@@ -51,6 +53,13 @@ const defaultFormData: TaxRuleFormData = {
 };
 
 export default function TaxRulesSettingsPage() {
+    const { toast } = useToast();
+    const qc = useQueryClient();
+
+    // Tab state
+    const [activeTab, setActiveTab] = useState<"rules" | "currency">("rules");
+
+    // Tax Rules state
     const [taxRules, setTaxRules] = useState<TaxRule[]>([]);
     const [loading, setLoading] = useState(true);
     const [campgroundId, setCampgroundId] = useState<string | null>(null);
@@ -59,6 +68,46 @@ export default function TaxRulesSettingsPage() {
     const [formData, setFormData] = useState<TaxRuleFormData>(defaultFormData);
     const [saving, setSaving] = useState(false);
     const [error, setError] = useState<string | null>(null);
+
+    // Currency state
+    const configQuery = useQuery({
+        queryKey: ["currency-tax"],
+        queryFn: apiClient.getCurrencyTaxConfig,
+        enabled: activeTab === "currency"
+    });
+    const [baseCurrency, setBaseCurrency] = useState("USD");
+    const [reportingCurrency, setReportingCurrency] = useState("USD");
+    const [conversion, setConversion] = useState({ amount: 1000, from: "USD", to: "CAD" });
+
+    useEffect(() => {
+        if (configQuery.data) {
+            setBaseCurrency(configQuery.data.baseCurrency);
+            setReportingCurrency(configQuery.data.reportingCurrency);
+            setConversion((prev) => ({ ...prev, from: configQuery.data.baseCurrency, to: configQuery.data.reportingCurrency }));
+        }
+    }, [configQuery.data]);
+
+    const updateCurrencyMutation = useMutation({
+        mutationFn: apiClient.updateCurrencyTaxConfig,
+        onSuccess: () => {
+            qc.invalidateQueries({ queryKey: ["currency-tax"] });
+            toast({ title: "Currency settings saved" });
+        },
+        onError: (err: any) => toast({ title: "Save failed", description: err?.message ?? "Try again", variant: "destructive" }),
+    });
+
+    const convertMutation = useMutation({
+        mutationFn: apiClient.convertCurrency,
+        onSuccess: (data) => {
+            toast({ title: "Conversion", description: `${conversion.amount} ${conversion.from} → ${data.converted} ${conversion.to} @ ${data.rate}` });
+        },
+        onError: (err: any) => toast({ title: "Conversion failed", description: err?.message ?? "Try again", variant: "destructive" }),
+    });
+
+    const currencies = useMemo(() => {
+        const fxCurrencies = configQuery.data?.fxRates?.flatMap((r: any) => [r.base, r.quote]) ?? [];
+        return Array.from(new Set([...(fxCurrencies ?? []), baseCurrency, reportingCurrency]));
+    }, [configQuery.data?.fxRates, baseCurrency, reportingCurrency]);
 
     useEffect(() => {
         const cg = localStorage.getItem("campreserv:selectedCampground");
@@ -198,84 +247,212 @@ export default function TaxRulesSettingsPage() {
     return (
         <DashboardShell>
             <div className="space-y-6">
-                <div className="flex items-center justify-between">
-                    <div>
-                        <h1 className="text-2xl font-bold text-slate-900">Tax Rules</h1>
-                        <p className="text-muted-foreground">Configure tax rates, exemptions, and waivers for reservations.</p>
-                    </div>
-                    <Button onClick={openCreateModal}>
-                        <Plus className="h-4 w-4 mr-2" />
-                        Add Tax Rule
-                    </Button>
+                <div>
+                    <h1 className="text-2xl font-bold text-slate-900">Tax & Currency Settings</h1>
+                    <p className="text-muted-foreground">Configure tax rates, exemptions, and currency for reservations, POS, and upsells.</p>
                 </div>
 
-                {loading ? (
-                    <div className="flex justify-center py-12">
-                        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                {/* Tabs */}
+                <div className="border-b border-slate-200">
+                    <div className="flex gap-1">
+                        <button
+                            onClick={() => setActiveTab("rules")}
+                            className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${activeTab === "rules"
+                                    ? "border-blue-600 text-blue-600"
+                                    : "border-transparent text-slate-600 hover:text-slate-900"
+                                }`}
+                        >
+                            <Percent className="w-4 h-4 inline mr-2" />
+                            Tax Rules
+                        </button>
+                        <button
+                            onClick={() => setActiveTab("currency")}
+                            className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${activeTab === "currency"
+                                    ? "border-blue-600 text-blue-600"
+                                    : "border-transparent text-slate-600 hover:text-slate-900"
+                                }`}
+                        >
+                            <DollarSign className="w-4 h-4 inline mr-2" />
+                            Currency
+                        </button>
                     </div>
-                ) : taxRules.length === 0 ? (
-                    <Card>
-                        <CardContent className="py-12 text-center">
-                            <Percent className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-                            <h3 className="font-semibold text-lg mb-2">No tax rules configured</h3>
-                            <p className="text-muted-foreground mb-4">
-                                Create tax rules to automatically apply taxes to reservations.
-                            </p>
+                </div>
+
+                {/* Tax Rules Tab */}
+                {activeTab === "rules" && (
+                    <div className="space-y-4">
+                        <div className="flex justify-end">
                             <Button onClick={openCreateModal}>
                                 <Plus className="h-4 w-4 mr-2" />
                                 Add Tax Rule
                             </Button>
-                        </CardContent>
-                    </Card>
-                ) : (
-                    <div className="grid gap-4">
-                        {taxRules.map((rule) => (
-                            <Card key={rule.id} className={!rule.isActive ? "opacity-60" : ""}>
-                                <CardContent className="p-6">
-                                    <div className="flex items-center justify-between">
-                                        <div className="flex items-center gap-4">
-                                            <div className={`p-3 rounded-lg ${getTypeColor(rule.type)}`}>
-                                                {getTypeIcon(rule.type)}
-                                            </div>
-                                            <div>
-                                                <div className="flex items-center gap-2">
-                                                    <span className="font-semibold text-lg">{rule.name}</span>
-                                                    <Badge variant={rule.isActive ? "default" : "secondary"}>
-                                                        {rule.isActive ? "Active" : "Inactive"}
-                                                    </Badge>
-                                                    {rule.requiresWaiver && (
-                                                        <Badge variant="outline" className="border-amber-200 text-amber-700">
-                                                            Requires Waiver
-                                                        </Badge>
-                                                    )}
-                                                </div>
-                                                <div className="text-sm text-muted-foreground mt-1">
-                                                    <span className="font-semibold text-foreground">{formatRate(rule)}</span>
-                                                    {rule.minNights && ` • Min ${rule.minNights} nights`}
-                                                    {rule.maxNights && ` • Max ${rule.maxNights} nights`}
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div className="flex items-center gap-2">
-                                            <Switch
-                                                checked={rule.isActive}
-                                                onCheckedChange={() => toggleActive(rule)}
-                                            />
-                                            <Button variant="ghost" size="icon" onClick={() => openEditModal(rule)}>
-                                                <Pencil className="h-4 w-4" />
-                                            </Button>
-                                            <Button variant="ghost" size="icon" onClick={() => handleDelete(rule.id)}>
-                                                <Trash2 className="h-4 w-4 text-destructive" />
-                                            </Button>
-                                        </div>
-                                    </div>
+                        </div>
+
+                        {loading ? (
+                            <div className="flex justify-center py-12">
+                                <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                            </div>
+                        ) : taxRules.length === 0 ? (
+                            <Card>
+                                <CardContent className="py-12 text-center">
+                                    <Percent className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+                                    <h3 className="font-semibold text-lg mb-2">No tax rules configured</h3>
+                                    <p className="text-muted-foreground mb-4">
+                                        Create tax rules to automatically apply taxes to reservations.
+                                    </p>
+                                    <Button onClick={openCreateModal}>
+                                        <Plus className="h-4 w-4 mr-2" />
+                                        Add Tax Rule
+                                    </Button>
                                 </CardContent>
                             </Card>
-                        ))}
+                        ) : (
+                            <div className="grid gap-4">
+                                {taxRules.map((rule) => (
+                                    <Card key={rule.id} className={!rule.isActive ? "opacity-60" : ""}>
+                                        <CardContent className="p-6">
+                                            <div className="flex items-center justify-between">
+                                                <div className="flex items-center gap-4">
+                                                    <div className={`p-3 rounded-lg ${getTypeColor(rule.type)}`}>
+                                                        {getTypeIcon(rule.type)}
+                                                    </div>
+                                                    <div>
+                                                        <div className="flex items-center gap-2">
+                                                            <span className="font-semibold text-lg">{rule.name}</span>
+                                                            <Badge variant={rule.isActive ? "default" : "secondary"}>
+                                                                {rule.isActive ? "Active" : "Inactive"}
+                                                            </Badge>
+                                                            {rule.requiresWaiver && (
+                                                                <Badge variant="outline" className="border-amber-200 text-amber-700">
+                                                                    Requires Waiver
+                                                                </Badge>
+                                                            )}
+                                                        </div>
+                                                        <div className="text-sm text-muted-foreground mt-1">
+                                                            <span className="font-semibold text-foreground">{formatRate(rule)}</span>
+                                                            {rule.minNights && ` • Min ${rule.minNights} nights`}
+                                                            {rule.maxNights && ` • Max ${rule.maxNights} nights`}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div className="flex items-center gap-2">
+                                                    <Switch
+                                                        checked={rule.isActive}
+                                                        onCheckedChange={() => toggleActive(rule)}
+                                                    />
+                                                    <Button variant="ghost" size="icon" onClick={() => openEditModal(rule)}>
+                                                        <Pencil className="h-4 w-4" />
+                                                    </Button>
+                                                    <Button variant="ghost" size="icon" onClick={() => handleDelete(rule.id)}>
+                                                        <Trash2 className="h-4 w-4 text-destructive" />
+                                                    </Button>
+                                                </div>
+                                            </div>
+                                        </CardContent>
+                                    </Card>
+                                ))}
+                            </div>
+                        )}
+                    </div>
+                )}
+
+                {/* Currency Tab */}
+                {activeTab === "currency" && (
+                    <div className="grid gap-4 lg:grid-cols-2">
+                        <Card>
+                            <CardHeader>
+                                <CardTitle className="flex items-center gap-2">
+                                    <Settings className="h-5 w-5" />
+                                    Currency Configuration
+                                </CardTitle>
+                                <CardDescription>Set your base and reporting currencies</CardDescription>
+                            </CardHeader>
+                            <CardContent className="space-y-4">
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div className="space-y-2">
+                                        <Label>Base Currency</Label>
+                                        <select
+                                            className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm"
+                                            value={baseCurrency}
+                                            onChange={(e) => setBaseCurrency(e.target.value)}
+                                        >
+                                            {currencies.map((c) => (
+                                                <option key={c} value={c}>{c}</option>
+                                            ))}
+                                        </select>
+                                    </div>
+                                    <div className="space-y-2">
+                                        <Label>Reporting Currency</Label>
+                                        <select
+                                            className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm"
+                                            value={reportingCurrency}
+                                            onChange={(e) => setReportingCurrency(e.target.value)}
+                                        >
+                                            {currencies.map((c) => (
+                                                <option key={c} value={c}>{c}</option>
+                                            ))}
+                                        </select>
+                                    </div>
+                                </div>
+                                <Button
+                                    onClick={() => updateCurrencyMutation.mutate({ baseCurrency, reportingCurrency })}
+                                    disabled={updateCurrencyMutation.isPending}
+                                >
+                                    Save Currency Settings
+                                </Button>
+                            </CardContent>
+                        </Card>
+
+                        <Card>
+                            <CardHeader>
+                                <CardTitle className="flex items-center gap-2">
+                                    <ArrowRightLeft className="h-5 w-5" />
+                                    Currency Converter
+                                </CardTitle>
+                                <CardDescription>Quick conversion tool (demo)</CardDescription>
+                            </CardHeader>
+                            <CardContent className="space-y-4">
+                                <div className="flex items-center gap-2">
+                                    <Input
+                                        type="number"
+                                        value={conversion.amount}
+                                        onChange={(e) => setConversion((prev) => ({ ...prev, amount: Number(e.target.value) }))}
+                                        className="w-28"
+                                    />
+                                    <select
+                                        className="rounded-md border border-slate-300 px-2 py-2 text-sm"
+                                        value={conversion.from}
+                                        onChange={(e) => setConversion((prev) => ({ ...prev, from: e.target.value }))}
+                                    >
+                                        {currencies.map((c) => (
+                                            <option key={c} value={c}>{c}</option>
+                                        ))}
+                                    </select>
+                                    <span className="text-slate-400">→</span>
+                                    <select
+                                        className="rounded-md border border-slate-300 px-2 py-2 text-sm"
+                                        value={conversion.to}
+                                        onChange={(e) => setConversion((prev) => ({ ...prev, to: e.target.value }))}
+                                    >
+                                        {currencies.map((c) => (
+                                            <option key={c} value={c}>{c}</option>
+                                        ))}
+                                    </select>
+                                </div>
+                                <Button
+                                    onClick={() => convertMutation.mutate({ amount: conversion.amount, from: conversion.from, to: conversion.to })}
+                                    variant="outline"
+                                    disabled={convertMutation.isPending}
+                                >
+                                    Convert
+                                </Button>
+                            </CardContent>
+                        </Card>
                     </div>
                 )}
             </div>
 
+            {/* Tax Rule Modal */}
             <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
                 <DialogContent className="sm:max-w-[500px]">
                     <DialogHeader>
@@ -405,3 +582,4 @@ export default function TaxRulesSettingsPage() {
         </DashboardShell>
     );
 }
+

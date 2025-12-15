@@ -466,8 +466,7 @@ export function DashboardShell({ children, className, title, subtitle }: { child
       { label: "Deposit Policies", href: "/settings/deposit-policies", icon: "payments" },
       { label: "Upsells & Add-ons", href: "/settings/upsells", icon: "tag" },
       { label: "Blackout Dates", href: "/settings/blackout-dates", icon: "calendar" },
-      { label: "Tax Rules", href: "/settings/tax-rules", icon: "pricing" },
-      { label: "Currency & Tax", href: "/settings/currency-tax", icon: "payments" },
+      { label: "Tax & Currency", href: "/settings/tax-rules", icon: "pricing" },
       { label: "Memberships & Programs", href: "/settings/memberships", icon: "star" }
     ];
 
