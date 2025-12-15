@@ -6,6 +6,8 @@ import { useWhoami } from "@/hooks/use-whoami";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
+import { Plus, X, Search, Loader2 } from "lucide-react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 type Ticket = {
   id: string;
@@ -58,6 +60,16 @@ export default function TicketsPage() {
   const [search, setSearch] = useState("");
   const [expandedNotes, setExpandedNotes] = useState<Record<string, boolean>>({});
   const { data: whoami } = useWhoami();
+
+  // Create Ticket State
+  const [createOpen, setCreateOpen] = useState(false);
+  const [creating, setCreating] = useState(false);
+  const [newTicket, setNewTicket] = useState({
+    title: "",
+    notes: "",
+    category: "issue" as "issue" | "question" | "feature" | "other",
+    area: "General"
+  });
 
   const loadTickets = async () => {
     setLoading(true);
@@ -249,6 +261,44 @@ export default function TicketsPage() {
     }
   };
 
+  const handleCreate = async () => {
+    if (!newTicket.title.trim()) return;
+    setCreating(true);
+    try {
+      const res = await fetch("/api/tickets", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          title: newTicket.title,
+          notes: newTicket.notes,
+          category: newTicket.category,
+          area: newTicket.area,
+          status: "open",
+          submitter: {
+            id: (whoami as any)?.id,
+            name: (whoami as any)?.name,
+            email: (whoami as any)?.email
+          }
+        }),
+      });
+      if (!res.ok) throw new Error(`Request failed (${res.status})`);
+      setCreateOpen(false);
+      setNewTicket({
+        title: "",
+        notes: "",
+        category: "issue",
+        area: "General"
+      });
+      await loadTickets();
+    } catch (err) {
+      console.error(err);
+      alert("Failed to create ticket");
+    } finally {
+      setCreating(false);
+    }
+  };
+
+
   return (
     <div className="w-full">
       <div className="flex w-full flex-col gap-5 px-4 md:px-8 py-6">
@@ -322,6 +372,10 @@ export default function TicketsPage() {
                   Roadmap
                 </a>
               </Button>
+              <Button onClick={() => setCreateOpen(true)} className="gap-2">
+                <Plus className="h-4 w-4" />
+                New Ticket
+              </Button>
               <Button variant="secondary" onClick={loadTickets} disabled={loading}>
                 {loading ? "Refreshing..." : "Refresh"}
               </Button>
@@ -377,9 +431,22 @@ export default function TicketsPage() {
         {error && <div className="rounded-md bg-red-50 px-3 py-2 text-sm text-red-700">{error}</div>}
 
         {loading ? (
-          <div className="text-sm text-slate-600">Loading tickets...</div>
+          <div className="flex items-center gap-2 text-sm text-slate-600">
+            <Loader2 className="h-4 w-4 animate-spin" />
+            Loading tickets...
+          </div>
         ) : filteredTickets.length === 0 ? (
-          <div className="text-sm text-slate-600">No tickets yet. Use the floating button to add one.</div>
+          <div className="flex flex-col items-center justify-center py-12 text-slate-500">
+            <div className="p-4 rounded-full bg-slate-50 border border-slate-200 mb-4">
+              <Search className="h-6 w-6 text-slate-400" />
+            </div>
+            <h3 className="text-lg font-medium text-slate-900">No tickets found</h3>
+            <p className="text-sm mt-1 mb-4">You can create a new ticket to get started.</p>
+            <Button onClick={() => setCreateOpen(true)} className="gap-2">
+              <Plus className="h-4 w-4" />
+              Create Ticket
+            </Button>
+          </div>
         ) : (
           <>
             {/* Desktop table */}
@@ -417,8 +484,8 @@ export default function TicketsPage() {
                       <td className="px-4 py-4 align-top text-xs font-semibold">
                         <span
                           className={`inline-flex rounded-full px-2 py-1 ${ticket.status === "completed"
-                              ? "bg-emerald-100 text-emerald-800"
-                              : "bg-amber-100 text-amber-800"
+                            ? "bg-emerald-100 text-emerald-800"
+                            : "bg-amber-100 text-amber-800"
                             }`}
                         >
                           {ticket.status === "completed" ? "Completed" : "Open"}
@@ -606,10 +673,6 @@ export default function TicketsPage() {
           </>
         )}
 
-        <div className="text-xs text-slate-500">
-          Raw storage: <code>data/tickets.json</code> (local JSON for testing; swap to real persistence later).
-        </div>
-
         <Dialog open={!!detailTicket} onOpenChange={(open) => (!open ? setDetailTicket(null) : undefined)}>
           <DialogContent className="max-w-2xl">
             <DialogHeader>
@@ -649,6 +712,79 @@ export default function TicketsPage() {
             </DialogFooter>
           </DialogContent>
         </Dialog>
+
+        {/* Create Ticket Dialog */}
+        <Dialog open={createOpen} onOpenChange={setCreateOpen}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Create New Ticket</DialogTitle>
+            </DialogHeader>
+            <div className="space-y-4 py-2">
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Title</label>
+                <Input
+                  placeholder="Brief summary of the issue"
+                  value={newTicket.title}
+                  onChange={(e) => setNewTicket(prev => ({ ...prev, title: e.target.value }))}
+                />
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Category</label>
+                  <Select
+                    value={newTicket.category}
+                    onValueChange={(val: any) => setNewTicket(prev => ({ ...prev, category: val }))}
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="issue">Issue</SelectItem>
+                      <SelectItem value="question">Question</SelectItem>
+                      <SelectItem value="feature">Feature</SelectItem>
+                      <SelectItem value="other">Other</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Area</label>
+                  <Select
+                    value={newTicket.area}
+                    onValueChange={(val) => setNewTicket(prev => ({ ...prev, area: val }))}
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="General">General</SelectItem>
+                      <SelectItem value="Admin">Admin</SelectItem>
+                      <SelectItem value="UI/UX">UI/UX</SelectItem>
+                      <SelectItem value="Reservations">Reservations</SelectItem>
+                      <SelectItem value="Payments">Payments</SelectItem>
+                      <SelectItem value="Auth">Auth</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Description / Notes</label>
+                <Textarea
+                  placeholder="Detailed description..."
+                  rows={4}
+                  value={newTicket.notes}
+                  onChange={(e) => setNewTicket(prev => ({ ...prev, notes: e.target.value }))}
+                />
+              </div>
+            </div>
+            <DialogFooter>
+              <Button variant="ghost" onClick={() => setCreateOpen(false)}>Cancel</Button>
+              <Button onClick={handleCreate} disabled={creating || !newTicket.title.trim()}>
+                {creating ? "Creating..." : "Create Ticket"}
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
       </div>
     </div>
   );
