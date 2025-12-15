@@ -7,10 +7,12 @@ import { Breadcrumbs } from "../../components/breadcrumbs";
 import { Button } from "../../components/ui/button";
 import { useToast } from "../../components/ui/use-toast";
 import { HelpAnchor } from "../../components/help/HelpAnchor";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "../../components/ui/dialog";
 import { apiClient } from "../../lib/api-client";
 import { saveReport } from "@/components/reports/savedReports";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
+import { FileDown, Calendar, FileSpreadsheet, X, Info } from "lucide-react";
 
 import { BookingSourcesTab } from "../../components/reports/BookingSourcesTab";
 import { GuestOriginsTab } from "../../components/reports/GuestOriginsTab";
@@ -101,6 +103,16 @@ function ReportsPageInner() {
     };
   });
   const [showActivePromos, setShowActivePromos] = useState(false);
+
+  // Export confirmation dialog state
+  const [showExportDialog, setShowExportDialog] = useState(false);
+  const [exportPreview, setExportPreview] = useState<{
+    reportName: string;
+    subReportName: string | null;
+    dateRange: { start: string; end: string };
+    rowCount: number;
+    tabName: string;
+  } | null>(null);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -3627,6 +3639,55 @@ function ReportsPageInner() {
     };
   }, [reservationsQuery.data]);
 
+  // Get human-readable report names
+  const getReportDisplayName = (tabName: string): string => {
+    const names: Record<string, string> = {
+      overview: 'Overview',
+      daily: 'Daily Operations',
+      revenue: 'Revenue',
+      performance: 'Performance',
+      guests: 'Guests',
+      marketing: 'Marketing',
+      forecasting: 'Forecasting',
+      accounting: 'Accounting',
+      audits: 'Audits'
+    };
+    return names[tabName] || tabName;
+  };
+
+  // Calculate row count for export preview
+  const getExportRowCount = (tabName: string): number => {
+    switch (tabName) {
+      case 'daily':
+        return (dailyArrivals?.length || 0) + (dailyDepartures?.length || 0) + (inHouseGuests?.length || 0) + (transactionLog?.length || 0);
+      case 'revenue':
+        return reservationsQuery.data?.length || 0;
+      case 'overview':
+        return 10; // Summary metrics
+      case 'performance':
+        return (sitePerformance?.length || 0) + (revenueTrends?.length || 0);
+      case 'guests':
+        return reservationsQuery.data?.filter(r => r.status !== 'cancelled').length || 0;
+      case 'accounting':
+        return reservationsQuery.data?.length || 0;
+      default:
+        return reservationsQuery.data?.length || 0;
+    }
+  };
+
+  // Prepare export preview and show confirmation dialog
+  const prepareExportPreview = (tabName: string) => {
+    const subMeta = currentSubMeta();
+    setExportPreview({
+      reportName: getReportDisplayName(tabName),
+      subReportName: subMeta?.label || null,
+      dateRange,
+      rowCount: getExportRowCount(tabName),
+      tabName
+    });
+    setShowExportDialog(true);
+  };
+
   // Tab-specific export functions
   const exportTabToCSV = (tabName: string) => {
     const timestamp = new Date().toISOString().slice(0, 10);
@@ -3930,9 +3991,11 @@ function ReportsPageInner() {
               <Button
                 variant="secondary"
                 size="sm"
-                onClick={() => exportTabToCSV(activeTab)}
+                onClick={() => prepareExportPreview(activeTab)}
+                className="flex items-center gap-2"
               >
-                Export {activeTab.charAt(0).toUpperCase() + activeTab.slice(1)}
+                <FileDown className="h-4 w-4" />
+                Export {getReportDisplayName(activeTab)}
               </Button>
             </div>
           </div>
@@ -4003,6 +4066,82 @@ function ReportsPageInner() {
           </div>
         </div>
 
+        {/* Export Confirmation Dialog */}
+        <Dialog open={showExportDialog} onOpenChange={setShowExportDialog}>
+          <DialogContent className="sm:max-w-md">
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-2">
+                <FileSpreadsheet className="h-5 w-5 text-emerald-600" />
+                Export Report
+              </DialogTitle>
+              <DialogDescription>
+                Review what you're about to export
+              </DialogDescription>
+            </DialogHeader>
+
+            {exportPreview && (
+              <div className="space-y-4 py-4">
+                {/* Report Details */}
+                <div className="rounded-lg border border-slate-200 bg-slate-50 p-4 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-slate-600">Report</span>
+                    <span className="font-medium text-slate-900">{exportPreview.reportName}</span>
+                  </div>
+                  {exportPreview.subReportName && (
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm text-slate-600">View</span>
+                      <span className="font-medium text-slate-900">{exportPreview.subReportName}</span>
+                    </div>
+                  )}
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-slate-600 flex items-center gap-1">
+                      <Calendar className="h-3.5 w-3.5" /> Date Range
+                    </span>
+                    <span className="font-medium text-slate-900">
+                      {new Date(exportPreview.dateRange.start).toLocaleDateString()} — {new Date(exportPreview.dateRange.end).toLocaleDateString()}
+                    </span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-slate-600">Rows</span>
+                    <span className="font-medium text-slate-900">~{exportPreview.rowCount.toLocaleString()}</span>
+                  </div>
+                </div>
+
+                {/* Info Note */}
+                <div className="flex items-start gap-2 text-xs text-slate-500 bg-blue-50 border border-blue-100 rounded-lg p-3">
+                  <Info className="h-4 w-4 text-blue-500 mt-0.5 shrink-0" />
+                  <span>
+                    Reports are read-only views of your live data. To edit reservation or billing data,
+                    use the <a href="/reservations" className="text-blue-600 underline">Reservations</a> or <a href="/billing" className="text-blue-600 underline">Billing</a> pages.
+                  </span>
+                </div>
+              </div>
+            )}
+
+            <DialogFooter className="flex gap-2 sm:gap-0">
+              <Button variant="outline" onClick={() => setShowExportDialog(false)}>
+                Cancel
+              </Button>
+              <Button
+                onClick={() => {
+                  if (exportPreview) {
+                    exportTabToCSV(exportPreview.tabName);
+                    setShowExportDialog(false);
+                    toast({
+                      title: "Export started",
+                      description: `Downloading ${exportPreview.reportName} report...`
+                    });
+                  }
+                }}
+                className="flex items-center gap-2"
+              >
+                <FileDown className="h-4 w-4" />
+                Download CSV
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
       </DashboardShell>
     );
   }
@@ -4063,9 +4202,11 @@ function ReportsPageInner() {
                 <Button
                   variant="secondary"
                   size="sm"
-                  onClick={() => exportTabToCSV(activeTab)}
+                  onClick={() => prepareExportPreview(activeTab)}
+                  className="flex items-center gap-2"
                 >
-                  Export {activeTab.charAt(0).toUpperCase() + activeTab.slice(1)}
+                  <FileDown className="h-4 w-4" />
+                  Export {getReportDisplayName(activeTab)}
                 </Button>
               </div>
             ) : (
@@ -7025,6 +7166,81 @@ function ReportsPageInner() {
           )}
         </div>
       </div>
+
+      {/* Export Confirmation Dialog */}
+      <Dialog open={showExportDialog} onOpenChange={setShowExportDialog}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <FileSpreadsheet className="h-5 w-5 text-emerald-600" />
+              Export Report
+            </DialogTitle>
+            <DialogDescription>
+              Review what you're about to export
+            </DialogDescription>
+          </DialogHeader>
+
+          {exportPreview && (
+            <div className="space-y-4 py-4">
+              <div className="rounded-lg border border-slate-200 bg-slate-50 p-4 space-y-3">
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-slate-600">Report</span>
+                  <span className="font-medium text-slate-900">{exportPreview.reportName}</span>
+                </div>
+                {exportPreview.subReportName && (
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-slate-600">View</span>
+                    <span className="font-medium text-slate-900">{exportPreview.subReportName}</span>
+                  </div>
+                )}
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-slate-600 flex items-center gap-1">
+                    <Calendar className="h-3.5 w-3.5" /> Date Range
+                  </span>
+                  <span className="font-medium text-slate-900">
+                    {new Date(exportPreview.dateRange.start).toLocaleDateString()} — {new Date(exportPreview.dateRange.end).toLocaleDateString()}
+                  </span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-slate-600">Rows</span>
+                  <span className="font-medium text-slate-900">~{exportPreview.rowCount.toLocaleString()}</span>
+                </div>
+              </div>
+
+              <div className="flex items-start gap-2 text-xs text-slate-500 bg-blue-50 border border-blue-100 rounded-lg p-3">
+                <Info className="h-4 w-4 text-blue-500 mt-0.5 shrink-0" />
+                <span>
+                  Reports are read-only views of your live data. To edit reservation or billing data,
+                  use the <a href="/reservations" className="text-blue-600 underline">Reservations</a> or <a href="/billing" className="text-blue-600 underline">Billing</a> pages.
+                </span>
+              </div>
+            </div>
+          )}
+
+          <DialogFooter className="flex gap-2 sm:gap-0">
+            <Button variant="outline" onClick={() => setShowExportDialog(false)}>
+              Cancel
+            </Button>
+            <Button
+              onClick={() => {
+                if (exportPreview) {
+                  exportTabToCSV(exportPreview.tabName);
+                  setShowExportDialog(false);
+                  toast({
+                    title: "Export started",
+                    description: `Downloading ${exportPreview.reportName} report...`
+                  });
+                }
+              }}
+              className="flex items-center gap-2"
+            >
+              <FileDown className="h-4 w-4" />
+              Download CSV
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
     </DashboardShell>
   );
 }
