@@ -37,7 +37,8 @@ const subTabs: Record<Exclude<ReportTab, 'overview' | 'audits'>, SubTab[]> = {
   ],
   performance: [
     { id: 'pace', label: 'Pace vs target', description: 'On-the-books vs goals' },
-    { id: 'occupancy', label: 'Occupancy & ADR', description: 'Blend by date/site type' }
+    { id: 'occupancy', label: 'Occupancy & ADR', description: 'Blend by date/site type' },
+    { id: 'site-breakdown', label: 'Site breakdown', description: 'RevPAR, ADR, occupancy by site' }
   ],
   guests: [
     { id: 'guest-origins', label: 'Guest origins', description: 'State/ZIP mix' },
@@ -615,6 +616,164 @@ function ReportsPageInner() {
         }
         break;
       case 'performance':
+        if (activeSubTab === 'site-breakdown' && sitesQuery.data && reservationsQuery.data) {
+          const startDate = new Date(dateRange.start);
+          const endDate = new Date(dateRange.end);
+          const totalDays = Math.max(1, Math.floor((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24)));
+
+          const siteMetrics = sitesQuery.data.map((site: any) => {
+            const siteReservations = reservationsQuery.data.filter((r: any) =>
+              r.siteId === site.id &&
+              r.status !== 'cancelled' &&
+              new Date(r.arrivalDate) >= startDate &&
+              new Date(r.arrivalDate) <= endDate
+            );
+
+            let totalNights = 0;
+            let totalRevenue = 0;
+
+            siteReservations.forEach((r: any) => {
+              const arrival = new Date(r.arrivalDate);
+              const departure = new Date(r.departureDate);
+              const nights = Math.max(1, Math.floor((departure.getTime() - arrival.getTime()) / (1000 * 60 * 60 * 24)));
+              totalNights += nights;
+              totalRevenue += (r.totalAmount || 0) / 100;
+            });
+
+            const occupancy = totalDays > 0 ? (totalNights / totalDays) * 100 : 0;
+            const adr = totalNights > 0 ? totalRevenue / totalNights : 0;
+            const revpar = totalDays > 0 ? totalRevenue / totalDays : 0;
+            const availableDays = totalDays - totalNights;
+
+            return {
+              id: site.id,
+              name: site.name,
+              siteClass: (site as any).siteClass?.name || 'N/A',
+              bookings: siteReservations.length,
+              nights: totalNights,
+              available: availableDays,
+              revenue: totalRevenue,
+              occupancy: occupancy.toFixed(1),
+              adr: adr,
+              revpar: revpar
+            };
+          }).sort((a: any, b: any) => b.revenue - a.revenue);
+
+          const totals = siteMetrics.reduce((acc: any, s: any) => ({
+            bookings: acc.bookings + s.bookings,
+            nights: acc.nights + s.nights,
+            revenue: acc.revenue + s.revenue
+          }), { bookings: 0, nights: 0, revenue: 0 });
+
+          const setPresetRange = (preset: string) => {
+            const end = new Date();
+            const start = new Date();
+            switch (preset) {
+              case '7d': start.setDate(end.getDate() - 7); break;
+              case '30d': start.setDate(end.getDate() - 30); break;
+              case '90d': start.setDate(end.getDate() - 90); break;
+              case 'ytd': start.setMonth(0, 1); break;
+              case '1y': start.setFullYear(end.getFullYear() - 1); break;
+            }
+            setDateRange({ start: start.toISOString().slice(0, 10), end: end.toISOString().slice(0, 10) });
+          };
+
+          return (
+            <div className="space-y-4">
+              <div className="flex flex-wrap items-center gap-2">
+                <span className="text-sm text-slate-600">Date range:</span>
+                <div className="flex gap-1">
+                  {[
+                    { label: '7 Days', value: '7d' },
+                    { label: '30 Days', value: '30d' },
+                    { label: '90 Days', value: '90d' },
+                    { label: 'YTD', value: 'ytd' },
+                    { label: '1 Year', value: '1y' },
+                  ].map(preset => (
+                    <button
+                      key={preset.value}
+                      onClick={() => setPresetRange(preset.value)}
+                      className="px-2 py-1 text-xs rounded-md border border-slate-200 bg-white hover:bg-slate-50 text-slate-700"
+                    >
+                      {preset.label}
+                    </button>
+                  ))}
+                </div>
+                <input
+                  type="date"
+                  value={dateRange.start}
+                  onChange={(e) => setDateRange(prev => ({ ...prev, start: e.target.value }))}
+                  className="px-2 py-1 text-xs rounded-md border border-slate-200"
+                />
+                <span className="text-slate-400">→</span>
+                <input
+                  type="date"
+                  value={dateRange.end}
+                  onChange={(e) => setDateRange(prev => ({ ...prev, end: e.target.value }))}
+                  className="px-2 py-1 text-xs rounded-md border border-slate-200"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                <div className="rounded-lg border border-emerald-200 bg-emerald-50 p-3">
+                  <div className="text-xs text-emerald-700 mb-1">Total Revenue</div>
+                  <div className="text-2xl font-bold text-emerald-900">{formatCurrency(totals.revenue)}</div>
+                </div>
+                <div className="rounded-lg border border-blue-200 bg-blue-50 p-3">
+                  <div className="text-xs text-blue-700 mb-1">Bookings</div>
+                  <div className="text-2xl font-bold text-blue-900">{totals.bookings}</div>
+                </div>
+                <div className="rounded-lg border border-indigo-200 bg-indigo-50 p-3">
+                  <div className="text-xs text-indigo-700 mb-1">Nights Booked</div>
+                  <div className="text-2xl font-bold text-indigo-900">{totals.nights}</div>
+                </div>
+                <div className="rounded-lg border border-slate-200 bg-slate-50 p-3">
+                  <div className="text-xs text-slate-600 mb-1">Avg Occupancy</div>
+                  <div className="text-2xl font-bold text-slate-900">
+                    {sitesQuery.data.length > 0 ? ((totals.nights / (sitesQuery.data.length * totalDays)) * 100).toFixed(1) : 0}%
+                  </div>
+                </div>
+              </div>
+
+              <div className="overflow-x-auto rounded-lg border border-slate-200 bg-white shadow-sm">
+                <table className="min-w-full text-sm">
+                  <thead className="bg-slate-50 text-xs uppercase text-slate-500">
+                    <tr>
+                      <th className="px-3 py-2 text-left">Site</th>
+                      <th className="px-3 py-2 text-left">Class</th>
+                      <th className="px-3 py-2 text-right">Bookings</th>
+                      <th className="px-3 py-2 text-right">Nights</th>
+                      <th className="px-3 py-2 text-right">Available</th>
+                      <th className="px-3 py-2 text-right">Occupancy</th>
+                      <th className="px-3 py-2 text-right">Revenue</th>
+                      <th className="px-3 py-2 text-right">ADR</th>
+                      <th className="px-3 py-2 text-right">RevPAR</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-100">
+                    {siteMetrics.map((site: any) => (
+                      <tr key={site.id} className="hover:bg-slate-50">
+                        <td className="px-3 py-2 font-medium text-slate-900">{site.name}</td>
+                        <td className="px-3 py-2 text-slate-600">{site.siteClass}</td>
+                        <td className="px-3 py-2 text-right text-slate-800">{site.bookings}</td>
+                        <td className="px-3 py-2 text-right text-slate-800">{site.nights}</td>
+                        <td className="px-3 py-2 text-right text-slate-500">{site.available}</td>
+                        <td className="px-3 py-2 text-right">
+                          <span className={`font-medium ${Number(site.occupancy) >= 70 ? 'text-emerald-700' : Number(site.occupancy) >= 40 ? 'text-amber-700' : 'text-rose-700'}`}>
+                            {site.occupancy}%
+                          </span>
+                        </td>
+                        <td className="px-3 py-2 text-right font-medium text-slate-900">{formatCurrency(site.revenue)}</td>
+                        <td className="px-3 py-2 text-right text-slate-800">{formatCurrency(site.adr)}</td>
+                        <td className="px-3 py-2 text-right text-slate-800">{formatCurrency(site.revpar)}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          );
+        }
         if (revenueTrends) {
           return (
             <div className="space-y-3">
