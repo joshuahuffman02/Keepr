@@ -12,6 +12,7 @@ import { MaintenanceDailyReport } from "./definitions/MaintenanceDailyReport";
 import { DailySummaryReport } from "./definitions/DailySummaryReport";
 import { HousekeepingReport } from "./definitions/HousekeepingReport";
 import { TransactionLogReport } from "./definitions/TransactionLogReport";
+import { RevenueBySiteTypeReport } from "./definitions/RevenueBySiteTypeReport";
 
 interface ReportRendererProps {
     tab: ReportTab;
@@ -56,6 +57,9 @@ export function ReportRenderer({ tab, subTab, campgroundId, dateRange, reportFil
     if (tab === "revenue") {
         if (subTab === "revenue-by-source") {
             return <RevenueBySourceReport campgroundId={campgroundId} dateRange={dateRange} />;
+        }
+        if (subTab === "revenue-by-site-type") {
+            return <RevenueBySiteTypeReport campgroundId={campgroundId} dateRange={dateRange} />;
         }
     }
 
