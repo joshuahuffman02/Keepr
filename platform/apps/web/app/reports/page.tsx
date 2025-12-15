@@ -4045,23 +4045,8 @@ function ReportsPageInner() {
             )}
           </div>
 
-          {/* Sub-tabs */}
-          {(activeTab as string) !== 'overview' && (activeTab as string) !== 'audits' && subTabs[activeTab as keyof typeof subTabs] && (
-            <div className="flex flex-wrap gap-2 -mx-1">
-              {subTabs[activeTab as keyof typeof subTabs].map((sub: SubTab, idx: number) => (
-                <button
-                  key={sub.id}
-                  onClick={() => setActiveSubTab(sub.id)}
-                  className={`px-3 py-2 rounded-lg border text-sm font-medium transition-colors whitespace-nowrap ${activeSubTab === sub.id || (!activeSubTab && idx === 0)
-                    ? 'border-emerald-200 bg-emerald-50 text-emerald-700'
-                    : 'border-slate-200 bg-white text-slate-600 hover:bg-slate-50'
-                    }`}
-                >
-                  {sub.label}
-                </button>
-              ))}
-            </div>
-          )}
+
+          {/* Sub-tabs are now rendered only inside the campgroundId check below */}
 
           {/* Report Customization Panel */}
           <div className="border border-slate-200 rounded-xl bg-white">
