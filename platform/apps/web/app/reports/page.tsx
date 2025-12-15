@@ -4070,6 +4070,80 @@ function ReportsPageInner() {
             </div>
           </div>
 
+          {/* Report Catalog - Collapsible Browse All */}
+          <div className="border border-slate-200 rounded-xl bg-gradient-to-r from-slate-50 to-white">
+            <button
+              onClick={() => setShowCatalog(!showCatalog)}
+              className="w-full px-4 py-3 flex items-center justify-between text-left hover:bg-slate-50/50 transition-colors rounded-xl"
+            >
+              <div className="flex items-center gap-3">
+                <LayoutList className="h-5 w-5 text-indigo-600" />
+                <div>
+                  <span className="font-medium text-slate-900">Browse All Reports</span>
+                  <span className="text-slate-500 text-sm ml-2">({reportCatalog.reduce((acc, cat) => acc + cat.subReports.length, 0)} available)</span>
+                </div>
+              </div>
+              {showCatalog ? (
+                <ChevronUp className="h-5 w-5 text-slate-400" />
+              ) : (
+                <ChevronDown className="h-5 w-5 text-slate-400" />
+              )}
+            </button>
+
+            {showCatalog && (
+              <div className="px-4 pb-4 pt-2 border-t border-slate-100">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                  {reportCatalog.map((category) => {
+                    const IconComponent = category.icon;
+                    const isActive = activeTab === category.id;
+                    return (
+                      <div
+                        key={category.id}
+                        className={`rounded-lg border p-3 transition-all cursor-pointer hover:shadow-sm ${isActive
+                          ? 'border-indigo-200 bg-indigo-50 ring-1 ring-indigo-100'
+                          : 'border-slate-200 bg-white hover:border-slate-300'
+                          }`}
+                        onClick={() => {
+                          setActiveTab(category.id as ReportTab);
+                          if (category.id !== 'overview' && category.id !== 'audits') {
+                            const subs = subTabs[category.id as keyof typeof subTabs] || [];
+                            setActiveSubTab(subs[0]?.id ?? null);
+                          } else {
+                            setActiveSubTab(null);
+                          }
+                          setShowCatalog(false);
+                        }}
+                      >
+                        <div className="flex items-start gap-3">
+                          <div className={`p-2 rounded-lg ${isActive ? 'bg-indigo-100' : 'bg-slate-100'}`}>
+                            <IconComponent className={`h-4 w-4 ${isActive ? 'text-indigo-600' : 'text-slate-600'}`} />
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <div className="font-medium text-slate-900 text-sm">{category.label}</div>
+                            <div className="text-xs text-slate-500 mt-0.5">{category.description}</div>
+                            <div className="mt-2 flex flex-wrap gap-1">
+                              {category.subReports.slice(0, 3).map((sub, idx) => (
+                                <span
+                                  key={idx}
+                                  className="text-xs px-1.5 py-0.5 rounded bg-slate-100 text-slate-600"
+                                >
+                                  {sub.label}
+                                </span>
+                              ))}
+                              {category.subReports.length > 3 && (
+                                <span className="text-xs text-slate-400">+{category.subReports.length - 3}</span>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+          </div>
+
           {/* Tab Navigation */}
           <div className="flex flex-wrap gap-2 -mx-1">
             {[
@@ -4287,6 +4361,82 @@ function ReportsPageInner() {
           {!campgroundId && (
             <div className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
               Choose a campground from the sidebar to load reports.
+            </div>
+          )}
+
+          {/* Report Catalog - Collapsible Browse All */}
+          {campgroundId && (
+            <div className="border border-slate-200 rounded-xl bg-gradient-to-r from-slate-50 to-white">
+              <button
+                onClick={() => setShowCatalog(!showCatalog)}
+                className="w-full px-4 py-3 flex items-center justify-between text-left hover:bg-slate-50/50 transition-colors rounded-xl"
+              >
+                <div className="flex items-center gap-3">
+                  <LayoutList className="h-5 w-5 text-indigo-600" />
+                  <div>
+                    <span className="font-medium text-slate-900">Browse All Reports</span>
+                    <span className="text-slate-500 text-sm ml-2">({reportCatalog.reduce((acc, cat) => acc + cat.subReports.length, 0)} available)</span>
+                  </div>
+                </div>
+                {showCatalog ? (
+                  <ChevronUp className="h-5 w-5 text-slate-400" />
+                ) : (
+                  <ChevronDown className="h-5 w-5 text-slate-400" />
+                )}
+              </button>
+
+              {showCatalog && (
+                <div className="px-4 pb-4 pt-2 border-t border-slate-100">
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                    {reportCatalog.map((category) => {
+                      const IconComponent = category.icon;
+                      const isActive = activeTab === category.id;
+                      return (
+                        <div
+                          key={category.id}
+                          className={`rounded-lg border p-3 transition-all cursor-pointer hover:shadow-sm ${isActive
+                              ? 'border-indigo-200 bg-indigo-50 ring-1 ring-indigo-100'
+                              : 'border-slate-200 bg-white hover:border-slate-300'
+                            }`}
+                          onClick={() => {
+                            setActiveTab(category.id as ReportTab);
+                            if (category.id !== 'overview' && category.id !== 'audits') {
+                              const subs = subTabs[category.id as keyof typeof subTabs] || [];
+                              setActiveSubTab(subs[0]?.id ?? null);
+                            } else {
+                              setActiveSubTab(null);
+                            }
+                            setShowCatalog(false);
+                          }}
+                        >
+                          <div className="flex items-start gap-3">
+                            <div className={`p-2 rounded-lg ${isActive ? 'bg-indigo-100' : 'bg-slate-100'}`}>
+                              <IconComponent className={`h-4 w-4 ${isActive ? 'text-indigo-600' : 'text-slate-600'}`} />
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <div className="font-medium text-slate-900 text-sm">{category.label}</div>
+                              <div className="text-xs text-slate-500 mt-0.5">{category.description}</div>
+                              <div className="mt-2 flex flex-wrap gap-1">
+                                {category.subReports.slice(0, 3).map((sub, idx) => (
+                                  <span
+                                    key={idx}
+                                    className="text-xs px-1.5 py-0.5 rounded bg-slate-100 text-slate-600"
+                                  >
+                                    {sub.label}
+                                  </span>
+                                ))}
+                                {category.subReports.length > 3 && (
+                                  <span className="text-xs text-slate-400">+{category.subReports.length - 3}</span>
+                                )}
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
             </div>
           )}
 
