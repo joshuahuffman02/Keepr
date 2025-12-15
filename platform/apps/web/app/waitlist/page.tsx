@@ -4,6 +4,7 @@ import { useEffect, useState, useCallback } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { DashboardShell } from "@/components/ui/layout/DashboardShell";
 import { apiClient } from "@/lib/api-client";
+import { PageSettingsLink } from "@/components/ui/PageSettingsLink";
 
 interface WaitlistEntry {
   id: string;
@@ -127,13 +128,16 @@ export default function WaitlistPage() {
             <h1 className="text-2xl font-bold text-slate-900" data-testid="waitlist-title">Waitlist Management</h1>
             <p className="text-slate-500 mt-1" data-testid="waitlist-subtitle">Manage guests waiting for availability</p>
           </div>
-          <button
-            onClick={() => setShowCreateModal(true)}
-            className="px-4 py-2 bg-emerald-600 text-white rounded-lg font-medium hover:bg-emerald-700 transition-colors flex items-center gap-2"
-            data-testid="waitlist-add-button"
-          >
-            <span>+</span> Add to Waitlist
-          </button>
+          <div className="flex items-center gap-3">
+            <PageSettingsLink href="/settings/seasonal-rates" label="Rate Settings" />
+            <button
+              onClick={() => setShowCreateModal(true)}
+              className="px-4 py-2 bg-emerald-600 text-white rounded-lg font-medium hover:bg-emerald-700 transition-colors flex items-center gap-2"
+              data-testid="waitlist-add-button"
+            >
+              <span>+</span> Add to Waitlist
+            </button>
+          </div>
         </div>
 
         {/* Stats Cards */}
@@ -465,8 +469,8 @@ function WaitlistModal({
                 type="button"
                 onClick={() => setType("regular")}
                 className={`flex-1 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${type === "regular"
-                    ? "bg-emerald-100 text-emerald-700 border-2 border-emerald-300"
-                    : "bg-slate-50 text-slate-600 border border-slate-200"
+                  ? "bg-emerald-100 text-emerald-700 border-2 border-emerald-300"
+                  : "bg-slate-50 text-slate-600 border border-slate-200"
                   }`}
               >
                 Regular
@@ -475,8 +479,8 @@ function WaitlistModal({
                 type="button"
                 onClick={() => setType("seasonal")}
                 className={`flex-1 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${type === "seasonal"
-                    ? "bg-amber-100 text-amber-700 border-2 border-amber-300"
-                    : "bg-slate-50 text-slate-600 border border-slate-200"
+                  ? "bg-amber-100 text-amber-700 border-2 border-amber-300"
+                  : "bg-slate-50 text-slate-600 border border-slate-200"
                   }`}
               >
                 Seasonal
