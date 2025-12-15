@@ -196,7 +196,7 @@ export default function Dashboard() {
             </div>
             <h1 className="text-3xl font-bold text-slate-900">Front Desk Overview</h1>
             <p className="text-sm text-slate-600">
-              Stay ahead of today’s arrivals, departures, balances, and quick actions.
+              Stay ahead of today's arrivals, departures, balances, and quick actions.
             </p>
           </div>
           <div className="flex flex-wrap gap-2">
@@ -217,103 +217,127 @@ export default function Dashboard() {
           </div>
         </div>
 
-        {/* Ops strip */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-5 gap-3">
-          <OpsCard label="Arrivals" value={todayArrivals.length} href="/check-in-out" icon={<UserCheck className="h-4 w-4" />} tone="emerald" />
-          <OpsCard label="Departures" value={todayDepartures.length} href="/check-in-out" icon={<LogOut className="h-4 w-4" />} tone="amber" />
-          <OpsCard label="In-house" value={inHouse.length} href="/reservations" icon={<Users className="h-4 w-4" />} tone="blue" />
-          <OpsCard label="Occupancy" value={`${occupancyRate}%`} href="/calendar" icon={<Calendar className="h-4 w-4" />} tone="purple" />
-          <OpsCard label="Balance due" value={formatMoney(outstandingBalanceCents)} href="/billing/repeat-charges" icon={<DollarSign className="h-4 w-4" />} tone="rose" />
-        </div>
-        <div className="flex flex-wrap gap-2 text-xs text-slate-600">
-          <Link href="/calendar" className="inline-flex items-center gap-1 rounded border border-slate-200 px-3 py-1 hover:border-emerald-200 hover:text-emerald-700">
-            <Calendar className="h-3 w-3" /> Jump to today
-          </Link>
-          <Link href="/check-in-out" className="inline-flex items-center gap-1 rounded border border-slate-200 px-3 py-1 hover:border-emerald-200 hover:text-emerald-700">
-            <UserCheck className="h-3 w-3" /> Today’s arrivals/departures
-          </Link>
-          <Link href={`/reservations?focus=today`} className="inline-flex items-center gap-1 rounded border border-slate-200 px-3 py-1 hover:border-emerald-200 hover:text-emerald-700">
-            <ClipboardList className="h-3 w-3" /> View reservations list
-          </Link>
-        </div>
-
-        {/* Arrivals / Departures board */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-          <BoardCard
-            title="Arrivals"
-            count={todayArrivals.length}
-            ctaLabel="Open arrivals"
-            ctaHref="/check-in-out"
-            rows={todayArrivals}
-          />
-          <BoardCard
-            title="Departures"
-            count={todayDepartures.length}
-            ctaLabel="Open departures"
-            ctaHref="/check-in-out"
-            rows={todayDepartures}
-            tone="amber"
-          />
-        </div>
-
-        {/* Attention rail & quick actions */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-          <div className="card p-5 lg:col-span-2 space-y-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <h3 className="text-lg font-semibold text-slate-900">Attention</h3>
-                <p className="text-sm text-slate-600">Balances and items that need a nudge.</p>
-              </div>
-              <span className="rounded-full bg-amber-50 text-amber-700 text-xs font-semibold px-3 py-1">
-                {attentionList.length} open
-              </span>
-            </div>
-            {attentionList.length === 0 ? (
-              <div className="flex items-center gap-3 rounded-lg border border-dashed border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-500">
-                <CheckCircle className="h-4 w-4 text-emerald-500" />
-                All clear — no outstanding balances right now.
-              </div>
-            ) : (
-              <div className="space-y-2">
-                {attentionList.map((r) => (
-                  <div
-                    key={r.id}
-                    className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 rounded-lg border border-slate-200 bg-white px-3 py-2.5"
-                  >
-                    <div className="flex items-center gap-3">
-                      <div className="h-8 w-8 rounded-full bg-amber-50 text-amber-700 font-semibold flex items-center justify-center text-xs">
-                        {r.guest?.primaryFirstName?.[0] ?? "?"}
-                      </div>
-                      <div>
-                        <div className="text-sm font-semibold text-slate-900">
-                          {r.guest?.primaryFirstName ?? "Guest"} {r.guest?.primaryLastName ?? ""}
-                        </div>
-                        <div className="text-xs text-slate-500">Site {r.siteId ?? "—"}</div>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-3 w-full sm:w-auto justify-between sm:justify-end">
-                      <span className="text-sm font-semibold text-amber-700 whitespace-nowrap">{formatMoney(r.balance)}</span>
-                      <Link
-                        href="/billing/repeat-charges"
-                        className="inline-flex items-center justify-center rounded-md bg-emerald-50 px-3 py-1.5 text-xs font-semibold text-emerald-700 hover:bg-emerald-100"
-                      >
-                        Resolve
-                      </Link>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
+        {/* ═══════════════════════════════════════════════════════════════════ */}
+        {/* TODAY'S NUMBERS - Most important metrics at a glance */}
+        {/* ═══════════════════════════════════════════════════════════════════ */}
+        <div className="rounded-2xl bg-gradient-to-br from-slate-50 to-slate-100 border border-slate-200 p-5 space-y-4">
+          <div className="flex items-center gap-2 text-sm font-semibold uppercase tracking-wide text-slate-600">
+            <Calendar className="h-4 w-4" />
+            Today's Numbers
           </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-5 gap-3">
+            <OpsCard label="Arrivals" value={todayArrivals.length} href="/check-in-out" icon={<UserCheck className="h-4 w-4" />} tone="emerald" />
+            <OpsCard label="Departures" value={todayDepartures.length} href="/check-in-out" icon={<LogOut className="h-4 w-4" />} tone="amber" />
+            <OpsCard label="In-house" value={inHouse.length} href="/reservations" icon={<Users className="h-4 w-4" />} tone="blue" />
+            <OpsCard label="Occupancy" value={`${occupancyRate}%`} href="/calendar" icon={<Calendar className="h-4 w-4" />} tone="purple" />
+            <OpsCard label="Balance due" value={formatMoney(outstandingBalanceCents)} href="/billing/repeat-charges" icon={<DollarSign className="h-4 w-4" />} tone="rose" />
+          </div>
+          <div className="flex flex-wrap gap-2 text-xs text-slate-600">
+            <Link href="/calendar" className="inline-flex items-center gap-1 rounded border border-slate-200 bg-white px-3 py-1 hover:border-emerald-200 hover:text-emerald-700">
+              <Calendar className="h-3 w-3" /> Jump to today
+            </Link>
+            <Link href="/check-in-out" className="inline-flex items-center gap-1 rounded border border-slate-200 bg-white px-3 py-1 hover:border-emerald-200 hover:text-emerald-700">
+              <UserCheck className="h-3 w-3" /> Today's arrivals/departures
+            </Link>
+            <Link href={`/reservations?focus=today`} className="inline-flex items-center gap-1 rounded border border-slate-200 bg-white px-3 py-1 hover:border-emerald-200 hover:text-emerald-700">
+              <ClipboardList className="h-3 w-3" /> View reservations list
+            </Link>
+          </div>
+        </div>
 
-          <div className="card p-5 space-y-3">
-            <h3 className="text-lg font-semibold text-slate-900">Quick actions</h3>
-            <div className="space-y-2">
-              <QuickLink href="/booking" label="New booking" icon={<Plus className="h-4 w-4" />} />
-              <QuickLink href="/reservations" label="Extend stay / Move site" icon={<ArrowRight className="h-4 w-4" />} />
-              <QuickLink href="/pos" label="Open POS order" icon={<ShoppingBag className="h-4 w-4" />} />
-              <QuickLink href="/finance/gift-cards" label="Issue credit / refund" icon={<DollarSign className="h-4 w-4" />} />
-              <QuickLink href="/messages" label="Send pre-arrival" icon={<MessageCircle className="h-4 w-4" />} />
+        {/* ═══════════════════════════════════════════════════════════════════ */}
+        {/* ARRIVALS & DEPARTURES - Detailed boards */}
+        {/* ═══════════════════════════════════════════════════════════════════ */}
+        <div className="space-y-3">
+          <div className="flex items-center gap-2 text-sm font-semibold uppercase tracking-wide text-slate-600 pl-1">
+            <UserCheck className="h-4 w-4" />
+            Arrivals & Departures
+          </div>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            <BoardCard
+              title="Arrivals"
+              count={todayArrivals.length}
+              ctaLabel="Open arrivals"
+              ctaHref="/check-in-out"
+              rows={todayArrivals}
+            />
+            <BoardCard
+              title="Departures"
+              count={todayDepartures.length}
+              ctaLabel="Open departures"
+              ctaHref="/check-in-out"
+              rows={todayDepartures}
+              tone="amber"
+            />
+          </div>
+        </div>
+
+        {/* ═══════════════════════════════════════════════════════════════════ */}
+        {/* ATTENTION & ACTIONS - Needs action items alongside quick links */}
+        {/* ═══════════════════════════════════════════════════════════════════ */}
+        <div className="space-y-3">
+          <div className="flex items-center gap-2 text-sm font-semibold uppercase tracking-wide text-amber-600 pl-1">
+            <DollarSign className="h-4 w-4" />
+            Needs Attention
+          </div>
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+            <div className="rounded-xl border-2 border-amber-200 bg-amber-50/50 p-5 lg:col-span-2 space-y-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h3 className="text-lg font-semibold text-slate-900">Balances Due</h3>
+                  <p className="text-sm text-slate-600">Outstanding amounts that need collection.</p>
+                </div>
+                <span className="rounded-full bg-amber-100 text-amber-800 text-xs font-bold px-3 py-1 border border-amber-200">
+                  {attentionList.length} open
+                </span>
+              </div>
+              {attentionList.length === 0 ? (
+                <div className="flex items-center gap-3 rounded-lg border border-dashed border-emerald-300 bg-emerald-50 px-4 py-3 text-sm text-emerald-700">
+                  <CheckCircle className="h-4 w-4" />
+                  All clear — no outstanding balances right now.
+                </div>
+              ) : (
+                <div className="space-y-2">
+                  {attentionList.map((r) => (
+                    <div
+                      key={r.id}
+                      className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 rounded-lg border border-amber-200 bg-white px-3 py-2.5 shadow-sm"
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className="h-8 w-8 rounded-full bg-amber-100 text-amber-700 font-semibold flex items-center justify-center text-xs border border-amber-200">
+                          {r.guest?.primaryFirstName?.[0] ?? "?"}
+                        </div>
+                        <div>
+                          <div className="text-sm font-semibold text-slate-900">
+                            {r.guest?.primaryFirstName ?? "Guest"} {r.guest?.primaryLastName ?? ""}
+                          </div>
+                          <div className="text-xs text-slate-500">Site {r.siteId ?? "—"}</div>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-3 w-full sm:w-auto justify-between sm:justify-end">
+                        <span className="text-sm font-bold text-amber-700 whitespace-nowrap">{formatMoney(r.balance)}</span>
+                        <Link
+                          href="/billing/repeat-charges"
+                          className="inline-flex items-center justify-center rounded-md bg-emerald-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-emerald-700"
+                        >
+                          Resolve
+                        </Link>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            <div className="rounded-xl border border-slate-200 bg-white p-5 space-y-3 shadow-sm">
+              <h3 className="text-lg font-semibold text-slate-900">Quick Actions</h3>
+              <div className="space-y-2">
+                <QuickLink href="/booking" label="New booking" icon={<Plus className="h-4 w-4" />} />
+                <QuickLink href="/reservations" label="Extend stay / Move site" icon={<ArrowRight className="h-4 w-4" />} />
+                <QuickLink href="/pos" label="Open POS order" icon={<ShoppingBag className="h-4 w-4" />} />
+                <QuickLink href="/finance/gift-cards" label="Issue credit / refund" icon={<DollarSign className="h-4 w-4" />} />
+                <QuickLink href="/messages" label="Send pre-arrival" icon={<MessageCircle className="h-4 w-4" />} />
+              </div>
             </div>
           </div>
         </div>
