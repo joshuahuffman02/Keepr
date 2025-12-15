@@ -2696,7 +2696,7 @@ function ReportsPageInner() {
       });
 
       years.push({
-        year: y.toString(),
+        year: y,
         bookings: yearReservations.length,
         revenue: yearReservations.reduce((sum, r) => sum + (r.totalAmount || 0), 0) / 100,
         paid: yearReservations.reduce((sum, r) => sum + (r.paidAmount || 0), 0) / 100,
