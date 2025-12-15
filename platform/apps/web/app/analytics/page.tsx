@@ -5,6 +5,10 @@ import { useQuery } from "@tanstack/react-query";
 import { DashboardShell } from "@/components/ui/layout/DashboardShell";
 import { apiClient } from "@/lib/api-client";
 import Link from "next/link";
+import {
+  PlaneLanding, PlaneTakeoff, CalendarDays, DollarSign, Tent,
+  BarChart3, ScrollText, Landmark
+} from "lucide-react";
 
 export default function AnalyticsPage() {
   const [selectedCampgroundId, setSelectedCampgroundId] = useState<string | null>(null);
@@ -128,11 +132,10 @@ export default function AnalyticsPage() {
               <button
                 key={d}
                 onClick={() => setPeriod(d as 7 | 30 | 90)}
-                className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
-                  period === d
-                    ? "bg-emerald-600 text-white"
-                    : "bg-white border border-slate-200 text-slate-700 hover:border-emerald-300"
-                }`}
+                className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${period === d
+                  ? "bg-emerald-600 text-white"
+                  : "bg-white border border-slate-200 text-slate-700 hover:border-emerald-300"
+                  }`}
               >
                 {d}d
               </button>
@@ -233,11 +236,11 @@ export default function AnalyticsPage() {
 
         {/* Operations Quick Stats */}
         <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
-          <QuickStat label="Today's Arrivals" value={metrics?.today.arrivals ?? 0} icon="🛬" href="/check-in-out" />
-          <QuickStat label="Today's Departures" value={metrics?.today.departures ?? 0} icon="🛫" href="/check-in-out" />
-          <QuickStat label="Future Bookings" value={metrics?.futureBookings ?? 0} icon="📅" href="/reservations" />
-          <QuickStat label="Outstanding Balance" value={metrics ? formatCurrency(metrics.balances.outstandingCents) : "—"} icon="💰" href="/billing/repeat-charges" />
-          <QuickStat label="Total Sites" value={metrics?.totalSites ?? 0} icon="🏕️" href="/campgrounds" />
+          <QuickStat label="Today's Arrivals" value={metrics?.today.arrivals ?? 0} icon={<PlaneLanding className="h-6 w-6" />} href="/check-in-out" />
+          <QuickStat label="Today's Departures" value={metrics?.today.departures ?? 0} icon={<PlaneTakeoff className="h-6 w-6" />} href="/check-in-out" />
+          <QuickStat label="Future Bookings" value={metrics?.futureBookings ?? 0} icon={<CalendarDays className="h-6 w-6" />} href="/reservations" />
+          <QuickStat label="Outstanding Balance" value={metrics ? formatCurrency(metrics.balances.outstandingCents) : "—"} icon={<DollarSign className="h-6 w-6" />} href="/billing/repeat-charges" />
+          <QuickStat label="Total Sites" value={metrics?.totalSites ?? 0} icon={<Tent className="h-6 w-6" />} href="/campgrounds" />
         </div>
 
         {/* Tasks Widget */}
@@ -326,12 +329,11 @@ export default function AnalyticsPage() {
                     <div key={i} className="flex-1 flex flex-col items-center group">
                       <div className="relative w-full flex justify-center">
                         <div
-                          className={`w-full rounded-t transition-all ${
-                            f.pct >= 90 ? "bg-red-500" :
+                          className={`w-full rounded-t transition-all ${f.pct >= 90 ? "bg-red-500" :
                             f.pct >= 70 ? "bg-amber-500" :
-                            f.pct >= 50 ? "bg-emerald-500" :
-                            "bg-slate-300"
-                          } ${isWeekend ? "opacity-80" : ""}`}
+                              f.pct >= 50 ? "bg-emerald-500" :
+                                "bg-slate-300"
+                            } ${isWeekend ? "opacity-80" : ""}`}
                           style={{ height: `${Math.max(f.pct, 2)}%` }}
                         />
                         <div className="absolute bottom-full mb-1 hidden group-hover:block bg-slate-900 text-white text-xs px-2 py-1 rounded whitespace-nowrap z-10">
@@ -359,10 +361,10 @@ export default function AnalyticsPage() {
 
         {/* Quick Links */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <QuickLink href="/reports" label="Full Reports" icon="📊" />
-          <QuickLink href="/reports/audit" label="Audit Log" icon="📜" />
-          <QuickLink href="/settings/pricing-rules" label="Pricing Rules" icon="💲" />
-          <QuickLink href="/settings/deposit-policies" label="Deposit Policies" icon="🏦" />
+          <QuickLink href="/reports" label="Full Reports" icon={<BarChart3 className="h-5 w-5" />} />
+          <QuickLink href="/reports/audit" label="Audit Log" icon={<ScrollText className="h-5 w-5" />} />
+          <QuickLink href="/settings/pricing-rules" label="Pricing Rules" icon={<DollarSign className="h-5 w-5" />} />
+          <QuickLink href="/settings/deposit-policies" label="Deposit Policies" icon={<Landmark className="h-5 w-5" />} />
         </div>
       </div>
     </DashboardShell>
@@ -424,7 +426,7 @@ function QuickStat({
 }: {
   label: string;
   value: string | number;
-  icon: string;
+  icon: React.ReactNode;
   href: string;
 }) {
   return (
@@ -433,7 +435,7 @@ function QuickStat({
       className="bg-white rounded-xl border border-slate-200 p-4 hover:border-emerald-300 hover:shadow-sm transition-all"
     >
       <div className="flex items-center gap-3">
-        <span className="text-2xl">{icon}</span>
+        <span className="text-emerald-600">{icon}</span>
         <div>
           <div className="text-lg font-bold text-slate-900">{value}</div>
           <div className="text-xs text-slate-500">{label}</div>
@@ -450,14 +452,14 @@ function QuickLink({
 }: {
   href: string;
   label: string;
-  icon: string;
+  icon: React.ReactNode;
 }) {
   return (
     <Link
       href={href}
       className="flex items-center gap-3 p-4 bg-white rounded-xl border border-slate-200 hover:border-emerald-300 hover:shadow-sm transition-all"
     >
-      <span className="text-xl">{icon}</span>
+      <span className="text-slate-600">{icon}</span>
       <span className="font-medium text-slate-700">{label}</span>
     </Link>
   );
