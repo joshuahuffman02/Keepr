@@ -1,19 +1,30 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { apiClient } from "@/lib/api-client";
 import { DashboardShell } from "@/components/ui/layout/DashboardShell";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Search, User, Calendar } from "lucide-react";
 
 type Incident = Awaited<ReturnType<typeof apiClient.createIncident>>;
+type Guest = { id: string; primaryFirstName?: string; primaryLastName?: string; email?: string };
+type Reservation = { id: string; arrivalDate?: string; departureDate?: string; guest?: Guest; site?: { name?: string } };
 
 export default function IncidentsPage() {
   const [campgroundId, setCampgroundId] = useState<string>("");
   const [incidents, setIncidents] = useState<Incident[]>([]);
   const [loading, setLoading] = useState(false);
   const [report, setReport] = useState<any>(null);
+
+  // Guest/Reservation search states
+  const [guests, setGuests] = useState<Guest[]>([]);
+  const [reservations, setReservations] = useState<Reservation[]>([]);
+  const [guestSearch, setGuestSearch] = useState("");
+  const [reservationSearch, setReservationSearch] = useState("");
+  const [showGuestDropdown, setShowGuestDropdown] = useState(false);
+  const [showReservationDropdown, setShowReservationDropdown] = useState(false);
 
   const [form, setForm] = useState({
     type: "injury",
@@ -31,6 +42,30 @@ export default function IncidentsPage() {
   const [coiUrl, setCoiUrl] = useState("");
   const [coiExpiry, setCoiExpiry] = useState("");
 
+  // Selected display names
+  const selectedGuest = useMemo(() => guests.find(g => g.id === form.guestId), [guests, form.guestId]);
+  const selectedReservation = useMemo(() => reservations.find(r => r.id === form.reservationId), [reservations, form.reservationId]);
+
+  // Filtered lists
+  const filteredGuests = useMemo(() => {
+    if (!guestSearch.trim()) return guests.slice(0, 10);
+    const q = guestSearch.toLowerCase();
+    return guests.filter(g => {
+      const name = `${g.primaryFirstName || ""} ${g.primaryLastName || ""}`.toLowerCase();
+      return name.includes(q) || (g.email || "").toLowerCase().includes(q);
+    }).slice(0, 10);
+  }, [guests, guestSearch]);
+
+  const filteredReservations = useMemo(() => {
+    if (!reservationSearch.trim()) return reservations.slice(0, 10);
+    const q = reservationSearch.toLowerCase();
+    return reservations.filter(r => {
+      const guestName = `${r.guest?.primaryFirstName || ""} ${r.guest?.primaryLastName || ""}`.toLowerCase();
+      const siteName = (r.site?.name || "").toLowerCase();
+      return guestName.includes(q) || siteName.includes(q) || r.id.toLowerCase().includes(q);
+    }).slice(0, 10);
+  }, [reservations, reservationSearch]);
+
   useEffect(() => {
     const bootstrap = async () => {
       setLoading(true);
@@ -39,8 +74,14 @@ export default function IncidentsPage() {
         const cg = camps[0];
         if (cg?.id) {
           setCampgroundId(cg.id);
-          const list = await apiClient.listIncidents(cg.id);
+          const [list, guestList, resList] = await Promise.all([
+            apiClient.listIncidents(cg.id),
+            apiClient.getGuests().catch(() => []),
+            apiClient.getReservations(cg.id).catch(() => [])
+          ]);
           setIncidents(list as Incident[]);
+          setGuests(guestList as Guest[]);
+          setReservations(resList as Reservation[]);
           if (list.length) setSelectedIncidentId(list[0].id);
         }
       } finally {
@@ -149,9 +190,106 @@ export default function IncidentsPage() {
                 rows={3}
               />
             </label>
-            <div className="grid grid-cols-2 gap-2">
-              <Input placeholder="Reservation ID" value={form.reservationId} onChange={(e) => setForm({ ...form, reservationId: e.target.value })} />
-              <Input placeholder="Guest ID" value={form.guestId} onChange={(e) => setForm({ ...form, guestId: e.target.value })} />
+            {/* Reservation Selector */}
+            <div className="relative">
+              <label className="block text-sm font-medium mb-1">
+                <Calendar className="inline h-4 w-4 mr-1" />
+                Reservation
+              </label>
+              <div className="relative">
+                <Search className="absolute left-2 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                <input
+                  type="text"
+                  placeholder="Search by guest name or site..."
+                  value={form.reservationId ? `${selectedReservation?.guest?.primaryFirstName || ""} ${selectedReservation?.guest?.primaryLastName || ""} (${selectedReservation?.site?.name || "Site"})` : reservationSearch}
+                  onChange={(e) => {
+                    setReservationSearch(e.target.value);
+                    setForm({ ...form, reservationId: "" });
+                    setShowReservationDropdown(true);
+                  }}
+                  onFocus={() => setShowReservationDropdown(true)}
+                  className="w-full pl-8 pr-2 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                />
+                {form.reservationId && (
+                  <button
+                    type="button"
+                    onClick={() => { setForm({ ...form, reservationId: "" }); setReservationSearch(""); }}
+                    className="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+                  >×</button>
+                )}
+              </div>
+              {showReservationDropdown && !form.reservationId && (
+                <div className="absolute z-10 w-full mt-1 bg-white border border-slate-200 rounded-lg shadow-lg max-h-48 overflow-y-auto">
+                  {filteredReservations.length > 0 ? filteredReservations.map(r => (
+                    <button
+                      key={r.id}
+                      type="button"
+                      onClick={() => {
+                        setForm({ ...form, reservationId: r.id, guestId: r.guest?.id || form.guestId });
+                        setShowReservationDropdown(false);
+                        setReservationSearch("");
+                      }}
+                      className="w-full px-3 py-2 text-left hover:bg-slate-50 text-sm border-b last:border-b-0"
+                    >
+                      <div className="font-medium">{r.guest?.primaryFirstName} {r.guest?.primaryLastName}</div>
+                      <div className="text-xs text-slate-500">{r.site?.name} · {r.arrivalDate?.slice(0, 10)} → {r.departureDate?.slice(0, 10)}</div>
+                    </button>
+                  )) : (
+                    <div className="px-3 py-2 text-sm text-slate-500">No reservations found</div>
+                  )}
+                </div>
+              )}
+            </div>
+
+            {/* Guest Selector */}
+            <div className="relative">
+              <label className="block text-sm font-medium mb-1">
+                <User className="inline h-4 w-4 mr-1" />
+                Guest
+              </label>
+              <div className="relative">
+                <Search className="absolute left-2 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                <input
+                  type="text"
+                  placeholder="Search by name or email..."
+                  value={form.guestId ? `${selectedGuest?.primaryFirstName || ""} ${selectedGuest?.primaryLastName || ""}` : guestSearch}
+                  onChange={(e) => {
+                    setGuestSearch(e.target.value);
+                    setForm({ ...form, guestId: "" });
+                    setShowGuestDropdown(true);
+                  }}
+                  onFocus={() => setShowGuestDropdown(true)}
+                  className="w-full pl-8 pr-2 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                />
+                {form.guestId && (
+                  <button
+                    type="button"
+                    onClick={() => { setForm({ ...form, guestId: "" }); setGuestSearch(""); }}
+                    className="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+                  >×</button>
+                )}
+              </div>
+              {showGuestDropdown && !form.guestId && (
+                <div className="absolute z-10 w-full mt-1 bg-white border border-slate-200 rounded-lg shadow-lg max-h-48 overflow-y-auto">
+                  {filteredGuests.length > 0 ? filteredGuests.map(g => (
+                    <button
+                      key={g.id}
+                      type="button"
+                      onClick={() => {
+                        setForm({ ...form, guestId: g.id });
+                        setShowGuestDropdown(false);
+                        setGuestSearch("");
+                      }}
+                      className="w-full px-3 py-2 text-left hover:bg-slate-50 text-sm border-b last:border-b-0"
+                    >
+                      <div className="font-medium">{g.primaryFirstName} {g.primaryLastName}</div>
+                      <div className="text-xs text-slate-500">{g.email}</div>
+                    </button>
+                  )) : (
+                    <div className="px-3 py-2 text-sm text-slate-500">No guests found</div>
+                  )}
+                </div>
+              )}
             </div>
             <Button onClick={submitIncident} disabled={loading || !campgroundId}>Create Incident</Button>
           </CardContent>
