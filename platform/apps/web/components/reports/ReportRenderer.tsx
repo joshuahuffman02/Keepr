@@ -10,6 +10,7 @@ import { OccupancyReport } from "./definitions/OccupancyReport";
 import { LedgerSummaryReport } from "./definitions/LedgerSummaryReport";
 import { MaintenanceDailyReport } from "./definitions/MaintenanceDailyReport";
 import { DailySummaryReport } from "./definitions/DailySummaryReport";
+import { HousekeepingReport } from "./definitions/HousekeepingReport";
 
 interface ReportRendererProps {
     tab: ReportTab;
@@ -29,6 +30,9 @@ export function ReportRenderer({ tab, subTab, campgroundId, dateRange, reportFil
     if (tab === "daily") {
         if (subTab === "daily-summary") {
             return <DailySummaryReport campgroundId={campgroundId} dateRange={dateRange} />;
+        }
+        if (subTab === "housekeeping-status") {
+            return <HousekeepingReport campgroundId={campgroundId} />;
         }
         if (subTab === "arrivals-list") {
             return <ArrivalsReport campgroundId={campgroundId} dateRange={dateRange} />;
