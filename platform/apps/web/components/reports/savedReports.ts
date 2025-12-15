@@ -7,6 +7,11 @@ export type SavedReport = {
   tab: string;
   subTab?: string | null;
   dateRange?: { start: string; end: string };
+  filters?: {
+    status: string;
+    siteType: string;
+    groupBy: string;
+  };
   campgroundId?: string | null;
   createdAt: string;
   updatedAt: string;

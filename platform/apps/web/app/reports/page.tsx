@@ -209,6 +209,17 @@ function ReportsPageInner() {
         end: urlEnd || prev.end
       }));
     }
+    const urlStatus = searchParams.get("status");
+    const urlSiteType = searchParams.get("siteType");
+    const urlGroupBy = searchParams.get("groupBy");
+    if (urlStatus || urlSiteType || urlGroupBy) {
+      setReportFilters((prev) => ({
+        status: (urlStatus || prev.status) as any,
+        siteType: (urlSiteType || prev.siteType) as any,
+        groupBy: (urlGroupBy || prev.groupBy) as any
+      }));
+      setShowFilters(true);
+    }
   }, [searchParams]);
 
   const enableAnalyticsMaps = process.env.NEXT_PUBLIC_ENABLE_ANALYTICS_MAPS !== "false";
@@ -4141,6 +4152,7 @@ function ReportsPageInner() {
                     tab: activeTab,
                     subTab: activeSubTab,
                     dateRange,
+                    filters: reportFilters,
                     campgroundId
                   });
                   toast({ title: "Report saved", description: saved.name });
@@ -4460,9 +4472,9 @@ function ReportsPageInner() {
               </Button>
             </DialogFooter>
           </DialogContent>
-        </Dialog>
+        </Dialog >
 
-      </DashboardShell>
+      </DashboardShell >
     );
   }
 
