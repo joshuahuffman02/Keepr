@@ -2178,7 +2178,11 @@ function ReportsPageInner() {
       conversionRate,
       totalValue,
       avgBookingValue: avgValue,
-      totalBookings: confirmed + pending
+      totalBookings: confirmed + pending,
+      total,
+      confirmed,
+      pending,
+      cancelled
     };
   }, [reservationsQuery.data, sitesQuery.data, reportFilters]);
 
