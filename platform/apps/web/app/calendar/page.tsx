@@ -13,23 +13,23 @@ import { useWhoami } from "@/hooks/use-whoami";
 import { CalendarRow } from "./CalendarRow";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../../components/ui/dialog";
 import { HelpAnchor } from "../../components/help/HelpAnchor";
-  import {
-    CheckCircle,
-    Clock,
-    XCircle,
-    Calendar,
-    ChevronLeft,
-    ChevronRight,
-    Tent,
-    Home,
-    Caravan,
-    RefreshCw,
-    Wrench,
-    Sparkles,
-    AlertTriangle,
-    Mail,
-    CreditCard
-  } from "lucide-react";
+import {
+  CheckCircle,
+  Clock,
+  XCircle,
+  Calendar,
+  ChevronLeft,
+  ChevronRight,
+  Tent,
+  Home,
+  Caravan,
+  RefreshCw,
+  Wrench,
+  Sparkles,
+  AlertTriangle,
+  Mail,
+  CreditCard
+} from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { computeDepositDue } from "@campreserv/shared";
 
@@ -961,11 +961,17 @@ export default function CalendarPage() {
   };
 
   const handleMouseUp = async (siteId?: string, dayIdx?: number) => {
-    // dragging flow (requires target site + day)
+    // Full drag flow - user dragged across multiple cells
     if (isDragging && dragSiteId !== null && dragStartIdx !== null && dragEndIdx !== null && siteId !== undefined && dayIdx !== undefined) {
       await selectRange(siteId, dragStartIdx, dayIdx);
-    } else if (siteId && typeof dayIdx === "number") {
-      // two-click flow
+    }
+    // Single-cell click-and-release: user clicked a cell and released without dragging
+    // This creates a 1-night selection from that day
+    else if (!isDragging && dragSiteId !== null && dragStartIdx !== null && siteId === dragSiteId && dayIdx === dragStartIdx) {
+      await selectRange(siteId, dragStartIdx, dragStartIdx);
+    }
+    // Two-click flow for range selection
+    else if (siteId && typeof dayIdx === "number") {
       if (!clickStart || clickStart.siteId !== siteId) {
         setClickStart({ siteId, idx: dayIdx });
       } else {
@@ -1041,7 +1047,7 @@ export default function CalendarPage() {
     <DashboardShell>
       <div className="space-y-4">
         <div className="flex items-center justify-between">
-        <Breadcrumbs items={[{ label: "Smart Calendar" }]} />
+          <Breadcrumbs items={[{ label: "Smart Calendar" }]} />
           <HelpAnchor topicId="calendar-availability" label="Calendar help" />
         </div>
 
@@ -1077,7 +1083,7 @@ export default function CalendarPage() {
                 <div className="text-sm text-slate-600">
                   Site: <span className="font-semibold">{selectedConflict.a?.site?.name || selectedConflict.a?.siteId || "Unknown"}</span>
                 </div>
-              <div className="rounded-lg border border-amber-200 bg-amber-50 p-3 text-sm text-amber-800">
+                <div className="rounded-lg border border-amber-200 bg-amber-50 p-3 text-sm text-amber-800">
                   Overlap {selectedConflict.overlapStart?.toISOString()?.slice(0, 10)} → {selectedConflict.overlapEnd?.toISOString()?.slice(0, 10)}
                 </div>
                 <div className="grid grid-cols-2 gap-3 text-sm">
@@ -1559,8 +1565,8 @@ export default function CalendarPage() {
               <div className="text-4xl mb-3">🛶</div>
               <h2 className="text-lg font-semibold text-slate-900 mb-2">No reservations in this range</h2>
               <p className="text-sm text-slate-600">Try expanding the date range or creating a new reservation.</p>
-          </div>
-        )}
+            </div>
+          )}
 
         {/* Empty State - No Campground */}
         {!selectedCampground && (
@@ -1873,7 +1879,7 @@ export default function CalendarPage() {
                   const overlaps = bEnd > start && bStart < visibleEnd;
                   const matchesSite = !b.siteId || b.siteId === site.id;
                   return overlaps && matchesSite;
-                }) || (filteredReservations.filter((r) => r.siteId === site.id && r.status !== "cancelled").length > 1))) 
+                }) || (filteredReservations.filter((r) => r.siteId === site.id && r.status !== "cancelled").length > 1)))
                 .map((site, rowIdx) => {
                   const allSiteReservations = filteredReservations.filter((r) => r.siteId === site.id);
                   const siteReservations = statusFilter === "all"
@@ -1944,28 +1950,28 @@ export default function CalendarPage() {
                   })();
                   const conflictCount = (hasBlackout ? 1 : 0) + (hasOverlap ? 1 : 0);
 
-                const siteMaintenance = (maintenanceQuery.data || []).filter((m) => m.siteId === site.id);
-                const hasMaintenance = siteMaintenance.length > 0;
-                const cleaningStatus = site.housekeepingStatus || "clean";
-                const cleaningTask = findHousekeepingTask(site.id);
-                const cleaningLabel =
-                  cleaningStatus === "dirty"
-                    ? "Dirty"
-                    : cleaningStatus === "inspecting"
-                      ? "Cleaning"
-                      : "Clean";
-                const cleaningClasses =
-                  cleaningStatus === "dirty"
-                    ? "border-rose-400 bg-rose-50 text-rose-700"
-                    : cleaningStatus === "inspecting"
-                      ? "border-cyan-400 bg-cyan-50 text-cyan-700"
-                      : "border-emerald-300 bg-emerald-50 text-emerald-700";
+                  const siteMaintenance = (maintenanceQuery.data || []).filter((m) => m.siteId === site.id);
+                  const hasMaintenance = siteMaintenance.length > 0;
+                  const cleaningStatus = site.housekeepingStatus || "clean";
+                  const cleaningTask = findHousekeepingTask(site.id);
+                  const cleaningLabel =
+                    cleaningStatus === "dirty"
+                      ? "Dirty"
+                      : cleaningStatus === "inspecting"
+                        ? "Cleaning"
+                        : "Clean";
+                  const cleaningClasses =
+                    cleaningStatus === "dirty"
+                      ? "border-rose-400 bg-rose-50 text-rose-700"
+                      : cleaningStatus === "inspecting"
+                        ? "border-cyan-400 bg-cyan-50 text-cyan-700"
+                        : "border-emerald-300 bg-emerald-50 text-emerald-700";
 
                   return (
                     <div
                       key={site.id}
                       className={`grid relative group ${showConflictsOnly && !hasBlackout && !hasOverlap ? "opacity-50" : ""}`}
-                    style={{ gridTemplateColumns: gridTemplate, minWidth: gridMinWidth }}
+                      style={{ gridTemplateColumns: gridTemplate, minWidth: gridMinWidth }}
                     >
                       <div
                         className={`px-3 py-2 sticky left-0 z-20 border-r border-slate-200 ${zebra}`}
@@ -1974,9 +1980,9 @@ export default function CalendarPage() {
                           <div className="min-w-0">
                             <div className="text-sm font-semibold text-slate-900 truncate" title={site.name}>{site.name}</div>
                             <div className="text-xs text-slate-600 truncate">
-                          {site.siteType} • Max {site.maxOccupancy} ppl
-                        </div>
-                      </div>
+                              {site.siteType} • Max {site.maxOccupancy} ppl
+                            </div>
+                          </div>
                           <div className="flex gap-1 flex-wrap opacity-100 sm:opacity-0 sm:group-hover:opacity-100 sm:group-focus-within:opacity-100 transition-opacity">
                             {cleaningStatus === "clean" && (
                               <Button
@@ -2024,25 +2030,25 @@ export default function CalendarPage() {
                               <Clock className="h-3 w-3" /> {hasBlackout ? "Blackout in view" : "Potential overlap"}
                             </span>
                           )}
-                        {hasMaintenance ? (
+                          {hasMaintenance ? (
                             <span className="inline-flex items-center gap-1 rounded border border-amber-500 bg-amber-50 px-1.5 py-[2px] text-[11px] text-amber-700">
                               <Wrench className="h-3 w-3" /> Maint open
-                          </span>
-                        ) : (
-                          <span
+                            </span>
+                          ) : (
+                            <span
                               className={`inline-flex items-center gap-1 rounded px-1.5 py-[2px] text-[11px] ${cleaningClasses}`}
-                            title={cleaningTask?.description || undefined}
-                          >
-                            <Sparkles className="h-3 w-3" /> {cleaningLabel}
-                          </span>
-                        )}
+                              title={cleaningTask?.description || undefined}
+                            >
+                              <Sparkles className="h-3 w-3" /> {cleaningLabel}
+                            </span>
+                          )}
                           <span className="inline-flex items-center gap-1 rounded border border-slate-200 bg-slate-50 px-1.5 py-[2px]">
                             <Calendar className="h-3 w-3" />
                             {nextArrival
                               ? `Arrives ${new Date(nextArrival.arrivalDate).toLocaleDateString(undefined, { weekday: "short" })} · ${Math.max(
-                                  1,
-                                  diffInDays(new Date(nextArrival.departureDate), new Date(nextArrival.arrivalDate))
-                                )}n`
+                                1,
+                                diffInDays(new Date(nextArrival.departureDate), new Date(nextArrival.arrivalDate))
+                              )}n`
                               : "No arrivals in view"}
                           </span>
                           <span className="inline-flex items-center gap-1 rounded border border-slate-200 bg-slate-50 px-1.5 py-[2px]">
@@ -2097,7 +2103,7 @@ export default function CalendarPage() {
                                 onMouseDown={() => !isBlackedOut && handleMouseDown(site.id, i)}
                                 onMouseEnter={() => handleMouseEnter(i)}
                                 onMouseUp={() => !isBlackedOut && handleMouseUp(site.id, i)}
-                                title={isBlackedOut ? `Blocked: ${blackout?.reason || "Blackout"} (${blackout?.startDate?.slice(0,10)} → ${blackout?.endDate?.slice(0,10)})` : undefined}
+                                title={isBlackedOut ? `Blocked: ${blackout?.reason || "Blackout"} (${blackout?.startDate?.slice(0, 10)} → ${blackout?.endDate?.slice(0, 10)})` : undefined}
                               />
                             );
                           })}
@@ -2241,13 +2247,13 @@ export default function CalendarPage() {
             const requiredDeposit =
               selectedCampgroundDetails && res.totalAmount
                 ? computeDepositDue({
-                    total: res.totalAmount / 100,
-                    nights,
-                    arrivalDate: res.arrivalDate,
-                    depositRule: selectedCampgroundDetails.depositRule,
-                    depositPercentage: selectedCampgroundDetails.depositPercentage ?? null,
-                    depositConfig: (selectedCampgroundDetails as any)?.depositConfig ?? null
-                  })
+                  total: res.totalAmount / 100,
+                  nights,
+                  arrivalDate: res.arrivalDate,
+                  depositRule: selectedCampgroundDetails.depositRule,
+                  depositPercentage: selectedCampgroundDetails.depositPercentage ?? null,
+                  depositConfig: (selectedCampgroundDetails as any)?.depositConfig ?? null
+                })
                 : 0;
             const statusColors: Record<string, string> = {
               confirmed: "bg-emerald-100 text-emerald-800",
@@ -2283,7 +2289,7 @@ export default function CalendarPage() {
                   <div>
                     <div className="text-sm font-semibold text-slate-900">{guestName}</div>
                     <div className="text-xs text-slate-600">Reservation inspector</div>
-                </div>
+                  </div>
                   <span className={`px-2 py-1 rounded-full text-[11px] font-medium capitalize ${statusColors[res.status] || "bg-slate-100"}`}>
                     {res.status?.replace("_", " ")}
                   </span>
@@ -2303,7 +2309,7 @@ export default function CalendarPage() {
                           const elem = document.querySelector(`[data-res-id="${resOverlap.id}"]`) as HTMLElement | null;
                           if (elem) elem.scrollIntoView({ behavior: "smooth", block: "center" });
                           setStoreSelection({ highlightedId: resOverlap.id, openDetailsId: resOverlap.id });
-                        setStartDate(formatLocalDateInput(new Date(resOverlap.arrivalDate)));
+                          setStartDate(formatLocalDateInput(new Date(resOverlap.arrivalDate)));
                           // ensure date range covers
                           setDayCount((prev) => Math.max(prev, Math.max(14, diffInDays(new Date(resOverlap.departureDate), start) + 1)));
                         }}
@@ -2329,11 +2335,10 @@ export default function CalendarPage() {
                   <div className="flex justify-between">
                     <span className="text-slate-500">Deposit</span>
                     <span
-                      className={`px-2 py-0.5 rounded-full text-[11px] font-semibold ${
-                        (res.paidAmount ?? 0) / 100 >= requiredDeposit
+                      className={`px-2 py-0.5 rounded-full text-[11px] font-semibold ${(res.paidAmount ?? 0) / 100 >= requiredDeposit
                           ? "bg-emerald-100 text-emerald-800"
                           : "bg-amber-100 text-amber-800"
-                      }`}
+                        }`}
                     >
                       {(res.paidAmount ?? 0) / 100 >= requiredDeposit
                         ? "Deposit covered"
@@ -2364,8 +2369,8 @@ export default function CalendarPage() {
                     variant="secondary"
                     className="flex-1"
                     onClick={() => {
-                        localStorage.setItem("campreserv:openReservationId", res.id);
-                        window.location.href = `/campgrounds/${selectedCampground}/reservations/${res.id}`;
+                      localStorage.setItem("campreserv:openReservationId", res.id);
+                      window.location.href = `/campgrounds/${selectedCampground}/reservations/${res.id}`;
                     }}
                   >
                     Open details
@@ -2385,7 +2390,7 @@ export default function CalendarPage() {
                       Check in
                     </Button>
                   )}
-              </div>
+                </div>
                 <div className="rounded-md border border-slate-200 bg-slate-50 p-3 space-y-2">
                   <div className="flex items-center justify-between">
                     <div className="text-xs font-semibold text-slate-700 uppercase">Communications</div>
@@ -2447,11 +2452,10 @@ export default function CalendarPage() {
                               </span>
                             </div>
                             <span
-                              className={`text-[11px] uppercase px-2 py-0.5 rounded-full ${
-                                (c.status || "").toLowerCase().includes("fail") || (c.status || "").toLowerCase().includes("bounce")
+                              className={`text-[11px] uppercase px-2 py-0.5 rounded-full ${(c.status || "").toLowerCase().includes("fail") || (c.status || "").toLowerCase().includes("bounce")
                                   ? "bg-rose-100 text-rose-700 border border-rose-200"
                                   : "bg-emerald-100 text-emerald-700 border border-emerald-200"
-                              }`}
+                                }`}
                             >
                               {(c.status || "").toString()}
                             </span>
@@ -2485,7 +2489,7 @@ export default function CalendarPage() {
                       Open in Reservations
                     </Button>
                   </div>
-              </div>
+                </div>
 
                 <div className="space-y-2">
                   <div className="text-xs font-semibold text-slate-700">Cleaning</div>
@@ -2555,18 +2559,18 @@ export default function CalendarPage() {
                 </div>
                 {quotePreview && (
                   <>
-                <div className="flex justify-between">
+                    <div className="flex justify-between">
                       <span className="text-slate-500">Nights</span>
                       <span className="font-medium">{quotePreview.nights}</span>
-                </div>
+                    </div>
                     <div className="flex justify-between">
                       <span className="text-slate-500">Base</span>
                       <span className="font-medium">${quotePreview.base.toFixed(2)}</span>
-                </div>
+                    </div>
                     <div className="flex justify-between">
                       <span className="text-slate-500">Rules/adjust</span>
                       <span className="font-medium">${quotePreview.rulesDelta.toFixed(2)}</span>
-              </div>
+                    </div>
                     <div className="flex justify-between">
                       <span className="text-slate-500">Avg / night</span>
                       <span className="font-medium">${quotePreview.perNight.toFixed(2)}</span>
@@ -2612,8 +2616,8 @@ export default function CalendarPage() {
                 )}
                 {holdStatus.state === "error" && (
                   <div className="text-xs text-rose-700 bg-rose-50 rounded-md p-2">{holdStatus.message}</div>
-              )}
-            </div>
+                )}
+              </div>
               <Button variant="ghost" size="sm" className="w-full" onClick={clearSelection}>
                 Clear selection
               </Button>
@@ -2627,8 +2631,8 @@ export default function CalendarPage() {
                 <li>Filter by status or site type to declutter.</li>
                 <li>Selections will show live quotes and holds here.</li>
               </ul>
-          </div>
-        )}
+            </div>
+          )}
         </div>
 
         {/* Extension confirmation */}
