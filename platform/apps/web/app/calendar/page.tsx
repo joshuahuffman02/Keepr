@@ -140,6 +140,13 @@ export default function CalendarPage() {
     currentTotalCents: number;
   } | null>(null);
   const [isMoveSubmitting, setIsMoveSubmitting] = useState(false);
+
+  // Split booking state
+  const [splitModalOpen, setSplitModalOpen] = useState(false);
+  const [splitReservation, setSplitReservation] = useState<any>(null);
+  const [splitSegments, setSplitSegments] = useState<Array<{ siteId: string; startDate: string; endDate: string }>>([]);
+  const [splitLoading, setSplitLoading] = useState(false);
+
   const loadTimers = useRef<Record<string, number | null>>({
     campgrounds: null,
     sites: null,
@@ -2336,8 +2343,8 @@ export default function CalendarPage() {
                     <span className="text-slate-500">Deposit</span>
                     <span
                       className={`px-2 py-0.5 rounded-full text-[11px] font-semibold ${(res.paidAmount ?? 0) / 100 >= requiredDeposit
-                          ? "bg-emerald-100 text-emerald-800"
-                          : "bg-amber-100 text-amber-800"
+                        ? "bg-emerald-100 text-emerald-800"
+                        : "bg-amber-100 text-amber-800"
                         }`}
                     >
                       {(res.paidAmount ?? 0) / 100 >= requiredDeposit
@@ -2453,8 +2460,8 @@ export default function CalendarPage() {
                             </div>
                             <span
                               className={`text-[11px] uppercase px-2 py-0.5 rounded-full ${(c.status || "").toLowerCase().includes("fail") || (c.status || "").toLowerCase().includes("bounce")
-                                  ? "bg-rose-100 text-rose-700 border border-rose-200"
-                                  : "bg-emerald-100 text-emerald-700 border border-emerald-200"
+                                ? "bg-rose-100 text-rose-700 border border-rose-200"
+                                : "bg-emerald-100 text-emerald-700 border border-emerald-200"
                                 }`}
                             >
                               {(c.status || "").toString()}
@@ -2906,7 +2913,25 @@ export default function CalendarPage() {
                       </div>
                     )}
                   </div>
-                  <div className="flex gap-2 pt-2 border-t">
+                  <div className="flex flex-wrap gap-2 pt-2 border-t">
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => {
+                        setSplitReservation(res);
+                        const nights = diffInDays(new Date(res.departureDate), new Date(res.arrivalDate));
+                        const midDate = new Date(res.arrivalDate);
+                        midDate.setDate(midDate.getDate() + Math.floor(nights / 2));
+                        setSplitSegments([
+                          { siteId: res.siteId || '', startDate: res.arrivalDate.slice(0, 10), endDate: midDate.toISOString().slice(0, 10) },
+                          { siteId: '', startDate: midDate.toISOString().slice(0, 10), endDate: res.departureDate.slice(0, 10) }
+                        ]);
+                        setSplitModalOpen(true);
+                        setSelectedReservation(null);
+                      }}
+                    >
+                      Split Stay
+                    </Button>
                     <Button
                       size="sm"
                       variant="secondary"
@@ -3177,6 +3202,142 @@ export default function CalendarPage() {
             </div>
           </div>
         )}
+
+        {/* Split Stay Modal */}
+        <Dialog open={splitModalOpen} onOpenChange={(open) => { setSplitModalOpen(open); if (!open) setSplitReservation(null); }}>
+          <DialogContent className="max-w-lg">
+            <DialogHeader>
+              <DialogTitle>Split Stay - Multiple Sites</DialogTitle>
+            </DialogHeader>
+            {splitReservation && (
+              <div className="space-y-4">
+                <div className="text-sm text-slate-600">
+                  <span className="font-medium">{splitReservation.guest?.primaryFirstName} {splitReservation.guest?.primaryLastName}</span>
+                  <span className="mx-2">·</span>
+                  {splitReservation.arrivalDate?.slice(0, 10)} → {splitReservation.departureDate?.slice(0, 10)}
+                </div>
+
+                <div className="space-y-3">
+                  {splitSegments.map((seg, idx) => (
+                    <div key={idx} className="p-3 rounded-lg border border-slate-200 space-y-2">
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm font-medium text-slate-700">Segment {idx + 1}</span>
+                        {splitSegments.length > 2 && (
+                          <button
+                            className="text-xs text-rose-500 hover:text-rose-700"
+                            onClick={() => setSplitSegments(s => s.filter((_, i) => i !== idx))}
+                          >
+                            Remove
+                          </button>
+                        )}
+                      </div>
+                      <div className="grid grid-cols-3 gap-2">
+                        <div>
+                          <label className="text-xs text-slate-500">Site</label>
+                          <select
+                            className="w-full rounded border border-slate-200 px-2 py-1 text-sm"
+                            value={seg.siteId}
+                            onChange={(e) => setSplitSegments(s => s.map((x, i) => i === idx ? { ...x, siteId: e.target.value } : x))}
+                          >
+                            <option value="">Select site...</option>
+                            {(sitesQuery.data || []).map((s: any) => (
+                              <option key={s.id} value={s.id}>{s.name}</option>
+                            ))}
+                          </select>
+                        </div>
+                        <div>
+                          <label className="text-xs text-slate-500">Start</label>
+                          <input
+                            type="date"
+                            className="w-full rounded border border-slate-200 px-2 py-1 text-sm"
+                            value={seg.startDate}
+                            min={splitReservation.arrivalDate?.slice(0, 10)}
+                            max={splitReservation.departureDate?.slice(0, 10)}
+                            onChange={(e) => {
+                              const newStart = e.target.value;
+                              setSplitSegments(s => s.map((x, i) => {
+                                if (i === idx) return { ...x, startDate: newStart };
+                                if (i === idx - 1) return { ...x, endDate: newStart };
+                                return x;
+                              }));
+                            }}
+                            disabled={idx === 0}
+                          />
+                        </div>
+                        <div>
+                          <label className="text-xs text-slate-500">End</label>
+                          <input
+                            type="date"
+                            className="w-full rounded border border-slate-200 px-2 py-1 text-sm"
+                            value={seg.endDate}
+                            min={seg.startDate}
+                            max={splitReservation.departureDate?.slice(0, 10)}
+                            onChange={(e) => {
+                              const newEnd = e.target.value;
+                              setSplitSegments(s => s.map((x, i) => {
+                                if (i === idx) return { ...x, endDate: newEnd };
+                                if (i === idx + 1) return { ...x, startDate: newEnd };
+                                return x;
+                              }));
+                            }}
+                            disabled={idx === splitSegments.length - 1}
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                <Button
+                  size="sm"
+                  variant="outline"
+                  className="w-full"
+                  onClick={() => {
+                    const last = splitSegments[splitSegments.length - 1];
+                    const midDate = new Date(last.startDate);
+                    midDate.setDate(midDate.getDate() + Math.max(1, Math.floor(diffInDays(new Date(last.endDate), new Date(last.startDate)) / 2)));
+                    setSplitSegments(s => [
+                      ...s.slice(0, -1),
+                      { ...last, endDate: midDate.toISOString().slice(0, 10) },
+                      { siteId: '', startDate: midDate.toISOString().slice(0, 10), endDate: last.endDate }
+                    ]);
+                  }}
+                >
+                  + Add Another Segment
+                </Button>
+
+                <div className="flex gap-2 pt-2 border-t">
+                  <Button variant="outline" className="flex-1" onClick={() => setSplitModalOpen(false)}>
+                    Cancel
+                  </Button>
+                  <Button
+                    className="flex-1"
+                    disabled={splitLoading || splitSegments.some(s => !s.siteId)}
+                    onClick={async () => {
+                      if (!splitReservation) return;
+                      setSplitLoading(true);
+                      try {
+                        await apiClient.splitReservation(splitReservation.id, {
+                          segments: splitSegments,
+                          sendNotification: true
+                        });
+                        await queryClient.invalidateQueries({ queryKey: ["calendar-reservations", selectedCampground] });
+                        setSplitModalOpen(false);
+                        setSplitReservation(null);
+                      } catch (err: any) {
+                        alert(err?.message || "Failed to split reservation");
+                      } finally {
+                        setSplitLoading(false);
+                      }
+                    }}
+                  >
+                    {splitLoading ? "Saving..." : "Save Split"}
+                  </Button>
+                </div>
+              </div>
+            )}
+          </DialogContent>
+        </Dialog>
       </div>
     </DashboardShell>
   );

@@ -2620,6 +2620,25 @@ export const apiClient = {
     return ReservationSchema.parse(data);
   },
 
+  async splitReservation(
+    id: string,
+    payload: { segments: Array<{ siteId: string; startDate: string; endDate: string }>; sendNotification?: boolean }
+  ) {
+    const res = await fetch(`${API_BASE}/reservations/${id}/split`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", ...scopedHeaders() },
+      body: JSON.stringify(payload)
+    });
+    const data = await parseResponse<unknown>(res);
+    return data;
+  },
+
+  async getReservationSegments(id: string) {
+    const res = await fetch(`${API_BASE}/reservations/${id}/segments`, { headers: scopedHeaders() });
+    const data = await parseResponse<unknown>(res);
+    return data as Array<{ id: string; siteId: string; startDate: string; endDate: string; subtotalCents: number; site?: { name?: string } }>;
+  },
+
   async refreshPaymentCapabilities(campgroundId: string) {
     const res = await fetch(`${API_BASE}/campgrounds/${campgroundId}/payments/capabilities/refresh`, {
       method: "POST",
