@@ -139,6 +139,62 @@ export default function LedgerPage() {
                   ))}
                 </div>
               )}
+
+              {/* Balance Sanity Checks */}
+              {(() => {
+                const entries = ledgerQuery.data || [];
+                const totalCredits = entries.filter(e => e.direction === 'credit').reduce((sum, e) => sum + e.amountCents, 0);
+                const totalDebits = entries.filter(e => e.direction === 'debit').reduce((sum, e) => sum + e.amountCents, 0);
+                const netBalance = totalCredits - totalDebits;
+                const missingGlCount = entries.filter(e => !e.glCode).length;
+                const hasUnbalanced = Math.abs(netBalance) > 0 && entries.length > 0;
+                const needsReview = missingGlCount > 0 || hasUnbalanced;
+
+                return (
+                  <div className={`rounded-lg border p-4 space-y-3 ${needsReview
+                      ? 'border-amber-200 bg-amber-50'
+                      : 'border-emerald-200 bg-emerald-50'
+                    }`}>
+                    <div className="flex items-center justify-between">
+                      <h3 className="font-semibold text-slate-900">Balance Verification</h3>
+                      <span className={`text-xs px-2 py-1 rounded-full ${needsReview
+                          ? 'bg-amber-100 text-amber-700'
+                          : 'bg-emerald-100 text-emerald-700'
+                        }`}>
+                        {needsReview ? 'Needs review' : 'Balanced'}
+                      </span>
+                    </div>
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+                      <div>
+                        <div className="text-slate-500">Total Credits</div>
+                        <div className="font-semibold text-emerald-700">${(totalCredits / 100).toFixed(2)}</div>
+                      </div>
+                      <div>
+                        <div className="text-slate-500">Total Debits</div>
+                        <div className="font-semibold text-rose-700">${(totalDebits / 100).toFixed(2)}</div>
+                      </div>
+                      <div>
+                        <div className="text-slate-500">Net Balance</div>
+                        <div className={`font-semibold ${netBalance >= 0 ? 'text-emerald-700' : 'text-rose-700'}`}>
+                          {netBalance >= 0 ? '+' : ''}{(netBalance / 100).toFixed(2)}
+                        </div>
+                      </div>
+                      <div>
+                        <div className="text-slate-500">Missing GL Codes</div>
+                        <div className={`font-semibold ${missingGlCount > 0 ? 'text-amber-700' : 'text-slate-700'}`}>
+                          {missingGlCount} {missingGlCount === 1 ? 'entry' : 'entries'}
+                        </div>
+                      </div>
+                    </div>
+                    {needsReview && (
+                      <div className="text-xs text-amber-700 space-y-1">
+                        {hasUnbalanced && <div>⚠️ Ledger has an unbalanced net of ${(Math.abs(netBalance) / 100).toFixed(2)}</div>}
+                        {missingGlCount > 0 && <div>⚠️ {missingGlCount} entries are missing GL codes</div>}
+                      </div>
+                    )}
+                  </div>
+                );
+              })()}
               {Object.keys(grouped).length > 0 && (
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
                   {Object.entries(grouped).map(([gl, amt]) => (
