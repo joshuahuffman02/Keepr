@@ -2273,10 +2273,13 @@ export const apiClient = {
       routingAssigneeId?: string | null;
     }
   ) {
-    return fetchJSON<Campground>(`/campgrounds/${id}/ops`, {
+    const res = await fetch(`${API_BASE}/campgrounds/${id}/ops`, {
       method: "PATCH",
+      headers: { "Content-Type": "application/json", ...scopedHeaders() },
       body: JSON.stringify(data)
     });
+    const result = await parseResponse<unknown>(res);
+    return CampgroundWithAnalyticsSchema.parse(result);
   },
 
   async updateCampgroundFinancials(
@@ -2289,10 +2292,13 @@ export const apiClient = {
       taxLocal?: number | null;
     }
   ) {
-    return fetchJSON<Campground>(`/campgrounds/${id}/financials`, {
+    const res = await fetch(`${API_BASE}/campgrounds/${id}/financials`, {
       method: "PATCH",
+      headers: { "Content-Type": "application/json", ...scopedHeaders() },
       body: JSON.stringify(data)
     });
+    const result = await parseResponse<unknown>(res);
+    return CampgroundWithAnalyticsSchema.parse(result);
   },
   async listTemplates(campgroundId: string, status?: string) {
     const params = new URLSearchParams();
