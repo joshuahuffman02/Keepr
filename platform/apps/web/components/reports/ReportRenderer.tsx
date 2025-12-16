@@ -16,6 +16,20 @@ import { RevenueBySiteTypeReport } from "./definitions/RevenueBySiteTypeReport";
 import { PaymentMethodsReport } from "./definitions/PaymentMethodsReport";
 import { NewVsReturningReport } from "./definitions/NewVsReturningReport";
 import { LengthOfStayReport } from "./definitions/LengthOfStayReport";
+// Phase 1 Guest Reports
+import { GuestBehaviorReport } from "./definitions/GuestBehaviorReport";
+import { RepeatGuestsReport } from "./definitions/RepeatGuestsReport";
+import { DemographicsReport } from "./definitions/DemographicsReport";
+import { TopSpendersReport } from "./definitions/TopSpendersReport";
+import { EmailCaptureReport } from "./definitions/EmailCaptureReport";
+// Phase 2 Placeholder Reports
+import {
+    LoyaltyMembershipReport,
+    GuestFeedbackReport,
+    GuestPreferencesReport,
+    BannedListReport,
+    SpecialDatesReport
+} from "./definitions/PlaceholderReports";
 
 interface ReportRendererProps {
     tab: ReportTab;
@@ -69,13 +83,43 @@ export function ReportRenderer({ tab, subTab, campgroundId, dateRange, reportFil
         }
     }
 
-    // 4. Guests Reports
+    // 4. Guests Reports - All implemented!
     if (tab === "guests") {
         if (subTab === "guest-origins") {
             return <GuestOriginsReport campgroundId={campgroundId} dateRange={dateRange} />;
         }
+        if (subTab === "guest-behavior") {
+            return <GuestBehaviorReport campgroundId={campgroundId} dateRange={dateRange} />;
+        }
+        if (subTab === "repeat-guests") {
+            return <RepeatGuestsReport campgroundId={campgroundId} dateRange={dateRange} />;
+        }
         if (subTab === "new-vs-returning") {
             return <NewVsReturningReport campgroundId={campgroundId} dateRange={dateRange} />;
+        }
+        if (subTab === "demographics") {
+            return <DemographicsReport campgroundId={campgroundId} dateRange={dateRange} />;
+        }
+        if (subTab === "top-spenders") {
+            return <TopSpendersReport campgroundId={campgroundId} dateRange={dateRange} />;
+        }
+        if (subTab === "loyalty-membership") {
+            return <LoyaltyMembershipReport campgroundId={campgroundId} dateRange={dateRange} />;
+        }
+        if (subTab === "guest-feedback") {
+            return <GuestFeedbackReport campgroundId={campgroundId} dateRange={dateRange} />;
+        }
+        if (subTab === "email-capture") {
+            return <EmailCaptureReport campgroundId={campgroundId} dateRange={dateRange} />;
+        }
+        if (subTab === "guest-preferences") {
+            return <GuestPreferencesReport campgroundId={campgroundId} dateRange={dateRange} />;
+        }
+        if (subTab === "banned-list") {
+            return <BannedListReport campgroundId={campgroundId} dateRange={dateRange} />;
+        }
+        if (subTab === "special-dates") {
+            return <SpecialDatesReport campgroundId={campgroundId} dateRange={dateRange} />;
         }
     }
 
