@@ -6932,6 +6932,49 @@ export const apiClient = {
     });
     return parseResponse<unknown>(res);
   },
+
+  // Webhooks
+  async listWebhooks(campgroundId: string) {
+    const qs = new URLSearchParams({ campgroundId });
+    const res = await fetch(`${API_BASE}/developer/webhooks?${qs.toString()}`, {
+      headers: { ...scopedHeaders() }
+    });
+    return parseResponse<any[]>(res);
+  },
+
+  async createWebhook(campgroundId: string, payload: { url: string; eventTypes: string[]; description?: string }) {
+    const res = await fetch(`${API_BASE}/developer/webhooks`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", ...scopedHeaders() },
+      body: JSON.stringify({ campgroundId, ...payload })
+    });
+    return parseResponse<{ endpoint: any; secret: string }>(res);
+  },
+
+  async toggleWebhook(id: string, isActive: boolean) {
+    const res = await fetch(`${API_BASE}/developer/webhooks/${id}/toggle`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json", ...scopedHeaders() },
+      body: JSON.stringify({ isActive })
+    });
+    return parseResponse<unknown>(res);
+  },
+
+  async listWebhookDeliveries(campgroundId: string) {
+    const qs = new URLSearchParams({ campgroundId });
+    const res = await fetch(`${API_BASE}/developer/webhooks/deliveries?${qs.toString()}`, {
+      headers: { ...scopedHeaders() }
+    });
+    return parseResponse<any[]>(res);
+  },
+
+  async replayWebhookDelivery(id: string) {
+    const res = await fetch(`${API_BASE}/developer/webhooks/deliveries/${id}/replay`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", ...scopedHeaders() },
+    });
+    return parseResponse<any>(res);
+  },
 };
 
 export type PublicCampgroundList = z.infer<typeof PublicCampgroundListSchema>;

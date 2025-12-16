@@ -14,7 +14,7 @@ import { CopilotActionDto } from "./dto/copilot-action.dto";
 export class AiService {
   private readonly logger = new Logger(AiService.name);
 
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly prisma: PrismaService) { }
 
   private async shouldUseMock(campgroundId?: string, forceMock?: boolean) {
     if (forceMock) return true;
@@ -342,13 +342,73 @@ Return:
       };
     }
     if (action === "draft_reply") {
-      return {
-        action,
-        preview: "Thanks for reaching out! We can extend your stay to Monday and add late checkout for $15. Want me to hold Site 12?",
-        tone: "friendly",
-        generatedAt: new Date().toISOString(),
-        mode: useMock ? "mock" : "live",
+      const { guestName, lastMessage, reservationContext } = dto.payload || {};
+
+      const prompt = `
+      You are a helpful campground concierge. Draft a friendly, professional reply to a guest.
+      Guest Name: ${guestName || "Guest"}
+      Last Message: "${lastMessage || "N/A"}"
+      Context: ${reservationContext || "General inquiry"}
+      
+      Guidelines:
+      - Be concise and warm.
+      - Address their specific question if clear.
+      - If they asked about late checkout, offer it for a fee if applicable.
+      - If they asked about amenities, mention the pool/wifi.
+      - Keep it under 50 words.
+      `;
+
+      const body = {
+        model: "gpt-4o-mini",
+        messages: [
+          { role: "system", content: "You are a helpful campground concierge. Draft concise, friendly replies." },
+          { role: "user", content: prompt },
+        ],
+        temperature: 0.7,
+        max_tokens: 150,
       };
+
+      try {
+        const res = await fetch("https://api.openai.com/v1/chat/completions", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${(cg as any).aiOpenaiApiKey}`,
+          },
+          body: JSON.stringify(body),
+        });
+
+        if (!res.ok) {
+          // Fallback for demo if no key or error
+          return {
+            action,
+            preview: `(AI Mock) Hi ${guestName || "Guest"}, thanks for your message! regarding "${lastMessage}", we'd be happy to help. Let us know if you need anything else!`,
+            tone: "friendly",
+            generatedAt: new Date().toISOString(),
+            mode: "mock",
+          };
+        }
+
+        const json = await res.json();
+        const content = json?.choices?.[0]?.message?.content || "";
+
+        return {
+          action,
+          preview: content.replace(/^"|"$/g, ''), // remove quotes if AI adds them
+          tone: "friendly",
+          generatedAt: new Date().toISOString(),
+          mode: "live",
+        };
+      } catch (err) {
+        // Fallback
+        return {
+          action,
+          preview: `(Fallback) Hi ${guestName || "Guest"}, received your message: "${lastMessage}". We will get back to you shortly.`,
+          tone: "neutral",
+          generatedAt: new Date().toISOString(),
+          mode: "fallback",
+        };
+      }
     }
     return {
       action,

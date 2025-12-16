@@ -496,6 +496,8 @@ export function DashboardShell({ children, className, title, subtitle }: { child
       { label: "Security", href: "/settings/security", icon: "audit" },
       { label: "Privacy & Consent", href: "/settings/privacy", icon: "audit" },
       { label: "Developers", href: "/settings/developers", icon: "code" },
+      { label: "Webhooks", href: "/settings/webhooks", icon: "webhook" },
+      { label: "System Status", href: "/settings/status", icon: "activity" },
       // Property Config
       { label: "Campground Config", href: selected ? `/campgrounds/${selected}/settings` : "/campgrounds", icon: "policy" },
       { label: "Photos", href: "/settings/photos", icon: "brand" },

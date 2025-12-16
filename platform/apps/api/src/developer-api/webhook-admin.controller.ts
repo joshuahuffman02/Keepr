@@ -1,7 +1,7 @@
 import { Body, Controller, Get, Param, Patch, Post, Query, UseGuards } from "@nestjs/common";
 import { JwtAuthGuard } from "../auth/guards";
 import { WebhookService } from "./webhook.service";
-import { IsArray, IsBoolean, IsNotEmpty, IsOptional, IsString, IsUrl } from "class-validator";
+import { IsArray, IsBoolean, IsNotEmpty, IsOptional, IsString } from "class-validator";
 
 class CreateWebhookDto {
   @IsString()
@@ -9,18 +9,15 @@ class CreateWebhookDto {
   campgroundId!: string;
 
   @IsString()
-  @IsOptional()
-  apiClientId?: string;
-
-  @IsUrl()
+  @IsNotEmpty()
   url!: string;
-
-  @IsArray()
-  eventTypes!: string[];
 
   @IsString()
   @IsOptional()
   description?: string;
+
+  @IsArray()
+  eventTypes!: string[];
 }
 
 class ToggleWebhookDto {
@@ -33,31 +30,24 @@ class ToggleWebhookDto {
 export class WebhookAdminController {
   constructor(private readonly webhookService: WebhookService) { }
 
-  @Get("endpoints")
-  listEndpoints(@Query("campgroundId") campgroundId: string) {
+  @Get()
+  list(@Query("campgroundId") campgroundId: string) {
     return this.webhookService.listEndpoints(campgroundId);
   }
 
-  @Post("endpoints")
-  createEndpoint(@Body() body: CreateWebhookDto) {
-    return this.webhookService.createEndpoint({
-      campgroundId: body.campgroundId,
-      apiClientId: body.apiClientId,
-      url: body.url,
-      description: body.description,
-      eventTypes: body.eventTypes
-    });
+  @Post()
+  create(@Body() body: CreateWebhookDto) {
+    return this.webhookService.createEndpoint(body);
   }
 
-  @Patch("endpoints/:id/toggle")
+  @Patch(":id/toggle")
   toggle(@Param("id") id: string, @Body() body: ToggleWebhookDto) {
-    return this.webhookService.toggleEndpoint(id, body.isActive as any);
+    return this.webhookService.toggleEndpoint(id, body.isActive);
   }
 
   @Get("deliveries")
-  deliveries(@Query("campgroundId") campgroundId: string, @Query("limit") limit?: string) {
-    const take = limit ? Number(limit) : 50;
-    return this.webhookService.listDeliveries(campgroundId, take);
+  listDeliveries(@Query("campgroundId") campgroundId: string) {
+    return this.webhookService.listDeliveries(campgroundId);
   }
 
   @Post("deliveries/:id/replay")
@@ -65,4 +55,3 @@ export class WebhookAdminController {
     return this.webhookService.replay(id);
   }
 }
-

@@ -6,11 +6,12 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Send, Loader2, MessageCircle } from "lucide-react";
+import { Send, Loader2, MessageCircle, Sparkles } from "lucide-react";
 import { format } from "date-fns";
 
 type Message = {
     id: string;
+    campgroundId: string;
     senderType: "guest" | "staff";
     content: string;
     readAt: string | null;
@@ -32,6 +33,7 @@ export function MessagesPanel({ reservationId, guestId }: MessagesPanelProps) {
     const [newMessage, setNewMessage] = useState("");
     const [loading, setLoading] = useState(true);
     const [sending, setSending] = useState(false);
+    const [generatingAI, setGeneratingAI] = useState(false);
     const messagesEndRef = useRef<HTMLDivElement>(null);
 
     const scrollToBottom = () => {
@@ -81,6 +83,43 @@ export function MessagesPanel({ reservationId, guestId }: MessagesPanelProps) {
             console.error("Failed to send message:", error);
         } finally {
             setSending(false);
+        }
+    };
+
+    const handleGenerateReply = async () => {
+        setGeneratingAI(true);
+        try {
+            const guestMsgs = messages.filter(m => m.senderType === "guest");
+            const lastMsg = guestMsgs[guestMsgs.length - 1];
+            const name = lastMsg ? `${lastMsg.guest.primaryFirstName} ${lastMsg.guest.primaryLastName}` : "Guest";
+            const content = lastMsg ? lastMsg.content : "";
+
+            // We need a campgroundId. Often it's in the reservation context, but here we only have IDs.
+            // However, MessagesPanel messages contain `campgroundId`.
+            const campgroundId = messages[0]?.campgroundId;
+            if (!campgroundId) {
+                console.warn("No campground ID found in messages");
+                setGeneratingAI(false);
+                return;
+            }
+
+            const res = await apiClient.runCopilot({
+                campgroundId,
+                action: "draft_reply",
+                payload: {
+                    guestName: name,
+                    lastMessage: content,
+                    reservationContext: "Reservation ID: " + reservationId
+                }
+            });
+
+            if (res.preview) {
+                setNewMessage(res.preview);
+            }
+        } catch (error) {
+            console.error("Failed to generate AI reply:", error);
+        } finally {
+            setGeneratingAI(false);
         }
     };
 
@@ -134,8 +173,8 @@ export function MessagesPanel({ reservationId, guestId }: MessagesPanelProps) {
                             >
                                 <div
                                     className={`max-w-[85%] rounded-lg px-3 py-2 ${msg.senderType === "staff"
-                                            ? "bg-primary text-primary-foreground"
-                                            : "bg-muted"
+                                        ? "bg-primary text-primary-foreground"
+                                        : "bg-muted"
                                         }`}
                                 >
                                     {msg.senderType === "guest" && (
@@ -146,8 +185,8 @@ export function MessagesPanel({ reservationId, guestId }: MessagesPanelProps) {
                                     <p className="text-sm whitespace-pre-wrap">{msg.content}</p>
                                     <p
                                         className={`text-[10px] mt-1 ${msg.senderType === "staff"
-                                                ? "text-primary-foreground/70"
-                                                : "text-muted-foreground"
+                                            ? "text-primary-foreground/70"
+                                            : "text-muted-foreground"
                                             }`}
                                     >
                                         {format(new Date(msg.createdAt), "MMM d, h:mm a")}
@@ -170,6 +209,15 @@ export function MessagesPanel({ reservationId, guestId }: MessagesPanelProps) {
                         disabled={sending}
                         className="flex-1"
                     />
+                    <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={handleGenerateReply}
+                        disabled={sending || generatingAI || messages.length === 0}
+                        title="Generate reply with AI"
+                    >
+                        {generatingAI ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4 text-purple-600" />}
+                    </Button>
                     <Button size="sm" onClick={handleSend} disabled={sending || !newMessage.trim()}>
                         {sending ? (
                             <Loader2 className="h-4 w-4 animate-spin" />
