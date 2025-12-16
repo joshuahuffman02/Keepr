@@ -13,9 +13,13 @@ export class SitesController {
     return this.sites.listByCampground(campgroundId);
   }
 
-  @Get("sites/:id")
   getById(@Param("id") id: string) {
     return this.sites.findOne(id);
+  }
+
+  @Get("sites/:id/availability/now")
+  checkAvailability(@Param("id") id: string) {
+    return this.sites.checkAvailability(id);
   }
 
   @Post("campgrounds/:campgroundId/sites")

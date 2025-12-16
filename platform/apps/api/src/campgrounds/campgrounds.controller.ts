@@ -28,6 +28,13 @@ export class CampgroundsController {
     return campground;
   }
 
+  @Get("public/campgrounds/:slug/sites/:code")
+  async getPublicSite(@Param("slug") slug: string, @Param("code") code: string) {
+    const result = await this.campgrounds.findPublicSite(slug, code);
+    if (!result) throw new NotFoundException("Site not found");
+    return result;
+  }
+
   // Admin endpoints (auth required)
   @UseGuards(JwtAuthGuard)
   @Get("campgrounds")

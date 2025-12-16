@@ -498,6 +498,43 @@ export class CampgroundsService {
     return campground;
   }
 
+  async findPublicSite(slug: string, code: string) {
+    const campground = await this.prisma.campground.findUnique({
+      where: { slug },
+      select: { id: true }
+    });
+    if (!campground) return null;
+
+    const site = await this.prisma.site.findFirst({
+      where: {
+        campgroundId: campground.id,
+        name: { equals: code, mode: "insensitive" } // Flexible matching
+      },
+      include: {
+        siteClass: true
+      }
+    });
+
+    if (!site) return null;
+
+    const now = new Date();
+    const activeReservation = await this.prisma.reservation.findFirst({
+      where: {
+        siteId: site.id,
+        status: { not: "canceled" }, // Assuming string based status or enum mapping
+        arrivalDate: { lte: now },
+        departureDate: { gt: now }
+      },
+      select: { id: true, status: true, arrivalDate: true, departureDate: true, guestId: true }
+    });
+
+    return {
+      site,
+      status: activeReservation ? "occupied" : "available",
+      currentReservation: activeReservation
+    };
+  }
+
   create(data: CreateCampgroundDto) {
     const {
       taxState,

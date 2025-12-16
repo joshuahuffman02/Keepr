@@ -5,7 +5,7 @@ import { SiteType } from "@prisma/client";
 
 @Injectable()
 export class SitesService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly prisma: PrismaService) { }
 
   findOne(id: string) {
     return this.prisma.site.findUnique({
@@ -42,5 +42,33 @@ export class SitesService {
 
   remove(id: string) {
     return this.prisma.site.delete({ where: { id } });
+  }
+
+  async checkAvailability(id: string) {
+    const now = new Date();
+    // Check for any active reservation overlapping *now*
+    const activeReservation = await this.prisma.reservation.findFirst({
+      where: {
+        siteId: id,
+        status: { not: "canceled" }, // Assuming 'canceled' is the status string from ReservationStatus enum or similar
+        arrivalDate: { lte: now },
+        departureDate: { gt: now }
+      },
+      select: {
+        id: true,
+        status: true,
+        arrivalDate: true,
+        departureDate: true,
+        guestId: true
+      }
+    });
+
+    if (activeReservation) {
+      return { status: "occupied", reservation: activeReservation };
+    }
+
+    // Check for blocks? (omitted for prototype speed, can accept for now)
+
+    return { status: "available" };
   }
 }

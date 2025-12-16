@@ -1440,6 +1440,22 @@ const PreviewAssignmentsResultSchema = z.object({
 });
 
 export const apiClient = {
+  // Public sites (QR)
+  async getPublicSite(slug: string, code: string) {
+    const data = await fetchJSON<unknown>(`/public/campgrounds/${slug}/sites/${code}`);
+    return z.object({
+      site: SiteSchema.extend({ siteClass: SiteClassSchema.nullable().optional() }),
+      status: z.string(),
+      currentReservation: z.object({
+        id: z.string(),
+        status: z.string(),
+        arrivalDate: z.string(),
+        departureDate: z.string(),
+        guestId: z.string(),
+      }).nullable()
+    }).parse(data);
+  },
+
   async signUpload(payload: { filename: string; contentType: string }) {
     const res = await fetch(`${API_BASE}/uploads/sign`, {
       method: "POST",
