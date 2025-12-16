@@ -14,7 +14,8 @@ import {
     LayoutDashboard,
     ExternalLink,
     LogOut,
-    ChevronRight
+    ChevronRight,
+    Zap
 } from "lucide-react";
 import { signOut } from "next-auth/react";
 
@@ -65,6 +66,13 @@ const adminNavItems = [
             { title: "Feature Flags", href: "/admin/system/flags" },
             { title: "Announcements", href: "/admin/system/announcements" },
             { title: "Sync Summary", href: "/admin/sync-summary" },
+        ],
+    },
+    {
+        title: "IoT",
+        icon: Zap,
+        children: [
+            { title: "Devices", href: "/admin/devices" },
         ],
     },
 ];

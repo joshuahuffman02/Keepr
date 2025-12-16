@@ -979,6 +979,7 @@ model Campground {
   disputes                  Dispute[]
   utilityRatePlans          UtilityRatePlan[]
   utilityMeters             UtilityMeter[]
+  smartLocks                SmartLock[]
   lateFeeRules              LateFeeRule[]
   analyticsEvents           AnalyticsEvent[]
   analyticsDailyAggregates  AnalyticsDailyAggregate[]
@@ -1479,6 +1480,7 @@ model Site {
   accessGrants       AccessGrant[]
   documentTemplates  DocumentTemplate[]
   reservationSegments ReservationSegment[]
+  smartLocks          SmartLock[]
 
   @@unique([campgroundId, name])
   @@index([campgroundId])
@@ -2131,6 +2133,7 @@ model UtilityMeter {
   multiplier     Decimal  @default(1.0)
   autoEmail      Boolean  @default(false)
   lastBilledReadAt DateTime?
+  metadata         Json?
 
   reads     UtilityMeterRead[]
   ratePlan  UtilityRatePlan? @relation(fields: [ratePlanId], references: [id], onDelete: SetNull)
@@ -2139,6 +2142,26 @@ model UtilityMeter {
 
   @@index([campgroundId])
   @@index([siteId, type])
+}
+
+model SmartLock {
+  id           String   @id @default(cuid())
+  campgroundId String
+  siteId       String?
+  name         String?
+  vendor       String   // e.g. "kisi", "remotelock"
+  externalId   String?  // ID in vendor system
+  status       String   @default("locked") // locked, unlocked, offline
+  batteryLevel Int?     // 0-100
+  metadata     Json?    // Simulation config
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  campground   Campground @relation(fields: [campgroundId], references: [id], onDelete: Cascade)
+  site         Site?      @relation(fields: [siteId], references: [id])
+
+  @@index([campgroundId])
+  @@index([siteId])
 }
 
 model UtilityMeterRead {

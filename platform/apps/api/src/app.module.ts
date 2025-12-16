@@ -90,6 +90,7 @@ import { SignaturesModule } from "./signatures/signatures.module";
 import { TicketsModule } from "./tickets/tickets.module";
 import { AdminModule } from "./admin/admin.module";
 import { AnomaliesModule } from "./anomalies/anomalies.module";
+import { IotModule } from "./iot/iot.module";
 
 @Module({
   imports: [
@@ -186,6 +187,7 @@ import { AnomaliesModule } from "./anomalies/anomalies.module";
     TicketsModule,
     AdminModule,
     AnomaliesModule,
+    IotModule,
   ],
   providers: []
 })

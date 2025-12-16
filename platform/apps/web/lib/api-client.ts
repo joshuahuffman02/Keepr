@@ -98,12 +98,41 @@ const OverlapCheckSchema = z.object({
 const OverlapListSchema = z.array(
   z.object({
     siteId: z.string(),
-    reservationA: z.string(),
-    reservationB: z.string(),
+    // ...
+  })
+);
+
+export const UtilityMeterSchema = z.object({
+  id: z.string(),
+  campgroundId: z.string(),
+  siteId: z.string().nullable().optional(),
+  type: z.string(), // power, water, sewer
+  serialNumber: z.string(),
+  model: z.string().nullable().optional(),
+  status: z.string().optional().default("active"),
+  metadata: z.record(z.any()).nullable().optional(),
+  reads: z.array(z.object({
+    readingValue: numberish(z.number()),
+    readAt: z.string().or(z.date()),
+  })).optional(),
+});
+
+export const SmartLockSchema = z.object({
+  id: z.string(),
+  campgroundId: z.string(),
+  siteId: z.string().nullable().optional(),
+  name: z.string().nullable().optional(),
+  vendor: z.string(),
+  status: z.string(),
+  batteryLevel: numberish(z.number().nullable().optional()),
+  metadata: z.record(z.any()).nullable().optional(),
+});
+reservationA: z.string(),
+  reservationB: z.string(),
     arrivalA: z.string(),
-    departureA: z.string(),
-    arrivalB: z.string(),
-    departureB: z.string()
+      departureA: z.string(),
+        arrivalB: z.string(),
+          departureB: z.string()
   })
 );
 const VehicleSchema = z.object({
@@ -6970,6 +6999,25 @@ export const apiClient = {
 
   async replayWebhookDelivery(id: string) {
     const res = await fetch(`${API_BASE}/developer/webhooks/deliveries/${id}/replay`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", ...scopedHeaders() },
+    });
+    return parseResponse<any>(res);
+  },
+
+  // IoT
+  async getUtilityMeters() {
+    const data = await fetchJSON<unknown>(`/iot/meters`);
+    return z.array(UtilityMeterSchema).parse(data);
+  },
+
+  async getSmartLocks() {
+    const data = await fetchJSON<unknown>(`/iot/locks`);
+    return z.array(SmartLockSchema).parse(data);
+  },
+
+  async triggerIotSimulation() {
+    const res = await fetch(`${API_BASE}/iot/simulate/trigger`, {
       method: "POST",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
     });
