@@ -103,17 +103,15 @@ export function AiChatWidget({ campgroundId, campgroundName }: AiChatWidgetProps
 
     if (!isOpen) {
         return (
-            <div className="fixed bottom-6 right-6 z-[9999]">
-                {/* Debug wrapper */}
-                <div className="bg-red-500 text-white text-xs px-1 py-0.5 rounded mb-1">Widget Here</div>
-                <button
-                    onClick={() => setIsOpen(true)}
-                    className="w-16 h-16 bg-emerald-500 text-white rounded-full shadow-xl hover:shadow-2xl hover:scale-105 transition-all flex items-center justify-center text-2xl font-bold"
-                    aria-label="Open AI booking assistant"
-                >
-                    💬
-                </button>
-            </div>
+            <button
+                onClick={() => setIsOpen(true)}
+                className="fixed bottom-6 right-6 w-14 h-14 bg-gradient-to-br from-emerald-500 to-teal-600 text-white rounded-full shadow-xl hover:shadow-2xl hover:scale-105 transition-all flex items-center justify-center z-[9999]"
+                aria-label="Open AI booking assistant"
+            >
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z" />
+                </svg>
+            </button>
         );
     }
 
