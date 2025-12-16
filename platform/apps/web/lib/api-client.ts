@@ -6885,6 +6885,53 @@ export const apiClient = {
     const data = await parseResponse<{ url: string }>(res);
     return data;
   },
+  // Developer API
+  async listApiClients(campgroundId: string) {
+    const qs = new URLSearchParams({ campgroundId });
+    const data = await fetchJSON<unknown>(`/developer/clients?${qs.toString()}`);
+    return z.array(z.object({
+      id: z.string(),
+      name: z.string(),
+      clientId: z.string(),
+      isActive: z.boolean(),
+      scopes: z.array(z.string()),
+      createdAt: z.string()
+    })).parse(data);
+  },
+
+  async createApiClient(campgroundId: string, name: string) {
+    const res = await fetch(`${API_BASE}/developer/clients`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", ...scopedHeaders() },
+      body: JSON.stringify({ campgroundId, name, scopes: [] })
+    });
+    return parseResponse<{ client: any; clientSecret: string }>(res);
+  },
+
+  async rotateApiClientSecret(clientId: string) {
+    const res = await fetch(`${API_BASE}/developer/clients/${clientId}/rotate`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", ...scopedHeaders() },
+    });
+    return parseResponse<{ client: any; clientSecret: string }>(res);
+  },
+
+  async toggleApiClient(clientId: string, isActive: boolean) {
+    const res = await fetch(`${API_BASE}/developer/clients/${clientId}/toggle`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json", ...scopedHeaders() },
+      body: JSON.stringify({ isActive })
+    });
+    return parseResponse<unknown>(res);
+  },
+
+  async deleteApiClient(clientId: string) {
+    const res = await fetch(`${API_BASE}/developer/clients/${clientId}`, {
+      method: "DELETE",
+      headers: { ...scopedHeaders() },
+    });
+    return parseResponse<unknown>(res);
+  },
 };
 
 export type PublicCampgroundList = z.infer<typeof PublicCampgroundListSchema>;
