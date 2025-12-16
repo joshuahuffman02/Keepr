@@ -420,6 +420,11 @@ export function CampgroundV2Client({ slug, initialData }: { slug: string; initia
         )}
       </main>
 
+      {/* TEST: Visible box to confirm v2 renders */}
+      <div className="fixed bottom-24 right-6 bg-blue-600 text-white px-4 py-2 rounded-lg shadow-xl z-50 text-sm font-bold">
+        V2 PAGE TEST
+      </div>
+
       {/* AI Chat Widget */}
       {campground?.id && <AiChatWidget campgroundId={campground.id} campgroundName={campground.name} />}
     </div>
