@@ -2261,7 +2261,6 @@ export const apiClient = {
       method: "PATCH",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
       body: JSON.stringify({ domain })
-      body: JSON.stringify(payload)
     });
     const data = await parseResponse<unknown>(res);
     return CampgroundWithAnalyticsSchema.parse(data);
