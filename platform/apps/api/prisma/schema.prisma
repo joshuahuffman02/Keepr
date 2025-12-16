@@ -846,8 +846,21 @@ model Campground {
   provenance           Json?
   gaMeasurementId      String?
   metaPixelId          String?
-  aiSuggestionsEnabled Boolean   @default(false)
-  aiOpenaiApiKey       String?
+  // AI Features
+  aiEnabled                Boolean   @default(false) // Master toggle for all AI features
+  aiReplyAssistEnabled     Boolean   @default(false) // Staff reply suggestions
+  aiBookingAssistEnabled   Boolean   @default(false) // Consumer booking assistant
+  aiAnalyticsEnabled       Boolean   @default(false) // AI-powered insights
+  aiForecastingEnabled     Boolean   @default(false) // Demand forecasting
+  aiAnonymizationLevel     String    @default("strict") // strict, moderate, minimal
+  aiProvider               String    @default("openai") // openai, anthropic, local
+  aiApiKey                 String?   // Encrypted API key for AI provider
+  aiConsentCollected       Boolean   @default(false)
+  aiConsentCollectedAt     DateTime?
+  aiMonthlyBudgetCents     Int?      // Optional spending cap
+  aiTotalTokensUsed        Int       @default(0) // Running total for billing
+
+  // NPS/Reviews
   npsAutoSendEnabled   Boolean   @default(false)
   npsSendHour          Int?      @default(7)
   npsTemplateId        String?
@@ -5690,4 +5703,62 @@ model ReportSubscription {
   @@index([userId])
   @@index([campgroundId])
   @@index([enabled, nextSendAt])
+}
+
+// ==================== AI FEATURES ====================
+
+enum AiFeatureType {
+  reply_assist
+  booking_assist
+  analytics
+  forecasting
+  anomaly_detection
+  recommendations
+}
+
+model AiInteractionLog {
+  id           String        @id @default(cuid())
+  campgroundId String
+  featureType  AiFeatureType
+  promptHash   String        // SHA-256 of anonymized prompt (for audit, not content)
+  responseHash String        // SHA-256 of response
+  tokensUsed   Int
+  latencyMs    Int
+  userId       String?       // Staff user ID if applicable
+  sessionId    String?       // Anonymous session for consumer interactions
+  success      Boolean       @default(true)
+  errorType    String?
+  provider     String        @default("openai")
+  modelUsed    String?       // e.g., gpt-4, claude-3
+  costCents    Int?          // Estimated cost for billing
+  createdAt    DateTime      @default(now())
+
+  @@index([campgroundId, createdAt])
+  @@index([featureType, createdAt])
+  @@index([userId, createdAt])
+}
+
+enum AiConsentType {
+  booking_assist
+  personalization
+  communications
+  analytics
+}
+
+model AiConsentRecord {
+  id           String        @id @default(cuid())
+  campgroundId String
+  guestId      String?       // Null for anonymous/session-based consent
+  sessionId    String?       // For anonymous users
+  consentType  AiConsentType
+  granted      Boolean       @default(true)
+  ipHash       String?       // Hashed IP for compliance
+  userAgent    String?
+  grantedAt    DateTime      @default(now())
+  revokedAt    DateTime?
+  source       String?       // e.g., booking_widget, chat, settings
+
+  @@index([campgroundId, guestId])
+  @@index([sessionId])
+  @@index([consentType, granted])
 }

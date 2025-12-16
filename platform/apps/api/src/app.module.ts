@@ -184,8 +184,6 @@ import { IotModule } from "./iot/iot.module";
     ReferralsModule,
     TicketsModule,
     AdminModule,
-    TicketsModule,
-    AdminModule,
     AnomaliesModule,
     IotModule,
   ],
