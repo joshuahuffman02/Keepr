@@ -2261,21 +2261,39 @@ export const apiClient = {
       method: "PATCH",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
       body: JSON.stringify({ domain })
+      body: JSON.stringify(payload)
     });
     const data = await parseResponse<unknown>(res);
     return CampgroundWithAnalyticsSchema.parse(data);
   },
   async updateCampgroundOps(
-    campgroundId: string,
-    payload: { quietHoursStart?: string | null; quietHoursEnd?: string | null; routingAssigneeId?: string | null }
+    id: string,
+    data: {
+      quietHoursStart?: string | null;
+      quietHoursEnd?: string | null;
+      routingAssigneeId?: string | null;
+    }
   ) {
-    const res = await fetch(`${API_BASE}/campgrounds/${campgroundId}/ops`, {
+    return fetchJSON<Campground>(`/campgrounds/${id}/ops`, {
       method: "PATCH",
-      headers: { "Content-Type": "application/json", ...scopedHeaders() },
-      body: JSON.stringify(payload)
+      body: JSON.stringify(data)
     });
-    const data = await parseResponse<unknown>(res);
-    return CampgroundWithAnalyticsSchema.parse(data);
+  },
+
+  async updateCampgroundFinancials(
+    id: string,
+    data: {
+      currency?: string | null;
+      taxId?: string | null;
+      taxIdName?: string | null;
+      taxState?: number | null;
+      taxLocal?: number | null;
+    }
+  ) {
+    return fetchJSON<Campground>(`/campgrounds/${id}/financials`, {
+      method: "PATCH",
+      body: JSON.stringify(data)
+    });
   },
   async listTemplates(campgroundId: string, status?: string) {
     const params = new URLSearchParams();

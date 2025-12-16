@@ -830,6 +830,30 @@ export class CampgroundsService {
     });
   }
 
+  async updateFinancials(
+    id: string,
+    data: {
+      currency?: string | null;
+      taxId?: string | null;
+      taxIdName?: string | null;
+      taxState?: number | null;
+      taxLocal?: number | null;
+    },
+    organizationId?: string
+  ) {
+    await this.assertCampgroundScoped(id, organizationId);
+    return this.prisma.campground.update({
+      where: { id },
+      data: {
+        currency: data.currency ?? "USD",
+        taxId: data.taxId ?? null,
+        taxIdName: data.taxIdName ?? "Tax ID",
+        taxState: data.taxState ?? null,
+        taxLocal: data.taxLocal ?? null
+      }
+    });
+  }
+
   async getMembers(id: string) {
     const memberships = await this.prisma.campgroundMembership.findMany({
       where: { campgroundId: id },

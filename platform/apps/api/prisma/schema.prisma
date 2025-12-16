@@ -789,6 +789,7 @@ model Organization {
   stripeCustomerId   String?          @unique
   subscriptionStatus String? // active, past_due, canceled, trialing
   trialEndsAt        DateTime?
+  dataRegion         String   @default("us-east-1")
 
   campgrounds              Campground[]
   analyticsEvents          AnalyticsEvent[]

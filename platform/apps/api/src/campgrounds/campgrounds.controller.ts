@@ -183,6 +183,23 @@ export class CampgroundsController {
   }
 
   @UseGuards(JwtAuthGuard)
+  @Patch("campgrounds/:id/financials")
+  updateFinancials(
+    @Param("id") id: string,
+    @Body() body: {
+      currency?: string | null;
+      taxId?: string | null;
+      taxIdName?: string | null;
+      taxState?: number | null;
+      taxLocal?: number | null;
+    },
+    @Req() req: Request
+  ) {
+    const org = (req as any).organizationId || null;
+    return this.campgrounds.updateFinancials(id, body, org || undefined);
+  }
+
+  @UseGuards(JwtAuthGuard)
   @Get("organizations/:organizationId/campgrounds")
   listByOrganization(@Param("organizationId") organizationId: string) {
     return this.campgrounds.listByOrganization(organizationId);
