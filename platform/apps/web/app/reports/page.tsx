@@ -4346,6 +4346,11 @@ function ReportsPageInner() {
             )}
           </div>
 
+          {/* UNCONDITIONAL DEBUG - always visible */}
+          <div className="bg-purple-100 border-2 border-purple-500 text-purple-900 px-4 py-3 rounded-md text-base font-bold mb-4">
+            🔍 UNCONDITIONAL DEBUG: activeTab="{activeTab}" | activeSubTab="{activeSubTab || 'null'}" | campgroundId="{campgroundId || 'NULL'}"
+          </div>
+
           {!campgroundId && (
             <div className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
               Choose a campground from the sidebar to load reports.
