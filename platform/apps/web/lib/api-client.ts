@@ -7053,6 +7053,44 @@ export const apiClient = {
     });
     return parseResponse<any>(res);
   },
+
+  // AI Settings
+  async getAiSettings(campgroundId: string) {
+    const data = await fetchJSON<unknown>(`/ai/campgrounds/${campgroundId}/settings`);
+    return data as {
+      id: string;
+      name: string;
+      aiEnabled: boolean;
+      aiReplyAssistEnabled: boolean;
+      aiBookingAssistEnabled: boolean;
+      aiAnalyticsEnabled: boolean;
+      aiForecastingEnabled: boolean;
+      aiAnonymizationLevel: string;
+      aiProvider: string;
+      aiApiKey: string | null;
+      hasCustomApiKey: boolean;
+      aiMonthlyBudgetCents: number | null;
+      aiTotalTokensUsed: number;
+    };
+  },
+
+  async updateAiSettings(campgroundId: string, settings: Record<string, unknown>) {
+    const res = await fetch(`${API_BASE}/ai/campgrounds/${campgroundId}/settings`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json", ...scopedHeaders() },
+      body: JSON.stringify(settings),
+    });
+    return parseResponse<unknown>(res);
+  },
+
+  async getAiUsage(campgroundId: string) {
+    const data = await fetchJSON<unknown>(`/ai/campgrounds/${campgroundId}/usage`);
+    return data as {
+      period: { days: number; since: string };
+      byFeature: { feature: string; interactions: number; tokensUsed: number; costCents: number; avgLatencyMs: number }[];
+      totals: { interactions: number; tokensUsed: number; costCents: number };
+    };
+  },
 };
 
 export type PublicCampgroundList = z.infer<typeof PublicCampgroundListSchema>;

@@ -50,29 +50,18 @@ export default function AiSettingsPage() {
 
     const { data: settings, isLoading } = useQuery({
         queryKey: ["ai-settings", campgroundId],
-        queryFn: async (): Promise<AiSettings> => {
-            const res = await apiClient.fetch(`/api/ai/campgrounds/${campgroundId}/settings`);
-            return res as AiSettings;
-        },
+        queryFn: () => apiClient.getAiSettings(campgroundId),
         enabled: !!campgroundId,
     });
 
     const { data: usage } = useQuery({
         queryKey: ["ai-usage", campgroundId],
-        queryFn: async (): Promise<UsageStats> => {
-            const res = await apiClient.fetch(`/api/ai/campgrounds/${campgroundId}/usage`);
-            return res as UsageStats;
-        },
+        queryFn: () => apiClient.getAiUsage(campgroundId),
         enabled: !!campgroundId && !!settings?.aiEnabled,
     });
 
     const mutation = useMutation({
-        mutationFn: async (updates: Partial<AiSettings>) => {
-            return apiClient.fetch(`/api/ai/campgrounds/${campgroundId}/settings`, {
-                method: "PATCH",
-                body: JSON.stringify(updates),
-            });
-        },
+        mutationFn: (updates: Partial<AiSettings>) => apiClient.updateAiSettings(campgroundId, updates),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["ai-settings", campgroundId] });
         },
@@ -181,8 +170,8 @@ export default function AiSettingsPage() {
                                                 key={option.value}
                                                 onClick={() => handleAnonymizationChange(option.value)}
                                                 className={`p-3 rounded-lg border text-left transition-all ${settings.aiAnonymizationLevel === option.value
-                                                        ? "border-emerald-500 bg-emerald-50 ring-1 ring-emerald-500"
-                                                        : "border-slate-200 hover:border-slate-300"
+                                                    ? "border-emerald-500 bg-emerald-50 ring-1 ring-emerald-500"
+                                                    : "border-slate-200 hover:border-slate-300"
                                                     }`}
                                             >
                                                 <div className="font-medium text-sm">{option.label}</div>
@@ -205,8 +194,8 @@ export default function AiSettingsPage() {
                                                 key={option.value}
                                                 onClick={() => handleProviderChange(option.value)}
                                                 className={`p-3 rounded-lg border text-left transition-all ${settings.aiProvider === option.value
-                                                        ? "border-violet-500 bg-violet-50 ring-1 ring-violet-500"
-                                                        : "border-slate-200 hover:border-slate-300"
+                                                    ? "border-violet-500 bg-violet-50 ring-1 ring-violet-500"
+                                                    : "border-slate-200 hover:border-slate-300"
                                                     }`}
                                             >
                                                 <div className="font-medium text-sm">{option.label}</div>
