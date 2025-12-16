@@ -13,6 +13,7 @@ interface BookingContext {
     partySize?: { adults: number; children: number };
     rigInfo?: { type: string; length: number };
     preferences?: string[];
+    history?: { role: 'user' | 'assistant'; content: string }[];
 }
 
 interface SiteRecommendation {
@@ -107,11 +108,50 @@ export class AiBookingAssistService {
         // Anonymize context
         const { anonymizedText } = this.privacy.anonymize(context.message, 'moderate');
 
+        // Fetch conversation history from DB if not provided in context
+        // (DB history is only useful for metadata since content is hashed, but good as fallback)
+        let historyMeta = [];
+        if (!context.history || context.history.length === 0) {
+            historyMeta = await this.prisma.aiInteractionLog.findMany({
+                where: {
+                    campgroundId: context.campgroundId,
+                    sessionId: context.sessionId,
+                    success: true,
+                    featureType: AiFeatureType.booking_assist,
+                },
+                orderBy: { createdAt: 'desc' },
+                take: 5,
+            });
+        }
+
         // Build system prompt
         const systemPrompt = this.buildSystemPrompt(campground);
 
-        // Build user prompt with context
-        const userPrompt = this.buildUserPrompt(anonymizedText, context, campground.siteClasses);
+        // Build user prompt with context AND history
+        let userPrompt = this.buildUserPrompt(anonymizedText, context, campground.siteClasses);
+
+        // Append conversation history
+        if (context.history && context.history.length > 0) {
+            userPrompt += "\n\nCONVERSATION HISTORY (Most recent first):";
+            // Take the last 5 messages, excluding the current one if it was somehow included
+            const recentHistory = context.history.slice(-5).reverse();
+
+            for (const msg of recentHistory) {
+                userPrompt += `\n${msg.role.toUpperCase()}: ${msg.content}`;
+            }
+        } else if (historyMeta.length > 0) {
+            // Fallback to minimal context if we only have DB logs (hashed content)
+            userPrompt += `\n\n(This is turn #${historyMeta.length + 1} of the conversation)`;
+        }
+
+        // If the context contains extracted entities (like dates), explicitly emphasize them
+        if (context.dates || context.rigInfo || context.partySize || context.preferences) {
+            userPrompt += "\n\nCRITICAL CONTEXT (Extracted from previous messages):";
+            if (context.dates) userPrompt += `\n- Dates: ${context.dates.arrival} to ${context.dates.departure}`;
+            if (context.partySize) userPrompt += `\n- Party: ${context.partySize.adults} adults, ${context.partySize.children} children`;
+            if (context.rigInfo) userPrompt += `\n- Rig: ${context.rigInfo.length}ft ${context.rigInfo.type}`;
+            if (context.preferences) userPrompt += `\n- Preferences: ${context.preferences.join(', ')}`;
+        }
 
         // Get AI response
         const response = await this.provider.getCompletion({

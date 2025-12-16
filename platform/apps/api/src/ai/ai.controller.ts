@@ -26,6 +26,7 @@ interface BookingChatDto {
   partySize?: { adults: number; children: number };
   rigInfo?: { type: string; length: number };
   preferences?: string[];
+  history?: { role: 'user' | 'assistant'; content: string }[];
 }
 
 @Controller('ai')
@@ -55,6 +56,7 @@ export class AiController {
         partySize: body.partySize,
         rigInfo: body.rigInfo,
         preferences: body.preferences,
+        history: body.history,
       });
     } catch (error) {
       console.error('Chat endpoint error:', error);

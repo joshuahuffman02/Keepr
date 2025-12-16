@@ -39,11 +39,15 @@ export function AiChatWidget({ campgroundId, campgroundName }: AiChatWidgetProps
     }, [messages]);
 
     const chatMutation = useMutation({
-        mutationFn: async (message: string) => {
+        mutationFn: async ({ message, history }: { message: string; history: { role: 'user' | 'assistant'; content: string }[] }) => {
             const res = await fetch(`${API_BASE}/ai/public/campgrounds/${campgroundId}/chat`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ sessionId, message }),
+                body: JSON.stringify({
+                    sessionId,
+                    message,
+                    history
+                }),
             });
             if (!res.ok) throw new Error("Failed to send message");
             return res.json();
@@ -79,7 +83,14 @@ export function AiChatWidget({ campgroundId, campgroundName }: AiChatWidgetProps
         };
 
         setMessages((prev) => [...prev, userMessage]);
-        chatMutation.mutate(input.trim());
+
+        // Prepare history for API (excluding the message we just added optimistically)
+        const history = messages.map(m => ({
+            role: m.role as 'user' | 'assistant',
+            content: m.content
+        }));
+
+        chatMutation.mutate({ message: input.trim(), history });
         setInput("");
     };
 
