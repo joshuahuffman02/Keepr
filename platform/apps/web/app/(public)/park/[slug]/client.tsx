@@ -7,6 +7,7 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useMemo, useState, useEffect } from "react";
 import { trackEvent } from "@/lib/analytics";
+import { AiChatWidget } from "@/components/ai/AiChatWidget";
 import {
     Wifi, Waves, Flame, Droplets, Store, Fish, Ship, PlayCircle, ShowerHead, Dog,
     Footprints, Mountain, Bike, Check, Tent, Caravan, Home, Users, Sparkles,
@@ -1071,6 +1072,9 @@ export function CampgroundDetailClient({
                     </section>
                 )}
             </div>
+
+            {/* AI Chat Widget */}
+            <AiChatWidget campgroundId={campground.id} campgroundName={campground.name} />
         </div >
     );
 }
