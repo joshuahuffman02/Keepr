@@ -3,6 +3,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { apiClient } from "../../lib/api-client";
 import { Button } from "../ui/button";
 import { ProductModal } from "./ProductModal";
+import { ProductImportExport } from "./ProductImportExport";
 import { Product, ProductCategory } from "@campreserv/shared";
 
 interface ProductListProps {
@@ -66,7 +67,10 @@ export function ProductList({ campgroundId }: ProductListProps) {
         <div className="space-y-4">
             <div className="flex justify-between items-center">
                 <h3 className="text-lg font-medium text-slate-900">Products</h3>
-                <Button onClick={handleCreate}>Add Product</Button>
+                <div className="flex items-center gap-3">
+                    <ProductImportExport campgroundId={campgroundId} />
+                    <Button onClick={handleCreate}>Add Product</Button>
+                </div>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
