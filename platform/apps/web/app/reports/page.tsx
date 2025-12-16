@@ -4455,6 +4455,11 @@ function ReportsPageInner() {
 
 
 
+                {/* DEBUG: Show current state values */}
+                <div className="bg-red-100 border border-red-300 text-red-800 px-3 py-2 rounded-md text-sm mb-4">
+                  <strong>Page Debug:</strong> activeTab="{activeTab}" | activeSubTab="{activeSubTab}" | campgroundId="{campgroundId || 'NULL'}"
+                </div>
+
                 {/* DYNAMIC REPORT RENDERER */}
                 {activeTab !== 'overview' && campgroundId && (
                   <ReportRenderer
