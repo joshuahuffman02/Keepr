@@ -12,6 +12,7 @@ import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { trackEvent } from "@/lib/analytics";
+import { AiChatWidget } from "@/components/ai/AiChatWidget";
 
 type PublicCampgroundDetail = Awaited<ReturnType<typeof apiClient.getPublicCampground>>;
 
@@ -44,8 +45,8 @@ export function CampgroundV2Client({ slug, initialData }: { slug: string; initia
 
   const events = campground?.events ?? [];
   const promotions = campground?.promotions ?? [];
-    const reviews = (campground as { reviews?: unknown[] })?.reviews ?? [];
-    const faq = (campground as { faqs?: unknown[] })?.faqs ?? [];
+  const reviews = (campground as { reviews?: unknown[] })?.reviews ?? [];
+  const faq = (campground as { faqs?: unknown[] })?.faqs ?? [];
   const siteClasses = campground?.siteClasses ?? [];
   const photos = campground?.photos ?? [];
   const hero = campground?.heroImageUrl || photos[0];
@@ -105,8 +106,8 @@ export function CampgroundV2Client({ slug, initialData }: { slug: string; initia
                       <SelectValue placeholder="Guests" />
                     </SelectTrigger>
                     <SelectContent>
-                      {["1","2","3","4","5","6","7","8"].map((g)=>(
-                        <SelectItem key={g} value={g}>{g} guest{g==="1"?"":"s"}</SelectItem>
+                      {["1", "2", "3", "4", "5", "6", "7", "8"].map((g) => (
+                        <SelectItem key={g} value={g}>{g} guest{g === "1" ? "" : "s"}</SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
@@ -247,7 +248,7 @@ export function CampgroundV2Client({ slug, initialData }: { slug: string; initia
           <section className="space-y-4">
             <div className="flex items-center justify-between">
               <h2 className="text-xl font-semibold text-slate-900">Events & offers</h2>
-              <Button variant="ghost" size="sm" onClick={() => window.location.href="#availability"}>
+              <Button variant="ghost" size="sm" onClick={() => window.location.href = "#availability"}>
                 Book from events <ArrowRight className="h-4 w-4 ml-1" />
               </Button>
             </div>
@@ -418,6 +419,9 @@ export function CampgroundV2Client({ slug, initialData }: { slug: string; initia
           </section>
         )}
       </main>
+
+      {/* AI Chat Widget */}
+      {campground?.id && <AiChatWidget campgroundId={campground.id} campgroundName={campground.name} />}
     </div>
   );
 }
