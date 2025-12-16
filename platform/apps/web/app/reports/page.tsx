@@ -5548,7 +5548,7 @@ function ReportsPageInner() {
 
                 {/* GUESTS TAB */}
                 {
-                  activeTab === 'guests' && guestStats && (
+                  activeTab === 'guests' && activeSubTab === 'legacy-overview' && guestStats && (
                     <div className="card p-4 space-y-3">
                       <div>
                         <div className="text-sm font-semibold text-slate-900">Guest Analytics</div>
@@ -5574,7 +5574,7 @@ function ReportsPageInner() {
 
                 {/* GUESTS TAB - Party Size Distribution */}
                 {
-                  activeTab === 'guests' && partySizeStats && (
+                  activeTab === 'guests' && activeSubTab === 'legacy-overview' && partySizeStats && (
                     <div className="card p-4 space-y-3">
                       <div>
                         <div className="text-sm font-semibold text-slate-900">Party Size Distribution</div>
@@ -5606,7 +5606,7 @@ function ReportsPageInner() {
 
                 {/* GUESTS TAB - Top Guests by Revenue */}
                 {
-                  activeTab === 'guests' && topGuestsStats && topGuestsStats.length > 0 && (
+                  activeTab === 'guests' && activeSubTab === 'legacy-overview' && topGuestsStats && topGuestsStats.length > 0 && (
                     <div className="card p-4 space-y-3">
                       <div>
                         <div className="text-sm font-semibold text-slate-900">Top 10 Guests by Revenue</div>
@@ -5635,7 +5635,7 @@ function ReportsPageInner() {
 
                 {/* GUESTS TAB - Guest Loyalty & Repeat Visitors */}
                 {
-                  activeTab === 'guests' && guestLoyaltyReport && (
+                  activeTab === 'guests' && activeSubTab === 'legacy-overview' && guestLoyaltyReport && (
                     <div className="card p-4 space-y-3">
                       <div>
                         <div className="text-sm font-semibold text-slate-900">Guest Loyalty & Repeat Visitors</div>
@@ -5700,7 +5700,7 @@ function ReportsPageInner() {
 
                 {/* GUESTS TAB - Guest Segmentation (New vs Returning) */}
                 {
-                  activeTab === 'guests' && guestSegmentationReport && (
+                  activeTab === 'guests' && activeSubTab === 'legacy-overview' && guestSegmentationReport && (
                     <div className="card p-4 space-y-3">
                       <div>
                         <div className="text-sm font-semibold text-slate-900">Guest Segmentation Analysis</div>
@@ -6300,7 +6300,7 @@ function ReportsPageInner() {
 
                 {/* GUESTS TAB - Group Booking Analysis */}
                 {
-                  activeTab === 'guests' && groupBookingReport && (
+                  activeTab === 'guests' && activeSubTab === 'legacy-overview' && groupBookingReport && (
                     <div className="card p-4 space-y-3">
                       <div>
                         <div className="text-sm font-semibold text-slate-900">Group Booking Analysis</div>
