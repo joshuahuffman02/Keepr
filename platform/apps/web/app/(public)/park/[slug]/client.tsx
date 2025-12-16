@@ -665,416 +665,418 @@ export function CampgroundDetailClient({
             : Object.keys(campground.amenitySummary || {});
 
     return (
-        <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white">
-            {/* Hero Section */}
-            <PhotoGallery photos={campground.photos || []} heroImage={campground.heroImageUrl} campgroundId={campground.id} />
+        <>
+            <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white">
+                {/* Hero Section */}
+                <PhotoGallery photos={campground.photos || []} heroImage={campground.heroImageUrl} campgroundId={campground.id} />
 
-            {/* Main Content */}
-            <div className="max-w-7xl mx-auto px-4 pb-12">
-                {/* Availability Filter Overlay */}
-                {!viewOnly && <AvailabilityFilter slug={slug} />}
+                {/* Main Content */}
+                <div className="max-w-7xl mx-auto px-4 pb-12">
+                    {/* Availability Filter Overlay */}
+                    {!viewOnly && <AvailabilityFilter slug={slug} />}
 
-                {/* Header */}
-                <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-6 mt-12 mb-10">
-                    <div>
-                        {campground.tagline && (
-                            <p className="text-emerald-600 font-medium mb-2">{campground.tagline}</p>
-                        )}
-                        <h1 className="text-4xl md:text-5xl font-bold text-slate-900">{campground.name}</h1>
-                        <p className="text-xl text-slate-600 mt-2">
-                            {[campground.city, campground.state, campground.country].filter(Boolean).join(", ")}
-                        </p>
-                        <div className="flex flex-wrap items-center gap-3 mt-3">
-                            <ReviewBadge score={campground.reviewScore as any} count={campground.reviewCount as any} />
-                            {externalHref && (
-                                <a
-                                    href={externalHref}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="text-emerald-600 hover:underline inline-flex items-center gap-1"
-                                >
-                                    <span>Visit Website</span> <span aria-hidden>↗</span>
-                                </a>
-                            )}
-                        </div>
-                    </div>
-                    <div className="flex flex-col items-end gap-3">
-                        {viewOnly ? (
-                            externalHref ? (
-                                <a
-                                    href={externalHref}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="bg-slate-900 text-white px-8 py-4 rounded-xl font-semibold text-lg hover:bg-slate-800 transition-colors shadow-lg shadow-slate-200"
-                                >
-                                    View on Website
-                                </a>
-                            ) : (
-                                <span className="px-4 py-3 rounded-xl bg-slate-100 text-slate-600 text-sm font-semibold border border-slate-200">
-                                    View-only listing
-                                </span>
-                            )
-                        ) : (
-                            <Link
-                                href={`/park/${slug}#availability`}
-                                className="bg-emerald-600 text-white px-8 py-4 rounded-xl font-semibold text-lg hover:bg-emerald-700 transition-colors shadow-lg shadow-emerald-200"
-                            >
-                                Book Now
-                            </Link>
-                        )}
-                        {campground.phone && (
-                            <a href={`tel:${campground.phone}`} className="text-slate-600 hover:text-emerald-600 inline-flex items-center gap-1">
-                                <Phone className="h-4 w-4" /> {campground.phone}
-                            </a>
-                        )}
-                        {campground.email && (
-                            <a href={`mailto:${campground.email}`} className="text-slate-600 hover:text-emerald-600 inline-flex items-center gap-1">
-                                <Mail className="h-4 w-4" /> {campground.email}
-                            </a>
-                        )}
-                    </div>
-                </div>
-
-                {viewOnly && (
-                    <div className="mb-8 flex items-start gap-3 p-4 bg-amber-50 border border-amber-200 rounded-xl">
-                        <Link2 className="h-5 w-5 text-amber-600 flex-shrink-0" aria-hidden />
+                    {/* Header */}
+                    <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-6 mt-12 mb-10">
                         <div>
-                            <p className="font-semibold text-amber-900">Discovery listing — booking handled off-platform</p>
-                            <p className="text-sm text-amber-800">
-                                Booking is disabled here. {externalHref ? "Use the website link to reserve directly." : "Please contact the campground to book."}
+                            {campground.tagline && (
+                                <p className="text-emerald-600 font-medium mb-2">{campground.tagline}</p>
+                            )}
+                            <h1 className="text-4xl md:text-5xl font-bold text-slate-900">{campground.name}</h1>
+                            <p className="text-xl text-slate-600 mt-2">
+                                {[campground.city, campground.state, campground.country].filter(Boolean).join(", ")}
                             </p>
-                        </div>
-                    </div>
-                )}
-
-                {/* Description */}
-                {campground.description && (
-                    <section className="mb-12">
-                        <h2 className="text-2xl font-bold text-slate-900 mb-4">About This Campground</h2>
-                        <p className="text-slate-700 text-lg leading-relaxed max-w-4xl">{campground.description}</p>
-                    </section>
-                )}
-
-                {/* Operations Info */}
-                <section className="mb-12 bg-slate-50 rounded-2xl p-6">
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
-                        {campground.checkInTime && (
-                            <div>
-                                <div className="flex justify-center mb-1"><Clock className="h-6 w-6 text-slate-400" /></div>
-                                <div className="text-sm text-slate-500">Check-in</div>
-                                <div className="font-semibold text-slate-800">{formatTime(campground.checkInTime)}</div>
-                            </div>
-                        )}
-                        {campground.checkOutTime && (
-                            <div>
-                                <div className="flex justify-center mb-1"><Clock className="h-6 w-6 text-slate-400" /></div>
-                                <div className="text-sm text-slate-500">Check-out</div>
-                                <div className="font-semibold text-slate-800">{formatTime(campground.checkOutTime)}</div>
-                            </div>
-                        )}
-                        {campground.seasonStart && (
-                            <div>
-                                <div className="flex justify-center mb-1"><Leaf className="h-6 w-6 text-green-500" /></div>
-                                <div className="text-sm text-slate-500">Season Opens</div>
-                                <div className="font-semibold text-slate-800">
-                                    {new Date(campground.seasonStart).toLocaleDateString("en-US", {
-                                        month: "short",
-                                        day: "numeric",
-                                    })}
-                                </div>
-                            </div>
-                        )}
-                        {campground.seasonEnd && (
-                            <div>
-                                <div className="flex justify-center mb-1"><TreeDeciduous className="h-6 w-6 text-amber-500" /></div>
-                                <div className="text-sm text-slate-500">Season Ends</div>
-                                <div className="font-semibold text-slate-800">
-                                    {new Date(campground.seasonEnd).toLocaleDateString("en-US", {
-                                        month: "short",
-                                        day: "numeric",
-                                    })}
-                                </div>
-                            </div>
-                        )}
-                    </div>
-                </section>
-
-                {/* Reviews */}
-                <section className="mb-12">
-                    <div className="flex items-center justify-between mb-3">
-                        <div>
-                            <h2 className="text-2xl font-bold text-slate-900">Guest Reviews</h2>
-                            <p className="text-sm text-slate-600">What recent guests are saying</p>
-                        </div>
-                        {campground.reviewScore ? (
-                            <div className="flex items-center gap-2 bg-amber-50 text-amber-800 px-3 py-2 rounded-full border border-amber-200 text-sm font-semibold">
-                                <span className="flex items-center gap-1"><Star className="h-4 w-4 text-amber-500" /> {Number(campground.reviewScore).toFixed(1)}</span>
-                                <span className="text-amber-700 text-xs">{campground.reviewCount ?? 0} reviews</span>
-                            </div>
-                        ) : null}
-                    </div>
-                    <div className="flex flex-col sm:flex-row gap-3 mb-4">
-                        <div className="flex items-center gap-2">
-                            <label className="text-sm text-slate-600">Rating</label>
-                            <select
-                                value={ratingFilter}
-                                onChange={(e) => setRatingFilter(e.target.value as any)}
-                                className="border border-slate-200 rounded-lg px-3 py-2 text-sm"
-                            >
-                                <option value="all">All</option>
-                                <option value="5">5 stars</option>
-                                <option value="4">4 stars</option>
-                                <option value="3">3 stars</option>
-                                <option value="2">2 stars</option>
-                                <option value="1">1 star</option>
-                            </select>
-                        </div>
-                        <div className="flex items-center gap-2">
-                            <label className="text-sm text-slate-600">Sort</label>
-                            <select
-                                value={sortOption}
-                                onChange={(e) => setSortOption(e.target.value as any)}
-                                className="border border-slate-200 rounded-lg px-3 py-2 text-sm"
-                            >
-                                <option value="relevant">Most relevant</option>
-                                <option value="newest">Newest</option>
-                                <option value="highest">Highest rating</option>
-                                <option value="lowest">Lowest rating</option>
-                                <option value="photos">Photos first</option>
-                            </select>
-                        </div>
-                        <div className="flex items-center gap-2">
-                            <label className="text-sm text-slate-600">Search</label>
-                            <input
-                                value={searchTerm}
-                                onChange={(e) => setSearchTerm(e.target.value)}
-                                placeholder="Keywords..."
-                                className="border border-slate-200 rounded-lg px-3 py-2 text-sm w-40"
-                            />
-                        </div>
-                        <label className="flex items-center gap-2 text-sm text-slate-600">
-                            <input
-                                type="checkbox"
-                                className="h-4 w-4 rounded border-slate-300"
-                                checked={photosOnly}
-                                onChange={(e) => setPhotosOnly(e.target.checked)}
-                            />
-                            Photos only
-                        </label>
-                    </div>
-                    {reviewsQuery.data && reviewsQuery.data.some((r) => (r.tags || []).length > 0) && (
-                        <div className="flex flex-wrap gap-2 mb-4">
-                            {Array.from(
-                                new Set(
-                                    (reviewsQuery.data ?? [])
-                                        .flatMap((r) => r.tags ?? [])
-                                        .map((t) => t.trim())
-                                        .filter(Boolean)
-                                )
-                            )
-                                .slice(0, 12)
-                                .map((tag) => (
-                                    <button
-                                        key={tag}
-                                        onClick={() => setTagFilter(tagFilter === tag ? null : tag)}
-                                        className={`px-3 py-1 rounded-full text-sm border transition-colors ${tagFilter === tag
-                                            ? "border-emerald-300 bg-emerald-50 text-emerald-700"
-                                            : "border-slate-200 bg-white text-slate-700 hover:border-emerald-200"
-                                            }`}
+                            <div className="flex flex-wrap items-center gap-3 mt-3">
+                                <ReviewBadge score={campground.reviewScore as any} count={campground.reviewCount as any} />
+                                {externalHref && (
+                                    <a
+                                        href={externalHref}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="text-emerald-600 hover:underline inline-flex items-center gap-1"
                                     >
-                                        {tag}
-                                    </button>
-                                ))}
-                            {tagFilter && (
-                                <button
-                                    onClick={() => setTagFilter(null)}
-                                    className="text-xs text-emerald-600 hover:underline"
+                                        <span>Visit Website</span> <span aria-hidden>↗</span>
+                                    </a>
+                                )}
+                            </div>
+                        </div>
+                        <div className="flex flex-col items-end gap-3">
+                            {viewOnly ? (
+                                externalHref ? (
+                                    <a
+                                        href={externalHref}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="bg-slate-900 text-white px-8 py-4 rounded-xl font-semibold text-lg hover:bg-slate-800 transition-colors shadow-lg shadow-slate-200"
+                                    >
+                                        View on Website
+                                    </a>
+                                ) : (
+                                    <span className="px-4 py-3 rounded-xl bg-slate-100 text-slate-600 text-sm font-semibold border border-slate-200">
+                                        View-only listing
+                                    </span>
+                                )
+                            ) : (
+                                <Link
+                                    href={`/park/${slug}#availability`}
+                                    className="bg-emerald-600 text-white px-8 py-4 rounded-xl font-semibold text-lg hover:bg-emerald-700 transition-colors shadow-lg shadow-emerald-200"
                                 >
-                                    Clear tags
-                                </button>
+                                    Book Now
+                                </Link>
+                            )}
+                            {campground.phone && (
+                                <a href={`tel:${campground.phone}`} className="text-slate-600 hover:text-emerald-600 inline-flex items-center gap-1">
+                                    <Phone className="h-4 w-4" /> {campground.phone}
+                                </a>
+                            )}
+                            {campground.email && (
+                                <a href={`mailto:${campground.email}`} className="text-slate-600 hover:text-emerald-600 inline-flex items-center gap-1">
+                                    <Mail className="h-4 w-4" /> {campground.email}
+                                </a>
                             )}
                         </div>
-                    )}
-                    {reviewsQuery.data && reviewsQuery.data.length > 0 && (
-                        <div className="mb-4 grid grid-cols-1 sm:grid-cols-5 gap-2">
-                            {[5, 4, 3, 2, 1].map((star) => {
-                                const count = ratingBuckets.buckets[star] || 0;
-                                const pct = ratingBuckets.total ? Math.round((count / ratingBuckets.total) * 100) : 0;
-                                return (
-                                    <div key={star} className="space-y-1">
-                                        <div className="flex items-center justify-between text-xs text-slate-600">
-                                            <span>{star}★</span>
-                                            <span>{pct}%</span>
-                                        </div>
-                                        <div className="h-2 w-full bg-slate-100 rounded">
-                                            <div className="h-2 bg-emerald-500 rounded" style={{ width: `${pct}%` }} />
-                                        </div>
-                                    </div>
-                                );
-                            })}
+                    </div>
+
+                    {viewOnly && (
+                        <div className="mb-8 flex items-start gap-3 p-4 bg-amber-50 border border-amber-200 rounded-xl">
+                            <Link2 className="h-5 w-5 text-amber-600 flex-shrink-0" aria-hidden />
+                            <div>
+                                <p className="font-semibold text-amber-900">Discovery listing — booking handled off-platform</p>
+                                <p className="text-sm text-amber-800">
+                                    Booking is disabled here. {externalHref ? "Use the website link to reserve directly." : "Please contact the campground to book."}
+                                </p>
+                            </div>
                         </div>
                     )}
-                    {reviewsQuery.isLoading && <div className="text-sm text-slate-500">Loading reviews…</div>}
-                    {filteredReviews && filteredReviews.length === 0 && (
-                        <div className="text-sm text-slate-500">No reviews yet.</div>
+
+                    {/* Description */}
+                    {campground.description && (
+                        <section className="mb-12">
+                            <h2 className="text-2xl font-bold text-slate-900 mb-4">About This Campground</h2>
+                            <p className="text-slate-700 text-lg leading-relaxed max-w-4xl">{campground.description}</p>
+                        </section>
                     )}
-                    {filteredReviews && filteredReviews.length > 0 && (
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            {filteredReviews.slice(0, visibleCount).map((review) => (
-                                <div key={review.id} className="rounded-xl border border-slate-200 bg-white p-4 space-y-2 shadow-sm">
-                                    <div className="flex items-center gap-2">
-                                        <span className="inline-flex items-center justify-center h-8 w-8 rounded-full bg-amber-100 text-amber-800 font-semibold">
-                                            {review.rating.toFixed(1)}
-                                        </span>
-                                        {review.photos && review.photos.length > 0 && (
-                                            <span className="text-xs text-slate-500 bg-slate-100 px-2 py-1 rounded-full">
-                                                {review.photos.length} photo{review.photos.length > 1 ? "s" : ""}
-                                            </span>
-                                        )}
-                                        <div className="text-sm text-slate-500">
-                                            {review.createdAt ? new Date(review.createdAt).toLocaleDateString() : ""}
-                                        </div>
-                                    </div>
-                                    {review.title && <div className="text-base font-semibold text-slate-900">{review.title}</div>}
-                                    {review.body && <p className="text-sm text-slate-700 leading-relaxed">{review.body}</p>}
-                                    {review.replies && review.replies.length > 0 && (
-                                        <div className="mt-2 border-t border-slate-100 pt-2 space-y-1">
-                                            {review.replies.map((reply) => (
-                                                <div key={reply.id} className="text-xs text-slate-600">
-                                                    <span className="font-semibold text-slate-800">{reply.authorType === "staff" ? "Host" : "Guest"}:</span> {reply.body}
-                                                </div>
-                                            ))}
-                                        </div>
-                                    )}
+
+                    {/* Operations Info */}
+                    <section className="mb-12 bg-slate-50 rounded-2xl p-6">
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
+                            {campground.checkInTime && (
+                                <div>
+                                    <div className="flex justify-center mb-1"><Clock className="h-6 w-6 text-slate-400" /></div>
+                                    <div className="text-sm text-slate-500">Check-in</div>
+                                    <div className="font-semibold text-slate-800">{formatTime(campground.checkInTime)}</div>
                                 </div>
-                            ))}
-                            {visibleCount < filteredReviews.length && (
-                                <button
-                                    onClick={() => setVisibleCount((c) => c + 6)}
-                                    className="col-span-full text-sm font-semibold text-emerald-600 hover:underline justify-self-center"
-                                >
-                                    Show more reviews
-                                </button>
+                            )}
+                            {campground.checkOutTime && (
+                                <div>
+                                    <div className="flex justify-center mb-1"><Clock className="h-6 w-6 text-slate-400" /></div>
+                                    <div className="text-sm text-slate-500">Check-out</div>
+                                    <div className="font-semibold text-slate-800">{formatTime(campground.checkOutTime)}</div>
+                                </div>
+                            )}
+                            {campground.seasonStart && (
+                                <div>
+                                    <div className="flex justify-center mb-1"><Leaf className="h-6 w-6 text-green-500" /></div>
+                                    <div className="text-sm text-slate-500">Season Opens</div>
+                                    <div className="font-semibold text-slate-800">
+                                        {new Date(campground.seasonStart).toLocaleDateString("en-US", {
+                                            month: "short",
+                                            day: "numeric",
+                                        })}
+                                    </div>
+                                </div>
+                            )}
+                            {campground.seasonEnd && (
+                                <div>
+                                    <div className="flex justify-center mb-1"><TreeDeciduous className="h-6 w-6 text-amber-500" /></div>
+                                    <div className="text-sm text-slate-500">Season Ends</div>
+                                    <div className="font-semibold text-slate-800">
+                                        {new Date(campground.seasonEnd).toLocaleDateString("en-US", {
+                                            month: "short",
+                                            day: "numeric",
+                                        })}
+                                    </div>
+                                </div>
                             )}
                         </div>
-                    )}
-                    {reviewsQuery.error && <div className="text-sm text-rose-600">Failed to load reviews.</div>}
-                </section>
-
-                {/* Amenities */}
-                {amenityList && amenityList.length > 0 && (
-                    <section className="mb-12">
-                        <h2 className="text-2xl font-bold text-slate-900 mb-6">Amenities</h2>
-                        <AmenitiesGrid amenities={amenityList} />
                     </section>
-                )}
 
-                {/* Site Types */}
-                {campground.siteClasses && campground.siteClasses.length > 0 && (
+                    {/* Reviews */}
                     <section className="mb-12">
-                        <h2 className="text-2xl font-bold text-slate-900 mb-6">Accommodations</h2>
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                            {campground.siteClasses.map((sc) => (
-                                <SiteClassCard
-                                    key={sc.id}
-                                    siteClass={sc}
-                                    slug={slug}
-                                    viewOnly={campground.isExternal || campground.isBookable === false}
-                                    externalUrl={campground.externalUrl || campground.website}
+                        <div className="flex items-center justify-between mb-3">
+                            <div>
+                                <h2 className="text-2xl font-bold text-slate-900">Guest Reviews</h2>
+                                <p className="text-sm text-slate-600">What recent guests are saying</p>
+                            </div>
+                            {campground.reviewScore ? (
+                                <div className="flex items-center gap-2 bg-amber-50 text-amber-800 px-3 py-2 rounded-full border border-amber-200 text-sm font-semibold">
+                                    <span className="flex items-center gap-1"><Star className="h-4 w-4 text-amber-500" /> {Number(campground.reviewScore).toFixed(1)}</span>
+                                    <span className="text-amber-700 text-xs">{campground.reviewCount ?? 0} reviews</span>
+                                </div>
+                            ) : null}
+                        </div>
+                        <div className="flex flex-col sm:flex-row gap-3 mb-4">
+                            <div className="flex items-center gap-2">
+                                <label className="text-sm text-slate-600">Rating</label>
+                                <select
+                                    value={ratingFilter}
+                                    onChange={(e) => setRatingFilter(e.target.value as any)}
+                                    className="border border-slate-200 rounded-lg px-3 py-2 text-sm"
+                                >
+                                    <option value="all">All</option>
+                                    <option value="5">5 stars</option>
+                                    <option value="4">4 stars</option>
+                                    <option value="3">3 stars</option>
+                                    <option value="2">2 stars</option>
+                                    <option value="1">1 star</option>
+                                </select>
+                            </div>
+                            <div className="flex items-center gap-2">
+                                <label className="text-sm text-slate-600">Sort</label>
+                                <select
+                                    value={sortOption}
+                                    onChange={(e) => setSortOption(e.target.value as any)}
+                                    className="border border-slate-200 rounded-lg px-3 py-2 text-sm"
+                                >
+                                    <option value="relevant">Most relevant</option>
+                                    <option value="newest">Newest</option>
+                                    <option value="highest">Highest rating</option>
+                                    <option value="lowest">Lowest rating</option>
+                                    <option value="photos">Photos first</option>
+                                </select>
+                            </div>
+                            <div className="flex items-center gap-2">
+                                <label className="text-sm text-slate-600">Search</label>
+                                <input
+                                    value={searchTerm}
+                                    onChange={(e) => setSearchTerm(e.target.value)}
+                                    placeholder="Keywords..."
+                                    className="border border-slate-200 rounded-lg px-3 py-2 text-sm w-40"
                                 />
-                            ))}
+                            </div>
+                            <label className="flex items-center gap-2 text-sm text-slate-600">
+                                <input
+                                    type="checkbox"
+                                    className="h-4 w-4 rounded border-slate-300"
+                                    checked={photosOnly}
+                                    onChange={(e) => setPhotosOnly(e.target.checked)}
+                                />
+                                Photos only
+                            </label>
                         </div>
-                    </section>
-                )}
-
-                {/* Upcoming Events */}
-                {campground.events && campground.events.length > 0 && (
-                    <section className="mb-12">
-                        <h2 className="text-2xl font-bold text-slate-900 mb-6">Upcoming Events & Activities</h2>
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                            {campground.events.map((event) => (
-                                <EventCard key={event.id} event={event} slug={slug} />
-                            ))}
-                        </div>
-                    </section>
-                )}
-
-
-                {/* Promotions / Deals */}
-                {campground.promotions && campground.promotions.length > 0 && (
-                    <section className="mb-12">
-                        <div className="flex items-center gap-3 mb-6">
-                            <h2 className="text-2xl font-bold text-slate-900">Deals & Offers</h2>
-                            <span className="bg-rose-100 text-rose-700 text-xs font-bold px-2 py-1 rounded-full uppercase tracking-wider animate-pulse">
-                                Limited Time
-                            </span>
-                        </div>
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                            {campground.promotions.map((promo) => (
-                                <div key={promo.id} className="bg-gradient-to-br from-rose-50 to-orange-50 rounded-xl border-2 border-rose-100 p-5 relative overflow-hidden group hover:shadow-lg transition-all hover:scale-[1.02]">
-                                    <div className="absolute top-0 right-0 bg-rose-500 text-white text-xs font-bold px-3 py-1 rounded-bl-lg">
-                                        SAVE {promo.type === 'percentage' ? `${promo.value}%` : formatPrice(promo.value)}
-                                    </div>
-                                    <div className="mb-4">
-                                        <div className="text-4xl mb-2">🏷️</div>
-                                        <h3 className="font-bold text-slate-900 text-lg">{promo.code}</h3>
-                                        <p className="text-slate-600 text-sm mt-1">{promo.description || "Special offer for our guests!"}</p>
-                                    </div>
-
-                                    <div className="space-y-2 mb-4">
-                                        {promo.validTo && (
-                                            <div className="text-xs text-rose-700 font-medium flex items-center gap-1">
-                                                <span>⏳</span>
-                                                <span>Expires {formatDate(promo.validTo)}</span>
+                        {reviewsQuery.data && reviewsQuery.data.some((r) => (r.tags || []).length > 0) && (
+                            <div className="flex flex-wrap gap-2 mb-4">
+                                {Array.from(
+                                    new Set(
+                                        (reviewsQuery.data ?? [])
+                                            .flatMap((r) => r.tags ?? [])
+                                            .map((t) => t.trim())
+                                            .filter(Boolean)
+                                    )
+                                )
+                                    .slice(0, 12)
+                                    .map((tag) => (
+                                        <button
+                                            key={tag}
+                                            onClick={() => setTagFilter(tagFilter === tag ? null : tag)}
+                                            className={`px-3 py-1 rounded-full text-sm border transition-colors ${tagFilter === tag
+                                                ? "border-emerald-300 bg-emerald-50 text-emerald-700"
+                                                : "border-slate-200 bg-white text-slate-700 hover:border-emerald-200"
+                                                }`}
+                                        >
+                                            {tag}
+                                        </button>
+                                    ))}
+                                {tagFilter && (
+                                    <button
+                                        onClick={() => setTagFilter(null)}
+                                        className="text-xs text-emerald-600 hover:underline"
+                                    >
+                                        Clear tags
+                                    </button>
+                                )}
+                            </div>
+                        )}
+                        {reviewsQuery.data && reviewsQuery.data.length > 0 && (
+                            <div className="mb-4 grid grid-cols-1 sm:grid-cols-5 gap-2">
+                                {[5, 4, 3, 2, 1].map((star) => {
+                                    const count = ratingBuckets.buckets[star] || 0;
+                                    const pct = ratingBuckets.total ? Math.round((count / ratingBuckets.total) * 100) : 0;
+                                    return (
+                                        <div key={star} className="space-y-1">
+                                            <div className="flex items-center justify-between text-xs text-slate-600">
+                                                <span>{star}★</span>
+                                                <span>{pct}%</span>
+                                            </div>
+                                            <div className="h-2 w-full bg-slate-100 rounded">
+                                                <div className="h-2 bg-emerald-500 rounded" style={{ width: `${pct}%` }} />
+                                            </div>
+                                        </div>
+                                    );
+                                })}
+                            </div>
+                        )}
+                        {reviewsQuery.isLoading && <div className="text-sm text-slate-500">Loading reviews…</div>}
+                        {filteredReviews && filteredReviews.length === 0 && (
+                            <div className="text-sm text-slate-500">No reviews yet.</div>
+                        )}
+                        {filteredReviews && filteredReviews.length > 0 && (
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                {filteredReviews.slice(0, visibleCount).map((review) => (
+                                    <div key={review.id} className="rounded-xl border border-slate-200 bg-white p-4 space-y-2 shadow-sm">
+                                        <div className="flex items-center gap-2">
+                                            <span className="inline-flex items-center justify-center h-8 w-8 rounded-full bg-amber-100 text-amber-800 font-semibold">
+                                                {review.rating.toFixed(1)}
+                                            </span>
+                                            {review.photos && review.photos.length > 0 && (
+                                                <span className="text-xs text-slate-500 bg-slate-100 px-2 py-1 rounded-full">
+                                                    {review.photos.length} photo{review.photos.length > 1 ? "s" : ""}
+                                                </span>
+                                            )}
+                                            <div className="text-sm text-slate-500">
+                                                {review.createdAt ? new Date(review.createdAt).toLocaleDateString() : ""}
+                                            </div>
+                                        </div>
+                                        {review.title && <div className="text-base font-semibold text-slate-900">{review.title}</div>}
+                                        {review.body && <p className="text-sm text-slate-700 leading-relaxed">{review.body}</p>}
+                                        {review.replies && review.replies.length > 0 && (
+                                            <div className="mt-2 border-t border-slate-100 pt-2 space-y-1">
+                                                {review.replies.map((reply) => (
+                                                    <div key={reply.id} className="text-xs text-slate-600">
+                                                        <span className="font-semibold text-slate-800">{reply.authorType === "staff" ? "Host" : "Guest"}:</span> {reply.body}
+                                                    </div>
+                                                ))}
                                             </div>
                                         )}
                                     </div>
-
-                                    <Link
-                                        href={`/park/${slug}/book?promoCode=${promo.code}`}
-                                        onClick={() => trackEvent("deal_applied", { campgroundId: campground.id, promotionId: promo.id, metadata: { code: promo.code }, page: `/park/${slug}` })}
-                                        className="block w-full text-center bg-white border-2 border-rose-200 text-rose-600 font-bold py-2 rounded-lg hover:bg-rose-50 transition-colors"
+                                ))}
+                                {visibleCount < filteredReviews.length && (
+                                    <button
+                                        onClick={() => setVisibleCount((c) => c + 6)}
+                                        className="col-span-full text-sm font-semibold text-emerald-600 hover:underline justify-self-center"
                                     >
-                                        Claim Deal
-                                    </Link>
-                                </div>
-                            ))}
-                        </div>
+                                        Show more reviews
+                                    </button>
+                                )}
+                            </div>
+                        )}
+                        {reviewsQuery.error && <div className="text-sm text-rose-600">Failed to load reviews.</div>}
                     </section>
-                )}
 
-                {/* Social Links */}
-                {(campground.facebookUrl || campground.instagramUrl) && (
-                    <section className="mb-12 text-center">
-                        <h2 className="text-xl font-bold text-slate-900 mb-4">Connect With Us</h2>
-                        <div className="flex justify-center gap-4">
-                            {campground.facebookUrl && (
-                                <a
-                                    href={campground.facebookUrl}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="bg-blue-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-blue-700 transition-colors"
-                                >
-                                    Facebook
-                                </a>
-                            )}
-                            {campground.instagramUrl && (
-                                <a
-                                    href={campground.instagramUrl}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="bg-gradient-to-r from-purple-500 to-pink-500 text-white px-6 py-3 rounded-lg font-medium hover:opacity-90 transition-opacity"
-                                >
-                                    Instagram
-                                </a>
-                            )}
-                        </div>
-                    </section>
-                )}
+                    {/* Amenities */}
+                    {amenityList && amenityList.length > 0 && (
+                        <section className="mb-12">
+                            <h2 className="text-2xl font-bold text-slate-900 mb-6">Amenities</h2>
+                            <AmenitiesGrid amenities={amenityList} />
+                        </section>
+                    )}
+
+                    {/* Site Types */}
+                    {campground.siteClasses && campground.siteClasses.length > 0 && (
+                        <section className="mb-12">
+                            <h2 className="text-2xl font-bold text-slate-900 mb-6">Accommodations</h2>
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                                {campground.siteClasses.map((sc) => (
+                                    <SiteClassCard
+                                        key={sc.id}
+                                        siteClass={sc}
+                                        slug={slug}
+                                        viewOnly={campground.isExternal || campground.isBookable === false}
+                                        externalUrl={campground.externalUrl || campground.website}
+                                    />
+                                ))}
+                            </div>
+                        </section>
+                    )}
+
+                    {/* Upcoming Events */}
+                    {campground.events && campground.events.length > 0 && (
+                        <section className="mb-12">
+                            <h2 className="text-2xl font-bold text-slate-900 mb-6">Upcoming Events & Activities</h2>
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                                {campground.events.map((event) => (
+                                    <EventCard key={event.id} event={event} slug={slug} />
+                                ))}
+                            </div>
+                        </section>
+                    )}
+
+
+                    {/* Promotions / Deals */}
+                    {campground.promotions && campground.promotions.length > 0 && (
+                        <section className="mb-12">
+                            <div className="flex items-center gap-3 mb-6">
+                                <h2 className="text-2xl font-bold text-slate-900">Deals & Offers</h2>
+                                <span className="bg-rose-100 text-rose-700 text-xs font-bold px-2 py-1 rounded-full uppercase tracking-wider animate-pulse">
+                                    Limited Time
+                                </span>
+                            </div>
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                                {campground.promotions.map((promo) => (
+                                    <div key={promo.id} className="bg-gradient-to-br from-rose-50 to-orange-50 rounded-xl border-2 border-rose-100 p-5 relative overflow-hidden group hover:shadow-lg transition-all hover:scale-[1.02]">
+                                        <div className="absolute top-0 right-0 bg-rose-500 text-white text-xs font-bold px-3 py-1 rounded-bl-lg">
+                                            SAVE {promo.type === 'percentage' ? `${promo.value}%` : formatPrice(promo.value)}
+                                        </div>
+                                        <div className="mb-4">
+                                            <div className="text-4xl mb-2">🏷️</div>
+                                            <h3 className="font-bold text-slate-900 text-lg">{promo.code}</h3>
+                                            <p className="text-slate-600 text-sm mt-1">{promo.description || "Special offer for our guests!"}</p>
+                                        </div>
+
+                                        <div className="space-y-2 mb-4">
+                                            {promo.validTo && (
+                                                <div className="text-xs text-rose-700 font-medium flex items-center gap-1">
+                                                    <span>⏳</span>
+                                                    <span>Expires {formatDate(promo.validTo)}</span>
+                                                </div>
+                                            )}
+                                        </div>
+
+                                        <Link
+                                            href={`/park/${slug}/book?promoCode=${promo.code}`}
+                                            onClick={() => trackEvent("deal_applied", { campgroundId: campground.id, promotionId: promo.id, metadata: { code: promo.code }, page: `/park/${slug}` })}
+                                            className="block w-full text-center bg-white border-2 border-rose-200 text-rose-600 font-bold py-2 rounded-lg hover:bg-rose-50 transition-colors"
+                                        >
+                                            Claim Deal
+                                        </Link>
+                                    </div>
+                                ))}
+                            </div>
+                        </section>
+                    )}
+
+                    {/* Social Links */}
+                    {(campground.facebookUrl || campground.instagramUrl) && (
+                        <section className="mb-12 text-center">
+                            <h2 className="text-xl font-bold text-slate-900 mb-4">Connect With Us</h2>
+                            <div className="flex justify-center gap-4">
+                                {campground.facebookUrl && (
+                                    <a
+                                        href={campground.facebookUrl}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="bg-blue-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-blue-700 transition-colors"
+                                    >
+                                        Facebook
+                                    </a>
+                                )}
+                                {campground.instagramUrl && (
+                                    <a
+                                        href={campground.instagramUrl}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="bg-gradient-to-r from-purple-500 to-pink-500 text-white px-6 py-3 rounded-lg font-medium hover:opacity-90 transition-opacity"
+                                    >
+                                        Instagram
+                                    </a>
+                                )}
+                            </div>
+                        </section>
+                    )}
+                </div>
             </div>
 
             {/* AI Chat Widget */}
             <AiChatWidget campgroundId={campground.id} campgroundName={campground.name} />
-        </div >
+        </>
     );
 }
