@@ -4192,10 +4192,7 @@ function ReportsPageInner() {
               </div>
             )}
           </div>
-
-          <div className="rounded-xl border border-slate-200 bg-white shadow-sm p-4">
-            {renderSubReportContent()}
-          </div>
+          {/* Legacy renderSubReportContent() removed - now using ReportRenderer component */}
         </div>
 
         {/* Export Confirmation Dialog */}
@@ -4346,10 +4343,6 @@ function ReportsPageInner() {
             )}
           </div>
 
-          {/* UNCONDITIONAL DEBUG - always visible */}
-          <div className="bg-purple-100 border-2 border-purple-500 text-purple-900 px-4 py-3 rounded-md text-base font-bold mb-4">
-            🔍 UNCONDITIONAL DEBUG: activeTab="{activeTab}" | activeSubTab="{activeSubTab || 'null'}" | campgroundId="{campgroundId || 'NULL'}"
-          </div>
 
           {!campgroundId && (
             <div className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
@@ -4446,10 +4439,6 @@ function ReportsPageInner() {
                 </div>
               )}
 
-              {/* DEBUG: Show current state values - ALWAYS visible when campground selected */}
-              <div className="bg-red-100 border border-red-300 text-red-800 px-3 py-2 rounded-md text-sm mb-4">
-                <strong>Page Debug:</strong> activeTab="{activeTab}" | activeSubTab="{activeSubTab}" | campgroundId="{campgroundId || 'NULL'}"
-              </div>
 
               <>
                 {/* OVERVIEW TAB */}
