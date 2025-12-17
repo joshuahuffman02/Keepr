@@ -1,9 +1,11 @@
-import { Injectable, BadRequestException } from '@nestjs/common';
+import { Injectable, BadRequestException, Logger } from '@nestjs/common';
 import { CheckInStatus, CheckOutStatus } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { SignaturesService } from '../signatures/signatures.service';
 import { AuditService } from '../audit/audit.service';
 import { AccessControlService } from '../access-control/access-control.service';
+import { StripeService } from '../payments/stripe.service';
+import { GatewayConfigService } from '../payments/gateway-config.service';
 
 export type CheckinResult = {
   status: 'completed' | 'failed';
@@ -20,11 +22,15 @@ export type CheckoutResult = {
 
 @Injectable()
 export class SelfCheckinService {
+  private readonly logger = new Logger(SelfCheckinService.name);
+
   constructor(
     private readonly prisma: PrismaService,
     private readonly signatures: SignaturesService,
     private readonly audit: AuditService,
-    private readonly accessControl: AccessControlService
+    private readonly accessControl: AccessControlService,
+    private readonly stripeService: StripeService,
+    private readonly gatewayConfig: GatewayConfigService
   ) { }
 
   private async attachWaiverArtifacts(reservationId: string, guestId: string, evidence: { request?: any; artifact?: any; digital?: any }) {
@@ -352,14 +358,19 @@ export class SelfCheckinService {
 
     // Check for pending balance
     if (reservation.balanceAmount > 0 && !options?.override) {
-      // Attempt to capture remaining balance
-      // TODO: Integrate with payments service
-      // For now, mark as failed if balance remains
-      await this.prisma.reservation.update({
-        where: { id: reservationId },
-        data: { checkOutStatus: 'failed' },
-      });
-      return { status: 'failed', reason: 'payment_capture_failed' };
+      // Attempt to capture remaining balance using saved payment method
+      const paymentResult = await this.attemptBalanceCollection(reservationId, reservation.balanceAmount);
+
+      if (!paymentResult.success) {
+        await this.prisma.reservation.update({
+          where: { id: reservationId },
+          data: { checkOutStatus: 'failed' },
+        });
+        return {
+          status: 'failed',
+          reason: paymentResult.reason || 'payment_capture_failed'
+        };
+      }
     }
 
     const now = new Date();
@@ -450,6 +461,108 @@ export class SelfCheckinService {
     }
 
     return reservation;
+  }
+
+  /**
+   * Attempt to collect the remaining balance for a reservation during checkout
+   */
+  private async attemptBalanceCollection(
+    reservationId: string,
+    balanceAmountCents: number
+  ): Promise<{ success: boolean; reason?: string }> {
+    try {
+      // Get reservation with campground info
+      const reservation = await this.prisma.reservation.findUnique({
+        where: { id: reservationId },
+        include: {
+          campground: {
+            select: {
+              id: true,
+              stripeAccountId: true,
+              applicationFeeFlatCents: true,
+              perBookingFeeCents: true,
+              billingPlan: true,
+              feeMode: true
+            }
+          }
+        }
+      });
+
+      if (!reservation) {
+        return { success: false, reason: 'reservation_not_found' };
+      }
+
+      const stripeAccountId = (reservation.campground as any)?.stripeAccountId;
+      if (!stripeAccountId) {
+        this.logger.warn(`No Stripe account for campground ${reservation.campgroundId}, cannot collect balance`);
+        return { success: false, reason: 'payment_not_configured' };
+      }
+
+      // Check if Stripe is configured
+      if (!this.stripeService.isConfigured()) {
+        this.logger.warn('Stripe not configured, cannot collect balance');
+        return { success: false, reason: 'payment_not_configured' };
+      }
+
+      // Check gateway config
+      const gatewayConfig = await this.gatewayConfig.getConfig(reservation.campgroundId);
+      if (!gatewayConfig || gatewayConfig.gateway !== 'stripe') {
+        this.logger.warn(`Gateway not configured for campground ${reservation.campgroundId}`);
+        return { success: false, reason: 'payment_not_configured' };
+      }
+
+      // Calculate application fee
+      const plan = (reservation.campground as any)?.billingPlan as string | undefined;
+      const planDefaultFee = plan === 'standard' ? 200 : plan === 'enterprise' ? 100 : 300;
+      const applicationFeeCents =
+        (reservation.campground as any)?.perBookingFeeCents ??
+        (reservation.campground as any)?.applicationFeeFlatCents ??
+        planDefaultFee;
+
+      // Create payment intent for the balance
+      const idempotencyKey = `checkout-balance-${reservationId}-${Date.now()}`;
+
+      const paymentIntent = await this.stripeService.createPaymentIntent(
+        balanceAmountCents,
+        'usd',
+        {
+          reservationId,
+          campgroundId: reservation.campgroundId,
+          source: 'self_checkout',
+          checkoutBalanceCollection: 'true'
+        },
+        stripeAccountId,
+        applicationFeeCents,
+        'automatic', // Auto-capture
+        ['card'], // Only card for checkout
+        idempotencyKey,
+        'automatic'
+      );
+
+      this.logger.log(`Created payment intent ${paymentIntent.id} for checkout balance collection`);
+
+      // For self-checkout, we need the guest to complete the payment
+      // Store the payment intent ID on the reservation for the frontend to handle
+      await this.prisma.reservation.update({
+        where: { id: reservationId },
+        data: {
+          checkoutPaymentIntentId: paymentIntent.id,
+          checkoutPaymentIntentSecret: paymentIntent.client_secret
+        } as any
+      });
+
+      // Return success with intent info - frontend will need to complete payment
+      return {
+        success: true,
+        reason: 'payment_required'
+      };
+    } catch (error: any) {
+      this.logger.error(`Failed to collect checkout balance for ${reservationId}: ${error.message}`, error.stack);
+      return {
+        success: false,
+        reason: error.message || 'payment_error'
+      };
+    }
   }
 }
 

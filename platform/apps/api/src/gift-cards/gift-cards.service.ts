@@ -1,5 +1,6 @@
 import { BadRequestException, Injectable, NotFoundException } from "@nestjs/common";
 import { PrismaService } from "../prisma/prisma.service";
+import { StoredValueDirection, StoredValueStatus } from "@prisma/client";
 
 type RedemptionChannel = "booking" | "pos";
 
@@ -8,33 +9,26 @@ export type GiftCardRecord = {
   balanceCents: number;
   currency?: string;
   kind?: "gift_card" | "store_credit";
+  accountId?: string;
 };
 
 @Injectable()
 export class GiftCardsService {
-  private readonly memory = new Map<string, GiftCardRecord>();
+  constructor(private readonly prisma: PrismaService) {}
 
-  constructor(private readonly prisma: PrismaService) {
-    // Seed a couple of stub cards so the endpoints work even without a database row.
-    this.seedInMemory([
-      { code: "CAMP-WELCOME-100", balanceCents: 10000, kind: "gift_card" },
-      { code: "STORE-RETURN-50", balanceCents: 5000, kind: "store_credit" }
-    ]);
+  /**
+   * Get balance for a gift card code
+   */
+  async getBalance(code: string): Promise<number | null> {
+    const card = await this.loadCard(code);
+    return card?.balanceCents ?? null;
   }
 
   /**
-   * Test/helper hook to reset the in-memory stub state.
+   * Lookup a gift card by code
    */
-  seedInMemory(cards: GiftCardRecord[]) {
-    this.memory.clear();
-    cards.forEach((card) => this.memory.set(card.code, { currency: "usd", ...card }));
-  }
-
-  /**
-   * Used by smoke tests to assert balance updates without poking at internals.
-   */
-  getBalance(code: string) {
-    return this.memory.get(code)?.balanceCents ?? null;
+  async lookup(code: string): Promise<GiftCardRecord | null> {
+    return this.loadCard(code);
   }
 
   async redeemAgainstBooking(code: string, amountCents: number, bookingId: string) {
@@ -57,32 +51,47 @@ export class GiftCardsService {
     if (!card) throw new NotFoundException("Gift card or store credit not found");
     if (card.balanceCents < amountCents) throw new BadRequestException("Insufficient balance");
 
-    const balanceCents = card.balanceCents - amountCents;
-    this.memory.set(code, { ...card, balanceCents });
-
-    const prismaGiftCard = (this.prisma as any)?.giftCard;
-    if (prismaGiftCard?.update) {
-      await prismaGiftCard.update({
-        where: { code },
-        data: { balanceCents }
-      });
-    }
-
-    const prismaTxn = (this.prisma as any)?.giftCardTransaction;
-    if (prismaTxn?.create) {
-      await prismaTxn.create({
-        data: {
-          code,
-          amountCents,
-          channel: context.channel,
-          referenceId: context.referenceId
+    // Use database transaction for proper persistence
+    const result = await this.prisma.$transaction(async (tx) => {
+      // Get current balance from ledger
+      const ledgerAgg = await tx.storedValueLedger.aggregate({
+        where: { accountId: card.accountId },
+        _sum: {
+          amountCents: true
         }
       });
-    }
+
+      const currentBalance = ledgerAgg._sum.amountCents ?? 0;
+      if (currentBalance < amountCents) {
+        throw new BadRequestException("Insufficient balance");
+      }
+
+      const afterBalance = currentBalance - amountCents;
+
+      // Create ledger entry for the redemption
+      await tx.storedValueLedger.create({
+        data: {
+          campgroundId: card.accountId ? (await tx.storedValueAccount.findUnique({ where: { id: card.accountId } }))?.campgroundId ?? "unknown" : "unknown",
+          accountId: card.accountId!,
+          direction: StoredValueDirection.redeem,
+          amountCents: -amountCents, // Negative for redemption
+          currency: card.currency ?? "usd",
+          beforeBalanceCents: currentBalance,
+          afterBalanceCents: afterBalance,
+          referenceType: context.channel === "booking" ? "reservation" : "pos_order",
+          referenceId: context.referenceId,
+          idempotencyKey: `redeem-${code}-${context.referenceId}-${Date.now()}`,
+          channel: context.channel,
+          reason: `Redeemed against ${context.channel}`
+        }
+      });
+
+      return afterBalance;
+    });
 
     return {
       code,
-      balanceCents,
+      balanceCents: result,
       redeemedCents: amountCents,
       channel: context.channel,
       referenceId: context.referenceId
@@ -90,16 +99,32 @@ export class GiftCardsService {
   }
 
   private async loadCard(code: string): Promise<GiftCardRecord | null> {
-    const fromMemory = this.memory.get(code);
-    if (fromMemory) return fromMemory;
-
-    const prismaGiftCard = (this.prisma as any)?.giftCard;
-    if (prismaGiftCard?.findUnique) {
-      const found = await prismaGiftCard.findUnique({ where: { code } });
-      if (found) {
-        this.memory.set(code, found);
-        return found;
+    // Look up in StoredValueCode table
+    const storedValueCode = await this.prisma.storedValueCode.findUnique({
+      where: { code },
+      include: {
+        account: true
       }
+    });
+
+    if (storedValueCode && storedValueCode.active && storedValueCode.account.status === StoredValueStatus.active) {
+      // Calculate balance from ledger
+      const ledgerAgg = await this.prisma.storedValueLedger.aggregate({
+        where: { accountId: storedValueCode.accountId },
+        _sum: {
+          amountCents: true
+        }
+      });
+
+      const balanceCents = ledgerAgg._sum.amountCents ?? 0;
+
+      return {
+        code,
+        balanceCents,
+        currency: storedValueCode.account.currency,
+        kind: storedValueCode.account.type === "gift_card" ? "gift_card" : "store_credit",
+        accountId: storedValueCode.accountId
+      };
     }
 
     return null;
