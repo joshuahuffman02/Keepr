@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useWhoami } from "@/hooks/use-whoami";
 import {
   Card,
@@ -327,7 +327,8 @@ function SegmentCard({ segment, onEdit, onCopy, onArchive }: {
 
 export default function GuestSegmentsPage() {
   const { data: whoami, isLoading: whoamiLoading } = useWhoami();
-  const [segments, setSegments] = useState<GuestSegment[]>(mockSegments);
+  const [segments, setSegments] = useState<GuestSegment[]>([]);
+  const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [scopeFilter, setScopeFilter] = useState<string>("all");
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
@@ -343,65 +344,183 @@ export default function GuestSegmentsPage() {
   const platformRole = whoami?.user?.platformRole;
   const canManageSegments = platformRole === "platform_admin" || platformRole === "platform_support";
 
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
+
+  const fetchSegments = useCallback(async () => {
+    try {
+      setLoading(true);
+      const token = localStorage.getItem("campreserv:authToken");
+      const params = new URLSearchParams();
+      if (scopeFilter !== "all") params.append("scope", scopeFilter);
+      params.append("status", "active");
+
+      const res = await fetch(`${apiUrl}/admin/guest-segments?${params}`, {
+        headers: {
+          "Authorization": `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (!res.ok) {
+        // Fall back to mock data if API not available
+        console.warn("API not available, using mock data");
+        setSegments(mockSegments);
+        return;
+      }
+
+      const data = await res.json();
+      // Map API response to our interface
+      const mappedSegments: GuestSegment[] = data.map((s: any) => ({
+        id: s.id,
+        name: s.name,
+        description: s.description || "",
+        scope: s.scope,
+        criteria: s.criteria || [],
+        guestCount: s.guestCount || 0,
+        createdAt: s.createdAt,
+        updatedAt: s.updatedAt,
+        createdBy: s.createdByEmail || "Unknown",
+        isTemplate: s.isTemplate || false,
+        status: s.status,
+      }));
+      setSegments(mappedSegments);
+    } catch (err) {
+      console.warn("Failed to fetch segments, using mock data:", err);
+      setSegments(mockSegments);
+    } finally {
+      setLoading(false);
+    }
+  }, [apiUrl, scopeFilter]);
+
+  useEffect(() => {
+    if (!whoamiLoading) {
+      fetchSegments();
+    }
+  }, [whoamiLoading, fetchSegments]);
+
   const filteredSegments = segments.filter(segment => {
     const matchesSearch = segment.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      segment.description.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesScope = scopeFilter === "all" || segment.scope === scopeFilter;
-    return matchesSearch && matchesScope && segment.status === "active";
+      (segment.description?.toLowerCase().includes(searchQuery.toLowerCase()) || false);
+    return matchesSearch && segment.status === "active";
   });
 
   const handleEdit = (segment: GuestSegment) => {
     console.log("Edit segment:", segment.id);
   };
 
-  const handleCopy = (segment: GuestSegment) => {
-    const newSeg: GuestSegment = {
-      ...segment,
-      id: `seg-${Date.now()}`,
-      name: `${segment.name} (Copy)`,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-      createdBy: whoami?.user?.email || "Unknown",
-      isTemplate: false,
-      scope: "organization",
-    };
-    setSegments([newSeg, ...segments]);
+  const handleCopy = async (segment: GuestSegment) => {
+    try {
+      const token = localStorage.getItem("campreserv:authToken");
+      const res = await fetch(`${apiUrl}/admin/guest-segments/${segment.id}/duplicate`, {
+        method: "POST",
+        headers: {
+          "Authorization": `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (!res.ok) {
+        // Fall back to local copy
+        const newSeg: GuestSegment = {
+          ...segment,
+          id: `seg-${Date.now()}`,
+          name: `${segment.name} (Copy)`,
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+          createdBy: whoami?.user?.email || "Unknown",
+          isTemplate: false,
+          scope: "organization",
+        };
+        setSegments([newSeg, ...segments]);
+        return;
+      }
+
+      // Refresh segments list
+      await fetchSegments();
+    } catch (err) {
+      console.error("Failed to duplicate segment:", err);
+    }
   };
 
-  const handleArchive = (segment: GuestSegment) => {
-    setSegments(segments.map(s =>
-      s.id === segment.id ? { ...s, status: "archived" as const } : s
-    ));
+  const handleArchive = async (segment: GuestSegment) => {
+    try {
+      const token = localStorage.getItem("campreserv:authToken");
+      const res = await fetch(`${apiUrl}/admin/guest-segments/${segment.id}`, {
+        method: "DELETE",
+        headers: {
+          "Authorization": `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (!res.ok) {
+        // Fall back to local archive
+        setSegments(segments.map(s =>
+          s.id === segment.id ? { ...s, status: "archived" as const } : s
+        ));
+        return;
+      }
+
+      // Refresh segments list
+      await fetchSegments();
+    } catch (err) {
+      console.error("Failed to archive segment:", err);
+    }
   };
 
-  const handleCreateSegment = () => {
+  const handleCreateSegment = async () => {
     if (!newSegment.name) return;
 
-    const segment: GuestSegment = {
-      id: `seg-${Date.now()}`,
-      name: newSegment.name,
-      description: newSegment.description,
-      scope: newSegment.scope,
-      criteria: newSegment.criteria,
-      guestCount: 0, // Will be calculated by backend
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-      createdBy: whoami?.user?.email || "Unknown",
-      isTemplate: false,
-      status: "active",
-    };
+    try {
+      const token = localStorage.getItem("campreserv:authToken");
+      const res = await fetch(`${apiUrl}/admin/guest-segments`, {
+        method: "POST",
+        headers: {
+          "Authorization": `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          name: newSegment.name,
+          description: newSegment.description,
+          scope: newSegment.scope,
+          criteria: newSegment.criteria,
+        }),
+      });
 
-    setSegments([segment, ...segments]);
-    setIsCreateDialogOpen(false);
-    setNewSegment({
-      name: "",
-      description: "",
-      scope: "organization",
-      criteria: [],
-    });
+      if (!res.ok) {
+        // Fall back to local create
+        const segment: GuestSegment = {
+          id: `seg-${Date.now()}`,
+          name: newSegment.name,
+          description: newSegment.description,
+          scope: newSegment.scope,
+          criteria: newSegment.criteria,
+          guestCount: 0,
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+          createdBy: whoami?.user?.email || "Unknown",
+          isTemplate: false,
+          status: "active",
+        };
+        setSegments([segment, ...segments]);
+      } else {
+        // Refresh segments list
+        await fetchSegments();
+      }
+
+      setIsCreateDialogOpen(false);
+      setNewSegment({
+        name: "",
+        description: "",
+        scope: "organization",
+        criteria: [],
+      });
+    } catch (err) {
+      console.error("Failed to create segment:", err);
+    }
   };
 
-  if (whoamiLoading) {
+  if (whoamiLoading || loading) {
     return (
       <div className="p-8">
         <div className="animate-pulse space-y-6">

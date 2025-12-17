@@ -1067,6 +1067,7 @@ model Campground {
   portfolioMetrics       PortfolioMetric[]
   NotificationTrigger    NotificationTrigger[]
   ScheduledNotification  ScheduledNotification[]
+  guestSegments          GuestSegment[]
 
   @@index([dataSource, dataSourceId])
 }
@@ -1615,8 +1616,9 @@ model Guest {
   vehicles                  Vehicle[]
 
   // Phase 3 relations
-  digitalWaivers  DigitalWaiver[]
-  idVerifications IdVerification[]
+  digitalWaivers     DigitalWaiver[]
+  idVerifications    IdVerification[]
+  segmentMemberships GuestSegmentMembership[]
 
   @@unique([email])
   @@index([emailNormalized])
@@ -5761,4 +5763,58 @@ model AiConsentRecord {
   @@index([campgroundId, guestId])
   @@index([sessionId])
   @@index([consentType, granted])
+}
+
+// ==================== GUEST SEGMENTS ====================
+
+enum SegmentScope {
+  global       // Platform-wide template available to all
+  organization // Shared across campgrounds in org
+  campground   // Single campground only
+}
+
+enum SegmentStatus {
+  active
+  archived
+}
+
+model GuestSegment {
+  id             String        @id @default(cuid())
+  name           String
+  description    String?
+  scope          SegmentScope  @default(campground)
+  status         SegmentStatus @default(active)
+  criteria       Json          // Array of criteria objects
+  isTemplate     Boolean       @default(false) // Global templates
+  organizationId String?       // For org-level segments
+  campgroundId   String?       // For campground-level segments (null for global)
+  createdById    String        // User who created it
+  createdByEmail String
+  guestCount     Int           @default(0) // Cached count, updated periodically
+  lastCalculated DateTime?     // When guestCount was last calculated
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @default(now()) @updatedAt
+
+  campground  Campground?              @relation(fields: [campgroundId], references: [id], onDelete: Cascade)
+  memberships GuestSegmentMembership[]
+
+  @@index([scope, status])
+  @@index([campgroundId, status])
+  @@index([organizationId, status])
+  @@index([isTemplate])
+}
+
+model GuestSegmentMembership {
+  id         String   @id @default(cuid())
+  segmentId  String
+  guestId    String
+  addedAt    DateTime @default(now())
+  removedAt  DateTime?
+
+  segment GuestSegment @relation(fields: [segmentId], references: [id], onDelete: Cascade)
+  guest   Guest        @relation(fields: [guestId], references: [id], onDelete: Cascade)
+
+  @@unique([segmentId, guestId])
+  @@index([segmentId])
+  @@index([guestId])
 }
