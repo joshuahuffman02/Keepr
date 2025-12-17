@@ -446,6 +446,13 @@ function AvailabilityFilter({ slug }: { slug: string }) {
     const [departureDate, setDepartureDate] = useState(initialDeparture);
     const [siteType, setSiteType] = useState(initialSiteType);
 
+    // Sync state with URL params when they change (e.g. from AI Chat)
+    useEffect(() => {
+        setArrivalDate(searchParams.get("arrivalDate") || "");
+        setDepartureDate(searchParams.get("departureDate") || "");
+        setSiteType(searchParams.get("siteType") || "all");
+    }, [searchParams]);
+
     const handleSearch = () => {
         const params = new URLSearchParams();
         if (arrivalDate) params.set("arrivalDate", arrivalDate);

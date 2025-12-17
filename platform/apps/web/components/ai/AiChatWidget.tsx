@@ -69,9 +69,8 @@ export function AiChatWidget({ campgroundId, campgroundName }: AiChatWidgetProps
                 console.log("AI triggered booking action:", data.bookingDetails);
                 const params = new URLSearchParams(window.location.search);
                 if (data.bookingDetails.dates) {
-                    params.set('arrival', data.bookingDetails.dates.arrival);
-                    params.set('departure', data.bookingDetails.dates.departure);
-
+                    params.set('arrivalDate', data.bookingDetails.dates.arrival);
+                    params.set('departureDate', data.bookingDetails.dates.departure);
                 }
                 if (data.bookingDetails.partySize) {
                     params.set('adults', data.bookingDetails.partySize.adults.toString());
@@ -82,10 +81,15 @@ export function AiChatWidget({ campgroundId, campgroundName }: AiChatWidgetProps
                 if (data.bookingDetails.rigInfo) {
                     params.set('rvLength', data.bookingDetails.rigInfo.length.toString());
                     params.set('rvType', data.bookingDetails.rigInfo.type);
+                    // Infer siteType for the filter dropdown
+                    params.set('siteType', 'rv');
                 }
                 if (data.bookingDetails.siteClassId) {
                     params.set('siteClassId', data.bookingDetails.siteClassId);
                 }
+
+                // If no rig info but we have site class, we might want to infer siteType?
+                // For now, defaulting to 'rv' if rig info is present is safe.
 
                 // Use Next.js router for soft navigation to prevent clearing chat state
                 // This updates the URL params which the parent page watches to pre-fill the form
