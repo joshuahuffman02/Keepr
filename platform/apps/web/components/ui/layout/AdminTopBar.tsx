@@ -148,14 +148,41 @@ export function AdminTopBar({ onToggleNav, mobileNavOpen }: AdminTopBarProps) {
         }
     };
 
-    // Sample notifications (local state with links and resolved flag)
-    const [notifications, setNotifications] = useState<
-        { id: number; title: string; subtitle: string; time: string; unread: boolean; resolved?: boolean; href?: string }[]
-    >([
+    // Notifications with localStorage persistence
+    const NOTIFICATIONS_STORAGE_KEY = "campeveryday:notifications";
+
+    const defaultNotifications = [
         { id: 1, title: "New booking received", subtitle: "Site A-12, Dec 15-20", time: "5m ago", unread: true, href: "/reservations" },
         { id: 2, title: "System update available", subtitle: "Version 2.1.0 is ready", time: "1h ago", unread: true, href: "/updates" },
         { id: 3, title: "Payment received", subtitle: "$150.00 from John Smith", time: "3h ago", unread: false, href: "/finance/payouts" }
-    ]);
+    ];
+
+    const [notifications, setNotifications] = useState<
+        { id: number; title: string; subtitle: string; time: string; unread: boolean; resolved?: boolean; href?: string }[]
+    >([]);
+
+    // Load notifications from localStorage on mount
+    useEffect(() => {
+        if (typeof window !== "undefined") {
+            const stored = localStorage.getItem(NOTIFICATIONS_STORAGE_KEY);
+            if (stored) {
+                try {
+                    setNotifications(JSON.parse(stored));
+                } catch {
+                    setNotifications(defaultNotifications);
+                }
+            } else {
+                setNotifications(defaultNotifications);
+            }
+        }
+    }, []);
+
+    // Persist notifications to localStorage when they change
+    useEffect(() => {
+        if (typeof window !== "undefined" && notifications.length > 0) {
+            localStorage.setItem(NOTIFICATIONS_STORAGE_KEY, JSON.stringify(notifications));
+        }
+    }, [notifications]);
 
     const unreadCount = notifications.filter((n) => n.unread && !n.resolved).length;
 

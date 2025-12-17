@@ -4213,6 +4213,16 @@ export const apiClient = {
     return parseResponse<unknown>(res);
   },
 
+  // Campground FAQs
+  async updateCampgroundFaqs(campgroundId: string, faqs: Array<{ id: string; question: string; answer: string; order: number }>) {
+    const res = await fetch(`${API_BASE}/campgrounds/${campgroundId}/faqs`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json", ...scopedHeaders() },
+      body: JSON.stringify({ faqs }),
+    });
+    return parseResponse<unknown>(res);
+  },
+
   // Form templates
   async getFormTemplates(campgroundId: string) {
     const data = await fetchJSON<unknown>(`/campgrounds/${campgroundId}/forms`);

@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useSession } from "next-auth/react";
@@ -17,7 +18,9 @@ import {
     ChevronRight,
     Zap,
     TrendingUp,
-    Heart
+    Heart,
+    Menu,
+    X
 } from "lucide-react";
 import { signOut } from "next-auth/react";
 
@@ -165,6 +168,7 @@ function NavItem({ item, pathname }: { item: typeof adminNavItems[0]; pathname: 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
     const pathname = usePathname();
     const { data: session, status } = useSession();
+    const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
     if (status === "loading") {
         return (
@@ -232,50 +236,96 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     }
 
 
-    return (
-        <div className="min-h-screen bg-slate-900 flex">
-            {/* Sidebar */}
-            <aside className="w-64 bg-slate-950 border-r border-slate-800 flex flex-col">
-                {/* Header */}
-                <div className="p-4 border-b border-slate-800">
+    const sidebarContent = (
+        <>
+            {/* Header */}
+            <div className="p-4 border-b border-slate-800">
+                <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
                         <Shield className="h-6 w-6 text-blue-400" />
                         <span className="text-lg font-bold text-white">Platform Admin</span>
                     </div>
-                </div>
-
-                {/* Navigation */}
-                <nav className="flex-1 p-4 space-y-2 overflow-y-auto">
-                    {adminNavItems.map((item) => (
-                        <NavItem key={item.title} item={item} pathname={pathname} />
-                    ))}
-                </nav>
-
-                {/* Footer */}
-                <div className="p-4 border-t border-slate-800 space-y-2">
-                    <Link
-                        href="/dashboard"
-                        className="flex items-center gap-2 px-3 py-2 text-sm text-slate-400 hover:text-white hover:bg-slate-800 rounded-lg transition-colors"
-                    >
-                        <ExternalLink className="h-4 w-4" />
-                        Staff Dashboard
-                    </Link>
+                    {/* Close button for mobile */}
                     <button
-                        onClick={() => signOut({ callbackUrl: "/" })}
-                        className="flex items-center gap-2 px-3 py-2 text-sm text-slate-400 hover:text-white hover:bg-slate-800 rounded-lg transition-colors w-full"
+                        onClick={() => setMobileMenuOpen(false)}
+                        className="md:hidden p-2 text-slate-400 hover:text-white"
                     >
-                        <LogOut className="h-4 w-4" />
-                        Sign Out
+                        <X className="h-5 w-5" />
                     </button>
-                    <div className="px-3 py-2 text-xs text-slate-500">
-                        {session.user?.email}
-                    </div>
                 </div>
+            </div>
+
+            {/* Navigation */}
+            <nav className="flex-1 p-4 space-y-2 overflow-y-auto">
+                {adminNavItems.map((item) => (
+                    <NavItem key={item.title} item={item} pathname={pathname} />
+                ))}
+            </nav>
+
+            {/* Footer */}
+            <div className="p-4 border-t border-slate-800 space-y-2">
+                <Link
+                    href="/dashboard"
+                    className="flex items-center gap-2 px-3 py-2 text-sm text-slate-400 hover:text-white hover:bg-slate-800 rounded-lg transition-colors"
+                >
+                    <ExternalLink className="h-4 w-4" />
+                    Staff Dashboard
+                </Link>
+                <button
+                    onClick={() => signOut({ callbackUrl: "/" })}
+                    className="flex items-center gap-2 px-3 py-2 text-sm text-slate-400 hover:text-white hover:bg-slate-800 rounded-lg transition-colors w-full"
+                >
+                    <LogOut className="h-4 w-4" />
+                    Sign Out
+                </button>
+                <div className="px-3 py-2 text-xs text-slate-500">
+                    {session.user?.email}
+                </div>
+            </div>
+        </>
+    );
+
+    return (
+        <div className="min-h-screen bg-slate-900 flex">
+            {/* Mobile menu backdrop */}
+            {mobileMenuOpen && (
+                <div
+                    className="fixed inset-0 bg-black/50 z-40 md:hidden"
+                    onClick={() => setMobileMenuOpen(false)}
+                />
+            )}
+
+            {/* Sidebar - Desktop */}
+            <aside className="hidden md:flex w-64 bg-slate-950 border-r border-slate-800 flex-col">
+                {sidebarContent}
+            </aside>
+
+            {/* Sidebar - Mobile (Slide-in) */}
+            <aside
+                className={`fixed inset-y-0 left-0 z-50 w-64 bg-slate-950 border-r border-slate-800 flex flex-col transform transition-transform duration-200 ease-in-out md:hidden ${
+                    mobileMenuOpen ? "translate-x-0" : "-translate-x-full"
+                }`}
+            >
+                {sidebarContent}
             </aside>
 
             {/* Main content */}
             <main className="flex-1 bg-slate-900">
-                <div className="p-6">
+                {/* Mobile header */}
+                <div className="md:hidden sticky top-0 z-30 bg-slate-900 border-b border-slate-800 px-4 py-3 flex items-center gap-3">
+                    <button
+                        onClick={() => setMobileMenuOpen(true)}
+                        className="p-2 text-slate-400 hover:text-white hover:bg-slate-800 rounded-lg"
+                    >
+                        <Menu className="h-5 w-5" />
+                    </button>
+                    <div className="flex items-center gap-2">
+                        <Shield className="h-5 w-5 text-blue-400" />
+                        <span className="font-semibold text-white">Admin</span>
+                    </div>
+                </div>
+
+                <div className="p-4 md:p-6">
                     {children}
                 </div>
             </main>

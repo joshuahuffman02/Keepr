@@ -39,7 +39,8 @@ type IconName =
   | "plus"
   | "clock"
   | "alert"
-  | "lock";
+  | "lock"
+  | "trophy";
 
 type NavItem = {
   label: string;
@@ -238,6 +239,16 @@ const Icon = ({ name, active }: { name: IconName; active?: boolean }) => {
           <path d="M8 11V8a4 4 0 0 1 8 0v3" />
         </svg>
       );
+    case "trophy":
+      return (
+        <svg {...common} viewBox="0 0 24 24">
+          <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6M18 9h1.5a2.5 2.5 0 0 0 0-5H18" />
+          <path d="M4 22h16" />
+          <path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22" />
+          <path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22" />
+          <path d="M18 2H6v7a6 6 0 0 0 12 0V2Z" />
+        </svg>
+      );
     default:
       return null;
   }
@@ -246,7 +257,7 @@ const Icon = ({ name, active }: { name: IconName; active?: boolean }) => {
 export function DashboardShell({ children, className, title, subtitle }: { children: ReactNode; className?: string; title?: string; subtitle?: string }) {
   const { data: session } = useSession();
   const { data: whoami } = useWhoami();
-  const [campgrounds, setCampgrounds] = useState<{ id: string; name: string; organizationId?: string }[]>([]);
+  const [campgrounds, setCampgrounds] = useState<{ id: string; name: string; organizationId?: string; gamificationSetting?: { enabled: boolean } }[]>([]);
   const [campgroundsLoading, setCampgroundsLoading] = useState(true);
   const [campgroundsError, setCampgroundsError] = useState<string | null>(null);
   const [selected, setSelected] = useState<string | "">("");
@@ -447,6 +458,10 @@ export function DashboardShell({ children, className, title, subtitle }: { child
   ], [selected]);
 
   const navSections = useMemo(() => {
+    // Check if gamification is enabled for the selected campground
+    const selectedCampground = campgrounds.find((cg) => cg.id === selected);
+    const gamificationEnabled = selectedCampground?.gamificationSetting?.enabled ?? false;
+
     // PRIMARY - Core daily operations (no accordion, always visible)
     const primaryItems: NavItem[] = [
       { label: "Dashboard", href: "/dashboard", icon: "dashboard" },
@@ -456,6 +471,11 @@ export function DashboardShell({ children, className, title, subtitle }: { child
       { label: "Messages", href: "/messages", icon: "message", badge: unreadMessages },
       { label: "Reports", href: "/reports", icon: "reports" }
     ];
+
+    // Add Gamification link when enabled for the campground
+    if (gamificationEnabled) {
+      primaryItems.push({ label: "Gamification", href: "/gamification", icon: "trophy", tooltip: "Staff leaderboards and rewards" });
+    }
 
     // Add Management link for managers (simplified - links to hub page)
     if (isManager) {
@@ -480,7 +500,7 @@ export function DashboardShell({ children, className, title, subtitle }: { child
     ];
 
     return sections;
-  }, [cgReservationsPath, unreadMessages, isManager, isAdmin]);
+  }, [cgReservationsPath, unreadMessages, isManager, isAdmin, campgrounds, selected]);
 
   const frontDeskShortcuts = useMemo<NavItem[]>(() => {
     const items: NavItem[] = [

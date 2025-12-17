@@ -875,6 +875,7 @@ model Campground {
   heroImageUrl   String? // Main hero image for public page
   isPublished    Boolean   @default(false) // Whether visible on public marketplace
   amenitySummary Json?
+  faqs           Json?     // Array of { question: string, answer: string, order: number }
   importedAt     DateTime?
 
   // Operations

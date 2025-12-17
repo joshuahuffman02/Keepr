@@ -239,6 +239,30 @@ export class CampgroundsService {
     return updated;
   }
 
+  async updateFaqs(campgroundId: string, faqs: Array<{ id: string; question: string; answer: string; order: number }>, organizationId?: string) {
+    const cg = await this.prisma.campground.findUnique({ where: { id: campgroundId }, select: { id: true, organizationId: true, faqs: true } });
+    if (!cg) throw new NotFoundException("Campground not found");
+    if (organizationId && cg.organizationId !== organizationId) throw new ForbiddenException("Unauthorized");
+
+    // Validate and sanitize FAQs
+    const sanitizedFaqs = faqs
+      .filter(faq => faq.question?.trim() && faq.answer?.trim())
+      .map((faq, idx) => ({
+        id: faq.id || `faq-${Date.now()}-${idx}`,
+        question: faq.question.trim(),
+        answer: faq.answer.trim(),
+        order: faq.order ?? idx
+      }))
+      .sort((a, b) => a.order - b.order);
+
+    const updated = await this.prisma.campground.update({
+      where: { id: campgroundId },
+      data: { faqs: sanitizedFaqs },
+    });
+
+    return updated;
+  }
+
   private async ensureExternalOrganization(organizationId?: string) {
     if (organizationId) return organizationId;
     if (process.env.EXTERNAL_ORG_ID) return process.env.EXTERNAL_ORG_ID;
@@ -284,10 +308,15 @@ export class CampgroundsService {
   }
 
   listAll(orgId?: string) {
+    const include = {
+      gamificationSetting: {
+        select: { enabled: true }
+      }
+    };
     if (orgId) {
-      return this.prisma.campground.findMany({ where: { organizationId: orgId } });
+      return this.prisma.campground.findMany({ where: { organizationId: orgId }, include });
     }
-    return this.prisma.campground.findMany();
+    return this.prisma.campground.findMany({ include });
   }
 
   // Public campgrounds (published only)

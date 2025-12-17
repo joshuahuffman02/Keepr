@@ -574,8 +574,8 @@ export class PaymentsController {
       });
     }
 
-    const returnUrl = process.env.FRONTEND_URL ? `${process.env.FRONTEND_URL}/settings/payments/success` : "https://app.campreserv.com/settings/payments/success";
-    const refreshUrl = process.env.FRONTEND_URL ? `${process.env.FRONTEND_URL}/settings/payments/error` : "https://app.campreserv.com/settings/payments/error";
+    const returnUrl = process.env.FRONTEND_URL ? `${process.env.FRONTEND_URL}/dashboard/settings/payments?status=success` : "https://campreservweb-production.up.railway.app/dashboard/settings/payments?status=success";
+    const refreshUrl = process.env.FRONTEND_URL ? `${process.env.FRONTEND_URL}/dashboard/settings/payments?status=error` : "https://campreservweb-production.up.railway.app/dashboard/settings/payments?status=error";
     const link = await this.stripeService.createAccountOnboardingLink(accountId, returnUrl, refreshUrl);
 
     // Fetch capabilities after onboarding link creation

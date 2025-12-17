@@ -164,6 +164,18 @@ export class CampgroundsController {
     return this.campgrounds.updatePhotos(id, body, org || undefined, actorId || undefined);
   }
 
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.owner, UserRole.manager)
+  @Patch("campgrounds/:id/faqs")
+  updateFaqs(
+    @Param("id") id: string,
+    @Body() body: { faqs: Array<{ id: string; question: string; answer: string; order: number }> },
+    @Req() req: Request
+  ) {
+    const org = (req as any).organizationId || null;
+    return this.campgrounds.updateFaqs(id, body.faqs, org || undefined);
+  }
+
   @UseGuards(JwtAuthGuard)
   @Patch("campgrounds/:id/policies")
   updatePolicies(

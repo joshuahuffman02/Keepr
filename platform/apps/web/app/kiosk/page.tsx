@@ -32,10 +32,21 @@ type Site = {
     name: string;
     siteNumber: string;
     siteType: string;
+    hookupsPower?: boolean;
+    hookupsWater?: boolean;
+    hookupsSewer?: boolean;
+    powerAmps?: number;
+    petFriendly?: boolean;
+    accessible?: boolean;
     siteClass: {
         name: string;
         defaultRate: number;
     } | null;
+};
+
+type SiteFilters = {
+    siteType: string | null;
+    hookups: ("power" | "water" | "sewer")[];
 };
 
 type KioskState = "home" | "lookup" | "details" | "upsell" | "payment" | "success" | "walkin-nights" | "walkin-sites" | "walkin-guest";
@@ -56,6 +67,7 @@ export default function KioskPage() {
     const [showCustomNights, setShowCustomNights] = useState(false);
     const [availableSites, setAvailableSites] = useState<Site[]>([]);
     const [selectedSite, setSelectedSite] = useState<Site | null>(null);
+    const [siteFilters, setSiteFilters] = useState<SiteFilters>({ siteType: null, hookups: [] });
     const [campgroundCenter, setCampgroundCenter] = useState<{ latitude: number | null; longitude: number | null }>({
         latitude: null,
         longitude: null
@@ -331,6 +343,14 @@ export default function KioskPage() {
         const departure = addDays(arrival, nights);
 
         try {
+            // Validate required fields
+            const zipCode = guestInfo.zipCode?.trim() || "";
+            if (zipCode.length < 5 || zipCode.length > 10) {
+                setError("Please enter a valid zip code (5 digits).");
+                setLoading(false);
+                return;
+            }
+
             // 1. Create Reservation
             const newRes = await apiClient.createPublicReservation({
                 campgroundSlug: CAMPGROUND_SLUG,
@@ -344,7 +364,7 @@ export default function KioskPage() {
                     lastName: guestInfo.lastName,
                     email: guestInfo.email,
                     phone: guestInfo.phone,
-                    zipCode: guestInfo.zipCode || ""
+                    zipCode: zipCode
                 },
                 equipment: {
                     type: "car",
@@ -550,7 +570,29 @@ export default function KioskPage() {
             )}
 
             {/* Walk-in: Site Selection */}
-            {state === "walkin-sites" && (
+            {state === "walkin-sites" && (() => {
+                // Filter sites based on selected filters
+                const filteredSites = availableSites.filter((site) => {
+                    if (siteFilters.siteType && site.siteType !== siteFilters.siteType) return false;
+                    if (siteFilters.hookups.includes("power") && !site.hookupsPower) return false;
+                    if (siteFilters.hookups.includes("water") && !site.hookupsWater) return false;
+                    if (siteFilters.hookups.includes("sewer") && !site.hookupsSewer) return false;
+                    return true;
+                });
+
+                const siteTypes = [...new Set(availableSites.map((s) => s.siteType))];
+                const hasHookupSites = availableSites.some((s) => s.hookupsPower || s.hookupsWater || s.hookupsSewer);
+
+                const toggleHookup = (hookup: "power" | "water" | "sewer") => {
+                    setSiteFilters((prev) => ({
+                        ...prev,
+                        hookups: prev.hookups.includes(hookup)
+                            ? prev.hookups.filter((h) => h !== hookup)
+                            : [...prev.hookups, hookup]
+                    }));
+                };
+
+                return (
                 <Card className="w-full max-w-5xl shadow-2xl h-[80vh] flex flex-col">
                     <CardHeader className="text-center pb-4 pt-8">
                         <CardTitle className="text-3xl font-bold text-gray-900">Select a Site</CardTitle>
@@ -559,20 +601,95 @@ export default function KioskPage() {
                         </CardDescription>
                     </CardHeader>
                     <CardContent className="flex-1 overflow-y-auto px-8 pb-8">
+                        {/* Filters */}
+                        {!loading && availableSites.length > 0 && (
+                            <div className="mb-6 space-y-3">
+                                {/* Site Type Filter */}
+                                <div className="flex flex-wrap gap-2">
+                                    <Button
+                                        variant={siteFilters.siteType === null ? "default" : "outline"}
+                                        size="sm"
+                                        onClick={() => setSiteFilters((prev) => ({ ...prev, siteType: null }))}
+                                        className="h-10 px-4"
+                                    >
+                                        All Types
+                                    </Button>
+                                    {siteTypes.map((type) => (
+                                        <Button
+                                            key={type}
+                                            variant={siteFilters.siteType === type ? "default" : "outline"}
+                                            size="sm"
+                                            onClick={() => setSiteFilters((prev) => ({ ...prev, siteType: type }))}
+                                            className="h-10 px-4 capitalize"
+                                        >
+                                            {type === "rv" ? "RV" : type}
+                                        </Button>
+                                    ))}
+                                </div>
+
+                                {/* Hookups Filter */}
+                                {hasHookupSites && (
+                                    <div className="flex flex-wrap gap-2">
+                                        <span className="text-sm text-gray-500 flex items-center mr-2">Hookups:</span>
+                                        <Button
+                                            variant={siteFilters.hookups.includes("power") ? "default" : "outline"}
+                                            size="sm"
+                                            onClick={() => toggleHookup("power")}
+                                            className="h-10 px-4"
+                                        >
+                                            ⚡ Electric
+                                        </Button>
+                                        <Button
+                                            variant={siteFilters.hookups.includes("water") ? "default" : "outline"}
+                                            size="sm"
+                                            onClick={() => toggleHookup("water")}
+                                            className="h-10 px-4"
+                                        >
+                                            💧 Water
+                                        </Button>
+                                        <Button
+                                            variant={siteFilters.hookups.includes("sewer") ? "default" : "outline"}
+                                            size="sm"
+                                            onClick={() => toggleHookup("sewer")}
+                                            className="h-10 px-4"
+                                        >
+                                            🚿 Sewer
+                                        </Button>
+                                    </div>
+                                )}
+
+                                {/* Results count */}
+                                <p className="text-sm text-gray-500">
+                                    Showing {filteredSites.length} of {availableSites.length} sites
+                                </p>
+                            </div>
+                        )}
+
                         {loading ? (
                             <div className="flex justify-center items-center h-64">
                                 <Loader2 className="w-12 h-12 animate-spin text-green-600" />
                             </div>
-                        ) : availableSites.length === 0 ? (
+                        ) : filteredSites.length === 0 ? (
                             <div className="text-center py-12">
-                                <p className="text-2xl text-gray-500">No sites available for these dates.</p>
-                                <Button onClick={() => setState("walkin-nights")} className="mt-6">Try different dates</Button>
+                                <p className="text-2xl text-gray-500">
+                                    {availableSites.length === 0
+                                        ? "No sites available for these dates."
+                                        : "No sites match your filters."}
+                                </p>
+                                <Button
+                                    onClick={() => availableSites.length === 0
+                                        ? setState("walkin-nights")
+                                        : setSiteFilters({ siteType: null, hookups: [] })}
+                                    className="mt-6"
+                                >
+                                    {availableSites.length === 0 ? "Try different dates" : "Clear filters"}
+                                </Button>
                             </div>
                         ) : (
                             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                                 <div className="lg:col-span-2 space-y-4">
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                        {availableSites.map((site) => (
+                                        {filteredSites.map((site) => (
                                             <div
                                                 key={site.id}
                                                 onClick={() => { setSelectedSite(site); setState("walkin-guest"); }}
@@ -599,15 +716,22 @@ export default function KioskPage() {
                                             <p className="text-xs text-gray-500">Tap a pin to pick a site</p>
                                         </div>
                                         <Badge variant="outline" className="text-xs">
-                                            {mapSites.length} pins
+                                            {filteredSites.length} pins
                                         </Badge>
                                     </div>
                                     <BookingMap
-                                        sites={mapSites}
+                                        sites={filteredSites.map((site, idx) => ({
+                                            id: site.id,
+                                            name: site.name,
+                                            siteNumber: site.siteNumber,
+                                            status: "available" as const,
+                                            latitude: Number.isFinite(campgroundCenter.latitude) ? (campgroundCenter.latitude as number) + 0.0004 * Math.sin(idx) : null,
+                                            longitude: Number.isFinite(campgroundCenter.longitude) ? (campgroundCenter.longitude as number) + 0.0004 * Math.cos(idx) : null,
+                                        }))}
                                         campgroundCenter={campgroundCenter}
                                         selectedSiteId={selectedSite?.id}
                                         onSelectSite={(siteId) => {
-                                            const target = availableSites.find(s => s.id === siteId);
+                                            const target = filteredSites.find(s => s.id === siteId);
                                             if (target) {
                                                 setSelectedSite(target);
                                                 setState("walkin-guest");
@@ -625,7 +749,8 @@ export default function KioskPage() {
                         </Button>
                     </div>
                 </Card>
-            )}
+                );
+            })()}
 
             {/* Walk-in: Guest Info */}
             {state === "walkin-guest" && selectedSite && (

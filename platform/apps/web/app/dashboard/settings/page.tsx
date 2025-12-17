@@ -171,6 +171,11 @@ const settingsCategories: SettingCategory[] = [
         description: "Manage property photos and gallery",
       },
       {
+        name: "FAQs",
+        href: "/dashboard/settings/faqs",
+        description: "Manage frequently asked questions for guests",
+      },
+      {
         name: "Localization",
         href: "/dashboard/settings/localization",
         description: "Set timezone, language, and regional preferences",
