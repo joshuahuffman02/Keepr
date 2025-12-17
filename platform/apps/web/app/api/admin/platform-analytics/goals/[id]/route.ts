@@ -1,6 +1,9 @@
 import { NextResponse } from "next/server";
 
-const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "http://localhost:4000/api";
+const API_BASE = process.env.NEXT_PUBLIC_API_BASE ||
+  (process.env.NODE_ENV === "production"
+    ? "https://camp-everydayapi-production.up.railway.app/api"
+    : "http://localhost:4000/api");
 
 /**
  * Individual Goal API Route - Proxies to backend NestJS API
