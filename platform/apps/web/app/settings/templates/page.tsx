@@ -2,8 +2,6 @@
 
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { DashboardShell } from "@/components/ui/layout/DashboardShell";
 import { FormField } from "@/components/ui/form-field";
@@ -166,25 +164,19 @@ const PREBUILT_TEMPLATES = [
   },
 ];
 
-// Validation schemas
-const createTemplateSchema = z.object({
-  name: z.string().min(1, "Template name is required").max(100, "Name must be less than 100 characters"),
-  channel: z.enum(["email", "sms"]),
-  category: z.string(),
-});
+// Form types
+type CreateTemplateFormData = {
+  name: string;
+  channel: "email" | "sms";
+  category: string;
+};
 
-const emailTemplateSchema = z.object({
-  name: z.string().min(1, "Template name is required").max(100, "Name must be less than 100 characters"),
-  subject: z.string().min(1, "Subject is required").max(200, "Subject must be less than 200 characters"),
-  html: z.string().min(1, "Email content is required"),
-});
-
-const smsTemplateSchema = z.object({
-  name: z.string().min(1, "Template name is required").max(100, "Name must be less than 100 characters"),
-  textBody: z.string().min(1, "Message is required").max(160, "SMS must be 160 characters or less"),
-});
-
-type CreateTemplateFormData = z.infer<typeof createTemplateSchema>;
+type TemplateEditorFormData = {
+  name: string;
+  subject: string;
+  html: string;
+  textBody: string;
+};
 
 export default function TemplatesPage() {
   const [campgroundId, setCampgroundId] = useState<string | null>(null);
@@ -384,16 +376,13 @@ function TemplateEditor({
   previewMode: boolean;
   onTogglePreview: () => void;
 }) {
-  const schema = template.channel === "email" ? emailTemplateSchema : smsTemplateSchema;
-
   const {
     register,
     handleSubmit,
-    formState: { errors, isValid, isDirty },
+    formState: { errors, isDirty },
     reset,
     watch,
-  } = useForm({
-    resolver: zodResolver(schema),
+  } = useForm<TemplateEditorFormData>({
     defaultValues: {
       name: template.name,
       subject: template.subject ?? "",
@@ -561,7 +550,6 @@ function CreateTemplateModal({
     watch,
     setValue,
   } = useForm<CreateTemplateFormData>({
-    resolver: zodResolver(createTemplateSchema),
     defaultValues: {
       name: "",
       channel: "email",

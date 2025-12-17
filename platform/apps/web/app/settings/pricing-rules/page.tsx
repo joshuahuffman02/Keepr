@@ -2,8 +2,6 @@
 
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { DashboardShell } from "../../../components/ui/layout/DashboardShell";
 import { Button } from "../../../components/ui/button";
@@ -33,29 +31,42 @@ type PricingRuleV2 = {
 
 type SiteClass = { id: string; name: string };
 
-// Validation schema - simplified to avoid ZodEffects compatibility issues with zod v4
-const pricingRuleSchema = z.object({
-  name: z.string().min(1, "Name is required").max(100, "Name must be less than 100 characters"),
-  type: z.enum(["season", "weekend", "holiday", "event", "demand"]),
-  priority: z.number().min(0, "Priority must be 0 or greater").max(999, "Priority must be less than 1000"),
-  stackMode: z.enum(["additive", "max", "override"]),
-  adjustmentType: z.enum(["percent", "flat"]),
-  adjustmentValue: z.string().min(1, "Adjustment value is required"),
-  siteClassId: z.string().optional(),
-  dowMask: z.array(z.number()).optional(),
-  startDate: z.string().optional(),
-  endDate: z.string().optional(),
-  minRateCap: z.string().optional(),
-  maxRateCap: z.string().optional(),
-  active: z.boolean(),
-});
+// Form data type
+type FormData = {
+  name: string;
+  type: "season" | "weekend" | "holiday" | "event" | "demand";
+  priority: number;
+  stackMode: "additive" | "max" | "override";
+  adjustmentType: "percent" | "flat";
+  adjustmentValue: string;
+  siteClassId?: string;
+  dowMask?: number[];
+  startDate?: string;
+  endDate?: string;
+  minRateCap?: string;
+  maxRateCap?: string;
+  active: boolean;
+};
 
-// Custom validation function for cross-field validation
+// Custom validation function
 function validateFormData(data: FormData): { field: string; message: string } | null {
+  // Validate name
+  if (!data.name || !data.name.trim()) {
+    return { field: "name", message: "Name is required" };
+  }
+  if (data.name.length > 100) {
+    return { field: "name", message: "Name must be less than 100 characters" };
+  }
+
+  // Validate priority
+  if (data.priority < 0 || data.priority > 999) {
+    return { field: "priority", message: "Priority must be between 0 and 999" };
+  }
+
   // Validate adjustment value is not zero
   const adjustmentNum = parseFloat(data.adjustmentValue);
-  if (isNaN(adjustmentNum) || adjustmentNum === 0) {
-    return { field: "adjustmentValue", message: "Adjustment value cannot be zero" };
+  if (!data.adjustmentValue || isNaN(adjustmentNum) || adjustmentNum === 0) {
+    return { field: "adjustmentValue", message: "Adjustment value is required and cannot be zero" };
   }
 
   // Validate min rate cap is a valid number
@@ -92,8 +103,6 @@ function validateFormData(data: FormData): { field: string; message: string } | 
 
   return null;
 }
-
-type FormData = z.infer<typeof pricingRuleSchema>;
 
 const defaultFormData: FormData = {
   name: "",
@@ -136,14 +145,13 @@ export default function PricingRulesV2Page() {
   const {
     register,
     handleSubmit,
-    formState: { errors, isValid, isDirty },
+    formState: { errors, isDirty },
     reset,
     watch,
     setValue,
   } = useForm<FormData>({
-    resolver: zodResolver(pricingRuleSchema),
     defaultValues: defaultFormData,
-    mode: "onChange", // Enable real-time validation
+    mode: "onChange",
   });
 
   const formData = watch();

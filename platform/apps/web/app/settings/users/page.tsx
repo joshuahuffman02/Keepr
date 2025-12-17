@@ -2,8 +2,6 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { DashboardShell } from "../../../components/ui/layout/DashboardShell";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -46,21 +44,21 @@ const roleLabels: Record<Role, string> = {
   readonly: "Read-only"
 };
 
-// Validation schemas
-const inviteMemberSchema = z.object({
-  email: z.string().min(1, "Email is required").email("Invalid email address"),
-  firstName: z.string().optional(),
-  lastName: z.string().optional(),
-  role: z.enum(["owner", "manager", "front_desk", "maintenance", "finance", "marketing", "readonly"]),
-});
+// Form types
+type InviteMemberFormData = {
+  email: string;
+  firstName?: string;
+  lastName?: string;
+  role: Role;
+};
 
-const onboardingInviteSchema = z.object({
-  email: z.string().min(1, "Email is required").email("Invalid email address"),
-  expiresInHours: z.number().min(1, "Must be at least 1 hour").max(168, "Must be less than 7 days (168 hours)"),
-});
+type OnboardingInviteFormData = {
+  email: string;
+  expiresInHours: number;
+};
 
-type InviteMemberFormData = z.infer<typeof inviteMemberSchema>;
-type OnboardingInviteFormData = z.infer<typeof onboardingInviteSchema>;
+// Email validation helper
+const isValidEmail = (email: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 
 export default function UsersPage() {
   const { toast } = useToast();
@@ -70,7 +68,6 @@ export default function UsersPage() {
 
   // Form for inviting members
   const inviteForm = useForm<InviteMemberFormData>({
-    resolver: zodResolver(inviteMemberSchema),
     defaultValues: {
       email: "",
       firstName: "",
@@ -82,7 +79,6 @@ export default function UsersPage() {
 
   // Form for onboarding invites
   const onboardingForm = useForm<OnboardingInviteFormData>({
-    resolver: zodResolver(onboardingInviteSchema),
     defaultValues: {
       email: "",
       expiresInHours: 72,
