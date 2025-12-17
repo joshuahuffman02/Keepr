@@ -467,6 +467,88 @@ export function HomeClient() {
                 </div>
             </section>
 
+
+            {/* Blog CTA Section */}
+            <section className="py-20 bg-slate-50">
+                <div className="max-w-7xl mx-auto px-6">
+                    <div className="flex flex-col md:flex-row items-center justify-between gap-8 mb-12">
+                        <div>
+                            <h2 className="text-2xl md:text-3xl font-bold text-slate-900 mb-4">
+                                Latest from the Blog
+                            </h2>
+                            <p className="text-slate-600 max-w-xl">
+                                Tips, guides, and industry insights to help you get the most out of your camping experience.
+                            </p>
+                        </div>
+                        <a
+                            href="/blog"
+                            className="inline-flex items-center gap-2 px-6 py-3 bg-white text-slate-900 border border-slate-200 font-semibold rounded-lg hover:border-emerald-500 hover:text-emerald-600 transition-colors"
+                        >
+                            View All Posts
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                            </svg>
+                        </a>
+                    </div>
+
+                    <div className="grid md:grid-cols-3 gap-6">
+                        {/* Featured Blog Card 1 */}
+                        <div className="bg-white rounded-2xl overflow-hidden shadow-sm border border-slate-100 group cursor-pointer hover:shadow-md transition-shadow">
+                            <div className="p-6">
+                                <span className="text-xs font-semibold uppercase tracking-wider text-emerald-600 mb-2 block">
+                                    Camper Tips
+                                </span>
+                                <h3 className="text-lg font-bold text-slate-900 mb-2 group-hover:text-emerald-600 transition-colors">
+                                    First-Time Camping Checklist: Everything You Need
+                                </h3>
+                                <p className="text-slate-600 text-sm mb-4 line-clamp-3">
+                                    Planning your first camping trip? The key to a great experience is preparation. This comprehensive checklist covers everything you need.
+                                </p>
+                                <a href="/blog/camper-tips/01-first-time-camping-checklist" className="text-sm font-semibold text-slate-900 flex items-center gap-1 group-hover:gap-2 transition-all">
+                                    Read Article <span aria-hidden="true">&rarr;</span>
+                                </a>
+                            </div>
+                        </div>
+
+                        {/* Featured Blog Card 2 */}
+                        <div className="bg-white rounded-2xl overflow-hidden shadow-sm border border-slate-100 group cursor-pointer hover:shadow-md transition-shadow">
+                            <div className="p-6">
+                                <span className="text-xs font-semibold uppercase tracking-wider text-violet-600 mb-2 block">
+                                    Industry Trends
+                                </span>
+                                <h3 className="text-lg font-bold text-slate-900 mb-2 group-hover:text-violet-600 transition-colors">
+                                    State of the Camping Industry: 2024 Trends
+                                </h3>
+                                <p className="text-slate-600 text-sm mb-4 line-clamp-3">
+                                    Explore the latest camping industry trends for 2024. Data, insights, and what campground owners need to know about the future.
+                                </p>
+                                <a href="/blog/industry/01-camping-industry-trends-2024" className="text-sm font-semibold text-slate-900 flex items-center gap-1 group-hover:gap-2 transition-all">
+                                    Read Article <span aria-hidden="true">&rarr;</span>
+                                </a>
+                            </div>
+                        </div>
+
+                        {/* Featured Blog Card 3 */}
+                        <div className="bg-white rounded-2xl overflow-hidden shadow-sm border border-slate-100 group cursor-pointer hover:shadow-md transition-shadow">
+                            <div className="p-6">
+                                <span className="text-xs font-semibold uppercase tracking-wider text-amber-600 mb-2 block">
+                                    Growth
+                                </span>
+                                <h3 className="text-lg font-bold text-slate-900 mb-2 group-hover:text-amber-600 transition-colors">
+                                    10 Ways to Increase Off-Season Bookings
+                                </h3>
+                                <p className="text-slate-600 text-sm mb-4 line-clamp-3">
+                                    Boost off-season campground revenue with proven strategies. Learn events, pricing, marketing, and partnerships that fill sites.
+                                </p>
+                                <a href="/blog/growth/01-increase-off-season-bookings" className="text-sm font-semibold text-slate-900 flex items-center gap-1 group-hover:gap-2 transition-all">
+                                    Read Article <span aria-hidden="true">&rarr;</span>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
             {/* CTA Section */}
             <section className="py-20">
                 <div className="max-w-4xl mx-auto px-6 text-center">

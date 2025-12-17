@@ -30,6 +30,12 @@ interface BookingAssistResponse {
     recommendations?: SiteRecommendation[];
     clarifyingQuestions?: string[];
     action?: 'search' | 'book' | 'clarify' | 'info';
+    bookingDetails?: {
+        dates?: { arrival: string; departure: string };
+        partySize?: { adults: number; children: number };
+        rigInfo?: { type: string; length: number };
+        siteClassId?: string;
+    };
 }
 
 @Injectable()
@@ -164,7 +170,22 @@ export class AiBookingAssistService {
             temperature: 0.7,
         });
 
-        return this.parseResponse(response.content, campground.siteClasses as any);
+        const parsedResponse = this.parseResponse(response.content, campground.siteClasses as any);
+
+        // If action is book, attach the current known booking details from context
+        if (parsedResponse.action === 'book') {
+            parsedResponse.bookingDetails = {
+                dates: context.dates,
+                partySize: context.partySize,
+                rigInfo: context.rigInfo,
+                // We could also try to infer the siteClassId from the message or recommendations
+                siteClassId: parsedResponse.recommendations?.[0]?.siteClassName
+                    ? campground.siteClasses.find(sc => sc.name === parsedResponse.recommendations![0].siteClassName)?.id
+                    : undefined
+            };
+        }
+
+        return parsedResponse;
     }
 
     /**

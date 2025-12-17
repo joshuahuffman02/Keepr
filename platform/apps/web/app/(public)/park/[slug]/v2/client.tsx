@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { useMemo, useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { apiClient } from "@/lib/api-client";
@@ -31,6 +32,7 @@ function nextWeekendRange() {
 }
 
 export function CampgroundV2Client({ slug, initialData }: { slug: string; initialData: PublicCampgroundDetail | null }) {
+  const searchParams = useSearchParams();
   const { data: campground } = useQuery({
     queryKey: ["public-campground", slug],
     queryFn: () => apiClient.getPublicCampground(slug),
@@ -38,9 +40,19 @@ export function CampgroundV2Client({ slug, initialData }: { slug: string; initia
   });
 
   const defaultDates = useMemo(() => nextWeekendRange(), []);
-  const [arrivalDate, setArrivalDate] = useState(defaultDates.arrival);
-  const [departureDate, setDepartureDate] = useState(defaultDates.departure);
-  const [guests, setGuests] = useState("2");
+
+  // Initialize from URL params or defaults
+  const [arrivalDate, setArrivalDate] = useState(searchParams?.get("arrival") || defaultDates.arrival);
+  const [departureDate, setDepartureDate] = useState(searchParams?.get("departure") || defaultDates.departure);
+
+  // Combine adults+children for guests count if needed, or take direct "guests" param
+  const paramGuests = searchParams?.get("guests");
+  const paramAdults = searchParams?.get("adults");
+  const paramChildren = searchParams?.get("children");
+
+  const totalGuests = paramGuests || (paramAdults ? (Number(paramAdults) + Number(paramChildren || 0)).toString() : "2");
+
+  const [guests, setGuests] = useState(totalGuests);
   const [typeFilter, setTypeFilter] = useState<string>("all");
 
   const events = campground?.events ?? [];
