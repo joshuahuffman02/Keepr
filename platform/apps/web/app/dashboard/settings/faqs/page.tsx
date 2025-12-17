@@ -29,7 +29,8 @@ type FAQ = {
 };
 
 export default function FAQsPage() {
-    const { campgroundId } = useCampground();
+    const { selectedCampground } = useCampground();
+    const campgroundId = selectedCampground?.id;
     const { toast } = useToast();
     const queryClient = useQueryClient();
     const [faqs, setFaqs] = useState<FAQ[]>([]);
