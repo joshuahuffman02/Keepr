@@ -133,6 +133,11 @@ export const CampgroundSchema = z.object({
   storeOpenHour: z.number().int().optional().nullable(),
   storeCloseHour: z.number().int().optional().nullable(),
 
+  // Payments / Stripe
+  stripeAccountId: z.string().nullish(),
+  billingPlan: z.string().optional().nullable(),
+  perBookingFeeCents: z.number().int().optional().nullable(),
+
   // Reviews / NPS
   npsAutoSendEnabled: z.boolean().optional(),
   npsSendHour: z.number().int().optional(),
