@@ -41,11 +41,13 @@ export interface SiteData {
 
 export interface LedgerEntry {
   id: string;
-  reservationId?: string;
+  reservationId?: string | null;
   direction: string;
   amountCents: number;
-  description?: string;
+  description?: string | null;
   occurredAt: string;
+  glCode?: string | null;
+  account?: string | null;
 }
 
 /**

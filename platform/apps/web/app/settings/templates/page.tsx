@@ -464,7 +464,7 @@ function TemplateEditor({
           <button
             type="button"
             onClick={handleSubmit(onSubmit)}
-            disabled={!isValid || !isDirty}
+            disabled={!isDirty}
             className="px-4 py-1.5 bg-violet-600 text-white rounded-lg text-sm font-medium hover:bg-violet-700 disabled:opacity-50"
           >
             Save
@@ -546,7 +546,7 @@ function CreateTemplateModal({
   const {
     register,
     handleSubmit,
-    formState: { errors, isValid },
+    formState: { errors },
     watch,
     setValue,
   } = useForm<CreateTemplateFormData>({
@@ -641,7 +641,7 @@ function CreateTemplateModal({
             </button>
             <button
               type="submit"
-              disabled={!isValid}
+              disabled={!watch("name")?.trim()}
               className="flex-1 px-4 py-2 bg-violet-600 text-white rounded-lg hover:bg-violet-700 disabled:opacity-50"
             >
               Create Template

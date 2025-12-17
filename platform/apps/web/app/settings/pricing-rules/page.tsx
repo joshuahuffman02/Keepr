@@ -657,7 +657,7 @@ export default function PricingRulesV2Page() {
                 </Button>
                 <Button
                   type="submit"
-                  disabled={!isValid || (!isDirty && !editingRule) || createMutation.isPending || updateMutation.isPending}
+                  disabled={(!isDirty && !editingRule) || createMutation.isPending || updateMutation.isPending}
                 >
                   {createMutation.isPending || updateMutation.isPending
                     ? "Saving..."

@@ -49,7 +49,7 @@ const DialogContent = React.forwardRef<
     DialogContentProps
 >(({ className, children, onRequestClose, ...props }, ref) => {
     const { open, onOpenChange } = React.useContext(DialogContext)
-    const contentRef = React.useRef<HTMLDivElement>(null)
+    const contentRef = React.useRef<HTMLDivElement | null>(null)
     const previousActiveElement = React.useRef<HTMLElement | null>(null)
 
     const attemptClose = () => {
@@ -124,8 +124,8 @@ const DialogContent = React.forwardRef<
             <div
                 ref={(node) => {
                     if (typeof ref === 'function') ref(node)
-                    else if (ref) ref.current = node
-                    contentRef.current = node
+                    else if (ref) (ref as React.MutableRefObject<HTMLDivElement | null>).current = node
+                    ;(contentRef as React.MutableRefObject<HTMLDivElement | null>).current = node
                 }}
                 className={cn(
                     "z-50 grid w-full max-w-lg gap-4 border border-slate-200 bg-white p-6 shadow-lg duration-200 sm:rounded-lg md:w-full",
