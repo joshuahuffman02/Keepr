@@ -1,171 +1,471 @@
 'use client';
 
-import { Check, ArrowRight } from 'lucide-react';
+import { Check, X, ArrowRight, Star, Clock, Users, Zap, Crown, Rocket, Gift, Shield } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { useState } from 'react';
 
-const plans = [
+// Early Access Tiers - Real scarcity with limited spots
+const earlyAccessTiers = [
   {
-    name: 'Essential',
-    description: 'Core bookings and payments',
-    price: '49',
-    period: '/mo + 1.9% + $0.20/txn',
-    features: [
-      'Online bookings with itemized taxes/fees',
-      'Calendar + availability grid',
-      'Basic reporting & exports',
-      'Standard support (email/chat)',
-      'Fee pass-through toggle for guests',
-      'Messaging add-on available ($49/mo)',
+    name: "Founder's Circle",
+    spots: 10,
+    spotsRemaining: 7, // Update this as spots fill
+    icon: Crown,
+    monthlyPrice: 0,
+    monthlyDuration: "forever",
+    bookingFee: 0.75,
+    highlight: "Best Deal",
+    color: "amber",
+    benefits: [
+      "$0/month forever (not a typo)",
+      "$0.75 per booking (locked forever)",
+      "Lifetime 'Founder' badge on your listing",
+      "Direct line to founders (phone/text)",
+      "Co-create features with us",
+      "Your logo on our website",
+      "First access to every new feature",
     ],
-    cta: 'Start free trial',
-    popular: false,
+    cta: "Claim Founder Spot",
+    urgency: "Only 7 spots left",
   },
   {
-    name: 'Pro',
-    description: 'Revenue and marketing tools',
-    price: '129',
-    period: '/mo + 1.5% + $0.15/txn',
-    features: [
-      'Everything in Essential',
-      'Dynamic pricing & rules',
-      'Waitlist + abandoned cart nudges',
-      'CRM + marketing campaigns',
-      'Priority support',
-      'Fee pass-through or absorb (configurable)',
+    name: "Pioneer",
+    spots: 25,
+    spotsRemaining: 25,
+    icon: Rocket,
+    monthlyPrice: 0,
+    monthlyDuration: "for 12 months",
+    bookingFee: 1.00,
+    highlight: "Most Popular",
+    color: "emerald",
+    benefits: [
+      "$0/month for first 12 months",
+      "$1.00 per booking (locked forever)",
+      "Then just $29/month",
+      "Priority support forever",
+      "Early access to new features",
+      "Quarterly strategy calls",
+      "Free data migration",
     ],
-    cta: 'Book a demo',
-    popular: true,
+    cta: "Become a Pioneer",
+    urgency: "25 spots available",
   },
   {
-    name: 'Business',
-    description: 'Operations at scale',
-    price: '289',
-    period: '/mo + 1.3% + $0.10/txn',
-    features: [
-      'Everything in Pro',
-      'OTA sync + channel rules',
-      'Staff scheduling & workflows',
-      'Custom reports & dashboards',
-      'Phone support included',
-      'Messaging bundle included',
+    name: "Trailblazer",
+    spots: 50,
+    spotsRemaining: 50,
+    icon: Star,
+    monthlyPrice: 14.50,
+    monthlyDuration: "for 6 months",
+    bookingFee: 1.25,
+    highlight: "Great Value",
+    color: "violet",
+    benefits: [
+      "50% off for first 6 months ($14.50/mo)",
+      "$1.25 per booking (locked forever)",
+      "Then $29/month",
+      "Early access to new features",
+      "Priority email support",
+      "Free data migration",
+      "Onboarding call included",
     ],
-    cta: 'Talk to sales',
-    popular: false,
-  },
-  {
-    name: 'Enterprise',
-    description: 'Multi-park and high volume',
-    price: 'Custom',
-    period: '',
-    features: [
-      'Volume pricing & SLAs',
-      'SSO + audit logging',
-      'Custom integrations & API access',
-      'Premium onboarding',
-      'Dedicated TAM & 24/7 support',
-      'Fee strategy guidance (pass-through vs absorb)',
-    ],
-    cta: 'Contact sales',
-    popular: false,
+    cta: "Join Trailblazers",
+    urgency: "50 spots available",
   },
 ];
 
+// Competitor comparison data
+const competitors = [
+  {
+    name: "Camp Everyday",
+    isUs: true,
+    monthlyBase: "$29",
+    perBooking: "$1.25",
+    marketplaceCommission: "0%",
+    setupFee: "$0",
+    paymentProcessing: "2.9% + $0.30",
+    freeTrialDays: "30",
+    support: "Priority",
+    features: {
+      onlineBooking: true,
+      dynamicPricing: true,
+      guestMessaging: true,
+      pos: true,
+      staffScheduling: true,
+      mobileApp: true,
+      aiFeatures: true,
+      multiProperty: true,
+    },
+  },
+  {
+    name: "Campspot",
+    isUs: false,
+    monthlyBase: "Varies",
+    perBooking: "$3.00",
+    marketplaceCommission: "10%",
+    setupFee: "$$$",
+    paymentProcessing: "2.5%",
+    freeTrialDays: "No",
+    support: "Standard",
+    features: {
+      onlineBooking: true,
+      dynamicPricing: true,
+      guestMessaging: true,
+      pos: true,
+      staffScheduling: false,
+      mobileApp: true,
+      aiFeatures: false,
+      multiProperty: true,
+    },
+  },
+  {
+    name: "Firefly",
+    isUs: false,
+    monthlyBase: "Quote",
+    perBooking: "Varies",
+    marketplaceCommission: "N/A",
+    setupFee: "$$",
+    paymentProcessing: "2.5%",
+    freeTrialDays: "Yes",
+    support: "24/7",
+    features: {
+      onlineBooking: true,
+      dynamicPricing: true,
+      guestMessaging: true,
+      pos: true,
+      staffScheduling: true,
+      mobileApp: false,
+      aiFeatures: false,
+      multiProperty: true,
+    },
+  },
+  {
+    name: "Newbook",
+    isUs: false,
+    monthlyBase: "Quote",
+    perBooking: "Varies",
+    marketplaceCommission: "N/A",
+    setupFee: "$0",
+    paymentProcessing: "Varies",
+    freeTrialDays: "Free tier",
+    support: "24/7",
+    features: {
+      onlineBooking: true,
+      dynamicPricing: true,
+      guestMessaging: true,
+      pos: true,
+      staffScheduling: true,
+      mobileApp: true,
+      aiFeatures: false,
+      multiProperty: true,
+    },
+  },
+  {
+    name: "ResNexus",
+    isUs: false,
+    monthlyBase: "$30+",
+    perBooking: "$0",
+    marketplaceCommission: "N/A",
+    setupFee: "$$",
+    paymentProcessing: "2.5%",
+    freeTrialDays: "14",
+    support: "Standard",
+    features: {
+      onlineBooking: true,
+      dynamicPricing: true,
+      guestMessaging: true,
+      pos: false,
+      staffScheduling: false,
+      mobileApp: true,
+      aiFeatures: false,
+      multiProperty: true,
+    },
+  },
+];
+
+const featureLabels: Record<string, string> = {
+  onlineBooking: "Online Booking",
+  dynamicPricing: "Dynamic Pricing",
+  guestMessaging: "Guest Messaging",
+  pos: "Point of Sale",
+  staffScheduling: "Staff Scheduling",
+  mobileApp: "Mobile App",
+  aiFeatures: "AI Features",
+  multiProperty: "Multi-Property",
+};
+
 export function PricingPreview() {
+  const [showComparison, setShowComparison] = useState(false);
+
   return (
-    <section id="pricing" className="py-24 bg-gradient-to-br from-slate-50 to-white">
+    <section id="pricing" className="py-24 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        {/* Section Header */}
-        <div className="text-center max-w-3xl mx-auto mb-16">
-          <h2 className="text-base font-semibold text-emerald-600 tracking-wide uppercase mb-3">
-            Pricing
+
+        {/* Early Access Hero */}
+        <div className="text-center max-w-4xl mx-auto mb-16">
+          <div className="inline-flex items-center gap-2 px-4 py-2 bg-amber-500/20 border border-amber-500/30 rounded-full text-amber-400 text-sm font-semibold mb-6">
+            <Clock className="h-4 w-4" />
+            Early Access Program - Limited Spots
+          </div>
+
+          <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
+            Lock In Your Rate.{' '}
+            <span className="bg-gradient-to-r from-amber-400 to-orange-400 bg-clip-text text-transparent">
+              Forever.
+            </span>
           </h2>
-          <p className="text-4xl font-bold text-slate-900 mb-4">
-            Simple, transparent pricing
+
+          <p className="text-xl text-slate-300 mb-8">
+            We're looking for our first 85 campgrounds to help us build the best platform in the industry.
+            In exchange, you get pricing that will never go up.
           </p>
-          <p className="text-xl text-slate-600">
-            Choose the plan that fits your campground. All plans include a 30-day free trial.
-          </p>
+
+          <div className="flex flex-wrap items-center justify-center gap-6 text-slate-400">
+            <div className="flex items-center gap-2">
+              <Shield className="h-5 w-5 text-emerald-400" />
+              <span>Price locked forever</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <Gift className="h-5 w-5 text-emerald-400" />
+              <span>Free migration</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <Zap className="h-5 w-5 text-emerald-400" />
+              <span>Go live in 48 hours</span>
+            </div>
+          </div>
         </div>
 
-        {/* Pricing Cards */}
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8 max-w-6xl mx-auto">
-          {plans.map((plan) => (
-            <div
-              key={plan.name}
-              className={`relative rounded-2xl border-2 p-8 transition-all duration-300 ${
-                plan.popular
-                  ? 'border-emerald-500 shadow-2xl scale-105 bg-white'
-                  : 'border-slate-200 hover:border-emerald-300 hover:shadow-xl bg-white'
-              }`}
-            >
-              {/* Popular Badge */}
-              {plan.popular && (
-                <div className="absolute -top-4 left-1/2 -translate-x-1/2 px-4 py-1.5 bg-gradient-to-r from-emerald-600 to-teal-600 text-white text-sm font-semibold rounded-full">
-                  Most Popular
-                </div>
-              )}
+        {/* Early Access Tiers */}
+        <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto mb-20">
+          {earlyAccessTiers.map((tier) => {
+            const colorStylesMap = {
+              amber: {
+                border: "border-amber-500",
+                bg: "bg-amber-500/10",
+                badge: "bg-amber-500 text-slate-900",
+                icon: "text-amber-400",
+                button: "bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400",
+                urgency: "text-amber-400",
+              },
+              emerald: {
+                border: "border-emerald-500",
+                bg: "bg-emerald-500/10",
+                badge: "bg-emerald-500 text-white",
+                icon: "text-emerald-400",
+                button: "bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400",
+                urgency: "text-emerald-400",
+              },
+              violet: {
+                border: "border-violet-500",
+                bg: "bg-violet-500/10",
+                badge: "bg-violet-500 text-white",
+                icon: "text-violet-400",
+                button: "bg-gradient-to-r from-violet-500 to-purple-500 hover:from-violet-400 hover:to-purple-400",
+                urgency: "text-violet-400",
+              },
+            };
+            const colorStyles = colorStylesMap[tier.color as keyof typeof colorStylesMap];
 
-              {/* Plan Header */}
-              <div className="text-center mb-8">
-                <h3 className="text-2xl font-bold text-slate-900 mb-2">{plan.name}</h3>
-                <p className="text-slate-600 text-sm mb-4">{plan.description}</p>
-
-                <div className="flex items-baseline justify-center gap-1">
-                  {plan.price === 'Custom' ? (
-                    <div className="text-4xl font-bold text-slate-900">{plan.price}</div>
-                  ) : (
-                    <>
-                      <span className="text-2xl text-slate-600">$</span>
-                      <span className="text-5xl font-bold text-slate-900">{plan.price}</span>
-                      <span className="text-slate-600">{plan.period}</span>
-                    </>
-                  )}
-                </div>
-              </div>
-
-              {/* Features */}
-              <ul className="space-y-3 mb-8">
-                {plan.features.map((feature) => (
-                  <li key={feature} className="flex items-start gap-3">
-                    <Check className="h-5 w-5 text-emerald-500 flex-shrink-0 mt-0.5" />
-                    <span className="text-slate-700">{feature}</span>
-                  </li>
-                ))}
-              </ul>
-
-              {/* CTA Button */}
-              <Button
-                className={`w-full py-6 text-lg group ${
-                  plan.popular
-                    ? 'bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white'
-                    : 'border-2 border-slate-300 hover:border-emerald-600 hover:bg-emerald-50 hover:text-emerald-700'
-                }`}
-                variant={plan.popular ? 'default' : 'outline'}
+            return (
+              <div
+                key={tier.name}
+                className={`relative rounded-2xl border-2 ${colorStyles.border} ${colorStyles.bg} p-8 transition-all duration-300 hover:scale-[1.02]`}
               >
-                {plan.cta}
-                <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
-              </Button>
-            </div>
-          ))}
+                {/* Badge */}
+                <div className={`absolute -top-4 left-1/2 -translate-x-1/2 px-4 py-1.5 ${colorStyles.badge} text-sm font-bold rounded-full`}>
+                  {tier.highlight}
+                </div>
+
+                {/* Header */}
+                <div className="text-center mb-8 pt-4">
+                  <tier.icon className={`h-12 w-12 mx-auto mb-4 ${colorStyles.icon}`} />
+                  <h3 className="text-2xl font-bold text-white mb-2">{tier.name}</h3>
+
+                  {/* Spots Counter */}
+                  <div className="flex items-center justify-center gap-2 mb-4">
+                    <div className="flex -space-x-1">
+                      {[...Array(Math.min(tier.spotsRemaining, 5))].map((_, i) => (
+                        <div key={i} className="w-6 h-6 rounded-full bg-slate-600 border-2 border-slate-800" />
+                      ))}
+                    </div>
+                    <span className={`text-sm font-semibold ${colorStyles.urgency}`}>
+                      {tier.urgency}
+                    </span>
+                  </div>
+
+                  {/* Pricing */}
+                  <div className="space-y-2">
+                    <div className="flex items-baseline justify-center gap-1">
+                      <span className="text-3xl text-slate-400">$</span>
+                      <span className="text-6xl font-bold text-white">{tier.monthlyPrice}</span>
+                      <span className="text-slate-400">/mo</span>
+                    </div>
+                    <p className="text-slate-400">{tier.monthlyDuration}</p>
+                    <div className="pt-2 border-t border-slate-700/50">
+                      <span className="text-emerald-400 font-semibold">
+                        ${tier.bookingFee.toFixed(2)} per booking
+                      </span>
+                      <span className="text-slate-500 text-sm block">
+                        (pass to guest or absorb)
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Benefits */}
+                <ul className="space-y-3 mb-8">
+                  {tier.benefits.map((benefit) => (
+                    <li key={benefit} className="flex items-start gap-3">
+                      <Check className="h-5 w-5 text-emerald-400 flex-shrink-0 mt-0.5" />
+                      <span className="text-slate-300">{benefit}</span>
+                    </li>
+                  ))}
+                </ul>
+
+                {/* CTA */}
+                <Button
+                  className={`w-full py-6 text-lg font-semibold ${colorStyles.button} text-white shadow-lg`}
+                >
+                  {tier.cta}
+                  <ArrowRight className="ml-2 h-5 w-5" />
+                </Button>
+              </div>
+            );
+          })}
         </div>
 
-        {/* Additional Info */}
-        <div className="mt-16 text-center">
-          <p className="text-slate-600 mb-4">
-            All plans include free data migration, onboarding, and training. Toggle guest fee pass-through or absorption on every plan.
+        {/* After Early Access Note */}
+        <div className="text-center mb-16">
+          <p className="text-slate-400">
+            After early access fills: <span className="text-white font-semibold">$29/month + $1.50/booking</span>
           </p>
-          <div className="flex flex-wrap items-center justify-center gap-8 text-sm text-slate-500">
-            <div className="flex items-center gap-2">
-              <Check className="h-4 w-4 text-emerald-500" />
-              <span>No setup fees</span>
+        </div>
+
+        {/* Competitor Comparison Toggle */}
+        <div className="text-center mb-8">
+          <button
+            onClick={() => setShowComparison(!showComparison)}
+            className="inline-flex items-center gap-2 px-6 py-3 bg-white/10 hover:bg-white/20 text-white rounded-full transition-colors"
+          >
+            {showComparison ? "Hide" : "Show"} Competitor Comparison
+            <ArrowRight className={`h-4 w-4 transition-transform ${showComparison ? "rotate-90" : ""}`} />
+          </button>
+        </div>
+
+        {/* Competitor Comparison Table */}
+        {showComparison && (
+          <div className="overflow-x-auto rounded-2xl border border-slate-700 bg-slate-800/50 backdrop-blur">
+            <table className="w-full">
+              <thead>
+                <tr className="border-b border-slate-700">
+                  <th className="text-left p-4 text-slate-400 font-medium">Feature</th>
+                  {competitors.map((c) => (
+                    <th
+                      key={c.name}
+                      className={`p-4 text-center ${c.isUs ? "bg-emerald-500/20" : ""}`}
+                    >
+                      <span className={c.isUs ? "text-emerald-400 font-bold" : "text-white"}>
+                        {c.name}
+                      </span>
+                      {c.isUs && (
+                        <span className="block text-xs text-emerald-400/70 mt-1">That's us!</span>
+                      )}
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {/* Pricing rows */}
+                <tr className="border-b border-slate-700/50">
+                  <td className="p-4 text-slate-300">Monthly Base</td>
+                  {competitors.map((c) => (
+                    <td key={c.name} className={`p-4 text-center ${c.isUs ? "bg-emerald-500/10 text-emerald-400 font-semibold" : "text-white"}`}>
+                      {c.monthlyBase}
+                    </td>
+                  ))}
+                </tr>
+                <tr className="border-b border-slate-700/50">
+                  <td className="p-4 text-slate-300">Per Booking Fee</td>
+                  {competitors.map((c) => (
+                    <td key={c.name} className={`p-4 text-center ${c.isUs ? "bg-emerald-500/10 text-emerald-400 font-semibold" : "text-white"}`}>
+                      {c.perBooking}
+                    </td>
+                  ))}
+                </tr>
+                <tr className="border-b border-slate-700/50">
+                  <td className="p-4 text-slate-300">Marketplace Commission</td>
+                  {competitors.map((c) => (
+                    <td key={c.name} className={`p-4 text-center ${c.isUs ? "bg-emerald-500/10 text-emerald-400 font-semibold" : c.marketplaceCommission === "10%" ? "text-red-400" : "text-white"}`}>
+                      {c.marketplaceCommission}
+                    </td>
+                  ))}
+                </tr>
+                <tr className="border-b border-slate-700/50">
+                  <td className="p-4 text-slate-300">Setup Fee</td>
+                  {competitors.map((c) => (
+                    <td key={c.name} className={`p-4 text-center ${c.isUs ? "bg-emerald-500/10 text-emerald-400 font-semibold" : "text-white"}`}>
+                      {c.setupFee}
+                    </td>
+                  ))}
+                </tr>
+                <tr className="border-b border-slate-700/50">
+                  <td className="p-4 text-slate-300">Free Trial</td>
+                  {competitors.map((c) => (
+                    <td key={c.name} className={`p-4 text-center ${c.isUs ? "bg-emerald-500/10 text-emerald-400 font-semibold" : "text-white"}`}>
+                      {c.freeTrialDays === "No" ? <X className="h-5 w-5 mx-auto text-red-400" /> : c.freeTrialDays + " days"}
+                    </td>
+                  ))}
+                </tr>
+
+                {/* Feature rows */}
+                {Object.entries(featureLabels).map(([key, label]) => (
+                  <tr key={key} className="border-b border-slate-700/50">
+                    <td className="p-4 text-slate-300">{label}</td>
+                    {competitors.map((c) => (
+                      <td key={c.name} className={`p-4 text-center ${c.isUs ? "bg-emerald-500/10" : ""}`}>
+                        {c.features[key as keyof typeof c.features] ? (
+                          <Check className={`h-5 w-5 mx-auto ${c.isUs ? "text-emerald-400" : "text-emerald-500"}`} />
+                        ) : (
+                          <X className="h-5 w-5 mx-auto text-slate-500" />
+                        )}
+                      </td>
+                    ))}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+
+        {/* Bottom CTA */}
+        <div className="mt-16 text-center">
+          <p className="text-slate-400 mb-6">
+            Not sure which tier is right for you?
+          </p>
+          <Button
+            variant="outline"
+            className="border-slate-600 text-white hover:bg-slate-700 px-8 py-6 text-lg"
+          >
+            Book a Free Consultation
+            <ArrowRight className="ml-2 h-5 w-5" />
+          </Button>
+        </div>
+
+        {/* Trust Elements */}
+        <div className="mt-16 pt-16 border-t border-slate-700">
+          <div className="grid md:grid-cols-3 gap-8 text-center">
+            <div>
+              <div className="text-4xl font-bold text-white mb-2">30-Day</div>
+              <p className="text-slate-400">Money-back guarantee</p>
             </div>
-            <div className="flex items-center gap-2">
-              <Check className="h-4 w-4 text-emerald-500" />
-              <span>Messaging add-on for Essential/Pro</span>
+            <div>
+              <div className="text-4xl font-bold text-white mb-2">48 Hours</div>
+              <p className="text-slate-400">Average time to go live</p>
             </div>
-            <div className="flex items-center gap-2">
-              <Check className="h-4 w-4 text-emerald-500" />
-              <span>Money-back guarantee</span>
+            <div>
+              <div className="text-4xl font-bold text-white mb-2">$0</div>
+              <p className="text-slate-400">Setup and migration fees</p>
             </div>
           </div>
         </div>
