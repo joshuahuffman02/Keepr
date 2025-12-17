@@ -1072,6 +1072,8 @@ model Campground {
   analyticsExports       AnalyticsExport[]
   platformGoals          PlatformGoal[]
   campgroundAwards       CampgroundAward[]
+  charitySettings        CampgroundCharity?
+  charityDonations       CharityDonation[]
 
   @@index([dataSource, dataSourceId])
 }
@@ -1788,6 +1790,9 @@ model Reservation {
 
   // Split booking segments (when a stay spans multiple sites)
   segments ReservationSegment[]
+
+  // Charity donation (if guest opted to round up)
+  charityDonation CharityDonation?
 
   @@index([campgroundId])
   @@index([siteId])
@@ -6016,4 +6021,109 @@ model CampgroundAward {
   @@index([campgroundId])
   @@index([year])
   @@index([awardType])
+}
+
+// =============================================================================
+// CHARITY ROUND-UP
+// =============================================================================
+
+enum DonationStatus {
+  collected       // Payment received with reservation
+  pending_payout  // Marked for next payout batch
+  paid_out        // Sent to charity
+  refunded        // Reservation cancelled, donation refunded
+}
+
+enum CharityPayoutStatus {
+  pending
+  processing
+  completed
+  failed
+}
+
+// Charity registry - platform-managed list of verified charities
+model Charity {
+  id          String   @id @default(cuid())
+  name        String
+  description String?  @db.Text
+  logoUrl     String?
+  taxId       String?  // EIN for US charities (for tax receipts)
+  website     String?
+  category    String?  // environment, youth, veterans, animals, etc.
+  isActive    Boolean  @default(true)
+  isVerified  Boolean  @default(false) // Platform has verified legitimacy
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  campgroundCharities CampgroundCharity[]
+  donations           CharityDonation[]
+  payouts             CharityPayout[]
+
+  @@index([isActive])
+  @@index([category])
+}
+
+// Campground's charity selection and round-up settings
+model CampgroundCharity {
+  id             String   @id @default(cuid())
+  campgroundId   String   @unique // One charity per campground
+  charityId      String
+  isEnabled      Boolean  @default(true)
+  customMessage  String?  @db.Text // "Help us support local veterans!"
+  roundUpType    String   @default("nearest_dollar") // nearest_dollar, nearest_5, fixed
+  roundUpOptions Json?    // { values: [1, 2, 5] } for fixed amounts
+  defaultOptIn   Boolean  @default(false) // Pre-check the donation box?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  campground     Campground @relation(fields: [campgroundId], references: [id], onDelete: Cascade)
+  charity        Charity    @relation(fields: [charityId], references: [id])
+
+  @@index([charityId])
+}
+
+// Individual donation records linked to reservations
+model CharityDonation {
+  id             String         @id @default(cuid())
+  reservationId  String         @unique // One donation per reservation
+  charityId      String
+  campgroundId   String
+  guestId        String?
+  amountCents    Int
+  status         DonationStatus @default(collected)
+  payoutId       String?
+  journalEntryId String?        // Link to ledger entry for accounting
+  refundedAt     DateTime?
+  createdAt      DateTime       @default(now())
+
+  reservation    Reservation    @relation(fields: [reservationId], references: [id], onDelete: Cascade)
+  charity        Charity        @relation(fields: [charityId], references: [id])
+  campground     Campground     @relation(fields: [campgroundId], references: [id])
+  payout         CharityPayout? @relation(fields: [payoutId], references: [id])
+
+  @@index([charityId])
+  @@index([campgroundId])
+  @@index([status])
+  @@index([createdAt])
+}
+
+// Batch payouts to charities
+model CharityPayout {
+  id           String              @id @default(cuid())
+  charityId    String
+  amountCents  Int
+  status       CharityPayoutStatus @default(pending)
+  payoutDate   DateTime?
+  payoutMethod String?             // check, ach, wire
+  reference    String?             // Check number, wire reference
+  notes        String?             @db.Text
+  createdBy    String?             // Admin who initiated
+  createdAt    DateTime            @default(now())
+  updatedAt    DateTime            @updatedAt
+
+  charity      Charity             @relation(fields: [charityId], references: [id])
+  donations    CharityDonation[]
+
+  @@index([charityId])
+  @@index([status])
 }
