@@ -172,12 +172,12 @@ export class AiBookingAssistService {
 
         const parsedResponse = this.parseResponse(response.content, campground.siteClasses as any);
 
-        // If action is book, attach the current known booking details from context
+        // If action is book, attach the current known booking details from context or extracted from response
         if (parsedResponse.action === 'book') {
             parsedResponse.bookingDetails = {
-                dates: context.dates,
-                partySize: context.partySize,
-                rigInfo: context.rigInfo,
+                dates: parsedResponse.bookingDetails?.dates || context.dates,
+                partySize: parsedResponse.bookingDetails?.partySize || context.partySize,
+                rigInfo: parsedResponse.bookingDetails?.rigInfo || context.rigInfo,
                 // We could also try to infer the siteClassId from the message or recommendations
                 siteClassId: parsedResponse.recommendations?.[0]?.siteClassName
                     ? campground.siteClasses.find(sc => sc.name === parsedResponse.recommendations![0].siteClassName)?.id
@@ -289,13 +289,20 @@ Guidelines:
 - Don't make up policies or amenities not listed
 
 CRITICAL:
-- When the guest confirms they want to proceed with a booking (e.g. "yes", "book it", "sounds good"), you MUST use "ACTION: book" in your response.
+- When the guest confirms they want to proceed with a booking, you MUST use "ACTION: book" in your response.
 - Do NOT just say you will book it. You must trigger the action.
 - Only use "ACTION: book" if you have Dates and Party Size/RV Info.
+- IF ACTION IS BOOK, YOU MUST ALSO OUTPUT METADATA:
+  DATES: YYYY-MM-DD,YYYY-MM-DD
+  RIG: length,type (if applicable)
+  PARTY: adults,children
 
 Response format:
 MESSAGE: <your response>
 ACTION: search|book|clarify|info
+DATES: <arrival>,<departure>
+RIG: <length>,<type>
+PARTY: <adults>,<children>
 QUESTIONS: <optional comma-separated clarifying questions>
 RECOMMENDATIONS: <optional comma-separated site class names>`;
     }
@@ -335,6 +342,27 @@ RECOMMENDATIONS: <optional comma-separated site class names>`;
             result.action = actionMatch[1].toLowerCase() as any;
         }
 
+        // Parse DATES
+        const datesMatch = content.match(/DATES:\s*(\d{4}-\d{2}-\d{2}),\s*(\d{4}-\d{2}-\d{2})/i);
+        if (datesMatch) {
+            result.bookingDetails = result.bookingDetails || {};
+            result.bookingDetails.dates = { arrival: datesMatch[1], departure: datesMatch[2] };
+        }
+
+        // Parse PARTY
+        const partyMatch = content.match(/PARTY:\s*(\d+),\s*(\d+)/i);
+        if (partyMatch) {
+            result.bookingDetails = result.bookingDetails || {};
+            result.bookingDetails.partySize = { adults: parseInt(partyMatch[1]), children: parseInt(partyMatch[2]) };
+        }
+
+        // Parse RIG
+        const rigMatch = content.match(/RIG:\s*(\d+),\s*([a-zA-Z\s]+)/i);
+        if (rigMatch) {
+            result.bookingDetails = result.bookingDetails || {};
+            result.bookingDetails.rigInfo = { length: parseInt(rigMatch[1]), type: rigMatch[2].trim() };
+        }
+
         // Parse clarifying questions
         const questionsMatch = content.match(/QUESTIONS:\s*(.+)/i);
         if (questionsMatch) {
@@ -358,7 +386,7 @@ RECOMMENDATIONS: <optional comma-separated site class names>`;
         }
 
         // Parse message
-        const messageMatch = content.match(/MESSAGE:\s*(.+?)(?=ACTION:|QUESTIONS:|RECOMMENDATIONS:|$)/is);
+        const messageMatch = content.match(/MESSAGE:\s*(.+?)(?=ACTION:|QUESTIONS:|RECOMMENDATIONS:|DATES:|RIG:|PARTY:|$)/is);
         if (messageMatch) {
             result.message = messageMatch[1].trim();
         } else {
@@ -367,6 +395,9 @@ RECOMMENDATIONS: <optional comma-separated site class names>`;
                 .replace(/ACTION:.*(\n|$)/gi, '')
                 .replace(/QUESTIONS:.*(\n|$)/gi, '')
                 .replace(/RECOMMENDATIONS:.*(\n|$)/gi, '')
+                .replace(/DATES:.*(\n|$)/gi, '')
+                .replace(/PARTY:.*(\n|$)/gi, '')
+                .replace(/RIG:.*(\n|$)/gi, '')
                 .replace(/MESSAGE:/gi, '')
                 .trim();
         }
