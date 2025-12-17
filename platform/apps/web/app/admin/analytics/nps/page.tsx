@@ -13,6 +13,16 @@ import {
   Smile,
   Meh,
   Frown,
+  UserPlus,
+  Repeat,
+  Sun,
+  Snowflake,
+  Leaf,
+  Flower2,
+  AlertCircle,
+  CheckCircle,
+  Clock,
+  Mail,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -99,6 +109,23 @@ const mockNpsData = {
     { tag: "wifi", count: 212, avgScore: 5.2, sentiment: "negative" },
     { tag: "noise", count: 178, avgScore: 4.8, sentiment: "negative" },
     { tag: "sites", count: 165, avgScore: 7.5, sentiment: "neutral" },
+  ],
+  byGuestType: [
+    { guestType: "first_time", score: 38, responses: 1523, promoters: 720, passives: 410, detractors: 393 },
+    { guestType: "repeat", score: 52, responses: 1324, promoters: 818, passives: 302, detractors: 204 },
+  ],
+  bySeason: [
+    { season: "Spring", score: 45, responses: 580, promoters: 310, passives: 145, detractors: 125 },
+    { season: "Summer", score: 38, responses: 1250, promoters: 625, passives: 312, detractors: 313 },
+    { season: "Fall", score: 48, responses: 620, promoters: 350, passives: 155, detractors: 115 },
+    { season: "Winter", score: 44, responses: 397, promoters: 210, passives: 100, detractors: 87 },
+  ],
+  detractorFollowUps: [
+    { id: "d1", score: 2, comment: "Terrible experience. Site was dirty and staff was rude.", campgroundName: "Dusty Pines RV Park", guestEmail: "john@example.com", createdAt: new Date("2024-12-15"), followedUp: false, resolved: false },
+    { id: "d2", score: 4, comment: "WiFi didn't work at all. Very disappointing.", campgroundName: "Shady Acres Camp", guestEmail: "jane@example.com", createdAt: new Date("2024-12-14"), followedUp: true, followUpAt: new Date("2024-12-15"), resolved: false },
+    { id: "d3", score: 3, comment: "Noisy neighbors all night. No quiet hours enforced.", campgroundName: "River Valley Camp", guestEmail: "mike@example.com", createdAt: new Date("2024-12-13"), followedUp: true, followUpAt: new Date("2024-12-14"), followUpNote: "Offered refund", resolved: true },
+    { id: "d4", score: 5, comment: "Bathrooms were in poor condition.", campgroundName: "Budget Bay Marina", guestEmail: "sarah@example.com", createdAt: new Date("2024-12-12"), followedUp: false, resolved: false },
+    { id: "d5", score: 1, comment: "Complete waste of money. Nothing as advertised.", campgroundName: "Roadside Rest Stop", guestEmail: "bob@example.com", createdAt: new Date("2024-12-11"), followedUp: false, resolved: false },
   ],
 };
 
@@ -438,6 +465,189 @@ export default function NpsAnalyticsPage() {
                   ))}
                 </tbody>
               </table>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Guest Type & Seasonal Analysis */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* NPS by Guest Type */}
+        <Card className="bg-slate-800/50 border-slate-700">
+          <CardHeader>
+            <CardTitle className="text-lg text-white flex items-center gap-2">
+              <Users className="h-5 w-5 text-blue-400" />
+              NPS by Guest Type
+            </CardTitle>
+            <p className="text-sm text-slate-400">First-time vs returning guests</p>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-2 gap-4">
+              {data.byGuestType?.map((gt) => (
+                <div
+                  key={gt.guestType}
+                  className={`p-4 rounded-lg border ${
+                    gt.guestType === "repeat"
+                      ? "bg-blue-500/10 border-blue-500/30"
+                      : "bg-slate-700/50 border-slate-600"
+                  }`}
+                >
+                  <div className="flex items-center gap-2 mb-3">
+                    {gt.guestType === "first_time" ? (
+                      <UserPlus className="h-5 w-5 text-slate-400" />
+                    ) : (
+                      <Repeat className="h-5 w-5 text-blue-400" />
+                    )}
+                    <span className="font-medium text-white">
+                      {gt.guestType === "first_time" ? "First-Time" : "Repeat"}
+                    </span>
+                  </div>
+                  <p className={`text-3xl font-bold ${getNpsColor(gt.score)}`}>{gt.score}</p>
+                  <p className="text-sm text-slate-400 mt-1">{gt.responses.toLocaleString()} responses</p>
+                  <div className="flex gap-3 mt-2 text-xs">
+                    <span className="text-green-400">{gt.promoters} promoters</span>
+                    <span className="text-red-400">{gt.detractors} detractors</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+            {data.byGuestType && data.byGuestType.length === 2 && (
+              <div className="mt-4 p-3 bg-blue-500/10 border border-blue-500/30 rounded-lg">
+                <p className="text-sm text-blue-300">
+                  <strong>Insight:</strong> Repeat guests score{" "}
+                  <span className="font-bold">
+                    {Math.abs(data.byGuestType[1].score - data.byGuestType[0].score)} points
+                  </span>{" "}
+                  {data.byGuestType[1].score > data.byGuestType[0].score ? "higher" : "lower"} than first-time guests
+                </p>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
+        {/* NPS by Season */}
+        <Card className="bg-slate-800/50 border-slate-700">
+          <CardHeader>
+            <CardTitle className="text-lg text-white flex items-center gap-2">
+              <Sun className="h-5 w-5 text-amber-400" />
+              NPS by Season
+            </CardTitle>
+            <p className="text-sm text-slate-400">How satisfaction varies throughout the year</p>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-2 gap-3">
+              {data.bySeason?.map((s) => {
+                const SeasonIcon =
+                  s.season === "Summer" ? Sun :
+                  s.season === "Winter" ? Snowflake :
+                  s.season === "Fall" ? Leaf : Flower2;
+                const seasonColor =
+                  s.season === "Summer" ? "text-amber-400" :
+                  s.season === "Winter" ? "text-blue-300" :
+                  s.season === "Fall" ? "text-orange-400" : "text-pink-400";
+                return (
+                  <div key={s.season} className="p-3 rounded-lg bg-slate-700/50 border border-slate-600">
+                    <div className="flex items-center justify-between mb-2">
+                      <div className="flex items-center gap-2">
+                        <SeasonIcon className={`h-4 w-4 ${seasonColor}`} />
+                        <span className="font-medium text-white">{s.season}</span>
+                      </div>
+                      <span className={`text-xl font-bold ${getNpsColor(s.score)}`}>{s.score}</span>
+                    </div>
+                    <p className="text-xs text-slate-400">{s.responses.toLocaleString()} responses</p>
+                  </div>
+                );
+              })}
+            </div>
+            {data.bySeason && data.bySeason.length > 0 && (
+              <div className="mt-4 p-3 bg-amber-500/10 border border-amber-500/30 rounded-lg">
+                <p className="text-sm text-amber-300">
+                  <strong>Peak Season Impact:</strong> Summer has the most responses but{" "}
+                  {data.bySeason.find(s => s.season === "Summer")?.score || 0 <
+                   Math.max(...data.bySeason.map(s => s.score))
+                    ? "lower NPS—high volume may strain quality"
+                    : "maintains strong NPS"}
+                </p>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Detractor Follow-ups */}
+      {data.detractorFollowUps && data.detractorFollowUps.length > 0 && (
+        <Card className="bg-slate-800/50 border-slate-700">
+          <CardHeader>
+            <div className="flex items-center justify-between">
+              <div>
+                <CardTitle className="text-lg text-white flex items-center gap-2">
+                  <AlertCircle className="h-5 w-5 text-amber-400" />
+                  Detractor Follow-ups
+                </CardTitle>
+                <p className="text-sm text-slate-400">Track outreach to unhappy guests</p>
+              </div>
+              <div className="flex gap-2 text-sm">
+                <span className="px-2 py-1 bg-red-500/20 text-red-400 rounded">
+                  {data.detractorFollowUps.filter(d => !d.followedUp).length} Pending
+                </span>
+                <span className="px-2 py-1 bg-amber-500/20 text-amber-400 rounded">
+                  {data.detractorFollowUps.filter(d => d.followedUp && !d.resolved).length} In Progress
+                </span>
+                <span className="px-2 py-1 bg-green-500/20 text-green-400 rounded">
+                  {data.detractorFollowUps.filter(d => d.resolved).length} Resolved
+                </span>
+              </div>
+            </div>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-3">
+              {data.detractorFollowUps.map((d) => (
+                <div
+                  key={d.id}
+                  className={`p-4 rounded-lg border ${
+                    d.resolved
+                      ? "bg-green-500/5 border-green-500/20"
+                      : d.followedUp
+                        ? "bg-amber-500/5 border-amber-500/20"
+                        : "bg-red-500/5 border-red-500/20"
+                  }`}
+                >
+                  <div className="flex items-start justify-between">
+                    <div className="flex-1">
+                      <div className="flex items-center gap-3 mb-2">
+                        <span className="text-lg font-bold text-red-400">{d.score}</span>
+                        <span className="text-slate-400">{d.campgroundName}</span>
+                        {d.resolved ? (
+                          <Badge className="bg-green-500/20 text-green-400 border-0">
+                            <CheckCircle className="h-3 w-3 mr-1" /> Resolved
+                          </Badge>
+                        ) : d.followedUp ? (
+                          <Badge className="bg-amber-500/20 text-amber-400 border-0">
+                            <Clock className="h-3 w-3 mr-1" /> Contacted
+                          </Badge>
+                        ) : (
+                          <Badge className="bg-red-500/20 text-red-400 border-0">
+                            <AlertCircle className="h-3 w-3 mr-1" /> Needs Follow-up
+                          </Badge>
+                        )}
+                      </div>
+                      <p className="text-slate-300 text-sm">{d.comment}</p>
+                      {d.followUpNote && (
+                        <p className="text-xs text-slate-500 mt-2 italic">Note: {d.followUpNote}</p>
+                      )}
+                    </div>
+                    <div className="text-right text-xs text-slate-500">
+                      <p>{new Date(d.createdAt).toLocaleDateString()}</p>
+                      {d.guestEmail && (
+                        <div className="flex items-center gap-1 mt-1 text-blue-400">
+                          <Mail className="h-3 w-3" />
+                          <span>{d.guestEmail}</span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              ))}
             </div>
           </CardContent>
         </Card>

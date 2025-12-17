@@ -11,6 +11,8 @@ import { AmenityAnalyticsService } from "./services/amenity-analytics.service";
 import { BenchmarkService } from "./services/benchmark.service";
 import { NpsAnalyticsService } from "./services/nps-analytics.service";
 import { AnalyticsExportService, ExportOptions } from "./export/analytics-export.service";
+import { ExecutiveDashboardService } from "./services/executive-dashboard.service";
+import { AiSuggestionsService } from "./services/ai-suggestions.service";
 
 @Controller("admin/platform-analytics")
 export class PlatformAnalyticsController {
@@ -25,7 +27,9 @@ export class PlatformAnalyticsController {
     private amenityService: AmenityAnalyticsService,
     private benchmarkService: BenchmarkService,
     private npsService: NpsAnalyticsService,
-    private exportService: AnalyticsExportService
+    private exportService: AnalyticsExportService,
+    private executiveService: ExecutiveDashboardService,
+    private aiSuggestionsService: AiSuggestionsService
   ) {}
 
   /**
@@ -42,6 +46,44 @@ export class PlatformAnalyticsController {
   @Get("full")
   async getFullAnalytics(@Query() params: AnalyticsQueryParams) {
     return this.analyticsService.getFullAnalytics(params);
+  }
+
+  // ============================================
+  // Executive Dashboard
+  // ============================================
+
+  @Get("executive")
+  async getExecutiveDashboard(@Query() params: AnalyticsQueryParams) {
+    const dateRange = this.analyticsService.parseDateRange(params);
+    return this.executiveService.getExecutiveSummary(dateRange);
+  }
+
+  @Get("executive/kpis")
+  async getExecutiveKpis(@Query() params: AnalyticsQueryParams) {
+    const dateRange = this.analyticsService.parseDateRange(params);
+    return this.executiveService.getExecutiveKpis(dateRange);
+  }
+
+  @Get("executive/alerts")
+  async getExecutiveAlerts(@Query() params: AnalyticsQueryParams) {
+    const dateRange = this.analyticsService.parseDateRange(params);
+    return this.executiveService.getActiveAlerts(dateRange);
+  }
+
+  // ============================================
+  // AI Suggestions & Anomaly Detection
+  // ============================================
+
+  @Get("ai/suggestions")
+  async getAiSuggestions(@Query() params: AnalyticsQueryParams) {
+    const dateRange = this.analyticsService.parseDateRange(params);
+    return this.aiSuggestionsService.getImprovementSuggestions(dateRange);
+  }
+
+  @Get("ai/anomalies")
+  async getAnomalies(@Query() params: AnalyticsQueryParams) {
+    const dateRange = this.analyticsService.parseDateRange(params);
+    return this.aiSuggestionsService.detectAnomalies(dateRange);
   }
 
   // ============================================

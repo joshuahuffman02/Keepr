@@ -71,6 +71,7 @@ const adminNavItems = [
         title: "Analytics Hub",
         icon: BarChart3,
         children: [
+            { title: "Executive", href: "/admin/analytics/executive" },
             { title: "Overview", href: "/admin/analytics" },
             { title: "Revenue", href: "/admin/analytics/revenue" },
             { title: "Guests", href: "/admin/analytics/guests" },
@@ -81,6 +82,9 @@ const adminNavItems = [
             { title: "Amenities", href: "/admin/analytics/amenities" },
             { title: "Benchmarks", href: "/admin/analytics/benchmarks" },
             { title: "NPS", href: "/admin/analytics/nps" },
+            { title: "Compare", href: "/admin/analytics/compare" },
+            { title: "Goals", href: "/admin/analytics/goals" },
+            { title: "AI Insights", href: "/admin/analytics/insights" },
             { title: "Export", href: "/admin/analytics/export" },
         ],
     },

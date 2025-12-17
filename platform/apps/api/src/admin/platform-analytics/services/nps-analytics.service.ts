@@ -49,6 +49,38 @@ interface NpsComment {
   campgroundName?: string;
 }
 
+interface NpsBySeason {
+  season: string;
+  score: number;
+  responses: number;
+  promoters: number;
+  passives: number;
+  detractors: number;
+}
+
+interface NpsByGuestType {
+  guestType: "first_time" | "repeat";
+  score: number;
+  responses: number;
+  promoters: number;
+  passives: number;
+  detractors: number;
+  avgLifetimeValue?: number;
+}
+
+interface DetractorFollowUp {
+  id: string;
+  score: number;
+  comment: string;
+  campgroundName: string;
+  guestEmail?: string;
+  createdAt: Date;
+  followedUp: boolean;
+  followUpAt?: Date;
+  followUpNote?: string;
+  resolved: boolean;
+}
+
 @Injectable()
 export class NpsAnalyticsService {
   constructor(private prisma: PrismaService) {}
@@ -160,16 +192,29 @@ export class NpsAnalyticsService {
    * Get full NPS analytics
    */
   async getFullAnalytics(dateRange: DateRange) {
-    const [overview, trends, byAccommodation, byCampground, worstCampgrounds, recentComments, tagAnalysis] =
-      await Promise.all([
-        this.getOverview(dateRange),
-        this.getNpsTrends(dateRange),
-        this.getNpsByAccommodationType(dateRange),
-        this.getNpsByCampground(dateRange),
-        this.getWorstPerformingCampgrounds(dateRange),
-        this.getRecentComments(dateRange),
-        this.getTagAnalysis(dateRange),
-      ]);
+    const [
+      overview,
+      trends,
+      byAccommodation,
+      byCampground,
+      worstCampgrounds,
+      recentComments,
+      tagAnalysis,
+      byGuestType,
+      bySeason,
+      detractorFollowUps,
+    ] = await Promise.all([
+      this.getOverview(dateRange),
+      this.getNpsTrends(dateRange),
+      this.getNpsByAccommodationType(dateRange),
+      this.getNpsByCampground(dateRange),
+      this.getWorstPerformingCampgrounds(dateRange),
+      this.getRecentComments(dateRange),
+      this.getTagAnalysis(dateRange),
+      this.getNpsByGuestType(dateRange),
+      this.getNpsBySeason(dateRange),
+      this.getDetractorFollowUps(dateRange),
+    ]);
 
     return {
       overview,
@@ -179,6 +224,9 @@ export class NpsAnalyticsService {
       worstCampgrounds,
       recentComments,
       tagAnalysis,
+      byGuestType,
+      bySeason,
+      detractorFollowUps,
     };
   }
 
@@ -523,5 +571,150 @@ export class NpsAnalyticsService {
         count,
       }))
       .sort((a, b) => a.score - b.score);
+  }
+
+  /**
+   * Get NPS by guest type (first-time vs repeat)
+   */
+  async getNpsByGuestType(dateRange: DateRange): Promise<NpsByGuestType[]> {
+    const { start, end } = dateRange;
+
+    const responses = await this.prisma.npsResponse.findMany({
+      where: {
+        createdAt: { gte: start, lte: end },
+        guestId: { not: null },
+      },
+      select: {
+        score: true,
+        guest: {
+          select: {
+            repeatStays: true,
+          },
+        },
+      },
+    });
+
+    const firstTime: { score: number }[] = [];
+    const repeat: { score: number }[] = [];
+
+    for (const r of responses) {
+      const isRepeat = (r.guest?.repeatStays || 0) > 1;
+      if (isRepeat) {
+        repeat.push({ score: r.score });
+      } else {
+        firstTime.push({ score: r.score });
+      }
+    }
+
+    const firstTimeNps = this.calculateNps(firstTime);
+    const repeatNps = this.calculateNps(repeat);
+
+    return [
+      {
+        guestType: "first_time",
+        score: firstTimeNps.score,
+        responses: firstTime.length,
+        promoters: firstTimeNps.promoters,
+        passives: firstTimeNps.passives,
+        detractors: firstTimeNps.detractors,
+      },
+      {
+        guestType: "repeat",
+        score: repeatNps.score,
+        responses: repeat.length,
+        promoters: repeatNps.promoters,
+        passives: repeatNps.passives,
+        detractors: repeatNps.detractors,
+      },
+    ];
+  }
+
+  /**
+   * Get NPS by season
+   */
+  async getNpsBySeason(dateRange: DateRange): Promise<NpsBySeason[]> {
+    const { start, end } = dateRange;
+
+    const responses = await this.prisma.npsResponse.findMany({
+      where: {
+        createdAt: { gte: start, lte: end },
+      },
+      select: {
+        score: true,
+        createdAt: true,
+      },
+    });
+
+    const getSeason = (date: Date): string => {
+      const month = date.getMonth();
+      if (month >= 2 && month <= 4) return "Spring";
+      if (month >= 5 && month <= 7) return "Summer";
+      if (month >= 8 && month <= 10) return "Fall";
+      return "Winter";
+    };
+
+    const bySeason: Record<string, { score: number }[]> = {
+      Spring: [],
+      Summer: [],
+      Fall: [],
+      Winter: [],
+    };
+
+    for (const r of responses) {
+      const season = getSeason(r.createdAt);
+      bySeason[season].push({ score: r.score });
+    }
+
+    return Object.entries(bySeason).map(([season, seasonResponses]) => {
+      const nps = this.calculateNps(seasonResponses);
+      return {
+        season,
+        score: nps.score,
+        responses: seasonResponses.length,
+        promoters: nps.promoters,
+        passives: nps.passives,
+        detractors: nps.detractors,
+      };
+    });
+  }
+
+  /**
+   * Get detractors for follow-up tracking
+   * Returns detractors (score 0-6) with their contact info and follow-up status
+   */
+  async getDetractorFollowUps(dateRange: DateRange, limit = 50): Promise<DetractorFollowUp[]> {
+    const { start, end } = dateRange;
+
+    const responses = await this.prisma.npsResponse.findMany({
+      where: {
+        createdAt: { gte: start, lte: end },
+        score: { lte: 6 },
+      },
+      select: {
+        id: true,
+        score: true,
+        comment: true,
+        createdAt: true,
+        campground: { select: { name: true } },
+        guest: { select: { email: true } },
+      },
+      orderBy: { createdAt: "desc" },
+      take: limit,
+    });
+
+    // TODO: Add follow-up tracking fields to NpsResponse model
+    // For now, return with default follow-up status
+    return responses.map((r) => ({
+      id: r.id,
+      score: r.score,
+      comment: r.comment || "",
+      campgroundName: r.campground.name,
+      guestEmail: r.guest?.email,
+      createdAt: r.createdAt,
+      followedUp: false, // Would come from DB once model is extended
+      followUpAt: undefined,
+      followUpNote: undefined,
+      resolved: false,
+    }));
   }
 }

@@ -12,6 +12,8 @@ import { AmenityAnalyticsService } from "./services/amenity-analytics.service";
 import { BenchmarkService } from "./services/benchmark.service";
 import { NpsAnalyticsService } from "./services/nps-analytics.service";
 import { AnalyticsExportService } from "./export/analytics-export.service";
+import { ExecutiveDashboardService } from "./services/executive-dashboard.service";
+import { AiSuggestionsService } from "./services/ai-suggestions.service";
 
 @Module({
   imports: [PrismaModule],
@@ -28,6 +30,8 @@ import { AnalyticsExportService } from "./export/analytics-export.service";
     BenchmarkService,
     NpsAnalyticsService,
     AnalyticsExportService,
+    ExecutiveDashboardService,
+    AiSuggestionsService,
   ],
   exports: [
     PlatformAnalyticsService,
@@ -41,6 +45,8 @@ import { AnalyticsExportService } from "./export/analytics-export.service";
     BenchmarkService,
     NpsAnalyticsService,
     AnalyticsExportService,
+    ExecutiveDashboardService,
+    AiSuggestionsService,
   ],
 })
 export class PlatformAnalyticsModule {}
