@@ -305,7 +305,17 @@ const PublicCampgroundListSchema = z.array(
       z.number().nullable()
     ).optional(),
     reviewCount: z.number().optional(),
-    amenitySummary: z.record(z.any()).nullable().optional()
+    amenitySummary: z.record(z.any()).nullable().optional(),
+    // NPS fields
+    npsScore: z.number().nullable().optional(),
+    npsResponseCount: z.number().optional().default(0),
+    npsRank: z.number().nullable().optional(),
+    npsPercentile: z.number().nullable().optional(),
+    isWorldClassNps: z.boolean().optional().default(false),
+    isTopCampground: z.boolean().optional().default(false),
+    isTop1PercentNps: z.boolean().optional().default(false),
+    isTop5PercentNps: z.boolean().optional().default(false),
+    isTop10PercentNps: z.boolean().optional().default(false)
   })
 );
 

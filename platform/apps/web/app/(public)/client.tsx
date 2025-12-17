@@ -110,20 +110,36 @@ export function HomeClient() {
                 }
             }
 
+            // Determine NPS badge - priority order matters
+            let npsBadge: { type: "world-class" | "top-campground" | "top-1" | "top-5" | "top-10"; label: string } | undefined;
+            if (cg.isTopCampground) {
+                npsBadge = { type: "top-campground", label: "#1 Campground" };
+            } else if (cg.isTop1PercentNps) {
+                npsBadge = { type: "top-1", label: "Top 1%" };
+            } else if (cg.isTop5PercentNps) {
+                npsBadge = { type: "top-5", label: "Top 5%" };
+            } else if (cg.isTop10PercentNps) {
+                npsBadge = { type: "top-10", label: "Top 10%" };
+            } else if (cg.isWorldClassNps) {
+                npsBadge = { type: "world-class", label: "World Class Service" };
+            }
+
             return {
                 ...cg,
                 isInternal: true,
                 rating,
                 reviewCount,
                 pricePerNight: undefined,
-                ratingBadge: badge
+                ratingBadge: badge,
+                npsBadge
             };
         });
 
         const externalWithBadges = externalCampgrounds.map((cg) => ({
             ...cg,
             isInternal: false,
-            ratingBadge: cg.reviewCount && cg.reviewCount > 150 ? "Popular pick" : undefined
+            ratingBadge: cg.reviewCount && cg.reviewCount > 150 ? "Popular pick" : undefined,
+            npsBadge: undefined
         }));
 
         const combined = [...internal, ...externalWithBadges];
@@ -277,6 +293,7 @@ export function HomeClient() {
                                     reviewCount={campground.reviewCount}
                                     pricePerNight={pricePerNight}
                                     amenities={"amenities" in campground ? campground.amenities : []}
+                                    npsBadge={campground.npsBadge}
                                     onExplore={() => trackEvent("site_card_view", { campgroundId: campground.id, page: "/" })}
                                 />
                             );

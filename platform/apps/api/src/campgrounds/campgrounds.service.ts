@@ -291,8 +291,9 @@ export class CampgroundsService {
   }
 
   // Public campgrounds (published only)
-  listPublic() {
-    return this.prisma.campground.findMany({
+  async listPublic() {
+    // Fetch campgrounds
+    const campgrounds = await this.prisma.campground.findMany({
       where: { OR: [{ isPublished: true }, { isExternal: true }] },
       select: {
         id: true,
@@ -313,6 +314,81 @@ export class CampgroundsService {
         reviewSources: true,
         amenitySummary: true
       }
+    });
+
+    // Fetch NPS responses for all campgrounds (last 12 months)
+    const oneYearAgo = new Date();
+    oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1);
+
+    const npsResponses = await this.prisma.npsResponse.findMany({
+      where: {
+        createdAt: { gte: oneYearAgo },
+        campgroundId: { in: campgrounds.map(c => c.id) }
+      },
+      select: {
+        campgroundId: true,
+        score: true
+      }
+    });
+
+    // Calculate NPS per campground
+    const npsData: Record<string, { score: number; responseCount: number }> = {};
+    const responsesByCampground: Record<string, number[]> = {};
+
+    for (const response of npsResponses) {
+      if (!responsesByCampground[response.campgroundId]) {
+        responsesByCampground[response.campgroundId] = [];
+      }
+      responsesByCampground[response.campgroundId].push(response.score);
+    }
+
+    for (const [campgroundId, scores] of Object.entries(responsesByCampground)) {
+      if (scores.length >= 5) { // Only calculate NPS if we have enough responses
+        const promoters = scores.filter(s => s >= 9).length;
+        const detractors = scores.filter(s => s <= 6).length;
+        const nps = Math.round(((promoters - detractors) / scores.length) * 100);
+        npsData[campgroundId] = { score: nps, responseCount: scores.length };
+      }
+    }
+
+    // Compute percentile rankings
+    const npsScores = Object.entries(npsData)
+      .map(([id, data]) => ({ id, score: data.score }))
+      .sort((a, b) => b.score - a.score); // Sort descending
+
+    const totalWithNps = npsScores.length;
+    const percentileRankings: Record<string, { rank: number; percentile: number; isTop1Percent: boolean; isTop5Percent: boolean; isTop10Percent: boolean; isTopCampground: boolean }> = {};
+
+    npsScores.forEach((item, index) => {
+      const rank = index + 1;
+      const percentile = totalWithNps > 0 ? ((totalWithNps - rank + 1) / totalWithNps) * 100 : 0;
+      percentileRankings[item.id] = {
+        rank,
+        percentile,
+        isTopCampground: rank === 1,
+        isTop1Percent: percentile >= 99,
+        isTop5Percent: percentile >= 95,
+        isTop10Percent: percentile >= 90
+      };
+    });
+
+    // Combine data
+    return campgrounds.map(cg => {
+      const nps = npsData[cg.id];
+      const ranking = percentileRankings[cg.id];
+
+      return {
+        ...cg,
+        npsScore: nps?.score ?? null,
+        npsResponseCount: nps?.responseCount ?? 0,
+        npsRank: ranking?.rank ?? null,
+        npsPercentile: ranking?.percentile ?? null,
+        isWorldClassNps: nps && nps.score >= 70,
+        isTopCampground: ranking?.isTopCampground ?? false,
+        isTop1PercentNps: ranking?.isTop1Percent ?? false,
+        isTop5PercentNps: ranking?.isTop5Percent ?? false,
+        isTop10PercentNps: ranking?.isTop10Percent ?? false
+      };
     });
   }
 

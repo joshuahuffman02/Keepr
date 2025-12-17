@@ -19,6 +19,11 @@ interface CampgroundCardProps {
     amenities?: string[];
     onExplore?: () => void;
     ratingBadge?: string;
+    // NPS recognition
+    npsBadge?: {
+        type: "world-class" | "top-campground" | "top-1" | "top-5" | "top-10";
+        label: string;
+    } | null;
 }
 
 export function CampgroundCard({
@@ -36,7 +41,8 @@ export function CampgroundCard({
     pricePerNight,
     amenities = [],
     onExplore,
-    ratingBadge
+    ratingBadge,
+    npsBadge
 }: CampgroundCardProps) {
     const [isHovered, setIsHovered] = useState(false);
     const [isFavorited, setIsFavorited] = useState(false);
@@ -112,15 +118,43 @@ export function CampgroundCard({
                 {/* Overlay gradient */}
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
 
-                {/* Enhanced badge for internal campgrounds */}
-                {isInternal && (
-                    <div className="absolute top-4 left-4 px-3 py-1.5 bg-gradient-to-r from-emerald-500 to-teal-500 text-white text-xs font-bold rounded-full shadow-lg flex items-center gap-1.5">
-                        <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20">
-                            <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                        </svg>
-                        Verified
-                    </div>
-                )}
+                {/* Badges at top left */}
+                <div className="absolute top-4 left-4 flex flex-col gap-2">
+                    {/* NPS Badge - Most prominent */}
+                    {npsBadge && (
+                        <div className={`px-3 py-1.5 text-white text-xs font-bold rounded-full shadow-lg flex items-center gap-1.5 ${
+                            npsBadge.type === "top-campground"
+                                ? "bg-gradient-to-r from-amber-500 to-yellow-500"
+                                : npsBadge.type === "world-class"
+                                ? "bg-gradient-to-r from-purple-500 to-indigo-500"
+                                : npsBadge.type === "top-1"
+                                ? "bg-gradient-to-r from-rose-500 to-pink-500"
+                                : npsBadge.type === "top-5"
+                                ? "bg-gradient-to-r from-blue-500 to-cyan-500"
+                                : "bg-gradient-to-r from-slate-600 to-slate-500"
+                        }`}>
+                            {npsBadge.type === "top-campground" ? (
+                                <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20">
+                                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                                </svg>
+                            ) : (
+                                <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fillRule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                                </svg>
+                            )}
+                            {npsBadge.label}
+                        </div>
+                    )}
+                    {/* Verified badge for internal campgrounds */}
+                    {isInternal && !npsBadge && (
+                        <div className="px-3 py-1.5 bg-gradient-to-r from-emerald-500 to-teal-500 text-white text-xs font-bold rounded-full shadow-lg flex items-center gap-1.5">
+                            <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20">
+                                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                            </svg>
+                            Verified
+                        </div>
+                    )}
+                </div>
 
                 {/* Favorite button */}
                 <button
