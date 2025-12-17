@@ -16,7 +16,8 @@ import {
     LogOut,
     ChevronRight,
     Zap,
-    TrendingUp
+    TrendingUp,
+    Heart
 } from "lucide-react";
 import { signOut } from "next-auth/react";
 
@@ -56,6 +57,14 @@ const adminNavItems = [
         icon: Megaphone,
         children: [
             { title: "Leads", href: "/admin/marketing/leads" },
+        ],
+    },
+    {
+        title: "Charity",
+        icon: Heart,
+        children: [
+            { title: "Charities", href: "/admin/charity" },
+            { title: "Reports", href: "/admin/charity/reports" },
         ],
     },
     {
