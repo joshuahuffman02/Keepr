@@ -80,6 +80,7 @@ const adminNavItems = [
             { title: "Length of Stay", href: "/admin/analytics/los" },
             { title: "Amenities", href: "/admin/analytics/amenities" },
             { title: "Benchmarks", href: "/admin/analytics/benchmarks" },
+            { title: "NPS", href: "/admin/analytics/nps" },
             { title: "Export", href: "/admin/analytics/export" },
         ],
     },

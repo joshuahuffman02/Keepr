@@ -9,6 +9,7 @@ import { BookingBehaviorService } from "./services/booking-behavior.service";
 import { LengthOfStayService } from "./services/length-of-stay.service";
 import { AmenityAnalyticsService } from "./services/amenity-analytics.service";
 import { BenchmarkService } from "./services/benchmark.service";
+import { NpsAnalyticsService } from "./services/nps-analytics.service";
 import { AnalyticsExportService, ExportOptions } from "./export/analytics-export.service";
 
 @Controller("admin/platform-analytics")
@@ -23,6 +24,7 @@ export class PlatformAnalyticsController {
     private losService: LengthOfStayService,
     private amenityService: AmenityAnalyticsService,
     private benchmarkService: BenchmarkService,
+    private npsService: NpsAnalyticsService,
     private exportService: AnalyticsExportService
   ) {}
 
@@ -207,6 +209,40 @@ export class PlatformAnalyticsController {
   ) {
     const dateRange = this.analyticsService.parseDateRange(params);
     return this.benchmarkService.getCampgroundVsPlatform(campgroundId, dateRange);
+  }
+
+  // ============================================
+  // NPS Analytics
+  // ============================================
+
+  @Get("nps")
+  async getNps(@Query() params: AnalyticsQueryParams) {
+    const dateRange = this.analyticsService.parseDateRange(params);
+    return this.npsService.getFullAnalytics(dateRange);
+  }
+
+  @Get("nps/overview")
+  async getNpsOverview(@Query() params: AnalyticsQueryParams) {
+    const dateRange = this.analyticsService.parseDateRange(params);
+    return this.npsService.getOverview(dateRange);
+  }
+
+  @Get("nps/trends")
+  async getNpsTrends(@Query() params: AnalyticsQueryParams) {
+    const dateRange = this.analyticsService.parseDateRange(params);
+    return this.npsService.getNpsTrends(dateRange);
+  }
+
+  @Get("nps/distribution")
+  async getNpsDistribution(@Query() params: AnalyticsQueryParams) {
+    const dateRange = this.analyticsService.parseDateRange(params);
+    return this.npsService.getScoreDistribution(dateRange);
+  }
+
+  @Get("nps/comments")
+  async getNpsComments(@Query() params: AnalyticsQueryParams) {
+    const dateRange = this.analyticsService.parseDateRange(params);
+    return this.npsService.getRecentComments(dateRange);
   }
 
   // ============================================

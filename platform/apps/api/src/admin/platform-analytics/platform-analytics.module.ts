@@ -10,6 +10,7 @@ import { BookingBehaviorService } from "./services/booking-behavior.service";
 import { LengthOfStayService } from "./services/length-of-stay.service";
 import { AmenityAnalyticsService } from "./services/amenity-analytics.service";
 import { BenchmarkService } from "./services/benchmark.service";
+import { NpsAnalyticsService } from "./services/nps-analytics.service";
 import { AnalyticsExportService } from "./export/analytics-export.service";
 
 @Module({
@@ -25,6 +26,7 @@ import { AnalyticsExportService } from "./export/analytics-export.service";
     LengthOfStayService,
     AmenityAnalyticsService,
     BenchmarkService,
+    NpsAnalyticsService,
     AnalyticsExportService,
   ],
   exports: [
@@ -37,6 +39,7 @@ import { AnalyticsExportService } from "./export/analytics-export.service";
     LengthOfStayService,
     AmenityAnalyticsService,
     BenchmarkService,
+    NpsAnalyticsService,
     AnalyticsExportService,
   ],
 })
