@@ -14,7 +14,6 @@ const defaultStats: Stat[] = [
   { value: "500+", label: "Campgrounds", icon: MapPin },
   { value: "50K+", label: "Happy Campers", icon: Users },
   { value: "4.8", label: "Average Rating", icon: Star, suffix: "★" },
-  { value: "$0", label: "Booking Fees", icon: Receipt },
 ];
 
 interface SocialProofStripProps {
@@ -57,7 +56,7 @@ export function SocialProofStrip({
   return (
     <div className={cn(variantStyles[variant], "py-6 md:py-8", className)}>
       <div className="max-w-7xl mx-auto px-6">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8">
+        <div className="grid grid-cols-3 gap-6 md:gap-8">
           {stats.map((stat, i) => (
             <div key={i} className="text-center">
               <div className="flex items-center justify-center gap-2 mb-1">

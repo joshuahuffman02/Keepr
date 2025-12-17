@@ -5,16 +5,16 @@ import { cn } from "../../lib/utils";
 
 const benefits = [
   {
-    icon: DollarSign,
-    title: "No Booking Fees",
-    description: "Keep more money in your pocket. We never charge service or booking fees.",
+    icon: MessageSquare,
+    title: "Direct Communication",
+    description: "Message the park directly with questions before you book. No middleman.",
     iconColor: "text-emerald-500",
     iconBg: "bg-emerald-50",
   },
   {
-    icon: MessageSquare,
-    title: "Direct Communication",
-    description: "Message the park directly with questions before you book. No middleman.",
+    icon: DollarSign,
+    title: "Transparent Pricing",
+    description: "See the full price upfront. Know exactly what you're paying before you book.",
     iconColor: "text-violet-500",
     iconBg: "bg-violet-50",
   },
@@ -27,8 +27,8 @@ const benefits = [
   },
   {
     icon: Shield,
-    title: "Best Rate Guarantee",
-    description: "Book direct for the best available rate. Price match guaranteed.",
+    title: "Secure Booking",
+    description: "Your payment and personal info are protected with industry-standard security.",
     iconColor: "text-rose-500",
     iconBg: "bg-rose-50",
   },

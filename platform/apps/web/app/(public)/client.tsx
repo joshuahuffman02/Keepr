@@ -6,11 +6,9 @@ import Link from "next/link";
 import { CampgroundCard } from "../../components/public/CampgroundCard";
 import { apiClient } from "../../lib/api-client";
 import { trackEvent } from "@/lib/analytics";
-import { LeadCaptureForm } from "../../components/marketing/LeadCaptureForm";
 import { HeroBanner } from "../../components/public/HeroBanner";
 import { ValueStack } from "../../components/public/ValueStack";
 import { UrgencySection } from "../../components/public/UrgencySection";
-import { CamperTestimonials } from "../../components/public/CamperTestimonials";
 import { OwnerCTA } from "../../components/public/OwnerCTA";
 
 // Sample external campgrounds to mix with internal ones
@@ -304,37 +302,6 @@ export function HomeClient() {
                     availableSites: Math.floor(Math.random() * 8) + 1, // Stubbed for now
                 }))}
             />
-
-            {/* Camper Testimonials - Social Proof Wall */}
-            <CamperTestimonials />
-
-            {/* Demo request */}
-            <section className="bg-white py-16 border-y border-slate-100">
-                <div className="max-w-6xl mx-auto px-6 grid md:grid-cols-2 gap-12 items-center">
-                    <div className="space-y-4">
-                        <div className="text-xs font-semibold uppercase tracking-[0.08em] text-emerald-700">Request a demo</div>
-                        <h2 className="text-2xl md:text-3xl font-bold text-slate-900">
-                            Want more bookings or a smoother operation?
-                        </h2>
-                        <p className="text-slate-600">
-                            Tell us what you want to improve. We’ll follow up with a tailored walkthrough—no spam, no auto-sync to external tools.
-                        </p>
-                        <ul className="space-y-2 text-sm text-slate-700">
-                            <li>• Name + email + interest captured securely</li>
-                            <li>• Scoped to your selected campground (or the public demo)</li>
-                            <li>• No third-party sync—stays inside Camp Everyday</li>
-                        </ul>
-                    </div>
-                    <LeadCaptureForm
-                        defaultCampgroundId="public-site"
-                        defaultCampgroundName="Camp Everyday demo"
-                        title="Request a walkthrough"
-                    />
-                </div>
-            </section>
-
-
-
 
             {/* Blog CTA Section */}
             <section className="py-20 bg-slate-50">

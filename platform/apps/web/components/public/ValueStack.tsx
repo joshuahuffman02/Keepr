@@ -5,18 +5,18 @@ import { cn } from "../../lib/utils";
 
 const pillars = [
   {
-    icon: DollarSign,
-    title: "No Hidden Fees",
-    description: "Zero booking fees, zero service fees. The price you see is the price you pay.",
-    guarantee: "Price transparency guaranteed",
+    icon: Building2,
+    title: "Book Direct",
+    description: "Book directly with the campground. No middleman, direct communication with the park.",
+    guarantee: "Direct from the park",
     iconBg: "from-emerald-500 to-teal-600",
     iconShadow: "shadow-emerald-500/20",
   },
   {
-    icon: Building2,
-    title: "Book Direct",
-    description: "Skip the middleman. Book directly with the campground for the best experience and rates.",
-    guarantee: "Direct from the park",
+    icon: DollarSign,
+    title: "Transparent Pricing",
+    description: "See the full price upfront before you book. No surprises at checkout.",
+    guarantee: "Clear pricing",
     iconBg: "from-violet-500 to-purple-600",
     iconShadow: "shadow-violet-500/20",
   },
@@ -30,8 +30,8 @@ const pillars = [
   },
   {
     icon: Camera,
-    title: "Verified Quality",
-    description: "Real photos, real reviews, real availability. What you see is what you get when you arrive.",
+    title: "Verified Photos",
+    description: "Real photos from the campground. What you see is what you get when you arrive.",
     guarantee: "No surprises",
     iconBg: "from-rose-500 to-pink-600",
     iconShadow: "shadow-rose-500/20",

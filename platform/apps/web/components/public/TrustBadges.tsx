@@ -17,9 +17,8 @@ const badges = [
   },
   {
     icon: DollarSign,
-    text: "No booking fees.",
-    shortText: "No fees",
-    iconClassName: "line-through",
+    text: "Transparent pricing.",
+    shortText: "Clear pricing",
   },
   {
     icon: Zap,
@@ -53,7 +52,7 @@ export function TrustBadges({ variant = "inline", className, showIcons = true }:
         {badges.map((badge, i) => (
           <div key={i} className="flex items-center gap-3">
             <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-emerald-100">
-              <badge.icon className={cn("h-5 w-5 text-emerald-600", badge.iconClassName)} />
+              <badge.icon className="h-5 w-5 text-emerald-600" />
             </div>
             <div>
               <p className="font-medium text-slate-900">{badge.text}</p>
@@ -73,7 +72,7 @@ export function TrustBadges({ variant = "inline", className, showIcons = true }:
           className="flex items-center gap-2 rounded-full bg-white/10 backdrop-blur-sm px-3 py-1.5 text-sm text-white/90"
         >
           {showIcons && (
-            <badge.icon className={cn("h-4 w-4", badge.iconClassName)} />
+            <badge.icon className="h-4 w-4" />
           )}
           <span>{badge.shortText}</span>
         </div>
@@ -92,7 +91,7 @@ export function TrustBadgesDark({ className }: { className?: string }) {
       </span>
       <span className="flex items-center gap-1.5">
         <CheckCircle2 className="h-4 w-4 text-emerald-400" />
-        No booking fees
+        Clear pricing
       </span>
       <span className="flex items-center gap-1.5">
         <CheckCircle2 className="h-4 w-4 text-emerald-400" />

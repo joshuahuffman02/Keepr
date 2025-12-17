@@ -53,7 +53,7 @@ export function HeroBanner({ onSearch }: HeroBannerProps) {
             </span>
           </h1>
           <p className="text-lg md:text-xl text-white/80 max-w-2xl mx-auto">
-            Real photos. Real availability. No booking fees. Instant confirmation.
+            Real photos. Real availability. Transparent pricing. Instant confirmation.
           </p>
         </div>
 
