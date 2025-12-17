@@ -6,209 +6,182 @@ import { Card, CardHeader, CardTitle, CardDescription } from "@/components/ui/ca
 import { Input } from "@/components/ui/input";
 import Link from "next/link";
 import {
+  Tent,
+  Users,
+  ShoppingCart,
   DollarSign,
-  Mail,
-  Lock,
-  Settings,
+  CreditCard,
+  AlertTriangle,
+  Wrench,
+  Ticket,
+  Clock,
+  Calendar,
+  Sparkles,
   Search,
   ChevronRight,
   Star,
 } from "lucide-react";
 
-type SettingLink = {
+type ManagementLink = {
   name: string;
   href: string;
   description: string;
 };
 
-type SettingCategory = {
+type ManagementCategory = {
   title: string;
   description: string;
-  icon: typeof DollarSign;
+  icon: typeof Tent;
   color: string;
-  links: SettingLink[];
+  links: ManagementLink[];
 };
 
-const settingsCategories: SettingCategory[] = [
+const managementCategories: ManagementCategory[] = [
   {
-    title: "Pricing & Revenue",
-    description: "Manage pricing strategies, rates, and revenue optimization",
-    icon: DollarSign,
+    title: "Inventory & Property",
+    description: "Manage sites, site classes, and property details",
+    icon: Tent,
     color: "emerald",
     links: [
       {
-        name: "Dynamic Pricing",
-        href: "/dashboard/settings/pricing-rules",
-        description: "Configure automated pricing rules based on demand, seasons, and events",
+        name: "Sites & Inventory",
+        href: "/campgrounds",
+        description: "View and manage individual campsites and their availability",
       },
       {
-        name: "Seasonal Rates",
-        href: "/dashboard/settings/seasonal-rates",
-        description: "Set up seasonal rate variations throughout the year",
+        name: "Site Classes",
+        href: "/campgrounds/classes",
+        description: "Configure site categories and their default settings",
       },
       {
-        name: "Deposit Policies",
-        href: "/dashboard/settings/deposit-policies",
-        description: "Define deposit requirements and policies for reservations",
-      },
-      {
-        name: "Tax Rules",
-        href: "/dashboard/settings/tax-rules",
-        description: "Configure tax rates and rules for different site types",
-      },
-      {
-        name: "Upsells",
-        href: "/dashboard/settings/upsells",
-        description: "Create and manage additional products and services",
-      },
-      {
-        name: "Memberships",
-        href: "/dashboard/settings/memberships",
-        description: "Set up membership tiers and benefits",
-      },
-      {
-        name: "Blackout Dates",
-        href: "/dashboard/settings/blackout-dates",
-        description: "Block dates for maintenance or special events",
-      },
-      {
-        name: "Promotions",
-        href: "/dashboard/settings/promotions",
-        description: "Create promotional campaigns and discount codes",
+        name: "Amenities",
+        href: "/campgrounds/amenities",
+        description: "Manage site amenities and features",
       },
     ],
   },
   {
-    title: "Communications",
-    description: "Configure email templates and notification settings",
-    icon: Mail,
+    title: "Guests & Groups",
+    description: "Manage guest records and group bookings",
+    icon: Users,
     color: "blue",
     links: [
       {
-        name: "Email Templates",
-        href: "/dashboard/settings/templates",
-        description: "Customize email templates for confirmations, reminders, and more",
+        name: "Groups",
+        href: "/groups",
+        description: "Manage group reservations and events",
       },
       {
-        name: "Notification Triggers",
-        href: "/dashboard/settings/notification-triggers",
-        description: "Set up automated notifications and triggers",
+        name: "Guest Database",
+        href: "/guests",
+        description: "Search and manage guest profiles",
       },
       {
-        name: "Communications",
-        href: "/dashboard/settings/communications",
-        description: "Manage communication preferences and settings",
-      },
-      {
-        name: "Campaigns",
-        href: "/dashboard/settings/campaigns",
-        description: "Create and manage marketing campaigns",
+        name: "Memberships",
+        href: "/memberships",
+        description: "View and manage guest memberships",
       },
     ],
   },
   {
-    title: "Access & Security",
-    description: "Manage users, permissions, and security settings",
-    icon: Lock,
-    color: "red",
+    title: "Finance & Revenue",
+    description: "Track revenue, payouts, and financial transactions",
+    icon: DollarSign,
+    color: "green",
     links: [
       {
-        name: "Users & Roles",
-        href: "/dashboard/settings/users",
-        description: "Manage staff users and their roles",
+        name: "Ledger",
+        href: "/ledger",
+        description: "View all financial transactions and entries",
       },
       {
-        name: "Permissions",
-        href: "/dashboard/settings/permissions",
-        description: "Configure role-based access control",
+        name: "Payouts",
+        href: "/finance/payouts",
+        description: "Track and manage payment disbursements",
       },
       {
-        name: "Access Control",
-        href: "/dashboard/settings/access-control",
-        description: "Set up advanced access controls and restrictions",
+        name: "Gift Cards",
+        href: "/finance/gift-cards",
+        description: "Manage gift card inventory and redemptions",
       },
       {
-        name: "Security",
-        href: "/dashboard/settings/security",
-        description: "Configure security policies and authentication",
-      },
-      {
-        name: "Privacy",
-        href: "/dashboard/settings/privacy",
-        description: "Manage privacy settings and data protection",
-      },
-      {
-        name: "Developers",
-        href: "/dashboard/settings/developers",
-        description: "API keys and developer tools",
-      },
-      {
-        name: "Webhooks",
-        href: "/dashboard/settings/webhooks",
-        description: "Configure webhook endpoints for integrations",
+        name: "Disputes",
+        href: "/finance/disputes",
+        description: "Handle payment disputes and chargebacks",
       },
     ],
   },
   {
-    title: "Property",
-    description: "Configure campground details, branding, and localization",
-    icon: Settings,
+    title: "Store & Products",
+    description: "Manage store inventory and products",
+    icon: ShoppingCart,
+    color: "orange",
+    links: [
+      {
+        name: "Store",
+        href: "/store",
+        description: "Manage store products and inventory",
+      },
+      {
+        name: "Point of Sale",
+        href: "/pos",
+        description: "Process walk-in sales and transactions",
+      },
+      {
+        name: "Equipment Rentals",
+        href: "/operations/rentals",
+        description: "Manage rental equipment and bookings",
+      },
+    ],
+  },
+  {
+    title: "Operations",
+    description: "Daily operations and maintenance tasks",
+    icon: Wrench,
     color: "violet",
     links: [
       {
-        name: "Campground Config",
-        href: "/dashboard/settings/policies",
-        description: "Basic campground information and policies",
+        name: "Operations Board",
+        href: "/operations",
+        description: "Central dashboard for daily operations",
       },
       {
-        name: "Branding",
-        href: "/dashboard/settings/branding",
-        description: "Customize your brand colors, logo, and style",
+        name: "Maintenance",
+        href: "/maintenance",
+        description: "Track and manage maintenance requests",
       },
       {
-        name: "Photos",
-        href: "/dashboard/settings/photos",
-        description: "Manage property photos and gallery",
+        name: "Housekeeping",
+        href: "/housekeeping",
+        description: "Manage cleaning schedules and site turnover",
       },
       {
-        name: "Localization",
-        href: "/dashboard/settings/localization",
-        description: "Set timezone, language, and regional preferences",
+        name: "Waitlist",
+        href: "/waitlist",
+        description: "Manage guest waitlist for sold-out dates",
+      },
+    ],
+  },
+  {
+    title: "Staff",
+    description: "Staff management and scheduling",
+    icon: Clock,
+    color: "indigo",
+    links: [
+      {
+        name: "Staff Timeclock",
+        href: "/staff/timeclock",
+        description: "Track employee clock-in and clock-out times",
       },
       {
-        name: "Store Hours",
-        href: "/dashboard/settings/store-hours",
-        description: "Configure operating hours and schedules",
+        name: "Staff Scheduling",
+        href: "/staff-scheduling",
+        description: "Create and manage staff schedules",
       },
       {
-        name: "Integrations",
-        href: "/dashboard/settings/integrations",
-        description: "Connect third-party services and tools",
-      },
-      {
-        name: "Analytics",
-        href: "/dashboard/settings/analytics",
-        description: "Configure analytics and tracking",
-      },
-      {
-        name: "Payments",
-        href: "/dashboard/settings/payments",
-        description: "Set up payment processors and methods",
-      },
-      {
-        name: "OTA Channels",
-        href: "/dashboard/settings/ota",
-        description: "Manage online travel agency integrations",
-      },
-      {
-        name: "Gamification",
-        href: "/dashboard/settings/gamification",
-        description: "Configure badges, rewards, and engagement features",
-      },
-      {
-        name: "Jobs",
-        href: "/dashboard/settings/jobs",
-        description: "Manage background jobs and scheduled tasks",
+        name: "Staff Gamification",
+        href: "/gamification",
+        description: "View staff achievements and leaderboards",
       },
     ],
   },
@@ -217,11 +190,13 @@ const settingsCategories: SettingCategory[] = [
 const iconColorMap: Record<string, string> = {
   emerald: "bg-emerald-100 text-emerald-700",
   blue: "bg-blue-100 text-blue-700",
-  red: "bg-red-100 text-red-700",
+  green: "bg-green-100 text-green-700",
+  orange: "bg-orange-100 text-orange-700",
   violet: "bg-violet-100 text-violet-700",
+  indigo: "bg-indigo-100 text-indigo-700",
 };
 
-export default function SettingsLandingPage() {
+export default function ManagementLandingPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [favorites, setFavorites] = useState<string[]>([]);
 
@@ -253,7 +228,7 @@ export default function SettingsLandingPage() {
   };
 
   // Filter categories and links based on search query
-  const filteredCategories = settingsCategories
+  const filteredCategories = managementCategories
     .map((category) => ({
       ...category,
       links: category.links.filter(
@@ -269,9 +244,9 @@ export default function SettingsLandingPage() {
       <div className="p-6 max-w-[1400px] mx-auto">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-slate-900">Settings</h1>
+          <h1 className="text-3xl font-bold text-slate-900">Management</h1>
           <p className="text-slate-500 mt-2">
-            Manage your campground configuration, pricing, communications, and security
+            Manage your campground inventory, finances, operations, and staff
           </p>
         </div>
 
@@ -281,7 +256,7 @@ export default function SettingsLandingPage() {
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-slate-400" />
             <Input
               type="text"
-              placeholder="Search settings..."
+              placeholder="Search management areas..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="pl-10"
@@ -294,7 +269,7 @@ export default function SettingsLandingPage() {
           <Star className="h-5 w-5 text-amber-600 mt-0.5 flex-shrink-0" />
           <div>
             <p className="text-sm font-medium text-amber-800">
-              Save your most-used settings to Favorites
+              Save your most-used pages to Favorites
             </p>
             <p className="text-sm text-amber-700 mt-1">
               Click the star icon on any card to add it to your sidebar favorites for quick access.
@@ -302,7 +277,7 @@ export default function SettingsLandingPage() {
           </div>
         </div>
 
-        {/* Settings Categories */}
+        {/* Management Categories */}
         <div className="space-y-12">
           {filteredCategories.map((category) => {
             const IconComponent = category.icon;
@@ -321,7 +296,7 @@ export default function SettingsLandingPage() {
                   </div>
                 </div>
 
-                {/* Settings Links Grid */}
+                {/* Links Grid */}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
                   {category.links.map((link) => {
                     const isFavorite = favorites.includes(link.href);
@@ -376,7 +351,7 @@ export default function SettingsLandingPage() {
             <div className="text-slate-400 mb-2">
               <Search className="h-12 w-12 mx-auto" />
             </div>
-            <h3 className="text-lg font-semibold text-slate-900 mb-1">No settings found</h3>
+            <h3 className="text-lg font-semibold text-slate-900 mb-1">No items found</h3>
             <p className="text-slate-500">
               Try adjusting your search term or browse the categories above
             </p>

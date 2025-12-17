@@ -436,8 +436,18 @@ export function DashboardShell({ children, className, title, subtitle }: { child
   const cgSitesPath = selected ? `/campgrounds/${selected}/sites` : "/campgrounds";
   const cgClassesPath = selected ? `/campgrounds/${selected}/classes` : "/campgrounds";
   const cgReservationsPath = selected ? `/campgrounds/${selected}/reservations` : "/reservations";
+  // Operations items for top bar quick actions (moved from sidebar)
+  const operationsItems = useMemo<NavItem[]>(() => [
+    { label: "Check In/Out", href: "/check-in-out", icon: "reservation" },
+    { label: "New Booking", href: "/booking", icon: "plus" },
+    { label: "POS", href: "/pos", icon: "payments" },
+    { label: "Waitlist", href: "/waitlist", icon: "clock" },
+    { label: "Maintenance", href: "/maintenance", icon: "wrench" },
+    { label: "Housekeeping", href: selected ? `/campgrounds/${selected}/housekeeping` : "/campgrounds", icon: "wrench" }
+  ], [selected]);
+
   const navSections = useMemo(() => {
-    // PRIMARY - Always visible, core daily operations
+    // PRIMARY - Core daily operations (no accordion, always visible)
     const primaryItems: NavItem[] = [
       { label: "Dashboard", href: "/dashboard", icon: "dashboard" },
       { label: "Calendar", href: "/calendar", icon: "calendar" },
@@ -447,44 +457,18 @@ export function DashboardShell({ children, className, title, subtitle }: { child
       { label: "Reports", href: "/reports", icon: "reports" }
     ];
 
-    // OPERATIONS - Front desk daily tasks
-    const operationsItems: NavItem[] = [
-      { label: "Check In/Out", href: "/check-in-out", icon: "reservation" },
-      { label: "New Booking", href: "/booking", icon: "plus" },
-      { label: "POS", href: "/pos", icon: "payments" },
-      { label: "Waitlist", href: "/waitlist", icon: "clock" },
-      { label: "Maintenance", href: "/maintenance", icon: "wrench" },
-      { label: "Housekeeping", href: selected ? `/campgrounds/${selected}/housekeeping` : "/campgrounds", icon: "wrench" }
-    ];
-
-    // MANAGEMENT - Manager+ level features
-    const managementItems: NavItem[] = [
-      { label: "Sites & Inventory", href: cgScopedPath, icon: "camp" },
-      { label: "Groups", href: "/groups", icon: "guest" },
-      { label: "Store", href: "/store", icon: "tag" },
-      { label: "Ledger", href: "/ledger", icon: "ledger" },
-      { label: "Payouts", href: "/finance/payouts", icon: "payments" },
-      { label: "Gift Cards", href: "/finance/gift-cards", icon: "payments" },
-      { label: "Disputes", href: "/finance/disputes", icon: "alert" }
-    ];
-
-    if (allowOps) {
-      managementItems.push(
-        { label: "Operations Board", href: "/operations", icon: "wrench" },
-        { label: "Equipment Rentals", href: "/operations/rentals", icon: "ticket" },
-        { label: "Staff Timeclock", href: selected ? `/campgrounds/${selected}/staff/timeclock` : "/campgrounds", icon: "clock" },
-        { label: "Staff Scheduling", href: selected ? `/campgrounds/${selected}/staff-scheduling` : "/campgrounds", icon: "users" },
-        { label: "Staff Gamification", href: "/gamification", icon: "sparkles" }
-      );
+    // Add Management link for managers (simplified - links to hub page)
+    if (isManager) {
+      primaryItems.push({ label: "Management", href: "/dashboard/management", icon: "wrench", tooltip: "Inventory, finance, and operations" });
     }
 
-    // NOTE: Support Queue / Analytics / Platform Users are accessed via /admin layout
-    // They should NOT appear in the campground staff navigation
+    // Add Settings link for admins (simplified - links to hub page)
+    if (isAdmin) {
+      primaryItems.push({ label: "Settings", href: "/dashboard/settings", icon: "policy", tooltip: "All settings and configuration" });
+    }
 
-    // SETTINGS - Single link to settings hub (detailed items moved to /dashboard/settings)
-    const settingsItems: NavItem[] = [
-      { label: "Settings", href: "/dashboard/settings", icon: "policy", tooltip: "All settings and configuration" },
-    ];
+    // NOTE: Operations items moved to top bar
+    // NOTE: Support Queue / Analytics / Platform Users are accessed via /admin layout
 
     const sections = [
       {
@@ -492,37 +476,11 @@ export function DashboardShell({ children, className, title, subtitle }: { child
         items: primaryItems,
         collapsible: false,
         defaultOpen: true
-      },
-      {
-        heading: "Operations",
-        items: operationsItems,
-        collapsible: true,
-        defaultOpen: true
       }
     ];
 
-    // Only show Management section for managers and above
-    if (isManager) {
-      sections.push({
-        heading: "Management",
-        items: managementItems,
-        collapsible: true,
-        defaultOpen: false
-      });
-    }
-
-    // Only show Settings section for admins
-    if (isAdmin) {
-      sections.push({
-        heading: "Settings",
-        items: settingsItems,
-        collapsible: true,
-        defaultOpen: false
-      });
-    }
-
     return sections;
-  }, [cgReservationsPath, cgScopedPath, unreadMessages, allowOps, allowSupport, selected, platformRole, isManager, isAdmin]);
+  }, [cgReservationsPath, unreadMessages, isManager, isAdmin]);
 
   const frontDeskShortcuts = useMemo<NavItem[]>(() => {
     const items: NavItem[] = [
@@ -734,87 +692,35 @@ export function DashboardShell({ children, className, title, subtitle }: { child
               </div>
             )}
 
-            {mostVisitedItems.length > 0 && (
-              <div className="space-y-2">
-                <div className="text-[11px] uppercase tracking-wide text-slate-400">Most visited</div>
-                <div className="space-y-1">
-                  {mostVisitedItems.map((item) => {
-                    const isActive = currentPath === item.href || currentPath.startsWith(item.href + "/");
-                    return (
-                      <Link
-                        key={`m-mv-${item.href}`}
-                        href={item.href}
-                        title={"tooltip" in item && item.tooltip ? item.tooltip : item.label}
-                        aria-current={isActive ? "page" : undefined}
-                        className={cn(
-                          "flex items-center gap-3 rounded-lg px-3 py-3 text-base",
-                          isActive ? "bg-slate-800 text-white font-semibold" : "bg-slate-800/40 text-slate-100 hover:bg-slate-800"
-                        )}
-                        onClick={() => setMobileNavOpen(false)}
-                      >
-                        <Icon name={(item.icon as IconName) ?? "sparkles"} active={isActive} />
-                        <span>{item.label}</span>
-                      </Link>
-                    );
-                  })}
-                </div>
-              </div>
-            )}
-
-            {navSections.map((section) => {
-              const isOpen = openSections[section.heading] ?? section.defaultOpen ?? true;
-              return (
-                <div key={`m-${section.heading}`} className="space-y-2">
-                  <button
-                    type="button"
-                    className="flex w-full items-center justify-between text-sm uppercase tracking-wide text-slate-300 py-2"
-                    onClick={() => toggleSection(section.heading)}
-                    aria-expanded={isOpen}
-                  >
-                    <span>{section.heading}</span>
-                    <svg
-                      className={cn("h-3 w-3 transition-transform", isOpen ? "rotate-0" : "-rotate-90")}
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
+            {/* Primary Navigation - No accordion for mobile */}
+            {navSections.map((section) => (
+              <div key={`m-${section.heading}`} className="space-y-1">
+                {section.items.map((item) => {
+                  const isActive = currentPath === item.href || currentPath.startsWith(item.href + "/");
+                  return (
+                    <Link
+                      key={`m-${section.heading}-${item.href}`}
+                      href={item.href}
+                      title={"tooltip" in item && item.tooltip ? item.tooltip : item.label}
+                      aria-current={isActive ? "page" : undefined}
+                      className={cn(
+                        "flex items-center gap-3 rounded-lg px-3 py-3 text-base",
+                        isActive ? "bg-slate-800 text-white font-semibold" : "bg-slate-800/40 text-slate-100 hover:bg-slate-800"
+                      )}
+                      onClick={() => setMobileNavOpen(false)}
                     >
-                      <path d="m6 9 6 6 6-6" />
-                    </svg>
-                  </button>
-                  {isOpen && (
-                    <div className="space-y-1">
-                      {section.items.map((item) => {
-                        const isActive = currentPath === item.href || currentPath.startsWith(item.href + "/");
-                        return (
-                          <Link
-                            key={`m-${section.heading}-${item.href}`}
-                            href={item.href}
-                            title={"tooltip" in item && item.tooltip ? item.tooltip : item.label}
-                            aria-current={isActive ? "page" : undefined}
-                            className={cn(
-                              "flex items-center gap-3 rounded-lg px-3 py-3 text-base",
-                              isActive ? "bg-slate-800 text-white font-semibold" : "bg-slate-800/40 text-slate-100 hover:bg-slate-800"
-                            )}
-                            onClick={() => setMobileNavOpen(false)}
-                          >
-                            <Icon name={(item.icon as IconName) ?? "sparkles"} active={isActive} />
-                            <span className="flex-1">{item.label}</span>
-                            {(item as any).badge && (item as any).badge > 0 && (
-                              <span className="ml-2 rounded-full bg-red-500 px-2 py-0.5 text-[10px] font-semibold text-white">
-                                {(item as any).badge > 99 ? "99+" : (item as any).badge}
-                              </span>
-                            )}
-                          </Link>
-                        );
-                      })}
-                    </div>
-                  )}
-                </div>
-              );
-            })}
+                      <Icon name={(item.icon as IconName) ?? "sparkles"} active={isActive} />
+                      <span className="flex-1">{item.label}</span>
+                      {(item as any).badge && (item as any).badge > 0 && (
+                        <span className="ml-2 rounded-full bg-red-500 px-2 py-0.5 text-[10px] font-semibold text-white">
+                          {(item as any).badge > 99 ? "99+" : (item as any).badge}
+                        </span>
+                      )}
+                    </Link>
+                  );
+                })}
+              </div>
+            ))}
           </div>
         </div>
       </div>
@@ -947,131 +853,53 @@ export function DashboardShell({ children, className, title, subtitle }: { child
               </div>
             )}
 
-            {/* Most Visited */}
-            {mostVisitedItems.length > 0 && (
-              <div className="space-y-1">
-                {!collapsed && (
-                  <div className="px-3 text-[11px] font-semibold uppercase tracking-wide text-slate-500">
-                    Most Visited
-                  </div>
-                )}
-                <div className="space-y-1">
-                  {mostVisitedItems.map((item) => {
-                    const isActive = currentPath === item.href || currentPath.startsWith(item.href + "/");
-                    const isFav = favorites.includes(item.href);
-                    return (
-                      <Link
-                        key={`mv-${item.href}`}
-                        className={cn(
-                          "flex items-center justify-between rounded-md px-3 py-2.5 text-sm md:text-[15px] text-slate-400 hover:bg-slate-800 hover:text-white transition-colors",
-                          isActive && "bg-slate-800 text-white font-semibold"
-                        )}
-                        href={item.href}
-                        aria-current={isActive ? "page" : undefined}
-                        title={item.tooltip ?? item.label}
-                      >
-                        <span className={cn("flex items-center gap-2", collapsed && "justify-center w-full")}>
-                          <Icon name={(item.icon as IconName) ?? "sparkles"} active={isActive} />
-                          {!collapsed && item.label}
-                        </span>
-                        {!collapsed && pinEditMode && (
-                          <PinButton
-                            isPinned={isFav}
-                            onClick={(e) => {
-                              e.preventDefault();
-                              e.stopPropagation();
-                              toggleFavorite(item.href);
-                            }}
-                          />
-                        )}
-                      </Link>
-                    );
-                  })}
-                </div>
-              </div>
-            )}
 
-            {navSections.map((section) => {
-              const isOpen = collapsed ? true : openSections[section.heading] ?? true;
-              const showToggle = !collapsed && section.collapsible !== false && section.items.length > 0;
-              return (
-                <div key={section.heading} className="space-y-1">
-                  {!collapsed && (
-                    <button
-                      type="button"
-                      className="flex w-full items-center justify-between px-3 py-2 text-xs font-semibold uppercase tracking-wide text-slate-400 hover:text-slate-200 transition-colors"
-                      onClick={() => showToggle && toggleSection(section.heading)}
-                      aria-expanded={isOpen}
-                      aria-controls={`section-${section.heading}`}
-                      disabled={!showToggle}
-                    >
-                      <span>{section.heading}</span>
-                      {showToggle && (
-                        <svg
-                          className={cn(
-                            "h-3 w-3 transition-transform",
-                            isOpen ? "rotate-0" : "-rotate-90"
-                          )}
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeWidth="2"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                        >
-                          <path d="m6 9 6 6 6-6" />
-                        </svg>
+            {/* Primary Navigation - No accordion, always visible */}
+            {navSections.map((section) => (
+              <div key={section.heading} className="space-y-1">
+                {section.items.map((item) => {
+                  const isActive = currentPath === item.href || currentPath.startsWith(item.href + "/");
+                  const isFav = favorites.includes(item.href);
+                  return (
+                    <Link
+                      key={`${section.heading}-${item.href}-${item.label}`}
+                      className={cn(
+                        "flex items-center justify-between rounded-md px-3 py-2.5 text-sm md:text-[15px] text-slate-400 hover:bg-slate-800 hover:text-white transition-colors",
+                        isActive && "bg-slate-800 text-white font-semibold"
                       )}
-                    </button>
-                  )}
-                  {(!collapsed && isOpen) || collapsed ? (
-                    <div id={`section-${section.heading}`} className="space-y-1">
-                      {section.items.map((item) => {
-                        const isActive = currentPath === item.href || currentPath.startsWith(item.href + "/");
-                        const isFav = favorites.includes(item.href);
-                        return (
-                          <Link
-                            key={`${section.heading}-${item.href}-${item.label}`}
-                            className={cn(
-                              "flex items-center justify-between rounded-md px-3 py-2.5 text-sm md:text-[15px] text-slate-400 hover:bg-slate-800 hover:text-white transition-colors",
-                              isActive && "bg-slate-800 text-white font-semibold"
-                            )}
-                            href={item.href}
-                            aria-current={isActive ? "page" : undefined}
-                            title={"tooltip" in item && item.tooltip ? item.tooltip : item.label}
-                          >
-                            <span className={cn("flex items-center gap-2", collapsed && "justify-center w-full")}>
-                              <Icon name={(item.icon as IconName) ?? "sparkles"} active={isActive} />
-                              {!collapsed && item.label}
-                            </span>
-                            {(item as any).soon && !collapsed && (
-                              <span className="ml-2 rounded-full border border-amber-200 bg-amber-50 px-2 py-0.5 text-[10px] font-semibold uppercase text-amber-800">
-                                Soon
-                              </span>
-                            )}
-                            {!collapsed && pinEditMode && (
-                              <PinButton
-                                isPinned={isFav}
-                                onClick={(e) => {
-                                  e.preventDefault();
-                                  e.stopPropagation();
-                                  toggleFavorite(item.href);
-                                }}
-                              />
-                            )}
-                            {(item as any).badge && (item as any).badge > 0 && !collapsed && (
-                              <span className="ml-2 rounded-full bg-red-500 px-2 py-0.5 text-[10px] font-semibold text-white">
-                                {(item as any).badge > 99 ? "99+" : (item as any).badge}
-                              </span>
-                            )}
-                          </Link>
-                        );
-                      })}
-                    </div>
-                  ) : null}
-                </div>
-              );
-            })}
+                      href={item.href}
+                      aria-current={isActive ? "page" : undefined}
+                      title={"tooltip" in item && item.tooltip ? item.tooltip : item.label}
+                    >
+                      <span className={cn("flex items-center gap-2", collapsed && "justify-center w-full")}>
+                        <Icon name={(item.icon as IconName) ?? "sparkles"} active={isActive} />
+                        {!collapsed && item.label}
+                      </span>
+                      {(item as any).soon && !collapsed && (
+                        <span className="ml-2 rounded-full border border-amber-200 bg-amber-50 px-2 py-0.5 text-[10px] font-semibold uppercase text-amber-800">
+                          Soon
+                        </span>
+                      )}
+                      {!collapsed && pinEditMode && (
+                        <PinButton
+                          isPinned={isFav}
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            toggleFavorite(item.href);
+                          }}
+                        />
+                      )}
+                      {(item as any).badge && (item as any).badge > 0 && !collapsed && (
+                        <span className="ml-2 rounded-full bg-red-500 px-2 py-0.5 text-[10px] font-semibold text-white">
+                          {(item as any).badge > 99 ? "99+" : (item as any).badge}
+                        </span>
+                      )}
+                    </Link>
+                  );
+                })}
+              </div>
+            ))}
           </nav>
         </aside>
         <main className={cn("flex-1", className)}>

@@ -206,8 +206,44 @@ export function AdminTopBar({ onToggleNav, mobileNavOpen }: AdminTopBarProps) {
                     </button>
                 </div>
 
-                {/* Right - Notifications & Menu */}
+                {/* Right - Operations, Notifications & Menu */}
                 <div className="flex items-center gap-2">
+                    {/* Operations Quick Actions */}
+                    <div className="hidden md:flex items-center gap-1 mr-2">
+                        <Link
+                            href="/check-in-out"
+                            className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-slate-600 hover:text-emerald-700 hover:bg-emerald-50 rounded-lg transition-colors"
+                            title="Check In/Out"
+                        >
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">
+                                <path d="M6 3h12a2 2 0 0 1 2 2v16l-5-3-5 3-5-3V5a2 2 0 0 1 2-2Z" />
+                                <path d="M9 8h6M9 12h6" />
+                            </svg>
+                            <span className="hidden lg:inline">Check In</span>
+                        </Link>
+                        <Link
+                            href="/booking"
+                            className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-slate-600 hover:text-emerald-700 hover:bg-emerald-50 rounded-lg transition-colors"
+                            title="New Booking"
+                        >
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">
+                                <path d="M12 5v14M5 12h14" />
+                            </svg>
+                            <span className="hidden lg:inline">New Booking</span>
+                        </Link>
+                        <Link
+                            href="/pos"
+                            className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-slate-600 hover:text-emerald-700 hover:bg-emerald-50 rounded-lg transition-colors"
+                            title="Point of Sale"
+                        >
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">
+                                <rect x="3" y="5" width="18" height="14" rx="2" />
+                                <path d="M3 10h18M7 15h2" />
+                            </svg>
+                            <span className="hidden lg:inline">POS</span>
+                        </Link>
+                    </div>
+
                     {/* Notifications */}
                     <div className="relative" ref={notificationsRef}>
                         <button
@@ -311,6 +347,19 @@ export function AdminTopBar({ onToggleNav, mobileNavOpen }: AdminTopBarProps) {
 
                         {isMenuOpen && (
                             <div className="absolute right-0 top-full mt-2 w-56 bg-white rounded-xl shadow-xl border border-slate-200 py-2 z-50">
+                                {/* Management */}
+                                <Link
+                                    href="/dashboard/management"
+                                    className="flex items-center gap-3 px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50 transition-colors"
+                                    onClick={() => setIsMenuOpen(false)}
+                                >
+                                    <svg className="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">
+                                        <path d="M19.4 4.6a5 5 0 0 1-6.8 6.8L8 15l-3-3 3.6-4.6a5 5 0 0 1 6.8-2.8l-3 3 3 3z" />
+                                        <path d="M7 14 3.5 17.5" />
+                                    </svg>
+                                    Management
+                                </Link>
+
                                 {/* Settings */}
                                 <Link
                                     href="/dashboard/settings"
