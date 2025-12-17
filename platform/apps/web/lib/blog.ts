@@ -2,26 +2,56 @@ import fs from 'fs';
 import path from 'path';
 import matter from 'gray-matter';
 
+const DEBUG_LOGS: string[] = [];
+
+function log(msg: string) {
+    DEBUG_LOGS.push(msg);
+    console.log(msg);
+}
+
 // Robust directory finding
 function findBlogDir() {
+    log(`[Blog] Starting search. CWD: ${process.cwd()}`);
+
     const candidates = [
-        path.join(process.cwd(), 'content/blog'),           // Docker production COPY
-        path.join(process.cwd(), '../../../content/blog'),  // Local monorepo
-        path.join(process.cwd(), 'public/content/blog'),    // Alternative fallback
+        '/app/content/blog',                                // Standard Docker Route
+        path.join(process.cwd(), 'content/blog'),           // Relative
+        path.join(process.cwd(), '../../../content/blog'),  // Monorepo relative
+        path.join(process.cwd(), '../../content/blog'),     // Alternative relative
+        path.join(process.cwd(), '../content/blog'),        // Alternative relative
+        '/content/blog',                                    // Root fallback
     ];
 
     for (const candidate of candidates) {
+        log(`[Blog] Checking: ${candidate}`);
         if (fs.existsSync(candidate)) {
-            console.log(`[Blog] Found blog directory at: ${candidate}`);
-            return candidate;
+            log(`[Blog] Found at: ${candidate}`);
+            // Verify it has files
+            try {
+                const files = fs.readdirSync(candidate);
+                log(`[Blog] Files in dir: ${files.length}`);
+                if (files.length > 0) return candidate;
+            } catch (e) {
+                log(`[Blog] Error reading dir: ${e}`);
+            }
+        } else {
+            log(`[Blog] Not found at: ${candidate}`);
         }
     }
 
-    console.warn(`[Blog] content/blog directory not found. Searched: ${candidates.join(', ')}`);
+    log(`[Blog] content/blog directory not found. Searched: ${candidates.join(', ')}`);
     return null;
 }
 
 const BLOG_DIR = findBlogDir();
+
+export function getDebugInfo() {
+    return {
+        cwd: process.cwd(),
+        blogDir: BLOG_DIR,
+        logs: DEBUG_LOGS
+    };
+}
 
 export interface BlogPost {
     slug: string;

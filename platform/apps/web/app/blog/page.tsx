@@ -2,7 +2,7 @@ import { Metadata } from "next";
 import Link from "next/link";
 import { BookOpen, ArrowRight, Tent, Map, Caravan, Users, Wrench, TreePine, Calendar, Clock, ChevronRight } from "lucide-react";
 import { PublicHeader } from "../../components/public/PublicHeader";
-import { getAllPosts, getCategories } from "../../lib/blog";
+import { getAllPosts, getCategories, getDebugInfo } from "../../lib/blog";
 
 export const metadata: Metadata = {
   title: "Blog - Camp Everyday",
@@ -22,6 +22,22 @@ export default function BlogPage() {
   const posts = getAllPosts();
   const categories = getCategories();
 
+  if (posts.length === 0) {
+    const debug = getDebugInfo();
+    return (
+      <div className="min-h-screen bg-slate-900 text-green-400 p-8 font-mono overflow-auto">
+        <h1 className="text-xl font-bold mb-4">Blog Debug Info</h1>
+        <div className="bg-slate-800 p-4 rounded mb-4">
+          <p><strong>CWD:</strong> {debug.cwd}</p>
+          <p><strong>Resolved Blog Dir:</strong> {String(debug.blogDir)}</p>
+        </div>
+        <h2 className="text-lg font-bold mb-2">Logs:</h2>
+        <pre className="whitespace-pre-wrap text-sm border border-slate-700 p-4 rounded bg-black">
+          {debug.logs.join('\n')}
+        </pre>
+      </div>
+    );
+  }
   // Sort posts by something if we had dates, for now just reverse so newest (bottom of file list?) is first
   // Actually file system order is arbitrary. Let's assume the order getAllPosts returns is acceptable or we could simple reverse.
   const sortedPosts = [...posts]; // .reverse() if needed
