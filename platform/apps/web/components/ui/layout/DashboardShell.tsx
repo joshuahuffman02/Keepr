@@ -13,6 +13,7 @@ import { useWhoami } from "@/hooks/use-whoami";
 import { SyncStatus } from "../../sync/SyncStatus";
 import { SyncDetailsDrawer } from "../../sync/SyncDetailsDrawer";
 import { useSyncStatus } from "@/contexts/SyncStatusContext";
+import { SupportChatWidget } from "../../support/SupportChatWidget";
 
 type IconName =
   | "dashboard"
@@ -940,6 +941,7 @@ export function DashboardShell({ children, className, title, subtitle }: { child
 
       <SyncDetailsDrawer open={syncDrawerOpen} onOpenChange={setSyncDrawerOpen} />
       <StaffChat />
+      <SupportChatWidget />
     </div>
   );
 }

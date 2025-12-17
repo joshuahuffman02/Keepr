@@ -1,5 +1,5 @@
 import { BadRequestException, ConflictException, Injectable, Logger, UnauthorizedException } from "@nestjs/common";
-import { IdempotencyStatus, OnboardingStatus } from "@prisma/client";
+import { IdempotencyStatus, OnboardingStatus, OnboardingStep } from "@prisma/client";
 import { instanceToPlain, plainToInstance } from "class-transformer";
 import { validateSync } from "class-validator";
 import crypto from "crypto";
@@ -261,6 +261,179 @@ export class OnboardingService {
       sequence,
       rateAction: "apply"
     });
+  }
+
+  /**
+   * Complete onboarding - creates campground, membership, and finalizes setup
+   * Called when user finishes onboarding wizard
+   */
+  async completeOnboarding(sessionId: string, token: string, userId: string) {
+    const session = await this.requireSession(sessionId, token);
+
+    // Check minimum required steps (account_profile is mandatory)
+    const completed = new Set(session.completedSteps ?? []);
+    if (!completed.has("account_profile")) {
+      throw new BadRequestException("Please complete the account profile step before finishing setup");
+    }
+
+    // Get session data
+    const data = (session.data ?? {}) as Record<string, any>;
+    const accountProfile = data.account_profile ?? {};
+
+    // Get organization and check for early access enrollment
+    const organization = session.organizationId
+      ? await this.prisma.organization.findUnique({
+          where: { id: session.organizationId },
+          include: { earlyAccessEnrollment: true }
+        })
+      : null;
+
+    // Generate slug from campground name
+    const campgroundName = accountProfile.campgroundName || accountProfile.name || "My Campground";
+    const baseSlug = campgroundName
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-|-$/g, "");
+
+    // Ensure unique slug
+    let slug = baseSlug;
+    let counter = 1;
+    while (await this.prisma.campground.findUnique({ where: { slug } })) {
+      slug = `${baseSlug}-${counter}`;
+      counter++;
+    }
+
+    // Create campground
+    const campground = await this.prisma.campground.create({
+      data: {
+        organizationId: session.organizationId || organization?.id || "",
+        name: campgroundName,
+        slug,
+        phone: accountProfile.phone,
+        email: accountProfile.email,
+        city: accountProfile.city,
+        state: accountProfile.state,
+        country: accountProfile.country || "US",
+        address1: accountProfile.address1,
+        postalCode: accountProfile.postalCode,
+        timezone: accountProfile.timezone || "America/New_York",
+        website: accountProfile.website,
+        isBookable: true
+      }
+    });
+
+    // Create membership for user
+    await this.prisma.campgroundMembership.create({
+      data: {
+        userId,
+        campgroundId: campground.id,
+        role: "owner"
+      }
+    });
+
+    // Update session with campground ID and mark completed
+    await this.prisma.onboardingSession.update({
+      where: { id: sessionId },
+      data: {
+        campgroundId: campground.id,
+        status: OnboardingStatus.completed
+      }
+    });
+
+    // Get user for welcome email
+    const user = await this.prisma.user.findUnique({ where: { id: userId } });
+
+    // Send welcome email
+    if (user?.email) {
+      const baseUrl = process.env.FRONTEND_BASE_URL || process.env.NEXT_PUBLIC_APP_URL || "https://app.campreserv.com";
+      const dashboardUrl = `${baseUrl}/dashboard`;
+
+      await this.email.sendEmail({
+        to: user.email,
+        subject: `${campground.name} is live on Camp Everyday!`,
+        html: this.generateGoLiveEmail({
+          firstName: user.firstName || "there",
+          campgroundName: campground.name,
+          dashboardUrl,
+          tierName: organization?.earlyAccessEnrollment
+            ? this.getTierDisplayName(organization.earlyAccessEnrollment.tier)
+            : null
+        })
+      });
+    }
+
+    return {
+      success: true,
+      campgroundId: campground.id,
+      slug: campground.slug,
+      redirectUrl: `/dashboard`
+    };
+  }
+
+  private getTierDisplayName(tier: string): string {
+    const names: Record<string, string> = {
+      founders_circle: "Founder's Circle",
+      pioneer: "Pioneer",
+      trailblazer: "Trailblazer"
+    };
+    return names[tier] || tier;
+  }
+
+  private generateGoLiveEmail(params: {
+    firstName: string;
+    campgroundName: string;
+    dashboardUrl: string;
+    tierName: string | null;
+  }): string {
+    const tierBadge = params.tierName
+      ? `<div style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); display: inline-block; padding: 6px 16px; border-radius: 9999px; color: white; font-weight: 600; font-size: 14px; margin-bottom: 16px;">
+          Early Access: ${params.tierName}
+        </div>`
+      : "";
+
+    return `
+      <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+        <div style="text-align: center; margin-bottom: 30px;">
+          <div style="font-size: 64px; margin-bottom: 16px;">🎉</div>
+          <h1 style="color: #0f172a; margin: 0 0 8px 0;">You're Live!</h1>
+          ${tierBadge}
+        </div>
+
+        <div style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); border-radius: 16px; padding: 24px; text-align: center; margin-bottom: 24px; color: white;">
+          <p style="margin: 0 0 8px 0; opacity: 0.9; font-size: 16px;">Congratulations!</p>
+          <h2 style="margin: 0; font-size: 24px;">${params.campgroundName}</h2>
+          <p style="margin: 8px 0 0 0; opacity: 0.9;">is now accepting reservations</p>
+        </div>
+
+        <div style="background: #f8fafc; border-radius: 12px; padding: 20px; margin-bottom: 24px;">
+          <p style="margin: 0 0 16px 0; color: #334155;">Hey ${params.firstName}!</p>
+          <p style="margin: 0 0 16px 0; color: #334155;">
+            Your campground is now live and ready to accept bookings. Here's what you can do next:
+          </p>
+          <ul style="margin: 0 0 16px 0; padding-left: 20px; color: #334155;">
+            <li style="margin-bottom: 8px;">Add your sites and set rates</li>
+            <li style="margin-bottom: 8px;">Connect Stripe to accept payments</li>
+            <li style="margin-bottom: 8px;">Share your booking page with guests</li>
+            <li style="margin-bottom: 8px;">Set up automated guest communications</li>
+          </ul>
+        </div>
+
+        <div style="text-align: center; margin-bottom: 24px;">
+          <a href="${params.dashboardUrl}" style="display: inline-block; background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; padding: 16px 32px; border-radius: 12px; text-decoration: none; font-weight: 600; font-size: 18px;">
+            Go to Dashboard
+          </a>
+        </div>
+
+        <div style="text-align: center; padding-top: 20px; border-top: 1px solid #e2e8f0;">
+          <p style="color: #64748b; font-size: 14px; margin: 0 0 8px 0;">
+            Need help? Reply to this email or check out our <a href="https://help.campeveryday.com" style="color: #10b981;">Help Center</a>
+          </p>
+          <p style="color: #94a3b8; font-size: 12px; margin: 0;">
+            Camp Everyday - Making campground management effortless
+          </p>
+        </div>
+      </div>
+    `;
   }
 }
 

@@ -546,6 +546,12 @@ enum BillingPlan {
   enterprise // Flat monthly + low per-booking fee (default $1 + monthly)
 }
 
+enum EarlyAccessTier {
+  founders_circle // 5 spots, $0/mo forever, $0.75/booking
+  pioneer // 15 spots, $0/mo 12mo, $1.00/booking
+  trailblazer // 25 spots, $14.50/mo 6mo, $1.25/booking
+}
+
 enum PaymentFeeMode {
   absorb // Platform fee is absorbed by campground (reduces payout)
   pass_through // Platform fee added to guest total
@@ -804,6 +810,9 @@ model Organization {
   portfolioDashboards   PortfolioDashboard[]
   portfolioMetrics      PortfolioMetric[]
   centralizedRatePushes CentralizedRatePush[]
+
+  // Early access program
+  earlyAccessEnrollment EarlyAccessEnrollment?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now()) @updatedAt
@@ -6184,4 +6193,32 @@ model CharityPayout {
 
   @@index([charityId])
   @@index([status])
+}
+
+// =============================================================================
+// EARLY ACCESS PROGRAM
+// =============================================================================
+
+// Tracks which organizations enrolled in early access tiers
+model EarlyAccessEnrollment {
+  id               String          @id @default(cuid())
+  organizationId   String          @unique
+  tier             EarlyAccessTier
+  enrolledAt       DateTime        @default(now())
+  lockedBookingFee Int // cents - locked forever at enrollment rate
+  monthlyFeeEndsAt DateTime? // When free/discounted monthly period ends (null = forever free)
+  lockedMonthlyFee Int? // cents - if special rate applies after promo period
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@index([tier])
+  @@index([enrolledAt])
+}
+
+// Tracks available spots per tier (singleton rows)
+model EarlyAccessSpot {
+  tier           EarlyAccessTier @id
+  totalSpots     Int
+  remainingSpots Int
+  updatedAt      DateTime        @updatedAt
 }

@@ -44,4 +44,20 @@ export class OnboardingController {
     const sequence = clientSeq ?? altSeq ?? undefined;
     return this.onboarding.saveStep(id, token, dto.step, dto.payload, idempotencyKey, sequence);
   }
+
+  /**
+   * Complete onboarding - finalize setup and create campground
+   */
+  @UseGuards(JwtAuthGuard)
+  @Post("session/:id/complete")
+  completeOnboarding(
+    @Param("id") id: string,
+    @Headers("x-onboarding-token") tokenHeader: string,
+    @Body() body: { token?: string },
+    @Req() req: any
+  ) {
+    const token = body.token ?? tokenHeader;
+    if (!token) throw new BadRequestException("Missing onboarding token");
+    return this.onboarding.completeOnboarding(id, token, req.user.id);
+  }
 }

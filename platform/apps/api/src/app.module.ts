@@ -92,6 +92,7 @@ import { AdminModule } from "./admin/admin.module";
 import { AnomaliesModule } from "./anomalies/anomalies.module";
 import { IotModule } from "./iot/iot.module";
 import { CharityModule } from "./charity/charity.module";
+import { EarlyAccessModule } from "./early-access/early-access.module";
 
 @Module({
   imports: [
@@ -188,6 +189,7 @@ import { CharityModule } from "./charity/charity.module";
     AnomaliesModule,
     IotModule,
     CharityModule,
+    EarlyAccessModule,
   ],
   providers: []
 })

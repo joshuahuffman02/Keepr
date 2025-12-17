@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState, useCallback } from "react";
+import { useEffect, useMemo, useState, useCallback, useRef } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { getAllTopics, getContextTopics, searchTopics, getPopularTopics } from "@/lib/help";
@@ -11,6 +11,8 @@ import { Textarea } from "../ui/textarea";
 import { Input } from "../ui/input";
 import { useToast } from "../ui/use-toast";
 import { useWhoami } from "@/hooks/use-whoami";
+
+const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "http://localhost:4000/api";
 
 type HelpPanelProps = {
   open: boolean;
@@ -35,6 +37,9 @@ export function HelpPanel({ open, onClose }: HelpPanelProps) {
   const [reportDescription, setReportDescription] = useState("");
   const [reportSteps, setReportSteps] = useState("");
   const [reportEmail, setReportEmail] = useState("");
+  const [aiResponse, setAiResponse] = useState<string | null>(null);
+  const [aiLoading, setAiLoading] = useState(false);
+  const aiSearchTimeout = useRef<NodeJS.Timeout | null>(null);
   const { toast } = useToast();
   const { data: whoami } = useWhoami();
 
@@ -81,6 +86,74 @@ export function HelpPanel({ open, onClose }: HelpPanelProps) {
       localStorage.removeItem(LS_ROLE);
     }
   }, [roleFilter]);
+
+  // AI search when static results are insufficient
+  const fetchAiHelp = useCallback(async (searchQuery: string) => {
+    if (!searchQuery.trim() || searchQuery.length < 3) {
+      setAiResponse(null);
+      return;
+    }
+
+    setAiLoading(true);
+    try {
+      const res = await fetch(`${API_BASE}/ai/support/help-search`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+        body: JSON.stringify({
+          query: searchQuery,
+          context: pathname || "/",
+        }),
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        setAiResponse(data.answer || null);
+      } else {
+        // Fallback response when AI endpoint doesn't exist
+        setAiResponse(
+          "I couldn't find a specific answer for that. Try browsing the topics below or submit a support ticket for personalized help."
+        );
+      }
+    } catch (err) {
+      console.error("AI search error:", err);
+      setAiResponse(null);
+    } finally {
+      setAiLoading(false);
+    }
+  }, [pathname]);
+
+  // Trigger AI search when static results < 3 (with debounce)
+  useEffect(() => {
+    if (aiSearchTimeout.current) {
+      clearTimeout(aiSearchTimeout.current);
+    }
+
+    // Clear AI response when query changes
+    setAiResponse(null);
+
+    // Only trigger AI if query exists and static results are insufficient
+    if (query && query.length >= 3) {
+      const staticResults = searchTopics(query, 50);
+      const filteredResults = roleFilter
+        ? staticResults.filter((t) => !t.roles || t.roles.includes(roleFilter))
+        : staticResults;
+
+      if (filteredResults.length < 3) {
+        aiSearchTimeout.current = setTimeout(() => {
+          fetchAiHelp(query);
+        }, 500); // 500ms debounce
+      }
+    }
+
+    return () => {
+      if (aiSearchTimeout.current) {
+        clearTimeout(aiSearchTimeout.current);
+      }
+    };
+  }, [query, roleFilter, fetchAiHelp]);
 
   const roleFilterTopics = useCallback(
     (topics: HelpTopic[]) => (roleFilter ? topics.filter((t) => !t.roles || t.roles.includes(roleFilter)) : topics),
@@ -385,7 +458,37 @@ export function HelpPanel({ open, onClose }: HelpPanelProps) {
             </section>
           )}
 
-          {emptyState && (
+          {/* AI Response Section */}
+          {query && (aiLoading || aiResponse) && (
+            <section className="mb-4">
+              <div className="rounded-lg border-2 border-blue-200 bg-gradient-to-br from-blue-50 to-indigo-50 p-4">
+                <div className="flex items-start gap-3">
+                  <div className="flex-shrink-0 w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
+                    <AiSparklesIcon />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="text-xs font-semibold text-blue-600 uppercase tracking-wide mb-1">
+                      AI Assistant
+                    </div>
+                    {aiLoading ? (
+                      <div className="flex items-center gap-2 text-sm text-slate-600">
+                        <div className="flex gap-1">
+                          <span className="w-2 h-2 bg-blue-400 rounded-full animate-bounce" />
+                          <span className="w-2 h-2 bg-blue-400 rounded-full animate-bounce [animation-delay:0.1s]" />
+                          <span className="w-2 h-2 bg-blue-400 rounded-full animate-bounce [animation-delay:0.2s]" />
+                        </div>
+                        Searching for an answer...
+                      </div>
+                    ) : (
+                      <p className="text-sm text-slate-700 whitespace-pre-wrap">{aiResponse}</p>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </section>
+          )}
+
+          {emptyState && !aiLoading && !aiResponse && (
             <div className="text-sm text-slate-600">
               No results for <span className="font-semibold">"{query}"</span>. Try a different keyword or browse below.
             </div>
@@ -520,6 +623,14 @@ function PinIcon({ filled }: { filled?: boolean }) {
   return (
     <svg className="w-4 h-4" viewBox="0 0 24 24" stroke="currentColor" fill={filled ? "currentColor" : "none"} strokeWidth="2">
       <path strokeLinecap="round" strokeLinejoin="round" d="M12 17v5M9 3h6l-1 7h-4zM7 10h10" />
+    </svg>
+  );
+}
+
+function AiSparklesIcon() {
+  return (
+    <svg className="w-4 h-4 text-white" viewBox="0 0 24 24" fill="currentColor">
+      <path d="M12 3L14 9H20L15 13L17 19L12 15L7 19L9 13L4 9H10L12 3Z" />
     </svg>
   );
 }
