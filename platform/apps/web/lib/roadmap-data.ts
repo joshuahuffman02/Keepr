@@ -518,15 +518,31 @@ export const roadmapPhases: RoadmapPhase[] = [
         id: 'platform-scale',
         name: 'Platform & Scale',
         description: 'Public API/webhooks, SDKs, AI assist, IoT hooks, enterprise/international packs.',
-        status: 'planned',
+        status: 'in_progress',
         order: 25,
         icon: 'globe-2',
         color: 'teal',
         milestones: [
             { id: 'public-api', name: 'Public API & webhooks', description: 'OAuth2 sandbox, SDKs, client generators, webhook retry/logs', status: 'planned' },
-            { id: 'ai-assist', name: 'AI assist', description: 'Replies, task bundling, routing, smart search, anomaly alerts across bookings/payments/comms', status: 'planned' },
+            { id: 'ai-assist', name: 'AI assist', description: 'Replies, task bundling, routing, smart search, anomaly alerts across bookings/payments/comms', status: 'in_progress' },
             { id: 'iot-hooks', name: 'IoT hooks', description: 'Metering/lock/alert stubs, QR-at-site flows, device registry', status: 'planned' },
             { id: 'enterprise-international-next', name: 'Enterprise & international depth', description: 'Multi-property controls, approvals depth, localization, FX/tax packs, data residency', status: 'planned' },
+        ],
+    },
+    {
+        id: 'charity-roundup',
+        name: 'Round Up for Charity',
+        description: 'Enable guests to round up their reservation total to donate to campground-selected charities, with full accounting integration and reporting.',
+        status: 'planned',
+        order: 26,
+        icon: 'heart',
+        color: 'rose',
+        milestones: [
+            { id: 'charity-models', name: 'Charity data models', description: 'Charity registry, campground charity selection, donation tracking, and payout management', status: 'planned' },
+            { id: 'charity-admin', name: 'Charity admin UI', description: 'Platform charity management, campground charity settings, enable/disable round-up', status: 'planned' },
+            { id: 'roundup-checkout', name: 'Round-up at checkout', description: 'Guest opt-in UI during booking with charity info and round-up amount display', status: 'planned' },
+            { id: 'charity-accounting', name: 'Charity accounting', description: 'Separate GL code for donations, liability tracking, journal entries, and payout reconciliation', status: 'planned' },
+            { id: 'charity-reporting', name: 'Charity reporting', description: 'Donation totals, opt-in rates, per-charity breakdown, payout history, and tax exports', status: 'planned' },
         ],
     },
 ];
@@ -536,6 +552,16 @@ export const roadmapPhases: RoadmapPhase[] = [
 // =============================================================================
 
 export const updates: Update[] = [
+    {
+        id: 'update-2025-12-17-ai-analytics-charity',
+        title: 'AI Analytics Hub & Charity Round-Up planning',
+        date: '2025-12-17',
+        body: 'Launched comprehensive Analytics Hub with AI-powered insights including anomaly detection, NPS analysis, improvement suggestions, and goal tracking. Added NPS recognition badges (Top 1%, Rising Star, Campground of the Year). Started Platform & Scale phase with AI assist. Planning Round Up for Charity feature to let guests donate to campground-selected charities.',
+        tags: ['analytics', 'ai', 'nps', 'charity', 'roadmap'],
+        category: 'feature',
+        phaseId: 'platform-scale',
+        milestoneIds: ['ai-assist'],
+    },
     {
         id: 'update-2025-12-16-ship-readiness-complete',
         title: 'Ship Readiness & Stabilize phases completed',
