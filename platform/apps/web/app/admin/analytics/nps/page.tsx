@@ -74,6 +74,14 @@ const mockNpsData = {
     { campgroundId: "7", campgroundName: "Sunset Ridge", score: 38, responses: 356, promoterPercentage: 52, detractorPercentage: 14 },
     { campgroundId: "8", campgroundName: "Highland Trails", score: 32, responses: 234, promoterPercentage: 48, detractorPercentage: 16 },
   ],
+  worstCampgrounds: [
+    { campgroundId: "9", campgroundName: "Dusty Pines RV Park", score: -12, responses: 156, promoterPercentage: 22, detractorPercentage: 34, topIssues: ["cleanliness", "facilities"] },
+    { campgroundId: "10", campgroundName: "Shady Acres Camp", score: -5, responses: 89, promoterPercentage: 28, detractorPercentage: 33, topIssues: ["noise", "management"] },
+    { campgroundId: "11", campgroundName: "Roadside Rest Stop", score: 5, responses: 245, promoterPercentage: 32, detractorPercentage: 27, topIssues: ["amenities", "value"] },
+    { campgroundId: "12", campgroundName: "Budget Bay Marina", score: 12, responses: 178, promoterPercentage: 35, detractorPercentage: 23, topIssues: ["wifi", "sites"] },
+    { campgroundId: "13", campgroundName: "Valley View RV", score: 18, responses: 312, promoterPercentage: 38, detractorPercentage: 20, topIssues: ["staff", "check-in"] },
+    { campgroundId: "14", campgroundName: "Creekside Camping", score: 22, responses: 134, promoterPercentage: 40, detractorPercentage: 18, topIssues: ["bathrooms", "maintenance"] },
+  ],
   recentComments: [
     { id: "1", score: 10, category: "promoter", comment: "Amazing experience! The staff was incredibly helpful and the facilities were top-notch.", sentiment: "positive", tags: ["staff", "facilities"], createdAt: new Date("2024-12-15"), campgroundName: "Mountain Vista Resort" },
     { id: "2", score: 9, category: "promoter", comment: "Beautiful location and clean sites. Will definitely be back next summer!", sentiment: "positive", tags: ["location", "cleanliness"], createdAt: new Date("2024-12-14"), campgroundName: "Lakeside Haven" },
@@ -376,6 +384,64 @@ export default function NpsAnalyticsPage() {
           maxRows={8}
         />
       </div>
+
+      {/* Needs Attention - Worst Performing */}
+      {data.worstCampgrounds && data.worstCampgrounds.length > 0 && (
+        <Card className="bg-red-500/5 border-red-500/20">
+          <CardHeader>
+            <div className="flex items-center gap-2">
+              <Frown className="h-5 w-5 text-red-400" />
+              <CardTitle className="text-lg text-white">Needs Attention</CardTitle>
+            </div>
+            <p className="text-sm text-slate-400">
+              Campgrounds with lowest NPS scores - prioritize for improvement
+            </p>
+          </CardHeader>
+          <CardContent>
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead>
+                  <tr className="border-b border-slate-700">
+                    <th className="text-left py-3 px-4 text-sm font-medium text-slate-400">Campground</th>
+                    <th className="text-right py-3 px-4 text-sm font-medium text-slate-400">NPS</th>
+                    <th className="text-right py-3 px-4 text-sm font-medium text-slate-400">Responses</th>
+                    <th className="text-right py-3 px-4 text-sm font-medium text-slate-400">Detractors</th>
+                    <th className="text-left py-3 px-4 text-sm font-medium text-slate-400">Top Issues</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {data.worstCampgrounds.map((cg, idx) => (
+                    <tr key={cg.campgroundId} className={idx % 2 === 0 ? "bg-slate-800/30" : ""}>
+                      <td className="py-3 px-4 text-sm text-white">{cg.campgroundName}</td>
+                      <td className={`py-3 px-4 text-sm text-right font-semibold ${getNpsColor(cg.score)}`}>
+                        {cg.score}
+                      </td>
+                      <td className="py-3 px-4 text-sm text-right text-slate-300">
+                        {cg.responses.toLocaleString()}
+                      </td>
+                      <td className="py-3 px-4 text-sm text-right text-red-400 font-medium">
+                        {cg.detractorPercentage}%
+                      </td>
+                      <td className="py-3 px-4">
+                        <div className="flex gap-1 flex-wrap">
+                          {cg.topIssues?.map((issue, i) => (
+                            <Badge
+                              key={i}
+                              className="bg-red-500/20 text-red-300 border-red-500/30 text-xs"
+                            >
+                              {issue}
+                            </Badge>
+                          ))}
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Tag Analysis */}
       <Card className="bg-slate-800/50 border-slate-700">

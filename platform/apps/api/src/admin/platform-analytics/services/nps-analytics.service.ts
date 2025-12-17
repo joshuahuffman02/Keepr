@@ -160,12 +160,13 @@ export class NpsAnalyticsService {
    * Get full NPS analytics
    */
   async getFullAnalytics(dateRange: DateRange) {
-    const [overview, trends, byAccommodation, byCampground, recentComments, tagAnalysis] =
+    const [overview, trends, byAccommodation, byCampground, worstCampgrounds, recentComments, tagAnalysis] =
       await Promise.all([
         this.getOverview(dateRange),
         this.getNpsTrends(dateRange),
         this.getNpsByAccommodationType(dateRange),
         this.getNpsByCampground(dateRange),
+        this.getWorstPerformingCampgrounds(dateRange),
         this.getRecentComments(dateRange),
         this.getTagAnalysis(dateRange),
       ]);
@@ -175,6 +176,7 @@ export class NpsAnalyticsService {
       trends,
       byAccommodationType: byAccommodation,
       byCampground,
+      worstCampgrounds,
       recentComments,
       tagAnalysis,
     };
@@ -318,6 +320,86 @@ export class NpsAnalyticsService {
         };
       })
       .sort((a, b) => b.score - a.score)
+      .slice(0, limit);
+  }
+
+  /**
+   * Get worst performing campgrounds (lowest NPS scores)
+   * Includes top issues from negative feedback
+   */
+  async getWorstPerformingCampgrounds(dateRange: DateRange, limit = 10): Promise<
+    {
+      campgroundId: string;
+      campgroundName: string;
+      score: number;
+      responses: number;
+      promoterPercentage: number;
+      detractorPercentage: number;
+      topIssues: string[];
+    }[]
+  > {
+    const { start, end } = dateRange;
+
+    const responses = await this.prisma.npsResponse.findMany({
+      where: {
+        createdAt: { gte: start, lte: end },
+      },
+      select: {
+        score: true,
+        tags: true,
+        campgroundId: true,
+        campground: { select: { name: true } },
+      },
+    });
+
+    // Group by campground with tag analysis
+    const byCampground: Record<
+      string,
+      { name: string; responses: { score: number }[]; tagCounts: Record<string, number> }
+    > = {};
+
+    for (const r of responses) {
+      if (!byCampground[r.campgroundId]) {
+        byCampground[r.campgroundId] = {
+          name: r.campground.name,
+          responses: [],
+          tagCounts: {},
+        };
+      }
+      byCampground[r.campgroundId].responses.push({ score: r.score });
+
+      // Count tags from detractor responses (score 0-6)
+      if (r.score <= 6) {
+        for (const tag of r.tags) {
+          byCampground[r.campgroundId].tagCounts[tag] =
+            (byCampground[r.campgroundId].tagCounts[tag] || 0) + 1;
+        }
+      }
+    }
+
+    return Object.entries(byCampground)
+      .map(([campgroundId, data]) => {
+        const nps = this.calculateNps(data.responses);
+        const total = data.responses.length;
+
+        // Get top 2 issues from negative feedback
+        const topIssues = Object.entries(data.tagCounts)
+          .sort((a, b) => b[1] - a[1])
+          .slice(0, 2)
+          .map(([tag]) => tag);
+
+        return {
+          campgroundId,
+          campgroundName: data.name,
+          score: nps.score,
+          responses: total,
+          promoterPercentage: total > 0 ? (nps.promoters / total) * 100 : 0,
+          detractorPercentage: total > 0 ? (nps.detractors / total) * 100 : 0,
+          topIssues,
+        };
+      })
+      .filter((cg) => cg.responses >= 10) // Only include campgrounds with enough data
+      .sort((a, b) => a.score - b.score) // Sort ascending (worst first)
       .slice(0, limit);
   }
 
