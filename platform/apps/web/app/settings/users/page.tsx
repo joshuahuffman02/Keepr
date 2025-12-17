@@ -1,11 +1,14 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { DashboardShell } from "../../../components/ui/layout/DashboardShell";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { FormField } from "@/components/ui/form-field";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
@@ -43,14 +46,49 @@ const roleLabels: Record<Role, string> = {
   readonly: "Read-only"
 };
 
+// Validation schemas
+const inviteMemberSchema = z.object({
+  email: z.string().min(1, "Email is required").email("Invalid email address"),
+  firstName: z.string().optional(),
+  lastName: z.string().optional(),
+  role: z.enum(["owner", "manager", "front_desk", "maintenance", "finance", "marketing", "readonly"]),
+});
+
+const onboardingInviteSchema = z.object({
+  email: z.string().min(1, "Email is required").email("Invalid email address"),
+  expiresInHours: z.number().min(1, "Must be at least 1 hour").max(168, "Must be less than 7 days (168 hours)"),
+});
+
+type InviteMemberFormData = z.infer<typeof inviteMemberSchema>;
+type OnboardingInviteFormData = z.infer<typeof onboardingInviteSchema>;
+
 export default function UsersPage() {
   const { toast } = useToast();
   const qc = useQueryClient();
   const [campgroundId, setCampgroundId] = useState<string | null>(null);
-  const [invite, setInvite] = useState({ email: "", firstName: "", lastName: "", role: "manager" as Role });
-  const [onboardingEmail, setOnboardingEmail] = useState("");
-  const [onboardingExpiresHours, setOnboardingExpiresHours] = useState(72);
   const [onboardingLink, setOnboardingLink] = useState<string | null>(null);
+
+  // Form for inviting members
+  const inviteForm = useForm<InviteMemberFormData>({
+    resolver: zodResolver(inviteMemberSchema),
+    defaultValues: {
+      email: "",
+      firstName: "",
+      lastName: "",
+      role: "manager",
+    },
+    mode: "onChange",
+  });
+
+  // Form for onboarding invites
+  const onboardingForm = useForm<OnboardingInviteFormData>({
+    resolver: zodResolver(onboardingInviteSchema),
+    defaultValues: {
+      email: "",
+      expiresInHours: 72,
+    },
+    mode: "onChange",
+  });
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -65,13 +103,13 @@ export default function UsersPage() {
   });
 
   const addMember = useMutation({
-    mutationFn: async () => {
+    mutationFn: async (data: InviteMemberFormData) => {
       if (!campgroundId) throw new Error("No campground selected");
-      return apiClient.addCampgroundMember(campgroundId, invite);
+      return apiClient.addCampgroundMember(campgroundId, data);
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["campground-members", campgroundId] });
-      setInvite({ email: "", firstName: "", lastName: "", role: "manager" });
+      inviteForm.reset();
       toast({ title: "Member added", description: "User invited/added to this campground." });
     },
     onError: (err: Error) => toast({ title: "Failed to add member", description: err.message, variant: "destructive" })
@@ -116,12 +154,12 @@ export default function UsersPage() {
   });
 
   const createOnboardingInvite = useMutation({
-    mutationFn: async () => {
+    mutationFn: async (data: OnboardingInviteFormData) => {
       if (!campgroundId) throw new Error("No campground selected");
       return apiClient.createOnboardingInvite({
-        email: onboardingEmail,
+        email: data.email,
         campgroundId,
-        expiresInHours: onboardingExpiresHours || undefined,
+        expiresInHours: data.expiresInHours,
       });
     },
     onSuccess: (res) => {
@@ -131,7 +169,7 @@ export default function UsersPage() {
           : process.env.NEXT_PUBLIC_APP_URL || "https://app.campreserv.com";
       const link = `${base}/onboarding/${res.token}`;
       setOnboardingLink(link);
-      setOnboardingEmail("");
+      onboardingForm.reset({ email: "", expiresInHours: 72 });
       toast({ title: "Onboarding invite sent", description: "Share the link with the new campground contact." });
     },
     onError: (err: Error) => toast({ title: "Failed to send onboarding invite", description: err.message, variant: "destructive" })
@@ -162,61 +200,58 @@ export default function UsersPage() {
             </CardTitle>
             <CardDescription>Creates the user if the email is new, then assigns the role for this campground.</CardDescription>
           </CardHeader>
-          <CardContent className="space-y-3">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-              <div className="space-y-2">
-                <Label>Email</Label>
-                <Input
-                  value={invite.email}
-                  onChange={(e) => setInvite((p) => ({ ...p, email: e.target.value }))}
-                  placeholder="staff@example.com"
+          <CardContent>
+            <form onSubmit={inviteForm.handleSubmit((data) => addMember.mutate(data))} className="space-y-3">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                <FormField
+                  label="Email"
                   type="email"
+                  placeholder="staff@example.com"
+                  error={inviteForm.formState.errors.email?.message}
+                  showSuccess
+                  {...inviteForm.register("email")}
                 />
-              </div>
-              <div className="space-y-2">
-                <Label>First name (optional)</Label>
-                <Input
-                  value={invite.firstName}
-                  onChange={(e) => setInvite((p) => ({ ...p, firstName: e.target.value }))}
+                <FormField
+                  label="First name (optional)"
                   placeholder="Pat"
+                  error={inviteForm.formState.errors.firstName?.message}
+                  {...inviteForm.register("firstName")}
                 />
-              </div>
-              <div className="space-y-2">
-                <Label>Last name (optional)</Label>
-                <Input
-                  value={invite.lastName}
-                  onChange={(e) => setInvite((p) => ({ ...p, lastName: e.target.value }))}
+                <FormField
+                  label="Last name (optional)"
                   placeholder="Smith"
+                  error={inviteForm.formState.errors.lastName?.message}
+                  {...inviteForm.register("lastName")}
                 />
               </div>
-            </div>
-            <div className="flex flex-col md:flex-row gap-3 items-start md:items-end">
-              <div className="space-y-2 w-full md:w-64">
-                <Label>Role</Label>
-                <Select
-                  value={invite.role}
-                  onValueChange={(val) => setInvite((p) => ({ ...p, role: val as Role }))}
+              <div className="flex flex-col md:flex-row gap-3 items-start md:items-end">
+                <div className="space-y-2 w-full md:w-64">
+                  <Label>Role</Label>
+                  <Select
+                    value={inviteForm.watch("role")}
+                    onValueChange={(val) => inviteForm.setValue("role", val as Role, { shouldValidate: true })}
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {Object.entries(roleLabels).map(([value, label]) => (
+                        <SelectItem key={value} value={value}>
+                          {label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <Button
+                  type="submit"
+                  disabled={!inviteForm.formState.isValid || addMember.isPending}
                 >
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {Object.entries(roleLabels).map(([value, label]) => (
-                      <SelectItem key={value} value={value}>
-                        {label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                  {addMember.isPending && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
+                  Add member
+                </Button>
               </div>
-              <Button
-                onClick={() => addMember.mutate()}
-                disabled={!invite.email || addMember.isPending}
-              >
-                {addMember.isPending && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
-                Add member
-              </Button>
-            </div>
+            </form>
           </CardContent>
         </Card>
 
@@ -228,43 +263,50 @@ export default function UsersPage() {
             </CardTitle>
             <CardDescription>Send the guided onboarding link to the campground owner/manager.</CardDescription>
           </CardHeader>
-          <CardContent className="space-y-3">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-              <div className="space-y-2">
-                <Label>Recipient email</Label>
-                <Input
-                  value={onboardingEmail}
-                  onChange={(e) => setOnboardingEmail(e.target.value)}
-                  placeholder="owner@camp.com"
+          <CardContent>
+            <form onSubmit={onboardingForm.handleSubmit((data) => createOnboardingInvite.mutate(data))} className="space-y-3">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                <FormField
+                  label="Recipient email"
                   type="email"
+                  placeholder="owner@camp.com"
+                  error={onboardingForm.formState.errors.email?.message}
+                  showSuccess
+                  {...onboardingForm.register("email")}
                 />
-              </div>
-              <div className="space-y-2">
-                <Label>Expires in (hours)</Label>
-                <Input
+                <FormField
+                  label="Expires in (hours)"
                   type="number"
-                  value={onboardingExpiresHours}
                   min={1}
-                  onChange={(e) => setOnboardingExpiresHours(Number(e.target.value) || 0)}
+                  max={168}
+                  error={onboardingForm.formState.errors.expiresInHours?.message}
+                  showSuccess
+                  {...onboardingForm.register("expiresInHours", { valueAsNumber: true })}
                 />
+                <div className="flex items-end">
+                  <Button
+                    type="submit"
+                    disabled={!onboardingForm.formState.isValid || createOnboardingInvite.isPending}
+                    className="w-full md:w-auto"
+                  >
+                    {createOnboardingInvite.isPending ? "Sending..." : "Send onboarding invite"}
+                  </Button>
+                </div>
               </div>
-              <div className="flex items-end">
-                <Button
-                  onClick={() => createOnboardingInvite.mutate()}
-                  disabled={!onboardingEmail || createOnboardingInvite.isPending}
-                  className="w-full md:w-auto"
-                >
-                  {createOnboardingInvite.isPending ? "Sending..." : "Send onboarding invite"}
-                </Button>
-              </div>
-            </div>
-            {onboardingLink && (
-              <div className="space-y-2">
-                <Label>Onboarding link</Label>
-                <Input value={onboardingLink} readOnly onFocus={(e) => e.target.select()} />
-                <p className="text-xs text-muted-foreground">Share this link with the campground to start setup. A new resend generates a fresh link.</p>
-              </div>
-            )}
+              {onboardingLink && (
+                <div className="space-y-2">
+                  <Label>Onboarding link</Label>
+                  <input
+                    type="text"
+                    value={onboardingLink}
+                    readOnly
+                    onFocus={(e) => e.target.select()}
+                    className="flex h-10 w-full rounded-md border border-slate-200 bg-slate-50 px-3 py-2 text-sm"
+                  />
+                  <p className="text-xs text-muted-foreground">Share this link with the campground to start setup. A new resend generates a fresh link.</p>
+                </div>
+              )}
+            </form>
           </CardContent>
         </Card>
 

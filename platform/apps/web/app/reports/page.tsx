@@ -23,6 +23,9 @@ import { recordTelemetry } from "../../lib/sync-telemetry";
 import { reportCatalog, subTabs, ReportTab, SubTab } from "./registry";
 import { OverviewReport } from "@/components/reports/definitions/OverviewReport";
 import { ReportRenderer } from "@/components/reports/ReportRenderer";
+import { ExportDialog } from "@/components/reports/ExportDialog";
+import { useReportExport } from "@/components/reports/useReportExport";
+import type { ExportFormat } from "@/lib/export-utils";
 
 const formatCurrency = (value: number, decimals: number = 0) => {
   return new Intl.NumberFormat('en-US', {
@@ -84,6 +87,9 @@ function ReportsPageInner() {
     siteType: 'all' as string,
     groupBy: 'none' as 'none' | 'site' | 'status' | 'date' | 'siteType'
   });
+
+  // Initialize export hook
+  const { exportReport } = useReportExport(campgroundId, dateRange);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -4210,80 +4216,16 @@ function ReportsPageInner() {
         </div>
 
         {/* Export Confirmation Dialog */}
-        <Dialog open={showExportDialog} onOpenChange={setShowExportDialog}>
-          <DialogContent className="sm:max-w-md">
-            <DialogHeader>
-              <DialogTitle className="flex items-center gap-2">
-                <FileSpreadsheet className="h-5 w-5 text-emerald-600" />
-                Export Report
-              </DialogTitle>
-              <DialogDescription>
-                Review what you're about to export
-              </DialogDescription>
-            </DialogHeader>
-
-            {exportPreview && (
-              <div className="space-y-4 py-4">
-                {/* Report Details */}
-                <div className="rounded-lg border border-slate-200 bg-slate-50 p-4 space-y-3">
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-slate-600">Report</span>
-                    <span className="font-medium text-slate-900">{exportPreview.reportName}</span>
-                  </div>
-                  {exportPreview.subReportName && (
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm text-slate-600">View</span>
-                      <span className="font-medium text-slate-900">{exportPreview.subReportName}</span>
-                    </div>
-                  )}
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-slate-600 flex items-center gap-1">
-                      <Calendar className="h-3.5 w-3.5" /> Date Range
-                    </span>
-                    <span className="font-medium text-slate-900">
-                      {new Date(exportPreview.dateRange.start).toLocaleDateString()} — {new Date(exportPreview.dateRange.end).toLocaleDateString()}
-                    </span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-slate-600">Rows</span>
-                    <span className="font-medium text-slate-900">~{exportPreview.rowCount.toLocaleString()}</span>
-                  </div>
-                </div>
-
-                {/* Info Note */}
-                <div className="flex items-start gap-2 text-xs text-slate-500 bg-blue-50 border border-blue-100 rounded-lg p-3">
-                  <Info className="h-4 w-4 text-blue-500 mt-0.5 shrink-0" />
-                  <span>
-                    Reports are read-only views of your live data. To edit reservation or billing data,
-                    use the <a href="/reservations" className="text-blue-600 underline">Reservations</a> or <a href="/billing" className="text-blue-600 underline">Billing</a> pages.
-                  </span>
-                </div>
-              </div>
-            )}
-
-            <DialogFooter className="flex gap-2 sm:gap-0">
-              <Button variant="outline" onClick={() => setShowExportDialog(false)}>
-                Cancel
-              </Button>
-              <Button
-                onClick={() => {
-                  if (exportPreview) {
-                    exportTabToCSV(exportPreview.tabName);
-                    setShowExportDialog(false);
-                    toast({
-                      title: "Export started",
-                      description: `Downloading ${exportPreview.reportName} report...`
-                    });
-                  }
-                }}
-                className="flex items-center gap-2"
-              >
-                <FileDown className="h-4 w-4" />
-                Download CSV
-              </Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog >
+        <ExportDialog
+          open={showExportDialog}
+          onOpenChange={setShowExportDialog}
+          exportPreview={exportPreview}
+          onExport={(format: ExportFormat) => {
+            if (exportPreview) {
+              exportReport(exportPreview.tabName, activeSubTab, format);
+            }
+          }}
+        />
 
       </DashboardShell >
     );
@@ -6947,78 +6889,16 @@ function ReportsPageInner() {
       </div >
 
       {/* Export Confirmation Dialog */}
-      < Dialog open={showExportDialog} onOpenChange={setShowExportDialog} >
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
-              <FileSpreadsheet className="h-5 w-5 text-emerald-600" />
-              Export Report
-            </DialogTitle>
-            <DialogDescription>
-              Review what you're about to export
-            </DialogDescription>
-          </DialogHeader>
-
-          {exportPreview && (
-            <div className="space-y-4 py-4">
-              <div className="rounded-lg border border-slate-200 bg-slate-50 p-4 space-y-3">
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-slate-600">Report</span>
-                  <span className="font-medium text-slate-900">{exportPreview.reportName}</span>
-                </div>
-                {exportPreview.subReportName && (
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-slate-600">View</span>
-                    <span className="font-medium text-slate-900">{exportPreview.subReportName}</span>
-                  </div>
-                )}
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-slate-600 flex items-center gap-1">
-                    <Calendar className="h-3.5 w-3.5" /> Date Range
-                  </span>
-                  <span className="font-medium text-slate-900">
-                    {new Date(exportPreview.dateRange.start).toLocaleDateString()} — {new Date(exportPreview.dateRange.end).toLocaleDateString()}
-                  </span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-slate-600">Rows</span>
-                  <span className="font-medium text-slate-900">~{exportPreview.rowCount.toLocaleString()}</span>
-                </div>
-              </div>
-
-              <div className="flex items-start gap-2 text-xs text-slate-500 bg-blue-50 border border-blue-100 rounded-lg p-3">
-                <Info className="h-4 w-4 text-blue-500 mt-0.5 shrink-0" />
-                <span>
-                  Reports are read-only views of your live data. To edit reservation or billing data,
-                  use the <a href="/reservations" className="text-blue-600 underline">Reservations</a> or <a href="/billing" className="text-blue-600 underline">Billing</a> pages.
-                </span>
-              </div>
-            </div>
-          )}
-
-          <DialogFooter className="flex gap-2 sm:gap-0">
-            <Button variant="outline" onClick={() => setShowExportDialog(false)}>
-              Cancel
-            </Button>
-            <Button
-              onClick={() => {
-                if (exportPreview) {
-                  exportTabToCSV(exportPreview.tabName);
-                  setShowExportDialog(false);
-                  toast({
-                    title: "Export started",
-                    description: `Downloading ${exportPreview.reportName} report...`
-                  });
-                }
-              }}
-              className="flex items-center gap-2"
-            >
-              <FileDown className="h-4 w-4" />
-              Download CSV
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog >
+      <ExportDialog
+        open={showExportDialog}
+        onOpenChange={setShowExportDialog}
+        exportPreview={exportPreview}
+        onExport={(format: ExportFormat) => {
+          if (exportPreview) {
+            exportReport(exportPreview.tabName, activeSubTab, format);
+          }
+        }}
+      />
 
     </DashboardShell >
   );

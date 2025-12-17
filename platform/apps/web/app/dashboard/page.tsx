@@ -215,7 +215,7 @@ export default function Dashboard() {
           <div className="flex flex-wrap gap-2">
             <Link
               href="/booking"
-              className="inline-flex items-center gap-2 rounded-lg bg-emerald-600 px-4 py-2 text-sm font-semibold text-white hover:bg-emerald-700 shadow-sm"
+              className="inline-flex items-center gap-2 rounded-lg bg-action-primary px-4 py-2 text-sm font-semibold text-action-primary-foreground hover:bg-action-primary-hover shadow-sm"
             >
               <Plus className="h-4 w-4" />
               New booking
@@ -261,9 +261,9 @@ export default function Dashboard() {
         {/* ═══════════════════════════════════════════════════════════════════ */}
         {/* QUICK ACTIONS - Prominently displayed above the fold */}
         {/* ═══════════════════════════════════════════════════════════════════ */}
-        <div className="rounded-2xl bg-white border-2 border-emerald-200 shadow-sm p-5 space-y-3">
+        <div className="rounded-2xl bg-white border-2 border-status-success-border shadow-sm p-5 space-y-3">
           <div className="flex items-center gap-2 text-sm font-semibold uppercase tracking-wide text-slate-700">
-            <Plus className="h-4 w-4 text-emerald-600" />
+            <Plus className="h-4 w-4 text-action-primary" />
             Quick Actions
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-3">
@@ -331,17 +331,17 @@ export default function Dashboard() {
         {/* ATTENTION - Needs action items */}
         {/* ═══════════════════════════════════════════════════════════════════ */}
         <div className="space-y-3">
-          <div className="flex items-center gap-2 text-sm font-semibold uppercase tracking-wide text-amber-600 pl-1">
+          <div className="flex items-center gap-2 text-sm font-semibold uppercase tracking-wide text-status-warning pl-1">
             <DollarSign className="h-4 w-4" />
             Needs Attention
           </div>
-          <div className="rounded-xl border-2 border-amber-200 bg-amber-50/50 p-5 space-y-4">
+          <div className="rounded-xl border-2 border-status-warning-border bg-status-warning-bg p-5 space-y-4">
             <div className="flex items-center justify-between">
               <div>
                 <h3 className="text-lg font-semibold text-slate-900">Balances Due</h3>
                 <p className="text-sm text-slate-600">Outstanding amounts that need collection.</p>
               </div>
-              <span className="rounded-full bg-amber-100 text-amber-800 text-xs font-bold px-3 py-1 border border-amber-200">
+              <span className="rounded-full bg-status-warning-bg text-status-warning-foreground text-xs font-bold px-3 py-1 border border-status-warning-border">
                 {attentionList.length} open
               </span>
             </div>
@@ -355,10 +355,10 @@ export default function Dashboard() {
                 {attentionList.map((r) => (
                   <div
                     key={r.id}
-                    className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 rounded-lg border border-amber-200 bg-white px-3 py-2.5 shadow-sm"
+                    className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 rounded-lg border border-status-warning-border bg-white px-3 py-2.5 shadow-sm"
                   >
                     <div className="flex items-center gap-3">
-                      <div className="h-8 w-8 rounded-full bg-amber-100 text-amber-700 font-semibold flex items-center justify-center text-xs border border-amber-200">
+                      <div className="h-8 w-8 rounded-full bg-status-warning-bg text-status-warning-foreground font-semibold flex items-center justify-center text-xs border border-status-warning-border">
                         {r.guest?.primaryFirstName?.[0] ?? "?"}
                       </div>
                       <div>
@@ -369,10 +369,10 @@ export default function Dashboard() {
                       </div>
                     </div>
                     <div className="flex items-center gap-3 w-full sm:w-auto justify-between sm:justify-end">
-                      <span className="text-sm font-bold text-amber-700 whitespace-nowrap">{formatMoney(r.balance)}</span>
+                      <span className="text-sm font-bold text-status-warning whitespace-nowrap">{formatMoney(r.balance)}</span>
                       <Link
                         href="/billing/repeat-charges"
-                        className="inline-flex items-center justify-center rounded-md bg-emerald-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-emerald-700"
+                        className="inline-flex items-center justify-center rounded-md bg-action-primary px-3 py-1.5 text-xs font-semibold text-action-primary-foreground hover:bg-action-primary-hover"
                       >
                         Resolve
                       </Link>
@@ -399,7 +399,7 @@ export default function Dashboard() {
                   <Link
                     key={a.id}
                     href={a.href}
-                    className="flex items-center justify-between rounded border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-800 hover:border-amber-300"
+                    className="flex items-center justify-between rounded border border-status-warning-border bg-status-warning-bg px-3 py-2 text-sm text-status-warning-foreground hover:border-amber-300"
                   >
                     <span>{a.label}</span>
                     <ArrowRight className="h-4 w-4" />
@@ -436,7 +436,7 @@ export default function Dashboard() {
                     <span className="text-xs text-slate-500">{d.label}</span>
                     <div className="h-2 w-full rounded bg-slate-100">
                       <div
-                        className={`h-2 rounded ${d.rate >= 90 ? "bg-amber-500" : "bg-emerald-500"}`}
+                        className={`h-2 rounded ${d.rate >= 90 ? "bg-status-warning" : "bg-status-success"}`}
                         style={{ width: `${Math.min(100, d.rate)}%` }}
                       />
                     </div>
@@ -491,7 +491,7 @@ export default function Dashboard() {
               <h3 className="text-lg font-semibold text-slate-900">Recent activity</h3>
               <p className="text-sm text-slate-600">Latest arrivals, departures, and moves.</p>
             </div>
-            <Link href="/reservations" className="text-sm font-semibold text-emerald-600 hover:text-emerald-700 flex items-center gap-1">
+            <Link href="/reservations" className="text-sm font-semibold text-action-primary hover:text-action-primary-hover flex items-center gap-1">
               View reservations <ArrowRight className="h-4 w-4" />
             </Link>
           </div>
@@ -519,11 +519,11 @@ function OpsCard({
   tone: "emerald" | "amber" | "blue" | "purple" | "rose";
 }) {
   const toneMap: Record<typeof tone, string> = {
-    emerald: "from-emerald-50 to-emerald-100 text-emerald-800 border-emerald-100",
-    amber: "from-amber-50 to-amber-100 text-amber-800 border-amber-100",
-    blue: "from-blue-50 to-blue-100 text-blue-800 border-blue-100",
+    emerald: "from-status-success-bg to-emerald-100 text-emerald-800 border-status-success-border",
+    amber: "from-status-warning-bg to-amber-100 text-amber-800 border-status-warning-border",
+    blue: "from-status-info-bg to-blue-100 text-blue-800 border-status-info-border",
     purple: "from-purple-50 to-purple-100 text-purple-800 border-purple-100",
-    rose: "from-rose-50 to-rose-100 text-rose-800 border-rose-100"
+    rose: "from-status-error-bg to-rose-100 text-rose-800 border-status-error-border"
   };
 
   return (
@@ -558,7 +558,7 @@ function BoardCard({
   rows: Reservation[];
   tone?: "emerald" | "amber";
 }) {
-  const color = tone === "emerald" ? "text-emerald-700 bg-emerald-50" : "text-amber-700 bg-amber-50";
+  const color = tone === "emerald" ? "text-status-success bg-status-success-bg" : "text-status-warning bg-status-warning-bg";
   return (
     <div className="card p-5 space-y-3">
       <div className="flex items-center justify-between">
@@ -603,7 +603,7 @@ function BoardCard({
         </div>
       )}
 
-      <Link href={ctaHref} className="inline-flex items-center gap-1 text-sm font-semibold text-emerald-600 hover:text-emerald-700">
+      <Link href={ctaHref} className="inline-flex items-center gap-1 text-sm font-semibold text-action-primary hover:text-action-primary-hover">
         {ctaLabel} <ArrowRight className="h-4 w-4" />
       </Link>
     </div>
@@ -623,16 +623,16 @@ function QuickActionButton({
 }) {
   const toneMap: Record<typeof tone, { bg: string; hover: string; icon: string; border: string }> = {
     emerald: {
-      bg: "bg-emerald-50",
+      bg: "bg-status-success-bg",
       hover: "hover:bg-emerald-100 hover:border-emerald-300",
-      icon: "text-emerald-600",
-      border: "border-emerald-200"
+      icon: "text-action-primary",
+      border: "border-status-success-border"
     },
     blue: {
-      bg: "bg-blue-50",
+      bg: "bg-status-info-bg",
       hover: "hover:bg-blue-100 hover:border-blue-300",
-      icon: "text-blue-600",
-      border: "border-blue-200"
+      icon: "text-status-info",
+      border: "border-status-info-border"
     },
     purple: {
       bg: "bg-purple-50",
@@ -641,10 +641,10 @@ function QuickActionButton({
       border: "border-purple-200"
     },
     amber: {
-      bg: "bg-amber-50",
+      bg: "bg-status-warning-bg",
       hover: "hover:bg-amber-100 hover:border-amber-300",
-      icon: "text-amber-600",
-      border: "border-amber-200"
+      icon: "text-status-warning",
+      border: "border-status-warning-border"
     },
     slate: {
       bg: "bg-slate-50",
@@ -691,7 +691,7 @@ function StatCard({
 }
 
 function ActivityList({ title, rows, tone }: { title: string; rows: Reservation[]; tone: "emerald" | "amber" }) {
-  const accent = tone === "emerald" ? "text-emerald-700" : "text-amber-700";
+  const accent = tone === "emerald" ? "text-status-success" : "text-status-warning";
   return (
     <div className="rounded-lg border border-slate-200 bg-white">
       <div className="flex items-center justify-between border-b border-slate-100 px-3 py-2">

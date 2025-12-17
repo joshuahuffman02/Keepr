@@ -850,16 +850,16 @@ function GuestStep({
     slug: string;
 }) {
     const emailTrackedRef = useRef(false);
+    const [showPartyDetails, setShowPartyDetails] = useState(false);
+    const [showStayReason, setShowStayReason] = useState(false);
+    const [showEquipment, setShowEquipment] = useState(false);
+
+    // Simplified validation - only require essential fields
     const isValid =
         guestInfo.firstName.trim() &&
         guestInfo.lastName.trim() &&
         guestInfo.email.includes("@") &&
-        guestInfo.phone.trim() &&
-        guestInfo.zipCode.trim().length >= 5 &&
-        guestInfo.adults >= 1 &&
-        guestInfo.stayReasonPreset &&
-        (guestInfo.stayReasonPreset !== "other" || guestInfo.stayReasonOther.trim()) &&
-        (guestInfo.equipment.type === "tent" || guestInfo.equipment.type === "car" || (guestInfo.equipment.length && Number(guestInfo.equipment.length) > 0));
+        guestInfo.phone.trim();
 
     const lengthError = maxRigLength && guestInfo.equipment.length && Number(guestInfo.equipment.length) > maxRigLength
         ? `Equipment length exceeds site maximum of ${maxRigLength}ft`
@@ -868,6 +868,8 @@ function GuestStep({
     return (
         <div className="max-w-md mx-auto">
             <h2 className="text-2xl font-bold text-slate-900 mb-6 text-center">Your Information</h2>
+
+            {/* Essential Fields Only */}
             <div className="space-y-4">
                 <div className="grid grid-cols-2 gap-3">
                     <div>
@@ -878,6 +880,7 @@ function GuestStep({
                             onChange={(e) => onChange({ ...guestInfo, firstName: e.target.value })}
                             className="w-full px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
                             placeholder="John"
+                            required
                         />
                     </div>
                     <div>
@@ -888,38 +891,27 @@ function GuestStep({
                             onChange={(e) => onChange({ ...guestInfo, lastName: e.target.value })}
                             className="w-full px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
                             placeholder="Doe"
+                            required
                         />
                     </div>
                 </div>
-                <div className="grid grid-cols-2 gap-3">
-                    <div>
-                        <label className="block text-sm font-medium text-slate-700 mb-1">Email</label>
-                        <input
-                            type="email"
-                            value={guestInfo.email}
-                            onChange={(e) => {
-                                const next = e.target.value;
-                                onChange({ ...guestInfo, email: next });
-                                if (!emailTrackedRef.current && next.includes("@") && campgroundId) {
-                                    emailTrackedRef.current = true;
-                                    trackEvent("email_signup", { campgroundId, page: `/park/${slug}/book` });
-                                }
-                            }}
-                            className="w-full px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
-                            placeholder="john@example.com"
-                        />
-                    </div>
-                    <div>
-                        <label className="block text-sm font-medium text-slate-700 mb-1">Zip Code</label>
-                        <input
-                            type="text"
-                            value={guestInfo.zipCode}
-                            onChange={(e) => onChange({ ...guestInfo, zipCode: e.target.value })}
-                            className="w-full px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
-                            placeholder="12345"
-                            maxLength={10}
-                        />
-                    </div>
+                <div>
+                    <label className="block text-sm font-medium text-slate-700 mb-1">Email</label>
+                    <input
+                        type="email"
+                        value={guestInfo.email}
+                        onChange={(e) => {
+                            const next = e.target.value;
+                            onChange({ ...guestInfo, email: next });
+                            if (!emailTrackedRef.current && next.includes("@") && campgroundId) {
+                                emailTrackedRef.current = true;
+                                trackEvent("email_signup", { campgroundId, page: `/park/${slug}/book` });
+                            }
+                        }}
+                        className="w-full px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                        placeholder="john@example.com"
+                        required
+                    />
                 </div>
                 <div>
                     <label className="block text-sm font-medium text-slate-700 mb-1">Phone</label>
@@ -929,320 +921,400 @@ function GuestStep({
                         onChange={(e) => onChange({ ...guestInfo, phone: e.target.value })}
                         className="w-full px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
                         placeholder="(555) 123-4567"
+                        required
                     />
                 </div>
-                <div className="grid grid-cols-2 gap-3">
-                    <div>
-                        <label className="block text-sm font-medium text-slate-700 mb-1">Adults</label>
-                        <select
-                            value={guestInfo.adults}
-                            onChange={(e) => onChange({ ...guestInfo, adults: parseInt(e.target.value) })}
-                            className="w-full px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
-                        >
-                            {[1, 2, 3, 4, 5, 6, 7, 8].map((n) => (
-                                <option key={n} value={n}>{n}</option>
-                            ))}
-                        </select>
-                    </div>
-                    <div>
-                        <label className="block text-sm font-medium text-slate-700 mb-1">Children</label>
-                        <select
-                            value={guestInfo.children}
-                            onChange={(e) => onChange({ ...guestInfo, children: parseInt(e.target.value) })}
-                            className="w-full px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
-                        >
-                            {[0, 1, 2, 3, 4, 5, 6].map((n) => (
-                                <option key={n} value={n}>{n}</option>
-                            ))}
-                        </select>
-                    </div>
+
+                {/* Note about optional details */}
+                <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 text-center">
+                    <p className="text-sm text-blue-800">
+                        That's all we need! You can add more details after booking if needed.
+                    </p>
                 </div>
 
-                <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-1">Reason for stay</label>
-                    <select
-                        value={guestInfo.stayReasonPreset}
-                        onChange={(e) => onChange({ ...guestInfo, stayReasonPreset: e.target.value, stayReasonOther: e.target.value === "other" ? guestInfo.stayReasonOther : "" })}
-                        className="w-full px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                {/* Collapsible: Party Details */}
+                <div className="border border-slate-200 rounded-xl overflow-hidden">
+                    <button
+                        type="button"
+                        onClick={() => setShowPartyDetails(!showPartyDetails)}
+                        className="w-full px-4 py-3 bg-slate-50 hover:bg-slate-100 transition-colors flex items-center justify-between text-left"
                     >
-                        <option value="vacation">Vacation / getaway</option>
-                        <option value="family_visit">Visiting family or friends</option>
-                        <option value="event">Event or festival</option>
-                        <option value="work_remote">Working remotely</option>
-                        <option value="stopover">Road-trip stopover</option>
-                        <option value="relocation">Relocation / temporary housing</option>
-                        <option value="other">Other</option>
-                    </select>
-                    {guestInfo.stayReasonPreset === "other" && (
-                        <input
-                            type="text"
-                            value={guestInfo.stayReasonOther}
-                            onChange={(e) => onChange({ ...guestInfo, stayReasonOther: e.target.value })}
-                            className="mt-2 w-full px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
-                            placeholder="Tell us more"
-                        />
-                    )}
-                </div>
-
-                <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-1">Referral code (optional)</label>
-                    <input
-                        type="text"
-                        value={guestInfo.referralCode}
-                        onChange={(e) => onChange({ ...guestInfo, referralCode: e.target.value.trim() })}
-                        className="w-full px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
-                        placeholder="Enter a friend’s code or link code"
-                    />
-                </div>
-
-                {/* Additional Guests Section */}
-                {guestInfo.adults > 1 && (
-                    <div className="mt-4 p-4 bg-slate-50 rounded-xl">
-                        <div className="flex justify-between items-center mb-3">
-                            <h4 className="text-sm font-semibold text-slate-700">Additional Adult Details (Optional)</h4>
-                            {guestInfo.additionalGuests.length < guestInfo.adults - 1 && (
-                                <button
-                                    type="button"
-                                    onClick={() => onChange({
-                                        ...guestInfo,
-                                        additionalGuests: [...guestInfo.additionalGuests, { firstName: '', lastName: '', email: '', phone: '' }]
-                                    })}
-                                    className="text-sm text-emerald-600 hover:text-emerald-700 font-medium"
-                                >
-                                    + Add Guest
-                                </button>
-                            )}
-                        </div>
-                        {guestInfo.additionalGuests.map((guest, idx) => (
-                            <div key={idx} className="mb-3 p-3 bg-white rounded-lg border border-slate-200">
-                                <div className="flex justify-between items-start mb-2">
-                                    <span className="text-xs font-medium text-slate-500">Guest {idx + 2}</span>
-                                    <button
-                                        type="button"
-                                        onClick={() => onChange({
-                                            ...guestInfo,
-                                            additionalGuests: guestInfo.additionalGuests.filter((_, i) => i !== idx)
-                                        })}
-                                        className="text-xs text-red-500 hover:text-red-600"
-                                    >
-                                        Remove
-                                    </button>
-                                </div>
-                                <div className="grid grid-cols-2 gap-2">
-                                    <input
-                                        type="text"
-                                        placeholder="First Name"
-                                        value={guest.firstName}
-                                        onChange={(e) => {
-                                            const updated = [...guestInfo.additionalGuests];
-                                            updated[idx] = { ...guest, firstName: e.target.value };
-                                            onChange({ ...guestInfo, additionalGuests: updated });
-                                        }}
-                                        className="px-3 py-2 text-sm border border-slate-200 rounded-lg focus:ring-1 focus:ring-emerald-500"
-                                    />
-                                    <input
-                                        type="text"
-                                        placeholder="Last Name"
-                                        value={guest.lastName}
-                                        onChange={(e) => {
-                                            const updated = [...guestInfo.additionalGuests];
-                                            updated[idx] = { ...guest, lastName: e.target.value };
-                                            onChange({ ...guestInfo, additionalGuests: updated });
-                                        }}
-                                        className="px-3 py-2 text-sm border border-slate-200 rounded-lg focus:ring-1 focus:ring-emerald-500"
-                                    />
-                                    <input
-                                        type="email"
-                                        placeholder="Email (optional)"
-                                        value={guest.email}
-                                        onChange={(e) => {
-                                            const updated = [...guestInfo.additionalGuests];
-                                            updated[idx] = { ...guest, email: e.target.value };
-                                            onChange({ ...guestInfo, additionalGuests: updated });
-                                        }}
-                                        className="px-3 py-2 text-sm border border-slate-200 rounded-lg focus:ring-1 focus:ring-emerald-500"
-                                    />
-                                    <input
-                                        type="tel"
-                                        placeholder="Phone (optional)"
-                                        value={guest.phone}
-                                        onChange={(e) => {
-                                            const updated = [...guestInfo.additionalGuests];
-                                            updated[idx] = { ...guest, phone: e.target.value };
-                                            onChange({ ...guestInfo, additionalGuests: updated });
-                                        }}
-                                        className="px-3 py-2 text-sm border border-slate-200 rounded-lg focus:ring-1 focus:ring-emerald-500"
-                                    />
-                                </div>
-                            </div>
-                        ))}
-                        {guestInfo.additionalGuests.length === 0 && (
-                            <p className="text-xs text-slate-500">Click "+ Add Guest" to add details for additional adults</p>
-                        )}
-                    </div>
-                )}
-
-                {/* Children Details Section */}
-                {guestInfo.children > 0 && (
-                    <div className="mt-4 p-4 bg-amber-50 rounded-xl">
-                        <div className="flex justify-between items-center mb-3">
-                            <h4 className="text-sm font-semibold text-slate-700">Children Details (Optional)</h4>
-                            {guestInfo.childrenDetails.length < guestInfo.children && (
-                                <button
-                                    type="button"
-                                    onClick={() => onChange({
-                                        ...guestInfo,
-                                        childrenDetails: [...guestInfo.childrenDetails, { name: '', gender: '', age: '' }]
-                                    })}
-                                    className="text-sm text-amber-600 hover:text-amber-700 font-medium"
-                                >
-                                    + Add Child
-                                </button>
-                            )}
-                        </div>
-                        {guestInfo.childrenDetails.map((child, idx) => (
-                            <div key={idx} className="mb-3 p-3 bg-white rounded-lg border border-amber-200">
-                                <div className="flex justify-between items-start mb-2">
-                                    <span className="text-xs font-medium text-slate-500">Child {idx + 1}</span>
-                                    <button
-                                        type="button"
-                                        onClick={() => onChange({
-                                            ...guestInfo,
-                                            childrenDetails: guestInfo.childrenDetails.filter((_, i) => i !== idx)
-                                        })}
-                                        className="text-xs text-red-500 hover:text-red-600"
-                                    >
-                                        Remove
-                                    </button>
-                                </div>
-                                <div className="grid grid-cols-3 gap-2">
-                                    <input
-                                        type="text"
-                                        placeholder="Name"
-                                        value={child.name}
-                                        onChange={(e) => {
-                                            const updated = [...guestInfo.childrenDetails];
-                                            updated[idx] = { ...child, name: e.target.value };
-                                            onChange({ ...guestInfo, childrenDetails: updated });
-                                        }}
-                                        className="px-3 py-2 text-sm border border-slate-200 rounded-lg focus:ring-1 focus:ring-emerald-500"
-                                    />
+                        <span className="text-sm font-medium text-slate-700">Party details (optional)</span>
+                        <svg
+                            className={`w-5 h-5 text-slate-500 transition-transform ${showPartyDetails ? 'rotate-180' : ''}`}
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                        >
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                        </svg>
+                    </button>
+                    {showPartyDetails && (
+                        <div className="p-4 space-y-4">
+                            <div className="grid grid-cols-2 gap-3">
+                                <div>
+                                    <label className="block text-sm font-medium text-slate-700 mb-1">Adults</label>
                                     <select
-                                        value={child.gender}
-                                        onChange={(e) => {
-                                            const updated = [...guestInfo.childrenDetails];
-                                            updated[idx] = { ...child, gender: e.target.value };
-                                            onChange({ ...guestInfo, childrenDetails: updated });
-                                        }}
-                                        className="px-3 py-2 text-sm border border-slate-200 rounded-lg focus:ring-1 focus:ring-emerald-500"
+                                        value={guestInfo.adults}
+                                        onChange={(e) => onChange({ ...guestInfo, adults: parseInt(e.target.value) })}
+                                        className="w-full px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
                                     >
-                                        <option value="">Gender</option>
-                                        <option value="male">Male</option>
-                                        <option value="female">Female</option>
-                                        <option value="other">Other</option>
+                                        {[1, 2, 3, 4, 5, 6, 7, 8].map((n) => (
+                                            <option key={n} value={n}>{n}</option>
+                                        ))}
                                     </select>
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-slate-700 mb-1">Children</label>
                                     <select
-                                        value={child.age}
-                                        onChange={(e) => {
-                                            const updated = [...guestInfo.childrenDetails];
-                                            updated[idx] = { ...child, age: e.target.value };
-                                            onChange({ ...guestInfo, childrenDetails: updated });
-                                        }}
-                                        className="px-3 py-2 text-sm border border-slate-200 rounded-lg focus:ring-1 focus:ring-emerald-500"
+                                        value={guestInfo.children}
+                                        onChange={(e) => onChange({ ...guestInfo, children: parseInt(e.target.value) })}
+                                        className="w-full px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
                                     >
-                                        <option value="">Age</option>
-                                        {[...Array(18)].map((_, i) => (
-                                            <option key={i} value={String(i)}>{i}</option>
+                                        {[0, 1, 2, 3, 4, 5, 6].map((n) => (
+                                            <option key={n} value={n}>{n}</option>
                                         ))}
                                     </select>
                                 </div>
                             </div>
-                        ))}
-                        {guestInfo.childrenDetails.length === 0 && (
-                            <p className="text-xs text-slate-500">Click "+ Add Child" to add details for children</p>
-                        )}
-                    </div>
-                )}
-            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-slate-700 mb-1">Zip Code</label>
+                                <input
+                                    type="text"
+                                    value={guestInfo.zipCode}
+                                    onChange={(e) => onChange({ ...guestInfo, zipCode: e.target.value })}
+                                    className="w-full px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                                    placeholder="12345"
+                                    maxLength={10}
+                                />
+                            </div>
 
-            <div className="mt-8 pt-6 border-t border-slate-200">
-                <h3 className="text-lg font-bold text-slate-900 mb-4">Equipment / Vehicle</h3>
-                <div className="space-y-4">
-                    <div className="grid grid-cols-2 gap-3">
-                        <div>
-                            <label className="block text-sm font-medium text-slate-700 mb-1">Type</label>
-                            <select
-                                value={guestInfo.equipment.type}
-                                onChange={(e) => onChange({
-                                    ...guestInfo,
-                                    equipment: { ...guestInfo.equipment, type: e.target.value }
-                                })}
-                                className="w-full px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
-                            >
-                                <option value="rv">RV / Motorhome</option>
-                                <option value="trailer">Travel Trailer</option>
-                                <option value="tent">Tent</option>
-                                <option value="car">Car / Van</option>
-                            </select>
+                            {/* Additional Guests Section */}
+                            {guestInfo.adults > 1 && (
+                                <div className="mt-4 p-4 bg-slate-50 rounded-xl">
+                                    <div className="flex justify-between items-center mb-3">
+                                        <h4 className="text-sm font-semibold text-slate-700">Additional Adult Details</h4>
+                                        {guestInfo.additionalGuests.length < guestInfo.adults - 1 && (
+                                            <button
+                                                type="button"
+                                                onClick={() => onChange({
+                                                    ...guestInfo,
+                                                    additionalGuests: [...guestInfo.additionalGuests, { firstName: '', lastName: '', email: '', phone: '' }]
+                                                })}
+                                                className="text-sm text-emerald-600 hover:text-emerald-700 font-medium"
+                                            >
+                                                + Add Guest
+                                            </button>
+                                        )}
+                                    </div>
+                                    {guestInfo.additionalGuests.map((guest, idx) => (
+                                        <div key={idx} className="mb-3 p-3 bg-white rounded-lg border border-slate-200">
+                                            <div className="flex justify-between items-start mb-2">
+                                                <span className="text-xs font-medium text-slate-500">Guest {idx + 2}</span>
+                                                <button
+                                                    type="button"
+                                                    onClick={() => onChange({
+                                                        ...guestInfo,
+                                                        additionalGuests: guestInfo.additionalGuests.filter((_, i) => i !== idx)
+                                                    })}
+                                                    className="text-xs text-red-500 hover:text-red-600"
+                                                >
+                                                    Remove
+                                                </button>
+                                            </div>
+                                            <div className="grid grid-cols-2 gap-2">
+                                                <input
+                                                    type="text"
+                                                    placeholder="First Name"
+                                                    value={guest.firstName}
+                                                    onChange={(e) => {
+                                                        const updated = [...guestInfo.additionalGuests];
+                                                        updated[idx] = { ...guest, firstName: e.target.value };
+                                                        onChange({ ...guestInfo, additionalGuests: updated });
+                                                    }}
+                                                    className="px-3 py-2 text-sm border border-slate-200 rounded-lg focus:ring-1 focus:ring-emerald-500"
+                                                />
+                                                <input
+                                                    type="text"
+                                                    placeholder="Last Name"
+                                                    value={guest.lastName}
+                                                    onChange={(e) => {
+                                                        const updated = [...guestInfo.additionalGuests];
+                                                        updated[idx] = { ...guest, lastName: e.target.value };
+                                                        onChange({ ...guestInfo, additionalGuests: updated });
+                                                    }}
+                                                    className="px-3 py-2 text-sm border border-slate-200 rounded-lg focus:ring-1 focus:ring-emerald-500"
+                                                />
+                                                <input
+                                                    type="email"
+                                                    placeholder="Email (optional)"
+                                                    value={guest.email}
+                                                    onChange={(e) => {
+                                                        const updated = [...guestInfo.additionalGuests];
+                                                        updated[idx] = { ...guest, email: e.target.value };
+                                                        onChange({ ...guestInfo, additionalGuests: updated });
+                                                    }}
+                                                    className="px-3 py-2 text-sm border border-slate-200 rounded-lg focus:ring-1 focus:ring-emerald-500"
+                                                />
+                                                <input
+                                                    type="tel"
+                                                    placeholder="Phone (optional)"
+                                                    value={guest.phone}
+                                                    onChange={(e) => {
+                                                        const updated = [...guestInfo.additionalGuests];
+                                                        updated[idx] = { ...guest, phone: e.target.value };
+                                                        onChange({ ...guestInfo, additionalGuests: updated });
+                                                    }}
+                                                    className="px-3 py-2 text-sm border border-slate-200 rounded-lg focus:ring-1 focus:ring-emerald-500"
+                                                />
+                                            </div>
+                                        </div>
+                                    ))}
+                                    {guestInfo.additionalGuests.length === 0 && (
+                                        <p className="text-xs text-slate-500">Click "+ Add Guest" to add details for additional adults</p>
+                                    )}
+                                </div>
+                            )}
+
+                            {/* Children Details Section */}
+                            {guestInfo.children > 0 && (
+                                <div className="mt-4 p-4 bg-amber-50 rounded-xl">
+                                    <div className="flex justify-between items-center mb-3">
+                                        <h4 className="text-sm font-semibold text-slate-700">Children Details</h4>
+                                        {guestInfo.childrenDetails.length < guestInfo.children && (
+                                            <button
+                                                type="button"
+                                                onClick={() => onChange({
+                                                    ...guestInfo,
+                                                    childrenDetails: [...guestInfo.childrenDetails, { name: '', gender: '', age: '' }]
+                                                })}
+                                                className="text-sm text-amber-600 hover:text-amber-700 font-medium"
+                                            >
+                                                + Add Child
+                                            </button>
+                                        )}
+                                    </div>
+                                    {guestInfo.childrenDetails.map((child, idx) => (
+                                        <div key={idx} className="mb-3 p-3 bg-white rounded-lg border border-amber-200">
+                                            <div className="flex justify-between items-start mb-2">
+                                                <span className="text-xs font-medium text-slate-500">Child {idx + 1}</span>
+                                                <button
+                                                    type="button"
+                                                    onClick={() => onChange({
+                                                        ...guestInfo,
+                                                        childrenDetails: guestInfo.childrenDetails.filter((_, i) => i !== idx)
+                                                    })}
+                                                    className="text-xs text-red-500 hover:text-red-600"
+                                                >
+                                                    Remove
+                                                </button>
+                                            </div>
+                                            <div className="grid grid-cols-3 gap-2">
+                                                <input
+                                                    type="text"
+                                                    placeholder="Name"
+                                                    value={child.name}
+                                                    onChange={(e) => {
+                                                        const updated = [...guestInfo.childrenDetails];
+                                                        updated[idx] = { ...child, name: e.target.value };
+                                                        onChange({ ...guestInfo, childrenDetails: updated });
+                                                    }}
+                                                    className="px-3 py-2 text-sm border border-slate-200 rounded-lg focus:ring-1 focus:ring-emerald-500"
+                                                />
+                                                <select
+                                                    value={child.gender}
+                                                    onChange={(e) => {
+                                                        const updated = [...guestInfo.childrenDetails];
+                                                        updated[idx] = { ...child, gender: e.target.value };
+                                                        onChange({ ...guestInfo, childrenDetails: updated });
+                                                    }}
+                                                    className="px-3 py-2 text-sm border border-slate-200 rounded-lg focus:ring-1 focus:ring-emerald-500"
+                                                >
+                                                    <option value="">Gender</option>
+                                                    <option value="male">Male</option>
+                                                    <option value="female">Female</option>
+                                                    <option value="other">Other</option>
+                                                </select>
+                                                <select
+                                                    value={child.age}
+                                                    onChange={(e) => {
+                                                        const updated = [...guestInfo.childrenDetails];
+                                                        updated[idx] = { ...child, age: e.target.value };
+                                                        onChange({ ...guestInfo, childrenDetails: updated });
+                                                    }}
+                                                    className="px-3 py-2 text-sm border border-slate-200 rounded-lg focus:ring-1 focus:ring-emerald-500"
+                                                >
+                                                    <option value="">Age</option>
+                                                    {[...Array(18)].map((_, i) => (
+                                                        <option key={i} value={String(i)}>{i}</option>
+                                                    ))}
+                                                </select>
+                                            </div>
+                                        </div>
+                                    ))}
+                                    {guestInfo.childrenDetails.length === 0 && (
+                                        <p className="text-xs text-slate-500">Click "+ Add Child" to add details for children</p>
+                                    )}
+                                </div>
+                            )}
                         </div>
-                        <div>
-                            <label className="block text-sm font-medium text-slate-700 mb-1">Length (ft)</label>
-                            <input
-                                type="number"
-                                value={guestInfo.equipment.length}
-                                onChange={(e) => onChange({
-                                    ...guestInfo,
-                                    equipment: { ...guestInfo.equipment, length: e.target.value }
-                                })}
-                                disabled={guestInfo.equipment.type === "tent" || guestInfo.equipment.type === "car"}
-                                className="w-full px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 disabled:bg-slate-100"
-                                placeholder={guestInfo.equipment.type === "tent" ? "N/A" : "e.g. 25"}
-                            />
-                        </div>
-                    </div>
-                    {lengthError && (
-                        <p className="text-red-600 text-sm font-medium">{lengthError}</p>
                     )}
-                    <div className="flex items-start gap-3 p-3 bg-emerald-50 border border-emerald-100 rounded-xl">
-                        <input
-                            id="needs-accessible"
-                            type="checkbox"
-                            checked={guestInfo.needsAccessible}
-                            onChange={(e) => onChange({ ...guestInfo, needsAccessible: e.target.checked })}
-                            className="mt-1 h-4 w-4 text-emerald-600 border-slate-300 rounded focus:ring-emerald-500"
-                        />
-                        <label htmlFor="needs-accessible" className="text-sm text-slate-700 leading-5">
-                            I need an ADA-accessible site (level pad, accessible route, proximity to facilities). We’ll filter and flag sites that don’t meet this.
-                        </label>
-                    </div>
-                    <div className="grid grid-cols-2 gap-3">
-                        <div>
-                            <label className="block text-sm font-medium text-slate-700 mb-1">Plate Number (Optional)</label>
-                            <input
-                                type="text"
-                                value={guestInfo.equipment.plateNumber}
-                                onChange={(e) => onChange({
-                                    ...guestInfo,
-                                    equipment: { ...guestInfo.equipment, plateNumber: e.target.value }
-                                })}
-                                className="w-full px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
-                                placeholder="ABC-123"
-                            />
+                </div>
+
+                {/* Collapsible: Stay Reason */}
+                <div className="border border-slate-200 rounded-xl overflow-hidden">
+                    <button
+                        type="button"
+                        onClick={() => setShowStayReason(!showStayReason)}
+                        className="w-full px-4 py-3 bg-slate-50 hover:bg-slate-100 transition-colors flex items-center justify-between text-left"
+                    >
+                        <span className="text-sm font-medium text-slate-700">Reason for stay (optional)</span>
+                        <svg
+                            className={`w-5 h-5 text-slate-500 transition-transform ${showStayReason ? 'rotate-180' : ''}`}
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                        >
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                        </svg>
+                    </button>
+                    {showStayReason && (
+                        <div className="p-4 space-y-4">
+                            <div>
+                                <label className="block text-sm font-medium text-slate-700 mb-1">Reason for stay</label>
+                                <select
+                                    value={guestInfo.stayReasonPreset}
+                                    onChange={(e) => onChange({ ...guestInfo, stayReasonPreset: e.target.value, stayReasonOther: e.target.value === "other" ? guestInfo.stayReasonOther : "" })}
+                                    className="w-full px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                                >
+                                    <option value="vacation">Vacation / getaway</option>
+                                    <option value="family_visit">Visiting family or friends</option>
+                                    <option value="event">Event or festival</option>
+                                    <option value="work_remote">Working remotely</option>
+                                    <option value="stopover">Road-trip stopover</option>
+                                    <option value="relocation">Relocation / temporary housing</option>
+                                    <option value="other">Other</option>
+                                </select>
+                                {guestInfo.stayReasonPreset === "other" && (
+                                    <input
+                                        type="text"
+                                        value={guestInfo.stayReasonOther}
+                                        onChange={(e) => onChange({ ...guestInfo, stayReasonOther: e.target.value })}
+                                        className="mt-2 w-full px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                                        placeholder="Tell us more"
+                                    />
+                                )}
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-slate-700 mb-1">Referral code</label>
+                                <input
+                                    type="text"
+                                    value={guestInfo.referralCode}
+                                    onChange={(e) => onChange({ ...guestInfo, referralCode: e.target.value.trim() })}
+                                    className="w-full px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                                    placeholder="Enter a friend's code or link code"
+                                />
+                            </div>
                         </div>
-                        <div>
-                            <label className="block text-sm font-medium text-slate-700 mb-1">State (Optional)</label>
-                            <input
-                                type="text"
-                                value={guestInfo.equipment.plateState}
-                                onChange={(e) => onChange({
-                                    ...guestInfo,
-                                    equipment: { ...guestInfo.equipment, plateState: e.target.value }
-                                })}
-                                className="w-full px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
-                                placeholder="CA"
-                            />
+                    )}
+                </div>
+
+                {/* Collapsible: Equipment/Vehicle */}
+                <div className="border border-slate-200 rounded-xl overflow-hidden">
+                    <button
+                        type="button"
+                        onClick={() => setShowEquipment(!showEquipment)}
+                        className="w-full px-4 py-3 bg-slate-50 hover:bg-slate-100 transition-colors flex items-center justify-between text-left"
+                    >
+                        <span className="text-sm font-medium text-slate-700">Equipment / Vehicle (optional)</span>
+                        <svg
+                            className={`w-5 h-5 text-slate-500 transition-transform ${showEquipment ? 'rotate-180' : ''}`}
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                        >
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                        </svg>
+                    </button>
+                    {showEquipment && (
+                        <div className="p-4 space-y-4">
+                            <div className="grid grid-cols-2 gap-3">
+                                <div>
+                                    <label className="block text-sm font-medium text-slate-700 mb-1">Type</label>
+                                    <select
+                                        value={guestInfo.equipment.type}
+                                        onChange={(e) => onChange({
+                                            ...guestInfo,
+                                            equipment: { ...guestInfo.equipment, type: e.target.value }
+                                        })}
+                                        className="w-full px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                                    >
+                                        <option value="rv">RV / Motorhome</option>
+                                        <option value="trailer">Travel Trailer</option>
+                                        <option value="tent">Tent</option>
+                                        <option value="car">Car / Van</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-slate-700 mb-1">Length (ft)</label>
+                                    <input
+                                        type="number"
+                                        value={guestInfo.equipment.length}
+                                        onChange={(e) => onChange({
+                                            ...guestInfo,
+                                            equipment: { ...guestInfo.equipment, length: e.target.value }
+                                        })}
+                                        disabled={guestInfo.equipment.type === "tent" || guestInfo.equipment.type === "car"}
+                                        className="w-full px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 disabled:bg-slate-100"
+                                        placeholder={guestInfo.equipment.type === "tent" ? "N/A" : "e.g. 25"}
+                                    />
+                                </div>
+                            </div>
+                            {lengthError && (
+                                <p className="text-red-600 text-sm font-medium">{lengthError}</p>
+                            )}
+                            <div className="flex items-start gap-3 p-3 bg-emerald-50 border border-emerald-100 rounded-xl">
+                                <input
+                                    id="needs-accessible"
+                                    type="checkbox"
+                                    checked={guestInfo.needsAccessible}
+                                    onChange={(e) => onChange({ ...guestInfo, needsAccessible: e.target.checked })}
+                                    className="mt-1 h-4 w-4 text-emerald-600 border-slate-300 rounded focus:ring-emerald-500"
+                                />
+                                <label htmlFor="needs-accessible" className="text-sm text-slate-700 leading-5">
+                                    I need an ADA-accessible site (level pad, accessible route, proximity to facilities). We'll filter and flag sites that don't meet this.
+                                </label>
+                            </div>
+                            <div className="grid grid-cols-2 gap-3">
+                                <div>
+                                    <label className="block text-sm font-medium text-slate-700 mb-1">Plate Number</label>
+                                    <input
+                                        type="text"
+                                        value={guestInfo.equipment.plateNumber}
+                                        onChange={(e) => onChange({
+                                            ...guestInfo,
+                                            equipment: { ...guestInfo.equipment, plateNumber: e.target.value }
+                                        })}
+                                        className="w-full px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                                        placeholder="ABC-123"
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-slate-700 mb-1">State</label>
+                                    <input
+                                        type="text"
+                                        value={guestInfo.equipment.plateState}
+                                        onChange={(e) => onChange({
+                                            ...guestInfo,
+                                            equipment: { ...guestInfo.equipment, plateState: e.target.value }
+                                        })}
+                                        className="w-full px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                                        placeholder="CA"
+                                    />
+                                </div>
+                            </div>
                         </div>
-                    </div>
+                    )}
                 </div>
             </div>
 

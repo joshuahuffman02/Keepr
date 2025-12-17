@@ -1,8 +1,13 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { DashboardShell } from "@/components/ui/layout/DashboardShell";
+import { FormField } from "@/components/ui/form-field";
+import { FormTextarea } from "@/components/ui/form-textarea";
 import { apiClient } from "@/lib/api-client";
 
 interface Template {
@@ -160,6 +165,26 @@ const PREBUILT_TEMPLATES = [
     textBody: "{{campground_name}} Alert: Weather advisory in effect. Please secure loose items and check in at the office if you need assistance.",
   },
 ];
+
+// Validation schemas
+const createTemplateSchema = z.object({
+  name: z.string().min(1, "Template name is required").max(100, "Name must be less than 100 characters"),
+  channel: z.enum(["email", "sms"]),
+  category: z.string(),
+});
+
+const emailTemplateSchema = z.object({
+  name: z.string().min(1, "Template name is required").max(100, "Name must be less than 100 characters"),
+  subject: z.string().min(1, "Subject is required").max(200, "Subject must be less than 200 characters"),
+  html: z.string().min(1, "Email content is required"),
+});
+
+const smsTemplateSchema = z.object({
+  name: z.string().min(1, "Template name is required").max(100, "Name must be less than 100 characters"),
+  textBody: z.string().min(1, "Message is required").max(160, "SMS must be 160 characters or less"),
+});
+
+type CreateTemplateFormData = z.infer<typeof createTemplateSchema>;
 
 export default function TemplatesPage() {
   const [campgroundId, setCampgroundId] = useState<string | null>(null);
@@ -359,38 +384,52 @@ function TemplateEditor({
   previewMode: boolean;
   onTogglePreview: () => void;
 }) {
-  const [name, setName] = useState(template.name);
-  const [subject, setSubject] = useState(template.subject ?? "");
-  const [html, setHtml] = useState(template.html ?? "");
-  const [textBody, setTextBody] = useState(template.textBody ?? "");
-  const [saving, setSaving] = useState(false);
+  const schema = template.channel === "email" ? emailTemplateSchema : smsTemplateSchema;
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isValid, isDirty },
+    reset,
+    watch,
+  } = useForm({
+    resolver: zodResolver(schema),
+    defaultValues: {
+      name: template.name,
+      subject: template.subject ?? "",
+      html: template.html ?? "",
+      textBody: template.textBody ?? "",
+    },
+    mode: "onChange",
+  });
+
+  const formData = watch();
 
   useEffect(() => {
-    setName(template.name);
-    setSubject(template.subject ?? "");
-    setHtml(template.html ?? "");
-    setTextBody(template.textBody ?? "");
-  }, [template]);
+    reset({
+      name: template.name,
+      subject: template.subject ?? "",
+      html: template.html ?? "",
+      textBody: template.textBody ?? "",
+    });
+  }, [template, reset]);
 
-  const handleSave = async () => {
-    setSaving(true);
+  const onSubmit = async (data: any) => {
     try {
       await apiClient.updateCampaignTemplate(template.id, {
-        name,
-        subject: subject || undefined,
-        html: html || undefined,
-        textBody: textBody || undefined,
+        name: data.name,
+        subject: data.subject || undefined,
+        html: data.html || undefined,
+        textBody: data.textBody || undefined,
       });
       onSave();
     } catch (err) {
       console.error("Failed to save template:", err);
-    } finally {
-      setSaving(false);
     }
   };
 
   // Preview with sample data
-  const previewHtml = html
+  const previewHtml = (formData.html || "")
     .replace(/\{\{guest_name\}\}/g, "John Smith")
     .replace(/\{\{campground_name\}\}/g, "Pine Valley Campground")
     .replace(/\{\{site_number\}\}/g, "A-15")
@@ -400,6 +439,11 @@ function TemplateEditor({
     .replace(/\{\{reservation_id\}\}/g, "RES-12345")
     .replace(/\{\{balance_due\}\}/g, "$50.00");
 
+  const previewText = (formData.textBody || "")
+    .replace(/\{\{guest_name\}\}/g, "John Smith")
+    .replace(/\{\{campground_name\}\}/g, "Pine Valley")
+    .replace(/\{\{site_number\}\}/g, "A-15");
+
   return (
     <div className="bg-white rounded-xl border border-slate-200 overflow-hidden">
       {/* Header */}
@@ -408,13 +452,13 @@ function TemplateEditor({
           <span className="text-lg">{template.channel === "email" ? "📧" : "📱"}</span>
           <input
             type="text"
-            value={name}
-            onChange={e => setName(e.target.value)}
+            {...register("name")}
             className="font-semibold text-slate-900 bg-transparent border-none outline-none focus:ring-0 text-lg"
           />
         </div>
         <div className="flex items-center gap-2">
           <button
+            type="button"
             onClick={onTogglePreview}
             className={`px-3 py-1.5 rounded-lg text-sm font-medium ${previewMode ? "bg-violet-100 text-violet-700" : "bg-slate-100 text-slate-600"
               }`}
@@ -422,34 +466,37 @@ function TemplateEditor({
             {previewMode ? "Edit" : "Preview"}
           </button>
           <button
+            type="button"
             onClick={onDelete}
             className="px-3 py-1.5 text-red-600 hover:bg-red-50 rounded-lg text-sm"
           >
             Delete
           </button>
           <button
-            onClick={handleSave}
-            disabled={saving}
+            type="button"
+            onClick={handleSubmit(onSubmit)}
+            disabled={!isValid || !isDirty}
             className="px-4 py-1.5 bg-violet-600 text-white rounded-lg text-sm font-medium hover:bg-violet-700 disabled:opacity-50"
           >
-            {saving ? "Saving..." : "Save"}
+            Save
           </button>
         </div>
       </div>
 
       {/* Content */}
-      <div className="p-5 space-y-4">
+      <form onSubmit={handleSubmit(onSubmit)} className="p-5 space-y-4">
+        {errors.name && (
+          <p className="text-sm text-red-600">{errors.name.message}</p>
+        )}
+
         {template.channel === "email" && (
-          <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">Subject Line</label>
-            <input
-              type="text"
-              value={subject}
-              onChange={e => setSubject(e.target.value)}
-              className="w-full px-3 py-2 border border-slate-200 rounded-lg"
-              placeholder="Email subject..."
-            />
-          </div>
+          <FormField
+            label="Subject Line"
+            placeholder="Email subject..."
+            error={errors.subject?.message}
+            showSuccess
+            {...register("subject")}
+          />
         )}
 
         {previewMode ? (
@@ -464,44 +511,36 @@ function TemplateEditor({
               />
             ) : (
               <div className="p-4 bg-slate-900 text-white font-mono text-sm whitespace-pre-wrap">
-                {textBody
-                  .replace(/\{\{guest_name\}\}/g, "John Smith")
-                  .replace(/\{\{campground_name\}\}/g, "Pine Valley")
-                  .replace(/\{\{site_number\}\}/g, "A-15")}
+                {previewText}
               </div>
             )}
           </div>
         ) : (
           <>
             {template.channel === "email" ? (
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">HTML Content</label>
-                <textarea
-                  value={html}
-                  onChange={e => setHtml(e.target.value)}
-                  rows={15}
-                  className="w-full px-3 py-2 border border-slate-200 rounded-lg font-mono text-sm"
-                  placeholder="<h1>Hello {{guest_name}}</h1>..."
-                />
-              </div>
+              <FormTextarea
+                label="HTML Content"
+                rows={15}
+                placeholder="<h1>Hello {{guest_name}}</h1>..."
+                error={errors.html?.message}
+                showSuccess
+                className="font-mono text-sm"
+                {...register("html")}
+              />
             ) : (
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">
-                  SMS Text <span className="text-slate-400 font-normal">({textBody.length}/160 chars)</span>
-                </label>
-                <textarea
-                  value={textBody}
-                  onChange={e => setTextBody(e.target.value)}
-                  rows={4}
-                  maxLength={160}
-                  className="w-full px-3 py-2 border border-slate-200 rounded-lg"
-                  placeholder="Your reservation at {{campground_name}} is confirmed..."
-                />
-              </div>
+              <FormTextarea
+                label={`SMS Text (${(formData.textBody || "").length}/160 chars)`}
+                rows={4}
+                maxLength={160}
+                placeholder="Your reservation at {{campground_name}} is confirmed..."
+                error={errors.textBody?.message}
+                showSuccess
+                {...register("textBody")}
+              />
             )}
           </>
         )}
-      </div>
+      </form>
     </div>
   );
 }
@@ -515,29 +554,37 @@ function CreateTemplateModal({
   onClose: () => void;
   onCreated: (template: Template) => void;
 }) {
-  const [name, setName] = useState("");
-  const [channel, setChannel] = useState<"email" | "sms">("email");
-  const [category, setCategory] = useState("general");
-  const [saving, setSaving] = useState(false);
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isValid },
+    watch,
+    setValue,
+  } = useForm<CreateTemplateFormData>({
+    resolver: zodResolver(createTemplateSchema),
+    defaultValues: {
+      name: "",
+      channel: "email",
+      category: "general",
+    },
+    mode: "onChange",
+  });
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!name) return;
-    setSaving(true);
+  const channel = watch("channel");
+
+  const onSubmit = async (data: CreateTemplateFormData) => {
     try {
       const result = await apiClient.createCampaignTemplate(campgroundId, {
-        name,
-        channel,
-        category,
-        subject: channel === "email" ? "New Template" : undefined,
-        html: channel === "email" ? "<p>Hello {{guest_name}},</p>" : undefined,
-        textBody: channel === "sms" ? "Hello {{guest_name}}!" : undefined,
+        name: data.name,
+        channel: data.channel,
+        category: data.category,
+        subject: data.channel === "email" ? "New Template" : undefined,
+        html: data.channel === "email" ? "<p>Hello {{guest_name}},</p>" : undefined,
+        textBody: data.channel === "sms" ? "Hello {{guest_name}}!" : undefined,
       });
       onCreated(result as Template);
     } catch (err) {
       console.error("Failed to create template:", err);
-    } finally {
-      setSaving(false);
     }
   };
 
@@ -549,25 +596,21 @@ function CreateTemplateModal({
           <button onClick={onClose} className="text-slate-400 hover:text-slate-600">✕</button>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">Template Name *</label>
-            <input
-              type="text"
-              value={name}
-              onChange={e => setName(e.target.value)}
-              className="w-full px-3 py-2 border border-slate-200 rounded-lg"
-              placeholder="Booking Confirmation"
-              required
-            />
-          </div>
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+          <FormField
+            label="Template Name *"
+            placeholder="Booking Confirmation"
+            error={errors.name?.message}
+            showSuccess
+            {...register("name")}
+          />
 
           <div>
             <label className="block text-sm font-medium text-slate-700 mb-1">Channel</label>
             <div className="flex gap-2">
               <button
                 type="button"
-                onClick={() => setChannel("email")}
+                onClick={() => setValue("channel", "email", { shouldValidate: true })}
                 className={`flex-1 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${channel === "email"
                   ? "bg-violet-100 text-violet-700 border-2 border-violet-300"
                   : "bg-slate-50 text-slate-600 border border-slate-200"
@@ -577,7 +620,7 @@ function CreateTemplateModal({
               </button>
               <button
                 type="button"
-                onClick={() => setChannel("sms")}
+                onClick={() => setValue("channel", "sms", { shouldValidate: true })}
                 className={`flex-1 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${channel === "sms"
                   ? "bg-violet-100 text-violet-700 border-2 border-violet-300"
                   : "bg-slate-50 text-slate-600 border border-slate-200"
@@ -591,9 +634,8 @@ function CreateTemplateModal({
           <div>
             <label className="block text-sm font-medium text-slate-700 mb-1">Category</label>
             <select
-              value={category}
-              onChange={e => setCategory(e.target.value)}
               className="w-full px-3 py-2 border border-slate-200 rounded-lg"
+              {...register("category")}
             >
               {CATEGORIES.map(cat => (
                 <option key={cat} value={cat} className="capitalize">{cat}</option>
@@ -611,10 +653,10 @@ function CreateTemplateModal({
             </button>
             <button
               type="submit"
-              disabled={saving || !name}
+              disabled={!isValid}
               className="flex-1 px-4 py-2 bg-violet-600 text-white rounded-lg hover:bg-violet-700 disabled:opacity-50"
             >
-              {saving ? "Creating..." : "Create Template"}
+              Create Template
             </button>
           </div>
         </form>

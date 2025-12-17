@@ -49,6 +49,42 @@ const config: Config = {
         card: {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))"
+        },
+        // Semantic action tokens
+        "action-primary": {
+          DEFAULT: "hsl(var(--action-primary))",
+          foreground: "hsl(var(--action-primary-foreground))",
+          hover: "hsl(var(--action-primary-hover))"
+        },
+        "action-secondary": {
+          DEFAULT: "hsl(var(--action-secondary))",
+          foreground: "hsl(var(--action-secondary-foreground))",
+          hover: "hsl(var(--action-secondary-hover))"
+        },
+        // Semantic status tokens
+        "status-success": {
+          DEFAULT: "hsl(var(--status-success))",
+          foreground: "hsl(var(--status-success-foreground))",
+          bg: "hsl(var(--status-success-bg))",
+          border: "hsl(var(--status-success-border))"
+        },
+        "status-warning": {
+          DEFAULT: "hsl(var(--status-warning))",
+          foreground: "hsl(var(--status-warning-foreground))",
+          bg: "hsl(var(--status-warning-bg))",
+          border: "hsl(var(--status-warning-border))"
+        },
+        "status-error": {
+          DEFAULT: "hsl(var(--status-error))",
+          foreground: "hsl(var(--status-error-foreground))",
+          bg: "hsl(var(--status-error-bg))",
+          border: "hsl(var(--status-error-border))"
+        },
+        "status-info": {
+          DEFAULT: "hsl(var(--status-info))",
+          foreground: "hsl(var(--status-info-foreground))",
+          bg: "hsl(var(--status-info-bg))",
+          border: "hsl(var(--status-info-border))"
         }
       },
       borderRadius: {

@@ -6,6 +6,7 @@
 
 @layer base {
   :root {
+    /* Base UI tokens (original shadcn/ui tokens) */
     --background: 210 40% 98%; /* slate-50 */
     --foreground: 222 47% 11%; /* slate-900 */
     --card: 0 0% 100%;
@@ -26,9 +27,58 @@
     --input: 214 32% 91%;
     --ring: 217 91% 60%;
     --radius: 0.5rem;
+
+    /* ============================================
+       SEMANTIC COLOR TOKENS
+       ============================================
+       Use these tokens for consistent color usage across the app.
+
+       ACTION TOKENS - For interactive elements (buttons, links)
+       - action-primary: Main CTA buttons, primary actions
+       - action-secondary: Secondary buttons, less prominent actions
+       - action-hover: Hover states for primary actions
+
+       STATUS TOKENS - For status indicators and feedback
+       - status-success: Successful operations, confirmed states
+       - status-warning: Warnings, balance due, attention needed
+       - status-error: Errors, destructive actions, critical alerts
+       - status-info: Informational messages, neutral states
+
+       Each token has a corresponding foreground color for text.
+    ============================================ */
+
+    /* Action tokens */
+    --action-primary: 158 64% 52%; /* emerald-600 */
+    --action-primary-foreground: 0 0% 100%;
+    --action-primary-hover: 158 64% 42%; /* emerald-700 */
+    --action-secondary: 210 40% 96%; /* slate-100 */
+    --action-secondary-foreground: 222 47% 11%; /* slate-900 */
+    --action-secondary-hover: 214 32% 91%; /* slate-200 */
+
+    /* Status tokens */
+    --status-success: 158 64% 52%; /* emerald-600 - green for success */
+    --status-success-foreground: 0 0% 100%;
+    --status-success-bg: 152 57% 96%; /* emerald-50 */
+    --status-success-border: 149 61% 86%; /* emerald-200 */
+
+    --status-warning: 38 92% 50%; /* amber-500 - amber for warnings */
+    --status-warning-foreground: 21 55% 11%; /* amber-950 */
+    --status-warning-bg: 48 100% 96%; /* amber-50 */
+    --status-warning-border: 48 96% 76%; /* amber-200 */
+
+    --status-error: 0 84% 60%; /* red-500 - red for errors */
+    --status-error-foreground: 0 0% 100%;
+    --status-error-bg: 0 86% 97%; /* red-50 */
+    --status-error-border: 0 72% 91%; /* red-200 */
+
+    --status-info: 217 91% 60%; /* blue-500 - blue for informational */
+    --status-info-foreground: 0 0% 100%;
+    --status-info-bg: 214 100% 97%; /* blue-50 */
+    --status-info-border: 213 97% 87%; /* blue-200 */
   }
 
   .dark {
+    /* Base UI tokens (dark mode) */
     --background: 222 47% 11%;
     --foreground: 210 40% 98%;
     --card: 217 33% 17%;
@@ -48,6 +98,34 @@
     --border: 217 33% 17%;
     --input: 217 33% 17%;
     --ring: 217 91% 60%;
+
+    /* Semantic tokens (dark mode) */
+    --action-primary: 158 64% 52%; /* emerald-500 */
+    --action-primary-foreground: 0 0% 100%;
+    --action-primary-hover: 158 64% 42%; /* emerald-600 */
+    --action-secondary: 217 33% 17%; /* slate-800 */
+    --action-secondary-foreground: 210 40% 98%;
+    --action-secondary-hover: 217 33% 23%; /* slate-700 */
+
+    --status-success: 158 64% 52%; /* emerald-500 */
+    --status-success-foreground: 0 0% 100%;
+    --status-success-bg: 158 64% 12%; /* emerald-950 */
+    --status-success-border: 158 64% 22%; /* emerald-800 */
+
+    --status-warning: 38 92% 50%; /* amber-500 */
+    --status-warning-foreground: 0 0% 100%;
+    --status-warning-bg: 36 77% 12%; /* amber-950 */
+    --status-warning-border: 36 86% 22%; /* amber-800 */
+
+    --status-error: 0 62% 50%; /* red-600 */
+    --status-error-foreground: 0 0% 100%;
+    --status-error-bg: 0 62% 12%; /* red-950 */
+    --status-error-border: 0 62% 22%; /* red-800 */
+
+    --status-info: 217 91% 60%; /* blue-500 */
+    --status-info-foreground: 0 0% 100%;
+    --status-info-bg: 222 84% 12%; /* blue-950 */
+    --status-info-border: 217 91% 22%; /* blue-800 */
   }
 }
 

@@ -15,6 +15,15 @@ const badgeVariants = cva(
                 destructive:
                     "border-transparent bg-destructive text-destructive-foreground shadow hover:bg-destructive/80",
                 outline: "text-foreground",
+                // Semantic status variants
+                success:
+                    "border-status-success-border bg-status-success-bg text-status-success",
+                warning:
+                    "border-status-warning-border bg-status-warning-bg text-status-warning-foreground",
+                error:
+                    "border-status-error-border bg-status-error-bg text-status-error",
+                info:
+                    "border-status-info-border bg-status-info-bg text-status-info",
             },
         },
         defaultVariants: {

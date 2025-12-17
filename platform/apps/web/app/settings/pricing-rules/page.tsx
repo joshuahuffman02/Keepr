@@ -1,9 +1,13 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { DashboardShell } from "../../../components/ui/layout/DashboardShell";
 import { Button } from "../../../components/ui/button";
+import { FormField } from "../../../components/ui/form-field";
 import { apiClient } from "../../../lib/api-client";
 import { Plus, Pencil, Trash2, Calendar, TrendingUp, Sun, Gift, BarChart3 } from "lucide-react";
 
@@ -27,21 +31,55 @@ type PricingRuleV2 = {
 
 type SiteClass = { id: string; name: string };
 
-type FormData = {
-  name: string;
-  type: "season" | "weekend" | "holiday" | "event" | "demand";
-  priority: number;
-  stackMode: "additive" | "max" | "override";
-  adjustmentType: "percent" | "flat";
-  adjustmentValue: string;
-  siteClassId: string;
-  dowMask: number[];
-  startDate: string;
-  endDate: string;
-  minRateCap: string;
-  maxRateCap: string;
-  active: boolean;
-};
+// Validation schema
+const pricingRuleSchema = z.object({
+  name: z.string().min(1, "Name is required").max(100, "Name must be less than 100 characters"),
+  type: z.enum(["season", "weekend", "holiday", "event", "demand"]),
+  priority: z.number().min(0, "Priority must be 0 or greater").max(999, "Priority must be less than 1000"),
+  stackMode: z.enum(["additive", "max", "override"]),
+  adjustmentType: z.enum(["percent", "flat"]),
+  adjustmentValue: z.string().refine((val) => {
+    const num = parseFloat(val);
+    return !isNaN(num) && num !== 0;
+  }, "Adjustment value is required and cannot be zero"),
+  siteClassId: z.string().optional(),
+  dowMask: z.array(z.number()).optional(),
+  startDate: z.string().optional(),
+  endDate: z.string().optional(),
+  minRateCap: z.string().optional().refine((val) => {
+    if (!val) return true;
+    const num = parseFloat(val);
+    return !isNaN(num) && num >= 0;
+  }, "Min rate cap must be a valid positive number"),
+  maxRateCap: z.string().optional().refine((val) => {
+    if (!val) return true;
+    const num = parseFloat(val);
+    return !isNaN(num) && num >= 0;
+  }, "Max rate cap must be a valid positive number"),
+  active: z.boolean(),
+}).refine((data) => {
+  // Validate that end date is after start date
+  if (data.startDate && data.endDate) {
+    return new Date(data.endDate) >= new Date(data.startDate);
+  }
+  return true;
+}, {
+  message: "End date must be after start date",
+  path: ["endDate"]
+}).refine((data) => {
+  // Validate that max rate cap is greater than min rate cap
+  if (data.minRateCap && data.maxRateCap) {
+    const min = parseFloat(data.minRateCap);
+    const max = parseFloat(data.maxRateCap);
+    return max >= min;
+  }
+  return true;
+}, {
+  message: "Max rate cap must be greater than or equal to min rate cap",
+  path: ["maxRateCap"]
+});
+
+type FormData = z.infer<typeof pricingRuleSchema>;
 
 const defaultFormData: FormData = {
   name: "",
@@ -79,10 +117,22 @@ export default function PricingRulesV2Page() {
   const [campgroundId, setCampgroundId] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingRule, setEditingRule] = useState<PricingRuleV2 | null>(null);
-  const [formData, setFormData] = useState<FormData>(defaultFormData);
-  const [saving, setSaving] = useState(false);
-  const [error, setError] = useState<string | null>(null);
   const qc = useQueryClient();
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isValid, isDirty },
+    reset,
+    watch,
+    setValue,
+  } = useForm<FormData>({
+    resolver: zodResolver(pricingRuleSchema),
+    defaultValues: defaultFormData,
+    mode: "onChange", // Enable real-time validation
+  });
+
+  const formData = watch();
 
   useEffect(() => {
     const cg = localStorage.getItem("campreserv:selectedCampground");
@@ -128,14 +178,13 @@ export default function PricingRulesV2Page() {
 
   const openCreateModal = () => {
     setEditingRule(null);
-    setFormData(defaultFormData);
-    setError(null);
+    reset(defaultFormData);
     setIsModalOpen(true);
   };
 
   const openEditModal = (rule: PricingRuleV2) => {
     setEditingRule(rule);
-    setFormData({
+    reset({
       name: rule.name,
       type: rule.type,
       priority: rule.priority,
@@ -152,54 +201,38 @@ export default function PricingRulesV2Page() {
       maxRateCap: rule.maxRateCap ? String(rule.maxRateCap / 100) : "",
       active: rule.active,
     });
-    setError(null);
     setIsModalOpen(true);
   };
 
   const closeModal = () => {
     setIsModalOpen(false);
     setEditingRule(null);
-    setFormData(defaultFormData);
-    setError(null);
-    setSaving(false);
+    reset(defaultFormData);
   };
 
-  const handleSubmit = async () => {
-    if (!formData.name.trim()) {
-      setError("Name is required");
-      return;
-    }
-
-    setSaving(true);
-    setError(null);
-
+  const onSubmit = async (data: FormData) => {
     const payload = {
-      name: formData.name.trim(),
-      type: formData.type,
-      priority: formData.priority,
-      stackMode: formData.stackMode,
-      adjustmentType: formData.adjustmentType,
-      adjustmentValue: formData.adjustmentType === "percent"
-        ? parseFloat(formData.adjustmentValue) / 100
-        : parseFloat(formData.adjustmentValue) * 100,
-      siteClassId: formData.siteClassId || null,
-      dowMask: formData.dowMask.length > 0 ? formData.dowMask : undefined,
-      startDate: formData.startDate || null,
-      endDate: formData.endDate || null,
-      minRateCap: formData.minRateCap ? parseFloat(formData.minRateCap) * 100 : null,
-      maxRateCap: formData.maxRateCap ? parseFloat(formData.maxRateCap) * 100 : null,
-      active: formData.active,
+      name: data.name.trim(),
+      type: data.type,
+      priority: data.priority,
+      stackMode: data.stackMode,
+      adjustmentType: data.adjustmentType,
+      adjustmentValue: data.adjustmentType === "percent"
+        ? parseFloat(data.adjustmentValue) / 100
+        : parseFloat(data.adjustmentValue) * 100,
+      siteClassId: data.siteClassId || null,
+      dowMask: data.dowMask && data.dowMask.length > 0 ? data.dowMask : undefined,
+      startDate: data.startDate || null,
+      endDate: data.endDate || null,
+      minRateCap: data.minRateCap ? parseFloat(data.minRateCap) * 100 : null,
+      maxRateCap: data.maxRateCap ? parseFloat(data.maxRateCap) * 100 : null,
+      active: data.active,
     };
 
-    try {
-      if (editingRule) {
-        await updateMutation.mutateAsync({ id: editingRule.id, data: payload });
-      } else {
-        await createMutation.mutateAsync(payload);
-      }
-    } catch (err: any) {
-      setError(err.message || "Failed to save");
-      setSaving(false);
+    if (editingRule) {
+      await updateMutation.mutateAsync({ id: editingRule.id, data: payload });
+    } else {
+      await createMutation.mutateAsync(payload);
     }
   };
 
@@ -209,12 +242,11 @@ export default function PricingRulesV2Page() {
   };
 
   const toggleDow = (day: number) => {
-    setFormData((prev) => ({
-      ...prev,
-      dowMask: prev.dowMask.includes(day)
-        ? prev.dowMask.filter((d) => d !== day)
-        : [...prev.dowMask, day].sort(),
-    }));
+    const current = formData.dowMask || [];
+    const updated = current.includes(day)
+      ? current.filter((d) => d !== day)
+      : [...current, day].sort();
+    setValue("dowMask", updated, { shouldValidate: true });
   };
 
   const formatAdjustment = (rule: PricingRuleV2) => {
@@ -345,31 +377,21 @@ export default function PricingRulesV2Page() {
               {editingRule ? "Edit Pricing Rule" : "Create Pricing Rule"}
             </h2>
 
-            {error && (
-              <div className="mb-4 p-3 rounded-lg bg-red-50 border border-red-200 text-red-700 text-sm">
-                {error}
-              </div>
-            )}
-
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">Name *</label>
-                <input
-                  type="text"
-                  className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm"
-                  placeholder="e.g., Summer Peak Season"
-                  value={formData.name}
-                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                />
-              </div>
+            <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+              <FormField
+                label="Name *"
+                placeholder="e.g., Summer Peak Season"
+                error={errors.name?.message}
+                showSuccess
+                {...register("name")}
+              />
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-slate-700 mb-1">Type</label>
                   <select
                     className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm"
-                    value={formData.type}
-                    onChange={(e) => setFormData({ ...formData, type: e.target.value as FormData["type"] })}
+                    {...register("type")}
                   >
                     {Object.entries(ruleTypeLabels).map(([key, val]) => (
                       <option key={key} value={key}>{val.label}</option>
@@ -377,13 +399,13 @@ export default function PricingRulesV2Page() {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-1">Priority</label>
-                  <input
+                  <FormField
+                    label="Priority"
                     type="number"
                     min="0"
-                    className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm"
-                    value={formData.priority}
-                    onChange={(e) => setFormData({ ...formData, priority: parseInt(e.target.value) || 0 })}
+                    error={errors.priority?.message}
+                    showSuccess
+                    {...register("priority", { valueAsNumber: true })}
                   />
                   <p className="text-xs text-slate-500 mt-1">
                     Lower numbers run first. If rules overlap, priority decides which wins (e.g., 1 beats 10).
@@ -395,8 +417,7 @@ export default function PricingRulesV2Page() {
                 <label className="block text-sm font-medium text-slate-700 mb-1">Stacking Mode</label>
                 <select
                   className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm"
-                  value={formData.stackMode}
-                  onChange={(e) => setFormData({ ...formData, stackMode: e.target.value as FormData["stackMode"] })}
+                  {...register("stackMode")}
                 >
                   {Object.entries(stackModeLabels).map(([key, label]) => (
                     <option key={key} value={key}>{label}</option>
@@ -409,34 +430,28 @@ export default function PricingRulesV2Page() {
                   <label className="block text-sm font-medium text-slate-700 mb-1">Adjustment Type</label>
                   <select
                     className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm"
-                    value={formData.adjustmentType}
-                    onChange={(e) => setFormData({ ...formData, adjustmentType: e.target.value as "percent" | "flat" })}
+                    {...register("adjustmentType")}
                   >
                     <option value="percent">Percentage (%)</option>
                     <option value="flat">Flat ($)</option>
                   </select>
                 </div>
-                <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-1">
-                    Value {formData.adjustmentType === "percent" ? "(%)" : "($)"}
-                  </label>
-                  <input
-                    type="number"
-                    step={formData.adjustmentType === "percent" ? "1" : "0.01"}
-                    className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm"
-                    placeholder={formData.adjustmentType === "percent" ? "e.g., 15" : "e.g., 10.00"}
-                    value={formData.adjustmentValue}
-                    onChange={(e) => setFormData({ ...formData, adjustmentValue: e.target.value })}
-                  />
-                </div>
+                <FormField
+                  label={`Value ${formData.adjustmentType === "percent" ? "(%)" : "($)"}`}
+                  type="number"
+                  step={formData.adjustmentType === "percent" ? "1" : "0.01"}
+                  placeholder={formData.adjustmentType === "percent" ? "e.g., 15" : "e.g., 10.00"}
+                  error={errors.adjustmentValue?.message}
+                  showSuccess
+                  {...register("adjustmentValue")}
+                />
               </div>
 
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-1">Site Class</label>
                 <select
                   className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm"
-                  value={formData.siteClassId}
-                  onChange={(e) => setFormData({ ...formData, siteClassId: e.target.value })}
+                  {...register("siteClassId")}
                 >
                   <option value="">All Site Classes</option>
                   {siteClassesQuery.data?.map((sc: SiteClass) => (
@@ -455,7 +470,7 @@ export default function PricingRulesV2Page() {
                         type="button"
                         onClick={() => toggleDow(idx)}
                         className={`px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${
-                          formData.dowMask.includes(idx)
+                          (formData.dowMask || []).includes(idx)
                             ? "bg-emerald-600 text-white"
                             : "bg-slate-100 text-slate-600 hover:bg-slate-200"
                         }`}
@@ -469,78 +484,75 @@ export default function PricingRulesV2Page() {
 
               {(formData.type === "season" || formData.type === "holiday" || formData.type === "event") && (
                 <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-1">Start Date</label>
-                    <input
-                      type="date"
-                      className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm"
-                      value={formData.startDate}
-                      onChange={(e) => setFormData({ ...formData, startDate: e.target.value })}
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-1">End Date</label>
-                    <input
-                      type="date"
-                      className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm"
-                      value={formData.endDate}
-                      onChange={(e) => setFormData({ ...formData, endDate: e.target.value })}
-                    />
-                  </div>
+                  <FormField
+                    label="Start Date"
+                    type="date"
+                    error={errors.startDate?.message}
+                    showSuccess
+                    {...register("startDate")}
+                  />
+                  <FormField
+                    label="End Date"
+                    type="date"
+                    error={errors.endDate?.message}
+                    showSuccess
+                    {...register("endDate")}
+                  />
                 </div>
               )}
 
               <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-1">Min Rate Cap ($)</label>
-                  <input
-                    type="number"
-                    step="0.01"
-                    min="0"
-                    className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm"
-                    placeholder="e.g., 25.00"
-                    value={formData.minRateCap}
-                    onChange={(e) => setFormData({ ...formData, minRateCap: e.target.value })}
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-1">Max Rate Cap ($)</label>
-                  <input
-                    type="number"
-                    step="0.01"
-                    min="0"
-                    className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm"
-                    placeholder="e.g., 150.00"
-                    value={formData.maxRateCap}
-                    onChange={(e) => setFormData({ ...formData, maxRateCap: e.target.value })}
-                  />
-                </div>
+                <FormField
+                  label="Min Rate Cap ($)"
+                  type="number"
+                  step="0.01"
+                  min="0"
+                  placeholder="e.g., 25.00"
+                  error={errors.minRateCap?.message}
+                  showSuccess
+                  {...register("minRateCap")}
+                />
+                <FormField
+                  label="Max Rate Cap ($)"
+                  type="number"
+                  step="0.01"
+                  min="0"
+                  placeholder="e.g., 150.00"
+                  error={errors.maxRateCap?.message}
+                  showSuccess
+                  {...register("maxRateCap")}
+                />
               </div>
 
               <div className="flex items-center gap-2">
                 <input
                   type="checkbox"
                   id="active"
-                  checked={formData.active}
-                  onChange={(e) => setFormData({ ...formData, active: e.target.checked })}
                   className="rounded border-slate-300"
+                  {...register("active")}
                 />
                 <label htmlFor="active" className="text-sm text-slate-700">Active</label>
               </div>
-            </div>
 
-            <div className="mt-6 flex justify-end gap-3">
-              <Button variant="outline" onClick={closeModal} disabled={saving}>
-                Cancel
-              </Button>
-              <Button onClick={handleSubmit} disabled={saving}>
-                {saving ? "Saving..." : editingRule ? "Save Changes" : "Create Rule"}
-              </Button>
-            </div>
+              <div className="mt-6 flex justify-end gap-3">
+                <Button type="button" variant="outline" onClick={closeModal}>
+                  Cancel
+                </Button>
+                <Button
+                  type="submit"
+                  disabled={!isValid || (!isDirty && !editingRule) || createMutation.isPending || updateMutation.isPending}
+                >
+                  {createMutation.isPending || updateMutation.isPending
+                    ? "Saving..."
+                    : editingRule
+                    ? "Save Changes"
+                    : "Create Rule"}
+                </Button>
+              </div>
+            </form>
           </div>
         </div>
       )}
     </DashboardShell>
   );
 }
-
