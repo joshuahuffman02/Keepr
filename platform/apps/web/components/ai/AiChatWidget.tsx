@@ -60,6 +60,32 @@ export function AiChatWidget({ campgroundId, campgroundName }: AiChatWidgetProps
                 recommendations: data.recommendations,
             };
             setMessages((prev) => [...prev, assistantMessage]);
+
+            // Handle booking action
+            if (data.action === 'book' && data.bookingDetails) {
+                const params = new URLSearchParams(window.location.search);
+                if (data.bookingDetails.dates) {
+                    params.set('arrival', data.bookingDetails.dates.arrival);
+                    params.set('departure', data.bookingDetails.dates.departure);
+                }
+                if (data.bookingDetails.partySize) {
+                    params.set('adults', data.bookingDetails.partySize.adults.toString());
+                    params.set('children', data.bookingDetails.partySize.children.toString());
+                    // Combined guests param for V2 client
+                    params.set('guests', (data.bookingDetails.partySize.adults + data.bookingDetails.partySize.children).toString());
+                }
+                if (data.bookingDetails.rigInfo) {
+                    params.set('rvLength', data.bookingDetails.rigInfo.length.toString());
+                    params.set('rvType', data.bookingDetails.rigInfo.type);
+                }
+                if (data.bookingDetails.siteClassId) {
+                    params.set('siteClassId', data.bookingDetails.siteClassId);
+                }
+
+                // If on the park page, reload with params to pre-fill the form
+                // Using window.location to force a reload so the client component re-initializes from URL
+                window.location.href = `${window.location.pathname}?${params.toString()}`;
+            }
         },
         onError: () => {
             setMessages((prev) => [
