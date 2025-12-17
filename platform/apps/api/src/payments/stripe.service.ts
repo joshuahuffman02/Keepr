@@ -3,29 +3,48 @@ import Stripe from "stripe";
 
 @Injectable()
 export class StripeService {
-    private stripe: Stripe;
+    private stripe: Stripe | null = null;
     private readonly configured: boolean;
     private readonly apiVersion = "2025-11-17.clover" as any;
 
     constructor() {
         const secretKey = process.env.STRIPE_SECRET_KEY;
-        this.configured = !!secretKey && !secretKey.includes("placeholder");
+
+        // Check if key is valid (not empty, not a placeholder)
+        const isValidKey = !!secretKey &&
+            secretKey.length > 20 &&
+            !secretKey.includes("placeholder") &&
+            (secretKey.startsWith("sk_live_") || secretKey.startsWith("sk_test_") || secretKey.startsWith("rk_"));
+
+        this.configured = isValidKey;
+
         if (!this.configured) {
-            console.warn("STRIPE_SECRET_KEY is not set. Stripe calls will be stubbed.");
+            const isProduction = process.env.NODE_ENV === "production";
+            const message = "STRIPE_SECRET_KEY is not configured or invalid. Payment processing is disabled.";
+
+            if (isProduction) {
+                console.error(`[STRIPE] ${message} Set a valid Stripe secret key to enable payments.`);
+            } else {
+                console.warn(`[STRIPE] ${message}`);
+            }
+        } else {
+            // Only create Stripe instance if we have a valid key
+            this.stripe = new Stripe(secretKey!, {
+                apiVersion: this.apiVersion,
+            });
+            console.log("[STRIPE] Initialized with valid API key");
         }
-        this.stripe = new Stripe(secretKey || "sk_test_placeholder", {
-            apiVersion: this.apiVersion,
-        });
     }
 
     isConfigured() {
         return this.configured;
     }
 
-    private assertConfigured(action: string) {
-        if (!this.configured) {
+    private assertConfigured(action: string): Stripe {
+        if (!this.configured || !this.stripe) {
             throw new Error(`Stripe is not configured; cannot ${action}. Set STRIPE_SECRET_KEY to enable payments.`);
         }
+        return this.stripe;
     }
 
     async createPaymentIntent(
@@ -39,12 +58,12 @@ export class StripeService {
         idempotencyKey?: string,
         threeDsPolicy: 'automatic' | 'any' = 'automatic'
     ) {
-        this.assertConfigured("create payment intents");
+        const stripe = this.assertConfigured("create payment intents");
         const requestOptions: Stripe.RequestOptions = {};
         if (idempotencyKey) {
             requestOptions.idempotencyKey = idempotencyKey;
         }
-        return this.stripe.paymentIntents.create({
+        return stripe.paymentIntents.create({
             amount: amountCents,
             currency,
             metadata,
@@ -67,17 +86,17 @@ export class StripeService {
     }
 
     async listBalanceTransactionsForPayout(payoutId: string, stripeAccountId: string) {
-        this.assertConfigured("list balance transactions");
-        return this.stripe.balanceTransactions.list(
+        const stripe = this.assertConfigured("list balance transactions");
+        return stripe.balanceTransactions.list(
             { payout: payoutId, limit: 100 },
             { stripeAccount: stripeAccountId }
         );
     }
 
     async listPayouts(stripeAccountId: string, sinceSeconds: number = 7 * 24 * 3600) {
-        this.assertConfigured("list payouts");
+        const stripe = this.assertConfigured("list payouts");
         const now = Math.floor(Date.now() / 1000);
-        return this.stripe.payouts.list(
+        return stripe.payouts.list(
             {
                 arrival_date: { gte: now - sinceSeconds },
                 limit: 100
@@ -87,8 +106,8 @@ export class StripeService {
     }
 
     async createSetupIntent(stripeAccountId: string, metadata: Record<string, string>, paymentMethodTypes: string[]) {
-        this.assertConfigured("create setup intents");
-        return this.stripe.setupIntents.create(
+        const stripe = this.assertConfigured("create setup intents");
+        return stripe.setupIntents.create(
             {
                 usage: "off_session",
                 payment_method_types: paymentMethodTypes,
@@ -99,7 +118,7 @@ export class StripeService {
     }
 
     async retrieveAccountCapabilities(stripeAccountId: string) {
-        if (!this.configured) {
+        if (!this.configured || !this.stripe) {
             // Stubbed when keys are not configured; return undefined to signal skip.
             return undefined;
         }
@@ -116,19 +135,20 @@ export class StripeService {
     }
 
     constructEventFromPayload(signature: string, payload: Buffer) {
+        const stripe = this.assertConfigured("construct webhook events");
         const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
         if (!webhookSecret) {
             throw new Error("STRIPE_WEBHOOK_SECRET is not set");
         }
-        return this.stripe.webhooks.constructEvent(payload, signature, webhookSecret);
+        return stripe.webhooks.constructEvent(payload, signature, webhookSecret);
     }
 
     /**
      * Retrieve the current status and details of a payment intent
      */
     async retrievePaymentIntent(paymentIntentId: string) {
-        this.assertConfigured("retrieve payment intents");
-        return this.stripe.paymentIntents.retrieve(paymentIntentId);
+        const stripe = this.assertConfigured("retrieve payment intents");
+        return stripe.paymentIntents.retrieve(paymentIntentId);
     }
 
     /**
@@ -138,7 +158,7 @@ export class StripeService {
      * @param idempotencyKey - Optional idempotency key for safe retries
      */
     async capturePaymentIntent(paymentIntentId: string, amountCents?: number, idempotencyKey?: string) {
-        this.assertConfigured("capture payment intents");
+        const stripe = this.assertConfigured("capture payment intents");
         const captureParams: Stripe.PaymentIntentCaptureParams = {};
         if (amountCents !== undefined) {
             captureParams.amount_to_capture = amountCents;
@@ -147,7 +167,7 @@ export class StripeService {
         if (idempotencyKey) {
             requestOptions.idempotencyKey = idempotencyKey;
         }
-        return this.stripe.paymentIntents.capture(paymentIntentId, captureParams, requestOptions);
+        return stripe.paymentIntents.capture(paymentIntentId, captureParams, requestOptions);
     }
 
     /**
@@ -163,7 +183,7 @@ export class StripeService {
         reason?: 'duplicate' | 'fraudulent' | 'requested_by_customer',
         idempotencyKey?: string
     ) {
-        this.assertConfigured("create refunds");
+        const stripe = this.assertConfigured("create refunds");
         const refundParams: Stripe.RefundCreateParams = {
             payment_intent: paymentIntentId,
         };
@@ -177,7 +197,7 @@ export class StripeService {
         if (idempotencyKey) {
             requestOptions.idempotencyKey = idempotencyKey;
         }
-        return this.stripe.refunds.create(refundParams, requestOptions);
+        return stripe.refunds.create(refundParams, requestOptions);
     }
 
     /**
@@ -190,8 +210,8 @@ export class StripeService {
         currency: string,
         metadata?: Record<string, string>
     ) {
-        this.assertConfigured("create payment intents with hold");
-        return this.stripe.paymentIntents.create({
+        const stripe = this.assertConfigured("create payment intents with hold");
+        return stripe.paymentIntents.create({
             amount: amountCents,
             currency,
             metadata,
@@ -203,8 +223,8 @@ export class StripeService {
     }
 
     async createExpressAccount(email?: string, metadata?: Record<string, string>) {
-        this.assertConfigured("create accounts");
-        return this.stripe.accounts.create({
+        const stripe = this.assertConfigured("create accounts");
+        return stripe.accounts.create({
             type: "express",
             email,
             metadata,
@@ -216,8 +236,8 @@ export class StripeService {
     }
 
     async createAccountOnboardingLink(accountId: string, returnUrl: string, refreshUrl: string) {
-        this.assertConfigured("create account onboarding links");
-        return this.stripe.accountLinks.create({
+        const stripe = this.assertConfigured("create account onboarding links");
+        return stripe.accountLinks.create({
             account: accountId,
             refresh_url: refreshUrl,
             return_url: returnUrl,

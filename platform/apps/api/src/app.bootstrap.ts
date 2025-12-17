@@ -22,9 +22,43 @@ export async function createApp(): Promise<INestApplication> {
         bodyParser: false
     });
 
-    // CORS configuration
+    // CORS configuration - environment-aware
+    const allowedOrigins = [
+        // Production frontend
+        "https://campreservweb-production.up.railway.app",
+        // Development
+        "http://localhost:3000",
+        "http://localhost:3001",
+        "http://localhost:3002",
+        "http://localhost:5173",
+        "http://127.0.0.1:3000",
+    ];
+
+    // Add custom allowed origins from environment
+    const envOrigins = process.env.CORS_ALLOWED_ORIGINS?.split(",").filter(Boolean) || [];
+    allowedOrigins.push(...envOrigins);
+
     app.enableCors({
-        origin: true,
+        origin: (origin, callback) => {
+            // Allow requests with no origin (mobile apps, Postman, etc.)
+            if (!origin) {
+                return callback(null, true);
+            }
+            // Allow ngrok and other dev tunnels
+            if (origin.includes("ngrok") || origin.includes("railway.app") || origin.includes("localhost")) {
+                return callback(null, true);
+            }
+            // Check explicit whitelist
+            if (allowedOrigins.includes(origin)) {
+                return callback(null, true);
+            }
+            // Reject unknown origins in production
+            if (process.env.NODE_ENV === "production") {
+                return callback(new Error(`Origin ${origin} not allowed by CORS`), false);
+            }
+            // Allow in development
+            return callback(null, true);
+        },
         credentials: true,
         methods: "GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS",
         allowedHeaders: [
@@ -42,27 +76,6 @@ export async function createApp(): Promise<INestApplication> {
         ],
         optionsSuccessStatus: 204,
         preflightContinue: false,
-    });
-
-    // CORS middleware for dev/ngrok
-    app.use((req: Request, res: Response, next: NextFunction) => {
-        const origin = req.headers.origin || "*";
-        res.header("Access-Control-Allow-Origin", origin as string);
-        res.header("Vary", "Origin");
-        res.header(
-            "Access-Control-Allow-Headers",
-            (req.headers["access-control-request-headers"] as string) ||
-            "Content-Type, Authorization, X-Campground-Id, X-Organization-Id, X-Portfolio-Id, X-Park-Id, X-Locale, X-Currency, X-Client, Accept, X-Requested-With"
-        );
-        res.header(
-            "Access-Control-Allow-Methods",
-            (req.headers["access-control-request-method"] as string) || "GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS"
-        );
-        res.header("Access-Control-Allow-Credentials", "true");
-        if (req.method === "OPTIONS") {
-            return res.status(204).send();
-        }
-        next();
     });
 
     app.setGlobalPrefix("api");
@@ -96,15 +109,20 @@ export async function createApp(): Promise<INestApplication> {
         })
     );
 
-    // Global interceptors - TEMPORARILY DISABLED for Railway deployment
-    // TODO: Re-enable after fixing ObservabilityService initialization
-    // const perfService = app.get(PerfService);
-    // const rateLimitService = app.get(RateLimitService);
-    // const observabilityService = app.get(ObservabilityService);
-    // app.useGlobalInterceptors(
-    //     new RateLimitInterceptor(rateLimitService, perfService),
-    //     new PerfInterceptor(perfService, observabilityService)
-    // );
+    // Global interceptors for rate limiting and performance monitoring
+    try {
+        const perfService = app.get(PerfService);
+        const rateLimitService = app.get(RateLimitService);
+        const observabilityService = app.get(ObservabilityService);
+        app.useGlobalInterceptors(
+            new RateLimitInterceptor(rateLimitService, perfService),
+            new PerfInterceptor(perfService, observabilityService)
+        );
+        console.log("[BOOTSTRAP] Global interceptors enabled: RateLimit, Perf");
+    } catch (err) {
+        console.error("[BOOTSTRAP] Failed to initialize global interceptors:", err);
+        // Continue without interceptors rather than crashing
+    }
 
     return app;
 }
