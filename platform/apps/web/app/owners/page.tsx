@@ -6,7 +6,9 @@ import { SocialProof } from '@/components/marketing/SocialProof';
 import { DemoCTA } from '@/components/marketing/DemoCTA';
 import { Testimonials } from '@/components/marketing/Testimonials';
 import { PricingPreview } from '@/components/marketing/PricingPreview';
+import { AiFeatures } from '@/components/marketing/AiFeatures';
 import { Footer } from '@/components/marketing/Footer';
+
 
 export const metadata: Metadata = {
   title: 'Camp Everyday Host - Campground Management Software',
@@ -32,18 +34,21 @@ export default function OwnersPage() {
 
       {/* Popular Features Showcase */}
       <section id="resources">
-      <PopularFeatures />
+        <PopularFeatures />
       </section>
 
       {/* Testimonials */}
       <section id="about">
-      <Testimonials />
+        <Testimonials />
       </section>
 
       {/* Pricing Preview */}
       <section id="pricing">
-      <PricingPreview />
+        <PricingPreview />
       </section>
+
+      {/* AI Features */}
+      <AiFeatures />
 
       {/* Demo CTA */}
       <DemoCTA />
