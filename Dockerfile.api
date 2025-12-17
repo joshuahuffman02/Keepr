@@ -1,5 +1,5 @@
-FROM node:22-alpine AS base
-# Build: 2025-12-17 - Railway cache buster v8 - Docker Hub fix
+FROM node:lts-alpine AS base
+# Build: 2025-12-17 - Railway cache buster v9 - Try lts-alpine
 RUN corepack enable && corepack prepare pnpm@7.33.6 --activate
 WORKDIR /app
 RUN echo "Dockerfile.api v7 - TSC FIX for decorator metadata" > /tmp/build-info
