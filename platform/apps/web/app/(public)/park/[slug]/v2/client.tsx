@@ -6,7 +6,7 @@ import { useSearchParams } from "next/navigation";
 import { useMemo, useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { apiClient } from "@/lib/api-client";
-import { ArrowRight, Calendar, MapPin, Search, Sparkles, Users } from "lucide-react";
+import { ArrowRight, Calendar, MapPin, Search, Sparkles, Users, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
@@ -15,6 +15,11 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Breadcrumbs } from "@/components/ui/breadcrumbs";
 import { trackEvent } from "@/lib/analytics";
 import { AiChatWidget } from "@/components/ai/AiChatWidget";
+import { TrustBadges } from "@/components/public/TrustBadges";
+import { FeaturedReview } from "@/components/public/FeaturedReview";
+import { WhyBookDirect } from "@/components/public/WhyBookDirect";
+import { StickyBookingBar } from "@/components/public/StickyBookingBar";
+import { ScarcityBadge } from "@/components/public/ScarcityIndicator";
 
 type PublicCampgroundDetail = Awaited<ReturnType<typeof apiClient.getPublicCampground>>;
 
@@ -173,6 +178,9 @@ export function CampgroundV2Client({ slug, initialData }: { slug: string; initia
                 </Button>
               </div>
             </div>
+
+            {/* Trust badges */}
+            <TrustBadges variant="compact" className="mt-4 justify-center text-white/90" />
           </div>
         </div>
       </section>
@@ -224,6 +232,29 @@ export function CampgroundV2Client({ slug, initialData }: { slug: string; initia
             )}
           </Card>
         </section>
+
+        {/* Featured Review - highlight top review */}
+        {reviews && reviews.length > 0 && (reviews[0] as any).rating >= 4 && (
+          <section className="grid md:grid-cols-3 gap-4">
+            <div className="md:col-span-2">
+              <FeaturedReview
+                review={{
+                  id: (reviews[0] as any).id,
+                  rating: (reviews[0] as any).rating || 5,
+                  comment: (reviews[0] as any).comment || "",
+                  guestName: (reviews[0] as any).reviewerName || "Guest",
+                  stayDate: (reviews[0] as any).stayDate,
+                  isVerified: true,
+                }}
+                variant="light"
+                className="h-full"
+              />
+            </div>
+            <div className="hidden md:block">
+              <WhyBookDirect variant="compact" />
+            </div>
+          </section>
+        )}
 
         {/* FAQ + Reviews side rail */}
         <section id="faq" className="grid gap-6 lg:grid-cols-3">
@@ -364,7 +395,10 @@ export function CampgroundV2Client({ slug, initialData }: { slug: string; initia
             <div className="text-sm text-slate-500">Based on your dates and filters</div>
           </div>
           <div className="grid gap-4 md:grid-cols-2">
-            {filteredSiteClasses.map((sc: any) => (
+            {filteredSiteClasses.map((sc: any, idx: number) => {
+              // Stub scarcity data - in production this would come from availability API
+              const stubbedAvailability = [3, 5, 2, 8, 4, 1, 6, 7][idx % 8];
+              return (
               <Card key={sc.id} className="overflow-hidden border-slate-200 hover:shadow-lg transition">
                 <div className="relative h-48 w-full bg-slate-100">
                   <Image src={sc.photoUrl || hero || "/placeholder.png"} alt={`${sc.name} site`} fill className="object-cover" />
@@ -374,6 +408,12 @@ export function CampgroundV2Client({ slug, initialData }: { slug: string; initia
                     </Badge>
                     {sc.petFriendly && <Badge variant="secondary" className="bg-emerald-600 text-white border-emerald-500">Pet friendly</Badge>}
                   </div>
+                  {/* Scarcity badge for limited availability */}
+                  {stubbedAvailability <= 5 && (
+                    <div className="absolute top-3 right-3">
+                      <ScarcityBadge sitesLeft={stubbedAvailability} />
+                    </div>
+                  )}
                 </div>
                 <div className="p-4 space-y-2">
                   <div className="flex items-center justify-between">
@@ -414,7 +454,8 @@ export function CampgroundV2Client({ slug, initialData }: { slug: string; initia
                   </div>
                 </div>
               </Card>
-            ))}
+              );
+            })}
             {filteredSiteClasses.length === 0 && (
               <Card className="p-6 text-center text-slate-600 space-y-2">
                 <div>No stays match these filters.</div>
@@ -444,8 +485,26 @@ export function CampgroundV2Client({ slug, initialData }: { slug: string; initia
         )}
       </main>
 
+      {/* Why Book Direct - full section */}
+      <WhyBookDirect campgroundName={campground?.name} />
+
       {/* AI Chat Widget */}
       {campground?.id && <AiChatWidget campgroundId={campground.id} campgroundName={campground.name} />}
+
+      {/* Sticky Booking Bar - mobile only */}
+      <StickyBookingBar
+        campgroundName={campground?.name || "Campground"}
+        priceFrom={siteClasses.length > 0 ? Math.min(...siteClasses.map((sc: any) => (sc.defaultRate || 0) / 100)) : undefined}
+        onBookClick={() => {
+          trackEvent("sticky_booking_cta", { campgroundId: campground?.id, page: `/park/${slug}/v2` });
+          const q = new URLSearchParams({
+            arrivalDate,
+            departureDate,
+            guests
+          }).toString();
+          window.location.href = `/park/${slug}/book?${q}`;
+        }}
+      />
     </div>
   );
 }

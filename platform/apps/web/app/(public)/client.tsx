@@ -3,11 +3,15 @@
 import { useQuery } from "@tanstack/react-query";
 import { useState, useMemo, useEffect } from "react";
 import Link from "next/link";
-import { SearchBar } from "../../components/public/SearchBar";
 import { CampgroundCard } from "../../components/public/CampgroundCard";
 import { apiClient } from "../../lib/api-client";
 import { trackEvent } from "@/lib/analytics";
 import { LeadCaptureForm } from "../../components/marketing/LeadCaptureForm";
+import { HeroBanner } from "../../components/public/HeroBanner";
+import { ValueStack } from "../../components/public/ValueStack";
+import { UrgencySection } from "../../components/public/UrgencySection";
+import { CamperTestimonials } from "../../components/public/CamperTestimonials";
+import { OwnerCTA } from "../../components/public/OwnerCTA";
 
 // Sample external campgrounds to mix with internal ones
 const externalCampgrounds = [
@@ -193,57 +197,11 @@ export function HomeClient() {
 
     return (
         <div className="min-h-screen max-w-[480px] mx-auto sm:max-w-none sm:mx-0">
-            {/* Hero Section */}
-            <section className="relative overflow-hidden">
-                {/* Background gradient */}
-                <div className="absolute inset-0 bg-gradient-to-br from-emerald-600 via-teal-600 to-cyan-700" />
-
-                {/* Decorative elements */}
-                <div className="absolute inset-0 overflow-hidden">
-                    <div className="absolute -top-40 -right-40 w-80 h-80 bg-white/10 rounded-full blur-3xl" />
-                    <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-white/10 rounded-full blur-3xl" />
-                    <svg className="absolute bottom-0 left-0 right-0 text-white/5" viewBox="0 0 1440 320">
-                        <path fill="currentColor" d="M0,192L48,197.3C96,203,192,213,288,229.3C384,245,480,267,576,250.7C672,235,768,181,864,181.3C960,181,1056,235,1152,234.7C1248,235,1344,181,1392,154.7L1440,128L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z" />
-                    </svg>
-                </div>
-
-                {/* Content */}
-                <div className="relative max-w-7xl mx-auto px-6 py-24 md:py-32">
-                    <div className="text-center mb-12">
-                        <h1 className="text-4xl md:text-6xl font-bold text-white mb-6 leading-tight">
-                            Find Your Perfect
-                            <span className="block bg-gradient-to-r from-amber-300 to-orange-300 bg-clip-text text-transparent">
-                                Camping Adventure with Camp Everyday
-                            </span>
-                        </h1>
-                        <p className="text-lg md:text-xl text-white/80 max-w-2xl mx-auto">
-                            Discover amazing campgrounds, RV parks, and cabins across the country.
-                            Book your next outdoor escape today.
-                        </p>
-                    </div>
-
-                    <SearchBar onSearch={handleSearch} />
-
-                    {/* Quick stats */}
-                    <div className="mt-16 grid grid-cols-3 gap-8 max-w-2xl mx-auto">
-                        <div className="text-center">
-                            <div className="text-3xl md:text-4xl font-bold text-white">500+</div>
-                            <div className="text-sm text-white/70">Campgrounds</div>
-                        </div>
-                        <div className="text-center">
-                            <div className="text-3xl md:text-4xl font-bold text-white">50K+</div>
-                            <div className="text-sm text-white/70">Happy Campers</div>
-                        </div>
-                        <div className="text-center">
-                            <div className="text-3xl md:text-4xl font-bold text-white">4.8★</div>
-                            <div className="text-sm text-white/70">Avg Rating</div>
-                        </div>
-                    </div>
-                </div>
-            </section>
+            {/* Hero Section with Hormozi-style messaging */}
+            <HeroBanner onSearch={handleSearch} />
 
             {/* Featured Campgrounds */}
-            <section className="max-w-7xl mx-auto px-6 py-16">
+            <section id="featured" className="max-w-7xl mx-auto px-6 py-16">
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-8">
                     <div>
                         <h2 className="text-2xl md:text-3xl font-bold text-slate-900">
@@ -323,61 +281,32 @@ export function HomeClient() {
                 )}
             </section>
 
-            {/* Why Camp Everyday Section */}
-            <section className="bg-slate-50 py-20">
-                <div className="max-w-7xl mx-auto px-6">
-                    <div className="text-center mb-12">
-                        <h2 className="text-2xl md:text-3xl font-bold text-slate-900 mb-4">
-                            Why Choose Camp Everyday?
-                        </h2>
-                        <p className="text-slate-600 max-w-2xl mx-auto">
-                            We partner with the best campgrounds to bring you verified listings,
-                            instant booking, and premium outdoor experiences.
-                        </p>
-                    </div>
+            {/* Value Stack - Why Book With Camp Everyday */}
+            <ValueStack />
 
-                    <div className="grid md:grid-cols-3 gap-8">
-                        <div className="bg-white rounded-2xl p-8 shadow-lg shadow-slate-900/5">
-                            <div className="w-14 h-14 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-xl flex items-center justify-center mb-6 shadow-lg shadow-emerald-500/20">
-                                <svg className="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                </svg>
-                            </div>
-                            <h3 className="text-xl font-bold text-slate-900 mb-3">Verified Listings</h3>
-                            <p className="text-slate-600">
-                                All campgrounds marked "Verified" are personally vetted for quality,
-                                amenities, and guest satisfaction.
-                            </p>
-                        </div>
+            {/* Urgency Section - Popular This Weekend */}
+            <UrgencySection
+                campgrounds={allCampgrounds.map((cg) => ({
+                    id: cg.id,
+                    name: cg.name,
+                    slug: "slug" in cg ? cg.slug : undefined,
+                    city: cg.city || undefined,
+                    state: cg.state || undefined,
+                    country: "country" in cg ? (cg.country || undefined) : undefined,
+                    heroImageUrl: "heroImageUrl" in cg ? (cg.heroImageUrl || undefined) : undefined,
+                    isInternal: cg.isInternal,
+                    rating: cg.rating,
+                    reviewCount: cg.reviewCount,
+                    pricePerNight: "pricePerNight" in cg ? cg.pricePerNight : undefined,
+                    amenities: "amenities" in cg ? cg.amenities : [],
+                    npsBadge: cg.npsBadge,
+                    pastAwards: "pastAwards" in cg ? cg.pastAwards : [],
+                    availableSites: Math.floor(Math.random() * 8) + 1, // Stubbed for now
+                }))}
+            />
 
-                        <div className="bg-white rounded-2xl p-8 shadow-lg shadow-slate-900/5">
-                            <div className="w-14 h-14 bg-gradient-to-br from-violet-500 to-purple-600 rounded-xl flex items-center justify-center mb-6 shadow-lg shadow-violet-500/20">
-                                <svg className="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                                </svg>
-                            </div>
-                            <h3 className="text-xl font-bold text-slate-900 mb-3">Instant Booking</h3>
-                            <p className="text-slate-600">
-                                Book your perfect site in seconds. Real-time availability,
-                                instant confirmation, zero hassle.
-                            </p>
-                        </div>
-
-                        <div className="bg-white rounded-2xl p-8 shadow-lg shadow-slate-900/5">
-                            <div className="w-14 h-14 bg-gradient-to-br from-amber-500 to-orange-600 rounded-xl flex items-center justify-center mb-6 shadow-lg shadow-amber-500/20">
-                                <svg className="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-                                </svg>
-                            </div>
-                            <h3 className="text-xl font-bold text-slate-900 mb-3">Best Price Promise</h3>
-                            <p className="text-slate-600">
-                                Find a lower price? We'll match it. Plus, exclusive deals and
-                                discounts for our members.
-                            </p>
-                        </div>
-                    </div>
-                </div>
-            </section>
+            {/* Camper Testimonials - Social Proof Wall */}
+            <CamperTestimonials />
 
             {/* Demo request */}
             <section className="bg-white py-16 border-y border-slate-100">
@@ -497,32 +426,8 @@ export function HomeClient() {
                 </div>
             </section>
 
-            {/* CTA Section */}
-            <section className="py-20">
-                <div className="max-w-4xl mx-auto px-6 text-center">
-                    <h2 className="text-2xl md:text-3xl font-bold text-slate-900 mb-4">
-                        Own a Campground?
-                    </h2>
-                    <p className="text-slate-600 mb-8 max-w-2xl mx-auto">
-                        Join hundreds of campground owners who use Camp Everyday Host to manage reservations,
-                        streamline operations, and grow their business.
-                    </p>
-                    <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-                        <a
-                            href="/auth/signin?callbackUrl=/dashboard"
-                            className="px-8 py-4 bg-gradient-to-r from-emerald-600 to-teal-600 text-white font-semibold rounded-xl hover:from-emerald-500 hover:to-teal-500 transition-all shadow-lg shadow-emerald-500/20 hover:shadow-emerald-500/30"
-                        >
-                            Get Started Free
-                        </a>
-                        <a
-                            href="/owners"
-                            className="px-8 py-4 text-slate-700 font-semibold border border-slate-200 rounded-xl hover:bg-slate-50 transition-colors"
-                        >
-                            Learn More
-                        </a>
-                    </div>
-                </div>
-            </section>
+            {/* Owner CTA Section */}
+            <OwnerCTA />
         </div>
     );
 }
