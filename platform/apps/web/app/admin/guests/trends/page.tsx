@@ -259,9 +259,14 @@ export default function GuestTrendsPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-white">Guest Trends</h1>
+          <div className="flex items-center gap-3">
+            <h1 className="text-2xl font-bold text-white">Guest Trends</h1>
+            <Badge className="bg-amber-600/20 text-amber-400 border border-amber-600/50">
+              Demo Data
+            </Badge>
+          </div>
           <p className="text-slate-400 mt-1">
-            Track guest behavior patterns and booking trends over time
+            Showing sample trends — real data will appear once you have reservations
           </p>
         </div>
         <div className="flex items-center gap-3">

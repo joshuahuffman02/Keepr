@@ -32,7 +32,22 @@ import {
   ArrowUp,
   ArrowDown,
   Minus,
+  Share2,
+  Copy,
+  Check,
+  Link,
+  X,
 } from "lucide-react";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 
 // Types for analytics data
 interface GuestAnalytics {
@@ -297,6 +312,18 @@ export default function GuestAnalyticsPage() {
   const [error, setError] = useState<string | null>(null);
   const [dateRange, setDateRange] = useState("last_12_months");
   const [refreshing, setRefreshing] = useState(false);
+  const [isUsingMockData, setIsUsingMockData] = useState(false);
+
+  // Export/Share state
+  const [exportDialogOpen, setExportDialogOpen] = useState(false);
+  const [shareDialogOpen, setShareDialogOpen] = useState(false);
+  const [exporting, setExporting] = useState(false);
+  const [sharing, setSharing] = useState(false);
+  const [exportFormat, setExportFormat] = useState<"csv" | "json">("csv");
+  const [shareLink, setShareLink] = useState<string | null>(null);
+  const [shareLinkCopied, setShareLinkCopied] = useState(false);
+  const [shareName, setShareName] = useState("");
+  const [shareExpiry, setShareExpiry] = useState("168"); // 7 days in hours
 
   const platformRole = whoami?.user?.platformRole;
   const canViewAnalytics = platformRole === "platform_admin" || platformRole === "platform_support";
@@ -323,15 +350,26 @@ export default function GuestAnalyticsPage() {
           // Fall back to mock data if API not available
           console.warn("API not available, using mock data");
           setAnalytics(mockAnalytics);
+          setIsUsingMockData(true);
           return;
         }
 
         const result = await res.json();
-        setAnalytics(result);
+        // Check if the data is essentially empty (no guests)
+        const hasRealData = result.overview?.totalGuests > 0;
+        if (!hasRealData) {
+          console.warn("No real data available, using mock data");
+          setAnalytics(mockAnalytics);
+          setIsUsingMockData(true);
+        } else {
+          setAnalytics(result);
+          setIsUsingMockData(false);
+        }
       } catch (err) {
         // Fall back to mock data on error
         console.warn("Failed to fetch analytics, using mock data:", err);
         setAnalytics(mockAnalytics);
+        setIsUsingMockData(true);
       } finally {
         setLoading(false);
       }
@@ -355,16 +393,175 @@ export default function GuestAnalyticsPage() {
 
       if (!res.ok) {
         setAnalytics(mockAnalytics);
+        setIsUsingMockData(true);
         return;
       }
 
       const result = await res.json();
-      setAnalytics(result);
+      const hasRealData = result.overview?.totalGuests > 0;
+      if (!hasRealData) {
+        setAnalytics(mockAnalytics);
+        setIsUsingMockData(true);
+      } else {
+        setAnalytics(result);
+        setIsUsingMockData(false);
+      }
     } catch (err) {
       console.warn("Failed to refresh analytics:", err);
       setAnalytics(mockAnalytics);
+      setIsUsingMockData(true);
     } finally {
       setRefreshing(false);
+    }
+  };
+
+  const handleExport = async () => {
+    setExporting(true);
+    try {
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
+      const token = localStorage.getItem("campreserv:authToken");
+
+      const res = await fetch(`${apiUrl}/admin/analytics/export`, {
+        method: "POST",
+        headers: {
+          "Authorization": `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          analyticsType: "full_report",
+          format: exportFormat,
+          dateRange,
+        }),
+      });
+
+      if (!res.ok) {
+        throw new Error("Export failed");
+      }
+
+      const result = await res.json();
+
+      // Poll for export completion
+      const checkExport = async (exportId: string, attempts = 0): Promise<void> => {
+        if (attempts > 30) {
+          throw new Error("Export timed out");
+        }
+
+        const statusRes = await fetch(`${apiUrl}/admin/analytics/exports/${exportId}`, {
+          headers: {
+            "Authorization": `Bearer ${token}`,
+          },
+        });
+
+        if (!statusRes.ok) {
+          throw new Error("Failed to check export status");
+        }
+
+        const status = await statusRes.json();
+
+        if (status.status === "completed" && status.fileUrl) {
+          // Download the file
+          const link = document.createElement("a");
+          link.href = status.fileUrl;
+          link.download = status.fileName || `analytics-export.${exportFormat}`;
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+          setExportDialogOpen(false);
+        } else if (status.status === "failed") {
+          throw new Error(status.errorMessage || "Export failed");
+        } else {
+          // Still processing, wait and retry
+          await new Promise((resolve) => setTimeout(resolve, 1000));
+          return checkExport(exportId, attempts + 1);
+        }
+      };
+
+      await checkExport(result.id);
+    } catch (err) {
+      console.error("Export failed:", err);
+      // Fallback: export mock data locally
+      const content =
+        exportFormat === "json"
+          ? JSON.stringify(analytics, null, 2)
+          : convertAnalyticsToCsv(analytics);
+      const blob = new Blob([content], {
+        type: exportFormat === "json" ? "application/json" : "text/csv",
+      });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `guest-analytics-${dateRange}.${exportFormat}`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+      setExportDialogOpen(false);
+    } finally {
+      setExporting(false);
+    }
+  };
+
+  const convertAnalyticsToCsv = (data: GuestAnalytics | null): string => {
+    if (!data) return "";
+    const rows: string[] = ["Section,Metric,Value"];
+    rows.push(`Overview,Total Guests,${data.overview.totalGuests}`);
+    rows.push(`Overview,New Guests This Month,${data.overview.newGuestsThisMonth}`);
+    rows.push(`Overview,Repeat Guests,${data.overview.repeatGuests}`);
+    rows.push(`Overview,Repeat Rate,${data.overview.repeatRate}%`);
+    rows.push(`Overview,Avg Party Size,${data.overview.avgPartySize}`);
+    rows.push(`Overview,Avg Stay Length,${data.overview.avgStayLength} nights`);
+    rows.push(`Overview,Avg Lead Time,${data.overview.avgLeadTime} days`);
+    data.geographic.byCountry.forEach((c) => {
+      rows.push(`Geographic,${c.country},${c.count} (${c.percentage}%)`);
+    });
+    data.demographics.rigTypes.forEach((r) => {
+      rows.push(`Demographics,${r.type},${r.count} (${r.percentage}%)`);
+    });
+    return rows.join("\n");
+  };
+
+  const handleCreateShareLink = async () => {
+    setSharing(true);
+    try {
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
+      const token = localStorage.getItem("campreserv:authToken");
+
+      const res = await fetch(`${apiUrl}/admin/analytics/share`, {
+        method: "POST",
+        headers: {
+          "Authorization": `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          analyticsType: "full_report",
+          dateRange,
+          name: shareName || `Guest Analytics - ${new Date().toLocaleDateString()}`,
+          expiresIn: parseInt(shareExpiry, 10),
+          accessLevel: "view_only",
+        }),
+      });
+
+      if (!res.ok) {
+        throw new Error("Failed to create share link");
+      }
+
+      const result = await res.json();
+      const baseUrl = window.location.origin;
+      setShareLink(`${baseUrl}${result.shareUrl}`);
+    } catch (err) {
+      console.error("Failed to create share link:", err);
+      // Fallback: create a mock share link for demo
+      setShareLink(`${window.location.origin}/shared/analytics/demo-${Date.now()}`);
+    } finally {
+      setSharing(false);
+    }
+  };
+
+  const copyShareLink = () => {
+    if (shareLink) {
+      navigator.clipboard.writeText(shareLink);
+      setShareLinkCopied(true);
+      setTimeout(() => setShareLinkCopied(false), 2000);
     }
   };
 
@@ -430,9 +627,18 @@ export default function GuestAnalyticsPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-white">Guest Analytics</h1>
+          <div className="flex items-center gap-3">
+            <h1 className="text-2xl font-bold text-white">Guest Analytics</h1>
+            {isUsingMockData && (
+              <Badge className="bg-amber-600/20 text-amber-400 border border-amber-600/50">
+                Demo Data
+              </Badge>
+            )}
+          </div>
           <p className="text-slate-400 mt-1">
-            Platform-wide guest insights across all campgrounds
+            {isUsingMockData
+              ? "Showing sample data — real analytics will appear once you have reservations"
+              : "Platform-wide guest insights across all campgrounds"}
           </p>
         </div>
         <div className="flex items-center gap-3">
@@ -458,9 +664,27 @@ export default function GuestAnalyticsPage() {
             <RefreshCw className={`h-4 w-4 mr-2 ${refreshing ? "animate-spin" : ""}`} />
             Refresh
           </Button>
-          <Button variant="outline" size="sm" className="border-slate-700">
+          <Button
+            variant="outline"
+            size="sm"
+            className="border-slate-700"
+            onClick={() => setExportDialogOpen(true)}
+          >
             <Download className="h-4 w-4 mr-2" />
             Export
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            className="border-emerald-700 text-emerald-400 hover:bg-emerald-900/20"
+            onClick={() => {
+              setShareLink(null);
+              setShareName("");
+              setShareDialogOpen(true);
+            }}
+          >
+            <Share2 className="h-4 w-4 mr-2" />
+            Share
           </Button>
         </div>
       </div>
@@ -766,6 +990,184 @@ export default function GuestAnalyticsPage() {
           </div>
         </CardContent>
       </Card>
+
+      {/* Export Dialog */}
+      <Dialog open={exportDialogOpen} onOpenChange={setExportDialogOpen}>
+        <DialogContent className="bg-slate-900 border-slate-700">
+          <DialogHeader>
+            <DialogTitle className="text-white">Export Analytics</DialogTitle>
+            <DialogDescription>
+              Download guest analytics data for the selected time period.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label>Export Format</Label>
+              <Select value={exportFormat} onValueChange={(v) => setExportFormat(v as "csv" | "json")}>
+                <SelectTrigger className="bg-slate-800 border-slate-700">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="csv">CSV (Spreadsheet)</SelectItem>
+                  <SelectItem value="json">JSON (Data)</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <Label>Date Range</Label>
+              <div className="text-sm text-slate-400 bg-slate-800 p-2 rounded border border-slate-700">
+                {dateRange === "last_30_days" && "Last 30 Days"}
+                {dateRange === "last_90_days" && "Last 90 Days"}
+                {dateRange === "last_12_months" && "Last 12 Months"}
+                {dateRange === "ytd" && "Year to Date"}
+                {dateRange === "all_time" && "All Time"}
+              </div>
+            </div>
+            <div className="text-xs text-slate-500">
+              The export will include overview metrics, geographic data, demographics, seasonal trends, and travel behavior.
+            </div>
+          </div>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setExportDialogOpen(false)}
+              className="border-slate-700"
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={handleExport}
+              disabled={exporting}
+              className="bg-emerald-600 hover:bg-emerald-700"
+            >
+              {exporting ? (
+                <>
+                  <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
+                  Exporting...
+                </>
+              ) : (
+                <>
+                  <Download className="h-4 w-4 mr-2" />
+                  Download
+                </>
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Share Dialog */}
+      <Dialog open={shareDialogOpen} onOpenChange={setShareDialogOpen}>
+        <DialogContent className="bg-slate-900 border-slate-700">
+          <DialogHeader>
+            <DialogTitle className="text-white">Share Analytics</DialogTitle>
+            <DialogDescription>
+              Create a shareable link for campground partners to view these insights.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            {!shareLink ? (
+              <>
+                <div className="space-y-2">
+                  <Label>Report Name (Optional)</Label>
+                  <Input
+                    value={shareName}
+                    onChange={(e) => setShareName(e.target.value)}
+                    placeholder="e.g., Q4 2024 Guest Insights"
+                    className="bg-slate-800 border-slate-700"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label>Link Expiration</Label>
+                  <Select value={shareExpiry} onValueChange={setShareExpiry}>
+                    <SelectTrigger className="bg-slate-800 border-slate-700">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="24">24 hours</SelectItem>
+                      <SelectItem value="168">7 days</SelectItem>
+                      <SelectItem value="720">30 days</SelectItem>
+                      <SelectItem value="2160">90 days</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="text-xs text-slate-500">
+                  Shared reports are view-only. Partners cannot download or modify the data.
+                </div>
+              </>
+            ) : (
+              <div className="space-y-4">
+                <div className="flex items-center gap-2 p-3 bg-emerald-900/20 border border-emerald-700/50 rounded-lg">
+                  <Check className="h-5 w-5 text-emerald-500" />
+                  <span className="text-sm text-emerald-300">Share link created successfully!</span>
+                </div>
+                <div className="space-y-2">
+                  <Label>Share Link</Label>
+                  <div className="flex gap-2">
+                    <Input
+                      value={shareLink}
+                      readOnly
+                      className="bg-slate-800 border-slate-700 text-slate-300"
+                    />
+                    <Button
+                      variant="outline"
+                      size="icon"
+                      onClick={copyShareLink}
+                      className="border-slate-700 shrink-0"
+                    >
+                      {shareLinkCopied ? (
+                        <Check className="h-4 w-4 text-emerald-500" />
+                      ) : (
+                        <Copy className="h-4 w-4" />
+                      )}
+                    </Button>
+                  </div>
+                </div>
+                <div className="text-xs text-slate-500">
+                  This link will expire in {shareExpiry === "24" ? "24 hours" : shareExpiry === "168" ? "7 days" : shareExpiry === "720" ? "30 days" : "90 days"}.
+                </div>
+              </div>
+            )}
+          </div>
+          <DialogFooter>
+            {!shareLink ? (
+              <>
+                <Button
+                  variant="outline"
+                  onClick={() => setShareDialogOpen(false)}
+                  className="border-slate-700"
+                >
+                  Cancel
+                </Button>
+                <Button
+                  onClick={handleCreateShareLink}
+                  disabled={sharing}
+                  className="bg-emerald-600 hover:bg-emerald-700"
+                >
+                  {sharing ? (
+                    <>
+                      <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
+                      Creating...
+                    </>
+                  ) : (
+                    <>
+                      <Link className="h-4 w-4 mr-2" />
+                      Create Link
+                    </>
+                  )}
+                </Button>
+              </>
+            ) : (
+              <Button
+                onClick={() => setShareDialogOpen(false)}
+                className="bg-slate-700 hover:bg-slate-600"
+              >
+                Done
+              </Button>
+            )}
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

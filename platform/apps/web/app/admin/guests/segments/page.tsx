@@ -330,6 +330,7 @@ export default function GuestSegmentsPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [scopeFilter, setScopeFilter] = useState<string>("all");
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
+  const [isUsingMockData, setIsUsingMockData] = useState(false);
 
   // New segment form state
   const [newSegment, setNewSegment] = useState({
@@ -363,6 +364,7 @@ export default function GuestSegmentsPage() {
         // Fall back to mock data if API not available
         console.warn("API not available, using mock data");
         setSegments(mockSegments);
+        setIsUsingMockData(true);
         return;
       }
 
@@ -381,10 +383,18 @@ export default function GuestSegmentsPage() {
         isTemplate: s.isTemplate || false,
         status: s.status,
       }));
-      setSegments(mappedSegments);
+      if (mappedSegments.length === 0) {
+        // No real segments, show mock data
+        setSegments(mockSegments);
+        setIsUsingMockData(true);
+      } else {
+        setSegments(mappedSegments);
+        setIsUsingMockData(false);
+      }
     } catch (err) {
       console.warn("Failed to fetch segments, using mock data:", err);
       setSegments(mockSegments);
+      setIsUsingMockData(true);
     } finally {
       setLoading(false);
     }
@@ -558,9 +568,18 @@ export default function GuestSegmentsPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-white">Guest Segments</h1>
+          <div className="flex items-center gap-3">
+            <h1 className="text-2xl font-bold text-white">Guest Segments</h1>
+            {isUsingMockData && (
+              <Badge className="bg-amber-600/20 text-amber-400 border border-amber-600/50">
+                Demo Data
+              </Badge>
+            )}
+          </div>
           <p className="text-slate-400 mt-1">
-            Create and manage guest segments for targeted messaging and insights
+            {isUsingMockData
+              ? "Showing sample segments — create your first segment to get started"
+              : "Create and manage guest segments for targeted messaging and insights"}
           </p>
         </div>
         <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>

@@ -11,6 +11,12 @@ import { GuestAnalyticsService } from "./guest-analytics.service";
 import { GuestAnalyticsController } from "./guest-analytics.controller";
 import { GuestSegmentService } from "./guest-segment.service";
 import { GuestSegmentController } from "./guest-segment.controller";
+import { AnalyticsExportService } from "./analytics-export.service";
+import { AnalyticsShareService } from "./analytics-share.service";
+import {
+    AnalyticsExportController,
+    SharedAnalyticsController,
+} from "./analytics-export.controller";
 
 @Module({
     imports: [PrismaModule],
@@ -21,6 +27,8 @@ import { GuestSegmentController } from "./guest-segment.controller";
         AdminCampgroundController,
         GuestAnalyticsController,
         GuestSegmentController,
+        AnalyticsExportController,
+        SharedAnalyticsController,
     ],
     providers: [
         AuditLogService,
@@ -28,6 +36,8 @@ import { GuestSegmentController } from "./guest-segment.controller";
         AnnouncementService,
         GuestAnalyticsService,
         GuestSegmentService,
+        AnalyticsExportService,
+        AnalyticsShareService,
     ],
     exports: [
         AuditLogService,
@@ -35,6 +45,8 @@ import { GuestSegmentController } from "./guest-segment.controller";
         AnnouncementService,
         GuestAnalyticsService,
         GuestSegmentService,
+        AnalyticsExportService,
+        AnalyticsShareService,
     ],
 })
 export class AdminModule { }

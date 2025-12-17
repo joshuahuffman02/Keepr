@@ -1068,6 +1068,8 @@ model Campground {
   NotificationTrigger    NotificationTrigger[]
   ScheduledNotification  ScheduledNotification[]
   guestSegments          GuestSegment[]
+  analyticsShareLinks    AnalyticsShareLink[]
+  analyticsExports       AnalyticsExport[]
 
   @@index([dataSource, dataSourceId])
 }
@@ -5817,4 +5819,119 @@ model GuestSegmentMembership {
   @@unique([segmentId, guestId])
   @@index([segmentId])
   @@index([guestId])
+}
+
+// ==================== ANALYTICS SHARING ====================
+
+enum AnalyticsType {
+  overview
+  geographic
+  demographics
+  seasonal_trends
+  travel_behavior
+  full_report
+  segment
+}
+
+enum ExportFormat {
+  csv
+  json
+  pdf
+}
+
+enum ExportStatus {
+  pending
+  processing
+  completed
+  failed
+}
+
+enum ShareAccessLevel {
+  view_only
+  downloadable
+}
+
+// Shareable links for analytics reports
+model AnalyticsShareLink {
+  id             String           @id @default(cuid())
+  token          String           @unique @default(cuid()) // Public access token
+  analyticsType  AnalyticsType
+  accessLevel    ShareAccessLevel @default(view_only)
+
+  // Scope and filtering
+  scope          SegmentScope     @default(campground)
+  organizationId String?
+  campgroundId   String?
+  segmentId      String?          // For segment-specific shares
+  dateRange      String?          // last_30_days, last_90_days, etc.
+  filters        Json?            // Additional filters
+
+  // Access control
+  sharedBy       String           // User ID who created share
+  sharedByEmail  String
+  password       String?          // Optional password protection
+  expiresAt      DateTime?        // Optional expiration
+  maxViews       Int?             // Optional view limit
+  viewCount      Int              @default(0)
+
+  // Metadata
+  name           String?          // Optional friendly name
+  description    String?
+  createdAt      DateTime         @default(now())
+  revokedAt      DateTime?        // Soft revoke
+  lastAccessedAt DateTime?
+
+  campground     Campground?      @relation(fields: [campgroundId], references: [id], onDelete: Cascade)
+
+  @@index([token])
+  @@index([campgroundId])
+  @@index([organizationId])
+  @@index([sharedBy])
+  @@index([expiresAt])
+}
+
+// Export job records for async/batch exports
+model AnalyticsExport {
+  id             String       @id @default(cuid())
+  analyticsType  AnalyticsType
+  format         ExportFormat
+  status         ExportStatus @default(pending)
+
+  // Scope and filtering
+  scope          SegmentScope @default(campground)
+  organizationId String?
+  campgroundId   String?
+  segmentId      String?
+  dateRange      String?
+  filters        Json?
+  includePII     Boolean      @default(false) // Whether to include guest PII
+
+  // Export details
+  requestedBy    String       // User ID
+  requestedByEmail String
+  fileName       String?
+  fileUrl        String?      // S3/storage URL when complete
+  fileSize       Int?         // Bytes
+  rowCount       Int?         // Number of records exported
+
+  // Processing
+  startedAt      DateTime?
+  completedAt    DateTime?
+  errorMessage   String?
+
+  // Email delivery
+  emailTo        String[]     @default([])
+  emailSentAt    DateTime?
+
+  // Metadata
+  createdAt      DateTime     @default(now())
+  expiresAt      DateTime?    // When download link expires
+
+  campground     Campground?  @relation(fields: [campgroundId], references: [id], onDelete: Cascade)
+
+  @@index([campgroundId])
+  @@index([organizationId])
+  @@index([requestedBy])
+  @@index([status])
+  @@index([createdAt])
 }
