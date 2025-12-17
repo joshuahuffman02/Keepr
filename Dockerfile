@@ -39,6 +39,7 @@ COPY --from=shared /app/platform/packages/shared/dist ./platform/packages/shared
 COPY --from=web-builder /app/platform/apps/web/.next ./platform/apps/web/.next
 COPY --from=web-builder /app/platform/apps/web/public ./platform/apps/web/public
 COPY --from=web-builder /app/platform/apps/web/package.json ./platform/apps/web/
+COPY content ./content
 COPY package.json pnpm-workspace.yaml ./
 
 WORKDIR /app/platform/apps/web

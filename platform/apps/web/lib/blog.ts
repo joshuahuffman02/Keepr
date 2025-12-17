@@ -2,7 +2,18 @@ import fs from 'fs';
 import path from 'path';
 import matter from 'gray-matter';
 
-const BLOG_DIR = path.join(process.cwd(), '../../../content/blog');
+// In Docker (NEXT_PUBLIC_API_BASE set), we are at /app/platform/apps/web
+// Content is copied to /app/content
+// So we need to go up 3 levels: ../../../content/blog
+// const BLOG_DIR = path.join(process.cwd(), '../../../content/blog');
+// Let's try to be more robust by checking if we are in Docker
+const isDocker = process.env.NEXT_PUBLIC_IS_DOCKER === 'true' || process.env.NODE_ENV === 'production';
+const BLOG_DIR = path.join(process.cwd(), isDocker ? '../../../content/blog' : '../../../content/blog');
+// Actually, process.cwd() in Docker WORKDIR /app/platform/apps/web is exactly that.
+// And content is at /app/content.
+// So path.join('/app/platform/apps/web', '../../../content/blog') = '/app/content/blog'.
+// This SHOULD work if the content is copied there.
+
 
 export interface BlogPost {
     slug: string;
