@@ -6,6 +6,8 @@ import { Badge } from "../../components/ui/badge";
 import { ProductGrid } from "../../components/pos/ProductGrid";
 import { CategoryTabs } from "../../components/pos/CategoryTabs";
 import { CartSidebar } from "../../components/pos/CartSidebar";
+import { CartDrawer } from "../../components/pos/CartDrawer";
+import { FloatingCartButton } from "../../components/pos/FloatingCartButton";
 import { CheckoutModal } from "../../components/pos/CheckoutModal";
 import { ReceiptView } from "../../components/pos/ReceiptView";
 import { z } from "zod";
@@ -275,6 +277,7 @@ export default function POSPage() {
     const [isRefundOpen, setIsRefundOpen] = useState(false);
     const [selectedOrderForRefund, setSelectedOrderForRefund] = useState<string | null>(null);
     const [savingRefund, setSavingRefund] = useState(false);
+    const [isCartDrawerOpen, setIsCartDrawerOpen] = useState(false);
 
     const queueKey = "campreserv:pos:orderQueue";
 
@@ -437,6 +440,7 @@ export default function POSPage() {
         setLastOrder(order);
         setCart([]);
         setIsCheckoutOpen(false);
+        setIsCartDrawerOpen(false);
         recordTelemetry({ source: "pos", type: "sync", status: "success", message: "POS order completed", meta: { id: order?.id } });
         void loadRecentOrders();
     };
@@ -486,13 +490,16 @@ export default function POSPage() {
         );
     }
 
+    const itemCount = cart.reduce((sum, item) => sum + item.qty, 0);
+    const totalCents = cart.reduce((sum, item) => sum + item.priceCents * item.qty, 0);
+
     return (
         <DashboardShell className="h-screen overflow-hidden flex flex-col">
-            <div className="flex h-full gap-6 p-6">
-                <div className="flex-1 flex flex-col gap-6 min-w-0">
-                    <div className="flex items-center justify-between">
-                        <h1 className="text-2xl font-bold text-slate-900">Point of Sale</h1>
-                        <div className="flex items-center gap-2">
+            <div className="flex h-full gap-6 p-3 sm:p-6">
+                <div className="flex-1 flex flex-col gap-4 sm:gap-6 min-w-0">
+                    <div className="flex items-center justify-between flex-wrap gap-3">
+                        <h1 className="text-xl sm:text-2xl font-bold text-slate-900">Point of Sale</h1>
+                        <div className="flex items-center gap-2 flex-wrap">
                             {!isOnline && <Badge variant="outline">Offline</Badge>}
                             {queuedOrders > 0 && (
                                 <Badge
@@ -515,13 +522,13 @@ export default function POSPage() {
                                     {queuedOrders} queued
                                 </Badge>
                             )}
-                            <Button asChild size="sm" variant="outline">
+                            <Button asChild size="sm" variant="outline" className="hidden md:flex">
                                 <Link href="/pwa/sync-log">Sync log</Link>
                             </Button>
-                            <Button size="sm" variant="outline" onClick={() => flushQueue()}>
+                            <Button size="sm" variant="outline" onClick={() => flushQueue()} className="hidden md:flex">
                                 Flush now
                             </Button>
-                            <Button asChild size="sm" variant="secondary">
+                            <Button asChild size="sm" variant="secondary" className="hidden lg:flex">
                                 <Link href="/store" title="Manage products, categories, add-ons, taxes, hours, channel allotments">Manage inventory</Link>
                             </Button>
                             <Button
@@ -531,6 +538,7 @@ export default function POSPage() {
                                     setIsRefundOpen(true);
                                 }}
                                 disabled={ordersLoading}
+                                className="hidden md:flex"
                             >
                                 Refund / Exchange
                             </Button>
@@ -613,8 +621,9 @@ export default function POSPage() {
                     )}
                 </div>
 
+                {/* Desktop Cart Sidebar - hidden on mobile/tablet */}
                 {showContent ? (
-                    <div className="w-96 flex-shrink-0 flex flex-col bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden h-full">
+                    <div className="hidden xl:flex w-96 flex-shrink-0 flex-col bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden h-full">
                         <CartSidebar
                             cart={cart}
                             onUpdateQty={updateQty}
@@ -634,6 +643,7 @@ export default function POSPage() {
                     onSuccess={handleCheckoutSuccess}
                     onQueued={() => {
                         setIsCheckoutOpen(false);
+                        setIsCartDrawerOpen(false);
                         setCart([]);
                     }}
                     isOnline={isOnline}
@@ -642,7 +652,7 @@ export default function POSPage() {
             )}
 
             {showContent && (
-                <div className="border-t border-slate-200 bg-slate-50/40 px-6 pb-6">
+                <div className="hidden md:block border-t border-slate-200 bg-slate-50/40 px-6 pb-6">
                     <div className="flex items-center justify-between py-4">
                         <div>
                             <p className="text-sm font-semibold text-slate-900">Recent POS orders</p>
@@ -734,6 +744,29 @@ export default function POSPage() {
                 onSubmit={handleRefundSubmit}
                 loading={savingRefund}
             />
+
+            {/* Mobile/Tablet Cart Drawer */}
+            {showContent && (
+                <CartDrawer
+                    open={isCartDrawerOpen}
+                    onOpenChange={setIsCartDrawerOpen}
+                    cart={cart}
+                    onUpdateQty={updateQty}
+                    onClear={clearCart}
+                    onCheckout={() => setIsCheckoutOpen(true)}
+                />
+            )}
+
+            {/* Floating Cart Button - shown on mobile/tablet only */}
+            {showContent && (
+                <div className="xl:hidden">
+                    <FloatingCartButton
+                        itemCount={itemCount}
+                        totalCents={totalCents}
+                        onClick={() => setIsCartDrawerOpen(true)}
+                    />
+                </div>
+            )}
         </DashboardShell>
     );
 }

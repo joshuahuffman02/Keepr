@@ -4,6 +4,9 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { SessionProvider } from "next-auth/react";
 import { PropsWithChildren, useState } from "react";
+import { KeyboardShortcutsProvider } from "@/contexts/KeyboardShortcutsContext";
+import { KeyboardShortcutsDialog } from "@/components/ui/keyboard-shortcuts-dialog";
+import { KeyboardSequenceIndicator } from "@/components/ui/keyboard-sequence-indicator";
 
 export function Providers({ children }: PropsWithChildren) {
   const [client] = useState(() => new QueryClient());
@@ -11,8 +14,12 @@ export function Providers({ children }: PropsWithChildren) {
   return (
     <SessionProvider>
       <QueryClientProvider client={client}>
-        {children}
-        <ReactQueryDevtools initialIsOpen={false} />
+        <KeyboardShortcutsProvider>
+          {children}
+          <KeyboardShortcutsDialog />
+          <KeyboardSequenceIndicator />
+          <ReactQueryDevtools initialIsOpen={false} />
+        </KeyboardShortcutsProvider>
       </QueryClientProvider>
     </SessionProvider>
   );

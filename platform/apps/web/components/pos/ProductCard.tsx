@@ -43,7 +43,7 @@ export function ProductCard({ product, onClick }: ProductCardProps) {
             onClick={hasStock ? onClick : undefined}
             disabled={!hasStock}
             className={cn(
-                "flex flex-col text-left bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-all active:scale-[0.98] h-full",
+                "flex flex-col text-left bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-all active:scale-[0.98] h-full min-h-[200px]",
                 !hasStock && "opacity-50 cursor-not-allowed grayscale"
             )}
         >

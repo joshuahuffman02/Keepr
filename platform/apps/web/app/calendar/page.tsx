@@ -11,6 +11,7 @@ import { useGanttStore } from "../../lib/gantt-store";
 import { recordMetric, recordError, startTiming } from "../../lib/calendar-metrics";
 import { useWhoami } from "@/hooks/use-whoami";
 import { CalendarRow } from "./CalendarRow";
+import { ListView } from "./ListView";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../../components/ui/dialog";
 import { HelpAnchor } from "../../components/help/HelpAnchor";
 import {
@@ -149,6 +150,10 @@ export default function CalendarPage() {
   const [splitReservation, setSplitReservation] = useState<any>(null);
   const [splitSegments, setSplitSegments] = useState<Array<{ siteId: string; startDate: string; endDate: string }>>([]);
   const [splitLoading, setSplitLoading] = useState(false);
+
+  // Mobile/tablet detection for responsive view switching
+  const [isMobileView, setIsMobileView] = useState(false);
+  const [userPreferredView, setUserPreferredView] = useState<"day" | "week" | "month" | "list" | null>(null);
 
   const loadTimers = useRef<Record<string, number | null>>({
     campgrounds: null,
@@ -322,6 +327,34 @@ export default function CalendarPage() {
     localStorage.setItem("campreserv:calendar:viewstate", JSON.stringify(payload));
   }, [statusFilter, siteTypeFilter, channelFilter, assignmentFilter, arrivalsNowOnly, viewMode, filtersLoaded]);
 
+  // Mobile/tablet detection and auto-switch to list view
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    const checkMobileView = () => {
+      const width = window.innerWidth;
+      const isMobile = width < 1024; // tablet and below (< lg breakpoint)
+      setIsMobileView(isMobile);
+
+      // Auto-switch to list view on mobile if user hasn't explicitly chosen a view
+      if (isMobile && !userPreferredView && viewMode !== "list") {
+        setViewMode("list");
+      } else if (!isMobile && userPreferredView === null && viewMode === "list") {
+        // Switch back to week view on desktop if we auto-switched to list
+        setViewMode("week");
+      }
+    };
+
+    checkMobileView();
+    window.addEventListener("resize", checkMobileView);
+    return () => window.removeEventListener("resize", checkMobileView);
+  }, [viewMode, userPreferredView]);
+
+  // Track user's manual view selection
+  const handleViewModeChange = useCallback((mode: "day" | "week" | "month" | "list") => {
+    setUserPreferredView(mode);
+    setViewMode(mode);
+  }, []);
 
   const createMaintenanceMutation = useMutation({
     mutationFn: (payload: Parameters<typeof apiClient.createMaintenanceTicket>[0]) =>
@@ -702,6 +735,41 @@ export default function CalendarPage() {
     setHoldStatus({ state: "idle" });
     setStoreSelection({ highlightedId: null, openDetailsId: null });
   };
+
+  // Handler for creating a new booking from list view
+  const handleNewBookingFromListView = useCallback(async (siteId: string, arrivalDate: string, departureDate: string) => {
+    if (!selectedCampground) return;
+
+    try {
+      setSelection({ siteId, arrival: arrivalDate, departure: departureDate });
+
+      const quote = await apiClient.getQuote(selectedCampground, {
+        siteId,
+        arrivalDate,
+        departureDate
+      });
+
+      const site = sitesQuery.data?.find(s => s.id === siteId);
+      setQuotePreview({
+        siteId,
+        siteName: site?.name || siteId,
+        arrival: arrivalDate,
+        departure: departureDate,
+        total: (quote.totalCents ?? 0) / 100,
+        nights: quote.nights ?? Math.max(1, diffInDays(new Date(departureDate), new Date(arrivalDate))),
+        base: (quote.baseSubtotalCents ?? quote.totalCents ?? 0) / 100,
+        perNight: (quote.perNightCents ?? 0) / 100,
+        rulesDelta: (quote.rulesDeltaCents ?? 0) / 100,
+        depositRule: selectedCampgroundDetails?.depositRule ?? null
+      });
+
+      setSelectionError(null);
+      setSelectionConflict(null);
+    } catch (err) {
+      recordError("quote.fetch", err);
+      setSelectionError("Unable to fetch quote. Please try again.");
+    }
+  }, [selectedCampground, sitesQuery.data]);
 
   useEffect(() => {
     setHoldStatus({ state: "idle" });
@@ -1261,12 +1329,17 @@ export default function CalendarPage() {
                   ? "bg-emerald-50 text-emerald-700"
                   : "text-slate-600 hover:bg-slate-50"
                   }`}
-                onClick={() => setViewMode(mode)}
+                onClick={() => handleViewModeChange(mode)}
               >
                 {mode}
               </button>
             ))}
           </div>
+          {isMobileView && viewMode !== "list" && (
+            <Badge variant="outline" className="text-xs">
+              Tip: List view works better on mobile
+            </Badge>
+          )}
 
           <div className="h-6 w-px bg-slate-300" />
 
@@ -1791,60 +1864,13 @@ export default function CalendarPage() {
 
         {/* List View */}
         {selectedCampground && !sitesQuery.isLoading && !reservationsQuery.isLoading && viewMode === "list" && (
-          <div className="rounded-xl border border-slate-200 bg-white shadow-sm">
-            <div className="divide-y divide-slate-200">
-              {filteredReservations
-                .slice()
-                .sort((a: any, b: any) => new Date(a.arrivalDate).getTime() - new Date(b.arrivalDate).getTime())
-                .map((res: any) => {
-                  const site = (sitesQuery.data || []).find((s: any) => s.id === res.siteId);
-                  return (
-                    <div key={res.id} className="p-4 flex flex-col gap-2">
-                      <div className="flex items-center gap-2 flex-wrap">
-                        <Badge variant="outline" className="text-[11px] capitalize">
-                          {res.status}
-                        </Badge>
-                        <div className="font-semibold text-slate-900">
-                          {res.guest?.primaryFirstName} {res.guest?.primaryLastName}
-                        </div>
-                        <span className="text-sm text-slate-500">
-                          • {res.arrivalDate?.slice(0, 10)} → {res.departureDate?.slice(0, 10)}
-                        </span>
-                      </div>
-                      <div className="flex items-center gap-3 text-sm text-slate-600 flex-wrap">
-                        <span>{site?.name || "Unassigned"}</span>
-                        <span>•</span>
-                        <span>{(res.channel || res.bookingChannel || res.source) ?? "direct"}</span>
-                        {res.balanceAmount ? (
-                          <>
-                            <span>•</span>
-                            <Badge variant="destructive" className="text-[11px]">Balance due</Badge>
-                          </>
-                        ) : null}
-                      </div>
-                      <div className="flex gap-2 flex-wrap">
-                        <Button size="sm" variant="secondary" onClick={() => setSelectedReservation(res)}>
-                          Open
-                        </Button>
-                        <Button
-                          size="sm"
-                          variant="ghost"
-                          onClick={() =>
-                            setSelection({
-                              siteId: res.siteId,
-                              arrival: res.arrivalDate,
-                              departure: res.departureDate
-                            })
-                          }
-                        >
-                          Highlight
-                        </Button>
-                      </div>
-                    </div>
-                  );
-                })}
-            </div>
-          </div>
+          <ListView
+            reservations={filteredReservations}
+            sites={sitesQuery.data || []}
+            onReservationClick={(res) => setSelectedReservation(res)}
+            onNewBooking={handleNewBookingFromListView}
+            allowOps={allowOps}
+          />
         )}
 
         {/* Calendar Grid */}

@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { signOut } from "next-auth/react";
 import { HelpPanel } from "../../help/HelpPanel";
+import { useKeyboardShortcuts } from "@/contexts/KeyboardShortcutsContext";
 
 type AdminTopBarProps = {
     onToggleNav?: () => void;
@@ -27,69 +28,23 @@ export function AdminTopBar({ onToggleNav, mobileNavOpen }: AdminTopBarProps) {
     const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
     const [isHelpPanelOpen, setIsHelpPanelOpen] = useState(false);
     const searchInputRef = useRef<HTMLInputElement>(null);
-    const shortcutPrimed = useRef(false);
-    const shortcutTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
     const router = useRouter();
+    const { setShowShortcutsDialog } = useKeyboardShortcuts();
 
-    // Handle Cmd/Ctrl+K for search and Cmd/Ctrl+/ for help (no plain "?")
+    // Register callbacks with keyboard shortcuts system
     useEffect(() => {
-        const handleKeyDown = (e: KeyboardEvent) => {
-            const target = e.target as HTMLElement | null;
-            const isTyping =
-                target &&
-                (target.tagName === "INPUT" ||
-                    target.tagName === "TEXTAREA" ||
-                    (target as any).isContentEditable);
-            if (isTyping) return;
-
-            if ((e.metaKey || e.ctrlKey) && e.key === "k") {
-                e.preventDefault();
-                setIsSearchOpen(true);
-            }
-            if ((e.metaKey || e.ctrlKey) && e.key === "/") {
-                e.preventDefault();
+        if (typeof window !== "undefined" && (window as any).__keyboardShortcuts) {
+            (window as any).__keyboardShortcuts.onSearch(() => setIsSearchOpen(true));
+            (window as any).__keyboardShortcuts.onHelp(() => {
                 setIsHelpPanelOpen(true);
                 setIsNotificationsOpen(false);
-            }
-
-            // g then key nav shortcuts
-            const navMap: Record<string, string> = {
-                t: "/dashboard",
-                c: "/calendar",
-                r: "/reservations",
-                i: "/campgrounds",
-                p: "/settings/pricing-rules",
-                f: "/finance",
-                m: "/messages",
-                s: "/settings"
-            };
-            if (!shortcutPrimed.current && e.key.toLowerCase() === "g") {
-                shortcutPrimed.current = true;
-                if (shortcutTimer.current) clearTimeout(shortcutTimer.current);
-                shortcutTimer.current = setTimeout(() => {
-                    shortcutPrimed.current = false;
-                }, 800);
-                return;
-            }
-            if (shortcutPrimed.current) {
-                const dest = navMap[e.key.toLowerCase()];
-                shortcutPrimed.current = false;
-                if (shortcutTimer.current) clearTimeout(shortcutTimer.current);
-                if (dest) {
-                    e.preventDefault();
-                    router.push(dest);
-                }
-            }
-
-            if (e.key === "Escape") {
+            });
+            (window as any).__keyboardShortcuts.onCloseModal(() => {
                 setIsSearchOpen(false);
                 setIsNotificationsOpen(false);
                 setIsHelpPanelOpen(false);
-            }
-        };
-
-        document.addEventListener("keydown", handleKeyDown);
-        return () => document.removeEventListener("keydown", handleKeyDown);
+            });
+        }
     }, []);
 
     // Focus search input when opened
@@ -226,8 +181,22 @@ export function AdminTopBar({ onToggleNav, mobileNavOpen }: AdminTopBarProps) {
                     </button>
                 </div>
 
-                {/* Right - Help, Notifications, User */}
+                {/* Right - Help, Shortcuts, Notifications, User */}
                 <div className="flex items-center gap-2">
+                    {/* Keyboard Shortcuts */}
+                    <div className="relative">
+                        <button
+                            onClick={() => setShowShortcutsDialog(true)}
+                            className="p-2 text-slate-500 hover:text-slate-700 hover:bg-slate-100 rounded-lg transition-colors"
+                            title="Keyboard Shortcuts (Press ?)"
+                        >
+                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">
+                                <rect x="2" y="4" width="20" height="16" rx="2" />
+                                <path d="M6 8h.01M10 8h.01M14 8h.01M6 12h.01M10 12h.01M14 12h.01M6 16h.01M10 16h.01M14 16h8" />
+                            </svg>
+                        </button>
+                    </div>
+
                     {/* Help */}
                     <div className="relative">
                         <button
@@ -236,7 +205,7 @@ export function AdminTopBar({ onToggleNav, mobileNavOpen }: AdminTopBarProps) {
                                 setIsNotificationsOpen(false);
                             }}
                             className="p-2 text-slate-500 hover:text-slate-700 hover:bg-slate-100 rounded-lg transition-colors"
-                            title="Help & Support"
+                            title="Help & Support (Cmd+/)"
                         >
                             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <circle cx="12" cy="12" r="10" />

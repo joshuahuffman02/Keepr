@@ -16,64 +16,33 @@ interface ShortcutGroup {
 
 const shortcutGroups: ShortcutGroup[] = [
   {
-    title: "Global Navigation",
+    title: "Global Shortcuts",
     icon: Command,
     shortcuts: [
       { keys: ["⌘", "K"], description: "Open global search" },
-      { keys: ["⌘", "/"], description: "Focus search bar" },
-      { keys: ["ESC"], description: "Close modals/dropdowns" },
-      { keys: ["G", "D"], description: "Go to Dashboard" },
-      { keys: ["G", "R"], description: "Go to Reservations" },
-      { keys: ["G", "G"], description: "Go to Guests" },
-      { keys: ["G", "S"], description: "Go to Sites" },
-      { keys: ["G", "P"], description: "Go to Reports" },
+      { keys: ["⌘", "/"], description: "Open help panel" },
+      { keys: ["?"], description: "Show keyboard shortcuts reference" },
+      { keys: ["ESC"], description: "Close any open modal/dialog" },
     ]
   },
   {
-    title: "Search & Filters",
+    title: "Navigation (Sequential)",
     icon: Search,
     shortcuts: [
-      { keys: ["⌘", "K"], description: "Quick search (guests, sites, reservations)" },
-      { keys: ["↑", "↓"], description: "Navigate search results" },
-      { keys: ["Enter"], description: "Select search result" },
-      { keys: ["⌘", "F"], description: "Find in current page" },
-      { keys: ["Tab"], description: "Switch between filters" },
-    ]
-  },
-  {
-    title: "Reservations",
-    icon: Zap,
-    shortcuts: [
-      { keys: ["N"], description: "New reservation" },
-      { keys: ["E"], description: "Edit selected reservation" },
-      { keys: ["C"], description: "Check-in guest" },
-      { keys: ["O"], description: "Check-out guest" },
-      { keys: ["P"], description: "Process payment" },
-      { keys: ["⌘", "S"], description: "Save changes" },
-      { keys: ["⌘", "⇧", "C"], description: "Cancel reservation" },
-    ]
-  },
-  {
-    title: "Reports & Data",
-    icon: Command,
-    shortcuts: [
-      { keys: ["R"], description: "Refresh current report" },
-      { keys: ["⌘", "E"], description: "Export to CSV" },
-      { keys: ["⌘", "P"], description: "Print report" },
-      { keys: ["T"], description: "Switch tab" },
-      { keys: ["D"], description: "Open date picker" },
-      { keys: ["←", "→"], description: "Previous/Next date range" },
+      { keys: ["G", "D"], description: "Go to Dashboard" },
+      { keys: ["G", "C"], description: "Go to Calendar" },
+      { keys: ["G", "R"], description: "Go to Reservations" },
+      { keys: ["G", "G"], description: "Go to Guests" },
+      { keys: ["G", "P"], description: "Go to POS" },
+      { keys: ["G", "M"], description: "Go to Messages" },
+      { keys: ["G", "S"], description: "Go to Settings" },
     ]
   },
   {
     title: "Quick Actions",
     icon: Zap,
     shortcuts: [
-      { keys: ["?"], description: "Show keyboard shortcuts" },
-      { keys: ["⌘", ","], description: "Open Settings" },
-      { keys: ["⌘", "⇧", "N"], description: "New walk-in booking" },
-      { keys: ["⌘", "⇧", "P"], description: "Quick payment entry" },
-      { keys: ["⌘", "B"], description: "Toggle sidebar" },
+      { keys: ["⌘", "N"], description: "New booking" },
     ]
   }
 ];
@@ -166,19 +135,27 @@ export default function ShortcutsPage() {
           <ul className="space-y-2 text-sm text-slate-700">
             <li className="flex items-start gap-2">
               <span className="text-amber-600 font-bold">•</span>
-              <span>Use <kbd className="px-1.5 py-0.5 bg-white rounded text-xs border border-slate-200">⌘K</kbd> to quickly search for anything - guests, sites, reservations</span>
+              <span>Use <kbd className="px-1.5 py-0.5 bg-white rounded text-xs border border-slate-200">⌘K</kbd> to quickly search for guests, sites, and reservations</span>
             </li>
             <li className="flex items-start gap-2">
               <span className="text-amber-600 font-bold">•</span>
-              <span>Sequential shortcuts like <kbd className="px-1.5 py-0.5 bg-white rounded text-xs border border-slate-200">G</kbd> then <kbd className="px-1.5 py-0.5 bg-white rounded text-xs border border-slate-200">R</kbd> should be pressed one after another, not together</span>
+              <span>Sequential shortcuts like <kbd className="px-1.5 py-0.5 bg-white rounded text-xs border border-slate-200">G</kbd> then <kbd className="px-1.5 py-0.5 bg-white rounded text-xs border border-slate-200">D</kbd> should be pressed one after another, not together (you have 1 second between keys)</span>
             </li>
             <li className="flex items-start gap-2">
               <span className="text-amber-600 font-bold">•</span>
-              <span>Most shortcuts work globally throughout the app</span>
+              <span>Global shortcuts (⌘K, ⌘/, ESC) work even when typing in input fields</span>
             </li>
             <li className="flex items-start gap-2">
               <span className="text-amber-600 font-bold">•</span>
-              <span>Keyboard shortcuts save an average of 30 minutes per day for power users</span>
+              <span>Most navigation and action shortcuts are disabled when typing to prevent conflicts</span>
+            </li>
+            <li className="flex items-start gap-2">
+              <span className="text-amber-600 font-bold">•</span>
+              <span>Press <kbd className="px-1.5 py-0.5 bg-white rounded text-xs border border-slate-200">?</kbd> anytime to see the quick reference panel</span>
+            </li>
+            <li className="flex items-start gap-2">
+              <span className="text-amber-600 font-bold">•</span>
+              <span>Keyboard shortcuts can save power users 30+ minutes per day</span>
             </li>
           </ul>
         </div>
