@@ -30,9 +30,9 @@ type Review = {
     rating: number;
     title?: string;
     body?: string;
-    status: "pending" | "approved" | "rejected";
-    helpfulCount: number;
-    unhelpfulCount: number;
+    status: string;
+    helpfulCount?: number;
+    unhelpfulCount?: number;
     ownerReply?: string;
     ownerReplyAt?: string;
     createdAt: string;
