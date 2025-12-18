@@ -7,6 +7,7 @@ import { ToastAction } from "@/components/ui/toast";
 import { FloatingTicketWidget } from "@/components/support/FloatingTicketWidget";
 import { SkipToContent } from "@/components/ui/skip-to-content";
 import { SyncStatusProvider } from "@/contexts/SyncStatusContext";
+import { FeatureTourProvider } from "@/components/tours/FeatureTourProvider";
 
 export default function ClientRoot({ children }: { children: ReactNode }) {
   const { toast } = useToast();
@@ -52,10 +53,12 @@ export default function ClientRoot({ children }: { children: ReactNode }) {
 
   return (
     <SyncStatusProvider>
-      <SkipToContent />
-      {children}
-      <FloatingTicketWidget />
-      <Toaster />
+      <FeatureTourProvider>
+        <SkipToContent />
+        {children}
+        <FloatingTicketWidget />
+        <Toaster />
+      </FeatureTourProvider>
     </SyncStatusProvider>
   );
 }

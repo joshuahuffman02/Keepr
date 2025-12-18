@@ -50,6 +50,7 @@ type NavItem = {
   badge?: number;
   soon?: boolean;
   tooltip?: string;
+  dataTour?: string;
 };
 
 type NavSection = {
@@ -461,13 +462,13 @@ export function DashboardShell({ children, className, title, subtitle }: { child
   const navSections = useMemo(() => {
     // PRIMARY - Core daily operations (no accordion, always visible)
     const primaryItems: NavItem[] = [
-      { label: "Dashboard", href: "/dashboard", icon: "dashboard" },
-      { label: "Calendar", href: "/calendar", icon: "calendar" },
-      { label: "Reservations", href: cgReservationsPath, icon: "reservation" },
-      { label: "Guests", href: "/guests", icon: "guest" },
-      { label: "Messages", href: "/messages", icon: "message", badge: unreadMessages },
-      { label: "Reports", href: "/reports", icon: "reports" },
-      { label: "Gamification", href: "/gamification", icon: "trophy", tooltip: "Staff leaderboards and rewards" }
+      { label: "Dashboard", href: "/dashboard", icon: "dashboard", dataTour: "nav-dashboard" },
+      { label: "Calendar", href: "/calendar", icon: "calendar", dataTour: "nav-calendar" },
+      { label: "Reservations", href: cgReservationsPath, icon: "reservation", dataTour: "nav-reservations" },
+      { label: "Guests", href: "/guests", icon: "guest", dataTour: "nav-guests" },
+      { label: "Messages", href: "/messages", icon: "message", badge: unreadMessages, dataTour: "nav-messages" },
+      { label: "Reports", href: "/reports", icon: "reports", dataTour: "nav-reports" },
+      { label: "Gamification", href: "/gamification", icon: "trophy", tooltip: "Staff leaderboards and rewards", dataTour: "nav-gamification" }
     ];
 
     // Add Management link for managers (simplified - links to hub page)
@@ -721,6 +722,7 @@ export function DashboardShell({ children, className, title, subtitle }: { child
                         isActive ? "bg-slate-800 text-white font-semibold" : "bg-slate-800/40 text-slate-100 hover:bg-slate-800"
                       )}
                       onClick={() => setMobileNavOpen(false)}
+                      data-tour={item.dataTour}
                     >
                       <Icon name={(item.icon as IconName) ?? "sparkles"} active={isActive} />
                       <span className="flex-1">{item.label}</span>
@@ -883,6 +885,7 @@ export function DashboardShell({ children, className, title, subtitle }: { child
                       href={item.href}
                       aria-current={isActive ? "page" : undefined}
                       title={"tooltip" in item && item.tooltip ? item.tooltip : item.label}
+                      data-tour={item.dataTour}
                     >
                       <span className={cn("flex items-center gap-2", collapsed && "justify-center w-full")}>
                         <Icon name={(item.icon as IconName) ?? "sparkles"} active={isActive} />
@@ -941,7 +944,9 @@ export function DashboardShell({ children, className, title, subtitle }: { child
 
       <SyncDetailsDrawer open={syncDrawerOpen} onOpenChange={setSyncDrawerOpen} />
       <StaffChat />
-      <SupportChatWidget />
+      <div data-tour="help-button">
+        <SupportChatWidget />
+      </div>
     </div>
   );
 }

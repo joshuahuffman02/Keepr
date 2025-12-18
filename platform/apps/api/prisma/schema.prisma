@@ -817,6 +817,12 @@ model Organization {
   // Early access program
   earlyAccessEnrollment EarlyAccessEnrollment?
 
+  // Referral program
+  referralCode       String?   @unique // Unique code for this org to share
+  referralCredits    Int       @default(0) // Total credits earned in cents
+  referralsGiven     OrgReferral[] @relation("ReferrerOrg")
+  referralsReceived  OrgReferral[] @relation("ReferredOrg")
+
   // Organization billing (what Camp Everyday charges them)
   billingPeriods OrganizationBillingPeriod[]
   usageEvents    UsageEvent[]
@@ -6359,4 +6365,51 @@ model UsageEvent {
   @@index([billed])
   @@index([createdAt])
   @@index([billingPeriodId])
+}
+
+// ============================================
+// Organization Referral Program (B2B)
+// ============================================
+
+enum OrgReferralStatus {
+  clicked     // Link was clicked
+  signed_up   // Referred org created an account
+  converted   // Referred org received first booking
+  credited    // Credit was applied to referrer
+}
+
+model OrgReferral {
+  id                String            @id @default(cuid())
+  referrerOrgId     String            // Organization that made the referral
+  referredOrgId     String?           // Organization that was referred (after signup)
+  referredEmail     String?           // Email used during signup (before org created)
+  referralCode      String            // Code used for tracking
+
+  status            OrgReferralStatus @default(clicked)
+  creditAmountCents Int               @default(5000) // $50 default credit
+
+  // Tracking
+  clickedAt         DateTime          @default(now())
+  signedUpAt        DateTime?
+  convertedAt       DateTime?
+  creditedAt        DateTime?
+
+  // Metadata
+  utmSource         String?
+  utmMedium         String?
+  utmCampaign       String?
+  ipAddress         String?
+  userAgent         String?
+
+  createdAt         DateTime          @default(now())
+  updatedAt         DateTime          @default(now()) @updatedAt
+
+  referrerOrg       Organization      @relation("ReferrerOrg", fields: [referrerOrgId], references: [id], onDelete: Cascade)
+  referredOrg       Organization?     @relation("ReferredOrg", fields: [referredOrgId], references: [id], onDelete: SetNull)
+
+  @@index([referrerOrgId])
+  @@index([referredOrgId])
+  @@index([referralCode])
+  @@index([referredEmail])
+  @@index([status])
 }
