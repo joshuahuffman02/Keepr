@@ -84,6 +84,7 @@ const adminNavItems = [
         icon: BarChart3,
         children: [
             { title: "Executive", href: "/admin/analytics/executive" },
+            { title: "Platform Growth", href: "/admin/analytics/growth" },
             { title: "Overview", href: "/admin/analytics" },
             { title: "Revenue", href: "/admin/analytics/revenue" },
             { title: "Guests", href: "/admin/analytics/guests" },
