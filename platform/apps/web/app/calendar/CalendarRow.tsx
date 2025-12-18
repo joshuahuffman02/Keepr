@@ -1,28 +1,26 @@
 import { memo } from "react";
 import { ReservationPill } from "./ReservationPill";
 import { cn } from "../../lib/utils";
+import type { CalendarSite, CalendarReservation, CalendarSelection, DragState, GanttSelection, DayMeta } from "./types";
 
 interface CalendarRowProps {
-    site: any; // Replace with proper type
-    days: any[];
-    reservations: any[];
+    site: CalendarSite;
+    days: DayMeta[];
+    reservations: CalendarReservation[];
     gridTemplate: string;
     dayCount: number;
     zebra: string;
-    dragState: {
-        siteId: string | null;
-        startIdx: number | null;
-        endIdx: number | null;
-        isDragging: boolean;
-    };
-    selection: any;
-    ganttSelection: any;
+    dragState: DragState;
+    selection: CalendarSelection | null;
+    ganttSelection: GanttSelection;
     handlers: {
         onMouseDown: (siteId: string, dayIdx: number) => void;
         onMouseEnter: (dayIdx: number) => void;
         onMouseUp: (siteId: string, dayIdx: number) => void;
         onReservationClick: (resId: string) => void;
+        onQuickCheckIn?: (reservationId: string) => void;
     };
+    today: Date;
 }
 
 function diffInDays(a: Date, b: Date) {
@@ -39,10 +37,21 @@ export const CalendarRow = memo(function CalendarRow({
     dragState,
     selection,
     ganttSelection,
-    handlers
+    handlers,
+    today
 }: CalendarRowProps) {
     const { siteId: dragSiteId, startIdx: dragStartIdx, endIdx: dragEndIdx, isDragging } = dragState;
-    const { onMouseDown, onMouseEnter, onMouseUp, onReservationClick } = handlers;
+    const { onMouseDown, onMouseEnter, onMouseUp, onReservationClick, onQuickCheckIn } = handlers;
+
+    // Helper to check if a reservation arrives today
+    const isArrivalToday = (res: CalendarReservation) => {
+        const arrivalDate = new Date(res.arrivalDate);
+        return (
+            arrivalDate.getDate() === today.getDate() &&
+            arrivalDate.getMonth() === today.getMonth() &&
+            arrivalDate.getFullYear() === today.getFullYear()
+        );
+    };
 
     return (
         <div
@@ -181,6 +190,8 @@ export const CalendarRow = memo(function CalendarRow({
                                         // Implement drag move start here if needed
                                     }}
                                     onMouseUp={(e) => e.stopPropagation()}
+                                    onQuickCheckIn={onQuickCheckIn}
+                                    isArrivalToday={isArrivalToday(res)}
                                 />
                             </div>
                         );

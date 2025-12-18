@@ -12,6 +12,7 @@ import { recordMetric, recordError, startTiming } from "../../lib/calendar-metri
 import { useWhoami } from "@/hooks/use-whoami";
 import { CalendarRow } from "./CalendarRow";
 import { ListView } from "./ListView";
+import { ReservationHoverCard } from "./ReservationHoverCard";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../../components/ui/dialog";
 import { HelpAnchor } from "../../components/help/HelpAnchor";
 import { HelpTooltip, HelpTooltipContent, HelpTooltipSection } from "../../components/help/HelpTooltip";
@@ -34,10 +35,15 @@ import {
   CreditCard,
   Map,
   SearchX,
-  MousePointer2
+  MousePointer2,
+  LogIn,
+  Filter,
+  ChevronDown,
+  Search
 } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { computeDepositDue } from "@campreserv/shared";
+import { launchConfetti } from "../../lib/gamification/confetti";
 
 type DayMeta = { date: Date; label: string; weekend: boolean; isToday: boolean };
 type AsyncReturn<T extends (...args: any[]) => any> = Awaited<ReturnType<T>>;
@@ -110,7 +116,9 @@ export default function CalendarPage() {
   const [siteTypeFilter, setSiteTypeFilter] = useState<string>("all");
   const [channelFilter, setChannelFilter] = useState<string>("all");
   const [assignmentFilter, setAssignmentFilter] = useState<"all" | "assigned" | "unassigned">("all");
+  const [guestSearch, setGuestSearch] = useState<string>("");
   const [arrivalsNowOnly, setArrivalsNowOnly] = useState(false);
+  const [showFiltersPanel, setShowFiltersPanel] = useState(false);
   const [conflictDrawerOpen, setConflictDrawerOpen] = useState(false);
   const [selectedConflict, setSelectedConflict] = useState<any | null>(null);
   const [resolveAction, setResolveAction] = useState<"reassign" | "adjust" | "comp" | null>(null);
@@ -172,12 +180,15 @@ export default function CalendarPage() {
   const [commsLoading, setCommsLoading] = useState<Record<string, boolean>>({});
   const [commsErrors, setCommsErrors] = useState<Record<string, string>>({});
   const [commsFilter, setCommsFilter] = useState<"all" | "messages" | "notes" | "failed">("all");
+  const isProcessingSelection = useRef(false); // Prevent overlapping async drag operations
+  const selectRangeRef = useRef<(siteId: string, startIdx: number, endIdx: number) => Promise<void>>(); // Ref to avoid stale closure
   const calendarFilterCount =
     (statusFilter !== "all" ? 1 : 0) +
     (siteTypeFilter !== "all" ? 1 : 0) +
     (channelFilter !== "all" ? 1 : 0) +
     (assignmentFilter !== "all" ? 1 : 0) +
-    (arrivalsNowOnly ? 1 : 0);
+    (arrivalsNowOnly ? 1 : 0) +
+    (guestSearch ? 1 : 0);
   const queryClient = useQueryClient();
   const { selection: ganttSelection, setSelection: setStoreSelection } = useGanttStore();
   const { data: whoami } = useWhoami();
@@ -562,6 +573,7 @@ export default function CalendarPage() {
   const filteredReservations = useMemo(() => {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
+    const searchLower = guestSearch.toLowerCase().trim();
     return reservationsActive.filter((res) => {
       if (statusFilter !== "all" && res.status !== statusFilter) return false;
       if (assignmentFilter === "assigned" && !res.siteId) return false;
@@ -575,9 +587,38 @@ export default function CalendarPage() {
         arr.setHours(0, 0, 0, 0);
         if (arr.getTime() !== today.getTime()) return false;
       }
+      // Guest search filter
+      if (searchLower) {
+        const firstName = (res.guest?.primaryFirstName || "").toLowerCase();
+        const lastName = (res.guest?.primaryLastName || "").toLowerCase();
+        const email = (res.guest?.email || "").toLowerCase();
+        const phone = (res.guest?.phone || "").toLowerCase();
+        const fullName = `${firstName} ${lastName}`;
+        if (
+          !firstName.includes(searchLower) &&
+          !lastName.includes(searchLower) &&
+          !email.includes(searchLower) &&
+          !phone.includes(searchLower) &&
+          !fullName.includes(searchLower)
+        ) {
+          return false;
+        }
+      }
       return true;
     });
-  }, [reservationsActive, statusFilter, assignmentFilter, channelFilter, arrivalsNowOnly]);
+  }, [reservationsActive, statusFilter, assignmentFilter, channelFilter, arrivalsNowOnly, guestSearch]);
+
+  // Memoized map of reservations by siteId for O(1) lookup instead of O(n) filtering
+  const reservationsBySite = useMemo(() => {
+    const map = new Map<string, typeof filteredReservations>();
+    for (const res of filteredReservations) {
+      if (!res.siteId) continue;
+      const existing = map.get(res.siteId) || [];
+      existing.push(res);
+      map.set(res.siteId, existing);
+    }
+    return map;
+  }, [filteredReservations]);
 
   const visibleEnd = useMemo(() => {
     const end = new Date(start);
@@ -738,6 +779,30 @@ export default function CalendarPage() {
     setStoreSelection({ highlightedId: null, openDetailsId: null });
   };
 
+  // Quick check-in handler for pills
+  const handleQuickCheckIn = useCallback(async (reservationId: string) => {
+    try {
+      await apiClient.checkInReservation(reservationId);
+      await queryClient.invalidateQueries({ queryKey: ["calendar-reservations", selectedCampground] });
+      recordMetric("calendar.quickCheckIn.success", { reservationId });
+      // Small celebration for successful check-in
+      launchConfetti({ particles: 40, durationMs: 600, spread: Math.PI * 0.4 });
+    } catch (err) {
+      recordError("calendar.quickCheckIn", err);
+    }
+  }, [queryClient, selectedCampground]);
+
+  // Helper to check if arrival is today
+  const isArrivalToday = useCallback((arrivalDate: string | Date) => {
+    const today = new Date();
+    const arrival = new Date(arrivalDate);
+    return (
+      arrival.getDate() === today.getDate() &&
+      arrival.getMonth() === today.getMonth() &&
+      arrival.getFullYear() === today.getFullYear()
+    );
+  }, []);
+
   // Handler for creating a new booking from list view
   const handleNewBookingFromListView = useCallback(async (siteId: string, arrivalDate: string, departureDate: string) => {
     if (!selectedCampground) return;
@@ -782,6 +847,9 @@ export default function CalendarPage() {
     const resId = selectedReservation?.id;
     if (!resId || !selectedCampground) return;
     if (commsByRes[resId] || commsLoading[resId]) return;
+
+    let cancelled = false; // Cleanup flag to prevent memory leaks
+
     setCommsLoading((prev) => ({ ...prev, [resId]: true }));
     setCommsErrors((prev) => {
       const next = { ...prev };
@@ -796,14 +864,24 @@ export default function CalendarPage() {
         limit: 50
       })
       .then((resp) => {
-        setCommsByRes((prev) => ({ ...prev, [resId]: resp.items }));
+        if (!cancelled) {
+          setCommsByRes((prev) => ({ ...prev, [resId]: resp.items }));
+        }
       })
       .catch(() => {
-        setCommsErrors((prev) => ({ ...prev, [resId]: "Failed to load messages." }));
+        if (!cancelled) {
+          setCommsErrors((prev) => ({ ...prev, [resId]: "Failed to load messages." }));
+        }
       })
       .finally(() => {
-        setCommsLoading((prev) => ({ ...prev, [resId]: false }));
+        if (!cancelled) {
+          setCommsLoading((prev) => ({ ...prev, [resId]: false }));
+        }
       });
+
+    return () => {
+      cancelled = true; // Cancel pending operations on cleanup
+    };
   }, [selectedReservation, selectedCampground, commsByRes, commsLoading]);
 
   const dayColumnWidth = useMemo(() => {
@@ -1016,6 +1094,9 @@ export default function CalendarPage() {
     recordMetric("calendar.selection.success", { siteId, arrivalDate, departureDate: departureExclusive, isMove: !!ganttSelection.highlightedId });
   };
 
+  // Keep ref in sync with latest selectRange function to avoid stale closures
+  selectRangeRef.current = selectRange;
+
   const handleCreateHold = async () => {
     if (!selection || !selectedCampground) {
       setSelectionError("Select a site and dates first.");
@@ -1033,6 +1114,8 @@ export default function CalendarPage() {
       });
       setHoldStatus({ state: "success", message: "Hold placed for 15 minutes." });
       recordMetric("calendar.hold.success", { siteId: selection.siteId, minutes: 15 });
+      // Celebrate successful hold with a small confetti burst
+      launchConfetti({ particles: 60, durationMs: 800, spread: Math.PI * 0.6 });
     } catch (err) {
       setHoldStatus({ state: "error", message: "Hold failed. Please retry." });
       setSelectionError("Hold failed. Please retry or create the reservation directly.");
@@ -1040,23 +1123,44 @@ export default function CalendarPage() {
     }
   };
 
-  const handleMouseUp = async (siteId?: string, dayIdx?: number) => {
+  const handleMouseUp = useCallback(async (siteId?: string, dayIdx?: number) => {
+    // Prevent overlapping async operations
+    if (isProcessingSelection.current) return;
+
+    const selectRangeFn = selectRangeRef.current;
+    if (!selectRangeFn) return;
+
     // Full drag flow - user dragged across multiple cells
     if (isDragging && dragSiteId !== null && dragStartIdx !== null && dragEndIdx !== null && siteId !== undefined && dayIdx !== undefined) {
-      await selectRange(siteId, dragStartIdx, dayIdx);
+      isProcessingSelection.current = true;
+      try {
+        await selectRangeFn(siteId, dragStartIdx, dayIdx);
+      } finally {
+        isProcessingSelection.current = false;
+      }
     }
     // Single-cell click-and-release: user clicked a cell and released without dragging
     // This creates a 1-night selection from that day
     else if (!isDragging && dragSiteId !== null && dragStartIdx !== null && siteId === dragSiteId && dayIdx === dragStartIdx) {
-      await selectRange(siteId, dragStartIdx, dragStartIdx);
+      isProcessingSelection.current = true;
+      try {
+        await selectRangeFn(siteId, dragStartIdx, dragStartIdx);
+      } finally {
+        isProcessingSelection.current = false;
+      }
     }
     // Two-click flow for range selection
     else if (siteId && typeof dayIdx === "number") {
       if (!clickStart || clickStart.siteId !== siteId) {
         setClickStart({ siteId, idx: dayIdx });
       } else {
-        await selectRange(siteId, clickStart.idx, dayIdx);
-        setClickStart(null);
+        isProcessingSelection.current = true;
+        try {
+          await selectRangeFn(siteId, clickStart.idx, dayIdx);
+          setClickStart(null);
+        } finally {
+          isProcessingSelection.current = false;
+        }
       }
     }
 
@@ -1065,7 +1169,7 @@ export default function CalendarPage() {
     setDragStartIdx(null);
     setDragEndIdx(null);
     setIsDragging(false);
-  };
+  }, [isDragging, dragSiteId, dragStartIdx, dragEndIdx, clickStart]);
 
   useEffect(() => {
     const onUp = () => {
@@ -1080,7 +1184,7 @@ export default function CalendarPage() {
     };
     window.addEventListener("mouseup", onUp);
     return () => window.removeEventListener("mouseup", onUp);
-  }, [isDragging, dragSiteId, dragStartIdx, dragEndIdx]);
+  }, [isDragging, handleMouseUp]);
 
   // Keyboard navigation
   useEffect(() => {
@@ -1358,7 +1462,7 @@ export default function CalendarPage() {
           </DialogContent>
         </Dialog>
 
-        {/* Controls */}
+        {/* Primary Controls Row */}
         <div className="flex flex-wrap items-center gap-3">
           {/* Campground Selector */}
           <select
@@ -1404,103 +1508,30 @@ export default function CalendarPage() {
 
           <div className="h-6 w-px bg-slate-300" />
 
-          {/* Status Filter */}
-          <select
-            className={`rounded-md border px-3 py-2 text-sm ${statusFilter === "all"
-              ? "border-slate-200"
-              : "border-blue-300 bg-blue-50 font-medium"
-              }`}
-            value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value)}
-          >
-            <option value="all">All Statuses</option>
-            <option value="confirmed">Confirmed</option>
-            <option value="checked_in">Checked In</option>
-            <option value="pending">Pending</option>
-          </select>
-
-          {/* Site Type Filter */}
-          <select
-            className={`rounded-md border px-3 py-2 text-sm ${siteTypeFilter === "all"
-              ? "border-slate-200"
-              : "border-emerald-300 bg-emerald-50 font-medium"
-              }`}
-            value={siteTypeFilter}
-            onChange={(e) => setSiteTypeFilter(e.target.value)}
-          >
-            <option value="all">All Site Types</option>
-            <option value="rv_full">RV Full Hookup</option>
-            <option value="rv_partial">RV Partial</option>
-            <option value="tent">Tent</option>
-            <option value="cabin">Cabin</option>
-            <option value="glamping">Glamping</option>
-          </select>
-
-          {/* Channel Filter */}
-          <select
-            className={`rounded-md border px-3 py-2 text-sm ${channelFilter === "all"
-              ? "border-slate-200"
-              : "border-violet-300 bg-violet-50 font-medium"
-              }`}
-            value={channelFilter}
-            onChange={(e) => setChannelFilter(e.target.value)}
-          >
-            <option value="all">All Channels</option>
-            <option value="direct">Direct</option>
-            <option value="ota">OTA / Marketplace</option>
-            <option value="phone">Phone</option>
-            <option value="web">Web</option>
-          </select>
-
-          {/* Assignment Filter */}
-          <select
-            className={`rounded-md border px-3 py-2 text-sm ${assignmentFilter === "all"
-              ? "border-slate-200"
-              : "border-amber-300 bg-amber-50 font-medium"
-              }`}
-            value={assignmentFilter}
-            onChange={(e) => setAssignmentFilter(e.target.value as any)}
-          >
-            <option value="all">All Assignments</option>
-            <option value="assigned">Assigned</option>
-            <option value="unassigned">Unassigned</option>
-          </select>
-
-          <button
-            type="button"
-            className={`rounded-full px-3 py-1 text-xs font-semibold border transition-colors ${arrivalsNowOnly
-              ? "border-emerald-300 bg-emerald-50 text-emerald-700"
-              : "border-slate-200 text-slate-600 hover:bg-slate-100"
-              }`}
-            onClick={() => setArrivalsNowOnly((v) => !v)}
-          >
-            Arrivals now
-          </button>
-
-          <div className="h-6 w-px bg-slate-300" />
-
           {/* Date Controls */}
-          <Button
-            variant="secondary"
-            size="sm"
-            onClick={() => shiftDays(-dayCount)}
-          >
-            ← Prev
-          </Button>
-          <Button
-            variant="secondary"
-            size="sm"
-            onClick={jumpToToday}
-          >
-            Today
-          </Button>
-          <Button
-            variant="secondary"
-            size="sm"
-            onClick={() => shiftDays(dayCount)}
-          >
-            Next →
-          </Button>
+          <div className="flex items-center gap-1">
+            <Button
+              variant="secondary"
+              size="sm"
+              onClick={() => shiftDays(-dayCount)}
+            >
+              ← Prev
+            </Button>
+            <Button
+              variant="secondary"
+              size="sm"
+              onClick={jumpToToday}
+            >
+              Today
+            </Button>
+            <Button
+              variant="secondary"
+              size="sm"
+              onClick={() => shiftDays(dayCount)}
+            >
+              Next →
+            </Button>
+          </div>
 
           <input
             type="date"
@@ -1508,30 +1539,6 @@ export default function CalendarPage() {
             value={startDate}
             onChange={(e) => setStartDate(e.target.value)}
           />
-          <div className="flex items-center gap-2">
-            <input
-              type="date"
-              className="rounded-md border border-slate-200 px-3 py-2 text-sm"
-              placeholder="Go to date"
-              value={jumpDate}
-              onChange={(e) => setJumpDate(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter") jumpToDate();
-              }}
-            />
-            <Button variant="secondary" size="sm" onClick={jumpToDate}>
-              Go
-            </Button>
-            <span className="text-[11px] text-slate-500">Shortcut: press G then type date</span>
-          </div>
-
-          <Button
-            variant={showConflictsOnly ? "secondary" : "outline"}
-            size="sm"
-            onClick={() => setShowConflictsOnly((v) => !v)}
-          >
-            {showConflictsOnly ? "Conflicts only" : "Highlight conflicts"}
-          </Button>
 
           {/* View Range */}
           <select
@@ -1548,29 +1555,35 @@ export default function CalendarPage() {
 
           <div className="h-6 w-px bg-slate-300" />
 
-          {calendarFilterCount > 0 && (
-            <div className="flex items-center gap-2">
-              <span className="rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 px-2 py-1 text-[11px] font-semibold">
-                {calendarFilterCount} filter{calendarFilterCount > 1 ? "s" : ""}
+          {/* Filters Toggle Button */}
+          <button
+            type="button"
+            onClick={() => setShowFiltersPanel((v) => !v)}
+            className={`flex items-center gap-2 rounded-md border px-3 py-2 text-sm font-medium transition-colors ${
+              showFiltersPanel || calendarFilterCount > 0
+                ? "border-emerald-300 bg-emerald-50 text-emerald-700"
+                : "border-slate-200 text-slate-600 hover:bg-slate-50"
+            }`}
+          >
+            <Filter className="h-4 w-4" />
+            <span>Filters</span>
+            {calendarFilterCount > 0 && (
+              <span className="rounded-full bg-emerald-600 text-white text-xs px-1.5 py-0.5 min-w-[20px] text-center">
+                {calendarFilterCount}
               </span>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => {
-                  setStatusFilter("all");
-                  setSiteTypeFilter("all");
-                  setChannelFilter("all");
-                  setAssignmentFilter("all");
-                  setArrivalsNowOnly(false);
-                  setViewMode("week");
-                }}
-              >
-                Clear filters
-              </Button>
-            </div>
-          )}
+            )}
+            <ChevronDown className={`h-4 w-4 transition-transform ${showFiltersPanel ? "rotate-180" : ""}`} />
+          </button>
 
-          {/* Actions - always rendered to prevent layout shift */}
+          <Button
+            variant={showConflictsOnly ? "secondary" : "outline"}
+            size="sm"
+            onClick={() => setShowConflictsOnly((v) => !v)}
+          >
+            {showConflictsOnly ? "Conflicts only" : "Highlight conflicts"}
+          </Button>
+
+          {/* Actions */}
           <Button
             variant="secondary"
             size="sm"
@@ -1579,31 +1592,156 @@ export default function CalendarPage() {
           >
             Clear Selection
           </Button>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => {
-              setStatusFilter("all");
-              setSiteTypeFilter("all");
-            }}
-          >
-            Clear filters
-          </Button>
 
-          <div className="ml-auto text-xs text-slate-500 hidden lg:block">
-            Shortcuts: ← → (days) • ↑ ↓ (weeks) • T (today) • Esc (clear)
-          </div>
-          <div className="flex items-center gap-2">
-            <div className="w-4 h-4 rounded border border-amber-500 flex items-center justify-center">
-              <Wrench className="h-3 w-3 text-amber-600" />
+          <div className="ml-auto flex items-center gap-4">
+            {/* Legend */}
+            <div className="hidden lg:flex items-center gap-4 text-xs text-slate-500">
+              <div className="flex items-center gap-1.5">
+                <div className="w-3 h-3 rounded bg-gradient-to-r from-emerald-500 to-emerald-600" />
+                <span>Confirmed</span>
+              </div>
+              <div className="flex items-center gap-1.5">
+                <div className="w-3 h-3 rounded bg-gradient-to-r from-blue-500 to-blue-600" />
+                <span>Checked In</span>
+              </div>
+              <div className="flex items-center gap-1.5">
+                <Wrench className="h-3 w-3 text-amber-600" />
+                <span>Maintenance</span>
+              </div>
+              <div className="flex items-center gap-1.5">
+                <Sparkles className="h-3 w-3 text-cyan-600" />
+                <span>Cleaning</span>
+              </div>
             </div>
-            <span>Maintenance on site</span>
+            <span className="text-xs text-slate-400 hidden xl:block">
+              ← → days • ↑ ↓ weeks • T today
+            </span>
           </div>
-          <div className="flex items-center gap-2">
-            <div className="w-4 h-4 rounded border border-cyan-500 flex items-center justify-center">
-              <Sparkles className="h-3 w-3 text-cyan-600" />
+        </div>
+
+        {/* Collapsible Filters Panel */}
+        <div
+          className={`overflow-hidden transition-all duration-200 ease-out ${
+            showFiltersPanel ? "max-h-24 opacity-100 mt-3" : "max-h-0 opacity-0"
+          }`}
+        >
+          <div className="flex flex-wrap items-center gap-3 p-3 bg-slate-50 rounded-lg border border-slate-200">
+            {/* Guest Search */}
+            <div className="relative">
+              <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+              <input
+                type="text"
+                placeholder="Search guest..."
+                value={guestSearch}
+                onChange={(e) => setGuestSearch(e.target.value)}
+                className={`rounded-md border pl-8 pr-8 py-2 text-sm w-48 ${guestSearch
+                  ? "border-purple-300 bg-purple-50 font-medium"
+                  : "border-slate-200 bg-white"
+                  }`}
+              />
+              {guestSearch && (
+                <button
+                  type="button"
+                  className="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+                  onClick={() => setGuestSearch("")}
+                >
+                  <XCircle className="h-4 w-4" />
+                </button>
+              )}
             </div>
-            <span>Cleaning needed</span>
+
+            {/* Status Filter */}
+            <select
+              className={`rounded-md border px-3 py-2 text-sm ${statusFilter === "all"
+                ? "border-slate-200 bg-white"
+                : "border-blue-300 bg-blue-50 font-medium"
+                }`}
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value)}
+            >
+              <option value="all">All Statuses</option>
+              <option value="confirmed">Confirmed</option>
+              <option value="checked_in">Checked In</option>
+              <option value="pending">Pending</option>
+            </select>
+
+            {/* Site Type Filter */}
+            <select
+              className={`rounded-md border px-3 py-2 text-sm ${siteTypeFilter === "all"
+                ? "border-slate-200 bg-white"
+                : "border-emerald-300 bg-emerald-50 font-medium"
+                }`}
+              value={siteTypeFilter}
+              onChange={(e) => setSiteTypeFilter(e.target.value)}
+            >
+              <option value="all">All Site Types</option>
+              <option value="rv_full">RV Full Hookup</option>
+              <option value="rv_partial">RV Partial</option>
+              <option value="tent">Tent</option>
+              <option value="cabin">Cabin</option>
+              <option value="glamping">Glamping</option>
+            </select>
+
+            {/* Channel Filter */}
+            <select
+              className={`rounded-md border px-3 py-2 text-sm ${channelFilter === "all"
+                ? "border-slate-200 bg-white"
+                : "border-violet-300 bg-violet-50 font-medium"
+                }`}
+              value={channelFilter}
+              onChange={(e) => setChannelFilter(e.target.value)}
+            >
+              <option value="all">All Channels</option>
+              <option value="direct">Direct</option>
+              <option value="ota">OTA / Marketplace</option>
+              <option value="phone">Phone</option>
+              <option value="web">Web</option>
+            </select>
+
+            {/* Assignment Filter */}
+            <select
+              className={`rounded-md border px-3 py-2 text-sm ${assignmentFilter === "all"
+                ? "border-slate-200 bg-white"
+                : "border-amber-300 bg-amber-50 font-medium"
+                }`}
+              value={assignmentFilter}
+              onChange={(e) => setAssignmentFilter(e.target.value as any)}
+            >
+              <option value="all">All Assignments</option>
+              <option value="assigned">Assigned</option>
+              <option value="unassigned">Unassigned</option>
+            </select>
+
+            <button
+              type="button"
+              className={`rounded-full px-3 py-1.5 text-xs font-semibold border transition-colors ${arrivalsNowOnly
+                ? "border-emerald-400 bg-emerald-100 text-emerald-700"
+                : "border-slate-200 bg-white text-slate-600 hover:bg-slate-100"
+                }`}
+              onClick={() => setArrivalsNowOnly((v) => !v)}
+            >
+              Arrivals Today
+            </button>
+
+            {/* Clear All Filters */}
+            {calendarFilterCount > 0 && (
+              <Button
+                variant="ghost"
+                size="sm"
+                className="text-slate-500 hover:text-slate-700"
+                onClick={() => {
+                  setStatusFilter("all");
+                  setSiteTypeFilter("all");
+                  setChannelFilter("all");
+                  setAssignmentFilter("all");
+                  setArrivalsNowOnly(false);
+                  setGuestSearch("");
+                }}
+              >
+                <XCircle className="h-4 w-4 mr-1" />
+                Clear all filters
+              </Button>
+            )}
           </div>
         </div>
 
@@ -1682,11 +1820,47 @@ export default function CalendarPage() {
           </div>
         </div>
 
-        {/* Loading State */}
+        {/* Loading State - Skeleton */}
         {selectedCampground && (sitesQuery.isLoading || reservationsQuery.isLoading) && (
-          <div className="card p-8 text-center">
-            <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-blue-600 border-r-transparent" />
-            <p className="mt-3 text-sm text-slate-600">Loading calendar data...</p>
+          <div className="rounded-xl border border-slate-200 bg-white shadow-sm overflow-hidden animate-pulse">
+            {/* Skeleton Header */}
+            <div className="grid border-b border-slate-200" style={{ gridTemplateColumns: "160px repeat(7, 1fr)" }}>
+              <div className="px-3 py-3 bg-slate-50 border-r border-slate-200">
+                <div className="h-4 w-20 bg-slate-200 rounded" />
+              </div>
+              {Array.from({ length: 7 }).map((_, i) => (
+                <div key={i} className="px-2 py-3 text-center bg-slate-50 border-r border-slate-200 last:border-r-0">
+                  <div className="h-3 w-12 bg-slate-200 rounded mx-auto mb-1" />
+                  <div className="h-3 w-8 bg-slate-200 rounded mx-auto" />
+                </div>
+              ))}
+            </div>
+            {/* Skeleton Rows */}
+            {Array.from({ length: 6 }).map((_, rowIdx) => (
+              <div
+                key={rowIdx}
+                className={`grid border-b border-slate-100 last:border-b-0 ${rowIdx % 2 === 0 ? "bg-white" : "bg-slate-50/50"}`}
+                style={{ gridTemplateColumns: "160px repeat(7, 1fr)" }}
+              >
+                <div className="px-3 py-4 border-r border-slate-200">
+                  <div className="h-4 w-24 bg-slate-200 rounded mb-2" />
+                  <div className="h-3 w-16 bg-slate-100 rounded" />
+                </div>
+                {Array.from({ length: 7 }).map((_, colIdx) => (
+                  <div key={colIdx} className="h-16 border-r border-slate-100 last:border-r-0 relative px-1 py-1">
+                    {/* Random pill skeletons */}
+                    {Math.random() > 0.7 && (
+                      <div className="h-10 bg-slate-200 rounded-md mx-1" style={{ width: `${Math.random() * 80 + 20}%` }} />
+                    )}
+                  </div>
+                ))}
+              </div>
+            ))}
+            {/* Loading indicator */}
+            <div className="p-3 bg-slate-50 border-t border-slate-200 flex items-center justify-center gap-2">
+              <div className="h-4 w-4 animate-spin rounded-full border-2 border-emerald-600 border-r-transparent" />
+              <span className="text-sm text-slate-600">Loading calendar...</span>
+            </div>
           </div>
         )}
 
@@ -1814,7 +1988,7 @@ export default function CalendarPage() {
             <div className="divide-y divide-slate-200 min-w-[960px]">
               {(sitesQuery.data || []).map((site, rowIdx) => {
                 const zebra = rowIdx % 2 === 0 ? "bg-white" : "bg-slate-50";
-                const siteReservations = filteredReservations.filter((r) => r.siteId === site.id);
+                const siteReservations = reservationsBySite.get(site.id) || [];
                 return (
                   <div key={site.id} className={`grid grid-cols-8 ${zebra}`}>
                     <div className="px-3 py-2 sticky left-0 z-20 border-r border-slate-200 flex flex-col gap-1">
@@ -2262,60 +2436,82 @@ export default function CalendarPage() {
                             const endIdx = Math.min(dayCount, diffInDays(resEnd, start));
                             if (endIdx <= 0 || startIdx >= dayCount) return null;
                             const span = Math.max(1, endIdx - startIdx);
-                            const statusColor =
+                            const statusStyles =
                               res.status === "confirmed"
-                                ? "bg-emerald-600"
+                                ? "bg-gradient-to-r from-emerald-500 to-emerald-600 border-emerald-600/50 shadow-emerald-500/25"
                                 : res.status === "checked_in"
-                                  ? "bg-blue-600"
+                                  ? "bg-gradient-to-r from-blue-500 to-blue-600 border-blue-600/50 shadow-blue-500/25"
                                   : res.status === "cancelled"
-                                    ? "bg-rose-500"
-                                    : "bg-amber-500";
+                                    ? "bg-gradient-to-r from-rose-400 to-rose-500 border-rose-500/50 shadow-rose-500/25"
+                                    : "bg-gradient-to-r from-amber-400 to-amber-500 border-amber-500/50 shadow-amber-500/25";
                             const guestName = `${(res as any).guest?.primaryFirstName || ""} ${(res as any).guest?.primaryLastName || ""}`.trim();
                             const total = (res.totalAmount ?? 0) / 100;
                             const nights = Math.max(1, endIdx - startIdx);
                             const adr = nights > 0 ? total / nights : total;
+                            const showQuickCheckIn = res.status === "confirmed" && isArrivalToday(res.arrivalDate);
                             return (
-                              <div
+                              <ReservationHoverCard
                                 key={res.id}
-                                className={`rounded-md text-xs text-white shadow-sm flex items-center px-2 overflow-hidden ${statusColor} ${ganttSelection.highlightedId === res.id ? "ring-2 ring-amber-300" : ""
-                                  }`}
-                                style={{
-                                  gridColumn: `${startIdx + 1} / span ${span}`,
-                                  minWidth: `${span * 90}px`,
-                                  pointerEvents: isDragging ? "none" : "auto",
-                                  height: "100%"
+                                reservation={{
+                                  ...res,
+                                  guest: (res as any).guest,
+                                  site: site,
                                 }}
-                                title={`${guestName || "Guest"} • ${res.arrivalDate} → ${res.departureDate} • $${total.toFixed(
-                                  2
-                                )} (${adr.toFixed(2)}/night)`}
-                                onMouseDown={(e) => {
-                                  e.stopPropagation();
-                                  setDragSiteId(site.id);
-                                  setDragStartIdx(startIdx);
-                                  setDragEndIdx(startIdx);
-                                  setIsDragging(true);
-                                  setStoreSelection({ highlightedId: res.id, openDetailsId: res.id });
-                                }}
-                                onMouseUp={(e) => {
-                                  e.stopPropagation();
-                                  if (isDragging && dragStartIdx !== null) {
-                                    handleMouseUp(site.id, startIdx);
-                                  }
-                                }}
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  setSelectedReservation(res);
-                                  setQuickActionRes(res.id);
-                                  setQuickActionAnchor(res.id);
-                                  setShowPopover(res.id);
-                                }}
-                                data-res-id={res.id}
+                                onQuickCheckIn={showQuickCheckIn ? () => handleQuickCheckIn(res.id) : undefined}
+                                isArrivalToday={showQuickCheckIn}
                               >
-                                <span className="truncate flex items-center gap-1">
-                                  {guestName || "Guest"} — {res.status.replace("_", " ")}
-                                  {conflictHit && <AlertTriangle className="h-3.5 w-3.5 text-amber-100" />}
-                                </span>
-                              </div>
+                                <div
+                                  className={`group rounded-lg text-xs text-white shadow-md border flex items-center px-2.5 overflow-hidden transition-all duration-200 ease-out cursor-pointer hover:scale-[1.02] hover:shadow-lg hover:z-20 active:scale-[0.98] ${statusStyles} ${ganttSelection.highlightedId === res.id ? "ring-2 ring-amber-300 scale-[1.02]" : ""
+                                    }`}
+                                  style={{
+                                    gridColumn: `${startIdx + 1} / span ${span}`,
+                                    minWidth: `${span * 90}px`,
+                                    pointerEvents: isDragging ? "none" : "auto",
+                                    height: "100%"
+                                  }}
+                                  onMouseDown={(e) => {
+                                    e.stopPropagation();
+                                    setDragSiteId(site.id);
+                                    setDragStartIdx(startIdx);
+                                    setDragEndIdx(startIdx);
+                                    setIsDragging(true);
+                                    setStoreSelection({ highlightedId: res.id, openDetailsId: res.id });
+                                  }}
+                                  onMouseUp={(e) => {
+                                    e.stopPropagation();
+                                    if (isDragging && dragStartIdx !== null) {
+                                      handleMouseUp(site.id, startIdx);
+                                    }
+                                  }}
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    setSelectedReservation(res);
+                                    setQuickActionRes(res.id);
+                                    setQuickActionAnchor(res.id);
+                                    setShowPopover(res.id);
+                                  }}
+                                  data-res-id={res.id}
+                                >
+                                  <span className="truncate flex items-center gap-1 flex-1">
+                                    {guestName || "Guest"} — {res.status.replace("_", " ")}
+                                    {conflictHit && <AlertTriangle className="h-3.5 w-3.5 text-amber-100" />}
+                                  </span>
+                                  {/* Quick Check-in Button - Shows on hover for confirmed arrivals today */}
+                                  {showQuickCheckIn && (
+                                    <button
+                                      type="button"
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        handleQuickCheckIn(res.id);
+                                      }}
+                                      className="ml-1 opacity-0 group-hover:opacity-100 transition-opacity bg-white/90 text-emerald-700 rounded-full p-1 hover:bg-white shadow-sm flex-shrink-0"
+                                      title="Quick Check-in"
+                                    >
+                                      <LogIn className="h-3 w-3" />
+                                    </button>
+                                  )}
+                                </div>
+                              </ReservationHoverCard>
                             );
                           })}
                         </div>
@@ -2334,8 +2530,8 @@ export default function CalendarPage() {
           </div>
         )}
 
-        {/* Inspector + quick actions */}
-        <div className="hidden xl:block fixed right-6 top-28 w-96 z-40 space-y-3">
+        {/* Inspector + quick actions - Show on lg screens and up */}
+        <div className="hidden lg:block fixed right-6 top-28 w-80 xl:w-96 z-40 space-y-3">
           {selectedReservation ? (() => {
             const res = selectedReservation;
             const guestName = `${res.guest?.primaryFirstName || ""} ${res.guest?.primaryLastName || ""}`.trim() || "Guest";
@@ -2945,9 +3141,9 @@ export default function CalendarPage() {
           </div>
         )}
 
-        {/* Reservation Detail Dialog */}
+        {/* Reservation Detail Dialog - Bottom sheet style on mobile, only show on small screens */}
         <Dialog open={!!selectedReservation} onOpenChange={() => setSelectedReservation(null)}>
-          <DialogContent className="max-w-md">
+          <DialogContent className="lg:hidden max-w-md fixed bottom-0 left-0 right-0 top-auto translate-y-0 rounded-t-2xl rounded-b-none sm:relative sm:bottom-auto sm:left-auto sm:right-auto sm:rounded-lg data-[state=open]:slide-in-from-bottom-full data-[state=closed]:slide-out-to-bottom-full sm:data-[state=open]:slide-in-from-bottom-0 sm:data-[state=closed]:slide-out-to-bottom-0">
             <DialogHeader>
               <DialogTitle className="flex items-center gap-2">
                 <Calendar className="w-5 h-5 text-blue-600" />

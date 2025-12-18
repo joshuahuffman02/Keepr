@@ -14,11 +14,12 @@ import {
   Plus
 } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../../components/ui/dialog";
+import type { CalendarReservation, CalendarSite } from "./types";
 
 interface ListViewProps {
-  reservations: any[];
-  sites: any[];
-  onReservationClick: (reservation: any) => void;
+  reservations: CalendarReservation[];
+  sites: CalendarSite[];
+  onReservationClick: (reservation: CalendarReservation) => void;
   onNewBooking?: (siteId: string, arrivalDate: string, departureDate: string) => void;
   allowOps?: boolean;
 }
@@ -190,7 +191,7 @@ export function ListView({
               {/* Group Items */}
               {isExpanded && (
                 <div className="divide-y divide-slate-200">
-                  {groupReservations.map((res: any) => {
+                  {groupReservations.map((res) => {
                     const site = sites.find(s => s.id === res.siteId);
                     const hasBalance = res.balanceAmount && res.balanceAmount > 0;
                     const statusColor = getStatusColor(res.status);
