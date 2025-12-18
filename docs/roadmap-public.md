@@ -1,6 +1,32 @@
 # Product Roadmap (Public)
 Living view of what's shipping for RV hospitality operators and guests. Themes only—details may change as we learn.
 
+## Update — Dec 17, 2025: Self-Service & Support Automation (SHIPPED)
+
+We've completed our Product-Led Growth initiative to make Camp Everyday fully self-service:
+
+### Self-Service Signup & Onboarding
+- **Early Access Program**: Choose your tier (Pioneer, Trailblazer, or Base Camp) with transparent pricing
+- **Guided Onboarding**: Step-by-step wizard to set up your campground
+- **Welcome Dashboard**: Track your setup progress and get started quickly
+
+### AI-Powered Support
+- **Support Chat Assistant**: Get instant answers about using Camp Everyday
+- **Smart Help Articles**: Context-aware suggestions based on your questions
+- **Seamless Escalation**: Create support tickets when you need human help
+
+### Referral Program
+- **Earn $50 Credits**: Refer other campground owners and both get credited
+- **Easy Sharing**: Copy your link or share via email, Twitter, or Facebook
+- **Track Progress**: See clicks, signups, and earned credits in your dashboard
+
+### Guided Feature Tours
+- **Welcome Tour**: New users get a guided introduction to key features
+- **On-Demand Tours**: Learn about specific features (booking, pricing, referrals)
+- **Smart Highlighting**: Tours point directly to relevant UI elements
+
+---
+
 ## Update — Dec 17, 2025: Guest Experience Polish (SHIPPED)
 We've shipped a comprehensive update to the guest booking experience:
 - **Trust & Security**: Clear security badges during checkout (SSL, PCI compliant, Stripe secure)

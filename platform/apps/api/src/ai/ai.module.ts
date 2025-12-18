@@ -5,6 +5,7 @@ import { AiFeatureGateService } from './ai-feature-gate.service';
 import { AiReplyAssistService } from './ai-reply-assist.service';
 import { AiInsightsService } from './ai-insights.service';
 import { AiBookingAssistService } from './ai-booking-assist.service';
+import { AiSupportService } from './ai-support.service';
 import { AiController } from './ai.controller';
 import { PrismaModule } from '../prisma/prisma.module';
 import { PublicReservationsModule } from '../public-reservations/public-reservations.module';
@@ -19,6 +20,7 @@ import { PublicReservationsModule } from '../public-reservations/public-reservat
     AiReplyAssistService,
     AiInsightsService,
     AiBookingAssistService,
+    AiSupportService,
   ],
   exports: [
     AiPrivacyService,
@@ -27,6 +29,7 @@ import { PublicReservationsModule } from '../public-reservations/public-reservat
     AiReplyAssistService,
     AiInsightsService,
     AiBookingAssistService,
+    AiSupportService,
   ],
 })
 export class AiModule { }

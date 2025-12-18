@@ -5,6 +5,7 @@ import { UserRole } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { AiFeatureGateService } from './ai-feature-gate.service';
 import { AiBookingAssistService } from './ai-booking-assist.service';
+import { AiSupportService } from './ai-support.service';
 import type { Request } from 'express';
 
 interface UpdateAiSettingsDto {
@@ -29,12 +30,20 @@ interface BookingChatDto {
   history?: { role: 'user' | 'assistant'; content: string }[];
 }
 
+interface SupportChatDto {
+  sessionId: string;
+  message: string;
+  history?: { role: 'user' | 'assistant'; content: string }[];
+  context?: string;
+}
+
 @Controller('ai')
 export class AiController {
   constructor(
     private readonly prisma: PrismaService,
     private readonly gate: AiFeatureGateService,
     private readonly bookingAssist: AiBookingAssistService,
+    private readonly supportService: AiSupportService,
   ) { }
 
   // ==================== PUBLIC ENDPOINTS ====================
@@ -88,6 +97,45 @@ export class AiController {
   }
 
   // ==================== AUTHENTICATED ENDPOINTS ====================
+
+  /**
+   * Support chat endpoint for dashboard users
+   * Provides AI-powered help with using Camp Everyday
+   */
+  @UseGuards(JwtAuthGuard)
+  @Post('support/chat')
+  async supportChat(
+    @Body() body: SupportChatDto,
+    @Req() req: Request,
+  ) {
+    const userId = (req as any).user?.id;
+
+    try {
+      return await this.supportService.chat({
+        sessionId: body.sessionId,
+        message: body.message,
+        history: body.history,
+        context: body.context,
+        userId,
+      });
+    } catch (error) {
+      console.error('Support chat error:', error);
+      // Return graceful fallback
+      return {
+        message:
+          "I'm having trouble connecting right now. Here are some ways to get help:\n\n" +
+          "- Check the Help Center for answers\n" +
+          "- Browse our FAQs\n" +
+          "- Submit a support ticket",
+        helpArticles: [
+          { title: "Help Center", url: "/help" },
+          { title: "FAQs", url: "/help/faq" },
+          { title: "Contact Support", url: "/help/contact" },
+        ],
+        showTicketPrompt: true,
+      };
+    }
+  }
 
   @UseGuards(JwtAuthGuard)
   @Get('campgrounds/:campgroundId/settings')

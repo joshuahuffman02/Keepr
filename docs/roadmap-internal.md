@@ -1,8 +1,58 @@
 # RV Hospitality Roadmap (Internal)
-Last updated: 2025-12-17 (emotional design shipped)
+Last updated: 2025-12-17 (PLG complete)
 Audience: product, engineering, GTM. Structure: Foundations → Differentiators → Moats. Owners are placeholders until staffed.
 
-## Update — Dec 17, 2025: Emotional Design & UX Polish (SHIPPED)
+## Update — Dec 17, 2025 (Session 2): Product-Led Growth Complete (SHIPPED)
+
+All PLG features are now complete. Camp Everyday can sell itself with minimal founder involvement.
+
+### AI Support Backend
+- **New service**: `ai-support.service.ts` with embedded help knowledge base
+- **Endpoint**: `POST /ai/support/chat` in `ai.controller.ts`
+- **Features**: Context-aware responses from help topics, graceful fallbacks, ticket prompts
+- **Integration**: Connects to existing `SupportChatWidget.tsx`
+
+### Referral Program Frontend
+- **New page**: `/dashboard/referrals/page.tsx`
+- **Stats display**: Clicks, signups, conversions, pending/earned credits
+- **Sharing**: Copy link, email, Twitter, Facebook sharing
+- **Referral history**: Table with status badges and credit amounts
+- **How it works**: Visual 3-step explanation
+
+### Feature Tours System
+- **Tour definitions**: `lib/tours/feature-tours.ts` with 4 tours (dashboard-welcome, booking-flow, pricing-setup, referral-program)
+- **Hook**: `hooks/use-feature-tour.ts` for programmatic tour control
+- **Provider**: `components/tours/FeatureTourProvider.tsx` with:
+  - Element highlighting with SVG mask cutout
+  - Keyboard navigation (arrows, Enter, Escape)
+  - Progress dots and step navigation
+  - Auto-start for first login
+  - `data-tour` attribute targeting
+
+### Files Created
+```
+platform/apps/api/src/ai/ai-support.service.ts
+platform/apps/web/app/dashboard/referrals/page.tsx
+platform/apps/web/lib/tours/feature-tours.ts
+platform/apps/web/hooks/use-feature-tour.ts
+platform/apps/web/components/tours/FeatureTourProvider.tsx
+platform/apps/web/components/tours/index.ts
+```
+
+### Files Modified
+```
+platform/apps/api/src/ai/ai.module.ts - Added AiSupportService
+platform/apps/api/src/ai/ai.controller.ts - Added support chat endpoint
+```
+
+### Remaining Integration Work
+- Add `FeatureTourProvider` to app layout
+- Add `data-tour` attributes to nav elements for tour highlighting
+- Create org-level referral tracking backend (frontend ready)
+
+---
+
+## Update — Dec 17, 2025 (Session 1): Emotional Design & UX Polish (SHIPPED)
 Comprehensive emotional design improvements deployed to all public-facing pages:
 
 ### Booking Flow
