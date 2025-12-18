@@ -185,17 +185,21 @@ export function useCalendarData() {
                 if (arr.getTime() !== today.getTime()) return false;
             }
             if (searchLower) {
-                const firstName = (res.guest?.primaryFirstName || "").toLowerCase();
-                const lastName = (res.guest?.primaryLastName || "").toLowerCase();
-                const email = (res.guest?.email || "").toLowerCase();
-                const phone = (res.guest?.phone || "").toLowerCase();
-                const fullName = `${firstName} ${lastName}`;
+                const guest = (res.guest || {}) as any;
+                const firstName = (guest.primaryFirstName || "").toLowerCase();
+                const lastName = (guest.primaryLastName || "").toLowerCase();
+                const email = (guest.email || "").toLowerCase();
+                const phone = (guest.phone || "").toLowerCase();
+                const siteName = (res.site?.name || "").toLowerCase();
+                const fullName = `${firstName} ${lastName}`.toLowerCase();
+
                 if (
                     !firstName.includes(searchLower) &&
                     !lastName.includes(searchLower) &&
                     !email.includes(searchLower) &&
                     !phone.includes(searchLower) &&
-                    !fullName.includes(searchLower)
+                    !fullName.includes(searchLower) &&
+                    !siteName.includes(searchLower)
                 ) {
                     return false;
                 }

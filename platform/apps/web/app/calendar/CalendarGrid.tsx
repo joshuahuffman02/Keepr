@@ -67,8 +67,36 @@ export function CalendarGrid({ data, onSelectionComplete }: CalendarGridProps) {
             }
         };
 
+        const handleGlobalPointerMove = (e: PointerEvent) => {
+            const drag = dragRef.current;
+            if (drag.isDragging && gridRef.current) {
+                const target = document.elementFromPoint(e.clientX, e.clientY) as HTMLElement | null;
+                const cell = target?.closest("[data-day-idx]") as HTMLElement | null;
+                const dayIdxAttr = cell?.getAttribute("data-day-idx");
+
+                if (dayIdxAttr !== null && dayIdxAttr !== undefined) {
+                    const idx = parseInt(dayIdxAttr, 10);
+                    // Update visual state WITHOUT React re-render for 60fps
+                    const startIdx = drag.startIdx ?? idx;
+                    const minIdx = Math.min(startIdx, idx);
+                    const maxIdx = Math.max(startIdx, idx);
+                    const span = maxIdx - minIdx + 1;
+
+                    gridRef.current.style.setProperty("--drag-start-col", (minIdx + 1).toString());
+                    gridRef.current.style.setProperty("--drag-span", span.toString());
+
+                    // Still call the handler for the final state, but throttle or just let it update ref
+                    drag.endIdx = idx;
+                }
+            }
+        };
+
         window.addEventListener("pointerup", handleGlobalPointerUp);
-        return () => window.removeEventListener("pointerup", handleGlobalPointerUp);
+        window.addEventListener("pointermove", handleGlobalPointerMove, { passive: true });
+        return () => {
+            window.removeEventListener("pointerup", handleGlobalPointerUp);
+            window.removeEventListener("pointermove", handleGlobalPointerMove);
+        };
     }, [handleDragEnd, dragRef]);
 
     if (sites.isLoading || reservations.isLoading) {

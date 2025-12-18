@@ -24,7 +24,9 @@ export const RowSelectionOverlay = ({ siteId, siteName, dayCount }: RowSelection
         <div
             className="absolute inset-y-1 mx-0.5 rounded-lg bg-blue-500/30 border-2 border-blue-500 z-30 pointer-events-none flex items-center justify-center overflow-hidden shadow-[0_0_15px_rgba(59,130,246,0.3)]"
             style={{
-                gridColumn: `${selStart + 1} / span ${span}`,
+                gridColumn: isDragging
+                    ? "var(--drag-start-col, 1) / span var(--drag-span, 1)"
+                    : `${selStart + 1} / span ${span}`,
             }}
         >
             <div className="bg-blue-600/95 backdrop-blur-md text-[10px] sm:text-[11px] font-black text-white px-3 py-1 rounded-full shadow-xl animate-in fade-in zoom-in duration-200 border border-blue-400/50 flex items-center gap-2 whitespace-nowrap">

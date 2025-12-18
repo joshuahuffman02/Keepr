@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import { useRouter } from "next/navigation";
 import { DashboardShell } from "../../components/ui/layout/DashboardShell";
 import { Breadcrumbs } from "../../components/breadcrumbs";
 import { useCalendarData } from "./useCalendarData";
@@ -22,6 +23,7 @@ export default function CalendarPage() {
 }
 
 function CalendarContent() {
+  const router = useRouter();
   const data = useCalendarData();
   const { state, actions, queries, derived } = data;
   const { campgrounds } = queries;
@@ -43,6 +45,8 @@ function CalendarContent() {
           viewMode={state.viewMode}
           setViewMode={actions.setViewMode}
           onToday={() => actions.setStartDate(new Date().toISOString().split("T")[0])}
+          dayCount={state.dayCount}
+          setDayCount={actions.setDayCount}
         />
 
         {state.viewMode !== "list" && (
@@ -95,7 +99,18 @@ function CalendarContent() {
                     <Button
                       size="sm"
                       className="bg-blue-600 hover:bg-blue-500 text-white font-bold px-6 shadow-[0_0_20px_rgba(37,99,235,0.4)]"
-                      onClick={() => actions.setReservationDraft(null)}
+                      onClick={() => {
+                        const slug = selectedCampgroundDetails?.slug || "none";
+                        const draft = state.reservationDraft;
+                        if (draft) {
+                          const params = new URLSearchParams({
+                            siteId: draft.siteId,
+                            arrival: draft.arrival,
+                            departure: draft.departure
+                          });
+                          router.push(`/park/${slug}/book?${params.toString()}`);
+                        }
+                      }}
                     >
                       Book Now
                     </Button>

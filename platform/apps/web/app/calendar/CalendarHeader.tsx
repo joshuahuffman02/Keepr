@@ -1,8 +1,9 @@
 import React from "react";
 import { Button } from "../../components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../components/ui/select";
-import { ChevronLeft, ChevronRight, Calendar as CalendarIcon, List, CalendarDays, Maximize2 } from "lucide-react";
+import { ChevronLeft, ChevronRight, Calendar as CalendarIcon, List, CalendarDays, Maximize2, CalendarRange } from "lucide-react";
 import { formatLocalDateInput, parseLocalDateInput } from "./utils";
+import { cn } from "../../lib/utils";
 
 interface CalendarHeaderProps {
     startDate: string;
@@ -10,6 +11,8 @@ interface CalendarHeaderProps {
     viewMode: string;
     setViewMode: (v: any) => void;
     onToday: () => void;
+    dayCount: number;
+    setDayCount: (v: number) => void;
 }
 
 export function CalendarHeader({
@@ -17,18 +20,21 @@ export function CalendarHeader({
     setStartDate,
     viewMode,
     setViewMode,
-    onToday
+    onToday,
+    dayCount,
+    setDayCount
 }: CalendarHeaderProps) {
 
     const handlePrev = () => {
         const d = parseLocalDateInput(startDate);
-        d.setDate(d.getDate() - 7);
+        // Step by the visible range
+        d.setDate(d.getDate() - dayCount);
         setStartDate(formatLocalDateInput(d));
     };
 
     const handleNext = () => {
         const d = parseLocalDateInput(startDate);
-        d.setDate(d.getDate() + 7);
+        d.setDate(d.getDate() + dayCount);
         setStartDate(formatLocalDateInput(d));
     };
 
@@ -43,6 +49,31 @@ export function CalendarHeader({
             </div>
 
             <div className="flex flex-wrap items-center gap-3">
+                {/* View Toggles (7d, 14d, 30d) */}
+                <div className="flex items-center bg-white rounded-lg border border-slate-200 shadow-sm p-1">
+                    {[7, 14, 30].map((d) => (
+                        <Button
+                            key={d}
+                            variant="ghost"
+                            size="sm"
+                            className={cn(
+                                "px-3 h-8 text-[10px] font-bold uppercase tracking-tight",
+                                dayCount === d ? "bg-slate-100 text-blue-600" : "text-slate-500"
+                            )}
+                            onClick={() => setDayCount(d)}
+                        >
+                            {d}d
+                        </Button>
+                    ))}
+                    <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-8 w-8 text-slate-400 hover:text-blue-600"
+                        title="Custom Range"
+                    >
+                        <CalendarRange className="h-3.5 w-3.5" />
+                    </Button>
+                </div>
 
                 <div className="flex items-center bg-white rounded-lg border border-slate-200 shadow-sm p-1">
                     <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-600" onClick={handlePrev}>
