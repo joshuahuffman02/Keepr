@@ -235,6 +235,14 @@ function getNpsColor(nps: number): string {
   return "text-red-400";
 }
 
+// Helper to round long decimals in message strings
+function formatMessage(message: string): string {
+  return message.replace(/(\d+\.\d{2,})/g, (match) => {
+    const num = parseFloat(match);
+    return (Math.round(num * 10) / 10).toString();
+  });
+}
+
 export default function AiInsightsPage() {
   const [dateRange, setDateRange] = useState("last_30_days");
   const [suggestions, setSuggestions] = useState(mockSuggestions);
@@ -387,15 +395,15 @@ export default function AiInsightsPage() {
                           <span className="text-slate-400">{anomaly.campgroundName}</span>
                         )}
                       </div>
-                      <p className="font-medium text-white">{anomaly.message}</p>
+                      <p className="font-medium text-white">{formatMessage(anomaly.message)}</p>
                     </div>
                     <div className="text-right">
                       <p className="text-2xl font-bold text-red-400">
-                        {anomaly.currentValue > 0 ? anomaly.currentValue : anomaly.currentValue}
+                        {typeof anomaly.currentValue === 'number' ? Math.round(anomaly.currentValue * 10) / 10 : anomaly.currentValue}
                         {anomaly.type === "cancellation_spike" ? "%" : ""}
                       </p>
                       <p className="text-xs text-slate-500">
-                        Expected: {anomaly.expectedValue}{anomaly.type === "cancellation_spike" ? "%" : ""}
+                        Expected: {typeof anomaly.expectedValue === 'number' ? Math.round(anomaly.expectedValue * 10) / 10 : anomaly.expectedValue}{anomaly.type === "cancellation_spike" ? "%" : ""}
                       </p>
                     </div>
                   </div>
