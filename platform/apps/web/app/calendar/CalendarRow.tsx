@@ -1,11 +1,10 @@
 import { memo } from "react";
 import { ReservationPill } from "./ReservationPill";
 import { RowSelectionOverlay } from "./RowSelectionOverlay";
-import { useCalendarContext } from "./CalendarContext";
 import { cn } from "../../lib/utils";
 import type { CalendarSite, CalendarReservation, CalendarSelection, GanttSelection, DayMeta } from "./types";
 import { Wrench, Sparkles, AlertTriangle, Calendar, Tent } from "lucide-react";
-import { diffInDays } from "./utils";
+import { diffInDays, parseLocalDateInput } from "./utils";
 
 interface CalendarRowProps {
     site: CalendarSite;
@@ -38,11 +37,10 @@ export const CalendarRow = memo(function CalendarRow({
     handlers,
     today
 }: CalendarRowProps) {
-    const { dragState } = useCalendarContext();
     const { onDragStart, onDragEnter, onDragEnd, onReservationClick, onQuickCheckIn } = handlers;
 
     const isArrivalToday = (res: CalendarReservation) => {
-        const arrivalDate = new Date(res.arrivalDate);
+        const arrivalDate = parseLocalDateInput(res.arrivalDate);
         return (
             arrivalDate.getDate() === today.getDate() &&
             arrivalDate.getMonth() === today.getMonth() &&
@@ -55,10 +53,6 @@ export const CalendarRow = memo(function CalendarRow({
             className="grid relative group hover:bg-slate-50/50 transition-colors"
             style={{ gridTemplateColumns: gridTemplate }}
             onDragStart={(e) => e.preventDefault()}
-            onPointerLeave={() => {
-                // If the pointer leaves the row while dragging, we still want to track it
-                // but we don't clear the siteId here because it might be a drift.
-            }}
         >
             {/* Site Info Column */}
             <div className={cn("px-4 py-3 sticky left-0 z-20 border-r border-slate-200 flex flex-col justify-center", zebra)}>
@@ -111,8 +105,8 @@ export const CalendarRow = memo(function CalendarRow({
                         selection.siteId === site.id &&
                         (() => {
                             const start = days[0].date;
-                            const selStartIdx = Math.max(0, diffInDays(new Date(selection.arrival), start));
-                            const selEndIdx = Math.min(dayCount, diffInDays(new Date(selection.departure), start));
+                            const selStartIdx = Math.max(0, diffInDays(parseLocalDateInput(selection.arrival), start));
+                            const selEndIdx = Math.min(dayCount, diffInDays(parseLocalDateInput(selection.departure), start));
                             if (selEndIdx <= 0 || selStartIdx >= dayCount) return null;
                             const span = Math.max(1, selEndIdx - selStartIdx);
                             return (
@@ -133,8 +127,8 @@ export const CalendarRow = memo(function CalendarRow({
                     {/* Reservations */}
                     {reservations.map((res) => {
                         const start = days[0].date;
-                        const resStart = new Date(res.arrivalDate);
-                        const resEnd = new Date(res.departureDate);
+                        const resStart = parseLocalDateInput(res.arrivalDate);
+                        const resEnd = parseLocalDateInput(res.departureDate);
                         const startIdx = Math.max(0, diffInDays(resStart, start));
                         const endIdx = Math.min(dayCount, diffInDays(resEnd, start));
 
@@ -163,7 +157,6 @@ export const CalendarRow = memo(function CalendarRow({
                                     onPointerUp={(e) => e.stopPropagation()}
                                     onQuickCheckIn={onQuickCheckIn}
                                     isArrivalToday={isArrivalToday(res)}
-                                    isDragging={dragState.isDragging}
                                 />
                             </div>
                         );

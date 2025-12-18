@@ -1,4 +1,5 @@
 import { CheckCircle, Clock, XCircle, HelpCircle, Wrench, Sparkles, AlertTriangle, LogIn } from "lucide-react";
+import { useCalendarContext } from "./CalendarContext";
 import { cn } from "../../lib/utils";
 import type { CalendarReservation, ReservationStatus } from "./types";
 
@@ -14,7 +15,6 @@ interface ReservationPillProps {
     onPointerUp: (e: React.PointerEvent) => void;
     onQuickCheckIn?: (reservationId: string) => void;
     isArrivalToday?: boolean;
-    isDragging?: boolean;
 }
 
 export function ReservationPill({
@@ -28,9 +28,10 @@ export function ReservationPill({
     needsCleaning,
     hasConflict,
     onQuickCheckIn,
-    isArrivalToday,
-    isDragging
+    isArrivalToday
 }: ReservationPillProps) {
+    const { dragState } = useCalendarContext();
+    const isDragging = dragState.isDragging;
     // Wrapper handlers that stop propagation to prevent double events
     const handleClick = (e: React.MouseEvent) => {
         e.stopPropagation();

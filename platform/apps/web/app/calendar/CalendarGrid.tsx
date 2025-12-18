@@ -16,7 +16,7 @@ interface CalendarGridProps {
 }
 
 export function CalendarGrid({ data, onSelectionComplete }: CalendarGridProps) {
-    const { dragState, setDragVisual, dragRef } = useCalendarContext();
+    const { setDragVisual, dragRef } = useCalendarContext();
     const { queries, derived, state, actions } = data;
     const { sites, reservations, blackouts } = queries;
     const { days, dayCount, reservationsBySite, ganttSelection } = derived;
