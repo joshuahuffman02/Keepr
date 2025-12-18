@@ -4,13 +4,22 @@ import { useParams, useRouter } from "next/navigation";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { apiClient } from "../../../../lib/api-client";
 import { Breadcrumbs } from "../../../../components/breadcrumbs";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect, useCallback, useRef } from "react";
 import { Button } from "../../../../components/ui/button";
 import { DashboardShell } from "../../../../components/ui/layout/DashboardShell";
 import { ImageUpload } from "../../../../components/ui/image-upload";
 import { useToast } from "../../../../components/ui/use-toast";
-import { ChevronDown, ChevronUp, Search, X } from "lucide-react";
+import { ToastAction } from "../../../../components/ui/toast";
+import { ChevronDown, ChevronUp, Search, X, MoreHorizontal, Pencil, Trash2, Copy } from "lucide-react";
 import { Input } from "../../../../components/ui/input";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "../../../../components/ui/table";
 
 // Standard power amp options for RV sites
 const POWER_AMP_OPTIONS = [
@@ -176,13 +185,33 @@ export default function SitesPage() {
     }
   };
 
-  // Quick class change mutation
+  // Quick update with undo capability
   const quickUpdateSite = useMutation({
-    mutationFn: (payload: { id: string; data: Partial<ReturnType<typeof mapFormToPayload>> }) =>
+    mutationFn: (payload: { id: string; data: Partial<ReturnType<typeof mapFormToPayload>>; previousData?: Partial<ReturnType<typeof mapFormToPayload>>; description?: string }) =>
       apiClient.updateSite(payload.id, payload.data),
-    onSuccess: () => {
+    onSuccess: (_data, variables) => {
       queryClient.invalidateQueries({ queryKey: ["sites", campgroundId] });
-      toast({ title: "Site updated", description: "Changes saved successfully." });
+      const { id, previousData, description } = variables;
+
+      // If we have previous data, show undo toast
+      if (previousData) {
+        toast({
+          title: "Site updated",
+          description: description || "Changes saved.",
+          action: (
+            <ToastAction altText="Undo" onClick={() => {
+              apiClient.updateSite(id, previousData).then(() => {
+                queryClient.invalidateQueries({ queryKey: ["sites", campgroundId] });
+                toast({ title: "Undone", description: "Change reverted." });
+              });
+            }}>
+              Undo
+            </ToastAction>
+          ),
+        });
+      } else {
+        toast({ title: "Site updated", description: "Changes saved successfully." });
+      }
     }
   });
 
@@ -676,15 +705,20 @@ export default function SitesPage() {
                       </div>
 
                       <div className="flex flex-col items-end gap-2">
-                        {/* Inline Class Dropdown */}
+                        {/* Inline Class Dropdown with Undo */}
                         <div className="flex items-center gap-2">
                           <span className="text-xs text-slate-500">Class:</span>
                           <select
                             value={(site as any).siteClassId ?? ""}
                             onChange={(e) => {
+                              const newClassId = e.target.value || null;
+                              const prevClassId = (site as any).siteClassId ?? null;
+                              const newClassName = classesQuery.data?.find(c => c.id === newClassId)?.name || "No class";
                               quickUpdateSite.mutate({
                                 id: site.id,
-                                data: { siteClassId: e.target.value || null }
+                                data: { siteClassId: newClassId },
+                                previousData: { siteClassId: prevClassId },
+                                description: `Class changed to ${newClassName}`
                               });
                             }}
                             className="text-sm border border-slate-200 rounded px-2 py-1 min-w-[140px]"
@@ -699,12 +733,15 @@ export default function SitesPage() {
                           </select>
                         </div>
 
-                        {/* Active/Inactive Toggle */}
+                        {/* Active/Inactive Toggle with Undo */}
                         <button
                           onClick={() => {
+                            const newStatus = !site.isActive;
                             quickUpdateSite.mutate({
                               id: site.id,
-                              data: { isActive: !site.isActive }
+                              data: { isActive: newStatus },
+                              previousData: { isActive: site.isActive },
+                              description: newStatus ? `${site.name} activated` : `${site.name} deactivated`
                             });
                           }}
                           className={`px-3 py-1 text-xs rounded transition-colors ${

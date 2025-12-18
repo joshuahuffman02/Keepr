@@ -5,11 +5,12 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { DashboardShell } from "../../../../components/ui/layout/DashboardShell";
 import { Breadcrumbs } from "../../../../components/breadcrumbs";
 import { apiClient } from "../../../../lib/api-client";
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useMemo } from "react";
 import { Button } from "../../../../components/ui/button";
 import { ImageUpload } from "../../../../components/ui/image-upload";
 import { useToast } from "../../../../components/ui/use-toast";
-import { ChevronDown, ChevronUp, Pencil } from "lucide-react";
+import { ToastAction } from "../../../../components/ui/toast";
+import { ChevronDown, ChevronUp, Pencil, X } from "lucide-react";
 
 type SiteClassFormState = {
   name: string;
@@ -65,10 +66,31 @@ export default function SiteClassesPage() {
     queryFn: () => apiClient.getSiteClasses(campgroundId),
     enabled: !!campgroundId
   });
+
+  // Fetch sites to show counts per class
+  const sitesQuery = useQuery({
+    queryKey: ["sites", campgroundId],
+    queryFn: () => apiClient.getSites(campgroundId),
+    enabled: !!campgroundId
+  });
+
+  // Count sites per class
+  const sitesPerClass = useMemo(() => {
+    if (!sitesQuery.data) return {};
+    return sitesQuery.data.reduce((acc, site) => {
+      const classId = (site as any).siteClassId;
+      if (classId) {
+        acc[classId] = (acc[classId] || 0) + 1;
+      }
+      return acc;
+    }, {} as Record<string, number>);
+  }, [sitesQuery.data]);
+
   const [form, setForm] = useState<SiteClassFormState>(defaultClassForm);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editForm, setEditForm] = useState<SiteClassFormState | null>(null);
   const [showAdvanced, setShowAdvanced] = useState(false);
+  const [showCreateForm, setShowCreateForm] = useState(false);
   const [inlineEditingRate, setInlineEditingRate] = useState<string | null>(null);
   const [inlineRateValue, setInlineRateValue] = useState<string>("");
   const inlineRateInputRef = useRef<HTMLInputElement>(null);
@@ -129,12 +151,26 @@ export default function SiteClassesPage() {
     }
   });
   const updateInlineRate = useMutation({
-    mutationFn: (payload: { id: string; rate: number }) =>
+    mutationFn: (payload: { id: string; rate: number; previousRate: number; className: string }) =>
       apiClient.updateSiteClass(payload.id, { defaultRate: Math.round(payload.rate * 100) }),
-    onSuccess: () => {
+    onSuccess: (_data, variables) => {
       queryClient.invalidateQueries({ queryKey: ["site-classes", campgroundId] });
       setInlineEditingRate(null);
-      toast({ title: "Rate updated", description: "The nightly rate has been saved." });
+      const { id, previousRate, className } = variables;
+      toast({
+        title: "Rate updated",
+        description: `${className} rate set to $${variables.rate.toFixed(2)}`,
+        action: (
+          <ToastAction altText="Undo" onClick={() => {
+            apiClient.updateSiteClass(id, { defaultRate: Math.round(previousRate * 100) }).then(() => {
+              queryClient.invalidateQueries({ queryKey: ["site-classes", campgroundId] });
+              toast({ title: "Undone", description: `Rate reverted to $${previousRate.toFixed(2)}` });
+            });
+          }}>
+            Undo
+          </ToastAction>
+        ),
+      });
     }
   });
   const deleteClass = useMutation({
@@ -147,15 +183,25 @@ export default function SiteClassesPage() {
 
   const handleInlineRateSave = (classId: string) => {
     const rate = parseFloat(inlineRateValue);
-    if (!isNaN(rate) && rate >= 0) {
-      updateInlineRate.mutate({ id: classId, rate });
+    const cls = classesQuery.data?.find(c => c.id === classId);
+    if (!isNaN(rate) && rate >= 0 && cls) {
+      updateInlineRate.mutate({
+        id: classId,
+        rate,
+        previousRate: cls.defaultRate / 100,
+        className: cls.name
+      });
     } else {
       setInlineEditingRate(null);
     }
   };
 
   const handleDeleteClass = (id: string, name: string) => {
-    if (window.confirm(`Are you sure you want to delete "${name}"? This action cannot be undone.`)) {
+    const siteCount = sitesPerClass[id] || 0;
+    const impactMessage = siteCount > 0
+      ? `\n\n${siteCount} site${siteCount === 1 ? '' : 's'} will lose ${siteCount === 1 ? 'its' : 'their'} class assignment.`
+      : '';
+    if (window.confirm(`Are you sure you want to delete "${name}"?${impactMessage}\n\nThis action cannot be undone.`)) {
       deleteClass.mutate(id);
     }
   };
@@ -170,10 +216,30 @@ export default function SiteClassesPage() {
             { label: "Site Classes" }
           ]}
         />
-        <h2 className="text-xl font-semibold text-slate-900">Site classes</h2>
-        <p className="text-sm text-slate-600">Add photos to classes to share gallery images across sites in that class.</p>
+        <div className="flex items-center justify-between">
+          <div>
+            <h2 className="text-xl font-semibold text-slate-900">Site Classes</h2>
+            {classesQuery.data && (
+              <p className="text-sm text-slate-500">
+                {classesQuery.data.length} classes
+                {classesQuery.data.filter(c => c.isActive !== false).length !== classesQuery.data.length &&
+                  ` (${classesQuery.data.filter(c => c.isActive !== false).length} active)`}
+              </p>
+            )}
+          </div>
+          {!showCreateForm && (
+            <Button onClick={() => setShowCreateForm(true)}>+ Add Class</Button>
+          )}
+        </div>
+
+        {showCreateForm && (
         <div className="card p-4">
-          <h3 className="text-lg font-semibold text-slate-900 mb-2">Add site class</h3>
+          <div className="flex items-center justify-between mb-3">
+            <h3 className="text-lg font-semibold text-slate-900">Add site class</h3>
+            <Button variant="ghost" size="sm" onClick={() => setShowCreateForm(false)}>
+              <X className="h-4 w-4" />
+            </Button>
+          </div>
           {/* Essential fields - always visible */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             <input
@@ -349,12 +415,17 @@ export default function SiteClassesPage() {
           </div>
 
           <div className="mt-4">
-            <Button disabled={createClass.isPending || !form.name} onClick={() => createClass.mutate()}>
+            <Button disabled={createClass.isPending || !form.name} onClick={() => {
+              createClass.mutate(undefined, {
+                onSuccess: () => setShowCreateForm(false)
+              });
+            }}>
               {createClass.isPending ? "Saving..." : "Save class"}
             </Button>
             {createClass.isError && <span className="ml-3 text-sm text-red-600">Failed to save class</span>}
           </div>
         </div>
+        )}
         <div className="grid gap-3">
           {classesQuery.data?.map((cls) => {
             const isEditing = editingId === cls.id;
@@ -362,7 +433,14 @@ export default function SiteClassesPage() {
               <div key={cls.id} className="card p-4 space-y-2">
                 <div className="flex items-start justify-between gap-4">
                   <div>
-                    <div className="text-lg font-semibold text-slate-900">{cls.name}</div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-lg font-semibold text-slate-900">{cls.name}</span>
+                      {sitesPerClass[cls.id] > 0 && (
+                        <span className="text-xs px-2 py-0.5 rounded-full bg-slate-100 text-slate-600">
+                          {sitesPerClass[cls.id]} site{sitesPerClass[cls.id] === 1 ? '' : 's'}
+                        </span>
+                      )}
+                    </div>
                     <div className="text-sm text-slate-600 flex items-center gap-1">
                       {cls.siteType} • Max {cls.maxOccupancy} •{" "}
                       {inlineEditingRate === cls.id ? (
