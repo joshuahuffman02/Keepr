@@ -1,8 +1,9 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo, useEffect, useRef } from "react";
 import Link from "next/link";
+import { motion, useInView, useReducedMotion } from "framer-motion";
 import { CampgroundCard } from "../../components/public/CampgroundCard";
 import { apiClient } from "../../lib/api-client";
 import { trackEvent } from "@/lib/analytics";
@@ -10,6 +11,128 @@ import { HeroBanner } from "../../components/public/HeroBanner";
 import { ValueStack } from "../../components/public/ValueStack";
 import { UrgencySection } from "../../components/public/UrgencySection";
 import { OwnerCTA } from "../../components/public/OwnerCTA";
+
+// Animation variants for scroll reveal
+const fadeInUp = {
+    hidden: { opacity: 0, y: 30 },
+    visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" } }
+};
+
+const staggerContainer = {
+    hidden: { opacity: 0 },
+    visible: {
+        opacity: 1,
+        transition: { staggerChildren: 0.1, delayChildren: 0.1 }
+    }
+};
+
+const scaleIn = {
+    hidden: { opacity: 0, scale: 0.95 },
+    visible: { opacity: 1, scale: 1, transition: { duration: 0.5, ease: "easeOut" } }
+};
+
+// Blog posts data
+const blogPosts = [
+    {
+        href: "/blog/camper-tips/01-first-time-camping-checklist",
+        category: "Camper Tips",
+        categoryColor: "emerald",
+        title: "First-Time Camping Checklist: Everything You Need",
+        description: "Planning your first camping trip? The key to a great experience is preparation. This comprehensive checklist covers everything you need."
+    },
+    {
+        href: "/blog/industry/01-camping-industry-trends-2024",
+        category: "Industry Trends",
+        categoryColor: "violet",
+        title: "State of the Camping Industry: 2024 Trends",
+        description: "Explore the latest camping industry trends for 2024. Data, insights, and what campground owners need to know about the future."
+    },
+    {
+        href: "/blog/growth/01-increase-off-season-bookings",
+        category: "Growth",
+        categoryColor: "amber",
+        title: "10 Ways to Increase Off-Season Bookings",
+        description: "Boost off-season campground revenue with proven strategies. Learn events, pricing, marketing, and partnerships that fill sites."
+    }
+];
+
+// Blog Section with scroll animations
+function BlogSection({ prefersReducedMotion }: { prefersReducedMotion: boolean | null }) {
+    const blogRef = useRef(null);
+    const blogInView = useInView(blogRef, { once: true, margin: "-100px" });
+
+    const categoryColors: Record<string, string> = {
+        emerald: "text-emerald-600 group-hover:text-emerald-600",
+        violet: "text-violet-600 group-hover:text-violet-600",
+        amber: "text-amber-600 group-hover:text-amber-600"
+    };
+
+    return (
+        <section className="py-20 bg-slate-50" ref={blogRef}>
+            <div className="max-w-7xl mx-auto px-6">
+                <motion.div
+                    className="flex flex-col md:flex-row items-center justify-between gap-8 mb-12"
+                    variants={prefersReducedMotion ? undefined : fadeInUp}
+                    initial="hidden"
+                    animate={blogInView ? "visible" : "hidden"}
+                >
+                    <div>
+                        <h2 className="text-2xl md:text-3xl font-bold text-slate-900 mb-4">
+                            Latest from the Blog
+                        </h2>
+                        <p className="text-slate-600 max-w-xl">
+                            Tips, guides, and industry insights to help you get the most out of your camping experience.
+                        </p>
+                    </div>
+                    <Link
+                        href="/blog"
+                        className="inline-flex items-center gap-2 px-6 py-3 bg-white text-slate-900 border border-slate-200 font-semibold rounded-lg hover:border-emerald-500 hover:text-emerald-600 transition-colors group"
+                    >
+                        View All Posts
+                        <svg className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                        </svg>
+                    </Link>
+                </motion.div>
+
+                <motion.div
+                    className="grid md:grid-cols-3 gap-6"
+                    variants={prefersReducedMotion ? undefined : staggerContainer}
+                    initial="hidden"
+                    animate={blogInView ? "visible" : "hidden"}
+                >
+                    {blogPosts.map((post, index) => (
+                        <motion.div
+                            key={post.href}
+                            variants={prefersReducedMotion ? undefined : scaleIn}
+                            custom={index}
+                        >
+                            <Link
+                                href={post.href}
+                                className="bg-white rounded-2xl overflow-hidden shadow-sm border border-slate-100 group cursor-pointer hover:shadow-md transition-shadow block h-full"
+                            >
+                                <div className="p-6">
+                                    <span className={`text-xs font-semibold uppercase tracking-wider mb-2 block ${categoryColors[post.categoryColor]}`}>
+                                        {post.category}
+                                    </span>
+                                    <h3 className={`text-lg font-bold text-slate-900 mb-2 transition-colors ${categoryColors[post.categoryColor]}`}>
+                                        {post.title}
+                                    </h3>
+                                    <p className="text-slate-600 text-sm mb-4 line-clamp-3">
+                                        {post.description}
+                                    </p>
+                                    <span className="text-sm font-semibold text-slate-900 flex items-center gap-1 group-hover:gap-2 transition-all">
+                                        Read Article <span aria-hidden="true">→</span>
+                                    </span>
+                                </div>
+                            </Link>
+                        </motion.div>
+                    ))}
+                </motion.div>
+            </div>
+        </section>
+    );
+}
 
 // Sample external campgrounds to mix with internal ones
 const externalCampgrounds = [
@@ -193,14 +316,24 @@ export function HomeClient() {
         trackEvent("page_view", { page: "/" });
     }, []);
 
+    // Scroll animation refs
+    const featuredRef = useRef(null);
+    const featuredInView = useInView(featuredRef, { once: true, margin: "-100px" });
+    const prefersReducedMotion = useReducedMotion();
+
     return (
         <div className="min-h-screen max-w-[480px] mx-auto sm:max-w-none sm:mx-0">
             {/* Hero Section with Hormozi-style messaging */}
             <HeroBanner onSearch={handleSearch} />
 
             {/* Featured Campgrounds */}
-            <section id="featured" className="max-w-7xl mx-auto px-6 py-16">
-                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-8">
+            <section id="featured" className="max-w-7xl mx-auto px-6 py-16" ref={featuredRef}>
+                <motion.div
+                    className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-8"
+                    variants={prefersReducedMotion ? undefined : fadeInUp}
+                    initial="hidden"
+                    animate={featuredInView ? "visible" : "hidden"}
+                >
                     <div>
                         <h2 className="text-2xl md:text-3xl font-bold text-slate-900">
                             {searchQuery ? "Search Results" : "Featured Campgrounds"}
@@ -224,58 +357,98 @@ export function HomeClient() {
                             <option>Reviews</option>
                         </select>
                     </div>
-                </div>
+                </motion.div>
 
                 {isLoading ? (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        {[1, 2, 3, 4, 5, 6].map((i) => (
-                            <div key={i} className="bg-white rounded-2xl overflow-hidden shadow-lg animate-pulse">
-                                <div className="aspect-[4/3] bg-slate-200" />
-                                <div className="p-5 space-y-3">
-                                    <div className="h-4 bg-slate-200 rounded w-1/3" />
-                                    <div className="h-5 bg-slate-200 rounded w-2/3" />
-                                    <div className="h-4 bg-slate-200 rounded w-1/2" />
-                                </div>
-                            </div>
-                        ))}
+                    <div className="space-y-8">
+                        {/* Friendly loading message */}
+                        <motion.div
+                            className="text-center py-4"
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            transition={{ delay: 0.5 }}
+                        >
+                            <p className="text-slate-500 text-sm flex items-center justify-center gap-2">
+                                <svg className="w-5 h-5 text-emerald-500 animate-bounce" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 21h18M5 21V7l7-4 7 4v14M9 21v-6h6v6" />
+                                </svg>
+                                Finding your perfect outdoor escape...
+                            </p>
+                        </motion.div>
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                            {[1, 2, 3, 4, 5, 6].map((i) => (
+                                <motion.div
+                                    key={i}
+                                    className="bg-white rounded-2xl overflow-hidden shadow-lg"
+                                    initial={{ opacity: 0, y: 20 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    transition={{ delay: i * 0.1 }}
+                                >
+                                    <div className="aspect-[4/3] bg-gradient-to-br from-slate-100 to-slate-200 relative overflow-hidden">
+                                        {/* Shimmer effect */}
+                                        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent -translate-x-full animate-[shimmer_1.5s_infinite]" />
+                                    </div>
+                                    <div className="p-5 space-y-3">
+                                        <div className="h-4 bg-slate-200 rounded w-1/3 animate-pulse" />
+                                        <div className="h-5 bg-slate-200 rounded w-2/3 animate-pulse" />
+                                        <div className="h-4 bg-slate-200 rounded w-1/2 animate-pulse" />
+                                    </div>
+                                </motion.div>
+                            ))}
+                        </div>
                     </div>
                 ) : (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        {allCampgrounds.map((campground) => {
+                    <motion.div
+                        className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+                        variants={prefersReducedMotion ? undefined : staggerContainer}
+                        initial="hidden"
+                        animate={featuredInView ? "visible" : "hidden"}
+                    >
+                        {allCampgrounds.map((campground, index) => {
                             const pricePerNight = "pricePerNight" in campground ? campground.pricePerNight : undefined;
 
                             return (
-                                <CampgroundCard
+                                <motion.div
                                     key={campground.id}
-                                    id={campground.id}
-                                    name={campground.name}
-                                    slug={"slug" in campground ? campground.slug : undefined}
-                                    city={campground.city || undefined}
-                                    state={campground.state || undefined}
-                                    country={"country" in campground ? (campground.country || undefined) : undefined}
-                                    imageUrl={"heroImageUrl" in campground ? (campground.heroImageUrl || undefined) : undefined}
-                                    isInternal={campground.isInternal}
-                                    rating={campground.rating}
-                                    reviewCount={campground.reviewCount}
-                                    pricePerNight={pricePerNight}
-                                    amenities={"amenities" in campground ? campground.amenities : []}
-                                    npsBadge={campground.npsBadge}
-                                    pastAwards={"pastAwards" in campground ? campground.pastAwards : []}
-                                    onExplore={() => trackEvent("site_card_view", { campgroundId: campground.id, page: "/" })}
-                                />
+                                    variants={prefersReducedMotion ? undefined : scaleIn}
+                                    custom={index}
+                                >
+                                    <CampgroundCard
+                                        id={campground.id}
+                                        name={campground.name}
+                                        slug={"slug" in campground ? campground.slug : undefined}
+                                        city={campground.city || undefined}
+                                        state={campground.state || undefined}
+                                        country={"country" in campground ? (campground.country || undefined) : undefined}
+                                        imageUrl={"heroImageUrl" in campground ? (campground.heroImageUrl || undefined) : undefined}
+                                        isInternal={campground.isInternal}
+                                        rating={campground.rating}
+                                        reviewCount={campground.reviewCount}
+                                        pricePerNight={pricePerNight}
+                                        amenities={"amenities" in campground ? campground.amenities : []}
+                                        npsBadge={campground.npsBadge}
+                                        pastAwards={"pastAwards" in campground ? campground.pastAwards : []}
+                                        onExplore={() => trackEvent("site_card_view", { campgroundId: campground.id, page: "/" })}
+                                    />
+                                </motion.div>
                             );
                         })}
-                    </div>
+                    </motion.div>
                 )}
 
                 {!isLoading && allCampgrounds.length === 0 && (
-                    <div className="text-center py-16">
+                    <motion.div
+                        className="text-center py-16"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        transition={{ delay: 0.2 }}
+                    >
                         <svg className="w-16 h-16 text-slate-300 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                         </svg>
                         <h3 className="text-xl font-semibold text-slate-900 mb-2">No campgrounds found</h3>
                         <p className="text-slate-600">Try adjusting your search or filters</p>
-                    </div>
+                    </motion.div>
                 )}
             </section>
 
@@ -304,94 +477,7 @@ export function HomeClient() {
             />
 
             {/* Blog CTA Section */}
-            <section className="py-20 bg-slate-50">
-                <div className="max-w-7xl mx-auto px-6">
-                    <div className="flex flex-col md:flex-row items-center justify-between gap-8 mb-12">
-                        <div>
-                            <h2 className="text-2xl md:text-3xl font-bold text-slate-900 mb-4">
-                                Latest from the Blog
-                            </h2>
-                            <p className="text-slate-600 max-w-xl">
-                                Tips, guides, and industry insights to help you get the most out of your camping experience.
-                            </p>
-                        </div>
-                        <Link
-                            href="/blog"
-                            className="inline-flex items-center gap-2 px-6 py-3 bg-white text-slate-900 border border-slate-200 font-semibold rounded-lg hover:border-emerald-500 hover:text-emerald-600 transition-colors"
-                        >
-                            View All Posts
-                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
-                            </svg>
-                        </Link>
-                    </div>
-
-                    <div className="grid md:grid-cols-3 gap-6">
-                        {/* Featured Blog Card 1 */}
-                        <Link
-                            href="/blog/camper-tips/01-first-time-camping-checklist"
-                            className="bg-white rounded-2xl overflow-hidden shadow-sm border border-slate-100 group cursor-pointer hover:shadow-md transition-shadow block"
-                        >
-                            <div className="p-6">
-                                <span className="text-xs font-semibold uppercase tracking-wider text-emerald-600 mb-2 block">
-                                    Camper Tips
-                                </span>
-                                <h3 className="text-lg font-bold text-slate-900 mb-2 group-hover:text-emerald-600 transition-colors">
-                                    First-Time Camping Checklist: Everything You Need
-                                </h3>
-                                <p className="text-slate-600 text-sm mb-4 line-clamp-3">
-                                    Planning your first camping trip? The key to a great experience is preparation. This comprehensive checklist covers everything you need.
-                                </p>
-                                <span className="text-sm font-semibold text-slate-900 flex items-center gap-1 group-hover:gap-2 transition-all">
-                                    Read Article <span aria-hidden="true">&rarr;</span>
-                                </span>
-                            </div>
-                        </Link>
-
-                        {/* Featured Blog Card 2 */}
-                        <Link
-                            href="/blog/industry/01-camping-industry-trends-2024"
-                            className="bg-white rounded-2xl overflow-hidden shadow-sm border border-slate-100 group cursor-pointer hover:shadow-md transition-shadow block"
-                        >
-                            <div className="p-6">
-                                <span className="text-xs font-semibold uppercase tracking-wider text-violet-600 mb-2 block">
-                                    Industry Trends
-                                </span>
-                                <h3 className="text-lg font-bold text-slate-900 mb-2 group-hover:text-violet-600 transition-colors">
-                                    State of the Camping Industry: 2024 Trends
-                                </h3>
-                                <p className="text-slate-600 text-sm mb-4 line-clamp-3">
-                                    Explore the latest camping industry trends for 2024. Data, insights, and what campground owners need to know about the future.
-                                </p>
-                                <span className="text-sm font-semibold text-slate-900 flex items-center gap-1 group-hover:gap-2 transition-all">
-                                    Read Article <span aria-hidden="true">&rarr;</span>
-                                </span>
-                            </div>
-                        </Link>
-
-                        {/* Featured Blog Card 3 */}
-                        <Link
-                            href="/blog/growth/01-increase-off-season-bookings"
-                            className="bg-white rounded-2xl overflow-hidden shadow-sm border border-slate-100 group cursor-pointer hover:shadow-md transition-shadow block"
-                        >
-                            <div className="p-6">
-                                <span className="text-xs font-semibold uppercase tracking-wider text-amber-600 mb-2 block">
-                                    Growth
-                                </span>
-                                <h3 className="text-lg font-bold text-slate-900 mb-2 group-hover:text-amber-600 transition-colors">
-                                    10 Ways to Increase Off-Season Bookings
-                                </h3>
-                                <p className="text-slate-600 text-sm mb-4 line-clamp-3">
-                                    Boost off-season campground revenue with proven strategies. Learn events, pricing, marketing, and partnerships that fill sites.
-                                </p>
-                                <span className="text-sm font-semibold text-slate-900 flex items-center gap-1 group-hover:gap-2 transition-all">
-                                    Read Article <span aria-hidden="true">&rarr;</span>
-                                </span>
-                            </div>
-                        </Link>
-                    </div>
-                </div>
-            </section>
+            <BlogSection prefersReducedMotion={prefersReducedMotion} />
 
             {/* Owner CTA Section */}
             <OwnerCTA />

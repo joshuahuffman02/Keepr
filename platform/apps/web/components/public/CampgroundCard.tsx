@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { Sparkles } from "lucide-react";
 
 interface CampgroundCardProps {
     id: string;
@@ -211,10 +212,11 @@ export function CampgroundCard({
                 {isInternal && (
                     <Link
                         href={campgroundPath}
-                        className={`absolute bottom-4 left-4 right-4 py-3 bg-white/95 backdrop-blur-sm text-center text-sm font-semibold text-slate-900 rounded-xl shadow-lg transition-all duration-300 ${isHovered ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
+                        className={`absolute bottom-4 left-4 right-4 py-3 bg-white/95 backdrop-blur-sm text-center text-sm font-semibold text-slate-900 rounded-xl shadow-lg transition-all duration-300 flex items-center justify-center gap-2 ${isHovered ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
                             }`}
                     >
-                        View Availability
+                        <Sparkles className="h-4 w-4 text-emerald-600" />
+                        See Available Sites
                     </Link>
                 )}
             </div>
@@ -296,9 +298,10 @@ export function CampgroundCard({
                         <Link
                             href={campgroundPath}
                             onClick={onExplore}
-                            className="px-4 py-2 text-sm font-semibold text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 rounded-lg transition-colors"
+                            className="px-4 py-2 text-sm font-semibold text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 rounded-lg transition-colors flex items-center gap-1 group"
                         >
-                            Explore →
+                            <span>Discover</span>
+                            <span className="group-hover:translate-x-0.5 transition-transform">→</span>
                         </Link>
                     ) : (
                         <div className="flex flex-col items-end gap-1">

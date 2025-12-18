@@ -9,6 +9,7 @@ import { useMemo, useState, useEffect } from "react";
 import { trackEvent } from "@/lib/analytics";
 import { AiChatWidget } from "@/components/ai/AiChatWidget";
 import { Breadcrumbs } from "@/components/ui/breadcrumbs";
+import { RecentBookingNotification } from "@/components/public/RecentBookingNotification";
 import {
     Wifi, Waves, Flame, Droplets, Store, Fish, Ship, PlayCircle, ShowerHead, Dog,
     Footprints, Mountain, Bike, Check, Tent, Caravan, Home, Users, Sparkles,
@@ -78,14 +79,57 @@ function ReviewBadge({ score, count }: { score?: number | null; count?: number |
     );
 }
 
-// Photo Gallery Component
-function PhotoGallery({ photos, heroImage, campgroundId }: { photos: string[]; heroImage?: string | null; campgroundId?: string }) {
+// Photo Gallery Component with Emotional Overlay
+function PhotoGallery({
+    photos,
+    heroImage,
+    campgroundId,
+    campgroundName,
+    tagline,
+    reviewScore,
+    reviewCount,
+    city,
+    state
+}: {
+    photos: string[];
+    heroImage?: string | null;
+    campgroundId?: string;
+    campgroundName?: string;
+    tagline?: string | null;
+    reviewScore?: number | null;
+    reviewCount?: number | null;
+    city?: string | null;
+    state?: string | null;
+}) {
     const [activeIndex, setActiveIndex] = useState(0);
+    const [touchStart, setTouchStart] = useState(0);
+    const [touchEnd, setTouchEnd] = useState(0);
     const allPhotos = heroImage ? [heroImage, ...photos.filter((p) => p !== heroImage)] : photos;
+
     useEffect(() => {
         if (!allPhotos[activeIndex]) return;
         trackEvent("image_viewed", { campgroundId, imageId: allPhotos[activeIndex], page: "campground_detail" });
     }, [activeIndex, campgroundId, allPhotos]);
+
+    // Touch handlers for mobile swipe
+    const handleTouchStart = (e: React.TouchEvent) => {
+        setTouchStart(e.targetTouches[0].clientX);
+    };
+
+    const handleTouchMove = (e: React.TouchEvent) => {
+        setTouchEnd(e.targetTouches[0].clientX);
+    };
+
+    const handleTouchEnd = () => {
+        if (touchStart - touchEnd > 75) {
+            // Swipe left - next image
+            setActiveIndex((prev) => (prev + 1) % allPhotos.length);
+        }
+        if (touchStart - touchEnd < -75) {
+            // Swipe right - previous image
+            setActiveIndex((prev) => (prev - 1 + allPhotos.length) % allPhotos.length);
+        }
+    };
 
     if (allPhotos.length === 0) {
         return (
@@ -97,7 +141,12 @@ function PhotoGallery({ photos, heroImage, campgroundId }: { photos: string[]; h
 
     return (
         <div className="relative">
-            <div className="w-full h-[500px] relative overflow-hidden">
+            <div
+                className="w-full h-[500px] relative overflow-hidden"
+                onTouchStart={handleTouchStart}
+                onTouchMove={handleTouchMove}
+                onTouchEnd={handleTouchEnd}
+            >
                 <Image
                     src={allPhotos[activeIndex]}
                     alt="Campground photo"
@@ -105,10 +154,61 @@ function PhotoGallery({ photos, heroImage, campgroundId }: { photos: string[]; h
                     className="object-cover"
                     priority
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
+
+                {/* Emotional Overlay Content */}
+                <div className="absolute inset-0 flex flex-col justify-end p-6 md:p-10">
+                    <div className="max-w-3xl space-y-3">
+                        {/* Pre-headline sparkle */}
+                        <div className="flex items-center gap-2 text-emerald-300 text-sm font-medium">
+                            <Sparkles className="h-4 w-4" />
+                            <span>Your next adventure awaits</span>
+                        </div>
+
+                        {/* Campground Name */}
+                        {campgroundName && (
+                            <h1 className="text-3xl md:text-5xl font-bold text-white leading-tight drop-shadow-lg">
+                                {campgroundName}
+                            </h1>
+                        )}
+
+                        {/* Tagline */}
+                        {tagline && (
+                            <p className="text-lg md:text-xl text-white/90 font-medium max-w-2xl">
+                                {tagline}
+                            </p>
+                        )}
+
+                        {/* Location & Reviews */}
+                        <div className="flex flex-wrap items-center gap-4 text-white/80 text-sm pt-2">
+                            {city && state && (
+                                <span className="flex items-center gap-1.5">
+                                    <MapPin className="h-4 w-4" />
+                                    {city}, {state}
+                                </span>
+                            )}
+                            {reviewScore && reviewScore > 0 && (
+                                <>
+                                    <span className="text-white/50">•</span>
+                                    <span className="flex items-center gap-1.5 bg-white/20 backdrop-blur-sm px-3 py-1 rounded-full">
+                                        <Star className="h-4 w-4 fill-amber-400 text-amber-400" />
+                                        <span className="font-semibold text-white">{reviewScore.toFixed(1)}</span>
+                                        <span className="text-white/70">({reviewCount} reviews)</span>
+                                    </span>
+                                </>
+                            )}
+                            <span className="flex items-center gap-1.5 text-emerald-300">
+                                <Check className="h-4 w-4" />
+                                Verified photos
+                            </span>
+                        </div>
+                    </div>
+                </div>
             </div>
+
+            {/* Photo navigation dots */}
             {allPhotos.length > 1 && (
-                <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
+                <div className="absolute bottom-24 left-1/2 -translate-x-1/2 flex gap-2">
                     {allPhotos.map((_, i) => (
                         <button
                             key={i}
@@ -209,9 +309,10 @@ function SiteClassCard({
                     ) : (
                         <Link
                             href={`/park/${slug}/book?siteType=${siteClass.siteType || "all"}`}
-                            className="bg-emerald-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-emerald-700 transition-colors"
+                            className="bg-gradient-to-r from-emerald-600 to-teal-600 text-white px-4 py-2 rounded-lg font-semibold hover:from-emerald-700 hover:to-teal-700 transition-all shadow-md shadow-emerald-500/20 flex items-center gap-1.5 group"
                         >
-                            Check Availability
+                            <Sparkles className="h-4 w-4 group-hover:animate-pulse" />
+                            Reserve This Site
                         </Link>
                     )}
                 </div>
@@ -518,9 +619,10 @@ function AvailabilityFilter({ slug }: { slug: string }) {
             </div>
             <button
                 onClick={handleSearch}
-                className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 px-4 rounded-lg transition-colors flex items-center justify-center gap-2"
+                className="w-full bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-bold py-2.5 px-4 rounded-lg transition-all flex items-center justify-center gap-2 shadow-md shadow-emerald-500/20 group"
             >
-                <span>Check Availability</span>
+                <Sparkles className="h-4 w-4 group-hover:animate-pulse" />
+                <span>Find Your Perfect Spot</span>
             </button>
         </div>
     );
@@ -643,8 +745,28 @@ export function CampgroundDetailClient({
 
     if (isLoading) {
         return (
-            <div className="min-h-screen flex items-center justify-center">
-                <div className="animate-spin rounded-full h-12 w-12 border-4 border-emerald-500 border-t-transparent" />
+            <div className="min-h-screen flex flex-col items-center justify-center gap-6 bg-gradient-to-b from-slate-50 to-white">
+                {/* Animated tent icon */}
+                <div className="relative">
+                    <Tent className="h-12 w-12 text-emerald-500 animate-bounce" />
+                    <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-16 h-2 bg-slate-200/50 rounded-full blur-sm" />
+                </div>
+                <div className="text-center space-y-2">
+                    <p className="text-slate-700 font-medium animate-pulse">Loading your adventure...</p>
+                    <p className="text-sm text-slate-500">Getting campground details ready</p>
+                </div>
+                {/* Progress dots */}
+                <div className="flex gap-1.5">
+                    {[0, 1, 2].map((i) => (
+                        <div
+                            key={i}
+                            className="w-2 h-2 rounded-full bg-emerald-500"
+                            style={{
+                                animation: `pulse 1.4s ease-in-out ${i * 0.2}s infinite`
+                            }}
+                        />
+                    ))}
+                </div>
             </div>
         );
     }
@@ -676,7 +798,17 @@ export function CampgroundDetailClient({
         <>
             <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white">
                 {/* Hero Section */}
-                <PhotoGallery photos={campground.photos || []} heroImage={campground.heroImageUrl} campgroundId={campground.id} />
+                <PhotoGallery
+                    photos={campground.photos || []}
+                    heroImage={campground.heroImageUrl}
+                    campgroundId={campground.id}
+                    campgroundName={campground.name}
+                    tagline={campground.tagline}
+                    reviewScore={campground.reviewScore}
+                    reviewCount={campground.reviewCount}
+                    city={campground.city}
+                    state={campground.state}
+                />
 
                 {/* Main Content */}
                 <div className="max-w-7xl mx-auto px-4 pb-12">
@@ -737,9 +869,10 @@ export function CampgroundDetailClient({
                             ) : (
                                 <Link
                                     href={`/park/${slug}#availability`}
-                                    className="bg-emerald-600 text-white px-8 py-4 rounded-xl font-semibold text-lg hover:bg-emerald-700 transition-colors shadow-lg shadow-emerald-200"
+                                    className="bg-gradient-to-r from-emerald-600 to-teal-600 text-white px-8 py-4 rounded-xl font-semibold text-lg hover:from-emerald-700 hover:to-teal-700 transition-all shadow-lg shadow-emerald-200 flex items-center gap-2 group"
                                 >
-                                    Book Now
+                                    <Sparkles className="h-5 w-5 group-hover:animate-pulse" />
+                                    Reserve Your Stay
                                 </Link>
                             )}
                             {campground.phone && (
@@ -934,7 +1067,20 @@ export function CampgroundDetailClient({
                                 })}
                             </div>
                         )}
-                        {reviewsQuery.isLoading && <div className="text-sm text-slate-500">Loading reviews…</div>}
+                        {reviewsQuery.isLoading && (
+                            <div className="flex items-center gap-2 text-sm text-slate-500">
+                                <div className="flex gap-0.5">
+                                    {[0, 1, 2, 3, 4].map((i) => (
+                                        <Star
+                                            key={i}
+                                            className="h-4 w-4 text-slate-200"
+                                            style={{ animation: `pulse 1s ease-in-out ${i * 0.1}s infinite` }}
+                                        />
+                                    ))}
+                                </div>
+                                <span>Gathering guest experiences...</span>
+                            </div>
+                        )}
                         {filteredReviews && filteredReviews.length === 0 && (
                             <div className="text-sm text-slate-500">No reviews yet.</div>
                         )}
@@ -1053,9 +1199,10 @@ export function CampgroundDetailClient({
                                         <Link
                                             href={`/park/${slug}/book?promoCode=${promo.code}`}
                                             onClick={() => trackEvent("deal_applied", { campgroundId: campground.id, promotionId: promo.id, metadata: { code: promo.code }, page: `/park/${slug}` })}
-                                            className="block w-full text-center bg-white border-2 border-rose-200 text-rose-600 font-bold py-2 rounded-lg hover:bg-rose-50 transition-colors"
+                                            className="flex items-center justify-center gap-2 w-full bg-gradient-to-r from-rose-500 to-orange-500 text-white font-bold py-2.5 rounded-lg hover:from-rose-600 hover:to-orange-600 transition-all shadow-md shadow-rose-500/20 group"
                                         >
-                                            Claim Deal
+                                            <Zap className="h-4 w-4 group-hover:animate-pulse" />
+                                            Grab This Deal
                                         </Link>
                                     </div>
                                 ))}
@@ -1095,8 +1242,10 @@ export function CampgroundDetailClient({
             </div>
 
             {/* AI Chat Widget */}
-            <div className="fixed bottom-20 right-6 bg-red-500 text-white px-4 py-2 rounded z-50">DEBUG: Widget Area</div>
             <AiChatWidget campgroundId={campground.id} campgroundName={campground.name} />
+
+            {/* Recent Booking Notifications */}
+            <RecentBookingNotification campgroundId={campground.id} />
         </>
     );
 }

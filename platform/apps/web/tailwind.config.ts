@@ -114,12 +114,22 @@ const config: Config = {
           "100%": {
             transform: "translate(0px, 0px) scale(1)"
           }
+        },
+        shimmer: {
+          "0%": { transform: "translateX(-100%)" },
+          "100%": { transform: "translateX(100%)" }
+        },
+        "fade-in-up": {
+          "0%": { opacity: "0", transform: "translateY(10px)" },
+          "100%": { opacity: "1", transform: "translateY(0)" }
         }
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
-        blob: "blob 7s infinite"
+        blob: "blob 7s infinite",
+        shimmer: "shimmer 1.5s infinite",
+        "fade-in-up": "fade-in-up 0.5s ease-out"
       }
     }
   },

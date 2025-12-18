@@ -65,9 +65,12 @@ export function SearchBar({ onSearch }: SearchBarProps) {
                     {/* Search button */}
                     <button
                         onClick={handleSearch}
-                        className="w-full sm:w-auto m-0 sm:m-2 px-5 sm:px-6 py-3 bg-gradient-to-r from-emerald-600 to-teal-600 text-white font-semibold rounded-xl hover:from-emerald-500 hover:to-teal-500 transition-all shadow-lg shadow-emerald-500/20 hover:shadow-emerald-500/30"
+                        className="w-full sm:w-auto m-0 sm:m-2 px-5 sm:px-6 py-3 bg-gradient-to-r from-emerald-600 to-teal-600 text-white font-semibold rounded-xl hover:from-emerald-500 hover:to-teal-500 transition-all shadow-lg shadow-emerald-500/20 hover:shadow-emerald-500/30 flex items-center justify-center gap-2 group"
                     >
-                        Search
+                        <span>Explore</span>
+                        <svg className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                        </svg>
                     </button>
                 </div>
 

@@ -14,8 +14,10 @@ import { useAnalyticsEmitters } from "./useAnalytics";
 import { trackEvent } from "@/lib/analytics";
 import {
     Check, Moon, CalendarDays, Caravan, Tent, Car, Home, Sparkles, Users, Lock,
-    Frown, CheckCircle
+    Frown, CheckCircle, Shield, CreditCard, Star, Mail, Calendar, MapPin,
+    Copy, ArrowLeft, Printer, Share2, AlertCircle, Loader2
 } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 import { RoundUpForCharity } from "@/components/checkout/RoundUpForCharity";
 
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY || "pk_test_placeholder");
@@ -581,9 +583,26 @@ function SiteStep({
 
     if (isLoading) {
         return (
-            <div className="flex flex-col items-center justify-center py-12">
-                <div className="animate-spin rounded-full h-12 w-12 border-4 border-emerald-500 border-t-transparent mb-4" />
-                <p className="text-slate-600">Checking availability...</p>
+            <div className="flex flex-col items-center justify-center py-12 gap-4">
+                {/* Animated tent icon */}
+                <div className="relative">
+                    <Tent className="h-12 w-12 text-emerald-500 animate-pulse" />
+                    <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-12 h-1.5 bg-slate-200/50 rounded-full blur-sm" />
+                </div>
+                <div className="text-center space-y-1">
+                    <p className="text-slate-700 font-medium">Finding available sites...</p>
+                    <p className="text-sm text-slate-500">We're checking what's open for your dates</p>
+                </div>
+                {/* Animated progress dots */}
+                <div className="flex gap-1.5">
+                    {[0, 1, 2].map((i) => (
+                        <div
+                            key={i}
+                            className="w-2 h-2 rounded-full bg-emerald-400"
+                            style={{ animation: `pulse 1.4s ease-in-out ${i * 0.2}s infinite` }}
+                        />
+                    ))}
+                </div>
             </div>
         );
     }
@@ -1412,7 +1431,33 @@ function PaymentForm({
                     )}
                 </ul>
             </div>
-            {error && <div className="text-sm text-red-600 bg-red-50 p-3 rounded-lg">{error}</div>}
+            {error && (
+                <div className="bg-red-50 border border-red-200 rounded-xl p-4">
+                    <div className="flex items-start gap-3">
+                        <AlertCircle className="h-5 w-5 text-red-600 mt-0.5 flex-shrink-0" />
+                        <div className="flex-1">
+                            <h4 className="font-semibold text-red-900 mb-1">Payment Error</h4>
+                            <p className="text-sm text-red-800 mb-3">{error}</p>
+                            <div className="bg-white/80 rounded-lg p-3 border border-red-100">
+                                <p className="text-xs font-medium text-red-900 mb-2">What you can try:</p>
+                                <ul className="space-y-1">
+                                    <li className="text-xs text-red-800 flex gap-2"><span>•</span>Check your card details are correct</li>
+                                    <li className="text-xs text-red-800 flex gap-2"><span>•</span>Verify you have sufficient funds</li>
+                                    <li className="text-xs text-red-800 flex gap-2"><span>•</span>Try a different card or payment method</li>
+                                    <li className="text-xs text-red-800 flex gap-2"><span>•</span>Contact your bank if the issue persists</li>
+                                </ul>
+                            </div>
+                            <button
+                                type="button"
+                                onClick={() => setError(null)}
+                                className="mt-3 text-sm text-red-600 hover:text-red-700 font-medium underline"
+                            >
+                                Dismiss and try again
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
             <div className="flex gap-3">
                 <button
                     type="button"
@@ -1425,9 +1470,19 @@ function PaymentForm({
                 <button
                     type="submit"
                     disabled={!stripe || isProcessing}
-                    className="flex-1 py-4 bg-emerald-600 text-white font-semibold rounded-xl hover:bg-emerald-700 disabled:bg-slate-400 transition-colors"
+                    className="flex-1 py-4 bg-gradient-to-r from-emerald-600 to-teal-600 text-white font-semibold rounded-xl hover:from-emerald-700 hover:to-teal-700 disabled:bg-slate-400 disabled:from-slate-400 disabled:to-slate-400 transition-all shadow-lg shadow-emerald-500/20 hover:shadow-xl"
                 >
-                    {isProcessing ? "Processing..." : `Pay $${(amountCents / 100).toFixed(2)}`}
+                    {isProcessing ? (
+                        <span className="flex items-center justify-center gap-2">
+                            <Loader2 className="h-5 w-5 animate-spin" />
+                            Processing...
+                        </span>
+                    ) : (
+                        <span className="flex items-center justify-center gap-2">
+                            <Lock className="h-4 w-4" />
+                            Pay ${(amountCents / 100).toFixed(2)}
+                        </span>
+                    )}
                 </button>
             </div>
         </form>
@@ -1786,9 +1841,28 @@ function ReviewStep({
 
     if (isLoadingQuote) {
         return (
-            <div className="flex flex-col items-center justify-center py-12">
-                <div className="animate-spin rounded-full h-12 w-12 border-4 border-emerald-500 border-t-transparent mb-4" />
-                <p className="text-slate-600">Calculating your total...</p>
+            <div className="flex flex-col items-center justify-center py-12 gap-4">
+                {/* Calculator animation */}
+                <div className="relative">
+                    <svg className="w-10 h-10 text-emerald-500 animate-bounce" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                    </svg>
+                    <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-10 h-1.5 bg-slate-200/50 rounded-full blur-sm" />
+                </div>
+                <div className="text-center space-y-1">
+                    <p className="text-slate-700 font-medium">Crunching the numbers...</p>
+                    <p className="text-sm text-slate-500">Getting your best price ready</p>
+                </div>
+                {/* Animated progress dots */}
+                <div className="flex gap-1.5">
+                    {[0, 1, 2].map((i) => (
+                        <div
+                            key={i}
+                            className="w-2 h-2 rounded-full bg-emerald-400"
+                            style={{ animation: `pulse 1.4s ease-in-out ${i * 0.2}s infinite` }}
+                        />
+                    ))}
+                </div>
             </div>
         );
     }
@@ -2022,10 +2096,55 @@ function ReviewStep({
             </div>
 
             {bookingError && (
-                <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-xl text-red-700 text-sm">
-                    {bookingError}
+                <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-xl">
+                    <div className="flex items-start gap-3">
+                        <AlertCircle className="h-5 w-5 text-red-600 mt-0.5 flex-shrink-0" />
+                        <div>
+                            <p className="font-medium text-red-900 mb-1">Something went wrong</p>
+                            <p className="text-red-700 text-sm mb-3">{bookingError}</p>
+                            <div className="bg-white/50 rounded-lg p-3 border border-red-100">
+                                <p className="text-xs font-medium text-red-900 mb-2">What you can try:</p>
+                                <ul className="space-y-1 text-xs text-red-800">
+                                    <li className="flex gap-2"><span>•</span>Wait a moment and try again</li>
+                                    <li className="flex gap-2"><span>•</span>Go back and verify your information</li>
+                                    <li className="flex gap-2"><span>•</span>Try a different payment method</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             )}
+
+            {/* Trust Badges */}
+            <div className="mb-6 rounded-xl border border-emerald-100 bg-gradient-to-br from-emerald-50 to-cyan-50 p-5">
+                <div className="flex items-center gap-2 mb-4">
+                    <Lock className="h-5 w-5 text-emerald-600" />
+                    <h4 className="font-semibold text-slate-900">Your Payment is Secure</h4>
+                </div>
+
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                    <div className="flex flex-col items-center text-center p-3 bg-white rounded-lg border border-slate-100">
+                        <Shield className="h-6 w-6 text-blue-600 mb-2" />
+                        <span className="text-xs font-medium text-slate-700">256-bit SSL</span>
+                    </div>
+                    <div className="flex flex-col items-center text-center p-3 bg-white rounded-lg border border-slate-100">
+                        <CheckCircle className="h-6 w-6 text-emerald-600 mb-2" />
+                        <span className="text-xs font-medium text-slate-700">PCI Compliant</span>
+                    </div>
+                    <div className="flex flex-col items-center text-center p-3 bg-white rounded-lg border border-slate-100">
+                        <CreditCard className="h-6 w-6 text-purple-600 mb-2" />
+                        <span className="text-xs font-medium text-slate-700">Stripe Secure</span>
+                    </div>
+                    <div className="flex flex-col items-center text-center p-3 bg-white rounded-lg border border-slate-100">
+                        <Users className="h-6 w-6 text-pink-600 mb-2" />
+                        <span className="text-xs font-medium text-slate-700">10K+ Bookings</span>
+                    </div>
+                </div>
+
+                <p className="text-xs text-slate-600 mt-4 text-center">
+                    Your payment information is encrypted and never stored on our servers. Powered by Stripe, the same payment processor trusted by Amazon and Google.
+                </p>
+            </div>
 
             {/* Payment Section */}
             {clientSecret ? (
@@ -2075,60 +2194,228 @@ function ReviewStep({
 
 // Success Screen
 function SuccessScreen({ campgroundName, slug, reservation }: { campgroundName: string; slug: string; reservation: any }) {
+    const [copied, setCopied] = useState(false);
+
+    const handleCopyCode = () => {
+        navigator.clipboard.writeText(reservation.id.slice(-8).toUpperCase());
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2000);
+    };
+
     return (
         <div className="max-w-2xl mx-auto py-12 px-4">
-            <div className="text-center mb-8">
-                <div className="text-6xl mb-4">🎉</div>
-                <h2 className="text-3xl font-bold text-slate-900 mb-2">Booking Confirmed!</h2>
-                <p className="text-slate-600">
-                    Thank you for booking at {campgroundName}. You'll receive a confirmation email shortly.
-                </p>
-            </div>
+            {/* Animated celebration header */}
+            <motion.div
+                className="text-center mb-8"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6 }}
+            >
+                <motion.div
+                    className="mb-4 relative"
+                    initial={{ scale: 0, rotate: -180 }}
+                    animate={{ scale: 1, rotate: 0 }}
+                    transition={{ type: "spring", stiffness: 200, damping: 15, delay: 0.2 }}
+                >
+                    <div className="w-20 h-20 bg-emerald-100 rounded-full flex items-center justify-center">
+                        <CheckCircle className="w-12 h-12 text-emerald-600" />
+                    </div>
+                    {/* Decorative sparkles */}
+                    <Sparkles className="absolute -top-2 -right-2 w-6 h-6 text-amber-400" />
+                    <Sparkles className="absolute -bottom-1 -left-2 w-5 h-5 text-emerald-400" />
+                </motion.div>
+                <motion.h2
+                    className="text-4xl font-bold text-emerald-600 mb-2"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ delay: 0.4 }}
+                >
+                    You're All Set!
+                </motion.h2>
+                <motion.p
+                    className="text-lg text-slate-700 mb-4"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ delay: 0.5 }}
+                >
+                    Your adventure at {campgroundName} is confirmed
+                </motion.p>
+                <motion.div
+                    className="inline-flex items-center gap-2 bg-emerald-50 border border-emerald-200 rounded-full px-6 py-3 text-sm text-emerald-800"
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ delay: 0.6 }}
+                >
+                    <Mail className="h-4 w-4" />
+                    <span className="font-medium">Confirmation email sent to {reservation.guest?.email || "your email"}</span>
+                </motion.div>
+            </motion.div>
 
-            <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm mb-8">
+            {/* Confirmation Details Card */}
+            <motion.div
+                className="bg-white border border-slate-200 rounded-2xl p-6 shadow-lg mb-8"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.3 }}
+            >
                 <div className="flex flex-col md:flex-row justify-between gap-6 mb-6 pb-6 border-b border-slate-100">
                     <div>
-                        <p className="text-sm text-slate-500 uppercase tracking-wide font-medium">Confirmation Code</p>
-                        <p className="text-2xl font-mono font-bold text-emerald-600">{reservation.id.slice(-8).toUpperCase()}</p>
+                        <p className="text-sm text-slate-500 uppercase tracking-wide font-medium mb-1">Confirmation Code</p>
+                        <div className="flex items-center gap-2">
+                            <p className="text-3xl font-mono font-bold text-emerald-600">
+                                {reservation.id.slice(-8).toUpperCase()}
+                            </p>
+                            <button
+                                onClick={handleCopyCode}
+                                className="p-2 hover:bg-slate-100 rounded-lg transition-colors"
+                                title="Copy confirmation code"
+                            >
+                                {copied ? (
+                                    <Check className="h-4 w-4 text-emerald-600" />
+                                ) : (
+                                    <Copy className="h-4 w-4 text-slate-500" />
+                                )}
+                            </button>
+                        </div>
                     </div>
-                    <div>
-                        <p className="text-sm text-slate-500 uppercase tracking-wide font-medium">Total Paid</p>
-                        <p className="text-2xl font-bold text-slate-900">${(reservation.totalAmount / 100).toFixed(2)}</p>
+                    <div className="text-right">
+                        <p className="text-sm text-slate-500 uppercase tracking-wide font-medium mb-1">Total Paid</p>
+                        <p className="text-3xl font-bold text-slate-900">${(reservation.totalAmount / 100).toFixed(2)}</p>
                     </div>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
-                        <p className="text-sm text-slate-500 mb-1">Dates</p>
+                        <p className="text-sm text-slate-500 mb-1 flex items-center gap-2">
+                            <Calendar className="h-4 w-4" />
+                            Dates
+                        </p>
                         <p className="font-medium text-slate-900">
                             {new Date(reservation.arrivalDate).toLocaleDateString()} - {new Date(reservation.departureDate).toLocaleDateString()}
                         </p>
                     </div>
                     <div>
-                        <p className="text-sm text-slate-500 mb-1">Guests</p>
+                        <p className="text-sm text-slate-500 mb-1 flex items-center gap-2">
+                            <Users className="h-4 w-4" />
+                            Guests
+                        </p>
                         <p className="font-medium text-slate-900">
                             {reservation.adults} Adults, {reservation.children} Children
                         </p>
                     </div>
                     {(reservation.siteId || reservation.siteClassId) && (
                         <div className="col-span-full">
-                            <p className="text-sm text-slate-500 mb-1">Site</p>
+                            <p className="text-sm text-slate-500 mb-1 flex items-center gap-2">
+                                <MapPin className="h-4 w-4" />
+                                Site
+                            </p>
                             <p className="font-medium text-slate-900">
                                 {reservation.site?.name || "Assigned on Arrival"}
                             </p>
                         </div>
                     )}
                 </div>
-            </div>
+            </motion.div>
 
-            <div className="text-center">
+            {/* What Happens Next */}
+            <motion.div
+                className="bg-gradient-to-br from-blue-50 to-indigo-50 border border-blue-200 rounded-2xl p-6 mb-8"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.5 }}
+            >
+                <h3 className="font-bold text-blue-900 mb-4 flex items-center gap-2 text-lg">
+                    <Sparkles className="h-5 w-5" />
+                    What happens next?
+                </h3>
+                <div className="space-y-4">
+                    <div className="flex gap-4">
+                        <div className="flex-shrink-0 w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center font-bold text-sm">
+                            1
+                        </div>
+                        <div>
+                            <p className="font-medium text-blue-900">Check your email</p>
+                            <p className="text-sm text-blue-800">
+                                We've sent your confirmation and receipt. Add it to your calendar!
+                            </p>
+                        </div>
+                    </div>
+                    <div className="flex gap-4">
+                        <div className="flex-shrink-0 w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center font-bold text-sm">
+                            2
+                        </div>
+                        <div>
+                            <p className="font-medium text-blue-900">Get check-in details</p>
+                            <p className="text-sm text-blue-800">
+                                48 hours before arrival, we'll email you check-in instructions and directions
+                            </p>
+                        </div>
+                    </div>
+                    <div className="flex gap-4">
+                        <div className="flex-shrink-0 w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center font-bold text-sm">
+                            3
+                        </div>
+                        <div>
+                            <p className="font-medium text-blue-900">Pack and enjoy!</p>
+                            <p className="text-sm text-blue-800">
+                                Check the weather, pack your gear, and get ready for an unforgettable stay
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </motion.div>
+
+            {/* Actions */}
+            <motion.div
+                className="flex flex-col sm:flex-row gap-4"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.7 }}
+            >
                 <Link
                     href={`/park/${slug}`}
-                    className="inline-block px-8 py-4 bg-emerald-600 text-white font-medium rounded-xl hover:bg-emerald-700 transition-colors shadow-lg shadow-emerald-200"
+                    className="flex-1 inline-flex items-center justify-center px-8 py-4 bg-gradient-to-r from-emerald-600 to-teal-600 text-white font-semibold rounded-xl hover:from-emerald-700 hover:to-teal-700 transition-all shadow-lg shadow-emerald-200"
                 >
-                    Back to Campground
+                    <ArrowLeft className="h-5 w-5 mr-2" />
+                    Back to {campgroundName}
                 </Link>
-            </div>
+                <button
+                    onClick={() => window.print()}
+                    className="flex-1 inline-flex items-center justify-center px-8 py-4 bg-white border-2 border-slate-300 text-slate-700 font-semibold rounded-xl hover:bg-slate-50 transition-colors"
+                >
+                    <Printer className="h-5 w-5 mr-2" />
+                    Print Confirmation
+                </button>
+            </motion.div>
+
+            {/* Social Proof / Share */}
+            <motion.div
+                className="mt-8 p-6 bg-slate-50 rounded-xl border border-slate-200"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.9 }}
+            >
+                <p className="text-sm text-slate-600 mb-3 text-center font-medium">
+                    Know someone who'd love {campgroundName}?
+                </p>
+                <div className="flex gap-3 justify-center">
+                    <button
+                        onClick={() => {
+                            navigator.share?.({
+                                title: `${campgroundName}`,
+                                text: `Check out ${campgroundName}!`,
+                                url: `${window.location.origin}/park/${slug}`
+                            }).catch(() => {
+                                navigator.clipboard.writeText(`${window.location.origin}/park/${slug}`);
+                            });
+                        }}
+                        className="px-6 py-2 bg-emerald-600 text-white rounded-lg text-sm font-medium hover:bg-emerald-700 transition-colors flex items-center gap-2"
+                    >
+                        <Share2 className="h-4 w-4" />
+                        Share with Friends
+                    </button>
+                </div>
+            </motion.div>
         </div>
     );
 }
@@ -2448,8 +2735,26 @@ export default function BookingPage() {
 
     if (isLoadingCampground) {
         return (
-            <div className="min-h-screen flex items-center justify-center">
-                <div className="animate-spin rounded-full h-12 w-12 border-4 border-emerald-500 border-t-transparent" />
+            <div className="min-h-screen flex flex-col items-center justify-center gap-6 bg-gradient-to-b from-slate-50 to-white">
+                {/* Animated campground icon */}
+                <div className="relative">
+                    <Tent className="h-12 w-12 text-emerald-500 animate-bounce" />
+                    <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-16 h-2 bg-slate-200/50 rounded-full blur-sm" />
+                </div>
+                <div className="text-center space-y-2">
+                    <p className="text-slate-700 font-medium animate-pulse">Preparing your booking...</p>
+                    <p className="text-sm text-slate-500">Almost ready for your adventure</p>
+                </div>
+                {/* Progress dots */}
+                <div className="flex gap-1.5">
+                    {[0, 1, 2].map((i) => (
+                        <div
+                            key={i}
+                            className="w-2 h-2 rounded-full bg-emerald-500"
+                            style={{ animation: `pulse 1.4s ease-in-out ${i * 0.2}s infinite` }}
+                        />
+                    ))}
+                </div>
             </div>
         );
     }
