@@ -107,7 +107,6 @@ export function CalendarGrid({ data, onSelectionComplete }: CalendarGridProps) {
                                 onDragEnd: handleDragEnd,
                                 onReservationClick: (id) => console.log("Click", id),
                             }}
-                            onDragStart={(e: React.DragEvent) => e.preventDefault()}
                             today={new Date()}
                         />
                     ))}
