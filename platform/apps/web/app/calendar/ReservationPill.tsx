@@ -59,28 +59,28 @@ export function ReservationPill({
 
     const statusConfig = {
         confirmed: {
-            bg: "bg-gradient-to-r from-emerald-500 to-emerald-600",
+            bg: "bg-gradient-to-br from-emerald-500/90 to-emerald-600/95",
             icon: CheckCircle,
-            border: "border-emerald-600/50",
-            shadow: "shadow-emerald-500/25"
+            border: "border-emerald-400/30",
+            shadow: "shadow-[0_2px_8px_-2px_rgba(16,185,129,0.4)]"
         },
         checked_in: {
-            bg: "bg-gradient-to-r from-blue-500 to-blue-600",
+            bg: "bg-gradient-to-br from-blue-500/90 to-blue-600/95",
             icon: Clock,
-            border: "border-blue-600/50",
-            shadow: "shadow-blue-500/25"
+            border: "border-blue-400/30",
+            shadow: "shadow-[0_2px_8px_-2px_rgba(59,130,246,0.4)]"
         },
         cancelled: {
-            bg: "bg-gradient-to-r from-rose-400 to-rose-500",
+            bg: "bg-gradient-to-br from-rose-400/90 to-rose-500/95",
             icon: XCircle,
-            border: "border-rose-500/50",
-            shadow: "shadow-rose-500/25"
+            border: "border-rose-400/30",
+            shadow: "shadow-[0_2px_8px_-2px_rgba(244,63,94,0.4)]"
         },
         pending: {
-            bg: "bg-gradient-to-r from-amber-400 to-amber-500",
+            bg: "bg-gradient-to-br from-amber-400/90 to-amber-500/95",
             icon: HelpCircle,
-            border: "border-amber-500/50",
-            shadow: "shadow-amber-500/25"
+            border: "border-amber-400/30",
+            shadow: "shadow-[0_2px_8px_-2px_rgba(245,158,11,0.4)]"
         },
     };
 
@@ -92,12 +92,12 @@ export function ReservationPill({
     return (
         <div
             className={cn(
-                "group absolute top-1 bottom-1 rounded-lg text-xs text-white shadow-md flex items-center px-2.5 overflow-hidden border transition-all duration-200 ease-out cursor-pointer",
-                "hover:scale-[1.02] hover:shadow-lg hover:z-20 active:scale-[0.98]",
+                "group absolute top-1.5 bottom-1.5 rounded-lg text-[11px] text-white backdrop-blur-[2px] flex items-center px-2.5 overflow-hidden border transition-all duration-300 ease-[cubic-bezier(0.23,1,0.32,1)] cursor-pointer",
+                "hover:scale-[1.015] hover:brightness-110 hover:shadow-xl hover:z-30 active:scale-[0.985]",
                 config.bg,
                 config.border,
                 config.shadow,
-                isHighlighted ? "ring-2 ring-white ring-offset-2 ring-offset-slate-100 z-20 scale-[1.02]" : "z-10"
+                isHighlighted ? "ring-2 ring-white/60 ring-offset-2 ring-offset-slate-100 z-20 shadow-lg" : "z-10"
             )}
             style={style}
             title={`${guestName} • ${reservation.status}`}
@@ -105,26 +105,32 @@ export function ReservationPill({
             onMouseDown={handleMouseDown}
             onMouseUp={handleMouseUp}
         >
-            <Icon className="w-3 h-3 mr-1.5 flex-shrink-0 opacity-90" />
-            <div className="flex flex-col leading-tight min-w-0">
-                <span className="font-semibold truncate">{guestName}</span>
-                {style.minWidth && parseInt(style.minWidth.toString()) > 100 && (
-                    <span className="text-[10px] opacity-90 truncate font-mono">${total.toFixed(0)}</span>
+            <div className="flex items-center min-w-0 w-full">
+                <Icon className="w-3 h-3 mr-2 flex-shrink-0 opacity-80 group-hover:opacity-100 transition-opacity" />
+                <div className="flex flex-col leading-none min-w-0 flex-1">
+                    <span className="font-bold truncate tracking-tight">{guestName}</span>
+                    {style.width && parseInt(style.width.toString()) > 120 && (
+                        <span className="text-[9px] opacity-70 truncate font-mono mt-0.5">${total.toFixed(0)}</span>
+                    )}
+                </div>
+                {(hasMaintenance || needsCleaning || hasConflict) && (
+                    <div className="ml-2 flex gap-1 items-center flex-shrink-0">
+                        {hasMaintenance && <Wrench className="h-2.5 w-2.5 text-amber-100/80" />}
+                        {needsCleaning && <Sparkles className="h-2.5 w-2.5 text-cyan-100/80" />}
+                        {hasConflict && <AlertTriangle className="h-2.5 w-2.5 text-rose-100/80" aria-label="Conflict" />}
+                    </div>
                 )}
             </div>
-            {(hasMaintenance || needsCleaning || hasConflict) && (
-                <div className="ml-2 flex gap-1 items-center">
-                    {hasMaintenance && <Wrench className="h-3 w-3 text-amber-100" />}
-                    {needsCleaning && <Sparkles className="h-3 w-3 text-cyan-100" />}
-                    {hasConflict && <AlertTriangle className="h-3 w-3 text-amber-100" aria-label="Conflict in date range" />}
-                </div>
-            )}
-            {/* Quick Check-in Button - Shows on hover for confirmed arrivals today */}
+
+            {/* Gloss Highlight effect */}
+            <div className="absolute inset-0 bg-gradient-to-b from-white/10 to-transparent pointer-events-none" />
+
+            {/* Quick Check-in Button */}
             {showQuickCheckIn && (
                 <button
                     type="button"
                     onClick={handleQuickCheckIn}
-                    className="absolute right-1 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity bg-white/90 text-emerald-700 rounded-full p-1 hover:bg-white shadow-sm"
+                    className="absolute right-1.5 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-all duration-200 bg-white shadow-md text-emerald-600 rounded-full p-1.5 hover:scale-110 active:scale-90"
                     title="Quick Check-in"
                 >
                     <LogIn className="h-3 w-3" />

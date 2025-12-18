@@ -72,20 +72,24 @@ export interface CalendarBlackout {
 // Conflict between reservations
 export interface ReservationConflict {
   siteId: string;
+  overlapStart?: Date;
+  overlapEnd?: Date;
   a?: CalendarReservation | null;
   b?: CalendarReservation | null;
 }
 
 // Quote preview for selection
 export interface QuotePreview {
+  siteId: string;
+  siteName: string;
+  arrival: string;
+  departure: string;
+  total: number;
   nights: number;
-  baseSubtotalCents: number;
-  rulesDeltaCents: number;
-  totalCents: number;
-  perNightCents: number;
-  taxExemptionEligible?: boolean;
-  requiresWaiver?: boolean;
-  waiverText?: string | null;
+  base: number;
+  perNight: number;
+  rulesDelta: number;
+  depositRule: string | null;
 }
 
 // Extend prompt for modifications
