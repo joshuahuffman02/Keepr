@@ -18,7 +18,7 @@ interface CalendarRowProps {
     handlers: {
         onDragStart: (siteId: string, dayIdx: number) => void;
         onDragEnter: (siteId: string, dayIdx: number) => void;
-        onDragEnd: (siteId: string, dayIdx: number) => void;
+        onDragEnd: (siteId: string | null, dayIdx: number | null) => void;
         onReservationClick: (resId: string) => void;
         onQuickCheckIn?: (reservationId: string) => void;
     };
@@ -53,6 +53,10 @@ export const CalendarRow = memo(function CalendarRow({
             className="grid relative group hover:bg-slate-50/50 transition-colors"
             style={{ gridTemplateColumns: gridTemplate }}
             onDragStart={(e) => e.preventDefault()}
+            onPointerLeave={() => {
+                // If the pointer leaves the row while dragging, we still want to track it
+                // but we don't clear the siteId here because it might be a drift.
+            }}
         >
             {/* Site Info Column */}
             <div className={cn("px-4 py-3 sticky left-0 z-20 border-r border-slate-200 flex flex-col justify-center", zebra)}>
@@ -76,15 +80,18 @@ export const CalendarRow = memo(function CalendarRow({
                         <div
                             key={i}
                             className={cn(
-                                "border-r border-slate-100 cursor-crosshair transition-colors h-16",
+                                "border-r border-slate-100 cursor-crosshair transition-colors h-16 touch-none",
                                 zebra,
                                 d.isToday && "bg-blue-50/40",
                                 d.weekend && "bg-slate-50/50",
                                 "hover:bg-blue-50/30"
                             )}
-                            onMouseDown={() => onDragStart(site.id, i)}
-                            onMouseEnter={() => onDragEnter(site.id, i)}
-                            onMouseUp={() => onDragEnd(site.id, i)}
+                            onPointerDown={(e) => {
+                                (e.target as HTMLElement).releasePointerCapture(e.pointerId);
+                                onDragStart(site.id, i);
+                            }}
+                            onPointerEnter={() => onDragEnter(site.id, i)}
+                            onPointerUp={() => onDragEnd(site.id, i)}
                         />
                     ))}
                 </div>
@@ -150,8 +157,8 @@ export const CalendarRow = memo(function CalendarRow({
                                         e.stopPropagation();
                                         onReservationClick(res.id);
                                     }}
-                                    onMouseDown={(e) => e.stopPropagation()}
-                                    onMouseUp={(e) => e.stopPropagation()}
+                                    onPointerDown={(e) => e.stopPropagation()}
+                                    onPointerUp={(e) => e.stopPropagation()}
                                     onQuickCheckIn={onQuickCheckIn}
                                     isArrivalToday={isArrivalToday(res)}
                                 />

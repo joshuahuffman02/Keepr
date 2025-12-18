@@ -10,8 +10,8 @@ interface ReservationPillProps {
     needsCleaning?: boolean;
     hasConflict?: boolean;
     onClick: (e: React.MouseEvent) => void;
-    onMouseDown: (e: React.MouseEvent) => void;
-    onMouseUp: (e: React.MouseEvent) => void;
+    onPointerDown: (e: React.PointerEvent) => void;
+    onPointerUp: (e: React.PointerEvent) => void;
     onQuickCheckIn?: (reservationId: string) => void;
     isArrivalToday?: boolean;
 }
@@ -21,8 +21,8 @@ export function ReservationPill({
     style,
     isHighlighted,
     onClick,
-    onMouseDown,
-    onMouseUp,
+    onPointerDown,
+    onPointerUp,
     hasMaintenance,
     needsCleaning,
     hasConflict,
@@ -36,14 +36,14 @@ export function ReservationPill({
         onClick(e);
     };
 
-    const handleMouseDown = (e: React.MouseEvent) => {
+    const handlePointerDown = (e: React.PointerEvent) => {
         e.stopPropagation();
-        onMouseDown(e);
+        onPointerDown(e);
     };
 
-    const handleMouseUp = (e: React.MouseEvent) => {
+    const handlePointerUp = (e: React.PointerEvent) => {
         e.stopPropagation();
-        onMouseUp(e);
+        onPointerUp(e);
     };
 
     const handleQuickCheckIn = (e: React.MouseEvent) => {
@@ -102,8 +102,8 @@ export function ReservationPill({
             style={style}
             title={`${guestName} • ${reservation.status}`}
             onClick={handleClick}
-            onMouseDown={handleMouseDown}
-            onMouseUp={handleMouseUp}
+            onPointerDown={handlePointerDown}
+            onPointerUp={handlePointerUp}
         >
             <div className="flex items-center min-w-0 w-full">
                 <Icon className="w-3 h-3 mr-2 flex-shrink-0 opacity-80 group-hover:opacity-100 transition-opacity" />

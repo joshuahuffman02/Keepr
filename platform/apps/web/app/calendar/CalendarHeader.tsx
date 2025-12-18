@@ -5,9 +5,6 @@ import { ChevronLeft, ChevronRight, Calendar as CalendarIcon, List, CalendarDays
 import { formatLocalDateInput, parseLocalDateInput } from "./utils";
 
 interface CalendarHeaderProps {
-    campgrounds: any[];
-    selectedCampground: string;
-    setSelectedCampground: (v: string) => void;
     startDate: string;
     setStartDate: (v: string) => void;
     viewMode: string;
@@ -16,9 +13,6 @@ interface CalendarHeaderProps {
 }
 
 export function CalendarHeader({
-    campgrounds,
-    selectedCampground,
-    setSelectedCampground,
     startDate,
     setStartDate,
     viewMode,
@@ -49,16 +43,6 @@ export function CalendarHeader({
             </div>
 
             <div className="flex flex-wrap items-center gap-3">
-                <Select value={selectedCampground} onValueChange={setSelectedCampground}>
-                    <SelectTrigger className="w-[200px] h-10 border-slate-200 shadow-sm transition-all hover:border-blue-300">
-                        <SelectValue placeholder="Select Campground" />
-                    </SelectTrigger>
-                    <SelectContent>
-                        {campgrounds.map((cg) => (
-                            <SelectItem key={cg.id} value={cg.id}>{cg.name}</SelectItem>
-                        ))}
-                    </SelectContent>
-                </Select>
 
                 <div className="flex items-center bg-white rounded-lg border border-slate-200 shadow-sm p-1">
                     <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-600" onClick={handlePrev}>

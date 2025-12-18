@@ -38,9 +38,6 @@ function CalendarContent() {
         />
 
         <CalendarHeader
-          campgrounds={campgrounds.data || []}
-          selectedCampground={state.selectedCampground}
-          setSelectedCampground={actions.setSelectedCampground}
           startDate={state.startDate}
           setStartDate={actions.setStartDate}
           viewMode={state.viewMode}
@@ -73,12 +70,12 @@ function CalendarContent() {
             />
 
             {/* Premium Quote Overlay */}
-            {state.selection && (
+            {state.reservationDraft && (
               <div className="fixed bottom-8 left-1/2 -translate-x-1/2 z-50 animate-in slide-in-from-bottom-8 duration-500 ease-out">
                 <Card className="p-4 bg-slate-900/95 backdrop-blur-xl border-slate-800 shadow-2xl flex items-center gap-6 min-w-[500px] text-white overflow-hidden group">
                   <div className="flex flex-col">
                     <span className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Draft Booking</span>
-                    <span className="text-sm font-bold truncate max-w-[150px]">{state.selection.siteName}</span>
+                    <span className="text-sm font-bold truncate max-w-[150px]">{state.reservationDraft.siteName}</span>
                   </div>
 
                   <div className="h-8 w-px bg-slate-800" />
@@ -86,19 +83,19 @@ function CalendarContent() {
                   <div className="flex flex-col">
                     <span className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Dates</span>
                     <span className="text-sm font-bold whitespace-nowrap">
-                      {state.selection.arrival} → {state.selection.departure}
+                      {state.reservationDraft.arrival} → {state.reservationDraft.departure}
                     </span>
                   </div>
 
                   <div className="ml-auto flex items-center gap-4">
                     <div className="text-right">
                       <span className="text-[10px] font-bold uppercase tracking-widest text-emerald-400 block">Total Est.</span>
-                      <span className="text-xl font-black text-white">${(state.selection.total / 100).toFixed(2)}</span>
+                      <span className="text-xl font-black text-white">${(state.reservationDraft.total / 100).toFixed(2)}</span>
                     </div>
                     <Button
                       size="sm"
                       className="bg-blue-600 hover:bg-blue-500 text-white font-bold px-6 shadow-[0_0_20px_rgba(37,99,235,0.4)]"
-                      onClick={() => actions.setSelection(null)}
+                      onClick={() => actions.setReservationDraft(null)}
                     >
                       Book Now
                     </Button>
@@ -106,7 +103,7 @@ function CalendarContent() {
                       size="icon"
                       variant="ghost"
                       className="h-8 w-8 text-slate-400 hover:text-white"
-                      onClick={() => actions.setSelection(null)}
+                      onClick={() => actions.setReservationDraft(null)}
                     >
                       <X className="h-4 w-4" />
                     </Button>

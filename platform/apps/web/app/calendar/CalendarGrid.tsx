@@ -37,9 +37,10 @@ export function CalendarGrid({ data, onSelectionComplete }: CalendarGridProps) {
         }
     }, [setDragVisual, dragRef]);
 
-    const handleDragEnd = useCallback(async (siteId: string, dayIdx: number) => {
+    const handleDragEnd = useCallback(async (siteId: string | null, dayIdx: number | null) => {
         const drag = dragRef.current;
-        if (drag.siteId === siteId && drag.startIdx !== null && drag.endIdx !== null) {
+        if (drag.siteId && drag.startIdx !== null && drag.endIdx !== null) {
+            const finalSiteId = siteId || drag.siteId;
             const startIdx = Math.min(drag.startIdx, drag.endIdx);
             const endIdx = Math.max(drag.startIdx, drag.endIdx);
 
@@ -48,7 +49,7 @@ export function CalendarGrid({ data, onSelectionComplete }: CalendarGridProps) {
             departureDate.setDate(departureDate.getDate() + 1); // Exclusive
 
             if (drag.isDragging) {
-                onSelectionComplete(siteId, arrivalDate, departureDate);
+                onSelectionComplete(finalSiteId, arrivalDate, departureDate);
             }
         }
 
@@ -89,7 +90,10 @@ export function CalendarGrid({ data, onSelectionComplete }: CalendarGridProps) {
                 </div>
 
                 {/* Rows */}
-                <div className="divide-y divide-slate-100">
+                <div
+                    className="divide-y divide-slate-100"
+                    onPointerUp={() => handleDragEnd(null, null)}
+                >
                     {(sites.data || []).map((site, idx) => (
                         <CalendarRow
                             key={site.id}
@@ -99,13 +103,18 @@ export function CalendarGrid({ data, onSelectionComplete }: CalendarGridProps) {
                             gridTemplate={gridTemplate}
                             dayCount={dayCount}
                             zebra={idx % 2 === 0 ? "bg-white" : "bg-slate-50/30"}
-                            selection={null} // TODO: Handle stored selection
-                            ganttSelection={{ highlightedId: null, openDetailsId: null }} // TODO
+                            selection={state.reservationDraft ? {
+                                siteId: state.reservationDraft.siteId,
+                                arrival: state.reservationDraft.arrival,
+                                departure: state.reservationDraft.departure
+                            } : null}
+                            ganttSelection={ganttSelection}
                             handlers={{
                                 onDragStart: handleDragStart,
                                 onDragEnter: handleDragEnter,
                                 onDragEnd: handleDragEnd,
-                                onReservationClick: (id) => console.log("Click", id),
+                                onReservationClick: actions.setSelectedReservationId,
+                                onQuickCheckIn: actions.handleQuickCheckIn
                             }}
                             today={new Date()}
                         />

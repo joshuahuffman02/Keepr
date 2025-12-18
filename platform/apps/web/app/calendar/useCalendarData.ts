@@ -31,7 +31,12 @@ export function useCalendarData() {
     const { selection: ganttSelection, setSelection: setStoreSelection } = useGanttStore();
     const { data: whoami } = useWhoami();
 
-    const [selectedCampground, setSelectedCampground] = useState<string>("");
+    const [selectedCampground, setSelectedCampground] = useState<string>(() => {
+        if (typeof window !== "undefined") {
+            return localStorage.getItem("campreserv:selectedCampground") || "";
+        }
+        return "";
+    });
     const [startDate, setStartDate] = useState(() => formatLocalDateInput(new Date()));
     const [viewMode, setViewMode] = useState<CalendarViewMode>("week");
     const [dayCount, setDayCount] = useState(14);
@@ -51,6 +56,21 @@ export function useCalendarData() {
         reservations: null,
         blackouts: null
     });
+
+    // Effect to sync with localStorage if it changes
+    useEffect(() => {
+        const handleStorageChange = () => {
+            const stored = localStorage.getItem("campreserv:selectedCampground");
+            if (stored && stored !== selectedCampground) {
+                setSelectedCampground(stored);
+            }
+        };
+
+        window.addEventListener("storage", handleStorageChange);
+        // Also poll briefly or use a custom event if needed, 
+        // but DashboardShell does a full reload so this is mostly for completeness.
+        return () => window.removeEventListener("storage", handleStorageChange);
+    }, [selectedCampground]);
 
     // Basic Queries
     const campgroundsQuery = useQuery({
@@ -234,7 +254,8 @@ export function useCalendarData() {
     }, [reservationsQuery.isSuccess, reservationsQuery.data, dayCount]);
 
     // Selection & Quote logic
-    const [selection, setSelection] = useState<QuotePreview | null>(null);
+    const [reservationDraft, setReservationDraft] = useState<QuotePreview | null>(null);
+    const [selectedReservationId, setSelectedReservationId] = useState<string | null>(null);
 
     const selectRange = async (siteId: string, arrival: Date, departure: Date) => {
         const arrivalStr = formatLocalDateInput(arrival);
@@ -259,7 +280,7 @@ export function useCalendarData() {
                 rulesDelta: 0,
                 depositRule: null
             };
-            setSelection(quote);
+            setReservationDraft(quote);
         } catch (err) {
             recordError("calendar.selectRange", err);
         }
@@ -280,6 +301,11 @@ export function useCalendarData() {
         }
     });
 
+    const handleQuickCheckIn = (reservationId: string) => {
+        // Implementation for quick check-in
+        console.log("Quick check-in for:", reservationId);
+    };
+
     return {
         state: {
             selectedCampground,
@@ -293,7 +319,8 @@ export function useCalendarData() {
             guestSearch,
             arrivalsNowOnly,
             lastUpdated,
-            selection
+            reservationDraft,
+            selectedReservationId
         },
         actions: {
             setSelectedCampground,
@@ -306,7 +333,9 @@ export function useCalendarData() {
             setAssignmentFilter,
             setGuestSearch,
             setArrivalsNowOnly,
-            setSelection,
+            setReservationDraft,
+            setSelectedReservationId,
+            handleQuickCheckIn,
             selectRange
         },
         queries: {
