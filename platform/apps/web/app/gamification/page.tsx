@@ -148,8 +148,8 @@ function LevelUpModal({
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.5 }}
               >
-                <h2 className="text-3xl font-bold text-slate-900 mb-2">
-                  Level Up! 🎉
+                <h2 className="text-3xl font-bold text-slate-900 mb-2 flex items-center justify-center gap-2">
+                  Level Up! <Sparkles className="h-8 w-8 text-amber-500" />
                 </h2>
                 <p className="text-xl text-emerald-600 font-semibold mb-4">
                   You're now a <span className="text-emerald-700">{levelTitle}</span>!
@@ -229,7 +229,7 @@ function XpToast({
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.3 }}
             >
-              🎉
+              <Sparkles className="h-5 w-5" />
             </motion.span>
           </div>
 
@@ -597,7 +597,7 @@ export default function GamificationDashboardPage() {
         // Show toast for badge unlock
         const newBadge = res.badges?.[res.badges.length - 1];
         if (newBadge) {
-          addXpToast(0, "badge", `🏆 Badge Unlocked: ${newBadge.name}`);
+          addXpToast(0, "badge", `Badge Unlocked: ${newBadge.name}`);
         }
       }
       prevLevelRef.current = res.level?.level ?? null;

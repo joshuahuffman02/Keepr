@@ -11,7 +11,7 @@ import { DashboardShell } from "../../../../components/ui/layout/DashboardShell"
 import { ImageUpload } from "../../../../components/ui/image-upload";
 import { useToast } from "../../../../components/ui/use-toast";
 import { ToastAction } from "../../../../components/ui/toast";
-import { ChevronDown, ChevronUp, ChevronLeft, ChevronRight, Search, X, MoreHorizontal, Pencil, Trash2, Copy } from "lucide-react";
+import { ChevronDown, ChevronUp, ChevronLeft, ChevronRight, Search, X, MoreHorizontal, Pencil, Trash2, Copy, Zap, Droplet, Waves } from "lucide-react";
 import { Input } from "../../../../components/ui/input";
 import {
   Table,
@@ -266,21 +266,52 @@ export default function SitesPage() {
     }
   };
 
-  // Quick update with undo capability
+  // Quick update with undo capability and optimistic updates
   const quickUpdateSite = useMutation({
     mutationFn: (payload: { id: string; data: Partial<ReturnType<typeof mapFormToPayload>>; previousData?: Partial<ReturnType<typeof mapFormToPayload>>; description?: string }) =>
       apiClient.updateSite(payload.id, payload.data),
+    onMutate: async (variables) => {
+      // Cancel any outgoing refetches
+      await queryClient.cancelQueries({ queryKey: ["sites", campgroundId] });
+
+      // Snapshot the previous value
+      const previousSites = queryClient.getQueryData(["sites", campgroundId]);
+
+      // Optimistically update the cache
+      queryClient.setQueryData(["sites", campgroundId], (old: any[] | undefined) => {
+        if (!old) return old;
+        return old.map((site) =>
+          site.id === variables.id ? { ...site, ...variables.data } : site
+        );
+      });
+
+      return { previousSites };
+    },
+    onError: (_err, _variables, context) => {
+      // Rollback on error
+      if (context?.previousSites) {
+        queryClient.setQueryData(["sites", campgroundId], context.previousSites);
+      }
+      toast({ title: "Error", description: "Failed to update site." });
+    },
     onSuccess: (_data, variables) => {
-      queryClient.invalidateQueries({ queryKey: ["sites", campgroundId] });
       const { id, previousData, description } = variables;
 
-      // If we have previous data, show undo toast
+      // Show undo toast if we have previous data
       if (previousData) {
         toast({
           title: "Site updated",
           description: description || "Changes saved.",
           action: (
             <ToastAction altText="Undo" onClick={() => {
+              // Optimistically revert
+              queryClient.setQueryData(["sites", campgroundId], (old: any[] | undefined) => {
+                if (!old) return old;
+                return old.map((site) =>
+                  site.id === id ? { ...site, ...previousData } : site
+                );
+              });
+              // Then sync with server
               apiClient.updateSite(id, previousData).then(() => {
                 queryClient.invalidateQueries({ queryKey: ["sites", campgroundId] });
                 toast({ title: "Undone", description: "Change reverted." });
@@ -290,9 +321,11 @@ export default function SitesPage() {
             </ToastAction>
           ),
         });
-      } else {
-        toast({ title: "Site updated", description: "Changes saved successfully." });
       }
+    },
+    onSettled: () => {
+      // Sync with server after mutation settles
+      queryClient.invalidateQueries({ queryKey: ["sites", campgroundId] });
     }
   });
 
@@ -754,11 +787,7 @@ export default function SitesPage() {
                 const isSelected = selectedSites.has(site.id);
                 const isInactive = site.isActive === false;
 
-                const hookups = [
-                  site.hookupsPower && `⚡${site.powerAmps || ""}`,
-                  site.hookupsWater && "💧",
-                  site.hookupsSewer && "🚿"
-                ].filter(Boolean).join(" ");
+                const hasHookups = site.hookupsPower || site.hookupsWater || site.hookupsSewer;
 
                 return (
                   <React.Fragment key={site.id}>
@@ -819,9 +848,22 @@ export default function SitesPage() {
                         )}
                       </TableCell>
                       <TableCell className="hidden lg:table-cell">
-                        <span className="text-sm" title={`Power: ${site.hookupsPower ? 'Yes' : 'No'}, Water: ${site.hookupsWater ? 'Yes' : 'No'}, Sewer: ${site.hookupsSewer ? 'Yes' : 'No'}`}>
-                          {hookups || <span className="text-slate-400">—</span>}
-                        </span>
+                        <div className="flex items-center gap-1" title={`Power: ${site.hookupsPower ? 'Yes' : 'No'}, Water: ${site.hookupsWater ? 'Yes' : 'No'}, Sewer: ${site.hookupsSewer ? 'Yes' : 'No'}`}>
+                          {hasHookups ? (
+                            <>
+                              {site.hookupsPower && (
+                                <span className="inline-flex items-center gap-0.5 text-amber-600">
+                                  <Zap className="h-3.5 w-3.5" />
+                                  {site.powerAmps && <span className="text-xs">{site.powerAmps}</span>}
+                                </span>
+                              )}
+                              {site.hookupsWater && <Droplet className="h-3.5 w-3.5 text-blue-500" />}
+                              {site.hookupsSewer && <Waves className="h-3.5 w-3.5 text-slate-500" />}
+                            </>
+                          ) : (
+                            <span className="text-slate-400">—</span>
+                          )}
+                        </div>
                       </TableCell>
                       <TableCell>
                         <button

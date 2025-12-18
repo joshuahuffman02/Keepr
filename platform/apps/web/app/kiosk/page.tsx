@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { BookingMap } from "@/components/maps/BookingMap";
-import { Loader2, Search, CheckCircle, MapPin, Calendar, User, CreditCard, Home, RefreshCw, Flame, Snowflake, Plus, Minus, ShoppingBag, Tent, ArrowRight, Grid3X3 } from "lucide-react";
+import { Loader2, Search, CheckCircle, MapPin, Calendar, User, CreditCard, Home, RefreshCw, Flame, Snowflake, Plus, Minus, ShoppingBag, Tent, ArrowRight, Grid3X3, Zap, Droplet, Waves } from "lucide-react";
 import Link from "next/link";
 import { format, parseISO, addDays } from "date-fns";
 import { randomId } from "@/lib/random-id";
@@ -637,7 +637,7 @@ export default function KioskPage() {
                                             onClick={() => toggleHookup("power")}
                                             className="h-10 px-4"
                                         >
-                                            ⚡ Electric
+                                            <Zap className="h-4 w-4 mr-1" /> Electric
                                         </Button>
                                         <Button
                                             variant={siteFilters.hookups.includes("water") ? "default" : "outline"}
@@ -645,7 +645,7 @@ export default function KioskPage() {
                                             onClick={() => toggleHookup("water")}
                                             className="h-10 px-4"
                                         >
-                                            💧 Water
+                                            <Droplet className="h-4 w-4 mr-1" /> Water
                                         </Button>
                                         <Button
                                             variant={siteFilters.hookups.includes("sewer") ? "default" : "outline"}
@@ -653,7 +653,7 @@ export default function KioskPage() {
                                             onClick={() => toggleHookup("sewer")}
                                             className="h-10 px-4"
                                         >
-                                            🚿 Sewer
+                                            <Waves className="h-4 w-4 mr-1" /> Sewer
                                         </Button>
                                     </div>
                                 )}
