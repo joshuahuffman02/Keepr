@@ -48,15 +48,6 @@ export const CalendarRow = memo(function CalendarRow({
         );
     };
 
-    // Use onPointerMove for highly responsive tracking during drag
-    const handlePointerMove = (e: React.PointerEvent) => {
-        const target = e.target as HTMLElement;
-        const dayIdx = target.getAttribute("data-day-idx");
-        if (dayIdx !== null) {
-            onDragEnter(site.id, parseInt(dayIdx, 10));
-        }
-    };
-
     return (
         <div
             className="grid relative group hover:bg-slate-50/50 transition-colors"
@@ -78,13 +69,12 @@ export const CalendarRow = memo(function CalendarRow({
             </div>
 
             {/* Grid Cells Container */}
-            <div
-                className="relative"
-                style={{ gridColumn: "2 / -1" }}
-                onPointerMove={handlePointerMove}
-            >
-                {/* Background Grid */}
-                <div className="grid h-full" style={{ gridTemplateColumns: `repeat(${dayCount}, minmax(94px, 1fr))` }}>
+            <div className="relative" style={{ gridColumn: "2 / -1" }}>
+                {/* Background Grid - use data-day-idx for global tracking */}
+                <div
+                    className="grid h-full"
+                    style={{ gridTemplateColumns: `repeat(${dayCount}, minmax(94px, 1fr))` }}
+                >
                     {days.map((d, i) => (
                         <div
                             key={i}
@@ -97,7 +87,8 @@ export const CalendarRow = memo(function CalendarRow({
                                 "hover:bg-blue-50/30"
                             )}
                             onPointerDown={(e) => {
-                                // Explicitly DO NOT capture pointer to allow pointerenter/move on other cells
+                                // Explicitly release capture to allow window pointermove to see other targets
+                                (e.target as HTMLElement).releasePointerCapture(e.pointerId);
                                 onDragStart(site.id, i);
                             }}
                             onPointerUp={() => onDragEnd(site.id, i)}
@@ -118,8 +109,10 @@ export const CalendarRow = memo(function CalendarRow({
                         selection.siteId === site.id &&
                         (() => {
                             const start = days[0].date;
-                            const selStartIdx = Math.max(0, diffInDays(parseLocalDateInput(selection.arrival), start));
-                            const selEndIdx = Math.min(dayCount, diffInDays(parseLocalDateInput(selection.departure), start));
+                            const resStart = parseLocalDateInput(selection.arrival);
+                            const resEnd = parseLocalDateInput(selection.departure);
+                            const selStartIdx = Math.max(0, diffInDays(resStart, start));
+                            const selEndIdx = Math.min(dayCount, diffInDays(resEnd, start));
                             if (selEndIdx <= 0 || selStartIdx >= dayCount) return null;
                             const span = Math.max(1, selEndIdx - selStartIdx);
                             return (

@@ -2,7 +2,7 @@ import React, { useMemo, useCallback, useEffect } from "react";
 import { CalendarRow } from "./CalendarRow";
 import { useCalendarContext } from "./CalendarContext";
 import { useCalendarData } from "./useCalendarData";
-import { formatLocalDateInput, toLocalDate } from "./utils";
+import { formatLocalDateInput, toLocalDate, parseLocalDateInput } from "./utils";
 
 function Skeleton({ className }: { className?: string }) {
     return <div className={cn("animate-pulse bg-slate-200 rounded", className)} />;
@@ -32,7 +32,7 @@ export function CalendarGrid({ data, onSelectionComplete }: CalendarGridProps) {
 
     const handleDragEnter = useCallback((siteId: string, dayIdx: number) => {
         const drag = dragRef.current;
-        if (drag.siteId && drag.startIdx !== null) {
+        if (drag.siteId && drag.startIdx !== null && drag.endIdx !== dayIdx) {
             drag.endIdx = dayIdx;
             drag.isDragging = true;
             setDragVisual({ siteId: drag.siteId, startIdx: drag.startIdx, endIdx: dayIdx });
@@ -66,9 +66,29 @@ export function CalendarGrid({ data, onSelectionComplete }: CalendarGridProps) {
                 handleDragEnd(null, null);
             }
         };
+
+        const handleGlobalPointerMove = (e: PointerEvent) => {
+            const drag = dragRef.current;
+            if (drag.isDragging) {
+                // Nuclear tracking: find cell under pointer regardless of capture/z-index
+                const target = document.elementFromPoint(e.clientX, e.clientY) as HTMLElement | null;
+                const cell = target?.closest("[data-day-idx]") as HTMLElement | null;
+                const dayIdxAttr = cell?.getAttribute("data-day-idx");
+
+                if (dayIdxAttr !== null && dayIdxAttr !== undefined) {
+                    const idx = parseInt(dayIdxAttr, 10);
+                    handleDragEnter(drag.siteId!, idx);
+                }
+            }
+        };
+
         window.addEventListener("pointerup", handleGlobalPointerUp);
-        return () => window.removeEventListener("pointerup", handleGlobalPointerUp);
-    }, [handleDragEnd, dragRef]);
+        window.addEventListener("pointermove", handleGlobalPointerMove);
+        return () => {
+            window.removeEventListener("pointerup", handleGlobalPointerUp);
+            window.removeEventListener("pointermove", handleGlobalPointerMove);
+        };
+    }, [handleDragEnd, handleDragEnter, dragRef]);
 
     if (sites.isLoading || reservations.isLoading) {
         return (
