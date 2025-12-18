@@ -161,7 +161,7 @@ export default function GeographicPage() {
           <BreakdownPie
             title="Distance Breakdown"
             data={distancePieData}
-            height={200}
+            height={280}
             formatValue={(v) => `${(v ?? 0).toFixed(1)}%`}
             loading={loading}
           />
@@ -169,11 +169,11 @@ export default function GeographicPage() {
             <CardContent className="p-4 space-y-3">
               <div className="flex justify-between">
                 <span className="text-slate-400">Average Distance</span>
-                <span className="text-white font-medium">{data.travelDistance.averageDistance} mi</span>
+                <span className="text-white font-medium">{Math.round(data.travelDistance.averageDistance ?? 0)} mi</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-slate-400">Median Distance</span>
-                <span className="text-white font-medium">{data.travelDistance.medianDistance} mi</span>
+                <span className="text-white font-medium">{Math.round(data.travelDistance.medianDistance ?? 0)} mi</span>
               </div>
             </CardContent>
           </Card>
@@ -189,7 +189,7 @@ export default function GeographicPage() {
           { key: "guestCount", label: "Guests", align: "right", format: (v) => v?.toLocaleString() ?? "0" },
           { key: "reservations", label: "Reservations", align: "right", format: (v) => v?.toLocaleString() ?? "0" },
           { key: "revenue", label: "Revenue", align: "right", format: (v) => formatCurrency(v ?? 0) },
-          { key: "averageDistance", label: "Avg Distance", align: "right", format: (v) => `${v ?? 0} mi` },
+          { key: "averageDistance", label: "Avg Distance", align: "right", format: (v) => `${Math.round(v ?? 0)} mi` },
         ]}
         data={data.originHeatmap}
         loading={loading}

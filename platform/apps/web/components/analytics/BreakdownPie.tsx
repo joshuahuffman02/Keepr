@@ -70,15 +70,20 @@ export function BreakdownPie({
 
   const renderLegend = (props: any) => {
     const { payload } = props;
+    // Use vertical layout for 5+ items, horizontal for fewer
+    const useVertical = payload.length >= 5;
     return (
-      <ul className="flex flex-wrap justify-center gap-4 mt-4">
+      <ul className={useVertical
+        ? "flex flex-col gap-1.5 mt-2 text-xs"
+        : "flex flex-wrap justify-center gap-4 mt-4"
+      }>
         {payload.map((entry: any, index: number) => (
           <li key={`item-${index}`} className="flex items-center gap-2 text-sm">
             <span
-              className="w-3 h-3 rounded-full"
+              className="w-2.5 h-2.5 rounded-full flex-shrink-0"
               style={{ backgroundColor: entry.color }}
             />
-            <span className="text-slate-400">{entry.value}</span>
+            <span className="text-slate-400 text-xs truncate">{entry.value}</span>
           </li>
         ))}
       </ul>
