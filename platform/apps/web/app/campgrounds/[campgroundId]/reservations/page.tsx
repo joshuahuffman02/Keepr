@@ -981,7 +981,7 @@ export default function ReservationsPage() {
       <div className="space-y-4">
         <Breadcrumbs
           items={[
-            { label: "Campgrounds", href: "/campgrounds" },
+            { label: "Campgrounds", href: "/campgrounds?all=true" },
             { label: campgroundQuery.data?.name || campgroundId },
             { label: "Reservations" }
           ]}

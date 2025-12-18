@@ -155,7 +155,7 @@ export default function HousekeepingPage() {
       <div className="space-y-4">
         <Breadcrumbs
           items={[
-            { label: "Campgrounds", href: "/campgrounds" },
+            { label: "Campgrounds", href: "/campgrounds?all=true" },
             { label: `Campground ${campgroundId}`, href: `/campgrounds/${campgroundId}` },
             { label: "Housekeeping" },
           ]}

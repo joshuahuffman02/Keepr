@@ -108,7 +108,7 @@ export default function SiteClassDetailPage() {
       <div className="space-y-4">
         <Breadcrumbs
           items={[
-            { label: "Campgrounds", href: "/campgrounds" },
+            { label: "Campgrounds", href: "/campgrounds?all=true" },
             { label: `Campground ${campgroundId}`, href: `/campgrounds/${campgroundId}` },
             { label: "Site Classes", href: `/campgrounds/${campgroundId}/classes` },
             { label: siteClass.name }

@@ -114,7 +114,7 @@ export default function AiSettingsPage() {
             <div className="space-y-6">
                 <Breadcrumbs
                     items={[
-                        { label: "Campgrounds", href: "/campgrounds" },
+                        { label: "Campgrounds", href: "/campgrounds?all=true" },
                         { label: campground?.name || "Campground", href: `/campgrounds/${campgroundId}` },
                         { label: "AI Settings" }
                     ]}

@@ -5,9 +5,11 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { DashboardShell } from "../../../../components/ui/layout/DashboardShell";
 import { Breadcrumbs } from "../../../../components/breadcrumbs";
 import { apiClient } from "../../../../lib/api-client";
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Button } from "../../../../components/ui/button";
 import { ImageUpload } from "../../../../components/ui/image-upload";
+import { useToast } from "../../../../components/ui/use-toast";
+import { ChevronDown, ChevronUp, Pencil } from "lucide-react";
 
 type SiteClassFormState = {
   name: string;
@@ -52,6 +54,7 @@ export default function SiteClassesPage() {
   const router = useRouter();
   const campgroundId = params?.campgroundId as string;
   const queryClient = useQueryClient();
+  const { toast } = useToast();
   const campgroundQuery = useQuery({
     queryKey: ["campground", campgroundId],
     queryFn: () => apiClient.getCampground(campgroundId),
@@ -65,6 +68,18 @@ export default function SiteClassesPage() {
   const [form, setForm] = useState<SiteClassFormState>(defaultClassForm);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editForm, setEditForm] = useState<SiteClassFormState | null>(null);
+  const [showAdvanced, setShowAdvanced] = useState(false);
+  const [inlineEditingRate, setInlineEditingRate] = useState<string | null>(null);
+  const [inlineRateValue, setInlineRateValue] = useState<string>("");
+  const inlineRateInputRef = useRef<HTMLInputElement>(null);
+
+  // Focus inline rate input when it becomes visible
+  useEffect(() => {
+    if (inlineEditingRate && inlineRateInputRef.current) {
+      inlineRateInputRef.current.focus();
+      inlineRateInputRef.current.select();
+    }
+  }, [inlineEditingRate]);
 
   const mapClassFormToPayload = (state: SiteClassFormState, opts?: { clearEmptyAsNull?: boolean }) => {
     const parseOptionalNumber = (value: number | "" | undefined | null) => {
@@ -100,6 +115,7 @@ export default function SiteClassesPage() {
     onSuccess: () => {
       setForm(defaultClassForm);
       queryClient.invalidateQueries({ queryKey: ["site-classes", campgroundId] });
+      toast({ title: "Site class created", description: "The new site class has been added." });
     }
   });
   const updateClass = useMutation({
@@ -109,19 +125,47 @@ export default function SiteClassesPage() {
       queryClient.invalidateQueries({ queryKey: ["site-classes", campgroundId] });
       setEditingId(null);
       setEditForm(null);
+      toast({ title: "Changes saved", description: "Site class has been updated." });
+    }
+  });
+  const updateInlineRate = useMutation({
+    mutationFn: (payload: { id: string; rate: number }) =>
+      apiClient.updateSiteClass(payload.id, { defaultRate: Math.round(payload.rate * 100) }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["site-classes", campgroundId] });
+      setInlineEditingRate(null);
+      toast({ title: "Rate updated", description: "The nightly rate has been saved." });
     }
   });
   const deleteClass = useMutation({
     mutationFn: (id: string) => apiClient.deleteSiteClass(id),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["site-classes", campgroundId] })
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["site-classes", campgroundId] });
+      toast({ title: "Site class deleted", description: "The site class has been removed." });
+    }
   });
+
+  const handleInlineRateSave = (classId: string) => {
+    const rate = parseFloat(inlineRateValue);
+    if (!isNaN(rate) && rate >= 0) {
+      updateInlineRate.mutate({ id: classId, rate });
+    } else {
+      setInlineEditingRate(null);
+    }
+  };
+
+  const handleDeleteClass = (id: string, name: string) => {
+    if (window.confirm(`Are you sure you want to delete "${name}"? This action cannot be undone.`)) {
+      deleteClass.mutate(id);
+    }
+  };
 
   return (
     <DashboardShell>
       <div className="space-y-4">
         <Breadcrumbs
           items={[
-            { label: "Campgrounds", href: "/campgrounds" },
+            { label: "Campgrounds", href: "/campgrounds?all=true" },
             { label: campgroundQuery.data?.name || campgroundId },
             { label: "Site Classes" }
           ]}
@@ -130,10 +174,11 @@ export default function SiteClassesPage() {
         <p className="text-sm text-slate-600">Add photos to classes to share gallery images across sites in that class.</p>
         <div className="card p-4">
           <h3 className="text-lg font-semibold text-slate-900 mb-2">Add site class</h3>
+          {/* Essential fields - always visible */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             <input
               className="rounded-md border border-slate-200 px-3 py-2"
-              placeholder="Name"
+              placeholder="Name *"
               value={form.name}
               onChange={(e) => setForm((s) => ({ ...s, name: e.target.value }))}
             />
@@ -142,7 +187,7 @@ export default function SiteClassesPage() {
               step="0.01"
               min="0"
               className="rounded-md border border-slate-200 px-3 py-2"
-              placeholder="Default rate ($)"
+              placeholder="Default rate ($) *"
               value={form.defaultRate}
               onChange={(e) => setForm((s) => ({ ...s, defaultRate: e.target.value === "" ? "" : Number(e.target.value) }))}
             />
@@ -158,132 +203,152 @@ export default function SiteClassesPage() {
               <option value="glamping">Glamping</option>
             </select>
             <input
+              type="number"
+              min="1"
               className="rounded-md border border-slate-200 px-3 py-2"
               placeholder="Max occupancy"
               value={form.maxOccupancy}
               onChange={(e) => setForm((s) => ({ ...s, maxOccupancy: e.target.value === "" ? "" : Number(e.target.value) }))}
             />
-            <input
-              className="rounded-md border border-slate-200 px-3 py-2"
-              placeholder="Rig max length"
-              value={form.rigMaxLength}
-              onChange={(e) => setForm((s) => ({ ...s, rigMaxLength: e.target.value === "" ? "" : Number(e.target.value) }))}
-            />
-            <input
-              className="rounded-md border border-slate-200 px-3 py-2 md:col-span-2"
-              placeholder="Description"
-              value={form.description}
-              onChange={(e) => setForm((s) => ({ ...s, description: e.target.value }))}
-            />
-            <div className="md:col-span-2 space-y-1">
-              <label className="text-xs font-semibold text-slate-700">Photos (comma-separated URLs)</label>
-              <div className="bg-slate-50 p-2 rounded border border-slate-100 mb-2">
-                <div className="text-xs text-slate-500 mb-2">Upload photo:</div>
-                <ImageUpload
-                  onChange={(url) => {
-                    if (!url) return;
-                    const current = form.photos ? form.photos.split(",").map(p => p.trim()).filter(Boolean) : [];
-                    setForm(s => ({ ...s, photos: [...current, url].join(", ") }));
-                  }}
-                  placeholder="Upload class photo"
-                />
-              </div>
-              <textarea
-                className="rounded-md border border-slate-200 px-3 py-2 w-full text-xs"
-                placeholder="https://img1.jpg, https://img2.jpg"
-                value={form.photos}
-                onChange={(e) => setForm((s) => ({ ...s, photos: e.target.value }))}
-              />
-              {form.photos && form.photos.split(",").map((p) => p.trim()).filter(Boolean).length > 0 && (
-                <div className="mt-2 grid grid-cols-2 sm:grid-cols-3 gap-2">
-                  {form.photos
-                    .split(",")
-                    .map((p) => p.trim())
-                    .filter(Boolean)
-                    .map((url) => (
-                      <div key={url} className="text-[10px] truncate rounded border border-slate-200 bg-slate-50 p-1">
-                        {url}
-                      </div>
-                    ))}
-                </div>
-              )}
-            </div>
-            <div className="flex flex-wrap gap-3 md:col-span-2">
-              <label className="flex items-center gap-2 text-sm text-slate-700">
-                <input
-                  type="checkbox"
-                  checked={form.hookupsPower}
-                  onChange={(e) => setForm((s) => ({ ...s, hookupsPower: e.target.checked }))}
-                />
-                Power
-              </label>
-              <label className="flex items-center gap-2 text-sm text-slate-700">
-                <input
-                  type="checkbox"
-                  checked={form.hookupsWater}
-                  onChange={(e) => setForm((s) => ({ ...s, hookupsWater: e.target.checked }))}
-                />
-                Water
-              </label>
-              <label className="flex items-center gap-2 text-sm text-slate-700">
-                <input
-                  type="checkbox"
-                  checked={form.hookupsSewer}
-                  onChange={(e) => setForm((s) => ({ ...s, hookupsSewer: e.target.checked }))}
-                />
-                Sewer
-              </label>
-              <label className="flex items-center gap-2 text-sm text-slate-700">
-                <input
-                  type="checkbox"
-                  checked={form.petFriendly}
-                  onChange={(e) => setForm((s) => ({ ...s, petFriendly: e.target.checked }))}
-                />
-                Pet friendly
-              </label>
-              <label className="flex items-center gap-2 text-sm text-slate-700">
-                <input
-                  type="checkbox"
-                  checked={form.accessible}
-                  onChange={(e) => setForm((s) => ({ ...s, accessible: e.target.checked }))}
-                />
-                Accessible
-              </label>
-            </div>
-            <input
-              className="rounded-md border border-slate-200 px-3 py-2"
-              placeholder="Min nights"
-              value={form.minNights}
-              onChange={(e) => setForm((s) => ({ ...s, minNights: e.target.value === "" ? "" : Number(e.target.value) }))}
-            />
-            <input
-              className="rounded-md border border-slate-200 px-3 py-2"
-              placeholder="Max nights"
-              value={form.maxNights}
-              onChange={(e) => setForm((s) => ({ ...s, maxNights: e.target.value === "" ? "" : Number(e.target.value) }))}
-            />
-            <input
-              className="rounded-md border border-slate-200 px-3 py-2 md:col-span-2"
-              placeholder="Photos (comma-separated URLs)"
-              value={form.photos}
-              onChange={(e) => setForm((s) => ({ ...s, photos: e.target.value }))}
-            />
-            <input
-              className="rounded-md border border-slate-200 px-3 py-2 md:col-span-2"
-              placeholder="Policy version (snapshot id)"
-              value={form.policyVersion}
-              onChange={(e) => setForm((s) => ({ ...s, policyVersion: e.target.value }))}
-            />
-            <label className="flex items-center gap-2 text-sm text-slate-700 md:col-span-2">
-              <input
-                type="checkbox"
-                checked={form.isActive}
-                onChange={(e) => setForm((s) => ({ ...s, isActive: e.target.checked }))}
-              />
-              Active
-            </label>
           </div>
-          <div className="mt-3">
+
+          {/* Advanced options - collapsible */}
+          <div className="mt-4">
+            <button
+              type="button"
+              onClick={() => setShowAdvanced(!showAdvanced)}
+              className="flex items-center gap-2 text-sm text-slate-600 hover:text-slate-900 transition-colors"
+            >
+              {showAdvanced ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+              {showAdvanced ? "Hide" : "Show"} advanced options
+            </button>
+
+            {showAdvanced && (
+              <div className="mt-3 pt-3 border-t border-slate-100 grid grid-cols-1 md:grid-cols-2 gap-3">
+                <input
+                  className="rounded-md border border-slate-200 px-3 py-2 md:col-span-2"
+                  placeholder="Description"
+                  value={form.description}
+                  onChange={(e) => setForm((s) => ({ ...s, description: e.target.value }))}
+                />
+                <input
+                  type="number"
+                  min="0"
+                  className="rounded-md border border-slate-200 px-3 py-2"
+                  placeholder="Rig max length (ft)"
+                  value={form.rigMaxLength}
+                  onChange={(e) => setForm((s) => ({ ...s, rigMaxLength: e.target.value === "" ? "" : Number(e.target.value) }))}
+                />
+                <div />
+                <div className="flex flex-wrap gap-3 md:col-span-2">
+                  <span className="text-xs font-semibold text-slate-600">Hookups:</span>
+                  <label className="flex items-center gap-2 text-sm text-slate-700">
+                    <input
+                      type="checkbox"
+                      checked={form.hookupsPower}
+                      onChange={(e) => setForm((s) => ({ ...s, hookupsPower: e.target.checked }))}
+                    />
+                    Power
+                  </label>
+                  <label className="flex items-center gap-2 text-sm text-slate-700">
+                    <input
+                      type="checkbox"
+                      checked={form.hookupsWater}
+                      onChange={(e) => setForm((s) => ({ ...s, hookupsWater: e.target.checked }))}
+                    />
+                    Water
+                  </label>
+                  <label className="flex items-center gap-2 text-sm text-slate-700">
+                    <input
+                      type="checkbox"
+                      checked={form.hookupsSewer}
+                      onChange={(e) => setForm((s) => ({ ...s, hookupsSewer: e.target.checked }))}
+                    />
+                    Sewer
+                  </label>
+                </div>
+                <div className="flex flex-wrap gap-3 md:col-span-2">
+                  <span className="text-xs font-semibold text-slate-600">Features:</span>
+                  <label className="flex items-center gap-2 text-sm text-slate-700">
+                    <input
+                      type="checkbox"
+                      checked={form.petFriendly}
+                      onChange={(e) => setForm((s) => ({ ...s, petFriendly: e.target.checked }))}
+                    />
+                    Pet friendly
+                  </label>
+                  <label className="flex items-center gap-2 text-sm text-slate-700">
+                    <input
+                      type="checkbox"
+                      checked={form.accessible}
+                      onChange={(e) => setForm((s) => ({ ...s, accessible: e.target.checked }))}
+                    />
+                    Accessible
+                  </label>
+                </div>
+                <input
+                  type="number"
+                  min="1"
+                  className="rounded-md border border-slate-200 px-3 py-2"
+                  placeholder="Min nights"
+                  value={form.minNights}
+                  onChange={(e) => setForm((s) => ({ ...s, minNights: e.target.value === "" ? "" : Number(e.target.value) }))}
+                />
+                <input
+                  type="number"
+                  min="1"
+                  className="rounded-md border border-slate-200 px-3 py-2"
+                  placeholder="Max nights"
+                  value={form.maxNights}
+                  onChange={(e) => setForm((s) => ({ ...s, maxNights: e.target.value === "" ? "" : Number(e.target.value) }))}
+                />
+                <div className="md:col-span-2 space-y-1">
+                  <label className="text-xs font-semibold text-slate-700">Photos</label>
+                  <div className="bg-slate-50 p-2 rounded border border-slate-100 mb-2">
+                    <ImageUpload
+                      onChange={(url) => {
+                        if (!url) return;
+                        const current = form.photos ? form.photos.split(",").map(p => p.trim()).filter(Boolean) : [];
+                        setForm(s => ({ ...s, photos: [...current, url].join(", ") }));
+                      }}
+                      placeholder="Upload class photo"
+                    />
+                  </div>
+                  <textarea
+                    className="rounded-md border border-slate-200 px-3 py-2 w-full text-xs"
+                    placeholder="Or enter URLs: https://img1.jpg, https://img2.jpg"
+                    value={form.photos}
+                    onChange={(e) => setForm((s) => ({ ...s, photos: e.target.value }))}
+                  />
+                  {form.photos && form.photos.split(",").map((p) => p.trim()).filter(Boolean).length > 0 && (
+                    <div className="mt-2 grid grid-cols-2 sm:grid-cols-3 gap-2">
+                      {form.photos.split(",").map((p) => p.trim()).filter(Boolean).map((url) => (
+                        <div key={url} className="text-[10px] truncate rounded border border-slate-200 bg-slate-50 p-1">
+                          {url}
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+                <input
+                  className="rounded-md border border-slate-200 px-3 py-2 md:col-span-2"
+                  placeholder="Policy version (snapshot id)"
+                  value={form.policyVersion}
+                  onChange={(e) => setForm((s) => ({ ...s, policyVersion: e.target.value }))}
+                />
+                <label className="flex items-center gap-2 text-sm text-slate-700 md:col-span-2">
+                  <input
+                    type="checkbox"
+                    checked={form.isActive}
+                    onChange={(e) => setForm((s) => ({ ...s, isActive: e.target.checked }))}
+                  />
+                  Active
+                </label>
+              </div>
+            )}
+          </div>
+
+          <div className="mt-4">
             <Button disabled={createClass.isPending || !form.name} onClick={() => createClass.mutate()}>
               {createClass.isPending ? "Saving..." : "Save class"}
             </Button>
@@ -298,8 +363,40 @@ export default function SiteClassesPage() {
                 <div className="flex items-start justify-between gap-4">
                   <div>
                     <div className="text-lg font-semibold text-slate-900">{cls.name}</div>
-                    <div className="text-sm text-slate-600">
-                      {cls.siteType} • Max {cls.maxOccupancy} • ${(cls.defaultRate / 100).toFixed(2)}
+                    <div className="text-sm text-slate-600 flex items-center gap-1">
+                      {cls.siteType} • Max {cls.maxOccupancy} •{" "}
+                      {inlineEditingRate === cls.id ? (
+                        <span className="inline-flex items-center">
+                          $
+                          <input
+                            ref={inlineRateInputRef}
+                            type="number"
+                            step="0.01"
+                            min="0"
+                            className="w-20 px-1 py-0.5 text-sm border border-emerald-400 rounded focus:outline-none focus:ring-1 focus:ring-emerald-500"
+                            value={inlineRateValue}
+                            onChange={(e) => setInlineRateValue(e.target.value)}
+                            onBlur={() => handleInlineRateSave(cls.id)}
+                            onKeyDown={(e) => {
+                              if (e.key === "Enter") handleInlineRateSave(cls.id);
+                              if (e.key === "Escape") setInlineEditingRate(null);
+                            }}
+                          />
+                          {updateInlineRate.isPending && <span className="ml-1 text-xs text-slate-400">...</span>}
+                        </span>
+                      ) : (
+                        <button
+                          className="inline-flex items-center gap-1 px-1 py-0.5 rounded hover:bg-slate-100 transition-colors group"
+                          onClick={() => {
+                            setInlineEditingRate(cls.id);
+                            setInlineRateValue((cls.defaultRate / 100).toFixed(2));
+                          }}
+                          title="Click to edit rate"
+                        >
+                          ${(cls.defaultRate / 100).toFixed(2)}
+                          <Pencil className="h-3 w-3 text-slate-400 opacity-0 group-hover:opacity-100 transition-opacity" />
+                        </button>
+                      )}
                     </div>
                     <div className="text-xs text-slate-500">
                       Min nights {cls.minNights ?? "n/a"} • Max nights {cls.maxNights ?? "n/a"} • Pet {cls.petFriendly ? "yes" : "no"} • Accessible{" "}
@@ -364,8 +461,9 @@ export default function SiteClassesPage() {
                       <Button
                         size="sm"
                         variant="ghost"
-                        onClick={() => deleteClass.mutate(cls.id)}
+                        onClick={() => handleDeleteClass(cls.id, cls.name)}
                         disabled={deleteClass.isPending}
+                        className="text-red-600 hover:text-red-700 hover:bg-red-50"
                       >
                         Delete
                       </Button>

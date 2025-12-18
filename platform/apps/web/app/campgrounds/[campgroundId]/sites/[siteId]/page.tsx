@@ -97,7 +97,7 @@ export default function SiteDetailPage() {
       <div className="space-y-4">
         <Breadcrumbs
           items={[
-            { label: "Campgrounds", href: "/campgrounds" },
+            { label: "Campgrounds", href: "/campgrounds?all=true" },
             { label: `Campground ${campgroundId}`, href: `/campgrounds/${campgroundId}` },
             { label: "Sites", href: `/campgrounds/${campgroundId}/sites` },
             { label: site.name || site.siteNumber }

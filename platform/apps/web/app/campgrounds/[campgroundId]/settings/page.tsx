@@ -407,7 +407,7 @@ export default function CampgroundSettingsPage() {
             <div className="space-y-6">
                 <Breadcrumbs
                     items={[
-                        { label: "Campgrounds", href: "/campgrounds" },
+                        { label: "Campgrounds", href: "/campgrounds?all=true" },
                         { label: cg.name, href: `/campgrounds/${campgroundId}` },
                         { label: "Settings" }
                     ]}

@@ -44,19 +44,19 @@ const managementCategories: ManagementCategory[] = [
     color: "emerald",
     links: [
       {
+        name: "Pricing & Rates",
+        href: "/campgrounds",
+        description: "Set nightly rates for your site classes",
+      },
+      {
         name: "Sites & Inventory",
         href: "/campgrounds",
-        description: "View and manage individual campsites and their availability",
+        description: "View and manage individual campsites",
       },
       {
         name: "Site Classes",
         href: "/campgrounds",
-        description: "Configure site categories and their default settings (select campground first)",
-      },
-      {
-        name: "Amenities",
-        href: "/campgrounds",
-        description: "Manage site amenities and features (select campground first)",
+        description: "Configure site categories and templates",
       },
     ],
   },
