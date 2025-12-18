@@ -50,13 +50,13 @@ const managementCategories: ManagementCategory[] = [
       },
       {
         name: "Site Classes",
-        href: "/campgrounds/classes",
-        description: "Configure site categories and their default settings",
+        href: "/campgrounds",
+        description: "Configure site categories and their default settings (select campground first)",
       },
       {
         name: "Amenities",
-        href: "/campgrounds/amenities",
-        description: "Manage site amenities and features",
+        href: "/campgrounds",
+        description: "Manage site amenities and features (select campground first)",
       },
     ],
   },
