@@ -256,6 +256,14 @@ function NewReservationInner() {
         rvLength: 0,
         rvType: ""
       });
+      toast({ title: "Guest created", description: "Guest profile saved successfully." });
+    },
+    onError: (err) => {
+      toast({
+        title: "Failed to create guest",
+        description: err instanceof Error ? err.message : "Please check the form and try again.",
+        variant: "destructive"
+      });
     }
   });
 
@@ -360,10 +368,16 @@ function NewReservationInner() {
 
   const handleCreateGuest = (e: React.FormEvent) => {
     e.preventDefault();
-    const { rvType, rvLength, ...rest } = newGuestData;
+    const { rvType, rvLength, address, zip, ...rest } = newGuestData;
     const rigType = rvType || null;
     const rigLength = rvType === "tent" || rvType === "cabin" ? null : (rvLength || null);
-    createGuest.mutate({ ...rest, rigType, rigLength });
+    createGuest.mutate({
+      ...rest,
+      address1: address || null,
+      postalCode: zip || null,
+      rigType,
+      rigLength
+    });
   };
 
   // Toggle amenity filter
@@ -1379,18 +1393,16 @@ function NewReservationInner() {
                         />
                       </div>
 
-                      <div className="md:col-span-2">
+                      <div>
                         <label className="block text-sm font-medium text-slate-700 mb-2">
-                          Accommodation Type
+                          RV/Camper Type
                         </label>
                         <select
                           value={newGuestData.rvType}
                           onChange={(e) => setNewGuestData({ ...newGuestData, rvType: e.target.value })}
                           className="w-full px-4 py-3 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500"
                         >
-                          <option value="">Select type...</option>
-                          <option value="tent">Tent</option>
-                          <option value="cabin">Cabin</option>
+                          <option value="">None / Tent camping</option>
                           <option value="popup">Pop-up Camper</option>
                           <option value="trailer">Travel Trailer</option>
                           <option value="5thwheel">5th Wheel</option>
@@ -1401,18 +1413,15 @@ function NewReservationInner() {
                       <div>
                         <label className="block text-sm font-medium text-slate-700 mb-2">
                           RV Length (feet)
-                          {(newGuestData.rvType === "tent" || newGuestData.rvType === "cabin") &&
-                            <span className="text-xs text-slate-500 ml-1">(not needed)</span>}
                         </label>
                         <input
                           type="number"
                           min="0"
                           placeholder="e.g., 35"
-                          value={(newGuestData.rvType === "tent" || newGuestData.rvType === "cabin") ? "" : (newGuestData.rvLength || "")}
+                          value={newGuestData.rvLength || ""}
                           onChange={(e) => setNewGuestData({ ...newGuestData, rvLength: Number(e.target.value) })}
-                          disabled={newGuestData.rvType === "tent" || newGuestData.rvType === "cabin"}
-                          className={`w-full px-4 py-3 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 ${(newGuestData.rvType === "tent" || newGuestData.rvType === "cabin") ? "bg-slate-100 text-slate-400 cursor-not-allowed" : ""
-                            }`}
+                          disabled={!newGuestData.rvType}
+                          className={`w-full px-4 py-3 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 ${!newGuestData.rvType ? "bg-slate-100 text-slate-400 cursor-not-allowed" : ""}`}
                         />
                       </div>
                     </div>

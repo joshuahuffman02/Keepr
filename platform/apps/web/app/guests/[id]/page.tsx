@@ -732,7 +732,7 @@ function GuestEquipmentTab({ guestId }: { guestId: string }) {
     const queryClient = useQueryClient();
     const [addOpen, setAddOpen] = useState(false);
     const [newEquipment, setNewEquipment] = useState({
-        type: "rv",
+        type: "trailer",
         make: "",
         model: "",
         length: "",
@@ -755,7 +755,7 @@ function GuestEquipmentTab({ guestId }: { guestId: string }) {
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["guest-equipment", guestId] });
             setAddOpen(false);
-            setNewEquipment({ type: "rv", make: "", model: "", length: "", plateNumber: "", plateState: "" });
+            setNewEquipment({ type: "trailer", make: "", model: "", length: "", plateNumber: "", plateState: "" });
             toast({ title: "Equipment added" });
         },
         onError: () => {
@@ -805,12 +805,15 @@ function GuestEquipmentTab({ guestId }: { guestId: string }) {
                                     value={newEquipment.type}
                                     onChange={(e) => setNewEquipment({ ...newEquipment, type: e.target.value })}
                                 >
-                                    <option value="rv">RV / Motorhome</option>
+                                    <option value="motorhome_a">Motorhome Class A</option>
+                                    <option value="motorhome_b">Motorhome Class B</option>
+                                    <option value="motorhome_c">Motorhome Class C</option>
                                     <option value="trailer">Travel Trailer</option>
                                     <option value="fifth_wheel">Fifth Wheel</option>
-                                    <option value="tent">Tent</option>
-                                    <option value="car">Car / Truck</option>
-                                    <option value="boat">Boat</option>
+                                    <option value="popup">Pop-up Camper</option>
+                                    <option value="truck_camper">Truck Camper</option>
+                                    <option value="van">Camper Van</option>
+                                    <option value="tow_vehicle">Tow Vehicle</option>
                                 </select>
                             </div>
                             <div className="grid grid-cols-4 items-center gap-4">
