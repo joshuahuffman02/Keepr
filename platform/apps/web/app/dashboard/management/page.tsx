@@ -109,6 +109,11 @@ const managementCategories: ManagementCategory[] = [
         href: "/finance/disputes",
         description: "Handle payment disputes and chargebacks",
       },
+      {
+        name: "Referral Program",
+        href: "/dashboard/referrals",
+        description: "Earn $50 credits by referring other campground owners",
+      },
     ],
   },
   {

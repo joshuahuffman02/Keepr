@@ -153,9 +153,14 @@ export function FeatureTourProvider({
     };
   }, [isActive, currentStep]);
 
-  // Auto-start first login tour
+  // Auto-start first login tour - only on main dashboard
   useEffect(() => {
     if (!autoStartFirstLogin) return;
+    if (typeof window === "undefined") return;
+
+    // Only auto-start on the main dashboard, not sub-pages
+    const path = window.location.pathname;
+    if (path !== "/dashboard" && path !== "/dashboard/") return;
 
     const hasCompletedWelcome = isTourCompleted("dashboard-welcome");
     if (!hasCompletedWelcome) {
