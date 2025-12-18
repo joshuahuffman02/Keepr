@@ -21,13 +21,13 @@ export const RowSelectionOverlay = ({ siteId, dayCount }: RowSelectionOverlayPro
 
     return (
         <div
-            className="absolute inset-y-1 mx-1 rounded-lg bg-emerald-500/20 border-2 border-emerald-500 border-dashed z-30 pointer-events-none flex items-center justify-center overflow-hidden transition-all duration-75"
+            className="absolute inset-y-1 mx-0.5 rounded-lg bg-emerald-500/30 border-2 border-emerald-500 z-30 pointer-events-none flex items-center justify-center overflow-hidden transition-all duration-75 shadow-[0_0_15px_rgba(16,185,129,0.2)]"
             style={{
                 gridColumn: `${selStart + 1} / span ${span}`,
             }}
         >
-            <div className="bg-emerald-600 text-[10px] font-bold text-white px-2 py-0.5 rounded shadow-sm animate-in fade-in zoom-in duration-200">
-                Draft
+            <div className="bg-emerald-600/90 backdrop-blur-sm text-[11px] font-black text-white px-3 py-1 rounded-full shadow-lg animate-in fade-in zoom-in duration-200 border border-emerald-400/50">
+                Draft Stay
             </div>
         </div>
     );

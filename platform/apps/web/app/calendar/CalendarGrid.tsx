@@ -1,4 +1,4 @@
-import React, { useMemo, useCallback } from "react";
+import React, { useMemo, useCallback, useEffect } from "react";
 import { CalendarRow } from "./CalendarRow";
 import { useCalendarContext } from "./CalendarContext";
 import { useCalendarData } from "./useCalendarData";
@@ -24,7 +24,7 @@ export function CalendarGrid({ data, onSelectionComplete }: CalendarGridProps) {
     const gridTemplate = `180px repeat(${dayCount}, minmax(94px, 1fr))`;
 
     const handleDragStart = useCallback((siteId: string, dayIdx: number) => {
-        dragRef.current = { siteId, startIdx: dayIdx, endIdx: dayIdx, isDragging: false };
+        dragRef.current = { siteId, startIdx: dayIdx, endIdx: dayIdx, isDragging: true };
         setDragVisual({ siteId, startIdx: dayIdx, endIdx: dayIdx });
     }, [setDragVisual, dragRef]);
 
@@ -40,7 +40,7 @@ export function CalendarGrid({ data, onSelectionComplete }: CalendarGridProps) {
     const handleDragEnd = useCallback(async (siteId: string | null, dayIdx: number | null) => {
         const drag = dragRef.current;
         if (drag.siteId && drag.startIdx !== null && drag.endIdx !== null) {
-            const finalSiteId = siteId || drag.siteId;
+            const finalSiteId = drag.siteId; // ALWAYS use the starting site
             const startIdx = Math.min(drag.startIdx, drag.endIdx);
             const endIdx = Math.max(drag.startIdx, drag.endIdx);
 
@@ -56,6 +56,16 @@ export function CalendarGrid({ data, onSelectionComplete }: CalendarGridProps) {
         dragRef.current = { siteId: null, startIdx: null, endIdx: null, isDragging: false };
         setDragVisual(null);
     }, [days, onSelectionComplete, setDragVisual, dragRef]);
+
+    useEffect(() => {
+        const handleGlobalPointerUp = () => {
+            if (dragRef.current.isDragging) {
+                handleDragEnd(null, null);
+            }
+        };
+        window.addEventListener("pointerup", handleGlobalPointerUp);
+        return () => window.removeEventListener("pointerup", handleGlobalPointerUp);
+    }, [handleDragEnd, dragRef]);
 
     if (sites.isLoading || reservations.isLoading) {
         return (

@@ -42,7 +42,6 @@ export function ReservationPill({
     };
 
     const handlePointerUp = (e: React.PointerEvent) => {
-        e.stopPropagation();
         onPointerUp(e);
     };
 
