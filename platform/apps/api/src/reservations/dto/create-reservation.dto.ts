@@ -14,6 +14,10 @@ export class CreateReservationDto {
   @IsString()
   siteClassId?: string;
 
+  @IsOptional()
+  @IsBoolean()
+  siteLocked?: boolean;
+
   @IsString()
   @IsNotEmpty()
   guestId!: string;

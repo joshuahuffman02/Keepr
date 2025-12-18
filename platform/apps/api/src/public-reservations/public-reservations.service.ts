@@ -697,6 +697,10 @@ export class PublicReservationsService {
             throw new BadRequestException("departureDate must be after arrivalDate");
         }
 
+        if (dto.siteLocked && !dto.siteId) {
+            throw new BadRequestException("siteLocked requires siteId.");
+        }
+
         // Resolve siteId - either provided directly or find available site from class
         let siteId = dto.siteId;
         const requestedRigLength = dto.equipment?.length !== undefined && dto.equipment?.length !== null
@@ -908,6 +912,7 @@ export class PublicReservationsService {
                         departureDate: departure,
                         adults: dto.adults,
                         children: dto.children ?? 0,
+                        siteLocked: dto.siteLocked ?? false,
                         status: ReservationStatus.pending,
                         totalAmount: totalAmount,
                         paidAmount: 0,

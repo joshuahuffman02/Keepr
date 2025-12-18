@@ -12,6 +12,7 @@ export interface ApiReservationInput {
   children?: number;
   status?: string;
   notes?: string;
+  siteLocked?: boolean;
 }
 
 export interface ApiGuestInput {
@@ -81,6 +82,7 @@ export class PublicApiService {
       data: {
         campgroundId,
         siteId: input.siteId,
+        siteLocked: input.siteLocked ?? false,
         guestId: input.guestId,
         arrivalDate: new Date(input.arrivalDate),
         departureDate: new Date(input.departureDate),
@@ -108,7 +110,8 @@ export class PublicApiService {
         ...(input.adults !== undefined ? { adults: input.adults } : {}),
         ...(input.children !== undefined ? { children: input.children } : {}),
         ...(input.status ? { status: input.status as any } : {}),
-        ...(input.notes !== undefined ? { notes: input.notes } : {})
+        ...(input.notes !== undefined ? { notes: input.notes } : {}),
+        ...(input.siteLocked !== undefined ? { siteLocked: input.siteLocked } : {})
       }
     });
     await this.webhook.emit("reservation.updated", campgroundId, { reservationId: id });
@@ -231,4 +234,3 @@ export class PublicApiService {
     return deleted;
   }
 }
-

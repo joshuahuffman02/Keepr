@@ -506,7 +506,8 @@ function NewReservationInner() {
       status: "confirmed",
       paymentMethod: paymentData.paymentMethod,
       rvLength: normalizedRigLength ?? undefined,
-      rvType: normalizedRigType ?? undefined
+      rvType: normalizedRigType ?? undefined,
+      siteLocked: formData.lockSpecificSite
     };
 
     // Only include siteId if a specific site was locked, otherwise use siteClassId

@@ -1717,6 +1717,7 @@ model Reservation {
   id                       String            @id @default(cuid())
   campgroundId             String
   siteId                   String
+  siteLocked               Boolean           @default(false)
   guestId                  String
   arrivalDate              DateTime
   departureDate            DateTime

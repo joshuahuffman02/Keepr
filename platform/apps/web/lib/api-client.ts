@@ -3944,6 +3944,7 @@ export const apiClient = {
     campgroundSlug: string;
     siteId?: string;
     siteClassId?: string; // For booking by site class
+    siteLocked?: boolean;
     arrivalDate: string;
     departureDate: string;
     adults: number;
@@ -7271,4 +7272,3 @@ export const apiClient = {
 };
 
 export type PublicCampgroundList = z.infer<typeof PublicCampgroundListSchema>;
-

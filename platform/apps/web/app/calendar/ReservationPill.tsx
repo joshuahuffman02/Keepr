@@ -1,4 +1,4 @@
-import { CheckCircle, Clock, XCircle, HelpCircle, Wrench, Sparkles, AlertTriangle, LogIn } from "lucide-react";
+import { CheckCircle, Clock, XCircle, HelpCircle, Wrench, Sparkles, AlertTriangle, Lock, LogIn } from "lucide-react";
 import { useCalendarContext } from "./CalendarContext";
 import { cn } from "../../lib/utils";
 import type { CalendarReservation, ReservationStatus } from "./types";
@@ -58,6 +58,7 @@ export function ReservationPill({
 
     // Show quick check-in for confirmed reservations arriving today
     const showQuickCheckIn = onQuickCheckIn && reservation.status === "confirmed" && isArrivalToday;
+    const showSignals = hasMaintenance || needsCleaning || hasConflict || reservation.siteLocked;
 
     const statusConfig = {
         confirmed: {
@@ -116,8 +117,9 @@ export function ReservationPill({
                         <span className="text-[9px] opacity-70 truncate font-mono mt-0.5">${total.toFixed(0)}</span>
                     )}
                 </div>
-                {(hasMaintenance || needsCleaning || hasConflict) && (
+                {showSignals && (
                     <div className="ml-2 flex gap-1 items-center flex-shrink-0">
+                        {reservation.siteLocked && <Lock className="h-2.5 w-2.5 text-white/90" aria-label="Site locked" />}
                         {hasMaintenance && <Wrench className="h-2.5 w-2.5 text-amber-100/80" />}
                         {needsCleaning && <Sparkles className="h-2.5 w-2.5 text-cyan-100/80" />}
                         {hasConflict && <AlertTriangle className="h-2.5 w-2.5 text-rose-100/80" aria-label="Conflict" />}

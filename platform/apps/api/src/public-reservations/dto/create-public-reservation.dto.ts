@@ -96,6 +96,10 @@ export class CreatePublicReservationDto {
     @IsOptional()
     siteClassId?: string; // For booking by site class
 
+    @IsOptional()
+    @IsBoolean()
+    siteLocked?: boolean;
+
     @IsDateString()
     arrivalDate!: string;
 

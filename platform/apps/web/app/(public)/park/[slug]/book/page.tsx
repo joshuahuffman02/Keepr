@@ -1758,6 +1758,7 @@ function ReviewStep({
                 campgroundSlug: slug!,
                 siteId: assignOnArrival ? undefined : selectedSite?.id,
                 siteClassId: assignOnArrival ? selectedSiteClassId || selectedSite?.siteClass?.id : undefined,
+                siteLocked: !assignOnArrival && !!selectedSite?.id,
                 arrivalDate,
                 departureDate,
                 adults: guestInfo.adults,

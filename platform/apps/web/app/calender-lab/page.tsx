@@ -9,6 +9,7 @@ import {
   CalendarCheck,
   ChevronLeft,
   ChevronRight,
+  Lock,
   Search,
   Sparkles,
   Users,
@@ -745,9 +746,16 @@ function ReservationChip({ reservation, onClick }: { reservation: CalendarReserv
       onClick={onClick}
       onPointerDown={(e) => e.stopPropagation()}
     >
-      <div className="flex flex-col min-w-0">
-        <span className="font-bold truncate tracking-tight">{guestName}</span>
-        <span className="text-[9px] opacity-80 truncate uppercase tracking-wider">{status.replace("_", " ")}</span>
+      <div className="flex items-center gap-2 min-w-0 w-full">
+        <div className="flex flex-col min-w-0">
+          <span className="font-bold truncate tracking-tight">{guestName}</span>
+          <span className="text-[9px] opacity-80 truncate uppercase tracking-wider">{status.replace("_", " ")}</span>
+        </div>
+        {reservation.siteLocked && (
+          <span className="ml-auto inline-flex items-center text-white/90">
+            <Lock className="h-3 w-3" aria-label="Site locked" />
+          </span>
+        )}
       </div>
     </div>
   );

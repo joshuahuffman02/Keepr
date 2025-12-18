@@ -3,12 +3,15 @@ import { ApiTokenGuard } from "./guards/api-token.guard";
 import { ApiScopeGuard } from "./guards/api-scope.guard";
 import { ApiScopes } from "./decorators/api-scopes.decorator";
 import { PublicApiService, ApiReservationInput } from "./public-api.service";
-import { IsDateString, IsNotEmpty, IsNumber, IsOptional, IsString } from "class-validator";
+import { IsBoolean, IsDateString, IsNotEmpty, IsNumber, IsOptional, IsString } from "class-validator";
 import { ApiTags, ApiOperation, ApiResponse, ApiProperty } from "@nestjs/swagger";
 
 class CreateReservationBody implements ApiReservationInput {
   @ApiProperty({ description: "ID of the site to reserve" })
   @IsString() @IsNotEmpty() siteId!: string;
+
+  @ApiProperty({ description: "Lock the site so it cannot be auto-reassigned", required: false, default: false })
+  @IsBoolean() @IsOptional() siteLocked?: boolean;
 
   @ApiProperty({ description: "ID of the guest making the reservation" })
   @IsString() @IsNotEmpty() guestId!: string;
@@ -35,6 +38,9 @@ class CreateReservationBody implements ApiReservationInput {
 class UpdateReservationBody {
   @ApiProperty({ description: "ID of the site to reserve", required: false })
   @IsString() @IsOptional() siteId?: string;
+
+  @ApiProperty({ description: "Lock the site so it cannot be auto-reassigned", required: false })
+  @IsBoolean() @IsOptional() siteLocked?: boolean;
 
   @ApiProperty({ description: "Arrival date (ISO string)", required: false })
   @IsDateString() @IsOptional() arrivalDate?: string;
@@ -127,4 +133,3 @@ export class PublicReservationsController {
     return this.api.recordPayment(campgroundId, id, body.amountCents, body.method);
   }
 }
-
