@@ -1,5 +1,6 @@
 "use client";
 
+import React from "react";
 import { useParams, useRouter } from "next/navigation";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { DashboardShell } from "../../../../components/ui/layout/DashboardShell";
@@ -10,7 +11,15 @@ import { Button } from "../../../../components/ui/button";
 import { ImageUpload } from "../../../../components/ui/image-upload";
 import { useToast } from "../../../../components/ui/use-toast";
 import { ToastAction } from "../../../../components/ui/toast";
-import { ChevronDown, ChevronUp, Pencil, X } from "lucide-react";
+import { ChevronDown, ChevronUp, Pencil, X, Zap, Droplet, Waves, Trash2 } from "lucide-react";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "../../../../components/ui/table";
 
 type SiteClassFormState = {
   name: string;
@@ -426,321 +435,339 @@ export default function SiteClassesPage() {
           </div>
         </div>
         )}
-        <div className="grid gap-3">
-          {classesQuery.data?.map((cls) => {
-            const isEditing = editingId === cls.id;
-            return (
-              <div key={cls.id} className="card p-4 space-y-2">
-                <div className="flex items-start justify-between gap-4">
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <span className="text-lg font-semibold text-slate-900">{cls.name}</span>
-                      {sitesPerClass[cls.id] > 0 && (
-                        <span className="text-xs px-2 py-0.5 rounded-full bg-slate-100 text-slate-600">
-                          {sitesPerClass[cls.id]} site{sitesPerClass[cls.id] === 1 ? '' : 's'}
-                        </span>
-                      )}
-                    </div>
-                    <div className="text-sm text-slate-600 flex items-center gap-1">
-                      {cls.siteType} • Max {cls.maxOccupancy} •{" "}
-                      {inlineEditingRate === cls.id ? (
-                        <span className="inline-flex items-center">
-                          $
-                          <input
-                            ref={inlineRateInputRef}
-                            type="number"
-                            step="0.01"
-                            min="0"
-                            className="w-20 px-1 py-0.5 text-sm border border-emerald-400 rounded focus:outline-none focus:ring-1 focus:ring-emerald-500"
-                            value={inlineRateValue}
-                            onChange={(e) => setInlineRateValue(e.target.value)}
-                            onBlur={() => handleInlineRateSave(cls.id)}
-                            onKeyDown={(e) => {
-                              if (e.key === "Enter") handleInlineRateSave(cls.id);
-                              if (e.key === "Escape") setInlineEditingRate(null);
-                            }}
-                          />
-                          {updateInlineRate.isPending && <span className="ml-1 text-xs text-slate-400">...</span>}
-                        </span>
-                      ) : (
-                        <button
-                          className="inline-flex items-center gap-1 px-1 py-0.5 rounded hover:bg-slate-100 transition-colors group"
-                          onClick={() => {
-                            setInlineEditingRate(cls.id);
-                            setInlineRateValue((cls.defaultRate / 100).toFixed(2));
-                          }}
-                          title="Click to edit rate"
-                        >
-                          ${(cls.defaultRate / 100).toFixed(2)}
-                          <Pencil className="h-3 w-3 text-slate-400 opacity-0 group-hover:opacity-100 transition-opacity" />
-                        </button>
-                      )}
-                    </div>
-                    <div className="text-xs text-slate-500">
-                      Min nights {cls.minNights ?? "n/a"} • Max nights {cls.maxNights ?? "n/a"} • Pet {cls.petFriendly ? "yes" : "no"} • Accessible{" "}
-                      {cls.accessible ? "yes" : "no"}
-                    </div>
-                    {cls.description && <div className="text-xs text-slate-500">{cls.description}</div>}
-                    {cls.photos && cls.photos.length > 0 && (
-                      <div className="space-y-1">
-                        <div className="text-xs text-slate-500">Photos: {cls.photos.length}</div>
-                        <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-                          {cls.photos.map((url) => (
-                            <div key={url} className="relative h-20 w-full overflow-hidden rounded border border-slate-200 bg-slate-50">
-                              <img src={url} alt="Class photo" className="h-full w-full object-cover" />
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                  <div className="text-right text-xs text-slate-500 space-y-2 min-w-[150px]">
-                    {cls.glCode && <div>GL {cls.glCode}</div>}
-                    {cls.clientAccount && <div>Acct {cls.clientAccount}</div>}
-                    {cls.policyVersion && <div>Policy {cls.policyVersion}</div>}
-                    <div className={cls.isActive ? "text-emerald-700 font-semibold" : "text-slate-500"}>{cls.isActive ? "Active" : "Inactive"}</div>
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={() => router.push(`/campgrounds/${campgroundId}/classes/${cls.id}`)}
-                    >
-                      View details
-                    </Button>
-                    {!isEditing && (
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        onClick={() => {
-                          setEditingId(cls.id);
-                          setEditForm({
-                            name: cls.name,
-                            description: cls.description ?? "",
-                            defaultRate: cls.defaultRate / 100,
-                            siteType: cls.siteType,
-                            maxOccupancy: cls.maxOccupancy,
-                            rigMaxLength: cls.rigMaxLength ?? "",
-                            hookupsPower: !!cls.hookupsPower,
-                            hookupsWater: !!cls.hookupsWater,
-                            hookupsSewer: !!cls.hookupsSewer,
-                            minNights: cls.minNights ?? "",
-                            maxNights: cls.maxNights ?? "",
-                            petFriendly: !!cls.petFriendly,
-                            accessible: !!cls.accessible,
-                            photos: cls.photos?.join(", ") ?? "",
-                            policyVersion: cls.policyVersion ?? "",
-                            isActive: cls.isActive ?? true
-                          });
-                        }}
-                      >
-                        Edit
-                      </Button>
-                    )}
-                    {!isEditing && (
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        onClick={() => handleDeleteClass(cls.id, cls.name)}
-                        disabled={deleteClass.isPending}
-                        className="text-red-600 hover:text-red-700 hover:bg-red-50"
-                      >
-                        Delete
-                      </Button>
-                    )}
-                  </div>
-                </div>
-                {isEditing && editForm && (
-                  <div className="border-t border-slate-200 pt-3 mt-3 space-y-3">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                      <input
-                        className="rounded-md border border-slate-200 px-3 py-2"
-                        placeholder="Name"
-                        value={editForm.name}
-                        onChange={(e) => setEditForm((s) => (s ? { ...s, name: e.target.value } : s))}
-                      />
-                      <input
-                        type="number"
-                        step="0.01"
-                        min="0"
-                        className="rounded-md border border-slate-200 px-3 py-2"
-                        placeholder="Default rate ($)"
-                        value={editForm.defaultRate}
-                        onChange={(e) =>
-                          setEditForm((s) => (s ? { ...s, defaultRate: e.target.value === "" ? "" : Number(e.target.value) } : s))
-                        }
-                      />
-                      <select
-                        className="rounded-md border border-slate-200 px-3 py-2"
-                        value={editForm.siteType}
-                        onChange={(e) => setEditForm((s) => (s ? { ...s, siteType: e.target.value } : s))}
-                      >
-                        <option value="rv">RV</option>
-                        <option value="tent">Tent</option>
-                        <option value="cabin">Cabin</option>
-                        <option value="group">Group</option>
-                        <option value="glamping">Glamping</option>
-                      </select>
-                      <input
-                        className="rounded-md border border-slate-200 px-3 py-2"
-                        placeholder="Max occupancy"
-                        value={editForm.maxOccupancy}
-                        onChange={(e) =>
-                          setEditForm((s) => (s ? { ...s, maxOccupancy: e.target.value === "" ? "" : Number(e.target.value) } : s))
-                        }
-                      />
-                      <input
-                        className="rounded-md border border-slate-200 px-3 py-2"
-                        placeholder="Rig max length"
-                        value={editForm.rigMaxLength}
-                        onChange={(e) =>
-                          setEditForm((s) => (s ? { ...s, rigMaxLength: e.target.value === "" ? "" : Number(e.target.value) } : s))
-                        }
-                      />
-                      <input
-                        className="rounded-md border border-slate-200 px-3 py-2 md:col-span-2"
-                        placeholder="Description"
-                        value={editForm.description}
-                        onChange={(e) => setEditForm((s) => (s ? { ...s, description: e.target.value } : s))}
-                      />
-                      <div className="flex flex-wrap gap-3 md:col-span-2">
-                        <label className="flex items-center gap-2 text-sm text-slate-700">
-                          <input
-                            type="checkbox"
-                            checked={editForm.hookupsPower}
-                            onChange={(e) => setEditForm((s) => (s ? { ...s, hookupsPower: e.target.checked } : s))}
-                          />
-                          Power
-                        </label>
-                        <label className="flex items-center gap-2 text-sm text-slate-700">
-                          <input
-                            type="checkbox"
-                            checked={editForm.hookupsWater}
-                            onChange={(e) => setEditForm((s) => (s ? { ...s, hookupsWater: e.target.checked } : s))}
-                          />
-                          Water
-                        </label>
-                        <label className="flex items-center gap-2 text-sm text-slate-700">
-                          <input
-                            type="checkbox"
-                            checked={editForm.hookupsSewer}
-                            onChange={(e) => setEditForm((s) => (s ? { ...s, hookupsSewer: e.target.checked } : s))}
-                          />
-                          Sewer
-                        </label>
-                        <label className="flex items-center gap-2 text-sm text-slate-700">
-                          <input
-                            type="checkbox"
-                            checked={editForm.petFriendly}
-                            onChange={(e) => setEditForm((s) => (s ? { ...s, petFriendly: e.target.checked } : s))}
-                          />
-                          Pet friendly
-                        </label>
-                        <label className="flex items-center gap-2 text-sm text-slate-700">
-                          <input
-                            type="checkbox"
-                            checked={editForm.accessible}
-                            onChange={(e) => setEditForm((s) => (s ? { ...s, accessible: e.target.checked } : s))}
-                          />
-                          Accessible
-                        </label>
-                      </div>
-                      <input
-                        className="rounded-md border border-slate-200 px-3 py-2"
-                        placeholder="Min nights"
-                        value={editForm.minNights}
-                        onChange={(e) =>
-                          setEditForm((s) => (s ? { ...s, minNights: e.target.value === "" ? "" : Number(e.target.value) } : s))
-                        }
-                      />
-                      <input
-                        className="rounded-md border border-slate-200 px-3 py-2"
-                        placeholder="Max nights"
-                        value={editForm.maxNights}
-                        onChange={(e) =>
-                          setEditForm((s) => (s ? { ...s, maxNights: e.target.value === "" ? "" : Number(e.target.value) } : s))
-                        }
-                      />
-                      <div className="md:col-span-2 space-y-1">
-                        <label className="text-xs font-semibold text-slate-700">Photos (comma-separated URLs)</label>
-                        <div className="bg-slate-50 p-2 rounded border border-slate-100 mb-2">
-                          <div className="text-xs text-slate-500 mb-2">Upload photo:</div>
-                          <ImageUpload
-                            onChange={(url) => {
-                              if (!url) return;
-                              const current = editForm.photos ? editForm.photos.split(",").map(p => p.trim()).filter(Boolean) : [];
-                              setEditForm(s => (s ? { ...s, photos: [...current, url].join(", ") } : s));
-                            }}
-                            placeholder="Upload class photo"
-                          />
-                        </div>
-                        <textarea
-                          className="rounded-md border border-slate-200 px-3 py-2 w-full text-xs"
-                          placeholder="https://img1.jpg, https://img2.jpg"
-                          value={editForm.photos}
-                          onChange={(e) => setEditForm((s) => (s ? { ...s, photos: e.target.value } : s))}
-                        />
-                        {editForm.photos &&
-                          editForm.photos.split(",").map((p) => p.trim()).filter(Boolean).length > 0 && (
-                            <div className="mt-2 grid grid-cols-2 sm:grid-cols-3 gap-2">
-                              {editForm.photos
-                                .split(",")
-                                .map((p) => p.trim())
-                                .filter(Boolean)
-                                .map((url) => (
-                                  <div key={url} className="text-[10px] truncate rounded border border-slate-200 bg-slate-50 p-1">
-                                    {url}
-                                  </div>
-                                ))}
-                            </div>
+        {/* Table View */}
+        <div className="card overflow-hidden">
+          <Table>
+            <TableHeader>
+              <TableRow className="bg-slate-50">
+                <TableHead className="font-semibold">Name</TableHead>
+                <TableHead className="font-semibold">Type</TableHead>
+                <TableHead className="font-semibold">Rate</TableHead>
+                <TableHead className="font-semibold hidden md:table-cell">Max Guests</TableHead>
+                <TableHead className="font-semibold hidden lg:table-cell">Hookups</TableHead>
+                <TableHead className="font-semibold hidden md:table-cell">Sites</TableHead>
+                <TableHead className="font-semibold">Status</TableHead>
+                <TableHead className="font-semibold text-right">Actions</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {classesQuery.data?.map((cls) => {
+                const isEditing = editingId === cls.id;
+                const isInactive = cls.isActive === false;
+                const hasHookups = cls.hookupsPower || cls.hookupsWater || cls.hookupsSewer;
+                const siteCount = sitesPerClass[cls.id] || 0;
+
+                return (
+                  <React.Fragment key={cls.id}>
+                    <TableRow className={`${isInactive ? "opacity-50 bg-slate-50" : ""} hover:bg-slate-50`}>
+                      <TableCell>
+                        <div className="flex flex-col">
+                          <button
+                            onClick={() => router.push(`/campgrounds/${campgroundId}/classes/${cls.id}`)}
+                            className="font-medium text-slate-900 hover:text-emerald-600 text-left"
+                          >
+                            {cls.name}
+                          </button>
+                          {cls.description && (
+                            <span className="text-xs text-slate-500 truncate max-w-[200px]">{cls.description}</span>
                           )}
-                      </div>
-                      <input
-                        className="rounded-md border border-slate-200 px-3 py-2 md:col-span-2"
-                        placeholder="Policy version (snapshot id)"
-                        value={editForm.policyVersion}
-                        onChange={(e) => setEditForm((s) => (s ? { ...s, policyVersion: e.target.value } : s))}
-                      />
-                      <label className="flex items-center gap-2 text-sm text-slate-700 md:col-span-2">
-                        <input
-                          type="checkbox"
-                          checked={editForm.isActive}
-                          onChange={(e) => setEditForm((s) => (s ? { ...s, isActive: e.target.checked } : s))}
-                        />
-                        Active
-                      </label>
-                    </div>
-                    <div className="flex items-center gap-3">
-                      <Button
-                        size="sm"
-                        onClick={() => {
-                          if (!editForm) return;
-                          updateClass.mutate({ id: cls.id, data: mapClassFormToPayload(editForm, { clearEmptyAsNull: true }) });
-                        }}
-                        disabled={updateClass.isPending}
-                      >
-                        {updateClass.isPending ? "Saving..." : "Save changes"}
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        onClick={() => {
-                          setEditingId(null);
-                          setEditForm(null);
-                        }}
-                        disabled={updateClass.isPending}
-                      >
-                        Cancel
-                      </Button>
-                      {updateClass.isError && <span className="text-sm text-red-600">Failed to update</span>}
-                      {deleteClass.isError && <span className="text-sm text-red-600">Failed to delete</span>}
-                    </div>
-                  </div>
-                )}
-              </div>
-            );
-          })}
-          {!classesQuery.isLoading && !classesQuery.data?.length && (
-            <div className="text-slate-600">No site classes yet.</div>
-          )}
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-slate-100 text-slate-700 capitalize">
+                          {cls.siteType}
+                        </span>
+                      </TableCell>
+                      <TableCell>
+                        {inlineEditingRate === cls.id ? (
+                          <span className="inline-flex items-center">
+                            $
+                            <input
+                              ref={inlineRateInputRef}
+                              type="number"
+                              step="0.01"
+                              min="0"
+                              className="w-20 px-1 py-0.5 text-sm border border-emerald-400 rounded focus:outline-none focus:ring-1 focus:ring-emerald-500"
+                              value={inlineRateValue}
+                              onChange={(e) => setInlineRateValue(e.target.value)}
+                              onBlur={() => handleInlineRateSave(cls.id)}
+                              onKeyDown={(e) => {
+                                if (e.key === "Enter") handleInlineRateSave(cls.id);
+                                if (e.key === "Escape") setInlineEditingRate(null);
+                              }}
+                            />
+                            {updateInlineRate.isPending && <span className="ml-1 text-xs text-slate-400">...</span>}
+                          </span>
+                        ) : (
+                          <button
+                            className="inline-flex items-center gap-1 px-1 py-0.5 rounded hover:bg-slate-100 transition-colors group font-medium"
+                            onClick={() => {
+                              setInlineEditingRate(cls.id);
+                              setInlineRateValue((cls.defaultRate / 100).toFixed(2));
+                            }}
+                            title="Click to edit rate"
+                          >
+                            ${(cls.defaultRate / 100).toFixed(2)}
+                            <Pencil className="h-3 w-3 text-slate-400 opacity-0 group-hover:opacity-100 transition-opacity" />
+                          </button>
+                        )}
+                      </TableCell>
+                      <TableCell className="hidden md:table-cell">
+                        {cls.maxOccupancy}
+                      </TableCell>
+                      <TableCell className="hidden lg:table-cell">
+                        <div className="flex items-center gap-1" title={`Power: ${cls.hookupsPower ? 'Yes' : 'No'}, Water: ${cls.hookupsWater ? 'Yes' : 'No'}, Sewer: ${cls.hookupsSewer ? 'Yes' : 'No'}`}>
+                          {hasHookups ? (
+                            <>
+                              {cls.hookupsPower && <Zap className="h-3.5 w-3.5 text-amber-600" />}
+                              {cls.hookupsWater && <Droplet className="h-3.5 w-3.5 text-blue-500" />}
+                              {cls.hookupsSewer && <Waves className="h-3.5 w-3.5 text-slate-500" />}
+                            </>
+                          ) : (
+                            <span className="text-slate-400">—</span>
+                          )}
+                        </div>
+                      </TableCell>
+                      <TableCell className="hidden md:table-cell">
+                        {siteCount > 0 ? (
+                          <span className="text-xs px-2 py-0.5 rounded-full bg-slate-100 text-slate-600">
+                            {siteCount}
+                          </span>
+                        ) : (
+                          <span className="text-slate-400">0</span>
+                        )}
+                      </TableCell>
+                      <TableCell>
+                        <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${
+                          cls.isActive !== false
+                            ? "bg-emerald-100 text-emerald-700"
+                            : "bg-slate-100 text-slate-500"
+                        }`}>
+                          {cls.isActive !== false ? "Active" : "Inactive"}
+                        </span>
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <div className="flex items-center justify-end gap-1">
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            onClick={() => {
+                              if (isEditing) {
+                                setEditingId(null);
+                                setEditForm(null);
+                              } else {
+                                setEditingId(cls.id);
+                                setEditForm({
+                                  name: cls.name,
+                                  description: cls.description ?? "",
+                                  defaultRate: cls.defaultRate / 100,
+                                  siteType: cls.siteType,
+                                  maxOccupancy: cls.maxOccupancy,
+                                  rigMaxLength: cls.rigMaxLength ?? "",
+                                  hookupsPower: !!cls.hookupsPower,
+                                  hookupsWater: !!cls.hookupsWater,
+                                  hookupsSewer: !!cls.hookupsSewer,
+                                  minNights: cls.minNights ?? "",
+                                  maxNights: cls.maxNights ?? "",
+                                  petFriendly: !!cls.petFriendly,
+                                  accessible: !!cls.accessible,
+                                  photos: cls.photos?.join(", ") ?? "",
+                                  policyVersion: cls.policyVersion ?? "",
+                                  isActive: cls.isActive ?? true
+                                });
+                              }
+                            }}
+                            className="h-8 w-8 p-0"
+                            title={isEditing ? "Cancel" : "Edit"}
+                          >
+                            {isEditing ? <X className="h-4 w-4" /> : <Pencil className="h-4 w-4" />}
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            onClick={() => handleDeleteClass(cls.id, cls.name)}
+                            disabled={deleteClass.isPending}
+                            className="h-8 w-8 p-0 text-red-600 hover:text-red-700 hover:bg-red-50"
+                            title="Delete"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+
+                    {/* Expandable edit row */}
+                    {isEditing && editForm && (
+                      <TableRow>
+                        <TableCell colSpan={8} className="bg-slate-50 p-0">
+                          <div className="p-4 border-t border-b border-slate-200 space-y-4">
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
+                              <input
+                                className="rounded-md border border-slate-200 px-3 py-2"
+                                placeholder="Name"
+                                value={editForm.name}
+                                onChange={(e) => setEditForm((s) => (s ? { ...s, name: e.target.value } : s))}
+                              />
+                              <input
+                                type="number"
+                                step="0.01"
+                                min="0"
+                                className="rounded-md border border-slate-200 px-3 py-2"
+                                placeholder="Default rate ($)"
+                                value={editForm.defaultRate}
+                                onChange={(e) =>
+                                  setEditForm((s) => (s ? { ...s, defaultRate: e.target.value === "" ? "" : Number(e.target.value) } : s))
+                                }
+                              />
+                              <select
+                                className="rounded-md border border-slate-200 px-3 py-2"
+                                value={editForm.siteType}
+                                onChange={(e) => setEditForm((s) => (s ? { ...s, siteType: e.target.value } : s))}
+                              >
+                                <option value="rv">RV</option>
+                                <option value="tent">Tent</option>
+                                <option value="cabin">Cabin</option>
+                                <option value="group">Group</option>
+                                <option value="glamping">Glamping</option>
+                              </select>
+                              <input
+                                type="number"
+                                className="rounded-md border border-slate-200 px-3 py-2"
+                                placeholder="Max occupancy"
+                                value={editForm.maxOccupancy}
+                                onChange={(e) =>
+                                  setEditForm((s) => (s ? { ...s, maxOccupancy: e.target.value === "" ? "" : Number(e.target.value) } : s))
+                                }
+                              />
+                            </div>
+                            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                              <input
+                                type="number"
+                                className="rounded-md border border-slate-200 px-3 py-2"
+                                placeholder="Rig max length (ft)"
+                                value={editForm.rigMaxLength}
+                                onChange={(e) =>
+                                  setEditForm((s) => (s ? { ...s, rigMaxLength: e.target.value === "" ? "" : Number(e.target.value) } : s))
+                                }
+                              />
+                              <input
+                                type="number"
+                                className="rounded-md border border-slate-200 px-3 py-2"
+                                placeholder="Min nights"
+                                value={editForm.minNights}
+                                onChange={(e) =>
+                                  setEditForm((s) => (s ? { ...s, minNights: e.target.value === "" ? "" : Number(e.target.value) } : s))
+                                }
+                              />
+                              <input
+                                type="number"
+                                className="rounded-md border border-slate-200 px-3 py-2"
+                                placeholder="Max nights"
+                                value={editForm.maxNights}
+                                onChange={(e) =>
+                                  setEditForm((s) => (s ? { ...s, maxNights: e.target.value === "" ? "" : Number(e.target.value) } : s))
+                                }
+                              />
+                              <label className="flex items-center gap-2 text-sm text-slate-700">
+                                <input
+                                  type="checkbox"
+                                  checked={editForm.isActive}
+                                  onChange={(e) => setEditForm((s) => (s ? { ...s, isActive: e.target.checked } : s))}
+                                />
+                                Active
+                              </label>
+                            </div>
+                            <div className="flex flex-wrap items-center gap-4">
+                              <span className="text-xs font-semibold text-slate-600">Hookups:</span>
+                              <label className="flex items-center gap-2 text-sm text-slate-700">
+                                <input
+                                  type="checkbox"
+                                  checked={editForm.hookupsPower}
+                                  onChange={(e) => setEditForm((s) => (s ? { ...s, hookupsPower: e.target.checked } : s))}
+                                />
+                                Power
+                              </label>
+                              <label className="flex items-center gap-2 text-sm text-slate-700">
+                                <input
+                                  type="checkbox"
+                                  checked={editForm.hookupsWater}
+                                  onChange={(e) => setEditForm((s) => (s ? { ...s, hookupsWater: e.target.checked } : s))}
+                                />
+                                Water
+                              </label>
+                              <label className="flex items-center gap-2 text-sm text-slate-700">
+                                <input
+                                  type="checkbox"
+                                  checked={editForm.hookupsSewer}
+                                  onChange={(e) => setEditForm((s) => (s ? { ...s, hookupsSewer: e.target.checked } : s))}
+                                />
+                                Sewer
+                              </label>
+                              <span className="text-xs font-semibold text-slate-600 ml-4">Features:</span>
+                              <label className="flex items-center gap-2 text-sm text-slate-700">
+                                <input
+                                  type="checkbox"
+                                  checked={editForm.petFriendly}
+                                  onChange={(e) => setEditForm((s) => (s ? { ...s, petFriendly: e.target.checked } : s))}
+                                />
+                                Pet friendly
+                              </label>
+                              <label className="flex items-center gap-2 text-sm text-slate-700">
+                                <input
+                                  type="checkbox"
+                                  checked={editForm.accessible}
+                                  onChange={(e) => setEditForm((s) => (s ? { ...s, accessible: e.target.checked } : s))}
+                                />
+                                Accessible
+                              </label>
+                            </div>
+                            <input
+                              className="rounded-md border border-slate-200 px-3 py-2 w-full"
+                              placeholder="Description"
+                              value={editForm.description}
+                              onChange={(e) => setEditForm((s) => (s ? { ...s, description: e.target.value } : s))}
+                            />
+                            <div className="flex items-center gap-3 pt-2 border-t border-slate-200">
+                              <Button
+                                size="sm"
+                                onClick={() => {
+                                  if (!editForm) return;
+                                  updateClass.mutate({ id: cls.id, data: mapClassFormToPayload(editForm, { clearEmptyAsNull: true }) });
+                                }}
+                                disabled={updateClass.isPending}
+                              >
+                                {updateClass.isPending ? "Saving..." : "Save changes"}
+                              </Button>
+                              <Button
+                                size="sm"
+                                variant="ghost"
+                                onClick={() => {
+                                  setEditingId(null);
+                                  setEditForm(null);
+                                }}
+                                disabled={updateClass.isPending}
+                              >
+                                Cancel
+                              </Button>
+                              <span className="text-xs text-slate-400">Cmd+S to save, Escape to cancel</span>
+                              {updateClass.isError && <span className="text-sm text-red-600">Failed to update</span>}
+                            </div>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    )}
+                  </React.Fragment>
+                );
+              })}
+              {classesQuery.data?.length === 0 && !classesQuery.isLoading && (
+                <TableRow>
+                  <TableCell colSpan={8} className="text-center py-8 text-slate-500">
+                    No site classes yet. Click &apos;+ Add Class&apos; to create one.
+                  </TableCell>
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
         </div>
       </div>
     </DashboardShell>
