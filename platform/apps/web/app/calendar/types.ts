@@ -14,20 +14,20 @@ export interface DayMeta {
 }
 
 // Calendar reservation with guest and site info
-// Using explicit types instead of Pick to handle nullable API responses
-export interface CalendarReservation extends Reservation {
+// Using Omit to override the site/guest types from base Reservation
+export interface CalendarReservation extends Omit<Reservation, 'site' | 'guest'> {
   guest?: {
     primaryFirstName?: string | null;
     primaryLastName?: string | null;
     email?: string | null;
     phone?: string | null;
-  } | null;
+  };
   site?: {
     id: string;
     name?: string | null;
     siteNumber?: string | null;
     siteType?: string | null;
-  } | null;
+  };
 }
 
 // Calendar site with display properties
