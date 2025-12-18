@@ -1103,7 +1103,12 @@ model Campground {
   orgBillingLineItems    OrganizationBillingLineItem[]
   usageEvents            UsageEvent[]
 
+  // Soft delete
+  deletedAt DateTime?
+  deletedBy String?
+
   @@index([dataSource, dataSourceId])
+  @@index([deletedAt])
 }
 
 model PushSubscription {
@@ -1540,6 +1545,7 @@ model Site {
   @@index([campgroundId])
   @@index([siteType])
   @@index([siteClassId])
+  @@index([campgroundId, isActive])
 }
 
 model SiteHold {
@@ -1655,9 +1661,14 @@ model Guest {
   idVerifications    IdVerification[]
   segmentMemberships GuestSegmentMembership[]
 
+  // Soft delete
+  deletedAt DateTime?
+  deletedBy String?
+
   @@unique([email])
   @@index([emailNormalized])
   @@index([phoneNormalized])
+  @@index([deletedAt])
 }
 
 model LoyaltyProfile {
@@ -1778,6 +1789,10 @@ model Reservation {
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now()) @updatedAt
 
+  // Soft delete
+  deletedAt DateTime?
+  deletedBy String?
+
   campground     Campground      @relation(fields: [campgroundId], references: [id], onDelete: Cascade)
   site           Site            @relation(fields: [siteId], references: [id], onDelete: Cascade)
   guest          Guest           @relation(fields: [guestId], references: [id], onDelete: Cascade)
@@ -1833,6 +1848,13 @@ model Reservation {
   @@index([groupId])
   @@index([referralCode])
   @@index([referralProgramId])
+  // Critical composite indexes for common queries
+  @@index([campgroundId, status])
+  @@index([campgroundId, arrivalDate, departureDate])
+  @@index([siteId, arrivalDate, departureDate])
+  @@index([campgroundId, status, arrivalDate])
+  @@index([status, arrivalDate])
+  @@index([deletedAt])
 }
 
 // Split booking segment - represents a portion of a reservation on a specific site

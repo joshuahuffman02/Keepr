@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { apiClient } from "@/lib/api-client";
 import { recordTelemetry } from "@/lib/sync-telemetry";
 import { loadQueue as loadQueueGeneric, saveQueue as saveQueueGeneric, registerBackgroundSync } from "@/lib/offline-queue";
@@ -77,6 +77,7 @@ export default function KioskPage() {
     const [queuedCheckinPending, setQueuedCheckinPending] = useState(false);
     const [conflicts, setConflicts] = useState<any[]>([]);
     const queueKey = "campreserv:kiosk:checkinQueue";
+    const isFlushingRef = useRef(false); // Mutex to prevent concurrent queue processing
     const loadQueue = () => loadQueueGeneric<any>(queueKey);
     const saveQueue = (items: any[]) => {
         saveQueueGeneric(queueKey, items);
@@ -99,36 +100,44 @@ export default function KioskPage() {
         void registerBackgroundSync();
     };
     const flushQueue = async () => {
+        // Prevent concurrent queue processing (race condition fix)
+        if (isFlushingRef.current) return;
         if (!navigator.onLine) return;
-        const now = Date.now();
-        const items = loadQueue();
-        if (!items.length) return;
-        const remaining: any[] = [];
-        for (const item of items) {
-            if (item.nextAttemptAt && item.nextAttemptAt > now) {
-                remaining.push(item);
-                continue;
+
+        isFlushingRef.current = true;
+        try {
+            const now = Date.now();
+            const items = loadQueue();
+            if (!items.length) return;
+            const remaining: any[] = [];
+            for (const item of items) {
+                if (item.nextAttemptAt && item.nextAttemptAt > now) {
+                    remaining.push(item);
+                    continue;
+                }
+                try {
+                    const headers: Record<string, string> = item.idempotencyKey ? { "X-Idempotency-Key": item.idempotencyKey } : {};
+                    await apiClient.kioskCheckIn(item.reservationId, item.upsellTotal);
+                    recordTelemetry({ source: "kiosk", type: "sync", status: "success", message: "Queued check-in flushed", meta: { reservationId: item.reservationId } });
+                    setQueuedCheckinPending(false);
+                } catch (err: any) {
+                    const attempt = (item.attempt ?? 0) + 1;
+                    const delay = Math.min(300000, 1000 * 2 ** attempt) + Math.floor(Math.random() * 500);
+                    const isConflict = err?.status === 409 || err?.status === 412 || /conflict/i.test(err?.message ?? "");
+                    remaining.push({ ...item, attempt, nextAttemptAt: Date.now() + delay, lastError: err?.message, conflict: isConflict });
+                    recordTelemetry({
+                        source: "kiosk",
+                        type: isConflict ? "conflict" : "error",
+                        status: isConflict ? "conflict" : "failed",
+                        message: isConflict ? "Check-in conflict, needs review" : "Flush failed, retry scheduled",
+                        meta: { error: err?.message },
+                    });
+                }
             }
-            try {
-                const headers: Record<string, string> = item.idempotencyKey ? { "X-Idempotency-Key": item.idempotencyKey } : {};
-                await apiClient.kioskCheckIn(item.reservationId, item.upsellTotal);
-                recordTelemetry({ source: "kiosk", type: "sync", status: "success", message: "Queued check-in flushed", meta: { reservationId: item.reservationId } });
-                setQueuedCheckinPending(false);
-            } catch (err: any) {
-                const attempt = (item.attempt ?? 0) + 1;
-                const delay = Math.min(300000, 1000 * 2 ** attempt) + Math.floor(Math.random() * 500);
-                const isConflict = err?.status === 409 || err?.status === 412 || /conflict/i.test(err?.message ?? "");
-                remaining.push({ ...item, attempt, nextAttemptAt: Date.now() + delay, lastError: err?.message, conflict: isConflict });
-                recordTelemetry({
-                    source: "kiosk",
-                    type: isConflict ? "conflict" : "error",
-                    status: isConflict ? "conflict" : "failed",
-                    message: isConflict ? "Check-in conflict, needs review" : "Flush failed, retry scheduled",
-                    meta: { error: err?.message },
-                });
-            }
+            saveQueue(remaining);
+        } finally {
+            isFlushingRef.current = false;
         }
-        saveQueue(remaining);
     };
 
     const retryConflict = (id: string) => {

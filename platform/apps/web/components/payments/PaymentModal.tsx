@@ -1,11 +1,12 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { loadStripe } from "@stripe/stripe-js";
 import { Elements, PaymentElement, useStripe, useElements } from "@stripe/react-stripe-js";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../ui/dialog";
 import { Button } from "../ui/button";
 import { apiClient } from "../../lib/api-client";
+import { AlertCircle, RefreshCw } from "lucide-react";
 
 // Initialize Stripe outside of component to avoid recreating object on renders
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY || "pk_test_placeholder");
@@ -76,15 +77,39 @@ function CheckoutForm({ amountCents, onSuccess, onClose }: { amountCents: number
 
 export function PaymentModal({ isOpen, onClose, reservationId, amountCents, onSuccess }: PaymentModalProps) {
     const [clientSecret, setClientSecret] = useState<string | null>(null);
+    const [initError, setInitError] = useState<string | null>(null);
+    const [isLoading, setIsLoading] = useState(false);
+
+    const createPaymentIntent = useCallback(async () => {
+        if (!reservationId || amountCents <= 0) return;
+
+        setIsLoading(true);
+        setInitError(null);
+        setClientSecret(null);
+
+        try {
+            const data = await apiClient.createPaymentIntent(amountCents, "usd", reservationId);
+            setClientSecret(data.clientSecret);
+        } catch (err) {
+            const message = err instanceof Error ? err.message : "Failed to initialize payment";
+            setInitError(message);
+        } finally {
+            setIsLoading(false);
+        }
+    }, [amountCents, reservationId]);
 
     useEffect(() => {
         if (isOpen && reservationId && amountCents > 0) {
-            // Create PaymentIntent
-            apiClient.createPaymentIntent(amountCents, "usd", reservationId)
-                .then((data) => setClientSecret(data.clientSecret))
-                .catch((err) => console.error("Failed to create payment intent", err));
+            createPaymentIntent();
         }
-    }, [isOpen, reservationId, amountCents]);
+
+        // Reset state when modal closes
+        if (!isOpen) {
+            setClientSecret(null);
+            setInitError(null);
+            setIsLoading(false);
+        }
+    }, [isOpen, reservationId, amountCents, createPaymentIntent]);
 
     return (
         <Dialog open={isOpen} onOpenChange={onClose}>
@@ -92,13 +117,36 @@ export function PaymentModal({ isOpen, onClose, reservationId, amountCents, onSu
                 <DialogHeader>
                     <DialogTitle>Pay Balance</DialogTitle>
                 </DialogHeader>
-                {clientSecret && (
+
+                {initError && (
+                    <div className="py-6 text-center space-y-4">
+                        <div className="flex items-center justify-center gap-2 text-red-600">
+                            <AlertCircle className="h-5 w-5" />
+                            <span className="text-sm">{initError}</span>
+                        </div>
+                        <Button
+                            variant="outline"
+                            onClick={createPaymentIntent}
+                            disabled={isLoading}
+                            className="gap-2"
+                        >
+                            <RefreshCw className={`h-4 w-4 ${isLoading ? 'animate-spin' : ''}`} />
+                            Try Again
+                        </Button>
+                    </div>
+                )}
+
+                {clientSecret && !initError && (
                     <Elements stripe={stripePromise} options={{ clientSecret }}>
                         <CheckoutForm amountCents={amountCents} onSuccess={onSuccess} onClose={onClose} />
                     </Elements>
                 )}
-                {!clientSecret && isOpen && (
-                    <div className="py-8 text-center text-slate-500">Initializing payment...</div>
+
+                {isLoading && !initError && (
+                    <div className="py-8 text-center text-slate-500">
+                        <RefreshCw className="h-5 w-5 animate-spin mx-auto mb-2" />
+                        Initializing payment...
+                    </div>
                 )}
             </DialogContent>
         </Dialog>

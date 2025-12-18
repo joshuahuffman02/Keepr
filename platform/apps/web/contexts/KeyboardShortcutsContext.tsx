@@ -38,6 +38,111 @@ interface KeyboardShortcutsContextValue {
 
 const KeyboardShortcutsContext = createContext<KeyboardShortcutsContextValue | null>(null);
 
+// Default shortcuts - defined outside component to prevent recreation on each render
+const DEFAULT_SHORTCUTS: KeyboardShortcut[] = [
+  // Global shortcuts
+  {
+    id: "global-search",
+    keys: ["cmd", "k"],
+    description: "Open global search",
+    action: "search",
+    category: "global",
+    global: true,
+    enabled: true,
+  },
+  {
+    id: "global-help",
+    keys: ["cmd", "/"],
+    description: "Open help",
+    action: "help",
+    category: "global",
+    global: true,
+    enabled: true,
+  },
+  {
+    id: "close-modal",
+    keys: ["escape"],
+    description: "Close any open modal/dialog",
+    action: "close-modal",
+    category: "global",
+    global: true,
+    enabled: true,
+  },
+  // Actions
+  {
+    id: "new-booking",
+    keys: ["cmd", "n"],
+    description: "New booking",
+    action: "new-booking",
+    category: "actions",
+    enabled: true,
+  },
+  // Navigation (sequential)
+  {
+    id: "nav-dashboard",
+    keys: ["g", "d"],
+    description: "Go to Dashboard",
+    action: "go-dashboard",
+    category: "navigation",
+    sequential: true,
+    enabled: true,
+  },
+  {
+    id: "nav-calendar",
+    keys: ["g", "c"],
+    description: "Go to Calendar",
+    action: "go-calendar",
+    category: "navigation",
+    sequential: true,
+    enabled: true,
+  },
+  {
+    id: "nav-reservations",
+    keys: ["g", "r"],
+    description: "Go to Reservations",
+    action: "go-reservations",
+    category: "navigation",
+    sequential: true,
+    enabled: true,
+  },
+  {
+    id: "nav-guests",
+    keys: ["g", "g"],
+    description: "Go to Guests",
+    action: "go-guests",
+    category: "navigation",
+    sequential: true,
+    enabled: true,
+  },
+  {
+    id: "nav-pos",
+    keys: ["g", "p"],
+    description: "Go to POS",
+    action: "go-pos",
+    category: "navigation",
+    sequential: true,
+    enabled: true,
+  },
+  {
+    id: "nav-messages",
+    keys: ["g", "m"],
+    description: "Go to Messages",
+    action: "go-messages",
+    category: "navigation",
+    sequential: true,
+    enabled: true,
+  },
+  {
+    id: "nav-settings",
+    keys: ["g", "s"],
+    description: "Go to Settings",
+    action: "go-settings",
+    category: "navigation",
+    sequential: true,
+    enabled: true,
+  },
+];
+
 export function useKeyboardShortcuts() {
   const context = useContext(KeyboardShortcutsContext);
   if (!context) {
@@ -53,7 +158,8 @@ interface KeyboardShortcutsProviderProps {
 export function KeyboardShortcutsProvider({ children }: KeyboardShortcutsProviderProps) {
   const router = useRouter();
   const pathname = usePathname();
-  const [shortcuts, setShortcuts] = useState<KeyboardShortcut[]>([]);
+  // Initialize with default shortcuts directly to avoid unnecessary effect
+  const [shortcuts, setShortcuts] = useState<KeyboardShortcut[]>(DEFAULT_SHORTCUTS);
   const [showShortcutsDialog, setShowShortcutsDialog] = useState(false);
   const [isInputFocused, setIsInputFocused] = useState(false);
   const sequentialPrimed = useRef(false);
@@ -62,115 +168,6 @@ export function KeyboardShortcutsProvider({ children }: KeyboardShortcutsProvide
   const onHelpRef = useRef<(() => void) | null>(null);
   const onNewBookingRef = useRef<(() => void) | null>(null);
   const onCloseModalRef = useRef<(() => void) | null>(null);
-
-  // Default shortcuts
-  const defaultShortcuts: KeyboardShortcut[] = [
-    // Global shortcuts
-    {
-      id: "global-search",
-      keys: ["cmd", "k"],
-      description: "Open global search",
-      action: "search",
-      category: "global",
-      global: true,
-      enabled: true,
-    },
-    {
-      id: "global-help",
-      keys: ["cmd", "/"],
-      description: "Open help",
-      action: "help",
-      category: "global",
-      global: true,
-      enabled: true,
-    },
-    {
-      id: "close-modal",
-      keys: ["escape"],
-      description: "Close any open modal/dialog",
-      action: "close-modal",
-      category: "global",
-      global: true,
-      enabled: true,
-    },
-    // Actions
-    {
-      id: "new-booking",
-      keys: ["cmd", "n"],
-      description: "New booking",
-      action: "new-booking",
-      category: "actions",
-      enabled: true,
-    },
-    // Navigation (sequential)
-    {
-      id: "nav-dashboard",
-      keys: ["g", "d"],
-      description: "Go to Dashboard",
-      action: "go-dashboard",
-      category: "navigation",
-      sequential: true,
-      enabled: true,
-    },
-    {
-      id: "nav-calendar",
-      keys: ["g", "c"],
-      description: "Go to Calendar",
-      action: "go-calendar",
-      category: "navigation",
-      sequential: true,
-      enabled: true,
-    },
-    {
-      id: "nav-reservations",
-      keys: ["g", "r"],
-      description: "Go to Reservations",
-      action: "go-reservations",
-      category: "navigation",
-      sequential: true,
-      enabled: true,
-    },
-    {
-      id: "nav-guests",
-      keys: ["g", "g"],
-      description: "Go to Guests",
-      action: "go-guests",
-      category: "navigation",
-      sequential: true,
-      enabled: true,
-    },
-    {
-      id: "nav-pos",
-      keys: ["g", "p"],
-      description: "Go to POS",
-      action: "go-pos",
-      category: "navigation",
-      sequential: true,
-      enabled: true,
-    },
-    {
-      id: "nav-messages",
-      keys: ["g", "m"],
-      description: "Go to Messages",
-      action: "go-messages",
-      category: "navigation",
-      sequential: true,
-      enabled: true,
-    },
-    {
-      id: "nav-settings",
-      keys: ["g", "s"],
-      description: "Go to Settings",
-      action: "go-settings",
-      category: "navigation",
-      sequential: true,
-      enabled: true,
-    },
-  ];
-
-  useEffect(() => {
-    setShortcuts(defaultShortcuts);
-  }, []);
 
   const registerShortcut = useCallback((shortcut: KeyboardShortcut) => {
     setShortcuts((prev) => {

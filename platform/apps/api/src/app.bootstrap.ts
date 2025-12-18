@@ -1,6 +1,7 @@
 import "reflect-metadata";
 import { NestFactory } from "@nestjs/core";
 import { ValidationPipe, INestApplication } from "@nestjs/common";
+import { HttpAdapterHost } from "@nestjs/core";
 import { AppModule } from "./app.module";
 import { PrismaService } from "./prisma/prisma.service";
 import * as dotenv from "dotenv";
@@ -10,6 +11,7 @@ import { PerfService } from "./perf/perf.service";
 import { RateLimitService } from "./perf/rate-limit.service";
 import { ObservabilityService } from "./observability/observability.service";
 import { RedactingLogger } from "./logger/redacting.logger";
+import { AllExceptionsFilter } from "./common/filters/all-exceptions.filter";
 import type { Request, Response, NextFunction } from "express";
 import { DeveloperApiModule } from "./developer-api/developer-api.module";
 
@@ -122,6 +124,15 @@ export async function createApp(): Promise<INestApplication> {
     } catch (err) {
         console.error("[BOOTSTRAP] Failed to initialize global interceptors:", err);
         // Continue without interceptors rather than crashing
+    }
+
+    // Global exception filter for consistent error handling
+    try {
+        const httpAdapterHost = app.get(HttpAdapterHost);
+        app.useGlobalFilters(new AllExceptionsFilter(httpAdapterHost));
+        console.log("[BOOTSTRAP] Global exception filter enabled");
+    } catch (err) {
+        console.error("[BOOTSTRAP] Failed to initialize global exception filter:", err);
     }
 
     return app;

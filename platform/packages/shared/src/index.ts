@@ -8,6 +8,7 @@ import {
   DepositScopeRuleSchema
 } from "./deposits.types";
 export * from "./deposits";
+export * from "./format";
 
 const numberish = <T extends z.ZodTypeAny>(schema: T) =>
   z.preprocess((val) => {
