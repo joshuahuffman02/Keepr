@@ -153,7 +153,7 @@ export default function GeographicPage() {
             xAxisKey="range"
             type="bar"
             height={300}
-            formatTooltip={(v) => v.toLocaleString()}
+            formatTooltip={(v) => v?.toLocaleString() ?? "0"}
             loading={loading}
           />
         </div>
@@ -162,7 +162,7 @@ export default function GeographicPage() {
             title="Distance Breakdown"
             data={distancePieData}
             height={200}
-            formatValue={(v) => `${v.toFixed(1)}%`}
+            formatValue={(v) => `${(v ?? 0).toFixed(1)}%`}
             loading={loading}
           />
           <Card className="bg-slate-800/50 border-slate-700">
@@ -186,10 +186,10 @@ export default function GeographicPage() {
         description="Where your guests are coming from"
         columns={[
           { key: "state", label: "State" },
-          { key: "guestCount", label: "Guests", align: "right", format: (v) => v.toLocaleString() },
-          { key: "reservations", label: "Reservations", align: "right", format: (v) => v.toLocaleString() },
-          { key: "revenue", label: "Revenue", align: "right", format: (v) => formatCurrency(v) },
-          { key: "averageDistance", label: "Avg Distance", align: "right", format: (v) => `${v} mi` },
+          { key: "guestCount", label: "Guests", align: "right", format: (v) => v?.toLocaleString() ?? "0" },
+          { key: "reservations", label: "Reservations", align: "right", format: (v) => v?.toLocaleString() ?? "0" },
+          { key: "revenue", label: "Revenue", align: "right", format: (v) => formatCurrency(v ?? 0) },
+          { key: "averageDistance", label: "Avg Distance", align: "right", format: (v) => `${v ?? 0} mi` },
         ]}
         data={data.originHeatmap}
         loading={loading}
@@ -202,9 +202,9 @@ export default function GeographicPage() {
         description="Guest and revenue by US region"
         columns={[
           { key: "region", label: "Region" },
-          { key: "totalGuests", label: "Guests", align: "right", format: (v) => v.toLocaleString() },
-          { key: "totalRevenue", label: "Revenue", align: "right", format: (v) => formatCurrency(v) },
-          { key: "growthRate", label: "Growth Rate", align: "right", format: (v) => `+${v.toFixed(1)}%` },
+          { key: "totalGuests", label: "Guests", align: "right", format: (v) => v?.toLocaleString() ?? "0" },
+          { key: "totalRevenue", label: "Revenue", align: "right", format: (v) => formatCurrency(v ?? 0) },
+          { key: "growthRate", label: "Growth Rate", align: "right", format: (v) => `+${(v ?? 0).toFixed(1)}%` },
         ]}
         data={regionData}
         loading={loading}
