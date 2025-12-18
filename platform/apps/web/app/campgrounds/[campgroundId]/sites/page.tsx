@@ -1,5 +1,6 @@
 "use client";
 
+import React from "react";
 import { useParams, useRouter } from "next/navigation";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { apiClient } from "../../../../lib/api-client";
@@ -692,100 +693,105 @@ export default function SitesPage() {
           </div>
         )}
 
-        <div className="grid gap-3">
-          {filteredSites.map((site, index) => {
-            const cls =
-              classesQuery.data?.find((c) => c.id === (site as any).siteClassId) ||
-              (site as any).siteClass ||
-              null;
-            const isEditing = editingId === site.id;
-            const isSelected = selectedSites.has(site.id);
-            const isInactive = site.isActive === false;
-            return (
-              <div key={site.id} className={`card p-4 ${isInactive ? "opacity-60 bg-slate-50" : ""}`}>
-                <div className="flex items-start gap-3">
-                  {/* Checkbox for bulk selection (shift+click for range) */}
+        {/* Table Layout */}
+        <div className="card overflow-hidden">
+          <Table>
+            <TableHeader>
+              <TableRow className="bg-slate-50">
+                <TableHead className="w-10">
                   <input
                     type="checkbox"
-                    checked={isSelected}
-                    onClick={(e) => toggleSiteSelection(site.id, index, e)}
-                    onChange={() => {}} // Handled by onClick for shift-key support
-                    className="mt-1 rounded border-slate-300 cursor-pointer"
+                    checked={selectedSites.size === filteredSites.length && filteredSites.length > 0}
+                    onChange={toggleSelectAll}
+                    className="rounded border-slate-300"
                   />
+                </TableHead>
+                <TableHead>Site</TableHead>
+                <TableHead className="hidden sm:table-cell">Type</TableHead>
+                <TableHead>Class</TableHead>
+                <TableHead className="hidden md:table-cell">Rate</TableHead>
+                <TableHead className="hidden lg:table-cell">Hookups</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead className="w-10"></TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {filteredSites.map((site, index) => {
+                const cls = classesQuery.data?.find((c) => c.id === (site as any).siteClassId) || null;
+                const isEditing = editingId === site.id;
+                const isSelected = selectedSites.has(site.id);
+                const isInactive = site.isActive === false;
 
-                  <div className="flex-1">
-                    <div className="flex items-start justify-between">
-                      <div>
-                        <div className="flex items-center gap-2">
-                          <span className="text-lg font-semibold text-slate-900">{site.name}</span>
-                          <span className="text-sm text-slate-400">#{site.siteNumber}</span>
-                          {isInactive && (
-                            <span className="px-2 py-0.5 text-xs rounded bg-slate-200 text-slate-600">Inactive</span>
-                          )}
-                        </div>
-                        <div className="flex flex-wrap gap-x-3 gap-y-1 text-sm text-slate-600 mt-1">
-                          <span className="inline-flex items-center gap-1">
-                            <span className="text-slate-400">Type:</span> {site.siteType.toUpperCase()}
-                          </span>
-                          <span className="inline-flex items-center gap-1">
-                            <span className="text-slate-400">Guests:</span> {site.maxOccupancy} max
-                          </span>
-                          {site.rigMaxLength && (
-                            <span className="inline-flex items-center gap-1">
-                              <span className="text-slate-400">Rig:</span> {site.rigMaxLength}ft max
-                            </span>
-                          )}
-                        </div>
-                        <div className="flex flex-wrap gap-x-3 gap-y-1 text-xs text-slate-500 mt-1">
-                          <span className="inline-flex items-center gap-1">
-                            <span className="text-slate-400">Hookups:</span>
-                            {site.hookupsPower || site.hookupsWater || site.hookupsSewer ? (
-                              <>
-                                {site.hookupsPower && <span>Power{site.powerAmps ? ` (${site.powerAmps}A)` : ""}</span>}
-                                {site.hookupsPower && site.hookupsWater && ", "}
-                                {site.hookupsWater && "Water"}
-                                {(site.hookupsPower || site.hookupsWater) && site.hookupsSewer && ", "}
-                                {site.hookupsSewer && "Sewer"}
-                              </>
-                            ) : (
-                              "None"
-                            )}
-                          </span>
-                          <span>{site.petFriendly ? "🐕 Pets OK" : "No pets"}</span>
-                          {site.accessible && <span>♿ Accessible</span>}
-                        </div>
-                      </div>
+                const hookups = [
+                  site.hookupsPower && `⚡${site.powerAmps || ""}`,
+                  site.hookupsWater && "💧",
+                  site.hookupsSewer && "🚿"
+                ].filter(Boolean).join(" ");
 
-                      <div className="flex flex-col items-end gap-2">
-                        {/* Inline Class Dropdown with Undo */}
-                        <div className="flex items-center gap-2">
-                          <span className="text-xs text-slate-500">Class:</span>
-                          <select
-                            value={(site as any).siteClassId ?? ""}
-                            onChange={(e) => {
-                              const newClassId = e.target.value || null;
-                              const prevClassId = (site as any).siteClassId ?? null;
-                              const newClassName = classesQuery.data?.find(c => c.id === newClassId)?.name || "No class";
-                              quickUpdateSite.mutate({
-                                id: site.id,
-                                data: { siteClassId: newClassId },
-                                previousData: { siteClassId: prevClassId },
-                                description: `Class changed to ${newClassName}`
-                              });
-                            }}
-                            className="text-sm border border-slate-200 rounded px-2 py-1 min-w-[140px]"
-                            disabled={quickUpdateSite.isPending}
+                return (
+                  <React.Fragment key={site.id}>
+                    <TableRow className={`${isInactive ? "opacity-50 bg-slate-50" : ""} ${isSelected ? "bg-emerald-50" : ""} hover:bg-slate-50`}>
+                      <TableCell>
+                        <input
+                          type="checkbox"
+                          checked={isSelected}
+                          onClick={(e) => toggleSiteSelection(site.id, index, e)}
+                          onChange={() => {}}
+                          className="rounded border-slate-300 cursor-pointer"
+                        />
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex flex-col">
+                          <button
+                            onClick={() => router.push(`/campgrounds/${campgroundId}/sites/${site.id}`)}
+                            className="font-medium text-slate-900 hover:text-emerald-600 text-left"
                           >
-                            <option value="">No class</option>
-                            {classesQuery.data?.map((c) => (
-                              <option key={c.id} value={c.id}>
-                                {c.name} (${(c.defaultRate / 100).toFixed(2)})
-                              </option>
-                            ))}
-                          </select>
+                            {site.name}
+                          </button>
+                          <span className="text-xs text-slate-500">#{site.siteNumber}</span>
                         </div>
-
-                        {/* Active/Inactive Toggle with Undo */}
+                      </TableCell>
+                      <TableCell className="hidden sm:table-cell">
+                        <span className="text-xs px-2 py-1 rounded bg-slate-100 text-slate-600 uppercase">
+                          {site.siteType}
+                        </span>
+                      </TableCell>
+                      <TableCell>
+                        <select
+                          value={(site as any).siteClassId ?? ""}
+                          onChange={(e) => {
+                            const newClassId = e.target.value || null;
+                            const prevClassId = (site as any).siteClassId ?? null;
+                            const newClassName = classesQuery.data?.find(c => c.id === newClassId)?.name || "No class";
+                            quickUpdateSite.mutate({
+                              id: site.id,
+                              data: { siteClassId: newClassId },
+                              previousData: { siteClassId: prevClassId },
+                              description: `Class changed to ${newClassName}`
+                            });
+                          }}
+                          className="text-xs border border-slate-200 rounded px-2 py-1 max-w-[120px]"
+                          disabled={quickUpdateSite.isPending}
+                        >
+                          <option value="">—</option>
+                          {classesQuery.data?.map((c) => (
+                            <option key={c.id} value={c.id}>{c.name}</option>
+                          ))}
+                        </select>
+                      </TableCell>
+                      <TableCell className="hidden md:table-cell">
+                        {cls ? (
+                          <span className="text-sm font-medium text-emerald-700">${(cls.defaultRate / 100).toFixed(0)}</span>
+                        ) : (
+                          <span className="text-xs text-slate-400">—</span>
+                        )}
+                      </TableCell>
+                      <TableCell className="hidden lg:table-cell">
+                        <span className="text-sm" title={`Power: ${site.hookupsPower ? 'Yes' : 'No'}, Water: ${site.hookupsWater ? 'Yes' : 'No'}, Sewer: ${site.hookupsSewer ? 'Yes' : 'No'}`}>
+                          {hookups || <span className="text-slate-400">—</span>}
+                        </span>
+                      </TableCell>
+                      <TableCell>
                         <button
                           onClick={() => {
                             const newStatus = !site.isActive;
@@ -796,7 +802,7 @@ export default function SitesPage() {
                               description: newStatus ? `${site.name} activated` : `${site.name} deactivated`
                             });
                           }}
-                          className={`px-3 py-1 text-xs rounded transition-colors ${
+                          className={`px-2 py-1 text-xs rounded transition-colors ${
                             site.isActive !== false
                               ? "bg-emerald-100 text-emerald-700 hover:bg-emerald-200"
                               : "bg-slate-200 text-slate-600 hover:bg-slate-300"
@@ -805,258 +811,219 @@ export default function SitesPage() {
                         >
                           {site.isActive !== false ? "Active" : "Inactive"}
                         </button>
-                      </div>
-                    </div>
-
-                    {/* Action buttons */}
-                    <div className="flex gap-2 mt-3 pt-3 border-t border-slate-100">
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => router.push(`/campgrounds/${campgroundId}/sites/${site.id}`)}
-                      >
-                        View details
-                      </Button>
-                      {!isEditing && (
-                        <Button
-                          size="sm"
-                          variant="ghost"
-                          onClick={() => {
-                            setEditingId(site.id);
-                            setEditForm({
-                              name: site.name,
-                              siteNumber: site.siteNumber,
-                              siteType: site.siteType,
-                              maxOccupancy: site.maxOccupancy,
-                              rigMaxLength: site.rigMaxLength ?? "",
-                              hookupsPower: !!site.hookupsPower,
-                              hookupsWater: !!site.hookupsWater,
-                              hookupsSewer: !!site.hookupsSewer,
-                              powerAmps: site.powerAmps?.toString() ?? "",
-                              petFriendly: !!site.petFriendly,
-                              accessible: !!site.accessible,
-                              minNights: site.minNights ?? "",
-                              maxNights: site.maxNights ?? "",
-                              photos: site.photos?.join(", ") ?? "",
-                              description: site.description ?? "",
-                              tags: site.tags?.join(", ") ?? "",
-                              siteClassId: site.siteClassId ?? "",
-                              isActive: site.isActive !== false
-                            });
-                          }}
-                        >
-                          Edit all
-                        </Button>
-                      )}
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => handleDelete(site.id, site.name)}
-                        disabled={deleteSite.isPending}
-                        className="text-red-600 hover:text-red-700 hover:bg-red-50"
-                      >
-                        Delete
-                      </Button>
-                    </div>
-                  </div>
-                </div>
-                {isEditing && editForm && (
-                  <div className="mt-4 space-y-3 border-t border-slate-200 pt-3">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                      <input
-                        className="rounded-md border border-slate-200 px-3 py-2"
-                        placeholder="Name"
-                        value={editForm.name}
-                        onChange={(e) => setEditForm((s) => (s ? { ...s, name: e.target.value } : s))}
-                      />
-                      <input
-                        className="rounded-md border border-slate-200 px-3 py-2"
-                        placeholder="Site number"
-                        value={editForm.siteNumber}
-                        onChange={(e) => setEditForm((s) => (s ? { ...s, siteNumber: e.target.value } : s))}
-                      />
-                      <select
-                        className="rounded-md border border-slate-200 px-3 py-2"
-                        value={editForm.siteType}
-                        onChange={(e) => setEditForm((s) => (s ? { ...s, siteType: e.target.value } : s))}
-                      >
-                        <option value="rv">RV</option>
-                        <option value="tent">Tent</option>
-                        <option value="cabin">Cabin</option>
-                        <option value="group">Group</option>
-                        <option value="glamping">Glamping</option>
-                      </select>
-                      <input
-                        type="number"
-                        className="rounded-md border border-slate-200 px-3 py-2"
-                        placeholder="Max occupancy"
-                        value={editForm.maxOccupancy}
-                        onChange={(e) =>
-                          setEditForm((s) => (s ? { ...s, maxOccupancy: e.target.value === "" ? 0 : Number(e.target.value) } : s))
-                        }
-                      />
-                      <input
-                        type="number"
-                        className="rounded-md border border-slate-200 px-3 py-2"
-                        placeholder="Rig max length (optional)"
-                        value={editForm.rigMaxLength}
-                        onChange={(e) => setEditForm((s) => (s ? { ...s, rigMaxLength: e.target.value === "" ? "" : Number(e.target.value) } : s))}
-                      />
-                      <select
-                        className="rounded-md border border-slate-200 px-3 py-2"
-                        value={editForm.powerAmps}
-                        onChange={(e) => setEditForm((s) => (s ? { ...s, powerAmps: e.target.value } : s))}
-                      >
-                        <option value="">Power amps</option>
-                        {POWER_AMP_OPTIONS.filter(o => o.value).map((opt) => (
-                          <option key={opt.value} value={opt.value}>{opt.label}</option>
-                        ))}
-                      </select>
-                      <select
-                        className="rounded-md border border-slate-200 px-3 py-2"
-                        value={editForm.siteClassId ?? ""}
-                        onChange={(e) => setEditForm((s) => (s ? { ...s, siteClassId: e.target.value || "" } : s))}
-                      >
-                        <option value="">Select class (optional)</option>
-                        {classesQuery.data?.map((cls) => (
-                          <option key={cls.id} value={cls.id}>
-                            {cls.name} (${(cls.defaultRate / 100).toFixed(2)})
-                          </option>
-                        ))}
-                      </select>
-                      <div className="flex flex-wrap gap-3">
-                        <label className="flex items-center gap-2 text-sm text-slate-700">
-                          <input
-                            type="checkbox"
-                            checked={editForm.hookupsPower}
-                            onChange={(e) => setEditForm((s) => (s ? { ...s, hookupsPower: e.target.checked } : s))}
-                          />
-                          Power
-                        </label>
-                        <label className="flex items-center gap-2 text-sm text-slate-700">
-                          <input
-                            type="checkbox"
-                            checked={editForm.hookupsWater}
-                            onChange={(e) => setEditForm((s) => (s ? { ...s, hookupsWater: e.target.checked } : s))}
-                          />
-                          Water
-                        </label>
-                        <label className="flex items-center gap-2 text-sm text-slate-700">
-                          <input
-                            type="checkbox"
-                            checked={editForm.hookupsSewer}
-                            onChange={(e) => setEditForm((s) => (s ? { ...s, hookupsSewer: e.target.checked } : s))}
-                          />
-                          Sewer
-                        </label>
-                        <label className="flex items-center gap-2 text-sm text-slate-700">
-                          <input
-                            type="checkbox"
-                            checked={editForm.petFriendly}
-                            onChange={(e) => setEditForm((s) => (s ? { ...s, petFriendly: e.target.checked } : s))}
-                          />
-                          Pet friendly
-                        </label>
-                        <label className="flex items-center gap-2 text-sm text-slate-700">
-                          <input
-                            type="checkbox"
-                            checked={editForm.accessible}
-                            onChange={(e) => setEditForm((s) => (s ? { ...s, accessible: e.target.checked } : s))}
-                          />
-                          Accessible
-                        </label>
-                      </div>
-                      <input
-                        type="number"
-                        className="rounded-md border border-slate-200 px-3 py-2"
-                        placeholder="Min nights"
-                        value={editForm.minNights}
-                        onChange={(e) => setEditForm((s) => (s ? { ...s, minNights: e.target.value === "" ? "" : Number(e.target.value) } : s))}
-                      />
-                      <input
-                        type="number"
-                        className="rounded-md border border-slate-200 px-3 py-2"
-                        placeholder="Max nights"
-                        value={editForm.maxNights}
-                        onChange={(e) => setEditForm((s) => (s ? { ...s, maxNights: e.target.value === "" ? "" : Number(e.target.value) } : s))}
-                      />
-                      <div className="md:col-span-2 space-y-1">
-                        <label className="text-xs font-semibold text-slate-700">Photos (comma-separated URLs)</label>
-                        <div className="bg-slate-50 p-2 rounded border border-slate-100 mb-2">
-                          <div className="text-xs text-slate-500 mb-2">Upload photo:</div>
-                          <ImageUpload
-                            onChange={(url) => {
-                              if (!url) return;
-                              const current = editForm.photos ? editForm.photos.split(",").map(p => p.trim()).filter(Boolean) : [];
-                              setEditForm(s => (s ? { ...s, photos: [...current, url].join(", ") } : s));
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex items-center gap-1">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="h-8 w-8 p-0"
+                            onClick={() => {
+                              setEditingId(isEditing ? null : site.id);
+                              if (!isEditing) {
+                                setEditForm({
+                                  name: site.name,
+                                  siteNumber: site.siteNumber,
+                                  siteType: site.siteType,
+                                  maxOccupancy: site.maxOccupancy,
+                                  rigMaxLength: site.rigMaxLength ?? "",
+                                  hookupsPower: !!site.hookupsPower,
+                                  hookupsWater: !!site.hookupsWater,
+                                  hookupsSewer: !!site.hookupsSewer,
+                                  powerAmps: site.powerAmps?.toString() ?? "",
+                                  petFriendly: !!site.petFriendly,
+                                  accessible: !!site.accessible,
+                                  minNights: site.minNights ?? "",
+                                  maxNights: site.maxNights ?? "",
+                                  photos: site.photos?.join(", ") ?? "",
+                                  description: site.description ?? "",
+                                  tags: site.tags?.join(", ") ?? "",
+                                  siteClassId: site.siteClassId ?? "",
+                                  isActive: site.isActive !== false
+                                });
+                              } else {
+                                setEditForm(null);
+                              }
                             }}
-                            placeholder="Upload site photo"
-                          />
+                            title="Edit"
+                          >
+                            <Pencil className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="h-8 w-8 p-0 text-red-600 hover:text-red-700 hover:bg-red-50"
+                            onClick={() => handleDelete(site.id, site.name)}
+                            disabled={deleteSite.isPending}
+                            title="Delete"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
                         </div>
-                        <textarea
-                          className="rounded-md border border-slate-200 px-3 py-2 w-full text-xs"
-                          placeholder="https://img1.jpg, https://img2.jpg"
-                          value={editForm.photos}
-                          onChange={(e) => setEditForm((s) => (s ? { ...s, photos: e.target.value } : s))}
-                        />
-                        {editForm.photos &&
-                          editForm.photos.split(",").map((p) => p.trim()).filter(Boolean).length > 0 && (
-                            <div className="mt-2 grid grid-cols-2 sm:grid-cols-3 gap-2">
-                              {editForm.photos
-                                .split(",")
-                                .map((p) => p.trim())
-                                .filter(Boolean)
-                                .map((url) => (
-                                  <div key={url} className="text-[10px] truncate rounded border border-slate-200 bg-slate-50 p-1">
-                                    {url}
-                                  </div>
+                      </TableCell>
+                    </TableRow>
+                    {/* Expandable edit row */}
+                    {isEditing && editForm && (
+                      <TableRow>
+                        <TableCell colSpan={8} className="bg-slate-50 p-0">
+                          <div className="p-4 border-t border-b border-slate-200 space-y-4">
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
+                              <input
+                                className="rounded-md border border-slate-200 px-3 py-2"
+                                placeholder="Name"
+                                value={editForm.name}
+                                onChange={(e) => setEditForm((s) => (s ? { ...s, name: e.target.value } : s))}
+                              />
+                              <input
+                                className="rounded-md border border-slate-200 px-3 py-2"
+                                placeholder="Site number"
+                                value={editForm.siteNumber}
+                                onChange={(e) => setEditForm((s) => (s ? { ...s, siteNumber: e.target.value } : s))}
+                              />
+                              <select
+                                className="rounded-md border border-slate-200 px-3 py-2"
+                                value={editForm.siteType}
+                                onChange={(e) => setEditForm((s) => (s ? { ...s, siteType: e.target.value } : s))}
+                              >
+                                <option value="rv">RV</option>
+                                <option value="tent">Tent</option>
+                                <option value="cabin">Cabin</option>
+                                <option value="group">Group</option>
+                                <option value="glamping">Glamping</option>
+                              </select>
+                              <select
+                                className="rounded-md border border-slate-200 px-3 py-2"
+                                value={editForm.siteClassId ?? ""}
+                                onChange={(e) => setEditForm((s) => (s ? { ...s, siteClassId: e.target.value || "" } : s))}
+                              >
+                                <option value="">Select class (optional)</option>
+                                {classesQuery.data?.map((cls) => (
+                                  <option key={cls.id} value={cls.id}>
+                                    {cls.name} (${(cls.defaultRate / 100).toFixed(2)})
+                                  </option>
                                 ))}
+                              </select>
                             </div>
-                          )}
-                      </div>
-                      <input
-                        className="rounded-md border border-slate-200 px-3 py-2 md:col-span-2"
-                        placeholder="Tags (comma-separated)"
-                        value={editForm.tags}
-                        onChange={(e) => setEditForm((s) => (s ? { ...s, tags: e.target.value } : s))}
-                      />
-                      <textarea
-                        className="rounded-md border border-slate-200 px-3 py-2 md:col-span-2"
-                        placeholder="Description"
-                        value={editForm.description}
-                        onChange={(e) => setEditForm((s) => (s ? { ...s, description: e.target.value } : s))}
-                      />
-                    </div>
-                    <div className="flex items-center gap-3">
-                      <Button
-                        size="sm"
-                        onClick={() => {
-                          if (!editForm) return;
-                          updateSite.mutate({ id: site.id, data: mapFormToPayload(editForm, { clearEmptyAsNull: true }) });
-                        }}
-                        disabled={updateSite.isPending}
-                      >
-                        {updateSite.isPending ? "Saving..." : "Save changes"}
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        onClick={() => {
-                          setEditingId(null);
-                          setEditForm(null);
-                        }}
-                        disabled={updateSite.isPending}
-                      >
-                        Cancel
-                      </Button>
-                      {updateSite.isError && <span className="text-sm text-red-600">Failed to update</span>}
-                    </div>
-                  </div>
-                )}
-              </div>
-            );
-          })}
-          {!isLoading && !data?.length && <div className="text-slate-600">No sites yet.</div>}
+                            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                              <input
+                                type="number"
+                                className="rounded-md border border-slate-200 px-3 py-2"
+                                placeholder="Max occupancy"
+                                value={editForm.maxOccupancy}
+                                onChange={(e) =>
+                                  setEditForm((s) => (s ? { ...s, maxOccupancy: e.target.value === "" ? 0 : Number(e.target.value) } : s))
+                                }
+                              />
+                              <input
+                                type="number"
+                                className="rounded-md border border-slate-200 px-3 py-2"
+                                placeholder="Rig max length (ft)"
+                                value={editForm.rigMaxLength}
+                                onChange={(e) => setEditForm((s) => (s ? { ...s, rigMaxLength: e.target.value === "" ? "" : Number(e.target.value) } : s))}
+                              />
+                              <select
+                                className="rounded-md border border-slate-200 px-3 py-2"
+                                value={editForm.powerAmps}
+                                onChange={(e) => setEditForm((s) => (s ? { ...s, powerAmps: e.target.value } : s))}
+                              >
+                                <option value="">Power amps</option>
+                                {POWER_AMP_OPTIONS.filter(o => o.value).map((opt) => (
+                                  <option key={opt.value} value={opt.value}>{opt.label}</option>
+                                ))}
+                              </select>
+                              <input
+                                type="number"
+                                className="rounded-md border border-slate-200 px-3 py-2"
+                                placeholder="Min nights"
+                                value={editForm.minNights}
+                                onChange={(e) => setEditForm((s) => (s ? { ...s, minNights: e.target.value === "" ? "" : Number(e.target.value) } : s))}
+                              />
+                            </div>
+                            <div className="flex flex-wrap items-center gap-4">
+                              <span className="text-xs font-semibold text-slate-600">Hookups:</span>
+                              <label className="flex items-center gap-2 text-sm text-slate-700">
+                                <input
+                                  type="checkbox"
+                                  checked={editForm.hookupsPower}
+                                  onChange={(e) => setEditForm((s) => (s ? { ...s, hookupsPower: e.target.checked } : s))}
+                                />
+                                Power
+                              </label>
+                              <label className="flex items-center gap-2 text-sm text-slate-700">
+                                <input
+                                  type="checkbox"
+                                  checked={editForm.hookupsWater}
+                                  onChange={(e) => setEditForm((s) => (s ? { ...s, hookupsWater: e.target.checked } : s))}
+                                />
+                                Water
+                              </label>
+                              <label className="flex items-center gap-2 text-sm text-slate-700">
+                                <input
+                                  type="checkbox"
+                                  checked={editForm.hookupsSewer}
+                                  onChange={(e) => setEditForm((s) => (s ? { ...s, hookupsSewer: e.target.checked } : s))}
+                                />
+                                Sewer
+                              </label>
+                              <span className="text-xs font-semibold text-slate-600 ml-4">Features:</span>
+                              <label className="flex items-center gap-2 text-sm text-slate-700">
+                                <input
+                                  type="checkbox"
+                                  checked={editForm.petFriendly}
+                                  onChange={(e) => setEditForm((s) => (s ? { ...s, petFriendly: e.target.checked } : s))}
+                                />
+                                Pet friendly
+                              </label>
+                              <label className="flex items-center gap-2 text-sm text-slate-700">
+                                <input
+                                  type="checkbox"
+                                  checked={editForm.accessible}
+                                  onChange={(e) => setEditForm((s) => (s ? { ...s, accessible: e.target.checked } : s))}
+                                />
+                                Accessible
+                              </label>
+                            </div>
+                            <div className="flex items-center gap-3 pt-2 border-t border-slate-200">
+                              <Button
+                                size="sm"
+                                onClick={() => {
+                                  if (!editForm) return;
+                                  updateSite.mutate({ id: site.id, data: mapFormToPayload(editForm, { clearEmptyAsNull: true }) });
+                                }}
+                                disabled={updateSite.isPending}
+                              >
+                                {updateSite.isPending ? "Saving..." : "Save changes"}
+                              </Button>
+                              <Button
+                                size="sm"
+                                variant="ghost"
+                                onClick={() => {
+                                  setEditingId(null);
+                                  setEditForm(null);
+                                }}
+                                disabled={updateSite.isPending}
+                              >
+                                Cancel
+                              </Button>
+                              <span className="text-xs text-slate-400">Cmd+S to save, Escape to cancel</span>
+                              {updateSite.isError && <span className="text-sm text-red-600">Failed to update</span>}
+                            </div>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    )}
+                  </React.Fragment>
+                );
+              })}
+              {filteredSites.length === 0 && !isLoading && (
+                <TableRow>
+                  <TableCell colSpan={8} className="text-center py-8 text-slate-500">
+                    {data?.length === 0 ? "No sites yet. Click '+ Add Site' to create one." : "No sites match your filters."}
+                  </TableCell>
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
         </div>
       </div>
     </DashboardShell>
