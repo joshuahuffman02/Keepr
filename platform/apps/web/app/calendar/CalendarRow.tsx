@@ -1,6 +1,7 @@
 import { memo } from "react";
 import { ReservationPill } from "./ReservationPill";
 import { RowSelectionOverlay } from "./RowSelectionOverlay";
+import { useCalendarContext } from "./CalendarContext";
 import { cn } from "../../lib/utils";
 import type { CalendarSite, CalendarReservation, CalendarSelection, GanttSelection, DayMeta } from "./types";
 import { Wrench, Sparkles, AlertTriangle, Calendar, Tent } from "lucide-react";
@@ -37,6 +38,7 @@ export const CalendarRow = memo(function CalendarRow({
     handlers,
     today
 }: CalendarRowProps) {
+    const { dragState } = useCalendarContext();
     const { onDragStart, onDragEnter, onDragEnd, onReservationClick, onQuickCheckIn } = handlers;
 
     const isArrivalToday = (res: CalendarReservation) => {
@@ -102,7 +104,7 @@ export const CalendarRow = memo(function CalendarRow({
                     style={{ gridTemplateColumns: `repeat(${dayCount}, minmax(94px, 1fr))` }}
                 >
                     {/* Active Drag Selection Overlay (Smarter re-renders) */}
-                    <RowSelectionOverlay siteId={site.id} dayCount={dayCount} />
+                    <RowSelectionOverlay siteId={site.id} siteName={site.name} dayCount={dayCount} />
 
                     {/* Stored Selection Pill */}
                     {selection &&
@@ -161,6 +163,7 @@ export const CalendarRow = memo(function CalendarRow({
                                     onPointerUp={(e) => e.stopPropagation()}
                                     onQuickCheckIn={onQuickCheckIn}
                                     isArrivalToday={isArrivalToday(res)}
+                                    isDragging={dragState.isDragging}
                                 />
                             </div>
                         );

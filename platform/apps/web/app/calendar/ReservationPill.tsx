@@ -14,6 +14,7 @@ interface ReservationPillProps {
     onPointerUp: (e: React.PointerEvent) => void;
     onQuickCheckIn?: (reservationId: string) => void;
     isArrivalToday?: boolean;
+    isDragging?: boolean;
 }
 
 export function ReservationPill({
@@ -27,7 +28,8 @@ export function ReservationPill({
     needsCleaning,
     hasConflict,
     onQuickCheckIn,
-    isArrivalToday
+    isArrivalToday,
+    isDragging
 }: ReservationPillProps) {
     // Wrapper handlers that stop propagation to prevent double events
     const handleClick = (e: React.MouseEvent) => {
@@ -96,7 +98,8 @@ export function ReservationPill({
                 config.bg,
                 config.border,
                 config.shadow,
-                isHighlighted ? "ring-2 ring-white/60 ring-offset-2 ring-offset-slate-100 z-20 shadow-lg" : "z-10"
+                isHighlighted ? "ring-2 ring-white/60 ring-offset-2 ring-offset-slate-100 z-20 shadow-lg" : "z-10",
+                isDragging && "pointer-events-none opacity-40 grayscale-[0.5]"
             )}
             style={style}
             title={`${guestName} • ${reservation.status}`}
