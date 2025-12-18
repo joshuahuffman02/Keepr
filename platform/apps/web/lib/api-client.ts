@@ -7160,6 +7160,114 @@ export const apiClient = {
     });
     return parseResponse<{ id: string; amountCents: number; status: string }>(res);
   },
+
+  // Data Import
+  async getImportSchema(campgroundId: string, entityType: string) {
+    const data = await fetchJSON<unknown>(`/campgrounds/${campgroundId}/import/schema/${entityType}`);
+    return data as {
+      entityType: string;
+      requiredFields: string[];
+      optionalFields: string[];
+      fieldDescriptions: Record<string, string>;
+      exampleCSV: string;
+    };
+  },
+
+  async getImportTemplate(campgroundId: string, entityType: string) {
+    const res = await fetch(`${API_BASE}/campgrounds/${campgroundId}/import/template/${entityType}`, {
+      headers: scopedHeaders(),
+    });
+    return res.text();
+  },
+
+  async detectImportFormat(campgroundId: string, payload: { csvContent: string; entityType: string }) {
+    const res = await fetch(`${API_BASE}/campgrounds/${campgroundId}/import/detect`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", ...scopedHeaders() },
+      body: JSON.stringify(payload),
+    });
+    return parseResponse<{
+      format: string;
+      confidence: number;
+      headers: string[];
+      suggestedMappings: Array<{
+        sourceField: string;
+        suggestedTarget: string;
+        confidence: number;
+      }>;
+    }>(res);
+  },
+
+  async previewImport(campgroundId: string, payload: {
+    csvContent: string;
+    entityType: string;
+    fieldMappings: Array<{ sourceField: string; targetField: string }>;
+  }) {
+    const res = await fetch(`${API_BASE}/campgrounds/${campgroundId}/import/preview`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", ...scopedHeaders() },
+      body: JSON.stringify(payload),
+    });
+    return parseResponse<{
+      totalRows: number;
+      validRows: number;
+      newSites?: number;
+      updateSites?: number;
+      newGuests?: number;
+      updateGuests?: number;
+      duplicateEmails?: number;
+      errors: Array<{ row: number; message: string }>;
+      warnings: Array<{ row: number; message: string }>;
+      preview: Array<{
+        rowNumber: number;
+        data: Record<string, unknown>;
+        action: "create" | "update" | "skip";
+        existingSite?: { id: string; siteNumber: string };
+        existingGuest?: { id: string; email: string };
+      }>;
+    }>(res);
+  },
+
+  async executeImport(campgroundId: string, payload: {
+    csvContent: string;
+    entityType: string;
+    fieldMappings: Array<{ sourceField: string; targetField: string }>;
+    updateExisting?: boolean;
+  }) {
+    const res = await fetch(`${API_BASE}/campgrounds/${campgroundId}/import/execute`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", ...scopedHeaders() },
+      body: JSON.stringify(payload),
+    });
+    return parseResponse<{
+      jobId: string;
+      success: boolean;
+      created: number;
+      updated: number;
+      skipped: number;
+      errors: Array<{ row: number; message: string }>;
+    }>(res);
+  },
+
+  async getImportJobStatus(jobId: string) {
+    const data = await fetchJSON<unknown>(`/import/jobs/${jobId}`);
+    return data as {
+      id: string;
+      campgroundId: string;
+      entityType: string;
+      format: string;
+      status: "pending" | "processing" | "completed" | "failed";
+      totalRows: number;
+      processedRows: number;
+      createdCount: number;
+      updatedCount: number;
+      skippedCount: number;
+      errorCount: number;
+      errors: Array<{ row: number; message: string }>;
+      createdAt: string;
+      completedAt?: string;
+    };
+  },
 };
 
 export type PublicCampgroundList = z.infer<typeof PublicCampgroundListSchema>;

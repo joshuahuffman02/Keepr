@@ -27,22 +27,38 @@ export function HeroSection() {
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
                 <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
               </span>
-              🚀 Early access now open — Join the waitlist
+              Tired of clunky software? There's a better way.
             </div>
 
             {/* Headline */}
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight text-slate-900">
-              The Most Powerful Platform for{' '}
+              The Modern Alternative to{' '}
               <span className="bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent">
-                Campground Owners
+                Legacy Reservation Systems
               </span>
             </h1>
 
             {/* Subheadline */}
             <p className="text-xl text-slate-600 leading-relaxed">
-              Streamline operations, boost revenue, and deliver exceptional guest experiences
-              with the all-in-one management system built specifically for campgrounds and RV parks.
+              Ditch the outdated software, confusing contracts, and nickel-and-dime fees.
+              Camp Everyday is built for 2025 — fast, simple, and priced fairly.
             </p>
+
+            {/* Pain Points */}
+            <div className="flex flex-wrap gap-3 text-sm">
+              <span className="inline-flex items-center px-3 py-1 rounded-full bg-red-50 text-red-700 border border-red-100">
+                <span className="mr-1.5">✗</span> No contracts
+              </span>
+              <span className="inline-flex items-center px-3 py-1 rounded-full bg-red-50 text-red-700 border border-red-100">
+                <span className="mr-1.5">✗</span> No setup fees
+              </span>
+              <span className="inline-flex items-center px-3 py-1 rounded-full bg-red-50 text-red-700 border border-red-100">
+                <span className="mr-1.5">✗</span> No hidden costs
+              </span>
+              <span className="inline-flex items-center px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-100">
+                <span className="mr-1.5">✓</span> Go live in 48 hours
+              </span>
+            </div>
 
             {/* CTA Buttons */}
             <div className="flex flex-col sm:flex-row gap-4">
@@ -74,10 +90,10 @@ export function HeroSection() {
                 ))}
               </div>
               <div className="text-sm text-slate-600">
-                <div className="font-semibold text-slate-900">Built for campground owners</div>
+                <div className="font-semibold text-slate-900">Switching from Campspot or Newbook?</div>
                 <div className="flex items-center gap-1">
                   <span className="text-emerald-600">✦</span>
-                  <span className="text-slate-600">Join early access today</span>
+                  <span className="text-slate-600">We migrate your data for free</span>
                 </div>
               </div>
             </div>
@@ -102,12 +118,12 @@ export function HeroSection() {
               <div className="flex items-center gap-3">
                 <div className="h-12 w-12 rounded-lg bg-emerald-100 flex items-center justify-center">
                   <svg className="h-6 w-6 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
                   </svg>
                 </div>
                 <div>
-                  <div className="text-2xl font-bold text-slate-900">Unified ops</div>
-                  <div className="text-xs text-slate-600">Grid + POS + Comms</div>
+                  <div className="text-2xl font-bold text-slate-900">10x faster</div>
+                  <div className="text-xs text-slate-600">vs legacy systems</div>
                 </div>
               </div>
             </div>
@@ -116,13 +132,12 @@ export function HeroSection() {
               <div className="flex items-center gap-3">
                 <div className="h-12 w-12 rounded-lg bg-teal-100 flex items-center justify-center">
                   <svg className="h-6 w-6 text-teal-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7" />
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 13l8 8 8-8" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
                 </div>
                 <div>
-                  <div className="text-2xl font-bold text-slate-900">Guest-ready</div>
-                  <div className="text-xs text-slate-600">Self-serve check-in</div>
+                  <div className="text-2xl font-bold text-slate-900">50% less</div>
+                  <div className="text-xs text-slate-600">than competitors</div>
                 </div>
               </div>
             </div>

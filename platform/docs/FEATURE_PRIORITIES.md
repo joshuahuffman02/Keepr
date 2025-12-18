@@ -10,10 +10,10 @@ These are the 7 key features identified as critical for competitive positioning 
 
 | # | Feature | Status | Priority | Notes |
 |---|---------|--------|----------|-------|
-| 1 | Marketing messaging | Pending | P1 | Lean into "modern alternative to legacy systems" |
+| 1 | Marketing messaging | **DONE** | P1 | "Modern alternative to legacy systems" positioning |
 | 2 | Booking calendar upgrade | Pending | P1 | Major upgrade needed to compete with Campspot |
 | 3 | Interactive site map | Pending | P2 | Site selection via visual map |
-| 4 | **Onboarding/Import** | Pending | **P0 CRITICAL** | Bulletproof import from Campspot/Newbook - key for competitive switching |
+| 4 | Onboarding/Import | **DONE** | P0 | CSV/Campspot/Newbook import with field mapping UI |
 | 5 | Campground billing portal | **DONE** | P0 | Stripe subscription billing integrated |
 | 6 | Email/SMS integration | Partial | P1 | SMS exists via Twilio, needs polish |
 | 7 | Modern dashboard UI/UX | Pending | P2 | Visual refresh for modern feel |
@@ -21,6 +21,24 @@ These are the 7 key features identified as critical for competitive positioning 
 ---
 
 ## Completed
+
+### Marketing Messaging (Dec 2025)
+- Updated HeroSection with "Modern Alternative to Legacy Systems" headline
+- Added pain point badges (no contracts, no setup fees, no hidden costs)
+- Created WhySwitch component comparing Camp Everyday vs legacy systems
+- Updated OwnerCTA with switch-focused messaging
+- Updated pricing copy to emphasize savings vs competitors
+- Updated meta titles/descriptions for SEO
+- Explicitly calls out Campspot, Newbook, ResNexus as legacy alternatives
+
+### Onboarding/Import System (Dec 2025)
+- CSV parser with field mapping and auto-detection
+- Campspot format parser with field mappings
+- NewBook format parser with field mappings
+- Sites and Guests import support
+- Field mapping UI with suggestions
+- Preview before import with validation
+- Import wizard at `/dashboard/settings/import`
 
 ### Campground Billing Portal (Dec 2025)
 - Stripe subscription billing with metered usage
@@ -32,22 +50,20 @@ These are the 7 key features identified as critical for competitive positioning 
 
 ---
 
-## Next Up: Onboarding/Import System
+## Next Up: Booking Calendar Upgrade
 
 **Why it's critical:**
-- Biggest barrier to switching from competitors
-- If import is painful, campgrounds won't switch
-- Need to support: CSV, Campspot export, Newbook export
+- Main competitor differentiator (Campspot has superior calendar)
+- Most-used feature for daily operations
+- Current calendar needs modernization
 
 **Requirements:**
-- [ ] CSV/Excel universal import
-- [ ] Campspot format parser
-- [ ] Newbook format parser
-- [ ] Field mapping UI
-- [ ] Validation with clear error messages
-- [ ] Preview before import
-- [ ] Rollback capability
-- [ ] Import: Sites, Guests, Reservations, Pricing
+- [ ] Full-width calendar view
+- [ ] Drag-and-drop reservations
+- [ ] Multi-site selection
+- [ ] Quick booking modal
+- [ ] Color coding by status/site type
+- [ ] Better mobile experience
 
 ---
 

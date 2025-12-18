@@ -4,10 +4,10 @@ import { Building2, ArrowRight, CheckCircle2, Sparkles } from "lucide-react";
 import { cn } from "../../lib/utils";
 
 const benefits = [
-  "Lock in early access pricing forever",
-  "Only pay per booking - no monthly fees",
-  "Full control over your rates",
-  "Professional booking system",
+  "Free data migration from any system",
+  "Go live in 48 hours, not weeks",
+  "No contracts, cancel anytime",
+  "50% less than legacy systems",
 ];
 
 interface OwnerCTAProps {
@@ -21,7 +21,7 @@ export function OwnerCTA({ className }: OwnerCTAProps) {
         {/* Early Access Badge */}
         <div className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-amber-500/20 to-orange-500/20 border border-amber-500/30 rounded-full text-amber-400 text-sm font-medium mb-6">
           <Sparkles className="h-4 w-4" />
-          Early Access - Only 45 Spots Available
+          Founder pricing ends soon — Only 45 spots
         </div>
 
         {/* Icon */}
@@ -31,13 +31,13 @@ export function OwnerCTA({ className }: OwnerCTAProps) {
 
         {/* Headline */}
         <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold text-white mb-4">
-          Own a Campground?
+          Ready to Ditch Your Legacy System?
         </h2>
 
         {/* Subheadline */}
         <p className="text-lg text-slate-400 mb-8 max-w-2xl mx-auto">
-          Join our founding members and lock in the lowest rates forever.
-          Early access members get exclusive pricing that never increases.
+          Stop overpaying for outdated software. Camp Everyday is the modern reservation
+          system built for how you actually run your campground — fast, simple, affordable.
         </p>
 
         {/* Benefits */}
@@ -69,7 +69,7 @@ export function OwnerCTA({ className }: OwnerCTAProps) {
 
         {/* Small print */}
         <p className="mt-8 text-sm text-slate-500">
-          No credit card required. Set up in under 5 minutes. Lock in your rate today.
+          No credit card required. No contracts. We'll import your data from Campspot, Newbook, or any system.
         </p>
       </div>
     </section>

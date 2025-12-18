@@ -215,6 +215,11 @@ const settingsCategories: SettingCategory[] = [
         href: "/dashboard/settings/jobs",
         description: "Manage background jobs and scheduled tasks",
       },
+      {
+        name: "Data Import",
+        href: "/dashboard/settings/import",
+        description: "Import sites and guests from CSV or other systems",
+      },
     ],
   },
 ];

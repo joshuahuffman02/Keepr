@@ -210,15 +210,15 @@ export function PricingPreview() {
           </div>
 
           <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
-            Lock In Your Rate.{' '}
+            Pay Less Than Legacy Systems.{' '}
             <span className="bg-gradient-to-r from-amber-400 to-orange-400 bg-clip-text text-transparent">
               Forever.
             </span>
           </h2>
 
           <p className="text-xl text-slate-300 mb-8">
-            We're looking for our first 45 campgrounds to help us build the best platform in the industry.
-            In exchange, you get pricing that will never go up.
+            Stop overpaying for outdated software. Join 45 founding campgrounds who locked in
+            pricing that will never increase — while competitors raise rates every year.
           </p>
 
           <div className="flex flex-wrap items-center justify-center gap-6 text-slate-400">
