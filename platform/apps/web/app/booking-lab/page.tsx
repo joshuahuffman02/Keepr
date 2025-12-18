@@ -658,11 +658,11 @@ export default function BookingLabPage() {
                             <div className="text-sm font-semibold text-slate-900">{site.name}</div>
                             <Badge className={cn("text-[10px]", meta.badge)}>{meta.label}</Badge>
                           </div>
-                          <div className="text-xs text-slate-500">#{site.siteNumber} • {site.siteClass?.name || "Class"}</div>
+                          <div className="text-xs text-slate-500">#{site.siteNumber} • {site.siteClassName || "Class"}</div>
                           <div className="mt-2 flex items-center justify-between text-xs">
                             <span className="text-slate-500">{site.statusDetail || site.status}</span>
-                            {site.siteClass?.defaultRate ? (
-                              <span className="font-semibold text-slate-700">${(site.siteClass.defaultRate / 100).toFixed(0)}/night</span>
+                            {site.defaultRate ? (
+                              <span className="font-semibold text-slate-700">${(site.defaultRate / 100).toFixed(0)}/night</span>
                             ) : null}
                           </div>
                         </button>
