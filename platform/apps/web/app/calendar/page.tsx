@@ -12,7 +12,6 @@ import { recordMetric, recordError, startTiming } from "../../lib/calendar-metri
 import { useWhoami } from "@/hooks/use-whoami";
 import { CalendarRow } from "./CalendarRow";
 import { ListView } from "./ListView";
-import { ReservationHoverCard } from "./ReservationHoverCard";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../../components/ui/dialog";
 import { HelpAnchor } from "../../components/help/HelpAnchor";
 import { HelpTooltip, HelpTooltipContent, HelpTooltipSection } from "../../components/help/HelpTooltip";
@@ -1257,61 +1256,19 @@ export default function CalendarPage() {
           }
         />
 
-        {/* Summary Statistics */}
+        {/* Summary Statistics - Compact 3-column layout */}
         {selectedCampground && !sitesQuery.isLoading && !reservationsQuery.isLoading && (
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+          <div className="grid grid-cols-3 gap-3">
             <div className="card p-3">
-              <div className="flex items-center gap-1 text-xs text-slate-600 mb-1">
-                Reservations
-                <HelpTooltip
-                  content={<div>Total number of reservations visible in the current date range.</div>}
-                  side="top"
-                  maxWidth={220}
-                />
-              </div>
+              <div className="text-xs text-slate-600 mb-1">Reservations</div>
               <div className="text-2xl font-bold text-slate-900">{stats.totalReservations}</div>
             </div>
             <div className="card p-3">
-              <div className="flex items-center gap-1 text-xs text-slate-600 mb-1">
-                Revenue
-                <HelpTooltip
-                  content={<div>Total revenue from all reservations in the current date range, including deposits and outstanding balances.</div>}
-                  side="top"
-                  maxWidth={240}
-                />
-              </div>
-              <div className="text-2xl font-bold text-emerald-600">${stats.totalRevenue.toFixed(0)}</div>
-            </div>
-            <div className="card p-3">
-              <div className="flex items-center gap-1 text-xs text-slate-600 mb-1">
-                Occupancy
-                <HelpTooltip
-                  content={
-                    <div className="space-y-1">
-                      <p>Average occupancy rate across the date range.</p>
-                      <p className="text-xs text-slate-600">Calculated as: (occupied site-nights / total available site-nights) × 100</p>
-                    </div>
-                  }
-                  side="top"
-                  maxWidth={260}
-                />
-              </div>
+              <div className="text-xs text-slate-600 mb-1">Occupancy</div>
               <div className="text-2xl font-bold text-blue-600">{stats.occupancyRate.toFixed(1)}%</div>
             </div>
             <div className="card p-3">
-              <div className="flex items-center gap-1 text-xs text-slate-600 mb-1">
-                Avg Daily Rate
-                <HelpTooltip
-                  content={
-                    <div className="space-y-1">
-                      <p>Average revenue earned per occupied site per night.</p>
-                      <p className="text-xs text-slate-600">Formula: total revenue ÷ total occupied nights</p>
-                    </div>
-                  }
-                  side="top"
-                  maxWidth={260}
-                />
-              </div>
+              <div className="text-xs text-slate-600 mb-1">Avg Daily Rate</div>
               <div className="text-2xl font-bold text-purple-600">${stats.averageDailyRate.toFixed(0)}</div>
             </div>
           </div>
@@ -2343,6 +2300,7 @@ export default function CalendarPage() {
                       </div>
 
                       <div className="relative" style={{ gridColumn: "2 / -1" }}>
+                        {/* Background visual layer */}
                         <div className="grid" style={{ gridTemplateColumns: `repeat(${dayCount}, minmax(90px, 1fr))` }}>
                           {days.map((d, i) => {
                             const inSelection =
@@ -2366,22 +2324,21 @@ export default function CalendarPage() {
                             return (
                               <div
                                 key={i}
-                                className={`h-12 border-r border-slate-100 select-none ${zebra} ${d.isToday ? "bg-blue-50/50 border-l-2 border-l-blue-400" :
+                                className={`h-14 border-r border-slate-100 select-none ${zebra} ${d.isToday ? "bg-blue-50/50 border-l-2 border-l-blue-400" :
                                   d.weekend ? "bg-slate-100" : ""
-                                  } ${inSelection ? "bg-emerald-100 border-emerald-300" : ""} ${isBlackedOut ? "cursor-not-allowed" : "cursor-pointer"}`}
+                                  } ${inSelection ? "bg-emerald-100 border-emerald-300" : ""}`}
                                 style={isBlackedOut ? {
                                   background: "repeating-linear-gradient(45deg, #fecaca, #fecaca 4px, #fee2e2 4px, #fee2e2 8px)"
                                 } : undefined}
-                                onMouseDown={() => !isBlackedOut && handleMouseDown(site.id, i)}
-                                onMouseEnter={() => handleMouseEnter(i)}
-                                onMouseUp={() => !isBlackedOut && handleMouseUp(site.id, i)}
                                 title={isBlackedOut ? `Blocked: ${blackout?.reason || "Blackout"} (${blackout?.startDate?.slice(0, 10)} → ${blackout?.endDate?.slice(0, 10)})` : undefined}
                               />
                             );
                           })}
                         </div>
+
+                        {/* Reservation pills layer - visual only, no pointer events */}
                         <div
-                          className="grid absolute inset-0 items-stretch auto-rows-fr"
+                          className="grid absolute inset-0 items-center"
                           style={{ gridTemplateColumns: `repeat(${dayCount}, minmax(90px, 1fr))`, pointerEvents: "none" }}
                         >
                           {selectionActive &&
@@ -2395,15 +2352,14 @@ export default function CalendarPage() {
                               return (
                                 <div
                                   key="selection-pill-active"
-                                  className="rounded-md text-xs text-white shadow-sm flex items-center px-2 overflow-hidden bg-emerald-600 h-full w-full self-stretch"
+                                  className="h-10 rounded-md text-xs text-white shadow-sm flex items-center px-2 overflow-hidden bg-emerald-600 border-2 border-emerald-400 border-dashed"
                                   style={{
                                     gridColumn: `${selStart + 1} / span ${span}`,
                                     pointerEvents: "none",
-                                    zIndex: 5,
-                                    height: "100%"
+                                    zIndex: 15,
                                   }}
                                 >
-                                  <span className="truncate">Selecting…</span>
+                                  <span className="truncate font-medium">Selecting…</span>
                                 </div>
                               );
                             })()}
@@ -2417,15 +2373,14 @@ export default function CalendarPage() {
                               return (
                                 <div
                                   key="selection-pill-stored"
-                                  className="rounded-md text-xs text-white shadow-sm flex items-center px-2 overflow-hidden bg-purple-600 h-full w-full self-stretch"
+                                  className="h-10 rounded-md text-xs text-white shadow-sm flex items-center px-2 overflow-hidden bg-purple-600 border-2 border-purple-400"
                                   style={{
                                     gridColumn: `${selStartIdx + 1} / span ${span}`,
                                     pointerEvents: "none",
-                                    zIndex: 4,
-                                    height: "100%"
+                                    zIndex: 10,
                                   }}
                                 >
-                                  <span className="truncate">Selected</span>
+                                  <span className="truncate font-medium">Selected</span>
                                 </div>
                               );
                             })()}
@@ -2446,73 +2401,86 @@ export default function CalendarPage() {
                                     ? "bg-gradient-to-r from-rose-400 to-rose-500 border-rose-500/50 shadow-rose-500/25"
                                     : "bg-gradient-to-r from-amber-400 to-amber-500 border-amber-500/50 shadow-amber-500/25";
                             const guestName = `${(res as any).guest?.primaryFirstName || ""} ${(res as any).guest?.primaryLastName || ""}`.trim();
-                            const total = (res.totalAmount ?? 0) / 100;
-                            const nights = Math.max(1, endIdx - startIdx);
-                            const adr = nights > 0 ? total / nights : total;
                             const showQuickCheckIn = res.status === "confirmed" && isArrivalToday(res.arrivalDate);
                             return (
-                              <ReservationHoverCard
+                              <div
                                 key={res.id}
-                                reservation={{
-                                  ...res,
-                                  guest: (res as any).guest,
-                                  site: site,
+                                className={`group h-10 rounded-lg text-xs text-white shadow-md border flex items-center px-2.5 overflow-hidden transition-all duration-200 ease-out cursor-pointer hover:scale-[1.02] hover:shadow-lg active:scale-[0.98] ${statusStyles} ${ganttSelection.highlightedId === res.id ? "ring-2 ring-amber-300 scale-[1.02]" : ""}`}
+                                style={{
+                                  gridColumn: `${startIdx + 1} / span ${span}`,
+                                  minWidth: `${span * 90}px`,
+                                  pointerEvents: isDragging ? "none" : "auto",
+                                  zIndex: 20,
                                 }}
-                                onQuickCheckIn={showQuickCheckIn ? () => handleQuickCheckIn(res.id) : undefined}
-                                isArrivalToday={showQuickCheckIn}
+                                title={`${guestName || "Guest"} • ${res.status.replace("_", " ")}`}
+                                onMouseDown={(e) => {
+                                  e.stopPropagation();
+                                  setStoreSelection({ highlightedId: res.id, openDetailsId: res.id });
+                                }}
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setSelectedReservation(res);
+                                  setQuickActionRes(res.id);
+                                  setQuickActionAnchor(res.id);
+                                  setShowPopover(res.id);
+                                }}
+                                data-res-id={res.id}
                               >
-                                <div
-                                  className={`group rounded-lg text-xs text-white shadow-md border flex items-center px-2.5 overflow-hidden transition-all duration-200 ease-out cursor-pointer hover:scale-[1.02] hover:shadow-lg hover:z-20 active:scale-[0.98] ${statusStyles} ${ganttSelection.highlightedId === res.id ? "ring-2 ring-amber-300 scale-[1.02]" : ""
-                                    }`}
-                                  style={{
-                                    gridColumn: `${startIdx + 1} / span ${span}`,
-                                    minWidth: `${span * 90}px`,
-                                    pointerEvents: isDragging ? "none" : "auto",
-                                    height: "100%"
-                                  }}
-                                  onMouseDown={(e) => {
-                                    e.stopPropagation();
-                                    setDragSiteId(site.id);
-                                    setDragStartIdx(startIdx);
-                                    setDragEndIdx(startIdx);
-                                    setIsDragging(true);
-                                    setStoreSelection({ highlightedId: res.id, openDetailsId: res.id });
-                                  }}
-                                  onMouseUp={(e) => {
-                                    e.stopPropagation();
-                                    if (isDragging && dragStartIdx !== null) {
-                                      handleMouseUp(site.id, startIdx);
-                                    }
-                                  }}
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    setSelectedReservation(res);
-                                    setQuickActionRes(res.id);
-                                    setQuickActionAnchor(res.id);
-                                    setShowPopover(res.id);
-                                  }}
-                                  data-res-id={res.id}
-                                >
-                                  <span className="truncate flex items-center gap-1 flex-1">
-                                    {guestName || "Guest"} — {res.status.replace("_", " ")}
-                                    {conflictHit && <AlertTriangle className="h-3.5 w-3.5 text-amber-100" />}
-                                  </span>
-                                  {/* Quick Check-in Button - Shows on hover for confirmed arrivals today */}
-                                  {showQuickCheckIn && (
-                                    <button
-                                      type="button"
-                                      onClick={(e) => {
-                                        e.stopPropagation();
-                                        handleQuickCheckIn(res.id);
-                                      }}
-                                      className="ml-1 opacity-0 group-hover:opacity-100 transition-opacity bg-white/90 text-emerald-700 rounded-full p-1 hover:bg-white shadow-sm flex-shrink-0"
-                                      title="Quick Check-in"
-                                    >
-                                      <LogIn className="h-3 w-3" />
-                                    </button>
-                                  )}
-                                </div>
-                              </ReservationHoverCard>
+                                <span className="truncate flex items-center gap-1 flex-1">
+                                  {guestName || "Guest"} — {res.status.replace("_", " ")}
+                                  {conflictHit && <AlertTriangle className="h-3.5 w-3.5 text-amber-100" />}
+                                </span>
+                                {showQuickCheckIn && (
+                                  <button
+                                    type="button"
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      handleQuickCheckIn(res.id);
+                                    }}
+                                    className="ml-1 opacity-0 group-hover:opacity-100 transition-opacity bg-white/90 text-emerald-700 rounded-full p-1 hover:bg-white shadow-sm flex-shrink-0"
+                                    title="Quick Check-in"
+                                  >
+                                    <LogIn className="h-3 w-3" />
+                                  </button>
+                                )}
+                              </div>
+                            );
+                          })}
+                        </div>
+
+                        {/* Transparent interaction layer for drag selection - sits on top */}
+                        <div
+                          className="grid absolute inset-0"
+                          style={{ gridTemplateColumns: `repeat(${dayCount}, minmax(90px, 1fr))`, zIndex: 40 }}
+                        >
+                          {days.map((d, i) => {
+                            const blackout = (blackoutsQuery.data || []).find((b) => {
+                              const bStart = new Date(b.startDate);
+                              const bEnd = new Date(b.endDate);
+                              bStart.setHours(0, 0, 0, 0);
+                              bEnd.setHours(0, 0, 0, 0);
+                              const day = new Date(d.date);
+                              day.setHours(0, 0, 0, 0);
+                              const inRange = day >= bStart && day <= bEnd;
+                              const matchesSite = !b.siteId || b.siteId === site.id;
+                              return inRange && matchesSite;
+                            });
+                            const isBlackedOut = !!blackout;
+                            // Check if there's a reservation on this day
+                            const hasReservation = siteReservations.some((res) => {
+                              const resStart = toLocalDate(res.arrivalDate);
+                              const resEnd = toLocalDate(res.departureDate);
+                              return d.date >= resStart && d.date < resEnd;
+                            });
+                            return (
+                              <div
+                                key={i}
+                                className={`h-full ${isBlackedOut ? "cursor-not-allowed" : "cursor-pointer"}`}
+                                style={{ pointerEvents: hasReservation && !isDragging ? "none" : "auto" }}
+                                onMouseDown={() => !isBlackedOut && handleMouseDown(site.id, i)}
+                                onMouseEnter={() => handleMouseEnter(i)}
+                                onMouseUp={() => !isBlackedOut && handleMouseUp(site.id, i)}
+                              />
                             );
                           })}
                         </div>
