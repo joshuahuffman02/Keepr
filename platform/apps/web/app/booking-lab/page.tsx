@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { Suspense, useEffect, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
@@ -50,6 +50,14 @@ const PAYMENT_METHODS = [
 ];
 
 export default function BookingLabPage() {
+  return (
+    <Suspense fallback={<div className="p-8 text-sm text-slate-500">Loading booking lab...</div>}>
+      <BookingLabPageInner />
+    </Suspense>
+  );
+}
+
+function BookingLabPageInner() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const queryClient = useQueryClient();
