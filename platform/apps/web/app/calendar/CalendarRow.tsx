@@ -52,6 +52,7 @@ export const CalendarRow = memo(function CalendarRow({
         <div
             className="grid relative group hover:bg-slate-50/50 transition-colors"
             style={{ gridTemplateColumns: gridTemplate }}
+            onDragStart={(e) => e.preventDefault()}
         >
             {/* Site Info Column */}
             <div className={cn("px-4 py-3 sticky left-0 z-20 border-r border-slate-200 flex flex-col justify-center", zebra)}>

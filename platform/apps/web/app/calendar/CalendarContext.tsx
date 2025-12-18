@@ -32,7 +32,7 @@ export function CalendarProvider({ children }: { children: React.ReactNode }) {
 
         setDragState({
             ...state,
-            isDragging: state.startIdx !== state.endIdx
+            isDragging: state.siteId !== null
         });
     }, []);
 

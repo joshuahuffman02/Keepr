@@ -30,9 +30,9 @@ export function CalendarGrid({ data, onSelectionComplete }: CalendarGridProps) {
 
     const handleDragEnter = useCallback((siteId: string, dayIdx: number) => {
         const drag = dragRef.current;
-        if (drag.siteId === siteId && drag.startIdx !== null) {
+        if (drag.siteId && drag.startIdx !== null) {
             drag.endIdx = dayIdx;
-            drag.isDragging = dayIdx !== drag.startIdx;
+            drag.isDragging = true;
             setDragVisual({ siteId: drag.siteId, startIdx: drag.startIdx, endIdx: dayIdx });
         }
     }, [setDragVisual, dragRef]);
@@ -107,6 +107,7 @@ export function CalendarGrid({ data, onSelectionComplete }: CalendarGridProps) {
                                 onDragEnd: handleDragEnd,
                                 onReservationClick: (id) => console.log("Click", id),
                             }}
+                            onDragStart={(e: React.DragEvent) => e.preventDefault()}
                             today={new Date()}
                         />
                     ))}
