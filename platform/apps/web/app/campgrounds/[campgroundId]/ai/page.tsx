@@ -8,6 +8,7 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
 import { Brain, Shield, Zap, BarChart3, TrendingUp, MessageSquare, AlertCircle } from "lucide-react";
 import { apiClient } from "@/lib/api-client";
+import { AiPartnerPanel } from "@/components/ai/AiPartnerPanel";
 
 interface AiSettings {
     id: string;
@@ -312,6 +313,8 @@ export default function AiSettingsPage() {
                                 </CardContent>
                             </Card>
                         )}
+
+                        <AiPartnerPanel campgroundId={campgroundId} />
                     </>
                 )}
             </div>

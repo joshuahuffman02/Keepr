@@ -5694,6 +5694,17 @@ export const apiClient = {
     });
     return parseResponse<{ answer: string; usage?: { promptTokens: number | null; completionTokens: number | null; totalTokens: number | null } }>(res);
   },
+  async aiPartnerChat(
+    campgroundId: string,
+    payload: { sessionId?: string; message: string; history?: { role: "user" | "assistant"; content: string }[] }
+  ) {
+    const res = await fetch(`${API_BASE}/ai/campgrounds/${campgroundId}/partner`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", ...scopedHeaders() },
+      body: JSON.stringify(payload),
+    });
+    return parseResponse<any>(res);
+  },
 
   // -------------------------------------------------------------------------
   // Social Media Planner

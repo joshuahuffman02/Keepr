@@ -152,7 +152,11 @@ function BookingLabPageInner() {
     primaryFirstName: "",
     primaryLastName: "",
     email: "",
-    phone: ""
+    phone: "",
+    address1: "",
+    city: "",
+    state: "",
+    postalCode: ""
   });
 
   const [formData, setFormData] = useState({
@@ -168,6 +172,8 @@ function BookingLabPageInner() {
     siteClassId: "",
     lockSite: false,
     notes: "",
+    referralSource: "",
+    stayReason: "",
     collectPayment: true,
     paymentAmount: "",
     paymentMethod: "card",
@@ -405,13 +411,17 @@ function BookingLabPageInner() {
       primaryLastName: guestForm.primaryLastName,
       email: guestForm.email,
       phone: guestForm.phone,
+      address1: guestForm.address1 || undefined,
+      city: guestForm.city || undefined,
+      state: guestForm.state || undefined,
+      postalCode: guestForm.postalCode || undefined,
       ...(campgroundGuestTag ? { tags: [campgroundGuestTag] } : {})
     }),
     onSuccess: (guest) => {
       setFormData((prev) => ({ ...prev, guestId: guest.id }));
       setGuestSearch(`${guest.primaryFirstName} ${guest.primaryLastName}`.trim());
       setShowNewGuest(false);
-      setGuestForm({ primaryFirstName: "", primaryLastName: "", email: "", phone: "" });
+      setGuestForm({ primaryFirstName: "", primaryLastName: "", email: "", phone: "", address1: "", city: "", state: "", postalCode: "" });
       queryClient.setQueryData(
         ["booking-lab-guests", selectedCampground?.id],
         (current: typeof guests | undefined) => {
@@ -461,6 +471,8 @@ function BookingLabPageInner() {
         rigType: formData.rigType || undefined,
         rigLength: formData.rigLength ? Number(formData.rigLength) : undefined,
         notes: formData.notes || undefined,
+        referralSource: formData.referralSource || undefined,
+        stayReasonPreset: formData.stayReason || undefined,
         totalAmount: totalCents,
         paidAmount: paidAmountCents,
         balanceAmount: Math.max(0, totalCents - paidAmountCents),
@@ -659,6 +671,28 @@ function BookingLabPageInner() {
                         value={guestForm.phone}
                         onChange={(e) => setGuestForm((prev) => ({ ...prev, phone: e.target.value }))}
                       />
+                      <Input
+                        placeholder="Street address"
+                        value={guestForm.address1}
+                        onChange={(e) => setGuestForm((prev) => ({ ...prev, address1: e.target.value }))}
+                      />
+                      <div className="grid gap-2 sm:grid-cols-3">
+                        <Input
+                          placeholder="City"
+                          value={guestForm.city}
+                          onChange={(e) => setGuestForm((prev) => ({ ...prev, city: e.target.value }))}
+                        />
+                        <Input
+                          placeholder="State"
+                          value={guestForm.state}
+                          onChange={(e) => setGuestForm((prev) => ({ ...prev, state: e.target.value }))}
+                        />
+                        <Input
+                          placeholder="ZIP"
+                          value={guestForm.postalCode}
+                          onChange={(e) => setGuestForm((prev) => ({ ...prev, postalCode: e.target.value }))}
+                        />
+                      </div>
                       <Button
                         size="sm"
                         className="w-full"
@@ -757,6 +791,52 @@ function BookingLabPageInner() {
                         value={formData.rigLength}
                         onChange={(e) => setFormData((prev) => ({ ...prev, rigLength: e.target.value }))}
                       />
+                    </div>
+                  </div>
+
+                  <div className="grid gap-2 sm:grid-cols-2">
+                    <div className="space-y-1">
+                      <Label className="text-xs text-slate-500">How did you hear about us?</Label>
+                      <Select
+                        value={formData.referralSource}
+                        onValueChange={(value) => setFormData((prev) => ({ ...prev, referralSource: value }))}
+                      >
+                        <SelectTrigger className="h-10">
+                          <SelectValue placeholder="Select source" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="google">Google Search</SelectItem>
+                          <SelectItem value="facebook">Facebook</SelectItem>
+                          <SelectItem value="instagram">Instagram</SelectItem>
+                          <SelectItem value="friend">Friend/Family</SelectItem>
+                          <SelectItem value="repeat">Repeat Guest</SelectItem>
+                          <SelectItem value="rvpark">RV Park Website</SelectItem>
+                          <SelectItem value="campspot">Campspot</SelectItem>
+                          <SelectItem value="hipcamp">Hipcamp</SelectItem>
+                          <SelectItem value="driving_by">Driving By</SelectItem>
+                          <SelectItem value="other">Other</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="space-y-1">
+                      <Label className="text-xs text-slate-500">Reason for visit</Label>
+                      <Select
+                        value={formData.stayReason}
+                        onValueChange={(value) => setFormData((prev) => ({ ...prev, stayReason: value }))}
+                      >
+                        <SelectTrigger className="h-10">
+                          <SelectValue placeholder="Select reason" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="vacation">Vacation</SelectItem>
+                          <SelectItem value="family_visit">Family Visit</SelectItem>
+                          <SelectItem value="event">Event</SelectItem>
+                          <SelectItem value="work_remote">Work/Remote</SelectItem>
+                          <SelectItem value="stopover">Stopover</SelectItem>
+                          <SelectItem value="relocation">Relocation</SelectItem>
+                          <SelectItem value="other">Other</SelectItem>
+                        </SelectContent>
+                      </Select>
                     </div>
                   </div>
 

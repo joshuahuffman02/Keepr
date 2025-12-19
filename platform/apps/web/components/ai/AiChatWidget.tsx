@@ -12,6 +12,7 @@ interface Message {
     role: "user" | "assistant";
     content: string;
     recommendations?: { siteName: string; siteClassName: string; reasons: string[] }[];
+    clarifyingQuestions?: string[];
 }
 
 interface AiChatWidgetProps {
@@ -30,6 +31,7 @@ export function AiChatWidget({ campgroundId, campgroundName }: AiChatWidgetProps
     const [sessionId] = useState(() => generateSessionId());
     const [hasConsented, setHasConsented] = useState(false);
     const messagesEndRef = useRef<HTMLDivElement>(null);
+    const inputRef = useRef<HTMLInputElement>(null);
     const router = useRouter();
 
     const scrollToBottom = () => {
@@ -60,6 +62,7 @@ export function AiChatWidget({ campgroundId, campgroundName }: AiChatWidgetProps
                 role: "assistant",
                 content: data.message,
                 recommendations: data.recommendations,
+                clarifyingQuestions: data.clarifyingQuestions || data.questions || [],
             };
             setMessages((prev) => [...prev, assistantMessage]);
 
@@ -143,6 +146,11 @@ export function AiChatWidget({ campgroundId, campgroundName }: AiChatWidgetProps
             e.preventDefault();
             handleSend();
         }
+    };
+
+    const handleQuickReply = (question: string) => {
+        setInput(question);
+        inputRef.current?.focus();
     };
 
     const handleConsent = () => {
@@ -245,8 +253,27 @@ export function AiChatWidget({ campgroundId, campgroundName }: AiChatWidgetProps
                                 >
                                     <p className="text-sm whitespace-pre-wrap">{msg.content}</p>
 
+                                    {msg.clarifyingQuestions && msg.clarifyingQuestions.length > 0 && (
+                                        <div className="mt-3 space-y-2">
+                                            <div className="text-xs font-semibold uppercase tracking-wide text-slate-500">Quick answers</div>
+                                            <div className="flex flex-wrap gap-2">
+                                                {msg.clarifyingQuestions.map((question, idx) => (
+                                                    <button
+                                                        key={`${question}-${idx}`}
+                                                        type="button"
+                                                        onClick={() => handleQuickReply(question)}
+                                                        className="rounded-full border border-slate-200 bg-white px-3 py-1 text-xs text-slate-600 hover:border-emerald-400 hover:text-emerald-600"
+                                                    >
+                                                        {question}
+                                                    </button>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    )}
+
                                     {msg.recommendations && msg.recommendations.length > 0 && (
                                         <div className="mt-3 space-y-2">
+                                            <div className="text-xs font-semibold uppercase tracking-wide text-slate-500">Recommended site classes</div>
                                             {msg.recommendations.map((rec, idx) => (
                                                 <div
                                                     key={idx}
@@ -296,6 +323,7 @@ export function AiChatWidget({ campgroundId, campgroundName }: AiChatWidgetProps
                                 placeholder="Describe what you're looking for..."
                                 className="flex-1 px-4 py-2 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 text-sm"
                                 disabled={chatMutation.isPending}
+                                ref={inputRef}
                             />
                             <button
                                 type="button"
