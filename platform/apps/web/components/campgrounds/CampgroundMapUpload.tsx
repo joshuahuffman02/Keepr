@@ -39,14 +39,22 @@ export function CampgroundMapUpload({
     if (!file) return;
     setIsUploading(true);
     try {
-      const formData = new FormData();
-      formData.append("file", file);
-      const res = await apiClient.uploadCampgroundMap(campgroundId, formData);
+      const contentType = file.type || "application/octet-stream";
+      const signed = await apiClient.signUpload({ filename: file.name, contentType });
+      const uploadRes = await fetch(signed.uploadUrl, {
+        method: "PUT",
+        headers: { "Content-Type": contentType },
+        body: file
+      });
+      if (!uploadRes.ok) {
+        throw new Error("Upload failed");
+      }
+      const res = await apiClient.uploadCampgroundMap(campgroundId, { url: signed.publicUrl });
       setPreview(res.url);
       toast({ title: "Map uploaded" });
       onUploaded?.(res.url);
     } catch (e) {
-      toast({ title: "Upload failed", variant: "destructive" });
+      toast({ title: "Upload failed", description: "Uploads may be disabled. Check storage settings.", variant: "destructive" });
     } finally {
       setIsUploading(false);
     }

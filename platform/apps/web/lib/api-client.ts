@@ -1474,7 +1474,7 @@ export const apiClient = {
   async signUpload(payload: { filename: string; contentType: string }) {
     const res = await fetch(`${API_BASE}/uploads/sign`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: { "Content-Type": "application/json", ...scopedHeaders() },
       body: JSON.stringify(payload)
     });
     if (!res.ok) {
@@ -6977,11 +6977,11 @@ export const apiClient = {
     });
     return parseResponse<unknown>(res);
   },
-  async uploadCampgroundMap(campgroundId: string, formData: FormData) {
+  async uploadCampgroundMap(campgroundId: string, payload: { url: string }) {
     const res = await fetch(`${API_BASE}/campgrounds/${campgroundId}/map`, {
       method: "POST",
-      headers: scopedHeaders(),
-      body: formData,
+      headers: { "Content-Type": "application/json", ...scopedHeaders() },
+      body: JSON.stringify(payload),
     });
     const data = await parseResponse<{ url: string }>(res);
     return data;
