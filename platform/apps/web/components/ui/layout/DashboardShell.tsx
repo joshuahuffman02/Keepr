@@ -456,6 +456,7 @@ export function DashboardShell({ children, className, title, subtitle }: { child
   const cgSitesPath = selected ? `/campgrounds/${selected}/sites` : "/campgrounds";
   const cgClassesPath = selected ? `/campgrounds/${selected}/classes` : "/campgrounds";
   const cgReservationsPath = selected ? `/campgrounds/${selected}/reservations` : "/reservations";
+  const cgMapPath = selected ? `/campgrounds/${selected}/settings?tab=advanced` : "/campgrounds";
   // Operations items for top bar quick actions (moved from sidebar)
   const operationsItems = useMemo<NavItem[]>(() => [
     { label: "Check In/Out", href: "/check-in-out", icon: "reservation" },
@@ -471,6 +472,7 @@ export function DashboardShell({ children, className, title, subtitle }: { child
     const primaryItems: NavItem[] = [
       { label: "Dashboard", href: "/dashboard", icon: "dashboard", dataTour: "nav-dashboard" },
       { label: "Calendar", href: "/calendar", icon: "calendar", dataTour: "nav-calendar" },
+      { label: "Site Map", href: cgMapPath, icon: "camp", tooltip: "View and manage the campground map" },
       { label: "Reservations", href: cgReservationsPath, icon: "reservation", dataTour: "nav-reservations" },
       { label: "Guests", href: "/guests", icon: "guest", dataTour: "nav-guests" },
       { label: "Messages", href: "/messages", icon: "message", badge: unreadMessages, dataTour: "nav-messages" },
@@ -501,7 +503,7 @@ export function DashboardShell({ children, className, title, subtitle }: { child
     ];
 
     return sections;
-  }, [cgReservationsPath, unreadMessages, isManager, isAdmin]);
+  }, [cgMapPath, cgReservationsPath, unreadMessages, isManager, isAdmin]);
 
   const frontDeskShortcuts = useMemo<NavItem[]>(() => {
     const items: NavItem[] = [
@@ -725,7 +727,8 @@ export function DashboardShell({ children, className, title, subtitle }: { child
                 <div className="text-[11px] uppercase tracking-wide text-slate-400">Favorites</div>
                 <div className="space-y-1">
                   {favoritesItems.map((item) => {
-                    const isActive = currentPath === item.href || currentPath.startsWith(item.href + "/");
+                    const baseHref = item.href.split(/[?#]/)[0];
+                    const isActive = currentPath === baseHref || currentPath.startsWith(baseHref + "/");
                     return (
                       <Link
                         key={`m-fav-${item.href}`}
@@ -751,7 +754,8 @@ export function DashboardShell({ children, className, title, subtitle }: { child
             {navSections.map((section) => (
               <div key={`m-${section.heading}`} className="space-y-1">
                 {section.items.map((item) => {
-                  const isActive = currentPath === item.href || currentPath.startsWith(item.href + "/");
+                  const baseHref = item.href.split(/[?#]/)[0];
+                  const isActive = currentPath === baseHref || currentPath.startsWith(baseHref + "/");
                   return (
                     <Link
                       key={`m-${section.heading}-${item.href}`}
@@ -876,7 +880,8 @@ export function DashboardShell({ children, className, title, subtitle }: { child
                 )}
                 <div className="space-y-1">
                   {favoritesItems.map((item) => {
-                    const isActive = currentPath === item.href || currentPath.startsWith(item.href + "/");
+                    const baseHref = item.href.split(/[?#]/)[0];
+                    const isActive = currentPath === baseHref || currentPath.startsWith(baseHref + "/");
                     return (
                       <Link
                         key={`fav-${item.href}`}
@@ -914,7 +919,8 @@ export function DashboardShell({ children, className, title, subtitle }: { child
             {navSections.map((section) => (
               <div key={section.heading} className="space-y-1">
                 {section.items.map((item) => {
-                  const isActive = currentPath === item.href || currentPath.startsWith(item.href + "/");
+                  const baseHref = item.href.split(/[?#]/)[0];
+                  const isActive = currentPath === baseHref || currentPath.startsWith(baseHref + "/");
                   const isFav = favorites.includes(item.href);
                   return (
                     <Link

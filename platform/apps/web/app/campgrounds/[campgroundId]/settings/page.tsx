@@ -2,7 +2,7 @@
 
 import { useParams } from "next/navigation";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { apiClient } from "@/lib/api-client";
 import { DashboardShell } from "@/components/ui/layout/DashboardShell";
 import { Breadcrumbs } from "@/components/breadcrumbs";
@@ -65,8 +65,17 @@ export default function CampgroundSettingsPage() {
     // Tab navigation
     type SettingsTab = "general" | "data" | "marketing" | "billing" | "advanced";
     const [activeTab, setActiveTab] = useState<SettingsTab>("general");
+    const locationSearch = typeof window !== "undefined" ? window.location.search : "";
 
     const queryClient = useQueryClient();
+
+    useEffect(() => {
+        if (!locationSearch) return;
+        const tab = new URLSearchParams(locationSearch).get("tab");
+        if (tab && ["general", "data", "marketing", "billing", "advanced"].includes(tab)) {
+            setActiveTab(tab as SettingsTab);
+        }
+    }, [locationSearch]);
 
     const campgroundQuery = useQuery({
         queryKey: ["campground", campgroundId],
