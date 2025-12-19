@@ -486,6 +486,7 @@ function BookingLabPageInner() {
         overrideApprovedBy: whoami?.user?.id || undefined
       };
 
+      console.log("[Booking] Creating reservation with payload:", JSON.stringify(payload, null, 2));
       return apiClient.createReservation(payload);
     },
     onSuccess: (reservation) => {
@@ -510,6 +511,7 @@ function BookingLabPageInner() {
       });
     },
     onError: (err: any) => {
+      console.error("[Booking] Reservation creation failed:", err);
       toast({ title: "Booking failed", description: err?.message || "Please try again.", variant: "destructive" });
     }
   });

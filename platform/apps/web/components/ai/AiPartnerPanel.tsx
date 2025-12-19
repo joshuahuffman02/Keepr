@@ -74,7 +74,7 @@ function formatValue(value: any) {
   return serialized.length > 120 ? `${serialized.slice(0, 117)}...` : serialized;
 }
 
-export function AiPartnerPanel({ campgroundId }: { campgroundId: string }) {
+export function AiPartnerPanel({ campgroundId, enabled = true }: { campgroundId: string; enabled?: boolean }) {
   const [messages, setMessages] = useState<PartnerMessage[]>([]);
   const [input, setInput] = useState("");
   const [sessionId] = useState(() => `partner_${Date.now()}_${Math.random().toString(36).slice(2, 9)}`);
@@ -124,7 +124,7 @@ export function AiPartnerPanel({ campgroundId }: { campgroundId: string }) {
 
   const handleSend = () => {
     const trimmed = input.trim();
-    if (!trimmed || chatMutation.isPending) return;
+    if (!trimmed || chatMutation.isPending || !enabled) return;
     const userMessage: PartnerMessage = {
       id: `msg_${Date.now()}`,
       role: "user",
@@ -171,6 +171,12 @@ export function AiPartnerPanel({ campgroundId }: { campgroundId: string }) {
         <div className="rounded-lg border border-emerald-100 bg-emerald-50 px-4 py-3 text-sm text-emerald-800">
           Ask for availability checks, temporary holds, or operational guidance. Drafted actions include impact summaries and confirmation prompts.
         </div>
+
+        {!enabled && (
+          <div className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+            Enable Reply Assist to activate the AI partner for staff.
+          </div>
+        )}
 
         <div className="h-[420px] overflow-y-auto rounded-xl border border-slate-200 bg-white p-4">
           <div className="space-y-4">
@@ -332,7 +338,7 @@ export function AiPartnerPanel({ campgroundId }: { campgroundId: string }) {
             onKeyDown={handleKeyDown}
             placeholder="Ask the AI partner to check availability, place a hold, or draft a change..."
             className="min-h-[84px] bg-white"
-            disabled={chatMutation.isPending}
+            disabled={chatMutation.isPending || !enabled}
           />
           <div className="mt-3 flex items-center justify-between text-xs text-slate-500">
             <span>Press Enter to send, Shift+Enter for a new line.</span>
@@ -340,7 +346,7 @@ export function AiPartnerPanel({ campgroundId }: { campgroundId: string }) {
               size="sm"
               className="gap-2"
               onClick={handleSend}
-              disabled={!input.trim() || chatMutation.isPending}
+              disabled={!input.trim() || chatMutation.isPending || !enabled}
             >
               Send
               <Send className="h-4 w-4" />

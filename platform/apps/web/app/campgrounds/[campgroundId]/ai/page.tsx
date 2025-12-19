@@ -314,7 +314,7 @@ export default function AiSettingsPage() {
                             </Card>
                         )}
 
-                        <AiPartnerPanel campgroundId={campgroundId} />
+                        <AiPartnerPanel campgroundId={campgroundId} enabled={settings.aiReplyAssistEnabled} />
                     </>
                 )}
             </div>
