@@ -14,7 +14,7 @@ import { Label } from "../../../components/ui/label";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "../../../components/ui/dialog";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../../../components/ui/table";
 import { Badge } from "../../../components/ui/badge";
-import { Trophy, Star, History, ArrowLeft, Trash2, Plus, Car, Truck, Mail, MessageSquare, GitBranch, RotateCcw } from "lucide-react";
+import { Trophy, Star, History, ArrowLeft, Trash2, Plus, Car, Truck, Mail, MessageSquare, GitBranch, RotateCcw, PlusCircle, Send } from "lucide-react";
 import { cn } from "../../../lib/utils";
 import { useToast } from "../../../components/ui/use-toast";
 import { formatDistanceToNow } from "date-fns";
@@ -489,6 +489,35 @@ export default function GuestDetailPage() {
                                 <CardDescription>Last 20 messages for this guest</CardDescription>
                             </CardHeader>
                             <CardContent className="space-y-3">
+                                {/* Quick Filters */}
+                                <div className="flex flex-wrap gap-2 text-sm">
+                                    <Button
+                                        size="sm"
+                                        variant={commTypeFilter === "email" && commDirectionFilter === "outbound" ? "secondary" : "outline"}
+                                        onClick={() => {
+                                            setCommTypeFilter("email");
+                                            setCommDirectionFilter("outbound");
+                                            commsQuery.refetch();
+                                        }}
+                                        className="gap-1"
+                                    >
+                                        <Send className="h-3 w-3" />
+                                        Sent Emails
+                                    </Button>
+                                    <Button
+                                        size="sm"
+                                        variant={commTypeFilter === "all" && commDirectionFilter === "all" ? "secondary" : "outline"}
+                                        onClick={() => {
+                                            setCommTypeFilter("all");
+                                            setCommDirectionFilter("all");
+                                            commsQuery.refetch();
+                                        }}
+                                    >
+                                        All Communications
+                                    </Button>
+                                </div>
+
+                                {/* Filters */}
                                 <div className="flex flex-wrap gap-3 text-sm">
                                     <div className="space-y-1">
                                         <Label className="text-xs">Type</Label>
@@ -511,7 +540,7 @@ export default function GuestDetailPage() {
                                         </select>
                                     </div>
                                     <div className="space-y-1">
-                                        <Label className="text-xs">Status (stub)</Label>
+                                        <Label className="text-xs">Status</Label>
                                         <select
                                             className="h-9 rounded border border-slate-200 bg-white px-2 text-sm"
                                             value={commStatusFilter}
@@ -547,88 +576,96 @@ export default function GuestDetailPage() {
                                     </div>
                                 </div>
 
-                                <div className="space-y-3">
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                                        <div className="space-y-1">
-                                            <Label className="text-xs">Type</Label>
-                                            <select
-                                                className="h-9 rounded border border-slate-200 bg-white px-2 text-sm"
-                                                value={composeType}
-                                                onChange={(e) => setComposeType(e.target.value as any)}
-                                            >
-                                                <option value="email">Email</option>
-                                                <option value="sms">SMS</option>
-                                                <option value="note">Note</option>
-                                                <option value="call">Call</option>
-                                            </select>
+                                {/* Collapsible Log Communication Form */}
+                                <details className="group">
+                                    <summary className="flex items-center gap-2 cursor-pointer text-sm text-slate-600 hover:text-slate-800 py-2 border-t border-slate-100 mt-2">
+                                        <PlusCircle className="h-4 w-4" />
+                                        <span>Log Communication</span>
+                                    </summary>
+                                    <div className="mt-3 p-3 bg-slate-50 rounded-lg border border-slate-200 space-y-3">
+                                        <div className="grid grid-cols-2 gap-3">
+                                            <div className="space-y-1">
+                                                <Label className="text-xs">Type</Label>
+                                                <select
+                                                    className="w-full h-9 rounded border border-slate-200 bg-white px-2 text-sm"
+                                                    value={composeType}
+                                                    onChange={(e) => setComposeType(e.target.value as any)}
+                                                >
+                                                    <option value="email">Email</option>
+                                                    <option value="sms">SMS</option>
+                                                    <option value="note">Note</option>
+                                                    <option value="call">Call</option>
+                                                </select>
+                                            </div>
+                                            <div className="space-y-1">
+                                                <Label className="text-xs">Direction</Label>
+                                                <select
+                                                    className="w-full h-9 rounded border border-slate-200 bg-white px-2 text-sm"
+                                                    value={composeDirection}
+                                                    onChange={(e) => setComposeDirection(e.target.value as any)}
+                                                >
+                                                    <option value="outbound">Outbound</option>
+                                                    <option value="inbound">Inbound</option>
+                                                </select>
+                                            </div>
                                         </div>
                                         <div className="space-y-1">
-                                            <Label className="text-xs">Direction</Label>
-                                            <select
-                                                className="h-9 rounded border border-slate-200 bg-white px-2 text-sm"
-                                                value={composeDirection}
-                                                onChange={(e) => setComposeDirection(e.target.value as any)}
-                                            >
-                                                <option value="outbound">Outbound</option>
-                                                <option value="inbound">Inbound</option>
-                                            </select>
-                                        </div>
-                                    </div>
-                                    <div className="space-y-1">
-                                        <Label className="text-xs">Subject (optional)</Label>
-                                        <Input
-                                            value={composeSubject}
-                                            onChange={(e) => setComposeSubject(e.target.value)}
-                                            placeholder="Subject"
-                                        />
-                                    </div>
-                                    <div className="space-y-1">
-                                        <Label className="text-xs">Body</Label>
-                                        <textarea
-                                            className="w-full rounded border border-slate-200 bg-white px-3 py-2 text-sm min-h-[90px]"
-                                            value={composeBody}
-                                            onChange={(e) => setComposeBody(e.target.value)}
-                                            placeholder="Log the message content"
-                                        />
-                                    </div>
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                                        <div className="space-y-1">
-                                            <Label className="text-xs">To</Label>
-                                            <Input value={composeTo} onChange={(e) => setComposeTo(e.target.value)} placeholder="email or phone" />
+                                            <Label className="text-xs">Subject (optional)</Label>
+                                            <Input
+                                                value={composeSubject}
+                                                onChange={(e) => setComposeSubject(e.target.value)}
+                                                placeholder="Subject"
+                                            />
                                         </div>
                                         <div className="space-y-1">
-                                            <Label className="text-xs">From</Label>
-                                            <Input value={composeFrom} onChange={(e) => setComposeFrom(e.target.value)} placeholder="email or phone" />
+                                            <Label className="text-xs">Body</Label>
+                                            <textarea
+                                                className="w-full rounded border border-slate-200 bg-white px-3 py-2 text-sm min-h-[80px]"
+                                                value={composeBody}
+                                                onChange={(e) => setComposeBody(e.target.value)}
+                                                placeholder="Log the message content"
+                                            />
                                         </div>
+                                        <div className="grid grid-cols-2 gap-3">
+                                            <div className="space-y-1">
+                                                <Label className="text-xs">To</Label>
+                                                <Input value={composeTo} onChange={(e) => setComposeTo(e.target.value)} placeholder="email or phone" />
+                                            </div>
+                                            <div className="space-y-1">
+                                                <Label className="text-xs">From</Label>
+                                                <Input value={composeFrom} onChange={(e) => setComposeFrom(e.target.value)} placeholder="email or phone" />
+                                            </div>
+                                        </div>
+                                        <Button
+                                            size="sm"
+                                            onClick={async () => {
+                                                if (!campgroundIdForGuest) return;
+                                                if (!composeBody.trim()) {
+                                                    return toast({ title: "Body required", variant: "destructive" });
+                                                }
+                                                await apiClient.createCommunication({
+                                                    campgroundId: campgroundIdForGuest,
+                                                    guestId,
+                                                    type: composeType,
+                                                    direction: composeDirection,
+                                                    subject: composeSubject || undefined,
+                                                    body: composeBody,
+                                                    toAddress: composeTo || undefined,
+                                                    fromAddress: composeFrom || undefined
+                                                });
+                                                setComposeBody("");
+                                                setComposeSubject("");
+                                                setComposeTo("");
+                                                setComposeFrom("");
+                                                commsQuery.refetch();
+                                                toast({ title: "Logged" });
+                                            }}
+                                            disabled={!campgroundIdForGuest}
+                                        >
+                                            Log communication
+                                        </Button>
                                     </div>
-                                    <Button
-                                        onClick={async () => {
-                                            if (!campgroundIdForGuest) return;
-                                            if (!composeBody.trim()) {
-                                                return toast({ title: "Body required", variant: "destructive" });
-                                            }
-                                            await apiClient.createCommunication({
-                                                campgroundId: campgroundIdForGuest,
-                                                guestId,
-                                                type: composeType,
-                                                direction: composeDirection,
-                                                subject: composeSubject || undefined,
-                                                body: composeBody,
-                                                toAddress: composeTo || undefined,
-                                                fromAddress: composeFrom || undefined
-                                            });
-                                            setComposeBody("");
-                                            setComposeSubject("");
-                                            setComposeTo("");
-                                            setComposeFrom("");
-                                            commsQuery.refetch();
-                                            toast({ title: "Logged" });
-                                        }}
-                                        disabled={!campgroundIdForGuest}
-                                    >
-                                        Log communication
-                                    </Button>
-                                </div>
+                                </details>
 
                                 <div className="space-y-2 max-h-96 overflow-auto pr-1">
                                     {!timelineItems.length && (
