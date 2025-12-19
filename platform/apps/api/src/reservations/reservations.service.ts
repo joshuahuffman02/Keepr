@@ -1193,18 +1193,16 @@ export class ReservationsService {
         // Get site info for siteClassId
         const siteInfo = await this.prisma.site.findUnique({
           where: { id: siteId },
-          include: {
-            siteClass: {
-              select: { rigMaxLength: true, siteType: true, name: true }
-            }
-          },
           select: {
             siteClassId: true,
             siteType: true,
             rigMaxLength: true,
             accessible: true,
             amenityTags: true,
-            maxOccupancy: true
+            maxOccupancy: true,
+            siteClass: {
+              select: { rigMaxLength: true, siteType: true, name: true }
+            }
           }
         });
 
