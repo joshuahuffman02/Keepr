@@ -168,9 +168,9 @@ function BookingLabPageInner() {
     siteClassId: "",
     lockSite: false,
     notes: "",
-    collectPayment: false,
+    collectPayment: true,
     paymentAmount: "",
-    paymentMethod: "",
+    paymentMethod: "card",
     cardEntryMode: "manual",
     cashReceived: "",
     transactionId: "",
@@ -337,12 +337,6 @@ function BookingLabPageInner() {
   }, [formData.collectPayment, formData.paymentMethod, formData.cashReceived, paymentAmountDefault]);
 
   useEffect(() => {
-    if (!formData.collectPayment) return;
-    if (formData.paymentMethod) return;
-    setFormData((prev) => ({ ...prev, paymentMethod: "card" }));
-  }, [formData.collectPayment, formData.paymentMethod]);
-
-  useEffect(() => {
     if (formData.paymentMethod !== "card") return;
     if (formData.cardEntryMode) return;
     setFormData((prev) => ({ ...prev, cardEntryMode: "manual" }));
@@ -447,12 +441,11 @@ function BookingLabPageInner() {
 
   const createReservationMutation = useMutation({
     mutationFn: async () => {
-      const wantsPayment = formData.collectPayment;
-      const isCardPayment = wantsPayment && formData.paymentMethod === "card";
-      const requestedPaymentCents = wantsPayment ? paymentAmountCents : 0;
-      const paidAmountCents = isCardPayment ? 0 : requestedPaymentCents;
+      const isCardPayment = formData.paymentMethod === "card";
+      // For card payments, paid amount starts at 0 until payment modal confirms
+      const paidAmountCents = isCardPayment ? 0 : paymentAmountCents;
       const cashNote =
-        wantsPayment && formData.paymentMethod === "cash" && cashReceivedCents > 0
+        formData.paymentMethod === "cash" && cashReceivedCents > 0
           ? `Cash received $${(cashReceivedCents / 100).toFixed(2)}${cashChangeDueCents ? ` • Change due $${(cashChangeDueCents / 100).toFixed(2)}` : ""}`
           : "";
       const paymentNotes = [formData.paymentNotes, cashNote].filter(Boolean).join(" • ") || undefined;
@@ -471,10 +464,11 @@ function BookingLabPageInner() {
         totalAmount: totalCents,
         paidAmount: paidAmountCents,
         balanceAmount: Math.max(0, totalCents - paidAmountCents),
-        status: wantsPayment && isCardPayment ? "pending" : "confirmed",
-        paymentMethod: wantsPayment && !isCardPayment ? formData.paymentMethod : undefined,
-        transactionId: wantsPayment && !isCardPayment ? formData.transactionId : undefined,
-        paymentNotes: wantsPayment && !isCardPayment ? paymentNotes : undefined,
+        // Card payments start as "pending" until payment completes
+        status: isCardPayment ? "pending" : "confirmed",
+        paymentMethod: !isCardPayment ? formData.paymentMethod : undefined,
+        transactionId: !isCardPayment ? formData.transactionId : undefined,
+        paymentNotes: !isCardPayment ? paymentNotes : undefined,
         siteLocked: formData.lockSite,
         overrideReason: lockFeeCents > 0 ? "Site lock fee" : undefined,
         overrideApprovedBy: whoami?.user?.id || undefined
@@ -484,27 +478,24 @@ function BookingLabPageInner() {
     },
     onSuccess: (reservation) => {
       queryClient.invalidateQueries({ queryKey: ["booking-lab-guests", selectedCampground?.id] });
-      if (formData.collectPayment && formData.paymentMethod === "card") {
+      // Card payment: open modal to complete payment
+      if (formData.paymentMethod === "card") {
         setPaymentModal({ reservationId: reservation.id, amountCents: paymentAmountCents });
         toast({ title: "Reservation created", description: "Complete payment to finish booking." });
         return;
       }
-      if (formData.collectPayment) {
-        setReceiptData({
-          reservationId: reservation.id,
-          guestName: `${reservation.guest?.primaryFirstName || ""} ${reservation.guest?.primaryLastName || ""}`.trim() || "Guest",
-          siteName: reservation.site?.name || "Site",
-          arrivalDate: reservation.arrivalDate,
-          departureDate: reservation.departureDate,
-          amountCents: paymentAmountCents,
-          method: formData.paymentMethod || "cash",
-          cashReceivedCents: formData.paymentMethod === "cash" ? cashReceivedCents : undefined,
-          changeDueCents: formData.paymentMethod === "cash" ? cashChangeDueCents : undefined
-        });
-        return;
-      }
-      toast({ title: "Reservation created", description: "Booking saved successfully." });
-      router.push(`/reservations/${reservation.id}`);
+      // Cash/check/folio: show receipt
+      setReceiptData({
+        reservationId: reservation.id,
+        guestName: `${reservation.guest?.primaryFirstName || ""} ${reservation.guest?.primaryLastName || ""}`.trim() || "Guest",
+        siteName: reservation.site?.name || "Site",
+        arrivalDate: reservation.arrivalDate,
+        departureDate: reservation.departureDate,
+        amountCents: paymentAmountCents,
+        method: formData.paymentMethod || "cash",
+        cashReceivedCents: formData.paymentMethod === "cash" ? cashReceivedCents : undefined,
+        changeDueCents: formData.paymentMethod === "cash" ? cashChangeDueCents : undefined
+      });
     },
     onError: (err: any) => {
       toast({ title: "Booking failed", description: err?.message || "Please try again.", variant: "destructive" });
@@ -514,11 +505,10 @@ function BookingLabPageInner() {
   const hasPricing = pricingSubtotalCents !== null;
   const cardEntryBlocked = formData.paymentMethod === "card" && formData.cardEntryMode === "reader";
   const paymentReady =
-    !formData.collectPayment ||
-    (!!formData.paymentMethod &&
-      paymentAmountCents > 0 &&
-      (formData.paymentMethod !== "cash" || cashReceivedCents >= paymentAmountCents) &&
-      !cardEntryBlocked);
+    !!formData.paymentMethod &&
+    paymentAmountCents > 0 &&
+    (formData.paymentMethod !== "cash" || cashReceivedCents >= paymentAmountCents) &&
+    !cardEntryBlocked;
   const canCreate =
     !!selectedCampground?.id &&
     !!formData.guestId &&
@@ -984,116 +974,106 @@ function BookingLabPageInner() {
                   </div>
                 </div>
 
-                <div className="mt-4 flex items-center gap-2">
-                  <Switch
-                    checked={formData.collectPayment}
-                    onCheckedChange={(value) => setFormData((prev) => ({ ...prev, collectPayment: value }))}
-                  />
-                  <div className="text-xs text-slate-600">Take payment now</div>
-                </div>
-
-                {formData.collectPayment && (
-                  <div className="mt-3 space-y-2">
-                    {formData.paymentMethod === "card" && (
-                      <div className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-[11px] text-slate-500">
-                        {formData.cardEntryMode === "reader"
-                          ? "Card reader payments require a connected terminal."
-                          : "Manual card checkout opens right after the reservation is created."}
-                      </div>
-                    )}
-                    <div className="grid gap-2 sm:grid-cols-2">
+                <div className="mt-4 space-y-2">
+                  {formData.paymentMethod === "card" && (
+                    <div className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-[11px] text-slate-500">
+                      {formData.cardEntryMode === "reader"
+                        ? "Card reader payments require a connected terminal."
+                        : "Manual card checkout opens right after the reservation is created."}
+                    </div>
+                  )}
+                  <div className="grid gap-2 sm:grid-cols-2">
+                    <div className="space-y-1">
+                      <Label className="text-xs text-slate-500">Amount to charge</Label>
+                      <Input
+                        type="number"
+                        min={0}
+                        step="0.01"
+                        value={formData.paymentAmount}
+                        onChange={(e) => setFormData((prev) => ({ ...prev, paymentAmount: e.target.value }))}
+                      />
+                    </div>
+                    <div className="space-y-1">
+                      <Label className="text-xs text-slate-500">Method</Label>
+                      <Select
+                        value={formData.paymentMethod}
+                        onValueChange={(value) => setFormData((prev) => ({ ...prev, paymentMethod: value }))}
+                      >
+                        <SelectTrigger className="h-9">
+                          <SelectValue placeholder="Select" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {PAYMENT_METHODS.map((method) => (
+                            <SelectItem key={method.value} value={method.value}>{method.label}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+                  {formData.paymentMethod === "card" && (
+                    <div className="rounded-lg border border-slate-200 bg-white px-3 py-2">
                       <div className="space-y-1">
-                        <Label className="text-xs text-slate-500">Amount to charge</Label>
-                        <Input
-                          type="number"
-                          min={0}
-                          step="0.01"
-                          value={formData.paymentAmount}
-                          onChange={(e) => setFormData((prev) => ({ ...prev, paymentAmount: e.target.value }))}
-                        />
-                      </div>
-                      <div className="space-y-1">
-                        <Label className="text-xs text-slate-500">Method</Label>
+                        <Label className="text-xs text-slate-500">Card entry</Label>
                         <Select
-                          value={formData.paymentMethod}
-                          onValueChange={(value) => setFormData((prev) => ({ ...prev, paymentMethod: value }))}
+                          value={formData.cardEntryMode}
+                          onValueChange={(value) => setFormData((prev) => ({ ...prev, cardEntryMode: value }))}
                         >
                           <SelectTrigger className="h-9">
-                            <SelectValue placeholder="Select" />
+                            <SelectValue placeholder="Select entry method" />
                           </SelectTrigger>
                           <SelectContent>
-                            {PAYMENT_METHODS.map((method) => (
-                              <SelectItem key={method.value} value={method.value}>{method.label}</SelectItem>
-                            ))}
+                            <SelectItem value="manual">Manual entry (keyed)</SelectItem>
+                            <SelectItem value="reader">Card reader (coming soon)</SelectItem>
                           </SelectContent>
                         </Select>
                       </div>
+                      {formData.cardEntryMode === "reader" && (
+                        <div className="mt-2 text-[11px] text-amber-600">
+                          Card reader payments are not enabled in this sandbox.
+                        </div>
+                      )}
                     </div>
-                    {formData.paymentMethod === "card" && (
-                      <div className="rounded-lg border border-slate-200 bg-white px-3 py-2">
+                  )}
+                  {formData.paymentMethod === "cash" && (
+                    <div className="rounded-lg border border-slate-200 bg-white px-3 py-2">
+                      <div className="grid gap-2 sm:grid-cols-2">
                         <div className="space-y-1">
-                          <Label className="text-xs text-slate-500">Card entry</Label>
-                          <Select
-                            value={formData.cardEntryMode}
-                            onValueChange={(value) => setFormData((prev) => ({ ...prev, cardEntryMode: value }))}
-                          >
-                            <SelectTrigger className="h-9">
-                              <SelectValue placeholder="Select entry method" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="manual">Manual entry (keyed)</SelectItem>
-                              <SelectItem value="reader">Card reader (coming soon)</SelectItem>
-                            </SelectContent>
-                          </Select>
+                          <Label className="text-xs text-slate-500">Cash received</Label>
+                          <Input
+                            type="number"
+                            min={0}
+                            step="0.01"
+                            value={formData.cashReceived}
+                            onChange={(e) => setFormData((prev) => ({ ...prev, cashReceived: e.target.value }))}
+                            placeholder="0.00"
+                          />
                         </div>
-                        {formData.cardEntryMode === "reader" && (
-                          <div className="mt-2 text-[11px] text-amber-600">
-                            Card reader payments are not enabled in this sandbox.
-                          </div>
-                        )}
-                      </div>
-                    )}
-                    {formData.paymentMethod === "cash" && (
-                      <div className="rounded-lg border border-slate-200 bg-white px-3 py-2">
-                        <div className="grid gap-2 sm:grid-cols-2">
-                          <div className="space-y-1">
-                            <Label className="text-xs text-slate-500">Cash received</Label>
-                            <Input
-                              type="number"
-                              min={0}
-                              step="0.01"
-                              value={formData.cashReceived}
-                              onChange={(e) => setFormData((prev) => ({ ...prev, cashReceived: e.target.value }))}
-                              placeholder="0.00"
-                            />
-                          </div>
-                          <div className="space-y-1">
-                            <Label className="text-xs text-slate-500">Change due</Label>
-                            <div className="h-10 rounded-md border border-slate-200 bg-slate-50 px-3 text-sm flex items-center">
-                              {cashChangeDueCents > 0 ? `$${(cashChangeDueCents / 100).toFixed(2)}` : "—"}
-                            </div>
+                        <div className="space-y-1">
+                          <Label className="text-xs text-slate-500">Change due</Label>
+                          <div className="h-10 rounded-md border border-slate-200 bg-slate-50 px-3 text-sm flex items-center">
+                            {cashChangeDueCents > 0 ? `$${(cashChangeDueCents / 100).toFixed(2)}` : "—"}
                           </div>
                         </div>
-                        {cashShortCents > 0 && (
-                          <div className="mt-2 text-xs text-amber-600">
-                            Cash received is short by ${(cashShortCents / 100).toFixed(2)}.
-                          </div>
-                        )}
                       </div>
-                    )}
-                    <Input
-                      placeholder="Transaction ID (optional)"
-                      value={formData.transactionId}
-                      onChange={(e) => setFormData((prev) => ({ ...prev, transactionId: e.target.value }))}
-                    />
-                    <Textarea
-                      rows={2}
-                      placeholder="Payment notes"
-                      value={formData.paymentNotes}
-                      onChange={(e) => setFormData((prev) => ({ ...prev, paymentNotes: e.target.value }))}
-                    />
-                  </div>
-                )}
+                      {cashShortCents > 0 && (
+                        <div className="mt-2 text-xs text-amber-600">
+                          Cash received is short by ${(cashShortCents / 100).toFixed(2)}.
+                        </div>
+                      )}
+                    </div>
+                  )}
+                  <Input
+                    placeholder="Transaction ID (optional)"
+                    value={formData.transactionId}
+                    onChange={(e) => setFormData((prev) => ({ ...prev, transactionId: e.target.value }))}
+                  />
+                  <Textarea
+                    rows={2}
+                    placeholder="Payment notes"
+                    value={formData.paymentNotes}
+                    onChange={(e) => setFormData((prev) => ({ ...prev, paymentNotes: e.target.value }))}
+                  />
+                </div>
 
                 <div className="mt-4 flex flex-col gap-2">
                   <Button
@@ -1109,11 +1089,7 @@ function BookingLabPageInner() {
                     onClick={() => createReservationMutation.mutate()}
                     disabled={!canCreate || createReservationMutation.isPending}
                   >
-                    {createReservationMutation.isPending
-                      ? "Creating..."
-                      : formData.collectPayment
-                        ? "Collect payment & book"
-                        : "Create reservation"}
+                    {createReservationMutation.isPending ? "Creating..." : "Collect payment & book"}
                     <ArrowRight className="h-4 w-4" />
                   </Button>
                 </div>
