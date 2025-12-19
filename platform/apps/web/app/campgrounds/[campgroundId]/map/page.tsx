@@ -124,8 +124,8 @@ export default function CampgroundMapPage() {
         </div>
 
         <Card className="p-6 space-y-4">
-          <div className="grid gap-6 md:grid-cols-2">
-            <div className="space-y-3">
+          <div className="flex flex-col gap-6 lg:flex-row">
+            <div className="space-y-3 lg:w-[360px] lg:flex-shrink-0">
               <div className="grid gap-2">
                 <Label htmlFor="start-date">Arrival date</Label>
                 <input
@@ -219,7 +219,7 @@ export default function CampgroundMapPage() {
               </div>
             </div>
 
-            <div className="space-y-4">
+            <div className="space-y-4 flex-1">
               <div className="space-y-3">
                 <div>
                   <div className="text-sm font-semibold text-slate-800">Site map preview</div>

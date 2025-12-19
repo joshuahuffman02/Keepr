@@ -153,6 +153,7 @@ const getBoundsFromConfig = (bounds: any): Bounds | null => {
 
 const roundPoint = (value: number) => Math.round(value * 100) / 100;
 const clampGrid = (value: number) => Math.min(200, Math.max(1, value));
+const clampValue = (value: number, min: number, max: number) => Math.min(max, Math.max(min, value));
 
 const snapToAngle = (point: Point, anchor: Point): Point => {
   const dx = point.x - anchor.x;
@@ -291,8 +292,16 @@ export function SiteMapEditor({
     const svg = svgRef.current;
     if (!svg) return null;
     const rect = svg.getBoundingClientRect();
-    let x = ((event.clientX - rect.left) / rect.width) * viewBox.width + viewBox.minX;
-    let y = ((event.clientY - rect.top) / rect.height) * viewBox.height + viewBox.minY;
+    if (rect.width === 0 || rect.height === 0) return null;
+    const scale = Math.min(rect.width / viewBox.width, rect.height / viewBox.height);
+    const contentWidth = viewBox.width * scale;
+    const contentHeight = viewBox.height * scale;
+    const offsetX = (rect.width - contentWidth) / 2;
+    const offsetY = (rect.height - contentHeight) / 2;
+    let x = (event.clientX - rect.left - offsetX) / scale + viewBox.minX;
+    let y = (event.clientY - rect.top - offsetY) / scale + viewBox.minY;
+    x = clampValue(x, viewBox.minX, viewBox.minX + viewBox.width);
+    y = clampValue(y, viewBox.minY, viewBox.minY + viewBox.height);
     let point = { x, y };
     if (event.shiftKey && anchor) {
       point = snapToAngle(point, anchor);
@@ -307,7 +316,7 @@ export function SiteMapEditor({
     return { x: roundPoint(point.x), y: roundPoint(point.y) };
   };
 
-  const handleCanvasClick = (event: React.PointerEvent<SVGSVGElement>) => {
+  const handleCanvasPointerDown = (event: React.PointerEvent<SVGSVGElement>) => {
     if (!isDrawing) return;
     if (dragIndex !== null) return;
     if (!selectedSiteId) {
@@ -585,13 +594,14 @@ export function SiteMapEditor({
           <svg
             ref={svgRef}
             viewBox={`${viewBox.minX} ${viewBox.minY} ${viewBox.width} ${viewBox.height}`}
-            className="h-[480px] w-full"
+            className="h-[620px] w-full"
             onPointerMove={handlePointerMove}
             onPointerUp={handlePointerUp}
             onPointerLeave={() => setHoverPoint(null)}
-            onClick={handleCanvasClick}
+            onPointerDown={handleCanvasPointerDown}
             role="img"
             aria-label="Site map editor canvas"
+            preserveAspectRatio="xMidYMid meet"
           >
             <image
               href={baseImageUrl}
@@ -601,6 +611,7 @@ export function SiteMapEditor({
               height={viewBox.height}
               preserveAspectRatio="xMidYMid meet"
               opacity={0.95}
+              pointerEvents="none"
             />
 
             {Array.from(mergedLayouts.entries())

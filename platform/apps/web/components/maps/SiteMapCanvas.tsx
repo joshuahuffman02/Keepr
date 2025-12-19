@@ -209,7 +209,7 @@ export function SiteMapCanvas({
 
   if (isLoading) {
     return (
-      <div className={cn("h-[320px] w-full animate-pulse rounded-xl border border-slate-200 bg-slate-100", className)} />
+      <div className={cn("h-[420px] w-full animate-pulse rounded-xl border border-slate-200 bg-slate-100", className)} />
     );
   }
 
@@ -248,7 +248,7 @@ export function SiteMapCanvas({
     <div className={cn("rounded-xl border border-slate-200 bg-slate-50 p-3", className)}>
       <svg
         viewBox={`${viewBox.minX} ${viewBox.minY} ${viewBox.width} ${viewBox.height}`}
-        className="h-[320px] w-full"
+        className="h-[420px] w-full"
         role="img"
         aria-label="Campground site map"
       >
