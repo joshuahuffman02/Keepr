@@ -862,6 +862,8 @@ function BookingLabPageInner() {
                       const displayName = site.name.replace(new RegExp(`^${meta.label}\\s+`, 'i'), '');
                       const displayNum = site.siteNumber.replace(new RegExp(`^${meta.label}`, 'i'), '');
                       const displayClass = (site.siteClassName || "Class").replace(new RegExp(`\\s+${meta.label}$`, 'i'), '');
+                      const isSelected = formData.siteId === site.id;
+                      const isDisabled = site.status !== "available";
 
                       return (
                         <button
