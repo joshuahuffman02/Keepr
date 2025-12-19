@@ -26,6 +26,7 @@ importers:
       '@campreserv/shared': workspace:*
       '@codegenie/serverless-express': ^4.17.1
       '@google/adk': ^0.2.1
+      '@opentelemetry/api': ^1.9.0
       '@jest/test-sequencer': ^29.7.0
       '@nestjs/cli': ^11.0.14
       '@nestjs/common': ^10.4.7
@@ -88,6 +89,7 @@ importers:
       '@campreserv/shared': link:../../packages/shared
       '@codegenie/serverless-express': 4.17.1
       '@google/adk': 0.2.1
+      '@opentelemetry/api': 1.9.0
       '@nestjs/common': 10.4.20_26q5nehxwcs3ri7zvy3wttpjeq
       '@nestjs/config': 4.0.2_d7wabo3ln2lhn3a3ctrkkbwyym
       '@nestjs/core': 10.4.20_ckonxzgiymdtimkdiovrfjr6qq
