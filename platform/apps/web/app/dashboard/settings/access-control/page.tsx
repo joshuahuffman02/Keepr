@@ -20,7 +20,7 @@ export default function AccessControlSettingsPage() {
   const queryClient = useQueryClient();
   const { data: whoami, isLoading: whoamiLoading } = useQuery({
     queryKey: ["whoami"],
-    queryFn: apiClient.getWhoami
+    queryFn: () => apiClient.getWhoami()
   });
 
   const campgroundId = useMemo(
