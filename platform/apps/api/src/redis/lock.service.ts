@@ -1,4 +1,4 @@
-import { ConflictException, Injectable } from "@nestjs/common";
+import { ConflictException, Injectable, Logger } from "@nestjs/common";
 import { randomUUID } from "crypto";
 import { RedisService } from "./redis.service";
 
@@ -10,6 +10,7 @@ import { RedisService } from "./redis.service";
 @Injectable()
 export class LockService {
   private readonly ttlMs = 5 * 60 * 1000; // 5 minutes
+  private readonly logger = new Logger(LockService.name);
 
   constructor(private readonly redis: RedisService) {}
 
@@ -51,6 +52,16 @@ export class LockService {
         }
         heldLocks.push({ key: lockKey, token });
       }
+    } catch (err) {
+      await this.release(client, heldLocks);
+      if (err instanceof ConflictException) {
+        throw err;
+      }
+      this.logger.warn(`Lock service unavailable; proceeding without locks`, err instanceof Error ? err.message : `${err}`);
+      return fn();
+    }
+
+    try {
       return await fn();
     } finally {
       await this.release(client, heldLocks);

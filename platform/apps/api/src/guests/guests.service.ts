@@ -6,13 +6,17 @@ import { CreateGuestDto } from "./dto/create-guest.dto";
 export class GuestsService {
   constructor(private readonly prisma: PrismaService) { }
 
-  findOne(id: string) {
-    return this.prisma.guest.findUnique({
-      where: { id },
+  findOne(id: string, campgroundId?: string) {
+    return this.prisma.guest.findFirst({
+      where: {
+        id,
+        ...(campgroundId ? { reservations: { some: { campgroundId } } } : {})
+      },
       include: {
         loyaltyProfile: true,
         reservations: {
           orderBy: { arrivalDate: "desc" },
+          ...(campgroundId ? { where: { campgroundId } } : {}),
           include: {
             site: { include: { siteClass: true } }
           }
@@ -27,8 +31,29 @@ export class GuestsService {
       include: {
         loyaltyProfile: true,
         reservations: {
-          orderBy: { departureDate: 'desc' },
+          orderBy: { departureDate: "desc" },
           take: 1,
+          select: {
+            departureDate: true,
+            site: {
+              select: { id: true, name: true, siteNumber: true, siteClassId: true }
+            }
+          }
+        }
+      }
+    });
+  }
+
+  findAllByCampground(campgroundId: string) {
+    return this.prisma.guest.findMany({
+      where: { reservations: { some: { campgroundId } } },
+      orderBy: { primaryLastName: "asc" },
+      include: {
+        loyaltyProfile: true,
+        reservations: {
+          orderBy: { departureDate: "desc" },
+          take: 1,
+          where: { campgroundId },
           select: {
             departureDate: true,
             site: {

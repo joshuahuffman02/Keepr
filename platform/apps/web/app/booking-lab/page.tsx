@@ -356,6 +356,18 @@ function BookingLabPageInner() {
     queryFn: () => apiClient.getMatchedSites(selectedCampground!.id, formData.guestId),
     enabled: !!selectedCampground?.id && !!formData.guestId
   });
+  const filteredMatches = useMemo(() => {
+    const matches = matchesQuery.data || [];
+    return matches.filter((match) => {
+      const siteType = (match.site.siteType || "").toLowerCase();
+      if (isRvRigType && (siteType === "tent" || siteType === "cabin")) return false;
+      if (hasRigLength) {
+        const maxLength = match.site.rigMaxLength ?? match.site.siteClass?.rigMaxLength ?? null;
+        if (maxLength && rigLengthValue > maxLength) return false;
+      }
+      return true;
+    });
+  }, [matchesQuery.data, isRvRigType, hasRigLength, rigLengthValue]);
 
   const createGuestMutation = useMutation({
     mutationFn: () => apiClient.createGuest({
@@ -369,7 +381,14 @@ function BookingLabPageInner() {
       setGuestSearch(`${guest.primaryFirstName} ${guest.primaryLastName}`.trim());
       setShowNewGuest(false);
       setGuestForm({ primaryFirstName: "", primaryLastName: "", email: "", phone: "" });
-      queryClient.invalidateQueries({ queryKey: ["booking-lab-guests", selectedCampground?.id] });
+      queryClient.setQueryData(
+        ["booking-lab-guests", selectedCampground?.id],
+        (current: typeof guests | undefined) => {
+          if (!current) return [guest];
+          if (current.some((item) => item.id === guest.id)) return current;
+          return [guest, ...current];
+        }
+      );
       toast({ title: "Guest created", description: "New guest added and selected." });
     },
     onError: () => toast({ title: "Guest creation failed", variant: "destructive" })
@@ -427,6 +446,7 @@ function BookingLabPageInner() {
       return apiClient.createReservation(payload);
     },
     onSuccess: (reservation) => {
+      queryClient.invalidateQueries({ queryKey: ["booking-lab-guests", selectedCampground?.id] });
       if (formData.collectPayment && formData.paymentMethod === "card") {
         setPaymentModal({ reservationId: reservation.id, amountCents: paymentAmountCents });
         toast({ title: "Reservation created", description: "Complete payment to finish booking." });
@@ -723,14 +743,14 @@ function BookingLabPageInner() {
                 </div>
               </Card>
 
-              {matchesQuery.data && matchesQuery.data.length > 0 && (
+              {filteredMatches.length > 0 && (
                 <Card className="p-5 border-slate-200 shadow-sm">
                   <div className="flex items-center justify-between">
                     <div className="text-xs font-bold uppercase tracking-widest text-slate-500">AI suggestions</div>
                     <Sparkles className="h-4 w-4 text-emerald-500" />
                   </div>
                   <div className="mt-3 space-y-2">
-                    {matchesQuery.data.slice(0, 3).map((match) => (
+                    {filteredMatches.slice(0, 3).map((match) => (
                       <button
                         key={match.site.id}
                         type="button"
