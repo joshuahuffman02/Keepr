@@ -20,7 +20,7 @@ type EditorSite = {
 
 type SiteMapData = {
   config?: any | null;
-  sites?: Array<{ siteId: string; geometry: any; centroid?: any; label?: string | null; rotation?: number | null }>;
+  sites?: Array<{ siteId: string; geometry?: any; centroid?: any; label?: string | null; rotation?: number | null }>;
 };
 
 type SiteMapEditorProps = {
