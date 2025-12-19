@@ -79,7 +79,8 @@ export class AllExceptionsFilter implements ExceptionFilter {
     // Handle Prisma validation errors
     else if (exception instanceof Prisma.PrismaClientValidationError) {
       statusCode = HttpStatus.BAD_REQUEST;
-      message = 'Invalid data provided';
+      // Include actual error for debugging
+      message = `Invalid data provided: ${exception.message.slice(0, 500)}`;
       error = 'Bad Request';
 
       this.logger.warn(

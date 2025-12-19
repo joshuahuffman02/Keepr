@@ -18,6 +18,7 @@ import { DeveloperApiModule } from "./developer-api/developer-api.module";
 // Shared app configuration - used by both local dev and serverless
 export async function createApp(): Promise<INestApplication> {
     dotenv.config();
+    const bodyLimit = process.env.API_BODY_LIMIT || "25mb";
 
     const app = await NestFactory.create(AppModule, {
         logger: new RedactingLogger(),
@@ -97,6 +98,7 @@ export async function createApp(): Promise<INestApplication> {
     const express = await import("express");
     app.use(
         express.json({
+            limit: bodyLimit,
             verify: (req: any, _res: any, buf: Buffer) => {
                 req.rawBody = buf;
             }
@@ -105,6 +107,7 @@ export async function createApp(): Promise<INestApplication> {
     app.use(
         express.urlencoded({
             extended: true,
+            limit: bodyLimit,
             verify: (req: any, _res: any, buf: Buffer) => {
                 req.rawBody = buf;
             }
@@ -163,4 +166,3 @@ export function configureSwagger(app: INestApplication): void {
 
     SwaggerModule.setup("api/docs", app, document);
 }
-
