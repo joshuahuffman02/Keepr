@@ -13,6 +13,11 @@ import { PublicReservationsModule } from '../public-reservations/public-reservat
 import { PermissionsModule } from '../permissions/permissions.module';
 import { AuditModule } from '../audit/audit.module';
 import { HoldsModule } from '../holds/holds.module';
+import { PricingV2Module } from '../pricing-v2/pricing-v2.module';
+import { MaintenanceModule } from '../maintenance/maintenance.module';
+import { ReservationsModule } from '../reservations/reservations.module';
+import { RepeatChargesModule } from '../repeat-charges/repeat-charges.module';
+import { SeasonalRatesModule } from '../seasonal-rates/seasonal-rates.module';
 
 @Module({
   imports: [
@@ -21,6 +26,11 @@ import { HoldsModule } from '../holds/holds.module';
     PermissionsModule,
     AuditModule,
     HoldsModule,
+    forwardRef(() => PricingV2Module),
+    forwardRef(() => MaintenanceModule),
+    forwardRef(() => ReservationsModule),
+    forwardRef(() => RepeatChargesModule),
+    forwardRef(() => SeasonalRatesModule),
   ],
   controllers: [AiController],
   providers: [

@@ -9,6 +9,12 @@ import { AuditService } from "../audit/audit.service";
 import { PrismaService } from "../prisma/prisma.service";
 import { HoldsService } from "../holds/holds.service";
 import { PublicReservationsService } from "../public-reservations/public-reservations.service";
+import { PricingV2Service } from "../pricing-v2/pricing-v2.service";
+import { MaintenanceService } from "../maintenance/maintenance.service";
+import { ReservationsService } from "../reservations/reservations.service";
+import { SeasonalRatesService } from "../seasonal-rates/seasonal-rates.service";
+import { RepeatChargesService } from "../repeat-charges/repeat-charges.service";
+import { createAgentRegistry } from "./adk-agents.registry";
 
 type PartnerMode = "staff" | "admin";
 
@@ -107,8 +113,23 @@ export class AiPartnerService {
     private readonly audit: AuditService,
     private readonly prisma: PrismaService,
     private readonly holds: HoldsService,
-    private readonly publicReservations: PublicReservationsService
-  ) { }
+    private readonly publicReservations: PublicReservationsService,
+    private readonly pricingV2: PricingV2Service,
+    private readonly maintenance: MaintenanceService,
+    private readonly reservations: ReservationsService,
+    private readonly seasonalRates: SeasonalRatesService,
+    private readonly repeatCharges: RepeatChargesService
+  ) {
+    this.adkRunner = createAgentRegistry({
+      pricingV2: this.pricingV2,
+      maintenance: this.maintenance,
+      reservations: this.reservations,
+      seasonalRates: this.seasonalRates,
+      repeatCharges: this.repeatCharges,
+    });
+  }
+
+  private adkRunner: any;
 
   async chat(request: PartnerChatRequest): Promise<AiPartnerResponse> {
     const { campgroundId, message, history = [], sessionId, user } = request;
@@ -129,191 +150,38 @@ export class AiPartnerService {
     }
 
     const { role, mode } = this.resolveUserRole(user, campgroundId);
+
+    // Privacy Redaction
     const { anonymizedText, tokenMap } = this.privacy.anonymize(message, campground.aiAnonymizationLevel ?? "moderate");
-    const { historyText, historyTokenMap } = this.buildHistory(history, campground.aiAnonymizationLevel ?? "moderate");
-    const mergedTokenMap = this.mergeTokenMaps(tokenMap, historyTokenMap);
 
-    const systemPrompt = this.buildSystemPrompt({
-      mode,
-      campgroundName: campground.name,
-      role,
-      campgroundId: campground.id
-    });
-
-    const userPrompt = this.buildUserPrompt({
-      anonymizedText,
-      historyText,
-      campgroundName: campground.name,
-      campgroundId: campground.id,
-      userId: user?.id,
-      role,
-      mode
-    });
-
-    let toolResponse;
+    // Execute via ADK Runner
     try {
-      toolResponse = await this.provider.getToolCompletion({
-        campgroundId,
-        featureType: AiFeatureType.reply_assist,
-        systemPrompt,
-        userPrompt,
-        userId: user?.id,
-        sessionId,
-        tools: this.buildTools()
+      const result = await this.adkRunner.run(anonymizedText, {
+        context: {
+          campgroundId,
+          campgroundName: campground.name,
+          userRole: role,
+          userMode: mode,
+          userId: user?.id,
+        }
       });
+
+      // Deanonymize the response
+      const cleanMessage = this.privacy.deanonymize(result.content || result.message, tokenMap);
+
+      return {
+        mode,
+        message: cleanMessage,
+        evidenceLinks: (result as any).evidenceLinks,
+        actionDrafts: (result as any).actionDrafts,
+      };
     } catch (err) {
-      this.logger.warn("AI partner tool call failed", err instanceof Error ? err.message : `${err}`);
+      this.logger.error("ADK Partner Execution Failed", err);
       return {
         mode,
-        message: "I had trouble analyzing that request. Try rephrasing or be more specific."
+        message: "I encountered an error while processing your request. Please try again later.",
       };
     }
-
-    const toolCall = this.pickToolCall(toolResponse.toolCalls);
-    if (!toolCall) {
-      const fallback = toolResponse.content?.trim();
-      return {
-        mode,
-        message: fallback ? this.privacy.deanonymize(fallback, mergedTokenMap) : "Tell me what you want to do and I can draft the steps."
-      };
-    }
-
-    const aiResult = this.parseToolArgs(toolCall.arguments);
-    if (!aiResult) {
-      return {
-        mode,
-        message: "I couldn't understand that request. Can you restate it?",
-        denials: [{ reason: "Unable to parse action request." }]
-      };
-    }
-
-    const responseMessage = this.privacy.deanonymize(aiResult.message || "", mergedTokenMap).trim();
-    const questions = (aiResult.questions || []).map((q: string) => this.privacy.deanonymize(q, mergedTokenMap));
-
-    if (aiResult.denial?.reason) {
-      return {
-        mode,
-        message: responseMessage || aiResult.denial.reason,
-        denials: [
-          {
-            reason: aiResult.denial.reason,
-            guidance: aiResult.denial.guidance
-          }
-        ],
-        questions: questions.length ? questions : undefined
-      };
-    }
-
-    const actionType = (aiResult.action?.type || "none") as ActionType;
-    if (actionType === "none") {
-      return {
-        mode,
-        message: responseMessage || "How can I help?",
-        questions: questions.length ? questions : undefined
-      };
-    }
-
-    const registry = ACTION_REGISTRY[actionType as Exclude<ActionType, "none">];
-    if (!registry) {
-      return {
-        mode,
-        message: responseMessage || "That action isn't available yet.",
-        denials: [{ reason: "Action not supported by AI partner." }],
-        questions: questions.length ? questions : undefined
-      };
-    }
-
-    const access = await this.permissions.checkAccess({
-      user,
-      campgroundId,
-      resource: registry.resource,
-      action: registry.action
-    });
-    if (!access.allowed) {
-      return {
-        mode,
-        message: responseMessage || "You don't have permission to do that.",
-        denials: [{ reason: "Permission denied for this action." }]
-      };
-    }
-
-    const draftId = randomUUID();
-    const resolvedParameters = this.resolveParameters(aiResult.action?.parameters || {}, mergedTokenMap);
-    const impact = await this.evaluateImpact({
-      campgroundId,
-      actionType,
-      impactArea: aiResult.action?.impactArea || registry.impactArea,
-      parameters: resolvedParameters
-    });
-
-    const requiresConfirmation =
-      registry.confirmByDefault ||
-      aiResult.action?.requiresConfirmation ||
-      (mode === "admin" && (impact?.level === "high" || registry.sensitivity !== "low"));
-
-    const actionDraft: ActionDraft = {
-      id: draftId,
-      actionType,
-      resource: registry.resource,
-      action: registry.action,
-      parameters: resolvedParameters,
-      status: "draft",
-      requiresConfirmation,
-      sensitivity: aiResult.action?.sensitivity || registry.sensitivity,
-      impactArea: aiResult.action?.impactArea || registry.impactArea,
-      impact: impact ?? undefined,
-      evidenceLinks: this.buildEvidenceLinks(actionType, resolvedParameters)
-    };
-
-    if (registry.action === "read" && !requiresConfirmation) {
-      const executed = await this.executeReadAction(campground, actionDraft);
-      if (executed) {
-        return {
-          mode,
-          message: executed.message,
-          actionDrafts: [executed.action],
-          evidenceLinks: executed.action.evidenceLinks,
-          questions: questions.length ? questions : undefined
-        };
-      }
-    }
-
-    if (registry.action === "write" && actionType === "create_hold" && !requiresConfirmation) {
-      const executed = await this.executeHold(campground, actionDraft, user);
-      if (executed) {
-        return {
-          mode,
-          message: executed.message,
-          actionDrafts: [executed.action],
-          evidenceLinks: executed.action.evidenceLinks,
-          questions: questions.length ? questions : undefined
-        };
-      }
-    }
-
-    await this.audit.record({
-      campgroundId,
-      actorId: user?.id ?? null,
-      action: "ai.partner.draft",
-      entity: "ai_action",
-      entityId: draftId,
-      after: {
-        actionType,
-        parameters: resolvedParameters,
-        impact
-      }
-    });
-
-    return {
-      mode,
-      message: responseMessage || "I drafted the action below.",
-      actionDrafts: [actionDraft],
-      confirmations: requiresConfirmation
-        ? [{ id: draftId, prompt: "Confirm this action?" }]
-        : undefined,
-      questions: questions.length ? questions : undefined,
-      evidenceLinks: actionDraft.evidenceLinks
-    };
   }
 
   private buildTools() {
@@ -470,7 +338,7 @@ User request: "${params.anonymizedText}"${historyBlock}`;
     }
   }
 
-  private resolveParameters(parameters: Record<string, any>, tokenMap: Map<string, string>) {
+  private resolveParameters(parameters: Record<string, any>, tokenMap: Map<string, string>): Record<string, any> {
     const resolved: Record<string, any> = Array.isArray(parameters) ? [] : {};
     for (const [key, value] of Object.entries(parameters || {})) {
       resolved[key] = this.resolveValue(value, tokenMap);
@@ -478,7 +346,7 @@ User request: "${params.anonymizedText}"${historyBlock}`;
     return resolved;
   }
 
-  private resolveValue(value: any, tokenMap: Map<string, string>) {
+  private resolveValue(value: any, tokenMap: Map<string, string>): any {
     if (typeof value === "string") {
       return tokenMap.get(value) ?? value;
     }
