@@ -43,7 +43,7 @@ type LocationInventory = {
     productId: string;
     locationId: string;
     stockQty: number;
-    lowStockAlert: number | null;
+    lowStockAlert?: number | null;
     product?: {
         id: string;
         name: string;
