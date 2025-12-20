@@ -295,7 +295,7 @@ export default function LocationInventoryPage() {
                                                     sku: product.sku ?? null,
                                                     priceCents: product.priceCents,
                                                     trackInventory: product.trackInventory ?? true,
-                                                    lowStockAlert: product.lowStockAlert ?? null,
+                                                    lowStockAlert: product.lowStockAlert ?? undefined,
                                                 },
                                             });
                                             setAdjustmentType("set");
