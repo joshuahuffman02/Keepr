@@ -64,8 +64,8 @@ type InventoryTransfer = {
     status: "pending" | "in_transit" | "completed" | "cancelled";
     notes?: string | null;
     createdAt?: string;
-    fromLocation?: { id: string; name: string; code: string | null };
-    toLocation?: { id: string; name: string; code: string | null };
+    fromLocation?: { id: string; name: string; code?: string | null };
+    toLocation?: { id: string; name: string; code?: string | null };
     requestedBy?: { firstName: string; lastName: string };
     approvedBy?: { firstName: string; lastName: string } | null;
     completedBy?: { firstName: string; lastName: string } | null;
