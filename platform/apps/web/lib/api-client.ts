@@ -21,6 +21,13 @@ import {
   CreateProductSchema,
   AddOnSchema,
   CreateAddOnSchema,
+  StoreLocationSchema,
+  CreateStoreLocationSchema,
+  LocationInventorySchema,
+  LocationPriceOverrideSchema,
+  InventoryMovementSchema,
+  InventoryTransferSchema,
+  CreateInventoryTransferSchema,
   BlackoutDateSchema,
   CreateBlackoutDateSchema,
   WaitlistEntrySchema,
@@ -2494,6 +2501,78 @@ export const apiClient = {
     const data = await parseResponse<unknown>(res);
     return CampgroundWithAnalyticsSchema.parse(data);
   },
+  async getPolicyTemplates(campgroundId: string) {
+    const data = await fetchJSON<unknown>(`/campgrounds/${campgroundId}/policy-templates`);
+    const PolicyTemplateSchema = z.object({
+      id: z.string(),
+      campgroundId: z.string(),
+      name: z.string(),
+      description: z.string().nullable().optional(),
+      content: z.string().optional().default(""),
+      type: z.string(),
+      version: z.number().int(),
+      policyConfig: z.record(z.any()).nullable().optional(),
+      isActive: z.boolean(),
+      autoSend: z.boolean(),
+      siteClassId: z.string().nullable().optional(),
+      siteId: z.string().nullable().optional(),
+      createdAt: z.string().or(z.date()).optional(),
+      updatedAt: z.string().or(z.date()).optional(),
+    });
+    return z.array(PolicyTemplateSchema).parse(data);
+  },
+  async createPolicyTemplate(
+    campgroundId: string,
+    payload: {
+      name: string;
+      description?: string | null;
+      content?: string;
+      type?: string;
+      version?: number;
+      isActive?: boolean;
+      autoSend?: boolean;
+      siteClassId?: string | null;
+      siteId?: string | null;
+      policyConfig?: Record<string, any> | null;
+    }
+  ) {
+    const res = await fetch(`${API_BASE}/campgrounds/${campgroundId}/policy-templates`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", ...scopedHeaders() },
+      body: JSON.stringify(payload)
+    });
+    const data = await parseResponse<unknown>(res);
+    return data;
+  },
+  async updatePolicyTemplate(
+    id: string,
+    payload: {
+      name?: string;
+      description?: string | null;
+      content?: string;
+      type?: string;
+      version?: number;
+      isActive?: boolean;
+      autoSend?: boolean;
+      siteClassId?: string | null;
+      siteId?: string | null;
+      policyConfig?: Record<string, any> | null;
+    }
+  ) {
+    const res = await fetch(`${API_BASE}/policy-templates/${id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json", ...scopedHeaders() },
+      body: JSON.stringify(payload)
+    });
+    return parseResponse<unknown>(res);
+  },
+  async deletePolicyTemplate(id: string) {
+    const res = await fetch(`${API_BASE}/policy-templates/${id}`, {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json", ...scopedHeaders() }
+    });
+    return parseResponse<unknown>(res);
+  },
   async getSites(campgroundId: string) {
     const data = await fetchJSON<unknown>(`/campgrounds/${campgroundId}/sites`);
     return SiteArray.parse(data);
@@ -3930,6 +4009,10 @@ export const apiClient = {
       stayReasonOther?: string;
       referralSource?: string;
       referralChannel?: string;
+      adults?: number;
+      children?: number;
+      petCount?: number;
+      petTypes?: string[];
     }
   ) {
     const res = await fetch(`${API_BASE}/public/campgrounds/${slug}/quote`, {
@@ -3938,6 +4021,18 @@ export const apiClient = {
       body: JSON.stringify(payload)
     });
     const data = await parseResponse<unknown>(res);
+
+    const PolicyRequirementSchema = z.object({
+      id: z.string(),
+      name: z.string(),
+      description: z.string().nullable().optional(),
+      content: z.string().optional().default(""),
+      version: z.number().int().optional().default(1),
+      siteId: z.string().nullable().optional(),
+      siteClassId: z.string().nullable().optional(),
+      documentType: z.string().optional(),
+      config: z.record(z.any()).optional().default({})
+    });
 
     const QuoteResponseSchema = z.object({
       nights: numberish(z.number().int().nonnegative()),
@@ -3979,7 +4074,8 @@ export const apiClient = {
       referralIncentiveType: z.string().nullable().optional(),
       referralIncentiveValue: numberish(z.number()).nullable().optional().default(0),
       referralSource: z.string().nullable().optional(),
-      referralChannel: z.string().nullable().optional()
+      referralChannel: z.string().nullable().optional(),
+      policyRequirements: z.array(PolicyRequirementSchema).optional().default([])
     });
 
     const parsed = QuoteResponseSchema.parse(data);
@@ -4020,6 +4116,15 @@ export const apiClient = {
       plateState?: string;
     };
     needsAccessible?: boolean;
+    petCount?: number;
+    petTypes?: string[];
+    policyAcceptances?: {
+      templateId: string;
+      accepted: boolean;
+      signerName?: string;
+      signerEmail?: string;
+      metadata?: Record<string, any>;
+    }[];
     holdId?: string;
     charityDonation?: {
       charityId: string;
@@ -4151,6 +4256,231 @@ export const apiClient = {
     const res = await fetch(`${API_BASE}/store/addons/${id}`, { method: "DELETE", headers: scopedHeaders() });
     if (!res.ok) throw new Error("Failed to delete add-on");
     return true;
+  },
+
+  // Store Locations (Multi-location POS)
+  async getStoreLocations(campgroundId: string, includeInactive = false) {
+    const params = includeInactive ? "?includeInactive=true" : "";
+    const data = await fetchJSON<unknown>(`/campgrounds/${campgroundId}/store/locations${params}`);
+    return z.array(StoreLocationSchema).parse(data);
+  },
+  async getStoreLocation(id: string) {
+    const data = await fetchJSON<unknown>(`/store/locations/${id}`);
+    return StoreLocationSchema.parse(data);
+  },
+  async getDefaultStoreLocation(campgroundId: string) {
+    const data = await fetchJSON<unknown>(`/campgrounds/${campgroundId}/store/locations/default`);
+    return StoreLocationSchema.nullable().parse(data);
+  },
+  async createStoreLocation(campgroundId: string, payload: z.input<typeof CreateStoreLocationSchema>) {
+    const res = await fetch(`${API_BASE}/campgrounds/${campgroundId}/store/locations`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", ...scopedHeaders() },
+      body: JSON.stringify(payload)
+    });
+    const data = await parseResponse<unknown>(res);
+    return StoreLocationSchema.parse(data);
+  },
+  async updateStoreLocation(id: string, payload: Partial<z.input<typeof CreateStoreLocationSchema>>) {
+    const res = await fetch(`${API_BASE}/store/locations/${id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json", ...scopedHeaders() },
+      body: JSON.stringify(payload)
+    });
+    const data = await parseResponse<unknown>(res);
+    return StoreLocationSchema.parse(data);
+  },
+  async deleteStoreLocation(id: string) {
+    const res = await fetch(`${API_BASE}/store/locations/${id}`, { method: "DELETE", headers: scopedHeaders() });
+    if (!res.ok) {
+      const error = await res.json().catch(() => ({}));
+      throw new Error(error.message || "Failed to delete location");
+    }
+    return true;
+  },
+  async ensureDefaultStoreLocation(campgroundId: string) {
+    const res = await fetch(`${API_BASE}/campgrounds/${campgroundId}/store/locations/ensure-default`, {
+      method: "POST",
+      headers: scopedHeaders()
+    });
+    const data = await parseResponse<string>(res);
+    return data;
+  },
+
+  // Location Inventory
+  async getLocationInventory(locationId: string, productId?: string) {
+    const params = productId ? `?productId=${productId}` : "";
+    const data = await fetchJSON<unknown>(`/store/locations/${locationId}/inventory${params}`);
+    return z.array(LocationInventorySchema).parse(data);
+  },
+  async updateLocationInventory(locationId: string, productId: string, payload: { stockQty?: number; adjustment?: number; lowStockAlert?: number; notes?: string }) {
+    const res = await fetch(`${API_BASE}/store/locations/${locationId}/inventory/${productId}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json", ...scopedHeaders() },
+      body: JSON.stringify(payload)
+    });
+    const data = await parseResponse<unknown>(res);
+    return LocationInventorySchema.parse(data);
+  },
+
+  // Location Price Overrides
+  async getLocationPriceOverrides(locationId: string) {
+    const data = await fetchJSON<unknown>(`/store/locations/${locationId}/prices`);
+    return z.array(LocationPriceOverrideSchema).parse(data);
+  },
+  async createLocationPriceOverride(locationId: string, payload: { productId: string; priceCents: number; reason?: string }) {
+    const res = await fetch(`${API_BASE}/store/locations/${locationId}/prices`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", ...scopedHeaders() },
+      body: JSON.stringify(payload)
+    });
+    const data = await parseResponse<unknown>(res);
+    return LocationPriceOverrideSchema.parse(data);
+  },
+  async deleteLocationPriceOverride(locationId: string, productId: string) {
+    const res = await fetch(`${API_BASE}/store/locations/${locationId}/prices/${productId}`, {
+      method: "DELETE",
+      headers: scopedHeaders()
+    });
+    if (!res.ok) throw new Error("Failed to delete price override");
+    return true;
+  },
+
+  // Inventory Movements (Audit Log)
+  async getInventoryMovements(campgroundId: string, params?: {
+    productId?: string;
+    locationId?: string;
+    movementType?: string;
+    startDate?: string;
+    endDate?: string;
+    limit?: number;
+  }) {
+    const searchParams = new URLSearchParams();
+    if (params?.productId) searchParams.set("productId", params.productId);
+    if (params?.locationId) searchParams.set("locationId", params.locationId);
+    if (params?.movementType) searchParams.set("movementType", params.movementType);
+    if (params?.startDate) searchParams.set("startDate", params.startDate);
+    if (params?.endDate) searchParams.set("endDate", params.endDate);
+    if (params?.limit) searchParams.set("limit", String(params.limit));
+    const qs = searchParams.toString();
+    const data = await fetchJSON<unknown>(`/campgrounds/${campgroundId}/store/inventory/movements${qs ? `?${qs}` : ""}`);
+    return z.array(InventoryMovementSchema).parse(data);
+  },
+
+  // Inventory Transfers
+  async getInventoryTransfers(campgroundId: string, params?: {
+    status?: string;
+    fromLocationId?: string;
+    toLocationId?: string;
+  }) {
+    const searchParams = new URLSearchParams();
+    if (params?.status) searchParams.set("status", params.status);
+    if (params?.fromLocationId) searchParams.set("fromLocationId", params.fromLocationId);
+    if (params?.toLocationId) searchParams.set("toLocationId", params.toLocationId);
+    const qs = searchParams.toString();
+    const data = await fetchJSON<unknown>(`/campgrounds/${campgroundId}/store/transfers${qs ? `?${qs}` : ""}`);
+    return z.array(InventoryTransferSchema).parse(data);
+  },
+  async getInventoryTransfer(id: string) {
+    const data = await fetchJSON<unknown>(`/store/transfers/${id}`);
+    return InventoryTransferSchema.parse(data);
+  },
+  async createInventoryTransfer(campgroundId: string, payload: z.input<typeof CreateInventoryTransferSchema>) {
+    const res = await fetch(`${API_BASE}/campgrounds/${campgroundId}/store/transfers`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", ...scopedHeaders() },
+      body: JSON.stringify(payload)
+    });
+    const data = await parseResponse<unknown>(res);
+    return InventoryTransferSchema.parse(data);
+  },
+  async approveInventoryTransfer(id: string) {
+    const res = await fetch(`${API_BASE}/store/transfers/${id}/approve`, {
+      method: "PATCH",
+      headers: scopedHeaders()
+    });
+    const data = await parseResponse<unknown>(res);
+    return InventoryTransferSchema.parse(data);
+  },
+  async completeInventoryTransfer(id: string) {
+    const res = await fetch(`${API_BASE}/store/transfers/${id}/complete`, {
+      method: "PATCH",
+      headers: scopedHeaders()
+    });
+    const data = await parseResponse<unknown>(res);
+    return InventoryTransferSchema.parse(data);
+  },
+  async cancelInventoryTransfer(id: string) {
+    const res = await fetch(`${API_BASE}/store/transfers/${id}/cancel`, {
+      method: "PATCH",
+      headers: scopedHeaders()
+    });
+    const data = await parseResponse<unknown>(res);
+    return InventoryTransferSchema.parse(data);
+  },
+
+  // POS Location Integration
+  async getProductsForLocation(campgroundId: string, locationId?: string) {
+    const params = locationId ? `?locationId=${locationId}` : "";
+    const data = await fetchJSON<unknown>(`/campgrounds/${campgroundId}/store/products-for-location${params}`);
+    return z.array(ProductSchema.extend({
+      effectivePriceCents: z.number(),
+      effectiveStock: z.number().nullable(),
+    })).parse(data);
+  },
+
+  // Fulfillment Queue
+  async getFulfillmentQueue(campgroundId: string, params?: {
+    status?: string;
+    locationId?: string;
+    limit?: number;
+  }) {
+    const searchParams = new URLSearchParams();
+    if (params?.status) searchParams.set("status", params.status);
+    if (params?.locationId) searchParams.set("locationId", params.locationId);
+    if (params?.limit) searchParams.set("limit", String(params.limit));
+    const qs = searchParams.toString();
+    const data = await fetchJSON<unknown>(`/campgrounds/${campgroundId}/store/orders/fulfillment-queue${qs ? `?${qs}` : ""}`);
+    return z.array(StoreOrderSchema.extend({
+      fulfillmentLocation: StoreLocationSchema.pick({ id: true, name: true, code: true }).nullable().optional(),
+      assignedBy: z.object({ id: z.string(), name: z.string().nullable(), email: z.string() }).nullable().optional(),
+    })).parse(data);
+  },
+  async getFulfillmentCounts(campgroundId: string) {
+    const data = await fetchJSON<unknown>(`/campgrounds/${campgroundId}/store/orders/fulfillment-counts`);
+    return z.record(z.string(), z.number()).parse(data);
+  },
+  async assignOrderToLocation(orderId: string, locationId: string) {
+    const res = await fetch(`${API_BASE}/store/orders/${orderId}/assign-location`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json", ...scopedHeaders() },
+      body: JSON.stringify({ locationId })
+    });
+    const data = await parseResponse<unknown>(res);
+    return StoreOrderSchema.parse(data);
+  },
+  async updateFulfillmentStatus(orderId: string, status: string) {
+    const res = await fetch(`${API_BASE}/store/orders/${orderId}/fulfillment-status`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json", ...scopedHeaders() },
+      body: JSON.stringify({ status })
+    });
+    const data = await parseResponse<unknown>(res);
+    return StoreOrderSchema.parse(data);
+  },
+  async getLocationFulfillmentOrders(locationId: string, includeCompleted = false) {
+    const params = includeCompleted ? "?includeCompleted=true" : "";
+    const data = await fetchJSON<unknown>(`/store/locations/${locationId}/fulfillment-orders${params}`);
+    return z.array(StoreOrderSchema).parse(data);
+  },
+  async bulkAssignOrders(campgroundId: string, orderIds: string[], locationId: string) {
+    const res = await fetch(`${API_BASE}/campgrounds/${campgroundId}/store/orders/bulk-assign`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", ...scopedHeaders() },
+      body: JSON.stringify({ orderIds, locationId })
+    });
+    const data = await parseResponse<unknown>(res);
+    return z.object({ assignedCount: z.number() }).parse(data);
   },
 
   // Blackout Dates

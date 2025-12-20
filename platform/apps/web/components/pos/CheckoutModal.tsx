@@ -6,6 +6,11 @@ import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import { Label } from "../ui/label";
 import { CartItem } from "../../app/pos/page";
+
+// Extended CartItem type that supports location-aware pricing
+type ExtendedCartItem = CartItem & {
+    effectivePriceCents?: number;
+};
 import { recordTelemetry } from "../../lib/sync-telemetry";
 import { RoundUpInline } from "../checkout/RoundUpForCharity";
 
@@ -33,8 +38,9 @@ const posApi = {
 interface CheckoutModalProps {
     isOpen: boolean;
     onClose: () => void;
-    cart: CartItem[];
+    cart: ExtendedCartItem[];
     campgroundId: string;
+    locationId?: string | null;
     onSuccess: (order: any) => void;
     onQueued: () => void;
     isOnline: boolean;
@@ -43,7 +49,7 @@ interface CheckoutModalProps {
 
 type PaymentMethod = "card" | "cash" | "charge_to_site";
 
-export function CheckoutModal({ isOpen, onClose, cart, campgroundId, onSuccess, onQueued, isOnline, queueOrder }: CheckoutModalProps) {
+export function CheckoutModal({ isOpen, onClose, cart, campgroundId, locationId, onSuccess, onQueued, isOnline, queueOrder }: CheckoutModalProps) {
     const [method, setMethod] = useState<PaymentMethod>("card");
     const [loading, setLoading] = useState(false);
     const [siteSearch, setSiteSearch] = useState("");
@@ -54,7 +60,7 @@ export function CheckoutModal({ isOpen, onClose, cart, campgroundId, onSuccess, 
     const [charityDonation, setCharityDonation] = useState<{ optedIn: boolean; amountCents: number; charityId: string | null }>({ optedIn: false, amountCents: 0, charityId: null });
     const offlineCardWarning = !isOnline && method === "card";
 
-    const subtotalCents = cart.reduce((sum, item) => sum + item.priceCents * item.qty, 0);
+    const subtotalCents = cart.reduce((sum, item) => sum + (item.effectivePriceCents ?? item.priceCents) * item.qty, 0);
     const totalCents = subtotalCents + (charityDonation.optedIn ? charityDonation.amountCents : 0);
 
     const handleSubmit = async () => {
@@ -62,10 +68,16 @@ export function CheckoutModal({ isOpen, onClose, cart, campgroundId, onSuccess, 
         setError(null);
         try {
             const payload: any = {
-                items: cart.map(item => ({ productId: item.id, qty: item.qty })),
+                items: cart.map(item => ({
+                    productId: item.id,
+                    qty: item.qty,
+                    // Use effective price if available (location-specific)
+                    priceCents: item.effectivePriceCents ?? item.priceCents,
+                })),
                 paymentMethod: method,
                 channel: "pos",
                 fulfillmentType: fulfillment,
+                locationId: locationId || undefined,
                 charityDonation: charityDonation.optedIn && charityDonation.charityId ? {
                     charityId: charityDonation.charityId,
                     amountCents: charityDonation.amountCents,

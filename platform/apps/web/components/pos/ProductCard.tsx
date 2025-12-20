@@ -15,6 +15,9 @@ type Product = {
     channelInventoryMode?: "shared" | "split";
     lowStockAlert?: number | null;
     afterHoursAllowed?: boolean;
+    // Location-aware fields
+    effectivePriceCents?: number;
+    effectiveStock?: number | null;
 };
 
 interface ProductCardProps {
@@ -23,20 +26,28 @@ interface ProductCardProps {
 }
 
 export function ProductCard({ product, onClick }: ProductCardProps) {
+    // Use location-aware effective values if available, otherwise fall back to legacy logic
+    const hasEffectiveStock = product.effectiveStock !== undefined;
+    const displayPrice = product.effectivePriceCents ?? product.priceCents;
+    const hasPriceOverride = product.effectivePriceCents !== undefined && product.effectivePriceCents !== product.priceCents;
+
+    // Stock calculation - prefer effectiveStock when available
     const mode = product.channelInventoryMode || "shared";
     const sharedStock = product.stock ?? product.posStockQty ?? 0;
     const posStock = product.posStockQty ?? product.stock ?? 0;
     const onlineStock = product.onlineStockQty ?? product.stock ?? 0;
-    const hasStock =
-        mode === "split"
-            ? (posStock > 0 || onlineStock > 0)
-            : sharedStock > 0;
+    const effectiveStock = hasEffectiveStock ? (product.effectiveStock ?? 0) : sharedStock;
+
+    const hasStock = hasEffectiveStock
+        ? (product.effectiveStock === null || (product.effectiveStock ?? 0) > 0)
+        : (mode === "split" ? (posStock > 0 || onlineStock > 0) : sharedStock > 0);
+
     const lowStock =
         product.lowStockAlert !== undefined &&
         product.lowStockAlert !== null &&
-        ((mode === "split"
-            ? Math.min(posStock, onlineStock)
-            : sharedStock) <= product.lowStockAlert);
+        (hasEffectiveStock
+            ? ((product.effectiveStock ?? 0) <= product.lowStockAlert)
+            : ((mode === "split" ? Math.min(posStock, onlineStock) : sharedStock) <= product.lowStockAlert));
 
     return (
         <button
@@ -84,11 +95,28 @@ export function ProductCard({ product, onClick }: ProductCardProps) {
                     <p className="text-xs text-slate-500 line-clamp-2 mb-2">{product.description}</p>
                 )}
                 <div className="space-y-2">
-                    <div className="font-bold text-emerald-700 text-lg">
-                        ${(product.priceCents / 100).toFixed(2)}
+                    <div className="flex items-center gap-2">
+                        <span className="font-bold text-emerald-700 text-lg">
+                            ${(displayPrice / 100).toFixed(2)}
+                        </span>
+                        {hasPriceOverride && (
+                            <span className="text-xs text-slate-400 line-through">
+                                ${(product.priceCents / 100).toFixed(2)}
+                            </span>
+                        )}
                     </div>
                     <div className="text-[11px] text-slate-600 flex flex-wrap gap-2">
-                        {mode === "split" ? (
+                        {hasEffectiveStock ? (
+                            product.effectiveStock === null ? (
+                                <span className="inline-flex items-center rounded-full border border-slate-200 px-2 py-0.5">
+                                    Unlimited
+                                </span>
+                            ) : (
+                                <span className="inline-flex items-center rounded-full border border-slate-200 px-2 py-0.5">
+                                    Stock: {Math.max(0, effectiveStock)}
+                                </span>
+                            )
+                        ) : mode === "split" ? (
                             <>
                                 <span className="inline-flex items-center rounded-full border border-slate-200 px-2 py-0.5">
                                     POS: {Math.max(0, posStock)}

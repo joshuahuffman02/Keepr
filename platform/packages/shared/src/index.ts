@@ -774,6 +774,167 @@ export const CreateAddOnSchema = AddOnSchema.omit({
 });
 export type CreateAddOnDto = z.infer<typeof CreateAddOnSchema>;
 
+// Store Locations (Multi-location POS)
+export const StoreLocationSchema = z.object({
+  id: z.string().cuid(),
+  campgroundId: z.string().cuid(),
+  name: z.string().min(1),
+  code: z.string().nullish(),
+  type: z.enum(["physical", "virtual"]).optional().default("physical"),
+  isDefault: z.boolean().optional().default(false),
+  isActive: z.boolean().optional().default(true),
+  acceptsOnline: z.boolean().optional().default(false),
+  sortOrder: z.number().int().optional().default(0),
+  createdAt: z.string().optional(),
+  updatedAt: z.string().optional(),
+  _count: z.object({
+    terminals: z.number().optional(),
+    locationInventory: z.number().optional(),
+    priceOverrides: z.number().optional(),
+    fulfillmentOrders: z.number().optional(),
+  }).optional(),
+});
+export type StoreLocation = z.infer<typeof StoreLocationSchema>;
+
+export const CreateStoreLocationSchema = StoreLocationSchema.omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+  _count: true,
+});
+export type CreateStoreLocationDto = z.infer<typeof CreateStoreLocationSchema>;
+
+export const LocationInventorySchema = z.object({
+  id: z.string().cuid(),
+  productId: z.string().cuid(),
+  locationId: z.string().cuid(),
+  stockQty: z.number().int().nonnegative().default(0),
+  lowStockAlert: z.number().int().nonnegative().nullish(),
+  createdAt: z.string().optional(),
+  updatedAt: z.string().optional(),
+  product: ProductSchema.optional(),
+  location: z.lazy(() => StoreLocationSchema).optional(),
+});
+export type LocationInventory = z.infer<typeof LocationInventorySchema>;
+
+export const LocationPriceOverrideSchema = z.object({
+  id: z.string().cuid(),
+  productId: z.string().cuid(),
+  locationId: z.string().cuid(),
+  priceCents: z.number().int().nonnegative(),
+  reason: z.string().nullish(),
+  isActive: z.boolean().optional().default(true),
+  createdAt: z.string().optional(),
+  updatedAt: z.string().optional(),
+  product: ProductSchema.optional(),
+});
+export type LocationPriceOverride = z.infer<typeof LocationPriceOverrideSchema>;
+
+export const InventoryMovementSchema = z.object({
+  id: z.string().cuid(),
+  campgroundId: z.string().cuid(),
+  productId: z.string().cuid(),
+  locationId: z.string().cuid().nullish(),
+  movementType: z.string(),
+  qty: z.number().int(),
+  previousQty: z.number().int(),
+  newQty: z.number().int(),
+  referenceType: z.string().nullish(),
+  referenceId: z.string().nullish(),
+  notes: z.string().nullish(),
+  actorUserId: z.string().cuid(),
+  createdAt: z.string().optional(),
+  product: z.object({
+    id: z.string(),
+    name: z.string(),
+    sku: z.string().nullish(),
+  }).optional(),
+  location: z.object({
+    id: z.string(),
+    name: z.string(),
+    code: z.string().nullish(),
+  }).nullish(),
+  actor: z.object({
+    id: z.string(),
+    firstName: z.string(),
+    lastName: z.string(),
+  }).optional(),
+});
+export type InventoryMovement = z.infer<typeof InventoryMovementSchema>;
+
+// Inventory Transfers
+export const InventoryTransferItemSchema = z.object({
+  id: z.string().cuid(),
+  transferId: z.string().cuid(),
+  productId: z.string().cuid(),
+  qty: z.number().int().positive(),
+  product: z.object({
+    id: z.string(),
+    name: z.string(),
+    sku: z.string().nullish(),
+    priceCents: z.number().optional(),
+  }).optional(),
+});
+export type InventoryTransferItem = z.infer<typeof InventoryTransferItemSchema>;
+
+export const InventoryTransferSchema = z.object({
+  id: z.string().cuid(),
+  campgroundId: z.string().cuid(),
+  fromLocationId: z.string().cuid(),
+  toLocationId: z.string().cuid(),
+  status: z.enum(["pending", "in_transit", "completed", "cancelled"]),
+  notes: z.string().nullish(),
+  requestedById: z.string().cuid(),
+  approvedById: z.string().cuid().nullish(),
+  completedById: z.string().cuid().nullish(),
+  requestedAt: z.string().optional(),
+  approvedAt: z.string().nullish(),
+  completedAt: z.string().nullish(),
+  createdAt: z.string().optional(),
+  updatedAt: z.string().optional(),
+  fromLocation: z.object({
+    id: z.string(),
+    name: z.string(),
+    code: z.string().nullish(),
+  }).optional(),
+  toLocation: z.object({
+    id: z.string(),
+    name: z.string(),
+    code: z.string().nullish(),
+  }).optional(),
+  requestedBy: z.object({
+    id: z.string(),
+    firstName: z.string(),
+    lastName: z.string(),
+  }).optional(),
+  approvedBy: z.object({
+    id: z.string(),
+    firstName: z.string(),
+    lastName: z.string(),
+  }).nullish(),
+  completedBy: z.object({
+    id: z.string(),
+    firstName: z.string(),
+    lastName: z.string(),
+  }).nullish(),
+  items: z.array(InventoryTransferItemSchema).optional(),
+  _count: z.object({
+    items: z.number().optional(),
+  }).optional(),
+});
+export type InventoryTransfer = z.infer<typeof InventoryTransferSchema>;
+
+export const CreateInventoryTransferSchema = z.object({
+  fromLocationId: z.string().cuid(),
+  toLocationId: z.string().cuid(),
+  items: z.array(z.object({
+    productId: z.string().cuid(),
+    qty: z.number().int().positive(),
+  })),
+  notes: z.string().optional(),
+});
+export type CreateInventoryTransferDto = z.infer<typeof CreateInventoryTransferSchema>;
+
 // Blackout Dates
 export const BlackoutDateSchema = z.object({
   id: z.string().cuid(),

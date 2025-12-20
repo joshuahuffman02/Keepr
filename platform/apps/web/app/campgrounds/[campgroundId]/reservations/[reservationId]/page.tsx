@@ -303,6 +303,24 @@ export default function ReservationDetailPage() {
         }
       ]
       : [];
+  const getRequestMetadata = (req: any) => {
+    const raw = req?.metadata;
+    if (!raw) return {};
+    if (typeof raw === "string") {
+      try {
+        return JSON.parse(raw);
+      } catch {
+        return {};
+      }
+    }
+    return raw;
+  };
+  const isPolicyRequest = (req: any) => {
+    const meta = getRequestMetadata(req);
+    return Boolean(meta?.policyId || meta?.policyName || meta?.enforcement || req?.template?.policyConfig);
+  };
+  const policyRequests = signatureRequests.filter(isPolicyRequest);
+  const otherSignatureRequests = signatureRequests.filter((req: any) => !isPolicyRequest(req));
 
   const statusBadge =
     reservation.status === "confirmed"
@@ -440,7 +458,7 @@ export default function ReservationDetailPage() {
                   Billing Schedule
                 </CardTitle>
                 <Button
-                  size="xs"
+                  size="sm"
                   variant="outline"
                   onClick={() => {
                     apiClient.fetchJSON(`/repeat-charges/reservation/${reservationId}/generate`, { method: 'POST' })
@@ -595,6 +613,72 @@ export default function ReservationDetailPage() {
             </CardHeader>
             <CardContent className="space-y-3 text-sm">
               <div className="space-y-2">
+                <div className="text-xs font-semibold uppercase tracking-wide text-slate-500">Policy agreements</div>
+                {policyRequests.length === 0 && (
+                  <div className="text-xs text-slate-500">No policy signature requests yet.</div>
+                )}
+                {policyRequests.map((req: any) => {
+                  const meta = getRequestMetadata(req);
+                  const policyName = req.template?.name ?? meta?.policyName ?? req.subject ?? "Policy";
+                  const enforcement = meta?.enforcement ?? req.template?.policyConfig?.enforcement ?? "post_booking";
+                  const enforcementLabel =
+                    enforcement === "pre_booking"
+                      ? "Required before booking"
+                      : enforcement === "pre_checkin"
+                        ? "Required before check-in"
+                        : enforcement === "post_booking"
+                          ? "Sent after booking"
+                          : "Information only";
+                  const statusDetail = req.signedAt
+                    ? `Signed ${formatDateTime(req.signedAt)}`
+                    : req.sentAt
+                      ? `Sent ${formatDateTime(req.sentAt)}`
+                      : "Draft";
+                  const canSignNow = req.token && !["signed", "declined", "voided"].includes(req.status);
+                  const hasPdf = Boolean(req.artifact?.pdfUrl);
+                  return (
+                    <div key={req.id} className="flex flex-col gap-2 rounded border border-slate-200 p-2 md:flex-row md:items-center md:justify-between">
+                      <div className="space-y-1">
+                        <div className="flex items-center gap-2">
+                          <span className="font-medium">{policyName}</span>
+                          <Badge variant="outline">{req.status}</Badge>
+                        </div>
+                        <div className="text-xs text-slate-500">
+                          {enforcementLabel} • {statusDetail}
+                        </div>
+                      </div>
+                      <div className="flex flex-wrap gap-2">
+                        {canSignNow && (
+                          <a
+                            href={`/sign/${req.token}`}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="inline-flex items-center justify-center rounded-md border border-slate-200 px-3 py-1 text-xs font-medium text-slate-700 hover:bg-slate-50"
+                          >
+                            Sign now
+                          </a>
+                        )}
+                        {hasPdf ? (
+                          <a
+                            href={req.artifact.pdfUrl}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="inline-flex items-center justify-center rounded-md border border-slate-200 px-3 py-1 text-xs font-medium text-slate-700 hover:bg-slate-50"
+                          >
+                            Download PDF
+                          </a>
+                        ) : (
+                          <Button size="sm" variant="outline" disabled>
+                            {req.status === "signed" ? "Signed" : "Awaiting signature"}
+                          </Button>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+
+              <div className="space-y-2">
                 <div className="grid grid-cols-1 gap-2 md:grid-cols-4">
                   <Input
                     placeholder="Recipient email"
@@ -637,8 +721,8 @@ export default function ReservationDetailPage() {
               </div>
 
               <div className="space-y-2">
-                {signatureRequests.length === 0 && <div className="text-xs text-slate-500">No signature requests yet.</div>}
-                {signatureRequests.map((req: any) => (
+                {otherSignatureRequests.length === 0 && <div className="text-xs text-slate-500">No additional signature requests yet.</div>}
+                {otherSignatureRequests.map((req: any) => (
                   <div key={req.id} className="flex flex-col gap-2 rounded border border-slate-200 p-2 md:flex-row md:items-center md:justify-between">
                     <div className="space-y-1">
                       <div className="flex items-center gap-2">

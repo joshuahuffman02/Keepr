@@ -28,10 +28,14 @@ import { SyncDetailsDrawer } from "../../components/sync/SyncDetailsDrawer";
 import { useSyncStatus } from "@/contexts/SyncStatusContext";
 
 const posApi = {
-    getProducts: (campgroundId: string) => apiClient.getProducts(campgroundId),
+    getProducts: (campgroundId: string, locationId?: string) =>
+        locationId
+            ? apiClient.getProductsForLocation(campgroundId, locationId)
+            : apiClient.getProducts(campgroundId),
     getProductCategories: (campgroundId: string) => apiClient.getProductCategories(campgroundId),
     createStoreOrder: (campgroundId: string, payload: any, headers?: Record<string, string>) =>
-        apiClient.createStoreOrder(campgroundId, payload)
+        apiClient.createStoreOrder(campgroundId, payload),
+    getLocations: (campgroundId: string) => apiClient.getStoreLocations(campgroundId),
 };
 
 // Local types based on schemas
@@ -43,11 +47,25 @@ type Product = {
     imageUrl: string | null;
     categoryId: string;
     stock?: number;
+    effectivePriceCents?: number;
+    effectiveStock?: number | null;
 };
 
 type Category = {
     id: string;
     name: string;
+    sortOrder: number;
+};
+
+type StoreLocation = {
+    id: string;
+    campgroundId: string;
+    name: string;
+    code: string | null;
+    type: string;
+    isDefault: boolean;
+    isActive: boolean;
+    acceptsOnline: boolean;
     sortOrder: number;
 };
 
@@ -271,6 +289,8 @@ export default function POSPage() {
     const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
     const [lastOrder, setLastOrder] = useState<any>(null);
     const [loading, setLoading] = useState(true);
+    const [locations, setLocations] = useState<StoreLocation[]>([]);
+    const [selectedLocationId, setSelectedLocationId] = useState<string | null>(null);
     const [isOnline, setIsOnline] = useState(true);
     const [queuedOrders, setQueuedOrders] = useState<number>(0);
     const [conflicts, setConflicts] = useState<any[]>([]);
@@ -376,17 +396,32 @@ export default function POSPage() {
         }
     }, []);
 
+    // Fetch locations when campground changes
     useEffect(() => {
         if (!campgroundId) return;
+        posApi.getLocations(campgroundId).then((locs) => {
+            setLocations(locs as StoreLocation[]);
+            // Auto-select default location if none selected
+            if (!selectedLocationId) {
+                const defaultLoc = locs.find((l: StoreLocation) => l.isDefault);
+                if (defaultLoc) setSelectedLocationId(defaultLoc.id);
+            }
+        }).catch(() => setLocations([]));
+    }, [campgroundId]);
+
+    // Fetch products and categories when campground or location changes
+    useEffect(() => {
+        if (!campgroundId) return;
+        setLoading(true);
         Promise.all([
-            posApi.getProducts(campgroundId).catch(() => []),
+            posApi.getProducts(campgroundId, selectedLocationId ?? undefined).catch(() => []),
             posApi.getProductCategories(campgroundId).catch(() => [])
         ]).then(([p, c]) => {
             setProducts(p as Product[]);
             setCategories(c as Category[]);
             setLoading(false);
         });
-    }, [campgroundId]);
+    }, [campgroundId, selectedLocationId]);
 
     const loadRecentOrders = async () => {
         if (!campgroundId) return;
@@ -503,7 +538,27 @@ export default function POSPage() {
             <div className="flex h-full gap-6 p-3 sm:p-6">
                 <div className="flex-1 flex flex-col gap-4 sm:gap-6 min-w-0">
                     <div className="flex items-center justify-between flex-wrap gap-3">
-                        <h1 className="text-xl sm:text-2xl font-bold text-slate-900">Point of Sale</h1>
+                        <div className="flex items-center gap-3">
+                            <h1 className="text-xl sm:text-2xl font-bold text-slate-900">Point of Sale</h1>
+                            {locations.length > 1 && (
+                                <select
+                                    value={selectedLocationId || ""}
+                                    onChange={(e) => setSelectedLocationId(e.target.value || null)}
+                                    className="rounded-md border border-slate-300 bg-white px-3 py-1.5 text-sm font-medium text-slate-700 shadow-sm hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                                >
+                                    {locations.map((loc) => (
+                                        <option key={loc.id} value={loc.id}>
+                                            {loc.name}{loc.isDefault ? " (Default)" : ""}
+                                        </option>
+                                    ))}
+                                </select>
+                            )}
+                            {locations.length === 1 && (
+                                <Badge variant="secondary" className="text-xs">
+                                    {locations[0].name}
+                                </Badge>
+                            )}
+                        </div>
                         <div className="flex items-center gap-2 flex-wrap">
                             <SyncStatus
                                 variant="badge"
@@ -628,6 +683,7 @@ export default function POSPage() {
                     onClose={() => setIsCheckoutOpen(false)}
                     cart={cart}
                     campgroundId={campgroundId}
+                    locationId={selectedLocationId}
                     onSuccess={handleCheckoutSuccess}
                     onQueued={() => {
                         setIsCheckoutOpen(false);

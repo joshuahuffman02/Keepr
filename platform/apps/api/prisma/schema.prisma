@@ -390,7 +390,8 @@ model User {
   internalConversationParticipants InternalConversationParticipant[]
   inviteTokens                     InviteToken[]
   auditLogs                        AuditLog[]
-  storeOrdersCompleted             StoreOrder[]
+  storeOrdersCompleted             StoreOrder[]                      @relation("OrderCompletedBy")
+  storeOrdersAssigned              StoreOrder[]                      @relation("OrderAssignedBy")
   supportReportsAuthored           SupportReport[]                   @relation("ReportAuthor")
   supportReportsAssigned           SupportReport[]                   @relation("ReportAssignee")
   uploadedAssets                   SocialContentAsset[]              @relation("AssetUploader")
@@ -423,6 +424,12 @@ model User {
   tillSessionsOpened  TillSession[]        @relation("TillSessionOpenedBy")
   tillSessionsClosed  TillSession[]        @relation("TillSessionClosedBy")
   tillMovements       TillMovement[]       @relation("TillMovementActor")
+
+  // Multi-location inventory relations
+  transfersRequested  InventoryTransfer[]  @relation("TransferRequester")
+  transfersApproved   InventoryTransfer[]  @relation("TransferApprover")
+  transfersCompleted  InventoryTransfer[]  @relation("TransferCompleter")
+  inventoryMovements  InventoryMovement[]
 }
 
 model GuestEquipment {
@@ -1105,6 +1112,11 @@ model Campground {
   orgBillingLineItems    OrganizationBillingLineItem[]
   usageEvents            UsageEvent[]
 
+  // Multi-location store management
+  storeLocations         StoreLocation[]
+  inventoryTransfers     InventoryTransfer[]
+  inventoryMovements     InventoryMovement[]
+
   // Soft delete
   deletedAt DateTime?
   deletedBy String?
@@ -1761,6 +1773,8 @@ model Reservation {
   departureDate            DateTime
   adults                   Int
   children                 Int               @default(0)
+  petCount                 Int?              @default(0)
+  petTypes                 Json?
   status                   ReservationStatus @default(pending)
   totalAmount              Int               @default(0)
   paidAmount               Int               @default(0)
@@ -2624,6 +2638,32 @@ enum ChannelInventoryMode {
   split
 }
 
+// Multi-location inventory management
+enum ProductInventoryMode {
+  shared        // Single stock pool across all locations
+  per_location  // Separate stock tracked per location
+}
+
+enum StoreLocationType {
+  physical      // Physical store location
+  virtual       // Virtual location (e.g., online-only warehouse)
+}
+
+enum InventoryTransferStatus {
+  pending       // Transfer requested
+  in_transit    // Items picked up, moving to destination
+  completed     // Transfer complete
+  cancelled     // Transfer cancelled
+}
+
+enum FulfillmentAssignmentStatus {
+  unassigned    // No location assigned yet
+  assigned      // Assigned to a location
+  preparing     // Location is preparing the order
+  ready         // Ready for pickup/delivery
+  completed     // Fulfilled
+}
+
 model ProductCategory {
   id           String   @id @default(cuid())
   campgroundId String
@@ -2651,9 +2691,11 @@ model Product {
   imageUrl             String?
   sku                  String?
   stockQty             Int                  @default(0)
-  onlineStockQty       Int? // Stock for online/portal channel (when split mode)
-  posStockQty          Int? // Stock for POS/kiosk channel (when split mode)
-  channelInventoryMode ChannelInventoryMode @default(shared)
+  onlineStockQty       Int? // DEPRECATED: Use LocationInventory instead
+  posStockQty          Int? // DEPRECATED: Use LocationInventory instead
+  channelInventoryMode ChannelInventoryMode @default(shared) // DEPRECATED
+  inventoryMode        ProductInventoryMode @default(shared) // NEW: shared or per_location
+  availableLocations   String[]             @default([]) // Location IDs (empty = all locations)
   lowStockAlert        Int? // Alert when stock falls below this
   trackInventory       Boolean              @default(true)
   afterHoursAllowed    Boolean              @default(false)
@@ -2663,10 +2705,14 @@ model Product {
   createdAt            DateTime             @default(now())
   updatedAt            DateTime             @default(now()) @updatedAt
 
-  campground Campground       @relation(fields: [campgroundId], references: [id], onDelete: Cascade)
-  category   ProductCategory? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
-  orderItems StoreOrderItem[]
-  posCartItems PosCartItem[]
+  campground        Campground              @relation(fields: [campgroundId], references: [id], onDelete: Cascade)
+  category          ProductCategory?        @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  orderItems        StoreOrderItem[]
+  posCartItems      PosCartItem[]
+  locationInventory LocationInventory[]
+  priceOverrides    LocationPriceOverride[]
+  transferItems     InventoryTransferItem[]
+  movements         InventoryMovement[]
 
   @@index([campgroundId])
   @@index([categoryId])
@@ -2692,38 +2738,47 @@ model AddOnService {
 }
 
 model StoreOrder {
-  id                   String        @id @default(cuid())
-  campgroundId         String
-  reservationId        String? // If charged to site
-  guestId              String?
-  siteNumber           String? // For delivery reference
-  channel              OrderChannel  @default(pos)
-  fulfillmentType      String? // pickup, delivery, dine_in
-  deliveryInstructions String?
-  promisedAt           DateTime?
-  prepTimeMinutes      Int?
-  status               OrderStatus   @default(pending)
-  paymentMethod        PaymentMethod @default(card)
-  subtotalCents        Int           @default(0)
-  taxCents             Int           @default(0)
-  totalCents           Int           @default(0)
-  notes                String?
-  createdBy            String? // Staff user ID
-  completedAt          DateTime?
-  completedById        String?
-  createdAt            DateTime      @default(now())
-  updatedAt            DateTime      @default(now()) @updatedAt
+  id                    String                      @id @default(cuid())
+  campgroundId          String
+  reservationId         String? // If charged to site
+  guestId               String?
+  siteNumber            String? // For delivery reference
+  channel               OrderChannel                @default(pos)
+  fulfillmentType       String? // pickup, delivery, dine_in
+  deliveryInstructions  String?
+  promisedAt            DateTime?
+  prepTimeMinutes       Int?
+  status                OrderStatus                 @default(pending)
+  paymentMethod         PaymentMethod               @default(card)
+  subtotalCents         Int                         @default(0)
+  taxCents              Int                         @default(0)
+  totalCents            Int                         @default(0)
+  notes                 String?
+  createdBy             String? // Staff user ID
+  completedAt           DateTime?
+  completedById         String?
+  // Multi-location fulfillment
+  fulfillmentLocationId String?
+  fulfillmentStatus     FulfillmentAssignmentStatus @default(unassigned)
+  assignedAt            DateTime?
+  assignedById          String?
+  createdAt             DateTime                    @default(now())
+  updatedAt             DateTime                    @default(now()) @updatedAt
 
-  campground  Campground       @relation(fields: [campgroundId], references: [id], onDelete: Cascade)
-  reservation Reservation?     @relation(fields: [reservationId], references: [id], onDelete: SetNull)
-  guest       Guest?           @relation(fields: [guestId], references: [id], onDelete: SetNull)
-  completedBy User?            @relation(fields: [completedById], references: [id], onDelete: SetNull)
-  items       StoreOrderItem[]
+  campground          Campground       @relation(fields: [campgroundId], references: [id], onDelete: Cascade)
+  reservation         Reservation?     @relation(fields: [reservationId], references: [id], onDelete: SetNull)
+  guest               Guest?           @relation(fields: [guestId], references: [id], onDelete: SetNull)
+  completedBy         User?            @relation("OrderCompletedBy", fields: [completedById], references: [id], onDelete: SetNull)
+  fulfillmentLocation StoreLocation?   @relation("FulfillmentLocation", fields: [fulfillmentLocationId], references: [id], onDelete: SetNull)
+  assignedBy          User?            @relation("OrderAssignedBy", fields: [assignedById], references: [id], onDelete: SetNull)
+  items               StoreOrderItem[]
 
   @@index([campgroundId])
   @@index([reservationId])
   @@index([guestId])
   @@index([status])
+  @@index([fulfillmentLocationId])
+  @@index([fulfillmentStatus])
 }
 
 model StoreOrderItem {
@@ -4674,9 +4729,11 @@ model DocumentTemplate {
   siteClassId  String?
   siteId       String?
   name         String
+  description  String?
   type         SignatureDocumentType
   version      Int                   @default(1)
   content      String                @db.Text
+  policyConfig Json?
   isActive     Boolean               @default(true)
   autoSend     Boolean               @default(false)
   createdAt    DateTime              @default(now())
@@ -5433,11 +5490,13 @@ model PosTerminal {
   priceVersion   String?
   createdAt      DateTime @default(now())
 
-  campground   Campground   @relation(fields: [campgroundId], references: [id], onDelete: Cascade)
+  campground   Campground     @relation(fields: [campgroundId], references: [id], onDelete: Cascade)
+  location     StoreLocation? @relation(fields: [locationId], references: [id], onDelete: SetNull)
   carts        PosCart[]
   tillSessions TillSession[]
 
   @@index([campgroundId])
+  @@index([locationId])
 }
 
 model PosCart {
@@ -6473,4 +6532,142 @@ model OrgReferral {
   @@index([referralCode])
   @@index([referredEmail])
   @@index([status])
+}
+
+// ============================================
+// Multi-Location Store Management
+// ============================================
+
+model StoreLocation {
+  id               String             @id @default(cuid())
+  campgroundId     String
+  name             String             // "Pool Bar", "Camp Store", "Snack Shack"
+  code             String?            // Short code: "PB", "CS", "SS"
+  type             StoreLocationType  @default(physical)
+  isDefault        Boolean            @default(false)
+  isActive         Boolean            @default(true)
+  acceptsOnline    Boolean            @default(false) // Can fulfill online orders
+  sortOrder        Int                @default(0)
+  createdAt        DateTime           @default(now())
+  updatedAt        DateTime           @default(now()) @updatedAt
+
+  campground        Campground             @relation(fields: [campgroundId], references: [id], onDelete: Cascade)
+  locationInventory LocationInventory[]
+  priceOverrides    LocationPriceOverride[]
+  terminals         PosTerminal[]
+  fulfillmentOrders StoreOrder[]           @relation("FulfillmentLocation")
+  transfersOut      InventoryTransfer[]    @relation("TransferFrom")
+  transfersIn       InventoryTransfer[]    @relation("TransferTo")
+  inventoryMovements InventoryMovement[]
+
+  @@unique([campgroundId, name])
+  @@index([campgroundId])
+  @@index([isActive])
+}
+
+model LocationInventory {
+  id            String   @id @default(cuid())
+  productId     String
+  locationId    String
+  stockQty      Int      @default(0)
+  lowStockAlert Int?     // Alert when stock falls below this
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @default(now()) @updatedAt
+
+  product  Product       @relation(fields: [productId], references: [id], onDelete: Cascade)
+  location StoreLocation @relation(fields: [locationId], references: [id], onDelete: Cascade)
+
+  @@unique([productId, locationId])
+  @@index([productId])
+  @@index([locationId])
+}
+
+model LocationPriceOverride {
+  id          String   @id @default(cuid())
+  productId   String
+  locationId  String
+  priceCents  Int      // Override price for this location
+  reason      String?  // "Pool bar markup", "Clearance", etc.
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @default(now()) @updatedAt
+
+  product  Product       @relation(fields: [productId], references: [id], onDelete: Cascade)
+  location StoreLocation @relation(fields: [locationId], references: [id], onDelete: Cascade)
+
+  @@unique([productId, locationId])
+  @@index([productId])
+  @@index([locationId])
+  @@index([isActive])
+}
+
+model InventoryTransfer {
+  id               String                  @id @default(cuid())
+  campgroundId     String
+  fromLocationId   String
+  toLocationId     String
+  status           InventoryTransferStatus @default(pending)
+  notes            String?
+  requestedById    String
+  approvedById     String?
+  completedById    String?
+  requestedAt      DateTime                @default(now())
+  approvedAt       DateTime?
+  completedAt      DateTime?
+  createdAt        DateTime                @default(now())
+  updatedAt        DateTime                @default(now()) @updatedAt
+
+  campground   Campground              @relation(fields: [campgroundId], references: [id], onDelete: Cascade)
+  fromLocation StoreLocation           @relation("TransferFrom", fields: [fromLocationId], references: [id], onDelete: Cascade)
+  toLocation   StoreLocation           @relation("TransferTo", fields: [toLocationId], references: [id], onDelete: Cascade)
+  requestedBy  User                    @relation("TransferRequester", fields: [requestedById], references: [id])
+  approvedBy   User?                   @relation("TransferApprover", fields: [approvedById], references: [id])
+  completedBy  User?                   @relation("TransferCompleter", fields: [completedById], references: [id])
+  items        InventoryTransferItem[]
+
+  @@index([campgroundId])
+  @@index([fromLocationId])
+  @@index([toLocationId])
+  @@index([status])
+}
+
+model InventoryTransferItem {
+  id         String   @id @default(cuid())
+  transferId String
+  productId  String
+  qty        Int
+  createdAt  DateTime @default(now())
+
+  transfer InventoryTransfer @relation(fields: [transferId], references: [id], onDelete: Cascade)
+  product  Product           @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@index([transferId])
+  @@index([productId])
+}
+
+model InventoryMovement {
+  id            String    @id @default(cuid())
+  campgroundId  String
+  productId     String
+  locationId    String?   // Null for shared-mode products
+  movementType  String    // sale, return, transfer_out, transfer_in, adjustment, restock
+  qty           Int       // Positive or negative
+  previousQty   Int
+  newQty        Int
+  referenceType String?   // order, transfer, manual
+  referenceId   String?   // ID of order/transfer/etc.
+  notes         String?
+  actorUserId   String
+  createdAt     DateTime  @default(now())
+
+  campground Campground     @relation(fields: [campgroundId], references: [id], onDelete: Cascade)
+  product    Product        @relation(fields: [productId], references: [id], onDelete: Cascade)
+  location   StoreLocation? @relation(fields: [locationId], references: [id], onDelete: SetNull)
+  actor      User           @relation(fields: [actorUserId], references: [id])
+
+  @@index([campgroundId])
+  @@index([productId])
+  @@index([locationId])
+  @@index([movementType])
+  @@index([createdAt])
 }
