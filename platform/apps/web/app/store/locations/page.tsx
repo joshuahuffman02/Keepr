@@ -43,7 +43,7 @@ type StoreLocation = {
     id: string;
     campgroundId: string;
     name: string;
-    code: string | null;
+    code?: string | null;
     type: "physical" | "virtual";
     isDefault: boolean;
     isActive: boolean;
