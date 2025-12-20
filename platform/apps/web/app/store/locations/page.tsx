@@ -87,7 +87,7 @@ export default function StoreLocationsPage() {
 
     const createMutation = useMutation({
         mutationFn: (data: typeof formData) =>
-            apiClient.createStoreLocation(selectedCg, data),
+            apiClient.createStoreLocation(selectedCg, { ...data, campgroundId: selectedCg }),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["store-locations"] });
             setIsCreateDialogOpen(false);
