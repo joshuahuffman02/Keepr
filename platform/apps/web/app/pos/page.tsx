@@ -61,12 +61,20 @@ type StoreLocation = {
     id: string;
     campgroundId: string;
     name: string;
-    code: string | null;
-    type: string;
+    code?: string | null;
+    type: "physical" | "virtual";
     isDefault: boolean;
     isActive: boolean;
     acceptsOnline: boolean;
     sortOrder: number;
+    createdAt?: string;
+    updatedAt?: string;
+    _count?: {
+        terminals?: number;
+        locationInventory?: number;
+        priceOverrides?: number;
+        fulfillmentOrders?: number;
+    };
 };
 
 export type CartItem = Product & { qty: number };
@@ -403,7 +411,7 @@ export default function POSPage() {
             setLocations(locs as StoreLocation[]);
             // Auto-select default location if none selected
             if (!selectedLocationId) {
-                const defaultLoc = locs.find((l: StoreLocation) => l.isDefault);
+                const defaultLoc = locs.find((l) => l.isDefault);
                 if (defaultLoc) setSelectedLocationId(defaultLoc.id);
             }
         }).catch(() => setLocations([]));
