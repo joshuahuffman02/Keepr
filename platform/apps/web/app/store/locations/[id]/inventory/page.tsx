@@ -289,14 +289,7 @@ export default function LocationInventoryPage() {
                                                 locationId,
                                                 stockQty: 0,
                                                 lowStockAlert: product.lowStockAlert ?? null,
-                                                product: {
-                                                    id: product.id,
-                                                    name: product.name,
-                                                    sku: product.sku ?? null,
-                                                    priceCents: product.priceCents,
-                                                    trackInventory: product.trackInventory ?? true,
-                                                    lowStockAlert: product.lowStockAlert ?? undefined,
-                                                },
+                                                product,
                                             });
                                             setAdjustmentType("set");
                                             setAdjustmentValue(0);
