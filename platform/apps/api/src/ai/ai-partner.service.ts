@@ -9,14 +9,8 @@ import { AuditService } from "../audit/audit.service";
 import { PrismaService } from "../prisma/prisma.service";
 import { HoldsService } from "../holds/holds.service";
 import { PublicReservationsService } from "../public-reservations/public-reservations.service";
-import { PricingV2Service } from "../pricing-v2/pricing-v2.service";
-import { MaintenanceService } from "../maintenance/maintenance.service";
-import { ReservationsService } from "../reservations/reservations.service";
-import { SeasonalRatesService } from "../seasonal-rates/seasonal-rates.service";
-import { RepeatChargesService } from "../repeat-charges/repeat-charges.service";
-import { createAgentRegistry } from "./adk-agents.registry";
-
 type PartnerMode = "staff" | "admin";
+type PersonaKey = "revenue" | "operations" | "marketing" | "accounting" | "hospitality" | "compliance" | "general";
 
 type ActionType =
   | "lookup_availability"
@@ -69,6 +63,16 @@ type PartnerChatRequest = {
   user: any;
 };
 
+const PERSONA_PROMPTS: Record<PersonaKey, string> = {
+  revenue: "You are the Revenue strategist. Focus on occupancy, ADR, demand signals, and pricing strategy. Explain trade-offs and highlight revenue impact.",
+  operations: "You are the Operations chief. Focus on site readiness, maintenance status, holds, and execution speed. Keep responses direct and action-oriented.",
+  marketing: "You are the Marketing advisor. Focus on demand generation, referrals, promotions, and messaging. Recommend experiments and channels.",
+  accounting: "You are the Accounting advisor. Focus on deposits, cash handling, refunds, reconciliation, and receipts. Be precise and risk-aware.",
+  hospitality: "You are the Hospitality advisor. Focus on guest experience, accessibility, and clear communication. Keep tone warm and practical.",
+  compliance: "You are the Compliance advisor. Focus on privacy, PCI, ADA, safety, and policy adherence. Be conservative and explicit about risk.",
+  general: "You are a helpful campground operations partner. Provide clear, calm guidance."
+};
+
 const ACTION_REGISTRY: Record<
   Exclude<ActionType, "none">,
   { resource: string; action: "read" | "write"; impactArea: ImpactArea; sensitivity: "low" | "medium" | "high"; confirmByDefault?: boolean }
@@ -113,23 +117,8 @@ export class AiPartnerService {
     private readonly audit: AuditService,
     private readonly prisma: PrismaService,
     private readonly holds: HoldsService,
-    private readonly publicReservations: PublicReservationsService,
-    private readonly pricingV2: PricingV2Service,
-    private readonly maintenance: MaintenanceService,
-    private readonly reservations: ReservationsService,
-    private readonly seasonalRates: SeasonalRatesService,
-    private readonly repeatCharges: RepeatChargesService
-  ) {
-    this.adkRunner = createAgentRegistry({
-      pricingV2: this.pricingV2,
-      maintenance: this.maintenance,
-      reservations: this.reservations,
-      seasonalRates: this.seasonalRates,
-      repeatCharges: this.repeatCharges,
-    });
-  }
-
-  private adkRunner: any;
+    private readonly publicReservations: PublicReservationsService
+  ) {}
 
   async chat(request: PartnerChatRequest): Promise<AiPartnerResponse> {
     const { campgroundId, message, history = [], sessionId, user } = request;
@@ -156,44 +145,82 @@ export class AiPartnerService {
     const { historyText, historyTokenMap } = this.buildHistory(history, campground.aiAnonymizationLevel ?? "moderate");
     const mergedTokenMap = this.mergeTokenMaps(tokenMap, historyTokenMap);
 
-    // Execute via ADK Runner
+    const routing = await this.routePersona({
+      campgroundId,
+      anonymizedText,
+      historyText,
+      role,
+      mode
+    });
+
+    return this.runOpenAiPartner({
+      campground,
+      campgroundId,
+      anonymizedText,
+      historyText,
+      tokenMap: mergedTokenMap,
+      role,
+      mode,
+      user,
+      sessionId,
+      persona: routing.persona,
+      routingReason: routing.reason,
+      routingConfidence: routing.confidence
+    });
+  }
+
+  private async routePersona(params: {
+    campgroundId: string;
+    anonymizedText: string;
+    historyText: string;
+    role: string;
+    mode: PartnerMode;
+  }): Promise<{ persona: PersonaKey; confidence?: number; reason?: string }> {
+    const systemPrompt = `You are a routing agent for Camp Everyday Host.
+Select the single best persona for the request.
+Return ONLY valid JSON with keys: persona, confidence, reason.
+
+Valid personas:
+- revenue
+- operations
+- marketing
+- accounting
+- hospitality
+- compliance
+- general`;
+
+    const historyBlock = params.historyText ? `\nHistory:\n${params.historyText}` : "";
+    const userPrompt = `User Role: ${params.role}
+Mode: ${params.mode}
+Request: "${params.anonymizedText}"${historyBlock}`;
+
     try {
-      const result = await this.adkRunner.run(anonymizedText, {
-        context: {
-          campgroundId,
-          campgroundName: campground.name,
-          userRole: role,
-          userMode: mode,
-          userId: user?.id,
-        }
+      const response = await this.provider.getCompletion({
+        campgroundId: params.campgroundId,
+        featureType: AiFeatureType.reply_assist,
+        systemPrompt,
+        userPrompt,
+        maxTokens: 120,
+        temperature: 0
       });
 
-      // Deanonymize the response
-      const cleanMessage = this.privacy.deanonymize(result.content || result.message, tokenMap);
+      const parsed = this.parseJsonBlock(response.content);
+      if (!parsed || typeof parsed !== "object") {
+        return { persona: "general" };
+      }
 
-      return {
-        mode,
-        message: cleanMessage,
-        evidenceLinks: (result as any).evidenceLinks,
-        actionDrafts: (result as any).actionDrafts,
-      };
+      const persona = this.normalizePersona(parsed.persona);
+      const confidence = typeof parsed.confidence === "number" ? parsed.confidence : undefined;
+      const reason = typeof parsed.reason === "string" ? parsed.reason.slice(0, 200) : undefined;
+
+      return { persona, confidence, reason };
     } catch (err) {
-      this.logger.error("ADK Partner Execution Failed", err);
-      return await this.runFallback({
-        campground,
-        campgroundId,
-        anonymizedText,
-        historyText,
-        tokenMap: mergedTokenMap,
-        role,
-        mode,
-        user,
-        sessionId
-      });
+      this.logger.warn("AI partner routing failed", err);
+      return { persona: "general" };
     }
   }
 
-  private async runFallback(params: {
+  private async runOpenAiPartner(params: {
     campground: { id: string; name: string; slug: string; aiAnonymizationLevel: string | null };
     campgroundId: string;
     anonymizedText: string;
@@ -203,13 +230,19 @@ export class AiPartnerService {
     mode: PartnerMode;
     user: any;
     sessionId?: string;
+    persona: PersonaKey;
+    routingReason?: string;
+    routingConfidence?: number;
   }): Promise<AiPartnerResponse> {
     try {
+      const personaPrompt = PERSONA_PROMPTS[params.persona] ?? PERSONA_PROMPTS.general;
       const systemPrompt = this.buildSystemPrompt({
         mode: params.mode,
         campgroundName: params.campground.name,
         role: params.role,
-        campgroundId: params.campgroundId
+        campgroundId: params.campgroundId,
+        persona: params.persona,
+        personaPrompt
       });
 
       const userPrompt = this.buildUserPrompt({
@@ -219,7 +252,10 @@ export class AiPartnerService {
         campgroundId: params.campgroundId,
         userId: params.user?.id,
         role: params.role,
-        mode: params.mode
+        mode: params.mode,
+        persona: params.persona,
+        routingReason: params.routingReason,
+        routingConfidence: params.routingConfidence
       });
 
       const toolResponse = await this.provider.getToolCompletion({
@@ -353,7 +389,7 @@ export class AiPartnerService {
         evidenceLinks: finalDraft.evidenceLinks
       };
     } catch (err) {
-      this.logger.error("AI Partner fallback failed", err);
+      this.logger.error("AI Partner request failed", err);
       return {
         mode: params.mode,
         message: "The AI partner is temporarily unavailable. Please try again shortly."
@@ -406,11 +442,28 @@ export class AiPartnerService {
     ];
   }
 
-  private buildSystemPrompt(params: { mode: PartnerMode; campgroundName: string; role: string; campgroundId: string }) {
+  private buildSystemPrompt(params: {
+    mode: PartnerMode;
+    campgroundName: string;
+    role: string;
+    campgroundId: string;
+    persona: PersonaKey;
+    personaPrompt: string;
+  }) {
     return `You are the Active Campground AI Partner for ${params.campgroundName}.
 MODE: ${params.mode.toUpperCase()}
 ROLE: ${params.role}
 PARK_SCOPE: ${params.campgroundId}
+PERSONA: ${params.persona.toUpperCase()}
+PERSONA_FOCUS: ${params.personaPrompt}
+
+Execution pipeline (do not skip):
+1) Use injected identity and park context.
+2) Assume input is privacy-redacted; never request PII.
+3) Map intent to allowed actions using the tool schema.
+4) Draft actions only; execution is gated by RBAC and confirmation.
+5) Evaluate impact for pricing/availability/policy/revenue and warn on risk.
+6) Provide evidence links when referencing data.
 
 Behavior:
 - Staff mode: fast, direct, minimal verbosity.
@@ -446,13 +499,21 @@ Return your output exclusively via the assistant_response tool.`;
     userId?: string;
     role: string;
     mode: PartnerMode;
+    persona: PersonaKey;
+    routingReason?: string;
+    routingConfidence?: number;
   }) {
     const historyBlock = params.historyText ? `\n\nRecent history:\n${params.historyText}` : "";
+    const routingBits: string[] = [`persona=${params.persona}`];
+    if (params.routingReason) routingBits.push(`reason=${params.routingReason}`);
+    if (typeof params.routingConfidence === "number") routingBits.push(`confidence=${params.routingConfidence.toFixed(2)}`);
+    const routingBlock = routingBits.length ? `\nRouting: ${routingBits.join(" | ")}` : "";
     return `Campground: ${params.campgroundName}
 Campground ID: ${params.campgroundId}
 User ID: ${params.userId ?? "unknown"}
 User Role: ${params.role}
 Mode: ${params.mode}
+${routingBlock}
 
 User request: "${params.anonymizedText}"${historyBlock}`;
   }
@@ -513,6 +574,29 @@ User request: "${params.anonymizedText}"${historyBlock}`;
     } catch {
       return null;
     }
+  }
+
+  private parseJsonBlock(content: string) {
+    if (!content) return null;
+    const match = content.match(/\{[\s\S]*\}/);
+    if (!match) return null;
+    try {
+      return JSON.parse(match[0]);
+    } catch {
+      return null;
+    }
+  }
+
+  private normalizePersona(value: any): PersonaKey {
+    if (typeof value !== "string") return "general";
+    const normalized = value.trim().toLowerCase();
+    if (normalized === "revenue") return "revenue";
+    if (normalized === "operations" || normalized === "ops") return "operations";
+    if (normalized === "marketing") return "marketing";
+    if (normalized === "accounting" || normalized === "finance") return "accounting";
+    if (normalized === "hospitality" || normalized === "guest") return "hospitality";
+    if (normalized === "compliance") return "compliance";
+    return "general";
   }
 
   private resolveParameters(parameters: Record<string, any>, tokenMap: Map<string, string>): Record<string, any> {
