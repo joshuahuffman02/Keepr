@@ -47,10 +47,10 @@ type LocationInventory = {
     product?: {
         id: string;
         name: string;
-        sku: string | null;
+        sku?: string | null;
         priceCents: number;
-        trackInventory: boolean;
-        lowStockAlert: number | null;
+        trackInventory?: boolean;
+        lowStockAlert?: number | null;
     };
 };
 
