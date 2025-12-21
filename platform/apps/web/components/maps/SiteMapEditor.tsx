@@ -206,6 +206,7 @@ export function SiteMapEditor({
   const [gridSize, setGridSize] = useState(10);
   const [editingPoints, setEditingPoints] = useState<Point[] | null>(null);
   const [dragIndex, setDragIndex] = useState<number | null>(null);
+  const [isFullscreen, setIsFullscreen] = useState(false);
 
   useEffect(() => {
     if (!baseImageUrl) {
@@ -242,6 +243,33 @@ export function SiteMapEditor({
     setDragIndex(null);
     setDrawTargetId(null);
   }, [selectedShapeId]);
+
+  useEffect(() => {
+    if (!isDrawing) return;
+    setIsFullscreen(true);
+  }, [isDrawing]);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    if (!isFullscreen) return;
+    const handleKey = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setIsFullscreen(false);
+      }
+    };
+    document.addEventListener("keydown", handleKey);
+    return () => document.removeEventListener("keydown", handleKey);
+  }, [isFullscreen]);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    if (!isFullscreen) return;
+    const original = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = original;
+    };
+  }, [isFullscreen]);
 
   const assignedShapeBySite = useMemo(() => {
     const map = new Map<string, string>();
@@ -788,8 +816,15 @@ export function SiteMapEditor({
     );
   }
 
+  const containerClasses = cn(
+    isFullscreen
+      ? "fixed inset-0 z-50 bg-white p-4 shadow-2xl"
+      : "rounded-xl border border-slate-200 bg-white p-4",
+    className
+  );
+
   return (
-    <div className={cn("rounded-xl border border-slate-200 bg-white p-4", className)}>
+    <div className={containerClasses}>
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <div className="text-sm font-semibold text-slate-800">Site map editor</div>
@@ -799,6 +834,9 @@ export function SiteMapEditor({
           <p className="text-[11px] text-slate-400">Enter: finish | Esc: cancel | Shift: lock 45-degree angles.</p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
+          <Button size="sm" variant="outline" onClick={() => setIsFullscreen((prev) => !prev)}>
+            {isFullscreen ? "Exit full screen" : "Full screen"}
+          </Button>
           <Button size="sm" variant="outline" onClick={() => handleStartDraw(null)} disabled={isDrawing}>
             Draw new shape
           </Button>
@@ -830,8 +868,13 @@ export function SiteMapEditor({
         </div>
       </div>
 
-      <div className="mt-4 grid gap-4 lg:grid-cols-[320px,1fr]">
-        <div className="space-y-4">
+      <div
+        className={cn(
+          "mt-4 grid gap-4 lg:grid-cols-[320px,1fr]",
+          isFullscreen && "h-[calc(100vh-180px)]"
+        )}
+      >
+        <div className={cn("space-y-4", isFullscreen && "h-full overflow-auto pr-1")}>
           <div className="rounded-lg border border-slate-200 bg-white p-3">
             <div className="flex items-center justify-between">
               <div className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">Shapes</div>
@@ -965,11 +1008,11 @@ export function SiteMapEditor({
           </div>
         </div>
 
-        <div className="rounded-xl border border-slate-200 bg-slate-50 p-2">
+        <div className={cn("rounded-xl border border-slate-200 bg-slate-50 p-2", isFullscreen && "h-full")}>
           <svg
             ref={svgRef}
             viewBox={`${viewBox.minX} ${viewBox.minY} ${viewBox.width} ${viewBox.height}`}
-            className="h-[620px] w-full"
+            className={cn(isFullscreen ? "h-full w-full" : "h-[620px] w-full")}
             onPointerMove={handlePointerMove}
             onPointerUp={handlePointerUp}
             onPointerLeave={() => setHoverPoint(null)}
