@@ -3664,12 +3664,47 @@ function ReportsPageInner() {
 
   // Prepare export preview and show confirmation dialog
   const prepareExportPreview = (tabName: string) => {
+    if (!campgroundId) {
+      toast({
+        title: "Select a campground",
+        description: "Choose a campground before exporting reports.",
+        variant: "destructive"
+      });
+      return;
+    }
+    if (reservationsQuery.isLoading || sitesQuery.isLoading) {
+      toast({
+        title: "Reports still loading",
+        description: "Wait for report data to finish loading before exporting.",
+        variant: "destructive"
+      });
+      return;
+    }
+    const start = new Date(dateRange.start);
+    const end = new Date(dateRange.end);
+    if (!dateRange.start || !dateRange.end || Number.isNaN(start.getTime()) || Number.isNaN(end.getTime()) || start > end) {
+      toast({
+        title: "Invalid date range",
+        description: "Choose a valid start and end date before exporting.",
+        variant: "destructive"
+      });
+      return;
+    }
+    const rowCount = getExportRowCount(tabName);
+    if (!rowCount) {
+      toast({
+        title: "Nothing to export",
+        description: "No rows match the current filters and date range.",
+        variant: "destructive"
+      });
+      return;
+    }
     const subMeta = currentSubMeta();
     setExportPreview({
       reportName: getReportDisplayName(tabName),
       subReportName: subMeta?.label || null,
       dateRange,
-      rowCount: getExportRowCount(tabName),
+      rowCount,
       tabName
     });
     setShowExportDialog(true);

@@ -967,7 +967,7 @@ export const WaitlistEntrySchema = z.object({
   siteTypeId: z.string().cuid().optional().nullable(),
   arrivalDate: z.string().nullable().optional(),
   departureDate: z.string().nullable().optional(),
-  status: z.enum(["active", "fulfilled", "expired", "cancelled"]).default("active"),
+  status: z.enum(["active", "offered", "converted", "fulfilled", "expired", "cancelled"]).default("active"),
   type: z.enum(["regular", "seasonal"]).default("regular"),
   contactName: z.string().nullable().optional(),
   contactEmail: z.string().nullable().optional(),
@@ -975,8 +975,26 @@ export const WaitlistEntrySchema = z.object({
   notes: z.string().nullable().optional(),
   lastNotifiedAt: z.string().nullable().optional(),
   notifiedCount: z.number().int().nonnegative().optional(),
+  priority: z.number().int().min(0).max(100).optional(),
+  autoOffer: z.boolean().optional(),
+  maxPrice: z.number().int().nullable().optional(),
+  flexibleDates: z.boolean().optional(),
+  flexibleDays: z.number().int().optional(),
+  convertedReservationId: z.string().cuid().nullable().optional(),
+  convertedAt: z.string().nullable().optional(),
   createdAt: z.string().optional(),
-  updatedAt: z.string().optional()
+  updatedAt: z.string().optional(),
+  guest: z.object({
+    primaryFirstName: z.string().nullable().optional(),
+    primaryLastName: z.string().nullable().optional(),
+    email: z.string().nullable().optional()
+  }).nullable().optional(),
+  site: z.object({
+    siteNumber: z.string()
+  }).nullable().optional(),
+  siteClass: z.object({
+    name: z.string()
+  }).nullable().optional()
 });
 export type WaitlistEntry = z.infer<typeof WaitlistEntrySchema>;
 

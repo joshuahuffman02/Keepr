@@ -34,6 +34,16 @@ export class StoredValueController {
     return this.service.adjust(dto, req.headers["idempotency-key"], req.user);
   }
 
+  @Get("campgrounds/:campgroundId/accounts")
+  listAccounts(@Param("campgroundId") campgroundId: string) {
+    return this.service.listAccounts(campgroundId);
+  }
+
+  @Get("campgrounds/:campgroundId/ledger")
+  listLedger(@Param("campgroundId") campgroundId: string) {
+    return this.service.listLedger(campgroundId);
+  }
+
   @Get(":id/balance")
   balance(@Param("id") id: string) {
     return this.service.balanceByAccount(id);

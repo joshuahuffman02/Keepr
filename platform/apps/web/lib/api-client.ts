@@ -200,6 +200,66 @@ const DashboardSummarySchema = z.object({
   maintenanceOverdue: z.number().optional().default(0)
 });
 
+const StoredValueCodeSchema = z.object({
+  id: z.string(),
+  code: z.string(),
+  active: z.boolean(),
+  createdAt: z.string().optional()
+});
+
+const StoredValueAccountSchema = z.object({
+  id: z.string(),
+  campgroundId: z.string(),
+  type: z.enum(["gift", "credit"]),
+  currency: z.string(),
+  status: z.enum(["active", "frozen", "expired"]),
+  issuedAt: z.string(),
+  expiresAt: z.string().nullable().optional(),
+  metadata: z.record(z.any()).nullable().optional(),
+  createdAt: z.string().optional(),
+  updatedAt: z.string().optional(),
+  codes: z.array(StoredValueCodeSchema).optional().default([]),
+  balanceCents: z.number(),
+  issuedCents: z.number()
+});
+
+const StoredValueLedgerSchema = z.object({
+  id: z.string(),
+  accountId: z.string(),
+  campgroundId: z.string(),
+  direction: z.string(),
+  amountCents: z.number(),
+  currency: z.string(),
+  beforeBalanceCents: z.number().optional(),
+  afterBalanceCents: z.number().optional(),
+  referenceType: z.string().optional(),
+  referenceId: z.string().optional(),
+  channel: z.string().nullable().optional(),
+  reason: z.string().nullable().optional(),
+  createdAt: z.string()
+});
+
+const StoredValueIssueResponseSchema = z.object({
+  accountId: z.string(),
+  balanceCents: z.number(),
+  expiresAt: z.string().nullable().optional(),
+  code: z.string().optional(),
+  pinRequired: z.boolean().optional(),
+  pin: z.string().optional()
+}).passthrough();
+
+const StoredValueRedeemResponseSchema = z.object({
+  accountId: z.string(),
+  balanceCents: z.number().optional(),
+  availableCents: z.number().optional(),
+  holdId: z.string().optional()
+}).passthrough();
+
+const StoredValueAdjustResponseSchema = z.object({
+  accountId: z.string(),
+  balanceCents: z.number()
+}).passthrough();
+
 const OnboardingStepEnum = z.enum([
   "account_profile",
   "payment_gateway",
@@ -7115,6 +7175,63 @@ export const apiClient = {
       body: JSON.stringify(payload),
     });
     return parseResponse<unknown>(res);
+  },
+
+  // ---------------------------------------------------------------------------
+  // Phase 4: Stored Value (Gift Cards / Credits)
+  // ---------------------------------------------------------------------------
+  async getStoredValueAccounts(campgroundId: string) {
+    const data = await fetchJSON<unknown>(`/stored-value/campgrounds/${campgroundId}/accounts`);
+    return z.array(StoredValueAccountSchema).parse(data);
+  },
+  async getStoredValueLedger(campgroundId: string) {
+    const data = await fetchJSON<unknown>(`/stored-value/campgrounds/${campgroundId}/ledger`);
+    return z.array(StoredValueLedgerSchema).parse(data);
+  },
+  async issueStoredValue(payload: {
+    tenantId: string;
+    amountCents: number;
+    currency: string;
+    expiresAt?: string;
+    customerId?: string;
+    code?: string;
+    type: "gift" | "credit";
+    metadata?: Record<string, any>;
+  }) {
+    const res = await fetch(`${API_BASE}/stored-value/issue`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", ...scopedHeaders() },
+      body: JSON.stringify(payload)
+    });
+    const data = await parseResponse<unknown>(res);
+    return StoredValueIssueResponseSchema.parse(data);
+  },
+  async redeemStoredValue(payload: {
+    accountId?: string;
+    code?: string;
+    pin?: string;
+    amountCents: number;
+    currency: string;
+    referenceType: string;
+    referenceId: string;
+    channel?: string;
+  }) {
+    const res = await fetch(`${API_BASE}/stored-value/redeem`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", ...scopedHeaders() },
+      body: JSON.stringify(payload)
+    });
+    const data = await parseResponse<unknown>(res);
+    return StoredValueRedeemResponseSchema.parse(data);
+  },
+  async adjustStoredValue(payload: { accountId: string; deltaCents: number; reason: string }) {
+    const res = await fetch(`${API_BASE}/stored-value/adjust`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", ...scopedHeaders() },
+      body: JSON.stringify(payload)
+    });
+    const data = await parseResponse<unknown>(res);
+    return StoredValueAdjustResponseSchema.parse(data);
   },
 
   // ---------------------------------------------------------------------------

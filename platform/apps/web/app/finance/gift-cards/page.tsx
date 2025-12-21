@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Breadcrumbs } from "@/components/ui/breadcrumbs";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -13,8 +14,8 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/components/ui/use-toast";
+import { apiClient } from "@/lib/api-client";
 import { cn } from "@/lib/utils";
-import { randomId } from "@/lib/random-id";
 
 type RedemptionChannel = "reservation" | "pos" | "manual";
 type GiftCardHistory = {
@@ -29,6 +30,7 @@ type GiftCardHistory = {
 };
 
 type GiftCard = {
+  accountId: string;
   code: string;
   amount: number;
   balance: number;
@@ -42,64 +44,37 @@ type GiftCard = {
 
 type GiftCardStatus = "active" | "expired" | "empty";
 
-const STORAGE_KEY = "campreserv:gift-cards";
+type StoredValueAccount = {
+  id: string;
+  campgroundId: string;
+  type: "gift" | "credit";
+  currency: string;
+  status: "active" | "frozen" | "expired";
+  issuedAt: string;
+  expiresAt?: string | null;
+  metadata?: Record<string, any> | null;
+  createdAt?: string;
+  updatedAt?: string;
+  codes: Array<{ id: string; code: string; active: boolean; createdAt?: string }>;
+  balanceCents: number;
+  issuedCents: number;
+};
 
-const seedGiftCards: GiftCard[] = [
-  {
-    code: "CAMP-WELCOME-100",
-    amount: 100,
-    balance: 65,
-    expiresOn: "2026-01-10",
-    issuedTo: "Sam Rivers",
-    issuedFor: "reservation",
-    campgroundId: null,
-    createdAt: "2025-11-18T15:00:00Z",
-    history: [
-      {
-        id: "seed-issue-1",
-        type: "issued",
-        amount: 100,
-        note: "Issued for reservation R-1045",
-        ref: "R-1045",
-        channel: "reservation",
-        createdAt: "2025-11-18T15:00:00Z",
-        balanceAfter: 100
-      },
-      {
-        id: "seed-redeem-1",
-        type: "redeemed",
-        amount: 35,
-        note: "Applied to POS order KIOSK-22",
-        ref: "POS-221104",
-        channel: "pos",
-        createdAt: "2025-12-02T18:30:00Z",
-        balanceAfter: 65
-      }
-    ]
-  },
-  {
-    code: "STORE-RETURN-50",
-    amount: 50,
-    balance: 50,
-    expiresOn: "2025-12-31",
-    issuedTo: "Walk-in credit",
-    issuedFor: "pos",
-    campgroundId: null,
-    createdAt: "2025-12-01T21:10:00Z",
-    history: [
-      {
-        id: "seed-issue-2",
-        type: "issued",
-        amount: 50,
-        note: "Return credit for POS-22098",
-        ref: "POS-22098",
-        channel: "pos",
-        createdAt: "2025-12-01T21:10:00Z",
-        balanceAfter: 50
-      }
-    ]
-  }
-];
+type StoredValueLedger = {
+  id: string;
+  accountId: string;
+  campgroundId: string;
+  direction: string;
+  amountCents: number;
+  currency: string;
+  beforeBalanceCents?: number;
+  afterBalanceCents?: number;
+  referenceType?: string;
+  referenceId?: string;
+  channel?: string | null;
+  reason?: string | null;
+  createdAt: string;
+};
 
 const formatMoney = (value: number) =>
   new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 2 }).format(value);
@@ -117,11 +92,27 @@ const remainingDays = (card: GiftCard) => {
   return Math.ceil(diff / (1000 * 60 * 60 * 24));
 };
 
-const uid = () => randomId();
+const normalizeChannel = (value?: string | null): RedemptionChannel => {
+  if (value === "reservation" || value === "pos" || value === "manual") return value;
+  return "manual";
+};
+
+const mapLedgerType = (direction: string): GiftCardHistory["type"] | null => {
+  if (direction === "issue" || direction === "refund") return "issued";
+  if (direction === "redeem" || direction === "hold_capture") return "redeemed";
+  if (direction === "adjust" || direction === "expire") return "adjusted";
+  return null;
+};
+
+const readMetadataString = (metadata: Record<string, any> | null | undefined, key: string) => {
+  const value = metadata?.[key];
+  return typeof value === "string" ? value : undefined;
+};
 
 export default function GiftCardsPage() {
   const { toast } = useToast();
-  const [cards, setCards] = useState<GiftCard[]>([]);
+  const queryClient = useQueryClient();
+  const [campgroundId, setCampgroundId] = useState<string | null>(null);
   const [issueForm, setIssueForm] = useState({
     code: "",
     amount: "100",
@@ -140,25 +131,119 @@ export default function GiftCardsPage() {
 
   useEffect(() => {
     if (typeof window === "undefined") return;
-    const stored = window.localStorage.getItem(STORAGE_KEY);
-    if (stored) {
-      try {
-        const parsed = JSON.parse(stored) as GiftCard[];
-        setCards(parsed);
-        setRedeemForm((prev) => ({ ...prev, code: parsed[0]?.code ?? "" }));
-        return;
-      } catch (err) {
-        console.warn("Unable to parse stored gift cards, falling back to seeds", err);
-      }
-    }
-    setCards(seedGiftCards);
-    setRedeemForm((prev) => ({ ...prev, code: seedGiftCards[0]?.code ?? "" }));
+    const stored = window.localStorage.getItem("campreserv:selectedCampground");
+    if (stored) setCampgroundId(stored);
   }, []);
 
+  const accountsQuery = useQuery({
+    queryKey: ["stored-value-accounts", campgroundId],
+    queryFn: () => apiClient.getStoredValueAccounts(campgroundId!),
+    enabled: !!campgroundId
+  });
+
+  const ledgerQuery = useQuery({
+    queryKey: ["stored-value-ledger", campgroundId],
+    queryFn: () => apiClient.getStoredValueLedger(campgroundId!),
+    enabled: !!campgroundId
+  });
+
+  const issueMutation = useMutation({
+    mutationFn: (payload: {
+      tenantId: string;
+      amountCents: number;
+      currency: string;
+      expiresAt?: string;
+      code?: string;
+      type: "gift" | "credit";
+      metadata?: Record<string, any>;
+    }) => apiClient.issueStoredValue(payload),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["stored-value-accounts", campgroundId] });
+      queryClient.invalidateQueries({ queryKey: ["stored-value-ledger", campgroundId] });
+    }
+  });
+
+  const redeemMutation = useMutation({
+    mutationFn: (payload: {
+      code?: string;
+      amountCents: number;
+      currency: string;
+      referenceType: string;
+      referenceId: string;
+      channel?: string;
+    }) => apiClient.redeemStoredValue(payload),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["stored-value-accounts", campgroundId] });
+      queryClient.invalidateQueries({ queryKey: ["stored-value-ledger", campgroundId] });
+    }
+  });
+
+  const adjustMutation = useMutation({
+    mutationFn: (payload: { accountId: string; deltaCents: number; reason: string }) =>
+      apiClient.adjustStoredValue(payload),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["stored-value-accounts", campgroundId] });
+      queryClient.invalidateQueries({ queryKey: ["stored-value-ledger", campgroundId] });
+    }
+  });
+
+  const ledgerByAccount = useMemo(() => {
+    const map = new Map<string, StoredValueLedger[]>();
+    (ledgerQuery.data ?? []).forEach((entry) => {
+      const list = map.get(entry.accountId) ?? [];
+      list.push(entry);
+      map.set(entry.accountId, list);
+    });
+    return map;
+  }, [ledgerQuery.data]);
+
+  const cards = useMemo(() => {
+    const accounts = (accountsQuery.data ?? []) as StoredValueAccount[];
+    return accounts.map((account) => {
+      const metadata = account.metadata ?? {};
+      const issuedForRaw = readMetadataString(metadata, "issuedFor") || readMetadataString(metadata, "channel");
+      const issuedFor = issuedForRaw ? normalizeChannel(issuedForRaw) : undefined;
+      const issuedTo = readMetadataString(metadata, "issuedTo");
+      const issuedNote = readMetadataString(metadata, "note");
+      const reference = readMetadataString(metadata, "reference");
+      const codeEntry = account.codes.find((c) => c.active) ?? account.codes[0];
+      const cardCode = codeEntry?.code || account.id.slice(-8).toUpperCase();
+      const history = (ledgerByAccount.get(account.id) ?? [])
+        .map((entry) => {
+          const type = mapLedgerType(entry.direction);
+          if (!type) return null;
+          return {
+            id: entry.id,
+            type,
+            amount: entry.amountCents / 100,
+            note: entry.reason || issuedNote,
+            ref: entry.referenceId || reference,
+            channel: normalizeChannel(entry.channel || issuedForRaw),
+            createdAt: entry.createdAt,
+            balanceAfter: (entry.afterBalanceCents ?? entry.amountCents) / 100
+          } as GiftCardHistory;
+        })
+        .filter((entry): entry is GiftCardHistory => Boolean(entry));
+
+      return {
+        accountId: account.id,
+        code: cardCode,
+        amount: account.issuedCents / 100,
+        balance: account.balanceCents / 100,
+        expiresOn: account.expiresAt || undefined,
+        issuedTo: issuedTo || undefined,
+        issuedFor,
+        campgroundId: account.campgroundId,
+        createdAt: account.issuedAt || account.createdAt || new Date().toISOString(),
+        history
+      } satisfies GiftCard;
+    });
+  }, [accountsQuery.data, ledgerByAccount]);
+
   useEffect(() => {
-    if (typeof window === "undefined") return;
-    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(cards));
-  }, [cards]);
+    if (!cards.length || redeemForm.code) return;
+    setRedeemForm((prev) => ({ ...prev, code: cards[0].code }));
+  }, [cards, redeemForm.code]);
 
   const stats = useMemo(() => {
     const totalIssued = cards.reduce((sum, c) => sum + c.amount, 0);
@@ -183,76 +268,74 @@ export default function GiftCardsPage() {
       .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
   }, [cards]);
 
-  const updateCard = (code: string, updater: (card: GiftCard) => GiftCard) => {
-    setCards((prev) => prev.map((card) => (card.code === code ? updater(card) : card)));
-  };
-
   const billingExplainer = (
     <Card className="border-amber-200 bg-amber-50">
       <CardHeader className="pb-2">
         <CardTitle className="text-base text-amber-900">Guest vs reservation billing</CardTitle>
         <CardDescription className="text-amber-800">
-          Guest wallets and transferring charges between guest and reservation are on the roadmap; today balances live on the reservation.
+          Guest wallets and transferring charges between guest and reservation are on the roadmap; today credits live in the stored value ledger.
         </CardDescription>
       </CardHeader>
       <CardContent className="text-sm text-amber-900 space-y-1">
         <p>Planned: per-guest wallets and move/merge tools between guest and their reservations.</p>
-        <p>Current workaround: issue a gift card/credit and apply it to the needed reservation or POS order.</p>
+        <p>Current workflow: issue a gift card/credit and apply it to the needed reservation or POS order.</p>
       </CardContent>
     </Card>
   );
 
-  const handleIssue = (event: React.FormEvent) => {
+  const handleIssue = async (event: React.FormEvent) => {
     event.preventDefault();
+    if (!campgroundId) {
+      toast({ title: "Select a campground", description: "Choose a campground before issuing.", variant: "destructive" });
+      return;
+    }
     const amount = parseFloat(issueForm.amount);
     if (!amount || amount <= 0) {
       toast({ title: "Enter an amount", description: "Amount must be greater than zero.", variant: "destructive" });
       return;
     }
-    const code = (issueForm.code || `CAMP-${Math.random().toString(36).slice(2, 8).toUpperCase()}`).toUpperCase();
-    if (cards.find((c) => c.code === code)) {
+
+    const customCode = issueForm.code.trim() ? issueForm.code.trim().toUpperCase() : undefined;
+    if (customCode && cards.find((c) => c.code === customCode)) {
       toast({ title: "Code already exists", description: "Use a unique code for each gift card.", variant: "destructive" });
       return;
     }
 
-    const newCard: GiftCard = {
-      code,
-      amount,
-      balance: amount,
-      expiresOn: issueForm.expiresOn || undefined,
-      issuedTo: issueForm.issuedTo || undefined,
-      issuedFor: issueForm.issuedFor,
-      campgroundId: null,
-      createdAt: new Date().toISOString(),
-      history: [
-        {
-          id: uid(),
-          type: "issued",
-          amount,
+    try {
+      const result = await issueMutation.mutateAsync({
+        tenantId: campgroundId,
+        amountCents: Math.round(amount * 100),
+        currency: "usd",
+        expiresAt: issueForm.expiresOn || undefined,
+        code: customCode,
+        type: "gift",
+        metadata: {
+          issuedTo: issueForm.issuedTo || undefined,
+          issuedFor: issueForm.issuedFor,
           note: issueForm.note || undefined,
-          ref: issueForm.reference || undefined,
-          channel: issueForm.issuedFor,
-          createdAt: new Date().toISOString(),
-          balanceAfter: amount
+          reference: issueForm.reference || undefined,
+          channel: issueForm.issuedFor
         }
-      ]
-    };
-
-    setCards((prev) => [newCard, ...prev]);
-    setIssueForm({
-      code: "",
-      amount: "100",
-      expiresOn: "",
-      issuedTo: "",
-      issuedFor: "reservation",
-      note: "",
-      reference: ""
-    });
-    setRedeemForm((prev) => ({ ...prev, code: newCard.code }));
-    toast({ title: "Gift card issued", description: `${code} created with ${formatMoney(amount)} available.` });
+      });
+      const issuedCode = result.code || customCode || "NEW-CODE";
+      setIssueForm({
+        code: "",
+        amount: "100",
+        expiresOn: "",
+        issuedTo: "",
+        issuedFor: "reservation",
+        note: "",
+        reference: ""
+      });
+      setRedeemForm((prev) => ({ ...prev, code: issuedCode }));
+      toast({ title: "Gift card issued", description: `${issuedCode} created with ${formatMoney(amount)} available.` });
+    } catch (err) {
+      console.error("Failed to issue gift card:", err);
+      toast({ title: "Issue failed", description: "Unable to issue gift card. Try again.", variant: "destructive" });
+    }
   };
 
-  const handleRedeem = (event: React.FormEvent) => {
+  const handleRedeem = async (event: React.FormEvent) => {
     event.preventDefault();
     const amount = parseFloat(redeemForm.amount);
     if (!redeemForm.code) {
@@ -278,26 +361,30 @@ export default function GiftCardsPage() {
       return;
     }
 
-    updateCard(card.code, (prev) => {
-      const newBalance = +(prev.balance - amount).toFixed(2);
-      const entry: GiftCardHistory = {
-        id: uid(),
-        type: "redeemed",
-        amount,
-        note: redeemForm.reference ? `${redeemForm.reference}` : undefined,
-        ref: redeemForm.reference || undefined,
-        channel: redeemForm.channel,
-        createdAt: new Date().toISOString(),
-        balanceAfter: newBalance
-      };
-      return { ...prev, balance: newBalance, history: [entry, ...prev.history] };
-    });
+    const reference = redeemForm.reference.trim();
+    if ((redeemForm.channel === "reservation" || redeemForm.channel === "pos") && !reference) {
+      toast({ title: "Add a reference", description: "Reservation or POS redemptions need a reference.", variant: "destructive" });
+      return;
+    }
 
-    toast({
-      title: "Redemption recorded",
-      description: `${formatMoney(amount)} applied to ${redeemForm.channel === "reservation" ? "reservation" : "POS order"}${redeemForm.reference ? ` (${redeemForm.reference})` : ""}.`
-    });
-    setRedeemForm((prev) => ({ ...prev, amount: "", reference: "" }));
+    try {
+      await redeemMutation.mutateAsync({
+        code: redeemForm.code,
+        amountCents: Math.round(amount * 100),
+        currency: "usd",
+        referenceType: redeemForm.channel,
+        referenceId: reference || `manual-${Date.now()}`,
+        channel: redeemForm.channel
+      });
+      toast({
+        title: "Redemption recorded",
+        description: `${formatMoney(amount)} applied to ${redeemForm.channel === "reservation" ? "reservation" : redeemForm.channel === "pos" ? "POS order" : "manual credit"}${reference ? ` (${reference})` : ""}.`
+      });
+      setRedeemForm((prev) => ({ ...prev, amount: "", reference: "" }));
+    } catch (err) {
+      console.error("Failed to redeem gift card:", err);
+      toast({ title: "Redemption failed", description: "Unable to redeem gift card. Try again.", variant: "destructive" });
+    }
   };
 
   const channelLabel = (channel: RedemptionChannel) => {
@@ -319,7 +406,7 @@ export default function GiftCardsPage() {
       <div className="mb-4">
         <h1 className="text-2xl font-semibold text-slate-900">Gift Cards & Store Credit</h1>
         <p className="text-sm text-slate-600">
-          Issue and redeem gift cards locally against reservations or POS orders. Everything here uses in-app data only—no external processors.
+          Issue and redeem gift cards against reservations or POS orders. Balances are tracked in the stored value ledger—no external processors needed.
         </p>
       </div>
 
@@ -445,7 +532,9 @@ export default function GiftCardsPage() {
                 />
               </div>
               <div className="flex justify-end">
-                <Button type="submit">Create code</Button>
+                <Button type="submit" disabled={!campgroundId || issueMutation.isPending}>
+                  {issueMutation.isPending ? "Creating..." : "Create code"}
+                </Button>
               </div>
             </form>
           </CardContent>
@@ -468,11 +557,17 @@ export default function GiftCardsPage() {
                     <SelectValue placeholder="Select gift card" />
                   </SelectTrigger>
                   <SelectContent>
-                    {cards.map((card) => (
-                      <SelectItem key={card.code} value={card.code}>
-                        {card.code} · {formatMoney(card.balance)} left
+                    {cards.length ? (
+                      cards.map((card) => (
+                        <SelectItem key={card.code} value={card.code}>
+                          {card.code} · {formatMoney(card.balance)} left
+                        </SelectItem>
+                      ))
+                    ) : (
+                      <SelectItem value="none" disabled>
+                        No gift cards yet
                       </SelectItem>
-                    ))}
+                    )}
                   </SelectContent>
                 </Select>
               </div>
@@ -516,7 +611,9 @@ export default function GiftCardsPage() {
                 />
               </div>
               <div className="flex justify-end">
-                <Button type="submit">Redeem</Button>
+                <Button type="submit" disabled={!campgroundId || redeemMutation.isPending || !cards.length}>
+                  {redeemMutation.isPending ? "Redeeming..." : "Redeem"}
+                </Button>
               </div>
             </form>
           </CardContent>
@@ -548,67 +645,70 @@ export default function GiftCardsPage() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {cards.map((card) => {
-                    const status = statusFor(card);
-                    return (
-                      <TableRow key={card.code} className={cn(status === "expired" ? "bg-amber-50" : "", status === "empty" ? "opacity-80" : "")}>
-                        <TableCell>
-                          <div className="font-semibold text-slate-900">{card.code}</div>
-                          <div className="text-xs text-slate-500">
-                            Issued {new Date(card.createdAt).toLocaleDateString()}
-                          </div>
-                        </TableCell>
-                        <TableCell>
-                          <Badge
-                            variant={status === "active" ? "secondary" : status === "expired" ? "destructive" : "outline"}
-                            className={status === "active" ? "bg-emerald-50 text-emerald-700 border-emerald-200" : ""}
-                          >
-                            {status === "active" ? "Active" : status === "expired" ? "Expired" : "Fully used"}
-                          </Badge>
-                          {remainingDays(card) !== null && remainingDays(card)! >= 0 && (
-                            <div className="text-xs text-amber-600 mt-1">{remainingDays(card)} days left</div>
-                          )}
-                        </TableCell>
-                        <TableCell>
-                          <div className="font-semibold text-slate-900">{formatMoney(card.balance)}</div>
-                          <div className="text-xs text-slate-500">Original {formatMoney(card.amount)}</div>
-                        </TableCell>
-                        <TableCell className="text-slate-700">{card.issuedTo ?? "—"}</TableCell>
-                        <TableCell className="text-slate-700">{card.expiresOn ? new Date(card.expiresOn).toLocaleDateString() : "No expiry"}</TableCell>
-                        <TableCell className="text-right">
-                          <div className="flex justify-end gap-2">
-                            <Button size="sm" variant="outline" onClick={() => setRedeemForm((prev) => ({ ...prev, code: card.code }))}>
-                              Redeem
-                            </Button>
-                            <Button
-                              size="sm"
-                              variant="secondary"
-                              onClick={() => {
-                                const adjustment = 5;
-                                updateCard(card.code, (prev) => {
-                                  const newBalance = +(prev.balance + adjustment).toFixed(2);
-                                  const entry: GiftCardHistory = {
-                                    id: uid(),
-                                    type: "adjusted",
-                                    amount: adjustment,
-                                    note: "Manual top-up for demo",
-                                    ref: undefined,
-                                    channel: "manual",
-                                    createdAt: new Date().toISOString(),
-                                    balanceAfter: newBalance
-                                  };
-                                  return { ...prev, balance: newBalance, history: [entry, ...prev.history] };
-                                });
-                                toast({ title: "Balance adjusted", description: `${formatMoney(adjustment)} added for demo.` });
-                              }}
+                  {cards.length ? (
+                    cards.map((card) => {
+                      const status = statusFor(card);
+                      return (
+                        <TableRow key={card.code} className={cn(status === "expired" ? "bg-amber-50" : "", status === "empty" ? "opacity-80" : "")}>
+                          <TableCell>
+                            <div className="font-semibold text-slate-900">{card.code}</div>
+                            <div className="text-xs text-slate-500">
+                              Issued {new Date(card.createdAt).toLocaleDateString()}
+                            </div>
+                          </TableCell>
+                          <TableCell>
+                            <Badge
+                              variant={status === "active" ? "secondary" : status === "expired" ? "destructive" : "outline"}
+                              className={status === "active" ? "bg-emerald-50 text-emerald-700 border-emerald-200" : ""}
                             >
-                              +$5 demo top-up
-                            </Button>
-                          </div>
-                        </TableCell>
-                      </TableRow>
-                    );
-                  })}
+                              {status === "active" ? "Active" : status === "expired" ? "Expired" : "Fully used"}
+                            </Badge>
+                            {remainingDays(card) !== null && remainingDays(card)! >= 0 && (
+                              <div className="text-xs text-amber-600 mt-1">{remainingDays(card)} days left</div>
+                            )}
+                          </TableCell>
+                          <TableCell>
+                            <div className="font-semibold text-slate-900">{formatMoney(card.balance)}</div>
+                            <div className="text-xs text-slate-500">Issued {formatMoney(card.amount)}</div>
+                          </TableCell>
+                          <TableCell className="text-slate-700">{card.issuedTo ?? "—"}</TableCell>
+                          <TableCell className="text-slate-700">{card.expiresOn ? new Date(card.expiresOn).toLocaleDateString() : "No expiry"}</TableCell>
+                          <TableCell className="text-right">
+                            <div className="flex justify-end gap-2">
+                              <Button size="sm" variant="outline" onClick={() => setRedeemForm((prev) => ({ ...prev, code: card.code }))}>
+                                Redeem
+                              </Button>
+                              <Button
+                                size="sm"
+                                variant="secondary"
+                                onClick={async () => {
+                                  try {
+                                    await adjustMutation.mutateAsync({
+                                      accountId: card.accountId,
+                                      deltaCents: 500,
+                                      reason: "Manual top-up"
+                                    });
+                                    toast({ title: "Balance adjusted", description: `${formatMoney(5)} added.` });
+                                  } catch (err) {
+                                    console.error("Failed to adjust balance:", err);
+                                    toast({ title: "Adjustment failed", description: "Unable to adjust balance.", variant: "destructive" });
+                                  }
+                                }}
+                              >
+                                Add $5 credit
+                              </Button>
+                            </div>
+                          </TableCell>
+                        </TableRow>
+                      );
+                    })
+                  ) : (
+                    <TableRow>
+                      <TableCell colSpan={6} className="text-center text-sm text-slate-500 py-6">
+                        No gift cards yet.
+                      </TableCell>
+                    </TableRow>
+                  )}
                 </TableBody>
               </Table>
             </TabsContent>
@@ -664,4 +764,3 @@ export default function GiftCardsPage() {
     </DashboardShell>
   );
 }
-

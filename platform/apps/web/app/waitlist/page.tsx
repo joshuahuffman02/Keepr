@@ -14,7 +14,7 @@ interface WaitlistEntry {
   siteTypeId: string | null;
   arrivalDate: string | null;
   departureDate: string | null;
-  status: "active" | "offered" | "converted" | "expired";
+  status: "active" | "offered" | "converted" | "fulfilled" | "expired" | "cancelled";
   type: "regular" | "seasonal";
   contactName: string | null;
   contactEmail: string | null;
@@ -51,7 +51,9 @@ const STATUS_COLORS: Record<string, string> = {
   active: "bg-emerald-100 text-emerald-800 border-emerald-200",
   offered: "bg-amber-100 text-amber-800 border-amber-200",
   converted: "bg-blue-100 text-blue-800 border-blue-200",
+  fulfilled: "bg-blue-100 text-blue-800 border-blue-200",
   expired: "bg-slate-100 text-slate-600 border-slate-200",
+  cancelled: "bg-slate-100 text-slate-600 border-slate-200",
 };
 
 const PRIORITY_COLORS = [
@@ -95,8 +97,9 @@ export default function WaitlistPage() {
     },
   });
 
+  const normalizeStatus = (status: WaitlistEntry["status"]) => (status === "fulfilled" ? "converted" : status);
   const entries = ((entriesQuery.data ?? []) as any[]).filter((e: WaitlistEntry) =>
-    statusFilter === "all" || e.status === statusFilter
+    statusFilter === "all" || normalizeStatus(e.status) === statusFilter
   );
   const stats = statsQuery.data as WaitlistStats | undefined;
 
@@ -242,7 +245,7 @@ export default function WaitlistPage() {
                         </td>
                         <td className="px-4 py-3">
                           <span className={`px-2 py-1 rounded text-xs font-medium border ${STATUS_COLORS[entry.status]}`}>
-                            {entry.status}
+                            {normalizeStatus(entry.status)}
                           </span>
                         </td>
                         <td className="px-4 py-3">

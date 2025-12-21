@@ -204,13 +204,23 @@ export class WaitlistService {
     }
 
     async getStats(campgroundId: string) {
-        const [active, offered, converted, expired] = await Promise.all([
+        const [active, offered, converted, fulfilled, expired, cancelled] = await Promise.all([
             this.prisma.waitlistEntry.count({ where: { campgroundId, status: WaitlistStatus.active } }),
             this.prisma.waitlistEntry.count({ where: { campgroundId, status: 'offered' as WaitlistStatus } }),
             this.prisma.waitlistEntry.count({ where: { campgroundId, status: 'converted' as WaitlistStatus } }),
+            this.prisma.waitlistEntry.count({ where: { campgroundId, status: WaitlistStatus.fulfilled } }),
             this.prisma.waitlistEntry.count({ where: { campgroundId, status: 'expired' as WaitlistStatus } }),
+            this.prisma.waitlistEntry.count({ where: { campgroundId, status: WaitlistStatus.cancelled } }),
         ]);
-        return { active, offered, converted, expired, total: active + offered + converted + expired };
+        const convertedTotal = converted + fulfilled;
+        const expiredTotal = expired + cancelled;
+        return {
+            active,
+            offered,
+            converted: convertedTotal,
+            expired: expiredTotal,
+            total: active + offered + convertedTotal + expiredTotal
+        };
     }
 
     async findAll(campgroundId: string, type?: string) {

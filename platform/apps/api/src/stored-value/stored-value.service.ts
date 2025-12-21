@@ -599,6 +599,74 @@ export class StoredValueService {
     return this.balanceByAccount(account.accountId);
   }
 
+  async listAccounts(campgroundId: string) {
+    const accounts = await this.prisma.storedValueAccount.findMany({
+      where: { campgroundId },
+      select: {
+        id: true,
+        campgroundId: true,
+        type: true,
+        currency: true,
+        status: true,
+        issuedAt: true,
+        expiresAt: true,
+        metadata: true,
+        createdAt: true,
+        updatedAt: true,
+        codes: {
+          select: { id: true, code: true, active: true, createdAt: true },
+          orderBy: { createdAt: "desc" }
+        }
+      },
+      orderBy: { issuedAt: "desc" }
+    });
+
+    if (!accounts.length) return [];
+
+    const ledger = await this.prisma.storedValueLedger.findMany({
+      where: { accountId: { in: accounts.map((acc: any) => acc.id) } },
+      select: { accountId: true, direction: true, amountCents: true }
+    });
+
+    const balances = new Map<string, number>();
+    const issued = new Map<string, number>();
+    for (const entry of ledger) {
+      const current = balances.get(entry.accountId) ?? 0;
+      balances.set(entry.accountId, current + this.directionToSigned(entry.direction, entry.amountCents));
+      if (entry.direction === StoredValueDirection.issue) {
+        issued.set(entry.accountId, (issued.get(entry.accountId) ?? 0) + entry.amountCents);
+      }
+    }
+
+    return accounts.map((account: any) => ({
+      ...account,
+      balanceCents: balances.get(account.id) ?? 0,
+      issuedCents: issued.get(account.id) ?? 0
+    }));
+  }
+
+  async listLedger(campgroundId: string) {
+    return this.prisma.storedValueLedger.findMany({
+      where: { campgroundId },
+      select: {
+        id: true,
+        accountId: true,
+        campgroundId: true,
+        direction: true,
+        amountCents: true,
+        currency: true,
+        beforeBalanceCents: true,
+        afterBalanceCents: true,
+        referenceType: true,
+        referenceId: true,
+        channel: true,
+        reason: true,
+        createdAt: true
+      },
+      orderBy: { createdAt: "desc" }
+    });
+  }
+
   async liabilitySnapshot(campgroundId: string, opts?: { enforce?: boolean }) {
     const accounts = await this.prisma.storedValueAccount.findMany({
       where: { campgroundId },
