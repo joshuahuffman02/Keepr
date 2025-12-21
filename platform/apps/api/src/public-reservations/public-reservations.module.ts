@@ -9,9 +9,22 @@ import { MembershipsModule } from "../memberships/memberships.module";
 import { SignaturesModule } from "../signatures/signatures.module";
 import { AccessControlModule } from "../access-control/access-control.module";
 import { PoliciesModule } from "../policies/policies.module";
+import { PricingV2Module } from "../pricing-v2/pricing-v2.module";
+import { DepositPoliciesModule } from "../deposit-policies/deposit-policies.module";
 
 @Module({
-    imports: [PrismaModule, RedisModule, PromotionsModule, AbandonedCartModule, MembershipsModule, SignaturesModule, PoliciesModule, AccessControlModule],
+    imports: [
+        PrismaModule,
+        RedisModule,
+        PromotionsModule,
+        AbandonedCartModule,
+        MembershipsModule,
+        SignaturesModule,
+        PoliciesModule,
+        AccessControlModule,
+        PricingV2Module,
+        DepositPoliciesModule
+    ],
     controllers: [PublicReservationsController],
     providers: [PublicReservationsService],
     exports: [PublicReservationsService]

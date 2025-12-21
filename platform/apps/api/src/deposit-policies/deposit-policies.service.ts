@@ -99,7 +99,7 @@ export class DepositPoliciesService {
 
   /**
    * Resolve the applicable deposit policy for a reservation.
-   * Priority: siteClass-specific > campground default > legacy campground.depositRule
+   * Priority: siteClass-specific > campground default > campground-wide policy
    */
   async resolve(campgroundId: string, siteClassId: string | null): Promise<any | null> {
     // 1. Try siteClass-specific policy
@@ -131,12 +131,12 @@ export class DepositPoliciesService {
     });
     if (campgroundPolicy) return campgroundPolicy;
 
-    // 4. Return null (caller can fallback to legacy depositRule)
+    // 4. Return null (caller can treat as no deposit requirement)
     return null;
   }
 
   /**
-   * Calculate deposit amount using resolved policy or legacy fallback.
+   * Calculate deposit amount using resolved policy.
    */
   async calculateDeposit(
     campgroundId: string,
@@ -147,10 +147,7 @@ export class DepositPoliciesService {
   ): Promise<DepositCalculation | null> {
     const policy = await this.resolve(campgroundId, siteClassId);
 
-    if (!policy) {
-      // No V2 policy; caller should use legacy depositRule
-      return null;
-    }
+    if (!policy) return null;
 
     const baseCents = policy.applyTo === DepositApplyTo.lodging_only
       ? lodgingOnlyCents
@@ -196,4 +193,3 @@ export class DepositPoliciesService {
     };
   }
 }
-

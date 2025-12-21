@@ -3,7 +3,6 @@ import { CheckInStatus, GamificationEventCategory, MaintenanceStatus, Prisma, Re
 import { PrismaService } from "../prisma/prisma.service";
 import { CreateReservationDto } from "./dto/create-reservation.dto";
 import { RefundPaymentDto } from "./dto/refund-payment.dto";
-import { PricingService } from "../pricing/pricing.service";
 import { LockService } from "../redis/lock.service";
 import { PromotionsService } from "../promotions/promotions.service";
 import { AccessControlService } from "../access-control/access-control.service";
@@ -11,7 +10,6 @@ import { AccessControlService } from "../access-control/access-control.service";
 import { WaitlistService } from '../waitlist/waitlist.service';
 import { EmailService } from '../email/email.service';
 import { LoyaltyService } from '../loyalty/loyalty.service';
-import { SeasonalRatesService } from '../seasonal-rates/seasonal-rates.service';
 import { TaxRulesService } from '../tax-rules/tax-rules.service';
 import { postBalancedLedgerEntries } from "../ledger/ledger-posting.util";
 import { AuditService } from "../audit/audit.service";
@@ -20,27 +18,26 @@ import { MatchScoreService } from "./match-score.service";
 import { GamificationService } from "../gamification/gamification.service";
 import { CommunicationPlaybook } from "@prisma/client";
 import { Cron } from "@nestjs/schedule";
-import { PricingV2Service, PricingBreakdown } from "../pricing-v2/pricing-v2.service";
-import { DepositPoliciesService, DepositCalculation } from "../deposit-policies/deposit-policies.service";
+import { PricingV2Service } from "../pricing-v2/pricing-v2.service";
+import { DepositPoliciesService } from "../deposit-policies/deposit-policies.service";
 import { SignaturesService } from "../signatures/signatures.service";
-import { AuditService } from "../audit/audit.service";
 import { ApprovalsService } from "../approvals/approvals.service";
 import { UsageTrackerService } from "../org-billing/usage-tracker.service";
 import { RepeatChargesService } from "../repeat-charges/repeat-charges.service";
 import { PoliciesService } from "../policies/policies.service";
 import { assertSiteLockValid } from "./reservation-guards";
+import { evaluatePricingV2 } from "./reservation-pricing";
+import { assertReservationDepositV2, calculateReservationDepositV2 } from "./reservation-deposit";
 
 @Injectable()
 export class ReservationsService {
   constructor(
     private readonly prisma: PrismaService,
-    private readonly pricingService: PricingService,
     private readonly locks: LockService,
     private readonly promotionsService: PromotionsService,
     private readonly emailService: EmailService,
     private readonly waitlistService: WaitlistService,
     private readonly loyaltyService: LoyaltyService,
-    private readonly seasonalRatesService: SeasonalRatesService,
     private readonly taxRulesService: TaxRulesService,
     private readonly matchScoreService: MatchScoreService,
     private readonly gamification: GamificationService,
@@ -86,24 +83,6 @@ export class ReservationsService {
     const ms = departure.getTime() - arrival.getTime();
     if (!Number.isFinite(ms) || ms <= 0) return 1;
     return Math.max(1, Math.round(ms / (1000 * 60 * 60 * 24)));
-  }
-
-  private computeDepositRequired(
-    rule: string | null | undefined,
-    totalCents: number,
-    nights: number,
-    depositPercentage?: number | null
-  ) {
-    const normalized = (rule || "none").toLowerCase();
-    if (normalized === "full") return totalCents;
-    if (normalized === "half" || normalized === "percentage_50") return Math.ceil(totalCents / 2);
-    if (normalized === "first_night" || normalized === "first_night_fees") return Math.ceil(totalCents / nights);
-    if (normalized === "percentage") {
-      const pct = depositPercentage ?? 0;
-      if (pct <= 0) return 0;
-      return Math.ceil(totalCents * (pct / 100));
-    }
-    return 0;
   }
 
   private async attachWaiverArtifacts(reservationId: string, guestId: string, evidence: { request?: any; artifact?: any; digital?: any }) {
@@ -266,153 +245,6 @@ export class ReservationsService {
       signingUrl = signingUrl ?? policyCompliance.signingUrl;
     }
     return { ok: reasons.length === 0, reason: reasons[0], reasons, signingUrl };
-  }
-
-  /**
-   * Compute pricing using V2 rules if any exist, otherwise fallback to legacy.
-   * Returns unified result with pricingRuleVersion for snapshot.
-   */
-  private async computePriceV2(
-    campgroundId: string,
-    siteId: string,
-    arrival: Date,
-    departure: Date,
-    options?: { taxWaiverSigned?: boolean; occupancyPct?: number }
-  ) {
-    const site = await this.prisma.site.findUnique({
-      where: { id: siteId },
-      include: { siteClass: true }
-    });
-    if (!site) throw new NotFoundException("Site not found");
-
-    const nights = this.computeNights(arrival, departure);
-    const defaultRate = site.siteClass?.defaultRate ?? 0;
-
-    // Check if V2 rules exist for this campground
-    const v2RuleCount = await this.prisma.pricingRuleV2.count({
-      where: { campgroundId, active: true }
-    });
-
-    let result: {
-      nights: number;
-      baseSubtotalCents: number;
-      totalCents: number;
-      rulesDeltaCents: number;
-      pricingRuleVersion: string;
-      appliedRules?: PricingBreakdown["appliedRules"];
-      seasonalRate?: any;
-      taxExemption?: any;
-    };
-
-    if (v2RuleCount > 0) {
-      // Use V2 pricing engine
-      const breakdown = await this.pricingV2Service.evaluate(
-        campgroundId,
-        site.siteClassId,
-        defaultRate,
-        arrival,
-        departure,
-        options?.occupancyPct
-      );
-
-      result = {
-        nights: breakdown.nights,
-        baseSubtotalCents: breakdown.baseSubtotalCents,
-        totalCents: breakdown.totalBeforeTaxCents,
-        rulesDeltaCents: breakdown.adjustmentsCents + breakdown.demandAdjustmentCents,
-        pricingRuleVersion: breakdown.pricingRuleVersion,
-        appliedRules: breakdown.appliedRules
-      };
-    } else {
-      // Fallback to legacy pricing
-      const legacy = await this.computePrice(campgroundId, siteId, arrival, departure, options);
-      result = {
-        nights: legacy.nights,
-        baseSubtotalCents: legacy.baseSubtotalCents,
-        totalCents: legacy.totalCents,
-        rulesDeltaCents: legacy.rulesDeltaCents,
-        pricingRuleVersion: "v1:legacy",
-        seasonalRate: legacy.seasonalRate,
-        taxExemption: legacy.taxExemption
-      };
-    }
-
-    // Add tax exemption evaluation for V2 as well
-    if (v2RuleCount > 0) {
-      const taxExemption = await this.taxRulesService.evaluateExemption(
-        campgroundId,
-        nights,
-        options?.taxWaiverSigned ?? false
-      );
-      result.taxExemption = {
-        eligible: taxExemption.eligible,
-        applied: taxExemption.applied,
-        requiresWaiver: taxExemption.rule?.requiresWaiver ?? false,
-        waiverText: taxExemption.rule?.waiverText ?? null,
-        reason: (taxExemption as any).reason ?? null
-      };
-    }
-
-    return result;
-  }
-
-  /**
-   * Assert deposit using V2 DepositPolicy if available, otherwise legacy.
-   * Returns deposit calculation with version string.
-   */
-  private async assertDepositV2(
-    campgroundId: string,
-    siteClassId: string | null,
-    totalAmount: number,
-    lodgingOnlyCents: number,
-    paidAmount: number,
-    arrivalDate: Date,
-    departureDate: Date
-  ): Promise<{ depositAmount: number; depositPolicyVersion: string }> {
-    const nights = this.computeNights(arrivalDate, departureDate);
-
-    // Try V2 deposit policy first
-    const v2Calc = await this.depositPoliciesService.calculateDeposit(
-      campgroundId,
-      siteClassId,
-      totalAmount,
-      lodgingOnlyCents,
-      nights
-    );
-
-    if (v2Calc) {
-      if (paidAmount < v2Calc.depositAmountCents) {
-        throw new BadRequestException(
-          `Deposit of at least $${(v2Calc.depositAmountCents / 100).toFixed(2)} required (${v2Calc.policy.name}: ${v2Calc.policy.strategy})`
-        );
-      }
-      return {
-        depositAmount: v2Calc.depositAmountCents,
-        depositPolicyVersion: v2Calc.depositPolicyVersion
-      };
-    }
-
-    // Fallback to legacy
-    const campground = await this.prisma.campground.findUnique({ where: { id: campgroundId } });
-    if (!campground) throw new NotFoundException("Campground not found");
-
-    const required = this.computeDepositRequired(
-      campground.depositRule,
-      totalAmount,
-      nights,
-      campground.depositPercentage
-    );
-
-    if (paidAmount < required) {
-      throw new BadRequestException(
-        `Deposit of at least $${(required / 100).toFixed(2)} required by campground rule (${campground.depositRule || "none"})`
-      );
-    }
-
-    return {
-      depositAmount: required,
-      depositPolicyVersion: "v1:legacy"
-    };
   }
 
   private computePaymentStatus(total: number, paid: number): string {
@@ -672,144 +504,29 @@ export class ReservationsService {
     }
   }
 
-  /**
-   * Pricing calculation with seasonal rates and tax exemptions.
-   * - Uses SeasonalRatesService.findApplicableRate() to get best rate based on stay length
-   * - Uses TaxRulesService.evaluateExemption() to check tax waiver eligibility
-   */
-  private async computePrice(
-    campgroundId: string,
-    siteId: string,
-    arrival: Date,
-    departure: Date,
-    options?: { taxWaiverSigned?: boolean }
-  ) {
-    const site = await this.prisma.site.findUnique({
-      where: { id: siteId },
-      include: { siteClass: true }
-    });
-    if (!site) throw new NotFoundException("Site not found");
-
-    const nights = this.computeNights(arrival, departure);
-    const defaultRate = site.siteClass?.defaultRate ?? 0; // cents per night
-
-    // Check for applicable seasonal rate
-    const seasonalRate = await this.seasonalRatesService.findApplicableRate(
-      campgroundId,
-      site.siteClassId,
-      nights,
-      arrival
-    );
-
-    // Use seasonal rate if available, otherwise use default rate
-    const baseRate = seasonalRate ? seasonalRate.amount : defaultRate;
-
-    const rules = await this.prisma.pricingRule.findMany({
-      where: {
-        campgroundId,
-        isActive: true,
-        OR: [{ siteClassId: null }, { siteClassId: site.siteClassId }]
-      }
-    });
-
-    let total = 0;
-    let baseSubtotal = 0;
-    let rulesDelta = 0;
-
-    for (let i = 0; i < nights; i++) {
-      const day = new Date(arrival);
-      day.setDate(day.getDate() + i);
-      const dow = day.getDay();
-
-      let nightly = baseRate;
-      let nightlyDelta = 0;
-
-      for (const rule of rules) {
-        if (rule.minNights && nights < rule.minNights) continue;
-        if (rule.startDate && day < rule.startDate) continue;
-        if (rule.endDate && day > rule.endDate) continue;
-        if (rule.dayOfWeek !== null && rule.dayOfWeek !== undefined && rule.dayOfWeek !== dow) continue;
-
-        if (rule.flatAdjust) nightlyDelta += rule.flatAdjust;
-        if (rule.percentAdjust) nightlyDelta += Math.round(nightly * Number(rule.percentAdjust));
-      }
-
-      nightly += nightlyDelta;
-      baseSubtotal += baseRate;
-      rulesDelta += nightlyDelta;
-      total += nightly;
-    }
-
-    // Evaluate tax exemption eligibility
-    const taxExemption = await this.taxRulesService.evaluateExemption(
-      campgroundId,
-      nights,
-      options?.taxWaiverSigned ?? false
-    );
-
-    return {
-      nights,
-      baseSubtotalCents: baseSubtotal,
-      rulesDeltaCents: rulesDelta,
-      totalCents: total,
-      seasonalRate: seasonalRate ? {
-        id: seasonalRate.id,
-        name: seasonalRate.name,
-        rateType: seasonalRate.rateType,
-        amount: seasonalRate.amount
-      } : null,
-      taxExemption: {
-        eligible: taxExemption.eligible,
-        applied: taxExemption.applied,
-        requiresWaiver: taxExemption.rule?.requiresWaiver ?? false,
-        waiverText: taxExemption.rule?.waiverText ?? null,
-        reason: (taxExemption as any).reason ?? null
-      }
-    };
-  }
-
-  private async assertDeposit(
-    campgroundId: string,
-    totalAmount: number,
-    paidAmount: number,
-    arrivalDate: Date,
-    departureDate: Date
-  ) {
-    const campground = await this.prisma.campground.findUnique({ where: { id: campgroundId } });
-    if (!campground) throw new NotFoundException("Campground not found");
-    const nights = this.computeNights(arrivalDate, departureDate);
-    const required = this.computeDepositRequired(
-      campground.depositRule,
-      totalAmount,
-      nights,
-      campground.depositPercentage
-    );
-    if (paidAmount < required) {
-      throw new BadRequestException(
-        `Deposit of at least $${(required / 100).toFixed(2)} required by campground rule (${campground.depositRule || "none"})`
-      );
-    }
-    return required;
-  }
-
   async calculateDeposit(id: string) {
     const reservation = await this.prisma.reservation.findUnique({
       where: { id },
-      include: { campground: true }
+      include: { site: { select: { siteClassId: true } } }
     });
     if (!reservation) throw new NotFoundException("Reservation not found");
 
     const nights = this.computeNights(reservation.arrivalDate, reservation.departureDate);
-    const depositAmount = this.computeDepositRequired(
-      reservation.campground.depositRule,
-      reservation.totalAmount,
-      nights,
-      reservation.campground.depositPercentage
-    );
+    const depositCalc = await calculateReservationDepositV2(this.depositPoliciesService, {
+      campgroundId: reservation.campgroundId,
+      siteClassId: reservation.site?.siteClassId ?? null,
+      totalAmountCents: reservation.totalAmount,
+      lodgingOnlyCents: reservation.baseSubtotal,
+      nights
+    });
 
     const remainingBalance = Math.max(0, reservation.totalAmount - (reservation.paidAmount || 0));
 
-    return { depositAmount, remainingBalance };
+    return {
+      depositAmount: depositCalc.depositAmount,
+      depositPolicyVersion: depositCalc.depositPolicyVersion,
+      remainingBalance
+    };
   }
 
   private buildPaymentFields(totalAmount: number, paidAmount: number) {
@@ -1249,7 +966,14 @@ export class ReservationsService {
           }
         );
 
-        const baselinePrice = await this.computePriceV2(data.campgroundId, siteId, arrival, departure);
+        const baselinePrice = await evaluatePricingV2(
+          this.prisma,
+          this.pricingV2Service,
+          data.campgroundId,
+          siteId,
+          arrival,
+          departure
+        );
         const manualPriceProvided = data.totalAmount !== undefined && data.totalAmount !== null && data.totalAmount > 0;
         const price = manualPriceProvided
           ? {
@@ -1330,15 +1054,14 @@ export class ReservationsService {
         const paidAmount = data.paidAmount ?? 0;
 
         // Use V2 deposit policy if available
-        const depositCalc = await this.assertDepositV2(
-          data.campgroundId,
-          siteInfo?.siteClassId ?? null,
-          totalAmount,
-          price.baseSubtotalCents, // lodging only
-          paidAmount,
-          arrival,
-          departure
-        );
+        const depositCalc = await assertReservationDepositV2(this.depositPoliciesService, {
+          campgroundId: data.campgroundId,
+          siteClassId: siteInfo?.siteClassId ?? null,
+          totalAmountCents: totalAmount,
+          lodgingOnlyCents: price.baseSubtotalCents,
+          paidAmountCents: paidAmount,
+          nights: price.nights
+        });
         const paymentFields = this.buildPaymentFields(totalAmount, paidAmount);
 
         const {
@@ -1608,7 +1331,14 @@ export class ReservationsService {
           }
         );
 
-        const baselinePrice = await this.computePriceV2(existing.campgroundId, targetSiteId, arrival, departure);
+        const baselinePrice = await evaluatePricingV2(
+          this.prisma,
+          this.pricingV2Service,
+          existing.campgroundId,
+          targetSiteId,
+          arrival,
+          departure
+        );
         const shouldReprice = data.totalAmount === undefined || data.totalAmount === null;
         const price = shouldReprice ? baselinePrice : null;
         const totalAmount = shouldReprice ? baselinePrice.totalCents : data.totalAmount ?? existing.totalAmount;
@@ -1622,15 +1352,14 @@ export class ReservationsService {
           throw new BadRequestException("Manual pricing overrides require overrideReason and overrideApprovedBy.");
         }
 
-        const depositCalc = await this.assertDepositV2(
-          existing.campgroundId,
-          siteInfo?.siteClassId ?? null,
-          totalAmount,
-          price?.baseSubtotalCents ?? data.baseSubtotal ?? existing.baseSubtotal ?? baselinePrice.baseSubtotalCents,
-          paidAmount,
-          arrival,
-          departure
-        );
+        const depositCalc = await assertReservationDepositV2(this.depositPoliciesService, {
+          campgroundId: existing.campgroundId,
+          siteClassId: siteInfo?.siteClassId ?? null,
+          totalAmountCents: totalAmount,
+          lodgingOnlyCents: price?.baseSubtotalCents ?? data.baseSubtotal ?? existing.baseSubtotal ?? baselinePrice.baseSubtotalCents,
+          paidAmountCents: paidAmount,
+          nights: baselinePrice.nights
+        });
         const paymentFields = this.buildPaymentFields(totalAmount, paidAmount);
 
         const {
@@ -2226,7 +1955,31 @@ export class ReservationsService {
   }
 
   async quote(campgroundId: string, siteId: string, arrival: string, departure: string) {
-    return this.computePrice(campgroundId, siteId, new Date(arrival), new Date(departure));
+    const pricing = await evaluatePricingV2(
+      this.prisma,
+      this.pricingV2Service,
+      campgroundId,
+      siteId,
+      new Date(arrival),
+      new Date(departure)
+    );
+    const taxExemption = await this.taxRulesService.evaluateExemption(campgroundId, pricing.nights, false);
+    const exemptionPayload = {
+      eligible: taxExemption.eligible,
+      applied: taxExemption.applied,
+      requiresWaiver: taxExemption.rule?.requiresWaiver ?? false,
+      waiverText: taxExemption.rule?.waiverText ?? null,
+      reason: (taxExemption as any).reason ?? null
+    };
+
+    return {
+      ...pricing,
+      perNightCents: Math.round(pricing.totalCents / pricing.nights),
+      taxExemption: exemptionPayload,
+      taxExemptionEligible: exemptionPayload.eligible,
+      requiresWaiver: exemptionPayload.requiresWaiver,
+      waiverText: exemptionPayload.waiverText
+    };
   }
 
   async agingBuckets(campgroundId: string) {
@@ -2574,7 +2327,9 @@ export class ReservationsService {
     // Calculate price for each segment
     const segmentPrices: number[] = [];
     for (const seg of sortedSegments) {
-      const priceResult = await this.computePriceV2(
+      const priceResult = await evaluatePricingV2(
+        this.prisma,
+        this.pricingV2Service,
         reservation.campgroundId,
         seg.siteId,
         new Date(seg.startDate),

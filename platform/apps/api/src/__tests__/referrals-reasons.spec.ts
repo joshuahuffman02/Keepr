@@ -40,6 +40,10 @@ describe("Referral codes and stay reasons", () => {
       {} as any,
       {} as any,
       {} as any,
+      {} as any,
+      {} as any,
+      {} as any,
+      {} as any,
       {} as any
     );
 

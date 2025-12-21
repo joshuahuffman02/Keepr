@@ -37,6 +37,7 @@ type PrismaMock = {
 describe("PublicReservationsService pricing", () => {
   let service: PublicReservationsService;
   let prisma: PrismaMock;
+  let pricingV2Service: { evaluate: jest.Mock };
 
   beforeEach(() => {
     prisma = {
@@ -46,13 +47,19 @@ describe("PublicReservationsService pricing", () => {
       campground: { findUnique: jest.fn() },
       reservation: { findUnique: jest.fn() }
     } as PrismaMock;
+    pricingV2Service = { evaluate: jest.fn() };
     service = new PublicReservationsService(
       prisma as unknown as PrismaService,
       { withLocks: (_keys: any, fn: any) => fn() } as LockService,
       { validate: jest.fn() } as unknown as PromotionsService,
       {} as EmailService,
       {} as AbandonedCartService,
-      { getActiveMembershipById: jest.fn(), getActiveMembershipByGuest: jest.fn() } as unknown as MembershipsService
+      { getActiveMembershipById: jest.fn(), getActiveMembershipByGuest: jest.fn() } as unknown as MembershipsService,
+      {} as any,
+      {} as any,
+      {} as any,
+      pricingV2Service as any,
+      {} as any
     );
   });
 
@@ -72,7 +79,15 @@ describe("PublicReservationsService pricing", () => {
       siteClass: { defaultRate: 10000 } // $100.00
     });
 
-    prisma.pricingRule.findMany = jest.fn().mockResolvedValue([]); // no extra rules
+    pricingV2Service.evaluate.mockResolvedValue({
+      nights: 2,
+      baseSubtotalCents: 20000,
+      adjustmentsCents: 0,
+      demandAdjustmentCents: 0,
+      totalBeforeTaxCents: 20000,
+      appliedRules: [],
+      pricingRuleVersion: "v2:test"
+    });
 
     // Tax 10%
     prisma.taxRule.findMany = jest.fn().mockImplementation(({ where }) => {
@@ -134,7 +149,15 @@ describe("PublicReservationsService pricing", () => {
       siteClass: { defaultRate: 10000 } // $100/night
     });
 
-    prisma.pricingRule.findMany = jest.fn().mockResolvedValue([]);
+    pricingV2Service.evaluate.mockResolvedValue({
+      nights: 1,
+      baseSubtotalCents: 10000,
+      adjustmentsCents: 0,
+      demandAdjustmentCents: 0,
+      totalBeforeTaxCents: 10000,
+      appliedRules: [],
+      pricingRuleVersion: "v2:test"
+    });
 
     // Exemption requires waiver; also a tax rule exists (10%) to verify waiver needed
     prisma.taxRule.findMany = jest.fn().mockImplementation(({ where }) => {
@@ -189,7 +212,15 @@ describe("PublicReservationsService pricing", () => {
       siteClass: { defaultRate: 10000 } // $100/night
     });
 
-    prisma.pricingRule.findMany = jest.fn().mockResolvedValue([]);
+    pricingV2Service.evaluate.mockResolvedValue({
+      nights: 1,
+      baseSubtotalCents: 10000,
+      adjustmentsCents: 0,
+      demandAdjustmentCents: 0,
+      totalBeforeTaxCents: 10000,
+      appliedRules: [],
+      pricingRuleVersion: "v2:test"
+    });
     prisma.taxRule.findMany = jest.fn().mockResolvedValue([]); // ignore taxes here
 
     // Promo flat $50 off (5000 cents)
@@ -341,4 +372,3 @@ describe("PublicReservationsService pricing", () => {
     expect(quoteSpy).toHaveBeenCalled();
   });
 });
-

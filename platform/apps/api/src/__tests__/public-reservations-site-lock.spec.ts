@@ -43,6 +43,8 @@ describe("PublicReservationsService site lock validation", () => {
       {} as any,
       {} as any,
       {} as any,
+      {} as any,
+      {} as any,
       {} as any
     );
   });

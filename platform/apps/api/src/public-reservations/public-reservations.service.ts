@@ -8,12 +8,16 @@ import { EmailService } from '../email/email.service';
 import { AbandonedCartService } from "../abandoned-cart/abandoned-cart.service";
 import { differenceInMinutes } from "date-fns";
 import { resolveDiscounts } from "../pricing-v2/discount-engine";
+import { PricingV2Service } from "../pricing-v2/pricing-v2.service";
 import { TaxRuleType } from "@prisma/client";
 import { MembershipsService } from "../memberships/memberships.service";
 import { SignaturesService } from "../signatures/signatures.service";
 import { PoliciesService } from "../policies/policies.service";
 import { AccessControlService } from "../access-control/access-control.service";
 import { assertSiteLockValid } from "../reservations/reservation-guards";
+import { evaluatePricingV2 } from "../reservations/reservation-pricing";
+import { DepositPoliciesService } from "../deposit-policies/deposit-policies.service";
+import { calculateReservationDepositV2 } from "../reservations/reservation-deposit";
 
 @Injectable()
 export class PublicReservationsService {
@@ -26,7 +30,9 @@ export class PublicReservationsService {
         private readonly memberships: MembershipsService,
         private readonly signatures: SignaturesService,
         private readonly policies: PoliciesService,
-        private readonly accessControl: AccessControlService
+        private readonly accessControl: AccessControlService,
+        private readonly pricingV2Service: PricingV2Service,
+        private readonly depositPoliciesService: DepositPoliciesService
     ) { }
 
     private async hasSignedWaiver(reservationId: string, guestId: string) {
@@ -137,24 +143,6 @@ export class PublicReservationsService {
         const ms = departure.getTime() - arrival.getTime();
         if (!Number.isFinite(ms) || ms <= 0) return 1;
         return Math.max(1, Math.round(ms / (1000 * 60 * 60 * 24)));
-    }
-
-    private computeDepositRequired(
-        rule: string | null | undefined,
-        totalCents: number,
-        nights: number,
-        depositPercentage?: number | null
-    ) {
-        const normalized = (rule || "none").toLowerCase();
-        if (normalized === "full") return totalCents;
-        if (normalized === "half" || normalized === "percentage_50") return Math.ceil(totalCents / 2);
-        if (normalized === "first_night" || normalized === "first_night_fees") return Math.ceil(totalCents / nights);
-        if (normalized === "percentage") {
-            const pct = depositPercentage ?? 0;
-            if (pct <= 0) return 0;
-            return Math.ceil(totalCents * (pct / 100));
-        }
-        return 0;
     }
 
     private computePaymentStatus(total: number, paid: number): string {
@@ -493,7 +481,6 @@ export class PublicReservationsService {
 
         const arrival = new Date(dto.arrivalDate);
         const departure = new Date(dto.departureDate);
-        const nights = this.computeNights(arrival, departure);
 
         const site = await this.prisma.site.findUnique({
             where: { id: dto.siteId },
@@ -504,44 +491,19 @@ export class PublicReservationsService {
             throw new NotFoundException("Site not found");
         }
 
-        const baseRate = site.siteClass?.defaultRate ?? 0;
+        const pricing = await evaluatePricingV2(
+            this.prisma,
+            this.pricingV2Service,
+            campground.id,
+            dto.siteId,
+            arrival,
+            departure
+        );
 
-        // Get applicable pricing rules
-        const rules = await this.prisma.pricingRule.findMany({
-            where: {
-                campgroundId: campground.id,
-                isActive: true,
-                OR: [{ siteClassId: null }, { siteClassId: site.siteClassId }]
-            }
-        });
-
-        let total = 0;
-        let baseSubtotal = 0;
-        let rulesDelta = 0;
-
-        for (let i = 0; i < nights; i++) {
-            const day = new Date(arrival);
-            day.setDate(day.getDate() + i);
-            const dow = day.getDay();
-
-            let nightly = baseRate;
-            let nightlyDelta = 0;
-
-            for (const rule of rules) {
-                if (rule.minNights && nights < rule.minNights) continue;
-                if (rule.startDate && day < rule.startDate) continue;
-                if (rule.endDate && day > rule.endDate) continue;
-                if (rule.dayOfWeek !== null && rule.dayOfWeek !== undefined && rule.dayOfWeek !== dow) continue;
-
-                if (rule.flatAdjust) nightlyDelta += rule.flatAdjust;
-                if (rule.percentAdjust) nightlyDelta += Math.round(nightly * Number(rule.percentAdjust));
-            }
-
-            nightly += nightlyDelta;
-            baseSubtotal += baseRate;
-            rulesDelta += nightlyDelta;
-            total += nightly;
-        }
+        const nights = pricing.nights;
+        let total = pricing.totalCents;
+        let baseSubtotal = pricing.baseSubtotalCents;
+        let rulesDelta = pricing.rulesDeltaCents;
 
         // Build discount candidates (promo + membership) and resolve once
         const candidates: any[] = [];
@@ -718,9 +680,7 @@ export class PublicReservationsService {
                 isPublished: true,
                 isBookable: true,
                 isExternal: true,
-                nonBookableReason: true,
-                depositRule: true,
-                depositPercentage: true
+                nonBookableReason: true
             }
         });
 
@@ -978,13 +938,14 @@ export class PublicReservationsService {
                     }
                 }
 
-                // Calculate deposit
-                const depositAmount = this.computeDepositRequired(
-                    campground.depositRule,
-                    quote.totalWithTaxesCents ?? totalAmount,
-                    quote.nights,
-                    campground.depositPercentage
-                );
+                const depositCalc = await calculateReservationDepositV2(this.depositPoliciesService, {
+                    campgroundId: campground.id,
+                    siteClassId: site.siteClassId ?? null,
+                    totalAmountCents: quote.totalWithTaxesCents ?? totalAmount,
+                    lodgingOnlyCents: quote.baseSubtotalCents,
+                    nights: quote.nights
+                });
+                const depositAmount = depositCalc.depositAmount;
 
                 // Create reservation
                 const reservation = await this.prisma.reservation.create({
@@ -1004,6 +965,7 @@ export class PublicReservationsService {
                         paidAmount: 0,
                         balanceAmount: totalAmount,
                         depositAmount,
+                        depositPolicyVersion: depositCalc.depositPolicyVersion,
                         depositDueDate: new Date(),
                         paymentStatus: "unpaid",
                         baseSubtotal: quote.baseSubtotalCents,

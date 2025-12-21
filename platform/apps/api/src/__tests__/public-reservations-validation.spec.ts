@@ -3,7 +3,19 @@ import { PublicReservationsService } from "../public-reservations/public-reserva
 // Lightweight unit tests to guard rig-fit logic used by availability + reservation creation
 describe("PublicReservationsService rig validation", () => {
     // We only need the private helper, so stub dependencies with empty objects
-    const service = new PublicReservationsService({} as any, {} as any, {} as any, {} as any, {} as any, {} as any);
+    const service = new PublicReservationsService(
+        {} as any,
+        {} as any,
+        {} as any,
+        {} as any,
+        {} as any,
+        {} as any,
+        {} as any,
+        {} as any,
+        {} as any,
+        {} as any,
+        {} as any
+    );
     const isRigCompatible: (site: any, rigType?: string | null, rigLength?: number | null) => boolean =
         (service as any).isRigCompatible.bind(service);
 
