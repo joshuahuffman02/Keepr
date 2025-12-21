@@ -16,6 +16,7 @@
     "ingest:osm": "ts-node -r tsconfig-paths/register src/scripts/ingest-osm.ts",
     "sandbox:seed": "ts-node prisma/seed-sandbox.ts",
     "openapi:generate": "ts-node --transpile-only -r tsconfig-paths/register src/scripts/generate-openapi.ts",
+    "migrate:seasonal-rates": "ts-node -r tsconfig-paths/register src/scripts/migrate-seasonal-rates-to-v2.ts",
     "prisma:studio": "prisma studio"
   },
   "prisma": {

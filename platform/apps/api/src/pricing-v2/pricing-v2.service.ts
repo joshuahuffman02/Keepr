@@ -166,8 +166,17 @@ export class PricingV2Service {
     if (rule.startDate && day < rule.startDate) return false;
     if (rule.endDate && day > rule.endDate) return false;
     if (rule.dowMask && rule.dowMask.length > 0 && !rule.dowMask.includes(dow)) return false;
-    // Add more checks (minNights, calendarRef, etc.) as needed
+    const minNights = this.extractMinNights(rule.calendarRefId);
+    if (minNights && nights < minNights) return false;
     return true;
+  }
+
+  private extractMinNights(calendarRefId?: string | null): number | null {
+    if (!calendarRefId) return null;
+    const match = calendarRefId.match(/minNights:(\d+)/i);
+    if (!match) return null;
+    const parsed = Number(match[1]);
+    return Number.isFinite(parsed) && parsed > 0 ? parsed : null;
   }
 
   private computeAdjustment(adjustmentType: AdjustmentType, value: Decimal, baseCents: number): number {
@@ -291,4 +300,3 @@ export class PricingV2Service {
     }
   }
 }
-
