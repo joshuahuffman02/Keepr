@@ -20,7 +20,8 @@ RUN pnpm --filter @campreserv/shared build
 # Build API
 FROM shared AS api-builder
 COPY platform/apps/api ./platform/apps/api
-RUN pnpm --filter @campreserv/api prisma:generate
+# Force prisma regeneration - 2025-12-21 v2
+RUN rm -rf node_modules/.prisma node_modules/@prisma/client && pnpm --filter @campreserv/api prisma:generate
 RUN pnpm --filter @campreserv/api build
 
 # Production image for API
