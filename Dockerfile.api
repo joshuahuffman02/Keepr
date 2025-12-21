@@ -1,5 +1,5 @@
 FROM node:lts-alpine AS base
-# Build: 2025-12-18 - Railway cache buster v10 - Fix booking 400
+# Build: 2025-12-21 - Railway cache buster v11 - Regenerate Prisma client with new columns
 RUN corepack enable && corepack prepare pnpm@7.33.6 --activate
 WORKDIR /app
 RUN echo "Dockerfile.api v7 - TSC FIX for decorator metadata" > /tmp/build-info
