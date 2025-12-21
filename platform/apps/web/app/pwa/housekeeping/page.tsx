@@ -189,7 +189,7 @@ export default function HousekeepingPwaPage() {
 
     recordTelemetry({
       source: "housekeeping-pwa",
-      type: "mutation",
+      type: "sync",
       status: navigator.onLine ? "success" : "pending",
       message: `Checklist item ${completed ? "completed" : "uncompleted"}`,
       meta: { taskId, itemId },
@@ -217,7 +217,7 @@ export default function HousekeepingPwaPage() {
 
     recordTelemetry({
       source: "housekeeping-pwa",
-      type: "mutation",
+      type: "sync",
       status: navigator.onLine ? "success" : "pending",
       message: "Task marked complete",
       meta: { taskId },
@@ -241,7 +241,7 @@ export default function HousekeepingPwaPage() {
 
     recordTelemetry({
       source: "housekeeping-pwa",
-      type: "mutation",
+      type: "sync",
       status: navigator.onLine ? "success" : "pending",
       message: "Task started",
       meta: { taskId },
