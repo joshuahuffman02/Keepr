@@ -61,6 +61,8 @@ const ACTION_LABELS: Record<string, string> = {
   adjust_rate: "Adjust rate",
 };
 
+const EXECUTABLE_ACTIONS = new Set(["lookup_availability", "create_hold"]);
+
 function formatValue(value: any) {
   if (value === null || value === undefined) return "-";
   if (typeof value === "string" || typeof value === "number" || typeof value === "boolean") {
@@ -81,6 +83,7 @@ export function SupportChatWidget() {
   const [supportSessionId] = useState(() => generateSessionId());
   const [partnerSessionId] = useState(() => `partner_${Date.now()}_${Math.random().toString(36).slice(2, 9)}`);
   const [campgroundId, setCampgroundId] = useState<string | null>(null);
+  const [confirmingDraftId, setConfirmingDraftId] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
@@ -233,6 +236,46 @@ export function SupportChatWidget() {
     },
   });
 
+  const confirmPartnerMutation = useMutation({
+    mutationFn: async (draft: ActionDraft) => {
+      if (!campgroundId) {
+        throw new Error("Select a campground to confirm actions.");
+      }
+      return apiClient.aiPartnerConfirmAction(campgroundId, {
+        action: {
+          type: draft.actionType,
+          parameters: draft.parameters,
+          sensitivity: draft.sensitivity,
+        },
+      });
+    },
+    onSuccess: (data) => {
+      setConfirmingDraftId(null);
+      const assistantMessage: PartnerMessage = {
+        id: `msg_${Date.now()}`,
+        role: "assistant",
+        content: data?.message || "Action confirmed.",
+        actionDrafts: data?.actionDrafts,
+        confirmations: data?.confirmations,
+        denials: data?.denials,
+        questions: data?.questions,
+        evidenceLinks: data?.evidenceLinks,
+      };
+      setPartnerMessages((prev) => [...prev, assistantMessage]);
+    },
+    onError: (error) => {
+      setConfirmingDraftId(null);
+      setPartnerMessages((prev) => [
+        ...prev,
+        {
+          id: `msg_${Date.now()}`,
+          role: "assistant",
+          content: error instanceof Error ? error.message : "Unable to confirm that action.",
+        },
+      ]);
+    },
+  });
+
   const handleSend = () => {
     if (mode === "support") {
       if (!supportInput.trim() || supportChatMutation.isPending) return;
@@ -295,6 +338,11 @@ export function SupportChatWidget() {
 
   const handlePartnerQuickReply = (question: string) => {
     setPartnerInput(question);
+  };
+
+  const handleConfirmDraft = (draft: ActionDraft) => {
+    setConfirmingDraftId(draft.id);
+    confirmPartnerMutation.mutate(draft);
   };
 
   const isSupportMode = mode === "support";
@@ -573,6 +621,25 @@ export function SupportChatWidget() {
                               ))}
                             </div>
                           ) : null}
+
+                          {draft.requiresConfirmation && (
+                            <div className="mt-3 flex flex-wrap items-center gap-2">
+                              {EXECUTABLE_ACTIONS.has(draft.actionType) ? (
+                                <button
+                                  type="button"
+                                  onClick={() => handleConfirmDraft(draft)}
+                                  disabled={confirmPartnerMutation.isPending && confirmingDraftId === draft.id}
+                                  className="rounded-full bg-emerald-600 px-3 py-1 text-[11px] font-semibold text-white shadow-sm transition hover:bg-emerald-700 disabled:opacity-60"
+                                >
+                                  {confirmingDraftId === draft.id ? "Confirming..." : "Confirm & run"}
+                                </button>
+                              ) : (
+                                <span className="text-[11px] text-slate-500">
+                                  Manual approval required in the app.
+                                </span>
+                              )}
+                            </div>
+                          )}
                         </div>
                       );
                     })}

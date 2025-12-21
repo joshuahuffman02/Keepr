@@ -5,6 +5,7 @@ import maplibregl, { Map as MapLibreMap, Marker } from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
 import { Caravan, Tent, Home, Users, Sparkles, MapPin } from "lucide-react";
 import { renderToStaticMarkup } from "react-dom/server";
+import { cn } from "@/lib/utils";
 
 export type MapSite = {
   id: string;
@@ -28,6 +29,8 @@ export interface BookingMapProps {
   selectedSiteId?: string;
   onSelectSite?: (siteId: string) => void;
   isLoading?: boolean;
+  height?: number | string;
+  variant?: "card" | "immersive";
   className?: string;
 }
 
@@ -45,11 +48,23 @@ const SITE_TYPE_ICONS: Record<string, any> = {
   glamping: Sparkles,
 };
 
-export function BookingMap({ sites, campgroundCenter, selectedSiteId, onSelectSite, isLoading, className }: BookingMapProps) {
+export function BookingMap({
+  sites,
+  campgroundCenter,
+  selectedSiteId,
+  onSelectSite,
+  isLoading,
+  height,
+  variant = "card",
+  className
+}: BookingMapProps) {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<MapLibreMap | null>(null);
   const markersRef = useRef<Marker[]>([]);
   const [isReady, setIsReady] = useState(false);
+  const heightStyle = {
+    height: typeof height === "number" ? `${height}px` : height ?? "420px"
+  };
 
   useEffect(() => {
     setIsReady(true);
@@ -166,10 +181,17 @@ export function BookingMap({ sites, campgroundCenter, selectedSiteId, onSelectSi
     };
   }, [validSites, onSelectSite, selectedSiteId, isReady]);
 
-  if (!isReady) return <div className={className} style={{ height: "420px" }} />;
+  if (!isReady) return <div className={className} style={heightStyle} />;
 
   return (
-    <div className={`relative h-[420px] w-full overflow-hidden rounded-xl border border-slate-200 bg-slate-50 shadow-inner ${className}`}>
+    <div
+      className={cn(
+        "relative w-full overflow-hidden",
+        variant === "immersive" ? "border-none" : "rounded-xl border border-slate-200 bg-slate-50 shadow-inner",
+        className
+      )}
+      style={heightStyle}
+    >
       <div ref={containerRef} className="absolute inset-0" />
 
       {isLoading && (
@@ -196,4 +218,3 @@ export function BookingMap({ sites, campgroundCenter, selectedSiteId, onSelectSi
 }
 
 export default BookingMap;
-

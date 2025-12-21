@@ -63,6 +63,12 @@ type PartnerChatRequest = {
   user: any;
 };
 
+type PartnerConfirmRequest = {
+  campgroundId: string;
+  action: { type: ActionType; parameters?: Record<string, any>; sensitivity?: "low" | "medium" | "high"; impactArea?: ImpactArea };
+  user: any;
+};
+
 const PERSONA_PROMPTS: Record<PersonaKey, string> = {
   revenue: "You are the Revenue strategist. Focus on occupancy, ADR, demand signals, and pricing strategy. Explain trade-offs and highlight revenue impact.",
   operations: "You are the Operations chief. Focus on site readiness, maintenance status, holds, and execution speed. Keep responses direct and action-oriented.",
@@ -167,6 +173,108 @@ export class AiPartnerService {
       routingReason: routing.reason,
       routingConfidence: routing.confidence
     });
+  }
+
+  async confirmAction(request: PartnerConfirmRequest): Promise<AiPartnerResponse> {
+    const { campgroundId, action, user } = request;
+
+    const campground = await this.prisma.campground.findUnique({
+      where: { id: campgroundId },
+      select: { id: true, name: true, slug: true, aiAnonymizationLevel: true }
+    });
+
+    if (!campground) {
+      return {
+        mode: "staff",
+        message: "Campground not found.",
+        denials: [{ reason: "Campground not found." }]
+      };
+    }
+
+    const { role, mode } = this.resolveUserRole(user, campgroundId);
+    const actionType = action?.type as ActionType | undefined;
+
+    if (!actionType || actionType === "none" || !(actionType in ACTION_REGISTRY)) {
+      return {
+        mode,
+        message: "No valid action to confirm.",
+        denials: [{ reason: "No valid action to confirm." }]
+      };
+    }
+
+    const registry = ACTION_REGISTRY[actionType as Exclude<ActionType, "none">];
+    const parameters = action?.parameters ?? {};
+    const sensitivity = action?.sensitivity ?? registry.sensitivity;
+    const impactArea = action?.impactArea ?? registry.impactArea;
+
+    const access = await this.permissions.checkAccess({
+      user,
+      campgroundId,
+      resource: registry.resource,
+      action: registry.action
+    });
+
+    const baseDraft: ActionDraft = {
+      id: randomUUID(),
+      actionType,
+      resource: registry.resource,
+      action: registry.action,
+      parameters,
+      status: access.allowed ? "draft" : "denied",
+      sensitivity,
+      impactArea
+    };
+
+    if (!access.allowed) {
+      return {
+        mode,
+        message: "You don't have permission to perform that action.",
+        actionDrafts: [baseDraft],
+        denials: [{ reason: "You don't have permission to perform that action." }]
+      };
+    }
+
+    const impact = await this.evaluateImpact({
+      campgroundId,
+      actionType,
+      impactArea,
+      parameters
+    });
+
+    const draft: ActionDraft = {
+      ...baseDraft,
+      requiresConfirmation: false,
+      impact,
+      evidenceLinks: this.buildEvidenceLinks(actionType, parameters)
+    };
+
+    let executed: { action: ActionDraft; message: string } | null = null;
+    if (actionType === "lookup_availability") {
+      executed = await this.executeReadAction(campground, draft);
+    } else if (actionType === "create_hold") {
+      executed = await this.executeHold(campground, draft, user);
+    }
+
+    if (!executed) {
+      return {
+        mode,
+        message: "This action requires manual review. Use the provided links to continue.",
+        actionDrafts: [draft],
+        evidenceLinks: draft.evidenceLinks
+      };
+    }
+
+    const actionWithEvidence = {
+      ...executed.action,
+      evidenceLinks: draft.evidenceLinks ?? executed.action.evidenceLinks
+    };
+
+    return {
+      mode,
+      message: executed.message,
+      actionDrafts: [actionWithEvidence],
+      evidenceLinks: actionWithEvidence.evidenceLinks
+    };
   }
 
   private async routePersona(params: {

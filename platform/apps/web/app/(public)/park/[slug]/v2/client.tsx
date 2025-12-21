@@ -204,7 +204,7 @@ export function CampgroundV2Client({ slug, initialData }: { slug: string; initia
 
       {/* Immersive Map Explorer */}
       <section className="w-full bg-slate-900 overflow-hidden">
-        <div className="relative h-[500px] group">
+        <div className="relative h-[70vh] min-h-[520px] group">
           <BookingMap
             sites={(sitesStatus || []).map(s => ({
               ...s,
@@ -224,7 +224,8 @@ export function CampgroundV2Client({ slug, initialData }: { slug: string; initia
                 element.scrollIntoView({ behavior: "smooth" });
               }
             }}
-            className="h-full rounded-none border-none"
+            height="100%"
+            variant="immersive"
           />
           <div className="absolute top-6 left-6 z-10 pointer-events-none max-w-sm">
             <div className="bg-white/90 backdrop-blur-md p-4 rounded-2xl shadow-2xl border border-white/20 pointer-events-auto">

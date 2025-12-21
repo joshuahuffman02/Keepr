@@ -59,6 +59,9 @@ export function ReservationPill({
     // Show quick check-in for confirmed reservations arriving today
     const showQuickCheckIn = onQuickCheckIn && reservation.status === "confirmed" && isArrivalToday;
     const showSignals = hasMaintenance || needsCleaning || hasConflict || reservation.siteLocked;
+    const lockedAccent = reservation.siteLocked
+        ? "border-amber-200/70 shadow-[0_0_0_1px_rgba(251,191,36,0.45)]"
+        : "";
 
     const statusConfig = {
         confirmed: {
@@ -100,6 +103,7 @@ export function ReservationPill({
                 config.bg,
                 config.border,
                 config.shadow,
+                lockedAccent,
                 isHighlighted ? "ring-2 ring-white/60 ring-offset-2 ring-offset-slate-100 z-20 shadow-lg" : "z-10",
                 isDragging && "pointer-events-none opacity-40 grayscale-[0.5]"
             )}
@@ -110,7 +114,7 @@ export function ReservationPill({
             onPointerUp={handlePointerUp}
         >
             {reservation.siteLocked && (
-                <span className="absolute left-0 top-0 bottom-0 w-1.5 bg-amber-200/90 rounded-l-lg" aria-hidden="true" />
+                <span className="absolute left-0 top-0 bottom-0 w-2 bg-amber-300/95 rounded-l-lg" aria-hidden="true" />
             )}
             <div className="flex items-center min-w-0 w-full">
                 <Icon className="w-3 h-3 mr-2 flex-shrink-0 opacity-80 group-hover:opacity-100 transition-opacity" />
@@ -123,8 +127,8 @@ export function ReservationPill({
                 {showSignals && (
                     <div className="ml-2 flex gap-1 items-center flex-shrink-0">
                         {reservation.siteLocked && (
-                            <span className="flex h-4 w-4 items-center justify-center rounded-full bg-amber-200/30 ring-1 ring-amber-200/60">
-                                <Lock className="h-2.5 w-2.5 text-white/90" aria-label="Site locked" />
+                            <span className="flex h-5 w-5 items-center justify-center rounded-full bg-amber-300/40 ring-1 ring-amber-200/70">
+                                <Lock className="h-3 w-3 text-white" aria-label="Site locked" />
                             </span>
                         )}
                         {hasMaintenance && <Wrench className="h-2.5 w-2.5 text-amber-100/80" />}

@@ -123,9 +123,9 @@ export default function CampgroundMapPage() {
           </div>
         </div>
 
-        <Card className="p-6 space-y-4">
-          <div className="flex flex-col gap-6 lg:flex-row">
-            <div className="space-y-3 lg:w-[360px] lg:flex-shrink-0">
+        <Card className="p-6 space-y-6">
+          <div className="grid gap-6 lg:grid-cols-[320px,1fr]">
+            <div className="space-y-3">
               <div className="grid gap-2">
                 <Label htmlFor="start-date">Arrival date</Label>
                 <input
@@ -219,88 +219,90 @@ export default function CampgroundMapPage() {
               </div>
             </div>
 
-            <div className="space-y-4 flex-1">
-              <div className="space-y-3">
-                <div>
-                  <div className="text-sm font-semibold text-slate-800">Site map preview</div>
-                  <p className="text-xs text-slate-500">
-                    Upload a base map image and review layout geometry + conflicts.
-                  </p>
-                </div>
-                <CampgroundMapUpload
-                  campgroundId={campgroundId}
-                  initialUrl={mapBaseImageUrl}
-                  onUploaded={() => mapQuery.refetch()}
-                />
-                <SiteMapCanvas
-                  map={mapQuery.data}
-                  isLoading={mapQuery.isLoading}
-                  showLabels
-                />
-                {mapQuery.isError && (
-                  <p className="text-xs text-rose-600">Failed to load map preview.</p>
-                )}
-                <SiteMapEditor
-                  campgroundId={campgroundId}
-                  mapData={mapQuery.data}
-                  baseImageUrl={mapBaseImageUrl}
-                  sites={sitesQuery.data ?? []}
-                  isLoading={mapQuery.isLoading || sitesQuery.isLoading}
-                  onSaved={() => mapQuery.refetch()}
-                />
+            <div className="space-y-3">
+              <div>
+                <div className="text-sm font-semibold text-slate-800">Site map preview</div>
+                <p className="text-xs text-slate-500">
+                  Upload a base map image and review layout geometry + conflicts.
+                </p>
               </div>
-              <div className="grid gap-2">
-                <Label>Eligibility preview</Label>
-                {previewMutation.isPending && <p className="text-sm text-slate-600">Checking...</p>}
-                {!previewMutation.data && !previewMutation.isPending && (
-                  <p className="text-sm text-slate-600">Set dates and run preview to see eligible sites.</p>
-                )}
-                {previewMutation.data && (
-                  <div className="space-y-3">
-                    <div className="space-y-1">
-                      <p className="text-sm font-semibold text-green-700">
-                        Eligible ({previewMutation.data.eligible.length})
-                      </p>
-                      <div className="space-y-1 max-h-48 overflow-auto pr-1">
-                        {previewMutation.data.eligible.map((row) => (
-                          <div key={row.siteId} className="rounded border border-green-100 bg-green-50 px-3 py-2">
-                            <div className="flex items-center justify-between text-sm font-medium text-green-800">
-                              <span>{siteLabelById.get(row.siteId) ?? row.siteId}</span>
-                              <span>{row.reasons?.length ? "With notes" : "Clear"}</span>
-                            </div>
-                            {row.conflicts?.length ? (
-                              <p className="text-xs text-amber-700">
-                                Conflicts present: {row.conflicts.map((c) => c.type).join(", ")}
-                              </p>
-                            ) : null}
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                    <div className="space-y-1">
-                      <p className="text-sm font-semibold text-red-700">
-                        Ineligible ({previewMutation.data.ineligible.length})
-                      </p>
-                      <div className="space-y-1 max-h-48 overflow-auto pr-1">
-                        {previewMutation.data.ineligible.map((row) => (
-                          <div key={row.siteId} className="rounded border border-red-100 bg-red-50 px-3 py-2">
-                            <div className="flex items-center justify-between text-sm font-medium text-red-800">
-                              <span>{siteLabelById.get(row.siteId) ?? row.siteId}</span>
-                              <span>{row.reasons.join(", ")}</span>
-                            </div>
-                            {row.conflicts?.length ? (
-                              <p className="text-xs text-amber-700">
-                                Conflicts: {row.conflicts.map((c) => c.type).join(", ")}
-                              </p>
-                            ) : null}
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-                )}
-              </div>
+              <CampgroundMapUpload
+                campgroundId={campgroundId}
+                initialUrl={mapBaseImageUrl}
+                onUploaded={() => mapQuery.refetch()}
+              />
+              <SiteMapCanvas
+                map={mapQuery.data}
+                isLoading={mapQuery.isLoading}
+                showLabels
+                height={520}
+              />
+              {mapQuery.isError && (
+                <p className="text-xs text-rose-600">Failed to load map preview.</p>
+              )}
             </div>
+          </div>
+
+          <SiteMapEditor
+            campgroundId={campgroundId}
+            mapData={mapQuery.data}
+            baseImageUrl={mapBaseImageUrl}
+            sites={sitesQuery.data ?? []}
+            isLoading={mapQuery.isLoading || sitesQuery.isLoading}
+            onSaved={() => mapQuery.refetch()}
+            className="w-full"
+          />
+
+          <div className="grid gap-2">
+            <Label>Eligibility preview</Label>
+            {previewMutation.isPending && <p className="text-sm text-slate-600">Checking...</p>}
+            {!previewMutation.data && !previewMutation.isPending && (
+              <p className="text-sm text-slate-600">Set dates and run preview to see eligible sites.</p>
+            )}
+            {previewMutation.data && (
+              <div className="space-y-3">
+                <div className="space-y-1">
+                  <p className="text-sm font-semibold text-green-700">
+                    Eligible ({previewMutation.data.eligible.length})
+                  </p>
+                  <div className="space-y-1 max-h-48 overflow-auto pr-1">
+                    {previewMutation.data.eligible.map((row) => (
+                      <div key={row.siteId} className="rounded border border-green-100 bg-green-50 px-3 py-2">
+                        <div className="flex items-center justify-between text-sm font-medium text-green-800">
+                          <span>{siteLabelById.get(row.siteId) ?? row.siteId}</span>
+                          <span>{row.reasons?.length ? "With notes" : "Clear"}</span>
+                        </div>
+                        {row.conflicts?.length ? (
+                          <p className="text-xs text-amber-700">
+                            Conflicts present: {row.conflicts.map((c) => c.type).join(", ")}
+                          </p>
+                        ) : null}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+                <div className="space-y-1">
+                  <p className="text-sm font-semibold text-red-700">
+                    Ineligible ({previewMutation.data.ineligible.length})
+                  </p>
+                  <div className="space-y-1 max-h-48 overflow-auto pr-1">
+                    {previewMutation.data.ineligible.map((row) => (
+                      <div key={row.siteId} className="rounded border border-red-100 bg-red-50 px-3 py-2">
+                        <div className="flex items-center justify-between text-sm font-medium text-red-800">
+                          <span>{siteLabelById.get(row.siteId) ?? row.siteId}</span>
+                          <span>{row.reasons.join(", ")}</span>
+                        </div>
+                        {row.conflicts?.length ? (
+                          <p className="text-xs text-amber-700">
+                            Conflicts: {row.conflicts.map((c) => c.type).join(", ")}
+                          </p>
+                        ) : null}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         </Card>
       </div>

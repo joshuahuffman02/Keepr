@@ -28,6 +28,7 @@ import { ApprovalsService } from "../approvals/approvals.service";
 import { UsageTrackerService } from "../org-billing/usage-tracker.service";
 import { RepeatChargesService } from "../repeat-charges/repeat-charges.service";
 import { PoliciesService } from "../policies/policies.service";
+import { assertSiteLockValid } from "./reservation-guards";
 
 @Injectable()
 export class ReservationsService {
@@ -1163,9 +1164,7 @@ export class ReservationsService {
     const arrival = new Date(data.arrivalDate);
     const departure = new Date(data.departureDate);
 
-    if (data.siteLocked && !data.siteId) {
-      throw new BadRequestException("siteLocked requires siteId.");
-    }
+    assertSiteLockValid(data.siteLocked, data.siteId);
 
     // If siteClassId is provided instead of siteId, find an available site in that class
     let siteId: string | null | undefined = data.siteId;

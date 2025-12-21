@@ -44,6 +44,15 @@ interface PartnerChatDto {
   history?: { role: 'user' | 'assistant'; content: string }[];
 }
 
+interface PartnerConfirmDto {
+  action: {
+    type: string;
+    parameters?: Record<string, any>;
+    sensitivity?: "low" | "medium" | "high";
+    impactArea?: string;
+  };
+}
+
 @Controller('ai')
 export class AiController {
   constructor(
@@ -170,6 +179,31 @@ export class AiController {
       return {
         mode: 'staff',
         message: "I'm having trouble completing that request right now.",
+        denials: [{ reason: error instanceof Error ? error.message : 'Unknown error' }],
+      };
+    }
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post('campgrounds/:campgroundId/partner/confirm')
+  async partnerConfirm(
+    @Param('campgroundId') campgroundId: string,
+    @Body() body: PartnerConfirmDto,
+    @Req() req: Request,
+  ) {
+    const user = (req as any).user;
+
+    try {
+      return await this.partnerService.confirmAction({
+        campgroundId,
+        action: body.action,
+        user,
+      });
+    } catch (error) {
+      console.error('AI partner confirm error:', error);
+      return {
+        mode: 'staff',
+        message: "I'm having trouble confirming that request right now.",
         denials: [{ reason: error instanceof Error ? error.message : 'Unknown error' }],
       };
     }

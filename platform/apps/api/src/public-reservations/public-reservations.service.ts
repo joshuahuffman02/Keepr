@@ -13,6 +13,7 @@ import { MembershipsService } from "../memberships/memberships.service";
 import { SignaturesService } from "../signatures/signatures.service";
 import { PoliciesService } from "../policies/policies.service";
 import { AccessControlService } from "../access-control/access-control.service";
+import { assertSiteLockValid } from "../reservations/reservation-guards";
 
 @Injectable()
 export class PublicReservationsService {
@@ -741,9 +742,7 @@ export class PublicReservationsService {
             throw new BadRequestException("departureDate must be after arrivalDate");
         }
 
-        if (dto.siteLocked && !dto.siteId) {
-            throw new BadRequestException("siteLocked requires siteId.");
-        }
+        assertSiteLockValid(dto.siteLocked, dto.siteId);
 
         // Resolve siteId - either provided directly or find available site from class
         let siteId = dto.siteId;

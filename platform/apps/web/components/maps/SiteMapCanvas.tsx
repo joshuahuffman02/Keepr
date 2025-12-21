@@ -34,6 +34,7 @@ type SiteMapCanvasProps = {
   onSelectSite?: (siteId: string) => void;
   showLabels?: boolean;
   isLoading?: boolean;
+  height?: number | string;
   className?: string;
 };
 
@@ -157,8 +158,12 @@ export function SiteMapCanvas({
   onSelectSite,
   showLabels = true,
   isLoading,
+  height,
   className
 }: SiteMapCanvasProps) {
+  const heightStyle = height
+    ? { height: typeof height === "number" ? `${height}px` : height }
+    : undefined;
   const { shapes, bounds, baseImageUrl } = useMemo(() => {
     const sites = map?.sites ?? [];
     const rawBounds = getBoundsFromConfig(map?.config?.bounds);
@@ -209,7 +214,10 @@ export function SiteMapCanvas({
 
   if (isLoading) {
     return (
-      <div className={cn("h-[420px] w-full animate-pulse rounded-xl border border-slate-200 bg-slate-100", className)} />
+      <div
+        className={cn("w-full animate-pulse rounded-xl border border-slate-200 bg-slate-100", height ? "h-full" : "h-[420px]", className)}
+        style={heightStyle}
+      />
     );
   }
 
@@ -245,10 +253,13 @@ export function SiteMapCanvas({
   })();
 
   return (
-    <div className={cn("rounded-xl border border-slate-200 bg-slate-50 p-3", className)}>
+    <div
+      className={cn("rounded-xl border border-slate-200 bg-slate-50 p-3", className)}
+      style={heightStyle}
+    >
       <svg
         viewBox={`${viewBox.minX} ${viewBox.minY} ${viewBox.width} ${viewBox.height}`}
-        className="h-[420px] w-full"
+        className={cn(height ? "h-full w-full" : "h-[420px] w-full")}
         role="img"
         aria-label="Campground site map"
       >

@@ -6108,6 +6108,24 @@ export const apiClient = {
     });
     return parseResponse<any>(res);
   },
+  async aiPartnerConfirmAction(
+    campgroundId: string,
+    payload: {
+      action: {
+        type: string;
+        parameters?: Record<string, any>;
+        sensitivity?: "low" | "medium" | "high";
+        impactArea?: string;
+      };
+    }
+  ) {
+    const res = await fetch(`${API_BASE}/ai/campgrounds/${campgroundId}/partner/confirm`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", ...scopedHeaders() },
+      body: JSON.stringify(payload),
+    });
+    return parseResponse<any>(res);
+  },
 
   // -------------------------------------------------------------------------
   // Social Media Planner
