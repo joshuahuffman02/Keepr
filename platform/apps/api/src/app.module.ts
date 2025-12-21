@@ -70,6 +70,10 @@ import { AutoCollectModule } from "./auto-collect/auto-collect.module";
 import { TasksModule } from "./tasks/tasks.module";
 import { SelfCheckinModule } from "./self-checkin/self-checkin.module";
 import { GroupsModule } from "./groups/groups.module";
+import { HousekeepingModule } from "./housekeeping/housekeeping.module";
+import { FlexCheckModule } from "./flex-check/flex-check.module";
+import { RoomMovesModule } from "./room-moves/room-moves.module";
+import { GroupBookingsModule } from "./group-bookings/group-bookings.module";
 // Phase 4 imports
 import { NotificationTriggersModule } from "./notification-triggers/notification-triggers.module";
 import { StoredValueModule } from "./stored-value/stored-value.module";
@@ -172,6 +176,10 @@ import { OrgReferralsModule } from "./org-referrals/org-referrals.module";
     TasksModule,
     SelfCheckinModule,
     GroupsModule,
+    HousekeepingModule,
+    FlexCheckModule,
+    RoomMovesModule,
+    GroupBookingsModule,
     // Phase 4 modules
     NotificationTriggersModule,
     StoredValueModule,

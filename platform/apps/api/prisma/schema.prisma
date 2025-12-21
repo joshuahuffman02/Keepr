@@ -15,11 +15,28 @@ enum ReservationStatus {
 }
 
 enum SiteType {
+  // Outdoor/Camping
   rv
   tent
   cabin
   group
   glamping
+
+  // Hotel/Lodge Types
+  hotel_room
+  suite
+  lodge_room
+
+  // Glamping Structures
+  yurt
+  treehouse
+  tiny_house
+  airstream
+  safari_tent
+  dome
+
+  // Specialty
+  boat_slip
 }
 
 enum MaintenanceStatus {
@@ -138,9 +155,40 @@ enum ChargeStatus {
 
 // Phase 2 housekeeping/maintenance/group bookings
 enum TaskType {
+  // Existing
   turnover
   inspection
   other
+
+  // Hotel-level cleaning
+  deep_clean
+  touch_up
+  make_ready
+  checkout_express
+  vip_prep
+  pet_treatment
+  linen_change
+  restocking
+}
+
+// Hotel-level housekeeping status state machine
+enum HousekeepingStatus {
+  // Vacant states
+  vacant_dirty
+  cleaning_in_progress
+  pending_inspection
+  inspection_failed
+  vacant_clean
+  vacant_inspected
+
+  // Occupied states
+  occupied
+  occupied_service     // Can receive housekeeping service
+  occupied_dnd         // Do Not Disturb
+
+  // Blocked states
+  out_of_order         // Maintenance issue
+  out_of_inventory     // Offline (renovations, seasonal)
 }
 
 enum TaskState {
@@ -430,6 +478,12 @@ model User {
   transfersApproved   InventoryTransfer[]  @relation("TransferApprover")
   transfersCompleted  InventoryTransfer[]  @relation("TransferCompleter")
   inventoryMovements  InventoryMovement[]
+
+  // Hotel operations relations
+  inspectionsPerformed     InspectionResult[]   @relation("InspectionInspector")
+  roomMovesRequested       RoomMoveRequest[]    @relation("RoomMoveRequester")
+  roomMovesApproved        RoomMoveRequest[]    @relation("RoomMoveApprover")
+  roomMovesCompleted       RoomMoveRequest[]    @relation("RoomMoveCompleter")
 }
 
 model GuestEquipment {
@@ -1117,6 +1171,13 @@ model Campground {
   inventoryTransfers     InventoryTransfer[]
   inventoryMovements     InventoryMovement[]
 
+  // Hotel operations relations
+  cleaningTaskTemplates  CleaningTaskTemplate[]
+  cleaningZones          CleaningZone[]
+  flexCheckPolicy        FlexCheckPolicy?
+  roomMoveRequests       RoomMoveRequest[]
+  groupBookings          GroupBooking[]
+
   // Soft delete
   deletedAt DateTime?
   deletedBy String?
@@ -1533,6 +1594,11 @@ model Site {
   surfaceType       String?
   padSlopePercent   Int?
   mapLabel          String?
+
+  // Hotel operations fields
+  cleaningMinutes   Int?                // Standard cleaning time for this unit
+  zone              String?             // "Building A Floor 2", "Lakeside Loop"
+
   createdAt         DateTime @default(now())
   updatedAt         DateTime @default(now()) @updatedAt
 
@@ -1541,8 +1607,9 @@ model Site {
   reservations       Reservation[]
   maintenance        MaintenanceTicket[]
   operationalTasks   OperationalTask[]
-  housekeepingStatus String              @default("clean") // clean, dirty, inspecting
+  housekeepingStatus String              @default("vacant_clean") // Uses HousekeepingStatus enum values
   blackoutDates      BlackoutDate[]
+  structureAttributes StructureAttributes?  // Hotel room/cabin specific attributes
   holds              SiteHold[]
   otaMappings        OtaListingMapping[] @relation("SiteOtaMappings")
   analyticsEvents    AnalyticsEvent[]
@@ -1555,6 +1622,10 @@ model Site {
   reservationSegments ReservationSegment[]
   smartLocks          SmartLock[]
   qrCodes             QRCode[]
+
+  // Hotel operations relations
+  roomMovesFrom       RoomMoveRequest[]   @relation("RoomMoveFrom")
+  roomMovesTo         RoomMoveRequest[]   @relation("RoomMoveTo")
 
   @@unique([campgroundId, name])
   @@index([campgroundId])
@@ -1711,6 +1782,9 @@ model Guest {
   idVerifications    IdVerification[]
   segmentMemberships GuestSegmentMembership[]
 
+  // Hotel operations relations
+  groupBookings      GroupBooking[]  @relation("GroupPrimaryGuest")
+
   // Soft delete
   deletedAt DateTime?
   deletedBy String?
@@ -1839,6 +1913,17 @@ model Reservation {
   selfCheckInAt          DateTime?
   selfCheckOutAt         DateTime?
 
+  // Hotel operations: Flex check-in/check-out
+  earlyCheckInRequested  DateTime?
+  earlyCheckInApproved   Boolean?
+  earlyCheckInCharge     Int?           // Cents charged for early check-in
+  lateCheckoutRequested  DateTime?
+  lateCheckoutApproved   Boolean?
+  lateCheckoutCharge     Int?           // Cents charged for late checkout
+
+  // Hotel operations: Group booking link
+  groupBookingId         String?
+
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now()) @updatedAt
 
@@ -1894,7 +1979,12 @@ model Reservation {
   // QR codes for check-in
   qrCodes QRCode[]
 
+  // Hotel operations relations
+  roomMoves     RoomMoveRequest[]
+  groupBooking  GroupBooking?     @relation(fields: [groupBookingId], references: [id], onDelete: SetNull)
+
   @@index([campgroundId])
+  @@index([groupBookingId])
   @@index([siteId])
   @@index([guestId])
   @@index([seasonalRateId])
@@ -4451,8 +4541,12 @@ model Task {
   notes            String?
   source           String?
   createdBy        String
+  templateId       String?   // Reference to CleaningTaskTemplate used
   createdAt        DateTime  @default(now())
   updatedAt        DateTime  @updatedAt
+
+  // Hotel operations relation
+  inspectionResults InspectionResult[]
 
   @@index([tenantId, siteId, state])
   @@index([tenantId, slaStatus])
@@ -6670,4 +6764,241 @@ model InventoryMovement {
   @@index([locationId])
   @@index([movementType])
   @@index([createdAt])
+}
+
+// ============================================================================
+// HOTEL OPERATIONS EXTENSION - Phase 1-5
+// ============================================================================
+
+// Structure attributes for non-RV accommodations (cabins, hotel rooms, glamping)
+model StructureAttributes {
+  id                String   @id @default(cuid())
+  siteId            String   @unique
+
+  // Sleeping configuration
+  bedConfiguration  Json?    // [{type: "king", count: 1}, {type: "bunk", count: 2}]
+  bedroomCount      Int?
+
+  // Facilities
+  bathroomCount     Int?
+  bathroomType      String?  // private, shared, none
+  hasKitchen        Boolean  @default(false)
+  kitchenType       String?  // full, kitchenette, none
+  hasHeat           Boolean  @default(false)
+  hasAC             Boolean  @default(false)
+  hasFireplace      Boolean  @default(false)
+
+  // Building location (for hotel rooms)
+  floorNumber       Int?
+  buildingName      String?
+  squareFeet        Int?
+
+  // Views & Features
+  hasBalcony        Boolean  @default(false)
+  hasPatio          Boolean  @default(false)
+  viewType          String?  // lake, mountain, forest, pool, parking_lot
+
+  // Linens & Supplies
+  linensProvided    Boolean  @default(true)
+  towelsProvided    Boolean  @default(true)
+
+  // Hotel-specific features
+  connectingRoomIds String[] @default([])
+  isConnecting      Boolean  @default(false)
+  minibar           Boolean  @default(false)
+  roomService       Boolean  @default(false)
+  safe              Boolean  @default(false)
+  coffeemaker       Boolean  @default(false)
+
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  site              Site     @relation(fields: [siteId], references: [id], onDelete: Cascade)
+
+  @@index([siteId])
+}
+
+// Cleaning task templates - configurable per property and site type
+model CleaningTaskTemplate {
+  id                 String    @id @default(cuid())
+  campgroundId       String
+  taskType           TaskType
+  siteType           SiteType? // null = applies to all site types
+
+  name               String
+  estimatedMinutes   Int
+  checklist          Json      // [{id, text, required, category}]
+  suppliesNeeded     Json?     // [{item, quantity}]
+  priority           Int       @default(100)
+  slaMinutes         Int?      // Default SLA for this task type
+  requiresInspection Boolean   @default(false)
+
+  isActive           Boolean   @default(true)
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
+
+  campground         Campground @relation(fields: [campgroundId], references: [id], onDelete: Cascade)
+
+  @@index([campgroundId])
+  @@index([taskType])
+  @@index([siteType])
+}
+
+// Inspection results for housekeeping quality control
+model InspectionResult {
+  id              String   @id @default(cuid())
+  taskId          String
+  inspectorId     String
+
+  // Inspection data
+  responses       Json     // [{itemId, passed, notes, photo}]
+  overallResult   String   // passed, failed, partial
+  score           Int?     // Percentage score (0-100)
+
+  // Follow-up
+  failedItems     String[] @default([])
+  requiresReclean Boolean  @default(false)
+  notes           String?
+  photos          String[] @default([])
+
+  completedAt     DateTime @default(now())
+
+  task            Task     @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  inspector       User     @relation("InspectionInspector", fields: [inspectorId], references: [id])
+
+  @@index([taskId])
+  @@index([inspectorId])
+}
+
+// Cleaning zones for organizing housekeeping by building/area
+model CleaningZone {
+  id              String   @id @default(cuid())
+  campgroundId    String
+  name            String   // "Building A Floor 2", "Lakeside Loop"
+  zoneType        String   // building_floor, outdoor_loop, wing, section
+  parentZoneId    String?  // Hierarchy support
+  primaryTeamId   String?  // Default assigned team
+  color           String?  // For dashboard visualization
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  campground      Campground    @relation(fields: [campgroundId], references: [id], onDelete: Cascade)
+  parentZone      CleaningZone? @relation("ZoneHierarchy", fields: [parentZoneId], references: [id])
+  childZones      CleaningZone[] @relation("ZoneHierarchy")
+
+  @@index([campgroundId])
+  @@index([parentZoneId])
+}
+
+// Flex check-in/check-out policy per campground
+model FlexCheckPolicy {
+  id                      String   @id @default(cuid())
+  campgroundId            String   @unique
+
+  // Early check-in
+  earlyCheckInEnabled     Boolean  @default(false)
+  earlyCheckInMinHours    Int?     // How many hours early allowed
+  earlyCheckInPricing     Json?    // {type: "flat"|"hourly", amount: cents}
+  earlyCheckInAutoApprove Boolean  @default(false)
+
+  // Late checkout
+  lateCheckoutEnabled     Boolean  @default(false)
+  lateCheckoutMaxHours    Int?     // How many hours late allowed
+  lateCheckoutPricing     Json?    // {type: "flat"|"hourly", amount: cents}
+  lateCheckoutAutoApprove Boolean  @default(false)
+
+  // VIP overrides
+  vipEarlyFree            Boolean  @default(false)
+  vipLateFree             Boolean  @default(false)
+
+  createdAt               DateTime @default(now())
+  updatedAt               DateTime @updatedAt
+
+  campground              Campground @relation(fields: [campgroundId], references: [id], onDelete: Cascade)
+}
+
+// Room move/upgrade requests during a stay
+model RoomMoveRequest {
+  id                  String    @id @default(cuid())
+  campgroundId        String
+  reservationId       String
+  fromSiteId          String
+  toSiteId            String
+
+  // Move details
+  moveDate            DateTime
+  moveReason          String    // guest_request, maintenance, upgrade, downgrade, overbooking
+  isComplimentary     Boolean   @default(false)
+  priceDifference     Int?      // Positive = guest pays, negative = refund
+
+  // Status workflow
+  status              String    @default("requested") // requested, approved, in_progress, completed, cancelled
+
+  // Logistics
+  luggageAssistance   Boolean   @default(false)
+  newKeysIssued       Boolean   @default(false)
+
+  // Audit
+  requestedById       String
+  approvedById        String?
+  completedById       String?
+  completedAt         DateTime?
+  notes               String?
+
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
+
+  campground          Campground  @relation(fields: [campgroundId], references: [id], onDelete: Cascade)
+  reservation         Reservation @relation(fields: [reservationId], references: [id], onDelete: Cascade)
+  fromSite            Site        @relation("RoomMoveFrom", fields: [fromSiteId], references: [id])
+  toSite              Site        @relation("RoomMoveTo", fields: [toSiteId], references: [id])
+  requestedBy         User        @relation("RoomMoveRequester", fields: [requestedById], references: [id])
+  approvedBy          User?       @relation("RoomMoveApprover", fields: [approvedById], references: [id])
+  completedBy         User?       @relation("RoomMoveCompleter", fields: [completedById], references: [id])
+
+  @@index([campgroundId])
+  @@index([reservationId])
+  @@index([status])
+}
+
+// Group bookings for multi-room coordination
+model GroupBooking {
+  id                  String   @id @default(cuid())
+  campgroundId        String
+
+  // Group info
+  groupName           String
+  primaryGuestId      String
+  groupType           String   // family, corporate, wedding, reunion, tour, sports_team
+
+  // Room preferences
+  preferAdjacent      Boolean  @default(false)
+  preferSameFloor     Boolean  @default(false)
+  preferConnecting    Boolean  @default(false)
+  preferredZone       String?  // Building/area preference
+
+  // Assignment status
+  assignmentStatus    String   @default("pending") // pending, partial, complete, confirmed
+
+  // Billing
+  billingType         String   @default("individual") // individual, master_folio, split
+  masterFolioId       String?  // If using master folio billing
+
+  // Coordination
+  groupArrivalTime    String?  // Coordinated arrival time
+  groupDepartureTime  String?  // Coordinated departure time
+  welcomeAmenity      String?  // Special welcome setup
+  groupNotes          String?
+
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+
+  campground          Campground    @relation(fields: [campgroundId], references: [id], onDelete: Cascade)
+  primaryGuest        Guest         @relation("GroupPrimaryGuest", fields: [primaryGuestId], references: [id])
+  reservations        Reservation[]
+
+  @@index([campgroundId])
+  @@index([primaryGuestId])
+  @@index([assignmentStatus])
 }

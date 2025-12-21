@@ -7713,6 +7713,354 @@ export const apiClient = {
       completedAt?: string;
     };
   },
+
+  // ==================== HOUSEKEEPING ====================
+
+  async getHousekeepingTasks(campgroundId?: string) {
+    const query = campgroundId ? `?campgroundId=${campgroundId}` : "";
+    const data = await fetchJSON<unknown>(`/tasks${query}`);
+    return z.array(z.any()).parse(data);
+  },
+
+  async getHousekeepingStats(campgroundId: string) {
+    const data = await fetchJSON<unknown>(`/housekeeping/stats?campgroundId=${campgroundId}`);
+    return data as { total: number; byStatus: Record<string, number> };
+  },
+
+  async getSiteStatuses(campgroundId?: string) {
+    const query = campgroundId ? `?campgroundId=${campgroundId}` : "";
+    const data = await fetchJSON<unknown>(`/housekeeping/sites${query}`);
+    return z.array(z.any()).parse(data);
+  },
+
+  async updateSiteHousekeepingStatus(siteId: string, status: string) {
+    const res = await fetch(`${API_BASE}/housekeeping/sites/${siteId}/status`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json", ...scopedHeaders() },
+      body: JSON.stringify({ status }),
+    });
+    return parseResponse<unknown>(res);
+  },
+
+  async getDailySchedule(campgroundId: string, date?: string) {
+    const query = new URLSearchParams({ campgroundId });
+    if (date) query.set("date", date);
+    const data = await fetchJSON<unknown>(`/housekeeping/schedule/daily?${query.toString()}`);
+    return data as any;
+  },
+
+  async getStaffWorkload(campgroundId: string, date?: string) {
+    const query = new URLSearchParams({ campgroundId });
+    if (date) query.set("date", date);
+    const data = await fetchJSON<unknown>(`/housekeeping/workload?${query.toString()}`);
+    return data as Record<string, { total: number; completed: number; inProgress: number; pending: number }>;
+  },
+
+  async getCleaningTemplates(campgroundId: string) {
+    const data = await fetchJSON<unknown>(`/housekeeping/templates?campgroundId=${campgroundId}`);
+    return z.array(z.any()).parse(data);
+  },
+
+  async createCleaningTemplate(payload: {
+    campgroundId: string;
+    taskType: string;
+    siteType?: string;
+    name: string;
+    estimatedMinutes: number;
+    checklist: any;
+    suppliesNeeded?: any;
+    priority?: number;
+    slaMinutes?: number;
+    requiresInspection?: boolean;
+  }) {
+    const res = await fetch(`${API_BASE}/housekeeping/templates`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", ...scopedHeaders() },
+      body: JSON.stringify(payload),
+    });
+    return parseResponse<unknown>(res);
+  },
+
+  async updateCleaningTemplate(id: string, payload: Partial<{
+    name: string;
+    estimatedMinutes: number;
+    checklist: any;
+    suppliesNeeded: any;
+    priority: number;
+    slaMinutes: number;
+    requiresInspection: boolean;
+    isActive: boolean;
+  }>) {
+    const res = await fetch(`${API_BASE}/housekeeping/templates/${id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json", ...scopedHeaders() },
+      body: JSON.stringify(payload),
+    });
+    return parseResponse<unknown>(res);
+  },
+
+  async getCleaningZones(campgroundId: string) {
+    const data = await fetchJSON<unknown>(`/housekeeping/zones?campgroundId=${campgroundId}`);
+    return z.array(z.any()).parse(data);
+  },
+
+  async createCleaningZone(payload: {
+    campgroundId: string;
+    name: string;
+    zoneType: string;
+    parentZoneId?: string;
+    primaryTeamId?: string;
+    color?: string;
+  }) {
+    const res = await fetch(`${API_BASE}/housekeeping/zones`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", ...scopedHeaders() },
+      body: JSON.stringify(payload),
+    });
+    return parseResponse<unknown>(res);
+  },
+
+  async submitInspection(payload: {
+    taskId: string;
+    inspectorId: string;
+    responses: Array<{ itemId: string; passed: boolean; notes?: string; photo?: string }>;
+    notes?: string;
+    photos?: string[];
+  }) {
+    const res = await fetch(`${API_BASE}/housekeeping/inspections`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", ...scopedHeaders() },
+      body: JSON.stringify(payload),
+    });
+    return parseResponse<unknown>(res);
+  },
+
+  async getInspectionStats(campgroundId: string, startDate?: string, endDate?: string) {
+    const query = new URLSearchParams({ campgroundId });
+    if (startDate) query.set("startDate", startDate);
+    if (endDate) query.set("endDate", endDate);
+    const data = await fetchJSON<unknown>(`/housekeeping/inspections/stats?${query.toString()}`);
+    return data as {
+      total: number;
+      passed: number;
+      failed: number;
+      partial: number;
+      passRate: number;
+      averageScore: number;
+      recleanRate: number;
+    };
+  },
+
+  // ==================== FLEX CHECK ====================
+
+  async getFlexCheckPolicy(campgroundId: string) {
+    const data = await fetchJSON<unknown>(`/flex-check/policy?campgroundId=${campgroundId}`);
+    return data as any;
+  },
+
+  async updateFlexCheckPolicy(campgroundId: string, payload: {
+    earlyCheckInEnabled?: boolean;
+    earlyCheckInMinHours?: number;
+    earlyCheckInPricing?: any;
+    earlyCheckInAutoApprove?: boolean;
+    lateCheckoutEnabled?: boolean;
+    lateCheckoutMaxHours?: number;
+    lateCheckoutPricing?: any;
+    lateCheckoutAutoApprove?: boolean;
+  }) {
+    const res = await fetch(`${API_BASE}/flex-check/policy?campgroundId=${campgroundId}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json", ...scopedHeaders() },
+      body: JSON.stringify(payload),
+    });
+    return parseResponse<unknown>(res);
+  },
+
+  async requestEarlyCheckIn(reservationId: string, requestedTime: string) {
+    const res = await fetch(`${API_BASE}/flex-check/early-checkin/request`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", ...scopedHeaders() },
+      body: JSON.stringify({ reservationId, requestedTime }),
+    });
+    return parseResponse<unknown>(res);
+  },
+
+  async approveEarlyCheckIn(reservationId: string) {
+    const res = await fetch(`${API_BASE}/flex-check/early-checkin/${reservationId}/approve`, {
+      method: "POST",
+      headers: scopedHeaders(),
+    });
+    return parseResponse<unknown>(res);
+  },
+
+  async requestLateCheckout(reservationId: string, requestedTime: string) {
+    const res = await fetch(`${API_BASE}/flex-check/late-checkout/request`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", ...scopedHeaders() },
+      body: JSON.stringify({ reservationId, requestedTime }),
+    });
+    return parseResponse<unknown>(res);
+  },
+
+  async approveLateCheckout(reservationId: string) {
+    const res = await fetch(`${API_BASE}/flex-check/late-checkout/${reservationId}/approve`, {
+      method: "POST",
+      headers: scopedHeaders(),
+    });
+    return parseResponse<unknown>(res);
+  },
+
+  async getPendingFlexRequests(campgroundId: string) {
+    const data = await fetchJSON<unknown>(`/flex-check/pending?campgroundId=${campgroundId}`);
+    return data as {
+      earlyCheckIn: Array<{
+        reservationId: string;
+        guestName: string;
+        siteName: string;
+        requestedTime: string;
+        arrivalDate: string;
+        proposedCharge: number;
+      }>;
+      lateCheckout: Array<{
+        reservationId: string;
+        guestName: string;
+        siteName: string;
+        requestedTime: string;
+        departureDate: string;
+        proposedCharge: number;
+      }>;
+    };
+  },
+
+  // ==================== ROOM MOVES ====================
+
+  async createRoomMoveRequest(payload: {
+    reservationId: string;
+    toSiteId: string;
+    moveDate: string;
+    moveReason: string;
+    isComplimentary?: boolean;
+    notes?: string;
+  }) {
+    const res = await fetch(`${API_BASE}/room-moves`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", ...scopedHeaders() },
+      body: JSON.stringify(payload),
+    });
+    return parseResponse<unknown>(res);
+  },
+
+  async getPendingRoomMoves(campgroundId: string) {
+    const data = await fetchJSON<unknown>(`/room-moves?campgroundId=${campgroundId}`);
+    return z.array(z.any()).parse(data);
+  },
+
+  async getTodaysRoomMoves(campgroundId: string) {
+    const data = await fetchJSON<unknown>(`/room-moves/today?campgroundId=${campgroundId}`);
+    return z.array(z.any()).parse(data);
+  },
+
+  async approveRoomMove(id: string) {
+    const res = await fetch(`${API_BASE}/room-moves/${id}/approve`, {
+      method: "POST",
+      headers: scopedHeaders(),
+    });
+    return parseResponse<unknown>(res);
+  },
+
+  async completeRoomMove(id: string) {
+    const res = await fetch(`${API_BASE}/room-moves/${id}/complete`, {
+      method: "POST",
+      headers: scopedHeaders(),
+    });
+    return parseResponse<unknown>(res);
+  },
+
+  // ==================== GROUP BOOKINGS ====================
+
+  async getGroupBookings(campgroundId: string, filters?: { groupType?: string; assignmentStatus?: string }) {
+    const query = new URLSearchParams({ campgroundId });
+    if (filters?.groupType) query.set("groupType", filters.groupType);
+    if (filters?.assignmentStatus) query.set("assignmentStatus", filters.assignmentStatus);
+    const data = await fetchJSON<unknown>(`/group-bookings?${query.toString()}`);
+    return z.array(z.any()).parse(data);
+  },
+
+  async getGroupBooking(id: string) {
+    const data = await fetchJSON<unknown>(`/group-bookings/${id}`);
+    return data as any;
+  },
+
+  async createGroupBooking(payload: {
+    campgroundId: string;
+    groupName: string;
+    primaryGuestId: string;
+    groupType: string;
+    preferAdjacent?: boolean;
+    preferSameFloor?: boolean;
+    preferConnecting?: boolean;
+    preferredZone?: string;
+    billingType?: string;
+    groupArrivalTime?: string;
+    groupDepartureTime?: string;
+  }) {
+    const res = await fetch(`${API_BASE}/group-bookings`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", ...scopedHeaders() },
+      body: JSON.stringify(payload),
+    });
+    return parseResponse<unknown>(res);
+  },
+
+  async updateGroupBooking(id: string, payload: Partial<{
+    groupName: string;
+    groupType: string;
+    preferAdjacent: boolean;
+    preferSameFloor: boolean;
+    preferConnecting: boolean;
+    preferredZone: string;
+    billingType: string;
+    groupArrivalTime: string;
+    groupDepartureTime: string;
+  }>) {
+    const res = await fetch(`${API_BASE}/group-bookings/${id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json", ...scopedHeaders() },
+      body: JSON.stringify(payload),
+    });
+    return parseResponse<unknown>(res);
+  },
+
+  async addReservationToGroup(groupId: string, reservationId: string) {
+    const res = await fetch(`${API_BASE}/group-bookings/${groupId}/reservations`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", ...scopedHeaders() },
+      body: JSON.stringify({ reservationId }),
+    });
+    return parseResponse<unknown>(res);
+  },
+
+  async optimizeGroupAssignments(groupId: string) {
+    const res = await fetch(`${API_BASE}/group-bookings/${groupId}/optimize-assignments`, {
+      method: "POST",
+      headers: scopedHeaders(),
+    });
+    return parseResponse<unknown>(res);
+  },
+
+  async getGroupStats(campgroundId: string, startDate?: string, endDate?: string) {
+    const query = new URLSearchParams({ campgroundId });
+    if (startDate) query.set("startDate", startDate);
+    if (endDate) query.set("endDate", endDate);
+    const data = await fetchJSON<unknown>(`/group-bookings/stats?${query.toString()}`);
+    return data as {
+      totalGroups: number;
+      totalRooms: number;
+      averageGroupSize: number;
+      byType: Record<string, number>;
+      byStatus: Record<string, number>;
+    };
+  },
 };
 
 export type PublicCampgroundList = z.infer<typeof PublicCampgroundListSchema>;
