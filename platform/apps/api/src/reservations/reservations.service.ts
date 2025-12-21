@@ -1052,16 +1052,28 @@ export class ReservationsService {
         const totalBeforeReferral = Math.max(0, subtotal - discountCents);
         const totalAmount = Math.max(0, totalBeforeReferral - referralDiscountCents);
         const paidAmount = data.paidAmount ?? 0;
+        const status = data.status ?? ReservationStatus.pending;
+        const allowPendingCardWithoutDeposit =
+          data.paymentMethod === "card" &&
+          status === ReservationStatus.pending &&
+          paidAmount <= 0;
 
-        // Use V2 deposit policy if available
-        const depositCalc = await assertReservationDepositV2(this.depositPoliciesService, {
-          campgroundId: data.campgroundId,
-          siteClassId: siteInfo?.siteClassId ?? null,
-          totalAmountCents: totalAmount,
-          lodgingOnlyCents: price.baseSubtotalCents,
-          paidAmountCents: paidAmount,
-          nights: price.nights
-        });
+        const depositCalc = allowPendingCardWithoutDeposit
+          ? await calculateReservationDepositV2(this.depositPoliciesService, {
+              campgroundId: data.campgroundId,
+              siteClassId: siteInfo?.siteClassId ?? null,
+              totalAmountCents: totalAmount,
+              lodgingOnlyCents: price.baseSubtotalCents,
+              nights: price.nights
+            })
+          : await assertReservationDepositV2(this.depositPoliciesService, {
+              campgroundId: data.campgroundId,
+              siteClassId: siteInfo?.siteClassId ?? null,
+              totalAmountCents: totalAmount,
+              lodgingOnlyCents: price.baseSubtotalCents,
+              paidAmountCents: paidAmount,
+              nights: price.nights
+            });
         const paymentFields = this.buildPaymentFields(totalAmount, paidAmount);
 
         const {

@@ -124,7 +124,7 @@ export default function CampgroundMapPage() {
         </div>
 
         <Card className="p-6 space-y-6">
-          <div className="grid gap-6 lg:grid-cols-[320px,1fr]">
+          <div className="grid gap-6">
             <div className="space-y-3">
               <div className="grid gap-2">
                 <Label htmlFor="start-date">Arrival date</Label>
@@ -235,7 +235,7 @@ export default function CampgroundMapPage() {
                 map={mapQuery.data}
                 isLoading={mapQuery.isLoading}
                 showLabels
-                height={520}
+                height={640}
               />
               {mapQuery.isError && (
                 <p className="text-xs text-rose-600">Failed to load map preview.</p>
@@ -251,6 +251,7 @@ export default function CampgroundMapPage() {
             isLoading={mapQuery.isLoading || sitesQuery.isLoading}
             onSaved={() => mapQuery.refetch()}
             className="w-full"
+            autoFullscreen
           />
 
           <div className="grid gap-2">

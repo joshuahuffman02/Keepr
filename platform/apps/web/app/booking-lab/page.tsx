@@ -96,6 +96,16 @@ function BookingLabPageInner() {
   const initialArrival = searchParams.get("arrivalDate") || "";
   const initialDeparture = searchParams.get("departureDate") || "";
   const initialSiteId = searchParams.get("siteId") || "";
+  const initialSiteClassId = searchParams.get("siteClassId") || "";
+  const initialRigType = searchParams.get("rigType") || searchParams.get("rvType") || "";
+  const initialRigLength = searchParams.get("rigLength") || searchParams.get("rvLength") || "";
+  const initialSiteTypeFilter = searchParams.get("siteType") || "all";
+  const initialAdultsRaw = searchParams.get("adults") || searchParams.get("guests") || "";
+  const initialChildrenRaw = searchParams.get("children") || "";
+  const parsedAdults = Number(initialAdultsRaw);
+  const parsedChildren = Number(initialChildrenRaw);
+  const initialAdults = Number.isFinite(parsedAdults) && parsedAdults > 0 ? parsedAdults : 2;
+  const initialChildren = Number.isFinite(parsedChildren) && parsedChildren >= 0 ? parsedChildren : 0;
 
   const { data: campgrounds = [] } = useQuery({
     queryKey: ["campgrounds"],
@@ -163,13 +173,13 @@ function BookingLabPageInner() {
     guestId: "",
     arrivalDate: initialArrival,
     departureDate: initialDeparture,
-    adults: 2,
-    children: 0,
+    adults: initialAdults,
+    children: initialChildren,
     pets: 0,
-    rigType: "",
-    rigLength: "",
+    rigType: initialRigType,
+    rigLength: initialRigLength,
     siteId: initialSiteId,
-    siteClassId: "",
+    siteClassId: initialSiteClassId,
     lockSite: false,
     notes: "",
     referralSource: "",
@@ -249,12 +259,23 @@ function BookingLabPageInner() {
     enabled: !!selectedCampground?.id && dateRangeValid
   });
 
-  const [siteTypeFilter, setSiteTypeFilter] = useState("all");
-  const [siteClassFilter, setSiteClassFilter] = useState("all");
+  const [siteTypeFilter, setSiteTypeFilter] = useState(initialSiteTypeFilter);
+  const [siteClassFilter, setSiteClassFilter] = useState(initialSiteClassId || "all");
   const [availableOnly, setAvailableOnly] = useState(true);
   const siteClassById = useMemo(() => {
     return new Map((siteClassesQuery.data || []).map((siteClass) => [siteClass.id, siteClass]));
   }, [siteClassesQuery.data]);
+  const siteClassByName = useMemo(() => {
+    return new Map((siteClassesQuery.data || []).map((siteClass) => [siteClass.name.toLowerCase(), siteClass]));
+  }, [siteClassesQuery.data]);
+
+  useEffect(() => {
+    if (siteClassFilter === "all") return;
+    const exists = (siteClassesQuery.data || []).some((siteClass) => siteClass.id === siteClassFilter);
+    if (!exists) {
+      setSiteClassFilter("all");
+    }
+  }, [siteClassesQuery.data, siteClassFilter]);
   const rigLengthValue = Number(formData.rigLength);
   const hasRigLength = Number.isFinite(rigLengthValue) && rigLengthValue > 0;
   const isRvRigType = RV_RIG_TYPES.has(formData.rigType);
@@ -286,6 +307,14 @@ function BookingLabPageInner() {
     siteClassById
   ]);
 
+  useEffect(() => {
+    if (formData.siteId || !formData.siteClassId) return;
+    const match = filteredSites.find((site) => site.siteClassId === formData.siteClassId);
+    if (match) {
+      setFormData((prev) => ({ ...prev, siteId: match.id }));
+    }
+  }, [filteredSites, formData.siteId, formData.siteClassId]);
+
   const selectedSite = useMemo(() => {
     const all = siteStatusQuery.data || [];
     return all.find((site) => site.id === formData.siteId) || null;
@@ -310,18 +339,34 @@ function BookingLabPageInner() {
   });
 
   const lockFeeCents = formData.lockSite && siteLockFeeCents > 0 ? siteLockFeeCents : 0;
-  const fallbackRateCents =
-    selectedSite?.defaultRate ??
-    siteClassById.get(selectedSite?.siteClassId ?? "")?.defaultRate ??
-    null;
+  const fallbackRateCents = (() => {
+    if (selectedSite?.defaultRate !== null && selectedSite?.defaultRate !== undefined) {
+      return selectedSite.defaultRate;
+    }
+    if (selectedSite?.siteClassId) {
+      const rate = siteClassById.get(selectedSite.siteClassId)?.defaultRate;
+      if (rate !== null && rate !== undefined) return rate;
+    }
+    if (selectedSite?.siteClassName) {
+      const rate = siteClassByName.get(selectedSite.siteClassName.toLowerCase())?.defaultRate;
+      if (rate !== null && rate !== undefined) return rate;
+    }
+    return null;
+  })();
   const fallbackSubtotalCents = fallbackRateCents !== null && nights ? fallbackRateCents * nights : null;
   const pricingSubtotalCents = quoteQuery.data?.baseSubtotalCents ?? fallbackSubtotalCents;
   const pricingRulesDeltaCents = quoteQuery.data?.rulesDeltaCents ?? null;
   const pricingTotalCents = quoteQuery.data?.totalCents ?? fallbackSubtotalCents;
   const pricingIsEstimate = !quoteQuery.data && fallbackSubtotalCents !== null;
-  const totalCents = (pricingTotalCents ?? 0) + lockFeeCents;
-  const paymentAmountDefault = totalCents > 0 ? (totalCents / 100).toFixed(2) : "";
   const paymentAmountCents = Math.round(Number(formData.paymentAmount || 0) * 100);
+  const manualTotalCents = paymentAmountCents > 0 ? paymentAmountCents : null;
+  const estimatedTotalCents = pricingTotalCents !== null ? pricingTotalCents + lockFeeCents : null;
+  const totalCents = estimatedTotalCents ?? manualTotalCents ?? 0;
+  const paymentAmountDefault = estimatedTotalCents && estimatedTotalCents > 0
+    ? (estimatedTotalCents / 100).toFixed(2)
+    : "";
+  const displaySubtotalCents = pricingSubtotalCents ?? manualTotalCents;
+  const displayTotalCents = estimatedTotalCents ?? manualTotalCents;
   const cashReceivedCents = Math.round(Number(formData.cashReceived || 0) * 100);
   const cashChangeDueCents =
     formData.paymentMethod === "cash" && cashReceivedCents > paymentAmountCents
@@ -494,6 +539,12 @@ function BookingLabPageInner() {
           ? `Cash received $${(cashReceivedCents / 100).toFixed(2)}${cashChangeDueCents ? ` • Change due $${(cashChangeDueCents / 100).toFixed(2)}` : ""}`
           : "";
       const paymentNotes = [formData.paymentNotes, cashNote].filter(Boolean).join(" • ") || undefined;
+      const needsOverride = lockFeeCents > 0 || pricingIsEstimate || quoteQuery.isError;
+      const overrideReason = lockFeeCents > 0 ? "Site lock fee" : needsOverride ? "Manual rate estimate" : undefined;
+      const overrideApprovedBy = overrideReason ? whoami?.user?.id || undefined : undefined;
+      if (overrideReason && !overrideApprovedBy) {
+        throw new Error("Override approval required. Refresh and try again.");
+      }
       const payload: any = {
         campgroundId: selectedCampground!.id,
         guestId: formData.guestId,
@@ -513,11 +564,11 @@ function BookingLabPageInner() {
         balanceAmount: Math.max(0, totalCents - paidAmountCents),
         // Card payments start as "pending" until payment completes
         status: isCardPayment ? "pending" : "confirmed",
-        paymentMethod: !isCardPayment ? formData.paymentMethod : undefined,
+        paymentMethod: formData.paymentMethod,
         paymentNotes: !isCardPayment ? paymentNotes : undefined,
         siteLocked: formData.lockSite,
-        overrideReason: lockFeeCents > 0 ? "Site lock fee" : undefined,
-        overrideApprovedBy: whoami?.user?.id || undefined
+        overrideReason,
+        overrideApprovedBy
       };
 
       console.log("[Booking] Creating reservation with payload:", JSON.stringify(payload, null, 2));
@@ -550,7 +601,7 @@ function BookingLabPageInner() {
     }
   });
 
-  const hasPricing = pricingSubtotalCents !== null;
+  const hasPricing = displayTotalCents !== null;
   const cardEntryBlocked = formData.paymentMethod === "card" && formData.cardEntryMode === "reader";
   const paymentReady =
     !!formData.paymentMethod &&
@@ -1089,7 +1140,7 @@ function BookingLabPageInner() {
                   <div className="flex items-center justify-between">
                     <span className="text-slate-500">Subtotal</span>
                     <span className="font-semibold text-slate-800">
-                      {pricingSubtotalCents !== null ? `$${(pricingSubtotalCents / 100).toFixed(2)}` : "-"}
+                      {displaySubtotalCents !== null ? `$${(displaySubtotalCents / 100).toFixed(2)}` : "-"}
                     </span>
                   </div>
                   <div className="flex items-center justify-between">
@@ -1107,7 +1158,7 @@ function BookingLabPageInner() {
                   <div className="flex items-center justify-between text-base">
                     <span className="font-semibold text-slate-700">Total</span>
                     <span className="font-black text-slate-900">
-                      {pricingSubtotalCents !== null ? `$${(totalCents / 100).toFixed(2)}` : "-"}
+                      {displayTotalCents !== null ? `$${(displayTotalCents / 100).toFixed(2)}` : "-"}
                     </span>
                   </div>
                 </div>
@@ -1259,6 +1310,7 @@ function BookingLabPageInner() {
           reservationId={paymentModal.reservationId}
           amountCents={paymentModal.amountCents}
           entryMode={formData.cardEntryMode === "reader" ? "reader" : "manual"}
+          defaultPostalCode={formData.guestPostalCode}
           onClose={() => {
             const reservationId = paymentModal.reservationId;
             setPaymentModal(null);

@@ -100,6 +100,14 @@ export default function WaitlistPage() {
   );
   const stats = statsQuery.data as WaitlistStats | undefined;
 
+  useEffect(() => {
+    if (!stats) return;
+    if (statusFilter !== "active") return;
+    if (stats.active === 0 && stats.total > 0) {
+      setStatusFilter("all");
+    }
+  }, [stats, statusFilter]);
+
   const formatDate = (d: string | null) => {
     if (!d) return "—";
     return new Date(d).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });

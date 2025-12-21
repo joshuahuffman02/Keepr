@@ -298,13 +298,31 @@ export function useCalendarData() {
         const departureStr = formatLocalDateInput(departure);
         const site = sitesQuery.data?.find((s: any) => s.id === siteId) as CalendarSite | undefined;
 
-        if (!site) return;
+        if (!site || !selectedCampground) return;
 
         try {
+            const quote = await apiClient.getQuote(selectedCampground, {
+                siteId,
+                arrivalDate: arrivalStr,
+                departureDate: departureStr
+            });
+            const quotePreview: QuotePreview = {
+                siteId,
+                siteName: site.name,
+                arrival: arrivalStr,
+                departure: departureStr,
+                total: quote.totalCents,
+                nights: quote.nights,
+                base: quote.baseSubtotalCents,
+                perNight: quote.perNightCents,
+                rulesDelta: quote.rulesDeltaCents,
+                depositRule: null
+            };
+            setReservationDraft(quotePreview);
+        } catch (err) {
             const nights = diffInDays(departure, arrival);
-            // Simulated quote for now - in real app, call apiClient.getQuote
             const base = (site.siteClass?.defaultRate || 5000) * nights;
-            const quote: QuotePreview = {
+            setReservationDraft({
                 siteId,
                 siteName: site.name,
                 arrival: arrivalStr,
@@ -312,12 +330,10 @@ export function useCalendarData() {
                 total: base,
                 nights,
                 base,
-                perNight: site.siteClassId ? 5000 : 5000,
+                perNight: site.siteClass?.defaultRate || 5000,
                 rulesDelta: 0,
                 depositRule: null
-            };
-            setReservationDraft(quote);
-        } catch (err) {
+            });
             recordError("calendar.selectRange", err);
         }
     };

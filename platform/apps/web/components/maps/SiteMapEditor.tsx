@@ -32,6 +32,7 @@ type SiteMapEditorProps = {
   isLoading?: boolean;
   onSaved?: () => void;
   className?: string;
+  autoFullscreen?: boolean;
 };
 
 type ShapeDraft = {
@@ -186,7 +187,8 @@ export function SiteMapEditor({
   sites,
   isLoading,
   onSaved,
-  className
+  className,
+  autoFullscreen
 }: SiteMapEditorProps) {
   const { toast } = useToast();
   const svgRef = useRef<SVGSVGElement | null>(null);
@@ -207,6 +209,7 @@ export function SiteMapEditor({
   const [editingPoints, setEditingPoints] = useState<Point[] | null>(null);
   const [dragIndex, setDragIndex] = useState<number | null>(null);
   const [isFullscreen, setIsFullscreen] = useState(false);
+  const [showPanels, setShowPanels] = useState(true);
 
   useEffect(() => {
     if (!baseImageUrl) {
@@ -248,6 +251,19 @@ export function SiteMapEditor({
     if (!isDrawing) return;
     setIsFullscreen(true);
   }, [isDrawing]);
+
+  useEffect(() => {
+    if (!autoFullscreen) return;
+    setIsFullscreen(true);
+  }, [autoFullscreen]);
+
+  useEffect(() => {
+    if (!isFullscreen) {
+      setShowPanels(true);
+      return;
+    }
+    setShowPanels(false);
+  }, [isFullscreen]);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -436,17 +452,30 @@ export function SiteMapEditor({
   const getSvgPoint = (event: React.PointerEvent<SVGSVGElement>, anchor?: Point | null) => {
     const svg = svgRef.current;
     if (!svg) return null;
-    const rect = svg.getBoundingClientRect();
-    if (rect.width === 0 || rect.height === 0) return null;
-    const scale = Math.min(rect.width / viewBox.width, rect.height / viewBox.height);
-    const contentWidth = viewBox.width * scale;
-    const contentHeight = viewBox.height * scale;
-    const offsetX = (rect.width - contentWidth) / 2;
-    const offsetY = (rect.height - contentHeight) / 2;
-    let x = (event.clientX - rect.left - offsetX) / scale + viewBox.minX;
-    let y = (event.clientY - rect.top - offsetY) / scale + viewBox.minY;
-    x = clampValue(x, viewBox.minX, viewBox.minX + viewBox.width);
-    y = clampValue(y, viewBox.minY, viewBox.minY + viewBox.height);
+    let rawPoint: Point | null = null;
+    const ctm = svg.getScreenCTM();
+    if (ctm) {
+      const cursor = svg.createSVGPoint();
+      cursor.x = event.clientX;
+      cursor.y = event.clientY;
+      const svgPoint = cursor.matrixTransform(ctm.inverse());
+      rawPoint = { x: svgPoint.x, y: svgPoint.y };
+    } else {
+      const rect = svg.getBoundingClientRect();
+      if (rect.width === 0 || rect.height === 0) return null;
+      const scale = Math.min(rect.width / viewBox.width, rect.height / viewBox.height);
+      const contentWidth = viewBox.width * scale;
+      const contentHeight = viewBox.height * scale;
+      const offsetX = (rect.width - contentWidth) / 2;
+      const offsetY = (rect.height - contentHeight) / 2;
+      rawPoint = {
+        x: (event.clientX - rect.left - offsetX) / scale + viewBox.minX,
+        y: (event.clientY - rect.top - offsetY) / scale + viewBox.minY
+      };
+    }
+    if (!rawPoint) return null;
+    let x = clampValue(rawPoint.x, viewBox.minX, viewBox.minX + viewBox.width);
+    let y = clampValue(rawPoint.y, viewBox.minY, viewBox.minY + viewBox.height);
     let point = { x, y };
     if (event.shiftKey && anchor) {
       point = snapToAngle(point, anchor);
@@ -464,6 +493,8 @@ export function SiteMapEditor({
   const handleCanvasPointerDown = (event: React.PointerEvent<SVGSVGElement>) => {
     if (!isDrawing) return;
     if (dragIndex !== null) return;
+    event.preventDefault();
+    event.currentTarget.setPointerCapture(event.pointerId);
     const anchor = draftPoints.length ? draftPoints[draftPoints.length - 1] : null;
     const point = getSvgPoint(event, anchor);
     if (!point) return;
@@ -602,6 +633,9 @@ export function SiteMapEditor({
   };
 
   const handlePointerUp = (event: React.PointerEvent<SVGSVGElement>) => {
+    if (event.currentTarget.hasPointerCapture(event.pointerId)) {
+      event.currentTarget.releasePointerCapture(event.pointerId);
+    }
     if (dragIndex === null || !editingPoints) return;
     event.preventDefault();
     commitEditing(editingPoints);
@@ -829,13 +863,16 @@ export function SiteMapEditor({
         <div>
           <div className="text-sm font-semibold text-slate-800">Site map editor</div>
           <p className="text-xs text-slate-500">
-            Draw polygons first, then assign them to sites. Drag points to fine-tune placement.
+            Draw polygons first, then assign them to sites. Click to add points and drag handles to fine-tune placement.
           </p>
           <p className="text-[11px] text-slate-400">Enter: finish | Esc: cancel | Shift: lock 45-degree angles.</p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
           <Button size="sm" variant="outline" onClick={() => setIsFullscreen((prev) => !prev)}>
             {isFullscreen ? "Exit full screen" : "Full screen"}
+          </Button>
+          <Button size="sm" variant="outline" onClick={() => setShowPanels((prev) => !prev)}>
+            {showPanels ? "Hide panels" : "Show panels"}
           </Button>
           <Button size="sm" variant="outline" onClick={() => handleStartDraw(null)} disabled={isDrawing}>
             Draw new shape
@@ -870,10 +907,12 @@ export function SiteMapEditor({
 
       <div
         className={cn(
-          "mt-4 grid gap-4 lg:grid-cols-[320px,1fr]",
+          "mt-4 grid gap-4",
+          showPanels ? "lg:grid-cols-[320px,1fr]" : "grid-cols-1",
           isFullscreen && "h-[calc(100vh-180px)]"
         )}
       >
+        {showPanels && (
         <div className={cn("space-y-4", isFullscreen && "h-full overflow-auto pr-1")}>
           <div className="rounded-lg border border-slate-200 bg-white p-3">
             <div className="flex items-center justify-between">
@@ -1007,12 +1046,13 @@ export function SiteMapEditor({
             </p>
           </div>
         </div>
+        )}
 
         <div className={cn("rounded-xl border border-slate-200 bg-slate-50 p-2", isFullscreen && "h-full")}>
           <svg
             ref={svgRef}
             viewBox={`${viewBox.minX} ${viewBox.minY} ${viewBox.width} ${viewBox.height}`}
-            className={cn(isFullscreen ? "h-full w-full" : "h-[620px] w-full")}
+            className={cn(isFullscreen ? "h-full w-full" : "h-[620px] w-full", isDrawing && "cursor-crosshair")}
             onPointerMove={handlePointerMove}
             onPointerUp={handlePointerUp}
             onPointerLeave={() => setHoverPoint(null)}

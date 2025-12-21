@@ -21,6 +21,7 @@ interface PaymentModalProps {
     onSuccess: () => void;
     entryMode?: "manual" | "reader";
     requirePostalCode?: boolean;
+    defaultPostalCode?: string;
 }
 
 function CheckoutForm({
@@ -28,21 +29,28 @@ function CheckoutForm({
     onSuccess,
     onClose,
     entryMode = "manual",
-    requirePostalCode = true
+    requirePostalCode = true,
+    defaultPostalCode
 }: {
     amountCents: number;
     onSuccess: () => void;
     onClose: () => void;
     entryMode?: "manual" | "reader";
     requirePostalCode?: boolean;
+    defaultPostalCode?: string;
 }) {
     const stripe = useStripe();
     const elements = useElements();
     const [error, setError] = useState<string | null>(null);
     const [processing, setProcessing] = useState(false);
-    const [postalCode, setPostalCode] = useState("");
+    const [postalCode, setPostalCode] = useState(defaultPostalCode ?? "");
     const postalRequired = requirePostalCode === undefined ? true : requirePostalCode;
     const postalReady = !postalRequired || postalCode.trim().length > 0;
+
+    useEffect(() => {
+        if (!defaultPostalCode) return;
+        setPostalCode((prev) => (prev ? prev : defaultPostalCode));
+    }, [defaultPostalCode]);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -124,7 +132,8 @@ export function PaymentModal({
     amountCents,
     onSuccess,
     entryMode = "manual",
-    requirePostalCode = true
+    requirePostalCode = true,
+    defaultPostalCode
 }: PaymentModalProps) {
     const [clientSecret, setClientSecret] = useState<string | null>(null);
     const [initError, setInitError] = useState<string | null>(null);
@@ -197,6 +206,7 @@ export function PaymentModal({
                             onClose={onClose}
                             entryMode={entryMode}
                             requirePostalCode={requirePostalCode}
+                            defaultPostalCode={defaultPostalCode}
                         />
                     </Elements>
                 )}
