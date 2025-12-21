@@ -31,13 +31,9 @@ export function useCalendarData() {
     const { selection: ganttSelection, setSelection: setStoreSelection } = useGanttStore();
     const { data: whoami } = useWhoami();
 
-    const [selectedCampground, setSelectedCampground] = useState<string>(() => {
-        if (typeof window !== "undefined") {
-            return localStorage.getItem("campreserv:selectedCampground") || "";
-        }
-        return "";
-    });
-    const [startDate, setStartDate] = useState(() => formatLocalDateInput(new Date()));
+    const [isReady, setIsReady] = useState(false);
+    const [selectedCampground, setSelectedCampground] = useState<string>("");
+    const [startDate, setStartDate] = useState(() => formatLocalDateInput(new Date(0)));
     const [viewMode, setViewMode] = useState<CalendarViewMode>("week");
     const [dayCount, setDayCount] = useState(14);
 
@@ -57,8 +53,24 @@ export function useCalendarData() {
         blackouts: null
     });
 
+    useEffect(() => {
+        if (typeof window === "undefined") return;
+        const stored = localStorage.getItem("campreserv:selectedCampground") || "";
+        if (stored) setSelectedCampground(stored);
+        setStartDate(formatLocalDateInput(new Date()));
+        setIsReady(true);
+    }, []);
+
+    useEffect(() => {
+        if (typeof window === "undefined") return;
+        if (selectedCampground) {
+            localStorage.setItem("campreserv:selectedCampground", selectedCampground);
+        }
+    }, [selectedCampground]);
+
     // Effect to sync with localStorage if it changes
     useEffect(() => {
+        if (typeof window === "undefined") return;
         const handleStorageChange = () => {
             const stored = localStorage.getItem("campreserv:selectedCampground");
             if (stored && stored !== selectedCampground) {
@@ -79,6 +91,7 @@ export function useCalendarData() {
             loadTimers.current.campgrounds = typeof performance !== "undefined" ? performance.now() : Date.now();
             return apiClient.getCampgrounds();
         },
+        enabled: isReady,
         staleTime: 60_000,
         refetchOnWindowFocus: false
     });
@@ -94,7 +107,7 @@ export function useCalendarData() {
             loadTimers.current.sites = typeof performance !== "undefined" ? performance.now() : Date.now();
             return apiClient.getSites(selectedCampground);
         },
-        enabled: !!selectedCampground,
+        enabled: isReady && !!selectedCampground,
         staleTime: 15_000,
         refetchInterval: 60_000
     });
@@ -105,7 +118,7 @@ export function useCalendarData() {
             loadTimers.current.reservations = typeof performance !== "undefined" ? performance.now() : Date.now();
             return apiClient.getReservations(selectedCampground);
         },
-        enabled: !!selectedCampground,
+        enabled: isReady && !!selectedCampground,
         staleTime: 15_000,
         refetchInterval: 60_000
     });
@@ -113,7 +126,7 @@ export function useCalendarData() {
     const guestsQuery = useQuery({
         queryKey: ["calendar-guests", selectedCampground],
         queryFn: () => apiClient.getGuests(selectedCampground),
-        enabled: !!selectedCampground,
+        enabled: isReady && !!selectedCampground,
         staleTime: 60_000,
         refetchInterval: 5 * 60_000
     });
@@ -124,7 +137,7 @@ export function useCalendarData() {
             loadTimers.current.blackouts = typeof performance !== "undefined" ? performance.now() : Date.now();
             return apiClient.getBlackouts(selectedCampground);
         },
-        enabled: !!selectedCampground,
+        enabled: isReady && !!selectedCampground,
         staleTime: 5 * 60_000,
         refetchInterval: 5 * 60_000
     });
@@ -132,7 +145,7 @@ export function useCalendarData() {
     const maintenanceQuery = useQuery({
         queryKey: ["calendar-maintenance", selectedCampground],
         queryFn: () => apiClient.getMaintenanceTickets("open", selectedCampground),
-        enabled: !!selectedCampground,
+        enabled: isReady && !!selectedCampground,
         staleTime: 60_000,
         refetchInterval: 60_000
     });
@@ -140,10 +153,19 @@ export function useCalendarData() {
     const housekeepingTasksQuery = useQuery({
         queryKey: ["calendar-housekeeping", selectedCampground],
         queryFn: () => apiClient.listTasks(selectedCampground, { type: "housekeeping" }),
-        enabled: !!selectedCampground,
+        enabled: isReady && !!selectedCampground,
         staleTime: 30_000,
         refetchInterval: 30_000
     });
+
+    useEffect(() => {
+        if (!isReady) return;
+        if (selectedCampground) return;
+        const first = campgroundsQuery.data?.[0];
+        if (first?.id) {
+            setSelectedCampground(first.id);
+        }
+    }, [isReady, selectedCampground, campgroundsQuery.data]);
 
     // Permissions
     const memberships = whoami?.user?.memberships ?? [];
@@ -360,6 +382,7 @@ export function useCalendarData() {
 
     return {
         state: {
+            isReady,
             selectedCampground,
             startDate,
             viewMode,

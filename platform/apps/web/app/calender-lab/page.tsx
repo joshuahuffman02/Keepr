@@ -119,23 +119,27 @@ export default function CalendarLabPage() {
     return `${format(start, "MMM d")} - ${format(end, "MMM d")}`;
   }, [state.startDate, state.dayCount]);
 
-  const todayKey = useMemo(() => formatLocalDateInput(new Date()), []);
-  const arrivalsToday = useMemo(
-    () => visibleReservations.filter((res) => formatLocalDateInput(toLocalDate(res.arrivalDate)) === todayKey).length,
-    [visibleReservations, todayKey]
-  );
-  const departuresToday = useMemo(
-    () => visibleReservations.filter((res) => formatLocalDateInput(toLocalDate(res.departureDate)) === todayKey).length,
-    [visibleReservations, todayKey]
-  );
+  const [todayKey, setTodayKey] = useState("");
+  useEffect(() => {
+    setTodayKey(formatLocalDateInput(new Date()));
+  }, []);
+  const todayDate = useMemo(() => (todayKey ? parseLocalDateInput(todayKey) : null), [todayKey]);
+  const arrivalsToday = useMemo(() => {
+    if (!todayKey) return 0;
+    return visibleReservations.filter((res) => formatLocalDateInput(toLocalDate(res.arrivalDate)) === todayKey).length;
+  }, [visibleReservations, todayKey]);
+  const departuresToday = useMemo(() => {
+    if (!todayKey) return 0;
+    return visibleReservations.filter((res) => formatLocalDateInput(toLocalDate(res.departureDate)) === todayKey).length;
+  }, [visibleReservations, todayKey]);
   const occupiedToday = useMemo(() => {
-    const today = toLocalDate(new Date());
+    if (!todayDate) return 0;
     return visibleReservations.filter((res) => {
       const arrival = toLocalDate(res.arrivalDate);
       const departure = toLocalDate(res.departureDate);
-      return arrival <= today && departure > today;
+      return arrival <= todayDate && departure > todayDate;
     }).length;
-  }, [visibleReservations]);
+  }, [visibleReservations, todayDate]);
   const availableToday = Math.max(0, visibleSites.length - occupiedToday);
 
   const maintenanceCount = Array.isArray(queries.maintenance.data) ? queries.maintenance.data.length : 0;
