@@ -1654,7 +1654,7 @@ export default function ReservationsPage() {
                 )}
               </div>
             )}
-            {tabFilteredReservations.map((res) => {
+            {tabFilteredReservations.filter((res) => openDetails[res.id] || focusId === res.id).map((res) => {
               const siteClassName =
                 siteClassesQuery.data?.find((cls) => cls.id === (res.site as any)?.siteClassId)?.name || "";
               const siteClass = siteClassesQuery.data?.find((cls) => cls.id === (res.site as any)?.siteClassId);
