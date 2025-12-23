@@ -8,7 +8,8 @@ import {
 } from "@nestjs/common";
 import { EarlyAccessService } from "./early-access.service";
 import { EnrollEarlyAccessDto, EarlyAccessTierType, EarlyAccessSignupDto } from "./dto/enroll-early-access.dto";
-import { JwtAuthGuard } from "../auth/guards";
+import { JwtAuthGuard, Roles, RolesGuard } from "../auth/guards";
+import { UserRole } from "@prisma/client";
 
 @Controller("early-access")
 export class EarlyAccessController {
@@ -75,5 +76,53 @@ export class EarlyAccessController {
   @Post("signup")
   signup(@Body() dto: EarlyAccessSignupDto) {
     return this.earlyAccess.signup(dto);
+  }
+
+  /**
+   * Protected endpoint - resend onboarding email for current user
+   */
+  @UseGuards(JwtAuthGuard)
+  @Post("resend-email/:userId")
+  resendEmail(@Param("userId") userId: string) {
+    return this.earlyAccess.resendOnboardingEmail(userId);
+  }
+
+  /**
+   * Public endpoint - resend onboarding email by email address
+   * For users who started signup but lost their email
+   */
+  @Post("resend-by-email")
+  resendByEmail(@Body() body: { email: string }) {
+    return this.earlyAccess.resendOnboardingByEmail(body.email);
+  }
+
+  /**
+   * Admin endpoint - get early access stats
+   */
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.super_admin)
+  @Get("admin/stats")
+  getStats() {
+    return this.earlyAccess.getEarlyAccessStats();
+  }
+
+  /**
+   * Admin endpoint - get all pending onboardings
+   */
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.super_admin)
+  @Get("admin/pending")
+  getPendingOnboardings() {
+    return this.earlyAccess.getPendingOnboardings();
+  }
+
+  /**
+   * Admin endpoint - resend email for a specific session
+   */
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.super_admin)
+  @Post("admin/resend/:sessionId")
+  adminResendEmail(@Param("sessionId") sessionId: string) {
+    return this.earlyAccess.adminResendEmail(sessionId);
   }
 }

@@ -27,6 +27,13 @@ import { Badge } from "@/components/ui/badge";
 
 const adminSections = [
     {
+        title: "Early Access",
+        description: "Monitor signups and resend onboarding emails",
+        href: "/admin/early-access",
+        icon: UserPlus,
+        color: "bg-emerald-500",
+    },
+    {
         title: "Platform Users",
         description: "Manage all users across the platform",
         href: "/admin/platform/users",

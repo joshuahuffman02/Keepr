@@ -21,7 +21,11 @@ import {
   Clock,
   AlertCircle,
   Loader2,
-  Sparkles
+  Sparkles,
+  RefreshCw,
+  ChevronDown,
+  Mail,
+  CheckCircle2
 } from "lucide-react";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "http://localhost:4000/api";
@@ -161,6 +165,12 @@ export default function SignupPage() {
   const [showTierCelebration, setShowTierCelebration] = useState(false);
   const [showSubmitSuccess, setShowSubmitSuccess] = useState(false);
 
+  // Resend email states
+  const [showResendForm, setShowResendForm] = useState(false);
+  const [resendEmail, setResendEmail] = useState("");
+  const [resendLoading, setResendLoading] = useState(false);
+  const [resendMessage, setResendMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
+
   // Form fields
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
@@ -270,6 +280,38 @@ export default function SignupPage() {
     } catch (err) {
       setError(err instanceof Error ? err.message : "Something went wrong");
       setSubmitting(false);
+    }
+  };
+
+  const handleResendEmail = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!resendEmail.trim()) return;
+
+    setResendLoading(true);
+    setResendMessage(null);
+
+    try {
+      const res = await fetch(`${API_BASE}/early-access/resend-by-email`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: resendEmail.trim() })
+      });
+
+      const data = await res.json();
+
+      if (data.success) {
+        setResendMessage({ type: "success", text: data.message });
+        setResendEmail("");
+      } else {
+        setResendMessage({ type: "error", text: data.message });
+      }
+    } catch (err) {
+      setResendMessage({
+        type: "error",
+        text: "Something went wrong. Please try again."
+      });
+    } finally {
+      setResendLoading(false);
     }
   };
 
@@ -712,6 +754,97 @@ export default function SignupPage() {
             </motion.div>
           )}
         </AnimatePresence>
+
+        {/* Resend Onboarding Email Section */}
+        <motion.div
+          className="mt-12 max-w-md mx-auto"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.5 }}
+        >
+          <div className="border-t border-slate-700 pt-8">
+            <motion.button
+              onClick={() => setShowResendForm(!showResendForm)}
+              className="w-full flex items-center justify-center gap-2 text-slate-400 hover:text-slate-300 transition-colors text-sm"
+              whileHover={!prefersReducedMotion ? { scale: 1.02 } : {}}
+            >
+              <Mail className="h-4 w-4" />
+              Started signup but lost your email?
+              <ChevronDown
+                className={`h-4 w-4 transition-transform ${showResendForm ? "rotate-180" : ""}`}
+              />
+            </motion.button>
+
+            <AnimatePresence>
+              {showResendForm && (
+                <motion.div
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: "auto" }}
+                  exit={{ opacity: 0, height: 0 }}
+                  transition={{ duration: 0.2 }}
+                  className="overflow-hidden"
+                >
+                  <div className="mt-6 p-6 rounded-xl bg-slate-800/50 border border-slate-700">
+                    <p className="text-slate-300 text-sm mb-4">
+                      Enter your email and we'll resend your onboarding link if you have a pending signup.
+                    </p>
+
+                    <form onSubmit={handleResendEmail} className="space-y-4">
+                      <input
+                        type="email"
+                        required
+                        value={resendEmail}
+                        onChange={(e) => setResendEmail(e.target.value)}
+                        placeholder="Enter your email address"
+                        className="w-full px-4 py-3 bg-slate-900/50 border border-slate-600 rounded-lg text-white placeholder-slate-500 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 outline-none transition-all"
+                      />
+
+                      <Button
+                        type="submit"
+                        disabled={resendLoading}
+                        className="w-full bg-slate-700 hover:bg-slate-600 text-white"
+                      >
+                        {resendLoading ? (
+                          <>
+                            <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
+                            Sending...
+                          </>
+                        ) : (
+                          <>
+                            <Mail className="h-4 w-4 mr-2" />
+                            Resend Onboarding Email
+                          </>
+                        )}
+                      </Button>
+                    </form>
+
+                    <AnimatePresence>
+                      {resendMessage && (
+                        <motion.div
+                          initial={{ opacity: 0, y: -10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          exit={{ opacity: 0, y: -10 }}
+                          className={`mt-4 p-3 rounded-lg flex items-center gap-2 ${
+                            resendMessage.type === "success"
+                              ? "bg-emerald-500/10 border border-emerald-500/30 text-emerald-400"
+                              : "bg-red-500/10 border border-red-500/30 text-red-400"
+                          }`}
+                        >
+                          {resendMessage.type === "success" ? (
+                            <CheckCircle2 className="h-4 w-4 flex-shrink-0" />
+                          ) : (
+                            <AlertCircle className="h-4 w-4 flex-shrink-0" />
+                          )}
+                          <span className="text-sm">{resendMessage.text}</span>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
+        </motion.div>
       </div>
 
       {/* Tier Selection Celebration */}

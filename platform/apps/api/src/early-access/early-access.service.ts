@@ -455,4 +455,306 @@ export class EarlyAccessService {
       </div>
     `;
   }
+
+  /**
+   * Resend onboarding email by email address (public endpoint)
+   * For returning users who lost their onboarding email
+   */
+  async resendOnboardingByEmail(email: string) {
+    // Find the onboarding invite by email
+    const invite = await this.prisma.onboardingInvite.findFirst({
+      where: { email: email.toLowerCase().trim() },
+      include: {
+        session: true
+      },
+      orderBy: { createdAt: "desc" }
+    });
+
+    if (!invite) {
+      // Don't reveal if email exists or not for security
+      return {
+        success: true,
+        message: "If an account exists with this email, we've sent a new onboarding link."
+      };
+    }
+
+    if (invite.session?.status === "completed") {
+      return {
+        success: false,
+        message: "Your account setup is already complete. Please sign in."
+      };
+    }
+
+    // Get enrollment info
+    const enrollment = invite.organizationId
+      ? await this.prisma.earlyAccessEnrollment.findFirst({
+          where: { organizationId: invite.organizationId }
+        })
+      : null;
+
+    const tier = enrollment?.tier || "pioneer";
+    const config = TIER_CONFIG[tier];
+    const sessionData = invite.session?.data as any;
+
+    // Extend expiration
+    const newExpiresAt = new Date();
+    newExpiresAt.setDate(newExpiresAt.getDate() + 7);
+
+    await this.prisma.onboardingInvite.update({
+      where: { id: invite.id },
+      data: {
+        expiresAt: newExpiresAt,
+        lastSentAt: new Date()
+      }
+    });
+
+    // Send the email
+    const frontendUrl = process.env.FRONTEND_URL || "http://localhost:3000";
+    const onboardingUrl = `${frontendUrl}/onboarding/${invite.token}`;
+
+    await this.emailService.sendEmail({
+      to: invite.email,
+      subject: `[Reminder] Complete Your Camp Everyday Setup`,
+      html: this.generateWelcomeEmail({
+        firstName: sessionData?.firstName || "there",
+        campgroundName: sessionData?.campgroundName || "Your Campground",
+        tier,
+        tierName: this.getTierDisplayName(tier as EarlyAccessTierType),
+        onboardingUrl,
+        bookingFee: `$${(config.bookingFeeCents / 100).toFixed(2)}`
+      })
+    });
+
+    return {
+      success: true,
+      message: "If an account exists with this email, we've sent a new onboarding link."
+    };
+  }
+
+  /**
+   * Resend onboarding email for a user who already started signup
+   */
+  async resendOnboardingEmail(userId: string) {
+    // Find the user's onboarding invite
+    const invite = await this.prisma.onboardingInvite.findFirst({
+      where: {
+        session: {
+          data: {
+            path: ["userId"],
+            equals: userId
+          }
+        }
+      },
+      include: {
+        session: true
+      },
+      orderBy: { createdAt: "desc" }
+    });
+
+    if (!invite) {
+      throw new NotFoundException("No pending onboarding found for this user");
+    }
+
+    if (invite.session?.status === "completed") {
+      throw new BadRequestException("Onboarding already completed");
+    }
+
+    // Get user info
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId }
+    });
+
+    if (!user) {
+      throw new NotFoundException("User not found");
+    }
+
+    // Get enrollment info
+    const enrollment = await this.prisma.earlyAccessEnrollment.findFirst({
+      where: { organizationId: invite.organizationId }
+    });
+
+    const tier = enrollment?.tier || "pioneer";
+    const config = TIER_CONFIG[tier];
+    const sessionData = invite.session?.data as any;
+
+    // Extend expiration if it was expired
+    const newExpiresAt = new Date();
+    newExpiresAt.setDate(newExpiresAt.getDate() + 7);
+
+    await this.prisma.onboardingInvite.update({
+      where: { id: invite.id },
+      data: {
+        expiresAt: newExpiresAt,
+        lastSentAt: new Date()
+      }
+    });
+
+    // Send the email
+    const frontendUrl = process.env.FRONTEND_URL || "http://localhost:3000";
+    const onboardingUrl = `${frontendUrl}/onboarding/${invite.token}`;
+
+    await this.emailService.sendEmail({
+      to: user.email,
+      subject: `[Reminder] Complete Your Camp Everyday Setup`,
+      html: this.generateWelcomeEmail({
+        firstName: user.firstName || "there",
+        campgroundName: sessionData?.campgroundName || "Your Campground",
+        tier,
+        tierName: this.getTierDisplayName(tier as EarlyAccessTierType),
+        onboardingUrl,
+        bookingFee: `$${(config.bookingFeeCents / 100).toFixed(2)}`
+      })
+    });
+
+    return {
+      success: true,
+      email: user.email,
+      onboardingUrl
+    };
+  }
+
+  /**
+   * Admin: Get all pending onboardings (signups that haven't completed setup)
+   */
+  async getPendingOnboardings() {
+    const pending = await this.prisma.onboardingSession.findMany({
+      where: {
+        status: { in: ["pending", "in_progress"] }
+      },
+      include: {
+        invite: true,
+        organization: {
+          include: {
+            earlyAccessEnrollment: true
+          }
+        }
+      },
+      orderBy: { createdAt: "desc" }
+    });
+
+    return pending.map(session => {
+      const data = session.data as any;
+      return {
+        id: session.id,
+        inviteId: session.inviteId,
+        email: session.invite.email,
+        campgroundName: data?.campgroundName || "Unknown",
+        phone: data?.phone,
+        tier: session.organization?.earlyAccessEnrollment?.tier || data?.tier,
+        status: session.status,
+        currentStep: session.currentStep,
+        completedSteps: session.completedSteps,
+        createdAt: session.createdAt,
+        updatedAt: session.updatedAt,
+        inviteExpiresAt: session.invite.expiresAt,
+        inviteExpired: session.invite.expiresAt < new Date(),
+        lastEmailSent: session.invite.lastSentAt,
+        organizationId: session.organizationId
+      };
+    });
+  }
+
+  /**
+   * Admin: Get early access stats
+   */
+  async getEarlyAccessStats() {
+    const [spots, enrollments, pendingSessions, completedSessions] = await Promise.all([
+      this.prisma.earlyAccessSpot.findMany(),
+      this.prisma.earlyAccessEnrollment.groupBy({
+        by: ["tier"],
+        _count: true
+      }),
+      this.prisma.onboardingSession.count({
+        where: { status: { in: ["pending", "in_progress"] } }
+      }),
+      this.prisma.onboardingSession.count({
+        where: { status: "completed" }
+      })
+    ]);
+
+    const enrollmentsByTier = Object.fromEntries(
+      enrollments.map(e => [e.tier, e._count])
+    );
+
+    return {
+      tiers: spots.map(spot => ({
+        tier: spot.tier,
+        totalSpots: spot.totalSpots,
+        remainingSpots: spot.remainingSpots,
+        claimed: spot.totalSpots - spot.remainingSpots,
+        enrolled: enrollmentsByTier[spot.tier] || 0
+      })),
+      onboarding: {
+        pending: pendingSessions,
+        completed: completedSessions,
+        conversionRate: pendingSessions + completedSessions > 0
+          ? Math.round((completedSessions / (pendingSessions + completedSessions)) * 100)
+          : 0
+      }
+    };
+  }
+
+  /**
+   * Admin: Resend email for a specific onboarding session
+   */
+  async adminResendEmail(sessionId: string) {
+    const session = await this.prisma.onboardingSession.findUnique({
+      where: { id: sessionId },
+      include: {
+        invite: true,
+        organization: {
+          include: {
+            earlyAccessEnrollment: true
+          }
+        }
+      }
+    });
+
+    if (!session) {
+      throw new NotFoundException("Onboarding session not found");
+    }
+
+    if (session.status === "completed") {
+      throw new BadRequestException("Onboarding already completed");
+    }
+
+    const data = session.data as any;
+    const tier = session.organization?.earlyAccessEnrollment?.tier || data?.tier || "pioneer";
+    const config = TIER_CONFIG[tier];
+
+    // Extend expiration
+    const newExpiresAt = new Date();
+    newExpiresAt.setDate(newExpiresAt.getDate() + 7);
+
+    await this.prisma.onboardingInvite.update({
+      where: { id: session.inviteId },
+      data: {
+        expiresAt: newExpiresAt,
+        lastSentAt: new Date()
+      }
+    });
+
+    // Send the email
+    const frontendUrl = process.env.FRONTEND_URL || "http://localhost:3000";
+    const onboardingUrl = `${frontendUrl}/onboarding/${session.invite.token}`;
+
+    await this.emailService.sendEmail({
+      to: session.invite.email,
+      subject: `[Reminder] Complete Your Camp Everyday Setup`,
+      html: this.generateWelcomeEmail({
+        firstName: data?.firstName || "there",
+        campgroundName: data?.campgroundName || "Your Campground",
+        tier,
+        tierName: this.getTierDisplayName(tier as EarlyAccessTierType),
+        onboardingUrl,
+        bookingFee: `$${(config.bookingFeeCents / 100).toFixed(2)}`
+      })
+    });
+
+    return {
+      success: true,
+      email: session.invite.email,
+      sessionId
+    };
+  }
 }
