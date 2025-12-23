@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { DashboardShell } from "@/components/ui/layout/DashboardShell";
+import { Breadcrumbs } from "@/components/breadcrumbs";
 
 type Rule = {
   id: string;
@@ -61,11 +63,19 @@ export default function DynamicPricingPage({ params }: { params: { campgroundId:
   };
 
   return (
-    <div className="space-y-6 p-6">
-      <div>
-        <h1 className="text-2xl font-semibold">Dynamic Pricing</h1>
-        <p className="text-slate-500">Configure occupancy and demand-based adjustments.</p>
-      </div>
+    <DashboardShell>
+      <div className="space-y-6">
+        <Breadcrumbs
+          items={[
+            { label: "Campgrounds", href: "/campgrounds?all=true" },
+            { label: "Settings", href: `/campgrounds/${params.campgroundId}` },
+            { label: "Dynamic Pricing" }
+          ]}
+        />
+        <div>
+          <h1 className="text-2xl font-semibold">Dynamic Pricing</h1>
+          <p className="text-slate-500">Configure occupancy and demand-based adjustments.</p>
+        </div>
 
       <div className="grid gap-4 md:grid-cols-2">
         <div className="rounded-lg border p-4">
@@ -150,7 +160,8 @@ export default function DynamicPricingPage({ params }: { params: { campgroundId:
           </div>
         </div>
       </div>
-    </div>
+      </div>
+    </DashboardShell>
   );
 }
 

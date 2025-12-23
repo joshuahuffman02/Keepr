@@ -123,28 +123,30 @@ export default function CampgroundMapPage() {
           </div>
         </div>
 
-        <Card className="p-6 space-y-6">
-          <div className="grid gap-6">
+        <Card className="p-4 md:p-6 space-y-6">
+          <div className="grid gap-6 lg:grid-cols-2">
             <div className="space-y-3">
-              <div className="grid gap-2">
-                <Label htmlFor="start-date">Arrival date</Label>
-                <input
-                  id="start-date"
-                  type="date"
-                  value={startDate}
-                  onChange={(e) => setStartDate(e.target.value)}
-                  className="w-full rounded border border-slate-200 px-3 py-2 text-sm"
-                />
-              </div>
-              <div className="grid gap-2">
-                <Label htmlFor="end-date">Departure date</Label>
-                <input
-                  id="end-date"
-                  type="date"
-                  value={endDate}
-                  onChange={(e) => setEndDate(e.target.value)}
-                  className="w-full rounded border border-slate-200 px-3 py-2 text-sm"
-                />
+              <div className="grid grid-cols-2 gap-2">
+                <div className="grid gap-2">
+                  <Label htmlFor="start-date">Arrival date</Label>
+                  <input
+                    id="start-date"
+                    type="date"
+                    value={startDate}
+                    onChange={(e) => setStartDate(e.target.value)}
+                    className="w-full rounded border border-slate-200 px-3 py-2 text-sm"
+                  />
+                </div>
+                <div className="grid gap-2">
+                  <Label htmlFor="end-date">Departure date</Label>
+                  <input
+                    id="end-date"
+                    type="date"
+                    value={endDate}
+                    onChange={(e) => setEndDate(e.target.value)}
+                    className="w-full rounded border border-slate-200 px-3 py-2 text-sm"
+                  />
+                </div>
               </div>
               <div className="grid gap-2">
                 <Label>Rig size (ft/in)</Label>
@@ -231,12 +233,14 @@ export default function CampgroundMapPage() {
                 initialUrl={mapBaseImageUrl}
                 onUploaded={() => mapQuery.refetch()}
               />
-              <SiteMapCanvas
-                map={mapQuery.data}
-                isLoading={mapQuery.isLoading}
-                showLabels
-                height={640}
-              />
+              <div className="h-[300px] md:h-[480px] lg:h-[640px]">
+                <SiteMapCanvas
+                  map={mapQuery.data}
+                  isLoading={mapQuery.isLoading}
+                  showLabels
+                  height="100%"
+                />
+              </div>
               {mapQuery.isError && (
                 <p className="text-xs text-rose-600">Failed to load map preview.</p>
               )}

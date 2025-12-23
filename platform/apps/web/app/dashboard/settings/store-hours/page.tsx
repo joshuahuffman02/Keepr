@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { apiClient } from "@/lib/api-client";
+import { DashboardShell } from "@/components/ui/layout/DashboardShell";
+import { Breadcrumbs } from "@/components/breadcrumbs";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -54,8 +56,17 @@ export default function StoreHoursPage() {
   };
 
   return (
-    <div className="p-6 max-w-2xl space-y-4">
-      <Card>
+    <DashboardShell>
+      <div className="space-y-6">
+        <Breadcrumbs
+          items={[
+            { label: "Dashboard", href: "/dashboard" },
+            { label: "Settings", href: "/dashboard/settings" },
+            { label: "Store Hours" }
+          ]}
+        />
+        <div className="max-w-2xl">
+          <Card>
         <CardHeader>
           <CardTitle>Store Hours</CardTitle>
           <CardDescription>Set opening and closing hours (0-23 local time).</CardDescription>
@@ -95,8 +106,10 @@ export default function StoreHoursPage() {
             </>
           )}
         </CardContent>
-      </Card>
-    </div>
+          </Card>
+        </div>
+      </div>
+    </DashboardShell>
   );
 }
 
