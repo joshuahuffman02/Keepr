@@ -201,6 +201,76 @@ const tillLibrary: SourceLibrary = {
   ],
 };
 
+// Inventory expiration & batch tracking library
+const inventoryBatchLibrary: SourceLibrary = {
+  dimensions: {
+    expiration_day: { id: "expiration_day", label: "Expiration Day", field: "expirationDate", kind: "date", timeGrain: "day" },
+    expiration_week: { id: "expiration_week", label: "Expiration Week", field: "expirationDate", kind: "date", timeGrain: "week" },
+    expiration_month: { id: "expiration_month", label: "Expiration Month", field: "expirationDate", kind: "date", timeGrain: "month" },
+    received_day: { id: "received_day", label: "Received Day", field: "receivedDate", kind: "date", timeGrain: "day" },
+    expiration_tier: { id: "expiration_tier", label: "Expiration Tier", field: "tier", kind: "enum" },
+    product: { id: "product", label: "Product", field: "productName", kind: "string" },
+    product_category: { id: "product_category", label: "Category", field: "categoryName", kind: "string", fallback: "uncategorized" },
+    location: { id: "location", label: "Location", field: "locationName", kind: "string", fallback: "shared" },
+  },
+  metrics: {
+    batches: { id: "batches", label: "Batches", field: "id", aggregation: "count", type: "number" },
+    qty_remaining: { id: "qty_remaining", label: "Qty Remaining", field: "qtyRemaining", aggregation: "sum", type: "number" },
+    value_at_cost: { id: "value_at_cost", label: "Value at Cost", field: "valueCents", aggregation: "sum", type: "currency", format: "currency" },
+    days_until_expiration: { id: "days_until_expiration", label: "Days Until Expiration", field: "daysRemaining", aggregation: "avg", type: "number" },
+  },
+  filters: [
+    { id: "expiration_tier", label: "Expiration Tier", field: "tier", type: "enum", operators: ["eq", "in"], options: ["fresh", "warning", "critical", "expired"] },
+    { id: "product", label: "Product", field: "productId", type: "string", operators: ["eq", "in"] },
+    { id: "location", label: "Location", field: "locationId", type: "string", operators: ["eq", "in"] },
+  ],
+};
+
+// Slow-moving inventory library
+const slowMovingLibrary: SourceLibrary = {
+  dimensions: {
+    last_sale_day: { id: "last_sale_day", label: "Last Sale Day", field: "lastSaleDate", kind: "date", timeGrain: "day" },
+    last_sale_month: { id: "last_sale_month", label: "Last Sale Month", field: "lastSaleDate", kind: "date", timeGrain: "month" },
+    product: { id: "product", label: "Product", field: "productName", kind: "string" },
+    product_category: { id: "product_category", label: "Category", field: "categoryName", kind: "string", fallback: "uncategorized" },
+    days_since_sale_bucket: { id: "days_since_sale_bucket", label: "Days Since Sale", field: "daysSinceLastSale", kind: "number" },
+  },
+  metrics: {
+    products: { id: "products", label: "Products", field: "id", aggregation: "count", type: "number" },
+    qty_on_hand: { id: "qty_on_hand", label: "Qty on Hand", field: "stockQty", aggregation: "sum", type: "number" },
+    value_at_retail: { id: "value_at_retail", label: "Value at Retail", field: "valueCents", aggregation: "sum", type: "currency", format: "currency" },
+    avg_days_since_sale: { id: "avg_days_since_sale", label: "Avg Days Since Sale", field: "daysSinceLastSale", aggregation: "avg", type: "number" },
+  },
+  filters: [
+    { id: "category", label: "Category", field: "categoryId", type: "string", operators: ["eq", "in"] },
+    { id: "min_days", label: "Min Days Since Sale", field: "daysSinceLastSale", type: "number", operators: ["gte"] },
+  ],
+};
+
+// Markdown tracking library
+const markdownLibrary: SourceLibrary = {
+  dimensions: {
+    markdown_day: { id: "markdown_day", label: "Markdown Day", field: "createdAt", kind: "date", timeGrain: "day" },
+    markdown_week: { id: "markdown_week", label: "Markdown Week", field: "createdAt", kind: "date", timeGrain: "week" },
+    markdown_month: { id: "markdown_month", label: "Markdown Month", field: "createdAt", kind: "date", timeGrain: "month" },
+    product: { id: "product", label: "Product", field: "productName", kind: "string" },
+    product_category: { id: "product_category", label: "Category", field: "categoryName", kind: "string", fallback: "uncategorized" },
+    markdown_rule: { id: "markdown_rule", label: "Markdown Rule", field: "markdownRuleId", kind: "string" },
+    days_until_expiration: { id: "days_until_expiration", label: "Days Until Expiration", field: "daysUntilExpiration", kind: "number" },
+  },
+  metrics: {
+    markdown_applications: { id: "markdown_applications", label: "Markdowns Applied", field: "id", aggregation: "count", type: "number" },
+    discount_total: { id: "discount_total", label: "Discount Total", field: "discountCents", aggregation: "sum", type: "currency", format: "currency" },
+    qty_sold: { id: "qty_sold", label: "Qty Sold", field: "qty", aggregation: "sum", type: "number" },
+    original_value: { id: "original_value", label: "Original Value", field: "originalPriceCents", aggregation: "sum", type: "currency", format: "currency" },
+    markdown_value: { id: "markdown_value", label: "Markdown Value", field: "markdownPriceCents", aggregation: "sum", type: "currency", format: "currency" },
+  },
+  filters: [
+    { id: "product", label: "Product", field: "productId", type: "string", operators: ["eq", "in"] },
+    { id: "markdown_rule", label: "Markdown Rule", field: "markdownRuleId", type: "string", operators: ["eq", "in"] },
+  ],
+};
+
 export const libraries: Record<ReportSource, SourceLibrary> = {
   reservation: reservationLibrary,
   payment: paymentLibrary,
@@ -211,6 +281,9 @@ export const libraries: Record<ReportSource, SourceLibrary> = {
   marketing: marketingLibrary,
   pos: posLibrary,
   till: tillLibrary,
+  inventory_batch: inventoryBatchLibrary,
+  slow_moving: slowMovingLibrary,
+  markdown: markdownLibrary,
 };
 
 const bookingTemplates: ReportSpec[] = [
@@ -329,6 +402,35 @@ const tillTemplates: ReportSpec[] = [
   { id: "till.movement_by_day_type", name: "Movements by day and type", category: "POS", source: "till", dimensions: ["movement_day", "movement_type"], metrics: ["movements", "movement_amount"], defaultTimeRange: { preset: "last_30_days" }, chartTypes: ["table"], defaultChart: "table", sampling: { limit: 5000 }, heavy: true },
 ];
 
+// Inventory Expiration & Batch Tracking Reports
+const expirationTemplates: ReportSpec[] = [
+  { id: "expiration.summary", name: "Expiration summary", category: "Inventory Expiration", source: "inventory_batch", dimensions: ["expiration_tier"], metrics: ["batches", "qty_remaining", "value_at_cost"], defaultTimeRange: { preset: "last_30_days" }, chartTypes: ["bar", "pie", "table"], defaultChart: "bar", sampling: { limit: 4000 } },
+  { id: "expiration.by_product", name: "Expiring by product", category: "Inventory Expiration", source: "inventory_batch", dimensions: ["product"], metrics: ["qty_remaining", "days_until_expiration"], defaultTimeRange: { preset: "last_30_days" }, chartTypes: ["bar", "table"], defaultChart: "bar", sampling: { limit: 5000 } },
+  { id: "expiration.by_category", name: "Expiring by category", category: "Inventory Expiration", source: "inventory_batch", dimensions: ["product_category"], metrics: ["batches", "qty_remaining", "value_at_cost"], defaultTimeRange: { preset: "last_30_days" }, chartTypes: ["bar", "pie", "table"], defaultChart: "bar", sampling: { limit: 4000 } },
+  { id: "expiration.by_location", name: "Expiring by location", category: "Inventory Expiration", source: "inventory_batch", dimensions: ["location"], metrics: ["batches", "qty_remaining"], defaultTimeRange: { preset: "last_30_days" }, chartTypes: ["bar", "table"], defaultChart: "bar", sampling: { limit: 4000 } },
+  { id: "expiration.timeline", name: "Expiration timeline", category: "Inventory Expiration", source: "inventory_batch", dimensions: ["expiration_week"], metrics: ["batches", "qty_remaining"], defaultTimeRange: { preset: "last_90_days" }, chartTypes: ["line", "bar", "table"], defaultChart: "line", sampling: { limit: 5000 } },
+  { id: "expiration.at_risk_value", name: "At-risk inventory value", category: "Inventory Expiration", source: "inventory_batch", dimensions: ["expiration_tier", "product_category"], metrics: ["value_at_cost"], defaultTimeRange: { preset: "last_30_days" }, chartTypes: ["table", "bar"], defaultChart: "table", sampling: { limit: 5000 }, heavy: true },
+];
+
+// Slow-Moving Inventory Reports
+const slowMovingTemplates: ReportSpec[] = [
+  { id: "slow_moving.summary", name: "Slow-moving summary", category: "Inventory Expiration", source: "slow_moving", dimensions: ["days_since_sale_bucket"], metrics: ["products", "qty_on_hand", "value_at_retail"], defaultTimeRange: { preset: "last_90_days" }, chartTypes: ["bar", "table"], defaultChart: "bar", sampling: { limit: 4000 } },
+  { id: "slow_moving.by_product", name: "Slow-moving products", category: "Inventory Expiration", source: "slow_moving", dimensions: ["product"], metrics: ["qty_on_hand", "avg_days_since_sale", "value_at_retail"], defaultTimeRange: { preset: "last_180_days" }, chartTypes: ["table", "bar"], defaultChart: "table", sampling: { limit: 5000 } },
+  { id: "slow_moving.by_category", name: "Slow-moving by category", category: "Inventory Expiration", source: "slow_moving", dimensions: ["product_category"], metrics: ["products", "value_at_retail"], defaultTimeRange: { preset: "last_180_days" }, chartTypes: ["bar", "pie", "table"], defaultChart: "bar", sampling: { limit: 4000 } },
+  { id: "slow_moving.never_sold", name: "Never-sold products", category: "Inventory Expiration", source: "slow_moving", dimensions: ["product"], metrics: ["qty_on_hand", "value_at_retail"], defaultTimeRange: { preset: "all_time" }, chartTypes: ["table"], defaultChart: "table", sampling: { limit: 3000 } },
+];
+
+// Markdown & Shrinkage Reports
+const markdownTemplates: ReportSpec[] = [
+  { id: "markdown.daily", name: "Daily markdowns", category: "Inventory Expiration", source: "markdown", dimensions: ["markdown_day"], metrics: ["markdown_applications", "discount_total", "qty_sold"], defaultTimeRange: { preset: "last_30_days" }, chartTypes: ["line", "bar", "table"], defaultChart: "line", sampling: { limit: 4000 } },
+  { id: "markdown.weekly", name: "Weekly markdowns", category: "Inventory Expiration", source: "markdown", dimensions: ["markdown_week"], metrics: ["markdown_applications", "discount_total"], defaultTimeRange: { preset: "last_90_days" }, chartTypes: ["bar", "table"], defaultChart: "bar", sampling: { limit: 4000 } },
+  { id: "markdown.by_product", name: "Markdowns by product", category: "Inventory Expiration", source: "markdown", dimensions: ["product"], metrics: ["discount_total", "qty_sold"], defaultTimeRange: { preset: "last_90_days" }, chartTypes: ["bar", "table"], defaultChart: "bar", sampling: { limit: 5000 } },
+  { id: "markdown.by_category", name: "Markdowns by category", category: "Inventory Expiration", source: "markdown", dimensions: ["product_category"], metrics: ["discount_total", "qty_sold", "markdown_applications"], defaultTimeRange: { preset: "last_90_days" }, chartTypes: ["bar", "pie", "table"], defaultChart: "bar", sampling: { limit: 4000 } },
+  { id: "markdown.by_rule", name: "Markdowns by rule", category: "Inventory Expiration", source: "markdown", dimensions: ["markdown_rule"], metrics: ["markdown_applications", "discount_total"], defaultTimeRange: { preset: "last_90_days" }, chartTypes: ["bar", "table"], defaultChart: "bar", sampling: { limit: 4000 } },
+  { id: "markdown.shrinkage", name: "Markdown shrinkage", category: "Inventory Expiration", source: "markdown", dimensions: ["markdown_month"], metrics: ["discount_total", "original_value", "markdown_value"], defaultTimeRange: { preset: "last_12_months" }, chartTypes: ["bar", "line", "table"], defaultChart: "bar", sampling: { limit: 4000 } },
+  { id: "markdown.expiry_trend", name: "Days-to-expiry trend", category: "Inventory Expiration", source: "markdown", dimensions: ["days_until_expiration"], metrics: ["qty_sold", "discount_total"], defaultTimeRange: { preset: "last_90_days" }, chartTypes: ["bar", "table"], defaultChart: "bar", sampling: { limit: 4000 } },
+];
+
 const definitions: ReportSpec[] = [
   ...bookingTemplates,
   ...inventoryTemplates,
@@ -338,6 +440,9 @@ const definitions: ReportSpec[] = [
   ...marketingTemplates,
   ...posTemplates,
   ...tillTemplates,
+  ...expirationTemplates,
+  ...slowMovingTemplates,
+  ...markdownTemplates,
 ];
 
 export function getReportCatalog(opts?: { category?: string; search?: string; includeHeavy?: boolean }) {

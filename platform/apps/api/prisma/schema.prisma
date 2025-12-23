@@ -480,6 +480,10 @@ model User {
   transfersCompleted  InventoryTransfer[]  @relation("TransferCompleter")
   inventoryMovements  InventoryMovement[]
 
+  // Inventory batch tracking relations
+  batchMovements               BatchMovement[]    @relation("BatchMovementActor")
+  expirationAlertsAcknowledged ExpirationAlert[]  @relation("AlertAcknowledger")
+
   // Hotel operations relations
   inspectionsPerformed     InspectionResult[]   @relation("InspectionInspector")
   roomMovesRequested       RoomMoveRequest[]    @relation("RoomMoveRequester")
@@ -1179,6 +1183,14 @@ model Campground {
   flexCheckPolicy        FlexCheckPolicy?
   roomMoveRequests       RoomMoveRequest[]
   groupBookings          GroupBooking[]
+
+  // Inventory batch & expiration tracking relations
+  inventoryBatches           InventoryBatch[]
+  categoryExpirationConfigs  CategoryExpirationConfig[]
+  productExpirationConfigs   ProductExpirationConfig[]
+  markdownRules              MarkdownRule[]
+  markdownApplications       MarkdownApplication[]
+  expirationAlerts           ExpirationAlert[]
 
   // Soft delete
   deletedAt DateTime?
@@ -2756,6 +2768,39 @@ enum FulfillmentAssignmentStatus {
   completed     // Fulfilled
 }
 
+// ---------------------------------------------------------------------------
+// Inventory Batch & Expiration Tracking enums
+// ---------------------------------------------------------------------------
+
+enum ExpirationTier {
+  fresh         // Beyond warning threshold
+  warning       // Within warning threshold
+  critical      // Within critical threshold
+  expired       // Past expiration date
+}
+
+enum MarkdownDiscountType {
+  percentage    // Discount as percentage (1-100)
+  flat          // Fixed amount off in cents
+}
+
+enum MarkdownScope {
+  all           // Applies to all products
+  category      // Applies to specific category
+  product       // Applies to specific product
+}
+
+enum BatchDisposalReason {
+  expired       // Past expiration date
+  damaged       // Physical damage
+  quality_issue // Quality degradation
+  recall        // Product recall
+  theft_loss    // Theft or unexplained loss
+  donation      // Donated to charity
+  sample        // Used as sample
+  other         // Other reason
+}
+
 model ProductCategory {
   id           String   @id @default(cuid())
   campgroundId String
@@ -2766,8 +2811,15 @@ model ProductCategory {
   createdAt    DateTime @default(now())
   updatedAt    DateTime @default(now()) @updatedAt
 
-  campground Campground @relation(fields: [campgroundId], references: [id], onDelete: Cascade)
-  products   Product[]
+  // Expiration tracking defaults for this category
+  defaultWarningDays    Int @default(7)   // Days before expiration for "warning" tier
+  defaultCriticalDays   Int @default(2)   // Days before expiration for "critical" tier
+  defaultSlowMovingDays Int @default(30)  // Days without sale to flag as slow-moving
+
+  campground        Campground                  @relation(fields: [campgroundId], references: [id], onDelete: Cascade)
+  products          Product[]
+  expirationConfigs CategoryExpirationConfig[]
+  markdownRules     MarkdownRule[]
 
   @@unique([campgroundId, name])
   @@index([campgroundId])
@@ -2797,6 +2849,10 @@ model Product {
   createdAt            DateTime             @default(now())
   updatedAt            DateTime             @default(now()) @updatedAt
 
+  // Batch tracking & expiration
+  useBatchTracking Boolean   @default(false) // Enable FEFO batch tracking for this product
+  lastSaleDate     DateTime?                 // Updated on each sale (for slow-moving detection)
+
   campground        Campground              @relation(fields: [campgroundId], references: [id], onDelete: Cascade)
   category          ProductCategory?        @relation(fields: [categoryId], references: [id], onDelete: SetNull)
   orderItems        StoreOrderItem[]
@@ -2805,6 +2861,11 @@ model Product {
   priceOverrides    LocationPriceOverride[]
   transferItems     InventoryTransferItem[]
   movements         InventoryMovement[]
+
+  // Batch tracking relations
+  inventoryBatches  InventoryBatch[]
+  expirationConfigs ProductExpirationConfig[]
+  markdownRules     MarkdownRule[]
 
   @@index([campgroundId])
   @@index([categoryId])
@@ -5635,6 +5696,13 @@ model PosCartItem {
   totalCents      Int
   metadata        Json?
 
+  // Expiration markdown tracking
+  markdownApplied       Boolean @default(false) // Was an expiration markdown applied?
+  markdownRuleId        String?                 // Which markdown rule was applied
+  originalPriceCents    Int?                    // Original price before markdown
+  markdownDiscountCents Int?                    // Amount discounted due to expiration
+  batchId               String?                 // Which inventory batch this item came from
+
   cart    PosCart  @relation(fields: [cartId], references: [id], onDelete: Cascade)
   product Product? @relation(fields: [productId], references: [id], onDelete: SetNull)
 
@@ -6719,6 +6787,7 @@ model StoreLocation {
   transfersOut      InventoryTransfer[]    @relation("TransferFrom")
   transfersIn       InventoryTransfer[]    @relation("TransferTo")
   inventoryMovements InventoryMovement[]
+  inventoryBatches  InventoryBatch[]
 
   @@unique([campgroundId, name])
   @@index([campgroundId])
@@ -6810,6 +6879,7 @@ model InventoryMovement {
   campgroundId  String
   productId     String
   locationId    String?   // Null for shared-mode products
+  batchId       String?   // Link to specific batch if batch tracking enabled
   movementType  String    // sale, return, transfer_out, transfer_in, adjustment, restock
   qty           Int       // Positive or negative
   previousQty   Int
@@ -6820,16 +6890,243 @@ model InventoryMovement {
   actorUserId   String
   createdAt     DateTime  @default(now())
 
-  campground Campground     @relation(fields: [campgroundId], references: [id], onDelete: Cascade)
-  product    Product        @relation(fields: [productId], references: [id], onDelete: Cascade)
-  location   StoreLocation? @relation(fields: [locationId], references: [id], onDelete: SetNull)
-  actor      User           @relation(fields: [actorUserId], references: [id])
+  campground     Campground      @relation(fields: [campgroundId], references: [id], onDelete: Cascade)
+  product        Product         @relation(fields: [productId], references: [id], onDelete: Cascade)
+  location       StoreLocation?  @relation(fields: [locationId], references: [id], onDelete: SetNull)
+  actor          User            @relation(fields: [actorUserId], references: [id])
+  batchMovements BatchMovement[]
 
   @@index([campgroundId])
   @@index([productId])
   @@index([locationId])
+  @@index([batchId])
   @@index([movementType])
   @@index([createdAt])
+}
+
+// ============================================================================
+// INVENTORY BATCH & EXPIRATION TRACKING
+// ============================================================================
+
+// Batch/lot tracking for inventory with expiration dates
+model InventoryBatch {
+  id            String    @id @default(cuid())
+  campgroundId  String
+  productId     String
+  locationId    String?   // Null for shared-mode products
+
+  // Batch identification
+  batchNumber   String?   // Optional lot/batch number from supplier
+  supplierId    String?   // Optional supplier reference
+
+  // Quantities
+  qtyReceived   Int       // Original quantity received
+  qtyRemaining  Int       // Current remaining quantity
+
+  // Dates
+  receivedDate   DateTime  // When batch was received
+  expirationDate DateTime? // Null for non-perishable items
+
+  // Cost tracking
+  unitCostCents Int?      // Cost per unit for this batch (COGS)
+
+  // Status
+  isActive    Boolean   @default(true)  // False when fully depleted
+  depletedAt  DateTime?                 // When qtyRemaining reached 0
+
+  // Audit
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @default(now()) @updatedAt
+  createdById String?
+
+  // Relations
+  campground           Campground            @relation(fields: [campgroundId], references: [id], onDelete: Cascade)
+  product              Product               @relation(fields: [productId], references: [id], onDelete: Cascade)
+  location             StoreLocation?        @relation(fields: [locationId], references: [id], onDelete: SetNull)
+  movements            BatchMovement[]
+  markdownApplications MarkdownApplication[]
+
+  @@index([campgroundId])
+  @@index([productId])
+  @@index([locationId])
+  @@index([expirationDate])
+  @@index([isActive, expirationDate])
+  @@index([productId, locationId, isActive, expirationDate]) // FEFO query optimization
+}
+
+// Track individual batch movements (for FIFO/FEFO audit)
+model BatchMovement {
+  id            String   @id @default(cuid())
+  batchId       String
+  movementId    String?  // Links to InventoryMovement for audit trail
+
+  // Movement details
+  qty           Int      // Quantity affected (negative for deductions)
+  movementType  String   // sale, return, adjustment, disposal, transfer
+  referenceType String?  // order, transfer, manual, disposal
+  referenceId   String?  // ID of order/transfer/etc.
+
+  // Disposal specific
+  disposalReason BatchDisposalReason?
+  disposalNotes  String?
+
+  // Audit
+  previousQty Int
+  newQty      Int
+  actorUserId String
+  createdAt   DateTime @default(now())
+
+  batch    InventoryBatch     @relation(fields: [batchId], references: [id], onDelete: Cascade)
+  movement InventoryMovement? @relation(fields: [movementId], references: [id], onDelete: SetNull)
+  actor    User               @relation("BatchMovementActor", fields: [actorUserId], references: [id])
+
+  @@index([batchId])
+  @@index([movementId])
+  @@index([actorUserId])
+  @@index([createdAt])
+}
+
+// Category-level expiration thresholds (defaults)
+model CategoryExpirationConfig {
+  id           String @id @default(cuid())
+  campgroundId String
+  categoryId   String
+
+  // Threshold days before expiration
+  warningDays  Int @default(7)  // Days before expiration for "warning" tier
+  criticalDays Int @default(2)  // Days before expiration for "critical" tier
+
+  // Slow-moving threshold
+  slowMovingDays Int @default(30) // Days without sale to be considered slow-moving
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
+
+  campground Campground      @relation(fields: [campgroundId], references: [id], onDelete: Cascade)
+  category   ProductCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+
+  @@unique([campgroundId, categoryId])
+  @@index([campgroundId])
+}
+
+// Product-level expiration threshold overrides
+model ProductExpirationConfig {
+  id           String @id @default(cuid())
+  campgroundId String
+  productId    String
+
+  // Threshold days before expiration (override category defaults)
+  warningDays  Int?
+  criticalDays Int?
+
+  // Slow-moving threshold override
+  slowMovingDays Int?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
+
+  campground Campground @relation(fields: [campgroundId], references: [id], onDelete: Cascade)
+  product    Product    @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@unique([campgroundId, productId])
+  @@index([campgroundId])
+}
+
+// Auto-markdown rules for expiring inventory
+model MarkdownRule {
+  id           String @id @default(cuid())
+  campgroundId String
+
+  // Trigger condition
+  daysUntilExpiration Int // Apply when X days until expiration
+
+  // Discount
+  discountType  MarkdownDiscountType
+  discountValue Int // Percentage (1-100) or flat cents
+
+  // Scope
+  scope      MarkdownScope
+  categoryId String? // If scope is 'category'
+  productId  String? // If scope is 'product'
+
+  // Priority (lower = higher priority, for overlapping rules)
+  priority Int @default(100)
+
+  // Status
+  isActive Boolean @default(true)
+
+  // Audit
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @default(now()) @updatedAt
+  createdById String?
+
+  campground   Campground           @relation(fields: [campgroundId], references: [id], onDelete: Cascade)
+  category     ProductCategory?     @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  product      Product?             @relation(fields: [productId], references: [id], onDelete: SetNull)
+  applications MarkdownApplication[]
+
+  @@index([campgroundId])
+  @@index([categoryId])
+  @@index([productId])
+  @@index([isActive, daysUntilExpiration])
+}
+
+// Track markdown applications for reporting
+model MarkdownApplication {
+  id             String @id @default(cuid())
+  campgroundId   String
+  markdownRuleId String
+  batchId        String
+  cartId         String? // POS cart where markdown was applied
+
+  // Markdown details
+  originalPriceCents Int
+  markdownPriceCents Int
+  discountCents      Int // Amount discounted
+  qty                Int // Quantity sold at markdown
+
+  // Reason tracking
+  daysUntilExpiration Int // Days remaining at time of sale
+
+  createdAt DateTime @default(now())
+
+  campground   Campground     @relation(fields: [campgroundId], references: [id], onDelete: Cascade)
+  markdownRule MarkdownRule   @relation(fields: [markdownRuleId], references: [id], onDelete: Cascade)
+  batch        InventoryBatch @relation(fields: [batchId], references: [id], onDelete: Cascade)
+
+  @@index([campgroundId])
+  @@index([markdownRuleId])
+  @@index([batchId])
+  @@index([createdAt])
+}
+
+// Expiration alerts log (for tracking sent notifications)
+model ExpirationAlert {
+  id           String @id @default(cuid())
+  campgroundId String
+  batchId      String
+
+  // Alert details
+  tier           ExpirationTier
+  expirationDate DateTime
+  daysRemaining  Int
+  productName    String  // Snapshot for historical record
+  locationName   String?
+  qtyRemaining   Int
+
+  // Notification tracking
+  alertedAt       DateTime  @default(now())
+  acknowledgedAt  DateTime?
+  acknowledgedById String?
+
+  campground     Campground @relation(fields: [campgroundId], references: [id], onDelete: Cascade)
+  acknowledgedBy User?      @relation("AlertAcknowledger", fields: [acknowledgedById], references: [id], onDelete: SetNull)
+
+  @@index([campgroundId])
+  @@index([batchId])
+  @@index([tier])
+  @@index([alertedAt])
+  @@index([acknowledgedById])
 }
 
 // ============================================================================

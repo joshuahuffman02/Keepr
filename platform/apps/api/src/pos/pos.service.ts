@@ -1,8 +1,8 @@
-import { BadRequestException, ConflictException, Injectable, Logger, NotFoundException } from "@nestjs/common";
+import { BadRequestException, ConflictException, Injectable, Logger, NotFoundException, Inject, forwardRef } from "@nestjs/common";
 import { PrismaService } from "../prisma/prisma.service";
 import { IdempotencyService } from "../payments/idempotency.service";
 import { CheckoutCartDto, CreateCartDto, OfflineReplayDto, UpdateCartDto, CreateReturnDto } from "./pos.dto";
-import { IdempotencyStatus, PosCartStatus, PosPaymentStatus, TillMovementType } from "@prisma/client";
+import { IdempotencyStatus, PosCartStatus, PosPaymentStatus, TillMovementType, ExpirationTier } from "@prisma/client";
 import { StoredValueService } from "../stored-value/stored-value.service";
 import { StripeService } from "../payments/stripe.service";
 import crypto from "crypto";
@@ -11,6 +11,8 @@ import { ObservabilityService } from "../observability/observability.service";
 import { PosProviderService } from "./pos-provider.service";
 import { AuditService } from "../audit/audit.service";
 import { EmailService } from "../email/email.service";
+import { BatchInventoryService, ExpiredBatchException } from "../inventory/batch-inventory.service";
+import { MarkdownRulesService } from "../inventory/markdown-rules.service";
 
 @Injectable()
 export class PosService {
@@ -25,7 +27,11 @@ export class PosService {
     private readonly observability: ObservabilityService,
     private readonly providerIntegrations: PosProviderService,
     private readonly audit: AuditService,
-    private readonly email: EmailService
+    private readonly email: EmailService,
+    @Inject(forwardRef(() => BatchInventoryService))
+    private readonly batchInventory: BatchInventoryService,
+    @Inject(forwardRef(() => MarkdownRulesService))
+    private readonly markdownRules: MarkdownRulesService
   ) {}
 
   async createCart(dto: CreateCartDto, actor: any) {
@@ -555,6 +561,271 @@ export class PosService {
 
     if (idempotencyKey) await this.idempotency.complete(idempotencyKey, response);
     return response;
+  }
+
+  /**
+   * Scan a product for POS - handles batch tracking, expiration, and markdown calculation.
+   * Returns pricing info including any applicable markdowns for expiring items.
+   *
+   * @param allowExpired If true, allows selling expired items (requires manager override)
+   */
+  async scanProduct(
+    campgroundId: string,
+    productId: string,
+    locationId: string | null,
+    qty: number = 1,
+    options?: { allowExpired?: boolean; existingPromoDiscountCents?: number }
+  ): Promise<{
+    productId: string;
+    productName: string;
+    sku: string | null;
+    basePriceCents: number;
+    effectivePriceCents: number;
+    qty: number;
+    // Batch tracking info
+    useBatchTracking: boolean;
+    batchId: string | null;
+    expirationDate: Date | null;
+    daysUntilExpiration: number | null;
+    expirationTier: ExpirationTier | null;
+    // Markdown info
+    markdownApplied: boolean;
+    markdownRuleId: string | null;
+    originalPriceCents: number;
+    markdownDiscountCents: number;
+    discountSource: "markdown" | "promotion" | "none";
+    // Warning flags
+    isExpired: boolean;
+    requiresOverride: boolean;
+    warningMessage: string | null;
+  }> {
+    const product = await this.prisma.product.findUnique({
+      where: { id: productId },
+      select: {
+        id: true,
+        name: true,
+        sku: true,
+        priceCents: true,
+        useBatchTracking: true,
+        trackInventory: true,
+      },
+    });
+
+    if (!product) {
+      throw new NotFoundException("Product not found");
+    }
+
+    const basePriceCents = product.priceCents;
+    let batchId: string | null = null;
+    let expirationDate: Date | null = null;
+    let daysUntilExpiration: number | null = null;
+    let expirationTier: ExpirationTier | null = null;
+    let isExpired = false;
+    let requiresOverride = false;
+    let warningMessage: string | null = null;
+
+    // Handle batch-tracked products
+    if (product.useBatchTracking) {
+      try {
+        // Preview FEFO allocation to determine which batch will be used
+        const allocations = await this.batchInventory.allocateFEFO(
+          productId,
+          locationId,
+          qty,
+          { previewOnly: true, allowExpired: options?.allowExpired }
+        );
+
+        if (allocations.length > 0) {
+          const primaryBatch = allocations[0];
+          batchId = primaryBatch.batchId;
+          expirationDate = primaryBatch.expirationDate;
+          daysUntilExpiration = primaryBatch.daysUntilExpiration;
+
+          // Determine expiration tier
+          if (expirationDate) {
+            expirationTier = await this.batchInventory.getExpirationTier({
+              productId,
+              expirationDate,
+            });
+
+            isExpired = expirationTier === ExpirationTier.expired;
+
+            if (isExpired && !options?.allowExpired) {
+              requiresOverride = true;
+              warningMessage = `Item expired on ${expirationDate.toLocaleDateString()}. Manager override required.`;
+            } else if (expirationTier === ExpirationTier.critical) {
+              warningMessage = `Item expires in ${daysUntilExpiration} day(s). Consider markdown.`;
+            } else if (expirationTier === ExpirationTier.warning) {
+              warningMessage = `Item approaching expiration (${daysUntilExpiration} days).`;
+            }
+          }
+        }
+      } catch (error) {
+        if (error instanceof ExpiredBatchException) {
+          isExpired = true;
+          requiresOverride = true;
+          warningMessage = error.message;
+        } else {
+          throw error;
+        }
+      }
+    }
+
+    // Calculate markdown (only if we have a batch with expiration)
+    let markdownApplied = false;
+    let markdownRuleId: string | null = null;
+    let markdownDiscountCents = 0;
+    let discountSource: "markdown" | "promotion" | "none" = "none";
+    let effectivePriceCents = basePriceCents;
+
+    if (batchId) {
+      const bestDiscount = await this.markdownRules.getBestDiscount(
+        campgroundId,
+        productId,
+        batchId,
+        basePriceCents,
+        options?.existingPromoDiscountCents ?? 0
+      );
+
+      discountSource = bestDiscount.source;
+
+      if (bestDiscount.source === "markdown") {
+        markdownApplied = true;
+        markdownRuleId = bestDiscount.markdownRuleId;
+        markdownDiscountCents = bestDiscount.discountCents;
+        effectivePriceCents = basePriceCents - markdownDiscountCents;
+      } else if (bestDiscount.source === "promotion") {
+        // Promotion wins - keep base price, let promotion system handle discount
+        effectivePriceCents = basePriceCents - bestDiscount.discountCents;
+      }
+    }
+
+    return {
+      productId: product.id,
+      productName: product.name,
+      sku: product.sku,
+      basePriceCents,
+      effectivePriceCents,
+      qty,
+      useBatchTracking: product.useBatchTracking,
+      batchId,
+      expirationDate,
+      daysUntilExpiration,
+      expirationTier,
+      markdownApplied,
+      markdownRuleId,
+      originalPriceCents: basePriceCents,
+      markdownDiscountCents,
+      discountSource,
+      isExpired,
+      requiresOverride,
+      warningMessage,
+    };
+  }
+
+  /**
+   * Add item to cart with batch tracking and markdown support.
+   * This is the recommended method for POS item addition.
+   */
+  async addItemToCart(
+    cartId: string,
+    productId: string,
+    qty: number,
+    actor: any,
+    options?: {
+      overridePriceCents?: number;
+      allowExpired?: boolean;
+      existingPromoDiscountCents?: number;
+    }
+  ) {
+    const cart = await this.prisma.posCart.findUnique({
+      where: { id: cartId },
+      select: { id: true, campgroundId: true, terminalId: true },
+    });
+
+    if (!cart) throw new NotFoundException("Cart not found");
+
+    // Get terminal's location if available
+    const terminal = cart.terminalId
+      ? await this.prisma.posTerminal.findUnique({
+          where: { id: cart.terminalId },
+          select: { locationId: true },
+        })
+      : null;
+
+    const locationId = terminal?.locationId ?? null;
+
+    // Scan product to get batch/markdown info
+    const scanResult = await this.scanProduct(
+      cart.campgroundId,
+      productId,
+      locationId,
+      qty,
+      {
+        allowExpired: options?.allowExpired,
+        existingPromoDiscountCents: options?.existingPromoDiscountCents,
+      }
+    );
+
+    // Block expired items unless override is provided
+    if (scanResult.requiresOverride && !options?.allowExpired) {
+      return {
+        success: false,
+        error: "EXPIRED_ITEM_REQUIRES_OVERRIDE",
+        message: scanResult.warningMessage,
+        scanResult,
+      };
+    }
+
+    // Determine final unit price
+    const unitPriceCents = options?.overridePriceCents ?? scanResult.effectivePriceCents;
+    const totalCents = unitPriceCents * qty;
+
+    // Create cart item with batch/markdown metadata
+    const cartItem = await this.prisma.posCartItem.create({
+      data: {
+        cartId,
+        productId,
+        qty,
+        unitPriceCents,
+        totalCents,
+        // Batch tracking fields
+        batchId: scanResult.batchId,
+        // Markdown tracking fields
+        markdownApplied: scanResult.markdownApplied,
+        markdownRuleId: scanResult.markdownRuleId,
+        originalPriceCents: scanResult.basePriceCents,
+        markdownDiscountCents: scanResult.markdownDiscountCents,
+      },
+      include: {
+        product: { select: { id: true, name: true, sku: true } },
+      },
+    });
+
+    // Record markdown application if applicable (for reporting)
+    if (scanResult.markdownApplied && scanResult.markdownRuleId && scanResult.batchId) {
+      try {
+        await this.markdownRules.recordMarkdownApplication(
+          cart.campgroundId,
+          scanResult.markdownRuleId,
+          scanResult.batchId,
+          cartId,
+          scanResult.basePriceCents,
+          scanResult.effectivePriceCents,
+          qty,
+          scanResult.daysUntilExpiration ?? 0
+        );
+      } catch (err) {
+        this.logger.warn(`Failed to record markdown application: ${err}`);
+      }
+    }
+
+    return {
+      success: true,
+      cartItem,
+      scanResult,
+      warning: scanResult.warningMessage,
+    };
   }
 
   private scopeKey(actor?: any) {

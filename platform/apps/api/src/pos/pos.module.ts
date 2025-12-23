@@ -1,4 +1,4 @@
-import { Module } from "@nestjs/common";
+import { Module, forwardRef } from "@nestjs/common";
 import { PosController } from "./pos.controller";
 import { PosService } from "./pos.service";
 import { PrismaService } from "../prisma/prisma.service";
@@ -14,9 +14,10 @@ import { PosProviderService } from "./pos-provider.service";
 import { PosProviderRegistry } from "./pos-provider.registry";
 import { CloverAdapter, SquareAdapter, ToastAdapter } from "./pos-provider.adapters";
 import { EmailService } from "../email/email.service";
+import { InventoryModule } from "../inventory/inventory.module";
 
 @Module({
-  imports: [StoredValueModule],
+  imports: [StoredValueModule, forwardRef(() => InventoryModule)],
   controllers: [PosController, TillController, PosProviderController],
   providers: [
     PosService,

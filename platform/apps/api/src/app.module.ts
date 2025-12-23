@@ -102,6 +102,7 @@ import { OrgBillingModule } from "./org-billing/org-billing.module";
 import { DataImportModule } from "./data-import/data-import.module";
 import { OrgReferralsModule } from "./org-referrals/org-referrals.module";
 import { SetupServicesModule } from "./setup-services/setup-services.module";
+import { InventoryModule } from "./inventory/inventory.module";
 
 @Module({
   imports: [
@@ -129,6 +130,7 @@ import { SetupServicesModule } from "./setup-services/setup-services.module";
     UpsellsModule,
     GiftCardsModule,
     StoreModule,
+    InventoryModule,
     BlackoutsModule,
     PromotionsModule,
     PublicReservationsModule,

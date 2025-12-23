@@ -1,4 +1,4 @@
-import { Injectable, ConflictException, NotFoundException } from "@nestjs/common";
+import { Injectable, ConflictException, NotFoundException, Inject, forwardRef } from "@nestjs/common";
 import { Prisma } from "@prisma/client";
 import { PrismaService } from "../prisma/prisma.service";
 import {
@@ -9,10 +9,15 @@ import {
     CreateLocationPriceOverrideDto,
     UpdateLocationPriceOverrideDto,
 } from "./dto/location.dto";
+import { BatchInventoryService, BatchAllocation } from "../inventory/batch-inventory.service";
 
 @Injectable()
 export class LocationService {
-    constructor(private readonly prisma: PrismaService) {}
+    constructor(
+        private readonly prisma: PrismaService,
+        @Inject(forwardRef(() => BatchInventoryService))
+        private readonly batchInventory: BatchInventoryService
+    ) {}
 
     // ==================== STORE LOCATIONS ====================
 
@@ -447,24 +452,69 @@ export class LocationService {
 
     /**
      * Deduct inventory for a POS sale.
-     * Handles both shared and per-location inventory modes.
+     * Handles shared, per-location, and batch-tracked inventory modes.
+     *
+     * @param options.batchAllocations Pre-computed batch allocations from POS (optional)
+     * @param options.allowExpired Whether to allow selling expired items (requires manager override)
      */
     async deductInventoryForSale(
         campgroundId: string,
-        items: Array<{ productId: string; qty: number }>,
+        items: Array<{
+            productId: string;
+            qty: number;
+            batchAllocations?: BatchAllocation[]; // Pre-allocated from POS
+        }>,
         locationId: string | null,
         actorUserId: string,
-        referenceId?: string
+        referenceId?: string,
+        options?: { allowExpired?: boolean }
     ): Promise<void> {
         await this.prisma.$transaction(async (tx: Prisma.TransactionClient) => {
             for (const item of items) {
                 const product = await tx.product.findUnique({
                     where: { id: item.productId },
-                    select: { id: true, name: true, stockQty: true, inventoryMode: true, trackInventory: true },
+                    select: {
+                        id: true,
+                        name: true,
+                        stockQty: true,
+                        inventoryMode: true,
+                        trackInventory: true,
+                        useBatchTracking: true,
+                    },
                 });
 
                 if (!product || !product.trackInventory) continue;
 
+                // Update lastSaleDate for slow-moving detection
+                await tx.product.update({
+                    where: { id: item.productId },
+                    data: { lastSaleDate: new Date() },
+                });
+
+                // Handle batch-tracked products
+                if (product.useBatchTracking) {
+                    // Use pre-allocated batches if provided, otherwise allocate now
+                    const allocations = item.batchAllocations ??
+                        await this.batchInventory.allocateFEFO(
+                            item.productId,
+                            locationId,
+                            item.qty,
+                            { allowExpired: options?.allowExpired }
+                        );
+
+                    // Deduct from batches (outside transaction since batchInventory has its own)
+                    // Note: In production, this should be refactored to share the transaction
+                    await this.batchInventory.deductFromBatches(
+                        campgroundId,
+                        allocations,
+                        actorUserId,
+                        "order",
+                        referenceId
+                    );
+                    continue;
+                }
+
+                // Standard inventory deduction (non-batch-tracked)
                 if (product.inventoryMode === "per_location" && locationId) {
                     // Deduct from location inventory
                     const inventory = await tx.locationInventory.findUnique({
@@ -527,10 +577,15 @@ export class LocationService {
 
     /**
      * Restore inventory for a returned item.
+     * For batch-tracked items, requires batchId to return to the original batch.
      */
     async restoreInventoryForReturn(
         campgroundId: string,
-        items: Array<{ productId: string; qty: number }>,
+        items: Array<{
+            productId: string;
+            qty: number;
+            batchId?: string; // Required for batch-tracked products
+        }>,
         locationId: string | null,
         actorUserId: string,
         referenceId?: string
@@ -539,11 +594,30 @@ export class LocationService {
             for (const item of items) {
                 const product = await tx.product.findUnique({
                     where: { id: item.productId },
-                    select: { id: true, stockQty: true, inventoryMode: true, trackInventory: true },
+                    select: {
+                        id: true,
+                        stockQty: true,
+                        inventoryMode: true,
+                        trackInventory: true,
+                        useBatchTracking: true,
+                    },
                 });
 
                 if (!product || !product.trackInventory) continue;
 
+                // Handle batch-tracked returns
+                if (product.useBatchTracking && item.batchId) {
+                    await this.batchInventory.returnToBatches(
+                        campgroundId,
+                        [{ batchId: item.batchId, qty: item.qty }],
+                        actorUserId,
+                        "order",
+                        referenceId
+                    );
+                    continue;
+                }
+
+                // Standard inventory return
                 if (product.inventoryMode === "per_location" && locationId) {
                     const inventory = await tx.locationInventory.findUnique({
                         where: { productId_locationId: { productId: item.productId, locationId } },

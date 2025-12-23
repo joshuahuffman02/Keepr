@@ -1,4 +1,4 @@
-export type ReportCategory = "Bookings" | "Inventory" | "Payments" | "Operations" | "Marketing" | "POS";
+export type ReportCategory = "Bookings" | "Inventory" | "Inventory Expiration" | "Payments" | "Operations" | "Marketing" | "POS";
 
 export type ReportChartType = "line" | "bar" | "pie" | "table";
 
@@ -53,7 +53,10 @@ export type ReportSource =
   | "task"
   | "marketing"
   | "pos"
-  | "till";
+  | "till"
+  | "inventory_batch"
+  | "slow_moving"
+  | "markdown";
 
 export type ReportSpec = {
   id: string;
