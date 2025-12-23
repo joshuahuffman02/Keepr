@@ -191,6 +191,11 @@ const settingsCategories: SettingCategory[] = [
         description: "Connect third-party services and tools",
       },
       {
+        name: "POS Integrations",
+        href: "/dashboard/settings/pos-integrations",
+        description: "Connect to Lightspeed, Shopify POS, Vend, and other point-of-sale systems",
+      },
+      {
         name: "Analytics",
         href: "/dashboard/settings/analytics",
         description: "Configure analytics and tracking",

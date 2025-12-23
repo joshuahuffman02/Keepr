@@ -8214,6 +8214,221 @@ export const apiClient = {
       byStatus: Record<string, number>;
     };
   },
+
+  // ==================== POS INTEGRATIONS ====================
+
+  async listPosIntegrations(campgroundId: string) {
+    const data = await fetchJSON<unknown>(`/pos/integrations?campgroundId=${campgroundId}`);
+    return data as Array<{
+      id: string;
+      campgroundId: string;
+      provider: string;
+      displayName: string | null;
+      status: string;
+      capabilities: string[];
+      lastSyncAt: string | null;
+      lastSyncStatus: string | null;
+      lastError: string | null;
+      mappingCount?: number;
+      createdAt: string;
+    }>;
+  },
+
+  async getPosIntegration(id: string) {
+    const data = await fetchJSON<unknown>(`/pos/integrations/${id}`);
+    return data as {
+      id: string;
+      campgroundId: string;
+      provider: string;
+      displayName: string | null;
+      status: string;
+      capabilities: string[];
+      credentials: Record<string, any>;
+      settings: Record<string, any> | null;
+      locationMappings: Record<string, string> | null;
+      lastSyncAt: string | null;
+      lastSyncStatus: string | null;
+      lastError: string | null;
+      createdAt: string;
+      updatedAt: string;
+    };
+  },
+
+  async createPosIntegration(payload: {
+    campgroundId: string;
+    provider: string;
+    displayName?: string;
+    credentials: Record<string, any>;
+    settings?: Record<string, any>;
+    capabilities?: string[];
+  }) {
+    const res = await fetch(`${API_BASE}/pos/integrations`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", ...scopedHeaders() },
+      body: JSON.stringify(payload),
+    });
+    return parseResponse<{ id: string; provider: string; status: string }>(res);
+  },
+
+  async updatePosIntegration(id: string, payload: {
+    displayName?: string;
+    credentials?: Record<string, any>;
+    settings?: Record<string, any>;
+    capabilities?: string[];
+    status?: string;
+  }) {
+    const res = await fetch(`${API_BASE}/pos/integrations/${id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json", ...scopedHeaders() },
+      body: JSON.stringify(payload),
+    });
+    return parseResponse<unknown>(res);
+  },
+
+  async deletePosIntegration(id: string) {
+    const res = await fetch(`${API_BASE}/pos/integrations/${id}`, {
+      method: "DELETE",
+      headers: scopedHeaders(),
+    });
+    return parseResponse<unknown>(res);
+  },
+
+  async testPosConnection(id: string) {
+    const res = await fetch(`${API_BASE}/pos/integrations/${id}/test`, {
+      method: "POST",
+      headers: scopedHeaders(),
+    });
+    return parseResponse<{ success: boolean; message?: string; details?: Record<string, any> }>(res);
+  },
+
+  async triggerPosSync(id: string, type: "products" | "inventory" | "sales") {
+    const res = await fetch(`${API_BASE}/pos/integrations/${id}/sync`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", ...scopedHeaders() },
+      body: JSON.stringify({ type }),
+    });
+    return parseResponse<{ jobId?: string; status: string; message?: string }>(res);
+  },
+
+  // Product Mappings
+  async listProductMappings(campgroundId: string, provider?: string) {
+    const query = new URLSearchParams({ campgroundId });
+    if (provider) query.set("provider", provider);
+    const data = await fetchJSON<unknown>(`/pos/product-mappings?${query.toString()}`);
+    return data as Array<{
+      id: string;
+      campgroundId: string;
+      productId: string;
+      provider: string;
+      externalId: string;
+      externalSku: string | null;
+      lastSyncedAt: string | null;
+      syncStatus: string | null;
+      syncError: string | null;
+      metadata: Record<string, any> | null;
+      product: {
+        id: string;
+        name: string;
+        sku: string | null;
+        priceCents: number;
+      };
+    }>;
+  },
+
+  async importExternalProducts(integrationId: string) {
+    const res = await fetch(`${API_BASE}/pos/integrations/${integrationId}/import-products`, {
+      method: "POST",
+      headers: scopedHeaders(),
+    });
+    return parseResponse<{
+      imported: number;
+      updated: number;
+      failed: number;
+      products: Array<{
+        externalId: string;
+        externalSku: string | null;
+        name: string;
+        priceCents: number;
+        category: string | null;
+      }>;
+    }>(res);
+  },
+
+  async linkProduct(payload: {
+    campgroundId: string;
+    productId: string;
+    provider: string;
+    externalId: string;
+  }) {
+    const res = await fetch(`${API_BASE}/pos/product-mappings/link`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", ...scopedHeaders() },
+      body: JSON.stringify(payload),
+    });
+    return parseResponse<{ id: string; syncStatus: string }>(res);
+  },
+
+  async unlinkProduct(mappingId: string) {
+    const res = await fetch(`${API_BASE}/pos/product-mappings/${mappingId}`, {
+      method: "DELETE",
+      headers: scopedHeaders(),
+    });
+    return parseResponse<unknown>(res);
+  },
+
+  async autoMatchProducts(integrationId: string) {
+    const res = await fetch(`${API_BASE}/pos/integrations/${integrationId}/auto-match`, {
+      method: "POST",
+      headers: scopedHeaders(),
+    });
+    return parseResponse<{ matched: number; unmatched: number }>(res);
+  },
+
+  // Sync Operations
+  async pushInventoryToPos(integrationId: string, productId?: string) {
+    const res = await fetch(`${API_BASE}/pos/integrations/${integrationId}/push-inventory`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", ...scopedHeaders() },
+      body: JSON.stringify({ productId }),
+    });
+    return parseResponse<{ pushed: number; failed: number; results: any[] }>(res);
+  },
+
+  async pullSalesFromPos(integrationId: string, since?: string) {
+    const query = since ? `?since=${since}` : "";
+    const res = await fetch(`${API_BASE}/pos/integrations/${integrationId}/pull-sales${query}`, {
+      method: "POST",
+      headers: scopedHeaders(),
+    });
+    return parseResponse<{ processed: number; deducted: number; skipped: number; errors: string[] }>(res);
+  },
+
+  async getSyncLogs(integrationId: string, limit?: number) {
+    const query = limit ? `?limit=${limit}` : "";
+    const data = await fetchJSON<unknown>(`/pos/integrations/${integrationId}/logs${query}`);
+    return data as Array<{
+      id: string;
+      integrationId: string;
+      direction: string;
+      type: string;
+      status: string;
+      itemsProcessed: number;
+      itemsFailed: number;
+      errors: string[];
+      startedAt: string;
+      completedAt: string | null;
+    }>;
+  },
+
+  async getUnmatchedExternalProducts(integrationId: string) {
+    const data = await fetchJSON<unknown>(`/pos/integrations/${integrationId}/unmatched`);
+    return data as Array<{
+      id: string;
+      externalId: string;
+      externalSku: string | null;
+      metadata: Record<string, any> | null;
+    }>;
+  },
 };
 
 export type PublicCampgroundList = z.infer<typeof PublicCampgroundListSchema>;
