@@ -76,6 +76,8 @@ export async function createApp(): Promise<INestApplication> {
             "X-Client",
             "Accept",
             "X-Requested-With",
+            "X-Onboarding-Token",
+            "Idempotency-Key",
         ],
         optionsSuccessStatus: 204,
         preflightContinue: false,
