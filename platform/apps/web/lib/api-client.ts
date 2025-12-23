@@ -441,7 +441,8 @@ const FormSubmissionArray = z.array(FormSubmissionSchema);
 const PublicCampgroundDetailSchema = CampgroundWithAnalyticsSchema.extend({
   siteClasses: z.array(SiteClassSchema),
   events: z.array(EventSchema),
-  promotions: z.array(PromotionSchema).optional().default([])
+  promotions: z.array(PromotionSchema).optional().default([]),
+  showPublicMap: z.boolean().optional().default(false)
 });
 
 export const CreatePublicWaitlistSchema = z.object({

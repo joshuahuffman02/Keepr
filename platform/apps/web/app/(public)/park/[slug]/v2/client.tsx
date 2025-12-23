@@ -202,78 +202,80 @@ export function CampgroundV2Client({ slug, initialData }: { slug: string; initia
         </div>
       </section>
 
-      {/* Immersive Map Explorer */}
-      <section className="w-full bg-slate-900 overflow-hidden">
-        <div className="relative h-[70vh] min-h-[520px] group">
-          <BookingMap
-            sites={(sitesStatus || []).map(s => ({
-              ...s,
-              latitude: s.latitude ?? null,
-              longitude: s.longitude ?? null
-            }))}
-            campgroundCenter={{
-              latitude: campground?.latitude ? Number(campground.latitude) : null,
-              longitude: campground?.longitude ? Number(campground.longitude) : null
-            }}
-            isLoading={sitesLoading}
-            selectedSiteId={selectedSiteId}
-            onSelectSite={(id) => {
-              setSelectedSiteId(id);
-              const element = document.getElementById("availability");
-              if (element) {
-                element.scrollIntoView({ behavior: "smooth" });
-              }
-            }}
-            height="100%"
-            variant="immersive"
-          />
-          <div className="absolute top-6 left-6 z-10 pointer-events-none max-w-sm">
-            <div className="bg-white/90 backdrop-blur-md p-4 rounded-2xl shadow-2xl border border-white/20 pointer-events-auto">
-              <h3 className="font-bold text-slate-900 flex items-center gap-2">
-                <MapPin className="h-4 w-4 text-emerald-600" />
-                Explore the Grounds
-              </h3>
-              <p className="text-sm text-slate-600 mt-1">
-                Tap pins to view site details and availability for your selected dates.
-              </p>
-              {selectedSiteId && (
-                <div className="mt-3 p-3 bg-emerald-50 rounded-xl border border-emerald-100 animate-in fade-in slide-in-from-top-2">
-                  <div className="text-xs font-bold text-emerald-800 uppercase tracking-wider">Currently Selection</div>
-                  <div className="font-semibold text-slate-900 mt-0.5">
-                    {sitesStatus?.find(s => s.id === selectedSiteId)?.siteNumber} ({sitesStatus?.find(s => s.id === selectedSiteId)?.siteClassName})
+      {/* Immersive Map Explorer - only shown if enabled */}
+      {campground?.showPublicMap && (
+        <section className="w-full bg-slate-900 overflow-hidden">
+          <div className="relative h-[70vh] min-h-[520px] group">
+            <BookingMap
+              sites={(sitesStatus || []).map(s => ({
+                ...s,
+                latitude: s.latitude ?? null,
+                longitude: s.longitude ?? null
+              }))}
+              campgroundCenter={{
+                latitude: campground?.latitude ? Number(campground.latitude) : null,
+                longitude: campground?.longitude ? Number(campground.longitude) : null
+              }}
+              isLoading={sitesLoading}
+              selectedSiteId={selectedSiteId}
+              onSelectSite={(id) => {
+                setSelectedSiteId(id);
+                const element = document.getElementById("availability");
+                if (element) {
+                  element.scrollIntoView({ behavior: "smooth" });
+                }
+              }}
+              height="100%"
+              variant="immersive"
+            />
+            <div className="absolute top-6 left-6 z-10 pointer-events-none max-w-sm">
+              <div className="bg-white/90 backdrop-blur-md p-4 rounded-2xl shadow-2xl border border-white/20 pointer-events-auto">
+                <h3 className="font-bold text-slate-900 flex items-center gap-2">
+                  <MapPin className="h-4 w-4 text-emerald-600" />
+                  Explore the Grounds
+                </h3>
+                <p className="text-sm text-slate-600 mt-1">
+                  Tap pins to view site details and availability for your selected dates.
+                </p>
+                {selectedSiteId && (
+                  <div className="mt-3 p-3 bg-emerald-50 rounded-xl border border-emerald-100 animate-in fade-in slide-in-from-top-2">
+                    <div className="text-xs font-bold text-emerald-800 uppercase tracking-wider">Currently Selection</div>
+                    <div className="font-semibold text-slate-900 mt-0.5">
+                      {sitesStatus?.find(s => s.id === selectedSiteId)?.siteNumber} ({sitesStatus?.find(s => s.id === selectedSiteId)?.siteClassName})
+                    </div>
+                    <Button
+                      size="sm"
+                      className="w-full mt-2 bg-emerald-600 hover:bg-emerald-700"
+                      onClick={() => {
+                        const site = sitesStatus?.find(s => s.id === selectedSiteId);
+                        if (site) {
+                          trackEvent("map_site_book_click", { siteId: selectedSiteId, campgroundId: campground?.id });
+                          const q = new URLSearchParams({
+                            arrivalDate,
+                            departureDate,
+                            siteType: site.siteType || "all",
+                            siteId: site.id,
+                            guests
+                          }).toString();
+                          window.location.href = `/park/${slug}/book?${q}`;
+                        }
+                      }}
+                    >
+                      Reserve This Spot
+                    </Button>
                   </div>
-                  <Button
-                    size="sm"
-                    className="w-full mt-2 bg-emerald-600 hover:bg-emerald-700"
-                    onClick={() => {
-                      const site = sitesStatus?.find(s => s.id === selectedSiteId);
-                      if (site) {
-                        trackEvent("map_site_book_click", { siteId: selectedSiteId, campgroundId: campground?.id });
-                        const q = new URLSearchParams({
-                          arrivalDate,
-                          departureDate,
-                          siteType: site.siteType || "all",
-                          siteId: site.id,
-                          guests
-                        }).toString();
-                        window.location.href = `/park/${slug}/book?${q}`;
-                      }
-                    }}
-                  >
-                    Reserve This Spot
-                  </Button>
-                </div>
-              )}
+                )}
+              </div>
+            </div>
+
+            <div className="absolute bottom-6 right-6 z-10 hidden md:block">
+              <Badge className="bg-slate-900/80 text-white backdrop-blur-md border-white/10 px-3 py-1.5 text-xs">
+                Live Availability Powered by Camp Everyday
+              </Badge>
             </div>
           </div>
-
-          <div className="absolute bottom-6 right-6 z-10 hidden md:block">
-            <Badge className="bg-slate-900/80 text-white backdrop-blur-md border-white/10 px-3 py-1.5 text-xs">
-              Live Availability Powered by Camp Everyday
-            </Badge>
-          </div>
-        </div>
-      </section>
+        </section>
+      )}
 
       <main className="max-w-6xl mx-auto px-6 py-10 space-y-10">
         {/* Preview strip for reviews/FAQ */}
