@@ -134,6 +134,14 @@ export class StripeService {
         return (acct as any).capabilities as Record<string, string> | undefined;
     }
 
+    /**
+     * Retrieve a connected Stripe account's details
+     */
+    async retrieveAccount(stripeAccountId: string) {
+        const stripe = this.assertConfigured("retrieve account");
+        return stripe.accounts.retrieve(stripeAccountId);
+    }
+
     constructEventFromPayload(signature: string, payload: Buffer) {
         const stripe = this.assertConfigured("construct webhook events");
         const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
