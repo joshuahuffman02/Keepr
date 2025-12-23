@@ -140,12 +140,15 @@ export class OnboardingService {
     if (existing?.status === IdempotencyStatus.succeeded && existing.responseJson) {
       return existing.responseJson;
     }
-    // Allow retry if inflight record is older than 10 seconds (likely a failed/abandoned request)
-    if (existing?.status === IdempotencyStatus.inflight && existing.createdAt && Date.now() - new Date(existing.createdAt).getTime() < 10000) {
+    // Only block if there's a genuinely concurrent request (1-5 seconds old)
+    // Records < 1 second might be our own just-created record
+    // Records > 5 seconds are likely stale from failed requests
+    const ageMs = existing?.createdAt ? Date.now() - new Date(existing.createdAt).getTime() : 0;
+    if (existing?.status === IdempotencyStatus.inflight && ageMs > 1000 && ageMs < 5000) {
       throw new ConflictException("Onboarding step already in progress");
     }
-    // If inflight but older than 10 seconds, mark it as failed so we can retry
-    if (existing?.status === IdempotencyStatus.inflight && idempotencyKey) {
+    // Mark stale inflight records (> 5 seconds) as failed so we can proceed
+    if (existing?.status === IdempotencyStatus.inflight && ageMs >= 5000 && idempotencyKey) {
       await this.idempotency.fail(idempotencyKey).catch(() => null);
     }
 
