@@ -261,6 +261,19 @@ const StoredValueAdjustResponseSchema = z.object({
 }).passthrough();
 
 const OnboardingStepEnum = z.enum([
+  // New step keys
+  "park_profile",
+  "stripe_connect",
+  "inventory_choice",
+  "data_import",
+  "site_classes",
+  "sites_builder",
+  "rates_setup",
+  "tax_rules",
+  "deposit_policy",
+  "park_rules",
+  "review_launch",
+  // Legacy step keys (for backwards compatibility)
   "account_profile",
   "payment_gateway",
   "taxes_and_fees",

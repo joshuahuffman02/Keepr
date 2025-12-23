@@ -1,389 +1,488 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
-import { useParams } from "next/navigation";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useState, useEffect, useCallback } from "react";
+import { useParams, useRouter, useSearchParams } from "next/navigation";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiClient } from "@/lib/api-client";
-import { onboardingSteps, onboardingStepOrder, OnboardingStepKey } from "@/lib/onboarding";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import { Progress } from "@/components/ui/progress";
-import { Switch } from "@/components/ui/switch";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { useToast } from "@/components/ui/use-toast";
-import { cn } from "@/lib/utils";
+import { OnboardingStepKey, onboardingSteps } from "@/lib/onboarding";
+import { SetupProgress } from "./components/SetupProgress";
+import { StepContainer } from "./components/StepContainer";
+import { SetupCelebration } from "./components/SetupCelebration";
+import { ParkProfile } from "./steps/ParkProfile";
+import { StripeConnect } from "./steps/StripeConnect";
+import { ImportOrManual } from "./steps/ImportOrManual";
+import { SiteClasses } from "./steps/SiteClasses";
+import { SitesBuilder } from "./steps/SitesBuilder";
+import { DepositPolicy } from "./steps/DepositPolicy";
+import { ReviewLaunch } from "./steps/ReviewLaunch";
+import { Loader2 } from "lucide-react";
 
-const US_TIMEZONES = [
-  { value: "America/New_York", label: "Eastern (ET)" },
-  { value: "America/Chicago", label: "Central (CT)" },
-  { value: "America/Denver", label: "Mountain (MT)" },
-  { value: "America/Phoenix", label: "Arizona (no DST)" },
-  { value: "America/Los_Angeles", label: "Pacific (PT)" },
-  { value: "America/Anchorage", label: "Alaska (AKT)" },
-  { value: "Pacific/Honolulu", label: "Hawaii (HST)" },
-] as const;
-
-type StepData = Partial<Record<OnboardingStepKey, any>>;
+interface WizardState {
+  currentStep: OnboardingStepKey;
+  completedSteps: OnboardingStepKey[];
+  inventoryPath: "import" | "manual" | null;
+  direction: "forward" | "backward";
+  // Data collected during setup
+  campground?: {
+    id: string;
+    name: string;
+    city: string;
+    state: string;
+  };
+  stripeConnected?: boolean;
+  stripeAccountId?: string;
+  siteClasses?: Array<{ id: string; name: string; siteType: string; defaultRate: number }>;
+  sites?: Array<{ id: string; name: string; siteNumber: string; siteClassId: string }>;
+  depositPolicy?: { strategy: string };
+}
 
 export default function OnboardingPage() {
   const params = useParams();
+  const router = useRouter();
+  const searchParams = useSearchParams();
   const token = params.token as string;
   const queryClient = useQueryClient();
-  const { toast } = useToast();
 
-  const [draft, setDraft] = useState<StepData>({});
-  const [activeStep, setActiveStep] = useState<OnboardingStepKey>("account_profile");
+  // Check if returning from Stripe
+  const stripeStatus = searchParams.get("stripe_status");
 
+  const [state, setState] = useState<WizardState>({
+    currentStep: "park_profile",
+    completedSteps: [],
+    inventoryPath: null,
+    direction: "forward",
+  });
+
+  const [celebration, setCelebration] = useState<{
+    show: boolean;
+    title: string;
+    subtitle?: string;
+    type: "stripe" | "sites" | "launch" | "default";
+  }>({ show: false, title: "", type: "default" });
+
+  // Fetch session data
   const sessionQuery = useQuery({
     queryKey: ["onboarding", token],
     queryFn: () => apiClient.startOnboardingSession(token),
-    enabled: Boolean(token)
+    enabled: Boolean(token),
   });
 
+  // Initialize state from session
   useEffect(() => {
     if (sessionQuery.data?.session) {
-      setDraft((prev) => ({ ...prev, ...(sessionQuery.data?.session.data ?? {}) }));
-      const next = (sessionQuery.data.progress.nextStep ??
-        sessionQuery.data.session.currentStep ??
-        onboardingStepOrder[0]) as OnboardingStepKey;
-      setActiveStep(next);
+      const session = sessionQuery.data.session;
+      const data = session.data || {};
+
+      // Map old step keys to new ones if needed
+      const mapStepKey = (key: string): OnboardingStepKey => {
+        const mapping: Record<string, OnboardingStepKey> = {
+          account_profile: "park_profile",
+          payment_gateway: "stripe_connect",
+          inventory_sites: "inventory_choice",
+          rates_and_fees: "rates_setup",
+          taxes_and_fees: "tax_rules",
+          policies: "deposit_policy",
+        };
+        return (mapping[key] as OnboardingStepKey) || (key as OnboardingStepKey);
+      };
+
+      const mappedCompletedSteps = (sessionQuery.data.progress?.completedSteps || [])
+        .map(mapStepKey)
+        .filter((key): key is OnboardingStepKey =>
+          onboardingSteps.some(s => s.key === key)
+        );
+
+      const currentStepKey = mapStepKey(
+        session.currentStep || sessionQuery.data.progress?.nextStep || "park_profile"
+      );
+
+      setState((prev) => ({
+        ...prev,
+        campground: data.campground,
+        stripeConnected: data.stripeConnected,
+        stripeAccountId: data.stripeAccountId,
+        siteClasses: data.siteClasses,
+        sites: data.sites,
+        depositPolicy: data.depositPolicy,
+        completedSteps: mappedCompletedSteps,
+        currentStep: currentStepKey,
+        inventoryPath: data.inventoryPath,
+      }));
     }
   }, [sessionQuery.data]);
 
-  const progressValue = sessionQuery.data?.progress?.percentage ?? 0;
-  const completed = new Set<OnboardingStepKey>(sessionQuery.data?.progress?.completedSteps ?? []);
+  // Handle Stripe return
+  useEffect(() => {
+    if (stripeStatus === "success") {
+      // Show celebration and move to next step
+      setCelebration({
+        show: true,
+        title: "Payments Ready!",
+        subtitle: "You can now accept credit cards, ACH, and more",
+        type: "stripe",
+      });
+      setState((prev) => ({
+        ...prev,
+        stripeConnected: true,
+        completedSteps: [...prev.completedSteps, "stripe_connect"],
+        currentStep: "inventory_choice",
+      }));
+      // Clear URL params
+      router.replace(`/onboarding/${token}`);
+    }
+  }, [stripeStatus, token, router]);
 
+  const goToStep = useCallback((step: OnboardingStepKey, direction: "forward" | "backward" = "forward") => {
+    setState((prev) => ({
+      ...prev,
+      currentStep: step,
+      direction,
+    }));
+  }, []);
+
+  const completeStep = useCallback((step: OnboardingStepKey) => {
+    setState((prev) => ({
+      ...prev,
+      completedSteps: prev.completedSteps.includes(step)
+        ? prev.completedSteps
+        : [...prev.completedSteps, step],
+    }));
+  }, []);
+
+  const showCelebration = useCallback(
+    (title: string, subtitle?: string, type: "stripe" | "sites" | "launch" | "default" = "default") => {
+      setCelebration({ show: true, title, subtitle, type });
+    },
+    []
+  );
+
+  const hideCelebration = useCallback(() => {
+    setCelebration((prev) => ({ ...prev, show: false }));
+  }, []);
+
+  // Save step mutation
   const saveMutation = useMutation({
-    mutationFn: async (payload: Record<string, any>) => {
+    mutationFn: async (payload: { step: OnboardingStepKey; data: Record<string, any> }) => {
       if (!sessionQuery.data) throw new Error("Session not ready");
-      const idempotencyKey =
-        typeof crypto !== "undefined" && "randomUUID" in crypto
-          ? crypto.randomUUID()
-          : `onb-${Date.now()}`;
+      const idempotencyKey = crypto.randomUUID();
       return apiClient.saveOnboardingStep(
         sessionQuery.data.session.id,
         token,
-        activeStep,
-        payload,
+        payload.step,
+        payload.data,
         idempotencyKey
       );
     },
-    onSuccess: (resp, payload) => {
-      queryClient.setQueryData(["onboarding", token], resp);
-      setDraft((prev) => ({ ...prev, [activeStep]: payload }));
-      const next = (resp.progress.nextStep ?? activeStep) as OnboardingStepKey;
-      setActiveStep(next);
-      toast({ title: "Saved", description: "Progress updated." });
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["onboarding", token] });
     },
-    onError: (err: any) => {
-      toast({
-        title: "Could not save",
-        description: err?.message ?? "Please try again.",
-        variant: "destructive"
-      });
-    }
   });
 
-  const activeData = draft[activeStep] ?? {};
-
-  const statusCopy = useMemo(() => {
-    if (!sessionQuery.data?.progress) return "Start your setup to get online faster.";
-    if (sessionQuery.data.progress.remainingSteps.length === 0) return "All steps completed!";
-    return `${sessionQuery.data.progress.completedSteps.length}/${onboardingSteps.length} steps done`;
-  }, [sessionQuery.data?.progress]);
-
+  // Loading state
   if (sessionQuery.isLoading) {
     return (
-      <div className="min-h-screen bg-slate-50 flex items-center justify-center text-sm text-slate-600">
-        Preparing your onboarding workspace...
+      <div className="min-h-screen bg-slate-900 flex items-center justify-center">
+        <div className="text-center">
+          <Loader2 className="w-8 h-8 text-emerald-400 animate-spin mx-auto mb-4" />
+          <p className="text-slate-400">Loading your setup...</p>
+        </div>
       </div>
     );
   }
 
+  // Error state
   if (sessionQuery.error || !sessionQuery.data) {
-    console.log("[onboarding] Error state:", {
-      error: sessionQuery.error,
-      data: sessionQuery.data,
-      isLoading: sessionQuery.isLoading,
-      status: sessionQuery.status,
-      fetchStatus: sessionQuery.fetchStatus
-    });
     return (
-      <div className="min-h-screen bg-slate-50 flex items-center justify-center">
-        <Card className="max-w-lg w-full">
-          <CardHeader>
-            <CardTitle>Link problem</CardTitle>
-            <CardDescription>We could not validate this onboarding link. Request a new invite or contact support.</CardDescription>
-          </CardHeader>
-        </Card>
+      <div className="min-h-screen bg-slate-900 flex items-center justify-center">
+        <div className="text-center max-w-md">
+          <h1 className="text-2xl font-bold text-white mb-2">Link Problem</h1>
+          <p className="text-slate-400">
+            We couldn't validate this setup link. Please request a new invite or
+            contact support.
+          </p>
+        </div>
       </div>
     );
   }
 
-  return (
-    <div className="min-h-screen bg-slate-50">
-      <div className="max-w-6xl mx-auto py-10 px-4">
-        <div className="flex flex-col md:flex-row gap-6">
-          <aside className="md:w-72 space-y-4">
-            <Card>
-              <CardHeader className="space-y-2">
-                <CardTitle>Guided onboarding</CardTitle>
-                <CardDescription>{statusCopy}</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                <Progress value={progressValue} max={100} />
-                <div className="text-xs text-slate-500">We autosave every step. You can close this tab and resume later.</div>
-              </CardContent>
-            </Card>
+  // Step handlers
+  const handleParkProfileSave = async (data: any) => {
+    await saveMutation.mutateAsync({
+      step: "park_profile",
+      data: { campground: data },
+    });
+    setState((prev) => ({
+      ...prev,
+      campground: {
+        id: sessionQuery.data?.session.campgroundId || "",
+        ...data,
+      },
+    }));
+    completeStep("park_profile");
+    goToStep("stripe_connect");
+  };
 
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-sm">Steps</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-2">
-                {onboardingSteps.map((step) => {
-                  const isActive = step.key === activeStep;
-                  const isDone = completed.has(step.key);
-                  return (
-                    <button
-                      key={step.key}
-                      className={cn(
-                        "w-full text-left rounded-lg border px-3 py-2 transition",
-                        isActive ? "border-emerald-500 bg-emerald-50" : "border-slate-200 bg-white",
-                        isDone ? "opacity-100" : "opacity-90"
-                      )}
-                      onClick={() => setActiveStep(step.key)}
-                    >
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <p className="text-sm font-semibold text-slate-900">{step.title}</p>
-                          <p className="text-xs text-slate-500">{step.description}</p>
-                        </div>
-                        {isDone ? (
-                          <span className="text-emerald-600 text-xs font-semibold">Done</span>
-                        ) : null}
-                      </div>
-                    </button>
-                  );
-                })}
-              </CardContent>
-            </Card>
-          </aside>
+  const handleStripeConnect = async (): Promise<string> => {
+    // Call API to create Stripe account link
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_API_BASE}/campgrounds/${sessionQuery.data?.session.campgroundId}/payments/connect`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-Onboarding-Token": token,
+        },
+      }
+    );
+    const result = await response.json();
+    return result.onboardingUrl;
+  };
 
-          <main className="flex-1">
-            <Card>
-              <CardHeader>
-                <CardTitle>{onboardingSteps.find((s) => s.key === activeStep)?.title}</CardTitle>
-                <CardDescription>{onboardingSteps.find((s) => s.key === activeStep)?.description}</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <StepFields
-                  step={activeStep}
-                  value={activeData}
-                  onChange={(updates) => setDraft((prev) => ({ ...prev, [activeStep]: { ...activeData, ...updates } }))}
-                />
+  const handleStripeCheckStatus = async (): Promise<boolean> => {
+    // Check if Stripe is connected
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_API_BASE}/campgrounds/${sessionQuery.data?.session.campgroundId}/payments/status`,
+      {
+        headers: {
+          "X-Onboarding-Token": token,
+        },
+      }
+    );
+    const result = await response.json();
+    return result.connected;
+  };
 
-                <div className="flex items-center justify-between pt-2">
-                  <div className="text-xs text-slate-500">Token: {token.slice(0, 6)}…</div>
-                  <div className="flex gap-2">
-                    <Button
-                      variant="outline"
-                      onClick={() => {
-                        const currentIndex = onboardingStepOrder.indexOf(activeStep);
-                        if (currentIndex > 0) setActiveStep(onboardingStepOrder[currentIndex - 1]);
-                      }}
-                    >
-                      Previous
-                    </Button>
-                    <Button
-                      onClick={() => saveMutation.mutate(draft[activeStep] ?? {})}
-                      disabled={saveMutation.isPending}
-                    >
-                      {saveMutation.isPending ? "Saving..." : "Save & Continue"}
-                    </Button>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </main>
-        </div>
-      </div>
-    </div>
-  );
-}
+  const handleInventoryChoice = (path: "import" | "manual") => {
+    setState((prev) => ({
+      ...prev,
+      inventoryPath: path,
+    }));
+    completeStep("inventory_choice");
+    goToStep(path === "import" ? "data_import" : "site_classes");
+  };
 
-function StepFields({
-  step,
-  value,
-  onChange
-}: {
-  step: OnboardingStepKey;
-  value: Record<string, any>;
-  onChange: (val: Record<string, any>) => void;
-}) {
-  switch (step) {
-    case "account_profile":
-      return (
-        <div className="grid md:grid-cols-2 gap-4">
-          <Field label="Campground name" value={value.campgroundName} onChange={(v) => onChange({ campgroundName: v })} />
-          <Field label="Contact name" value={value.contactName} onChange={(v) => onChange({ contactName: v })} />
-          <Field label="Contact email" value={value.contactEmail} onChange={(v) => onChange({ contactEmail: v })} />
-          <Field label="Phone" value={value.phone} onChange={(v) => onChange({ phone: v })} />
-          <TimezoneField value={value.timezone} onChange={(v) => onChange({ timezone: v })} />
-        </div>
-      );
-    case "payment_gateway":
-      return (
-        <div className="grid md:grid-cols-2 gap-4">
-          <Field label="Gateway provider" value={value.provider} onChange={(v) => onChange({ provider: v })} />
-          <Field label="Account ID (if already connected)" value={value.accountId} onChange={(v) => onChange({ accountId: v })} />
-          <Field label="Payout schedule" value={value.payoutSchedule} onChange={(v) => onChange({ payoutSchedule: v })} />
-        </div>
-      );
-    case "taxes_and_fees":
-      return (
-        <div className="grid md:grid-cols-2 gap-4">
-          <Field label="State/Lodging tax %" value={value.lodgingTaxRate} onChange={(v) => onChange({ lodgingTaxRate: v })} />
-          <Field label="Local tax %" value={value.localTaxRate} onChange={(v) => onChange({ localTaxRate: v })} />
-          <Field label="Fee notes" value={value.feeNotes} onChange={(v) => onChange({ feeNotes: v })} textarea />
-        </div>
-      );
-    case "inventory_sites":
-      return (
-        <div className="grid md:grid-cols-2 gap-4">
-          <Field label="Number of sites" value={value.siteCount} onChange={(v) => onChange({ siteCount: v })} />
-          <Field label="Primary rig types" value={value.primaryRigTypes} onChange={(v) => onChange({ primaryRigTypes: v })} />
-          <SwitchField label="Group sites available" checked={Boolean(value.hasGroups)} onCheckedChange={(checked) => onChange({ hasGroups: checked })} />
-        </div>
-      );
-    case "rates_and_fees":
-      return (
-        <div className="grid md:grid-cols-2 gap-4">
-          <Field label="Base nightly rate" value={value.baseNightlyRate} onChange={(v) => onChange({ baseNightlyRate: v })} />
-          <Field label="Deposit %" value={value.depositPercent} onChange={(v) => onChange({ depositPercent: v })} />
-          <Field label="Add-on notes" value={value.addOnNotes} onChange={(v) => onChange({ addOnNotes: v })} textarea />
-        </div>
-      );
-    case "policies":
-      return (
-        <div className="grid md:grid-cols-2 gap-4">
-          <Field label="Check-in time" value={value.checkInTime} onChange={(v) => onChange({ checkInTime: v })} />
-          <Field label="Check-out time" value={value.checkOutTime} onChange={(v) => onChange({ checkOutTime: v })} />
-          <Field label="Cancellation policy" value={value.cancellationPolicy} onChange={(v) => onChange({ cancellationPolicy: v })} textarea />
-        </div>
-      );
-    case "communications_templates":
-      return (
-        <div className="space-y-4">
-          <SwitchField
-            label="Enable SMS notifications"
-            checked={Boolean(value.enableSms)}
-            onCheckedChange={(checked) => onChange({ enableSms: checked })}
+  const handleSiteClassesSave = async (classes: any[]) => {
+    await saveMutation.mutateAsync({
+      step: "site_classes",
+      data: { siteClasses: classes },
+    });
+    setState((prev) => ({
+      ...prev,
+      siteClasses: classes.map((c, i) => ({
+        id: `temp-${i}`,
+        ...c,
+      })),
+    }));
+    completeStep("site_classes");
+    goToStep("sites_builder");
+  };
+
+  const handleSitesSave = async (sites: any[]) => {
+    await saveMutation.mutateAsync({
+      step: "sites_builder",
+      data: { sites },
+    });
+    setState((prev) => ({
+      ...prev,
+      sites: sites.map((s, i) => ({
+        id: `temp-${i}`,
+        ...s,
+      })),
+    }));
+    completeStep("sites_builder");
+    showCelebration(
+      `${sites.length} Sites Ready!`,
+      "Your inventory is set up",
+      "sites"
+    );
+    setTimeout(() => {
+      hideCelebration();
+      goToStep("rates_setup");
+    }, 2000);
+  };
+
+  const handleDepositPolicySave = async (data: any) => {
+    await saveMutation.mutateAsync({
+      step: "deposit_policy",
+      data: { depositPolicy: data },
+    });
+    setState((prev) => ({
+      ...prev,
+      depositPolicy: data,
+    }));
+    completeStep("deposit_policy");
+    goToStep("review_launch");
+  };
+
+  const handleLaunch = async () => {
+    await saveMutation.mutateAsync({
+      step: "review_launch",
+      data: { launched: true },
+    });
+    completeStep("review_launch");
+    showCelebration(
+      "You're LIVE!",
+      "Your campground is ready to accept bookings",
+      "launch"
+    );
+    setTimeout(() => {
+      // Redirect to dashboard
+      router.push("/dashboard");
+    }, 3000);
+  };
+
+  const handlePreview = () => {
+    // Open booking page in new tab
+    window.open(`/park/${state.campground?.name?.toLowerCase().replace(/\s+/g, "-")}`, "_blank");
+  };
+
+  // Render current step
+  const renderStep = () => {
+    switch (state.currentStep) {
+      case "park_profile":
+        return (
+          <ParkProfile
+            initialData={state.campground}
+            onSave={handleParkProfileSave}
+            onNext={() => goToStep("stripe_connect")}
           />
-          <Field label="Sender name" value={value.senderName} onChange={(v) => onChange({ senderName: v })} />
-          <Field label="Welcome template notes" value={value.welcomeTemplate} onChange={(v) => onChange({ welcomeTemplate: v })} textarea />
-        </div>
-      );
-    case "pos_hardware":
-      return (
-        <div className="space-y-4">
-          <SwitchField
-            label="Card readers/terminals on site"
-            checked={Boolean(value.hasTerminals)}
-            onCheckedChange={(checked) => onChange({ hasTerminals: checked })}
-          />
-          <SwitchField
-            label="Self-serve kiosk planned"
-            checked={Boolean(value.needsKiosk)}
-            onCheckedChange={(checked) => onChange({ needsKiosk: checked })}
-          />
-          <Field label="Preferred provider" value={value.primaryProvider} onChange={(v) => onChange({ primaryProvider: v })} />
-        </div>
-      );
-    case "imports":
-      return (
-        <div className="space-y-4">
-          <Field label="Source PMS or files" value={value.sourceSystem} onChange={(v) => onChange({ sourceSystem: v })} />
-          <SwitchField
-            label="Need data migration help"
-            checked={Boolean(value.needsDataMigration)}
-            onCheckedChange={(checked) => onChange({ needsDataMigration: checked })}
-          />
-          <Field label="Upload/notes" value={value.attachmentsHint} onChange={(v) => onChange({ attachmentsHint: v })} textarea />
-        </div>
-      );
-    default:
-      return null;
-  }
-}
+        );
 
-function Field({
-  label,
-  value,
-  onChange,
-  textarea
-}: {
-  label: string;
-  value: any;
-  onChange: (value: any) => void;
-  textarea?: boolean;
-}) {
-  return (
-    <div className="space-y-2">
-      <Label className="text-sm">{label}</Label>
-      {textarea ? (
-        <Textarea value={value ?? ""} onChange={(e) => onChange(e.target.value)} />
-      ) : (
-        <Input value={value ?? ""} onChange={(e) => onChange(e.target.value)} />
-      )}
-    </div>
-  );
-}
+      case "stripe_connect":
+        return (
+          <StripeConnect
+            campgroundId={sessionQuery.data?.session.campgroundId || ""}
+            isConnected={state.stripeConnected || false}
+            stripeAccountId={state.stripeAccountId}
+            onConnect={handleStripeConnect}
+            onCheckStatus={handleStripeCheckStatus}
+            onNext={() => {
+              completeStep("stripe_connect");
+              goToStep("inventory_choice");
+            }}
+          />
+        );
 
-function SwitchField({
-  label,
-  checked,
-  onCheckedChange
-}: {
-  label: string;
-  checked: boolean;
-  onCheckedChange: (checked: boolean) => void;
-}) {
-  return (
-    <div className="flex items-center justify-between rounded-lg border border-slate-200 bg-white px-3 py-2">
-      <div>
-        <p className="text-sm font-medium text-slate-900">{label}</p>
-      </div>
-      <Switch checked={checked} onCheckedChange={onCheckedChange} />
-    </div>
-  );
-}
+      case "inventory_choice":
+        return <ImportOrManual onSelect={handleInventoryChoice} />;
 
-function TimezoneField({
-  value,
-  onChange
-}: {
-  value: string | undefined;
-  onChange: (value: string) => void;
-}) {
+      case "site_classes":
+        return (
+          <SiteClasses
+            initialClasses={state.siteClasses?.map((c) => ({
+              templateId: c.siteType,
+              name: c.name,
+              siteType: c.siteType,
+              defaultRate: c.defaultRate / 100,
+              maxOccupancy: 6,
+              hookupsPower: true,
+              hookupsWater: true,
+              hookupsSewer: false,
+              petFriendly: true,
+            }))}
+            onSave={handleSiteClassesSave}
+            onNext={() => goToStep("sites_builder")}
+          />
+        );
+
+      case "sites_builder":
+        return (
+          <SitesBuilder
+            siteClasses={
+              state.siteClasses?.map((c) => ({
+                id: c.id,
+                name: c.name,
+                siteType: c.siteType,
+                defaultRate: c.defaultRate,
+              })) || []
+            }
+            initialSites={state.sites}
+            onSave={handleSitesSave}
+            onNext={() => goToStep("rates_setup")}
+          />
+        );
+
+      case "rates_setup":
+        // Simplified - just move to next step
+        // In full implementation, this would have its own component
+        completeStep("rates_setup");
+        goToStep("deposit_policy");
+        return null;
+
+      case "deposit_policy":
+        return (
+          <DepositPolicy
+            initialData={state.depositPolicy as any}
+            onSave={handleDepositPolicySave}
+            onNext={() => goToStep("review_launch")}
+          />
+        );
+
+      case "review_launch":
+        return (
+          <ReviewLaunch
+            summary={{
+              campground: state.campground || { name: "", city: "", state: "" },
+              stripeConnected: state.stripeConnected || false,
+              siteClasses: state.siteClasses?.length || 0,
+              sites: state.sites?.length || 0,
+              depositPolicy:
+                state.depositPolicy?.strategy === "first_night"
+                  ? "First Night Deposit"
+                  : state.depositPolicy?.strategy === "full"
+                    ? "Full Payment"
+                    : "50% Deposit",
+              taxRulesCount: 0,
+            }}
+            onLaunch={handleLaunch}
+            onPreview={handlePreview}
+          />
+        );
+
+      default:
+        return (
+          <div className="text-center text-slate-400">
+            Step not implemented yet: {state.currentStep}
+          </div>
+        );
+    }
+  };
+
   return (
-    <div className="space-y-2">
-      <Label className="text-sm">Timezone</Label>
-      <Select value={value || ""} onValueChange={onChange}>
-        <SelectTrigger>
-          <SelectValue placeholder="Select timezone" />
-        </SelectTrigger>
-        <SelectContent>
-          {US_TIMEZONES.map((tz) => (
-            <SelectItem key={tz.value} value={tz.value}>
-              {tz.label}
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
+    <div className="min-h-screen bg-slate-900 flex">
+      {/* Sidebar */}
+      <SetupProgress
+        currentStep={state.currentStep}
+        completedSteps={state.completedSteps}
+        inventoryPath={state.inventoryPath}
+        onStepClick={(step) => {
+          const currentIndex = onboardingSteps.findIndex(
+            (s) => s.key === state.currentStep
+          );
+          const targetIndex = onboardingSteps.findIndex((s) => s.key === step);
+          goToStep(step, targetIndex < currentIndex ? "backward" : "forward");
+        }}
+      />
+
+      {/* Main content */}
+      <main className="flex-1 flex flex-col">
+        <StepContainer
+          currentStep={state.currentStep}
+          direction={state.direction}
+        >
+          {renderStep()}
+        </StepContainer>
+      </main>
+
+      {/* Celebration overlay */}
+      <SetupCelebration
+        show={celebration.show}
+        title={celebration.title}
+        subtitle={celebration.subtitle}
+        type={celebration.type}
+        onComplete={hideCelebration}
+        duration={celebration.type === "launch" ? 3000 : 2000}
+      />
     </div>
   );
 }

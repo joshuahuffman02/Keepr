@@ -1,26 +1,58 @@
 export type OnboardingStepKey =
-  | "account_profile"
-  | "payment_gateway"
-  | "taxes_and_fees"
-  | "inventory_sites"
-  | "rates_and_fees"
-  | "policies"
-  | "communications_templates"
-  | "pos_hardware"
-  | "imports";
+  | "park_profile"
+  | "stripe_connect"
+  | "inventory_choice"
+  | "data_import"
+  | "site_classes"
+  | "sites_builder"
+  | "rates_setup"
+  | "tax_rules"
+  | "deposit_policy"
+  | "park_rules"
+  | "review_launch";
 
-export const ONBOARDING_STEPS: { key: OnboardingStepKey; title: string; description: string }[] = [
-  { key: "account_profile", title: "Account & profile", description: "Contact info, timezone, and branding basics." },
-  { key: "payment_gateway", title: "Payments", description: "Choose your gateway and payout details." },
-  { key: "taxes_and_fees", title: "Taxes & fees", description: "Set tax rates, service and platform fees." },
-  { key: "inventory_sites", title: "Inventory & sites", description: "Add sites, classes, and capacity." },
-  { key: "rates_and_fees", title: "Rates", description: "Base rates, deposits, and adjustments." },
-  { key: "policies", title: "Policies", description: "Check-in/out, cancellations, quiet hours." },
-  { key: "communications_templates", title: "Communications", description: "Default emails/SMS, sender identity." },
-  { key: "pos_hardware", title: "POS hardware", description: "Card readers, kiosks, printers, networks." },
-  { key: "imports", title: "Imports", description: "Legacy data, PMS exports, docs to import." },
+export type OnboardingPhase = "foundation" | "inventory" | "pricing" | "rules" | "launch";
+
+export interface OnboardingStep {
+  key: OnboardingStepKey;
+  title: string;
+  description: string;
+  phase: OnboardingPhase;
+  required: boolean;
+}
+
+export const ONBOARDING_STEPS: OnboardingStep[] = [
+  // Phase 1: Foundation
+  { key: "park_profile", title: "Your Campground", description: "Basic info and location", phase: "foundation", required: true },
+  { key: "stripe_connect", title: "Accept Payments", description: "Connect Stripe account", phase: "foundation", required: true },
+  // Phase 2: Inventory
+  { key: "inventory_choice", title: "Your Sites", description: "Import or build manually", phase: "inventory", required: true },
+  { key: "data_import", title: "Import Data", description: "Upload from CSV", phase: "inventory", required: false },
+  { key: "site_classes", title: "Site Types", description: "Define accommodation types", phase: "inventory", required: false },
+  { key: "sites_builder", title: "Add Sites", description: "Create bookable inventory", phase: "inventory", required: false },
+  // Phase 3: Pricing
+  { key: "rates_setup", title: "Pricing", description: "Set rates per site type", phase: "pricing", required: true },
+  // Phase 4: Rules & Policies
+  { key: "tax_rules", title: "Taxes", description: "Configure tax rules", phase: "rules", required: false },
+  { key: "deposit_policy", title: "Deposits", description: "Payment collection rules", phase: "rules", required: true },
+  { key: "park_rules", title: "Park Rules", description: "Guest policies", phase: "rules", required: false },
+  // Phase 5: Launch
+  { key: "review_launch", title: "Go Live", description: "Review and launch", phase: "launch", required: true },
 ];
 
 export const ONBOARDING_STEP_ORDER = ONBOARDING_STEPS.map((s) => s.key);
 
 export const ONBOARDING_TOTAL_STEPS = ONBOARDING_STEP_ORDER.length;
+
+// Map old step keys to new ones for backwards compatibility
+export const LEGACY_STEP_MAPPING: Record<string, OnboardingStepKey> = {
+  account_profile: "park_profile",
+  payment_gateway: "stripe_connect",
+  inventory_sites: "inventory_choice",
+  rates_and_fees: "rates_setup",
+  taxes_and_fees: "tax_rules",
+  policies: "deposit_policy",
+  communications_templates: "park_rules",
+  pos_hardware: "park_rules",
+  imports: "data_import",
+};

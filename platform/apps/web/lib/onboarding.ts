@@ -1,24 +1,220 @@
 export type OnboardingStepKey =
-  | "account_profile"
-  | "payment_gateway"
-  | "taxes_and_fees"
-  | "inventory_sites"
-  | "rates_and_fees"
-  | "policies"
-  | "communications_templates"
-  | "pos_hardware"
-  | "imports";
+  | "park_profile"
+  | "stripe_connect"
+  | "inventory_choice"
+  | "data_import"
+  | "site_classes"
+  | "sites_builder"
+  | "rates_setup"
+  | "tax_rules"
+  | "deposit_policy"
+  | "park_rules"
+  | "review_launch";
 
-export const onboardingSteps: { key: OnboardingStepKey; title: string; description: string }[] = [
-  { key: "account_profile", title: "Account & profile", description: "Contact info, timezone, branding basics." },
-  { key: "payment_gateway", title: "Payments", description: "Select gateway and payout destination." },
-  { key: "taxes_and_fees", title: "Taxes & fees", description: "State/local rates and service fees." },
-  { key: "inventory_sites", title: "Inventory & sites", description: "Site counts, types, and capacities." },
-  { key: "rates_and_fees", title: "Rates", description: "Base rates, deposits, add-on fees." },
-  { key: "policies", title: "Policies", description: "Check-in/out, cancellation, quiet hours." },
-  { key: "communications_templates", title: "Comms", description: "Default emails/SMS and sender name." },
-  { key: "pos_hardware", title: "POS hardware", description: "Terminals, kiosks, printers, networks." },
-  { key: "imports", title: "Imports", description: "Legacy PMS exports and files to ingest." },
+export type OnboardingPhase = "foundation" | "inventory" | "pricing" | "rules" | "launch";
+
+export interface OnboardingStep {
+  key: OnboardingStepKey;
+  title: string;
+  description: string;
+  phase: OnboardingPhase;
+  required: boolean;
+  celebration?: {
+    title: string;
+    subtitle?: string;
+  };
+}
+
+export const onboardingSteps: OnboardingStep[] = [
+  // Phase 1: Foundation
+  {
+    key: "park_profile",
+    title: "Your Campground",
+    description: "Let's get the basics set up",
+    phase: "foundation",
+    required: true,
+  },
+  {
+    key: "stripe_connect",
+    title: "Accept Payments",
+    description: "Connect your Stripe account",
+    phase: "foundation",
+    required: true,
+    celebration: {
+      title: "Payments Ready!",
+      subtitle: "You can now accept credit cards, ACH, and more",
+    },
+  },
+  // Phase 2: Inventory
+  {
+    key: "inventory_choice",
+    title: "Your Sites",
+    description: "Import existing data or start fresh",
+    phase: "inventory",
+    required: true,
+  },
+  {
+    key: "data_import",
+    title: "Import Data",
+    description: "Upload your sites from CSV or another system",
+    phase: "inventory",
+    required: false, // Only if they chose import path
+  },
+  {
+    key: "site_classes",
+    title: "Site Types",
+    description: "Define your accommodation categories",
+    phase: "inventory",
+    required: false, // Only if they chose manual path
+  },
+  {
+    key: "sites_builder",
+    title: "Add Sites",
+    description: "Create your bookable inventory",
+    phase: "inventory",
+    required: false, // Only if manual path
+    celebration: {
+      title: "Sites Ready!",
+      subtitle: "Your inventory is set up and ready for bookings",
+    },
+  },
+  // Phase 3: Pricing
+  {
+    key: "rates_setup",
+    title: "Pricing",
+    description: "Set rates for each site type",
+    phase: "pricing",
+    required: true,
+  },
+  // Phase 4: Rules & Policies
+  {
+    key: "tax_rules",
+    title: "Taxes",
+    description: "Configure lodging and local taxes",
+    phase: "rules",
+    required: false,
+  },
+  {
+    key: "deposit_policy",
+    title: "Deposits",
+    description: "How much to collect upfront",
+    phase: "rules",
+    required: true,
+  },
+  {
+    key: "park_rules",
+    title: "Park Rules",
+    description: "Policies guests must acknowledge",
+    phase: "rules",
+    required: false,
+  },
+  // Phase 5: Launch
+  {
+    key: "review_launch",
+    title: "Go Live",
+    description: "Review everything and launch",
+    phase: "launch",
+    required: true,
+    celebration: {
+      title: "You're LIVE!",
+      subtitle: "Your campground is ready to accept bookings",
+    },
+  },
 ];
 
 export const onboardingStepOrder = onboardingSteps.map((s) => s.key);
+
+export const phaseLabels: Record<OnboardingPhase, string> = {
+  foundation: "Getting Started",
+  inventory: "Your Sites",
+  pricing: "Pricing",
+  rules: "Rules & Policies",
+  launch: "Go Live",
+};
+
+// Site class templates for quick setup
+export const siteClassTemplates = [
+  {
+    id: "full_hookup_rv",
+    name: "Full Hookup RV",
+    siteType: "rv" as const,
+    icon: "Truck",
+    description: "RV sites with power, water, and sewer",
+    defaults: {
+      hookupsPower: true,
+      hookupsWater: true,
+      hookupsSewer: true,
+      maxOccupancy: 6,
+      rigMaxLength: 45,
+      petFriendly: true,
+    },
+  },
+  {
+    id: "backin_rv",
+    name: "Back-in RV",
+    siteType: "rv" as const,
+    icon: "Truck",
+    description: "Standard RV sites with electric and water",
+    defaults: {
+      hookupsPower: true,
+      hookupsWater: true,
+      hookupsSewer: false,
+      maxOccupancy: 6,
+      rigMaxLength: 35,
+      petFriendly: true,
+    },
+  },
+  {
+    id: "tent",
+    name: "Tent Site",
+    siteType: "tent" as const,
+    icon: "Tent",
+    description: "Primitive sites for tent camping",
+    defaults: {
+      hookupsPower: false,
+      hookupsWater: false,
+      hookupsSewer: false,
+      maxOccupancy: 4,
+      petFriendly: true,
+    },
+  },
+  {
+    id: "cabin",
+    name: "Cabin",
+    siteType: "cabin" as const,
+    icon: "Home",
+    description: "Rustic cabins with beds and amenities",
+    defaults: {
+      hookupsPower: true,
+      hookupsWater: true,
+      hookupsSewer: true,
+      maxOccupancy: 4,
+      petFriendly: false,
+    },
+  },
+  {
+    id: "glamping",
+    name: "Glamping",
+    siteType: "yurt" as const,
+    icon: "Sparkles",
+    description: "Yurts, safari tents, or unique stays",
+    defaults: {
+      hookupsPower: true,
+      hookupsWater: false,
+      hookupsSewer: false,
+      maxOccupancy: 4,
+      petFriendly: false,
+    },
+  },
+];
+
+// US Timezones for dropdown
+export const US_TIMEZONES = [
+  { value: "America/New_York", label: "Eastern (ET)" },
+  { value: "America/Chicago", label: "Central (CT)" },
+  { value: "America/Denver", label: "Mountain (MT)" },
+  { value: "America/Phoenix", label: "Arizona (no DST)" },
+  { value: "America/Los_Angeles", label: "Pacific (PT)" },
+  { value: "America/Anchorage", label: "Alaska (AKT)" },
+  { value: "Pacific/Honolulu", label: "Hawaii (HST)" },
+] as const;
