@@ -1,8 +1,9 @@
-import { Injectable, Logger } from "@nestjs/common";
+import { Injectable, Logger, Inject, forwardRef } from "@nestjs/common";
 import { Cron, CronExpression } from "@nestjs/schedule";
 import { Prisma, ExpirationTier } from "@prisma/client";
 import { PrismaService } from "../prisma/prisma.service";
 import { BatchInventoryService } from "./batch-inventory.service";
+import { WebhookService, WebhookEvent } from "../developer-api/webhook.service";
 
 interface ExpirationAlertData {
     batchId: string;
@@ -21,7 +22,8 @@ export class ExpirationAlertService {
 
     constructor(
         private readonly prisma: PrismaService,
-        private readonly batchInventory: BatchInventoryService
+        private readonly batchInventory: BatchInventoryService,
+        private readonly webhookService: WebhookService
     ) {}
 
     // ==================== SCHEDULED JOBS ====================
@@ -81,6 +83,7 @@ export class ExpirationAlertService {
                     select: {
                         id: true,
                         name: true,
+                        sku: true,
                         categoryId: true,
                         category: true,
                         expirationConfigs: { where: { campgroundId } },
@@ -138,6 +141,23 @@ export class ExpirationAlertService {
                         qtyRemaining: batch.qtyRemaining,
                     },
                 });
+
+                // Emit webhook event for new alert
+                const webhookEventType = this.getWebhookEventForTier(tier);
+                if (webhookEventType) {
+                    await this.webhookService.emit(webhookEventType, campgroundId, {
+                        batchId: batch.id,
+                        productId: batch.productId,
+                        productSku: batch.product.sku,
+                        productName: batch.product.name,
+                        expirationDate: batch.expirationDate!.toISOString(),
+                        daysUntilExpiration: daysRemaining,
+                        qtyRemaining: batch.qtyRemaining,
+                        locationId: batch.location?.id ?? null,
+                        locationName: batch.location?.name ?? null,
+                        tier,
+                    });
+                }
             }
         }
 
@@ -338,5 +358,23 @@ export class ExpirationAlertService {
             })),
             summary,
         };
+    }
+
+    // ==================== PRIVATE HELPERS ====================
+
+    /**
+     * Map expiration tier to webhook event type.
+     */
+    private getWebhookEventForTier(tier: ExpirationTier): WebhookEvent | null {
+        switch (tier) {
+            case ExpirationTier.warning:
+                return "inventory.expiration.warning";
+            case ExpirationTier.critical:
+                return "inventory.expiration.critical";
+            case ExpirationTier.expired:
+                return "inventory.expiration.expired";
+            default:
+                return null;
+        }
     }
 }

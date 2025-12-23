@@ -5,6 +5,7 @@ import {
 } from "@nestjs/common";
 import { Prisma, MarkdownScope, MarkdownDiscountType } from "@prisma/client";
 import { PrismaService } from "../prisma/prisma.service";
+import { WebhookService } from "../developer-api/webhook.service";
 import {
     CreateMarkdownRuleDto,
     UpdateMarkdownRuleDto,
@@ -14,7 +15,10 @@ import {
 
 @Injectable()
 export class MarkdownRulesService {
-    constructor(private readonly prisma: PrismaService) {}
+    constructor(
+        private readonly prisma: PrismaService,
+        private readonly webhookService: WebhookService
+    ) {}
 
     // ==================== RULE CRUD ====================
 
@@ -263,7 +267,15 @@ export class MarkdownRulesService {
         qty: number,
         daysUntilExpiration: number
     ) {
-        return this.prisma.markdownApplication.create({
+        // Get batch and product info for webhook
+        const batch = await this.prisma.inventoryBatch.findUnique({
+            where: { id: batchId },
+            include: {
+                product: { select: { id: true, name: true, sku: true } },
+            },
+        });
+
+        const application = await this.prisma.markdownApplication.create({
             data: {
                 campgroundId,
                 markdownRuleId: ruleId,
@@ -276,6 +288,26 @@ export class MarkdownRulesService {
                 daysUntilExpiration,
             },
         });
+
+        // Emit webhook event for markdown application
+        if (batch) {
+            await this.webhookService.emit("markdown.rule.applied", campgroundId, {
+                applicationId: application.id,
+                ruleId,
+                batchId,
+                productId: batch.productId,
+                productSku: batch.product.sku,
+                productName: batch.product.name,
+                originalPriceCents,
+                markdownPriceCents,
+                discountCents: originalPriceCents - markdownPriceCents,
+                discountPercent: Math.round(((originalPriceCents - markdownPriceCents) / originalPriceCents) * 100),
+                qty,
+                daysUntilExpiration,
+            });
+        }
+
+        return application;
     }
 
     // ==================== PREVIEW & REPORTING ====================

@@ -37,7 +37,16 @@ export type WebhookEvent =
   | "order.refunded"
   // Messaging
   | "message.received"
-  | "message.sent";
+  | "message.sent"
+  // Inventory & Expiration (3rd Party POS Integration)
+  | "inventory.expiration.warning"
+  | "inventory.expiration.critical"
+  | "inventory.expiration.expired"
+  | "inventory.batch.received"
+  | "inventory.batch.depleted"
+  | "inventory.low_stock"
+  | "markdown.rule.applied"
+  | "product.price.changed";
 
 // Retry configuration
 const RETRY_DELAYS_MS = [

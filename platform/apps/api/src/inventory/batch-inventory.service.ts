@@ -6,6 +6,7 @@ import {
 } from "@nestjs/common";
 import { Prisma, ExpirationTier } from "@prisma/client";
 import { PrismaService } from "../prisma/prisma.service";
+import { WebhookService } from "../developer-api/webhook.service";
 import {
     CreateBatchDto,
     UpdateBatchDto,
@@ -45,7 +46,10 @@ export class ExpiredBatchException extends BadRequestException {
 
 @Injectable()
 export class BatchInventoryService {
-    constructor(private readonly prisma: PrismaService) {}
+    constructor(
+        private readonly prisma: PrismaService,
+        private readonly webhookService: WebhookService
+    ) {}
 
     // ==================== BATCH CRUD ====================
 
@@ -113,6 +117,19 @@ export class BatchInventoryService {
 
             return batch;
         });
+
+        // Emit webhook event for batch received
+        await this.webhookService.emit("inventory.batch.received", campgroundId, {
+            batchId: batch.id,
+            productId: dto.productId,
+            productName: product.name,
+            batchNumber: dto.batchNumber ?? null,
+            qtyReceived: dto.qtyReceived,
+            expirationDate: dto.expirationDate?.toISOString() ?? null,
+            locationId: dto.locationId ?? null,
+        });
+
+        return batch;
     }
 
     async getBatch(id: string) {
@@ -230,15 +247,20 @@ export class BatchInventoryService {
         dto: DisposeBatchDto,
         actorUserId: string
     ) {
-        const batch = await this.prisma.inventoryBatch.findUnique({ where: { id } });
+        const batch = await this.prisma.inventoryBatch.findUnique({
+            where: { id },
+            include: {
+                product: { select: { id: true, name: true } },
+            },
+        });
         if (!batch) throw new NotFoundException("Batch not found");
 
         if (batch.qtyRemaining === 0) {
             throw new ConflictException("Batch is already depleted");
         }
 
-        return this.prisma.$transaction(async (tx: Prisma.TransactionClient) => {
-            const updatedBatch = await tx.inventoryBatch.update({
+        const updatedBatch = await this.prisma.$transaction(async (tx: Prisma.TransactionClient) => {
+            const updated = await tx.inventoryBatch.update({
                 where: { id },
                 data: {
                     qtyRemaining: 0,
@@ -261,8 +283,21 @@ export class BatchInventoryService {
                 },
             });
 
-            return updatedBatch;
+            return updated;
         });
+
+        // Emit webhook event for batch depleted (via disposal)
+        await this.webhookService.emit("inventory.batch.depleted", batch.campgroundId, {
+            batchId: batch.id,
+            productId: batch.productId,
+            productName: batch.product.name,
+            batchNumber: batch.batchNumber,
+            locationId: batch.locationId,
+            reason: "disposal",
+            disposalReason: dto.reason,
+        });
+
+        return updatedBatch;
     }
 
     // ==================== FEFO ALLOCATION ====================
@@ -362,10 +397,22 @@ export class BatchInventoryService {
         referenceType?: string,
         referenceId?: string
     ): Promise<void> {
+        // Track depleted batches for webhook emission after transaction
+        const depletedBatches: Array<{
+            batchId: string;
+            productId: string;
+            productName: string;
+            locationId: string | null;
+            batchNumber: string | null;
+        }> = [];
+
         await this.prisma.$transaction(async (tx: Prisma.TransactionClient) => {
             for (const alloc of allocations) {
                 const batch = await tx.inventoryBatch.findUnique({
                     where: { id: alloc.batchId },
+                    include: {
+                        product: { select: { name: true } },
+                    },
                 });
 
                 if (!batch) continue;
@@ -382,6 +429,17 @@ export class BatchInventoryService {
                         depletedAt: isDepleted ? new Date() : null,
                     },
                 });
+
+                // Track depleted batches for webhook
+                if (isDepleted) {
+                    depletedBatches.push({
+                        batchId: batch.id,
+                        productId: batch.productId,
+                        productName: batch.product.name,
+                        locationId: batch.locationId,
+                        batchNumber: batch.batchNumber,
+                    });
+                }
 
                 // Create inventory movement
                 const movement = await tx.inventoryMovement.create({
@@ -416,6 +474,17 @@ export class BatchInventoryService {
                 });
             }
         });
+
+        // Emit webhook events for depleted batches after transaction commits
+        for (const depleted of depletedBatches) {
+            await this.webhookService.emit("inventory.batch.depleted", campgroundId, {
+                batchId: depleted.batchId,
+                productId: depleted.productId,
+                productName: depleted.productName,
+                batchNumber: depleted.batchNumber,
+                locationId: depleted.locationId,
+            });
+        }
     }
 
     /**

@@ -12,7 +12,15 @@ import { AuditService } from "../audit/audit.service";
 import { PosProviderController } from "./pos-provider.controller";
 import { PosProviderService } from "./pos-provider.service";
 import { PosProviderRegistry } from "./pos-provider.registry";
-import { CloverAdapter, SquareAdapter, ToastAdapter } from "./pos-provider.adapters";
+import { InventorySyncService } from "./inventory-sync.service";
+import {
+  CloverAdapter,
+  SquareAdapter,
+  ToastAdapter,
+  LightspeedAdapter,
+  ShopifyPosAdapter,
+  VendAdapter,
+} from "./pos-provider.adapters";
 import { EmailService } from "../email/email.service";
 import { InventoryModule } from "../inventory/inventory.module";
 
@@ -29,11 +37,15 @@ import { InventoryModule } from "../inventory/inventory.module";
     AuditService,
     PosProviderService,
     PosProviderRegistry,
+    InventorySyncService,
     CloverAdapter,
     SquareAdapter,
     ToastAdapter,
+    LightspeedAdapter,
+    ShopifyPosAdapter,
+    VendAdapter,
     EmailService
   ],
-  exports: [PosService, TillService, PosProviderService]
+  exports: [PosService, TillService, PosProviderService, InventorySyncService, PosProviderRegistry]
 })
 export class PosModule {}

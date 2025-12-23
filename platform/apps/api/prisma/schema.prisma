@@ -1192,6 +1192,10 @@ model Campground {
   markdownApplications       MarkdownApplication[]
   expirationAlerts           ExpirationAlert[]
 
+  // 3rd party POS integration relations
+  externalPosSales           ExternalPosSale[]
+  productExternalMappings    ProductExternalMapping[]
+
   // Soft delete
   deletedAt DateTime?
   deletedBy String?
@@ -2867,6 +2871,9 @@ model Product {
   expirationConfigs ProductExpirationConfig[]
   markdownRules     MarkdownRule[]
 
+  // 3rd party POS integration
+  externalMappings  ProductExternalMapping[]
+
   @@index([campgroundId])
   @@index([categoryId])
 }
@@ -4136,6 +4143,7 @@ model ApiClient {
   tokens           ApiToken[]
   webhookEndpoints WebhookEndpoint[]
   apiUsage         ApiUsage[]
+  externalPosSales ExternalPosSale[]
 
   @@index([campgroundId])
 }
@@ -5611,12 +5619,19 @@ enum PosProviderType {
   clover
   square
   toast
+  lightspeed
+  shopify
+  vend
 }
 
 enum PosProviderCapability {
   payments
   items_sync
   receipts
+  inventory_push
+  inventory_pull
+  markdown_sync
+  expiration_sync
 }
 
 enum PosIntegrationStatus {
@@ -5629,6 +5644,8 @@ enum PosSyncTarget {
   catalog
   tenders
   payments
+  inventory
+  markdowns
 }
 
 enum PosSyncStatus {
@@ -6788,6 +6805,7 @@ model StoreLocation {
   transfersIn       InventoryTransfer[]    @relation("TransferTo")
   inventoryMovements InventoryMovement[]
   inventoryBatches  InventoryBatch[]
+  externalPosSales  ExternalPosSale[]
 
   @@unique([campgroundId, name])
   @@index([campgroundId])
@@ -7364,4 +7382,62 @@ model GroupBooking {
   @@index([campgroundId])
   @@index([primaryGuestId])
   @@index([assignmentStatus])
+}
+
+// =============================================================================
+// 3RD PARTY POS INTEGRATION MODELS
+// =============================================================================
+
+// Records sales from external POS systems (via Partner API)
+model ExternalPosSale {
+  id                    String    @id @default(cuid())
+  campgroundId          String
+  externalTransactionId String
+  provider              String?   // "partner_api" | "lightspeed" | "shopify" etc
+  apiClientId           String?   // Which API client recorded this sale
+
+  items                 Json      // Array of { sku, qty, priceCents, batchId?, markdownApplied? }
+  totalCents            Int
+  paymentMethod         String?
+  locationId            String?
+
+  inventoryDeducted     Boolean   @default(false)
+  saleDate              DateTime
+  metadata              Json?     // Additional provider-specific data
+
+  createdAt             DateTime  @default(now())
+
+  campground            Campground     @relation(fields: [campgroundId], references: [id], onDelete: Cascade)
+  location              StoreLocation? @relation(fields: [locationId], references: [id], onDelete: SetNull)
+  apiClient             ApiClient?     @relation(fields: [apiClientId], references: [id], onDelete: SetNull)
+
+  @@unique([campgroundId, externalTransactionId])
+  @@index([campgroundId, saleDate])
+  @@index([apiClientId])
+}
+
+// Maps internal products to external POS system product IDs
+model ProductExternalMapping {
+  id             String    @id @default(cuid())
+  campgroundId   String
+  productId      String
+  provider       PosProviderType
+  externalId     String    // ID in external system
+  externalSku    String?   // SKU in external system
+
+  lastSyncedAt   DateTime?
+  syncStatus     String?   // "synced" | "pending" | "error"
+  syncError      String?
+  metadata       Json?     // Provider-specific mapping data
+
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  campground     Campground @relation(fields: [campgroundId], references: [id], onDelete: Cascade)
+  product        Product    @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@unique([campgroundId, provider, externalId])
+  @@unique([campgroundId, provider, productId])
+  @@index([campgroundId, provider])
+  @@index([productId])
 }

@@ -103,6 +103,7 @@ import { DataImportModule } from "./data-import/data-import.module";
 import { OrgReferralsModule } from "./org-referrals/org-referrals.module";
 import { SetupServicesModule } from "./setup-services/setup-services.module";
 import { InventoryModule } from "./inventory/inventory.module";
+import { PartnerApiModule } from "./partner-api/partner-api.module";
 
 @Module({
   imports: [
@@ -210,6 +211,7 @@ import { InventoryModule } from "./inventory/inventory.module";
     DataImportModule,
     OrgReferralsModule,
     SetupServicesModule,
+    PartnerApiModule,
   ],
   providers: []
 })
