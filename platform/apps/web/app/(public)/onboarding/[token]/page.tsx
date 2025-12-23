@@ -93,6 +93,13 @@ export default function OnboardingPage() {
   }
 
   if (sessionQuery.error || !sessionQuery.data) {
+    console.log("[onboarding] Error state:", {
+      error: sessionQuery.error,
+      data: sessionQuery.data,
+      isLoading: sessionQuery.isLoading,
+      status: sessionQuery.status,
+      fetchStatus: sessionQuery.fetchStatus
+    });
     return (
       <div className="min-h-screen bg-slate-50 flex items-center justify-center">
         <Card className="max-w-lg w-full">
