@@ -1,6 +1,15 @@
 import { Injectable, NotFoundException, BadRequestException } from "@nestjs/common";
 import { PrismaService } from "../prisma/prisma.service";
-import { SetupServiceType, SetupServiceStatus } from "../generated/prisma";
+
+// Define types locally to avoid Prisma import issues at runtime
+type SetupServiceType =
+  | "quick_start"
+  | "data_import_500"
+  | "data_import_2000"
+  | "data_import_5000"
+  | "data_import_custom";
+
+type SetupServiceStatus = "pending" | "in_progress" | "completed" | "cancelled";
 
 // Pricing configuration (in cents)
 const SETUP_SERVICE_PRICING: Record<SetupServiceType, number> = {

@@ -10,7 +10,8 @@ import {
 import { SetupServicesService } from "./setup-services.service";
 import { JwtAuthGuard } from "../auth/guards/jwt-auth.guard";
 import { PurchaseSetupServiceDto } from "./dto/purchase-setup-service.dto";
-import { SetupServiceStatus } from "../generated/prisma";
+
+type SetupServiceStatus = "pending" | "in_progress" | "completed" | "cancelled";
 
 @Controller()
 export class SetupServicesController {

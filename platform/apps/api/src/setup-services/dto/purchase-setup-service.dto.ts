@@ -1,8 +1,18 @@
-import { IsEnum, IsBoolean, IsOptional, IsInt, IsString, Min } from "class-validator";
-import { SetupServiceType } from "../../generated/prisma";
+import { IsBoolean, IsOptional, IsInt, IsString, Min, IsIn } from "class-validator";
+
+// Define the enum values directly to avoid Prisma import issues at runtime
+const SETUP_SERVICE_TYPES = [
+  "quick_start",
+  "data_import_500",
+  "data_import_2000",
+  "data_import_5000",
+  "data_import_custom",
+] as const;
+
+export type SetupServiceType = (typeof SETUP_SERVICE_TYPES)[number];
 
 export class PurchaseSetupServiceDto {
-  @IsEnum(SetupServiceType)
+  @IsIn(SETUP_SERVICE_TYPES)
   serviceType: SetupServiceType;
 
   @IsBoolean()
