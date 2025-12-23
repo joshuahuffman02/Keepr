@@ -1,6 +1,7 @@
 "use client";
 
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useState } from "react";
 import { useCampground } from "@/contexts/CampgroundContext";
 import { DashboardShell } from "@/components/ui/layout/DashboardShell";
 import {
@@ -17,6 +18,10 @@ import {
   Crown,
   Rocket,
   Star,
+  Wrench,
+  Database,
+  Headphones,
+  Loader2,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
@@ -74,7 +79,34 @@ interface BillingSummary {
     smsOutbound: number;
     smsInbound: number;
     aiTokens: number;
+    setupServiceSurchargeCount: number;
+    setupServiceSurchargeCents: number;
   };
+  setupServices: {
+    activeWithBalance: Array<{
+      id: string;
+      serviceType: string;
+      totalCents: number;
+      balanceRemainingCents: number;
+      bookingsCharged: number;
+    }>;
+    totalBalanceRemainingCents: number;
+  };
+}
+
+interface SetupService {
+  id: string;
+  serviceType: string;
+  status: string;
+  totalCents: number;
+  paidUpfrontCents: number;
+  balanceRemainingCents: number;
+  perBookingSurchargeCents: number;
+  bookingsCharged: number;
+  displayName: string;
+  isPaidOff: boolean;
+  progressPercent: number;
+  createdAt: string;
 }
 
 interface BillingPeriod {
@@ -194,6 +226,58 @@ export default function BillingPage() {
       return res.json();
     },
     enabled: !!organizationId,
+  });
+
+  // Setup services
+  const { data: setupServices } = useQuery<SetupService[]>({
+    queryKey: ["setup-services", organizationId],
+    queryFn: async () => {
+      const res = await fetch(
+        `${API_BASE}/organizations/${organizationId}/setup-services`,
+        {
+          headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+        }
+      );
+      if (!res.ok) throw new Error("Failed to fetch setup services");
+      return res.json();
+    },
+    enabled: !!organizationId,
+  });
+
+  const queryClient = useQueryClient();
+  const [purchaseType, setPurchaseType] = useState<string | null>(null);
+  const [payUpfront, setPayUpfront] = useState(true);
+
+  const purchaseMutation = useMutation({
+    mutationFn: async ({
+      serviceType,
+      payUpfront,
+    }: {
+      serviceType: string;
+      payUpfront: boolean;
+    }) => {
+      const res = await fetch(
+        `${API_BASE}/organizations/${organizationId}/setup-services`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+          body: JSON.stringify({ serviceType, payUpfront }),
+        }
+      );
+      if (!res.ok) {
+        const error = await res.json();
+        throw new Error(error.message || "Failed to purchase");
+      }
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["setup-services"] });
+      queryClient.invalidateQueries({ queryKey: ["billing-summary"] });
+      setPurchaseType(null);
+    },
   });
 
   if (!organizationId) {
@@ -450,6 +534,208 @@ export default function BillingPage() {
                 </p>
               </div>
             </div>
+
+            {/* Setup Services Section */}
+            <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+              <div className="p-6 border-b border-slate-100">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 bg-blue-50 rounded-lg flex items-center justify-center">
+                      <Wrench className="h-5 w-5 text-blue-600" />
+                    </div>
+                    <div>
+                      <h3 className="text-lg font-semibold text-slate-900">
+                        Setup Assistance
+                      </h3>
+                      <p className="text-sm text-slate-500">
+                        Need help getting set up? We&apos;ve got you covered.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Active Setup Services with Balance */}
+              {setupServices && setupServices.filter(s => s.balanceRemainingCents > 0).length > 0 && (
+                <div className="p-6 border-b border-slate-100 bg-blue-50/50">
+                  <h4 className="text-sm font-semibold text-slate-700 mb-4">
+                    Pay-Over-Time Balance
+                  </h4>
+                  <div className="space-y-4">
+                    {setupServices
+                      .filter((s) => s.balanceRemainingCents > 0)
+                      .map((service) => (
+                        <div
+                          key={service.id}
+                          className="bg-white rounded-lg p-4 border border-slate-200"
+                        >
+                          <div className="flex items-center justify-between mb-2">
+                            <span className="font-medium text-slate-900">
+                              {service.displayName}
+                            </span>
+                            <span className="text-sm text-slate-600">
+                              {formatCents(service.balanceRemainingCents)} remaining
+                            </span>
+                          </div>
+                          <div className="h-2 bg-slate-100 rounded-full overflow-hidden">
+                            <div
+                              className="h-full bg-blue-500 rounded-full transition-all"
+                              style={{ width: `${service.progressPercent}%` }}
+                            />
+                          </div>
+                          <p className="text-xs text-slate-500 mt-2">
+                            {service.bookingsCharged} bookings charged @ $1.00 each
+                            {" • "}
+                            {Math.ceil(service.balanceRemainingCents / 100)} bookings to go
+                          </p>
+                        </div>
+                      ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Purchase Options */}
+              <div className="p-6">
+                <div className="grid md:grid-cols-2 gap-4">
+                  {/* Quick Start */}
+                  <div className="border border-slate-200 rounded-xl p-5 hover:border-blue-300 transition-colors">
+                    <div className="flex items-center gap-3 mb-3">
+                      <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
+                        <Headphones className="h-5 w-5 text-blue-600" />
+                      </div>
+                      <div>
+                        <h4 className="font-semibold text-slate-900">Quick Start</h4>
+                        <p className="text-sm text-slate-500">We configure, you relax</p>
+                      </div>
+                    </div>
+                    <p className="text-2xl font-bold text-slate-900 mb-2">$249</p>
+                    <ul className="text-sm text-slate-600 space-y-1 mb-4">
+                      <li>• Site & rate configuration</li>
+                      <li>• Payment gateway setup</li>
+                      <li>• 30-minute training call</li>
+                    </ul>
+                    <div className="flex gap-2">
+                      <Button
+                        size="sm"
+                        className="flex-1"
+                        onClick={() => {
+                          setPurchaseType("quick_start");
+                          setPayUpfront(true);
+                        }}
+                      >
+                        Pay Now
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="flex-1"
+                        onClick={() => {
+                          setPurchaseType("quick_start");
+                          setPayUpfront(false);
+                        }}
+                      >
+                        $1/booking
+                      </Button>
+                    </div>
+                  </div>
+
+                  {/* Data Import */}
+                  <div className="border border-slate-200 rounded-xl p-5 hover:border-emerald-300 transition-colors">
+                    <div className="flex items-center gap-3 mb-3">
+                      <div className="w-10 h-10 bg-emerald-100 rounded-lg flex items-center justify-center">
+                        <Database className="h-5 w-5 text-emerald-600" />
+                      </div>
+                      <div>
+                        <h4 className="font-semibold text-slate-900">Data Import</h4>
+                        <p className="text-sm text-slate-500">We import your reservations</p>
+                      </div>
+                    </div>
+                    <div className="text-sm text-slate-600 space-y-1 mb-4">
+                      <div className="flex justify-between">
+                        <span>Up to 500</span>
+                        <span className="font-medium">$299</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span>501 - 2,000</span>
+                        <span className="font-medium">$599</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span>2,001 - 5,000</span>
+                        <span className="font-medium">$999</span>
+                      </div>
+                    </div>
+                    <div className="flex gap-2">
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="flex-1"
+                        onClick={() => {
+                          setPurchaseType("data_import_500");
+                          setPayUpfront(true);
+                        }}
+                      >
+                        Get Started
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+
+                <p className="text-xs text-slate-500 text-center mt-4">
+                  Pay-over-time: Add $1/booking until paid off. No interest, no pressure.
+                </p>
+              </div>
+            </div>
+
+            {/* Purchase Confirmation Modal */}
+            {purchaseType && (
+              <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+                <div className="bg-white rounded-2xl p-6 max-w-md w-full mx-4 shadow-xl">
+                  <h3 className="text-xl font-bold text-slate-900 mb-4">
+                    Confirm Purchase
+                  </h3>
+                  <p className="text-slate-600 mb-6">
+                    {payUpfront ? (
+                      <>You&apos;ll be charged now for this service.</>
+                    ) : (
+                      <>
+                        No upfront payment. We&apos;ll add $1.00 to each booking until
+                        the service is paid off.
+                      </>
+                    )}
+                  </p>
+                  <div className="flex gap-3">
+                    <Button
+                      variant="outline"
+                      className="flex-1"
+                      onClick={() => setPurchaseType(null)}
+                    >
+                      Cancel
+                    </Button>
+                    <Button
+                      className="flex-1"
+                      onClick={() =>
+                        purchaseMutation.mutate({
+                          serviceType: purchaseType,
+                          payUpfront,
+                        })
+                      }
+                      disabled={purchaseMutation.isPending}
+                    >
+                      {purchaseMutation.isPending ? (
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                      ) : (
+                        "Confirm"
+                      )}
+                    </Button>
+                  </div>
+                  {purchaseMutation.isError && (
+                    <p className="text-red-600 text-sm mt-4">
+                      {purchaseMutation.error.message}
+                    </p>
+                  )}
+                </div>
+              </div>
+            )}
 
             {/* Billing History */}
             {history && history.length > 0 && (

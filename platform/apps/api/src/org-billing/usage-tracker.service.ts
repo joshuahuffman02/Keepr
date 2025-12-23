@@ -34,9 +34,11 @@ export class UsageTrackerService {
         return;
       }
 
+      const organizationId = campground.organizationId;
+
       await this.prisma.usageEvent.create({
         data: {
-          organizationId: campground.organizationId,
+          organizationId,
           campgroundId,
           eventType: "booking_created",
           quantity: 1,
@@ -47,11 +49,91 @@ export class UsageTrackerService {
       });
 
       this.logger.debug(
-        `Tracked booking_created for reservation ${reservationId}, org ${campground.organizationId}`
+        `Tracked booking_created for reservation ${reservationId}, org ${organizationId}`
       );
+
+      // Check for setup service surcharge and apply if needed
+      await this.applySetupServiceSurcharge(organizationId, reservationId);
     } catch (error) {
       // Log but don't fail the reservation creation
       this.logger.error(`Failed to track booking_created:`, error);
+    }
+  }
+
+  /**
+   * Check for and apply setup service surcharge ($1/booking until paid off)
+   */
+  private async applySetupServiceSurcharge(
+    organizationId: string,
+    reservationId: string
+  ) {
+    try {
+      // Find setup services with outstanding balance (oldest first)
+      const servicesWithBalance = await this.prisma.setupService.findMany({
+        where: {
+          organizationId,
+          balanceRemainingCents: { gt: 0 },
+          status: { in: ["pending", "in_progress", "completed"] },
+        },
+        orderBy: { createdAt: "asc" },
+        take: 1,
+      });
+
+      if (servicesWithBalance.length === 0) {
+        return;
+      }
+
+      const service = servicesWithBalance[0];
+      const chargeAmount = Math.min(
+        service.perBookingSurchargeCents,
+        service.balanceRemainingCents
+      );
+
+      const newBalance = service.balanceRemainingCents - chargeAmount;
+      const isPaidOff = newBalance <= 0;
+
+      // Update the setup service balance
+      await this.prisma.setupService.update({
+        where: { id: service.id },
+        data: {
+          balanceRemainingCents: Math.max(0, newBalance),
+          bookingsCharged: { increment: 1 },
+          lastChargedAt: new Date(),
+          paidOffAt: isPaidOff ? new Date() : undefined,
+        },
+      });
+
+      // Track the surcharge as a usage event
+      await this.prisma.usageEvent.create({
+        data: {
+          organizationId,
+          eventType: "setup_service_surcharge",
+          quantity: 1,
+          unitCents: chargeAmount,
+          referenceType: "reservation",
+          referenceId: reservationId,
+          metadata: {
+            setupServiceId: service.id,
+            setupServiceType: service.serviceType,
+            balanceRemaining: newBalance,
+            isPaidOff,
+          },
+        },
+      });
+
+      this.logger.debug(
+        `Applied setup service surcharge: $${(chargeAmount / 100).toFixed(2)} for service ${service.id}, ` +
+          `balance remaining: $${(newBalance / 100).toFixed(2)}`
+      );
+
+      if (isPaidOff) {
+        this.logger.log(
+          `Setup service ${service.id} (${service.serviceType}) is now fully paid off!`
+        );
+      }
+    } catch (error) {
+      // Log but don't fail - surcharge tracking is secondary to booking
+      this.logger.error(`Failed to apply setup service surcharge:`, error);
     }
   }
 

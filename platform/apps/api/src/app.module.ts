@@ -101,6 +101,7 @@ import { EarlyAccessModule } from "./early-access/early-access.module";
 import { OrgBillingModule } from "./org-billing/org-billing.module";
 import { DataImportModule } from "./data-import/data-import.module";
 import { OrgReferralsModule } from "./org-referrals/org-referrals.module";
+import { SetupServicesModule } from "./setup-services/setup-services.module";
 
 @Module({
   imports: [
@@ -206,6 +207,7 @@ import { OrgReferralsModule } from "./org-referrals/org-referrals.module";
     OrgBillingModule,
     DataImportModule,
     OrgReferralsModule,
+    SetupServicesModule,
   ],
   providers: []
 })

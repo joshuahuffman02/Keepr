@@ -135,7 +135,23 @@ export class OrgBillingService {
     const bookingFeesCents = usageSummary.bookingCount * (org.earlyAccessEnrollment?.lockedBookingFee || tierConfig.perBookingFeeCents);
     const smsOutboundCents = usageSummary.smsOutbound * tierConfig.smsOutboundCents;
     const smsInboundCents = usageSummary.smsInbound * tierConfig.smsInboundCents;
-    const totalCents = subscriptionCents + bookingFeesCents + smsOutboundCents + smsInboundCents;
+    const setupServiceSurchargeCents = usageSummary.setupServiceSurchargeCents || 0;
+    const totalCents = subscriptionCents + bookingFeesCents + smsOutboundCents + smsInboundCents + setupServiceSurchargeCents;
+
+    // Get active setup services with balance for display
+    const activeSetupServices = await this.prisma.setupService.findMany({
+      where: {
+        organizationId,
+        balanceRemainingCents: { gt: 0 },
+      },
+      select: {
+        id: true,
+        serviceType: true,
+        totalCents: true,
+        balanceRemainingCents: true,
+        bookingsCharged: true,
+      },
+    });
 
     return {
       organization: {
@@ -179,6 +195,11 @@ export class OrgBillingService {
           unitCents: tierConfig.smsInboundCents,
           amountCents: smsInboundCents,
         },
+        setupServiceSurcharge: {
+          description: `Setup service pay-over-time (${usageSummary.setupServiceSurchargeCount || 0} bookings)`,
+          quantity: usageSummary.setupServiceSurchargeCount || 0,
+          amountCents: setupServiceSurchargeCents,
+        },
       },
       totals: {
         subtotalCents: totalCents,
@@ -187,6 +208,13 @@ export class OrgBillingService {
         totalCents: totalCents,
       },
       usage: usageSummary,
+      setupServices: {
+        activeWithBalance: activeSetupServices,
+        totalBalanceRemainingCents: activeSetupServices.reduce(
+          (sum, s) => sum + s.balanceRemainingCents,
+          0
+        ),
+      },
     };
   }
 
@@ -244,11 +272,29 @@ export class OrgBillingService {
       },
     });
 
+    // Setup service surcharges (pay-over-time)
+    const setupServiceSurcharges = await this.prisma.usageEvent.aggregate({
+      where: {
+        organizationId,
+        eventType: "setup_service_surcharge",
+        createdAt: {
+          gte: periodStart,
+          lte: periodEnd,
+        },
+      },
+      _sum: {
+        unitCents: true,
+      },
+      _count: true,
+    });
+
     return {
       bookingCount,
       smsOutbound,
       smsInbound,
       aiTokens: aiUsage._sum.quantity || 0,
+      setupServiceSurchargeCount: setupServiceSurcharges._count || 0,
+      setupServiceSurchargeCents: setupServiceSurcharges._sum.unitCents || 0,
     };
   }
 
@@ -468,6 +514,17 @@ export class OrgBillingService {
         quantity: usage.smsInbound,
         unitCents: tierConfig.smsInboundCents,
         totalCents: usage.smsInbound * tierConfig.smsInboundCents,
+      });
+    }
+
+    // Setup service surcharges (pay-over-time)
+    if (usage.setupServiceSurchargeCents > 0) {
+      lineItems.push({
+        type: "setup_service_surcharge" as const,
+        description: `Setup service pay-over-time (${usage.setupServiceSurchargeCount} bookings @ $1.00)`,
+        quantity: usage.setupServiceSurchargeCount,
+        unitCents: 100, // $1.00
+        totalCents: usage.setupServiceSurchargeCents,
       });
     }
 
