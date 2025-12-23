@@ -155,6 +155,40 @@ export default function OnboardingPage() {
     }
   }, [stripeStatus, token, router]);
 
+  // Check Stripe status on page load if we're on stripe_connect step
+  useEffect(() => {
+    const checkStripeStatus = async () => {
+      if (!sessionQuery.data?.session?.id || !token) return;
+      if (state.stripeConnected) return; // Already connected
+      if (state.currentStep !== "stripe_connect") return; // Not on this step
+
+      try {
+        const response = await fetch(
+          `${process.env.NEXT_PUBLIC_API_BASE}/onboarding/session/${sessionQuery.data.session.id}/stripe/status?token=${encodeURIComponent(token)}`,
+          { headers: { "X-Onboarding-Token": token } }
+        );
+        if (response.ok) {
+          const result = await response.json();
+          if (result.connected) {
+            // Stripe is connected, update state and move forward
+            setState((prev) => ({
+              ...prev,
+              stripeConnected: true,
+              completedSteps: prev.completedSteps.includes("stripe_connect")
+                ? prev.completedSteps
+                : [...prev.completedSteps, "stripe_connect"],
+              currentStep: "inventory_choice",
+            }));
+          }
+        }
+      } catch (err) {
+        console.error("Error checking Stripe status:", err);
+      }
+    };
+
+    checkStripeStatus();
+  }, [sessionQuery.data?.session?.id, token, state.currentStep, state.stripeConnected]);
+
   const goToStep = useCallback((step: OnboardingStepKey, direction: "forward" | "backward" = "forward") => {
     setState((prev) => ({
       ...prev,
