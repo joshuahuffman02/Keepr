@@ -6101,6 +6101,23 @@ export const apiClient = {
       images: z.array(z.object({ imageId: z.string(), views: z.number(), clicks: z.number() })).optional(),
     }).parse(data);
   },
+  async getDeviceBreakdown(campgroundId: string, days: number = 30) {
+    const data = await fetchJSON<unknown>(`/analytics/reports/devices?campgroundId=${campgroundId}&days=${days}`);
+    return z.object({
+      period: z.object({ days: z.number(), since: z.string() }),
+      devices: z.array(z.object({
+        deviceType: z.string(),
+        sessions: z.number(),
+        bookings: z.number(),
+        conversionRate: z.number(),
+      })),
+      trends: z.array(z.object({
+        date: z.string(),
+        deviceType: z.string(),
+        sessions: z.number(),
+      })),
+    }).parse(data);
+  },
   async logAnalyticsEvent(payload: {
     sessionId: string;
     eventName: string;

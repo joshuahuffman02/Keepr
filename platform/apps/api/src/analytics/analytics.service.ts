@@ -787,5 +787,95 @@ export class AnalyticsService {
 
     return summary;
   }
+
+  /**
+   * Get device breakdown analytics - shows mobile vs desktop vs tablet usage
+   */
+  async getDeviceBreakdown(campgroundId: string, days: number = 30) {
+    const since = new Date();
+    since.setDate(since.getDate() - days);
+
+    if (MOCK_MODE) {
+      // Return mock data
+      return {
+        period: { days, since },
+        devices: [
+          { deviceType: "mobile", sessions: 245, bookings: 89, conversionRate: 36.3 },
+          { deviceType: "desktop", sessions: 312, bookings: 156, conversionRate: 50.0 },
+          { deviceType: "tablet", sessions: 43, bookings: 15, conversionRate: 34.9 }
+        ],
+        browsers: [
+          { browser: "Chrome", sessions: 320, percentage: 53.3 },
+          { browser: "Safari", sessions: 180, percentage: 30.0 },
+          { browser: "Firefox", sessions: 60, percentage: 10.0 },
+          { browser: "Edge", sessions: 40, percentage: 6.7 }
+        ],
+        trends: []
+      };
+    }
+
+    // Get session counts by device type
+    const deviceSessions = await this.prisma.$queryRaw<
+      Array<{ deviceType: string; sessions: bigint }>
+    >`
+      SELECT COALESCE("deviceType", 'unknown') as "deviceType",
+             COUNT(DISTINCT "sessionId")::bigint as sessions
+      FROM "AnalyticsEvent"
+      WHERE "campgroundId" = ${campgroundId}
+        AND "occurredAt" >= ${since}
+      GROUP BY "deviceType"
+      ORDER BY sessions DESC
+    `;
+
+    // Get booking counts by device type (completed_booking event)
+    const deviceBookings = await this.prisma.$queryRaw<
+      Array<{ deviceType: string; bookings: bigint }>
+    >`
+      SELECT COALESCE("deviceType", 'unknown') as "deviceType",
+             COUNT(*)::bigint as bookings
+      FROM "AnalyticsEvent"
+      WHERE "campgroundId" = ${campgroundId}
+        AND "eventName" = 'completed_booking'
+        AND "occurredAt" >= ${since}
+      GROUP BY "deviceType"
+    `;
+
+    // Build device breakdown with conversion rates
+    const bookingMap = new Map(deviceBookings.map(d => [d.deviceType, Number(d.bookings)]));
+    const devices = deviceSessions.map(d => {
+      const sessions = Number(d.sessions);
+      const bookings = bookingMap.get(d.deviceType) || 0;
+      return {
+        deviceType: d.deviceType,
+        sessions,
+        bookings,
+        conversionRate: sessions > 0 ? Math.round((bookings / sessions) * 1000) / 10 : 0
+      };
+    });
+
+    // Get daily trends by device type
+    const trends = await this.prisma.$queryRaw<
+      Array<{ date: Date; deviceType: string; sessions: bigint }>
+    >`
+      SELECT DATE_TRUNC('day', "occurredAt") as date,
+             COALESCE("deviceType", 'unknown') as "deviceType",
+             COUNT(DISTINCT "sessionId")::bigint as sessions
+      FROM "AnalyticsEvent"
+      WHERE "campgroundId" = ${campgroundId}
+        AND "occurredAt" >= ${since}
+      GROUP BY DATE_TRUNC('day', "occurredAt"), "deviceType"
+      ORDER BY date ASC
+    `;
+
+    return {
+      period: { days, since },
+      devices,
+      trends: trends.map(t => ({
+        date: t.date,
+        deviceType: t.deviceType,
+        sessions: Number(t.sessions)
+      }))
+    };
+  }
 }
 

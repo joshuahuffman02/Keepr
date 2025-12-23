@@ -101,5 +101,16 @@ export class AnalyticsController {
     const yr = year ? parseInt(year, 10) : undefined;
     return this.analyticsService.getAnnualReport(cgId, yr, format);
   }
+
+  @UseGuards(JwtAuthGuard)
+  @Get("reports/devices")
+  async getDeviceBreakdown(
+    @Query("campgroundId") campgroundId: string,
+    @Query("days") days: string,
+    @Req() req: any
+  ) {
+    const cgId = campgroundId || (req as any)?.campgroundId || (req.headers as any)["x-campground-id"];
+    return this.analyticsService.getDeviceBreakdown(cgId, days ? parseInt(days, 10) : 30);
+  }
 }
 
