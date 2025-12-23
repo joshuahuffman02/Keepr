@@ -241,13 +241,22 @@ export default function TicketsPage() {
     if (!trimmed) return;
     setResponding(true);
     try {
+      const timestamp = new Date().toLocaleString();
       const combinedNotes = detailTicket.agentNotes
-        ? `${detailTicket.agentNotes}\n\nResponse: ${trimmed}`
-        : `Response: ${trimmed}`;
+        ? `${detailTicket.agentNotes}\n\n[${timestamp}] Response: ${trimmed}`
+        : `[${timestamp}] Response: ${trimmed}`;
+
+      // Reopen ticket if it was completed - new response means it needs attention
+      const newStatus = detailTicket.status === "completed" ? "open" : detailTicket.status;
+
       const res = await fetch("/api/tickets", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id: detailTicket.id, agentNotes: combinedNotes }),
+        body: JSON.stringify({
+          id: detailTicket.id,
+          agentNotes: combinedNotes,
+          status: newStatus
+        }),
       });
       if (!res.ok) throw new Error(`Request failed (${res.status})`);
       setResponse("");
@@ -697,7 +706,14 @@ export default function TicketsPage() {
                   value={response}
                   onChange={(e) => setResponse(e.target.value)}
                 />
-                <div className="text-[11px] text-slate-500">Saved to agent notes history.</div>
+                <div className="text-[11px] text-slate-500">
+                  Saved to agent notes history.
+                  {detailTicket?.status === "completed" && response.trim() && (
+                    <span className="ml-1 text-amber-600 font-medium">
+                      This will reopen the ticket.
+                    </span>
+                  )}
+                </div>
               </div>
             </div>
             <DialogFooter>
@@ -706,7 +722,11 @@ export default function TicketsPage() {
                   Close
                 </Button>
                 <Button onClick={submitResponse} disabled={responding || !response.trim()}>
-                  {responding ? "Saving..." : "Save response"}
+                  {responding
+                    ? "Saving..."
+                    : detailTicket?.status === "completed" && response.trim()
+                      ? "Save & Reopen"
+                      : "Save response"}
                 </Button>
               </div>
             </DialogFooter>
