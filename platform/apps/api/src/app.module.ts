@@ -105,6 +105,7 @@ import { SetupServicesModule } from "./setup-services/setup-services.module";
 import { InventoryModule } from "./inventory/inventory.module";
 import { PartnerApiModule } from "./partner-api/partner-api.module";
 import { MenuConfigModule } from "./menu-config/menu-config.module";
+import { FeatureProgressModule } from "./feature-progress/feature-progress.module";
 
 @Module({
   imports: [
@@ -214,6 +215,7 @@ import { MenuConfigModule } from "./menu-config/menu-config.module";
     SetupServicesModule,
     PartnerApiModule,
     MenuConfigModule,
+    FeatureProgressModule,
   ],
   providers: []
 })

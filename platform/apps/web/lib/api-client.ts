@@ -287,6 +287,8 @@ const OnboardingStepEnum = z.enum([
   "team_setup",
   "communication_setup",
   "integrations",
+  "menu_setup",
+  "feature_discovery",
   "review_launch",
   // Legacy step keys (for backwards compatibility)
   "account_profile",

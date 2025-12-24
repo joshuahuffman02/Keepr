@@ -3,7 +3,9 @@
  * These are the default pinned pages for each role
  */
 
-export const ROLE_DEFAULT_MENUS: Record<string, string[]> = {
+export type UserRole = "front_desk" | "manager" | "owner" | "finance" | "maintenance" | "admin";
+
+export const ROLE_DEFAULT_MENUS: Record<UserRole, string[]> = {
   // Front desk staff - focus on daily operations
   front_desk: [
     "/dashboard",
@@ -76,7 +78,7 @@ export const ROLE_DEFAULT_MENUS: Record<string, string[]> = {
  * Get default menu for a role, with optional campgroundId for dynamic pages
  */
 export function getDefaultMenuForRole(
-  role: string,
+  role: UserRole,
   campgroundId?: string
 ): string[] {
   const menu = ROLE_DEFAULT_MENUS[role] || ROLE_DEFAULT_MENUS.front_desk;
@@ -112,7 +114,7 @@ export function getDefaultMenuForRole(
 export function inferRoleFromPermissions(
   permissions: Record<string, boolean>,
   platformRole?: string | null
-): string {
+): UserRole {
   if (platformRole) {
     return "admin";
   }

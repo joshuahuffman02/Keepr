@@ -448,6 +448,26 @@ export const PAGE_REGISTRY: PageDefinition[] = [
   },
 
   // ============================================
+  // DISCOVERY & HELP
+  // ============================================
+  {
+    href: "/features",
+    label: "Feature Discovery",
+    icon: "sparkles",
+    category: "settings",
+    description: "Explore and track all available features",
+    keywords: ["checklist", "discovery", "explore", "learn", "tour"],
+  },
+  {
+    href: "/all-pages",
+    label: "All Pages",
+    icon: "dashboard",
+    category: "settings",
+    description: "Browse all available pages",
+    keywords: ["navigation", "menu", "browse", "find"],
+  },
+
+  // ============================================
   // SETTINGS - Configuration pages
   // ============================================
   {

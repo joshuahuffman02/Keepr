@@ -18,6 +18,8 @@ export type OnboardingStepKey =
   | "team_setup"
   | "communication_setup"
   | "integrations"
+  | "menu_setup"
+  | "feature_discovery"
   | "review_launch";
 
 export type OnboardingPhase = "foundation" | "inventory" | "pricing" | "rules" | "launch";
@@ -182,6 +184,24 @@ export const onboardingSteps: OnboardingStep[] = [
     key: "integrations",
     title: "Integrations",
     description: "Connect your business tools",
+    phase: "launch",
+    required: false,
+  },
+  {
+    key: "menu_setup",
+    title: "Your Dashboard",
+    description: "Customize your sidebar menu",
+    phase: "launch",
+    required: false,
+    celebration: {
+      title: "Dashboard Personalized!",
+      subtitle: "Your menu is set up exactly how you like it",
+    },
+  },
+  {
+    key: "feature_discovery",
+    title: "Explore Features",
+    description: "Discover all the tools at your disposal",
     phase: "launch",
     required: false,
   },

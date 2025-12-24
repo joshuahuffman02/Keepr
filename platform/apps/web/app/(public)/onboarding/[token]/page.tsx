@@ -27,6 +27,8 @@ import { ParkRules } from "./steps/ParkRules";
 import { TeamSetup, TeamMember } from "./steps/TeamSetup";
 import { CommunicationSetup, CommunicationSetupData } from "./steps/CommunicationSetup";
 import { Integrations, IntegrationsData } from "./steps/Integrations";
+import { MenuSetup } from "./steps/MenuSetup";
+import { FeatureDiscovery } from "./steps/FeatureDiscovery";
 import { ReviewLaunch } from "./steps/ReviewLaunch";
 import { Loader2 } from "lucide-react";
 
@@ -105,6 +107,9 @@ interface WizardState {
   bookingRules?: BookingRulesData;
   waiversDocuments?: WaiversDocumentsData;
   communicationSetup?: CommunicationSetupData;
+  // Menu and feature discovery
+  pinnedPages?: string[];
+  completedFeatures?: string[];
 }
 
 export default function OnboardingPage() {
@@ -710,11 +715,51 @@ export default function OnboardingPage() {
       integrations,
     }));
     completeStep("integrations");
-    goToStep("review_launch");
+    goToStep("menu_setup");
   };
 
   const handleIntegrationsSkip = () => {
     completeStep("integrations");
+    goToStep("menu_setup");
+  };
+
+  const handleMenuSetupSave = async (pinnedPages: string[]) => {
+    await saveMutation.mutateAsync({
+      step: "menu_setup",
+      data: { pinnedPages },
+    });
+    setState((prev) => ({
+      ...prev,
+      pinnedPages,
+    }));
+    completeStep("menu_setup");
+    showCelebration("Dashboard Personalized!", "Your menu is set up exactly how you like it", "default");
+    setTimeout(() => {
+      hideCelebration();
+      goToStep("feature_discovery");
+    }, 2000);
+  };
+
+  const handleMenuSetupSkip = () => {
+    completeStep("menu_setup");
+    goToStep("feature_discovery");
+  };
+
+  const handleFeatureDiscoverySave = async (completedFeatures: string[]) => {
+    await saveMutation.mutateAsync({
+      step: "feature_discovery",
+      data: { completedFeatures },
+    });
+    setState((prev) => ({
+      ...prev,
+      completedFeatures,
+    }));
+    completeStep("feature_discovery");
+    goToStep("review_launch");
+  };
+
+  const handleFeatureDiscoverySkip = () => {
+    completeStep("feature_discovery");
     goToStep("review_launch");
   };
 
@@ -1034,6 +1079,38 @@ export default function OnboardingPage() {
             onSkip={handleIntegrationsSkip}
             sessionId={sessionQuery.data?.session?.id}
             token={token}
+          />
+        );
+
+      case "menu_setup":
+        return (
+          <MenuSetup
+            pinnedPages={state.pinnedPages || []}
+            onChange={(pinnedPages) => {
+              setState((prev) => ({ ...prev, pinnedPages }));
+            }}
+            onNext={() => {
+              if (state.pinnedPages && state.pinnedPages.length > 0) {
+                handleMenuSetupSave(state.pinnedPages);
+              } else {
+                handleMenuSetupSkip();
+              }
+            }}
+            onBack={() => goToStep("integrations", "backward")}
+            onSkip={handleMenuSetupSkip}
+          />
+        );
+
+      case "feature_discovery":
+        return (
+          <FeatureDiscovery
+            completedFeatures={state.completedFeatures || []}
+            onChange={(completedFeatures) => {
+              setState((prev) => ({ ...prev, completedFeatures }));
+            }}
+            onNext={() => handleFeatureDiscoverySave(state.completedFeatures || [])}
+            onBack={() => goToStep("menu_setup", "backward")}
+            onSkip={handleFeatureDiscoverySkip}
           />
         );
 
