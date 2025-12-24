@@ -5,9 +5,12 @@ export type OnboardingStepKey =
   | "data_import"
   | "site_classes"
   | "sites_builder"
+  | "rate_periods"
   | "rates_setup"
+  | "fees_and_addons"
   | "tax_rules"
   | "deposit_policy"
+  | "cancellation_rules"
   | "park_rules"
   | "review_launch";
 
@@ -31,10 +34,13 @@ export const ONBOARDING_STEPS: OnboardingStep[] = [
   { key: "site_classes", title: "Site Types", description: "Define accommodation types", phase: "inventory", required: false },
   { key: "sites_builder", title: "Add Sites", description: "Create bookable inventory", phase: "inventory", required: false },
   // Phase 3: Pricing
+  { key: "rate_periods", title: "Rate Periods", description: "Define pricing seasons", phase: "pricing", required: false },
   { key: "rates_setup", title: "Pricing", description: "Set rates per site type", phase: "pricing", required: true },
+  { key: "fees_and_addons", title: "Fees & Add-ons", description: "Booking fees and extras", phase: "pricing", required: false },
   // Phase 4: Rules & Policies
   { key: "tax_rules", title: "Taxes", description: "Configure tax rules", phase: "rules", required: false },
   { key: "deposit_policy", title: "Deposits", description: "Payment collection rules", phase: "rules", required: true },
+  { key: "cancellation_rules", title: "Cancellation", description: "Cancellation policies", phase: "rules", required: false },
   { key: "park_rules", title: "Park Rules", description: "Guest policies", phase: "rules", required: false },
   // Phase 5: Launch
   { key: "review_launch", title: "Go Live", description: "Review and launch", phase: "launch", required: true },

@@ -30,16 +30,22 @@ type OnboardingPayload =
   | CommunicationsTemplatesDto
   | ImportsDto;
 
-const STEP_VALIDATORS: Record<OnboardingStepKey, any> = {
-  account_profile: AccountProfileDto,
-  payment_gateway: PaymentGatewayDto,
-  taxes_and_fees: TaxesAndFeesDto,
-  inventory_sites: InventorySitesDto,
-  rates_and_fees: RatesAndFeesDto,
-  policies: PoliciesDto,
-  communications_templates: CommunicationsTemplatesDto,
-  pos_hardware: PoliciesDto, // reuse lightweight validator
-  imports: ImportsDto,
+const STEP_VALIDATORS: Partial<Record<OnboardingStepKey, any>> = {
+  park_profile: AccountProfileDto,
+  stripe_connect: PaymentGatewayDto,
+  tax_rules: TaxesAndFeesDto,
+  inventory_choice: InventorySitesDto,
+  rates_setup: RatesAndFeesDto,
+  deposit_policy: PoliciesDto,
+  park_rules: PoliciesDto,
+  data_import: ImportsDto,
+  // New steps - no strict validation, just pass through
+  site_classes: null,
+  sites_builder: null,
+  rate_periods: null,
+  fees_and_addons: null,
+  cancellation_rules: null,
+  review_launch: null,
 };
 
 @Injectable()
@@ -241,6 +247,19 @@ export class OnboardingService {
               accessible: sc.accessible ?? false,
               photos: sc.photos || [],
               tags: sc.amenityTags || [],
+              // New enhanced onboarding fields
+              rentalType: sc.rentalType || "transient",
+              equipmentTypes: sc.equipmentTypes || [],
+              slideOutsAccepted: sc.slideOutsAccepted ?? null,
+              occupantsIncluded: sc.occupantsIncluded ?? 2,
+              extraAdultFeeCents: sc.extraAdultFee ? Math.round(sc.extraAdultFee * 100) : null,
+              extraChildFeeCents: sc.extraChildFee ? Math.round(sc.extraChildFee * 100) : null,
+              weeklyRateCents: sc.weeklyRate ? Math.round(sc.weeklyRate * 100) : null,
+              monthlyRateCents: sc.monthlyRate ? Math.round(sc.monthlyRate * 100) : null,
+              petFeeEnabled: sc.petFeeEnabled ?? false,
+              petFeeCents: sc.petFee ? Math.round(sc.petFee * 100) : null,
+              bookingFeeCents: sc.bookingFee ? Math.round(sc.bookingFee * 100) : null,
+              siteLockFeeCents: sc.siteLockFee ? Math.round(sc.siteLockFee * 100) : null,
             },
           });
           createdIds.push(created.id);
