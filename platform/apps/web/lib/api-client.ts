@@ -443,7 +443,8 @@ const PublicCampgroundDetailSchema = CampgroundWithAnalyticsSchema.extend({
   siteClasses: z.array(SiteClassSchema),
   events: z.array(EventSchema),
   promotions: z.array(PromotionSchema).optional().default([]),
-  showPublicMap: z.boolean().optional().default(false)
+  showPublicMap: z.boolean().optional().default(false),
+  isPreview: z.boolean().optional(),
 });
 
 export const CreatePublicWaitlistSchema = z.object({
