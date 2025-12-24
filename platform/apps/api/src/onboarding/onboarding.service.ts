@@ -31,15 +31,15 @@ type OnboardingPayload =
   | ImportsDto;
 
 const STEP_VALIDATORS: Partial<Record<OnboardingStepKey, any>> = {
-  park_profile: AccountProfileDto,
-  stripe_connect: PaymentGatewayDto,
-  tax_rules: TaxesAndFeesDto,
-  inventory_choice: InventorySitesDto,
-  rates_setup: RatesAndFeesDto,
-  deposit_policy: PoliciesDto,
-  park_rules: PoliciesDto,
-  data_import: ImportsDto,
-  // New steps - no strict validation, just pass through
+  // All steps use lenient validation - service handles data transformation
+  park_profile: null,
+  stripe_connect: null,
+  tax_rules: null,
+  inventory_choice: null,
+  rates_setup: null,
+  deposit_policy: null,
+  park_rules: null,
+  data_import: null,
   site_classes: null,
   sites_builder: null,
   rate_periods: null,
