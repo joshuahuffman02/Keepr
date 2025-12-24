@@ -72,6 +72,12 @@ const CampgroundWithAnalyticsSchema = CampgroundSchema.extend({
   gaMeasurementId: z.string().nullable().optional(),
   metaPixelId: z.string().nullable().optional(),
   aiSuggestionsEnabled: z.boolean().optional().default(false),
+  // Override website to allow non-URL strings (user may enter "example.com" without https://)
+  website: z.string().nullish(),
+  facebookUrl: z.string().nullish(),
+  instagramUrl: z.string().nullish(),
+  externalUrl: z.string().nullish(),
+  heroImageUrl: z.string().nullish(),
 }).passthrough();
 const CampgroundArray = z.array(CampgroundWithAnalyticsSchema);
 const SiteArray = z.array(SiteSchema);
