@@ -30,6 +30,7 @@ interface ParkRulesProps {
   onSave: (data: ParkRulesData) => Promise<void>;
   onSkip: () => void;
   onNext: () => void;
+  onBack?: () => void;
   isLoading?: boolean;
 }
 
@@ -179,6 +180,7 @@ export function ParkRules({
   onSave,
   onSkip,
   onNext,
+  onBack,
   isLoading = false,
 }: ParkRulesProps) {
   const prefersReducedMotion = useReducedMotion();

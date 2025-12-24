@@ -33,18 +33,24 @@ type OnboardingPayload =
 const STEP_VALIDATORS: Partial<Record<OnboardingStepKey, any>> = {
   // All steps use lenient validation - service handles data transformation
   park_profile: null,
+  operational_hours: null,
   stripe_connect: null,
   tax_rules: null,
+  booking_rules: null,
   inventory_choice: null,
   rates_setup: null,
   deposit_policy: null,
+  cancellation_rules: null,
+  waivers_documents: null,
   park_rules: null,
   data_import: null,
   site_classes: null,
   sites_builder: null,
   rate_periods: null,
   fees_and_addons: null,
-  cancellation_rules: null,
+  team_setup: null,
+  communication_setup: null,
+  integrations: null,
   review_launch: null,
 };
 
@@ -333,6 +339,173 @@ export class OnboardingService {
             this.logger.log(`Updated SiteClass ${actualSiteClassId} with rate $${rate.nightlyRate}`);
           }
         }
+      }
+
+      // Create team members when team_setup step is saved
+      if (step === OnboardingStep.team_setup && campgroundId) {
+        const teamMembers = (sanitized as any).teamMembers || [];
+        const baseUrl = process.env.FRONTEND_URL || "https://app.campreserv.com";
+
+        for (const member of teamMembers) {
+          if (!member.email) continue;
+
+          // Check if user already exists
+          let user = await this.prisma.user.findUnique({
+            where: { email: member.email.toLowerCase() },
+          });
+
+          // Create user if doesn't exist
+          if (!user) {
+            const bcrypt = await import('bcryptjs');
+            const tempPassword = Math.random().toString(36).slice(-12);
+            const passwordHash = await bcrypt.hash(tempPassword, 10);
+
+            user = await this.prisma.user.create({
+              data: {
+                email: member.email.toLowerCase(),
+                firstName: member.firstName || '',
+                lastName: member.lastName || '',
+                passwordHash,
+                isActive: false, // Requires invite acceptance
+              },
+            });
+            this.logger.log(`Created user ${user.id} (${user.email}) during onboarding`);
+          }
+
+          // Check if membership already exists
+          const existingMembership = await this.prisma.campgroundMembership.findFirst({
+            where: { userId: user.id, campgroundId },
+          });
+
+          if (!existingMembership) {
+            // Create campground membership
+            await this.prisma.campgroundMembership.create({
+              data: {
+                userId: user.id,
+                campgroundId,
+                role: member.role || 'front_desk',
+              },
+            });
+            this.logger.log(`Created membership for ${user.email} with role ${member.role}`);
+
+            // Create invite token
+            const inviteToken = Math.random().toString(36).slice(-20) + Date.now().toString(36);
+            const expiresAt = new Date();
+            expiresAt.setDate(expiresAt.getDate() + 7);
+
+            await (this.prisma as any).inviteToken.create({
+              data: {
+                token: inviteToken,
+                userId: user.id,
+                campgroundId,
+                expiresAt,
+              },
+            });
+
+            // Send invite email (fire-and-forget)
+            const inviteUrl = `${baseUrl}/invite?token=${inviteToken}`;
+            const name = [member.firstName, member.lastName].filter(Boolean).join(' ') || 'there';
+            const roleLabel = (member.role || 'front_desk').replace('_', ' ');
+
+            this.email.sendEmail({
+              to: member.email,
+              subject: `You've been invited to join a campground team`,
+              html: `
+                <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 540px; margin: 0 auto; padding: 20px;">
+                  <h2 style="color: #0f172a; margin-bottom: 12px;">Welcome, ${name}!</h2>
+                  <p style="color: #475569; line-height: 1.5;">
+                    You've been invited as <strong>${roleLabel}</strong> to manage a campground in Camp Everyday Host.
+                  </p>
+                  <p style="color: #475569; line-height: 1.5;">
+                    Click the button below to set your password and get started.
+                  </p>
+                  <div style="margin: 24px 0;">
+                    <a href="${inviteUrl}" style="display: inline-block; padding: 12px 18px; background: #10b981; color: white; border-radius: 10px; text-decoration: none; font-weight: 600;">
+                      Accept Invite
+                    </a>
+                  </div>
+                  <p style="color: #94a3b8; font-size: 12px;">
+                    This invite expires in 7 days.
+                  </p>
+                </div>
+              `,
+            }).catch((err) => {
+              this.logger.warn(`Failed to send invite email to ${member.email}: ${err.message}`);
+            });
+          }
+        }
+      }
+
+      // Update campground with operational hours when operational_hours step is saved
+      if (step === OnboardingStep.operational_hours && campgroundId) {
+        const hoursData = sanitized as any;
+        await this.prisma.campground.update({
+          where: { id: campgroundId },
+          data: {
+            checkInTime: hoursData.checkInTime || "15:00",
+            checkOutTime: hoursData.checkOutTime || "11:00",
+            quietHoursStart: hoursData.quietHoursEnabled ? hoursData.quietHoursStart : null,
+            quietHoursEnd: hoursData.quietHoursEnabled ? hoursData.quietHoursEnd : null,
+          },
+        });
+        this.logger.log(`Updated operational hours for campground ${campgroundId}`);
+      }
+
+      // Update campground with booking rules when booking_rules step is saved
+      if (step === OnboardingStep.booking_rules && campgroundId) {
+        const rulesData = sanitized as any;
+        await this.prisma.campground.update({
+          where: { id: campgroundId },
+          data: {
+            longTermEnabled: rulesData.longTermEnabled ?? false,
+            longTermMinNights: rulesData.longTermMinNights || 28,
+            longTermAutoApply: rulesData.longTermAutoApply ?? true,
+          },
+        });
+        this.logger.log(`Updated booking rules for campground ${campgroundId}`);
+      }
+
+      // Create waiver template when waivers_documents step is saved
+      if (step === OnboardingStep.waivers_documents && campgroundId) {
+        const waiverData = sanitized as any;
+        if (waiverData.requireWaiver && (waiverData.waiverContent || waiverData.useDefaultWaiver)) {
+          const defaultWaiverContent = `RELEASE AND WAIVER OF LIABILITY
+
+By signing this waiver, I acknowledge and agree to the following:
+
+1. I understand that camping and outdoor activities involve inherent risks.
+2. I assume all responsibility for myself and any minors in my care.
+3. I release the campground from liability for any injuries or damages.
+4. I agree to follow all posted rules and regulations.
+5. I am responsible for any damages caused by myself or my guests.
+
+I have read and understand this waiver and agree to its terms.`;
+
+          await this.prisma.waiverTemplate.create({
+            data: {
+              campgroundId,
+              name: "Standard Liability Waiver",
+              content: waiverData.useDefaultWaiver ? defaultWaiverContent : waiverData.waiverContent,
+              isActive: true,
+              requiresSignature: true,
+            },
+          });
+          this.logger.log(`Created waiver template for campground ${campgroundId}`);
+        }
+      }
+
+      // Update campground with communication settings when communication_setup step is saved
+      if (step === OnboardingStep.communication_setup && campgroundId) {
+        const commData = sanitized as any;
+        await this.prisma.campground.update({
+          where: { id: campgroundId },
+          data: {
+            npsAutoSendEnabled: commData.enableNpsSurvey ?? false,
+            npsSendHour: commData.npsSendHour || 9,
+            senderDomain: commData.useCustomDomain ? commData.customDomain : null,
+          },
+        });
+        this.logger.log(`Updated communication settings for campground ${campgroundId}`);
       }
 
       const progress = this.buildProgress({

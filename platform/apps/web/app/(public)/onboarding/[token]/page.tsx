@@ -9,6 +9,7 @@ import { SetupProgress } from "./components/SetupProgress";
 import { StepContainer } from "./components/StepContainer";
 import { SetupCelebration } from "./components/SetupCelebration";
 import { ParkProfile } from "./steps/ParkProfile";
+import { OperationalHours, OperationalHoursData } from "./steps/OperationalHours";
 import { StripeConnect } from "./steps/StripeConnect";
 import { ImportOrManual } from "./steps/ImportOrManual";
 import { DataImport } from "./steps/DataImport";
@@ -18,9 +19,14 @@ import { RatePeriods, RatePeriod } from "./steps/RatePeriods";
 import { RatesSetup } from "./steps/RatesSetup";
 import { FeesAndAddons } from "./steps/FeesAndAddons";
 import { TaxRules } from "./steps/TaxRules";
+import { BookingRules, BookingRulesData } from "./steps/BookingRules";
 import { DepositPolicy } from "./steps/DepositPolicy";
 import { CancellationRules, CancellationRule } from "./steps/CancellationRules";
+import { WaiversDocuments, WaiversDocumentsData } from "./steps/WaiversDocuments";
 import { ParkRules } from "./steps/ParkRules";
+import { TeamSetup, TeamMember } from "./steps/TeamSetup";
+import { CommunicationSetup, CommunicationSetupData } from "./steps/CommunicationSetup";
+import { Integrations, IntegrationsData } from "./steps/Integrations";
 import { ReviewLaunch } from "./steps/ReviewLaunch";
 import { Loader2 } from "lucide-react";
 
@@ -61,6 +67,9 @@ interface WizardState {
     extraChildFee?: number | null;
     amenityTags?: string[];
     photos?: string[];
+    meteredEnabled?: boolean;
+    meteredType?: string | null;
+    meteredBillingMode?: string | null;
   }>;
   sites?: Array<{
     id: string;
@@ -89,6 +98,13 @@ interface WizardState {
   depositPolicy?: { strategy: string };
   cancellationRules?: CancellationRule[];
   parkRules?: { content: string; requireSignature: boolean };
+  teamMembers?: TeamMember[];
+  integrations?: IntegrationsData;
+  // New step data
+  operationalHours?: OperationalHoursData;
+  bookingRules?: BookingRulesData;
+  waiversDocuments?: WaiversDocumentsData;
+  communicationSetup?: CommunicationSetupData;
 }
 
 export default function OnboardingPage() {
@@ -173,7 +189,13 @@ export default function OnboardingPage() {
     const depositPolicyData = data.deposit_policy?.depositPolicy || data.depositPolicy;
     const cancellationRulesData = data.cancellation_rules?.cancellationRules || data.cancellationRules;
     const parkRulesData = data.park_rules?.parkRules || data.parkRules;
+    const teamMembersData = data.team_setup?.teamMembers || data.teamMembers;
+    const integrationsData = data.integrations?.integrations || data.integrations;
     const inventoryPathData = data.inventory_choice?.path || data.inventoryPath;
+    const operationalHoursData = data.operational_hours || data.operationalHours;
+    const bookingRulesData = data.booking_rules || data.bookingRules;
+    const waiversDocumentsData = data.waivers_documents || data.waiversDocuments;
+    const communicationSetupData = data.communication_setup || data.communicationSetup;
 
     setState((prev) => ({
       ...prev,
@@ -198,6 +220,12 @@ export default function OnboardingPage() {
       depositPolicy: depositPolicyData,
       cancellationRules: cancellationRulesData,
       parkRules: parkRulesData,
+      teamMembers: teamMembersData,
+      integrations: integrationsData,
+      operationalHours: operationalHoursData,
+      bookingRules: bookingRulesData,
+      waiversDocuments: waiversDocumentsData,
+      communicationSetup: communicationSetupData,
       completedSteps: mappedCompletedSteps,
       currentStep: currentStepKey,
       inventoryPath: inventoryPathData,
@@ -353,7 +381,7 @@ export default function OnboardingPage() {
       },
     }));
     completeStep("park_profile");
-    goToStep("stripe_connect");
+    goToStep("operational_hours");
   };
 
   const handleStripeConnect = async (): Promise<string> => {
@@ -549,6 +577,32 @@ export default function OnboardingPage() {
       depositPolicy: data,
     }));
     completeStep("deposit_policy");
+    goToStep("booking_rules");
+  };
+
+  const handleOperationalHoursSave = async (data: OperationalHoursData) => {
+    await saveMutation.mutateAsync({
+      step: "operational_hours",
+      data: { operationalHours: data },
+    });
+    setState((prev) => ({
+      ...prev,
+      operationalHours: data,
+    }));
+    completeStep("operational_hours");
+    goToStep("stripe_connect");
+  };
+
+  const handleBookingRulesSave = async (data: BookingRulesData) => {
+    await saveMutation.mutateAsync({
+      step: "booking_rules",
+      data: { bookingRules: data },
+    });
+    setState((prev) => ({
+      ...prev,
+      bookingRules: data,
+    }));
+    completeStep("booking_rules");
     goToStep("cancellation_rules");
   };
 
@@ -562,11 +616,29 @@ export default function OnboardingPage() {
       cancellationRules: rules,
     }));
     completeStep("cancellation_rules");
-    goToStep("park_rules");
+    goToStep("waivers_documents");
   };
 
   const handleCancellationRulesSkip = () => {
     completeStep("cancellation_rules");
+    goToStep("waivers_documents");
+  };
+
+  const handleWaiversDocumentsSave = async (data: WaiversDocumentsData) => {
+    await saveMutation.mutateAsync({
+      step: "waivers_documents",
+      data: { waiversDocuments: data },
+    });
+    setState((prev) => ({
+      ...prev,
+      waiversDocuments: data,
+    }));
+    completeStep("waivers_documents");
+    goToStep("park_rules");
+  };
+
+  const handleWaiversDocumentsSkip = () => {
+    completeStep("waivers_documents");
     goToStep("park_rules");
   };
 
@@ -580,11 +652,69 @@ export default function OnboardingPage() {
       parkRules: data,
     }));
     completeStep("park_rules");
-    goToStep("review_launch");
+    goToStep("team_setup");
   };
 
   const handleParkRulesSkip = () => {
     completeStep("park_rules");
+    goToStep("team_setup");
+  };
+
+  const handleTeamSetupSave = async (members: TeamMember[]) => {
+    await saveMutation.mutateAsync({
+      step: "team_setup",
+      data: { teamMembers: members },
+    });
+    setState((prev) => ({
+      ...prev,
+      teamMembers: members,
+    }));
+    completeStep("team_setup");
+    goToStep("communication_setup");
+  };
+
+  const handleTeamSetupSkip = () => {
+    completeStep("team_setup");
+    goToStep("communication_setup");
+  };
+
+  const handleCommunicationSetupSave = async (data: CommunicationSetupData) => {
+    await saveMutation.mutateAsync({
+      step: "communication_setup",
+      data: { communicationSetup: data },
+    });
+    setState((prev) => ({
+      ...prev,
+      communicationSetup: data,
+    }));
+    completeStep("communication_setup");
+    showCelebration("Emails Configured!", "Guests will receive beautiful, professional messages", "default");
+    setTimeout(() => {
+      hideCelebration();
+      goToStep("integrations");
+    }, 2000);
+  };
+
+  const handleCommunicationSetupSkip = () => {
+    completeStep("communication_setup");
+    goToStep("integrations");
+  };
+
+  const handleIntegrationsSave = async (integrations: IntegrationsData) => {
+    await saveMutation.mutateAsync({
+      step: "integrations",
+      data: { integrations },
+    });
+    setState((prev) => ({
+      ...prev,
+      integrations,
+    }));
+    completeStep("integrations");
+    goToStep("review_launch");
+  };
+
+  const handleIntegrationsSkip = () => {
+    completeStep("integrations");
     goToStep("review_launch");
   };
 
@@ -622,6 +752,15 @@ export default function OnboardingPage() {
           <ParkProfile
             initialData={state.campground}
             onSave={handleParkProfileSave}
+            onNext={() => goToStep("operational_hours")}
+          />
+        );
+
+      case "operational_hours":
+        return (
+          <OperationalHours
+            initialData={state.operationalHours}
+            onSave={handleOperationalHoursSave}
             onNext={() => goToStep("stripe_connect")}
           />
         );
@@ -665,6 +804,9 @@ export default function OnboardingPage() {
               extraChildFee: c.extraChildFee ?? null,
               amenityTags: c.amenityTags || [],
               photos: c.photos || [],
+              meteredEnabled: (c as any).meteredEnabled || false,
+              meteredType: (c as any).meteredType || null,
+              meteredBillingMode: (c as any).meteredBillingMode || null,
             }))}
             onSave={handleSiteClassesSave}
             onNext={() => goToStep("sites_builder")}
@@ -785,6 +927,15 @@ export default function OnboardingPage() {
           <DepositPolicy
             initialData={state.depositPolicy as any}
             onSave={handleDepositPolicySave}
+            onNext={() => goToStep("booking_rules")}
+          />
+        );
+
+      case "booking_rules":
+        return (
+          <BookingRules
+            initialData={state.bookingRules}
+            onSave={handleBookingRulesSave}
             onNext={() => goToStep("cancellation_rules")}
           />
         );
@@ -801,10 +952,10 @@ export default function OnboardingPage() {
                 handleCancellationRulesSave(state.cancellationRules);
               } else {
                 completeStep("cancellation_rules");
-                goToStep("park_rules");
+                goToStep("waivers_documents");
               }
             }}
-            onBack={() => goToStep("deposit_policy", "backward")}
+            onBack={() => goToStep("booking_rules", "backward")}
             onSkip={handleCancellationRulesSkip}
             siteClasses={
               state.siteClasses?.map((c) => ({
@@ -815,13 +966,74 @@ export default function OnboardingPage() {
           />
         );
 
+      case "waivers_documents":
+        return (
+          <WaiversDocuments
+            initialData={state.waiversDocuments}
+            onSave={handleWaiversDocumentsSave}
+            onSkip={handleWaiversDocumentsSkip}
+            onNext={() => goToStep("park_rules")}
+          />
+        );
+
       case "park_rules":
         return (
           <ParkRules
             initialData={state.parkRules as any}
             onSave={handleParkRulesSave}
             onSkip={handleParkRulesSkip}
-            onNext={() => goToStep("review_launch")}
+            onNext={() => goToStep("team_setup")}
+            onBack={() => goToStep("waivers_documents", "backward")}
+          />
+        );
+
+      case "team_setup":
+        return (
+          <TeamSetup
+            members={state.teamMembers || []}
+            onChange={(members) => {
+              setState((prev) => ({ ...prev, teamMembers: members }));
+            }}
+            onNext={() => {
+              if (state.teamMembers && state.teamMembers.length > 0) {
+                handleTeamSetupSave(state.teamMembers);
+              } else {
+                handleTeamSetupSkip();
+              }
+            }}
+            onBack={() => goToStep("park_rules", "backward")}
+            onSkip={handleTeamSetupSkip}
+          />
+        );
+
+      case "communication_setup":
+        return (
+          <CommunicationSetup
+            initialData={state.communicationSetup}
+            onSave={handleCommunicationSetupSave}
+            onSkip={handleCommunicationSetupSkip}
+            onNext={() => goToStep("integrations")}
+          />
+        );
+
+      case "integrations":
+        return (
+          <Integrations
+            data={state.integrations || { interestedIn: [] }}
+            onChange={(integrations) => {
+              setState((prev) => ({ ...prev, integrations }));
+            }}
+            onNext={() => {
+              if (state.integrations) {
+                handleIntegrationsSave(state.integrations);
+              } else {
+                handleIntegrationsSkip();
+              }
+            }}
+            onBack={() => goToStep("communication_setup", "backward")}
+            onSkip={handleIntegrationsSkip}
+            sessionId={sessionQuery.data?.session?.id}
+            token={token}
           />
         );
 

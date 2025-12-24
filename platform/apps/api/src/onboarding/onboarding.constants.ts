@@ -1,5 +1,6 @@
 export type OnboardingStepKey =
   | "park_profile"
+  | "operational_hours"
   | "stripe_connect"
   | "inventory_choice"
   | "data_import"
@@ -9,9 +10,14 @@ export type OnboardingStepKey =
   | "rates_setup"
   | "fees_and_addons"
   | "tax_rules"
+  | "booking_rules"
   | "deposit_policy"
   | "cancellation_rules"
+  | "waivers_documents"
   | "park_rules"
+  | "team_setup"
+  | "communication_setup"
+  | "integrations"
   | "review_launch";
 
 export type OnboardingPhase = "foundation" | "inventory" | "pricing" | "rules" | "launch";
@@ -27,6 +33,7 @@ export interface OnboardingStep {
 export const ONBOARDING_STEPS: OnboardingStep[] = [
   // Phase 1: Foundation
   { key: "park_profile", title: "Your Campground", description: "Basic info and location", phase: "foundation", required: true },
+  { key: "operational_hours", title: "Hours & Times", description: "Check-in, check-out, quiet hours", phase: "foundation", required: true },
   { key: "stripe_connect", title: "Accept Payments", description: "Connect Stripe account", phase: "foundation", required: true },
   // Phase 2: Inventory
   { key: "inventory_choice", title: "Your Sites", description: "Import or build manually", phase: "inventory", required: true },
@@ -39,10 +46,15 @@ export const ONBOARDING_STEPS: OnboardingStep[] = [
   { key: "fees_and_addons", title: "Fees & Add-ons", description: "Booking fees and extras", phase: "pricing", required: false },
   // Phase 4: Rules & Policies
   { key: "tax_rules", title: "Taxes", description: "Configure tax rules", phase: "rules", required: false },
+  { key: "booking_rules", title: "Booking Rules", description: "Advance booking and stay limits", phase: "rules", required: true },
   { key: "deposit_policy", title: "Deposits", description: "Payment collection rules", phase: "rules", required: true },
   { key: "cancellation_rules", title: "Cancellation", description: "Cancellation policies", phase: "rules", required: false },
+  { key: "waivers_documents", title: "Waivers", description: "Liability and guest agreements", phase: "rules", required: false },
   { key: "park_rules", title: "Park Rules", description: "Guest policies", phase: "rules", required: false },
-  // Phase 5: Launch
+  // Phase 5: Team & Launch
+  { key: "team_setup", title: "Team Setup", description: "Invite staff members", phase: "launch", required: false },
+  { key: "communication_setup", title: "Communications", description: "Email templates and automation", phase: "launch", required: false },
+  { key: "integrations", title: "Integrations", description: "Connect business tools", phase: "launch", required: false },
   { key: "review_launch", title: "Go Live", description: "Review and launch", phase: "launch", required: true },
 ];
 

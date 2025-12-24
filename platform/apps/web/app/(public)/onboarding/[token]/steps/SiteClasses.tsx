@@ -33,6 +33,7 @@ import { SiteClassPhotoUpload } from "@/components/onboarding/SiteClassPhotoUplo
 import { EquipmentTypePicker } from "@/components/onboarding/EquipmentTypePicker";
 import { GuestPricingPanel } from "@/components/onboarding/GuestPricingPanel";
 import { RentalTypeSelector, type RentalType } from "@/components/onboarding/RentalTypeSelector";
+import { MeteredUtilitiesPanel, type MeteredType, type MeteredBillingMode } from "@/components/onboarding/MeteredUtilitiesPanel";
 import {
   Select,
   SelectContent,
@@ -67,6 +68,10 @@ interface SiteClassData {
   // Amenities and photos
   amenityTags: string[];
   photos: string[];
+  // Metered utilities
+  meteredEnabled: boolean;
+  meteredType: MeteredType | null;
+  meteredBillingMode: MeteredBillingMode | null;
 }
 
 interface SiteClassesProps {
@@ -160,6 +165,9 @@ function getDefaultsForType(type: SiteBaseType): Partial<SiteClassData> {
         extraChildFee: null,
         amenityTags: [],
         photos: [],
+        meteredEnabled: false,
+        meteredType: null,
+        meteredBillingMode: null,
       };
     case "tent":
       return {
@@ -177,6 +185,9 @@ function getDefaultsForType(type: SiteBaseType): Partial<SiteClassData> {
         extraChildFee: null,
         amenityTags: ["fire_pit"],
         photos: [],
+        meteredEnabled: false,
+        meteredType: null,
+        meteredBillingMode: null,
       };
     case "cabin":
       return {
@@ -194,6 +205,9 @@ function getDefaultsForType(type: SiteBaseType): Partial<SiteClassData> {
         extraChildFee: null,
         amenityTags: [],
         photos: [],
+        meteredEnabled: false,
+        meteredType: null,
+        meteredBillingMode: null,
       };
     case "glamping":
       return {
@@ -211,6 +225,9 @@ function getDefaultsForType(type: SiteBaseType): Partial<SiteClassData> {
         extraChildFee: null,
         amenityTags: [],
         photos: [],
+        meteredEnabled: false,
+        meteredType: null,
+        meteredBillingMode: null,
       };
   }
 }
@@ -240,6 +257,9 @@ function SiteClassWizard({
     extraChildFee: null,
     amenityTags: [],
     photos: [],
+    meteredEnabled: false,
+    meteredType: null,
+    meteredBillingMode: null,
   });
 
   const handleTypeSelect = (type: SiteBaseType) => {
@@ -504,6 +524,23 @@ function SiteClassWizard({
               />
             </div>
 
+            {/* Metered Utilities - show for RV and tent sites primarily */}
+            <MeteredUtilitiesPanel
+              enabled={data.meteredEnabled || false}
+              onEnabledChange={(enabled) => {
+                setData((prev) => ({
+                  ...prev,
+                  meteredEnabled: enabled,
+                  meteredType: enabled && !prev.meteredType ? "power" : prev.meteredType,
+                  meteredBillingMode: enabled && !prev.meteredBillingMode ? "per_reading" : prev.meteredBillingMode,
+                }));
+              }}
+              type={data.meteredType || null}
+              onTypeChange={(type) => setData((prev) => ({ ...prev, meteredType: type }))}
+              billingMode={data.meteredBillingMode || null}
+              onBillingModeChange={(mode) => setData((prev) => ({ ...prev, meteredBillingMode: mode }))}
+            />
+
             {/* Guest Pricing Panel */}
             <GuestPricingPanel
               occupantsIncluded={data.occupantsIncluded || 2}
@@ -684,6 +721,9 @@ export function SiteClasses({
       extraChildFee: c.extraChildFee || null,
       amenityTags: c.amenityTags || [],
       photos: c.photos || [],
+      meteredEnabled: c.meteredEnabled || false,
+      meteredType: c.meteredType || null,
+      meteredBillingMode: c.meteredBillingMode || null,
     }))
   );
   const [saving, setSaving] = useState(false);

@@ -14,6 +14,8 @@ import {
   Check,
   Info,
   ChevronRight,
+  ChevronDown,
+  BookOpen,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -35,6 +37,14 @@ interface AddOnItem {
   pricingType: "flat" | "per_night" | "per_person";
 }
 
+interface GlCodes {
+  siteRevenue: string | null;
+  bookingFees: string | null;
+  petFees: string | null;
+  storeSales: string | null;
+  lateFees: string | null;
+}
+
 interface FeesAndAddonsData {
   bookingFeeCents: number | null;
   siteLockFeeCents: number | null;
@@ -42,6 +52,7 @@ interface FeesAndAddonsData {
   petFeeCents: number | null;
   petFeeType: "per_pet_per_night" | "flat";
   addOnItems: AddOnItem[];
+  glCodes?: GlCodes;
 }
 
 interface FeesAndAddonsProps {
@@ -81,6 +92,7 @@ export function FeesAndAddons({
 }: FeesAndAddonsProps) {
   const prefersReducedMotion = useReducedMotion();
   const [showAddForm, setShowAddForm] = useState(false);
+  const [showGlCodes, setShowGlCodes] = useState(false);
 
   // New add-on form state
   const [newItemName, setNewItemName] = useState("");
@@ -182,6 +194,22 @@ export function FeesAndAddons({
 
   const handleSkip = () => {
     onNext();
+  };
+
+  const updateGlCode = (field: keyof GlCodes, value: string) => {
+    const currentGlCodes = data.glCodes || {
+      siteRevenue: null,
+      bookingFees: null,
+      petFees: null,
+      storeSales: null,
+      lateFees: null,
+    };
+    updateData({
+      glCodes: {
+        ...currentGlCodes,
+        [field]: value.trim() || null,
+      },
+    });
   };
 
   return (
@@ -573,6 +601,106 @@ export function FeesAndAddons({
             You can configure these anytime in your dashboard. Add-ons will be
             visible to guests during booking.
           </div>
+        </motion.div>
+
+        {/* GL Codes Section (Collapsible) */}
+        <motion.div
+          initial={prefersReducedMotion ? {} : { opacity: 0 }}
+          animate={prefersReducedMotion ? {} : { opacity: 1 }}
+          transition={{ delay: 0.4 }}
+          className="border-t border-slate-700 pt-6"
+        >
+          <button
+            onClick={() => setShowGlCodes(!showGlCodes)}
+            className="flex items-center justify-between w-full text-left group"
+          >
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 rounded-lg bg-amber-500/20 flex items-center justify-center">
+                <BookOpen className="w-4 h-4 text-amber-400" />
+              </div>
+              <div>
+                <span className="text-sm font-medium text-slate-300 group-hover:text-white transition-colors">
+                  Advanced: Accounting Setup
+                </span>
+                <span className="text-xs text-slate-500 ml-2">(Optional)</span>
+              </div>
+            </div>
+            <ChevronDown
+              className={cn(
+                "w-5 h-5 text-slate-500 transition-transform",
+                showGlCodes && "rotate-180"
+              )}
+            />
+          </button>
+
+          <AnimatePresence>
+            {showGlCodes && (
+              <motion.div
+                initial={prefersReducedMotion ? {} : { opacity: 0, height: 0 }}
+                animate={prefersReducedMotion ? {} : { opacity: 1, height: "auto" }}
+                exit={prefersReducedMotion ? {} : { opacity: 0, height: 0 }}
+                className="overflow-hidden"
+              >
+                <div className="pt-4 space-y-4">
+                  <div className="bg-blue-500/10 border border-blue-500/20 rounded-lg p-3 flex gap-2">
+                    <Info className="w-4 h-4 text-blue-400 flex-shrink-0 mt-0.5" />
+                    <p className="text-xs text-blue-300">
+                      GL Codes help categorize revenue for your accountant or QuickBooks/Xero.
+                      Skip this if you're not sure - you can set it up later in Settings.
+                    </p>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label className="text-xs text-slate-400">Site Revenue</Label>
+                      <Input
+                        value={data.glCodes?.siteRevenue || ""}
+                        onChange={(e) => updateGlCode("siteRevenue", e.target.value)}
+                        placeholder="e.g., 4000-SITES"
+                        className="bg-slate-800/50 border-slate-700 text-white text-sm"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label className="text-xs text-slate-400">Booking Fees</Label>
+                      <Input
+                        value={data.glCodes?.bookingFees || ""}
+                        onChange={(e) => updateGlCode("bookingFees", e.target.value)}
+                        placeholder="e.g., 4100-FEES"
+                        className="bg-slate-800/50 border-slate-700 text-white text-sm"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label className="text-xs text-slate-400">Pet Fees</Label>
+                      <Input
+                        value={data.glCodes?.petFees || ""}
+                        onChange={(e) => updateGlCode("petFees", e.target.value)}
+                        placeholder="e.g., 4200-PETS"
+                        className="bg-slate-800/50 border-slate-700 text-white text-sm"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label className="text-xs text-slate-400">Store Sales</Label>
+                      <Input
+                        value={data.glCodes?.storeSales || ""}
+                        onChange={(e) => updateGlCode("storeSales", e.target.value)}
+                        placeholder="e.g., 4300-STORE"
+                        className="bg-slate-800/50 border-slate-700 text-white text-sm"
+                      />
+                    </div>
+                    <div className="space-y-2 col-span-2 sm:col-span-1">
+                      <Label className="text-xs text-slate-400">Late Fees</Label>
+                      <Input
+                        value={data.glCodes?.lateFees || ""}
+                        onChange={(e) => updateGlCode("lateFees", e.target.value)}
+                        placeholder="e.g., 4400-LATE"
+                        className="bg-slate-800/50 border-slate-700 text-white text-sm"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </motion.div>
 
         {/* Action buttons */}

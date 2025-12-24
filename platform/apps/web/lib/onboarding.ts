@@ -1,5 +1,6 @@
 export type OnboardingStepKey =
   | "park_profile"
+  | "operational_hours"
   | "stripe_connect"
   | "inventory_choice"
   | "data_import"
@@ -9,9 +10,14 @@ export type OnboardingStepKey =
   | "rates_setup"
   | "fees_and_addons"
   | "tax_rules"
+  | "booking_rules"
   | "deposit_policy"
   | "cancellation_rules"
+  | "waivers_documents"
   | "park_rules"
+  | "team_setup"
+  | "communication_setup"
+  | "integrations"
   | "review_launch";
 
 export type OnboardingPhase = "foundation" | "inventory" | "pricing" | "rules" | "launch";
@@ -34,6 +40,13 @@ export const onboardingSteps: OnboardingStep[] = [
     key: "park_profile",
     title: "Your Campground",
     description: "Let's get the basics set up",
+    phase: "foundation",
+    required: true,
+  },
+  {
+    key: "operational_hours",
+    title: "Hours & Times",
+    description: "Set check-in, check-out, and quiet hours",
     phase: "foundation",
     required: true,
   },
@@ -112,6 +125,13 @@ export const onboardingSteps: OnboardingStep[] = [
     required: false,
   },
   {
+    key: "booking_rules",
+    title: "Booking Rules",
+    description: "Set advance booking and stay limits",
+    phase: "rules",
+    required: true,
+  },
+  {
     key: "deposit_policy",
     title: "Deposits",
     description: "How much to collect upfront",
@@ -126,6 +146,13 @@ export const onboardingSteps: OnboardingStep[] = [
     required: false,
   },
   {
+    key: "waivers_documents",
+    title: "Waivers & Agreements",
+    description: "Liability waivers guests must sign",
+    phase: "rules",
+    required: false,
+  },
+  {
     key: "park_rules",
     title: "Park Rules",
     description: "Policies guests must acknowledge",
@@ -133,6 +160,31 @@ export const onboardingSteps: OnboardingStep[] = [
     required: false,
   },
   // Phase 5: Launch
+  {
+    key: "team_setup",
+    title: "Team Setup",
+    description: "Invite staff members",
+    phase: "launch",
+    required: false,
+  },
+  {
+    key: "communication_setup",
+    title: "Communications",
+    description: "Set up email templates and automation",
+    phase: "launch",
+    required: false,
+    celebration: {
+      title: "Emails Configured!",
+      subtitle: "Guests will receive beautiful, professional messages",
+    },
+  },
+  {
+    key: "integrations",
+    title: "Integrations",
+    description: "Connect your business tools",
+    phase: "launch",
+    required: false,
+  },
   {
     key: "review_launch",
     title: "Go Live",
