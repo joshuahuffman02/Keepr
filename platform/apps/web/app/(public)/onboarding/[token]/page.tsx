@@ -138,29 +138,39 @@ export default function OnboardingPage() {
       email: data.email || data.campground?.email || "",
     };
 
+    // Extract data from step-keyed structure
+    const parkProfileData = data.park_profile?.campground || data.account_profile?.campground || data.campground;
+    const siteClassesData = data.site_classes?.siteClasses || data.siteClasses;
+    const sitesData = data.sites_builder?.sites || data.sites;
+    const ratesData = data.rates_setup?.rates || data.rates;
+    const taxRulesData = data.tax_rules?.taxRules || data.taxRules;
+    const depositPolicyData = data.deposit_policy?.depositPolicy || data.depositPolicy;
+    const parkRulesData = data.park_rules?.parkRules || data.parkRules;
+    const inventoryPathData = data.inventory_choice?.path || data.inventoryPath;
+
     setState((prev) => ({
       ...prev,
       campground: {
-        id: session.campgroundId || data.campground?.id || "",
-        name: data.campground?.name || signupData.name,
-        slug: session.campgroundSlug || data.campground?.slug,
-        phone: data.campground?.phone || signupData.phone,
-        email: data.campground?.email || signupData.email,
-        city: data.campground?.city || "",
-        state: data.campground?.state || "",
-        amenities: data.campground?.amenities,
+        id: session.campgroundId || parkProfileData?.id || "",
+        name: parkProfileData?.name || signupData.name,
+        slug: session.campgroundSlug || parkProfileData?.slug,
+        phone: parkProfileData?.phone || signupData.phone,
+        email: parkProfileData?.email || signupData.email,
+        city: parkProfileData?.city || "",
+        state: parkProfileData?.state || "",
+        amenities: parkProfileData?.amenities,
       },
-      stripeConnected: data.stripeConnected,
-      stripeAccountId: data.stripeAccountId,
-      siteClasses: data.siteClasses,
-      sites: data.sites,
-      rates: data.rates,
-      taxRules: data.taxRules,
-      depositPolicy: data.depositPolicy,
-      parkRules: data.parkRules,
+      stripeConnected: data.stripe_connect?.connected || data.stripeConnected,
+      stripeAccountId: data.stripe_connect?.accountId || data.stripeAccountId,
+      siteClasses: siteClassesData,
+      sites: sitesData,
+      rates: ratesData,
+      taxRules: taxRulesData,
+      depositPolicy: depositPolicyData,
+      parkRules: parkRulesData,
       completedSteps: mappedCompletedSteps,
       currentStep: currentStepKey,
-      inventoryPath: data.inventoryPath,
+      inventoryPath: inventoryPathData,
     }));
 
     setInitialized(true);
