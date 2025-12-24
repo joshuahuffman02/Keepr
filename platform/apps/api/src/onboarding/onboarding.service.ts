@@ -214,6 +214,72 @@ export class OnboardingService {
         };
       }
 
+      // Create SiteClass records when site_classes step is saved
+      if (step === OnboardingStep.site_classes && campgroundId) {
+        const siteClassesData = (sanitized as any).siteClasses || [];
+        const createdIds: string[] = [];
+
+        // Delete existing site classes for this campground (idempotent re-save)
+        await this.prisma.siteClass.deleteMany({ where: { campgroundId } });
+
+        for (const sc of siteClassesData) {
+          const created = await this.prisma.siteClass.create({
+            data: {
+              campgroundId,
+              name: sc.name,
+              siteType: sc.siteType || "rv",
+              description: sc.description || null,
+              defaultRate: Math.round((sc.defaultRate || 0) * 100), // Convert to cents
+              maxOccupancy: sc.maxOccupancy || 6,
+              rigMaxLength: sc.rigMaxLength || null,
+              hookupsPower: sc.hookupsPower ?? (sc.electricAmps?.length > 0),
+              hookupsWater: sc.hookupsWater ?? false,
+              hookupsSewer: sc.hookupsSewer ?? false,
+              electricAmps: sc.electricAmps || [],
+              rvOrientation: sc.rvOrientation || null,
+              petFriendly: sc.petFriendly ?? true,
+              accessible: sc.accessible ?? false,
+              photos: sc.photos || [],
+              tags: sc.amenityTags || [],
+            },
+          });
+          createdIds.push(created.id);
+          this.logger.log(`Created SiteClass ${created.id} (${created.name}) for campground ${campgroundId}`);
+        }
+
+        // Store the created IDs in sanitized data
+        (sanitized as any).siteClassIds = createdIds;
+      }
+
+      // Create Site records when sites_builder step is saved
+      if (step === OnboardingStep.sites_builder && campgroundId) {
+        const sitesData = (sanitized as any).sites || [];
+        const sessionData = session.data as any;
+        const siteClassIds = sessionData?.site_classes?.siteClassIds || [];
+
+        // Delete existing sites for this campground (idempotent re-save)
+        await this.prisma.site.deleteMany({ where: { campgroundId } });
+
+        for (const site of sitesData) {
+          // Map the temp siteClassId to actual database ID
+          const siteClassIndex = parseInt(site.siteClassId?.replace('temp-', '') || '0');
+          const actualSiteClassId = siteClassIds[siteClassIndex];
+
+          if (actualSiteClassId) {
+            await this.prisma.site.create({
+              data: {
+                campgroundId,
+                siteClassId: actualSiteClassId,
+                name: site.name || `Site ${site.siteNumber}`,
+                siteNumber: site.siteNumber,
+                status: "available",
+              },
+            });
+            this.logger.log(`Created Site ${site.siteNumber} for campground ${campgroundId}`);
+          }
+        }
+      }
+
       const progress = this.buildProgress({
         ...session,
         currentStep: step,
