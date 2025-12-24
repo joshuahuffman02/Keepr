@@ -13,7 +13,7 @@ type AdminTopBarProps = {
     navigationItems?: CommandItem[];
     actionItems?: CommandItem[];
     favoriteItems?: CommandItem[];
-    recentItems?: CommandItem[];
+    allPagesItems?: CommandItem[];
 };
 
 // Click outside hook for closing dropdowns
@@ -55,7 +55,7 @@ export function AdminTopBar({
     navigationItems = [],
     actionItems = [],
     favoriteItems = [],
-    recentItems = []
+    allPagesItems = []
 }: AdminTopBarProps) {
     const [isSearchOpen, setIsSearchOpen] = useState(false);
     const [searchQuery, setSearchQuery] = useState("");
@@ -104,10 +104,10 @@ export function AdminTopBar({
     const normalizedQuery = searchQuery.trim().toLowerCase();
     const searchSections = useMemo(() => {
         const sections = [
-            { title: "Favorites", items: favoriteItems },
-            { title: "Recent", items: recentItems },
+            { title: "Pinned", items: favoriteItems },
             { title: "Actions", items: actionItems },
-            { title: "Navigation", items: navigationItems }
+            { title: "Navigation", items: navigationItems },
+            { title: "All Pages", items: allPagesItems }
         ];
 
         const matchesQuery = (item: CommandItem) => {
@@ -122,7 +122,7 @@ export function AdminTopBar({
                 ...section,
                 items: section.items.filter(matchesQuery)
             }))
-            : sections.filter((section) => section.title !== "Navigation");
+            : sections.filter((section) => section.title !== "All Pages"); // Only show All Pages when searching
 
         const seen = new Set<string>();
         filtered = filtered
@@ -145,14 +145,21 @@ export function AdminTopBar({
 
         const totalCount = filtered.reduce((sum, section) => sum + section.items.length, 0);
         return { sections: filtered, totalCount };
-    }, [actionItems, favoriteItems, navigationItems, recentItems, normalizedQuery]);
+    }, [actionItems, favoriteItems, navigationItems, allPagesItems, normalizedQuery]);
 
     const getSectionIcon = (title: string) => {
         switch (title) {
             case "Favorites":
+            case "Pinned":
                 return (
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path d="M12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2z" />
+                    </svg>
+                );
+            case "All Pages":
+                return (
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path d="M4 6h16M4 12h16M4 18h16" strokeWidth="2" strokeLinecap="round" />
                     </svg>
                 );
             case "Recent":

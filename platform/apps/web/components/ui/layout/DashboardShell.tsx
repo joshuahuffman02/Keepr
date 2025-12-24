@@ -10,10 +10,29 @@ import { AdminTopBar } from "./AdminTopBar";
 import { apiClient } from "@/lib/api-client";
 import { StaffChat } from "../../StaffChat";
 import { useWhoami } from "@/hooks/use-whoami";
+import { useMenuConfig } from "@/hooks/use-menu-config";
 import { SyncStatus } from "../../sync/SyncStatus";
 import { SyncDetailsDrawer } from "../../sync/SyncDetailsDrawer";
 import { useSyncStatus } from "@/contexts/SyncStatusContext";
 import { SupportChatWidget } from "../../support/SupportChatWidget";
+import { resolvePages, PAGE_REGISTRY, PageDefinition } from "@/lib/page-registry";
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  DragEndEvent,
+} from "@dnd-kit/core";
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  useSortable,
+  verticalListSortingStrategy,
+} from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
 
 type IconName =
   | "dashboard"
@@ -277,11 +296,57 @@ export function DashboardShell({ children, className, title, subtitle }: { child
   const [collapsed, setCollapsed] = useState(false);
   const [openSections, setOpenSections] = useState<Record<string, boolean>>({});
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
-  const [favorites, setFavorites] = useState<string[]>([]);
-  const [visitCounts, setVisitCounts] = useState<Record<string, number>>({});
   const [pinEditMode, setPinEditMode] = useState(false);
   const [syncDrawerOpen, setSyncDrawerOpen] = useState(false);
   const { status } = useSyncStatus();
+
+  // Use the menu config hook for pinned pages
+  const {
+    pinnedPages,
+    sidebarCollapsed: savedCollapsed,
+    isPinned,
+    togglePin,
+    setSidebarCollapsed,
+    reorderPages,
+  } = useMenuConfig();
+
+  // DnD sensors for drag-and-drop reordering
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 8,
+      },
+    }),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
+
+  // Handle drag end for reordering pinned pages
+  const handleDragEnd = useCallback(
+    (event: DragEndEvent) => {
+      const { active, over } = event;
+      if (over && active.id !== over.id) {
+        const oldIndex = pinnedPages.indexOf(active.id as string);
+        const newIndex = pinnedPages.indexOf(over.id as string);
+        if (oldIndex !== -1 && newIndex !== -1) {
+          const newOrder = arrayMove(pinnedPages, oldIndex, newIndex);
+          reorderPages(newOrder);
+        }
+      }
+    },
+    [pinnedPages, reorderPages]
+  );
+
+  // Sync collapsed state from server
+  useEffect(() => {
+    if (savedCollapsed !== undefined) {
+      setCollapsed(savedCollapsed);
+    }
+  }, [savedCollapsed]);
+
+  // Get all resolved pages for this campground
+  const allPages = useMemo(() => resolvePages(selected || null), [selected]);
 
   // Permission helpers
   const memberships = whoami?.user?.memberships ?? [];
@@ -406,41 +471,7 @@ export function DashboardShell({ children, className, title, subtitle }: { child
     return () => clearInterval(id);
   }, [selected, session]);
 
-  // Load personalization (favorites & visit counts)
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-    try {
-      const storedFavs = localStorage.getItem("campreserv:nav:favorites");
-      const storedCounts = localStorage.getItem("campreserv:nav:visits");
-      if (storedFavs) setFavorites(JSON.parse(storedFavs));
-      if (storedCounts) setVisitCounts(JSON.parse(storedCounts));
-    } catch {
-      // ignore parse errors
-    }
-  }, []);
-
-  // Seed default favorites for ops users with a selected campground
-  useEffect(() => {
-    if (!allowOps || !selected) return;
-    if (favorites.length) return;
-    setFavorites([
-      "/check-in-out",
-      `/campgrounds/${selected}/staff/timeclock`,
-      `/campgrounds/${selected}/staff/approvals`,
-      `/campgrounds/${selected}/staff/overrides`
-    ]);
-  }, [allowOps, selected, favorites.length]);
-
-  // Persist personalization
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-    localStorage.setItem("campreserv:nav:favorites", JSON.stringify(favorites));
-  }, [favorites]);
-
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-    localStorage.setItem("campreserv:nav:visits", JSON.stringify(visitCounts));
-  }, [visitCounts]);
+  // Note: Favorites are now managed via useMenuConfig hook (database-backed)
 
   useEffect(() => {
     if (!selected) return;
@@ -550,38 +581,34 @@ export function DashboardShell({ children, className, title, subtitle }: { child
     return map;
   }, [navSections]);
 
-  const incrementVisit = useCallback(
-    (href: string) => {
-      setVisitCounts((prev) => {
-        const next = { ...prev, [href]: (prev[href] ?? 0) + 1 };
-        return next;
-      });
-    },
-    [setVisitCounts]
-  );
-
-  // Track most visited on navigation change
+  // Close mobile nav on navigation
   useEffect(() => {
     if (!pathname) return;
-    // Only record known nav items to avoid noise
-    if (allNavItems.has(pathname)) {
-      incrementVisit(pathname);
-    }
     setMobileNavOpen(false);
-  }, [pathname, allNavItems, incrementVisit]);
+  }, [pathname]);
 
+  // Build favorites items from pinned pages (from hook)
   const favoritesItems = useMemo(() => {
-    return favorites
-      .map((href) => allNavItems.get(href))
-      .filter(Boolean) as NavItem[];
-  }, [favorites, allNavItems]);
+    return pinnedPages
+      .map((href) => {
+        // First check allNavItems for exact match
+        const navItem = allNavItems.get(href);
+        if (navItem) return navItem;
 
-  const mostVisitedItems = useMemo(() => {
-    const entries = Object.entries(visitCounts)
-      .filter(([href]) => allNavItems.has(href) && !favorites.includes(href));
-    const sorted = entries.sort((a, b) => b[1] - a[1]).slice(0, 5);
-    return sorted.map(([href]) => allNavItems.get(href)).filter(Boolean) as NavItem[];
-  }, [visitCounts, allNavItems, favorites]);
+        // Then check page registry for the page definition
+        const pageDef = allPages.find((p) => p.href === href);
+        if (pageDef) {
+          return {
+            label: pageDef.label,
+            href: pageDef.href,
+            icon: pageDef.icon,
+            tooltip: pageDef.description,
+          } as NavItem;
+        }
+        return null;
+      })
+      .filter(Boolean) as NavItem[];
+  }, [pinnedPages, allNavItems, allPages]);
 
   const toCommandItem = useCallback((item: NavItem, subtitle?: string): CommandItem => ({
     id: item.href,
@@ -601,38 +628,35 @@ export function DashboardShell({ children, className, title, subtitle }: { child
   );
 
   const favoriteCommandItems = useMemo(
-    () => favoritesItems.map((item) => toCommandItem(item, "Favorite")),
+    () => favoritesItems.map((item) => toCommandItem(item, "Pinned")),
     [favoritesItems, toCommandItem]
   );
 
-  const recentCommandItems = useMemo(
-    () => mostVisitedItems.map((item) => toCommandItem(item, "Recently visited")),
-    [mostVisitedItems, toCommandItem]
+  // Build command items from all pages for search
+  const allPagesCommandItems = useMemo(
+    () => allPages.map((page) => ({
+      id: page.href,
+      label: page.label,
+      href: page.href,
+      subtitle: page.description,
+    })),
+    [allPages]
   );
 
-  const toggleFavorite = useCallback((href: string) => {
-    setFavorites((prev) => {
-      if (prev.includes(href)) {
-        return prev.filter((f) => f !== href);
-      }
-      return [href, ...prev].slice(0, 20);
-    });
-  }, []);
-
-  const PinButton = ({ isPinned, onClick }: { isPinned: boolean; onClick: (e: React.MouseEvent) => void }) => (
+  const PinButton = ({ pinned, onClick }: { pinned: boolean; onClick: (e: React.MouseEvent) => void }) => (
     <button
       type="button"
       className={cn(
         "ml-2 inline-flex h-6 w-6 items-center justify-center rounded border text-slate-400 hover:text-white transition-colors",
-        isPinned ? "border-amber-300 bg-amber-50/10" : "border-slate-700 bg-slate-900/60 hover:bg-slate-800"
+        pinned ? "border-amber-300 bg-amber-50/10" : "border-slate-700 bg-slate-900/60 hover:bg-slate-800"
       )}
-      aria-label={isPinned ? "Unpin from favorites" : "Pin to favorites"}
-      title={isPinned ? "Unpin from favorites" : "Pin to favorites"}
+      aria-label={pinned ? "Unpin from menu" : "Pin to menu"}
+      title={pinned ? "Unpin from menu" : "Pin to menu"}
       onClick={onClick}
     >
       <svg
         viewBox="0 0 24 24"
-        fill={isPinned ? "currentColor" : "none"}
+        fill={pinned ? "currentColor" : "none"}
         stroke="currentColor"
         strokeWidth="2"
         className="h-3.5 w-3.5"
@@ -641,6 +665,77 @@ export function DashboardShell({ children, className, title, subtitle }: { child
       </svg>
     </button>
   );
+
+  // Sortable favorite item component for drag-and-drop reordering
+  const SortableFavoriteItem = ({ item, isActive, isCollapsed, showPin }: {
+    item: NavItem;
+    isActive: boolean;
+    isCollapsed: boolean;
+    showPin: boolean;
+  }) => {
+    const {
+      attributes,
+      listeners,
+      setNodeRef,
+      transform,
+      transition,
+      isDragging,
+    } = useSortable({ id: item.href });
+
+    const style = {
+      transform: CSS.Transform.toString(transform),
+      transition,
+      opacity: isDragging ? 0.5 : 1,
+    };
+
+    return (
+      <div ref={setNodeRef} style={style}>
+        <Link
+          className={cn(
+            "flex items-center justify-between rounded-md px-3 py-2.5 text-sm md:text-[15px] text-slate-400 hover:bg-slate-800 hover:text-white transition-colors",
+            isActive && "bg-slate-800 text-white font-semibold",
+            isDragging && "z-50"
+          )}
+          href={item.href}
+          aria-current={isActive ? "page" : undefined}
+          title={item.tooltip ?? item.label}
+        >
+          <span className={cn("flex items-center gap-2", isCollapsed && "justify-center w-full")}>
+            {/* Drag handle - only show in edit mode */}
+            {showPin && !isCollapsed && (
+              <span
+                {...attributes}
+                {...listeners}
+                className="cursor-grab active:cursor-grabbing text-slate-500 hover:text-slate-300 mr-1"
+                onClick={(e) => e.preventDefault()}
+              >
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
+                  <circle cx="9" cy="6" r="2" />
+                  <circle cx="15" cy="6" r="2" />
+                  <circle cx="9" cy="12" r="2" />
+                  <circle cx="15" cy="12" r="2" />
+                  <circle cx="9" cy="18" r="2" />
+                  <circle cx="15" cy="18" r="2" />
+                </svg>
+              </span>
+            )}
+            <Icon name={(item.icon as IconName) ?? "sparkles"} active={isActive} />
+            {!isCollapsed && item.label}
+          </span>
+          {!isCollapsed && showPin && (
+            <PinButton
+              pinned={true}
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                togglePin(item.href);
+              }}
+            />
+          )}
+        </Link>
+      </div>
+    );
+  };
 
   // Initialize open sections; preserve prior state but default to section defaults
   useEffect(() => {
@@ -680,7 +775,7 @@ export function DashboardShell({ children, className, title, subtitle }: { child
         navigationItems={navigationCommandItems}
         actionItems={actionCommandItems}
         favoriteItems={favoriteCommandItems}
-        recentItems={recentCommandItems}
+        allPagesItems={allPagesCommandItems}
       />
 
       {/* Mobile nav drawer */}
@@ -807,7 +902,11 @@ export function DashboardShell({ children, className, title, subtitle }: { child
             )}
             <button
               className="rounded-md border border-slate-700 bg-slate-800 p-2 text-slate-400 hover:bg-slate-700 hover:text-white"
-              onClick={() => setCollapsed((v) => !v)}
+              onClick={() => {
+                const newValue = !collapsed;
+                setCollapsed(newValue);
+                setSidebarCollapsed(newValue);
+              }}
               aria-label="Toggle sidebar"
             >
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
@@ -870,47 +969,40 @@ export function DashboardShell({ children, className, title, subtitle }: { child
                 </button>
               </div>
             )}
-            {/* Favorites */}
+            {/* Favorites with drag-and-drop reordering */}
             {favoritesItems.length > 0 && (
               <div className="space-y-1">
                 {!collapsed && (
                   <div className="px-3 text-[11px] font-semibold uppercase tracking-wide text-slate-500">
-                    Favorites
+                    Pinned
                   </div>
                 )}
-                <div className="space-y-1">
-                  {favoritesItems.map((item) => {
-                    const baseHref = item.href.split(/[?#]/)[0];
-                    const isActive = currentPath === baseHref || currentPath.startsWith(baseHref + "/");
-                    return (
-                      <Link
-                        key={`fav-${item.href}`}
-                        className={cn(
-                          "flex items-center justify-between rounded-md px-3 py-2.5 text-sm md:text-[15px] text-slate-400 hover:bg-slate-800 hover:text-white transition-colors",
-                          isActive && "bg-slate-800 text-white font-semibold"
-                        )}
-                        href={item.href}
-                        aria-current={isActive ? "page" : undefined}
-                        title={item.tooltip ?? item.label}
-                      >
-                        <span className={cn("flex items-center gap-2", collapsed && "justify-center w-full")}>
-                          <Icon name={(item.icon as IconName) ?? "sparkles"} active={isActive} />
-                          {!collapsed && item.label}
-                        </span>
-                        {!collapsed && pinEditMode && (
-                          <PinButton
-                            isPinned={true}
-                            onClick={(e) => {
-                              e.preventDefault();
-                              e.stopPropagation();
-                              toggleFavorite(item.href);
-                            }}
+                <DndContext
+                  sensors={sensors}
+                  collisionDetection={closestCenter}
+                  onDragEnd={handleDragEnd}
+                >
+                  <SortableContext
+                    items={pinnedPages}
+                    strategy={verticalListSortingStrategy}
+                  >
+                    <div className="space-y-1">
+                      {favoritesItems.map((item) => {
+                        const baseHref = item.href.split(/[?#]/)[0];
+                        const isActive = currentPath === baseHref || currentPath.startsWith(baseHref + "/");
+                        return (
+                          <SortableFavoriteItem
+                            key={`fav-${item.href}`}
+                            item={item}
+                            isActive={isActive}
+                            isCollapsed={collapsed}
+                            showPin={pinEditMode}
                           />
-                        )}
-                      </Link>
-                    );
-                  })}
-                </div>
+                        );
+                      })}
+                    </div>
+                  </SortableContext>
+                </DndContext>
               </div>
             )}
 
@@ -921,7 +1013,7 @@ export function DashboardShell({ children, className, title, subtitle }: { child
                 {section.items.map((item) => {
                   const baseHref = item.href.split(/[?#]/)[0];
                   const isActive = currentPath === baseHref || currentPath.startsWith(baseHref + "/");
-                  const isFav = favorites.includes(item.href);
+                  const itemIsPinned = isPinned(item.href);
                   return (
                     <Link
                       key={`${section.heading}-${item.href}-${item.label}`}
@@ -945,11 +1037,11 @@ export function DashboardShell({ children, className, title, subtitle }: { child
                       )}
                       {!collapsed && pinEditMode && (
                         <PinButton
-                          isPinned={isFav}
+                          pinned={itemIsPinned}
                           onClick={(e) => {
                             e.preventDefault();
                             e.stopPropagation();
-                            toggleFavorite(item.href);
+                            togglePin(item.href);
                           }}
                         />
                       )}
@@ -963,6 +1055,30 @@ export function DashboardShell({ children, className, title, subtitle }: { child
                 })}
               </div>
             ))}
+
+            {/* All Pages link */}
+            {!collapsed && (
+              <div className="mt-6 pt-4 border-t border-slate-700">
+                <Link
+                  href="/all-pages"
+                  className="flex items-center gap-2 px-3 py-2 text-sm text-slate-400 hover:text-white hover:bg-slate-800 rounded-md transition-colors"
+                >
+                  <svg
+                    width="18"
+                    height="18"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="1.6"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <path d="M4 6h16M4 12h16M4 18h16" />
+                  </svg>
+                  <span>All Pages</span>
+                </Link>
+              </div>
+            )}
           </nav>
         </aside>
         <main className={cn("flex-1", className)}>

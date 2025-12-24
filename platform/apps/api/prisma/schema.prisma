@@ -511,6 +511,22 @@ model User {
   roomMovesRequested       RoomMoveRequest[]    @relation("RoomMoveRequester")
   roomMovesApproved        RoomMoveRequest[]    @relation("RoomMoveApprover")
   roomMovesCompleted       RoomMoveRequest[]    @relation("RoomMoveCompleter")
+
+  // Customizable menu configuration
+  menuConfig               UserMenuConfig?
+}
+
+// User's customizable sidebar menu configuration
+model UserMenuConfig {
+  id                String   @id @default(cuid())
+  userId            String   @unique
+  pinnedPages       String[] @default([])     // hrefs pinned to sidebar
+  sidebarCollapsed  Boolean  @default(false)
+  migratedFromLocal Boolean  @default(false)  // track localStorage migration
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model GuestEquipment {

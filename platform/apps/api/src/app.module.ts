@@ -104,6 +104,7 @@ import { OrgReferralsModule } from "./org-referrals/org-referrals.module";
 import { SetupServicesModule } from "./setup-services/setup-services.module";
 import { InventoryModule } from "./inventory/inventory.module";
 import { PartnerApiModule } from "./partner-api/partner-api.module";
+import { MenuConfigModule } from "./menu-config/menu-config.module";
 
 @Module({
   imports: [
@@ -212,6 +213,7 @@ import { PartnerApiModule } from "./partner-api/partner-api.module";
     OrgReferralsModule,
     SetupServicesModule,
     PartnerApiModule,
+    MenuConfigModule,
   ],
   providers: []
 })
