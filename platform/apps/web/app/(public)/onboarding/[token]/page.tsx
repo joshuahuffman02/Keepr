@@ -606,11 +606,11 @@ export default function OnboardingPage() {
   };
 
   const handlePreview = () => {
-    // Open booking page in new tab with preview token
+    // Open campground homepage in new tab with preview token
     // Fallback slug generation uses same algorithm as backend
     const slug = state.campground?.slug || state.campground?.name?.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
     if (slug) {
-      window.open(`/park/${slug}/book?token=${encodeURIComponent(token)}`, "_blank");
+      window.open(`/park/${slug}/v2?token=${encodeURIComponent(token)}`, "_blank");
     }
   };
 

@@ -1,7 +1,6 @@
 [build]
-# Note: Each service should specify its Dockerfile in Railway dashboard:
-# - API service: Dockerfile.api
-# - Web service: Dockerfile (default)
+# Force Docker builds instead of Railpack to support pnpm workspaces
+builder = "DOCKERFILE"
 
 # Pass these environment variables as Docker build arguments
 buildArgs = [
@@ -12,5 +11,6 @@ buildArgs = [
   "CACHE_BUST"
 ]
 
-# Force no cache for Prisma client regeneration issue
-# Note: Set CACHE_BUST environment variable in Railway dashboard to force rebuild
+[deploy]
+restartPolicyType = "ON_FAILURE"
+restartPolicyMaxRetries = 3

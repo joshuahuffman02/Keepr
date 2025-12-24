@@ -5,17 +5,19 @@ import Script from "next/script";
 
 type Props = {
   params: Promise<{ slug: string }>;
+  searchParams: Promise<{ token?: string }>;
 };
 
 const baseUrl = (process.env.NEXT_PUBLIC_APP_BASE || "https://campeveryday.com").replace(/\/+$/, "");
 
 export async function generateMetadata(
-  { params }: Props,
+  { params, searchParams }: Props,
   parent: ResolvingMetadata
 ): Promise<Metadata> {
   const { slug } = await params;
+  const { token } = await searchParams;
   try {
-    const campground = await apiClient.getPublicCampground(slug);
+    const campground = await apiClient.getPublicCampground(slug, token);
     const previousImages = (await parent).openGraph?.images || [];
     const canonical = `${baseUrl}/park/${slug}/v2`;
     const description = campground.description || campground.tagline || `Book your stay at ${campground.name}`;
@@ -47,9 +49,10 @@ export async function generateMetadata(
   }
 }
 
-export default async function Page({ params }: Props) {
+export default async function Page({ params, searchParams }: Props) {
   const { slug } = await params;
-  const initialData = await apiClient.getPublicCampground(slug).catch(() => null);
+  const { token } = await searchParams;
+  const initialData = await apiClient.getPublicCampground(slug, token).catch(() => null);
 
   const jsonLd = initialData
     ? {
@@ -135,7 +138,7 @@ export default async function Page({ params }: Props) {
       {jsonLd && (
         <Script id="campground-json-ld-v2" type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       )}
-      <CampgroundV2Client slug={slug} initialData={initialData} />
+      <CampgroundV2Client slug={slug} initialData={initialData} previewToken={token} />
     </>
   );
 }

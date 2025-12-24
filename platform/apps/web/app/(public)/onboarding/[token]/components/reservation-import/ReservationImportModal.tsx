@@ -41,7 +41,7 @@ import type {
   RowOverride,
 } from "./types";
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
+const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "http://localhost:4000";
 
 // ============ Main Modal ============
 
@@ -476,8 +476,27 @@ function Step1Upload({
       <div className="bg-slate-800/50 rounded-lg p-4">
         <div className="flex items-start gap-3">
           <FileSpreadsheet className="w-5 h-5 text-slate-400 mt-0.5" />
-          <div className="text-sm">
-            <p className="text-slate-300 font-medium">Expected columns:</p>
+          <div className="text-sm flex-1">
+            <div className="flex items-center justify-between">
+              <p className="text-slate-300 font-medium">Expected columns:</p>
+              <button
+                onClick={() => {
+                  const template = `arrival_date,departure_date,first_name,last_name,email,phone,site_number,total_amount,paid_amount,adults,children,confirmation_number,status,notes
+2025-01-15,2025-01-18,John,Doe,john@example.com,555-1234,A1,150.00,150.00,2,1,RES-001,confirmed,Returning guest
+2025-01-20,2025-01-22,Jane,Smith,jane@example.com,555-5678,B3,100.00,50.00,2,0,RES-002,confirmed,`;
+                  const blob = new Blob([template], { type: "text/csv" });
+                  const url = URL.createObjectURL(blob);
+                  const a = document.createElement("a");
+                  a.href = url;
+                  a.download = "reservation-import-template.csv";
+                  a.click();
+                  URL.revokeObjectURL(url);
+                }}
+                className="text-xs text-emerald-400 hover:text-emerald-300 underline"
+              >
+                Download Template
+              </button>
+            </div>
             <p className="text-slate-500 mt-1">
               arrival_date, departure_date, first_name, last_name, email, site_number (or site_class), total_amount
             </p>

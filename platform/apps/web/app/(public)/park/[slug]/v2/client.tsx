@@ -43,11 +43,11 @@ function nextWeekendRange() {
   };
 }
 
-export function CampgroundV2Client({ slug, initialData }: { slug: string; initialData: PublicCampgroundDetail | null }) {
+export function CampgroundV2Client({ slug, initialData, previewToken }: { slug: string; initialData: PublicCampgroundDetail | null; previewToken?: string }) {
   const searchParams = useSearchParams();
   const { data: campground } = useQuery({
-    queryKey: ["public-campground", slug],
-    queryFn: () => apiClient.getPublicCampground(slug),
+    queryKey: ["public-campground", slug, previewToken],
+    queryFn: () => apiClient.getPublicCampground(slug, previewToken),
     initialData
   });
 
@@ -183,7 +183,8 @@ export function CampgroundV2Client({ slug, initialData }: { slug: string; initia
                     const q = new URLSearchParams({
                       arrivalDate,
                       departureDate,
-                      guests
+                      guests,
+                      ...(previewToken ? { token: previewToken } : {})
                     }).toString();
                     window.location.href = `/park/${slug}/book?${q}`;
                   }}
@@ -255,7 +256,8 @@ export function CampgroundV2Client({ slug, initialData }: { slug: string; initia
                             departureDate,
                             siteType: site.siteType || "all",
                             siteId: site.id,
-                            guests
+                            guests,
+                            ...(previewToken ? { token: previewToken } : {})
                           }).toString();
                           window.location.href = `/park/${slug}/book?${q}`;
                         }
@@ -458,7 +460,8 @@ export function CampgroundV2Client({ slug, initialData }: { slug: string; initia
                           const q = new URLSearchParams({
                             arrivalDate,
                             departureDate,
-                            promoCode: promo.code
+                            promoCode: promo.code,
+                            ...(previewToken ? { token: previewToken } : {})
                           }).toString();
                           window.location.href = `/park/${slug}/book?${q}`;
                         }}
@@ -536,7 +539,8 @@ export function CampgroundV2Client({ slug, initialData }: { slug: string; initia
                             arrivalDate,
                             departureDate,
                             siteType: sc.siteType || "all",
-                            guests
+                            guests,
+                            ...(previewToken ? { token: previewToken } : {})
                           }).toString();
                           window.location.href = `/park/${slug}/book?${q}`;
                         }}
@@ -592,7 +596,8 @@ export function CampgroundV2Client({ slug, initialData }: { slug: string; initia
           const q = new URLSearchParams({
             arrivalDate,
             departureDate,
-            guests
+            guests,
+            ...(previewToken ? { token: previewToken } : {})
           }).toString();
           window.location.href = `/park/${slug}/book?${q}`;
         }}
