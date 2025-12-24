@@ -17,7 +17,7 @@ import type { Request } from "express";
 
 interface AuthenticatedRequest extends Request {
   user: {
-    sub: string;
+    id: string;
     email: string;
   };
 }
@@ -32,7 +32,7 @@ export class MenuConfigController {
    */
   @Get()
   async getConfig(@Req() req: AuthenticatedRequest) {
-    const userId = req.user.sub;
+    const userId = req.user.id;
     return this.menuConfig.getConfig(userId);
   }
 
@@ -44,7 +44,7 @@ export class MenuConfigController {
     @Req() req: AuthenticatedRequest,
     @Body() body: { pinnedPages?: string[]; sidebarCollapsed?: boolean }
   ) {
-    const userId = req.user.sub;
+    const userId = req.user.id;
     return this.menuConfig.updateConfig(userId, body);
   }
 
@@ -57,7 +57,7 @@ export class MenuConfigController {
     @Req() req: AuthenticatedRequest,
     @Body() body: { href: string }
   ) {
-    const userId = req.user.sub;
+    const userId = req.user.id;
     return this.menuConfig.pinPage(userId, body.href);
   }
 
@@ -69,7 +69,7 @@ export class MenuConfigController {
     @Req() req: AuthenticatedRequest,
     @Param("href") href: string
   ) {
-    const userId = req.user.sub;
+    const userId = req.user.id;
     // URL decode the href parameter
     const decodedHref = decodeURIComponent(href);
     return this.menuConfig.unpinPage(userId, decodedHref);
@@ -84,7 +84,7 @@ export class MenuConfigController {
     @Req() req: AuthenticatedRequest,
     @Body() body: { pinnedPages: string[] }
   ) {
-    const userId = req.user.sub;
+    const userId = req.user.id;
     return this.menuConfig.reorderPages(userId, body.pinnedPages);
   }
 
@@ -97,7 +97,7 @@ export class MenuConfigController {
     @Req() req: AuthenticatedRequest,
     @Body() body: { pinnedPages: string[]; sidebarCollapsed?: boolean }
   ) {
-    const userId = req.user.sub;
+    const userId = req.user.id;
     return this.menuConfig.migrateFromLocal(userId, body);
   }
 
@@ -107,7 +107,7 @@ export class MenuConfigController {
   @Post("reset")
   @HttpCode(HttpStatus.OK)
   async resetToDefaults(@Req() req: AuthenticatedRequest) {
-    const userId = req.user.sub;
+    const userId = req.user.id;
     return this.menuConfig.resetToDefaults(userId);
   }
 }
