@@ -357,10 +357,32 @@ export function DataImport({
               <div className="bg-slate-800/30 border border-slate-700 rounded-lg p-4">
                 <div className="flex items-start gap-3">
                   <Info className="w-5 h-5 text-slate-400 flex-shrink-0 mt-0.5" />
-                  <div className="text-sm text-slate-400">
-                    <p className="text-slate-300 font-medium mb-1">
-                      CSV Format Tips
-                    </p>
+                  <div className="text-sm text-slate-400 flex-1">
+                    <div className="flex items-center justify-between mb-1">
+                      <p className="text-slate-300 font-medium">
+                        CSV Format Tips
+                      </p>
+                      <button
+                        onClick={() => {
+                          const template = `site_number,name,site_type,site_class,max_length,max_occupancy,nightly_rate,power_hookup,water_hookup,sewer_hookup,pet_friendly,description
+A1,Site A1,rv,Full Hookup RV,45,6,55.00,yes,yes,yes,yes,Spacious pull-through site
+A2,Site A2,rv,Full Hookup RV,45,6,55.00,yes,yes,yes,yes,Back-in site with shade
+T1,Site T1,tent,Tent Sites,0,4,25.00,no,yes,no,yes,Walk-in tent site near creek
+C1,Cabin 1,cabin,Rustic Cabins,0,4,95.00,yes,no,no,no,One room cabin with queen bed`;
+                          const blob = new Blob([template], { type: "text/csv" });
+                          const url = URL.createObjectURL(blob);
+                          const a = document.createElement("a");
+                          a.href = url;
+                          a.download = "site-import-template.csv";
+                          a.click();
+                          URL.revokeObjectURL(url);
+                        }}
+                        className="text-xs text-emerald-400 hover:text-emerald-300 underline flex items-center gap-1"
+                      >
+                        <Download className="w-3 h-3" />
+                        Download Template
+                      </button>
+                    </div>
                     <ul className="list-disc list-inside space-y-1">
                       <li>First row should be column headers</li>
                       <li>Required: Site Number and Site Type</li>

@@ -67,6 +67,18 @@ const DEFAULT_PERIODS: Omit<RatePeriod, "id">[] = [
     isDefault: false,
   },
   {
+    name: "Holidays",
+    icon: "🎄",
+    dateRanges: [
+      { startDate: "2025-11-27", endDate: "2025-11-30" }, // Thanksgiving
+      { startDate: "2025-12-20", endDate: "2026-01-02" }, // Christmas/New Year
+      { startDate: "2025-07-03", endDate: "2025-07-06" }, // July 4th
+      { startDate: "2025-05-24", endDate: "2025-05-26" }, // Memorial Day
+      { startDate: "2025-08-30", endDate: "2025-09-01" }, // Labor Day
+    ],
+    isDefault: false,
+  },
+  {
     name: "Off Season",
     icon: "❄️",
     dateRanges: [],

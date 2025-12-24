@@ -309,6 +309,32 @@ export class OnboardingService {
         }
       }
 
+      // Update SiteClass rates when rates_setup step is saved
+      if (step === OnboardingStep.rates_setup && campgroundId) {
+        const ratesData = (sanitized as any).rates || [];
+        const sessionData = session.data as any;
+        const siteClassIds = sessionData?.site_classes?.siteClassIds || [];
+
+        for (const rate of ratesData) {
+          // Map temp IDs to actual database IDs
+          let actualSiteClassId = rate.siteClassId;
+          if (rate.siteClassId?.startsWith('temp-')) {
+            const index = parseInt(rate.siteClassId.replace('temp-', '') || '0');
+            actualSiteClassId = siteClassIds[index];
+          }
+
+          if (actualSiteClassId && rate.nightlyRate) {
+            await this.prisma.siteClass.update({
+              where: { id: actualSiteClassId },
+              data: {
+                defaultRate: Math.round(rate.nightlyRate * 100), // Convert to cents
+              },
+            });
+            this.logger.log(`Updated SiteClass ${actualSiteClassId} with rate $${rate.nightlyRate}`);
+          }
+        }
+      }
+
       const progress = this.buildProgress({
         ...session,
         currentStep: step,
