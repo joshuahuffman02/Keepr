@@ -192,6 +192,7 @@ importers:
       maplibre-gl: ^4.7.1
       next: ^14.2.35
       next-auth: ^5.0.0-beta.25
+      next-themes: ^0.4.6
       postcss: ^8.4.47
       react: ^18.3.1
       react-big-calendar: ^1.19.4
@@ -236,6 +237,7 @@ importers:
       maplibre-gl: 4.7.1
       next: 14.2.35_7mi4qzvw5jy5gttmfewpeqrwx4
       next-auth: 5.0.0-beta.30_next@14.2.35+react@18.3.1
+      next-themes: 0.4.6_nnrd3gsncyragczmpvfhocinkq
       postcss: 8.5.6
       react: 18.3.1
       react-big-calendar: 1.19.4_nnrd3gsncyragczmpvfhocinkq
@@ -11297,6 +11299,16 @@ packages:
       '@auth/core': 0.41.0
       next: 14.2.35_7mi4qzvw5jy5gttmfewpeqrwx4
       react: 18.3.1
+    dev: false
+
+  /next-themes/0.4.6_nnrd3gsncyragczmpvfhocinkq:
+    resolution: {integrity: sha512-pZvgD5L0IEvX5/9GWyHMf3m8BKiVQwsCMHfoFosXtXBMnaS0ZnIJ9ST4b4NqLVKDEm8QBxoNNGNaBv2JNF6XNA==}
+    peerDependencies:
+      react: ^16.8 || ^17 || ^18 || ^19 || ^19.0.0-rc
+      react-dom: ^16.8 || ^17 || ^18 || ^19 || ^19.0.0-rc
+    dependencies:
+      react: 18.3.1
+      react-dom: 18.3.1_react@18.3.1
     dev: false
 
   /next/14.2.35_7mi4qzvw5jy5gttmfewpeqrwx4:

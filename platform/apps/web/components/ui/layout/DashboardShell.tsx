@@ -768,7 +768,7 @@ export function DashboardShell({ children, className, title, subtitle }: { child
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-900">
+    <div className="min-h-screen bg-background text-foreground transition-colors">
       {/* Admin Top Bar */}
       <AdminTopBar
         onToggleNav={() => setMobileNavOpen((v) => !v)}

@@ -214,6 +214,74 @@
   .focus-ring-enhanced {
     @apply focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-offset-2;
   }
+
+  /* ============================================
+     GLASSMORPHISM UTILITIES
+     Matching the onboarding UI design patterns
+     ============================================ */
+
+  /* Glass background effect */
+  .glass {
+    @apply bg-white/80 dark:bg-slate-800/50 backdrop-blur-sm;
+  }
+
+  /* Glass with stronger blur */
+  .glass-strong {
+    @apply bg-white/90 dark:bg-slate-800/70 backdrop-blur-md;
+  }
+
+  /* Glass border styling */
+  .glass-border {
+    @apply border border-slate-200/60 dark:border-slate-700/50;
+  }
+
+  /* Combined glass card */
+  .glass-card {
+    @apply glass glass-border rounded-xl shadow-lg;
+  }
+
+  /* Emerald glow effect for focus/active states */
+  .glow-emerald {
+    box-shadow: 0 0 20px -5px rgba(16, 185, 129, 0.3);
+  }
+
+  /* Stronger emerald glow for hover */
+  .glow-emerald-hover:hover {
+    box-shadow: 0 0 25px -5px rgba(16, 185, 129, 0.4);
+  }
+
+  /* Focus glow matching onboarding inputs */
+  .focus-glow:focus {
+    box-shadow: 0 0 20px -5px rgba(16, 185, 129, 0.3);
+  }
+
+  /* Card hover glow effect */
+  .hover-glow {
+    @apply transition-shadow duration-300;
+  }
+
+  .hover-glow:hover {
+    @apply shadow-lg shadow-emerald-500/10;
+  }
+
+  /* Gradient backgrounds */
+  .gradient-emerald {
+    @apply bg-gradient-to-r from-emerald-500 to-teal-500;
+  }
+
+  .gradient-emerald-hover:hover {
+    @apply from-emerald-400 to-teal-400;
+  }
+
+  /* Subtle gradient overlay for cards */
+  .gradient-overlay::before {
+    content: "";
+    @apply absolute inset-0 bg-gradient-to-br from-emerald-500/0 to-teal-500/0 transition-all rounded-xl;
+  }
+
+  .gradient-overlay:hover::before {
+    @apply from-emerald-500/5 to-teal-500/5;
+  }
 }
 
 /* Ensure proper focus styles are never removed */

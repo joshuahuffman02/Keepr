@@ -8,23 +8,26 @@ import { KeyboardShortcutsProvider } from "@/contexts/KeyboardShortcutsContext";
 import { KeyboardShortcutsDialog } from "@/components/ui/keyboard-shortcuts-dialog";
 import { KeyboardSequenceIndicator } from "@/components/ui/keyboard-sequence-indicator";
 import { AccessibilityProvider } from "@/components/accessibility/AccessibilityProvider";
+import { ThemeProvider } from "@/components/theme/ThemeProvider";
 
 export function Providers({ children }: PropsWithChildren) {
   const [client] = useState(() => new QueryClient());
 
   return (
-    <SessionProvider>
-      <QueryClientProvider client={client}>
-        <AccessibilityProvider>
-          <KeyboardShortcutsProvider>
-            {children}
-            <KeyboardShortcutsDialog />
-            <KeyboardSequenceIndicator />
-            <ReactQueryDevtools initialIsOpen={false} />
-          </KeyboardShortcutsProvider>
-        </AccessibilityProvider>
-      </QueryClientProvider>
-    </SessionProvider>
+    <ThemeProvider>
+      <SessionProvider>
+        <QueryClientProvider client={client}>
+          <AccessibilityProvider>
+            <KeyboardShortcutsProvider>
+              {children}
+              <KeyboardShortcutsDialog />
+              <KeyboardSequenceIndicator />
+              <ReactQueryDevtools initialIsOpen={false} />
+            </KeyboardShortcutsProvider>
+          </AccessibilityProvider>
+        </QueryClientProvider>
+      </SessionProvider>
+    </ThemeProvider>
   );
 }
 

@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { signOut } from "next-auth/react";
 import { HelpPanel } from "../../help/HelpPanel";
 import { useKeyboardShortcuts } from "@/contexts/KeyboardShortcutsContext";
+import { ThemeToggle } from "@/components/theme/ThemeToggle";
 
 type AdminTopBarProps = {
     onToggleNav?: () => void;
@@ -223,7 +224,7 @@ export function AdminTopBar({
     return (
         <>
             {/* Top Bar */}
-            <div className="sticky top-0 z-50 h-14 border-b border-slate-200 bg-white/95 backdrop-blur flex items-center px-3 sm:px-4 gap-3 sm:gap-4 shadow-sm">
+            <div className="sticky top-0 z-50 h-14 border-b border-border bg-background/95 backdrop-blur flex items-center px-3 sm:px-4 gap-3 sm:gap-4 shadow-sm transition-colors">
                 {/* Left - mobile nav + spacer */}
                 <div className="flex items-center">
                     {onToggleNav && (
@@ -245,20 +246,25 @@ export function AdminTopBar({
                 <div className="flex-1 flex justify-center">
                     <button
                         onClick={() => setIsSearchOpen(true)}
-                        className="flex items-center gap-3 px-3 sm:px-4 py-2 w-full max-w-2xl sm:max-w-3xl bg-slate-100 hover:bg-slate-200 rounded-lg transition-colors text-sm text-slate-500"
+                        className="flex items-center gap-3 px-3 sm:px-4 py-2 w-full max-w-2xl sm:max-w-3xl bg-muted hover:bg-muted/80 rounded-lg transition-colors text-sm text-muted-foreground"
                     >
                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                         </svg>
                         <span>Search pages and actions...</span>
-                        <kbd className="ml-auto px-2 py-0.5 bg-white rounded text-xs text-slate-400 border border-slate-200">
+                        <kbd className="ml-auto px-2 py-0.5 bg-background rounded text-xs text-muted-foreground border border-border">
                             ⌘K
                         </kbd>
                     </button>
                 </div>
 
-                {/* Right - Operations, Notifications & Menu */}
+                {/* Right - Theme, Operations, Notifications & Menu */}
                 <div className="flex items-center gap-2">
+                    {/* Theme Toggle */}
+                    <div className="hidden sm:block">
+                        <ThemeToggle />
+                    </div>
+
                     {/* Operations Quick Actions */}
                     <div className="hidden md:flex items-center gap-1 mr-2">
                         <Link
