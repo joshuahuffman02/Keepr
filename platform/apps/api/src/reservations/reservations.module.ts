@@ -26,9 +26,10 @@ import { ApprovalsModule } from "../approvals/approvals.module";
 import { UsageTrackerModule } from "../org-billing/usage-tracker.module";
 import { RepeatChargesModule } from "../repeat-charges/repeat-charges.module";
 import { PoliciesModule } from "../policies/policies.module";
+import { GuestWalletModule } from "../guest-wallet/guest-wallet.module";
 
 @Module({
-  imports: [WaitlistModule, LoyaltyModule, SeasonalRatesModule, TaxRulesModule, GamificationModule, AuditModule, AccessControlModule, SignaturesModule, PoliciesModule, ApprovalsModule, UsageTrackerModule, RepeatChargesModule],
+  imports: [WaitlistModule, LoyaltyModule, SeasonalRatesModule, TaxRulesModule, GamificationModule, AuditModule, AccessControlModule, SignaturesModule, PoliciesModule, ApprovalsModule, UsageTrackerModule, RepeatChargesModule, GuestWalletModule],
   controllers: [ReservationsController],
   providers: [
     ReservationsService,

@@ -25,6 +25,7 @@ import { ApprovalsService } from "../approvals/approvals.service";
 import { UsageTrackerService } from "../org-billing/usage-tracker.service";
 import { RepeatChargesService } from "../repeat-charges/repeat-charges.service";
 import { PoliciesService } from "../policies/policies.service";
+import { GuestWalletService } from "../guest-wallet/guest-wallet.service";
 import { assertSiteLockValid } from "./reservation-guards";
 import { evaluatePricingV2 } from "./reservation-pricing";
 import { assertReservationDepositV2, calculateReservationDepositV2 } from "./reservation-deposit";
@@ -49,7 +50,8 @@ export class ReservationsService {
     private readonly approvals: ApprovalsService,
     private readonly usageTracker: UsageTrackerService,
     private readonly repeatChargesService: RepeatChargesService,
-    private readonly policiesService: PoliciesService
+    private readonly policiesService: PoliciesService,
+    private readonly guestWalletService: GuestWalletService
   ) { }
 
   async getMatchedSites(campgroundId: string, guestId: string) {
@@ -1768,7 +1770,11 @@ export class ReservationsService {
     return updated;
   }
 
-  async refundPayment(id: string, amountCents: number) {
+  async refundPayment(
+    id: string,
+    amountCents: number,
+    options?: { destination?: "card" | "wallet"; reason?: string }
+  ) {
     if (amountCents <= 0) throw new BadRequestException("Refund amount must be positive");
     const reservation = await this.prisma.reservation.findUnique({
       where: { id },
@@ -1786,6 +1792,7 @@ export class ReservationsService {
 
     const newPaid = (reservation.paidAmount ?? 0) - amountCents;
     const paymentFields = this.buildPaymentFields(reservation.totalAmount, newPaid);
+    const destination = options?.destination ?? "card";
 
     const updated = await this.prisma.reservation.update({
       where: { id },
@@ -1795,38 +1802,62 @@ export class ReservationsService {
       }
     });
 
-    await this.prisma.payment.create({
-      data: {
-        campgroundId: reservation.campgroundId,
-        reservationId: reservation.id,
+    // Handle wallet refund
+    if (destination === "wallet" && reservation.guestId) {
+      await this.guestWalletService.creditFromRefund(
+        reservation.campgroundId,
+        reservation.id,
+        reservation.guestId,
         amountCents,
-        method: "card",
-        direction: "refund",
-        note: "Reservation refund"
-      }
-    });
+        options?.reason ?? "Reservation refund"
+      );
+
+      await this.prisma.payment.create({
+        data: {
+          campgroundId: reservation.campgroundId,
+          reservationId: reservation.id,
+          amountCents,
+          method: "wallet_credit",
+          direction: "refund",
+          note: options?.reason ?? "Reservation refund - credited to wallet"
+        }
+      });
+    } else {
+      // Standard card refund
+      await this.prisma.payment.create({
+        data: {
+          campgroundId: reservation.campgroundId,
+          reservationId: reservation.id,
+          amountCents,
+          method: "card",
+          direction: "refund",
+          note: options?.reason ?? "Reservation refund"
+        }
+      });
+    }
+
     const revenueGl = reservation.site?.siteClass?.glCode ?? "REVENUE_UNMAPPED";
     const revenueAccount = reservation.site?.siteClass?.clientAccount ?? "Revenue";
     await postBalancedLedgerEntries(this.prisma, [
       {
         campgroundId: reservation.campgroundId,
         reservationId: reservation.id,
-        glCode: "CASH",
-        account: "Cash",
-        description: "Reservation refund",
+        glCode: destination === "wallet" ? "GUEST_WALLET" : "CASH",
+        account: destination === "wallet" ? "Guest Wallet Liability" : "Cash",
+        description: options?.reason ?? "Reservation refund",
         amountCents,
         direction: "credit",
-        dedupeKey: `res:${reservation.id}:refund:${amountCents}:credit`
+        dedupeKey: `res:${reservation.id}:refund:${amountCents}:credit:${Date.now()}`
       },
       {
         campgroundId: reservation.campgroundId,
         reservationId: reservation.id,
         glCode: revenueGl,
         account: revenueAccount,
-        description: "Reservation refund",
+        description: options?.reason ?? "Reservation refund",
         amountCents,
         direction: "debit",
-        dedupeKey: `res:${reservation.id}:refund:${amountCents}:debit`
+        dedupeKey: `res:${reservation.id}:refund:${amountCents}:debit:${Date.now()}`
       }
     ]);
 
@@ -1837,7 +1868,7 @@ export class ReservationsService {
         guestName: reservation ? `${(reservation as any)?.guest?.primaryFirstName ?? ""} ${(reservation as any)?.guest?.primaryLastName ?? ""}`.trim() : "",
         campgroundName: (reservation as any)?.campground?.name ?? "Campground",
         amountCents,
-        paymentMethod: "Card",
+        paymentMethod: destination === "wallet" ? "Guest Wallet Credit" : "Card",
         transactionId: undefined,
         reservationId: reservation.id,
         siteNumber: (reservation as any)?.site?.siteNumber,

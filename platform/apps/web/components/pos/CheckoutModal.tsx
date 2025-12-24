@@ -45,11 +45,14 @@ interface CheckoutModalProps {
     onQueued: () => void;
     isOnline: boolean;
     queueOrder: (payload: any) => void;
+    guestId?: string | null;
+    guestName?: string | null;
+    walletBalanceCents?: number;
 }
 
-type PaymentMethod = "card" | "cash" | "charge_to_site";
+type PaymentMethod = "card" | "cash" | "charge_to_site" | "guest_wallet";
 
-export function CheckoutModal({ isOpen, onClose, cart, campgroundId, locationId, onSuccess, onQueued, isOnline, queueOrder }: CheckoutModalProps) {
+export function CheckoutModal({ isOpen, onClose, cart, campgroundId, locationId, onSuccess, onQueued, isOnline, queueOrder, guestId, guestName, walletBalanceCents = 0 }: CheckoutModalProps) {
     const [method, setMethod] = useState<PaymentMethod>("card");
     const [loading, setLoading] = useState(false);
     const [siteSearch, setSiteSearch] = useState("");
@@ -59,6 +62,7 @@ export function CheckoutModal({ isOpen, onClose, cart, campgroundId, locationId,
     const [error, setError] = useState<string | null>(null);
     const [charityDonation, setCharityDonation] = useState<{ optedIn: boolean; amountCents: number; charityId: string | null }>({ optedIn: false, amountCents: 0, charityId: null });
     const offlineCardWarning = !isOnline && method === "card";
+    const hasWallet = !!guestId && walletBalanceCents > 0;
 
     const subtotalCents = cart.reduce((sum, item) => sum + (item.effectivePriceCents ?? item.priceCents) * item.qty, 0);
     const totalCents = subtotalCents + (charityDonation.optedIn ? charityDonation.amountCents : 0);
@@ -82,6 +86,8 @@ export function CheckoutModal({ isOpen, onClose, cart, campgroundId, locationId,
                     charityId: charityDonation.charityId,
                     amountCents: charityDonation.amountCents,
                 } : undefined,
+                // Include guestId for wallet payments
+                guestId: method === "guest_wallet" ? guestId : undefined,
             };
 
             if (method === "charge_to_site") {
@@ -196,7 +202,7 @@ export function CheckoutModal({ isOpen, onClose, cart, campgroundId, locationId,
                         />
                     </div>
 
-                    <div className="grid grid-cols-3 gap-3">
+                    <div className={`grid gap-3 ${hasWallet ? "grid-cols-2" : "grid-cols-3"}`}>
                         <button
                             onClick={() => setMethod("card")}
                             className={`p-4 rounded-xl border-2 flex flex-col items-center gap-2 transition-all ${method === "card"
@@ -236,6 +242,22 @@ export function CheckoutModal({ isOpen, onClose, cart, campgroundId, locationId,
                             </svg>
                             <span className="font-medium text-sm">Site Charge</span>
                         </button>
+                        {hasWallet && (
+                            <button
+                                onClick={() => setMethod("guest_wallet")}
+                                className={`p-4 rounded-xl border-2 flex flex-col items-center gap-2 transition-all ${method === "guest_wallet"
+                                        ? "border-emerald-600 bg-emerald-50 text-emerald-700"
+                                        : "border-slate-200 hover:border-slate-300 text-slate-600"
+                                    }`}
+                            >
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                    <path d="M19 7V4a1 1 0 0 0-1-1H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h13a1 1 0 0 0 1-1v-3" />
+                                    <path d="M21 12a2 2 0 0 0-2-2h-4a2 2 0 0 0 0 4h4a2 2 0 0 0 2-2v0Z" />
+                                </svg>
+                                <span className="font-medium text-sm">Wallet</span>
+                                <span className="text-xs text-slate-500">${(walletBalanceCents / 100).toFixed(2)}</span>
+                            </button>
+                        )}
                     </div>
 
                     {/* Round up for charity */}
@@ -247,7 +269,19 @@ export function CheckoutModal({ isOpen, onClose, cart, campgroundId, locationId,
 
                     {offlineCardWarning && (
                         <div className="rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-800">
-                            Offline: card payments can’t be processed right now. Switch to cash / charge to site or wait until you’re back online.
+                            Offline: card payments can't be processed right now. Switch to cash / charge to site or wait until you're back online.
+                        </div>
+                    )}
+
+                    {method === "guest_wallet" && walletBalanceCents < totalCents && (
+                        <div className="rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-800">
+                            Wallet balance (${(walletBalanceCents / 100).toFixed(2)}) is less than total (${(totalCents / 100).toFixed(2)}). Please use a different payment method or split payment.
+                        </div>
+                    )}
+
+                    {method === "guest_wallet" && guestName && (
+                        <div className="rounded-md border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm text-emerald-800">
+                            Paying from {guestName}'s wallet
                         </div>
                     )}
 
@@ -261,7 +295,11 @@ export function CheckoutModal({ isOpen, onClose, cart, campgroundId, locationId,
                         <Button variant="outline" className="flex-1" onClick={onClose} disabled={loading}>
                             Cancel
                         </Button>
-                        <Button className="flex-1" onClick={handleSubmit} disabled={loading || offlineCardWarning}>
+                        <Button
+                            className="flex-1"
+                            onClick={handleSubmit}
+                            disabled={loading || offlineCardWarning || (method === "guest_wallet" && walletBalanceCents < totalCents)}
+                        >
                             {loading ? "Processing..." : `Pay $${(totalCents / 100).toFixed(2)}`}
                         </Button>
                     </div>

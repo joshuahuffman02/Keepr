@@ -14,7 +14,7 @@ import { Label } from "../../../components/ui/label";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "../../../components/ui/dialog";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../../../components/ui/table";
 import { Badge } from "../../../components/ui/badge";
-import { Trophy, Star, History, ArrowLeft, Trash2, Plus, Car, Truck, Mail, MessageSquare, GitBranch, RotateCcw, PlusCircle, Send } from "lucide-react";
+import { Trophy, Star, History, ArrowLeft, Trash2, Plus, Car, Truck, Mail, MessageSquare, GitBranch, RotateCcw, PlusCircle, Send, Wallet, DollarSign } from "lucide-react";
 import { cn } from "../../../lib/utils";
 import { useToast } from "../../../components/ui/use-toast";
 import { formatDistanceToNow } from "date-fns";
@@ -74,6 +74,39 @@ export default function GuestDetailPage() {
         () => (guestQuery.data as any)?.campgroundId || (guestQuery.data as any)?.campgrounds?.[0]?.id || "",
         [guestQuery.data]
     );
+
+    // Wallet state and queries
+    const [addCreditOpen, setAddCreditOpen] = useState(false);
+    const [creditAmount, setCreditAmount] = useState("");
+    const [creditReason, setCreditReason] = useState("");
+
+    const walletQuery = useQuery({
+        queryKey: ["wallet", campgroundIdForGuest, guestId],
+        queryFn: () => apiClient.getGuestWallet(campgroundIdForGuest, guestId),
+        enabled: !!campgroundIdForGuest && !!guestId
+    });
+
+    const walletTransactionsQuery = useQuery({
+        queryKey: ["wallet-transactions", campgroundIdForGuest, guestId],
+        queryFn: () => apiClient.getWalletTransactions(campgroundIdForGuest, guestId, 20),
+        enabled: !!campgroundIdForGuest && !!guestId
+    });
+
+    const addCreditMutation = useMutation({
+        mutationFn: (data: { amountCents: number; reason?: string }) =>
+            apiClient.addWalletCredit(campgroundIdForGuest, guestId, data.amountCents, data.reason),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ["wallet", campgroundIdForGuest, guestId] });
+            queryClient.invalidateQueries({ queryKey: ["wallet-transactions", campgroundIdForGuest, guestId] });
+            setAddCreditOpen(false);
+            setCreditAmount("");
+            setCreditReason("");
+            toast({ title: "Credit added", description: "Wallet credit has been added successfully." });
+        },
+        onError: (error: any) => {
+            toast({ title: "Error", description: error.message || "Failed to add credit", variant: "destructive" });
+        }
+    });
 
     type CommunicationsPage = { items: any[]; nextCursor?: string | null };
     const campgroundQuery = useQuery({
@@ -271,6 +304,7 @@ export default function GuestDetailPage() {
                     <TabsList>
                         <TabsTrigger value="overview">Overview</TabsTrigger>
                         <TabsTrigger value="equipment">Equipment</TabsTrigger>
+                        <TabsTrigger value="wallet">Wallet</TabsTrigger>
                         <TabsTrigger value="loyalty">Loyalty & Rewards</TabsTrigger>
                         <TabsTrigger value="communications">Communications</TabsTrigger>
                     </TabsList>
@@ -339,6 +373,165 @@ export default function GuestDetailPage() {
 
                     <TabsContent value="equipment" className="space-y-4">
                         <GuestEquipmentTab guestId={guestId} />
+                    </TabsContent>
+
+                    <TabsContent value="wallet" className="space-y-4">
+                        <div className="grid gap-4 md:grid-cols-2">
+                            <Card>
+                                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                                    <CardTitle className="text-sm font-medium">Wallet Balance</CardTitle>
+                                    <Wallet className="h-4 w-4 text-muted-foreground" />
+                                </CardHeader>
+                                <CardContent>
+                                    <div className="text-2xl font-bold">
+                                        ${((walletQuery.data?.balanceCents ?? 0) / 100).toFixed(2)}
+                                    </div>
+                                    <p className="text-xs text-muted-foreground">
+                                        Available for purchases
+                                    </p>
+                                </CardContent>
+                            </Card>
+                            <Card>
+                                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                                    <CardTitle className="text-sm font-medium">Available</CardTitle>
+                                    <DollarSign className="h-4 w-4 text-muted-foreground" />
+                                </CardHeader>
+                                <CardContent>
+                                    <div className="text-2xl font-bold">
+                                        ${((walletQuery.data?.availableCents ?? 0) / 100).toFixed(2)}
+                                    </div>
+                                    <p className="text-xs text-muted-foreground">
+                                        After pending holds
+                                    </p>
+                                </CardContent>
+                            </Card>
+                        </div>
+
+                        <Card>
+                            <CardHeader className="flex flex-row items-center justify-between">
+                                <div>
+                                    <CardTitle>Transaction History</CardTitle>
+                                    <CardDescription>Recent wallet activity for this guest</CardDescription>
+                                </div>
+                                <Dialog open={addCreditOpen} onOpenChange={setAddCreditOpen}>
+                                    <DialogTrigger asChild>
+                                        <Button>
+                                            <Plus className="h-4 w-4 mr-2" />
+                                            Add Credit
+                                        </Button>
+                                    </DialogTrigger>
+                                    <DialogContent>
+                                        <DialogHeader>
+                                            <DialogTitle>Add Wallet Credit</DialogTitle>
+                                            <DialogDescription>
+                                                Add credit to this guest&apos;s wallet. This can be used for POS purchases or reservation payments.
+                                            </DialogDescription>
+                                        </DialogHeader>
+                                        <div className="grid gap-4 py-4">
+                                            <div className="grid grid-cols-4 items-center gap-4">
+                                                <Label htmlFor="credit-amount" className="text-right">
+                                                    Amount
+                                                </Label>
+                                                <div className="col-span-3 relative">
+                                                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">$</span>
+                                                    <Input
+                                                        id="credit-amount"
+                                                        type="number"
+                                                        step="0.01"
+                                                        min="0"
+                                                        value={creditAmount}
+                                                        onChange={(e) => setCreditAmount(e.target.value)}
+                                                        className="pl-7"
+                                                        placeholder="0.00"
+                                                    />
+                                                </div>
+                                            </div>
+                                            <div className="grid grid-cols-4 items-center gap-4">
+                                                <Label htmlFor="credit-reason" className="text-right">
+                                                    Reason
+                                                </Label>
+                                                <Input
+                                                    id="credit-reason"
+                                                    value={creditReason}
+                                                    onChange={(e) => setCreditReason(e.target.value)}
+                                                    className="col-span-3"
+                                                    placeholder="e.g. Grandparent gift, Goodwill credit"
+                                                />
+                                            </div>
+                                        </div>
+                                        <DialogFooter>
+                                            <Button variant="outline" onClick={() => setAddCreditOpen(false)}>
+                                                Cancel
+                                            </Button>
+                                            <Button
+                                                onClick={() => {
+                                                    const amountCents = Math.round(parseFloat(creditAmount) * 100);
+                                                    if (isNaN(amountCents) || amountCents <= 0) {
+                                                        toast({ title: "Invalid amount", variant: "destructive" });
+                                                        return;
+                                                    }
+                                                    addCreditMutation.mutate({ amountCents, reason: creditReason || undefined });
+                                                }}
+                                                disabled={addCreditMutation.isPending}
+                                            >
+                                                {addCreditMutation.isPending ? "Adding..." : "Add Credit"}
+                                            </Button>
+                                        </DialogFooter>
+                                    </DialogContent>
+                                </Dialog>
+                            </CardHeader>
+                            <CardContent>
+                                {walletTransactionsQuery.isLoading ? (
+                                    <div className="text-center py-4 text-muted-foreground">Loading transactions...</div>
+                                ) : walletTransactionsQuery.data?.transactions.length === 0 ? (
+                                    <div className="text-center py-8 text-muted-foreground">
+                                        <Wallet className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                                        <p>No wallet transactions yet</p>
+                                        <p className="text-sm">Add credit to get started</p>
+                                    </div>
+                                ) : (
+                                    <Table>
+                                        <TableHeader>
+                                            <TableRow>
+                                                <TableHead>Date</TableHead>
+                                                <TableHead>Type</TableHead>
+                                                <TableHead>Reason</TableHead>
+                                                <TableHead className="text-right">Amount</TableHead>
+                                                <TableHead className="text-right">Balance</TableHead>
+                                            </TableRow>
+                                        </TableHeader>
+                                        <TableBody>
+                                            {walletTransactionsQuery.data?.transactions.map((tx) => (
+                                                <TableRow key={tx.id}>
+                                                    <TableCell className="text-muted-foreground">
+                                                        {formatDistanceToNow(new Date(tx.createdAt), { addSuffix: true })}
+                                                    </TableCell>
+                                                    <TableCell>
+                                                        <Badge variant={
+                                                            tx.direction === "issue" || tx.direction === "refund" ? "default" :
+                                                            tx.direction === "redeem" ? "secondary" : "outline"
+                                                        }>
+                                                            {tx.direction}
+                                                        </Badge>
+                                                    </TableCell>
+                                                    <TableCell>{tx.reason || tx.referenceType}</TableCell>
+                                                    <TableCell className={cn(
+                                                        "text-right font-medium",
+                                                        tx.direction === "issue" || tx.direction === "refund" ? "text-green-600" : "text-red-600"
+                                                    )}>
+                                                        {tx.direction === "issue" || tx.direction === "refund" ? "+" : "-"}
+                                                        ${(tx.amountCents / 100).toFixed(2)}
+                                                    </TableCell>
+                                                    <TableCell className="text-right">
+                                                        ${(tx.afterBalanceCents / 100).toFixed(2)}
+                                                    </TableCell>
+                                                </TableRow>
+                                            ))}
+                                        </TableBody>
+                                    </Table>
+                                )}
+                            </CardContent>
+                        </Card>
                     </TabsContent>
 
                     <TabsContent value="loyalty" className="space-y-4">

@@ -23,9 +23,10 @@ import {
 } from "./pos-provider.adapters";
 import { EmailService } from "../email/email.service";
 import { InventoryModule } from "../inventory/inventory.module";
+import { GuestWalletModule } from "../guest-wallet/guest-wallet.module";
 
 @Module({
-  imports: [StoredValueModule, forwardRef(() => InventoryModule)],
+  imports: [StoredValueModule, forwardRef(() => InventoryModule), GuestWalletModule],
   controllers: [PosController, TillController, PosProviderController],
   providers: [
     PosService,

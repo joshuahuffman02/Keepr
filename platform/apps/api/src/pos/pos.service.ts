@@ -4,6 +4,7 @@ import { IdempotencyService } from "../payments/idempotency.service";
 import { CheckoutCartDto, CreateCartDto, OfflineReplayDto, UpdateCartDto, CreateReturnDto } from "./pos.dto";
 import { IdempotencyStatus, PosCartStatus, PosPaymentStatus, TillMovementType, ExpirationTier } from "@prisma/client";
 import { StoredValueService } from "../stored-value/stored-value.service";
+import { GuestWalletService } from "../guest-wallet/guest-wallet.service";
 import { StripeService } from "../payments/stripe.service";
 import crypto from "crypto";
 import { TillService } from "./till.service";
@@ -22,6 +23,7 @@ export class PosService {
     private readonly prisma: PrismaService,
     private readonly idempotency: IdempotencyService,
     private readonly storedValue: StoredValueService,
+    private readonly guestWallet: GuestWalletService,
     private readonly stripe: StripeService,
     private readonly till: TillService,
     private readonly observability: ObservabilityService,
@@ -155,8 +157,40 @@ export class PosService {
           );
         }
 
+        // Process guest wallet payments
+        for (const p of dto.payments.filter((p) => p.method === "guest_wallet")) {
+          if (!dto.guestId) {
+            throw new BadRequestException("guestId required for guest wallet payment");
+          }
+          await this.guestWallet.debitForPayment(
+            cart.campgroundId,
+            {
+              guestId: dto.guestId,
+              amountCents: p.amountCents,
+              referenceType: "pos_cart",
+              referenceId: cartId,
+              description: `POS purchase - Cart #${cartId.slice(-8)}`
+            },
+            p.idempotencyKey,
+            actor
+          );
+          // Record the payment
+          await tx.posPayment.create({
+            data: {
+              cartId,
+              method: p.method,
+              amountCents: p.amountCents,
+              currency: p.currency.toLowerCase(),
+              status: PosPaymentStatus.succeeded,
+              idempotencyKey: p.idempotencyKey,
+              referenceType: p.referenceType ?? "guest_wallet",
+              referenceId: p.referenceId ?? dto.guestId
+            }
+          });
+        }
+
         // Process non-stored-value tenders
-        for (const p of dto.payments.filter((p) => p.method !== "gift" && p.method !== "store_credit")) {
+        for (const p of dto.payments.filter((p) => p.method !== "gift" && p.method !== "store_credit" && p.method !== "guest_wallet")) {
           if (p.method === "charge_to_site") {
             // TODO: integrate with reservations AR/folio; mark pending for now
             await tx.posPayment.create({

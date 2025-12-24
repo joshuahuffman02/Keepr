@@ -166,7 +166,10 @@ export class ReservationsController {
 
   @Post("reservations/:id/refunds")
   refund(@Param("id") id: string, @Body() body: RefundPaymentDto) {
-    return this.reservations.refundPayment(id, body.amountCents);
+    return this.reservations.refundPayment(id, body.amountCents, {
+      destination: body.destination,
+      reason: body.reason
+    });
   }
 
   @Delete("reservations/:id")

@@ -8,6 +8,7 @@ import {
   UseGuards,
   Request,
 } from "@nestjs/common";
+import { AuthGuard } from "@nestjs/passport";
 import { JwtAuthGuard } from "../auth/guards/jwt-auth.guard";
 import { GuestWalletService } from "./guest-wallet.service";
 import {
@@ -17,14 +18,55 @@ import {
 } from "./guest-wallet.dto";
 
 @Controller()
-@UseGuards(JwtAuthGuard)
 export class GuestWalletController {
   constructor(private readonly guestWalletService: GuestWalletService) {}
+
+  // ==========================================
+  // Guest Portal Endpoints (Guest JWT Auth)
+  // ==========================================
+
+  /**
+   * Get all wallets for the authenticated guest (across all campgrounds)
+   */
+  @Get("portal/wallet")
+  @UseGuards(AuthGuard("guest-jwt"))
+  async getMyWallets(@Request() req: any) {
+    const guestId = req.user.id;
+    return this.guestWalletService.getGuestWallets(guestId);
+  }
+
+  /**
+   * Get wallet transactions for the authenticated guest at a campground
+   */
+  @Get("portal/wallet/:campgroundId/transactions")
+  @UseGuards(AuthGuard("guest-jwt"))
+  async getMyTransactions(
+    @Request() req: any,
+    @Param("campgroundId") campgroundId: string,
+    @Query() query: WalletTransactionsQueryDto
+  ) {
+    const guestId = req.user.id;
+    const wallet = await this.guestWalletService.findWallet(campgroundId, guestId);
+    if (!wallet) {
+      return { transactions: [], total: 0 };
+    }
+
+    return this.guestWalletService.listTransactions(
+      wallet.id,
+      query.limit ?? 50,
+      query.offset ?? 0
+    );
+  }
+
+  // ==========================================
+  // Staff Endpoints (Staff JWT Auth)
+  // ==========================================
 
   /**
    * Get guest's wallet balance at a campground
    */
   @Get("campgrounds/:campgroundId/guests/:guestId/wallet")
+  @UseGuards(JwtAuthGuard)
   async getWalletBalance(
     @Param("campgroundId") campgroundId: string,
     @Param("guestId") guestId: string
@@ -36,6 +78,7 @@ export class GuestWalletController {
    * Add credit to guest's wallet
    */
   @Post("campgrounds/:campgroundId/guests/:guestId/wallet/credit")
+  @UseGuards(JwtAuthGuard)
   async addCredit(
     @Param("campgroundId") campgroundId: string,
     @Param("guestId") guestId: string,
@@ -54,6 +97,7 @@ export class GuestWalletController {
    * Get wallet transaction history
    */
   @Get("campgrounds/:campgroundId/guests/:guestId/wallet/transactions")
+  @UseGuards(JwtAuthGuard)
   async getTransactions(
     @Param("campgroundId") campgroundId: string,
     @Param("guestId") guestId: string,
@@ -75,6 +119,7 @@ export class GuestWalletController {
    * Use wallet to pay for something (internal endpoint for POS/reservations)
    */
   @Post("campgrounds/:campgroundId/wallet/debit")
+  @UseGuards(JwtAuthGuard)
   async debitWallet(
     @Param("campgroundId") campgroundId: string,
     @Body() dto: DebitWalletDto,
@@ -92,6 +137,7 @@ export class GuestWalletController {
    * Credit wallet from reservation refund
    */
   @Post("campgrounds/:campgroundId/wallet/credit-from-refund")
+  @UseGuards(JwtAuthGuard)
   async creditFromRefund(
     @Param("campgroundId") campgroundId: string,
     @Body()

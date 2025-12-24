@@ -32,8 +32,8 @@ class CartItemUpdateInput {
 }
 
 class PaymentInput {
-  @IsIn(["card", "cash", "gift", "store_credit", "charge_to_site"])
-  method!: "card" | "cash" | "gift" | "store_credit" | "charge_to_site";
+  @IsIn(["card", "cash", "gift", "store_credit", "charge_to_site", "guest_wallet"])
+  method!: "card" | "cash" | "gift" | "store_credit" | "charge_to_site" | "guest_wallet";
 
   @Type(() => Number)
   @IsInt()
@@ -113,6 +113,10 @@ export class CheckoutCartDto {
   @IsOptional()
   @IsString()
   giftCode?: string;
+
+  @IsOptional()
+  @IsString()
+  guestId?: string;
 
   @IsArray()
   @ValidateNested({ each: true })

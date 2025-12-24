@@ -3010,11 +3010,19 @@ export const apiClient = {
     });
     return parseResponse<unknown>(res);
   },
-  async refundReservationPayment(id: string, amountCents: number) {
+  async refundReservationPayment(
+    id: string,
+    amountCents: number,
+    options?: { destination?: "card" | "wallet"; reason?: string }
+  ) {
     const res = await fetch(`${API_BASE}/reservations/${id}/refunds`, {
       method: "POST",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
-      body: JSON.stringify({ amountCents })
+      body: JSON.stringify({
+        amountCents,
+        destination: options?.destination,
+        reason: options?.reason
+      })
     });
     const data = await parseResponse<unknown>(res);
     return ReservationSchema.parse(data);
@@ -4283,6 +4291,95 @@ export const apiClient = {
     return LoyaltyProfileSchema.parse(data);
   },
 
+  // Guest Wallet
+  async getGuestWallet(campgroundId: string, guestId: string) {
+    const data = await fetchJSON<{
+      walletId: string;
+      guestId: string;
+      campgroundId: string;
+      balanceCents: number;
+      availableCents: number;
+      currency: string;
+    }>(`/campgrounds/${campgroundId}/guests/${guestId}/wallet`);
+    return data;
+  },
+
+  async addWalletCredit(campgroundId: string, guestId: string, amountCents: number, reason?: string) {
+    const res = await fetch(`${API_BASE}/campgrounds/${campgroundId}/guests/${guestId}/wallet/credit`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", ...scopedHeaders() },
+      body: JSON.stringify({ amountCents, reason })
+    });
+    const data = await parseResponse<{
+      walletId: string;
+      balanceCents: number;
+      transactionId: string;
+    }>(res);
+    return data;
+  },
+
+  async getWalletTransactions(campgroundId: string, guestId: string, limit?: number, offset?: number) {
+    const params = new URLSearchParams();
+    if (limit) params.set("limit", String(limit));
+    if (offset) params.set("offset", String(offset));
+    const query = params.toString() ? `?${params.toString()}` : "";
+    const data = await fetchJSON<{
+      transactions: Array<{
+        id: string;
+        direction: string;
+        amountCents: number;
+        beforeBalanceCents: number;
+        afterBalanceCents: number;
+        referenceType: string;
+        referenceId: string;
+        reason: string | null;
+        createdAt: string;
+      }>;
+      total: number;
+    }>(`/campgrounds/${campgroundId}/guests/${guestId}/wallet/transactions${query}`);
+    return data;
+  },
+
+  // Guest Portal - Wallet (uses guest token)
+  async getPortalWallets(token: string) {
+    const res = await fetch(`${API_BASE}/portal/wallet`, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+    const data = await parseResponse<Array<{
+      walletId: string;
+      campgroundId: string;
+      campgroundName: string;
+      balanceCents: number;
+      availableCents: number;
+      currency: string;
+    }>>(res);
+    return data;
+  },
+
+  async getPortalWalletTransactions(token: string, campgroundId: string, limit?: number, offset?: number) {
+    const params = new URLSearchParams();
+    if (limit) params.set("limit", String(limit));
+    if (offset) params.set("offset", String(offset));
+    const query = params.toString() ? `?${params.toString()}` : "";
+    const res = await fetch(`${API_BASE}/portal/wallet/${campgroundId}/transactions${query}`, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+    const data = await parseResponse<{
+      transactions: Array<{
+        id: string;
+        direction: string;
+        amountCents: number;
+        beforeBalanceCents: number;
+        afterBalanceCents: number;
+        referenceType: string;
+        referenceId: string;
+        reason: string | null;
+        createdAt: string;
+      }>;
+      total: number;
+    }>(res);
+    return data;
+  },
 
   // Store
   async getStoreCategories(campgroundId: string) {
