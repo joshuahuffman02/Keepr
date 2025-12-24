@@ -596,6 +596,29 @@ model SiteClass {
   photoAttributions Json?
   policyVersion     String?
   isActive          Boolean  @default(true)
+
+  // Rental type
+  rentalType          String    @default("transient")  // "transient" | "seasonal" | "flexible"
+
+  // Equipment & dimensions
+  equipmentTypes      String[]  @default([])
+  slideOutsAccepted   String?   // "both_sides" | "driver_side" | "passenger_side" | "none"
+
+  // Guest pricing
+  occupantsIncluded   Int       @default(2)
+  extraAdultFeeCents  Int?
+  extraChildFeeCents  Int?
+
+  // Fees (per site class)
+  petFeeEnabled       Boolean   @default(false)
+  petFeeCents         Int?
+  bookingFeeCents     Int?
+  siteLockFeeCents    Int?
+
+  // Monthly/seasonal rates
+  monthlyRateCents    Int?
+  weeklyRateCents     Int?
+
   createdAt         DateTime @default(now())
   updatedAt         DateTime @default(now()) @updatedAt
 
@@ -998,6 +1021,15 @@ model Campground {
   quietHoursStart       String? // HH:mm
   quietHoursEnd         String? // HH:mm
   routingAssigneeId     String?
+
+  // Long-term settings
+  longTermEnabled         Boolean   @default(false)
+  longTermMinNights       Int?      @default(28)
+  longTermAutoApply       Boolean   @default(true)
+
+  // Booking tracking
+  bookingSources          String[]  @default([])
+  stayReasons             String[]  @default([])
 
   // Branding
   logoUrl        String?

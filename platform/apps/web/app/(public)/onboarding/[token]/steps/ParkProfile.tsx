@@ -6,6 +6,7 @@ import { MapPin, Phone, Mail, Globe, Upload, Check, ChevronDown, ChevronUp, X, L
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import {
   Select,
   SelectContent,
@@ -43,6 +44,8 @@ interface ParkProfileData {
   timezone: string;
   logoUrl?: string;
   amenities: string[];
+  bookingSources: string[];
+  stayReasons: string[];
 }
 
 interface ParkProfileProps {
@@ -57,6 +60,29 @@ const SPRING_CONFIG = {
   stiffness: 300,
   damping: 25,
 };
+
+// Default booking sources
+const DEFAULT_BOOKING_SOURCES = [
+  "Google",
+  "Facebook",
+  "Instagram",
+  "Friend/Referral",
+  "Return Guest",
+  "Yelp",
+  "Hipcamp",
+  "Airbnb",
+  "Outdoorsy",
+];
+
+// Default stay reasons
+const DEFAULT_STAY_REASONS = [
+  "Vacation",
+  "Family Visit",
+  "Work/Remote",
+  "Event",
+  "Stopover",
+  "Relocation",
+];
 
 // US States dropdown data
 const US_STATES = [
@@ -173,6 +199,44 @@ function ValidatedField({
   );
 }
 
+function ToggleChip({
+  label,
+  selected,
+  onToggle,
+}: {
+  label: string;
+  selected: boolean;
+  onToggle: () => void;
+}) {
+  const prefersReducedMotion = useReducedMotion();
+
+  return (
+    <motion.button
+      type="button"
+      initial={prefersReducedMotion ? {} : { opacity: 0, scale: 0.9 }}
+      animate={prefersReducedMotion ? {} : { opacity: 1, scale: 1 }}
+      onClick={onToggle}
+      className={cn(
+        "relative px-3 py-2 rounded-lg border text-sm transition-all",
+        selected
+          ? "border-emerald-500 bg-emerald-500/20 text-emerald-400"
+          : "border-slate-700 bg-slate-800/50 text-slate-400 hover:border-slate-600 hover:bg-slate-800"
+      )}
+    >
+      {selected && (
+        <motion.div
+          initial={prefersReducedMotion ? {} : { scale: 0 }}
+          animate={prefersReducedMotion ? {} : { scale: 1 }}
+          className="absolute -top-1 -right-1"
+        >
+          <Check className="w-3 h-3 text-emerald-400 bg-slate-900 rounded-full" />
+        </motion.div>
+      )}
+      {label}
+    </motion.button>
+  );
+}
+
 export function ParkProfile({
   initialData,
   onSave,
@@ -184,6 +248,10 @@ export function ParkProfile({
   const [stateOpen, setStateOpen] = useState(false);
   const [uploadingLogo, setUploadingLogo] = useState(false);
   const [amenitiesExpanded, setAmenitiesExpanded] = useState(false);
+  const [bookingSourcesExpanded, setBookingSourcesExpanded] = useState(false);
+  const [stayReasonsExpanded, setStayReasonsExpanded] = useState(false);
+  const [customBookingSources, setCustomBookingSources] = useState("");
+  const [customStayReasons, setCustomStayReasons] = useState("");
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [data, setData] = useState<ParkProfileData>({
@@ -198,6 +266,8 @@ export function ParkProfile({
     timezone: initialData?.timezone || "",
     logoUrl: initialData?.logoUrl || "",
     amenities: initialData?.amenities || [],
+    bookingSources: initialData?.bookingSources || [],
+    stayReasons: initialData?.stayReasons || [],
   });
 
   // Update data when initialData changes (e.g., when signup data loads)
@@ -216,6 +286,8 @@ export function ParkProfile({
         timezone: initialData.timezone || prev.timezone,
         logoUrl: initialData.logoUrl || prev.logoUrl,
         amenities: initialData.amenities || prev.amenities,
+        bookingSources: initialData.bookingSources || prev.bookingSources,
+        stayReasons: initialData.stayReasons || prev.stayReasons,
       }));
     }
   }, [initialData]);
@@ -234,6 +306,62 @@ export function ParkProfile({
       }
     }
   }, []);
+
+  // Helper to toggle booking source
+  const toggleBookingSource = (source: string) => {
+    setData((prev) => ({
+      ...prev,
+      bookingSources: prev.bookingSources.includes(source)
+        ? prev.bookingSources.filter((s) => s !== source)
+        : [...prev.bookingSources, source],
+    }));
+  };
+
+  // Helper to toggle stay reason
+  const toggleStayReason = (reason: string) => {
+    setData((prev) => ({
+      ...prev,
+      stayReasons: prev.stayReasons.includes(reason)
+        ? prev.stayReasons.filter((r) => r !== reason)
+        : [...prev.stayReasons, reason],
+    }));
+  };
+
+  // Merge custom booking sources when text area changes
+  const handleCustomBookingSourcesChange = (value: string) => {
+    setCustomBookingSources(value);
+    const customLines = value
+      .split("\n")
+      .map((line) => line.trim())
+      .filter((line) => line.length > 0);
+
+    // Keep default selections and add custom ones
+    const defaultSelected = data.bookingSources.filter((s) =>
+      DEFAULT_BOOKING_SOURCES.includes(s)
+    );
+    setData((prev) => ({
+      ...prev,
+      bookingSources: [...defaultSelected, ...customLines],
+    }));
+  };
+
+  // Merge custom stay reasons when text area changes
+  const handleCustomStayReasonsChange = (value: string) => {
+    setCustomStayReasons(value);
+    const customLines = value
+      .split("\n")
+      .map((line) => line.trim())
+      .filter((line) => line.length > 0);
+
+    // Keep default selections and add custom ones
+    const defaultSelected = data.stayReasons.filter((r) =>
+      DEFAULT_STAY_REASONS.includes(r)
+    );
+    setData((prev) => ({
+      ...prev,
+      stayReasons: [...defaultSelected, ...customLines],
+    }));
+  };
 
   const handleLogoClick = () => {
     fileInputRef.current?.click();
@@ -588,11 +716,133 @@ export function ParkProfile({
           )}
         </motion.div>
 
-        {/* Continue button */}
+        {/* Booking Sources */}
         <motion.div
           initial={prefersReducedMotion ? {} : { opacity: 0, y: 10 }}
           animate={prefersReducedMotion ? {} : { opacity: 1, y: 0 }}
           transition={{ delay: 0.35 }}
+          className="border-t border-slate-700 pt-6"
+        >
+          <button
+            type="button"
+            onClick={() => setBookingSourcesExpanded(!bookingSourcesExpanded)}
+            className="w-full flex items-center justify-between text-left"
+          >
+            <div>
+              <h3 className="text-sm font-medium text-white">
+                How do guests find you? <span className="text-slate-500">(Optional)</span>
+              </h3>
+              <p className="text-xs text-slate-500 mt-0.5">
+                {data.bookingSources.length > 0
+                  ? `${data.bookingSources.length} selected`
+                  : "Track where your bookings come from for reporting"}
+              </p>
+            </div>
+            {bookingSourcesExpanded ? (
+              <ChevronUp className="w-5 h-5 text-slate-400" />
+            ) : (
+              <ChevronDown className="w-5 h-5 text-slate-400" />
+            )}
+          </button>
+
+          {bookingSourcesExpanded && (
+            <motion.div
+              initial={prefersReducedMotion ? {} : { opacity: 0, height: 0 }}
+              animate={prefersReducedMotion ? {} : { opacity: 1, height: "auto" }}
+              className="mt-4 space-y-4"
+            >
+              <div className="flex flex-wrap gap-2">
+                {DEFAULT_BOOKING_SOURCES.map((source) => (
+                  <ToggleChip
+                    key={source}
+                    label={source}
+                    selected={data.bookingSources.includes(source)}
+                    onToggle={() => toggleBookingSource(source)}
+                  />
+                ))}
+              </div>
+
+              <div className="space-y-2">
+                <Label className="text-sm text-slate-300">
+                  Custom booking sources (one per line)
+                </Label>
+                <Textarea
+                  value={customBookingSources}
+                  onChange={(e) => handleCustomBookingSourcesChange(e.target.value)}
+                  placeholder="Other Channel&#10;Partner Site&#10;Direct Mail"
+                  className="bg-slate-800/50 border-slate-700 text-white placeholder:text-slate-500 focus:shadow-[0_0_20px_-5px_rgba(16,185,129,0.3)] min-h-[80px]"
+                />
+              </div>
+            </motion.div>
+          )}
+        </motion.div>
+
+        {/* Stay Reasons */}
+        <motion.div
+          initial={prefersReducedMotion ? {} : { opacity: 0, y: 10 }}
+          animate={prefersReducedMotion ? {} : { opacity: 1, y: 0 }}
+          transition={{ delay: 0.4 }}
+          className="border-t border-slate-700 pt-6"
+        >
+          <button
+            type="button"
+            onClick={() => setStayReasonsExpanded(!stayReasonsExpanded)}
+            className="w-full flex items-center justify-between text-left"
+          >
+            <div>
+              <h3 className="text-sm font-medium text-white">
+                Why do guests visit? <span className="text-slate-500">(Optional)</span>
+              </h3>
+              <p className="text-xs text-slate-500 mt-0.5">
+                {data.stayReasons.length > 0
+                  ? `${data.stayReasons.length} selected`
+                  : "Track common reasons for stays"}
+              </p>
+            </div>
+            {stayReasonsExpanded ? (
+              <ChevronUp className="w-5 h-5 text-slate-400" />
+            ) : (
+              <ChevronDown className="w-5 h-5 text-slate-400" />
+            )}
+          </button>
+
+          {stayReasonsExpanded && (
+            <motion.div
+              initial={prefersReducedMotion ? {} : { opacity: 0, height: 0 }}
+              animate={prefersReducedMotion ? {} : { opacity: 1, height: "auto" }}
+              className="mt-4 space-y-4"
+            >
+              <div className="flex flex-wrap gap-2">
+                {DEFAULT_STAY_REASONS.map((reason) => (
+                  <ToggleChip
+                    key={reason}
+                    label={reason}
+                    selected={data.stayReasons.includes(reason)}
+                    onToggle={() => toggleStayReason(reason)}
+                  />
+                ))}
+              </div>
+
+              <div className="space-y-2">
+                <Label className="text-sm text-slate-300">
+                  Custom stay reasons (one per line)
+                </Label>
+                <Textarea
+                  value={customStayReasons}
+                  onChange={(e) => handleCustomStayReasonsChange(e.target.value)}
+                  placeholder="Extended Stay&#10;Emergency Housing&#10;Special Event"
+                  className="bg-slate-800/50 border-slate-700 text-white placeholder:text-slate-500 focus:shadow-[0_0_20px_-5px_rgba(16,185,129,0.3)] min-h-[80px]"
+                />
+              </div>
+            </motion.div>
+          )}
+        </motion.div>
+
+        {/* Continue button */}
+        <motion.div
+          initial={prefersReducedMotion ? {} : { opacity: 0, y: 10 }}
+          animate={prefersReducedMotion ? {} : { opacity: 1, y: 0 }}
+          transition={{ delay: 0.45 }}
           className="pt-4"
         >
           <Button

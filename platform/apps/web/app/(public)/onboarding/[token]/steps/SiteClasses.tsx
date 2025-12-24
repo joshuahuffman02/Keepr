@@ -30,15 +30,29 @@ import { SiteTypeSelector, type SiteBaseType } from "@/components/onboarding/Sit
 import { RvConfigPanel, type RvOrientation } from "@/components/onboarding/RvConfigPanel";
 import { AmenityPicker } from "@/components/onboarding/AmenityPicker";
 import { SiteClassPhotoUpload } from "@/components/onboarding/SiteClassPhotoUpload";
+import { EquipmentTypePicker } from "@/components/onboarding/EquipmentTypePicker";
+import { GuestPricingPanel } from "@/components/onboarding/GuestPricingPanel";
+import { RentalTypeSelector, type RentalType } from "@/components/onboarding/RentalTypeSelector";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { SITE_CLASS_AMENITIES } from "@/lib/amenities";
 
 interface SiteClassData {
   id?: string;
   name: string;
   siteType: SiteBaseType;
+  // Rental type
+  rentalType: RentalType;
   // RV-specific
   rvOrientation?: RvOrientation;
   electricAmps: number[];
+  equipmentTypes: string[];
+  slideOutsAccepted: string | null;
   // Hookups
   hookupsWater: boolean;
   hookupsSewer: boolean;
@@ -46,6 +60,10 @@ interface SiteClassData {
   defaultRate: number;
   maxOccupancy: number;
   petFriendly: boolean;
+  // Guest pricing
+  occupantsIncluded: number;
+  extraAdultFee: number | null;
+  extraChildFee: number | null;
   // Amenities and photos
   amenityTags: string[];
   photos: string[];
@@ -127,46 +145,70 @@ function getDefaultsForType(type: SiteBaseType): Partial<SiteClassData> {
   switch (type) {
     case "rv":
       return {
+        rentalType: "transient",
         rvOrientation: "back_in",
         electricAmps: [30],
+        equipmentTypes: [],
+        slideOutsAccepted: null,
         hookupsWater: true,
         hookupsSewer: false,
         maxOccupancy: 6,
         petFriendly: true,
         defaultRate: 55,
+        occupantsIncluded: 2,
+        extraAdultFee: null,
+        extraChildFee: null,
         amenityTags: [],
         photos: [],
       };
     case "tent":
       return {
+        rentalType: "transient",
         electricAmps: [],
+        equipmentTypes: [],
+        slideOutsAccepted: null,
         hookupsWater: false,
         hookupsSewer: false,
         maxOccupancy: 4,
         petFriendly: true,
         defaultRate: 25,
+        occupantsIncluded: 2,
+        extraAdultFee: null,
+        extraChildFee: null,
         amenityTags: ["fire_pit"],
         photos: [],
       };
     case "cabin":
       return {
+        rentalType: "transient",
         electricAmps: [],
+        equipmentTypes: [],
+        slideOutsAccepted: null,
         hookupsWater: true,
         hookupsSewer: true,
         maxOccupancy: 4,
         petFriendly: false,
         defaultRate: 125,
+        occupantsIncluded: 2,
+        extraAdultFee: null,
+        extraChildFee: null,
         amenityTags: [],
         photos: [],
       };
     case "glamping":
       return {
+        rentalType: "transient",
         electricAmps: [],
+        equipmentTypes: [],
+        slideOutsAccepted: null,
         hookupsWater: false,
         hookupsSewer: false,
         maxOccupancy: 4,
         petFriendly: false,
         defaultRate: 150,
+        occupantsIncluded: 2,
+        extraAdultFee: null,
+        extraChildFee: null,
         amenityTags: [],
         photos: [],
       };
@@ -184,12 +226,18 @@ function SiteClassWizard({
   const prefersReducedMotion = useReducedMotion();
   const [step, setStep] = useState<WizardStep>("type");
   const [data, setData] = useState<Partial<SiteClassData>>({
+    rentalType: "transient",
     electricAmps: [],
+    equipmentTypes: [],
+    slideOutsAccepted: null,
     hookupsWater: false,
     hookupsSewer: false,
     petFriendly: true,
     maxOccupancy: 4,
     defaultRate: 50,
+    occupantsIncluded: 2,
+    extraAdultFee: null,
+    extraChildFee: null,
     amenityTags: [],
     photos: [],
   });
@@ -216,11 +264,11 @@ function SiteClassWizard({
   };
 
   const handleComplete = () => {
-    if (!data.siteType || !data.name) return;
+    if (!data.siteType || !data.name || !data.rentalType) return;
     onComplete(data as SiteClassData);
   };
 
-  const canComplete = data.siteType && data.name && data.maxOccupancy;
+  const canComplete = data.siteType && data.name && data.rentalType && data.maxOccupancy;
 
   return (
     <motion.div
@@ -270,11 +318,25 @@ function SiteClassWizard({
             initial={prefersReducedMotion ? {} : { opacity: 0, x: -20 }}
             animate={prefersReducedMotion ? {} : { opacity: 1, x: 0 }}
             exit={prefersReducedMotion ? {} : { opacity: 0, x: -20 }}
+            className="space-y-6"
           >
-            <SiteTypeSelector
-              selected={data.siteType || null}
-              onSelect={handleTypeSelect}
-            />
+            <div className="space-y-3">
+              <h3 className="text-lg font-medium text-slate-200">Rental Type</h3>
+              <RentalTypeSelector
+                value={data.rentalType || "transient"}
+                onChange={(rentalType) =>
+                  setData((prev) => ({ ...prev, rentalType }))
+                }
+              />
+            </div>
+
+            <div className="space-y-3">
+              <h3 className="text-lg font-medium text-slate-200">Site Type</h3>
+              <SiteTypeSelector
+                selected={data.siteType || null}
+                onSelect={handleTypeSelect}
+              />
+            </div>
           </motion.div>
         )}
 
@@ -317,6 +379,55 @@ function SiteClassWizard({
                 setData((prev) => ({ ...prev, hookupsSewer: value }))
               }
             />
+
+            {/* Equipment Types - RV only */}
+            <div className="space-y-3">
+              <Label className="text-sm text-slate-300">Accepted Equipment Types</Label>
+              <EquipmentTypePicker
+                selected={data.equipmentTypes || []}
+                onChange={(types) =>
+                  setData((prev) => ({ ...prev, equipmentTypes: types }))
+                }
+              />
+              <p className="text-xs text-slate-500">
+                Select which types of RVs can book this site type
+              </p>
+            </div>
+
+            {/* Slide-outs Accepted - RV only */}
+            <div className="space-y-2">
+              <Label className="text-sm text-slate-300">Slide-outs Accepted</Label>
+              <Select
+                value={data.slideOutsAccepted || "any"}
+                onValueChange={(value) =>
+                  setData((prev) => ({
+                    ...prev,
+                    slideOutsAccepted: value === "any" ? null : value
+                  }))
+                }
+              >
+                <SelectTrigger className="bg-slate-800/50 border-slate-700 text-white">
+                  <SelectValue placeholder="Select slide-out policy" />
+                </SelectTrigger>
+                <SelectContent className="bg-slate-800 border-slate-700">
+                  <SelectItem value="any" className="text-white hover:bg-slate-700">
+                    Any (No restrictions)
+                  </SelectItem>
+                  <SelectItem value="one_side" className="text-white hover:bg-slate-700">
+                    One side only
+                  </SelectItem>
+                  <SelectItem value="both_sides" className="text-white hover:bg-slate-700">
+                    Both sides allowed
+                  </SelectItem>
+                  <SelectItem value="none" className="text-white hover:bg-slate-700">
+                    No slide-outs
+                  </SelectItem>
+                </SelectContent>
+              </Select>
+              <p className="text-xs text-slate-500">
+                Specify if this site accommodates RV slide-outs
+              </p>
+            </div>
 
             <Button
               onClick={handleConfigNext}
@@ -392,6 +503,21 @@ function SiteClassWizard({
                 onCheckedChange={(checked) => setData((prev) => ({ ...prev, petFriendly: checked }))}
               />
             </div>
+
+            {/* Guest Pricing Panel */}
+            <GuestPricingPanel
+              occupantsIncluded={data.occupantsIncluded || 2}
+              extraAdultFee={data.extraAdultFee ?? null}
+              extraChildFee={data.extraChildFee ?? null}
+              onChange={({ occupantsIncluded, extraAdultFee, extraChildFee }) =>
+                setData((prev) => ({
+                  ...prev,
+                  occupantsIncluded,
+                  extraAdultFee,
+                  extraChildFee,
+                }))
+              }
+            />
 
             {/* Site Amenities */}
             <div className="space-y-3">
@@ -549,7 +675,13 @@ export function SiteClasses({
   const [classes, setClasses] = useState<SiteClassData[]>(
     initialClasses.map((c) => ({
       ...c,
+      rentalType: c.rentalType || "transient",
       electricAmps: c.electricAmps || [],
+      equipmentTypes: c.equipmentTypes || [],
+      slideOutsAccepted: c.slideOutsAccepted || null,
+      occupantsIncluded: c.occupantsIncluded || 2,
+      extraAdultFee: c.extraAdultFee || null,
+      extraChildFee: c.extraChildFee || null,
       amenityTags: c.amenityTags || [],
       photos: c.photos || [],
     }))

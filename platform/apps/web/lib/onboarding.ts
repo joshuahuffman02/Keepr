@@ -5,9 +5,12 @@ export type OnboardingStepKey =
   | "data_import"
   | "site_classes"
   | "sites_builder"
+  | "rate_periods"
   | "rates_setup"
+  | "fees_and_addons"
   | "tax_rules"
   | "deposit_policy"
+  | "cancellation_rules"
   | "park_rules"
   | "review_launch";
 
@@ -80,11 +83,25 @@ export const onboardingSteps: OnboardingStep[] = [
   },
   // Phase 3: Pricing
   {
+    key: "rate_periods",
+    title: "Rate Periods",
+    description: "Define seasonal pricing periods",
+    phase: "pricing",
+    required: false,
+  },
+  {
     key: "rates_setup",
     title: "Pricing",
     description: "Set rates for each site type",
     phase: "pricing",
     required: true,
+  },
+  {
+    key: "fees_and_addons",
+    title: "Fees & Add-ons",
+    description: "Configure booking fees and purchasable items",
+    phase: "pricing",
+    required: false,
   },
   // Phase 4: Rules & Policies
   {
@@ -100,6 +117,13 @@ export const onboardingSteps: OnboardingStep[] = [
     description: "How much to collect upfront",
     phase: "rules",
     required: true,
+  },
+  {
+    key: "cancellation_rules",
+    title: "Cancellation Policy",
+    description: "Set tiered refund rules",
+    phase: "rules",
+    required: false,
   },
   {
     key: "park_rules",

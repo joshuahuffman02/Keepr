@@ -14,9 +14,12 @@ import { ImportOrManual } from "./steps/ImportOrManual";
 import { DataImport } from "./steps/DataImport";
 import { SiteClasses } from "./steps/SiteClasses";
 import { SitesBuilder } from "./steps/SitesBuilder";
+import { RatePeriods, RatePeriod } from "./steps/RatePeriods";
 import { RatesSetup } from "./steps/RatesSetup";
+import { FeesAndAddons } from "./steps/FeesAndAddons";
 import { TaxRules } from "./steps/TaxRules";
 import { DepositPolicy } from "./steps/DepositPolicy";
+import { CancellationRules, CancellationRule } from "./steps/CancellationRules";
 import { ParkRules } from "./steps/ParkRules";
 import { ReviewLaunch } from "./steps/ReviewLaunch";
 import { Loader2 } from "lucide-react";
@@ -43,13 +46,19 @@ interface WizardState {
     id: string;
     name: string;
     siteType: string;
+    rentalType?: string;
     defaultRate: number;
     maxOccupancy?: number;
     hookupsWater?: boolean;
     hookupsSewer?: boolean;
     petFriendly?: boolean;
     electricAmps?: number[];
+    equipmentTypes?: string[];
+    slideOutsAccepted?: string | null;
     rvOrientation?: string;
+    occupantsIncluded?: number;
+    extraAdultFee?: number | null;
+    extraChildFee?: number | null;
     amenityTags?: string[];
     photos?: string[];
   }>;
@@ -61,9 +70,24 @@ interface WizardState {
     rigMaxLength?: number;
     powerAmps?: number;
   }>;
+  ratePeriods?: RatePeriod[];
   rates?: Array<{ siteClassId: string; nightlyRate: number }>;
+  feesAndAddons?: {
+    bookingFeeCents: number | null;
+    siteLockFeeCents: number | null;
+    petFeeEnabled: boolean;
+    petFeeCents: number | null;
+    petFeeType: "per_pet_per_night" | "flat";
+    addOnItems: Array<{
+      id: string;
+      name: string;
+      priceCents: number;
+      pricingType: "flat" | "per_night" | "per_person";
+    }>;
+  };
   taxRules?: Array<{ name: string; type: string; rate: number }>;
   depositPolicy?: { strategy: string };
+  cancellationRules?: CancellationRule[];
   parkRules?: { content: string; requireSignature: boolean };
 }
 
@@ -142,9 +166,12 @@ export default function OnboardingPage() {
     const parkProfileData = data.park_profile?.campground || data.account_profile?.campground || data.campground;
     const siteClassesData = data.site_classes?.siteClasses || data.siteClasses;
     const sitesData = data.sites_builder?.sites || data.sites;
+    const ratePeriodsData = data.rate_periods?.ratePeriods || data.ratePeriods;
     const ratesData = data.rates_setup?.rates || data.rates;
+    const feesAndAddonsData = data.fees_and_addons?.feesAndAddons || data.feesAndAddons;
     const taxRulesData = data.tax_rules?.taxRules || data.taxRules;
     const depositPolicyData = data.deposit_policy?.depositPolicy || data.depositPolicy;
+    const cancellationRulesData = data.cancellation_rules?.cancellationRules || data.cancellationRules;
     const parkRulesData = data.park_rules?.parkRules || data.parkRules;
     const inventoryPathData = data.inventory_choice?.path || data.inventoryPath;
 
@@ -164,9 +191,12 @@ export default function OnboardingPage() {
       stripeAccountId: data.stripe_connect?.accountId || data.stripeAccountId,
       siteClasses: siteClassesData,
       sites: sitesData,
+      ratePeriods: ratePeriodsData,
       rates: ratesData,
+      feesAndAddons: feesAndAddonsData,
       taxRules: taxRulesData,
       depositPolicy: depositPolicyData,
+      cancellationRules: cancellationRulesData,
       parkRules: parkRulesData,
       completedSteps: mappedCompletedSteps,
       currentStep: currentStepKey,
@@ -417,7 +447,7 @@ export default function OnboardingPage() {
     );
     setTimeout(() => {
       hideCelebration();
-      goToStep("rates_setup");
+      goToStep("rate_periods");
     }, 2000);
   };
 
@@ -436,8 +466,21 @@ export default function OnboardingPage() {
     );
     setTimeout(() => {
       hideCelebration();
-      goToStep("rates_setup");
+      goToStep("rate_periods");
     }, 2000);
+  };
+
+  const handleRatePeriodsSave = async (periods: RatePeriod[]) => {
+    await saveMutation.mutateAsync({
+      step: "rate_periods",
+      data: { ratePeriods: periods },
+    });
+    setState((prev) => ({
+      ...prev,
+      ratePeriods: periods,
+    }));
+    completeStep("rate_periods");
+    goToStep("rates_setup");
   };
 
   const handleRatesSave = async (rates: Array<{ siteClassId: string; nightlyRate: number }>) => {
@@ -450,6 +493,31 @@ export default function OnboardingPage() {
       rates,
     }));
     completeStep("rates_setup");
+    goToStep("fees_and_addons");
+  };
+
+  const handleFeesAndAddonsSave = async (data: {
+    bookingFeeCents: number | null;
+    siteLockFeeCents: number | null;
+    petFeeEnabled: boolean;
+    petFeeCents: number | null;
+    petFeeType: "per_pet_per_night" | "flat";
+    addOnItems: Array<{
+      id: string;
+      name: string;
+      priceCents: number;
+      pricingType: "flat" | "per_night" | "per_person";
+    }>;
+  }) => {
+    await saveMutation.mutateAsync({
+      step: "fees_and_addons",
+      data: { feesAndAddons: data },
+    });
+    setState((prev) => ({
+      ...prev,
+      feesAndAddons: data,
+    }));
+    completeStep("fees_and_addons");
     goToStep("tax_rules");
   };
 
@@ -481,6 +549,24 @@ export default function OnboardingPage() {
       depositPolicy: data,
     }));
     completeStep("deposit_policy");
+    goToStep("cancellation_rules");
+  };
+
+  const handleCancellationRulesSave = async (rules: CancellationRule[]) => {
+    await saveMutation.mutateAsync({
+      step: "cancellation_rules",
+      data: { cancellationRules: rules },
+    });
+    setState((prev) => ({
+      ...prev,
+      cancellationRules: rules,
+    }));
+    completeStep("cancellation_rules");
+    goToStep("park_rules");
+  };
+
+  const handleCancellationRulesSkip = () => {
+    completeStep("cancellation_rules");
     goToStep("park_rules");
   };
 
@@ -564,13 +650,19 @@ export default function OnboardingPage() {
             initialClasses={state.siteClasses?.map((c) => ({
               name: c.name,
               siteType: c.siteType as "rv" | "tent" | "cabin" | "glamping",
+              rentalType: (c.rentalType as "transient" | "seasonal" | "flexible") || "transient",
               defaultRate: c.defaultRate / 100,
               maxOccupancy: c.maxOccupancy || 6,
               hookupsWater: c.hookupsWater ?? true,
               hookupsSewer: c.hookupsSewer ?? false,
               petFriendly: c.petFriendly ?? true,
               electricAmps: c.electricAmps || [],
+              equipmentTypes: c.equipmentTypes || [],
+              slideOutsAccepted: c.slideOutsAccepted || null,
               rvOrientation: c.rvOrientation as "back_in" | "pull_through" | undefined,
+              occupantsIncluded: c.occupantsIncluded || 2,
+              extraAdultFee: c.extraAdultFee ?? null,
+              extraChildFee: c.extraChildFee ?? null,
               amenityTags: c.amenityTags || [],
               photos: c.photos || [],
             }))}
@@ -611,6 +703,25 @@ export default function OnboardingPage() {
           />
         );
 
+      case "rate_periods":
+        return (
+          <RatePeriods
+            periods={state.ratePeriods || []}
+            onChange={(periods) => {
+              setState((prev) => ({ ...prev, ratePeriods: periods }));
+            }}
+            onNext={() => {
+              if (state.ratePeriods && state.ratePeriods.length > 0) {
+                handleRatePeriodsSave(state.ratePeriods);
+              } else {
+                completeStep("rate_periods");
+                goToStep("rates_setup");
+              }
+            }}
+            onBack={() => goToStep("sites_builder", "backward")}
+          />
+        );
+
       case "rates_setup":
         return (
           <RatesSetup
@@ -623,7 +734,35 @@ export default function OnboardingPage() {
               })) || []
             }
             onSave={handleRatesSave}
-            onNext={() => goToStep("tax_rules")}
+            onNext={() => goToStep("fees_and_addons")}
+          />
+        );
+
+      case "fees_and_addons":
+        return (
+          <FeesAndAddons
+            data={
+              state.feesAndAddons || {
+                bookingFeeCents: null,
+                siteLockFeeCents: null,
+                petFeeEnabled: false,
+                petFeeCents: null,
+                petFeeType: "per_pet_per_night",
+                addOnItems: [],
+              }
+            }
+            onChange={(data) => {
+              setState((prev) => ({ ...prev, feesAndAddons: data }));
+            }}
+            onNext={() => {
+              if (state.feesAndAddons) {
+                handleFeesAndAddonsSave(state.feesAndAddons);
+              } else {
+                completeStep("fees_and_addons");
+                goToStep("tax_rules");
+              }
+            }}
+            onBack={() => goToStep("rates_setup", "backward")}
           />
         );
 
@@ -646,7 +785,33 @@ export default function OnboardingPage() {
           <DepositPolicy
             initialData={state.depositPolicy as any}
             onSave={handleDepositPolicySave}
-            onNext={() => goToStep("park_rules")}
+            onNext={() => goToStep("cancellation_rules")}
+          />
+        );
+
+      case "cancellation_rules":
+        return (
+          <CancellationRules
+            rules={state.cancellationRules || []}
+            onChange={(rules) => {
+              setState((prev) => ({ ...prev, cancellationRules: rules }));
+            }}
+            onNext={() => {
+              if (state.cancellationRules && state.cancellationRules.length > 0) {
+                handleCancellationRulesSave(state.cancellationRules);
+              } else {
+                completeStep("cancellation_rules");
+                goToStep("park_rules");
+              }
+            }}
+            onBack={() => goToStep("deposit_policy", "backward")}
+            onSkip={handleCancellationRulesSkip}
+            siteClasses={
+              state.siteClasses?.map((c) => ({
+                id: c.id,
+                name: c.name,
+              })) || []
+            }
           />
         );
 

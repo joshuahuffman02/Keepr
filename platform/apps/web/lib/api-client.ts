@@ -268,9 +268,12 @@ const OnboardingStepEnum = z.enum([
   "data_import",
   "site_classes",
   "sites_builder",
+  "rate_periods",
   "rates_setup",
+  "fees_and_addons",
   "tax_rules",
   "deposit_policy",
+  "cancellation_rules",
   "park_rules",
   "review_launch",
   // Legacy step keys (for backwards compatibility)
