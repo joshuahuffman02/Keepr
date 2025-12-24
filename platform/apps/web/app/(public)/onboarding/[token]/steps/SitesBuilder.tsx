@@ -205,8 +205,14 @@ export function SitesBuilder({
   const prefersReducedMotion = useReducedMotion();
   const [sites, setSites] = useState<SiteData[]>(initialSites);
   const [saving, setSaving] = useState(false);
-  const [mode, setMode] = useState<"bulk" | "individual">("bulk");
+  const [mode, setMode] = useState<"bulk" | "individual" | "quick">("bulk");
   const [viewMode, setViewMode] = useState<"compact" | "detailed">("compact");
+
+  // Quick entry state
+  const [quickSiteClassId, setQuickSiteClassId] = useState<string>(
+    siteClasses[0]?.id || ""
+  );
+  const [quickText, setQuickText] = useState("");
 
   // Bulk creation state
   const [bulkSiteClassId, setBulkSiteClassId] = useState<string>(
@@ -270,6 +276,24 @@ export function SitesBuilder({
     setNewSiteAmp(undefined);
   };
 
+  const addQuickSites = () => {
+    if (!quickText.trim()) return;
+    // Parse comma, newline, or space-separated site numbers
+    const siteNumbers = quickText
+      .split(/[,\n]+/)
+      .map((s) => s.trim())
+      .filter((s) => s.length > 0);
+
+    const newSites: SiteData[] = siteNumbers.map((siteNumber) => ({
+      name: `Site ${siteNumber}`,
+      siteNumber,
+      siteClassId: quickSiteClassId,
+    }));
+
+    setSites((prev) => [...prev, ...newSites]);
+    setQuickText("");
+  };
+
   const updateSite = (index: number, data: Partial<SiteData>) => {
     setSites((prev) => prev.map((s, i) => (i === index ? { ...s, ...data } : s)));
   };
@@ -321,7 +345,19 @@ export function SitesBuilder({
             )}
           >
             <Layers className="w-4 h-4 inline-block mr-2" />
-            Bulk Add
+            Sequential
+          </button>
+          <button
+            onClick={() => setMode("quick")}
+            className={cn(
+              "px-4 py-2 rounded-md text-sm font-medium transition-all",
+              mode === "quick"
+                ? "bg-emerald-500 text-white"
+                : "text-slate-400 hover:text-white"
+            )}
+          >
+            <Edit2 className="w-4 h-4 inline-block mr-2" />
+            Custom List
           </button>
           <button
             onClick={() => setMode("individual")}
@@ -333,7 +369,7 @@ export function SitesBuilder({
             )}
           >
             <Plus className="w-4 h-4 inline-block mr-2" />
-            One at a Time
+            One by One
           </button>
         </div>
 
@@ -469,6 +505,86 @@ export function SitesBuilder({
               >
                 <Plus className="w-4 h-4 mr-2" />
                 Add {bulkCount} Sites
+              </Button>
+            </motion.div>
+          )}
+
+          {mode === "quick" && (
+            <motion.div
+              key="quick"
+              initial={prefersReducedMotion ? {} : { opacity: 0, x: -20 }}
+              animate={prefersReducedMotion ? {} : { opacity: 1, x: 0 }}
+              exit={prefersReducedMotion ? {} : { opacity: 0, x: 20 }}
+              className="bg-slate-800/30 border border-slate-700 rounded-xl p-6 space-y-4"
+            >
+              <h3 className="font-medium text-white">Add Custom Site Numbers</h3>
+              <p className="text-sm text-slate-400">
+                Enter your site numbers separated by commas or new lines. Perfect for parks with non-sequential numbering.
+              </p>
+
+              <div className="space-y-2">
+                <Label className="text-sm text-slate-300">Site Type</Label>
+                <Select
+                  value={quickSiteClassId}
+                  onValueChange={setQuickSiteClassId}
+                >
+                  <SelectTrigger className="bg-slate-800/50 border-slate-700 text-white">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {siteClasses.map((sc) => (
+                      <SelectItem key={sc.id} value={sc.id}>
+                        {sc.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-2">
+                <Label className="text-sm text-slate-300">
+                  Site Numbers
+                </Label>
+                <textarea
+                  value={quickText}
+                  onChange={(e) => setQuickText(e.target.value)}
+                  placeholder="101, 105, 107, 112&#10;A-1, A-3, A-7&#10;Lakefront-1, Lakefront-2&#10;..."
+                  rows={5}
+                  className="w-full px-3 py-2 bg-slate-800/50 border border-slate-700 rounded-lg text-white placeholder:text-slate-600 focus:outline-none focus:border-emerald-500 resize-none font-mono text-sm"
+                />
+              </div>
+
+              {/* Preview */}
+              {quickText.trim() && (
+                <div className="bg-slate-900/50 rounded-lg p-3 text-sm">
+                  <p className="text-slate-400 mb-2">Preview ({quickText.split(/[,\n]+/).filter(s => s.trim()).length} sites):</p>
+                  <div className="flex flex-wrap gap-1">
+                    {quickText
+                      .split(/[,\n]+/)
+                      .map((s) => s.trim())
+                      .filter((s) => s.length > 0)
+                      .slice(0, 12)
+                      .map((s, i) => (
+                        <span key={i} className="px-2 py-0.5 bg-slate-800 rounded text-white text-xs">
+                          {s}
+                        </span>
+                      ))}
+                    {quickText.split(/[,\n]+/).filter(s => s.trim()).length > 12 && (
+                      <span className="px-2 py-0.5 text-slate-500 text-xs">
+                        +{quickText.split(/[,\n]+/).filter(s => s.trim()).length - 12} more
+                      </span>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              <Button
+                onClick={addQuickSites}
+                disabled={!quickText.trim()}
+                className="w-full bg-emerald-600 hover:bg-emerald-500 disabled:opacity-50"
+              >
+                <Plus className="w-4 h-4 mr-2" />
+                Add Sites
               </Button>
             </motion.div>
           )}
