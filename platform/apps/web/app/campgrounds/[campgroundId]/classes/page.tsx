@@ -3,23 +3,66 @@
 import React from "react";
 import { useParams, useRouter } from "next/navigation";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import { DashboardShell } from "../../../../components/ui/layout/DashboardShell";
 import { Breadcrumbs } from "../../../../components/breadcrumbs";
 import { apiClient } from "../../../../lib/api-client";
 import { useState, useRef, useEffect, useMemo } from "react";
 import { Button } from "../../../../components/ui/button";
+import { Input } from "../../../../components/ui/input";
+import { Label } from "../../../../components/ui/label";
+import { Textarea } from "../../../../components/ui/textarea";
+import { Badge } from "../../../../components/ui/badge";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../../../../components/ui/card";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../../../../components/ui/select";
 import { ImageUpload } from "../../../../components/ui/image-upload";
 import { useToast } from "../../../../components/ui/use-toast";
 import { ToastAction } from "../../../../components/ui/toast";
-import { ChevronDown, ChevronUp, Pencil, X, Zap, Droplet, Waves, Trash2 } from "lucide-react";
 import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "../../../../components/ui/table";
+  ChevronDown,
+  ChevronUp,
+  Pencil,
+  X,
+  Zap,
+  Droplet,
+  Waves,
+  Trash2,
+  Plus,
+  Layers,
+  DollarSign,
+  Users,
+  Loader2,
+  Tent,
+  Home,
+  Trees,
+  Sparkles,
+  CheckCircle2,
+  PawPrint,
+  Accessibility,
+} from "lucide-react";
+import { cn } from "../../../../lib/utils";
+import {
+  SPRING_CONFIG,
+  fadeInUp,
+  staggerContainer,
+  staggerChild,
+  reducedMotion as reducedMotionVariants,
+} from "../../../../lib/animations";
+
+// Site type configuration with icons
+const siteTypeConfig: Record<string, { icon: React.ReactNode; label: string; color: string }> = {
+  rv: { icon: <Home className="h-4 w-4" />, label: "RV", color: "bg-blue-100 text-blue-700 dark:bg-blue-900/50 dark:text-blue-400" },
+  tent: { icon: <Tent className="h-4 w-4" />, label: "Tent", color: "bg-green-100 text-green-700 dark:bg-green-900/50 dark:text-green-400" },
+  cabin: { icon: <Home className="h-4 w-4" />, label: "Cabin", color: "bg-amber-100 text-amber-700 dark:bg-amber-900/50 dark:text-amber-400" },
+  group: { icon: <Users className="h-4 w-4" />, label: "Group", color: "bg-purple-100 text-purple-700 dark:bg-purple-900/50 dark:text-purple-400" },
+  glamping: { icon: <Sparkles className="h-4 w-4" />, label: "Glamping", color: "bg-pink-100 text-pink-700 dark:bg-pink-900/50 dark:text-pink-400" },
+};
 
 type SiteClassFormState = {
   name: string;
@@ -65,6 +108,8 @@ export default function SiteClassesPage() {
   const campgroundId = params?.campgroundId as string;
   const queryClient = useQueryClient();
   const { toast } = useToast();
+  const prefersReducedMotion = useReducedMotion();
+
   const campgroundQuery = useQuery({
     queryKey: ["campground", campgroundId],
     queryFn: () => apiClient.getCampground(campgroundId),
@@ -215,9 +260,37 @@ export default function SiteClassesPage() {
     }
   };
 
+  // Stats
+  const totalClasses = classesQuery.data?.length || 0;
+  const activeClasses = classesQuery.data?.filter(c => c.isActive !== false).length || 0;
+  const totalSitesWithClass = Object.values(sitesPerClass).reduce((a, b) => a + b, 0);
+
+  if (classesQuery.isLoading) {
+    return (
+      <DashboardShell>
+        <div className="flex items-center justify-center min-h-[60vh]">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="text-center"
+          >
+            <Loader2 className="h-12 w-12 animate-spin text-emerald-500 mx-auto mb-4" />
+            <p className="text-muted-foreground">Loading site classes...</p>
+          </motion.div>
+        </div>
+      </DashboardShell>
+    );
+  }
+
   return (
     <DashboardShell>
-      <div className="space-y-4">
+      <motion.div
+        className="space-y-6"
+        variants={staggerContainer}
+        initial="initial"
+        animate="animate"
+      >
+        {/* Breadcrumbs */}
         <Breadcrumbs
           items={[
             { label: "Campgrounds", href: "/campgrounds?all=true" },
@@ -225,551 +298,537 @@ export default function SiteClassesPage() {
             { label: "Site Classes" }
           ]}
         />
-        <div className="flex items-center justify-between">
+
+        {/* Header */}
+        <motion.div
+          className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between"
+          variants={staggerChild}
+          transition={SPRING_CONFIG}
+        >
           <div>
-            <h2 className="text-xl font-semibold text-slate-900">Site Classes</h2>
-            {classesQuery.data && (
-              <p className="text-sm text-slate-500">
-                {classesQuery.data.length} classes
-                {classesQuery.data.filter(c => c.isActive !== false).length !== classesQuery.data.length &&
-                  ` (${classesQuery.data.filter(c => c.isActive !== false).length} active)`}
-              </p>
-            )}
+            <h1 className="text-3xl font-bold text-foreground flex items-center gap-3">
+              <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-purple-500 to-indigo-500 flex items-center justify-center">
+                <Layers className="h-5 w-5 text-white" />
+              </div>
+              Site Classes
+            </h1>
+            <p className="text-muted-foreground mt-1">
+              Define pricing tiers and amenity packages for your sites
+            </p>
           </div>
           {!showCreateForm && (
-            <Button onClick={() => setShowCreateForm(true)}>+ Add Class</Button>
+            <Button
+              onClick={() => setShowCreateForm(true)}
+              className="gap-2 bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700"
+            >
+              <Plus className="h-4 w-4" />
+              Add Class
+            </Button>
           )}
-        </div>
+        </motion.div>
 
-        {showCreateForm && (
-        <div className="card p-4">
-          <div className="flex items-center justify-between mb-3">
-            <h3 className="text-lg font-semibold text-slate-900">Add site class</h3>
-            <Button variant="ghost" size="sm" onClick={() => setShowCreateForm(false)}>
-              <X className="h-4 w-4" />
-            </Button>
-          </div>
-          {/* Essential fields - always visible */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-            <input
-              className="rounded-md border border-slate-200 px-3 py-2"
-              placeholder="Name *"
-              value={form.name}
-              onChange={(e) => setForm((s) => ({ ...s, name: e.target.value }))}
-            />
-            <input
-              type="number"
-              step="0.01"
-              min="0"
-              className="rounded-md border border-slate-200 px-3 py-2"
-              placeholder="Default rate ($) *"
-              value={form.defaultRate}
-              onChange={(e) => setForm((s) => ({ ...s, defaultRate: e.target.value === "" ? "" : Number(e.target.value) }))}
-            />
-            <select
-              className="rounded-md border border-slate-200 px-3 py-2"
-              value={form.siteType}
-              onChange={(e) => setForm((s) => ({ ...s, siteType: e.target.value }))}
-            >
-              <option value="rv">RV</option>
-              <option value="tent">Tent</option>
-              <option value="cabin">Cabin</option>
-              <option value="group">Group</option>
-              <option value="glamping">Glamping</option>
-            </select>
-            <input
-              type="number"
-              min="1"
-              className="rounded-md border border-slate-200 px-3 py-2"
-              placeholder="Max occupancy"
-              value={form.maxOccupancy}
-              onChange={(e) => setForm((s) => ({ ...s, maxOccupancy: e.target.value === "" ? "" : Number(e.target.value) }))}
-            />
-          </div>
-
-          {/* Advanced options - collapsible */}
-          <div className="mt-4">
-            <button
-              type="button"
-              onClick={() => setShowAdvanced(!showAdvanced)}
-              className="flex items-center gap-2 text-sm text-slate-600 hover:text-slate-900 transition-colors"
-            >
-              {showAdvanced ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
-              {showAdvanced ? "Hide" : "Show"} advanced options
-            </button>
-
-            {showAdvanced && (
-              <div className="mt-3 pt-3 border-t border-slate-100 grid grid-cols-1 md:grid-cols-2 gap-3">
-                <input
-                  className="rounded-md border border-slate-200 px-3 py-2 md:col-span-2"
-                  placeholder="Description"
-                  value={form.description}
-                  onChange={(e) => setForm((s) => ({ ...s, description: e.target.value }))}
-                />
-                <input
-                  type="number"
-                  min="0"
-                  className="rounded-md border border-slate-200 px-3 py-2"
-                  placeholder="Rig max length (ft)"
-                  value={form.rigMaxLength}
-                  onChange={(e) => setForm((s) => ({ ...s, rigMaxLength: e.target.value === "" ? "" : Number(e.target.value) }))}
-                />
-                <div />
-                <div className="flex flex-wrap gap-3 md:col-span-2">
-                  <span className="text-xs font-semibold text-slate-600">Hookups:</span>
-                  <label className="flex items-center gap-2 text-sm text-slate-700">
-                    <input
-                      type="checkbox"
-                      checked={form.hookupsPower}
-                      onChange={(e) => setForm((s) => ({ ...s, hookupsPower: e.target.checked }))}
-                    />
-                    Power
-                  </label>
-                  <label className="flex items-center gap-2 text-sm text-slate-700">
-                    <input
-                      type="checkbox"
-                      checked={form.hookupsWater}
-                      onChange={(e) => setForm((s) => ({ ...s, hookupsWater: e.target.checked }))}
-                    />
-                    Water
-                  </label>
-                  <label className="flex items-center gap-2 text-sm text-slate-700">
-                    <input
-                      type="checkbox"
-                      checked={form.hookupsSewer}
-                      onChange={(e) => setForm((s) => ({ ...s, hookupsSewer: e.target.checked }))}
-                    />
-                    Sewer
-                  </label>
+        {/* Stats Cards */}
+        <motion.div
+          className="grid grid-cols-1 sm:grid-cols-3 gap-4"
+          variants={staggerChild}
+          transition={SPRING_CONFIG}
+        >
+          <Card className="border-border bg-card/80 backdrop-blur-sm">
+            <CardContent className="pt-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <div className="text-3xl font-bold text-foreground">{totalClasses}</div>
+                  <div className="text-sm text-muted-foreground">Total Classes</div>
                 </div>
-                <div className="flex flex-wrap gap-3 md:col-span-2">
-                  <span className="text-xs font-semibold text-slate-600">Features:</span>
-                  <label className="flex items-center gap-2 text-sm text-slate-700">
-                    <input
-                      type="checkbox"
-                      checked={form.petFriendly}
-                      onChange={(e) => setForm((s) => ({ ...s, petFriendly: e.target.checked }))}
-                    />
-                    Pet friendly
-                  </label>
-                  <label className="flex items-center gap-2 text-sm text-slate-700">
-                    <input
-                      type="checkbox"
-                      checked={form.accessible}
-                      onChange={(e) => setForm((s) => ({ ...s, accessible: e.target.checked }))}
-                    />
-                    Accessible
-                  </label>
+                <div className="h-12 w-12 rounded-full bg-muted flex items-center justify-center">
+                  <Layers className="h-6 w-6 text-muted-foreground" />
                 </div>
-                <input
-                  type="number"
-                  min="1"
-                  className="rounded-md border border-slate-200 px-3 py-2"
-                  placeholder="Min nights"
-                  value={form.minNights}
-                  onChange={(e) => setForm((s) => ({ ...s, minNights: e.target.value === "" ? "" : Number(e.target.value) }))}
-                />
-                <input
-                  type="number"
-                  min="1"
-                  className="rounded-md border border-slate-200 px-3 py-2"
-                  placeholder="Max nights"
-                  value={form.maxNights}
-                  onChange={(e) => setForm((s) => ({ ...s, maxNights: e.target.value === "" ? "" : Number(e.target.value) }))}
-                />
-                <div className="md:col-span-2 space-y-1">
-                  <label className="text-xs font-semibold text-slate-700">Photos</label>
-                  <div className="bg-slate-50 p-2 rounded border border-slate-100 mb-2">
-                    <ImageUpload
-                      onChange={(url) => {
-                        if (!url) return;
-                        const current = form.photos ? form.photos.split(",").map(p => p.trim()).filter(Boolean) : [];
-                        setForm(s => ({ ...s, photos: [...current, url].join(", ") }));
-                      }}
-                      placeholder="Upload class photo"
-                    />
-                  </div>
-                  <textarea
-                    className="rounded-md border border-slate-200 px-3 py-2 w-full text-xs"
-                    placeholder="Or enter URLs: https://img1.jpg, https://img2.jpg"
-                    value={form.photos}
-                    onChange={(e) => setForm((s) => ({ ...s, photos: e.target.value }))}
-                  />
-                  {form.photos && form.photos.split(",").map((p) => p.trim()).filter(Boolean).length > 0 && (
-                    <div className="mt-2 grid grid-cols-2 sm:grid-cols-3 gap-2">
-                      {form.photos.split(",").map((p) => p.trim()).filter(Boolean).map((url) => (
-                        <div key={url} className="text-[10px] truncate rounded border border-slate-200 bg-slate-50 p-1">
-                          {url}
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
-                <input
-                  className="rounded-md border border-slate-200 px-3 py-2 md:col-span-2"
-                  placeholder="Policy version (snapshot id)"
-                  value={form.policyVersion}
-                  onChange={(e) => setForm((s) => ({ ...s, policyVersion: e.target.value }))}
-                />
-                <label className="flex items-center gap-2 text-sm text-slate-700 md:col-span-2">
-                  <input
-                    type="checkbox"
-                    checked={form.isActive}
-                    onChange={(e) => setForm((s) => ({ ...s, isActive: e.target.checked }))}
-                  />
-                  Active
-                </label>
               </div>
-            )}
-          </div>
+            </CardContent>
+          </Card>
 
-          <div className="mt-4">
-            <Button disabled={createClass.isPending || !form.name} onClick={() => {
-              createClass.mutate(undefined, {
-                onSuccess: () => setShowCreateForm(false)
-              });
-            }}>
-              {createClass.isPending ? "Saving..." : "Save class"}
-            </Button>
-            {createClass.isError && <span className="ml-3 text-sm text-red-600">Failed to save class</span>}
-          </div>
-        </div>
-        )}
-        {/* Table View */}
-        <div className="card overflow-hidden">
-          <Table>
-            <TableHeader>
-              <TableRow className="bg-slate-50">
-                <TableHead className="font-semibold">Name</TableHead>
-                <TableHead className="font-semibold">Type</TableHead>
-                <TableHead className="font-semibold">Rate</TableHead>
-                <TableHead className="font-semibold hidden md:table-cell">Max Guests</TableHead>
-                <TableHead className="font-semibold hidden lg:table-cell">Hookups</TableHead>
-                <TableHead className="font-semibold hidden md:table-cell">Sites</TableHead>
-                <TableHead className="font-semibold">Status</TableHead>
-                <TableHead className="font-semibold text-right">Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {classesQuery.data?.map((cls) => {
-                const isEditing = editingId === cls.id;
-                const isInactive = cls.isActive === false;
-                const hasHookups = cls.hookupsPower || cls.hookupsWater || cls.hookupsSewer;
-                const siteCount = sitesPerClass[cls.id] || 0;
+          <Card className="border-border bg-card/80 backdrop-blur-sm">
+            <CardContent className="pt-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <div className="text-3xl font-bold text-foreground">{activeClasses}</div>
+                  <div className="text-sm text-muted-foreground">Active Classes</div>
+                </div>
+                <div className="h-12 w-12 rounded-full bg-emerald-100 dark:bg-emerald-900/50 flex items-center justify-center">
+                  <CheckCircle2 className="h-6 w-6 text-emerald-600 dark:text-emerald-400" />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
 
-                return (
-                  <React.Fragment key={cls.id}>
-                    <TableRow className={`${isInactive ? "opacity-50 bg-slate-50" : ""} hover:bg-slate-50`}>
-                      <TableCell>
-                        <div className="flex flex-col">
-                          <button
-                            onClick={() => router.push(`/campgrounds/${campgroundId}/classes/${cls.id}`)}
-                            className="font-medium text-slate-900 hover:text-emerald-600 text-left"
-                          >
-                            {cls.name}
-                          </button>
-                          {cls.description && (
-                            <span className="text-xs text-slate-500 truncate max-w-[200px]">{cls.description}</span>
-                          )}
+          <Card className="border-border bg-card/80 backdrop-blur-sm">
+            <CardContent className="pt-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <div className="text-3xl font-bold text-foreground">{totalSitesWithClass}</div>
+                  <div className="text-sm text-muted-foreground">Sites Assigned</div>
+                </div>
+                <div className="h-12 w-12 rounded-full bg-blue-100 dark:bg-blue-900/50 flex items-center justify-center">
+                  <Trees className="h-6 w-6 text-blue-600 dark:text-blue-400" />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </motion.div>
+
+        {/* Create Form */}
+        <AnimatePresence>
+          {showCreateForm && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: "auto" }}
+              exit={{ opacity: 0, height: 0 }}
+              transition={SPRING_CONFIG}
+            >
+              <Card className="border-border bg-card/80 backdrop-blur-sm">
+                <CardHeader>
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <CardTitle className="flex items-center gap-2">
+                        <Plus className="h-5 w-5 text-muted-foreground" />
+                        Add Site Class
+                      </CardTitle>
+                      <CardDescription>Create a new pricing tier for your sites</CardDescription>
+                    </div>
+                    <Button variant="ghost" size="sm" onClick={() => setShowCreateForm(false)}>
+                      <X className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  {/* Essential fields */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="name" className="text-foreground">Name *</Label>
+                      <Input
+                        id="name"
+                        placeholder="e.g., Premium Full Hookup"
+                        value={form.name}
+                        onChange={(e) => setForm((s) => ({ ...s, name: e.target.value }))}
+                        className="bg-background border-border"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="rate" className="text-foreground">Default Rate ($) *</Label>
+                      <div className="relative">
+                        <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                        <Input
+                          id="rate"
+                          type="number"
+                          step="0.01"
+                          min="0"
+                          placeholder="45.00"
+                          value={form.defaultRate}
+                          onChange={(e) => setForm((s) => ({ ...s, defaultRate: e.target.value === "" ? "" : Number(e.target.value) }))}
+                          className="pl-10 bg-background border-border"
+                        />
+                      </div>
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="type" className="text-foreground">Site Type</Label>
+                      <Select value={form.siteType} onValueChange={(v) => setForm((s) => ({ ...s, siteType: v }))}>
+                        <SelectTrigger id="type" className="bg-background border-border">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {Object.entries(siteTypeConfig).map(([key, config]) => (
+                            <SelectItem key={key} value={key}>
+                              <span className="flex items-center gap-2">
+                                {config.icon}
+                                {config.label}
+                              </span>
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="occupancy" className="text-foreground">Max Guests</Label>
+                      <div className="relative">
+                        <Users className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                        <Input
+                          id="occupancy"
+                          type="number"
+                          min="1"
+                          placeholder="6"
+                          value={form.maxOccupancy}
+                          onChange={(e) => setForm((s) => ({ ...s, maxOccupancy: e.target.value === "" ? "" : Number(e.target.value) }))}
+                          className="pl-10 bg-background border-border"
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Hookups */}
+                  <div className="flex flex-wrap items-center gap-4 p-3 rounded-lg bg-muted/50">
+                    <span className="text-sm font-medium text-foreground">Hookups:</span>
+                    {[
+                      { key: "hookupsPower", label: "Power", icon: <Zap className="h-4 w-4" />, color: "text-amber-500" },
+                      { key: "hookupsWater", label: "Water", icon: <Droplet className="h-4 w-4" />, color: "text-blue-500" },
+                      { key: "hookupsSewer", label: "Sewer", icon: <Waves className="h-4 w-4" />, color: "text-slate-500" },
+                    ].map((hookup) => (
+                      <motion.button
+                        key={hookup.key}
+                        type="button"
+                        onClick={() => setForm((s) => ({ ...s, [hookup.key]: !s[hookup.key as keyof SiteClassFormState] }))}
+                        className={cn(
+                          "flex items-center gap-2 px-3 py-2 rounded-lg border-2 transition-all",
+                          form[hookup.key as keyof SiteClassFormState]
+                            ? "border-emerald-500 bg-emerald-50 dark:bg-emerald-950/30"
+                            : "border-border hover:border-muted-foreground/30"
+                        )}
+                        whileHover={prefersReducedMotion ? {} : { scale: 1.02 }}
+                        whileTap={prefersReducedMotion ? {} : { scale: 0.98 }}
+                      >
+                        <span className={hookup.color}>{hookup.icon}</span>
+                        <span className="text-sm text-foreground">{hookup.label}</span>
+                        {form[hookup.key as keyof SiteClassFormState] && (
+                          <CheckCircle2 className="h-4 w-4 text-emerald-500" />
+                        )}
+                      </motion.button>
+                    ))}
+                  </div>
+
+                  {/* Features */}
+                  <div className="flex flex-wrap items-center gap-4 p-3 rounded-lg bg-muted/50">
+                    <span className="text-sm font-medium text-foreground">Features:</span>
+                    <motion.button
+                      type="button"
+                      onClick={() => setForm((s) => ({ ...s, petFriendly: !s.petFriendly }))}
+                      className={cn(
+                        "flex items-center gap-2 px-3 py-2 rounded-lg border-2 transition-all",
+                        form.petFriendly
+                          ? "border-emerald-500 bg-emerald-50 dark:bg-emerald-950/30"
+                          : "border-border hover:border-muted-foreground/30"
+                      )}
+                      whileHover={prefersReducedMotion ? {} : { scale: 1.02 }}
+                      whileTap={prefersReducedMotion ? {} : { scale: 0.98 }}
+                    >
+                      <PawPrint className="h-4 w-4 text-orange-500" />
+                      <span className="text-sm text-foreground">Pet Friendly</span>
+                      {form.petFriendly && <CheckCircle2 className="h-4 w-4 text-emerald-500" />}
+                    </motion.button>
+                    <motion.button
+                      type="button"
+                      onClick={() => setForm((s) => ({ ...s, accessible: !s.accessible }))}
+                      className={cn(
+                        "flex items-center gap-2 px-3 py-2 rounded-lg border-2 transition-all",
+                        form.accessible
+                          ? "border-emerald-500 bg-emerald-50 dark:bg-emerald-950/30"
+                          : "border-border hover:border-muted-foreground/30"
+                      )}
+                      whileHover={prefersReducedMotion ? {} : { scale: 1.02 }}
+                      whileTap={prefersReducedMotion ? {} : { scale: 0.98 }}
+                    >
+                      <Accessibility className="h-4 w-4 text-blue-500" />
+                      <span className="text-sm text-foreground">Accessible</span>
+                      {form.accessible && <CheckCircle2 className="h-4 w-4 text-emerald-500" />}
+                    </motion.button>
+                  </div>
+
+                  {/* Advanced Toggle */}
+                  <button
+                    type="button"
+                    onClick={() => setShowAdvanced(!showAdvanced)}
+                    className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
+                  >
+                    {showAdvanced ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+                    {showAdvanced ? "Hide" : "Show"} advanced options
+                  </button>
+
+                  <AnimatePresence>
+                    {showAdvanced && (
+                      <motion.div
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: "auto" }}
+                        exit={{ opacity: 0, height: 0 }}
+                        className="space-y-4 pt-4 border-t border-border"
+                      >
+                        <div className="space-y-2">
+                          <Label htmlFor="description" className="text-foreground">Description</Label>
+                          <Textarea
+                            id="description"
+                            placeholder="Describe what makes this class special..."
+                            value={form.description}
+                            onChange={(e) => setForm((s) => ({ ...s, description: e.target.value }))}
+                            className="bg-background border-border"
+                          />
                         </div>
-                      </TableCell>
-                      <TableCell>
-                        <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-slate-100 text-slate-700 capitalize">
-                          {cls.siteType}
-                        </span>
-                      </TableCell>
-                      <TableCell>
-                        {inlineEditingRate === cls.id ? (
-                          <span className="inline-flex items-center">
-                            $
-                            <input
-                              ref={inlineRateInputRef}
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                          <div className="space-y-2">
+                            <Label className="text-foreground">Min Nights</Label>
+                            <Input
                               type="number"
-                              step="0.01"
+                              min="1"
+                              value={form.minNights}
+                              onChange={(e) => setForm((s) => ({ ...s, minNights: e.target.value === "" ? "" : Number(e.target.value) }))}
+                              className="bg-background border-border"
+                            />
+                          </div>
+                          <div className="space-y-2">
+                            <Label className="text-foreground">Max Nights</Label>
+                            <Input
+                              type="number"
+                              min="1"
+                              value={form.maxNights}
+                              onChange={(e) => setForm((s) => ({ ...s, maxNights: e.target.value === "" ? "" : Number(e.target.value) }))}
+                              className="bg-background border-border"
+                            />
+                          </div>
+                          <div className="space-y-2">
+                            <Label className="text-foreground">Max Rig Length (ft)</Label>
+                            <Input
+                              type="number"
                               min="0"
-                              className="w-20 px-1 py-0.5 text-sm border border-emerald-400 rounded focus:outline-none focus:ring-1 focus:ring-emerald-500"
-                              value={inlineRateValue}
-                              onChange={(e) => setInlineRateValue(e.target.value)}
-                              onBlur={() => handleInlineRateSave(cls.id)}
-                              onKeyDown={(e) => {
-                                if (e.key === "Enter") handleInlineRateSave(cls.id);
-                                if (e.key === "Escape") setInlineEditingRate(null);
+                              value={form.rigMaxLength}
+                              onChange={(e) => setForm((s) => ({ ...s, rigMaxLength: e.target.value === "" ? "" : Number(e.target.value) }))}
+                              className="bg-background border-border"
+                            />
+                          </div>
+                          <div className="flex items-end">
+                            <label className="flex items-center gap-2 text-sm text-foreground h-10">
+                              <input
+                                type="checkbox"
+                                checked={form.isActive}
+                                onChange={(e) => setForm((s) => ({ ...s, isActive: e.target.checked }))}
+                                className="rounded border-border"
+                              />
+                              Active
+                            </label>
+                          </div>
+                        </div>
+                        <div className="space-y-2">
+                          <Label className="text-foreground">Photos</Label>
+                          <div className="bg-muted/50 p-3 rounded-lg">
+                            <ImageUpload
+                              onChange={(url) => {
+                                if (!url) return;
+                                const current = form.photos ? form.photos.split(",").map(p => p.trim()).filter(Boolean) : [];
+                                setForm(s => ({ ...s, photos: [...current, url].join(", ") }));
                               }}
+                              placeholder="Upload class photo"
                             />
-                            {updateInlineRate.isPending && <span className="ml-1 text-xs text-slate-400">...</span>}
-                          </span>
-                        ) : (
-                          <button
-                            className="inline-flex items-center gap-1 px-1 py-0.5 rounded hover:bg-slate-100 transition-colors group font-medium"
-                            onClick={() => {
-                              setInlineEditingRate(cls.id);
-                              setInlineRateValue((cls.defaultRate / 100).toFixed(2));
-                            }}
-                            title="Click to edit rate"
-                          >
-                            ${(cls.defaultRate / 100).toFixed(2)}
-                            <Pencil className="h-3 w-3 text-slate-400 opacity-0 group-hover:opacity-100 transition-opacity" />
-                          </button>
-                        )}
-                      </TableCell>
-                      <TableCell className="hidden md:table-cell">
-                        {cls.maxOccupancy}
-                      </TableCell>
-                      <TableCell className="hidden lg:table-cell">
-                        <div className="flex items-center gap-1" title={`Power: ${cls.hookupsPower ? 'Yes' : 'No'}, Water: ${cls.hookupsWater ? 'Yes' : 'No'}, Sewer: ${cls.hookupsSewer ? 'Yes' : 'No'}`}>
-                          {hasHookups ? (
-                            <>
-                              {cls.hookupsPower && <Zap className="h-3.5 w-3.5 text-amber-600" />}
-                              {cls.hookupsWater && <Droplet className="h-3.5 w-3.5 text-blue-500" />}
-                              {cls.hookupsSewer && <Waves className="h-3.5 w-3.5 text-slate-500" />}
-                            </>
-                          ) : (
-                            <span className="text-slate-400">—</span>
-                          )}
+                          </div>
                         </div>
-                      </TableCell>
-                      <TableCell className="hidden md:table-cell">
-                        {siteCount > 0 ? (
-                          <span className="text-xs px-2 py-0.5 rounded-full bg-slate-100 text-slate-600">
-                            {siteCount}
-                          </span>
-                        ) : (
-                          <span className="text-slate-400">0</span>
-                        )}
-                      </TableCell>
-                      <TableCell>
-                        <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${
-                          cls.isActive !== false
-                            ? "bg-emerald-100 text-emerald-700"
-                            : "bg-slate-100 text-slate-500"
-                        }`}>
-                          {cls.isActive !== false ? "Active" : "Inactive"}
-                        </span>
-                      </TableCell>
-                      <TableCell className="text-right">
-                        <div className="flex items-center justify-end gap-1">
-                          <Button
-                            size="sm"
-                            variant="ghost"
-                            onClick={() => {
-                              if (isEditing) {
-                                setEditingId(null);
-                                setEditForm(null);
-                              } else {
-                                setEditingId(cls.id);
-                                setEditForm({
-                                  name: cls.name,
-                                  description: cls.description ?? "",
-                                  defaultRate: cls.defaultRate / 100,
-                                  siteType: cls.siteType,
-                                  maxOccupancy: cls.maxOccupancy,
-                                  rigMaxLength: cls.rigMaxLength ?? "",
-                                  hookupsPower: !!cls.hookupsPower,
-                                  hookupsWater: !!cls.hookupsWater,
-                                  hookupsSewer: !!cls.hookupsSewer,
-                                  minNights: cls.minNights ?? "",
-                                  maxNights: cls.maxNights ?? "",
-                                  petFriendly: !!cls.petFriendly,
-                                  accessible: !!cls.accessible,
-                                  photos: cls.photos?.join(", ") ?? "",
-                                  policyVersion: cls.policyVersion ?? "",
-                                  isActive: cls.isActive ?? true
-                                });
-                              }
-                            }}
-                            className="h-8 w-8 p-0"
-                            title={isEditing ? "Cancel" : "Edit"}
-                          >
-                            {isEditing ? <X className="h-4 w-4" /> : <Pencil className="h-4 w-4" />}
-                          </Button>
-                          <Button
-                            size="sm"
-                            variant="ghost"
-                            onClick={() => handleDeleteClass(cls.id, cls.name)}
-                            disabled={deleteClass.isPending}
-                            className="h-8 w-8 p-0 text-red-600 hover:text-red-700 hover:bg-red-50"
-                            title="Delete"
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
-                        </div>
-                      </TableCell>
-                    </TableRow>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
 
-                    {/* Expandable edit row */}
-                    {isEditing && editForm && (
-                      <TableRow>
-                        <TableCell colSpan={8} className="bg-slate-50 p-0">
-                          <div className="p-4 border-t border-b border-slate-200 space-y-4">
-                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
-                              <input
-                                className="rounded-md border border-slate-200 px-3 py-2"
-                                placeholder="Name"
-                                value={editForm.name}
-                                onChange={(e) => setEditForm((s) => (s ? { ...s, name: e.target.value } : s))}
-                              />
-                              <input
-                                type="number"
-                                step="0.01"
-                                min="0"
-                                className="rounded-md border border-slate-200 px-3 py-2"
-                                placeholder="Default rate ($)"
-                                value={editForm.defaultRate}
-                                onChange={(e) =>
-                                  setEditForm((s) => (s ? { ...s, defaultRate: e.target.value === "" ? "" : Number(e.target.value) } : s))
-                                }
-                              />
-                              <select
-                                className="rounded-md border border-slate-200 px-3 py-2"
-                                value={editForm.siteType}
-                                onChange={(e) => setEditForm((s) => (s ? { ...s, siteType: e.target.value } : s))}
-                              >
-                                <option value="rv">RV</option>
-                                <option value="tent">Tent</option>
-                                <option value="cabin">Cabin</option>
-                                <option value="group">Group</option>
-                                <option value="glamping">Glamping</option>
-                              </select>
-                              <input
-                                type="number"
-                                className="rounded-md border border-slate-200 px-3 py-2"
-                                placeholder="Max occupancy"
-                                value={editForm.maxOccupancy}
-                                onChange={(e) =>
-                                  setEditForm((s) => (s ? { ...s, maxOccupancy: e.target.value === "" ? "" : Number(e.target.value) } : s))
-                                }
-                              />
+                  {/* Actions */}
+                  <div className="flex items-center gap-3 pt-4 border-t border-border">
+                    <Button
+                      onClick={() => {
+                        createClass.mutate(undefined, {
+                          onSuccess: () => setShowCreateForm(false)
+                        });
+                      }}
+                      disabled={createClass.isPending || !form.name}
+                      className="gap-2"
+                    >
+                      {createClass.isPending ? (
+                        <>
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                          Creating...
+                        </>
+                      ) : (
+                        <>
+                          <CheckCircle2 className="h-4 w-4" />
+                          Create Class
+                        </>
+                      )}
+                    </Button>
+                    <Button variant="ghost" onClick={() => setShowCreateForm(false)}>
+                      Cancel
+                    </Button>
+                    {createClass.isError && <span className="text-sm text-red-500">Failed to save class</span>}
+                  </div>
+                </CardContent>
+              </Card>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* Classes Grid */}
+        <motion.div variants={staggerChild} transition={SPRING_CONFIG}>
+          <AnimatePresence mode="wait">
+            {classesQuery.data?.length === 0 ? (
+              <motion.div
+                key="empty"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+              >
+                <Card className="border-border bg-card/80 backdrop-blur-sm">
+                  <CardContent className="py-16">
+                    <div className="flex flex-col items-center justify-center text-center">
+                      <motion.div
+                        animate={{ y: [0, -8, 0] }}
+                        transition={{ duration: 2, repeat: Infinity }}
+                        className="h-16 w-16 rounded-full bg-purple-100 dark:bg-purple-900/50 flex items-center justify-center mb-4"
+                      >
+                        <Layers className="h-8 w-8 text-purple-600 dark:text-purple-400" />
+                      </motion.div>
+                      <p className="text-lg font-medium text-foreground">No site classes yet</p>
+                      <p className="text-sm text-muted-foreground mt-1 max-w-sm">
+                        Create your first site class to define pricing tiers and amenity packages
+                      </p>
+                      <Button
+                        onClick={() => setShowCreateForm(true)}
+                        className="mt-4 gap-2"
+                      >
+                        <Plus className="h-4 w-4" />
+                        Create First Class
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              </motion.div>
+            ) : (
+              <motion.div
+                key="grid"
+                className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"
+                variants={staggerContainer}
+                initial="initial"
+                animate="animate"
+              >
+                {classesQuery.data?.map((cls, index) => {
+                  const typeConfig = siteTypeConfig[cls.siteType] || siteTypeConfig.rv;
+                  const isInactive = cls.isActive === false;
+                  const siteCount = sitesPerClass[cls.id] || 0;
+                  const hasHookups = cls.hookupsPower || cls.hookupsWater || cls.hookupsSewer;
+
+                  return (
+                    <motion.div
+                      key={cls.id}
+                      initial={prefersReducedMotion ? {} : { opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: index * 0.05 }}
+                    >
+                      <Card className={cn(
+                        "border-border bg-card/80 backdrop-blur-sm transition-all hover:shadow-lg",
+                        isInactive && "opacity-60"
+                      )}>
+                        <CardContent className="p-4">
+                          {/* Header */}
+                          <div className="flex items-start justify-between mb-3">
+                            <div className="flex items-center gap-2">
+                              <Badge className={cn("text-xs flex items-center gap-1", typeConfig.color)}>
+                                {typeConfig.icon}
+                                {typeConfig.label}
+                              </Badge>
+                              {!cls.isActive && (
+                                <Badge variant="outline" className="text-xs text-muted-foreground">
+                                  Inactive
+                                </Badge>
+                              )}
                             </div>
-                            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                              <input
-                                type="number"
-                                className="rounded-md border border-slate-200 px-3 py-2"
-                                placeholder="Rig max length (ft)"
-                                value={editForm.rigMaxLength}
-                                onChange={(e) =>
-                                  setEditForm((s) => (s ? { ...s, rigMaxLength: e.target.value === "" ? "" : Number(e.target.value) } : s))
-                                }
-                              />
-                              <input
-                                type="number"
-                                className="rounded-md border border-slate-200 px-3 py-2"
-                                placeholder="Min nights"
-                                value={editForm.minNights}
-                                onChange={(e) =>
-                                  setEditForm((s) => (s ? { ...s, minNights: e.target.value === "" ? "" : Number(e.target.value) } : s))
-                                }
-                              />
-                              <input
-                                type="number"
-                                className="rounded-md border border-slate-200 px-3 py-2"
-                                placeholder="Max nights"
-                                value={editForm.maxNights}
-                                onChange={(e) =>
-                                  setEditForm((s) => (s ? { ...s, maxNights: e.target.value === "" ? "" : Number(e.target.value) } : s))
-                                }
-                              />
-                              <label className="flex items-center gap-2 text-sm text-slate-700">
-                                <input
-                                  type="checkbox"
-                                  checked={editForm.isActive}
-                                  onChange={(e) => setEditForm((s) => (s ? { ...s, isActive: e.target.checked } : s))}
-                                />
-                                Active
-                              </label>
-                            </div>
-                            <div className="flex flex-wrap items-center gap-4">
-                              <span className="text-xs font-semibold text-slate-600">Hookups:</span>
-                              <label className="flex items-center gap-2 text-sm text-slate-700">
-                                <input
-                                  type="checkbox"
-                                  checked={editForm.hookupsPower}
-                                  onChange={(e) => setEditForm((s) => (s ? { ...s, hookupsPower: e.target.checked } : s))}
-                                />
-                                Power
-                              </label>
-                              <label className="flex items-center gap-2 text-sm text-slate-700">
-                                <input
-                                  type="checkbox"
-                                  checked={editForm.hookupsWater}
-                                  onChange={(e) => setEditForm((s) => (s ? { ...s, hookupsWater: e.target.checked } : s))}
-                                />
-                                Water
-                              </label>
-                              <label className="flex items-center gap-2 text-sm text-slate-700">
-                                <input
-                                  type="checkbox"
-                                  checked={editForm.hookupsSewer}
-                                  onChange={(e) => setEditForm((s) => (s ? { ...s, hookupsSewer: e.target.checked } : s))}
-                                />
-                                Sewer
-                              </label>
-                              <span className="text-xs font-semibold text-slate-600 ml-4">Features:</span>
-                              <label className="flex items-center gap-2 text-sm text-slate-700">
-                                <input
-                                  type="checkbox"
-                                  checked={editForm.petFriendly}
-                                  onChange={(e) => setEditForm((s) => (s ? { ...s, petFriendly: e.target.checked } : s))}
-                                />
-                                Pet friendly
-                              </label>
-                              <label className="flex items-center gap-2 text-sm text-slate-700">
-                                <input
-                                  type="checkbox"
-                                  checked={editForm.accessible}
-                                  onChange={(e) => setEditForm((s) => (s ? { ...s, accessible: e.target.checked } : s))}
-                                />
-                                Accessible
-                              </label>
-                            </div>
-                            <input
-                              className="rounded-md border border-slate-200 px-3 py-2 w-full"
-                              placeholder="Description"
-                              value={editForm.description}
-                              onChange={(e) => setEditForm((s) => (s ? { ...s, description: e.target.value } : s))}
-                            />
-                            <div className="flex items-center gap-3 pt-2 border-t border-slate-200">
+                            <div className="flex items-center gap-1">
                               <Button
-                                size="sm"
-                                onClick={() => {
-                                  if (!editForm) return;
-                                  updateClass.mutate({ id: cls.id, data: mapClassFormToPayload(editForm, { clearEmptyAsNull: true }) });
-                                }}
-                                disabled={updateClass.isPending}
-                              >
-                                {updateClass.isPending ? "Saving..." : "Save changes"}
-                              </Button>
-                              <Button
-                                size="sm"
                                 variant="ghost"
-                                onClick={() => {
-                                  setEditingId(null);
-                                  setEditForm(null);
-                                }}
-                                disabled={updateClass.isPending}
+                                size="sm"
+                                onClick={() => router.push(`/campgrounds/${campgroundId}/classes/${cls.id}`)}
+                                className="h-8 w-8 p-0"
                               >
-                                Cancel
+                                <Pencil className="h-4 w-4" />
                               </Button>
-                              <span className="text-xs text-slate-400">Cmd+S to save, Escape to cancel</span>
-                              {updateClass.isError && <span className="text-sm text-red-600">Failed to update</span>}
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => handleDeleteClass(cls.id, cls.name)}
+                                className="h-8 w-8 p-0 text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/30"
+                              >
+                                <Trash2 className="h-4 w-4" />
+                              </Button>
                             </div>
                           </div>
-                        </TableCell>
-                      </TableRow>
-                    )}
-                  </React.Fragment>
-                );
-              })}
-              {classesQuery.data?.length === 0 && !classesQuery.isLoading && (
-                <TableRow>
-                  <TableCell colSpan={8} className="text-center py-8 text-slate-500">
-                    No site classes yet. Click &apos;+ Add Class&apos; to create one.
-                  </TableCell>
-                </TableRow>
-              )}
-            </TableBody>
-          </Table>
-        </div>
-      </div>
+
+                          {/* Name & Rate */}
+                          <div className="mb-3">
+                            <h3 className="font-semibold text-foreground text-lg">{cls.name}</h3>
+                            {inlineEditingRate === cls.id ? (
+                              <div className="flex items-center gap-1 mt-1">
+                                <span className="text-2xl font-bold text-emerald-600">$</span>
+                                <input
+                                  ref={inlineRateInputRef}
+                                  type="number"
+                                  step="0.01"
+                                  min="0"
+                                  className="w-20 text-2xl font-bold text-emerald-600 bg-transparent border-b-2 border-emerald-500 focus:outline-none"
+                                  value={inlineRateValue}
+                                  onChange={(e) => setInlineRateValue(e.target.value)}
+                                  onBlur={() => handleInlineRateSave(cls.id)}
+                                  onKeyDown={(e) => {
+                                    if (e.key === "Enter") handleInlineRateSave(cls.id);
+                                    if (e.key === "Escape") setInlineEditingRate(null);
+                                  }}
+                                />
+                                <span className="text-sm text-muted-foreground">/night</span>
+                              </div>
+                            ) : (
+                              <button
+                                onClick={() => {
+                                  setInlineEditingRate(cls.id);
+                                  setInlineRateValue((cls.defaultRate / 100).toFixed(2));
+                                }}
+                                className="flex items-center gap-1 group mt-1"
+                              >
+                                <span className="text-2xl font-bold text-emerald-600 dark:text-emerald-400">
+                                  ${(cls.defaultRate / 100).toFixed(0)}
+                                </span>
+                                <span className="text-sm text-muted-foreground">/night</span>
+                                <Pencil className="h-3 w-3 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
+                              </button>
+                            )}
+                          </div>
+
+                          {/* Description */}
+                          {cls.description && (
+                            <p className="text-sm text-muted-foreground mb-3 line-clamp-2">
+                              {cls.description}
+                            </p>
+                          )}
+
+                          {/* Features */}
+                          <div className="flex flex-wrap gap-2 mb-3">
+                            <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                              <Users className="h-3.5 w-3.5" />
+                              {cls.maxOccupancy} guests
+                            </div>
+                            {hasHookups && (
+                              <div className="flex items-center gap-1">
+                                {cls.hookupsPower && <Zap className="h-3.5 w-3.5 text-amber-500" />}
+                                {cls.hookupsWater && <Droplet className="h-3.5 w-3.5 text-blue-500" />}
+                                {cls.hookupsSewer && <Waves className="h-3.5 w-3.5 text-slate-500" />}
+                              </div>
+                            )}
+                            {cls.petFriendly && <PawPrint className="h-3.5 w-3.5 text-orange-500" />}
+                            {cls.accessible && <Accessibility className="h-3.5 w-3.5 text-blue-500" />}
+                          </div>
+
+                          {/* Site Count */}
+                          <div className="pt-3 border-t border-border">
+                            <div className="flex items-center justify-between text-sm">
+                              <span className="text-muted-foreground">Sites using this class</span>
+                              <Badge variant="secondary" className="text-xs">
+                                {siteCount}
+                              </Badge>
+                            </div>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    </motion.div>
+                  );
+                })}
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </motion.div>
+      </motion.div>
     </DashboardShell>
   );
 }
