@@ -5575,6 +5575,12 @@ enum StoredValueType {
   credit
 }
 
+enum StoredValueScopeType {
+  campground
+  organization
+  global
+}
+
 enum StoredValueStatus {
   active
   frozen
@@ -5602,6 +5608,8 @@ enum StoredValueHoldStatus {
 model StoredValueAccount {
   id               String             @id @default(cuid())
   campgroundId     String
+  scopeType        StoredValueScopeType @default(campground)
+  scopeId          String?
   type             StoredValueType
   currency         String
   status           StoredValueStatus  @default(active)
@@ -5625,6 +5633,7 @@ model StoredValueAccount {
   holds      StoredValueHold[]
 
   @@index([campgroundId])
+  @@index([scopeType, scopeId])
   @@index([guestId])
   @@index([status])
 }
@@ -5647,6 +5656,9 @@ model StoredValueCode {
 model StoredValueLedger {
   id                  String              @id @default(cuid())
   campgroundId        String
+  issuerCampgroundId  String?
+  scopeType           StoredValueScopeType @default(campground)
+  scopeId             String?
   accountId           String
   direction           StoredValueDirection
   amountCents         Int
@@ -5666,6 +5678,8 @@ model StoredValueLedger {
   account    StoredValueAccount @relation(fields: [accountId], references: [id], onDelete: Cascade)
 
   @@index([campgroundId, idempotencyKey])
+  @@index([issuerCampgroundId])
+  @@index([scopeType, scopeId])
   @@index([accountId, createdAt])
 }
 
