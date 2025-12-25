@@ -1145,7 +1145,16 @@ export const NpsMetricsSchema = z.object({
   passives: z.number(),
   detractors: z.number(),
   nps: z.number().nullable(),
-  responseRate: z.number().nullable()
+  responseRate: z.number().nullable(),
+  // Benchmarking data
+  systemAverage: z.number().nullable().optional(),
+  systemTotalResponses: z.number().optional(),
+  campgroundsInSystem: z.number().optional(),
+  // Guidance to reach benchmarks
+  toReachAverage: z.number().nullable().optional(),
+  toReachWorldClass: z.number().nullable().optional(),
+  isAboveAverage: z.boolean().nullable().optional(),
+  isWorldClass: z.boolean().optional()
 });
 export type NpsMetrics = z.infer<typeof NpsMetricsSchema>;
 

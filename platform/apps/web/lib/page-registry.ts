@@ -671,16 +671,7 @@ export const PAGE_REGISTRY: PageDefinition[] = [
     keywords: ["api", "automation", "events"],
     permissions: ["settingsWrite"],
   },
-  {
-    href: "/dashboard/settings/developer",
-    label: "Developer",
-    icon: "brand",
-    category: "settings",
-    description: "API keys and developer tools",
-    keywords: ["api", "keys", "tokens"],
-    permissions: ["settingsWrite"],
-  },
-  {
+    {
     href: "/dashboard/settings/import",
     label: "Import Data",
     icon: "form",

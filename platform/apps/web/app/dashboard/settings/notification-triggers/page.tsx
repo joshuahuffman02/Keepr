@@ -122,7 +122,7 @@ export default function NotificationTriggersPage() {
       <div className="rounded-lg border border-amber-200 bg-amber-50 p-4 space-y-2 text-sm text-amber-900 mb-6">
         <div className="font-semibold">How to send messages</div>
         <ul className="list-disc pl-4 space-y-1">
-            <li>Create or edit a template in <Link href="/settings/templates" className="underline font-semibold text-amber-800">Settings → Templates</Link>.</li>
+            <li>Create or edit a template in <Link href="/dashboard/settings/templates" className="underline font-semibold text-amber-800">Settings → Templates</Link>.</li>
             <li>Pick the template when you set up the trigger (email/SMS). If none is set, the default system message is used.</li>
             <li>Use delays for reminders (e.g., 1440 = 24h before check-in).</li>
           </ul>

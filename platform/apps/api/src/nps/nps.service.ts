@@ -432,25 +432,93 @@ export class NpsService {
 
   async metrics(campgroundId: string) {
     const prisma = this.prisma as any;
-    const [responses, invites] = await Promise.all([
+    const [responses, invites, systemResponses] = await Promise.all([
       prisma.npsResponse.findMany({
         where: { campgroundId },
         select: { score: true, createdAt: true }
       }),
-      prisma.npsInvite.count({ where: { campgroundId } })
+      prisma.npsInvite.count({ where: { campgroundId } }),
+      // Get system-wide responses for average calculation
+      prisma.npsResponse.findMany({
+        select: { score: true, campgroundId: true }
+      })
     ]);
+
     const total = responses.length;
     const promoters = (responses as any[]).filter((r) => r.score >= 9).length;
     const detractors = (responses as any[]).filter((r) => r.score <= 6).length;
     const passives = total - promoters - detractors;
     const nps = total > 0 ? Math.round(((promoters - detractors) / total) * 100) : null;
+
+    // Calculate system-wide NPS average
+    const systemTotal = systemResponses.length;
+    const systemPromoters = (systemResponses as any[]).filter((r) => r.score >= 9).length;
+    const systemDetractors = (systemResponses as any[]).filter((r) => r.score <= 6).length;
+    const systemNps = systemTotal > 0 ? Math.round(((systemPromoters - systemDetractors) / systemTotal) * 100) : null;
+
+    // Count unique campgrounds with responses for context
+    const campgroundsWithResponses = new Set((systemResponses as any[]).map((r) => r.campgroundId)).size;
+
+    // Calculate what's needed to reach benchmarks
+    let toReachAverage: number | null = null;
+    let toReachWorldClass: number | null = null;
+
+    if (nps !== null && total > 0) {
+      // To reach a target NPS, we need to solve for additional promoters needed
+      // NPS = ((promoters - detractors) / total) * 100
+      // Target = ((promoters + x - detractors) / (total + x)) * 100
+      // Solving for x (additional promoters needed)
+
+      const calculatePromotersNeeded = (targetNps: number): number => {
+        // Current state
+        const currentPromoterRatio = promoters / total;
+        const currentDetractorRatio = detractors / total;
+        const targetRatio = targetNps / 100;
+
+        // If we already meet the target, return 0
+        if ((nps ?? 0) >= targetNps) return 0;
+
+        // We need: (promoters + x) / (total + x) - detractors / (total + x) = targetRatio
+        // Simplifying: promoters + x - detractors = targetRatio * (total + x)
+        // promoters + x - detractors = targetRatio * total + targetRatio * x
+        // x - targetRatio * x = targetRatio * total - promoters + detractors
+        // x * (1 - targetRatio) = targetRatio * total - promoters + detractors
+        // x = (targetRatio * total - promoters + detractors) / (1 - targetRatio)
+
+        if (targetRatio >= 1) return Infinity; // Can't reach 100+ NPS
+
+        const needed = Math.ceil(
+          (targetRatio * total - promoters + detractors) / (1 - targetRatio)
+        );
+
+        return Math.max(0, needed);
+      };
+
+      if (systemNps !== null && (nps ?? 0) < systemNps) {
+        toReachAverage = calculatePromotersNeeded(systemNps);
+      }
+
+      if ((nps ?? 0) < 70) {
+        toReachWorldClass = calculatePromotersNeeded(70);
+      }
+    }
+
     return {
       totalResponses: total,
       promoters,
       passives,
       detractors,
       nps,
-      responseRate: invites > 0 ? Math.round((total / invites) * 100) : null
+      responseRate: invites > 0 ? Math.round((total / invites) * 100) : null,
+      // Benchmarking data
+      systemAverage: systemNps,
+      systemTotalResponses: systemTotal,
+      campgroundsInSystem: campgroundsWithResponses,
+      // Guidance
+      toReachAverage,
+      toReachWorldClass,
+      isAboveAverage: nps !== null && systemNps !== null ? nps > systemNps : null,
+      isWorldClass: nps !== null ? nps >= 70 : false
     };
   }
 }

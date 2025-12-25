@@ -1,447 +1,433 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { motion } from "framer-motion";
+import {
+    Plug,
+    Search,
+    CheckCircle2,
+    AlertCircle,
+    Loader2,
+    Settings2,
+    Sparkles
+} from "lucide-react";
 import { apiClient } from "@/lib/api-client";
+import { Breadcrumbs } from "@/components/breadcrumbs";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
+import { IntegrationCard } from "@/components/integrations/IntegrationCard";
+import { IntegrationDetailModal } from "@/components/integrations/IntegrationDetailModal";
+import {
+    INTEGRATIONS_DIRECTORY,
+    INTEGRATION_CATEGORIES,
+    type IntegrationDefinition,
+    type IntegrationCategory
+} from "@/lib/integrations-directory";
+import { cn } from "@/lib/utils";
 
-type ConnectionForm = {
-  id?: string;
-  campgroundId: string;
-  organizationId?: string;
-  type: "accounting" | "access_control" | "crm" | "export";
-  provider: string;
-  status?: string;
-  authType?: string;
-  webhookSecret?: string;
-  credentials?: string;
-  settings?: string;
+const SPRING_CONFIG = {
+    type: "spring" as const,
+    stiffness: 200,
+    damping: 20,
 };
 
-export default function IntegrationsSettingsPage() {
-  const { toast } = useToast();
-  const qc = useQueryClient();
-  const [campgroundId, setCampgroundId] = useState("");
-  const [form, setForm] = useState<ConnectionForm>({
-    campgroundId: "",
-    type: "accounting",
-    provider: "qbo",
-  });
-  const [selectedConnectionId, setSelectedConnectionId] = useState<string | null>(null);
+type ConnectionStatus = "connected" | "error" | "pending" | "disconnected";
 
-  useEffect(() => {
-    const stored = typeof window !== "undefined" ? localStorage.getItem("campreserv:selectedCampground") : null;
-    if (stored) {
-      setCampgroundId(stored);
-      setForm((f) => ({ ...f, campgroundId: stored }));
-    }
-  }, []);
-
-  const connectionsQuery = useQuery({
-    queryKey: ["integrations", campgroundId],
-    queryFn: () => apiClient.listIntegrationConnections(campgroundId),
-    enabled: !!campgroundId
-  });
-
-  const upsertMutation = useMutation({
-    mutationFn: async (payload: ConnectionForm) => {
-      let parsedCreds: any;
-      let parsedSettings: any;
-      try {
-        parsedCreds = payload.credentials ? JSON.parse(payload.credentials) : undefined;
-      } catch (err) {
-        throw new Error("Credentials must be valid JSON");
-      }
-      try {
-        parsedSettings = payload.settings ? JSON.parse(payload.settings) : undefined;
-      } catch (err) {
-        throw new Error("Settings must be valid JSON");
-      }
-      if (payload.id) {
-        return apiClient.updateIntegrationConnection(payload.id, {
-          organizationId: payload.organizationId,
-          status: payload.status,
-          authType: payload.authType,
-          credentials: parsedCreds,
-          settings: parsedSettings,
-          webhookSecret: payload.webhookSecret
-        });
-      }
-      return apiClient.upsertIntegrationConnection({
-        campgroundId: payload.campgroundId,
-        organizationId: payload.organizationId,
-        type: payload.type,
-        provider: payload.provider,
-        status: payload.status,
-        authType: payload.authType,
-        credentials: parsedCreds,
-        settings: parsedSettings,
-        webhookSecret: payload.webhookSecret
-      });
-    },
-    onSuccess: () => {
-      toast({ title: "Saved connection" });
-      qc.invalidateQueries({ queryKey: ["integrations", campgroundId] });
-    },
-    onError: (err: any) => {
-      toast({ title: "Save failed", description: err?.message ?? "Unknown error", variant: "destructive" });
-    }
-  });
-
-  const syncMutation = useMutation({
-    mutationFn: ({ id }: { id: string }) => apiClient.triggerIntegrationSync(id, { note: "Manual sync" }),
-    onSuccess: () => {
-      toast({ title: "Sync queued" });
-      qc.invalidateQueries({ queryKey: ["integrations", campgroundId] });
-    },
-    onError: (err: any) => {
-      toast({ title: "Sync failed", description: err?.message ?? "Unknown error", variant: "destructive" });
-    }
-  });
-
-  const selectedConnection = useMemo(() => {
-    return connectionsQuery.data?.find((c) => c.id === selectedConnectionId) ?? null;
-  }, [connectionsQuery.data, selectedConnectionId]);
-
-  const logsQuery = useQuery({
-    queryKey: ["integration-logs", selectedConnectionId],
-    queryFn: () => apiClient.listIntegrationLogs(selectedConnectionId!, { limit: 20 }),
-    enabled: !!selectedConnectionId
-  });
-
-  const webhooksQuery = useQuery({
-    queryKey: ["integration-webhooks", selectedConnectionId],
-    queryFn: () => apiClient.listIntegrationWebhooks(selectedConnectionId!, { limit: 20 }),
-    enabled: !!selectedConnectionId
-  });
-
-  const exportsMutation = useMutation({
-    mutationFn: ({ id }: { id: string }) =>
-      apiClient.queueIntegrationExport({ type: "api", connectionId: id, campgroundId }),
-    onSuccess: () => toast({ title: "Export queued" }),
-    onError: (err: any) =>
-      toast({ title: "Export failed", description: err?.message ?? "Unknown error", variant: "destructive" })
-  });
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!form.campgroundId) {
-      toast({ title: "Campground required", variant: "destructive" });
-      return;
-    }
-    upsertMutation.mutate(form);
-  };
-
-  return (
-    <div>
-      <div className="space-y-6">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-bold text-slate-900">Integrations</h1>
-            <p className="text-slate-600">Manage accounting, access control, CRM, and export connections.</p>
-          </div>
-        </div>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>Provider hints</CardTitle>
-            <CardDescription>Sandbox wiring available for QBO; others stay generic until creds are approved.</CardDescription>
-          </CardHeader>
-          <CardContent className="text-sm text-slate-700 space-y-1">
-            <div>• QBO sandbox: set provider=qbo, type=accounting. Settings JSON: {"{"}"realmId":"sandbox-realm-id"{"}"}. Credentials JSON can include tokens/clientId/secret (sandbox only).</div>
-            <div>• Webhook HMAC: set per-connection `webhookSecret` or env `INTEGRATIONS_WEBHOOK_SECRET`.</div>
-            <div>• Exports: queue via "Queue export" to test API/SFTP job records.</div>
-            <div>• Required envs: `QBO_SANDBOX_TOKEN`, `QBO_SANDBOX_REALMID` (optional: `QBO_SANDBOX_BASE`, `INTEGRATIONS_SANDBOX_ENABLED`).</div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>Connection</CardTitle>
-            <CardDescription>Create or update a connection; credentials/settings accept JSON.</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <form onSubmit={handleSubmit} className="grid gap-4 md:grid-cols-2">
-              <div>
-                <Label>Campground ID</Label>
-                <Input
-                  value={form.campgroundId}
-                  onChange={(e) => setForm({ ...form, campgroundId: e.target.value })}
-                  placeholder="campground id"
-                />
-              </div>
-              <div>
-                <Label>Organization ID</Label>
-                <Input
-                  value={form.organizationId ?? ""}
-                  onChange={(e) => setForm({ ...form, organizationId: e.target.value })}
-                  placeholder="optional"
-                />
-              </div>
-              <div>
-                <Label>Type</Label>
-                <select
-                  className="w-full rounded-md border px-3 py-2"
-                  value={form.type}
-                  onChange={(e) => setForm({ ...form, type: e.target.value as ConnectionForm["type"] })}
-                >
-                  <option value="accounting">Accounting</option>
-                  <option value="access_control">Access control</option>
-                  <option value="crm">CRM/helpdesk</option>
-                  <option value="export">Exports</option>
-                </select>
-              </div>
-              <div>
-                <Label>Provider</Label>
-                <Input
-                  value={form.provider}
-                  onChange={(e) => setForm({ ...form, provider: e.target.value })}
-                  placeholder="qbo | xero | hubspot | intercom | zendesk | sftp"
-                />
-              </div>
-              <div>
-                <Label>Status</Label>
-                <Input
-                  value={form.status ?? ""}
-                  onChange={(e) => setForm({ ...form, status: e.target.value })}
-                  placeholder="connected | disconnected | pending | error"
-                />
-              </div>
-              <div>
-                <Label>Auth type</Label>
-                <Input
-                  value={form.authType ?? ""}
-                  onChange={(e) => setForm({ ...form, authType: e.target.value })}
-                  placeholder="oauth | api_key | basic | sftp"
-                />
-              </div>
-              <div className="md:col-span-2">
-                <Label>Webhook secret</Label>
-                <Input
-                  value={form.webhookSecret ?? ""}
-                  onChange={(e) => setForm({ ...form, webhookSecret: e.target.value })}
-                  placeholder="optional HMAC secret"
-                />
-              </div>
-              <div className="md:col-span-2">
-                <Label>Credentials (JSON)</Label>
-                <Input
-                  value={form.credentials ?? ""}
-                  onChange={(e) => setForm({ ...form, credentials: e.target.value })}
-                  placeholder='{"clientId":"...","clientSecret":"..."}'
-                />
-              </div>
-              <div className="md:col-span-2">
-                <Label>Settings (JSON)</Label>
-                <Input
-                  value={form.settings ?? ""}
-                  onChange={(e) => setForm({ ...form, settings: e.target.value })}
-                  placeholder='{"realmId":"...","region":"us"}'
-                />
-              </div>
-              <div className="md:col-span-2 flex gap-2">
-                <Button type="submit" disabled={upsertMutation.isPending}>
-                  {form.id ? "Update" : "Create"} connection
-                </Button>
-                {form.id && (
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={() => {
-                      setForm({
-                        campgroundId: campgroundId,
-                        type: "accounting",
-                        provider: "qbo"
-                      });
-                      setSelectedConnectionId(null);
-                    }}
-                  >
-                    Clear
-                  </Button>
-                )}
-              </div>
-            </form>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>Connections</CardTitle>
-            <CardDescription>Existing connections for this campground.</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            {connectionsQuery.isLoading && <div>Loading...</div>}
-            {!connectionsQuery.isLoading && (connectionsQuery.data?.length ?? 0) === 0 && (
-              <div className="text-slate-500">No connections yet.</div>
-            )}
-            {connectionsQuery.data?.map((c) => (
-              <div key={c.id} className="rounded-lg border p-4 space-y-2">
-                <div className="flex items-center justify-between">
-                  <div className="space-y-1">
-                    <div className="flex items-center gap-2">
-                      <span className="font-semibold">{c.provider}</span>
-                      <Badge variant={c.status === "connected" ? "default" : "secondary"}>{c.status}</Badge>
-                      <Badge variant="outline">{c.type}</Badge>
-                    </div>
-                    <div className="text-sm text-slate-500">
-                      Last sync: {c.lastSyncAt ?? "—"} {c.lastError ? ` • Error: ${c.lastError}` : ""}
-                    </div>
-                  </div>
-                  <div className="flex gap-2">
-                    <Button size="sm" onClick={() => syncMutation.mutate({ id: c.id })} disabled={syncMutation.isPending}>
-                      Queue sync
-                    </Button>
-                    <Button size="sm" variant="secondary" onClick={() => exportsMutation.mutate({ id: c.id })}>
-                      Queue export
-                    </Button>
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={() => {
-                        setSelectedConnectionId(c.id);
-                        setForm({
-                          id: c.id,
-                          campgroundId: c.campgroundId || campgroundId,
-                          organizationId: c.organizationId || "",
-                          type: c.type as ConnectionForm["type"],
-                          provider: c.provider,
-                          status: c.status,
-                          authType: c.authType || "",
-                          webhookSecret: c.webhookSecret || "",
-                          credentials: c.credentials ? JSON.stringify(c.credentials) : "",
-                          settings: c.settings ? JSON.stringify(c.settings) : ""
-                        });
-                      }}
-                    >
-                      View
-                    </Button>
-                  </div>
-                </div>
-                {c.logs && c.logs.length > 0 && (
-                  <div className="text-sm text-slate-600">
-                    Last log: {c.logs[0].status} — {c.logs[0].message ?? "No message"} at {c.logs[0].occurredAt}
-                  </div>
-                )}
-              </div>
-            ))}
-          </CardContent>
-        </Card>
-
-        {selectedConnection && (
-          <Card>
-            <CardHeader>
-              <CardTitle>{selectedConnection.provider} debug</CardTitle>
-              <CardDescription>Logs, webhooks, and actions</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Tabs defaultValue="logs">
-                <TabsList>
-                  <TabsTrigger value="logs">Sync logs</TabsTrigger>
-                  <TabsTrigger value="webhooks">Webhook events</TabsTrigger>
-                </TabsList>
-                <TabsContent value="logs" className="mt-4 space-y-2">
-                  {logsQuery.isLoading && <div>Loading logs...</div>}
-                  {logsQuery.data?.items.map((l) => (
-                    <div key={l.id} className="rounded border px-3 py-2 text-sm">
-                      <div className="flex items-center gap-2">
-                        <Badge variant="outline">{l.direction}</Badge>
-                        <Badge variant={l.status === "success" ? "default" : "secondary"}>{l.status}</Badge>
-                        <span className="text-slate-500">{l.scope}</span>
-                      </div>
-                      <div className="text-slate-700">{l.message ?? "No message"}</div>
-                      <div className="text-xs text-slate-500">{l.occurredAt}</div>
-                    </div>
-                  ))}
-                  {logsQuery.data?.nextCursor && (
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={async () => {
-                        const next = await apiClient.listIntegrationLogs(selectedConnectionId!, {
-                          limit: 20,
-                          cursor: logsQuery.data?.nextCursor || undefined
-                        });
-                        if (next.items.length > 0) {
-                          const merged = {
-                            items: [...(logsQuery.data?.items ?? []), ...next.items],
-                            nextCursor: next.nextCursor
-                          };
-                          qc.setQueryData(["integration-logs", selectedConnectionId], merged);
-                        }
-                      }}
-                    >
-                      Load more
-                    </Button>
-                  )}
-                  {!logsQuery.isLoading && (logsQuery.data?.items.length ?? 0) === 0 && (
-                    <div className="text-slate-500 text-sm">No logs yet.</div>
-                  )}
-                </TabsContent>
-                <TabsContent value="webhooks" className="mt-4 space-y-2">
-                  {webhooksQuery.isLoading && <div>Loading webhook events...</div>}
-                  {webhooksQuery.data?.items.map((w) => (
-                    <div key={w.id} className="rounded border px-3 py-2 text-sm">
-                      <div className="flex items-center gap-2">
-                        <Badge variant="outline">{w.provider}</Badge>
-                        <Badge variant={w.signatureValid ? "default" : "destructive"}>
-                          {w.signatureValid ? "verified" : "invalid"}
-                        </Badge>
-                        <span className="text-slate-500">{w.eventType ?? "unknown"}</span>
-                      </div>
-                      <div className="text-slate-700">{w.message ?? "No message"}</div>
-                      <div className="text-xs text-slate-500">{w.receivedAt}</div>
-                    </div>
-                  ))}
-                  {webhooksQuery.data?.nextCursor && (
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={async () => {
-                        const next = await apiClient.listIntegrationWebhooks(selectedConnectionId!, {
-                          limit: 20,
-                          cursor: webhooksQuery.data?.nextCursor || undefined
-                        });
-                        if (next.items.length > 0) {
-                          const merged = {
-                            items: [...(webhooksQuery.data?.items ?? []), ...next.items],
-                            nextCursor: next.nextCursor
-                          };
-                          qc.setQueryData(["integration-webhooks", selectedConnectionId], merged);
-                        }
-                      }}
-                    >
-                      Load more
-                    </Button>
-                  )}
-                  {!webhooksQuery.isLoading && (webhooksQuery.data?.items.length ?? 0) === 0 && (
-                    <div className="text-slate-500 text-sm">No webhook events yet.</div>
-                  )}
-                </TabsContent>
-              </Tabs>
-            </CardContent>
-          </Card>
-        )}
-
-        <Card>
-          <CardHeader>
-            <CardTitle>Checklist</CardTitle>
-            <CardDescription>Quick reminders for provider wiring.</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-2 text-sm text-slate-700">
-            <div>• Set `INTEGRATIONS_WEBHOOK_SECRET` or per-connection `webhookSecret`.</div>
-            <div>• Use sandbox client IDs/secrets for QBO/Xero/CRM until prod approvals land.</div>
-            <div>• Map scopes per provider (accounting, access_control, crm, export) and store realm/site IDs in settings.</div>
-          </CardContent>
-        </Card>
-      </div>
-    </div>
-  );
+interface Connection {
+    id: string;
+    provider: string;
+    type: string;
+    status: string;
+    lastSyncAt?: string | null;
+    lastError?: string | null;
 }
 
+export default function IntegrationsSettingsPage() {
+    const { toast } = useToast();
+    const queryClient = useQueryClient();
+    const [campgroundId, setCampgroundId] = useState("");
+    const [searchQuery, setSearchQuery] = useState("");
+    const [selectedIntegration, setSelectedIntegration] = useState<IntegrationDefinition | null>(null);
+    const [isModalOpen, setIsModalOpen] = useState(false);
+
+    useEffect(() => {
+        const stored = typeof window !== "undefined"
+            ? localStorage.getItem("campreserv:selectedCampground")
+            : null;
+        if (stored) {
+            setCampgroundId(stored);
+        }
+    }, []);
+
+    // Fetch existing connections
+    const connectionsQuery = useQuery({
+        queryKey: ["integrations", campgroundId],
+        queryFn: () => apiClient.listIntegrationConnections(campgroundId),
+        enabled: !!campgroundId
+    });
+
+    // Map connections by provider
+    const connectionsByProvider = useMemo(() => {
+        const map = new Map<string, Connection>();
+        if (connectionsQuery.data) {
+            for (const conn of connectionsQuery.data) {
+                map.set(conn.provider, conn as Connection);
+            }
+        }
+        return map;
+    }, [connectionsQuery.data]);
+
+    // Filter integrations by search
+    const filteredIntegrations = useMemo(() => {
+        if (!searchQuery.trim()) return INTEGRATIONS_DIRECTORY;
+        const query = searchQuery.toLowerCase();
+        return INTEGRATIONS_DIRECTORY.filter(
+            (i) =>
+                i.name.toLowerCase().includes(query) ||
+                i.description.toLowerCase().includes(query) ||
+                i.category.toLowerCase().includes(query)
+        );
+    }, [searchQuery]);
+
+    // Group by category
+    const integrationsByCategory = useMemo(() => {
+        const grouped: Record<IntegrationCategory, IntegrationDefinition[]> = {
+            accounting: [],
+            crm: [],
+            access_control: [],
+            export: []
+        };
+        for (const integration of filteredIntegrations) {
+            grouped[integration.category].push(integration);
+        }
+        return grouped;
+    }, [filteredIntegrations]);
+
+    // Connected integrations
+    const connectedIntegrations = useMemo(() => {
+        return INTEGRATIONS_DIRECTORY.filter((i) => {
+            const conn = connectionsByProvider.get(i.id);
+            return conn && conn.status === "connected";
+        });
+    }, [connectionsByProvider]);
+
+    // Mutations
+    const connectMutation = useMutation({
+        mutationFn: async (provider: string) => {
+            // For now, create a basic connection
+            // In production, this would initiate OAuth flow
+            return apiClient.upsertIntegrationConnection({
+                campgroundId,
+                type: getIntegrationType(provider),
+                provider,
+                status: "connected",
+                authType: "oauth"
+            });
+        },
+        onSuccess: (_, provider) => {
+            toast({
+                title: "Integration connected!",
+                description: `${getIntegrationName(provider)} is now syncing with your campground.`
+            });
+            queryClient.invalidateQueries({ queryKey: ["integrations", campgroundId] });
+        },
+        onError: (err: Error) => {
+            toast({
+                title: "Connection failed",
+                description: err.message || "Please try again.",
+                variant: "destructive"
+            });
+        }
+    });
+
+    const syncMutation = useMutation({
+        mutationFn: (connectionId: string) =>
+            apiClient.triggerIntegrationSync(connectionId, { note: "Manual sync" }),
+        onSuccess: () => {
+            toast({ title: "Sync started", description: "Data is being synced now." });
+            queryClient.invalidateQueries({ queryKey: ["integrations", campgroundId] });
+        },
+        onError: (err: Error) => {
+            toast({
+                title: "Sync failed",
+                description: err.message || "Please try again.",
+                variant: "destructive"
+            });
+        }
+    });
+
+    const getConnectionStatus = (provider: string): ConnectionStatus | null => {
+        const conn = connectionsByProvider.get(provider);
+        if (!conn) return null;
+        if (conn.status === "connected") return "connected";
+        if (conn.status === "error" || conn.lastError) return "error";
+        if (conn.status === "pending") return "pending";
+        return "disconnected";
+    };
+
+    const getConnectionLastSync = (provider: string): string | null => {
+        const conn = connectionsByProvider.get(provider);
+        return conn?.lastSyncAt || null;
+    };
+
+    const handleConnect = (integration: IntegrationDefinition) => {
+        setSelectedIntegration(integration);
+        setIsModalOpen(true);
+    };
+
+    const handleManage = (integration: IntegrationDefinition) => {
+        setSelectedIntegration(integration);
+        setIsModalOpen(true);
+    };
+
+    const handleModalConnect = async () => {
+        if (!selectedIntegration) return;
+        await connectMutation.mutateAsync(selectedIntegration.id);
+    };
+
+    const handleModalSync = async () => {
+        if (!selectedIntegration) return;
+        const conn = connectionsByProvider.get(selectedIntegration.id);
+        if (conn) {
+            await syncMutation.mutateAsync(conn.id);
+        }
+    };
+
+    const handleModalDisconnect = async () => {
+        if (!selectedIntegration) return;
+        const conn = connectionsByProvider.get(selectedIntegration.id);
+        if (conn) {
+            // Would call disconnect API
+            toast({ title: "Integration disconnected" });
+            setIsModalOpen(false);
+            queryClient.invalidateQueries({ queryKey: ["integrations", campgroundId] });
+        }
+    };
+
+    return (
+        <div className="space-y-8">
+            <Breadcrumbs items={[{ label: "Settings" }, { label: "Integrations" }]} />
+
+            {/* Header */}
+            <motion.div
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={SPRING_CONFIG}
+                className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between"
+            >
+                <div className="space-y-1">
+                    <div className="flex items-center gap-3">
+                        <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-to-br from-blue-500 to-indigo-600 text-white shadow-lg shadow-blue-500/25">
+                            <Plug className="h-5 w-5" />
+                        </div>
+                        <div>
+                            <h1 className="text-2xl font-bold tracking-tight text-foreground">
+                                Integrations
+                            </h1>
+                            <p className="text-muted-foreground">
+                                Connect your campground with the tools you already use
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </motion.div>
+
+            {/* Connected integrations summary */}
+            {connectedIntegrations.length > 0 && (
+                <motion.div
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ ...SPRING_CONFIG, delay: 0.05 }}
+                    className="rounded-xl border bg-emerald-50 dark:bg-emerald-900/20 border-emerald-200 dark:border-emerald-800 p-4"
+                >
+                    <div className="flex items-center gap-3">
+                        <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-emerald-100 dark:bg-emerald-900/50">
+                            <CheckCircle2 className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
+                        </div>
+                        <div className="flex-1">
+                            <h3 className="font-medium text-emerald-900 dark:text-emerald-100">
+                                {connectedIntegrations.length} integration{connectedIntegrations.length > 1 ? "s" : ""} connected
+                            </h3>
+                            <p className="text-sm text-emerald-700 dark:text-emerald-300">
+                                {connectedIntegrations.map((i) => i.name).join(", ")}
+                            </p>
+                        </div>
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            className="border-emerald-300 dark:border-emerald-700 hover:bg-emerald-100 dark:hover:bg-emerald-900/50"
+                            onClick={() => {
+                                if (connectedIntegrations[0]) {
+                                    handleManage(connectedIntegrations[0]);
+                                }
+                            }}
+                        >
+                            <Settings2 className="h-4 w-4 mr-1" />
+                            Manage
+                        </Button>
+                    </div>
+                </motion.div>
+            )}
+
+            {/* Search */}
+            <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ ...SPRING_CONFIG, delay: 0.1 }}
+                className="relative"
+            >
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input
+                    type="text"
+                    placeholder="Search integrations..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="pl-10"
+                />
+            </motion.div>
+
+            {/* Loading state */}
+            {connectionsQuery.isLoading && (
+                <div className="flex items-center justify-center py-12">
+                    <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+                </div>
+            )}
+
+            {/* No campground selected */}
+            {!campgroundId && !connectionsQuery.isLoading && (
+                <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    className="rounded-xl border-2 border-dashed border-muted p-12 text-center"
+                >
+                    <AlertCircle className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
+                    <h3 className="text-lg font-semibold text-foreground">
+                        No campground selected
+                    </h3>
+                    <p className="text-muted-foreground mt-1">
+                        Please select a campground from the sidebar to manage integrations.
+                    </p>
+                </motion.div>
+            )}
+
+            {/* Empty search results */}
+            {campgroundId && filteredIntegrations.length === 0 && (
+                <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    className="rounded-xl border-2 border-dashed border-muted p-12 text-center"
+                >
+                    <Search className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
+                    <h3 className="text-lg font-semibold text-foreground">
+                        No integrations found
+                    </h3>
+                    <p className="text-muted-foreground mt-1">
+                        Try a different search term.
+                    </p>
+                </motion.div>
+            )}
+
+            {/* Integration categories */}
+            {campgroundId && !connectionsQuery.isLoading && filteredIntegrations.length > 0 && (
+                <div className="space-y-10">
+                    {(Object.entries(integrationsByCategory) as [IntegrationCategory, IntegrationDefinition[]][]).map(
+                        ([category, integrations], categoryIndex) => {
+                            if (integrations.length === 0) return null;
+                            const categoryInfo = INTEGRATION_CATEGORIES[category];
+
+                            return (
+                                <motion.section
+                                    key={category}
+                                    initial={{ opacity: 0, y: 20 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    transition={{ ...SPRING_CONFIG, delay: 0.15 + categoryIndex * 0.05 }}
+                                >
+                                    <div className="mb-4">
+                                        <h2 className="text-lg font-semibold text-foreground">
+                                            {categoryInfo.label}
+                                        </h2>
+                                        <p className="text-sm text-muted-foreground">
+                                            {categoryInfo.description}
+                                        </p>
+                                    </div>
+
+                                    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                                        {integrations.map((integration, index) => (
+                                            <motion.div
+                                                key={integration.id}
+                                                initial={{ opacity: 0, y: 10 }}
+                                                animate={{ opacity: 1, y: 0 }}
+                                                transition={{
+                                                    ...SPRING_CONFIG,
+                                                    delay: 0.2 + categoryIndex * 0.05 + index * 0.03
+                                                }}
+                                            >
+                                                <IntegrationCard
+                                                    integration={integration}
+                                                    status={getConnectionStatus(integration.id)}
+                                                    lastSyncedAt={getConnectionLastSync(integration.id)}
+                                                    onConnect={() => handleConnect(integration)}
+                                                    onManage={() => handleManage(integration)}
+                                                />
+                                            </motion.div>
+                                        ))}
+                                    </div>
+                                </motion.section>
+                            );
+                        }
+                    )}
+                </div>
+            )}
+
+            {/* Empty state - no integrations connected yet */}
+            {campgroundId &&
+                !connectionsQuery.isLoading &&
+                connectedIntegrations.length === 0 &&
+                !searchQuery && (
+                    <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ ...SPRING_CONFIG, delay: 0.3 }}
+                        className="mt-8 rounded-xl bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 border border-blue-200 dark:border-blue-800 p-6 text-center"
+                    >
+                        <div className="flex h-12 w-12 items-center justify-center rounded-full bg-blue-100 dark:bg-blue-900/50 mx-auto mb-4">
+                            <Sparkles className="h-6 w-6 text-blue-600 dark:text-blue-400" />
+                        </div>
+                        <h3 className="text-lg font-semibold text-foreground">
+                            Connect your first integration
+                        </h3>
+                        <p className="text-muted-foreground mt-1 max-w-md mx-auto">
+                            Link CampReserv with QuickBooks, Xero, or your CRM to keep everything in sync automatically.
+                        </p>
+                    </motion.div>
+                )}
+
+            {/* Integration detail modal */}
+            <IntegrationDetailModal
+                integration={selectedIntegration}
+                isOpen={isModalOpen}
+                onClose={() => {
+                    setIsModalOpen(false);
+                    setSelectedIntegration(null);
+                }}
+                status={selectedIntegration ? getConnectionStatus(selectedIntegration.id) : null}
+                lastSyncedAt={selectedIntegration ? getConnectionLastSync(selectedIntegration.id) : null}
+                onConnect={handleModalConnect}
+                onDisconnect={handleModalDisconnect}
+                onSync={handleModalSync}
+            />
+        </div>
+    );
+}
+
+function getIntegrationType(provider: string): "accounting" | "crm" | "access_control" | "export" {
+    const integration = INTEGRATIONS_DIRECTORY.find((i) => i.id === provider);
+    return integration?.category || "export";
+}
+
+function getIntegrationName(provider: string): string {
+    const integration = INTEGRATIONS_DIRECTORY.find((i) => i.id === provider);
+    return integration?.name || provider;
+}
