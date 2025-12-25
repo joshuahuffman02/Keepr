@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 import { DashboardShell } from "../../components/ui/layout/DashboardShell";
 import { Badge } from "../../components/ui/badge";
 import { ProductGrid } from "../../components/pos/ProductGrid";
@@ -59,7 +59,7 @@ type Category = {
 
 type StoreLocation = Awaited<ReturnType<typeof apiClient.getStoreLocations>>[0];
 
-export type CartItem = Product & { qty: number };
+export type CartItem = Product & { qty: number; justAdded?: boolean };
 
 type OrderAdjustmentPayload = {
     type?: "refund" | "exchange";
@@ -292,6 +292,11 @@ export default function POSPage() {
     const [savingRefund, setSavingRefund] = useState(false);
     const [isCartDrawerOpen, setIsCartDrawerOpen] = useState(false);
     const [syncDrawerOpen, setSyncDrawerOpen] = useState(false);
+    const [showSuccessCelebration, setShowSuccessCelebration] = useState(false);
+    const [successOrderTotal, setSuccessOrderTotal] = useState(0);
+    const [searchQuery, setSearchQuery] = useState("");
+    const [showSearch, setShowSearch] = useState(false);
+    const searchInputRef = useRef<HTMLInputElement>(null);
     const { status: syncStatus } = useSyncStatus();
 
     const queueKey = "campreserv:pos:orderQueue";
@@ -432,6 +437,45 @@ export default function POSPage() {
         void loadRecentOrders();
     }, [campgroundId]);
 
+    // Keyboard shortcuts for power users
+    useEffect(() => {
+        const handleKeyDown = (e: KeyboardEvent) => {
+            // Don't trigger if user is typing in an input
+            if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) {
+                // But allow Escape to close search
+                if (e.key === "Escape" && showSearch) {
+                    setShowSearch(false);
+                    setSearchQuery("");
+                }
+                return;
+            }
+
+            // Cmd/Ctrl + K = Open search
+            if ((e.metaKey || e.ctrlKey) && e.key === "k") {
+                e.preventDefault();
+                setShowSearch(true);
+                setTimeout(() => searchInputRef.current?.focus(), 50);
+            }
+
+            // Cmd/Ctrl + Enter = Go to checkout (if cart has items)
+            if ((e.metaKey || e.ctrlKey) && e.key === "Enter" && cart.length > 0) {
+                e.preventDefault();
+                setIsCheckoutOpen(true);
+            }
+
+            // Escape = Close modals/search
+            if (e.key === "Escape") {
+                if (showSearch) {
+                    setShowSearch(false);
+                    setSearchQuery("");
+                }
+            }
+        };
+
+        window.addEventListener("keydown", handleKeyDown);
+        return () => window.removeEventListener("keydown", handleKeyDown);
+    }, [cart.length, showSearch]);
+
     const retryConflict = (id: string) => {
         const items = loadQueue().map((i) => (i.id === id ? { ...i, conflict: false, nextAttemptAt: Date.now() } : i));
         saveQueue(items);
@@ -447,9 +491,24 @@ export default function POSPage() {
         setCart(prev => {
             const existing = prev.find(item => item.id === product.id);
             if (existing) {
-                return prev.map(item => item.id === product.id ? { ...item, qty: item.qty + 1 } : item);
+                // Mark as just added for animation, then clear after delay
+                const updated = prev.map(item =>
+                    item.id === product.id ? { ...item, qty: item.qty + 1, justAdded: true } : item
+                );
+                setTimeout(() => {
+                    setCart(current => current.map(item =>
+                        item.id === product.id ? { ...item, justAdded: false } : item
+                    ));
+                }, 600);
+                return updated;
             }
-            return [...prev, { ...product, qty: 1 }];
+            // New item - mark as just added
+            setTimeout(() => {
+                setCart(current => current.map(item =>
+                    item.id === product.id ? { ...item, justAdded: false } : item
+                ));
+            }, 600);
+            return [...prev, { ...product, qty: 1, justAdded: true }];
         });
     };
 
@@ -467,7 +526,17 @@ export default function POSPage() {
     const clearCart = () => setCart([]);
 
     const handleCheckoutSuccess = (order: any) => {
-        setLastOrder(order);
+        // Calculate total for celebration
+        const orderTotal = order?.totalCents ?? cart.reduce((sum, item) => sum + item.priceCents * item.qty, 0);
+        setSuccessOrderTotal(orderTotal);
+        setShowSuccessCelebration(true);
+
+        // Auto-hide celebration after 2.5 seconds
+        setTimeout(() => {
+            setShowSuccessCelebration(false);
+            setLastOrder(order);
+        }, 2500);
+
         setCart([]);
         setIsCheckoutOpen(false);
         setIsCartDrawerOpen(false);
@@ -498,9 +567,12 @@ export default function POSPage() {
         }
     };
 
-    const filteredProducts = !selectedCategory || selectedCategory === "all"
-        ? products
-        : products.filter(p => p.categoryId === selectedCategory);
+    // Filter by category and search query
+    const filteredProducts = products.filter(p => {
+        const matchesCategory = !selectedCategory || selectedCategory === "all" || p.categoryId === selectedCategory;
+        const matchesSearch = !searchQuery || p.name.toLowerCase().includes(searchQuery.toLowerCase());
+        return matchesCategory && matchesSearch;
+    });
 
     const handleSelectCategory = (id: string) => {
         setSelectedCategory(id);
@@ -575,6 +647,48 @@ export default function POSPage() {
                             >
                                 Refund / Exchange
                             </Button>
+                        </div>
+                    </div>
+
+                    {/* Quick Search Bar */}
+                    <div className="relative">
+                        <div className="flex items-center gap-2">
+                            <div className="relative flex-1 max-w-md">
+                                <input
+                                    ref={searchInputRef}
+                                    type="text"
+                                    placeholder="Search products..."
+                                    value={searchQuery}
+                                    onChange={(e) => setSearchQuery(e.target.value)}
+                                    className="w-full pl-10 pr-4 py-2 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition-shadow"
+                                />
+                                <svg
+                                    className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    viewBox="0 0 24 24"
+                                >
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                                </svg>
+                                {searchQuery && (
+                                    <button
+                                        onClick={() => setSearchQuery("")}
+                                        className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+                                        aria-label="Clear search"
+                                    >
+                                        <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                        </svg>
+                                    </button>
+                                )}
+                            </div>
+                            <div className="hidden sm:flex items-center gap-1.5 text-xs text-slate-400">
+                                <kbd className="px-1.5 py-0.5 bg-slate-100 border border-slate-200 rounded text-[10px] font-mono">⌘K</kbd>
+                                <span>search</span>
+                                <span className="mx-1">·</span>
+                                <kbd className="px-1.5 py-0.5 bg-slate-100 border border-slate-200 rounded text-[10px] font-mono">⌘↵</kbd>
+                                <span>checkout</span>
+                            </div>
                         </div>
                     </div>
 
@@ -803,6 +917,41 @@ export default function POSPage() {
             )}
 
             <SyncDetailsDrawer open={syncDrawerOpen} onOpenChange={setSyncDrawerOpen} />
+
+            {/* Success Celebration Modal */}
+            {showSuccessCelebration && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 motion-safe:animate-in motion-safe:fade-in motion-safe:duration-200">
+                    <div className="bg-white rounded-2xl shadow-2xl p-8 text-center max-w-sm mx-4 motion-safe:animate-in motion-safe:zoom-in-95 motion-safe:duration-300">
+                        {/* Success checkmark animation */}
+                        <div className="relative mx-auto w-20 h-20 mb-4">
+                            <div className="absolute inset-0 bg-emerald-100 rounded-full motion-safe:animate-ping opacity-75" />
+                            <div className="relative flex items-center justify-center w-20 h-20 bg-emerald-500 rounded-full">
+                                <svg
+                                    className="w-10 h-10 text-white motion-safe:animate-in motion-safe:zoom-in motion-safe:duration-300 motion-safe:delay-150"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    viewBox="0 0 24 24"
+                                >
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                                </svg>
+                            </div>
+                        </div>
+                        <h2 className="text-2xl font-bold text-slate-900 mb-2">Order Complete!</h2>
+                        <p className="text-3xl font-bold text-emerald-600 mb-1">
+                            ${(successOrderTotal / 100).toFixed(2)}
+                        </p>
+                        <p className="text-slate-500 text-sm">
+                            Payment processed successfully
+                        </p>
+                        <div className="mt-4 flex items-center justify-center gap-1 text-xs text-slate-400">
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+                            </svg>
+                            Receipt ready
+                        </div>
+                    </div>
+                </div>
+            )}
         </DashboardShell>
     );
 }

@@ -53,8 +53,11 @@ export function ProductCard({ product, onClick }: ProductCardProps) {
         <button
             onClick={hasStock ? onClick : undefined}
             disabled={!hasStock}
+            aria-label={hasStock ? `Add ${product.name} to cart, $${(displayPrice / 100).toFixed(2)}` : `${product.name} is out of stock`}
             className={cn(
-                "flex flex-col text-left bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-all active:scale-[0.98] h-full min-h-[200px]",
+                "group flex flex-col text-left bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm transition-all duration-200 h-full min-h-[200px]",
+                "focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2 outline-none",
+                hasStock && "hover:shadow-lg hover:border-emerald-200 hover:-translate-y-0.5 active:scale-[0.97] active:shadow-sm cursor-pointer",
                 !hasStock && "opacity-50 cursor-not-allowed grayscale"
             )}
         >
@@ -62,8 +65,8 @@ export function ProductCard({ product, onClick }: ProductCardProps) {
                 {product.imageUrl ? (
                     <img
                         src={product.imageUrl}
-                        alt={product.name}
-                        className="w-full h-full object-cover"
+                        alt=""
+                        className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
                     />
                 ) : (
                     <div className="w-full h-full flex items-center justify-center text-slate-300">
@@ -77,6 +80,14 @@ export function ProductCard({ product, onClick }: ProductCardProps) {
                 {!hasStock && (
                     <div className="absolute inset-0 bg-black/10 flex items-center justify-center">
                         <span className="bg-black/70 text-white px-3 py-1 rounded-full text-sm font-medium">Out of Stock</span>
+                    </div>
+                )}
+                {/* Add to cart overlay on hover */}
+                {hasStock && (
+                    <div className="absolute inset-0 bg-emerald-600/0 group-hover:bg-emerald-600/10 transition-colors duration-200 flex items-center justify-center">
+                        <div className="opacity-0 group-hover:opacity-100 transform scale-90 group-hover:scale-100 transition-all duration-200 bg-emerald-600 text-white px-3 py-1.5 rounded-full text-sm font-medium shadow-lg">
+                            + Add to Cart
+                        </div>
                     </div>
                 )}
             </div>
