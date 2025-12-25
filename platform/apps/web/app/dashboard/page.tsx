@@ -7,17 +7,28 @@ import { motion, useReducedMotion } from "framer-motion";
 import {
   AlertCircle,
   ArrowRight,
+  BarChart3,
   Calendar,
   CheckCircle,
   ClipboardList,
   Clock,
   DollarSign,
+  Hand,
   LogOut,
   MessageCircle,
+  Moon,
+  PartyPopper,
   Plus,
   RefreshCw,
+  Scale,
+  Search,
   ShoppingBag,
   Sparkles,
+  Sun,
+  Sunrise,
+  Sunset,
+  Tent,
+  TrendingUp,
   Trophy,
   UserCheck,
   Users
@@ -58,21 +69,21 @@ function getTimeOfDayGreeting() {
   if (hour < 12) {
     return {
       greeting: "Good morning",
-      emoji: "☀️",
+      icon: <Sun className="h-8 w-8 text-amber-500" />,
       message: "Here's what's happening at the park today",
       tone: "from-amber-50 to-orange-50 dark:from-amber-950/30 dark:to-orange-950/30 border-amber-200 dark:border-amber-800"
     };
   } else if (hour < 17) {
     return {
       greeting: "Good afternoon",
-      emoji: "🌤️",
+      icon: <Sunset className="h-8 w-8 text-sky-500" />,
       message: "Let's check on today's progress",
       tone: "from-sky-50 to-blue-50 dark:from-sky-950/30 dark:to-blue-950/30 border-sky-200 dark:border-sky-800"
     };
   } else {
     return {
       greeting: "Good evening",
-      emoji: "🌙",
+      icon: <Moon className="h-8 w-8 text-indigo-500" />,
       message: "Winding down the day",
       tone: "from-indigo-50 to-purple-50 dark:from-indigo-950/30 dark:to-purple-950/30 border-indigo-200 dark:border-indigo-800"
     };
@@ -157,12 +168,12 @@ function TodaysWins({
   prefersReducedMotion: boolean | null;
 }) {
   const achievements = useMemo(() => {
-    const list: { id: string; icon: string; text: string }[] = [];
+    const list: { id: string; icon: React.ReactNode; text: string }[] = [];
 
     if (outstandingBalanceCents === 0 && reservationsCount > 0) {
       list.push({
         id: "paid",
-        icon: "💰",
+        icon: <DollarSign className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />,
         text: "All payments collected"
       });
     }
@@ -170,13 +181,13 @@ function TodaysWins({
     if (occupancyRate >= 90) {
       list.push({
         id: "busy",
-        icon: "🏕️",
+        icon: <Tent className="h-4 w-4 text-purple-600 dark:text-purple-400" />,
         text: `${occupancyRate}% occupancy - Nearly full!`
       });
     } else if (occupancyRate >= 70) {
       list.push({
         id: "good-occ",
-        icon: "📈",
+        icon: <TrendingUp className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />,
         text: `${occupancyRate}% occupancy - Great day!`
       });
     }
@@ -184,7 +195,7 @@ function TodaysWins({
     if (todayArrivals.length >= 5) {
       list.push({
         id: "busy-arrivals",
-        icon: "🎉",
+        icon: <PartyPopper className="h-4 w-4 text-amber-600 dark:text-amber-400" />,
         text: `${todayArrivals.length} arrivals today`
       });
     }
@@ -192,7 +203,7 @@ function TodaysWins({
     if (todayArrivals.length === todayDepartures.length && todayArrivals.length > 0) {
       list.push({
         id: "balanced",
-        icon: "⚖️",
+        icon: <Scale className="h-4 w-4 text-blue-600 dark:text-blue-400" />,
         text: "Balanced arrivals & departures"
       });
     }
@@ -237,9 +248,7 @@ function TodaysWins({
               "shadow-sm"
             )}
           >
-            <span role="img" aria-label="achievement">
-              {achievement.icon}
-            </span>
+            {achievement.icon}
             <span className="text-foreground font-medium">
               {achievement.text}
             </span>
@@ -513,9 +522,7 @@ export default function Dashboard() {
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ ...SPRING_CONFIG, delay: 0.1 }}
               >
-                <span className="text-3xl" role="img" aria-label="time of day">
-                  {timeOfDay.emoji}
-                </span>
+                {timeOfDay.icon}
                 <h1 className="text-3xl font-bold text-foreground">
                   {timeOfDay.greeting}
                 </h1>
@@ -1018,7 +1025,9 @@ export default function Dashboard() {
                 "rounded-lg p-6 text-center space-y-2",
                 "border-2 border-dashed border-border bg-muted"
               )}>
-                <div className="text-2xl mb-2">📊</div>
+                <div className="flex justify-center mb-2">
+                  <BarChart3 className="h-8 w-8 text-muted-foreground" />
+                </div>
                 <p className="text-sm font-semibold text-foreground">No occupancy data yet</p>
                 <p className="text-xs text-muted-foreground">Data will appear as you add reservations and sites</p>
               </div>
@@ -1093,7 +1102,7 @@ export default function Dashboard() {
             <div className="space-y-2">
               {searchResults.length === 0 && (
                 <div className="text-sm text-muted-foreground flex items-center gap-2 py-2">
-                  <span>🔍</span>
+                  <Search className="h-4 w-4" />
                   No matches found. Try a different search term.
                 </div>
               )}
@@ -1325,8 +1334,12 @@ function BoardCard({
             "dark:from-slate-800/30 dark:to-slate-900/30"
           )}
         >
-          <div className="text-3xl mb-2">
-            {title === "Arrivals" ? "🎣" : "👋"}
+          <div className="flex justify-center mb-2">
+            {title === "Arrivals" ? (
+              <Sunrise className="h-10 w-10 text-emerald-500" />
+            ) : (
+              <Hand className="h-10 w-10 text-amber-500" />
+            )}
           </div>
           <p className="text-sm font-semibold text-foreground">
             {title === "Arrivals"
@@ -1530,7 +1543,11 @@ function ActivityList({
       </div>
       {rows.length === 0 ? (
         <div className="px-3 py-4 text-sm text-muted-foreground flex items-center gap-2">
-          <span>{title === "Arrivals" ? "🌅" : "🌙"}</span>
+          {title === "Arrivals" ? (
+            <Sunrise className="h-4 w-4 text-amber-500" />
+          ) : (
+            <Moon className="h-4 w-4 text-indigo-500" />
+          )}
           No {title.toLowerCase()} yet today.
         </div>
       ) : (

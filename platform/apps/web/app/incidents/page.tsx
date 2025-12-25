@@ -32,6 +32,11 @@ import {
   ListTodo,
   X,
   ChevronRight,
+  Stethoscope,
+  Wrench,
+  Eye,
+  Leaf,
+  ClipboardList,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
@@ -48,12 +53,12 @@ type Reservation = { id: string; arrivalDate?: string; departureDate?: string; g
 
 // Incident type configuration
 const incidentTypes = [
-  { value: "injury", label: "Injury", icon: "🤕", color: "text-red-600 dark:text-red-400" },
-  { value: "property_damage", label: "Property Damage", icon: "🔧", color: "text-orange-600 dark:text-orange-400" },
-  { value: "safety", label: "Safety Issue", icon: "⚠️", color: "text-yellow-600 dark:text-yellow-400" },
-  { value: "near_miss", label: "Near Miss", icon: "👁️", color: "text-blue-600 dark:text-blue-400" },
-  { value: "environmental", label: "Environmental", icon: "🌿", color: "text-green-600 dark:text-green-400" },
-  { value: "other", label: "Other", icon: "📝", color: "text-slate-600 dark:text-slate-400" },
+  { value: "injury", label: "Injury", icon: <Stethoscope className="h-5 w-5" />, color: "text-red-600 dark:text-red-400" },
+  { value: "property_damage", label: "Property Damage", icon: <Wrench className="h-5 w-5" />, color: "text-orange-600 dark:text-orange-400" },
+  { value: "safety", label: "Safety Issue", icon: <AlertTriangle className="h-5 w-5" />, color: "text-yellow-600 dark:text-yellow-400" },
+  { value: "near_miss", label: "Near Miss", icon: <Eye className="h-5 w-5" />, color: "text-blue-600 dark:text-blue-400" },
+  { value: "environmental", label: "Environmental", icon: <Leaf className="h-5 w-5" />, color: "text-green-600 dark:text-green-400" },
+  { value: "other", label: "Other", icon: <ClipboardList className="h-5 w-5" />, color: "text-slate-600 dark:text-slate-400" },
 ];
 
 // Severity configuration
@@ -392,7 +397,7 @@ export default function IncidentsPage() {
                       whileHover={prefersReducedMotion ? {} : { scale: 1.02 }}
                       whileTap={prefersReducedMotion ? {} : { scale: 0.98 }}
                     >
-                      <span className="text-lg">{type.icon}</span>
+                      <span className={cn(form.type === type.value ? type.color : "text-muted-foreground")}>{type.icon}</span>
                       <span className={cn("flex-1", form.type === type.value ? "text-emerald-700 dark:text-emerald-400" : "text-foreground")}>
                         {type.label}
                       </span>
@@ -605,7 +610,7 @@ export default function IncidentsPage() {
                       return (
                         <SelectItem key={i.id} value={i.id}>
                           <span className="flex items-center gap-2">
-                            <span>{typeConfig.icon}</span>
+                            <span className={typeConfig.color}>{typeConfig.icon}</span>
                             <span className="capitalize">{i.type.replace('_', ' ')}</span>
                             <span className="text-muted-foreground">·</span>
                             <span className="text-muted-foreground capitalize">{i.status}</span>
@@ -813,7 +818,7 @@ export default function IncidentsPage() {
                         >
                           <div className="flex items-start justify-between gap-3">
                             <div className="flex items-start gap-3 flex-1">
-                              <span className="text-2xl">{typeConfig.icon}</span>
+                              <div className={cn("h-10 w-10 rounded-lg flex items-center justify-center", typeConfig.color, "bg-muted")}>{typeConfig.icon}</div>
                               <div className="flex-1 min-w-0">
                                 <div className="flex items-center gap-2 flex-wrap">
                                   <span className="font-semibold text-foreground capitalize">
@@ -937,7 +942,7 @@ export default function IncidentsPage() {
                           return (
                             <div key={t.type} className="flex items-center justify-between text-sm">
                               <span className="flex items-center gap-2">
-                                <span>{typeConfig.icon}</span>
+                                <span className={typeConfig.color}>{typeConfig.icon}</span>
                                 <span className="capitalize text-muted-foreground">{t.type.replace('_', ' ')}</span>
                               </span>
                               <span className="font-medium text-foreground">{t._count._all}</span>
