@@ -118,7 +118,7 @@ export function LocationLinks({
         {locations.map((location) => (
           <Link
             key={location.slug}
-            href={`/campgrounds/${location.slug}`}
+            href={`/browse/${location.slug}`}
             className="inline-flex items-center gap-2 px-4 py-2 bg-slate-50 hover:bg-emerald-50 border border-slate-200 hover:border-emerald-200 rounded-full text-sm text-slate-700 hover:text-emerald-700 transition-colors"
           >
             <MapPin className="h-4 w-4" />
@@ -162,7 +162,7 @@ export function SiteTypeLinks({
         {siteTypes.map((siteType) => (
           <Link
             key={siteType.type}
-            href={`/campgrounds?type=${siteType.type}`}
+            href={`/browse?type=${siteType.type}`}
             className="inline-flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 hover:border-emerald-300 rounded-lg text-sm text-slate-700 hover:text-emerald-700 transition-colors"
           >
             {siteType.label}

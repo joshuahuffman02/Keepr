@@ -10,7 +10,7 @@ export const metadata: Metadata = generatePageMetadata({
   title: "Find Campgrounds - RV Parks, Cabins & Camping Sites",
   description:
     "Browse campgrounds across the United States. Find RV parks, tent sites, cabins, and glamping experiences. Book online with instant confirmation.",
-  path: "/campgrounds",
+  path: "/browse",
   keywords: [
     "campgrounds near me",
     "RV parks",
@@ -67,7 +67,7 @@ export default async function CampgroundsIndexPage() {
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       {/* Breadcrumbs */}
       <Breadcrumbs
-        items={[{ name: "Campgrounds", path: "/campgrounds" }]}
+        items={[{ name: "Browse Campgrounds", path: "/browse" }]}
         className="mb-6"
       />
 
@@ -159,7 +159,7 @@ export default async function CampgroundsIndexPage() {
           {sortedStates.map((state) => (
             <Link
               key={state.slug}
-              href={`/campgrounds/${state.slug}`}
+              href={`/browse/${state.slug}`}
               className="group flex items-center justify-between p-4 bg-white border border-slate-200 rounded-xl hover:border-emerald-300 hover:shadow-md transition-all"
             >
               <div className="flex items-center gap-3">

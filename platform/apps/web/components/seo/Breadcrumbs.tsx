@@ -101,21 +101,21 @@ export function getCampgroundBreadcrumbs(campground: {
   city?: string | null;
 }): BreadcrumbItem[] {
   const items: BreadcrumbItem[] = [
-    { name: "Campgrounds", path: "/campgrounds" },
+    { name: "Browse Campgrounds", path: "/browse" },
   ];
 
   if (campground.state) {
     const stateSlug = campground.state.toLowerCase().replace(/\s+/g, "-");
     items.push({
       name: campground.state,
-      path: `/campgrounds/${stateSlug}`,
+      path: `/browse/${stateSlug}`,
     });
 
     if (campground.city) {
       const citySlug = `${campground.city.toLowerCase().replace(/\s+/g, "-")}-${stateSlug}`;
       items.push({
         name: campground.city,
-        path: `/campgrounds/${citySlug}`,
+        path: `/browse/${citySlug}`,
       });
     }
   }

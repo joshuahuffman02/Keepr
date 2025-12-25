@@ -75,7 +75,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return generatePageMetadata({
     title,
     description,
-    path: `/campgrounds/${location}`,
+    path: `/browse/${location}`,
     keywords: [
       `campgrounds ${cityName || stateName}`,
       `camping ${cityName || stateName}`,
@@ -121,16 +121,16 @@ export default async function LocationPage({ params }: Props) {
 
   // Build breadcrumbs
   const breadcrumbs: BreadcrumbItem[] = [
-    { name: "Campgrounds", path: "/campgrounds" },
+    { name: "Browse Campgrounds", path: "/browse" },
   ];
 
   if (cityName) {
     breadcrumbs.push(
-      { name: stateName, path: `/campgrounds/${parsed.state}` },
-      { name: cityName, path: `/campgrounds/${location}` }
+      { name: stateName, path: `/browse/${parsed.state}` },
+      { name: cityName, path: `/browse/${location}` }
     );
   } else {
-    breadcrumbs.push({ name: stateName, path: `/campgrounds/${location}` });
+    breadcrumbs.push({ name: stateName, path: `/browse/${location}` });
   }
 
   // Get unique cities for internal linking (if showing state page)
@@ -295,7 +295,7 @@ export default async function LocationPage({ params }: Props) {
             {nearbyStates.map((state) => (
               <Link
                 key={state.slug}
-                href={`/campgrounds/${state.slug}`}
+                href={`/browse/${state.slug}`}
                 className="inline-flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 hover:border-emerald-300 rounded-lg text-sm text-slate-700 hover:text-emerald-700 transition-colors"
               >
                 <MapPin className="h-4 w-4" />

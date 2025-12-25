@@ -31,7 +31,7 @@ export const getBaseUrl = () => SEO_CONFIG.siteUrl.replace(/\/+$/, "");
  */
 export const STATIC_PAGES = [
   { path: "/", priority: 1.0, changeFrequency: "daily" as const },
-  { path: "/campgrounds", priority: 0.9, changeFrequency: "daily" as const },
+  { path: "/browse", priority: 0.9, changeFrequency: "daily" as const },
   { path: "/developers", priority: 0.7, changeFrequency: "monthly" as const },
   { path: "/careers", priority: 0.6, changeFrequency: "weekly" as const },
   { path: "/case-studies", priority: 0.8, changeFrequency: "weekly" as const },

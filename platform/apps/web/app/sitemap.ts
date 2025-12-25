@@ -58,7 +58,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     const stateUrls: MetadataRoute.Sitemap = Array.from(stateMap.entries())
       .filter(([, data]) => data.count >= 1) // Include states with at least 1 campground
       .map(([state, data]) => ({
-        url: `${baseUrl}/campgrounds/${state.toLowerCase().replace(/\s+/g, "-")}`,
+        url: `${baseUrl}/browse/${state.toLowerCase().replace(/\s+/g, "-")}`,
         lastModified: data.lastModified,
         changeFrequency: "weekly" as const,
         priority: 0.6,
@@ -87,7 +87,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         const [city] = cityState.split("-");
         const slug = `${city.toLowerCase().replace(/\s+/g, "-")}-${data.state.toLowerCase().replace(/\s+/g, "-")}`;
         return {
-          url: `${baseUrl}/campgrounds/${slug}`,
+          url: `${baseUrl}/browse/${slug}`,
           lastModified: data.lastModified,
           changeFrequency: "weekly" as const,
           priority: 0.5,
