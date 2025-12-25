@@ -64,18 +64,19 @@ export default function AllPagesPage() {
     [filteredPages]
   );
 
-  const categories: (PageCategory | "all")[] = [
-    "all",
-    "operations",
-    "guests",
-    "finance",
-    "marketing",
-    "reports",
-    "store",
-    "staff",
-    "settings",
-    "admin",
-  ];
+  // Only show categories that have accessible pages
+  const availableCategories = useMemo(() => {
+    const categoriesWithPages = new Set<PageCategory>();
+    for (const page of accessiblePages) {
+      categoriesWithPages.add(page.category);
+    }
+    return ["all" as const, ...Array.from(categoriesWithPages).sort((a, b) => {
+      const order: PageCategory[] = ["operations", "guests", "finance", "marketing", "reports", "store", "staff", "settings", "admin"];
+      return order.indexOf(a) - order.indexOf(b);
+    })];
+  }, [accessiblePages]);
+
+  const categories = availableCategories;
 
   return (
     <DashboardShell title="All Pages" subtitle="Browse and pin pages to your menu">
