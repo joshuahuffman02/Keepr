@@ -4,7 +4,6 @@ import { useEffect, useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Copy, Plus, RefreshCw, Activity, Terminal, Play } from "lucide-react";
 import { apiClient } from "@/lib/api-client";
-import { DashboardShell } from "@/components/ui/layout/DashboardShell";
 import { Breadcrumbs } from "@/components/breadcrumbs";
 import { Button } from "@/components/ui/button";
 import {
@@ -129,7 +128,7 @@ export default function WebhooksSettingsPage() {
     };
 
     return (
-        <DashboardShell>
+        <div>
             <div className="space-y-6">
                 <Breadcrumbs items={[{ label: "Settings" }, { label: "Webhooks" }]} />
 
@@ -363,6 +362,6 @@ export default function WebhooksSettingsPage() {
                     </TabsContent>
                 </Tabs>
             </div>
-        </DashboardShell>
+        </div>
     );
 }

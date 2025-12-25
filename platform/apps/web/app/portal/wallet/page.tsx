@@ -13,6 +13,8 @@ type WalletBalance = {
     walletId: string;
     campgroundId: string;
     campgroundName: string;
+    scopeType: "campground" | "organization" | "global";
+    scopeId: string | null;
     balanceCents: number;
     availableCents: number;
     currency: string;
@@ -34,7 +36,7 @@ export default function WalletPage() {
     const router = useRouter();
     const [wallets, setWallets] = useState<WalletBalance[]>([]);
     const [transactions, setTransactions] = useState<WalletTransaction[]>([]);
-    const [selectedCampground, setSelectedCampground] = useState<string | null>(null);
+    const [selectedWalletId, setSelectedWalletId] = useState<string | null>(null);
     const [loading, setLoading] = useState(true);
     const [loadingTransactions, setLoadingTransactions] = useState(false);
 
@@ -51,7 +53,7 @@ export default function WalletPage() {
                 setWallets(walletsData || []);
                 // If there's only one wallet, auto-select it
                 if (walletsData && walletsData.length === 1) {
-                    setSelectedCampground(walletsData[0].campgroundId);
+                    setSelectedWalletId(walletsData[0].walletId);
                 }
             } catch (err) {
                 console.error(err);
@@ -64,8 +66,10 @@ export default function WalletPage() {
         fetchWallets();
     }, [router]);
 
+    const selectedWallet = wallets.find((wallet) => wallet.walletId === selectedWalletId) ?? null;
+
     useEffect(() => {
-        if (!selectedCampground) return;
+        if (!selectedWalletId || !selectedWallet) return;
 
         const storedToken = localStorage.getItem("campreserv:guestToken");
         if (!storedToken) return;
@@ -73,7 +77,13 @@ export default function WalletPage() {
         const fetchTransactions = async () => {
             setLoadingTransactions(true);
             try {
-                const data = await apiClient.getPortalWalletTransactions(storedToken, selectedCampground, 20);
+                const data = await apiClient.getPortalWalletTransactions(
+                    storedToken,
+                    selectedWallet.campgroundId,
+                    20,
+                    undefined,
+                    selectedWalletId
+                );
                 setTransactions(data.transactions || []);
             } catch (err) {
                 console.error(err);
@@ -84,7 +94,7 @@ export default function WalletPage() {
         };
 
         fetchTransactions();
-    }, [selectedCampground]);
+    }, [selectedWalletId, selectedWallet]);
 
     const handleLogout = () => {
         localStorage.removeItem("campreserv:guestToken");
@@ -96,6 +106,16 @@ export default function WalletPage() {
             style: 'currency',
             currency: 'USD'
         }).format(cents / 100);
+    };
+
+    const walletScopeLabel = (wallet: WalletBalance) => {
+        if (wallet.scopeType === "organization") {
+            return `Portfolio${wallet.campgroundName ? ` · ${wallet.campgroundName}` : ""}`;
+        }
+        if (wallet.scopeType === "global") {
+            return "Global wallet";
+        }
+        return wallet.campgroundName || "Campground";
     };
 
     const totalBalanceCents = wallets.reduce((sum, w) => sum + w.balanceCents, 0);
@@ -154,36 +174,36 @@ export default function WalletPage() {
                                     </div>
                                     {wallets.length > 1 && (
                                         <div className="text-right">
-                                            <p className="text-sm opacity-80">{wallets.length} campgrounds</p>
+                                            <p className="text-sm opacity-80">{wallets.length} wallets</p>
                                         </div>
                                     )}
                                 </div>
                             </div>
                         </Card>
 
-                        {/* Wallet Balances by Campground */}
+                        {/* Wallet Balances */}
                         {wallets.length > 1 && (
                             <Card>
                                 <CardHeader>
                                     <CardTitle className="flex items-center gap-2">
                                         <Building2 className="h-5 w-5" />
-                                        Balances by Campground
+                                        Wallet Balances
                                     </CardTitle>
                                 </CardHeader>
                                 <CardContent className="space-y-3">
                                     {wallets.map((wallet) => (
                                         <button
                                             key={wallet.walletId}
-                                            onClick={() => setSelectedCampground(wallet.campgroundId)}
+                                            onClick={() => setSelectedWalletId(wallet.walletId)}
                                             className={`w-full p-4 rounded-lg border text-left transition-all ${
-                                                selectedCampground === wallet.campgroundId
+                                                selectedWalletId === wallet.walletId
                                                     ? "border-primary bg-primary/5"
                                                     : "border-border hover:border-primary/50"
                                             }`}
                                         >
                                             <div className="flex items-center justify-between">
                                                 <div>
-                                                    <p className="font-medium">{wallet.campgroundName}</p>
+                                                    <p className="font-medium">{walletScopeLabel(wallet)}</p>
                                                 </div>
                                                 <span className="font-bold text-lg">
                                                     {formatCurrency(wallet.balanceCents)}
@@ -202,7 +222,7 @@ export default function WalletPage() {
                                     <div className="flex items-center justify-between">
                                         <div className="flex items-center gap-3">
                                             <Building2 className="h-5 w-5 text-muted-foreground" />
-                                            <span className="font-medium">{wallets[0].campgroundName}</span>
+                                            <span className="font-medium">{walletScopeLabel(wallets[0])}</span>
                                         </div>
                                         <span className="text-sm text-muted-foreground">
                                             Available: {formatCurrency(wallets[0].availableCents)}
@@ -249,9 +269,9 @@ export default function WalletPage() {
                                     <History className="h-5 w-5" />
                                     Transaction History
                                 </CardTitle>
-                                {wallets.length > 1 && !selectedCampground && (
+                                {wallets.length > 1 && !selectedWalletId && (
                                     <CardDescription>
-                                        Select a campground above to view transactions
+                                        Select a wallet above to view transactions
                                     </CardDescription>
                                 )}
                             </CardHeader>
@@ -260,9 +280,9 @@ export default function WalletPage() {
                                     <div className="flex justify-center py-8">
                                         <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
                                     </div>
-                                ) : !selectedCampground && wallets.length > 1 ? (
+                                ) : !selectedWalletId && wallets.length > 1 ? (
                                     <p className="text-muted-foreground text-center py-8">
-                                        Select a campground to view transaction history
+                                        Select a wallet to view transaction history
                                     </p>
                                 ) : transactions.length > 0 ? (
                                     <div className="space-y-4">

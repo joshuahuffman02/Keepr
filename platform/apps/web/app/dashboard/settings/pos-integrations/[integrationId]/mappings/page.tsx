@@ -3,7 +3,6 @@
 import { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { DashboardShell } from "@/components/ui/layout/DashboardShell";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -306,7 +305,7 @@ export default function ProductMappingsPage() {
   };
 
   return (
-    <DashboardShell>
+    <div>
       <div className="space-y-6">
         {/* Header */}
         <div className="flex items-center justify-between">
@@ -581,6 +580,6 @@ export default function ProductMappingsPage() {
           </DialogContent>
         </Dialog>
       </div>
-    </DashboardShell>
+    </div>
   );
 }

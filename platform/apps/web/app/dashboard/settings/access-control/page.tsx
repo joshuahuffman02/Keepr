@@ -3,7 +3,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "../../../../components/ui/card";
-import { DashboardShell } from "../../../../components/ui/layout/DashboardShell";
 import { Badge } from "../../../../components/ui/badge";
 import { DoorOpen, KeyRound, RefreshCcw } from "lucide-react";
 import { apiClient } from "../../../../lib/api-client";
@@ -87,22 +86,22 @@ export default function AccessControlSettingsPage() {
 
   if (whoamiLoading) {
     return (
-      <DashboardShell>
+      <div>
         <div className="text-sm text-slate-600">Loading access control…</div>
-      </DashboardShell>
+      </div>
     );
   }
 
   if (!allowed || !campgroundId) {
     return (
-      <DashboardShell>
+      <div>
         <div className="text-sm text-slate-600">Access control is restricted to authorized users.</div>
-      </DashboardShell>
+      </div>
     );
   }
 
   return (
-    <DashboardShell>
+    <div>
       <div className="flex items-center justify-between mb-6">
         <div>
           <h1 className="text-xl font-semibold text-slate-900">Access Control</h1>
@@ -217,6 +216,6 @@ export default function AccessControlSettingsPage() {
           </div>
         </CardContent>
       </Card>
-    </DashboardShell>
+    </div>
   );
 }

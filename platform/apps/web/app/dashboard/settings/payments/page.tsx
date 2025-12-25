@@ -2,7 +2,6 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { DashboardShell } from "../../../../components/ui/layout/DashboardShell";
 import { apiClient } from "@/lib/api-client";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -281,8 +280,7 @@ export default function PaymentsSettingsPage() {
   };
 
   return (
-    <DashboardShell>
-      <div className="max-w-3xl space-y-4">
+    <div className="max-w-3xl space-y-4">
         <div className="flex items-center gap-2">
           <h1 className="text-2xl font-semibold text-slate-900">Payments</h1>
           <HelpAnchor topicId="payments-config" label="Payments setup help" />
@@ -599,6 +597,5 @@ export default function PaymentsSettingsPage() {
           </CardContent>
         </Card>
       </div>
-    </DashboardShell>
   );
 }

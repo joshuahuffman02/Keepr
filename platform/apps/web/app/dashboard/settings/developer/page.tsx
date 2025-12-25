@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { DashboardShell } from "../../../../components/ui/layout/DashboardShell";
 import { Breadcrumbs } from "../../../../components/breadcrumbs";
 import { Button } from "../../../../components/ui/button";
 import { Card } from "../../../../components/ui/card";
@@ -171,8 +170,7 @@ export default function DeveloperSettingsPage() {
   }
 
   return (
-    <DashboardShell>
-      <div className="space-y-4">
+    <div className="space-y-4">
         <Breadcrumbs items={[{ label: "Settings" }, { label: "Developer ecosystem" }]} />
         <div className="flex items-center justify-between">
           <div>
@@ -304,7 +302,6 @@ export default function DeveloperSettingsPage() {
           </div>
         </Card>
       </div>
-    </DashboardShell>
   );
 }
 

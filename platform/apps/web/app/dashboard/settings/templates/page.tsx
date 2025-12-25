@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { DashboardShell } from "@/components/ui/layout/DashboardShell";
 import { FormField } from "@/components/ui/form-field";
 import { FormTextarea } from "@/components/ui/form-textarea";
 import { apiClient } from "@/lib/api-client";
@@ -215,16 +214,16 @@ export default function TemplatesPage() {
 
   if (!campgroundId) {
     return (
-      <DashboardShell>
+      <div>
         <div className="flex items-center justify-center h-64">
           <p className="text-slate-500">Select a campground to manage templates</p>
         </div>
-      </DashboardShell>
+      </div>
     );
   }
 
   return (
-    <DashboardShell>
+    <div>
       <div className="p-6 max-w-[1600px] mx-auto">
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
@@ -359,7 +358,7 @@ export default function TemplatesPage() {
           />
         )}
       </div>
-    </DashboardShell>
+    </div>
   );
 }
 

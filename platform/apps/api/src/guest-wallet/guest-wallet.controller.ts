@@ -46,7 +46,9 @@ export class GuestWalletController {
     @Query() query: WalletTransactionsQueryDto
   ) {
     const guestId = req.user.id;
-    const wallet = await this.guestWalletService.findWallet(campgroundId, guestId);
+    const wallet = query.walletId
+      ? await this.guestWalletService.resolveWalletForGuest(guestId, query.walletId, campgroundId)
+      : await this.guestWalletService.findWallet(campgroundId, guestId);
     if (!wallet) {
       return { transactions: [], total: 0 };
     }
@@ -72,6 +74,18 @@ export class GuestWalletController {
     @Param("guestId") guestId: string
   ) {
     return this.guestWalletService.getGuestBalance(campgroundId, guestId);
+  }
+
+  /**
+   * Get wallets for a guest that can be used at this campground
+   */
+  @Get("campgrounds/:campgroundId/guests/:guestId/wallets")
+  @UseGuards(JwtAuthGuard)
+  async getWalletsForGuest(
+    @Param("campgroundId") campgroundId: string,
+    @Param("guestId") guestId: string
+  ) {
+    return this.guestWalletService.getGuestWalletsForCampground(campgroundId, guestId);
   }
 
   /**
@@ -103,7 +117,9 @@ export class GuestWalletController {
     @Param("guestId") guestId: string,
     @Query() query: WalletTransactionsQueryDto
   ) {
-    const wallet = await this.guestWalletService.findWallet(campgroundId, guestId);
+    const wallet = query.walletId
+      ? await this.guestWalletService.resolveWalletForGuest(guestId, query.walletId, campgroundId)
+      : await this.guestWalletService.findWallet(campgroundId, guestId);
     if (!wallet) {
       return { transactions: [], total: 0 };
     }

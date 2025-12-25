@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { DashboardShell } from "../../../../components/ui/layout/DashboardShell";
 import { Button } from "../../../../components/ui/button";
 import { FormField } from "../../../../components/ui/form-field";
 import { apiClient } from "../../../../lib/api-client";
@@ -295,17 +294,14 @@ export default function PricingRulesV2Page() {
 
   if (!campgroundId) {
     return (
-      <DashboardShell>
-        <div className="text-center py-12 text-muted-foreground">
-          Please select a campground first.
-        </div>
-      </DashboardShell>
+      <div className="text-center py-12 text-muted-foreground">
+        Please select a campground first.
+      </div>
     );
   }
 
   return (
-    <DashboardShell>
-      <div className="space-y-6">
+    <div className="space-y-6">
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-2xl font-bold text-slate-900">Dynamic Pricing Rules</h1>
@@ -414,7 +410,6 @@ export default function PricingRulesV2Page() {
             })}
           </div>
         )}
-      </div>
 
       {/* Modal */}
       {isModalOpen && (
@@ -670,6 +665,6 @@ export default function PricingRulesV2Page() {
           </div>
         </div>
       )}
-    </DashboardShell>
+    </div>
   );
 }

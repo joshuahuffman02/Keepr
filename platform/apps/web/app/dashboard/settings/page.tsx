@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { DashboardShell } from "@/components/ui/layout/DashboardShell";
 import { Card, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import Link from "next/link";
@@ -285,8 +284,7 @@ export default function SettingsLandingPage() {
     .filter((category) => category.links.length > 0 || searchQuery === "");
 
   return (
-    <DashboardShell>
-      <div className="p-6 max-w-[1400px] mx-auto">
+    <div className="max-w-[1400px] mx-auto">
         {/* Header */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-slate-900">Settings</h1>
@@ -403,6 +401,5 @@ export default function SettingsLandingPage() {
           </div>
         )}
       </div>
-    </DashboardShell>
   );
 }

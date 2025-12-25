@@ -2,7 +2,6 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { DashboardShell } from "@/components/ui/layout/DashboardShell";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -227,7 +226,7 @@ export default function DataImportPage() {
     : [];
 
   return (
-    <DashboardShell>
+    <div>
       <div className="max-w-5xl mx-auto space-y-6 p-6">
         {/* Header */}
         <div>
@@ -726,6 +725,6 @@ export default function DataImportPage() {
           </Card>
         )}
       </div>
-    </DashboardShell>
+    </div>
   );
 }

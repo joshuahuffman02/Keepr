@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { DashboardShell } from "@/components/ui/layout/DashboardShell";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -262,17 +261,14 @@ export default function SeasonalRatesSettingsPage() {
 
     if (!campgroundId) {
         return (
-            <DashboardShell>
-                <div className="text-center py-12 text-muted-foreground">
-                    Please select a campground first.
-                </div>
-            </DashboardShell>
+            <div className="text-center py-12 text-muted-foreground">
+                Please select a campground first.
+            </div>
         );
     }
 
     return (
-        <DashboardShell>
-            <div className="space-y-6">
+        <div className="space-y-6">
                 <div className="rounded-lg border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900">
                     <div className="font-semibold">Heads up: pricing is consolidating</div>
                     <p className="mt-1">
@@ -405,7 +401,6 @@ export default function SeasonalRatesSettingsPage() {
                         ))}
                     </div>
                 )}
-            </div>
 
             <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
                 <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
@@ -648,6 +643,6 @@ export default function SeasonalRatesSettingsPage() {
                     </div>
                 </DialogContent>
             </Dialog>
-        </DashboardShell>
+        </div>
     );
 }

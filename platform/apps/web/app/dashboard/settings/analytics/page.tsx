@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { DashboardShell } from "@/components/ui/layout/DashboardShell";
 import { apiClient } from "@/lib/api-client";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -55,7 +54,7 @@ export default function AnalyticsSettingsPage() {
   };
 
   return (
-    <DashboardShell>
+    <div>
       <div className="max-w-3xl space-y-4">
         <div>
           <h1 className="text-2xl font-semibold text-slate-900">Analytics & Tracking</h1>
@@ -104,7 +103,7 @@ export default function AnalyticsSettingsPage() {
           </CardContent>
         </Card>
       </div>
-    </DashboardShell>
+    </div>
   );
 }
 

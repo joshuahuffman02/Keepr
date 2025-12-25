@@ -3,7 +3,6 @@
 import Link from "next/link";
 import { useEffect, useState, useCallback } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { DashboardShell } from "@/components/ui/layout/DashboardShell";
 import { apiClient } from "@/lib/api-client";
 
 type TriggerEvent =
@@ -98,34 +97,31 @@ export default function NotificationTriggersPage() {
 
   if (!campgroundId) {
     return (
-      <DashboardShell>
-        <div className="flex items-center justify-center h-64">
-          <p className="text-slate-500">Select a campground to manage notification triggers</p>
-        </div>
-      </DashboardShell>
+      <div className="flex items-center justify-center h-64">
+        <p className="text-slate-500">Select a campground to manage notification triggers</p>
+      </div>
     );
   }
 
   return (
-    <DashboardShell>
-      <div className="p-6 max-w-[1200px] mx-auto">
-        {/* Header */}
-        <div className="flex items-center justify-between mb-8">
-          <div>
-            <h1 className="text-2xl font-bold text-slate-900">Notification Triggers</h1>
-            <p className="text-slate-500 mt-1">Automate emails and SMS based on events</p>
-          </div>
-          <button
-            onClick={() => setShowCreateModal(true)}
-            className="px-4 py-2 bg-violet-600 text-white rounded-lg font-medium hover:bg-violet-700 transition-colors flex items-center gap-2"
-          >
-            <span>+</span> New Trigger
-          </button>
+    <div className="p-6 max-w-[1200px] mx-auto">
+      {/* Header */}
+      <div className="flex items-center justify-between mb-8">
+        <div>
+          <h1 className="text-2xl font-bold text-slate-900">Notification Triggers</h1>
+          <p className="text-slate-500 mt-1">Automate emails and SMS based on events</p>
         </div>
+        <button
+          onClick={() => setShowCreateModal(true)}
+          className="px-4 py-2 bg-violet-600 text-white rounded-lg font-medium hover:bg-violet-700 transition-colors flex items-center gap-2"
+        >
+          <span>+</span> New Trigger
+        </button>
+      </div>
 
-        <div className="rounded-lg border border-amber-200 bg-amber-50 p-4 space-y-2 text-sm text-amber-900 mb-6">
-          <div className="font-semibold">How to send messages</div>
-          <ul className="list-disc pl-4 space-y-1">
+      <div className="rounded-lg border border-amber-200 bg-amber-50 p-4 space-y-2 text-sm text-amber-900 mb-6">
+        <div className="font-semibold">How to send messages</div>
+        <ul className="list-disc pl-4 space-y-1">
             <li>Create or edit a template in <Link href="/settings/templates" className="underline font-semibold text-amber-800">Settings → Templates</Link>.</li>
             <li>Pick the template when you set up the trigger (email/SMS). If none is set, the default system message is used.</li>
             <li>Use delays for reminders (e.g., 1440 = 24h before check-in).</li>
@@ -216,23 +212,22 @@ export default function NotificationTriggersPage() {
         )}
 
         {/* Create/Edit Modal */}
-        {(showCreateModal || editingTrigger) && (
-          <TriggerModal
-            campgroundId={campgroundId}
-            trigger={editingTrigger}
-            onClose={() => {
-              setShowCreateModal(false);
-              setEditingTrigger(null);
-            }}
-            onSaved={() => {
-              setShowCreateModal(false);
-              setEditingTrigger(null);
-              queryClient.invalidateQueries({ queryKey: ["notification-triggers"] });
-            }}
-          />
-        )}
-      </div>
-    </DashboardShell>
+      {(showCreateModal || editingTrigger) && (
+        <TriggerModal
+          campgroundId={campgroundId}
+          trigger={editingTrigger}
+          onClose={() => {
+            setShowCreateModal(false);
+            setEditingTrigger(null);
+          }}
+          onSaved={() => {
+            setShowCreateModal(false);
+            setEditingTrigger(null);
+            queryClient.invalidateQueries({ queryKey: ["notification-triggers"] });
+          }}
+        />
+      )}
+    </div>
   );
 }
 

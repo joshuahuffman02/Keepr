@@ -3,7 +3,6 @@
 import { useState, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiClient } from "@/lib/api-client";
-import { DashboardShell } from "@/components/ui/layout/DashboardShell";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -194,16 +193,16 @@ export default function BlackoutDatesPage() {
 
     if (isLoading) {
         return (
-            <DashboardShell>
+            <div>
                 <div className="flex items-center justify-center h-64">
                     <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-emerald-600" />
                 </div>
-            </DashboardShell>
+            </div>
         );
     }
 
     return (
-        <DashboardShell>
+        <div>
             <div className="space-y-6">
                 {/* Header */}
                 <div className="flex items-center justify-between">
@@ -415,6 +414,6 @@ export default function BlackoutDatesPage() {
                     </Card>
                 )}
             </div>
-        </DashboardShell>
+        </div>
     );
 }

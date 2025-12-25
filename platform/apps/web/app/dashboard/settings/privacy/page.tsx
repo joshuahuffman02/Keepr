@@ -2,7 +2,6 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { DashboardShell } from "@/components/ui/layout/DashboardShell";
 import { Breadcrumbs } from "@/components/breadcrumbs";
 import { apiClient } from "@/lib/api-client";
 import { Button } from "@/components/ui/button";
@@ -135,8 +134,7 @@ export default function PrivacySettingsPage() {
   const retentionLabel = useMemo(() => `${settings?.backupRetentionDays ?? 0} days`, [settings?.backupRetentionDays]);
 
   return (
-    <DashboardShell>
-      <div className="space-y-6">
+    <div className="space-y-6">
         <Breadcrumbs items={[{ label: "Settings" }, { label: "Privacy & PII" }]} />
 
         {/* How It Works Section */}
@@ -471,7 +469,6 @@ export default function PrivacySettingsPage() {
           </div>
         </div>
       </div>
-    </DashboardShell>
   );
 }
 

@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { DashboardShell } from "@/components/ui/layout/DashboardShell";
 import { Breadcrumbs } from "@/components/breadcrumbs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -151,8 +150,7 @@ export default function SecuritySettingsPage() {
   const backupStatus = backupQuery.data;
 
   return (
-    <DashboardShell>
-      <div className="space-y-6">
+    <div className="space-y-6">
         <Breadcrumbs items={[{ label: "Settings" }, { label: "Security" }]} />
 
         <div className="flex items-center justify-between">
@@ -406,7 +404,6 @@ export default function SecuritySettingsPage() {
           </CardContent>
         </Card>
       </div>
-    </DashboardShell>
   );
 }
 

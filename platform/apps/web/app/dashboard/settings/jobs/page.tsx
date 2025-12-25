@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { apiClient } from "@/lib/api-client";
-import { DashboardShell } from "@/components/ui/layout/DashboardShell";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { formatDistanceToNow } from "date-fns";
@@ -76,7 +75,7 @@ export default function JobsPage() {
   };
 
   return (
-    <DashboardShell>
+    <div>
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <div>
@@ -121,7 +120,7 @@ export default function JobsPage() {
           </CardContent>
         </Card>
       </div>
-    </DashboardShell>
+    </div>
   );
 }
 

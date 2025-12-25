@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { DashboardShell } from "@/components/ui/layout/DashboardShell";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -30,6 +29,7 @@ import {
   ExternalLink,
   Shield,
   Award,
+  Lightbulb,
 } from "lucide-react";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
@@ -39,8 +39,6 @@ export default function AccessibilitySettingsPage() {
   const queryClient = useQueryClient();
   const [campgroundId, setCampgroundId] = useState<string | null>(null);
   const [completedItems, setCompletedItems] = useState<Set<string>>(new Set());
-  const [accessibleSiteCount, setAccessibleSiteCount] = useState(0);
-  const [totalSiteCount, setTotalSiteCount] = useState(0);
   const [notes, setNotes] = useState("");
 
   // Load campground ID from localStorage
@@ -56,6 +54,22 @@ export default function AccessibilitySettingsPage() {
     enabled: !!campgroundId
   });
 
+  // Fetch sites to calculate actual accessible site counts
+  const sitesQuery = useQuery({
+    queryKey: ["sites", campgroundId],
+    queryFn: () => apiClient.getSites(campgroundId!),
+    enabled: !!campgroundId
+  });
+
+  // Calculate site counts from actual site data
+  const sites = sitesQuery.data ?? [];
+  const totalSiteCount = sites.length;
+  const accessibleSiteCount = sites.filter((site: any) => site.accessible === true).length;
+  const accessibleSiteNames = sites
+    .filter((site: any) => site.accessible === true)
+    .map((site: any) => site.name || site.siteNumber)
+    .slice(0, 10); // Show first 10
+
   // Initialize form from campground data
   useEffect(() => {
     const cg = campgroundQuery.data;
@@ -65,12 +79,7 @@ export default function AccessibilitySettingsPage() {
     const adaData = (cg as any).adaAssessment as AdaAssessmentData | null;
     if (adaData) {
       setCompletedItems(new Set(adaData.completedItems || []));
-      setAccessibleSiteCount(adaData.accessibleSiteCount || 0);
-      setTotalSiteCount(adaData.totalSiteCount || 0);
       setNotes(adaData.notes || "");
-    } else {
-      setAccessibleSiteCount((cg as any).adaAccessibleSiteCount || 0);
-      setTotalSiteCount((cg as any).adaTotalSiteCount || 0);
     }
   }, [campgroundQuery.data]);
 
@@ -146,27 +155,22 @@ export default function AccessibilitySettingsPage() {
 
   if (!campgroundId) {
     return (
-      <DashboardShell>
-        <div className="flex items-center justify-center min-h-[400px]">
-          <p className="text-slate-500">Select a campground to configure accessibility settings.</p>
-        </div>
-      </DashboardShell>
+      <div className="flex items-center justify-center min-h-[400px]">
+        <p className="text-slate-500">Select a campground to configure accessibility settings.</p>
+      </div>
     );
   }
 
   if (campgroundQuery.isLoading) {
     return (
-      <DashboardShell>
-        <div className="flex items-center justify-center min-h-[400px]">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-emerald-500" />
-        </div>
-      </DashboardShell>
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-emerald-500" />
+      </div>
     );
   }
 
   return (
-    <DashboardShell>
-      <div className="max-w-4xl mx-auto space-y-6">
+    <div className="max-w-4xl mx-auto space-y-6">
         {/* Header */}
         <div className="flex items-start justify-between">
           <div>
@@ -276,47 +280,229 @@ export default function AccessibilitySettingsPage() {
           </CardContent>
         </Card>
 
-        {/* Site Count Inputs */}
+        {/* Site Inventory - Dynamic from actual site data */}
         <Card>
           <CardHeader>
-            <CardTitle>Site Inventory</CardTitle>
+            <CardTitle className="flex items-center justify-between">
+              <span>Site Inventory</span>
+              {campgroundId && (
+                <a
+                  href={`/campgrounds/${campgroundId}/sites`}
+                  className="text-sm font-normal text-emerald-600 hover:text-emerald-700 flex items-center gap-1"
+                >
+                  Manage Sites
+                  <ExternalLink className="w-3.5 h-3.5" />
+                </a>
+              )}
+            </CardTitle>
             <CardDescription>
-              Enter the number of camping sites to calculate accessibility requirements
+              Site accessibility data is pulled automatically from your site inventory
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="grid sm:grid-cols-2 gap-6">
-              <div className="space-y-2">
-                <Label htmlFor="totalSites">Total Camping Sites</Label>
-                <Input
-                  id="totalSites"
-                  type="number"
-                  min={0}
-                  value={totalSiteCount}
-                  onChange={(e) => setTotalSiteCount(parseInt(e.target.value) || 0)}
-                  placeholder="Enter total number of sites"
-                />
-                <p className="text-xs text-slate-500">
-                  Based on ADA scoping, you need at least {requiredUnits} accessible units
-                </p>
+            {sitesQuery.isLoading ? (
+              <div className="flex items-center gap-2 text-slate-500">
+                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-emerald-500" />
+                Loading site data...
               </div>
-              <div className="space-y-2">
-                <Label htmlFor="accessibleSites">Accessible Sites</Label>
-                <Input
-                  id="accessibleSites"
-                  type="number"
-                  min={0}
-                  value={accessibleSiteCount}
-                  onChange={(e) => setAccessibleSiteCount(parseInt(e.target.value) || 0)}
-                  placeholder="Enter number of accessible sites"
-                />
-                {!meetsScoping && totalSiteCount > 0 && (
-                  <p className="text-xs text-amber-600">
-                    Add {requiredUnits - accessibleSiteCount} more accessible units to meet requirements
-                  </p>
+            ) : (
+              <div className="space-y-4">
+                <div className="grid sm:grid-cols-2 gap-6">
+                  <div className="p-4 rounded-xl bg-slate-50 border border-slate-200">
+                    <div className="text-3xl font-bold text-slate-900">{totalSiteCount}</div>
+                    <div className="text-sm text-slate-600">Total Sites</div>
+                    <p className="text-xs text-slate-500 mt-2">
+                      ADA scoping requires at least <span className="font-semibold">{requiredUnits}</span> accessible units
+                    </p>
+                  </div>
+                  <div className={cn(
+                    "p-4 rounded-xl border",
+                    meetsScoping
+                      ? "bg-emerald-50 border-emerald-200"
+                      : "bg-amber-50 border-amber-200"
+                  )}>
+                    <div className={cn(
+                      "text-3xl font-bold",
+                      meetsScoping ? "text-emerald-700" : "text-amber-700"
+                    )}>
+                      {accessibleSiteCount}
+                    </div>
+                    <div className={cn(
+                      "text-sm",
+                      meetsScoping ? "text-emerald-600" : "text-amber-600"
+                    )}>
+                      Accessible Sites
+                    </div>
+                    {!meetsScoping && totalSiteCount > 0 && (
+                      <p className="text-xs text-amber-700 mt-2 font-medium">
+                        Need {requiredUnits - accessibleSiteCount} more accessible units to meet ADA requirements
+                      </p>
+                    )}
+                    {meetsScoping && (
+                      <p className="text-xs text-emerald-700 mt-2">
+                        <CheckCircle2 className="w-3 h-3 inline mr-1" />
+                        Meets ADA scoping requirements
+                      </p>
+                    )}
+                  </div>
+                </div>
+
+                {/* Show accessible site names */}
+                {accessibleSiteNames.length > 0 && (
+                  <div className="p-4 rounded-lg bg-blue-50 border border-blue-200">
+                    <div className="text-sm font-medium text-blue-900 mb-2 flex items-center gap-2">
+                      <Accessibility className="w-4 h-4" />
+                      Accessible Sites
+                    </div>
+                    <div className="flex flex-wrap gap-2">
+                      {accessibleSiteNames.map((name: string, idx: number) => (
+                        <span key={idx} className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-md font-medium">
+                          {name}
+                        </span>
+                      ))}
+                      {sites.filter((s: any) => s.accessible).length > 10 && (
+                        <span className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-md">
+                          +{sites.filter((s: any) => s.accessible).length - 10} more
+                        </span>
+                      )}
+                    </div>
+                    <p className="text-xs text-blue-700 mt-2">
+                      To mark a site as accessible, edit the site and enable the "Accessible" toggle.
+                    </p>
+                  </div>
+                )}
+
+                {accessibleSiteCount === 0 && totalSiteCount > 0 && (
+                  <div className="p-4 rounded-lg bg-amber-50 border border-amber-200">
+                    <div className="flex items-start gap-3">
+                      <AlertCircle className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
+                      <div>
+                        <div className="text-sm font-medium text-amber-900">No accessible sites configured</div>
+                        <p className="text-xs text-amber-700 mt-1">
+                          Go to your <a href={`/campgrounds/${campgroundId}/sites`} className="underline hover:no-underline">site management</a> and
+                          enable the "Accessible" toggle on sites that meet accessibility standards.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
                 )}
               </div>
-            </div>
+            )}
+          </CardContent>
+        </Card>
+
+        {/* Guidance Card - What to do to become ADA compliant */}
+        <Card className="border-2 border-blue-200 bg-gradient-to-br from-blue-50 to-white">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Lightbulb className="w-5 h-5 text-blue-600" />
+              How to Achieve ADA Compliance
+            </CardTitle>
+            <CardDescription>
+              Follow these steps to improve your accessibility certification level
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {certificationLevel === "none" && (
+              <div className="p-4 rounded-lg bg-white border border-blue-100">
+                <h4 className="font-semibold text-slate-900 mb-2">Getting Started</h4>
+                <ul className="text-sm text-slate-600 space-y-2">
+                  <li className="flex items-start gap-2">
+                    <span className="w-5 h-5 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center text-xs font-bold flex-shrink-0 mt-0.5">1</span>
+                    <span><strong>Mark accessible sites:</strong> Go to site management and enable "Accessible" on sites with level/paved access, appropriate dimensions, and accessible amenities.</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="w-5 h-5 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center text-xs font-bold flex-shrink-0 mt-0.5">2</span>
+                    <span><strong>Meet scoping requirements:</strong> For {totalSiteCount} sites, you need at least {requiredUnits} accessible units per ADA guidelines.</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="w-5 h-5 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center text-xs font-bold flex-shrink-0 mt-0.5">3</span>
+                    <span><strong>Complete the checklist:</strong> Work through the accessibility checklist below, starting with required items marked with a "Required" badge.</span>
+                  </li>
+                </ul>
+              </div>
+            )}
+
+            {certificationLevel === "friendly" && (
+              <div className="p-4 rounded-lg bg-white border border-emerald-100">
+                <h4 className="font-semibold text-emerald-800 mb-2">Great progress! To reach ADA Compliant:</h4>
+                <ul className="text-sm text-slate-600 space-y-2">
+                  <li className="flex items-start gap-2">
+                    <CheckCircle2 className="w-4 h-4 text-emerald-500 mt-0.5" />
+                    <span>Complete all <strong>required</strong> checklist items (look for "Required" badges)</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <CheckCircle2 className="w-4 h-4 text-emerald-500 mt-0.5" />
+                    <span>Ensure restrooms have accessible stalls with grab bars and turning space</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <CheckCircle2 className="w-4 h-4 text-emerald-500 mt-0.5" />
+                    <span>Verify parking has van-accessible spaces with proper signage</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <CheckCircle2 className="w-4 h-4 text-emerald-500 mt-0.5" />
+                    <span>Check that routes to amenities are firm, stable, and at least 36" wide</span>
+                  </li>
+                </ul>
+              </div>
+            )}
+
+            {certificationLevel === "compliant" && (
+              <div className="p-4 rounded-lg bg-white border border-amber-100">
+                <h4 className="font-semibold text-amber-800 mb-2">Almost there! To reach ADA Excellence:</h4>
+                <ul className="text-sm text-slate-600 space-y-2">
+                  <li className="flex items-start gap-2">
+                    <Award className="w-4 h-4 text-amber-500 mt-0.5" />
+                    <span>Add accessible picnic tables at each accessible site</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <Award className="w-4 h-4 text-amber-500 mt-0.5" />
+                    <span>Install visual or tactile alerts for notifications</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <Award className="w-4 h-4 text-amber-500 mt-0.5" />
+                    <span>Provide accessible fishing or viewing platforms if applicable</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <Award className="w-4 h-4 text-amber-500 mt-0.5" />
+                    <span>Consider roll-in showers and service animal relief areas</span>
+                  </li>
+                </ul>
+              </div>
+            )}
+
+            {certificationLevel === "excellence" && (
+              <div className="p-4 rounded-lg bg-gradient-to-r from-amber-50 to-yellow-50 border border-amber-200">
+                <h4 className="font-semibold text-amber-800 mb-2 flex items-center gap-2">
+                  <Award className="w-5 h-5" />
+                  Congratulations! You've achieved ADA Excellence!
+                </h4>
+                <p className="text-sm text-amber-700">
+                  Your campground provides exceptional accessibility features. Display your badge proudly on your
+                  booking page and marketing materials. Consider sharing your accessibility features in your
+                  property description to attract guests who need accessible accommodations.
+                </p>
+              </div>
+            )}
+
+            {/* Quick wins section */}
+            {certificationLevel !== "excellence" && (
+              <div className="p-4 rounded-lg bg-slate-50 border border-slate-200">
+                <h4 className="font-semibold text-slate-900 mb-2">Quick Wins (Highest Point Items)</h4>
+                <div className="space-y-2">
+                  {ADA_CHECKLIST
+                    .filter(item => !completedItems.has(item.id))
+                    .sort((a, b) => b.points - a.points)
+                    .slice(0, 3)
+                    .map(item => (
+                      <div key={item.id} className="flex items-center justify-between p-2 bg-white rounded border border-slate-100">
+                        <span className="text-sm text-slate-700">{item.label}</span>
+                        <Badge variant="secondary" className="ml-2">{item.points} pts</Badge>
+                      </div>
+                    ))}
+                </div>
+              </div>
+            )}
           </CardContent>
         </Card>
 
@@ -495,6 +681,5 @@ export default function AccessibilitySettingsPage() {
           </Button>
         </div>
       </div>
-    </DashboardShell>
   );
 }

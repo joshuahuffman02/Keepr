@@ -3,7 +3,6 @@
 import { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { DashboardShell } from "@/components/ui/layout/DashboardShell";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -312,17 +311,17 @@ export default function PosIntegrationDetailPage() {
 
   if (isLoading) {
     return (
-      <DashboardShell>
+      <div>
         <div className="flex items-center justify-center py-12">
           <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
         </div>
-      </DashboardShell>
+      </div>
     );
   }
 
   if (!integration) {
     return (
-      <DashboardShell>
+      <div>
         <div className="flex flex-col items-center justify-center py-12 gap-4">
           <p className="text-muted-foreground">Integration not found</p>
           <Button asChild variant="outline">
@@ -332,7 +331,7 @@ export default function PosIntegrationDetailPage() {
             </Link>
           </Button>
         </div>
-      </DashboardShell>
+      </div>
     );
   }
 
@@ -353,7 +352,7 @@ export default function PosIntegrationDetailPage() {
   };
 
   return (
-    <DashboardShell>
+    <div>
       <div className="space-y-6">
         {/* Header */}
         <div className="flex items-center justify-between">
@@ -602,6 +601,6 @@ export default function PosIntegrationDetailPage() {
           </Card>
         </div>
       </div>
-    </DashboardShell>
+    </div>
   );
 }

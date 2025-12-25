@@ -2,7 +2,6 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { DashboardShell } from "@/components/ui/layout/DashboardShell";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -141,7 +140,7 @@ export default function IntegrationsSettingsPage() {
   };
 
   return (
-    <DashboardShell>
+    <div>
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <div>
@@ -442,7 +441,7 @@ export default function IntegrationsSettingsPage() {
           </CardContent>
         </Card>
       </div>
-    </DashboardShell>
+    </div>
   );
 }
 

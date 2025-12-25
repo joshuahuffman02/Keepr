@@ -2,7 +2,6 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { DashboardShell } from "@/components/ui/layout/DashboardShell";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { registerBackgroundSync } from "@/lib/offline-queue";
@@ -279,7 +278,7 @@ export default function OtaSettingsPage() {
   const channelErrorCount = (ch: any) => (ch?.mappings ?? []).filter((m: any) => m?.lastError).length;
 
   return (
-    <DashboardShell>
+    <div>
       <div className="space-y-4">
         <div className="flex items-center justify-between gap-4" data-testid="ota-header">
           <div>
@@ -902,7 +901,7 @@ export default function OtaSettingsPage() {
           </Card>
         )}
       </div>
-    </DashboardShell>
+    </div>
   );
 }
 

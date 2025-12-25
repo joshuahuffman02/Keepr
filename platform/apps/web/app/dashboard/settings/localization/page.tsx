@@ -2,7 +2,6 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { DashboardShell } from "@/components/ui/layout/DashboardShell";
 import { Breadcrumbs } from "@/components/breadcrumbs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -54,7 +53,7 @@ export default function LocalizationSettingsPage() {
   };
 
   return (
-    <DashboardShell>
+    <div>
       <Breadcrumbs
         items={[
           { label: "Settings", href: "/settings" },
@@ -150,6 +149,6 @@ export default function LocalizationSettingsPage() {
           <div className="text-sm text-slate-500">Translation bundle upload/download coming soon.</div>
         </CardContent>
       </Card>
-    </DashboardShell>
+    </div>
   );
 }

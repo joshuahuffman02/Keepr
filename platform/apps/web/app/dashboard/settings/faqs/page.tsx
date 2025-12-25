@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { DashboardShell } from "@/components/ui/layout/DashboardShell";
 import { apiClient } from "@/lib/api-client";
 import { useCampground } from "@/contexts/CampgroundContext";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -100,7 +99,7 @@ export default function FAQsPage() {
     const isValid = faqs.every(faq => faq.question.trim() && faq.answer.trim());
 
     return (
-        <DashboardShell>
+        <div>
             <div className="space-y-6">
                 <div className="flex items-center justify-between">
                     <div>
@@ -241,6 +240,6 @@ export default function FAQsPage() {
                     </Card>
                 )}
             </div>
-        </DashboardShell>
+        </div>
     );
 }

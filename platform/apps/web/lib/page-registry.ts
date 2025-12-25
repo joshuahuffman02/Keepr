@@ -816,6 +816,15 @@ export const PAGE_REGISTRY: PageDefinition[] = [
     permissions: ["settingsWrite"],
   },
   {
+    href: "/dashboard/settings/accessibility",
+    label: "ADA Accessibility",
+    icon: "form",
+    category: "settings",
+    description: "Certify accessibility features and earn ADA badges",
+    keywords: ["ada", "accessibility", "wheelchair", "accessible", "disability", "compliance", "certification"],
+    permissions: ["settingsWrite"],
+  },
+  {
     href: "/dashboard/settings/analytics",
     label: "Analytics Settings",
     icon: "reports",

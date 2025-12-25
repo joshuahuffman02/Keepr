@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { DashboardShell } from "@/components/ui/layout/DashboardShell";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -176,16 +175,16 @@ export default function PromotionsSettingsPage() {
 
     if (!campgroundId) {
         return (
-            <DashboardShell>
+            <div>
                 <div className="text-center py-12 text-muted-foreground">
                     Please select a campground first.
                 </div>
-            </DashboardShell>
+            </div>
         );
     }
 
     return (
-        <DashboardShell>
+        <div>
             <div className="space-y-6">
                 <div className="flex items-center justify-between">
                     <div>
@@ -404,6 +403,6 @@ export default function PromotionsSettingsPage() {
                     </div>
                 </DialogContent>
             </Dialog>
-        </DashboardShell>
+        </div>
     );
 }

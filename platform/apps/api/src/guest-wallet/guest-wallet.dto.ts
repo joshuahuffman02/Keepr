@@ -19,6 +19,14 @@ export class AddWalletCreditDto {
   reason?: string;
 
   @IsOptional()
+  @IsIn(["campground", "organization", "global"])
+  scopeType?: "campground" | "organization" | "global";
+
+  @IsOptional()
+  @IsString()
+  scopeId?: string;
+
+  @IsOptional()
   @IsString()
   referenceId?: string;
 }
@@ -26,6 +34,10 @@ export class AddWalletCreditDto {
 export class DebitWalletDto {
   @IsString()
   guestId!: string;
+
+  @IsOptional()
+  @IsString()
+  walletId?: string;
 
   @Type(() => Number)
   @IsInt()
@@ -72,15 +84,23 @@ export class WalletTransactionsQueryDto {
   @IsInt()
   @Min(0)
   offset?: number;
+
+  @IsOptional()
+  @IsString()
+  walletId?: string;
 }
 
 export interface WalletBalance {
   walletId: string;
   guestId: string;
   campgroundId: string;
+  scopeType: "campground" | "organization" | "global";
+  scopeId: string | null;
   balanceCents: number;
   availableCents: number;
   currency: string;
+  campgroundName?: string;
+  campgroundSlug?: string;
 }
 
 export interface WalletTransaction {

@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { DashboardShell } from "@/components/ui/layout/DashboardShell";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
@@ -238,8 +237,7 @@ export default function GamificationSettingsPage() {
   };
 
   return (
-    <DashboardShell>
-      <div className="max-w-5xl space-y-6">
+    <div className="max-w-5xl space-y-6">
         <div className="flex items-center justify-between gap-3">
           <div>
             <h1 className="text-2xl font-semibold text-slate-900">Gamification</h1>
@@ -724,7 +722,6 @@ export default function GamificationSettingsPage() {
           </CardContent>
         </Card>
       </div>
-    </DashboardShell>
   );
 }
 

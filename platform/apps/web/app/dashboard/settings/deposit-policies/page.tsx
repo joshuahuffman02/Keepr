@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { DashboardShell } from "../../../../components/ui/layout/DashboardShell";
 import { Button } from "../../../../components/ui/button";
 import { apiClient } from "../../../../lib/api-client";
 import { Plus, Pencil, Trash2, Banknote, Clock, Percent, DollarSign } from "lucide-react";
@@ -215,17 +214,14 @@ export default function DepositPoliciesPage() {
 
   if (!campgroundId) {
     return (
-      <DashboardShell>
-        <div className="text-center py-12 text-muted-foreground">
-          Please select a campground first.
-        </div>
-      </DashboardShell>
+      <div className="text-center py-12 text-muted-foreground">
+        Please select a campground first.
+      </div>
     );
   }
 
   return (
-    <DashboardShell>
-      <div className="space-y-6">
+    <div className="space-y-6">
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-2xl font-bold text-slate-900">Deposit Policies</h1>
@@ -312,7 +308,6 @@ export default function DepositPoliciesPage() {
             })}
           </div>
         )}
-      </div>
 
       {/* Modal */}
       {isModalOpen && (
@@ -485,7 +480,7 @@ export default function DepositPoliciesPage() {
           </div>
         </div>
       )}
-    </DashboardShell>
+    </div>
   );
 }
 

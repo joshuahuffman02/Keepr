@@ -5,7 +5,7 @@ import { useParams, useRouter } from "next/navigation";
 import { DashboardShell } from "../../../components/ui/layout/DashboardShell";
 import { Breadcrumbs } from "../../../components/breadcrumbs";
 import { apiClient } from "../../../lib/api-client";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Button } from "../../../components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../../../components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../../components/ui/tabs";
@@ -14,6 +14,7 @@ import { Label } from "../../../components/ui/label";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "../../../components/ui/dialog";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../../../components/ui/table";
 import { Badge } from "../../../components/ui/badge";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../../components/ui/select";
 import { Trophy, Star, History, ArrowLeft, Trash2, Plus, Car, Truck, Mail, MessageSquare, GitBranch, RotateCcw, PlusCircle, Send, Wallet, DollarSign } from "lucide-react";
 import { cn } from "../../../lib/utils";
 import { useToast } from "../../../components/ui/use-toast";
@@ -79,24 +80,56 @@ export default function GuestDetailPage() {
     const [addCreditOpen, setAddCreditOpen] = useState(false);
     const [creditAmount, setCreditAmount] = useState("");
     const [creditReason, setCreditReason] = useState("");
+    const [selectedWalletId, setSelectedWalletId] = useState<string | null>(null);
+    const [creditScopeType, setCreditScopeType] = useState<"campground" | "organization" | "global">("campground");
 
-    const walletQuery = useQuery({
-        queryKey: ["wallet", campgroundIdForGuest, guestId],
-        queryFn: () => apiClient.getGuestWallet(campgroundIdForGuest, guestId),
+    const walletsQuery = useQuery({
+        queryKey: ["wallets", campgroundIdForGuest, guestId],
+        queryFn: () => apiClient.getGuestWalletsForCampground(campgroundIdForGuest, guestId),
         enabled: !!campgroundIdForGuest && !!guestId
     });
 
+    const wallets = walletsQuery.data ?? [];
+    const selectedWallet = useMemo(
+        () => wallets.find((wallet) => wallet.walletId === selectedWalletId) ?? wallets[0],
+        [wallets, selectedWalletId]
+    );
+    const selectedBalanceCents = selectedWallet?.balanceCents ?? 0;
+    const selectedAvailableCents = selectedWallet?.availableCents ?? 0;
+    const walletScopeLabel = (wallet: { scopeType: string; campgroundName?: string }) => {
+        if (wallet.scopeType === "organization") return `Portfolio${wallet.campgroundName ? ` · ${wallet.campgroundName}` : ""}`;
+        if (wallet.scopeType === "global") return "Global wallet";
+        return `Campground${wallet.campgroundName ? ` · ${wallet.campgroundName}` : ""}`;
+    };
+
+    useEffect(() => {
+        if (!wallets.length) {
+            setSelectedWalletId(null);
+            return;
+        }
+        if (!selectedWalletId || !wallets.some((wallet) => wallet.walletId === selectedWalletId)) {
+            setSelectedWalletId(wallets[0].walletId);
+        }
+    }, [selectedWalletId, wallets]);
+
+    useEffect(() => {
+        if (selectedWallet?.scopeType) {
+            setCreditScopeType(selectedWallet.scopeType);
+        }
+    }, [selectedWallet?.walletId, selectedWallet?.scopeType]);
+
     const walletTransactionsQuery = useQuery({
-        queryKey: ["wallet-transactions", campgroundIdForGuest, guestId],
-        queryFn: () => apiClient.getWalletTransactions(campgroundIdForGuest, guestId, 20),
-        enabled: !!campgroundIdForGuest && !!guestId
+        queryKey: ["wallet-transactions", campgroundIdForGuest, guestId, selectedWallet?.walletId],
+        queryFn: () =>
+            apiClient.getWalletTransactions(campgroundIdForGuest, guestId, 20, 0, selectedWallet?.walletId),
+        enabled: !!campgroundIdForGuest && !!guestId && !!selectedWallet?.walletId
     });
 
     const addCreditMutation = useMutation({
-        mutationFn: (data: { amountCents: number; reason?: string }) =>
-            apiClient.addWalletCredit(campgroundIdForGuest, guestId, data.amountCents, data.reason),
+        mutationFn: (data: { amountCents: number; reason?: string; scopeType: "campground" | "organization" | "global"; scopeId?: string }) =>
+            apiClient.addWalletCredit(campgroundIdForGuest, guestId, data.amountCents, data.reason, data.scopeType, data.scopeId),
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ["wallet", campgroundIdForGuest, guestId] });
+            queryClient.invalidateQueries({ queryKey: ["wallets", campgroundIdForGuest, guestId] });
             queryClient.invalidateQueries({ queryKey: ["wallet-transactions", campgroundIdForGuest, guestId] });
             setAddCreditOpen(false);
             setCreditAmount("");
@@ -114,6 +147,7 @@ export default function GuestDetailPage() {
         queryFn: () => apiClient.getCampground(campgroundIdForGuest),
         enabled: !!campgroundIdForGuest
     });
+    const organizationId = campgroundQuery.data?.organizationId;
     const SLA_MINUTES = campgroundQuery.data?.slaMinutes ?? Number(process.env.NEXT_PUBLIC_SLA_MINUTES || 30);
 
     const commsQuery = useInfiniteQuery<CommunicationsPage>({
@@ -376,6 +410,25 @@ export default function GuestDetailPage() {
                     </TabsContent>
 
                     <TabsContent value="wallet" className="space-y-4">
+                        <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-slate-200 bg-white p-3">
+                            <div>
+                                <div className="text-sm font-medium">Wallet scope</div>
+                                <div className="text-xs text-muted-foreground">Choose which wallet to view or apply.</div>
+                            </div>
+                            <Select value={selectedWalletId ?? ""} onValueChange={setSelectedWalletId}>
+                                <SelectTrigger className="w-[220px]" disabled={!wallets.length}>
+                                    <SelectValue placeholder={wallets.length ? "Select wallet" : "No wallets yet"} />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    {wallets.map((wallet) => (
+                                        <SelectItem key={wallet.walletId} value={wallet.walletId}>
+                                            {walletScopeLabel(wallet)} · ${(wallet.balanceCents / 100).toFixed(2)}
+                                        </SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+                        </div>
+
                         <div className="grid gap-4 md:grid-cols-2">
                             <Card>
                                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -384,10 +437,10 @@ export default function GuestDetailPage() {
                                 </CardHeader>
                                 <CardContent>
                                     <div className="text-2xl font-bold">
-                                        ${((walletQuery.data?.balanceCents ?? 0) / 100).toFixed(2)}
+                                        ${(selectedBalanceCents / 100).toFixed(2)}
                                     </div>
                                     <p className="text-xs text-muted-foreground">
-                                        Available for purchases
+                                        {selectedWallet ? walletScopeLabel(selectedWallet) : "Available for purchases"}
                                     </p>
                                 </CardContent>
                             </Card>
@@ -398,7 +451,7 @@ export default function GuestDetailPage() {
                                 </CardHeader>
                                 <CardContent>
                                     <div className="text-2xl font-bold">
-                                        ${((walletQuery.data?.availableCents ?? 0) / 100).toFixed(2)}
+                                        ${(selectedAvailableCents / 100).toFixed(2)}
                                     </div>
                                     <p className="text-xs text-muted-foreground">
                                         After pending holds
@@ -458,6 +511,20 @@ export default function GuestDetailPage() {
                                                     placeholder="e.g. Grandparent gift, Goodwill credit"
                                                 />
                                             </div>
+                                            <div className="grid grid-cols-4 items-center gap-4">
+                                                <Label className="text-right">Scope</Label>
+                                                <div className="col-span-3">
+                                                    <Select value={creditScopeType} onValueChange={(value) => setCreditScopeType(value as "campground" | "organization" | "global")}>
+                                                        <SelectTrigger>
+                                                            <SelectValue placeholder="Select scope" />
+                                                        </SelectTrigger>
+                                                        <SelectContent>
+                                                            <SelectItem value="campground">This campground</SelectItem>
+                                                            {organizationId && <SelectItem value="organization">Portfolio (all campgrounds)</SelectItem>}
+                                                        </SelectContent>
+                                                    </Select>
+                                                </div>
+                                            </div>
                                         </div>
                                         <DialogFooter>
                                             <Button variant="outline" onClick={() => setAddCreditOpen(false)}>
@@ -470,7 +537,22 @@ export default function GuestDetailPage() {
                                                         toast({ title: "Invalid amount", variant: "destructive" });
                                                         return;
                                                     }
-                                                    addCreditMutation.mutate({ amountCents, reason: creditReason || undefined });
+                                                    if (creditScopeType === "organization" && !organizationId) {
+                                                        toast({ title: "Organization required", variant: "destructive" });
+                                                        return;
+                                                    }
+                                                    const scopeId =
+                                                        creditScopeType === "organization"
+                                                            ? organizationId
+                                                            : creditScopeType === "campground"
+                                                            ? campgroundIdForGuest
+                                                            : undefined;
+                                                    addCreditMutation.mutate({
+                                                        amountCents,
+                                                        reason: creditReason || undefined,
+                                                        scopeType: creditScopeType,
+                                                        scopeId: scopeId || undefined
+                                                    });
                                                 }}
                                                 disabled={addCreditMutation.isPending}
                                             >

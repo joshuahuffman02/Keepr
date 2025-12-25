@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { DashboardShell } from "../../../../components/ui/layout/DashboardShell";
 import { DepositSettingsForm } from "../../../../components/settings/DepositSettingsForm";
 import { apiClient } from "../../../../lib/api-client";
 import { HelpAnchor } from "@/components/help/HelpAnchor";
@@ -329,8 +328,7 @@ export default function PoliciesPage() {
   };
 
   return (
-    <DashboardShell>
-      <div className="space-y-6">
+    <div className="space-y-6">
         <div className="card p-6 space-y-3">
           <div className="flex items-center gap-2">
             <h1 className="text-xl font-semibold text-slate-900">Policies</h1>
@@ -533,7 +531,6 @@ export default function PoliciesPage() {
             </div>
           </div>
         )}
-      </div>
 
       {isTemplateModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
@@ -817,6 +814,6 @@ export default function PoliciesPage() {
           </div>
         </div>
       )}
-    </DashboardShell>
+    </div>
   );
 }

@@ -54,6 +54,12 @@ function generateSessionId() {
   return `support_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
 }
 
+type ActionHighlight = {
+  key: string;
+  label: string;
+  value: string;
+};
+
 const ACTION_LABELS: Record<string, string> = {
   lookup_availability: "Lookup availability",
   create_hold: "Create hold",
@@ -71,6 +77,100 @@ function formatValue(value: any) {
   const serialized = JSON.stringify(value);
   if (!serialized) return "-";
   return serialized.length > 120 ? `${serialized.slice(0, 117)}...` : serialized;
+}
+
+function formatId(value: any) {
+  if (value === null || value === undefined) return "-";
+  const text = String(value);
+  if (text.length <= 12) return text;
+  return `${text.slice(0, 6)}...${text.slice(-4)}`;
+}
+
+function formatDateRange(start?: string, end?: string) {
+  if (start && end) return `${start} to ${end}`;
+  if (start) return `from ${start}`;
+  if (end) return `through ${end}`;
+  return "";
+}
+
+function isPrimitive(value: any) {
+  const t = typeof value;
+  return t === "string" || t === "number" || t === "boolean";
+}
+
+function toLabel(value: string) {
+  const spaced = value.replace(/_/g, " ").replace(/([a-z])([A-Z])/g, "$1 $2");
+  return `${spaced.charAt(0).toUpperCase()}${spaced.slice(1)}`;
+}
+
+function buildActionSummary(draft: ActionDraft) {
+  const params = draft.parameters ?? {};
+  const dateRange = formatDateRange(params.arrivalDate, params.departureDate);
+  const siteLabel = params.siteNumber
+    ? `Site ${params.siteNumber}`
+    : params.siteId
+      ? `Site ${formatId(params.siteId)}`
+      : null;
+  const reservationLabel = params.reservationId ? `Reservation ${formatId(params.reservationId)}` : null;
+
+  switch (draft.actionType) {
+    case "lookup_availability":
+      return dateRange ? `Checking availability for ${dateRange}.` : "Checking availability for your campground.";
+    case "create_hold":
+      if (siteLabel && dateRange) return `Drafting a hold for ${siteLabel} (${dateRange}).`;
+      if (siteLabel) return `Drafting a hold for ${siteLabel}.`;
+      if (dateRange) return `Drafting a hold for ${dateRange}.`;
+      return "Drafting a temporary hold.";
+    case "move_reservation":
+      if (reservationLabel && dateRange) return `Drafting a move for ${reservationLabel} to ${dateRange}.`;
+      if (reservationLabel) return `Drafting a move for ${reservationLabel}.`;
+      return "Drafting a reservation move.";
+    case "adjust_rate":
+      return dateRange ? `Drafting a rate adjustment for ${dateRange}.` : "Drafting a rate adjustment.";
+    default:
+      return "";
+  }
+}
+
+function buildActionHighlights(draft: ActionDraft) {
+  const params = draft.parameters ?? {};
+  const items: ActionHighlight[] = [];
+  const usedKeys = new Set<string>();
+
+  const addItem = (keys: string | string[], label: string, value: string) => {
+    const list = Array.isArray(keys) ? keys : [keys];
+    list.forEach((key) => usedKeys.add(key));
+    items.push({ key: list[0], label, value });
+  };
+
+  const dateRange = formatDateRange(params.arrivalDate, params.departureDate);
+  if (dateRange) addItem(["arrivalDate", "departureDate"], "Dates", dateRange);
+
+  if (params.siteNumber) {
+    addItem("siteNumber", "Site", String(params.siteNumber));
+  } else if (params.siteId) {
+    addItem("siteId", "Site", formatId(params.siteId));
+  }
+
+  if (params.reservationId) addItem("reservationId", "Reservation", formatId(params.reservationId));
+  if (params.holdMinutes) addItem("holdMinutes", "Hold length", `${params.holdMinutes} mins`);
+
+  if (params.newSiteNumber) {
+    addItem("newSiteNumber", "New site", String(params.newSiteNumber));
+  } else if (params.newSiteId) {
+    addItem("newSiteId", "New site", formatId(params.newSiteId));
+  }
+
+  const newDateRange = formatDateRange(params.newArrivalDate, params.newDepartureDate);
+  if (newDateRange) addItem(["newArrivalDate", "newDepartureDate"], "New dates", newDateRange);
+
+  const extras = Object.entries(params)
+    .filter(([key, value]) => !usedKeys.has(key) && isPrimitive(value))
+    .slice(0, items.length ? 2 : 3);
+
+  extras.forEach(([key, value]) => addItem(key, toLabel(key), formatValue(value)));
+
+  return { items, usedKeys };
 }
 
 export function SupportChatWidget() {
@@ -414,6 +514,22 @@ export function SupportChatWidget() {
         )}
       </div>
 
+      {!isSupportMode && (
+        <div className="border-b border-emerald-100 bg-emerald-50 px-4 py-2 text-[11px] text-emerald-800">
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <span className="font-semibold">Staff actions</span>
+            <span className="rounded-full border border-emerald-200 bg-white px-2 py-0.5 text-emerald-700">
+              {campgroundId ? `Campground ${formatId(campgroundId)}` : "Select a campground"}
+            </span>
+          </div>
+          <div className="mt-1 text-emerald-700">
+            {campgroundId
+              ? "Actions run with your permissions. Ask for availability checks or holds."
+              : "Select a campground in the top bar to run actions."}
+          </div>
+        </div>
+      )}
+
       {/* Messages */}
       <div className="flex-1 overflow-y-auto p-4 space-y-4">
         {isSupportMode ? (
@@ -473,24 +589,29 @@ export function SupportChatWidget() {
             </div>
           ))
         ) : (
-          partnerMessages.map((msg) => (
-            <div
-              key={msg.id}
-              className={`flex gap-3 ${msg.role === "user" ? "justify-end" : "justify-start"}`}
-            >
-              {msg.role === "assistant" && (
-                <div className="w-8 h-8 bg-emerald-100 rounded-full flex items-center justify-center flex-shrink-0">
-                  <Bot className="w-4 h-4 text-emerald-600" />
-                </div>
-              )}
+          partnerMessages.map((msg) => {
+            const hasActionDrafts = (msg.actionDrafts?.length ?? 0) > 0;
+            const bubbleWidth = msg.role === "user" ? "max-w-[75%]" : hasActionDrafts ? "max-w-[90%]" : "max-w-[75%]";
+            const bubbleStyle =
+              msg.role === "user"
+                ? "bg-emerald-500 text-white rounded-br-md"
+                : hasActionDrafts
+                  ? "bg-slate-50 text-slate-900 rounded-bl-md border border-slate-200"
+                  : "bg-slate-100 text-slate-900 rounded-bl-md";
+            const bubblePadding = hasActionDrafts ? "p-4" : "p-3";
+
+            return (
               <div
-                className={`max-w-[75%] p-3 rounded-2xl ${
-                  msg.role === "user"
-                    ? "bg-emerald-500 text-white rounded-br-md"
-                    : "bg-slate-100 text-slate-900 rounded-bl-md"
-                }`}
+                key={msg.id}
+                className={`flex gap-3 ${msg.role === "user" ? "justify-end" : "justify-start"}`}
               >
-                <p className="text-sm whitespace-pre-wrap">{msg.content}</p>
+                {msg.role === "assistant" && (
+                  <div className="w-8 h-8 bg-emerald-100 rounded-full flex items-center justify-center flex-shrink-0">
+                    <Bot className="w-4 h-4 text-emerald-600" />
+                  </div>
+                )}
+                <div className={`${bubbleWidth} ${bubblePadding} rounded-2xl ${bubbleStyle}`}>
+                  <p className="text-sm whitespace-pre-wrap">{msg.content}</p>
 
                 {msg.denials?.length ? (
                   <div className="mt-3 rounded-lg border border-rose-200 bg-rose-50 px-3 py-2 text-xs text-rose-700">
@@ -536,17 +657,23 @@ export function SupportChatWidget() {
                           : draft.impact?.level === "medium"
                             ? "bg-amber-100 text-amber-700"
                             : "bg-emerald-100 text-emerald-700";
+                      const summary = buildActionSummary(draft);
+                      const { items: highlights, usedKeys } = buildActionHighlights(draft);
+                      const detailParams = Object.entries(draft.parameters ?? {}).filter(([key]) => !usedKeys.has(key));
 
                       return (
-                        <div key={draft.id} className="rounded-lg border border-slate-200 bg-white p-3 text-xs text-slate-600">
-                          <div className="flex items-center justify-between gap-2">
-                            <div className="text-sm font-semibold text-slate-900">
-                              {ACTION_LABELS[draft.actionType] || draft.actionType}
+                        <div key={draft.id} className="rounded-xl border border-slate-200 bg-white p-3 text-xs text-slate-600">
+                          <div className="flex flex-wrap items-start justify-between gap-2">
+                            <div>
+                              <div className="text-sm font-semibold text-slate-900">
+                                {ACTION_LABELS[draft.actionType] || draft.actionType}
+                              </div>
+                              {summary ? <div className="mt-1 text-xs text-slate-600">{summary}</div> : null}
                             </div>
                             <div className="flex flex-wrap items-center gap-2">
                               {draft.requiresConfirmation && (
                                 <span className="rounded-full bg-amber-100 px-2 py-0.5 text-[11px] text-amber-700">
-                                  Needs confirmation
+                                  Confirm to run
                                 </span>
                               )}
                               <span className={`rounded-full px-2 py-0.5 text-[11px] ${statusClass}`}>
@@ -555,30 +682,21 @@ export function SupportChatWidget() {
                             </div>
                           </div>
 
-                          <div className="mt-2 flex flex-wrap gap-2">
-                            <span className="rounded-full bg-slate-100 px-2 py-0.5 text-[11px] text-slate-600">
-                              Action: {draft.action}
-                            </span>
-                            <span className="rounded-full bg-slate-100 px-2 py-0.5 text-[11px] text-slate-600">
-                              Resource: {draft.resource}
-                            </span>
-                            {draft.sensitivity && (
-                              <span className="rounded-full bg-slate-100 px-2 py-0.5 text-[11px] text-slate-600">
-                                Sensitivity: {draft.sensitivity}
-                              </span>
-                            )}
-                          </div>
-
-                          {draft.parameters && Object.keys(draft.parameters).length > 0 && (
-                            <div className="mt-2 space-y-1">
-                              {Object.entries(draft.parameters).map(([key, value]) => (
-                                <div key={key} className="flex items-center justify-between gap-4">
-                                  <span className="text-slate-500">{key}</span>
-                                  <span className="text-slate-900">{formatValue(value)}</span>
-                                </div>
-                              ))}
+                          {highlights.length ? (
+                            <div className="mt-3 rounded-lg border border-slate-100 bg-slate-50 px-3 py-2 text-[11px]">
+                              <div className="text-[10px] font-semibold uppercase tracking-wide text-slate-500">
+                                Key details
+                              </div>
+                              <div className="mt-2 space-y-1">
+                                {highlights.map((item) => (
+                                  <div key={`${draft.id}-${item.key}`} className="flex items-center justify-between gap-4">
+                                    <span className="text-slate-500">{item.label}</span>
+                                    <span className="text-slate-900">{item.value}</span>
+                                  </div>
+                                ))}
+                              </div>
                             </div>
-                          )}
+                          ) : null}
 
                           {draft.impact && (
                             <div className="mt-2 rounded-lg border border-slate-100 bg-slate-50 px-3 py-2 text-xs">
@@ -605,20 +723,28 @@ export function SupportChatWidget() {
                           )}
 
                           {draft.result && (
-                            <div className="mt-2 text-slate-600">Result: {formatValue(draft.result)}</div>
+                            <div className="mt-2 rounded-lg border border-emerald-100 bg-emerald-50 px-3 py-2 text-[11px] text-emerald-800">
+                              <div className="font-semibold">Result</div>
+                              <div className="mt-1 text-emerald-700">{formatValue(draft.result)}</div>
+                            </div>
                           )}
 
                           {draft.evidenceLinks?.length ? (
-                            <div className="mt-2 flex flex-wrap gap-2 text-[11px]">
-                              {draft.evidenceLinks.map((link) => (
-                                <Link
-                                  key={`${link.label}-${link.url}`}
-                                  href={link.url}
-                                  className="rounded-full border border-slate-200 bg-white px-3 py-1 text-slate-600 hover:border-emerald-400 hover:text-emerald-600"
-                                >
-                                  {link.label}
-                                </Link>
-                              ))}
+                            <div className="mt-2 space-y-2 text-[11px]">
+                              <div className="text-[10px] font-semibold uppercase tracking-wide text-slate-500">
+                                Evidence
+                              </div>
+                              <div className="flex flex-wrap gap-2">
+                                {draft.evidenceLinks.map((link) => (
+                                  <Link
+                                    key={`${link.label}-${link.url}`}
+                                    href={link.url}
+                                    className="rounded-full border border-slate-200 bg-white px-3 py-1 text-slate-600 hover:border-emerald-400 hover:text-emerald-600"
+                                  >
+                                    {link.label}
+                                  </Link>
+                                ))}
+                              </div>
                             </div>
                           ) : null}
 
@@ -635,10 +761,43 @@ export function SupportChatWidget() {
                                 </button>
                               ) : (
                                 <span className="text-[11px] text-slate-500">
-                                  Manual approval required in the app.
+                                  Review this draft in the linked screen to continue.
                                 </span>
                               )}
+                              <span className="text-[11px] text-slate-400">Runs with your permissions.</span>
                             </div>
+                          )}
+
+                          {(draft.sensitivity || detailParams.length > 0) && (
+                            <details className="mt-3 text-[11px] text-slate-500">
+                              <summary className="cursor-pointer select-none">Technical details</summary>
+                              <div className="mt-2 space-y-1">
+                                <div className="flex items-center justify-between gap-4">
+                                  <span>Action</span>
+                                  <span className="text-slate-900">{draft.action}</span>
+                                </div>
+                                <div className="flex items-center justify-between gap-4">
+                                  <span>Resource</span>
+                                  <span className="text-slate-900">{draft.resource}</span>
+                                </div>
+                                {draft.sensitivity && (
+                                  <div className="flex items-center justify-between gap-4">
+                                    <span>Sensitivity</span>
+                                    <span className="text-slate-900">{draft.sensitivity}</span>
+                                  </div>
+                                )}
+                                {detailParams.length > 0 && (
+                                  <div className="mt-2 space-y-1">
+                                    {detailParams.map(([key, value]) => (
+                                      <div key={key} className="flex items-center justify-between gap-4">
+                                        <span>{key}</span>
+                                        <span className="text-slate-900">{formatValue(value)}</span>
+                                      </div>
+                                    ))}
+                                  </div>
+                                )}
+                              </div>
+                            </details>
                           )}
                         </div>
                       );
@@ -667,14 +826,15 @@ export function SupportChatWidget() {
                     ))}
                   </div>
                 ) : null}
-              </div>
-              {msg.role === "user" && (
-                <div className="w-8 h-8 bg-slate-200 rounded-full flex items-center justify-center flex-shrink-0">
-                  <User className="w-4 h-4 text-slate-600" />
                 </div>
-              )}
-            </div>
-          ))
+                {msg.role === "user" && (
+                  <div className="w-8 h-8 bg-slate-200 rounded-full flex items-center justify-center flex-shrink-0">
+                    <User className="w-4 h-4 text-slate-600" />
+                  </div>
+                )}
+              </div>
+            );
+          })
         )}
 
         {isPending && (

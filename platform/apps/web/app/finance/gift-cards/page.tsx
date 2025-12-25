@@ -39,6 +39,9 @@ type GiftCard = {
   issuedTo?: string;
   issuedFor?: RedemptionChannel;
   campgroundId?: string | null;
+  scopeType?: "campground" | "organization" | "global";
+  scopeId?: string | null;
+  issuerName?: string;
   createdAt: string;
   history: GiftCardHistory[];
 };
@@ -48,6 +51,8 @@ type GiftCardStatus = "active" | "expired" | "empty";
 type StoredValueAccount = {
   id: string;
   campgroundId: string;
+  scopeType?: "campground" | "organization" | "global";
+  scopeId?: string | null;
   type: "gift" | "credit";
   currency: string;
   status: "active" | "frozen" | "expired";
@@ -56,6 +61,7 @@ type StoredValueAccount = {
   metadata?: Record<string, any> | null;
   createdAt?: string;
   updatedAt?: string;
+  campground?: { id: string; name: string };
   codes: Array<{ id: string; code: string; active: boolean; createdAt?: string }>;
   balanceCents: number;
   issuedCents: number;
@@ -65,6 +71,9 @@ type StoredValueLedger = {
   id: string;
   accountId: string;
   campgroundId: string;
+  issuerCampgroundId?: string | null;
+  scopeType?: "campground" | "organization" | "global";
+  scopeId?: string | null;
   direction: string;
   amountCents: number;
   currency: string;
@@ -98,6 +107,12 @@ const normalizeChannel = (value?: string | null): RedemptionChannel => {
   return "manual";
 };
 
+const scopeLabel = (scopeType?: string) => {
+  if (scopeType === "organization") return "Portfolio";
+  if (scopeType === "global") return "All campgrounds";
+  return "This campground";
+};
+
 const mapLedgerType = (direction: string): GiftCardHistory["type"] | null => {
   if (direction === "issue" || direction === "refund") return "issued";
   if (direction === "redeem" || direction === "hold_capture") return "redeemed";
@@ -120,6 +135,7 @@ export default function GiftCardsPage() {
     expiresOn: "",
     issuedTo: "",
     issuedFor: "reservation" as RedemptionChannel,
+    scopeType: "campground" as "campground" | "organization" | "global",
     note: "",
     reference: ""
   });
@@ -142,6 +158,14 @@ export default function GiftCardsPage() {
     enabled: !!campgroundId
   });
 
+  const campgroundQuery = useQuery({
+    queryKey: ["campground", campgroundId],
+    queryFn: () => apiClient.getCampground(campgroundId!),
+    enabled: !!campgroundId
+  });
+
+  const organizationId = campgroundQuery.data?.organizationId;
+
   const ledgerQuery = useQuery({
     queryKey: ["stored-value-ledger", campgroundId],
     queryFn: () => apiClient.getStoredValueLedger(campgroundId!),
@@ -156,6 +180,8 @@ export default function GiftCardsPage() {
       expiresAt?: string;
       code?: string;
       type: "gift" | "credit";
+      scopeType?: "campground" | "organization" | "global";
+      scopeId?: string;
       metadata?: Record<string, any>;
     }) => apiClient.issueStoredValue(payload),
     onSuccess: () => {
@@ -169,6 +195,7 @@ export default function GiftCardsPage() {
       code?: string;
       amountCents: number;
       currency: string;
+      redeemCampgroundId?: string;
       referenceType: string;
       referenceId: string;
       channel?: string;
@@ -209,6 +236,9 @@ export default function GiftCardsPage() {
       const reference = readMetadataString(metadata, "reference");
       const codeEntry = account.codes.find((c) => c.active) ?? account.codes[0];
       const cardCode = codeEntry?.code || account.id.slice(-8).toUpperCase();
+      const scopeType = account.scopeType ?? "campground";
+      const scopeId = account.scopeId ?? account.campgroundId ?? null;
+      const issuerName = account.campground?.name;
       const history = (ledgerByAccount.get(account.id) ?? [])
         .map((entry) => {
           const type = mapLedgerType(entry.direction);
@@ -235,6 +265,9 @@ export default function GiftCardsPage() {
         issuedTo: issuedTo || undefined,
         issuedFor,
         campgroundId: account.campgroundId,
+        scopeType,
+        scopeId,
+        issuerName,
         createdAt: account.issuedAt || account.createdAt || new Date().toISOString(),
         history
       } satisfies GiftCard;
@@ -275,6 +308,10 @@ export default function GiftCardsPage() {
       toast({ title: "Select a campground", description: "Choose a campground before issuing.", variant: "destructive" });
       return;
     }
+    if (issueForm.scopeType === "organization" && !organizationId) {
+      toast({ title: "Missing portfolio", description: "Select a campground with an organization.", variant: "destructive" });
+      return;
+    }
     const amount = parseFloat(issueForm.amount);
     if (!amount || amount <= 0) {
       toast({ title: "Enter an amount", description: "Amount must be greater than zero.", variant: "destructive" });
@@ -295,6 +332,13 @@ export default function GiftCardsPage() {
         expiresAt: issueForm.expiresOn || undefined,
         code: customCode,
         type: "gift",
+        scopeType: issueForm.scopeType,
+        scopeId:
+          issueForm.scopeType === "organization"
+            ? organizationId
+            : issueForm.scopeType === "campground"
+            ? campgroundId
+            : undefined,
         metadata: {
           issuedTo: issueForm.issuedTo || undefined,
           issuedFor: issueForm.issuedFor,
@@ -310,6 +354,7 @@ export default function GiftCardsPage() {
         expiresOn: "",
         issuedTo: "",
         issuedFor: "reservation",
+        scopeType: issueForm.scopeType,
         note: "",
         reference: ""
       });
@@ -358,6 +403,7 @@ export default function GiftCardsPage() {
         code: redeemForm.code,
         amountCents: Math.round(amount * 100),
         currency: "usd",
+        redeemCampgroundId: campgroundId ?? undefined,
         referenceType: redeemForm.channel,
         referenceId: reference || `manual-${Date.now()}`,
         channel: redeemForm.channel
@@ -533,6 +579,23 @@ export default function GiftCardsPage() {
                   </Select>
                 </div>
                 <div className="space-y-1">
+                  <Label htmlFor="scope">Scope</Label>
+                  <Select
+                    value={issueForm.scopeType}
+                    onValueChange={(value: "campground" | "organization" | "global") =>
+                      setIssueForm((prev) => ({ ...prev, scopeType: value }))
+                    }
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Choose scope" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="campground">This campground only</SelectItem>
+                      {organizationId && <SelectItem value="organization">Portfolio (all campgrounds)</SelectItem>}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-1">
                   <Label htmlFor="reference">Reference (optional)</Label>
                   <Input
                     id="reference"
@@ -580,7 +643,7 @@ export default function GiftCardsPage() {
                     {cards.length ? (
                       cards.map((card) => (
                         <SelectItem key={card.code} value={card.code}>
-                          {card.code} · {formatMoney(card.balance)} left
+                          {card.code} · {formatMoney(card.balance)} left · {scopeLabel(card.scopeType)}
                         </SelectItem>
                       ))
                     ) : (
@@ -674,6 +737,9 @@ export default function GiftCardsPage() {
                             <div className="font-semibold text-slate-900">{card.code}</div>
                             <div className="text-xs text-slate-500">
                               Issued {new Date(card.createdAt).toLocaleDateString()}
+                            </div>
+                            <div className="text-xs text-slate-500">
+                              {scopeLabel(card.scopeType)}{card.issuerName ? ` · ${card.issuerName}` : ""}
                             </div>
                           </TableCell>
                           <TableCell>

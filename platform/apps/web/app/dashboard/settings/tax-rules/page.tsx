@@ -2,7 +2,6 @@
 
 import { useState, useEffect, useMemo } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { DashboardShell } from "@/components/ui/layout/DashboardShell";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -236,17 +235,14 @@ export default function TaxRulesSettingsPage() {
 
     if (!campgroundId) {
         return (
-            <DashboardShell>
-                <div className="text-center py-12 text-muted-foreground">
-                    Please select a campground first.
-                </div>
-            </DashboardShell>
+            <div className="text-center py-12 text-muted-foreground">
+                Please select a campground first.
+            </div>
         );
     }
 
     return (
-        <DashboardShell>
-            <div className="space-y-6">
+        <div className="space-y-6">
                 <div>
                     <h1 className="text-2xl font-bold text-slate-900">Tax & Currency Settings</h1>
                     <p className="text-muted-foreground">Configure tax rates, exemptions, and currency for reservations, POS, and upsells.</p>
@@ -450,7 +446,6 @@ export default function TaxRulesSettingsPage() {
                         </Card>
                     </div>
                 )}
-            </div>
 
             {/* Tax Rule Modal */}
             <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
@@ -579,7 +574,7 @@ export default function TaxRulesSettingsPage() {
                     </div>
                 </DialogContent>
             </Dialog>
-        </DashboardShell>
+        </div>
     );
 }
 

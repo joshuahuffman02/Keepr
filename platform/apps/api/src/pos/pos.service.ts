@@ -149,6 +149,7 @@ export class PosService {
               code: dto.giftCode,
               amountCents: p.amountCents,
               currency: cart.currency,
+              redeemCampgroundId: cart.campgroundId,
               referenceType: "pos_cart",
               referenceId: cartId
             },
@@ -166,10 +167,11 @@ export class PosService {
             cart.campgroundId,
             {
               guestId: dto.guestId,
+              walletId: p.walletId,
               amountCents: p.amountCents,
+              currency: p.currency,
               referenceType: "pos_cart",
-              referenceId: cartId,
-              description: `POS purchase - Cart #${cartId.slice(-8)}`
+              referenceId: cartId
             },
             p.idempotencyKey,
             actor

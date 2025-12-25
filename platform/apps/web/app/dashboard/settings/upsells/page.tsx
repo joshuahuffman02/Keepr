@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { DashboardShell } from "../../../../components/ui/layout/DashboardShell";
 import { Button } from "../../../../components/ui/button";
 import { AddOnList } from "../../../../components/store/AddOnList";
 
@@ -16,17 +15,14 @@ export default function UpsellsPage() {
 
   if (!campgroundId) {
     return (
-      <DashboardShell>
-        <div className="text-center py-12 text-muted-foreground">
-          Please select a campground first.
-        </div>
-      </DashboardShell>
+      <div className="text-center py-12 text-muted-foreground">
+        Please select a campground first.
+      </div>
     );
   }
 
   return (
-    <DashboardShell>
-      <div className="space-y-6">
+    <div className="space-y-6">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
             <h1 className="text-2xl font-bold text-slate-900">Upsells & Add-ons</h1>
@@ -48,6 +44,5 @@ export default function UpsellsPage() {
 
         <AddOnList campgroundId={campgroundId} />
       </div>
-    </DashboardShell>
   );
 }

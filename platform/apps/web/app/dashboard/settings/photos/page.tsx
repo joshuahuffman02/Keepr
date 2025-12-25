@@ -2,7 +2,6 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { DashboardShell } from "@/components/ui/layout/DashboardShell";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -89,7 +88,7 @@ export default function PhotosPage() {
   }, [campgroundQuery.data, photos, hero]);
 
   return (
-    <DashboardShell>
+    <div>
       <div className="space-y-4">
         <Card>
           <CardHeader>
@@ -168,7 +167,7 @@ export default function PhotosPage() {
           </CardContent>
         </Card>
       </div>
-    </DashboardShell>
+    </div>
   );
 }
 

@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { DashboardShell } from "@/components/ui/layout/DashboardShell";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -212,8 +211,7 @@ export default function PosIntegrationsPage() {
   const providerInfo = (providerId: string) => POS_PROVIDERS.find((p) => p.id === providerId);
 
   return (
-    <DashboardShell>
-      <div className="space-y-6">
+    <div className="space-y-6">
         {/* Header */}
         <div className="flex items-center justify-between">
           <div>
@@ -487,7 +485,6 @@ export default function PosIntegrationsPage() {
           </TabsContent>
         </Tabs>
       </div>
-    </DashboardShell>
   );
 }
 

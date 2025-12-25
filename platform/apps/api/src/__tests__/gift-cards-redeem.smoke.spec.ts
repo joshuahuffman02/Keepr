@@ -5,20 +5,17 @@ import { ValidationPipe } from "@nestjs/common";
 import { GiftCardsController } from "../gift-cards/gift-cards.controller";
 import { GiftCardsService } from "../gift-cards/gift-cards.service";
 import { PrismaService } from "../prisma/prisma.service";
+import { StoredValueService } from "../stored-value/stored-value.service";
 import { JwtAuthGuard } from "../auth/guards";
 import { RolesGuard } from "../auth/guards/roles.guard";
 
 describe("Gift cards & store credit redeem smoke", () => {
   let app: any;
-  let service: GiftCardsService;
+  let storedValue: any;
 
   const prisma = {
-    giftCard: {
-      findUnique: jest.fn(),
-      update: jest.fn()
-    },
-    giftCardTransaction: {
-      create: jest.fn()
+    storedValueCode: {
+      findUnique: jest.fn()
     }
   };
 
@@ -30,6 +27,13 @@ describe("Gift cards & store credit redeem smoke", () => {
         {
           provide: PrismaService,
           useValue: prisma
+        },
+        {
+          provide: StoredValueService,
+          useValue: {
+            balanceByAccount: jest.fn(),
+            redeem: jest.fn()
+          }
         }
       ]
     })
@@ -42,25 +46,44 @@ describe("Gift cards & store credit redeem smoke", () => {
     app = moduleRef.createNestApplication();
     app.setGlobalPrefix("api");
     app.useGlobalPipes(new ValidationPipe({ whitelist: true, transform: true }));
-    service = moduleRef.get(GiftCardsService);
+    storedValue = moduleRef.get(StoredValueService);
     await app.init();
   });
 
   beforeEach(() => {
     jest.clearAllMocks();
-    service.seedInMemory([
-      { code: "CARD-BOOK-100", balanceCents: 10000, kind: "gift_card" },
-      { code: "CREDIT-POS-20", balanceCents: 2000, kind: "store_credit" }
-    ]);
-    prisma.giftCard.update.mockResolvedValue({});
-    prisma.giftCardTransaction.create.mockResolvedValue({});
+
+    const storedValueCodes = {
+      "CARD-BOOK-100": {
+        accountId: "acc-book",
+        active: true,
+        account: { id: "acc-book", status: "active", currency: "usd", type: "gift" }
+      },
+      "CREDIT-POS-20": {
+        accountId: "acc-pos",
+        active: true,
+        account: { id: "acc-pos", status: "active", currency: "usd", type: "credit" }
+      }
+    };
+
+    prisma.storedValueCode.findUnique.mockImplementation(({ where }) => storedValueCodes[where.code] ?? null);
+    storedValue.balanceByAccount.mockImplementation((accountId) => {
+      if (accountId === "acc-book") return { balanceCents: 10000, availableCents: 10000 };
+      if (accountId === "acc-pos") return { balanceCents: 2000, availableCents: 2000 };
+      return { balanceCents: 0, availableCents: 0 };
+    });
+    storedValue.redeem.mockImplementation(({ code }) => {
+      if (code === "CARD-BOOK-100") return { accountId: "acc-book", balanceCents: 7500 };
+      if (code === "CREDIT-POS-20") return { accountId: "acc-pos", balanceCents: 500 };
+      return { accountId: "acc-unknown", balanceCents: 0 };
+    });
   });
 
   afterAll(async () => {
     await app.close();
   });
 
-  it("redeems gift card against booking endpoint and updates balance", async () => {
+  it("redeems gift card against booking endpoint and returns updated balance", async () => {
     const api = request(app.getHttpServer());
 
     const res = await api
@@ -69,16 +92,19 @@ describe("Gift cards & store credit redeem smoke", () => {
       .expect(200);
 
     expect(res.body.balanceCents).toBe(7500);
-    expect(service.getBalance("CARD-BOOK-100")).toBe(7500);
-    expect(prisma.giftCard.update).toHaveBeenCalledWith(
+    const [firstCall] = storedValue.redeem.mock.calls;
+    expect(firstCall?.[0]).toEqual(
       expect.objectContaining({
-        where: { code: "CARD-BOOK-100" },
-        data: expect.objectContaining({ balanceCents: 7500 })
+        code: "CARD-BOOK-100",
+        amountCents: 2500,
+        currency: "usd",
+        referenceType: "reservation",
+        referenceId: "booking-1"
       })
     );
   });
 
-  it("redeems store credit against POS endpoint and updates balance", async () => {
+  it("redeems store credit against POS endpoint and returns updated balance", async () => {
     const api = request(app.getHttpServer());
 
     const res = await api
@@ -87,23 +113,15 @@ describe("Gift cards & store credit redeem smoke", () => {
       .expect(200);
 
     expect(res.body.balanceCents).toBe(500);
-    expect(service.getBalance("CREDIT-POS-20")).toBe(500);
-    expect(prisma.giftCard.update).toHaveBeenCalledWith(
+    const [firstCall] = storedValue.redeem.mock.calls;
+    expect(firstCall?.[0]).toEqual(
       expect.objectContaining({
-        where: { code: "CREDIT-POS-20" },
-        data: expect.objectContaining({ balanceCents: 500 })
-      })
-    );
-    expect(prisma.giftCardTransaction.create).toHaveBeenCalledWith(
-      expect.objectContaining({
-        data: expect.objectContaining({
-          code: "CREDIT-POS-20",
-          amountCents: 1500,
-          channel: "pos",
-          referenceId: "order-99"
-        })
+        code: "CREDIT-POS-20",
+        amountCents: 1500,
+        currency: "usd",
+        referenceType: "pos_order",
+        referenceId: "order-99"
       })
     );
   });
 });
-

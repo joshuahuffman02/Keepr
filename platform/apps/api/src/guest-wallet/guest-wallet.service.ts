@@ -1,6 +1,7 @@
 import {
   BadRequestException,
   ConflictException,
+  ForbiddenException,
   Injectable,
   NotFoundException,
 } from "@nestjs/common";
@@ -35,14 +36,19 @@ export class GuestWalletService {
   async getOrCreateWallet(
     campgroundId: string,
     guestId: string,
-    currency: string = "usd"
+    currency: string = "usd",
+    scopeType?: "campground" | "organization" | "global",
+    scopeId?: string
   ): Promise<{ id: string; isNew: boolean }> {
+    const scope = await this.resolveWalletScope(campgroundId, scopeType, scopeId);
+
     // Check if wallet already exists
     const existing = await this.prisma.storedValueAccount.findFirst({
       where: {
-        campgroundId,
         guestId,
         status: StoredValueStatus.active,
+        scopeType: scope.scopeType,
+        scopeId: scope.scopeId,
       },
     });
 
@@ -55,6 +61,8 @@ export class GuestWalletService {
       data: {
         campgroundId,
         guestId,
+        scopeType: scope.scopeType,
+        scopeId: scope.scopeId,
         type: StoredValueType.credit, // Guest wallets are always "credit" type
         currency: currency.toLowerCase(),
         status: StoredValueStatus.active,
@@ -73,17 +81,17 @@ export class GuestWalletService {
   async findWallet(
     campgroundId: string,
     guestId: string
-  ): Promise<{ id: string; currency: string } | null> {
-    const wallet = await this.prisma.storedValueAccount.findFirst({
-      where: {
-        campgroundId,
-        guestId,
-        status: StoredValueStatus.active,
-      },
-      select: { id: true, currency: true },
-    });
-
-    return wallet;
+  ): Promise<{ id: string; currency: string; scopeType: string; scopeId: string | null } | null> {
+    const organizationId = await this.getOrganizationIdForCampground(campgroundId);
+    const wallets = await this.fetchWalletCandidates(this.prisma, campgroundId, guestId, organizationId);
+    const preferred = this.selectPreferredWallet(wallets, campgroundId, organizationId);
+    if (!preferred) return null;
+    return {
+      id: preferred.id,
+      currency: preferred.currency,
+      scopeType: preferred.scopeType,
+      scopeId: preferred.scopeId ?? preferred.campgroundId ?? null,
+    };
   }
 
   /**
@@ -96,6 +104,8 @@ export class GuestWalletService {
         id: true,
         guestId: true,
         campgroundId: true,
+        scopeType: true,
+        scopeId: true,
         currency: true,
         status: true,
       },
@@ -115,6 +125,8 @@ export class GuestWalletService {
       walletId: wallet.id,
       guestId: wallet.guestId,
       campgroundId: wallet.campgroundId,
+      scopeType: wallet.scopeType ?? "campground",
+      scopeId: wallet.scopeId ?? wallet.campgroundId ?? null,
       balanceCents,
       availableCents,
       currency: wallet.currency,
@@ -128,8 +140,20 @@ export class GuestWalletService {
     campgroundId: string,
     guestId: string
   ): Promise<WalletBalance> {
-    const { id: walletId } = await this.getOrCreateWallet(campgroundId, guestId);
+    const { id: walletId } = await this.getOrCreateWallet(campgroundId, guestId, "usd", "campground", campgroundId);
     return this.getBalance(walletId);
+  }
+
+  async resolveWalletForGuest(guestId: string, walletId: string, campgroundId?: string) {
+    const wallet = await this.prisma.storedValueAccount.findUnique({ where: { id: walletId } });
+    if (!wallet || wallet.guestId !== guestId || wallet.status !== StoredValueStatus.active) {
+      return null;
+    }
+    if (campgroundId) {
+      const organizationId = await this.getOrganizationIdForCampground(campgroundId);
+      this.assertWalletRedeemable(wallet, campgroundId, organizationId);
+    }
+    return wallet;
   }
 
   /**
@@ -158,15 +182,17 @@ export class GuestWalletService {
     }
 
     const currency = dto.currency?.toLowerCase() ?? "usd";
+    const walletScope = await this.resolveWalletScope(campgroundId, dto.scopeType, dto.scopeId);
 
     try {
       const result = await this.prisma.$transaction(async (tx) => {
         // Get or create wallet
         let wallet = await tx.storedValueAccount.findFirst({
           where: {
-            campgroundId,
             guestId: dto.guestId,
             status: StoredValueStatus.active,
+            scopeType: walletScope.scopeType,
+            scopeId: walletScope.scopeId,
           },
         });
 
@@ -175,6 +201,8 @@ export class GuestWalletService {
             data: {
               campgroundId,
               guestId: dto.guestId,
+              scopeType: walletScope.scopeType,
+              scopeId: walletScope.scopeId,
               type: StoredValueType.credit,
               currency,
               status: StoredValueStatus.active,
@@ -184,6 +212,8 @@ export class GuestWalletService {
               metadata: { isGuestWallet: true },
             },
           });
+        } else if (wallet.currency !== currency) {
+          throw new ConflictException("Currency mismatch");
         }
 
         // Compute current balance
@@ -194,6 +224,9 @@ export class GuestWalletService {
         const ledgerEntry = await tx.storedValueLedger.create({
           data: {
             campgroundId,
+            issuerCampgroundId: wallet.campgroundId,
+            scopeType: wallet.scopeType ?? walletScope.scopeType,
+            scopeId: wallet.scopeId ?? walletScope.scopeId,
             accountId: wallet.id,
             direction: StoredValueDirection.issue,
             amountCents: dto.amountCents,
@@ -240,14 +273,16 @@ export class GuestWalletService {
     actor?: any
   ): Promise<WalletCreditResult> {
     const key = idempotencyKey ?? `wallet-refund-${reservationId}-${Date.now()}`;
+    const walletScope = await this.resolveWalletScope(campgroundId, "campground");
 
     return this.prisma.$transaction(async (tx) => {
       // Get or create wallet
       let wallet = await tx.storedValueAccount.findFirst({
         where: {
-          campgroundId,
           guestId,
           status: StoredValueStatus.active,
+          scopeType: walletScope.scopeType,
+          scopeId: walletScope.scopeId,
         },
       });
 
@@ -256,6 +291,8 @@ export class GuestWalletService {
           data: {
             campgroundId,
             guestId,
+            scopeType: walletScope.scopeType,
+            scopeId: walletScope.scopeId,
             type: StoredValueType.credit,
             currency: "usd",
             status: StoredValueStatus.active,
@@ -272,6 +309,9 @@ export class GuestWalletService {
       const ledgerEntry = await tx.storedValueLedger.create({
         data: {
           campgroundId,
+          issuerCampgroundId: wallet.campgroundId,
+          scopeType: wallet.scopeType ?? walletScope.scopeType,
+          scopeId: wallet.scopeId ?? walletScope.scopeId,
           accountId: wallet.id,
           direction: StoredValueDirection.refund,
           amountCents,
@@ -308,16 +348,25 @@ export class GuestWalletService {
     const key = idempotencyKey ?? `wallet-debit-${dto.referenceId}-${Date.now()}`;
 
     return this.prisma.$transaction(async (tx) => {
-      const wallet = await tx.storedValueAccount.findFirst({
-        where: {
-          campgroundId,
-          guestId: dto.guestId,
-          status: StoredValueStatus.active,
-        },
-      });
+      const organizationId = await this.getOrganizationIdForCampground(campgroundId, tx);
+      let wallet = null;
 
-      if (!wallet) {
-        throw new NotFoundException("Guest wallet not found");
+      if (dto.walletId) {
+        wallet = await tx.storedValueAccount.findUnique({ where: { id: dto.walletId } });
+        if (!wallet || wallet.guestId !== dto.guestId || wallet.status !== StoredValueStatus.active) {
+          throw new NotFoundException("Guest wallet not found");
+        }
+      } else {
+        const candidates = await this.fetchWalletCandidates(tx, campgroundId, dto.guestId, organizationId);
+        wallet = this.selectPreferredWallet(candidates, campgroundId, organizationId);
+        if (!wallet) {
+          throw new NotFoundException("Guest wallet not found");
+        }
+      }
+
+      this.assertWalletRedeemable(wallet, campgroundId, organizationId);
+      if (dto.currency && wallet.currency !== dto.currency.toLowerCase()) {
+        throw new BadRequestException("Currency mismatch");
       }
 
       const { balanceCents, availableCents } = await this.computeBalanceInTx(
@@ -336,6 +385,9 @@ export class GuestWalletService {
       const ledgerEntry = await tx.storedValueLedger.create({
         data: {
           campgroundId,
+          issuerCampgroundId: wallet.campgroundId,
+          scopeType: wallet.scopeType ?? "campground",
+          scopeId: wallet.scopeId ?? wallet.campgroundId ?? null,
           accountId: wallet.id,
           direction: StoredValueDirection.redeem,
           amountCents: dto.amountCents,
@@ -395,6 +447,53 @@ export class GuestWalletService {
   }
 
   /**
+   * Get wallets for a guest that are redeemable at a campground
+   */
+  async getGuestWalletsForCampground(campgroundId: string, guestId: string): Promise<WalletBalance[]> {
+    const organizationId = await this.getOrganizationIdForCampground(campgroundId);
+    const wallets = await this.prisma.storedValueAccount.findMany({
+      where: {
+        guestId,
+        status: StoredValueStatus.active,
+        OR: this.buildScopeFilters(campgroundId, organizationId),
+      },
+      include: {
+        campground: { select: { name: true, slug: true } },
+      },
+    });
+
+    if (!wallets.length) return [];
+
+    const balances = await Promise.all(
+      wallets.map(async (wallet) => {
+        const scope = this.normalizeScope(wallet);
+        const { balanceCents, availableCents } = await this.computeBalance(wallet.id);
+        return {
+          walletId: wallet.id,
+          guestId: wallet.guestId!,
+          campgroundId: wallet.campgroundId,
+          scopeType: scope.scopeType,
+          scopeId: scope.scopeId,
+          balanceCents,
+          availableCents,
+          currency: wallet.currency,
+          campgroundName: wallet.campground?.name,
+          campgroundSlug: wallet.campground?.slug,
+        };
+      })
+    );
+
+    const scopeRank = (wallet: WalletBalance) => {
+      if (wallet.scopeType === "campground" && wallet.scopeId === campgroundId) return 0;
+      if (wallet.scopeType === "organization" && wallet.scopeId === organizationId) return 1;
+      if (wallet.scopeType === "global") return 2;
+      return 3;
+    };
+
+    return balances.sort((a, b) => scopeRank(a) - scopeRank(b));
+  }
+
+  /**
    * Get all wallets for a guest (across campgrounds)
    */
   async getGuestWallets(guestId: string): Promise<WalletBalance[]> {
@@ -410,16 +509,19 @@ export class GuestWalletService {
 
     const balances = await Promise.all(
       wallets.map(async (wallet) => {
+        const scope = this.normalizeScope(wallet);
         const { balanceCents, availableCents } = await this.computeBalance(wallet.id);
         return {
           walletId: wallet.id,
           guestId: wallet.guestId!,
           campgroundId: wallet.campgroundId,
+          scopeType: scope.scopeType,
+          scopeId: scope.scopeId,
           balanceCents,
           availableCents,
           currency: wallet.currency,
-          campgroundName: wallet.campground.name,
-          campgroundSlug: wallet.campground.slug,
+          campgroundName: wallet.campground?.name,
+          campgroundSlug: wallet.campground?.slug,
         };
       })
     );
@@ -502,6 +604,111 @@ export class GuestWalletService {
       return -Math.abs(amount);
     }
     return 0;
+  }
+
+  private normalizeScope(wallet: { scopeType?: string | null; scopeId?: string | null; campgroundId?: string | null }) {
+    const scopeType = wallet?.scopeType ?? "campground";
+    if (scopeType === "global") {
+      return { scopeType: "global", scopeId: null as string | null };
+    }
+    if (scopeType === "organization") {
+      return { scopeType: "organization", scopeId: wallet?.scopeId ?? null };
+    }
+    const scopeId = wallet?.scopeId ?? wallet?.campgroundId ?? null;
+    return { scopeType: "campground", scopeId };
+  }
+
+  private async resolveWalletScope(
+    campgroundId: string,
+    scopeType?: "campground" | "organization" | "global",
+    scopeId?: string
+  ) {
+    const normalized = scopeType ?? "campground";
+    if (normalized === "global") {
+      return { scopeType: "global", scopeId: null as string | null };
+    }
+    if (normalized === "organization") {
+      const organizationId = scopeId ?? (await this.getOrganizationIdForCampground(campgroundId));
+      if (!organizationId) {
+        throw new BadRequestException("organization scope requires scopeId");
+      }
+      return { scopeType: "organization", scopeId: organizationId };
+    }
+    return { scopeType: "campground", scopeId: scopeId ?? campgroundId };
+  }
+
+  private buildScopeFilters(campgroundId: string, organizationId?: string | null) {
+    const filters: Array<{ scopeType: string; scopeId: string | null }> = [
+      { scopeType: "campground", scopeId: campgroundId },
+    ];
+    if (organizationId) {
+      filters.push({ scopeType: "organization", scopeId: organizationId });
+    }
+    filters.push({ scopeType: "global", scopeId: null });
+    return filters;
+  }
+
+  private async fetchWalletCandidates(
+    tx: any,
+    campgroundId: string,
+    guestId: string,
+    organizationId?: string | null
+  ) {
+    return tx.storedValueAccount.findMany({
+      where: {
+        guestId,
+        status: StoredValueStatus.active,
+        OR: this.buildScopeFilters(campgroundId, organizationId),
+      },
+      select: {
+        id: true,
+        guestId: true,
+        campgroundId: true,
+        scopeType: true,
+        scopeId: true,
+        currency: true,
+        status: true,
+      },
+    });
+  }
+
+  private selectPreferredWallet(wallets: any[], campgroundId: string, organizationId?: string | null) {
+    const normalized = wallets.map((wallet) => ({
+      ...wallet,
+      ...this.normalizeScope(wallet),
+    }));
+    const campWallet = normalized.find(
+      (wallet) => wallet.scopeType === "campground" && wallet.scopeId === campgroundId
+    );
+    if (campWallet) return campWallet;
+    if (organizationId) {
+      const orgWallet = normalized.find(
+        (wallet) => wallet.scopeType === "organization" && wallet.scopeId === organizationId
+      );
+      if (orgWallet) return orgWallet;
+    }
+    return normalized.find((wallet) => wallet.scopeType === "global") ?? null;
+  }
+
+  private assertWalletRedeemable(wallet: any, campgroundId: string, organizationId?: string | null) {
+    const scope = this.normalizeScope(wallet);
+    if (scope.scopeType === "campground" && scope.scopeId !== campgroundId) {
+      throw new ForbiddenException("Wallet not valid for this campground");
+    }
+    if (scope.scopeType === "organization") {
+      if (!organizationId || scope.scopeId !== organizationId) {
+        throw new ForbiddenException("Wallet not valid for this organization");
+      }
+    }
+  }
+
+  private async getOrganizationIdForCampground(campgroundId: string, tx?: any) {
+    const store = tx ?? this.prisma;
+    const campground = await store.campground.findUnique({
+      where: { id: campgroundId },
+      select: { organizationId: true },
+    });
+    return campground?.organizationId ?? null;
   }
 
   private async guardIdempotency(

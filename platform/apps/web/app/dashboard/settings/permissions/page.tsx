@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { DashboardShell } from "@/components/ui/layout/DashboardShell";
 import { Breadcrumbs } from "@/components/breadcrumbs";
 import { apiClient } from "@/lib/api-client";
 import { Button } from "@/components/ui/button";
@@ -64,8 +63,7 @@ export default function PermissionsPage() {
   });
 
   return (
-    <DashboardShell>
-      <div className="space-y-6">
+    <div className="space-y-6">
         <Breadcrumbs items={[{ label: "Settings" }, { label: "Permissions" }]} />
 
         <div className="card p-4 space-y-3">
@@ -192,7 +190,6 @@ export default function PermissionsPage() {
           </div>
         </div>
       </div>
-    </DashboardShell>
   );
 }
 

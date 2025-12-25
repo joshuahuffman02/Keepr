@@ -53,6 +53,10 @@ class PaymentInput {
   @IsOptional()
   @IsString()
   referenceId?: string;
+
+  @IsOptional()
+  @IsString()
+  walletId?: string;
 }
 
 export class CreateCartDto {

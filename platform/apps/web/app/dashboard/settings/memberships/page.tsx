@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { DashboardShell } from "../../../../components/ui/layout/DashboardShell";
 import { apiClient } from "../../../../lib/api-client";
 import { Button } from "../../../../components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "../../../../components/ui/card";
@@ -73,14 +72,14 @@ export default function MembershipSettingsPage() {
 
     if (isLoading) {
         return (
-            <DashboardShell>
+            <div>
                 <div className="flex items-center justify-center h-96">Loading membership types...</div>
-            </DashboardShell>
+            </div>
         );
     }
 
     return (
-        <DashboardShell>
+        <div>
             <div className="space-y-6">
                 <div className="flex items-center justify-between">
                     <div>
@@ -234,6 +233,6 @@ export default function MembershipSettingsPage() {
                     )}
                 </div>
             </div>
-        </DashboardShell>
+        </div>
     );
 }

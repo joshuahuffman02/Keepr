@@ -9,12 +9,20 @@ import { AuditService } from "../audit/audit.service";
 import { PrismaService } from "../prisma/prisma.service";
 import { HoldsService } from "../holds/holds.service";
 import { PublicReservationsService } from "../public-reservations/public-reservations.service";
+import { MaintenanceService } from "../maintenance/maintenance.service";
+import { OperationsService } from "../operations/operations.service";
+import { RepeatChargesService } from "../repeat-charges/repeat-charges.service";
 type PartnerMode = "staff" | "admin";
 type PersonaKey = "revenue" | "operations" | "marketing" | "accounting" | "hospitality" | "compliance" | "general";
 
 type ActionType =
   | "lookup_availability"
   | "create_hold"
+  | "block_site"
+  | "create_maintenance_ticket"
+  | "create_operational_task"
+  | "update_housekeeping_status"
+  | "generate_billing_schedule"
   | "move_reservation"
   | "adjust_rate"
   | "none";
@@ -95,6 +103,38 @@ const ACTION_REGISTRY: Record<
     impactArea: "availability",
     sensitivity: "medium"
   },
+  block_site: {
+    resource: "operations",
+    action: "write",
+    impactArea: "availability",
+    sensitivity: "medium",
+    confirmByDefault: true
+  },
+  create_maintenance_ticket: {
+    resource: "operations",
+    action: "write",
+    impactArea: "operations",
+    sensitivity: "low"
+  },
+  create_operational_task: {
+    resource: "operations",
+    action: "write",
+    impactArea: "operations",
+    sensitivity: "low"
+  },
+  update_housekeeping_status: {
+    resource: "operations",
+    action: "write",
+    impactArea: "operations",
+    sensitivity: "low"
+  },
+  generate_billing_schedule: {
+    resource: "payments",
+    action: "write",
+    impactArea: "revenue",
+    sensitivity: "medium",
+    confirmByDefault: true
+  },
   move_reservation: {
     resource: "reservations",
     action: "write",
@@ -123,7 +163,10 @@ export class AiPartnerService {
     private readonly audit: AuditService,
     private readonly prisma: PrismaService,
     private readonly holds: HoldsService,
-    private readonly publicReservations: PublicReservationsService
+    private readonly publicReservations: PublicReservationsService,
+    private readonly maintenance: MaintenanceService,
+    private readonly operations: OperationsService,
+    private readonly repeatCharges: RepeatChargesService
   ) {}
 
   async chat(request: PartnerChatRequest): Promise<AiPartnerResponse> {
@@ -251,8 +294,8 @@ export class AiPartnerService {
     let executed: { action: ActionDraft; message: string } | null = null;
     if (actionType === "lookup_availability") {
       executed = await this.executeReadAction(campground, draft);
-    } else if (actionType === "create_hold") {
-      executed = await this.executeHold(campground, draft, user);
+    } else {
+      executed = await this.executeWriteAction(campground, draft, user);
     }
 
     if (!executed) {
@@ -474,9 +517,8 @@ Request: "${params.anonymizedText}"${historyBlock}`;
             finalMessage = executed.message;
             finalDraft = executed.action;
           }
-        }
-        if (actionType === "create_hold") {
-          const executed = await this.executeHold(params.campground, actionDraft, params.user);
+        } else {
+          const executed = await this.executeWriteAction(params.campground, actionDraft, params.user);
           if (executed) {
             finalMessage = executed.message;
             finalDraft = executed.action;
@@ -521,7 +563,18 @@ Request: "${params.anonymizedText}"${historyBlock}`;
                 properties: {
                   type: {
                     type: "string",
-                    enum: ["lookup_availability", "create_hold", "move_reservation", "adjust_rate", "none"]
+                    enum: [
+                      "lookup_availability",
+                      "create_hold",
+                      "block_site",
+                      "create_maintenance_ticket",
+                      "create_operational_task",
+                      "update_housekeeping_status",
+                      "generate_billing_schedule",
+                      "move_reservation",
+                      "adjust_rate",
+                      "none"
+                    ]
                   },
                   parameters: { type: "object" },
                   sensitivity: { type: "string", enum: ["low", "medium", "high"] },
@@ -581,9 +634,14 @@ Privacy rules:
 - Never request or expose personal data. Any identifiers appear as tokens like [NAME_1], [EMAIL_1].
 - Do not ask for names, emails, phone numbers, or payment details.
 
-Allowed actions (must map to one of these):
-- lookup_availability (read-only)
-- create_hold (write: place a temporary hold)
+Allowed actions (choose one; use none when you can only guide):
+- lookup_availability (arrivalDate, departureDate, optional rigType/rigLength)
+- create_hold (siteId or siteNumber, arrivalDate, departureDate, optional holdMinutes)
+- block_site (siteId or siteNumber, arrivalDate, departureDate, reason)
+- create_maintenance_ticket (siteId or siteNumber, issue, optional priority)
+- create_operational_task (title, type, optional priority/dueDate/siteId/siteNumber/assignedTo)
+- update_housekeeping_status (siteId or siteNumber, status: clean|dirty|inspecting)
+- generate_billing_schedule (reservationId)
 - move_reservation (write: draft only)
 - adjust_rate (write: draft only)
 - none
@@ -728,6 +786,16 @@ User request: "${params.anonymizedText}"${historyBlock}`;
     return value;
   }
 
+  private async resolveSiteId(campgroundId: string, params: { siteId?: string; siteNumber?: string }) {
+    if (params.siteId) return params.siteId;
+    if (!params.siteNumber) return undefined;
+    const site = await this.prisma.site.findFirst({
+      where: { campgroundId, siteNumber: String(params.siteNumber) },
+      select: { id: true }
+    });
+    return site?.id;
+  }
+
   private async executeReadAction(campground: { id: string; slug: string; name: string }, draft: ActionDraft) {
     if (draft.actionType !== "lookup_availability") return null;
     const { arrivalDate, departureDate, rigType, rigLength } = draft.parameters;
@@ -789,14 +857,7 @@ User request: "${params.anonymizedText}"${historyBlock}`;
     const { siteId, siteNumber, arrivalDate, departureDate, holdMinutes } = draft.parameters;
     if (!arrivalDate || !departureDate) return null;
 
-    let resolvedSiteId = siteId as string | undefined;
-    if (!resolvedSiteId && siteNumber) {
-      const site = await this.prisma.site.findFirst({
-        where: { campgroundId: campground.id, siteNumber: String(siteNumber) },
-        select: { id: true }
-      });
-      resolvedSiteId = site?.id;
-    }
+    const resolvedSiteId = await this.resolveSiteId(campground.id, { siteId, siteNumber });
     if (!resolvedSiteId) return null;
 
     try {

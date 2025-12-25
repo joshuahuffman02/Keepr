@@ -2,7 +2,6 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { DashboardShell } from "@/components/ui/layout/DashboardShell";
 import { apiClient } from "@/lib/api-client";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
@@ -188,7 +187,7 @@ export default function CampaignsPage() {
   }, [html, htmlMode]);
 
   return (
-    <DashboardShell>
+    <div>
       <div className="max-w-6xl space-y-6">
         <div>
           <h1 className="text-2xl font-semibold text-slate-900">Email Campaigns</h1>
@@ -622,7 +621,7 @@ export default function CampaignsPage() {
           </DialogContent>
         </Dialog>
       </div>
-    </DashboardShell>
+    </div>
   );
 }
 

@@ -4,6 +4,7 @@ import { usePathname } from "next/navigation";
 import Link from "next/link";
 import { ChevronRight, Settings } from "lucide-react";
 import { ReactNode, useMemo } from "react";
+import { DashboardShell } from "@/components/ui/layout/DashboardShell";
 
 // Map of route segments to human-readable names
 const routeLabels: Record<string, string> = {
@@ -39,6 +40,10 @@ const routeLabels: Record<string, string> = {
   "jobs": "Jobs",
   "developer": "Developer",
   "accessibility": "ADA Accessibility",
+  "faqs": "FAQs",
+  "import": "Data Import",
+  "billing": "Subscription",
+  "pos-integrations": "POS Integrations",
 };
 
 export default function SettingsLayout({ children }: { children: ReactNode }) {
@@ -69,7 +74,7 @@ export default function SettingsLayout({ children }: { children: ReactNode }) {
   const showBreadcrumbs = breadcrumbs.length > 0;
 
   return (
-    <div>
+    <DashboardShell>
       {showBreadcrumbs && (
         <div className="mb-6 flex items-center gap-2 text-sm">
           <Link
@@ -83,7 +88,7 @@ export default function SettingsLayout({ children }: { children: ReactNode }) {
             <div key={crumb.href} className="flex items-center gap-2">
               <ChevronRight className="h-4 w-4 text-slate-300" />
               {index === breadcrumbs.length - 1 ? (
-                <span className="font-medium text-slate-900">{crumb.label}</span>
+                <span className="font-medium text-slate-900 dark:text-slate-100">{crumb.label}</span>
               ) : (
                 <Link
                   href={crumb.href}
@@ -97,6 +102,6 @@ export default function SettingsLayout({ children }: { children: ReactNode }) {
         </div>
       )}
       {children}
-    </div>
+    </DashboardShell>
   );
 }

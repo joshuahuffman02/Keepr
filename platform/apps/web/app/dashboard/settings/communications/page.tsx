@@ -2,7 +2,6 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { DashboardShell } from "@/components/ui/layout/DashboardShell";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -111,14 +110,14 @@ export default function CommunicationsSettingsPage() {
 
   if (!campgroundId) {
     return (
-      <DashboardShell>
+      <div>
         <div className="p-6 text-slate-600">Select or create a campground to manage communications.</div>
-      </DashboardShell>
+      </div>
     );
   }
 
   return (
-    <DashboardShell>
+    <div>
       <div className="max-w-5xl space-y-6">
         <div>
           <h1 className="text-2xl font-bold text-slate-900">Communications — NPS</h1>
@@ -288,7 +287,7 @@ export default function CommunicationsSettingsPage() {
           </Button>
         </div>
       </div>
-    </DashboardShell>
+    </div>
   );
 }
 

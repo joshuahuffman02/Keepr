@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import { apiClient } from "@/lib/api-client";
-import { DashboardShell } from "@/components/ui/layout/DashboardShell";
 import { Breadcrumbs } from "@/components/breadcrumbs";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -56,8 +55,7 @@ export default function StoreHoursPage() {
   };
 
   return (
-    <DashboardShell>
-      <div className="space-y-6">
+    <div className="space-y-6">
         <Breadcrumbs
           items={[
             { label: "Dashboard", href: "/dashboard" },
@@ -109,7 +107,6 @@ export default function StoreHoursPage() {
           </Card>
         </div>
       </div>
-    </DashboardShell>
   );
 }
 

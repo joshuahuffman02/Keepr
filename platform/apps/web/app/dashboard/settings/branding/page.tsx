@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { DashboardShell } from "../../../../components/ui/layout/DashboardShell";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../../../../components/ui/card";
 import { Input } from "../../../../components/ui/input";
 import { Textarea } from "../../../../components/ui/textarea";
@@ -90,9 +89,8 @@ export default function BrandingPage() {
   const update = (key: keyof BrandingForm, value: string) => setForm((f) => ({ ...f, [key]: value }));
 
   return (
-    <DashboardShell>
-      <div className="space-y-4">
-        <Card>
+    <div className="space-y-4">
+      <Card>
           <CardHeader>
             <CardTitle>Branding</CardTitle>
             <CardDescription>Logos, colors, email/receipt touches, and brand notes.</CardDescription>
@@ -154,6 +152,5 @@ export default function BrandingPage() {
           </CardContent>
         </Card>
       </div>
-    </DashboardShell>
   );
 }

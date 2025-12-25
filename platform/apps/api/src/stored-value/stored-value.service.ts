@@ -28,11 +28,12 @@ export class StoredValueService {
       throw new ConflictException("Request already in progress");
     }
 
-    const campgroundId = scope.campgroundId ?? null;
+    const issuerCampgroundId = scope.campgroundId ?? dto.tenantId ?? null;
     const now = new Date();
+    const issueScope = await this.resolveIssueScope(issuerCampgroundId, dto);
 
     try {
-      await this.validateTaxableLoad(campgroundId, dto.taxableLoad);
+      await this.validateTaxableLoad(issuerCampgroundId, dto.taxableLoad);
       const result = await this.prisma.$transaction(async (tx: any) => {
         const codeValue = dto.code || this.generateCode();
         const pinValue = dto.codeOptions?.pin || this.generatePinIfRequested(dto.codeOptions);
@@ -44,13 +45,16 @@ export class StoredValueService {
           this.ensureActive(existingAccount);
           this.ensureCurrency(existingAccount, dto.currency);
           this.ensureTaxableFlag(existingAccount.metadata, dto.taxableLoad);
+          this.ensureScopeMatches(existingAccount, issueScope);
         }
 
         const account =
           existingAccount ??
           (await tx.storedValueAccount.create({
             data: {
-              campgroundId: campgroundId ?? dto.tenantId,
+              campgroundId: issuerCampgroundId ?? dto.tenantId,
+              scopeType: issueScope.scopeType,
+              scopeId: issueScope.scopeId,
               type: dto.type,
               currency: dto.currency.toLowerCase(),
               status: StoredValueStatus.active,
@@ -79,6 +83,9 @@ export class StoredValueService {
         await tx.storedValueLedger.create({
           data: {
             campgroundId: account.campgroundId,
+            issuerCampgroundId: account.campgroundId,
+            scopeType: issueScope.scopeType,
+            scopeId: issueScope.scopeId,
             accountId: account.id,
             direction: StoredValueDirection.issue,
             amountCents: dto.amountCents,
@@ -106,7 +113,7 @@ export class StoredValueService {
       });
 
       if (dto.taxableLoad) {
-        await this.assertLiabilityRollForward(campgroundId);
+        await this.assertLiabilityRollForward(issuerCampgroundId);
       }
 
       if (idempotencyKey) await this.idempotency.complete(idempotencyKey, result);
@@ -136,6 +143,8 @@ export class StoredValueService {
     this.ensureActive(account);
     this.ensureCurrency(account, dto.currency);
     this.ensureTaxableFlag(account.metadata, dto.taxableLoad);
+    const accountScope = this.normalizeScope(account);
+    const transactionCampgroundId = actor?.campgroundId ?? account.campgroundId;
 
     const now = new Date();
 
@@ -147,7 +156,10 @@ export class StoredValueService {
 
         await tx.storedValueLedger.create({
           data: {
-            campgroundId: account.campgroundId,
+            campgroundId: transactionCampgroundId,
+            issuerCampgroundId: account.campgroundId,
+            scopeType: accountScope.scopeType,
+            scopeId: accountScope.scopeId,
             accountId: account.id,
             direction: StoredValueDirection.issue,
             amountCents: dto.amountCents,
@@ -191,8 +203,11 @@ export class StoredValueService {
     const account = await this.getAccount(dto);
     this.ensureActive(account);
     this.ensureCurrency(account, dto.currency);
+    let redeemContext: { transactionCampgroundId: string; scopeType: string; scopeId: string | null } | null = null;
 
     try {
+      const context = await this.resolveRedeemContext(account, dto.redeemCampgroundId, actor);
+      redeemContext = context;
       const result = await this.prisma.$transaction(async (tx: any) => {
         const { balanceCents, availableCents } = await this.getBalances(tx, account.id);
 
@@ -234,7 +249,10 @@ export class StoredValueService {
 
         await tx.storedValueLedger.create({
           data: {
-            campgroundId: account.campgroundId,
+            campgroundId: context.transactionCampgroundId,
+            issuerCampgroundId: account.campgroundId,
+            scopeType: context.scopeType,
+            scopeId: context.scopeId,
             accountId: account.id,
             direction: StoredValueDirection.redeem,
             amountCents: dto.amountCents,
@@ -255,7 +273,7 @@ export class StoredValueService {
 
       if (idempotencyKey) await this.idempotency.complete(idempotencyKey, result);
       this.observability.recordRedeemOutcome(true, Date.now() - started, {
-        campgroundId: actor?.campgroundId ?? dto.referenceId,
+        campgroundId: redeemContext.transactionCampgroundId ?? actor?.campgroundId ?? dto.referenceId,
         referenceType: dto.referenceType,
       });
       return result;
@@ -263,7 +281,7 @@ export class StoredValueService {
       if (idempotencyKey) await this.idempotency.fail(idempotencyKey);
       this.observability.recordRedeemOutcome(false, Date.now() - started, {
         error: (err as any)?.message ?? "redeem_failed",
-        campgroundId: actor?.campgroundId ?? dto.referenceId,
+        campgroundId: redeemContext?.transactionCampgroundId ?? actor?.campgroundId ?? dto.referenceId,
       });
       throw err;
     }
@@ -285,6 +303,8 @@ export class StoredValueService {
     const account = await this.prisma.storedValueAccount.findUnique({ where: { id: hold.accountId } });
     if (!account) throw new NotFoundException("Account not found");
     this.ensureActive(account);
+    const accountScope = this.normalizeScope(account);
+    const transactionCampgroundId = actor?.campgroundId ?? account.campgroundId;
 
     try {
       const result = await this.prisma.$transaction(async (tx: any) => {
@@ -297,7 +317,10 @@ export class StoredValueService {
 
         await tx.storedValueLedger.create({
           data: {
-            campgroundId: account.campgroundId,
+            campgroundId: transactionCampgroundId,
+            issuerCampgroundId: account.campgroundId,
+            scopeType: accountScope.scopeType,
+            scopeId: accountScope.scopeId,
             accountId: account.id,
             direction: StoredValueDirection.hold_capture,
             amountCents: hold.amountCents,
@@ -345,6 +368,8 @@ export class StoredValueService {
     const account = await this.prisma.storedValueAccount.findUnique({ where: { id: dto.accountId } });
     if (!account) throw new NotFoundException("Account not found");
     this.ensureActive(account);
+    const accountScope = this.normalizeScope(account);
+    const transactionCampgroundId = actor?.campgroundId ?? account.campgroundId;
     this.ensureCurrency(account, dto.currency);
 
     try {
@@ -353,7 +378,10 @@ export class StoredValueService {
         const after = balanceCents + dto.amountCents;
         await tx.storedValueLedger.create({
           data: {
-            campgroundId: account.campgroundId,
+            campgroundId: transactionCampgroundId,
+            issuerCampgroundId: account.campgroundId,
+            scopeType: accountScope.scopeType,
+            scopeId: accountScope.scopeId,
             accountId: account.id,
             direction: StoredValueDirection.refund,
             amountCents: dto.amountCents,
@@ -399,7 +427,10 @@ export class StoredValueService {
 
         await tx.storedValueLedger.create({
           data: {
-            campgroundId: account.campgroundId,
+            campgroundId: transactionCampgroundId,
+            issuerCampgroundId: account.campgroundId,
+            scopeType: accountScope.scopeType,
+            scopeId: accountScope.scopeId,
             accountId: account.id,
             direction: StoredValueDirection.expire,
             amountCents: balanceCents,
@@ -484,7 +515,7 @@ export class StoredValueService {
     const now = cutoff ?? new Date();
     const accounts = await this.prisma.storedValueAccount.findMany({
       where: { status: StoredValueStatus.active, expiresAt: { not: null, lt: now } },
-      select: { id: true, campgroundId: true, currency: true, expiresAt: true }
+      select: { id: true, campgroundId: true, currency: true, expiresAt: true, scopeType: true, scopeId: true }
     });
     if (!accounts.length) return { expired: 0, zeroed: 0 };
 
@@ -503,9 +534,13 @@ export class StoredValueService {
           return;
         }
 
+        const accountScope = this.normalizeScope(acc);
         await tx.storedValueLedger.create({
           data: {
             campgroundId: acc.campgroundId,
+            issuerCampgroundId: acc.campgroundId,
+            scopeType: accountScope.scopeType,
+            scopeId: accountScope.scopeId,
             accountId: acc.id,
             direction: StoredValueDirection.expire,
             amountCents: balanceCents,
@@ -549,7 +584,10 @@ export class StoredValueService {
 
         await tx.storedValueLedger.create({
           data: {
-            campgroundId: account.campgroundId,
+            campgroundId: transactionCampgroundId,
+            issuerCampgroundId: account.campgroundId,
+            scopeType: accountScope.scopeType,
+            scopeId: accountScope.scopeId,
             accountId: account.id,
             direction: StoredValueDirection.adjust,
             amountCents: dto.deltaCents,
@@ -600,11 +638,26 @@ export class StoredValueService {
   }
 
   async listAccounts(campgroundId: string) {
+    const scopeCampground = await this.prisma.campground.findUnique({
+      where: { id: campgroundId },
+      select: { id: true, organizationId: true }
+    });
+    if (!scopeCampground) return [];
+
     const accounts = await this.prisma.storedValueAccount.findMany({
-      where: { campgroundId },
+      where: {
+        guestId: null,
+        OR: [
+          { scopeType: "campground", scopeId: campgroundId },
+          { scopeType: "organization", scopeId: scopeCampground.organizationId },
+          { scopeType: "global" }
+        ]
+      },
       select: {
         id: true,
         campgroundId: true,
+        scopeType: true,
+        scopeId: true,
         type: true,
         currency: true,
         status: true,
@@ -613,6 +666,7 @@ export class StoredValueService {
         metadata: true,
         createdAt: true,
         updatedAt: true,
+        campground: { select: { id: true, name: true } },
         codes: {
           select: { id: true, code: true, active: true, createdAt: true },
           orderBy: { createdAt: "desc" }
@@ -647,11 +701,14 @@ export class StoredValueService {
 
   async listLedger(campgroundId: string) {
     return this.prisma.storedValueLedger.findMany({
-      where: { campgroundId },
+      where: { campgroundId, account: { guestId: null } },
       select: {
         id: true,
         accountId: true,
         campgroundId: true,
+        issuerCampgroundId: true,
+        scopeType: true,
+        scopeId: true,
         direction: true,
         amountCents: true,
         currency: true,
@@ -798,6 +855,83 @@ export class StoredValueService {
       merged.taxableLoad = taxableLoad;
     }
     return merged;
+  }
+
+  private normalizeScope(account: { scopeType?: string | null; scopeId?: string | null; campgroundId?: string | null }) {
+    const scopeType = account?.scopeType ?? "campground";
+    if (scopeType === "global") {
+      return { scopeType: "global", scopeId: null as string | null };
+    }
+    if (scopeType === "organization") {
+      return { scopeType: "organization", scopeId: account?.scopeId ?? null };
+    }
+    const scopeId = account?.scopeId ?? account?.campgroundId ?? null;
+    return { scopeType: "campground", scopeId };
+  }
+
+  private ensureScopeMatches(account: any, expected: { scopeType: string; scopeId: string | null }) {
+    const normalized = this.normalizeScope(account);
+    if (normalized.scopeType !== expected.scopeType || (normalized.scopeId ?? null) !== (expected.scopeId ?? null)) {
+      throw new ConflictException("Stored value scope mismatch");
+    }
+  }
+
+  private async resolveIssueScope(issuerCampgroundId: string | null, dto: IssueStoredValueDto) {
+    const scopeType = dto.scopeType ?? "campground";
+    if (scopeType === "global") {
+      return { scopeType: "global", scopeId: null as string | null };
+    }
+    if (scopeType === "organization") {
+      const scopeId =
+        dto.scopeId ??
+        (issuerCampgroundId ? await this.getOrganizationIdForCampground(issuerCampgroundId) : null);
+      if (!scopeId) {
+        throw new BadRequestException("organization scope requires scopeId");
+      }
+      return { scopeType: "organization", scopeId };
+    }
+    const scopeId = dto.scopeId ?? issuerCampgroundId ?? dto.tenantId ?? null;
+    if (!scopeId) {
+      throw new BadRequestException("campground scope requires scopeId");
+    }
+    return { scopeType: "campground", scopeId };
+  }
+
+  private async resolveRedeemContext(account: any, redeemCampgroundId?: string | null, actor?: any) {
+    const transactionCampgroundId = redeemCampgroundId ?? actor?.campgroundId ?? account?.campgroundId ?? null;
+    if (!transactionCampgroundId) {
+      throw new BadRequestException("campground context required for redemption");
+    }
+
+    const accountScope = this.normalizeScope(account);
+    if (accountScope.scopeType === "campground") {
+      const scopeId = accountScope.scopeId ?? account?.campgroundId ?? null;
+      if (scopeId && scopeId !== transactionCampgroundId) {
+        throw new ForbiddenException("Stored value not valid for this campground");
+      }
+    } else if (accountScope.scopeType === "organization") {
+      if (!accountScope.scopeId) {
+        throw new BadRequestException("organization scope missing scopeId");
+      }
+      const orgId = await this.getOrganizationIdForCampground(transactionCampgroundId);
+      if (!orgId || orgId !== accountScope.scopeId) {
+        throw new ForbiddenException("Stored value not valid for this organization");
+      }
+    }
+
+    return {
+      transactionCampgroundId,
+      scopeType: accountScope.scopeType,
+      scopeId: accountScope.scopeId
+    };
+  }
+
+  private async getOrganizationIdForCampground(campgroundId: string) {
+    const campground = await this.prisma.campground.findUnique({
+      where: { id: campgroundId },
+      select: { organizationId: true }
+    });
+    return campground?.organizationId ?? null;
   }
 
   private async assertLiabilityRollForward(campgroundId?: string | null) {

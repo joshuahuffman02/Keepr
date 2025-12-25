@@ -18,6 +18,7 @@ import { MaintenanceModule } from '../maintenance/maintenance.module';
 import { ReservationsModule } from '../reservations/reservations.module';
 import { RepeatChargesModule } from '../repeat-charges/repeat-charges.module';
 import { SeasonalRatesModule } from '../seasonal-rates/seasonal-rates.module';
+import { OperationsModule } from '../operations/operations.module';
 
 @Module({
   imports: [
@@ -28,6 +29,7 @@ import { SeasonalRatesModule } from '../seasonal-rates/seasonal-rates.module';
     HoldsModule,
     forwardRef(() => PricingV2Module),
     forwardRef(() => MaintenanceModule),
+    OperationsModule,
     forwardRef(() => ReservationsModule),
     forwardRef(() => RepeatChargesModule),
     forwardRef(() => SeasonalRatesModule),

@@ -3,7 +3,6 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { useCampground } from "@/contexts/CampgroundContext";
-import { DashboardShell } from "@/components/ui/layout/DashboardShell";
 import {
   CreditCard,
   Receipt,
@@ -282,18 +281,18 @@ export default function BillingPage() {
 
   if (!organizationId) {
     return (
-      <DashboardShell>
+      <div>
         <div className="flex items-center justify-center h-64">
           <p className="text-slate-500">Please select a campground first.</p>
         </div>
-      </DashboardShell>
+      </div>
     );
   }
 
   const isLoading = summaryLoading || historyLoading;
 
   return (
-    <DashboardShell>
+    <div>
       <div className="max-w-5xl mx-auto space-y-8">
         {/* Header */}
         <div className="flex items-center justify-between">
@@ -819,6 +818,6 @@ export default function BillingPage() {
           </div>
         )}
       </div>
-    </DashboardShell>
+    </div>
   );
 }
