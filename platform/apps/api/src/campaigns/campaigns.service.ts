@@ -82,6 +82,33 @@ export class CampaignsService {
     });
   }
 
+  async updateTemplate(id: string, data: Partial<{
+    name: string;
+    channel: string;
+    category: string;
+    subject: string | null;
+    html: string | null;
+    textBody: string | null;
+  }>) {
+    const templateClient = (this.prisma as any).campaignTemplate;
+    if (!templateClient?.update) throw new NotFoundException("Template model not available");
+    const existing = await templateClient.findUnique({ where: { id } });
+    if (!existing) throw new NotFoundException("Template not found");
+    return templateClient.update({
+      where: { id },
+      data
+    });
+  }
+
+  async deleteTemplate(id: string) {
+    const templateClient = (this.prisma as any).campaignTemplate;
+    if (!templateClient?.delete) throw new NotFoundException("Template model not available");
+    const existing = await templateClient.findUnique({ where: { id } });
+    if (!existing) throw new NotFoundException("Template not found");
+    await templateClient.delete({ where: { id } });
+    return { success: true };
+  }
+
   async audiencePreview(filters: AudienceFiltersDto) {
     const whereReservation: any = {
       ...(filters.campgroundId ? { campgroundId: filters.campgroundId } : {})

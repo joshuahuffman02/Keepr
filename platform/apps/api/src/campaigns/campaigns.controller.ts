@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post, Patch, Query, UseGuards } from "@nestjs/common";
+import { Body, Controller, Get, Param, Post, Patch, Delete, Query, UseGuards } from "@nestjs/common";
 import { CampaignsService } from "./campaigns.service";
 import { JwtAuthGuard } from "../auth/guards";
 import { CreateCampaignDto } from "./dto/create-campaign.dto";
@@ -45,6 +45,26 @@ export class CampaignsController {
   @Get("campaign-templates")
   listTemplates(@Query("campgroundId") campgroundId: string) {
     return this.campaigns.listTemplates(campgroundId);
+  }
+
+  @Patch("campaign-templates/:id")
+  updateTemplate(
+    @Param("id") id: string,
+    @Body() body: Partial<{
+      name: string;
+      channel: string;
+      category: string;
+      subject: string | null;
+      html: string | null;
+      textBody: string | null;
+    }>
+  ) {
+    return this.campaigns.updateTemplate(id, body);
+  }
+
+  @Delete("campaign-templates/:id")
+  deleteTemplate(@Param("id") id: string) {
+    return this.campaigns.deleteTemplate(id);
   }
 
   @Post("campaigns/audience/preview")
