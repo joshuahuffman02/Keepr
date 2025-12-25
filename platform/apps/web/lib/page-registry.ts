@@ -825,6 +825,15 @@ export const PAGE_REGISTRY: PageDefinition[] = [
     permissions: ["settingsWrite"],
   },
   {
+    href: "/dashboard/settings/security-certification",
+    label: "Security Certification",
+    icon: "shield",
+    category: "settings",
+    description: "CISO-level security checklist and privacy certification",
+    keywords: ["security", "privacy", "ciso", "compliance", "certification", "data protection", "gdpr", "ccpa", "pci"],
+    permissions: ["settingsWrite"],
+  },
+  {
     href: "/dashboard/settings/analytics",
     label: "Analytics Settings",
     icon: "reports",
