@@ -682,8 +682,9 @@ Privacy rules:
 - Do not ask for names, emails, phone numbers, or payment details.
 
 Date handling:
-- Use TODAY and TIME_ZONE to resolve relative dates (today, tomorrow, this weekend, next weekend).
-- For "next weekend" default to Friday arrival and Sunday departure unless the user specifies another range.
+- Use TODAY and TIME_ZONE to resolve relative dates (today, tomorrow, this weekend, next weekend, next week).
+- For "this weekend" or "next weekend" default to Friday arrival and Sunday departure unless the user specifies another range.
+- For "next week" default to Monday arrival and Monday departure (7 nights) unless the user specifies another range.
 - If a relative date is unambiguous, include explicit arrivalDate/departureDate and avoid asking for dates.
 
 Allowed actions (choose one; use none when you can only guide):
@@ -800,22 +801,66 @@ User request: "${params.anonymizedText}"${historyBlock}`;
 
   private inferRelativeDateRange(requestText: string, timeZone: string) {
     const normalized = requestText.toLowerCase();
-    const nextWeekendMatch = /\bnext\s+(week-?end|wknd)\b/.test(normalized);
-    if (!nextWeekendMatch) return null;
-
     const { utcDate, dayOfWeek } = this.getZonedDateInfo(new Date(), timeZone);
-    let daysUntilFriday = (5 - dayOfWeek + 7) % 7;
-    if (daysUntilFriday === 0) {
-      daysUntilFriday = 7;
+
+    const buildRange = (arrival: Date, nights: number) => {
+      const departure = this.addDaysUtc(arrival, nights);
+      return {
+        arrivalDate: this.formatDateUtc(arrival),
+        departureDate: this.formatDateUtc(departure)
+      };
+    };
+
+    if (/\bnext\s+(week-?end|wknd)\b/.test(normalized)) {
+      let daysUntilFriday = (5 - dayOfWeek + 7) % 7;
+      if (daysUntilFriday === 0) {
+        daysUntilFriday = 7;
+      }
+      const arrival = this.addDaysUtc(utcDate, daysUntilFriday);
+      return buildRange(arrival, 2);
     }
 
-    const arrival = this.addDaysUtc(utcDate, daysUntilFriday);
-    const departure = this.addDaysUtc(arrival, 2);
+    if (/\bthis\s+(week-?end|wknd)\b/.test(normalized)) {
+      if (dayOfWeek >= 5 || dayOfWeek === 0) {
+        const daysSinceFriday = (dayOfWeek - 5 + 7) % 7;
+        let arrival = this.addDaysUtc(utcDate, -daysSinceFriday);
+        let departure = this.addDaysUtc(arrival, 2);
+        if (arrival < utcDate) {
+          arrival = utcDate;
+        }
+        if (departure <= arrival) {
+          departure = this.addDaysUtc(arrival, 1);
+        }
+        return {
+          arrivalDate: this.formatDateUtc(arrival),
+          departureDate: this.formatDateUtc(departure)
+        };
+      }
 
-    return {
-      arrivalDate: this.formatDateUtc(arrival),
-      departureDate: this.formatDateUtc(departure)
-    };
+      const daysUntilFriday = (5 - dayOfWeek + 7) % 7;
+      const arrival = this.addDaysUtc(utcDate, daysUntilFriday);
+      return buildRange(arrival, 2);
+    }
+
+    if (/\bnext\s+week\b/.test(normalized)) {
+      let daysUntilNextMonday = (8 - dayOfWeek) % 7;
+      if (daysUntilNextMonday === 0) {
+        daysUntilNextMonday = 7;
+      }
+      const arrival = this.addDaysUtc(utcDate, daysUntilNextMonday);
+      return buildRange(arrival, 7);
+    }
+
+    if (/\btomorrow\b/.test(normalized)) {
+      const arrival = this.addDaysUtc(utcDate, 1);
+      return buildRange(arrival, 1);
+    }
+
+    if (/\btoday\b/.test(normalized)) {
+      return buildRange(utcDate, 1);
+    }
+
+    return null;
   }
 
   private applyRelativeDateDefaults(
