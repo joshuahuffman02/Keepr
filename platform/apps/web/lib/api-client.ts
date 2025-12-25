@@ -2503,6 +2503,27 @@ export const apiClient = {
     const result = await parseResponse<unknown>(res);
     return CampgroundWithAnalyticsSchema.parse(result);
   },
+  async updateSecuritySettings(
+    campgroundId: string,
+    data: {
+      securityAssessment?: any;
+      securityCertificationLevel?: string;
+      securityAssessmentUpdatedAt?: string;
+      securityVerified?: boolean;
+      securityVerifiedAt?: string | null;
+      securityVerifiedBy?: string | null;
+      securityAuditorEmail?: string | null;
+      securityAuditorOrg?: string | null;
+    }
+  ) {
+    const res = await fetch(`${API_BASE}/campgrounds/${campgroundId}/security`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json", ...scopedHeaders() },
+      body: JSON.stringify(data)
+    });
+    const result = await parseResponse<unknown>(res);
+    return CampgroundWithAnalyticsSchema.parse(result);
+  },
   async listTemplates(campgroundId: string, status?: string) {
     const params = new URLSearchParams();
     if (campgroundId) params.set("campgroundId", campgroundId);

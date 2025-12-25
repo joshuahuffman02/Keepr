@@ -280,6 +280,26 @@ export class CampgroundsController {
   }
 
   @UseGuards(JwtAuthGuard)
+  @Patch("campgrounds/:id/security")
+  updateSecuritySettings(
+    @Param("id") id: string,
+    @Body() body: {
+      securityAssessment?: any;
+      securityCertificationLevel?: string;
+      securityAssessmentUpdatedAt?: string;
+      securityVerified?: boolean;
+      securityVerifiedAt?: string | null;
+      securityVerifiedBy?: string | null;
+      securityAuditorEmail?: string | null;
+      securityAuditorOrg?: string | null;
+    },
+    @Req() req: Request
+  ) {
+    const org = (req as any).organizationId || null;
+    return this.campgrounds.updateSecuritySettings(id, body, org || undefined);
+  }
+
+  @UseGuards(JwtAuthGuard)
   @Get("organizations/:organizationId/campgrounds")
   listByOrganization(@Param("organizationId") organizationId: string) {
     return this.campgrounds.listByOrganization(organizationId);
