@@ -112,7 +112,7 @@ export default function AccessibilitySettingsPage() {
   // Save mutation
   const saveMutation = useMutation({
     mutationFn: () =>
-      apiClient.updateCampground(campgroundId!, {
+      apiClient.updateCampgroundProfile(campgroundId!, {
         adaAssessment: assessmentData,
         adaCertificationLevel: certificationLevel,
         adaAccessibleSiteCount: accessibleSiteCount,
