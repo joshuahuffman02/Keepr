@@ -1,4 +1,4 @@
-import { IsBoolean, IsInt, IsNotEmpty, IsOptional, IsString, Min } from "class-validator";
+import { IsArray, IsBoolean, IsInt, IsNotEmpty, IsOptional, IsString, Min } from "class-validator";
 
 export class CreateSiteClassDto {
   @IsString()
@@ -41,6 +41,20 @@ export class CreateSiteClassDto {
   @IsOptional()
   @IsBoolean()
   hookupsSewer?: boolean;
+
+  @IsOptional()
+  @IsArray()
+  @IsInt({ each: true })
+  electricAmps?: number[];
+
+  @IsOptional()
+  @IsString()
+  rvOrientation?: string;
+
+  @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
+  amenityTags?: string[];
 
   // Metered utility defaults
   @IsOptional()

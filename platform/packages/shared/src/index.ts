@@ -192,6 +192,8 @@ export const SiteClassSchema = z.object({
   hookupsWater: z.boolean().optional(),
   hookupsSewer: z.boolean().optional(),
   electricAmps: z.array(z.number().int()).optional().default([]),
+  rvOrientation: z.string().nullish(),
+  amenityTags: z.array(z.string()).optional().default([]),
   meteredEnabled: z.boolean().optional(),
   meteredType: z.string().nullish(),
   meteredBillingMode: z.string().nullish(),
