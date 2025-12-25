@@ -1273,20 +1273,21 @@ export default function SitesPage() {
                             onClick={() => {
                               setEditingId(isEditing ? null : site.id);
                               if (!isEditing) {
+                                // Use effective values (site overrides or class defaults)
                                 setEditForm({
                                   name: site.name,
                                   siteNumber: site.siteNumber,
-                                  siteType: site.siteType,
-                                  maxOccupancy: site.maxOccupancy,
-                                  rigMaxLength: site.rigMaxLength ?? "",
-                                  hookupsPower: !!site.hookupsPower,
-                                  hookupsWater: !!site.hookupsWater,
-                                  hookupsSewer: !!site.hookupsSewer,
+                                  siteType: site.siteType || cls?.siteType || "rv",
+                                  maxOccupancy: site.maxOccupancy || cls?.maxOccupancy || 4,
+                                  rigMaxLength: site.rigMaxLength ?? cls?.rigMaxLength ?? "",
+                                  hookupsPower: site.hookupsPower ?? cls?.hookupsPower ?? false,
+                                  hookupsWater: site.hookupsWater ?? cls?.hookupsWater ?? false,
+                                  hookupsSewer: site.hookupsSewer ?? cls?.hookupsSewer ?? false,
                                   powerAmps: site.powerAmps?.toString() ?? "",
-                                  petFriendly: !!site.petFriendly,
-                                  accessible: !!site.accessible,
-                                  minNights: site.minNights ?? "",
-                                  maxNights: site.maxNights ?? "",
+                                  petFriendly: site.petFriendly ?? cls?.petFriendly ?? false,
+                                  accessible: site.accessible ?? cls?.accessible ?? false,
+                                  minNights: site.minNights ?? cls?.minNights ?? "",
+                                  maxNights: site.maxNights ?? cls?.maxNights ?? "",
                                   photos: site.photos?.join(", ") ?? "",
                                   description: site.description ?? "",
                                   tags: site.tags?.join(", ") ?? "",
@@ -1357,16 +1358,39 @@ export default function SitesPage() {
                               </Select>
                               <Select
                                 value={editForm.siteClassId || "none"}
-                                onValueChange={(value) => setEditForm((s) => (s ? { ...s, siteClassId: value === "none" ? "" : value } : s))}
+                                onValueChange={(value) => {
+                                  const classId = value === "none" ? "" : value;
+                                  const selectedClass = classesQuery.data?.find(c => c.id === classId);
+
+                                  if (selectedClass) {
+                                    // Auto-fill from class defaults when changing class
+                                    setEditForm((s) => s ? {
+                                      ...s,
+                                      siteClassId: classId,
+                                      siteType: selectedClass.siteType || s.siteType,
+                                      maxOccupancy: selectedClass.maxOccupancy || s.maxOccupancy,
+                                      rigMaxLength: selectedClass.rigMaxLength ?? s.rigMaxLength,
+                                      hookupsPower: selectedClass.hookupsPower ?? s.hookupsPower,
+                                      hookupsWater: selectedClass.hookupsWater ?? s.hookupsWater,
+                                      hookupsSewer: selectedClass.hookupsSewer ?? s.hookupsSewer,
+                                      petFriendly: selectedClass.petFriendly ?? s.petFriendly,
+                                      accessible: selectedClass.accessible ?? s.accessible,
+                                      minNights: selectedClass.minNights ?? s.minNights,
+                                      maxNights: selectedClass.maxNights ?? s.maxNights,
+                                    } : s);
+                                  } else {
+                                    setEditForm((s) => s ? { ...s, siteClassId: classId } : s);
+                                  }
+                                }}
                               >
                                 <SelectTrigger className="bg-background border-border">
-                                  <SelectValue placeholder="Select class (optional)" />
+                                  <SelectValue placeholder="Select class (inherits settings)" />
                                 </SelectTrigger>
                                 <SelectContent>
-                                  <SelectItem value="none">Select class (optional)</SelectItem>
-                                  {classesQuery.data?.map((cls) => (
-                                    <SelectItem key={cls.id} value={cls.id}>
-                                      {cls.name} (${(cls.defaultRate / 100).toFixed(2)})
+                                  <SelectItem value="none">No class</SelectItem>
+                                  {classesQuery.data?.map((c) => (
+                                    <SelectItem key={c.id} value={c.id}>
+                                      {c.name} (${(c.defaultRate / 100).toFixed(2)})
                                     </SelectItem>
                                   ))}
                                 </SelectContent>
