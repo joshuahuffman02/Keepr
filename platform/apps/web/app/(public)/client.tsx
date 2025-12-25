@@ -6,6 +6,7 @@ import Link from "next/link";
 import { motion, useInView, useReducedMotion } from "framer-motion";
 import { CampgroundCard } from "../../components/public/CampgroundCard";
 import { apiClient } from "../../lib/api-client";
+import type { AdaCertificationLevel } from "../../lib/ada-accessibility";
 import { trackEvent } from "@/lib/analytics";
 import { HeroBanner } from "../../components/public/HeroBanner";
 import { ValueStack } from "../../components/public/ValueStack";
@@ -429,7 +430,7 @@ export function HomeClient() {
                                         amenities={"amenities" in campground ? campground.amenities : []}
                                         npsBadge={campground.npsBadge}
                                         pastAwards={"pastAwards" in campground ? campground.pastAwards : []}
-                                        adaCertificationLevel={"adaCertificationLevel" in campground ? campground.adaCertificationLevel : undefined}
+                                        adaCertificationLevel={"adaCertificationLevel" in campground ? campground.adaCertificationLevel as AdaCertificationLevel : undefined}
                                         onExplore={() => trackEvent("site_card_view", { campgroundId: campground.id, page: "/" })}
                                     />
                                 </motion.div>
