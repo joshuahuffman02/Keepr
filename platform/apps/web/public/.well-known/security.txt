@@ -1,0 +1,27 @@
+# Security Policy for CampReserv
+# https://securitytxt.org/
+
+# If you discover a security vulnerability, please report it to us
+Contact: mailto:security@campreserv.com
+Contact: https://campreserv.com/security
+
+# Encryption (if you prefer to encrypt your report)
+# Encryption: https://campreserv.com/.well-known/pgp-key.txt
+
+# Our security policy
+Policy: https://campreserv.com/security-policy
+
+# When this file expires (update annually)
+Expires: 2026-12-25T00:00:00.000Z
+
+# Preferred languages
+Preferred-Languages: en
+
+# Acknowledgements page (Hall of Fame)
+# Acknowledgments: https://campreserv.com/security/thanks
+
+# Canonical location
+Canonical: https://campreserv.com/.well-known/security.txt
+
+# Hiring
+# Hiring: https://campreserv.com/careers

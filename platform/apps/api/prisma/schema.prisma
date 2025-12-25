@@ -452,6 +452,14 @@ model User {
   ownershipRoles     String[]      @default([])
   isActive           Boolean       @default(true)
   mustChangePassword Boolean       @default(false) // Force password change on first login
+
+  // 2FA/MFA (TOTP)
+  totpEnabled        Boolean       @default(false) // Is 2FA enabled
+  totpSecret         String?       // Encrypted TOTP secret
+  totpPendingSecret  String?       // Temp secret during setup
+  totpBackupCodes    Json?         // Hashed backup codes
+  totpEnabledAt      DateTime?     // When 2FA was enabled
+
   createdAt          DateTime      @default(now())
   updatedAt          DateTime      @default(now()) @updatedAt
 

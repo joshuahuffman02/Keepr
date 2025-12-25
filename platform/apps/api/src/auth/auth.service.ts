@@ -5,12 +5,16 @@ import { PrismaService } from '../prisma/prisma.service';
 import { PlatformRole } from '@prisma/client';
 import { RegisterDto, LoginDto } from './dto';
 import { AcceptInviteDto } from './dto/accept-invite.dto';
+import { AccountLockoutService } from '../security/account-lockout.service';
+import { SecurityEventsService, SecurityEventType, SecurityEventSeverity } from '../security/security-events.service';
 
 @Injectable()
 export class AuthService {
     constructor(
         private readonly prisma: PrismaService,
-        private readonly jwtService: JwtService
+        private readonly jwtService: JwtService,
+        private readonly accountLockout: AccountLockoutService,
+        private readonly securityEvents: SecurityEventsService
     ) { }
 
     async register(dto: RegisterDto) {
@@ -49,9 +53,23 @@ export class AuthService {
         };
     }
 
-    async login(dto: LoginDto) {
+    async login(dto: LoginDto, ipAddress?: string, userAgent?: string) {
+        const normalizedEmail = dto.email.trim().toLowerCase();
+
         try {
-            const normalizedEmail = dto.email.trim().toLowerCase();
+            // Check if account is locked before attempting login
+            const isLocked = this.accountLockout.isLocked(normalizedEmail);
+            if (isLocked) {
+                await this.securityEvents.logEvent({
+                    type: SecurityEventType.LOGIN_BLOCKED,
+                    severity: SecurityEventSeverity.WARNING,
+                    ipAddress,
+                    userAgent,
+                    details: { email: normalizedEmail, reason: "account_locked" },
+                });
+                this.accountLockout.checkAndThrowIfLocked(normalizedEmail);
+            }
+
             console.log(`[AuthService] Attempting login for ${normalizedEmail}`);
             let user = await this.prisma.user.findUnique({
                 where: { email: normalizedEmail },
@@ -89,21 +107,38 @@ export class AuthService {
                     });
                 } else {
                     console.log(`[AuthService] User not found: ${normalizedEmail}`);
+                    // Record failed attempt even for non-existent users (prevents enumeration)
+                    this.accountLockout.handleFailedLogin(normalizedEmail);
+                    await this.securityEvents.logLoginAttempt(false, normalizedEmail, ipAddress, userAgent, undefined, "user_not_found");
                     throw new UnauthorizedException('Invalid credentials');
                 }
             }
 
             if (!user.isActive) {
                 console.log(`[AuthService] User not active: ${normalizedEmail}`);
+                this.accountLockout.handleFailedLogin(normalizedEmail);
+                await this.securityEvents.logLoginAttempt(false, normalizedEmail, ipAddress, userAgent, user.id, "user_inactive");
                 throw new UnauthorizedException('Invalid credentials');
             }
 
             console.log(`[AuthService] User found, comparing password hash for ${user.id}`);
             const passwordValid = await bcrypt.compare(dto.password, user.passwordHash);
             if (!passwordValid) {
-            console.log(`[AuthService] Invalid password for ${normalizedEmail}`);
-            throw new UnauthorizedException('Invalid credentials');
-        }
+                console.log(`[AuthService] Invalid password for ${normalizedEmail}`);
+                // Record failed attempt and check if now locked
+                const lockStatus = this.accountLockout.handleFailedLogin(normalizedEmail);
+                await this.securityEvents.logLoginAttempt(false, normalizedEmail, ipAddress, userAgent, user.id, "invalid_password");
+
+                // Check if account just got locked
+                if (lockStatus.locked) {
+                    await this.securityEvents.logAccountLocked(normalizedEmail, ipAddress, lockStatus.attempts);
+                }
+                throw new UnauthorizedException('Invalid credentials');
+            }
+
+            // Successful login - clear any lockout tracking
+            this.accountLockout.recordSuccessfulLogin(normalizedEmail);
+            await this.securityEvents.logLoginAttempt(true, normalizedEmail, ipAddress, userAgent, user.id);
 
             console.log(`[AuthService] Password valid, generating token`);
             const token = this.generateToken(user.id, user.email);
@@ -123,7 +158,7 @@ export class AuthService {
                 token
             };
         } catch (error) {
-            console.error(`[AuthService] Login error for ${dto.email}:`, error);
+            console.error(`[AuthService] Login error for ${normalizedEmail}:`, error);
             throw error;
         }
     }

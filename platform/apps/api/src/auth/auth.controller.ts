@@ -1,4 +1,4 @@
-import { Controller, Post, Body, Get, UseGuards, Request } from '@nestjs/common';
+import { Controller, Post, Body, Get, UseGuards, Request, Headers, Req } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { RegisterDto, LoginDto } from './dto';
 import { JwtAuthGuard } from './guards';
@@ -14,8 +14,15 @@ export class AuthController {
     }
 
     @Post('login')
-    login(@Body() dto: LoginDto) {
-        return this.authService.login(dto);
+    login(
+        @Body() dto: LoginDto,
+        @Req() req: any,
+        @Headers('user-agent') userAgent: string,
+        @Headers('x-forwarded-for') forwardedFor?: string
+    ) {
+        // Use forwarded IP if behind proxy, otherwise use direct IP
+        const clientIp = forwardedFor?.split(',')[0]?.trim() || req.ip;
+        return this.authService.login(dto, clientIp, userAgent);
     }
 
     @Get('me')

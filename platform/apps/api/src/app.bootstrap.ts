@@ -5,6 +5,8 @@ import { HttpAdapterHost } from "@nestjs/core";
 import { AppModule } from "./app.module";
 import { PrismaService } from "./prisma/prisma.service";
 import * as dotenv from "dotenv";
+import helmet from "helmet";
+import * as cookieParser from "cookie-parser";
 import { PerfInterceptor } from "./perf/perf.interceptor";
 import { RateLimitInterceptor } from "./perf/rate-limit.interceptor";
 import { PerfService } from "./perf/perf.service";
@@ -85,6 +87,66 @@ export async function createApp(): Promise<INestApplication> {
 
     app.setGlobalPrefix("api");
     app.useGlobalPipes(new ValidationPipe({ whitelist: true, transform: true }));
+
+    // Cookie parser for CSRF and session handling
+    app.use(cookieParser(process.env.COOKIE_SECRET || process.env.JWT_SECRET));
+
+    // Security headers via helmet
+    const isProduction = process.env.NODE_ENV === "production";
+    const frontendUrl = process.env.FRONTEND_URL || "https://campreservweb-production.up.railway.app";
+
+    app.use(
+        helmet({
+            // Content Security Policy - restrict script sources
+            contentSecurityPolicy: isProduction ? {
+                directives: {
+                    defaultSrc: ["'self'"],
+                    scriptSrc: ["'self'", "'unsafe-inline'", "https://js.stripe.com"],
+                    styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
+                    fontSrc: ["'self'", "https://fonts.gstatic.com"],
+                    imgSrc: ["'self'", "data:", "https:", "blob:"],
+                    connectSrc: [
+                        "'self'",
+                        frontendUrl,
+                        "https://api.stripe.com",
+                        "wss://*.stripe.com",
+                        "https://maps.googleapis.com"
+                    ],
+                    frameSrc: ["'self'", "https://js.stripe.com", "https://hooks.stripe.com"],
+                    objectSrc: ["'none'"],
+                    upgradeInsecureRequests: [],
+                },
+            } : false, // Disable CSP in development for easier debugging
+
+            // HTTP Strict Transport Security - force HTTPS
+            strictTransportSecurity: isProduction ? {
+                maxAge: 31536000, // 1 year
+                includeSubDomains: true,
+                preload: true,
+            } : false,
+
+            // Prevent clickjacking
+            frameguard: { action: "deny" },
+
+            // Prevent MIME type sniffing
+            noSniff: true,
+
+            // XSS Protection (legacy but still useful)
+            xssFilter: true,
+
+            // Hide X-Powered-By header
+            hidePoweredBy: true,
+
+            // Referrer Policy
+            referrerPolicy: { policy: "strict-origin-when-cross-origin" },
+
+            // Cross-Origin policies
+            crossOriginEmbedderPolicy: false, // Can break some embeds
+            crossOriginOpenerPolicy: { policy: "same-origin-allow-popups" },
+            crossOriginResourcePolicy: { policy: "cross-origin" }, // Allow API access
+        })
+    );
+    console.log("[BOOTSTRAP] Security headers (helmet) enabled");
 
     // Scope middleware
     app.use((req: Request, _res: Response, next: NextFunction) => {

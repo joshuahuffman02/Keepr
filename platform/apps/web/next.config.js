@@ -48,25 +48,67 @@ const nextConfig = {
 
   // Headers for security and caching
   async headers() {
+    const isProduction = process.env.NODE_ENV === "production";
+
+    // Content Security Policy directives
+    const cspDirectives = [
+      "default-src 'self'",
+      "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://js.stripe.com https://maps.googleapis.com",
+      "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+      "font-src 'self' https://fonts.gstatic.com data:",
+      "img-src 'self' data: blob: https: http:",
+      "connect-src 'self' https://api.stripe.com wss://*.stripe.com https://maps.googleapis.com https://*.railway.app http://localhost:* ws://localhost:*",
+      "frame-src 'self' https://js.stripe.com https://hooks.stripe.com https://www.google.com",
+      "object-src 'none'",
+      "base-uri 'self'",
+      "form-action 'self' https://hooks.stripe.com",
+      "frame-ancestors 'none'",
+      isProduction ? "upgrade-insecure-requests" : "",
+    ].filter(Boolean).join("; ");
+
     return [
       {
         source: "/(.*)",
         headers: [
+          // Content Security Policy
+          {
+            key: "Content-Security-Policy",
+            value: cspDirectives,
+          },
+          // HTTP Strict Transport Security (HSTS) - only in production
+          ...(isProduction ? [{
+            key: "Strict-Transport-Security",
+            value: "max-age=31536000; includeSubDomains; preload",
+          }] : []),
+          // Prevent MIME type sniffing
           {
             key: "X-Content-Type-Options",
             value: "nosniff",
           },
+          // Prevent clickjacking
           {
             key: "X-Frame-Options",
             value: "DENY",
           },
+          // XSS Protection (legacy but still useful)
           {
             key: "X-XSS-Protection",
             value: "1; mode=block",
           },
+          // Referrer Policy
           {
             key: "Referrer-Policy",
             value: "strict-origin-when-cross-origin",
+          },
+          // Permissions Policy - restrict browser features
+          {
+            key: "Permissions-Policy",
+            value: "camera=(), microphone=(), geolocation=(self), payment=(self)",
+          },
+          // Cross-Origin policies
+          {
+            key: "Cross-Origin-Opener-Policy",
+            value: "same-origin-allow-popups",
           },
         ],
       },

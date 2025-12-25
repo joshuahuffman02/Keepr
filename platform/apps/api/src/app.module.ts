@@ -109,11 +109,13 @@ import { MenuConfigModule } from "./menu-config/menu-config.module";
 import { FeatureProgressModule } from "./feature-progress/feature-progress.module";
 import { KioskModule } from "./kiosk/kiosk.module";
 import { IdempotencyModule } from "./idempotency/idempotency.module";
+import { SecurityModule } from "./security/security.module";
 
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
     ScheduleModule.forRoot(),
+    SecurityModule, // Must be before AuthModule
     PrismaModule,
     AuthModule,
     GuestAuthModule,
