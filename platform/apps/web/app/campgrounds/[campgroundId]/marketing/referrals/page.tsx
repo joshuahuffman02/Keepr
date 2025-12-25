@@ -49,13 +49,13 @@ const SPRING_CONFIG = {
 type ReferralProgram = {
     id: string;
     code: string;
-    linkSlug?: string;
-    source?: string;
-    channel?: string;
+    linkSlug: string | null;
+    source: string | null;
+    channel: string | null;
     incentiveType: string;
     incentiveValue: number;
     isActive: boolean;
-    notes?: string;
+    notes: string | null;
 };
 
 export default function ReferralsPage() {

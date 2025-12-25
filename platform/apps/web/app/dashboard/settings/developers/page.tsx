@@ -643,8 +643,8 @@ export default function DevelopersSettingsPage() {
                                         </div>
                                     </TableCell>
                                     <TableCell className="text-slate-500">
-                                        {client.lastUsedAt ? (
-                                            formatDistanceToNow(new Date(client.lastUsedAt), { addSuffix: true })
+                                        {(client as any).lastUsedAt ? (
+                                            formatDistanceToNow(new Date((client as any).lastUsedAt), { addSuffix: true })
                                         ) : (
                                             <span className="text-slate-400">Never</span>
                                         )}

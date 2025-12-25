@@ -136,8 +136,8 @@ export default function BillingSettingsPage() {
         try {
             await apiClient.addUtilityMeterRead(readForm.meterId, {
                 readingValue: Number(readForm.readingValue),
-                readAt: readForm.readAt || undefined,
-                note: readForm.note || undefined
+                readAt: readForm.readAt || new Date().toISOString(),
+                ...(readForm.note && { note: readForm.note })
             });
             setReadMessage({ type: "success", text: "Reading saved! Usage will be calculated on next billing cycle." });
             setReadForm({ meterId: readForm.meterId, readingValue: "", readAt: "", note: "" });
