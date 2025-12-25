@@ -60,7 +60,7 @@ import {
   staggerContainer,
   staggerChild,
 } from "../../../../../lib/animations";
-import { SITE_CLASS_AMENITIES } from "../../../../../lib/amenities";
+import { SITE_CLASS_AMENITIES, CABIN_AMENITIES, getCabinAmenitiesByCategory } from "../../../../../lib/amenities";
 
 // Site type configuration with icons
 const siteTypeConfig: Record<string, { icon: React.ReactNode; label: string; color: string }> = {
@@ -889,7 +889,7 @@ export default function SiteClassDetailPage() {
                           Site Amenities
                         </CardTitle>
                       </CardHeader>
-                      <CardContent>
+                      <CardContent className="space-y-4">
                         <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-2">
                           {SITE_CLASS_AMENITIES.map((amenity) => (
                             <button
@@ -910,6 +910,51 @@ export default function SiteClassDetailPage() {
                         </div>
                       </CardContent>
                     </Card>
+
+                    {/* Cabin/Glamping Amenities - only show for cabin or glamping types */}
+                    {(editForm.siteType === "cabin" || editForm.siteType === "glamping") && (
+                      <Card className="border-border bg-card/80">
+                        <CardHeader>
+                          <CardTitle className="flex items-center gap-2">
+                            <Home className="h-5 w-5 text-amber-500" />
+                            {editForm.siteType === "cabin" ? "Cabin" : "Glamping"} Amenities
+                          </CardTitle>
+                        </CardHeader>
+                        <CardContent className="space-y-6">
+                          {Object.entries(getCabinAmenitiesByCategory()).map(([category, amenities]) => (
+                            <div key={category}>
+                              <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">
+                                {category === "sleeping" ? "Sleeping" :
+                                 category === "bathroom" ? "Bathroom" :
+                                 category === "kitchen" ? "Kitchen" :
+                                 category === "climate" ? "Climate Control" :
+                                 category === "entertainment" ? "Entertainment" :
+                                 category === "laundry" ? "Laundry" :
+                                 category === "outdoor" ? "Outdoor" : category}
+                              </div>
+                              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
+                                {amenities.map((amenity) => (
+                                  <button
+                                    key={amenity.id}
+                                    type="button"
+                                    onClick={() => toggleAmenity(amenity.id)}
+                                    className={cn(
+                                      "flex items-center gap-2 px-3 py-2 rounded-lg border text-sm transition-all",
+                                      editForm.amenityTags?.includes(amenity.id)
+                                        ? "border-amber-500 bg-amber-100 text-amber-700 dark:bg-amber-900/50 dark:text-amber-400"
+                                        : "border-border bg-background hover:border-amber-300"
+                                    )}
+                                  >
+                                    <amenity.icon className="h-4 w-4 flex-shrink-0" />
+                                    <span className="truncate">{amenity.label}</span>
+                                  </button>
+                                ))}
+                              </div>
+                            </div>
+                          ))}
+                        </CardContent>
+                      </Card>
+                    )}
 
                     {/* Description */}
                     <Card className="border-border bg-card/80">
@@ -1088,9 +1133,17 @@ export default function SiteClassDetailPage() {
                         <div className="text-xs text-muted-foreground mb-2">Site Amenities</div>
                         <div className="flex flex-wrap gap-2">
                           {siteClass.amenityTags.map((tag: string) => {
-                            const amenity = SITE_CLASS_AMENITIES.find(a => a.id === tag);
+                            const amenity = SITE_CLASS_AMENITIES.find(a => a.id === tag) || CABIN_AMENITIES.find(a => a.id === tag);
+                            const isCabinAmenity = CABIN_AMENITIES.some(a => a.id === tag);
                             return (
-                              <Badge key={tag} variant="outline" className="gap-1">
+                              <Badge
+                                key={tag}
+                                variant="outline"
+                                className={cn(
+                                  "gap-1",
+                                  isCabinAmenity && "border-amber-300 bg-amber-50 dark:bg-amber-900/20"
+                                )}
+                              >
                                 {amenityIconMap[tag]}
                                 {amenity?.label || tag}
                               </Badge>
