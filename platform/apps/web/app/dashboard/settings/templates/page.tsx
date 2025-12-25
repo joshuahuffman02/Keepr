@@ -7,6 +7,16 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { FormField } from "@/components/ui/form-field";
 import { FormTextarea } from "@/components/ui/form-textarea";
 import { apiClient } from "@/lib/api-client";
+import {
+  Mail,
+  Smartphone,
+  FileText,
+  Lightbulb,
+  Check,
+  X,
+  Sparkles,
+  Plus,
+} from "lucide-react";
 
 interface Template {
   id: string;
@@ -249,7 +259,11 @@ export default function TemplatesPage() {
               </div>
             ) : templates.length === 0 ? (
               <div className="bg-gradient-to-br from-violet-50 to-indigo-50 rounded-2xl p-8 text-center border border-violet-100">
-                <div className="text-5xl mb-4 motion-safe:animate-bounce">✨</div>
+                <div className="flex justify-center mb-4">
+                <div className="p-4 bg-violet-100 rounded-full">
+                  <Sparkles className="h-10 w-10 text-violet-600" />
+                </div>
+              </div>
                 <h3 className="text-xl font-bold text-slate-900 mb-2">
                   Create Your First Template
                 </h3>
@@ -287,7 +301,7 @@ export default function TemplatesPage() {
                             <div>
                               <div className="font-medium text-slate-900">{template.name}</div>
                               <div className="text-xs text-slate-500">
-                                {template.channel === "email" ? "📧" : "📱"} {template.channel}
+                                {template.channel === "email" ? <Mail className="h-4 w-4" /> : <Smartphone className="h-4 w-4" />} {template.channel}
                               </div>
                             </div>
                           </div>
@@ -446,7 +460,7 @@ function TemplateEditor({
       {/* Header */}
       <div className="px-5 py-4 border-b border-slate-200 flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <span className="text-lg">{template.channel === "email" ? "📧" : "📱"}</span>
+          <span className="text-slate-600">{template.channel === "email" ? <Mail className="h-5 w-5" /> : <Smartphone className="h-5 w-5" />}</span>
           <input
             type="text"
             {...register("name")}
@@ -615,7 +629,7 @@ function CreateTemplateModal({
             className="text-slate-400 hover:text-slate-600 p-1 rounded
               focus-visible:ring-2 focus-visible:ring-violet-500"
           >
-            ✕
+            <X className="h-5 w-5" />
           </button>
         </div>
 
@@ -647,7 +661,7 @@ function CreateTemplateModal({
                     : "bg-slate-50 text-slate-600 border border-slate-200 hover:border-slate-300"
                   }`}
               >
-                📧 Email
+                <Mail className="h-4 w-4" /> Email
               </button>
               <button
                 type="button"
@@ -661,7 +675,7 @@ function CreateTemplateModal({
                     : "bg-slate-50 text-slate-600 border border-slate-200 hover:border-slate-300"
                   }`}
               >
-                📱 SMS
+                <Smartphone className="h-4 w-4" /> SMS
               </button>
             </div>
           </div>
@@ -743,7 +757,7 @@ function PrebuiltTemplatesGallery({
     <div className="mt-8 bg-white rounded-xl border border-slate-200 p-6">
       <div className="flex items-center justify-between mb-4">
         <div>
-          <h3 className="text-lg font-semibold text-slate-900">📋 Prebuilt Templates</h3>
+          <h3 className="text-lg font-semibold text-slate-900 flex items-center gap-2"><FileText className="h-5 w-5" /> Prebuilt Templates</h3>
           <p className="text-sm text-slate-500">One-click add common campground notification templates</p>
         </div>
       </div>
@@ -763,7 +777,7 @@ function PrebuiltTemplatesGallery({
             >
               <div className="flex items-start justify-between mb-2">
                 <div className="flex items-center gap-2">
-                  <span className="text-lg">{template.channel === "email" ? "📧" : "📱"}</span>
+                  <span className="text-slate-600">{template.channel === "email" ? <Mail className="h-5 w-5" /> : <Smartphone className="h-5 w-5" />}</span>
                   <span className="font-medium text-slate-900 text-sm">{template.name}</span>
                 </div>
                 <span className="text-[10px] uppercase text-slate-500 bg-slate-100 px-2 py-0.5 rounded">
@@ -779,7 +793,7 @@ function PrebuiltTemplatesGallery({
 
               {added ? (
                 <span className="text-xs text-green-600 flex items-center gap-1">
-                  ✓ Already added
+                  <Check className="h-3.5 w-3.5" /> Already added
                 </span>
               ) : (
                 <button
@@ -797,7 +811,7 @@ function PrebuiltTemplatesGallery({
 
       <div className="mt-4 pt-4 border-t border-slate-100">
         <p className="text-xs text-slate-500">
-          💡 <strong>Tip:</strong> After adding a template, you can customize the content and attach it to{" "}
+          <Lightbulb className="h-4 w-4 inline" /> <strong>Tip:</strong> After adding a template, you can customize the content and attach it to{" "}
           <Link href="/dashboard/settings/notification-triggers" className="text-violet-600 hover:text-violet-700 underline">
             notification triggers
           </Link>{" "}

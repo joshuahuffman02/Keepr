@@ -1,9 +1,34 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState, useCallback, useRef } from "react";
+import { useEffect, useState, useCallback, useRef, ReactNode } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiClient } from "@/lib/api-client";
+import {
+  Ticket,
+  CheckCircle,
+  XCircle,
+  CreditCard,
+  AlertTriangle,
+  Bell,
+  LogOut,
+  Tent,
+  DollarSign,
+  Star,
+  Target,
+  Users,
+  Mail,
+  Smartphone,
+  Rocket,
+  Lightbulb,
+  Send,
+  Trash2,
+  Sparkles,
+  Check,
+  Plus,
+  X,
+  AlertCircle,
+} from "lucide-react";
 
 type TriggerEvent =
   | "reservation_created"
@@ -37,25 +62,40 @@ interface NotificationTrigger {
   } | null;
 }
 
-const EVENT_OPTIONS: { value: TriggerEvent; label: string; description: string; icon: string }[] = [
-  { value: "reservation_created", label: "Reservation Created", description: "When a new booking is made", icon: "🎫" },
-  { value: "reservation_confirmed", label: "Reservation Confirmed", description: "When booking is confirmed", icon: "✅" },
-  { value: "reservation_cancelled", label: "Reservation Cancelled", description: "When booking is cancelled", icon: "❌" },
-  { value: "payment_received", label: "Payment Received", description: "When payment is processed", icon: "💳" },
-  { value: "payment_failed", label: "Payment Failed", description: "When payment fails", icon: "⚠️" },
-  { value: "checkin_reminder", label: "Check-in Reminder", description: "Before arrival date", icon: "🔔" },
-  { value: "checkout_reminder", label: "Check-out Reminder", description: "Before departure date", icon: "👋" },
-  { value: "site_ready", label: "Site Ready", description: "When housekeeping marks site ready", icon: "🏕️" },
-  { value: "balance_due", label: "Balance Due", description: "Reminder for unpaid balance", icon: "💰" },
-  { value: "review_request", label: "Review Request", description: "After checkout", icon: "⭐" },
-  { value: "waitlist_match", label: "Waitlist Match", description: "When a site becomes available", icon: "🎯" },
-  { value: "group_update", label: "Group Update", description: "When group booking changes", icon: "👥" },
+const EVENT_ICONS: Record<TriggerEvent, ReactNode> = {
+  reservation_created: <Ticket className="h-5 w-5" />,
+  reservation_confirmed: <CheckCircle className="h-5 w-5" />,
+  reservation_cancelled: <XCircle className="h-5 w-5" />,
+  payment_received: <CreditCard className="h-5 w-5" />,
+  payment_failed: <AlertTriangle className="h-5 w-5" />,
+  checkin_reminder: <Bell className="h-5 w-5" />,
+  checkout_reminder: <LogOut className="h-5 w-5" />,
+  site_ready: <Tent className="h-5 w-5" />,
+  balance_due: <DollarSign className="h-5 w-5" />,
+  review_request: <Star className="h-5 w-5" />,
+  waitlist_match: <Target className="h-5 w-5" />,
+  group_update: <Users className="h-5 w-5" />,
+};
+
+const EVENT_OPTIONS: { value: TriggerEvent; label: string; description: string }[] = [
+  { value: "reservation_created", label: "Reservation Created", description: "When a new booking is made" },
+  { value: "reservation_confirmed", label: "Reservation Confirmed", description: "When booking is confirmed" },
+  { value: "reservation_cancelled", label: "Reservation Cancelled", description: "When booking is cancelled" },
+  { value: "payment_received", label: "Payment Received", description: "When payment is processed" },
+  { value: "payment_failed", label: "Payment Failed", description: "When payment fails" },
+  { value: "checkin_reminder", label: "Check-in Reminder", description: "Before arrival date" },
+  { value: "checkout_reminder", label: "Check-out Reminder", description: "Before departure date" },
+  { value: "site_ready", label: "Site Ready", description: "When housekeeping marks site ready" },
+  { value: "balance_due", label: "Balance Due", description: "Reminder for unpaid balance" },
+  { value: "review_request", label: "Review Request", description: "After checkout" },
+  { value: "waitlist_match", label: "Waitlist Match", description: "When a site becomes available" },
+  { value: "group_update", label: "Group Update", description: "When group booking changes" },
 ];
 
-const CHANNEL_OPTIONS = [
-  { value: "email", label: "📧 Email" },
-  { value: "sms", label: "📱 SMS" },
-  { value: "both", label: "📧📱 Both" },
+const CHANNEL_OPTIONS: { value: string; label: string; icon: ReactNode }[] = [
+  { value: "email", label: "Email", icon: <Mail className="h-4 w-4" /> },
+  { value: "sms", label: "SMS", icon: <Smartphone className="h-4 w-4" /> },
+  { value: "both", label: "Both", icon: <><Mail className="h-4 w-4" /><Smartphone className="h-4 w-4" /></> },
 ];
 
 const DELAY_PRESETS = [
@@ -165,14 +205,18 @@ export default function NotificationTriggersPage() {
             focus-visible:ring-2 focus-visible:ring-violet-500 focus-visible:ring-offset-2
             flex items-center gap-2"
         >
-          <span>+</span> New Trigger
+          <Plus className="h-4 w-4" /> New Trigger
         </button>
       </div>
 
       {/* Empty State */}
       {triggers.length === 0 && !triggersQuery.isLoading && (
         <div className="bg-gradient-to-br from-violet-50 to-indigo-50 rounded-2xl p-8 text-center border border-violet-100 mb-8">
-          <div className="text-6xl mb-4 motion-safe:animate-bounce">🚀</div>
+          <div className="flex justify-center mb-4">
+            <div className="p-4 bg-violet-100 rounded-full">
+              <Rocket className="h-10 w-10 text-violet-600" />
+            </div>
+          </div>
           <h2 className="text-2xl font-bold text-slate-900 mb-2">
             Automate Your Guest Communication
           </h2>
@@ -184,19 +228,19 @@ export default function NotificationTriggersPage() {
           {/* Quick Start Suggestions */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-6 max-w-2xl mx-auto">
             <QuickStartCard
-              icon="✅"
+              icon={<CheckCircle className="h-6 w-6 text-emerald-600" />}
               title="Booking Confirmation"
               description="Instant confirmation when guests book"
               onClick={() => handleQuickCreate("reservation_created", "email")}
             />
             <QuickStartCard
-              icon="🔔"
+              icon={<Bell className="h-6 w-6 text-amber-600" />}
               title="Check-in Reminder"
               description="24 hours before arrival"
               onClick={() => handleQuickCreate("checkin_reminder", "email", 1440)}
             />
             <QuickStartCard
-              icon="⭐"
+              icon={<Star className="h-6 w-6 text-yellow-500" />}
               title="Review Request"
               description="After checkout"
               onClick={() => handleQuickCreate("review_request", "email")}
@@ -218,7 +262,7 @@ export default function NotificationTriggersPage() {
       {triggers.length > 0 && (
         <div className="rounded-lg border border-amber-200 bg-amber-50 p-4 space-y-2 text-sm text-amber-900 mb-6">
           <div className="font-semibold flex items-center gap-2">
-            <span>💡</span> How to customize messages
+            <Lightbulb className="h-4 w-4" /> How to customize messages
           </div>
           <ul className="list-disc pl-6 space-y-1">
             <li>Create or edit a template in <Link href="/dashboard/settings/templates" className="underline font-semibold text-amber-800 hover:text-amber-900">Settings → Templates</Link>.</li>
@@ -235,7 +279,7 @@ export default function NotificationTriggersPage() {
         </div>
       ) : triggers.length > 0 ? (
         <div className="space-y-4">
-          {triggersByEvent.map(({ value, label, description, icon, triggers: eventTriggers }) => (
+          {triggersByEvent.map(({ value, label, description, triggers: eventTriggers }) => (
             <div
               key={value}
               className="bg-white rounded-xl border border-slate-200 overflow-hidden
@@ -243,7 +287,9 @@ export default function NotificationTriggersPage() {
             >
               <div className="px-5 py-4 bg-slate-50 border-b border-slate-200 flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <span className="text-2xl">{icon}</span>
+                  <div className="p-2 bg-white rounded-lg border border-slate-200 text-slate-600">
+                    {EVENT_ICONS[value]}
+                  </div>
                   <div>
                     <h3 className="font-semibold text-slate-900">{label}</h3>
                     <p className="text-sm text-slate-500">{description}</p>
@@ -302,8 +348,6 @@ export default function NotificationTriggersPage() {
       {showCelebration && (
         <CelebrationModal onClose={() => setShowCelebration(false)} />
       )}
-
-      {/* Delete Confirmation Modal */}
     </div>
   );
 }
@@ -314,7 +358,7 @@ function QuickStartCard({
   description,
   onClick
 }: {
-  icon: string;
+  icon: ReactNode;
   title: string;
   description: string;
   onClick: () => void;
@@ -326,9 +370,9 @@ function QuickStartCard({
         hover:border-violet-300 hover:shadow-sm transition-all duration-200 group
         focus-visible:ring-2 focus-visible:ring-violet-500 focus-visible:ring-offset-2"
     >
-      <span className="text-2xl group-hover:scale-110 inline-block transition-transform motion-safe:duration-200">
+      <div className="group-hover:scale-110 inline-block transition-transform motion-safe:duration-200">
         {icon}
-      </span>
+      </div>
       <div className="font-medium text-slate-900 mt-2">{title}</div>
       <div className="text-xs text-slate-500">{description}</div>
     </button>
@@ -350,6 +394,7 @@ function TriggerRow({
 }) {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const eventLabel = EVENT_OPTIONS.find(e => e.value === trigger.event)?.label ?? trigger.event;
+  const channelOption = CHANNEL_OPTIONS.find(c => c.value === trigger.channel);
 
   return (
     <div className="px-5 py-4 flex items-center justify-between">
@@ -372,8 +417,8 @@ function TriggerRow({
         </button>
         <div>
           <div className="flex items-center gap-2">
-            <span className="text-sm font-medium text-slate-900">
-              {CHANNEL_OPTIONS.find(c => c.value === trigger.channel)?.label}
+            <span className="text-sm font-medium text-slate-900 flex items-center gap-1.5">
+              {channelOption?.icon} {channelOption?.label}
             </span>
             {trigger.delayMinutes > 0 && (
               <span className="text-xs bg-amber-100 text-amber-700 px-2 py-0.5 rounded">
@@ -392,10 +437,10 @@ function TriggerRow({
         <button
           onClick={onTest}
           className="px-3 py-1.5 text-sm text-violet-600 hover:text-violet-700 hover:bg-violet-50 rounded
-            transition-colors duration-150 flex items-center gap-1
+            transition-colors duration-150 flex items-center gap-1.5
             focus-visible:ring-2 focus-visible:ring-violet-500"
         >
-          <span>📬</span> Test
+          <Send className="h-3.5 w-3.5" /> Test
         </button>
         <button
           onClick={onEdit}
@@ -465,7 +510,11 @@ function DeleteConfirmModal({
       aria-describedby="delete-desc"
     >
       <div className="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-6 motion-safe:animate-in motion-safe:zoom-in-95 motion-safe:duration-200">
-        <div className="text-4xl text-center mb-4">🗑️</div>
+        <div className="flex justify-center mb-4">
+          <div className="p-3 bg-red-100 rounded-full">
+            <Trash2 className="h-6 w-6 text-red-600" />
+          </div>
+        </div>
         <h2 id="delete-title" className="text-xl font-bold text-slate-900 text-center mb-2">
           Delete {itemName}?
         </h2>
@@ -554,8 +603,6 @@ function TriggerModal({
     }
   };
 
-  const isPresetDelay = DELAY_PRESETS.some(p => p.value === delayMinutes);
-
   return (
     <div
       className="fixed inset-0 bg-black/50 flex items-center justify-center z-50"
@@ -577,7 +624,7 @@ function TriggerModal({
             className="text-slate-400 hover:text-slate-600 p-1 rounded
               focus-visible:ring-2 focus-visible:ring-violet-500"
           >
-            ✕
+            <X className="h-5 w-5" />
           </button>
         </div>
 
@@ -597,7 +644,7 @@ function TriggerModal({
             >
               {EVENT_OPTIONS.map(opt => (
                 <option key={opt.value} value={opt.value}>
-                  {opt.icon} {opt.label}
+                  {opt.label}
                 </option>
               ))}
             </select>
@@ -617,13 +664,13 @@ function TriggerModal({
                   aria-checked={channel === opt.value}
                   onClick={() => setChannel(opt.value as "email" | "sms" | "both")}
                   className={`flex-1 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-150
-                    focus-visible:ring-2 focus-visible:ring-violet-500
+                    focus-visible:ring-2 focus-visible:ring-violet-500 flex items-center justify-center gap-1.5
                     ${channel === opt.value
                       ? "bg-violet-100 text-violet-700 border-2 border-violet-300"
                       : "bg-slate-50 text-slate-600 border border-slate-200 hover:border-slate-300"
                     }`}
                 >
-                  {opt.label}
+                  {opt.icon} {opt.label}
                 </button>
               ))}
             </div>
@@ -745,13 +792,13 @@ function TestTriggerModal({
   }, [onClose]);
 
   const eventInfo = EVENT_OPTIONS.find(e => e.value === trigger.event);
+  const channelOption = CHANNEL_OPTIONS.find(c => c.value === trigger.channel);
 
   const handleSendTest = async () => {
     if (!testEmail) return;
     setSending(true);
     setError(null);
     try {
-      // Call API to send test
       await apiClient.testNotificationTrigger(trigger.id, testEmail);
       setSent(true);
     } catch (err) {
@@ -779,16 +826,18 @@ function TestTriggerModal({
             className="text-slate-400 hover:text-slate-600 p-1 rounded
               focus-visible:ring-2 focus-visible:ring-violet-500"
           >
-            ✕
+            <X className="h-5 w-5" />
           </button>
         </div>
 
         <div className="flex items-center gap-3 p-3 bg-slate-50 rounded-lg mb-4">
-          <span className="text-2xl">{eventInfo?.icon}</span>
+          <div className="p-2 bg-white rounded-lg border border-slate-200 text-slate-600">
+            {EVENT_ICONS[trigger.event as TriggerEvent]}
+          </div>
           <div>
             <div className="font-medium text-slate-900">{eventInfo?.label}</div>
-            <div className="text-sm text-slate-500">
-              {CHANNEL_OPTIONS.find(c => c.value === trigger.channel)?.label}
+            <div className="text-sm text-slate-500 flex items-center gap-1">
+              {channelOption?.icon} {channelOption?.label}
             </div>
           </div>
         </div>
@@ -800,7 +849,7 @@ function TestTriggerModal({
 
         {sent ? (
           <div className="flex items-center gap-3 text-emerald-700 bg-emerald-50 p-4 rounded-lg mb-4 motion-safe:animate-in motion-safe:fade-in motion-safe:duration-300">
-            <span className="text-2xl">✓</span>
+            <Check className="h-5 w-5" />
             <div>
               <div className="font-medium">Test sent!</div>
               <div className="text-sm text-emerald-600">Check your inbox at {testEmail}</div>
@@ -826,7 +875,7 @@ function TestTriggerModal({
 
             {error && (
               <div role="alert" className="text-red-600 text-sm mb-4 flex items-center gap-2">
-                <span>⚠️</span> {error}
+                <AlertCircle className="h-4 w-4" /> {error}
               </div>
             )}
 
@@ -890,7 +939,11 @@ function CelebrationModal({ onClose }: { onClose: () => void }) {
       aria-labelledby="celebration-title"
     >
       <div className="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-8 text-center motion-safe:animate-in motion-safe:zoom-in-95 motion-safe:duration-300">
-        <div className="text-6xl mb-4 motion-safe:animate-bounce">🎉</div>
+        <div className="flex justify-center mb-4">
+          <div className="p-4 bg-violet-100 rounded-full">
+            <Sparkles className="h-10 w-10 text-violet-600" />
+          </div>
+        </div>
         <h2 id="celebration-title" className="text-2xl font-bold text-slate-900 mb-2">
           Your first automation is live!
         </h2>
