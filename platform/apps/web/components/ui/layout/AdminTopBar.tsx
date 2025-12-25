@@ -3,10 +3,13 @@
 import { useState, useEffect, useMemo, useRef } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { signOut } from "next-auth/react";
+import { signOut, useSession } from "next-auth/react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { formatDistanceToNow } from "date-fns";
 import { HelpPanel } from "../../help/HelpPanel";
 import { useKeyboardShortcuts } from "@/contexts/KeyboardShortcutsContext";
 import { ThemeToggle } from "@/components/theme/ThemeToggle";
+import { apiClient } from "@/lib/api-client";
 
 type AdminTopBarProps = {
     onToggleNav?: () => void;
@@ -42,13 +45,18 @@ type CommandItem = {
     subtitle?: string;
 };
 
-// Notifications storage key and defaults (outside component to avoid recreation)
-const NOTIFICATIONS_STORAGE_KEY = "campeveryday:notifications";
-const defaultNotifications = [
-    { id: 1, title: "New booking received", subtitle: "Site A-12, Dec 15-20", time: "5m ago", unread: true, href: "/reservations" },
-    { id: 2, title: "System update available", subtitle: "Version 2.1.0 is ready", time: "1h ago", unread: true, href: "/updates" },
-    { id: 3, title: "Payment received", subtitle: "$150.00 from John Smith", time: "3h ago", unread: false, href: "/finance/payouts" }
-];
+// Notification type configuration
+const notificationConfig: Record<string, { icon: string; color: string; href: string }> = {
+    arrival: { icon: "📥", color: "emerald", href: "/check-in-out" },
+    departure: { icon: "📤", color: "blue", href: "/check-in-out" },
+    task_assigned: { icon: "📋", color: "purple", href: "/tasks" },
+    task_sla_warning: { icon: "⚠️", color: "amber", href: "/tasks" },
+    maintenance_urgent: { icon: "🔧", color: "red", href: "/maintenance" },
+    payment_received: { icon: "💵", color: "emerald", href: "/finance/payouts" },
+    payment_failed: { icon: "❌", color: "red", href: "/finance/payouts" },
+    message_received: { icon: "💬", color: "blue", href: "/messages" },
+    general: { icon: "🔔", color: "slate", href: "/notifications" },
+};
 
 export function AdminTopBar({
     onToggleNav,
@@ -185,40 +193,51 @@ export function AdminTopBar({
         }
     };
 
-    // Notifications with localStorage persistence - use lazy initialization for SSR safety
-    const [notifications, setNotifications] = useState<
-        { id: number; title: string; subtitle: string; time: string; unread: boolean; resolved?: boolean; href?: string }[]
-    >(() => {
-        if (typeof window !== "undefined") {
-            const stored = localStorage.getItem(NOTIFICATIONS_STORAGE_KEY);
-            if (stored) {
-                try {
-                    return JSON.parse(stored);
-                } catch {
-                    return defaultNotifications;
-                }
-            }
-        }
-        return defaultNotifications;
+    // Get user session for fetching notifications
+    const { data: session } = useSession();
+    const queryClient = useQueryClient();
+    const userId = session?.user?.id;
+
+    // Fetch notifications from API
+    const { data: notificationsData } = useQuery({
+        queryKey: ["notifications", userId],
+        queryFn: () => apiClient.getNotifications(userId!, { limit: 10 }),
+        enabled: !!userId,
+        refetchInterval: 30000, // Refresh every 30 seconds
     });
 
-    // Persist notifications to localStorage when they change
-    useEffect(() => {
-        if (typeof window !== "undefined") {
-            localStorage.setItem(NOTIFICATIONS_STORAGE_KEY, JSON.stringify(notifications));
-        }
-    }, [notifications]);
+    const notifications = notificationsData || [];
+    const unreadCount = notifications.filter((n: any) => !n.readAt).length;
 
-    const unreadCount = notifications.filter((n) => n.unread && !n.resolved).length;
+    // Mark notification as read mutation
+    const markReadMutation = useMutation({
+        mutationFn: (notificationId: string) => apiClient.markNotificationRead(notificationId),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ["notifications", userId] });
+        },
+    });
+
+    // Mark all notifications as read mutation
+    const markAllReadMutation = useMutation({
+        mutationFn: () => apiClient.markAllNotificationsRead(userId!),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ["notifications", userId] });
+        },
+    });
 
     const markAllRead = () => {
-        setNotifications((prev) => prev.map((n) => ({ ...n, unread: false })));
+        if (userId) {
+            markAllReadMutation.mutate();
+        }
     };
 
-    const markResolved = (id: number) => {
-        setNotifications((prev) =>
-            prev.map((n) => (n.id === id ? { ...n, unread: false, resolved: true } : n))
-        );
+    const handleNotificationClick = (notification: any) => {
+        if (!notification.readAt) {
+            markReadMutation.mutate(notification.id);
+        }
+        const config = notificationConfig[notification.type] || notificationConfig.general;
+        router.push(config.href);
+        setIsNotificationsOpen(false);
     };
 
     return (
@@ -323,61 +342,67 @@ export function AdminTopBar({
                         </button>
 
                         {isNotificationsOpen && (
-                            <div className="absolute right-0 top-full mt-2 w-80 bg-white rounded-xl shadow-xl border border-slate-200 py-2 z-50">
-                                <div className="px-4 py-2 border-b border-slate-100 flex items-center justify-between">
-                                    <div className="font-semibold text-slate-900 text-sm">Notifications</div>
-                                    <button
-                                        className="text-xs text-emerald-600 hover:text-emerald-700 font-medium"
-                                        onClick={markAllRead}
-                                    >
-                                        Mark all read
-                                    </button>
+                            <div className="absolute right-0 top-full mt-2 w-80 bg-card rounded-xl shadow-xl border border-border py-2 z-50">
+                                <div className="px-4 py-2 border-b border-border flex items-center justify-between">
+                                    <div className="font-semibold text-foreground text-sm">Notifications</div>
+                                    {unreadCount > 0 && (
+                                        <button
+                                            className="text-xs text-emerald-600 hover:text-emerald-700 font-medium disabled:opacity-50"
+                                            onClick={markAllRead}
+                                            disabled={markAllReadMutation.isPending}
+                                        >
+                                            {markAllReadMutation.isPending ? "Marking..." : "Mark all read"}
+                                        </button>
+                                    )}
                                 </div>
                                 <div className="max-h-80 overflow-y-auto">
-                                    {notifications.map((notif) => (
-                                        <div
-                                            key={notif.id}
-                                            className={`w-full flex items-start gap-3 px-4 py-3 ${
-                                                notif.unread && !notif.resolved ? "bg-emerald-50/50" : "hover:bg-slate-50"
-                                            }`}
-                                        >
-                                            <div className={`w-2 h-2 rounded-full mt-2 ${notif.unread && !notif.resolved ? "bg-emerald-500" : "bg-transparent"}`} />
-                                            <div className="flex-1 min-w-0">
-                                                <div className="text-sm font-medium text-slate-900">{notif.title}</div>
-                                                <div className="text-xs text-slate-500 truncate">{notif.subtitle}</div>
-                                                <div className="flex items-center gap-2 mt-1 text-xs text-slate-500">
-                                                    <span>{notif.time}</span>
-                                                    {notif.resolved && <span className="text-emerald-600 font-semibold">Resolved</span>}
-                                                </div>
-                                                <div className="flex items-center gap-3 mt-2">
-                                                    <button
-                                                        className="text-xs font-semibold text-emerald-600 hover:text-emerald-700"
-                                                        onClick={() => {
-                                                            markResolved(notif.id);
-                                                            if (notif.href) router.push(notif.href);
-                                                        }}
-                                                    >
-                                                        Mark resolved
-                                                    </button>
-                                                    {notif.href && (
-                                                        <button
-                                                            className="text-xs text-slate-600 hover:text-slate-800"
-                                                            onClick={() => {
-                                                                setIsNotificationsOpen(false);
-                                                                router.push(notif.href as string);
-                                                            }}
-                                                        >
-                                                            Open
-                                                        </button>
-                                                    )}
-                                                </div>
+                                    {notifications.length === 0 ? (
+                                        <div className="px-4 py-8 text-center">
+                                            <div className="text-2xl mb-2">🔔</div>
+                                            <div className="text-sm text-muted-foreground">No notifications yet</div>
+                                            <div className="text-xs text-muted-foreground mt-1">
+                                                You'll see arrivals, payments, and alerts here
                                             </div>
                                         </div>
-                                    ))}
+                                    ) : (
+                                        notifications.map((notif: any) => {
+                                            const config = notificationConfig[notif.type] || notificationConfig.general;
+                                            const isUnread = !notif.readAt;
+                                            return (
+                                                <button
+                                                    key={notif.id}
+                                                    onClick={() => handleNotificationClick(notif)}
+                                                    className={`w-full flex items-start gap-3 px-4 py-3 text-left transition-colors ${
+                                                        isUnread ? "bg-emerald-50/50 dark:bg-emerald-950/20" : "hover:bg-muted"
+                                                    }`}
+                                                >
+                                                    <div className="text-lg flex-shrink-0">{config.icon}</div>
+                                                    <div className="flex-1 min-w-0">
+                                                        <div className="text-sm font-medium text-foreground flex items-center gap-2">
+                                                            {notif.title}
+                                                            {isUnread && (
+                                                                <span className="w-2 h-2 rounded-full bg-emerald-500 flex-shrink-0" />
+                                                            )}
+                                                        </div>
+                                                        {notif.body && (
+                                                            <div className="text-xs text-muted-foreground truncate">{notif.body}</div>
+                                                        )}
+                                                        <div className="text-xs text-muted-foreground mt-1">
+                                                            {formatDistanceToNow(new Date(notif.createdAt), { addSuffix: true })}
+                                                        </div>
+                                                    </div>
+                                                </button>
+                                            );
+                                        })
+                                    )}
                                 </div>
-                                <div className="border-t border-slate-100 px-4 py-2">
-                                    <Link href="/messages" className="text-sm text-emerald-600 hover:text-emerald-700 font-medium">
-                                        Open inbox →
+                                <div className="border-t border-border px-4 py-2">
+                                    <Link
+                                        href="/notifications"
+                                        className="text-sm text-emerald-600 hover:text-emerald-700 font-medium"
+                                        onClick={() => setIsNotificationsOpen(false)}
+                                    >
+                                        View all notifications →
                                     </Link>
                                 </div>
                             </div>

@@ -10,6 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Switch } from "@/components/ui/switch";
 import { apiClient } from "@/lib/api-client";
 import { useToast } from "@/components/ui/use-toast";
+import type { Site } from "@campreserv/shared";
 
 type MaintenancePriority = "low" | "medium" | "high" | "critical";
 
@@ -17,12 +18,17 @@ interface CreateTicketDialogProps {
     open: boolean;
     onOpenChange: (open: boolean) => void;
     onSuccess: () => void;
+    campgroundId?: string | null;
 }
 
-export function CreateTicketDialog({ open, onOpenChange, onSuccess }: CreateTicketDialogProps) {
+type SiteOption = Pick<Site, "id" | "name" | "siteNumber">;
+
+export function CreateTicketDialog({ open, onOpenChange, onSuccess, campgroundId }: CreateTicketDialogProps) {
     const { toast } = useToast();
     const [loading, setLoading] = useState(false);
-    const [sites, setSites] = useState<{ id: string; name: string }[]>([]);
+    const [sites, setSites] = useState<SiteOption[]>([]);
+    const [sitesLoading, setSitesLoading] = useState(false);
+    const [selectedCampgroundId, setSelectedCampgroundId] = useState<string | null>(campgroundId ?? null);
 
     const [formData, setFormData] = useState({
         title: "",
@@ -37,22 +43,32 @@ export function CreateTicketDialog({ open, onOpenChange, onSuccess }: CreateTick
 
     useEffect(() => {
         if (open) {
-            loadSites();
+            const stored = localStorage.getItem("campreserv:selectedCampground");
+            const nextCampgroundId = campgroundId ?? stored ?? null;
+            setSelectedCampgroundId(nextCampgroundId);
+            void loadSites(nextCampgroundId);
         }
-    }, [open]);
+    }, [open, campgroundId]);
 
-    async function loadSites() {
+    async function loadSites(nextCampgroundId: string | null) {
+        if (!nextCampgroundId) {
+            setSites([]);
+            return;
+        }
         try {
-            // Assuming we can fetch sites via existing API or we need to add a method
-            // For now, let's try to fetch sites if the method exists, or just mock/skip
-            // We'll assume apiClient has getSites or similar. If not, we might need to add it.
-            // Let's check api-client.ts later. For now, I'll assume we can get sites.
-            // Actually, let's just fetch campgrounds sites.
-            // We need campgroundId context. The dashboard should probably know the campground.
-            // For now, I'll skip site loading or assume a method exists.
-            // Let's try to use a generic getSites if available, or just leave empty for now.
+            setSitesLoading(true);
+            const data = await apiClient.getSites(nextCampgroundId);
+            const activeSites = data.filter((site) => site.isActive ?? true);
+            setSites(activeSites.map((site) => ({
+                id: site.id,
+                name: site.name,
+                siteNumber: site.siteNumber
+            })));
         } catch (e) {
             console.error(e);
+            setSites([]);
+        } finally {
+            setSitesLoading(false);
         }
     }
 
@@ -61,10 +77,19 @@ export function CreateTicketDialog({ open, onOpenChange, onSuccess }: CreateTick
         setLoading(true);
 
         try {
+            if (!selectedCampgroundId) {
+                toast({
+                    title: "Select a campground",
+                    description: "Pick a campground before creating a maintenance ticket.",
+                    variant: "destructive"
+                });
+                setLoading(false);
+                return;
+            }
             await apiClient.createMaintenanceTicket({
                 ...formData,
                 siteId: formData.siteId === "none" ? undefined : formData.siteId,
-                campgroundId: "default-campground-id", // TODO: Get from context
+                campgroundId: selectedCampgroundId,
                 status: "open",
                 outOfOrder: formData.outOfOrder,
                 outOfOrderReason: formData.outOfOrder ? formData.outOfOrderReason : undefined,
@@ -156,11 +181,21 @@ export function CreateTicketDialog({ open, onOpenChange, onSuccess }: CreateTick
                                 onValueChange={(v) => setFormData({ ...formData, siteId: v })}
                             >
                                 <SelectTrigger>
-                                    <SelectValue placeholder="Select site" />
+                                    <SelectValue placeholder={sitesLoading ? "Loading sites..." : "Select site"} />
                                 </SelectTrigger>
                                 <SelectContent>
                                     <SelectItem value="none">None / General</SelectItem>
-                                    {/* TODO: Map sites here */}
+                                    {sites.length === 0 && !sitesLoading ? (
+                                        <SelectItem value="__empty" disabled>
+                                            No sites available
+                                        </SelectItem>
+                                    ) : (
+                                        sites.map((site) => (
+                                            <SelectItem key={site.id} value={site.id}>
+                                                {site.siteNumber} · {site.name}
+                                            </SelectItem>
+                                        ))
+                                    )}
                                 </SelectContent>
                             </Select>
                         </div>

@@ -8695,6 +8695,76 @@ export const apiClient = {
     });
     return parseResponse<{ deleted: boolean }>(res);
   },
+
+  // ============================================================
+  // NOTIFICATIONS
+  // ============================================================
+
+  /**
+   * Get notifications for a user
+   */
+  async getNotifications(userId: string, options?: { limit?: number; unreadOnly?: boolean }) {
+    const params = new URLSearchParams();
+    if (options?.limit) params.set("limit", String(options.limit));
+    if (options?.unreadOnly) params.set("unreadOnly", "true");
+    const res = await fetch(`${API_BASE}/staff/notifications/${userId}?${params}`, {
+      headers: scopedHeaders(),
+    });
+    return parseResponse<{
+      id: string;
+      campgroundId: string;
+      userId: string | null;
+      type: string;
+      title: string;
+      body: string;
+      data: Record<string, unknown> | null;
+      sentAt: string | null;
+      readAt: string | null;
+      clickedAt: string | null;
+      createdAt: string;
+    }[]>(res);
+  },
+
+  /**
+   * Mark a notification as read
+   */
+  async markNotificationRead(notificationId: string) {
+    const res = await fetch(`${API_BASE}/staff/notifications/${notificationId}/read`, {
+      method: "PATCH",
+      headers: scopedHeaders(),
+    });
+    return parseResponse<{ id: string; readAt: string }>(res);
+  },
+
+  /**
+   * Mark all notifications as read for a user
+   */
+  async markAllNotificationsRead(userId: string) {
+    const res = await fetch(`${API_BASE}/staff/notifications/${userId}/read-all`, {
+      method: "POST",
+      headers: scopedHeaders(),
+    });
+    return parseResponse<{ count: number }>(res);
+  },
+
+  /**
+   * Send a push notification (for testing or manual triggers)
+   */
+  async sendNotification(data: {
+    campgroundId: string;
+    userId: string | null;
+    type: string;
+    title: string;
+    body: string;
+    data?: Record<string, unknown>;
+  }) {
+    const res = await fetch(`${API_BASE}/staff/notifications`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", ...scopedHeaders() },
+      body: JSON.stringify(data),
+    });
+    return parseResponse<{ id: string }>(res);
+  },
 };
 
 export type PublicCampgroundList = z.infer<typeof PublicCampgroundListSchema>;
