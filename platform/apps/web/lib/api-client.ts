@@ -1839,6 +1839,28 @@ export const apiClient = {
     });
     return parseResponse<{ ok: boolean; status: string; connectionId: string }>(res);
   },
+  async deleteIntegrationConnection(id: string) {
+    const res = await fetch(`${API_BASE}/integrations/connections/${id}`, {
+      method: "DELETE",
+      headers: scopedHeaders()
+    });
+    return parseResponse<{ ok: boolean; deleted: string }>(res);
+  },
+  async getIntegrationOAuthUrl(provider: string, campgroundId: string, redirectUri?: string) {
+    const params = new URLSearchParams({ campgroundId });
+    if (redirectUri) params.set("redirectUri", redirectUri);
+    const data = await fetchJSON<unknown>(`/integrations/oauth/${provider}/authorize?${params.toString()}`);
+    return data as {
+      provider: string;
+      authorizationUrl?: string;
+      state?: string;
+      requiresManualSetup?: boolean;
+      instructions?: string;
+      webhookUrl?: string;
+      error?: string;
+      message?: string;
+    };
+  },
   async listIntegrationLogs(id: string, params: { limit?: number; cursor?: string } = {}) {
     const query = new URLSearchParams();
     if (params.limit) query.set("limit", String(params.limit));

@@ -187,6 +187,20 @@ export const INTEGRATIONS_DIRECTORY: IntegrationDefinition[] = [
             "Retry logic",
             "Event filtering"
         ]
+    },
+    {
+        id: "custom",
+        name: "Custom Integration",
+        description: "Connect any service using webhooks & API",
+        longDescription: "For services we don't have pre-built support for, use our webhook URL and API credentials to build your own integration.",
+        category: "export",
+        logo: "Settings",
+        features: [
+            "Webhook URL for incoming events",
+            "API key for outgoing requests",
+            "Custom configuration",
+            "Works with any service"
+        ]
     }
 ];
 

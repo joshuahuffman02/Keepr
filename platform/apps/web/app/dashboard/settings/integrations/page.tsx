@@ -113,35 +113,33 @@ export default function IntegrationsSettingsPage() {
         });
     }, [connectionsByProvider]);
 
-    // Mutations
-    const connectMutation = useMutation({
-        mutationFn: async (provider: string) => {
-            // For now, create a basic connection
-            // In production, this would initiate OAuth flow
-            return apiClient.upsertIntegrationConnection({
-                campgroundId,
-                type: getIntegrationType(provider),
-                provider,
-                status: "connected",
-                authType: "oauth"
-            });
-        },
-        onSuccess: (_, provider) => {
+    // Check URL params for OAuth callback results
+    useEffect(() => {
+        if (typeof window === "undefined") return;
+        const params = new URLSearchParams(window.location.search);
+        const connected = params.get("connected");
+        const error = params.get("error");
+        const provider = params.get("provider");
+
+        if (connected) {
             toast({
                 title: "Integration connected!",
-                description: `${getIntegrationName(provider)} is now syncing with your campground.`
+                description: `${getIntegrationName(connected)} is now syncing with your campground.`
             });
+            // Clean up URL
+            window.history.replaceState({}, "", window.location.pathname);
             queryClient.invalidateQueries({ queryKey: ["integrations", campgroundId] });
-        },
-        onError: (err: Error) => {
+        } else if (error) {
             toast({
                 title: "Connection failed",
-                description: err.message || "Please try again.",
+                description: `Could not connect to ${provider || "the service"}. ${error === "not_configured" ? "This integration is not yet available." : "Please try again."}`,
                 variant: "destructive"
             });
+            window.history.replaceState({}, "", window.location.pathname);
         }
-    });
+    }, [campgroundId, queryClient, toast]);
 
+    // Sync mutation
     const syncMutation = useMutation({
         mutationFn: (connectionId: string) =>
             apiClient.triggerIntegrationSync(connectionId, { note: "Manual sync" }),
@@ -152,6 +150,25 @@ export default function IntegrationsSettingsPage() {
         onError: (err: Error) => {
             toast({
                 title: "Sync failed",
+                description: err.message || "Please try again.",
+                variant: "destructive"
+            });
+        }
+    });
+
+    // Disconnect mutation
+    const disconnectMutation = useMutation({
+        mutationFn: (connectionId: string) =>
+            apiClient.deleteIntegrationConnection(connectionId),
+        onSuccess: () => {
+            toast({ title: "Integration disconnected", description: "The connection has been removed." });
+            setIsModalOpen(false);
+            setSelectedIntegration(null);
+            queryClient.invalidateQueries({ queryKey: ["integrations", campgroundId] });
+        },
+        onError: (err: Error) => {
+            toast({
+                title: "Disconnect failed",
                 description: err.message || "Please try again.",
                 variant: "destructive"
             });
@@ -182,9 +199,57 @@ export default function IntegrationsSettingsPage() {
         setIsModalOpen(true);
     };
 
+    /**
+     * Initiate OAuth flow or show manual setup instructions
+     */
     const handleModalConnect = async () => {
-        if (!selectedIntegration) return;
-        await connectMutation.mutateAsync(selectedIntegration.id);
+        if (!selectedIntegration || !campgroundId) return;
+
+        try {
+            const oauthData = await apiClient.getIntegrationOAuthUrl(
+                selectedIntegration.id,
+                campgroundId
+            );
+
+            if (oauthData.error) {
+                // Integration not configured yet
+                toast({
+                    title: "Not available yet",
+                    description: oauthData.message || "This integration is coming soon.",
+                    variant: "destructive"
+                });
+                return;
+            }
+
+            if (oauthData.requiresManualSetup) {
+                // Show manual setup instructions (handled in modal)
+                toast({
+                    title: "Manual setup required",
+                    description: oauthData.instructions || "See the setup instructions in the dialog."
+                });
+                return;
+            }
+
+            if (oauthData.authorizationUrl) {
+                // Open OAuth popup/redirect
+                const width = 600;
+                const height = 700;
+                const left = window.screenX + (window.outerWidth - width) / 2;
+                const top = window.screenY + (window.outerHeight - height) / 2;
+
+                window.open(
+                    oauthData.authorizationUrl,
+                    "oauth",
+                    `width=${width},height=${height},left=${left},top=${top}`
+                );
+            }
+        } catch (err: any) {
+            toast({
+                title: "Connection failed",
+                description: err.message || "Please try again.",
+                variant: "destructive"
+            });
+        }
     };
 
     const handleModalSync = async () => {
@@ -199,10 +264,7 @@ export default function IntegrationsSettingsPage() {
         if (!selectedIntegration) return;
         const conn = connectionsByProvider.get(selectedIntegration.id);
         if (conn) {
-            // Would call disconnect API
-            toast({ title: "Integration disconnected" });
-            setIsModalOpen(false);
-            queryClient.invalidateQueries({ queryKey: ["integrations", campgroundId] });
+            await disconnectMutation.mutateAsync(conn.id);
         }
     };
 

@@ -13,6 +13,7 @@ import {
     DoorOpen,
     FolderSync,
     Webhook,
+    Settings,
     Check,
     CheckCircle2,
     Shield,
@@ -20,6 +21,7 @@ import {
     ExternalLink,
     AlertTriangle,
     Loader2,
+    Copy,
     type LucideIcon
 } from "lucide-react";
 import {
@@ -45,7 +47,8 @@ const ICON_MAP: Record<string, LucideIcon> = {
     KeyRound,
     DoorOpen,
     FolderSync,
-    Webhook
+    Webhook,
+    Settings
 };
 
 interface IntegrationDetailModalProps {

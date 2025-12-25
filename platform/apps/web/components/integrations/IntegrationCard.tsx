@@ -12,6 +12,7 @@ import {
     DoorOpen,
     FolderSync,
     Webhook,
+    Settings,
     Check,
     Sparkles,
     ArrowRight,
@@ -33,7 +34,8 @@ const ICON_MAP: Record<string, LucideIcon> = {
     KeyRound,
     DoorOpen,
     FolderSync,
-    Webhook
+    Webhook,
+    Settings
 };
 
 interface IntegrationCardProps {

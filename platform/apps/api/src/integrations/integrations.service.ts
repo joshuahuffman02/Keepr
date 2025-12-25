@@ -74,6 +74,265 @@ export class IntegrationsService {
     });
   }
 
+  async deleteConnection(id: string) {
+    const prisma = this.prismaClient();
+
+    // First, delete related logs and webhook events
+    await prisma.integrationSyncLog.deleteMany({ where: { connectionId: id } });
+    await prisma.integrationWebhookEvent.deleteMany({ where: { connectionId: id } });
+
+    // Then delete the connection
+    await prisma.integrationConnection.delete({ where: { id } });
+
+    return { ok: true, deleted: id };
+  }
+
+  /**
+   * OAuth provider configuration
+   * In production, these would come from environment variables
+   */
+  private getOAuthConfig(provider: string) {
+    const configs: Record<string, {
+      authUrl: string;
+      tokenUrl: string;
+      clientId: string;
+      clientSecret: string;
+      scopes: string[];
+      integrationType: string;
+    }> = {
+      qbo: {
+        authUrl: "https://appcenter.intuit.com/connect/oauth2",
+        tokenUrl: "https://oauth.platform.intuit.com/oauth2/v1/tokens/bearer",
+        clientId: process.env.QBO_CLIENT_ID || "",
+        clientSecret: process.env.QBO_CLIENT_SECRET || "",
+        scopes: ["com.intuit.quickbooks.accounting"],
+        integrationType: "accounting"
+      },
+      xero: {
+        authUrl: "https://login.xero.com/identity/connect/authorize",
+        tokenUrl: "https://identity.xero.com/connect/token",
+        clientId: process.env.XERO_CLIENT_ID || "",
+        clientSecret: process.env.XERO_CLIENT_SECRET || "",
+        scopes: ["openid", "profile", "email", "accounting.transactions", "accounting.contacts"],
+        integrationType: "accounting"
+      },
+      hubspot: {
+        authUrl: "https://app.hubspot.com/oauth/authorize",
+        tokenUrl: "https://api.hubapi.com/oauth/v1/token",
+        clientId: process.env.HUBSPOT_CLIENT_ID || "",
+        clientSecret: process.env.HUBSPOT_CLIENT_SECRET || "",
+        scopes: ["crm.objects.contacts.read", "crm.objects.contacts.write"],
+        integrationType: "crm"
+      },
+      zendesk: {
+        authUrl: "https://www.zendesk.com/oauth/authorizations/new",
+        tokenUrl: "https://www.zendesk.com/oauth/tokens",
+        clientId: process.env.ZENDESK_CLIENT_ID || "",
+        clientSecret: process.env.ZENDESK_CLIENT_SECRET || "",
+        scopes: ["read", "write"],
+        integrationType: "crm"
+      }
+    };
+
+    return configs[provider.toLowerCase()] || null;
+  }
+
+  /**
+   * Generate OAuth state token for CSRF protection
+   */
+  private generateOAuthState(campgroundId: string, provider: string): string {
+    const payload = {
+      campgroundId,
+      provider,
+      timestamp: Date.now(),
+      nonce: crypto.randomBytes(16).toString("hex")
+    };
+    // In production, this should be encrypted/signed
+    return Buffer.from(JSON.stringify(payload)).toString("base64url");
+  }
+
+  /**
+   * Parse OAuth state token
+   */
+  private parseOAuthState(state: string): { campgroundId: string; provider: string } | null {
+    try {
+      const payload = JSON.parse(Buffer.from(state, "base64url").toString());
+      // Verify state is not too old (15 min max)
+      if (Date.now() - payload.timestamp > 15 * 60 * 1000) {
+        return null;
+      }
+      return { campgroundId: payload.campgroundId, provider: payload.provider };
+    } catch {
+      return null;
+    }
+  }
+
+  /**
+   * Get OAuth authorization URL for a provider
+   */
+  getOAuthAuthorizationUrl(provider: string, campgroundId: string, customRedirectUri?: string) {
+    const config = this.getOAuthConfig(provider);
+
+    if (!config) {
+      // For providers without OAuth config, return instructions for manual setup
+      return {
+        provider,
+        requiresManualSetup: true,
+        instructions: this.getManualSetupInstructions(provider),
+        webhookUrl: `${process.env.API_BASE_URL || "https://api.campreserv.com"}/integrations/webhooks/${provider}`
+      };
+    }
+
+    if (!config.clientId) {
+      return {
+        provider,
+        error: "not_configured",
+        message: `${provider.toUpperCase()} integration is not yet configured. Please contact support.`
+      };
+    }
+
+    const state = this.generateOAuthState(campgroundId, provider);
+    const redirectUri = customRedirectUri || `${process.env.API_BASE_URL || "http://localhost:4000/api"}/integrations/oauth/${provider}/callback`;
+
+    const params = new URLSearchParams({
+      client_id: config.clientId,
+      redirect_uri: redirectUri,
+      response_type: "code",
+      scope: config.scopes.join(" "),
+      state
+    });
+
+    return {
+      provider,
+      authorizationUrl: `${config.authUrl}?${params.toString()}`,
+      state
+    };
+  }
+
+  /**
+   * Handle OAuth callback - exchange code for tokens
+   */
+  async handleOAuthCallback(
+    provider: string,
+    code: string,
+    state: string,
+    error?: string
+  ): Promise<{ success: boolean; connectionId?: string; error?: string }> {
+    if (error) {
+      return { success: false, error };
+    }
+
+    const stateData = this.parseOAuthState(state);
+    if (!stateData) {
+      return { success: false, error: "invalid_state" };
+    }
+
+    const config = this.getOAuthConfig(provider);
+    if (!config) {
+      return { success: false, error: "unknown_provider" };
+    }
+
+    try {
+      // Exchange code for tokens
+      const redirectUri = `${process.env.API_BASE_URL || "http://localhost:4000/api"}/integrations/oauth/${provider}/callback`;
+
+      const tokenResponse = await fetch(config.tokenUrl, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+          Accept: "application/json"
+        },
+        body: new URLSearchParams({
+          grant_type: "authorization_code",
+          code,
+          redirect_uri: redirectUri,
+          client_id: config.clientId,
+          client_secret: config.clientSecret
+        }).toString()
+      });
+
+      if (!tokenResponse.ok) {
+        const errorData = await tokenResponse.text();
+        console.error(`OAuth token exchange failed for ${provider}:`, errorData);
+        return { success: false, error: "token_exchange_failed" };
+      }
+
+      const tokens = await tokenResponse.json();
+
+      // Store the connection
+      const prisma = this.prismaClient();
+      const connection = await prisma.integrationConnection.upsert({
+        where: {
+          campgroundId_type_provider: {
+            campgroundId: stateData.campgroundId,
+            type: config.integrationType,
+            provider
+          }
+        },
+        create: {
+          campgroundId: stateData.campgroundId,
+          type: config.integrationType,
+          provider,
+          status: "connected",
+          authType: "oauth",
+          credentials: {
+            accessToken: tokens.access_token,
+            refreshToken: tokens.refresh_token,
+            expiresAt: tokens.expires_in ? Date.now() + tokens.expires_in * 1000 : null,
+            tokenType: tokens.token_type,
+            // Provider-specific fields
+            realmId: tokens.realmId, // QuickBooks
+            tenantId: tokens.tenantId // Xero
+          },
+          settings: {},
+          lastSyncStatus: "connected"
+        },
+        update: {
+          status: "connected",
+          credentials: {
+            accessToken: tokens.access_token,
+            refreshToken: tokens.refresh_token,
+            expiresAt: tokens.expires_in ? Date.now() + tokens.expires_in * 1000 : null,
+            tokenType: tokens.token_type,
+            realmId: tokens.realmId,
+            tenantId: tokens.tenantId
+          },
+          lastSyncStatus: "connected",
+          lastError: null
+        }
+      });
+
+      // Log the successful connection
+      await this.recordSyncLog(
+        connection.id,
+        "success",
+        `OAuth connection established with ${provider}`,
+        { provider, authType: "oauth" },
+        config.integrationType,
+        "connect"
+      );
+
+      return { success: true, connectionId: connection.id };
+    } catch (err: any) {
+      console.error(`OAuth callback error for ${provider}:`, err);
+      return { success: false, error: err?.message || "unknown_error" };
+    }
+  }
+
+  /**
+   * Get manual setup instructions for providers without OAuth
+   */
+  private getManualSetupInstructions(provider: string): string {
+    const instructions: Record<string, string> = {
+      sftp: "Configure your SFTP server details including host, port, username, and private key or password.",
+      api: "Use the webhook URL below to receive events. Configure your external service to POST JSON payloads to this endpoint.",
+      openpath: "Enter your OpenPath API credentials to enable automatic gate code generation.",
+      salto: "Enter your Salto system credentials to sync access control."
+    };
+
+    return instructions[provider.toLowerCase()] || "Contact support for setup instructions.";
+  }
+
   async listLogs(connectionId: string, limit = 50, cursor?: string) {
     const prisma = this.prismaClient();
     const take = Math.min(limit, 200);
