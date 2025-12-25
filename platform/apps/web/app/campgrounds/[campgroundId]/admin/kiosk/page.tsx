@@ -136,7 +136,7 @@ export default function KioskDevicesPage() {
         return `${minutes}m ${seconds}s`;
     };
 
-    const getLastSeenStatus = (lastSeenAt?: string) => {
+    const getLastSeenStatus = (lastSeenAt: string | null | undefined) => {
         if (!lastSeenAt) return { label: "Never connected", color: "text-muted-foreground", icon: WifiOff };
         const diff = Date.now() - new Date(lastSeenAt).getTime();
         const hours = diff / (1000 * 60 * 60);
