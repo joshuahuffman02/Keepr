@@ -1,15 +1,13 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import Link from "next/link";
 import { motion } from "framer-motion";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiClient } from "../../../lib/api-client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
-import { Calendar, Clock, Users, DollarSign, Ticket, Sparkles } from "lucide-react";
+import { Clock, DollarSign, Sparkles } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/components/ui/use-toast";
 import { format } from "date-fns";
@@ -18,6 +16,10 @@ import { recordTelemetry } from "../../../lib/sync-telemetry";
 import { loadQueue as loadQueueGeneric, saveQueue as saveQueueGeneric, registerBackgroundSync } from "../../../lib/offline-queue";
 import { randomId } from "@/lib/random-id";
 import { TableEmpty } from "@/components/ui/table";
+import { cn } from "@/lib/utils";
+import { GUEST_TOKEN_KEY, SPRING_CONFIG, STATUS_VARIANTS } from "@/lib/portal-constants";
+import { PortalPageHeader } from "@/components/portal/PortalPageHeader";
+import { PortalLoadingState, EmptyState } from "@/components/portal/PortalLoadingState";
 
 export default function GuestActivitiesPage() {
     const { toast } = useToast();
@@ -58,7 +60,7 @@ export default function GuestActivitiesPage() {
 
         const storedCg = localStorage.getItem("campreserv:selectedCampground");
         if (storedCg) setCampgroundId(storedCg);
-        const storedGuestToken = localStorage.getItem("campreserv:guestToken");
+        const storedGuestToken = localStorage.getItem(GUEST_TOKEN_KEY);
         if (storedGuestToken) {
             try {
                 const payload = JSON.parse(atob(storedGuestToken.split('.')[1]));
@@ -244,31 +246,38 @@ export default function GuestActivitiesPage() {
     });
 
     if (isLoading) {
-        return <div className="p-8 text-center">Loading activities...</div>;
+        return <PortalLoadingState variant="page" />;
     }
 
     return (
         <div className="container mx-auto px-4 py-6 space-y-6">
             {/* Page Header */}
-            <motion.div
-                initial={{ opacity: 0, y: -10 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="flex items-center justify-between flex-wrap gap-4"
-            >
-                <div className="flex items-center gap-3">
-                    <div className="h-12 w-12 rounded-xl bg-gradient-to-br from-orange-500 to-red-600 flex items-center justify-center">
-                        <Sparkles className="h-6 w-6 text-white" />
-                    </div>
-                    <div>
-                        <h1 className="text-2xl font-bold text-foreground">Activities & Events</h1>
-                        <p className="text-muted-foreground">Enhance your stay with curated experiences</p>
-                    </div>
-                </div>
+            <div className="flex items-center justify-between flex-wrap gap-4">
+                <PortalPageHeader
+                    icon={<Sparkles className="h-6 w-6 text-white" />}
+                    title="Activities & Events"
+                    subtitle="Enhance your stay with curated experiences"
+                    gradient="from-orange-500 to-red-600"
+                />
                 <div className="flex items-center gap-2">
-                    {!isOnline && <span className="inline-flex items-center rounded-full border border-border bg-muted px-2 py-1 text-xs text-muted-foreground">Offline</span>}
+                    {!isOnline && (
+                        <span className={cn(
+                            "inline-flex items-center rounded-full border px-2 py-1 text-xs",
+                            STATUS_VARIANTS.neutral.border,
+                            STATUS_VARIANTS.neutral.bg,
+                            STATUS_VARIANTS.neutral.text
+                        )}>
+                            Offline
+                        </span>
+                    )}
                     {queuedBookings > 0 && (
                         <span
-                            className="inline-flex items-center rounded-full border border-amber-300 dark:border-amber-700 bg-amber-50 dark:bg-amber-900/20 px-2 py-1 text-xs text-amber-800 dark:text-amber-300"
+                            className={cn(
+                                "inline-flex items-center rounded-full border px-2 py-1 text-xs",
+                                STATUS_VARIANTS.warning.border,
+                                STATUS_VARIANTS.warning.bg,
+                                STATUS_VARIANTS.warning.text
+                            )}
                             title={
                                 conflicts.length
                                     ? `${queuedBookings - conflicts.length} queued, ${conflicts.length} conflicts${conflicts[0]?.lastError ? ` (last error: ${conflicts[0].lastError})` : ""}${
@@ -289,9 +298,14 @@ export default function GuestActivitiesPage() {
                         </span>
                     )}
                 </div>
-            </motion.div>
+            </div>
             {conflicts.length > 0 && (
-                <div className="rounded-lg border border-amber-200 dark:border-amber-700 bg-amber-50 dark:bg-amber-900/20 text-amber-900 dark:text-amber-300 p-3 text-sm space-y-2">
+                <div className={cn(
+                    "rounded-lg border p-3 text-sm space-y-2",
+                    STATUS_VARIANTS.warning.border,
+                    STATUS_VARIANTS.warning.bg,
+                    STATUS_VARIANTS.warning.text
+                )}>
                     <div className="font-semibold">Conflicts detected</div>
                     {conflicts.map((c) => (
                         <div key={c.id} className="flex items-center justify-between gap-2">
@@ -318,13 +332,19 @@ export default function GuestActivitiesPage() {
             )}
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {activities?.filter((a: any) => a.isActive).map((activity: any) => (
-                    <Card key={activity.id} className="flex flex-col">
-                        {activity.images[0] && (
-                            <div className="h-48 w-full bg-slate-200 relative">
-                                <img src={activity.images[0]} alt={activity.name} className="object-cover w-full h-full rounded-t-lg" />
-                            </div>
-                        )}
+                {activities?.filter((a: any) => a.isActive).map((activity: any, index: number) => (
+                    <motion.div
+                        key={activity.id}
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: index * 0.05, ...SPRING_CONFIG }}
+                    >
+                        <Card className="flex flex-col h-full border-border">
+                            {activity.images[0] && (
+                                <div className="h-48 w-full bg-muted relative overflow-hidden">
+                                    <img src={activity.images[0]} alt={activity.name} className="object-cover w-full h-full rounded-t-lg" />
+                                </div>
+                            )}
                         <CardHeader>
                             <CardTitle>{activity.name}</CardTitle>
                             <CardDescription className="line-clamp-3">
@@ -364,29 +384,35 @@ export default function GuestActivitiesPage() {
                                             <Label>Select a Session</Label>
                                             <div className="grid gap-2 max-h-60 overflow-y-auto">
                                                 {sessions?.filter((s: any) => s.status === "scheduled").map((session: any) => (
-                                                    <div
+                                                    <button
                                                         key={session.id}
-                                                        className={`p-3 border rounded-lg cursor-pointer transition-colors ${selectedSession === session.id ? "border-blue-500 bg-blue-50" : "hover:bg-slate-50"}`}
+                                                        type="button"
+                                                        className={cn(
+                                                            "p-3 border rounded-lg text-left transition-colors",
+                                                            "focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2",
+                                                            selectedSession === session.id
+                                                                ? "border-primary bg-primary/10"
+                                                                : "border-border hover:bg-muted"
+                                                        )}
                                                         onClick={() => setSelectedSession(session.id)}
+                                                        aria-pressed={selectedSession === session.id}
                                                     >
                                                         <div className="flex justify-between items-center">
-                                                            <div className="font-medium">
+                                                            <div className="font-medium text-foreground">
                                                                 {format(new Date(session.startTime), "MMM d, h:mm a")}
                                                             </div>
-                                                            <div className="text-sm text-slate-500">
+                                                            <div className="text-sm text-muted-foreground">
                                                                 {session.capacity - session.bookedCount} spots left
                                                             </div>
                                                         </div>
-                                                    </div>
+                                                    </button>
                                                 ))}
                                                 {sessions?.length === 0 && (
-                                                    <div className="overflow-hidden rounded border border-slate-200 bg-white">
-                                                        <table className="w-full text-sm">
-                                                            <tbody>
-                                                                <TableEmpty>No upcoming sessions available.</TableEmpty>
-                                                            </tbody>
-                                                        </table>
-                                                    </div>
+                                                    <EmptyState
+                                                        icon={<Sparkles className="h-12 w-12" />}
+                                                        title="No sessions available"
+                                                        description="Check back later for upcoming sessions."
+                                                    />
                                                 )}
                                             </div>
                                         </div>
@@ -395,11 +421,27 @@ export default function GuestActivitiesPage() {
                                             <div className="space-y-2">
                                                 <Label>Number of Tickets</Label>
                                                 <div className="flex items-center gap-4">
-                                                    <Button variant="outline" size="icon" onClick={() => setQuantity(Math.max(1, quantity - 1))}>-</Button>
-                                                    <span className="text-lg font-medium w-8 text-center">{quantity}</span>
-                                                    <Button variant="outline" size="icon" onClick={() => setQuantity(quantity + 1)}>+</Button>
+                                                    <Button
+                                                        variant="outline"
+                                                        size="icon"
+                                                        className="h-10 w-10"
+                                                        onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                                                        aria-label="Decrease quantity"
+                                                    >
+                                                        -
+                                                    </Button>
+                                                    <span className="text-lg font-medium w-8 text-center text-foreground">{quantity}</span>
+                                                    <Button
+                                                        variant="outline"
+                                                        size="icon"
+                                                        className="h-10 w-10"
+                                                        onClick={() => setQuantity(quantity + 1)}
+                                                        aria-label="Increase quantity"
+                                                    >
+                                                        +
+                                                    </Button>
                                                 </div>
-                                                <div className="text-right font-medium text-lg">
+                                                <div className="text-right font-medium text-lg text-foreground">
                                                     Total: ${((activity.price * quantity) / 100).toFixed(2)}
                                                 </div>
                                             </div>
@@ -414,7 +456,8 @@ export default function GuestActivitiesPage() {
                                 </DialogContent>
                             </Dialog>
                         </CardFooter>
-                    </Card>
+                        </Card>
+                    </motion.div>
                 ))}
             </div>
         </div>

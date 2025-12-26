@@ -20,6 +20,8 @@ import {
   ChevronDown,
   ChevronUp,
   CheckCircle2,
+  RefreshCw,
+  Settings2,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -36,6 +38,10 @@ type ScheduleTemplate = {
   name: string;
   description?: string | null;
   isActive: boolean;
+  isRecurring?: boolean;
+  recurringDay?: number | null;
+  recurringWeeksAhead?: number | null;
+  lastAppliedAt?: string | null;
   shifts: TemplateShift[];
   createdAt: string;
   createdBy?: {

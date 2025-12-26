@@ -510,6 +510,9 @@ export class StaffController {
       name?: string;
       description?: string;
       isActive?: boolean;
+      isRecurring?: boolean;
+      recurringDay?: number | null;
+      recurringWeeksAhead?: number | null;
       shifts?: Array<{
         dayOfWeek: number;
         roleCode?: string;
@@ -533,6 +536,28 @@ export class StaffController {
     @Body() body: { weekStartDate: string; createdBy: string }
   ) {
     return this.service.applyScheduleTemplate(id, new Date(body.weekStartDate), body.createdBy);
+  }
+
+  @Post('templates/:id/recurring')
+  setTemplateRecurring(
+    @Param('id') id: string,
+    @Body() body: {
+      isRecurring: boolean;
+      recurringDay?: number;
+      recurringWeeksAhead?: number;
+    }
+  ) {
+    return this.service.setTemplateRecurring(
+      id,
+      body.isRecurring,
+      body.recurringDay,
+      body.recurringWeeksAhead
+    );
+  }
+
+  @Post('templates/process-recurring')
+  processRecurringTemplates() {
+    return this.service.processRecurringTemplates();
   }
 
   @Post('schedule/copy-week')

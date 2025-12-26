@@ -1,13 +1,16 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { apiClient } from "@/lib/api-client";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Loader2, Star, Gift, Trophy, TrendingUp, Sparkles } from "lucide-react";
+import { Star, Gift, Trophy, TrendingUp, Sparkles, Calendar } from "lucide-react";
 import { format } from "date-fns";
+import { cn } from "@/lib/utils";
+import { GUEST_TOKEN_KEY, SPRING_CONFIG, STATUS_VARIANTS } from "@/lib/portal-constants";
+import { PortalPageHeader } from "@/components/portal/PortalPageHeader";
+import { PortalLoadingState, EmptyState } from "@/components/portal/PortalLoadingState";
 
 type LoyaltyProfile = {
     id: string;
@@ -22,11 +25,28 @@ type LoyaltyProfile = {
     }>;
 };
 
-const TIER_COLORS: Record<string, string> = {
-    Bronze: "bg-amber-600",
-    Silver: "bg-slate-400",
-    Gold: "bg-yellow-500",
-    Platinum: "bg-gradient-to-r from-slate-300 to-slate-500"
+// Theme-aware tier colors with gradients
+const TIER_STYLES: Record<string, { bg: string; text: string; gradient: string }> = {
+    Bronze: {
+        bg: "bg-amber-600 dark:bg-amber-700",
+        text: "text-amber-600 dark:text-amber-400",
+        gradient: "bg-gradient-to-br from-amber-500 to-amber-700"
+    },
+    Silver: {
+        bg: "bg-slate-400 dark:bg-slate-500",
+        text: "text-slate-600 dark:text-slate-300",
+        gradient: "bg-gradient-to-br from-slate-300 to-slate-500 dark:from-slate-400 dark:to-slate-600"
+    },
+    Gold: {
+        bg: "bg-yellow-500 dark:bg-yellow-600",
+        text: "text-yellow-600 dark:text-yellow-400",
+        gradient: "bg-gradient-to-br from-yellow-400 to-yellow-600"
+    },
+    Platinum: {
+        bg: "bg-gradient-to-r from-slate-300 to-slate-500 dark:from-slate-400 dark:to-slate-600",
+        text: "text-slate-700 dark:text-slate-200",
+        gradient: "bg-gradient-to-br from-slate-200 via-slate-400 to-slate-600 dark:from-slate-300 dark:via-slate-500 dark:to-slate-700"
+    }
 };
 
 const TIER_THRESHOLDS = [
@@ -43,7 +63,7 @@ export default function RewardsPage() {
     const [guestId, setGuestId] = useState<string | null>(null);
 
     useEffect(() => {
-        const storedToken = localStorage.getItem("campreserv:guestToken");
+        const storedToken = localStorage.getItem(GUEST_TOKEN_KEY);
         if (!storedToken) {
             router.push("/portal/login");
             return;
@@ -74,146 +94,202 @@ export default function RewardsPage() {
         fetchData();
     }, [router, guestId]);
 
-    const getCurrentTier = () => {
+    // Memoized tier calculations
+    const currentTier = useMemo(() => {
         if (!profile) return TIER_THRESHOLDS[0];
         return TIER_THRESHOLDS.find(t => profile.pointsBalance >= t.min && profile.pointsBalance <= t.max) || TIER_THRESHOLDS[0];
-    };
+    }, [profile]);
 
-    const getNextTier = () => {
-        const current = getCurrentTier();
-        const idx = TIER_THRESHOLDS.findIndex(t => t.name === current.name);
+    const nextTier = useMemo(() => {
+        const idx = TIER_THRESHOLDS.findIndex(t => t.name === currentTier.name);
         return idx < TIER_THRESHOLDS.length - 1 ? TIER_THRESHOLDS[idx + 1] : null;
-    };
+    }, [currentTier]);
 
-    const getProgressToNextTier = () => {
+    const progressToNextTier = useMemo(() => {
         if (!profile) return 0;
-        const nextTier = getNextTier();
         if (!nextTier) return 100;
-        const current = getCurrentTier();
-        const progress = ((profile.pointsBalance - current.min) / (nextTier.min - current.min)) * 100;
+        const progress = ((profile.pointsBalance - currentTier.min) / (nextTier.min - currentTier.min)) * 100;
         return Math.min(100, Math.max(0, progress));
-    };
+    }, [profile, currentTier, nextTier]);
+
+    const tierStyle = TIER_STYLES[profile?.tier || "Bronze"] || TIER_STYLES.Bronze;
 
     if (loading) {
-        return (
-            <div className="min-h-screen flex items-center justify-center">
-                <Loader2 className="h-8 w-8 animate-spin text-primary" />
-            </div>
-        );
+        return <PortalLoadingState variant="page" />;
     }
 
     return (
         <div className="container mx-auto px-4 py-6 space-y-6">
             {/* Page Header */}
+            <PortalPageHeader
+                icon={<Sparkles className="h-6 w-6 text-white" />}
+                title="Rewards"
+                subtitle="Earn points, unlock perks"
+                gradient="from-amber-500 to-orange-600"
+            />
+
+            {/* Points Balance Card */}
             <motion.div
-                initial={{ opacity: 0, y: -10 }}
+                initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="flex items-center gap-3"
+                transition={{ ...SPRING_CONFIG, delay: 0.1 }}
             >
-                <div className="h-12 w-12 rounded-xl bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center">
-                    <Sparkles className="h-6 w-6 text-white" />
-                </div>
-                <div>
-                    <h1 className="text-2xl font-bold text-foreground">Rewards</h1>
-                    <p className="text-muted-foreground">Earn points, unlock perks</p>
-                </div>
-            </motion.div>
-                {/* Points Balance Card */}
-                <Card className="overflow-hidden">
-                    <div className={`${TIER_COLORS[profile?.tier || "Bronze"]} p-6 text-white`}>
+                <Card className="overflow-hidden border-0 shadow-lg">
+                    <div className={cn(tierStyle.gradient, "p-6 text-white")}>
                         <div className="flex items-center justify-between">
                             <div>
-                                <p className="text-sm opacity-80 mb-1">Your Tier</p>
+                                <p className="text-sm text-white/80 mb-1">Your Tier</p>
                                 <div className="flex items-center gap-2">
                                     <Trophy className="h-6 w-6" />
                                     <span className="text-2xl font-bold">{profile?.tier || "Bronze"}</span>
                                 </div>
                             </div>
                             <div className="text-right">
-                                <p className="text-sm opacity-80 mb-1">Points Balance</p>
+                                <p className="text-sm text-white/80 mb-1">Points Balance</p>
                                 <div className="flex items-center gap-2 justify-end">
                                     <Star className="h-6 w-6" />
-                                    <span className="text-3xl font-bold">{profile?.pointsBalance.toLocaleString() || 0}</span>
+                                    <motion.span
+                                        key={profile?.pointsBalance}
+                                        initial={{ scale: 1.2, opacity: 0 }}
+                                        animate={{ scale: 1, opacity: 1 }}
+                                        className="text-3xl font-bold"
+                                    >
+                                        {profile?.pointsBalance.toLocaleString() || 0}
+                                    </motion.span>
                                 </div>
                             </div>
                         </div>
                     </div>
                     <CardContent className="p-6">
-                        {getNextTier() && (
-                            <div className="space-y-2">
+                        {nextTier ? (
+                            <div className="space-y-3">
                                 <div className="flex justify-between text-sm">
-                                    <span className="text-muted-foreground">Progress to {getNextTier()?.name}</span>
-                                    <span className="font-medium">{getNextTier()!.min - (profile?.pointsBalance || 0)} points to go</span>
+                                    <span className="text-muted-foreground">Progress to {nextTier.name}</span>
+                                    <span className="font-medium text-foreground">
+                                        {(nextTier.min - (profile?.pointsBalance || 0)).toLocaleString()} points to go
+                                    </span>
                                 </div>
-                                <div className="h-2 bg-muted rounded-full overflow-hidden">
-                                    <div
-                                        className="h-full bg-primary transition-all duration-500"
-                                        style={{ width: `${getProgressToNextTier()}%` }}
+                                {/* Animated progress bar */}
+                                <div className="h-3 bg-muted rounded-full overflow-hidden">
+                                    <motion.div
+                                        className="h-full bg-gradient-to-r from-primary to-primary/80 rounded-full"
+                                        initial={{ width: 0 }}
+                                        animate={{ width: `${progressToNextTier}%` }}
+                                        transition={{ duration: 1, ease: "easeOut", delay: 0.3 }}
                                     />
                                 </div>
+                                <p className="text-xs text-muted-foreground">
+                                    {Math.round(progressToNextTier)}% of the way to {nextTier.name}
+                                </p>
                             </div>
-                        )}
-                        {!getNextTier() && (
-                            <div className="flex items-center gap-2 text-green-600">
+                        ) : (
+                            <motion.div
+                                initial={{ opacity: 0, scale: 0.9 }}
+                                animate={{ opacity: 1, scale: 1 }}
+                                transition={{ delay: 0.3 }}
+                                className={cn(
+                                    "flex items-center gap-2 p-3 rounded-lg",
+                                    STATUS_VARIANTS.success.bg,
+                                    STATUS_VARIANTS.success.text
+                                )}
+                            >
                                 <Gift className="h-5 w-5" />
                                 <span className="font-medium">You've reached the highest tier!</span>
-                            </div>
+                            </motion.div>
                         )}
                     </CardContent>
                 </Card>
+            </motion.div>
 
-                {/* How to Earn Points */}
-                <Card>
+            {/* How to Earn Points */}
+            <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ ...SPRING_CONFIG, delay: 0.2 }}
+            >
+                <Card className="border-border">
                     <CardHeader>
-                        <CardTitle className="flex items-center gap-2">
-                            <TrendingUp className="h-5 w-5" />
+                        <CardTitle className="flex items-center gap-2 text-foreground">
+                            <TrendingUp className="h-5 w-5 text-primary" />
                             How to Earn Points
                         </CardTitle>
                     </CardHeader>
                     <CardContent>
-                        <ul className="space-y-2 text-sm text-muted-foreground">
-                            <li className="flex items-center gap-2">
-                                <span className="h-2 w-2 rounded-full bg-primary" />
-                                Earn 1 point for every $1 spent on reservations
-                            </li>
-                            <li className="flex items-center gap-2">
-                                <span className="h-2 w-2 rounded-full bg-primary" />
-                                Points are credited after check-out
-                            </li>
+                        <ul className="space-y-3">
+                            {[
+                                { text: "Earn 1 point for every $1 spent on reservations", icon: Star },
+                                { text: "Points are credited after check-out", icon: Calendar },
+                                { text: "Bonus points on special promotions", icon: Gift }
+                            ].map((item, index) => (
+                                <motion.li
+                                    key={index}
+                                    initial={{ opacity: 0, x: -10 }}
+                                    animate={{ opacity: 1, x: 0 }}
+                                    transition={{ delay: 0.3 + index * 0.1 }}
+                                    className="flex items-center gap-3 text-sm text-muted-foreground"
+                                >
+                                    <div className="h-8 w-8 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
+                                        <item.icon className="h-4 w-4 text-primary" />
+                                    </div>
+                                    <span>{item.text}</span>
+                                </motion.li>
+                            ))}
                         </ul>
                     </CardContent>
                 </Card>
+            </motion.div>
 
-                {/* Transaction History */}
-                <Card>
+            {/* Transaction History */}
+            <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ ...SPRING_CONFIG, delay: 0.3 }}
+            >
+                <Card className="border-border">
                     <CardHeader>
-                        <CardTitle>Points History</CardTitle>
+                        <CardTitle className="text-foreground">Points History</CardTitle>
                         <CardDescription>Your recent points activity</CardDescription>
                     </CardHeader>
                     <CardContent>
                         {profile?.transactions && profile.transactions.length > 0 ? (
-                            <div className="space-y-4">
-                                {profile.transactions.map((tx) => (
-                                    <div key={tx.id} className="flex items-center justify-between py-3 border-b last:border-0">
+                            <div className="space-y-1">
+                                {profile.transactions.map((tx, index) => (
+                                    <motion.div
+                                        key={tx.id}
+                                        initial={{ opacity: 0, y: 10 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        transition={{ delay: 0.4 + index * 0.05 }}
+                                        className="flex items-center justify-between py-3 border-b border-border last:border-0"
+                                    >
                                         <div>
-                                            <p className="font-medium">{tx.reason}</p>
+                                            <p className="font-medium text-foreground">{tx.reason}</p>
                                             <p className="text-sm text-muted-foreground">
                                                 {format(new Date(tx.createdAt), "MMM d, yyyy")}
                                             </p>
                                         </div>
-                                        <Badge variant={tx.amount > 0 ? "default" : "destructive"}>
+                                        <div
+                                            className={cn(
+                                                "px-3 py-1 rounded-full text-sm font-medium",
+                                                tx.amount > 0
+                                                    ? cn(STATUS_VARIANTS.success.bg, STATUS_VARIANTS.success.text)
+                                                    : cn(STATUS_VARIANTS.error.bg, STATUS_VARIANTS.error.text)
+                                            )}
+                                        >
                                             {tx.amount > 0 ? "+" : ""}{tx.amount} pts
-                                        </Badge>
-                                    </div>
+                                        </div>
+                                    </motion.div>
                                 ))}
                             </div>
                         ) : (
-                            <p className="text-muted-foreground text-center py-8">
-                                No points activity yet. Complete a stay to start earning!
-                            </p>
+                            <EmptyState
+                                icon={<Star className="h-12 w-12" />}
+                                title="No points yet"
+                                description="Complete your first stay to start earning rewards!"
+                            />
                         )}
                     </CardContent>
                 </Card>
+            </motion.div>
         </div>
     );
 }

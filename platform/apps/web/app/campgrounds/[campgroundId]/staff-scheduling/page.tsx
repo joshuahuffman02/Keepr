@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { DashboardShell } from "../../../../components/ui/layout/DashboardShell";
 import { StaffNavigation } from "@/components/staff/StaffNavigation";
+import { useWhoami } from "@/hooks/use-whoami";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Search,
@@ -18,6 +19,7 @@ import {
   GripVertical,
   ArrowRight,
   ArrowLeft,
+  ArrowLeftRight,
   Copy,
   Send,
   Loader2,
@@ -25,6 +27,7 @@ import {
   LayoutGrid,
   List,
   Filter,
+  X,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -60,6 +63,7 @@ const SPRING_CONFIG = {
 };
 
 export default function StaffSchedulingPage({ params }: { params: { campgroundId: string } }) {
+  const { data: whoami } = useWhoami();
   const [shifts, setShifts] = useState<Shift[]>([]);
   const [roles, setRoles] = useState<StaffRole[]>([]);
   const [staffMembers, setStaffMembers] = useState<StaffMember[]>([]);
@@ -71,6 +75,14 @@ export default function StaffSchedulingPage({ params }: { params: { campgroundId
   const [processing, setProcessing] = useState<Set<string>>(new Set());
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
+
+  // Swap modal state
+  const [swapShift, setSwapShift] = useState<Shift | null>(null);
+  const [swapRecipientId, setSwapRecipientId] = useState("");
+  const [swapNote, setSwapNote] = useState("");
+  const [swapSubmitting, setSwapSubmitting] = useState(false);
+
+  const currentUserId = whoami?.user?.id;
 
   // Staff selector state
   const [staffSearch, setStaffSearch] = useState("");
@@ -370,6 +382,53 @@ export default function StaffSchedulingPage({ params }: { params: { campgroundId
     }
   };
 
+  const requestSwap = async () => {
+    if (!swapShift || !swapRecipientId || !currentUserId) return;
+
+    setSwapSubmitting(true);
+    try {
+      const res = await fetch("/api/staff/swaps", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          campgroundId: params.campgroundId,
+          requesterShiftId: swapShift.id,
+          requesterId: currentUserId,
+          recipientUserId: swapRecipientId,
+          note: swapNote || undefined,
+        }),
+      });
+
+      if (!res.ok) throw new Error("Failed to request swap");
+      showSuccess("Swap request sent!");
+      setSwapShift(null);
+      setSwapRecipientId("");
+      setSwapNote("");
+    } catch {
+      setError("Could not send swap request. Please try again.");
+    } finally {
+      setSwapSubmitting(false);
+    }
+  };
+
+  const openSwapModal = (shift: Shift) => {
+    setSwapShift(shift);
+    setSwapRecipientId("");
+    setSwapNote("");
+  };
+
+  const closeSwapModal = () => {
+    setSwapShift(null);
+    setSwapRecipientId("");
+    setSwapNote("");
+  };
+
+  // Filter out the current shift owner from swap recipients
+  const swapRecipients = useMemo(() => {
+    if (!swapShift) return [];
+    return staffMembers.filter((s) => s.id !== swapShift.userId);
+  }, [staffMembers, swapShift]);
+
   const formatDuration = (minutes?: number | null) => {
     if (!minutes) return null;
     const hours = Math.floor(minutes / 60);
@@ -415,6 +474,120 @@ export default function StaffSchedulingPage({ params }: { params: { campgroundId
             >
               <CheckCircle2 className="w-5 h-5" />
               <span className="font-medium">{successMessage}</span>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* Swap Request Modal */}
+        <AnimatePresence>
+          {swapShift && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4"
+              onClick={closeSwapModal}
+            >
+              <motion.div
+                initial={{ scale: 0.95, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                exit={{ scale: 0.95, opacity: 0 }}
+                className="bg-white rounded-2xl shadow-xl max-w-md w-full overflow-hidden"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <div className="bg-gradient-to-r from-violet-50 to-purple-50 border-b border-violet-100 px-6 py-4">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-lg bg-violet-100 flex items-center justify-center">
+                        <ArrowLeftRight className="w-5 h-5 text-violet-600" />
+                      </div>
+                      <div>
+                        <h3 className="font-semibold text-slate-900">Request Shift Swap</h3>
+                        <p className="text-sm text-slate-600">Find someone to take your shift</p>
+                      </div>
+                    </div>
+                    <button
+                      onClick={closeSwapModal}
+                      className="p-2 text-slate-400 hover:text-slate-600 rounded-lg hover:bg-slate-100"
+                    >
+                      <X className="w-5 h-5" />
+                    </button>
+                  </div>
+                </div>
+
+                <div className="p-6 space-y-4">
+                  {/* Shift info */}
+                  <div className="p-4 bg-slate-50 rounded-xl">
+                    <div className="text-sm font-medium text-slate-500 mb-1">Shift to swap</div>
+                    <div className="font-semibold text-slate-900">
+                      {new Date(swapShift.shiftDate).toLocaleDateString(undefined, { weekday: "long", month: "short", day: "numeric" })}
+                    </div>
+                    <div className="text-sm text-slate-600">
+                      {new Date(swapShift.startTime).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" })} - {new Date(swapShift.endTime).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" })}
+                      {swapShift.role && <span className="ml-2 text-slate-400">({swapShift.role})</span>}
+                    </div>
+                  </div>
+
+                  {/* Recipient selector */}
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 mb-2">
+                      Ask someone to take it
+                    </label>
+                    <select
+                      value={swapRecipientId}
+                      onChange={(e) => setSwapRecipientId(e.target.value)}
+                      className="w-full px-4 py-3 border border-slate-200 rounded-lg focus:ring-2 focus:ring-violet-500 focus:border-violet-500"
+                    >
+                      <option value="">Select a team member...</option>
+                      {swapRecipients.map((s) => (
+                        <option key={s.id} value={s.id}>
+                          {s.firstName} {s.lastName}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  {/* Note */}
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 mb-2">
+                      Note (optional)
+                    </label>
+                    <textarea
+                      value={swapNote}
+                      onChange={(e) => setSwapNote(e.target.value)}
+                      placeholder="e.g., I have a doctor's appointment..."
+                      rows={2}
+                      className="w-full px-4 py-3 border border-slate-200 rounded-lg focus:ring-2 focus:ring-violet-500 focus:border-violet-500"
+                    />
+                  </div>
+
+                  {/* Actions */}
+                  <div className="flex gap-3 pt-2">
+                    <button
+                      onClick={closeSwapModal}
+                      className="flex-1 px-4 py-3 bg-slate-100 text-slate-700 rounded-xl font-medium hover:bg-slate-200"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      onClick={requestSwap}
+                      disabled={!swapRecipientId || swapSubmitting}
+                      className={cn(
+                        "flex-1 px-4 py-3 rounded-xl font-medium flex items-center justify-center gap-2",
+                        "bg-violet-600 text-white hover:bg-violet-700",
+                        (!swapRecipientId || swapSubmitting) && "opacity-50 cursor-not-allowed"
+                      )}
+                    >
+                      {swapSubmitting ? (
+                        <Loader2 className="w-5 h-5 animate-spin" />
+                      ) : (
+                        <ArrowLeftRight className="w-5 h-5" />
+                      )}
+                      Request Swap
+                    </button>
+                  </div>
+                </div>
+              </motion.div>
             </motion.div>
           )}
         </AnimatePresence>
@@ -874,6 +1047,15 @@ export default function StaffSchedulingPage({ params }: { params: { campgroundId
                               <Copy className="w-3.5 h-3.5" />
                               Prefill
                             </button>
+                            {shift.status === "scheduled" && shift.userId === currentUserId && (
+                              <button
+                                onClick={() => openSwapModal(shift)}
+                                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-violet-100 text-violet-700 text-xs font-medium hover:bg-violet-200 transition-colors"
+                              >
+                                <ArrowLeftRight className="w-3.5 h-3.5" />
+                                Swap
+                              </button>
+                            )}
                             <button
                               onClick={() => moveShiftByDays(shift, -1)}
                               disabled={processing.has(shift.id)}
@@ -1031,6 +1213,14 @@ export default function StaffSchedulingPage({ params }: { params: { campgroundId
                                     >
                                       Prefill
                                     </button>
+                                    {shift.status === "scheduled" && shift.userId === currentUserId && (
+                                      <button
+                                        onClick={() => openSwapModal(shift)}
+                                        className="text-[10px] text-violet-700 font-medium hover:underline"
+                                      >
+                                        Swap
+                                      </button>
+                                    )}
                                     <button
                                       disabled={processing.has(shift.id)}
                                       onClick={() => moveShiftByDays(shift, -1)}

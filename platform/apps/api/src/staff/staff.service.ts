@@ -2,6 +2,7 @@ import { BadRequestException, Injectable, NotFoundException, Logger } from '@nes
 import { PrismaService } from '../prisma/prisma.service';
 import { PushNotificationType } from '@prisma/client';
 import { AuditService } from "../audit/audit.service";
+import { EmailService } from "../email/email.service";
 import { minutesBetween } from "./payroll.service";
 
 interface CreateShiftDto {
@@ -39,7 +40,8 @@ interface OverrideRequestDto {
 export class StaffService {
   constructor(
     private readonly prisma: PrismaService,
-    private readonly audit: AuditService
+    private readonly audit: AuditService,
+    private readonly emailService: EmailService
   ) {}
   private readonly logger = new Logger(StaffService.name);
 
@@ -880,7 +882,7 @@ export class StaffService {
       },
     });
 
-    // Send notification to recipient
+    // Send push notification to recipient
     await this.sendNotification(
       dto.campgroundId,
       dto.recipientUserId,
@@ -889,6 +891,32 @@ export class StaffService {
       `${swap.requester.firstName} ${swap.requester.lastName} wants to swap shifts with you`,
       { swapId: swap.id }
     );
+
+    // Send email notification to recipient
+    if (swap.recipient.email) {
+      const campground = await this.prisma.campground.findUnique({
+        where: { id: dto.campgroundId },
+        select: { name: true },
+      });
+
+      const startTime = swap.requesterShift.startTime;
+      const endTime = swap.requesterShift.endTime;
+
+      await this.emailService.sendShiftSwapRequest({
+        recipientEmail: swap.recipient.email,
+        recipientName: `${swap.recipient.firstName} ${swap.recipient.lastName}`,
+        requesterName: `${swap.requester.firstName} ${swap.requester.lastName}`,
+        campgroundName: campground?.name || 'your campground',
+        shiftDate: swap.requesterShift.shiftDate,
+        shiftStartTime: startTime.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }),
+        shiftEndTime: endTime.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }),
+        role: swap.requesterShift.role || undefined,
+        note: dto.note,
+        actionUrl: `${process.env.WEB_URL || 'http://localhost:3000'}/campgrounds/${dto.campgroundId}/staff/swaps`,
+      }).catch((err) => {
+        this.logger.warn(`Failed to send shift swap request email: ${err.message}`);
+      });
+    }
 
     return swap;
   }
@@ -982,7 +1010,7 @@ export class StaffService {
       },
     });
 
-    // Notify both parties
+    // Notify both parties via push notification
     const statusText = approve ? 'approved' : 'rejected';
     for (const userId of [swap.requesterId, swap.recipientUserId]) {
       await this.sendNotification(
@@ -993,6 +1021,36 @@ export class StaffService {
         `Manager has ${statusText} the shift swap request`,
         { swapId: swap.id }
       );
+    }
+
+    // Send email notifications to both parties
+    const campground = await this.prisma.campground.findUnique({
+      where: { id: swap.campgroundId },
+      select: { name: true },
+    });
+
+    const startTime = swap.requesterShift.startTime;
+    const endTime = swap.requesterShift.endTime;
+
+    const emailNotifications = [
+      { email: updated.requester.email, name: `${updated.requester.firstName} ${updated.requester.lastName}` },
+      { email: updated.recipient.email, name: `${updated.recipient.firstName} ${updated.recipient.lastName}` },
+    ].filter((n) => n.email);
+
+    for (const recipient of emailNotifications) {
+      await this.emailService.sendShiftSwapDecision({
+        recipientEmail: recipient.email!,
+        recipientName: recipient.name,
+        approved: approve,
+        campgroundName: campground?.name || 'your campground',
+        shiftDate: swap.requesterShift.shiftDate,
+        shiftStartTime: startTime.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }),
+        shiftEndTime: endTime.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }),
+        managerName: updated.manager ? `${updated.manager.firstName} ${updated.manager.lastName}` : undefined,
+        note,
+      }).catch((err) => {
+        this.logger.warn(`Failed to send shift swap decision email: ${err.message}`);
+      });
     }
 
     return updated;
@@ -1086,6 +1144,9 @@ export class StaffService {
       name?: string;
       description?: string;
       isActive?: boolean;
+      isRecurring?: boolean;
+      recurringDay?: number | null;
+      recurringWeeksAhead?: number | null;
       shifts?: Array<{
         dayOfWeek: number;
         roleCode?: string;
@@ -1101,6 +1162,9 @@ export class StaffService {
         name: dto.name,
         description: dto.description,
         isActive: dto.isActive,
+        isRecurring: dto.isRecurring,
+        recurringDay: dto.recurringDay,
+        recurringWeeksAhead: dto.recurringWeeksAhead,
         shifts: dto.shifts,
       },
       include: {
@@ -1365,6 +1429,139 @@ export class StaffService {
     }
 
     return report;
+  }
+
+  // ---- Recurring Template Processing ----
+
+  /**
+   * Get recurring templates that should run today
+   */
+  async getRecurringTemplatesForToday() {
+    const today = new Date();
+    const dayOfWeek = today.getDay(); // 0=Sunday, 1=Monday, etc.
+
+    return this.prisma.scheduleTemplate.findMany({
+      where: {
+        isActive: true,
+        isRecurring: true,
+        recurringDay: dayOfWeek,
+      },
+      include: {
+        campground: { select: { id: true, name: true } },
+        createdBy: { select: { id: true, firstName: true, lastName: true } },
+      },
+    });
+  }
+
+  /**
+   * Process all recurring templates that should run today.
+   * Called by a scheduled cron job.
+   */
+  async processRecurringTemplates() {
+    const templates = await this.getRecurringTemplatesForToday();
+    const results: Array<{
+      templateId: string;
+      templateName: string;
+      campgroundName: string;
+      success: boolean;
+      shiftsCreated: number;
+      error?: string;
+    }> = [];
+
+    for (const template of templates) {
+      try {
+        // Calculate the target week start date
+        const today = new Date();
+        const weeksAhead = template.recurringWeeksAhead ?? 1;
+
+        // Find the next Sunday (or configured week start)
+        const nextWeekStart = new Date(today);
+        const daysUntilSunday = (7 - today.getDay()) % 7 || 7;
+        nextWeekStart.setDate(today.getDate() + daysUntilSunday + (weeksAhead - 1) * 7);
+        nextWeekStart.setHours(0, 0, 0, 0);
+
+        // Check if we already applied for this week (prevent duplicates)
+        if (template.lastAppliedAt) {
+          const lastAppliedDate = new Date(template.lastAppliedAt);
+          const daysSinceLastApplied = Math.floor(
+            (today.getTime() - lastAppliedDate.getTime()) / (1000 * 60 * 60 * 24)
+          );
+          if (daysSinceLastApplied < 6) {
+            // Already ran within the last week, skip
+            this.logger.log(`Skipping template ${template.name} - already applied recently`);
+            continue;
+          }
+        }
+
+        // Apply the template
+        const result = await this.applyScheduleTemplate(
+          template.id,
+          nextWeekStart,
+          template.createdById // Use template creator as the "createdBy" for shifts
+        );
+
+        // Update lastAppliedAt
+        await this.prisma.scheduleTemplate.update({
+          where: { id: template.id },
+          data: { lastAppliedAt: new Date() },
+        });
+
+        results.push({
+          templateId: template.id,
+          templateName: template.name,
+          campgroundName: template.campground.name,
+          success: true,
+          shiftsCreated: result.count,
+        });
+
+        this.logger.log(
+          `Applied recurring template "${template.name}" for ${template.campground.name}: ${result.count} shifts created`
+        );
+      } catch (error) {
+        const message = error instanceof Error ? error.message : 'Unknown error';
+        results.push({
+          templateId: template.id,
+          templateName: template.name,
+          campgroundName: template.campground.name,
+          success: false,
+          shiftsCreated: 0,
+          error: message,
+        });
+        this.logger.error(
+          `Failed to apply recurring template "${template.name}": ${message}`
+        );
+      }
+    }
+
+    return {
+      processedAt: new Date(),
+      templatesProcessed: templates.length,
+      results,
+    };
+  }
+
+  /**
+   * Toggle recurring scheduling for a template
+   */
+  async setTemplateRecurring(
+    templateId: string,
+    isRecurring: boolean,
+    recurringDay?: number,
+    recurringWeeksAhead?: number
+  ) {
+    const template = await this.getScheduleTemplate(templateId);
+
+    return this.prisma.scheduleTemplate.update({
+      where: { id: templateId },
+      data: {
+        isRecurring,
+        recurringDay: isRecurring ? (recurringDay ?? 0) : null,
+        recurringWeeksAhead: isRecurring ? (recurringWeeksAhead ?? 1) : null,
+      },
+      include: {
+        createdBy: { select: { id: true, firstName: true, lastName: true } },
+      },
+    });
   }
 }
 

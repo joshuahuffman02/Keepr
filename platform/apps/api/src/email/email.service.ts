@@ -361,6 +361,175 @@ ${options.html}
     }
 
     /**
+     * Send shift swap request notification
+     */
+    async sendShiftSwapRequest(options: {
+        recipientEmail: string;
+        recipientName: string;
+        requesterName: string;
+        campgroundName: string;
+        shiftDate: Date;
+        shiftStartTime: string;
+        shiftEndTime: string;
+        role?: string;
+        note?: string;
+        actionUrl?: string;
+    }): Promise<void> {
+        const shiftDateStr = options.shiftDate.toLocaleDateString("en-US", {
+            weekday: "long",
+            year: "numeric",
+            month: "long",
+            day: "numeric"
+        });
+
+        const html = `
+            <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+                <div style="text-align: center; margin-bottom: 30px;">
+                    <div style="background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%); width: 60px; height: 60px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 16px;">
+                        <span style="color: white; font-size: 24px;">⇄</span>
+                    </div>
+                    <h1 style="color: #0f172a; margin: 0;">Shift Swap Request</h1>
+                    <p style="color: #64748b; margin-top: 8px;">Someone wants to swap shifts with you</p>
+                </div>
+
+                <div style="background: #f8fafc; border-radius: 12px; padding: 20px; margin-bottom: 24px;">
+                    <p style="margin: 0 0 16px 0; color: #334155;">
+                        Hi ${options.recipientName},
+                    </p>
+                    <p style="margin: 0; color: #334155; line-height: 1.6;">
+                        <strong>${options.requesterName}</strong> would like you to take their shift:
+                    </p>
+                </div>
+
+                <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 20px; margin-bottom: 24px;">
+                    <h2 style="margin: 0 0 16px 0; color: #0f172a; font-size: 16px;">Shift Details</h2>
+
+                    <table style="width: 100%; border-collapse: collapse;">
+                        <tr>
+                            <td style="padding: 8px 0; color: #64748b; border-bottom: 1px solid #f1f5f9;">Date</td>
+                            <td style="padding: 8px 0; color: #0f172a; text-align: right; border-bottom: 1px solid #f1f5f9; font-weight: 500;">${shiftDateStr}</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 8px 0; color: #64748b; border-bottom: 1px solid #f1f5f9;">Time</td>
+                            <td style="padding: 8px 0; color: #0f172a; text-align: right; border-bottom: 1px solid #f1f5f9;">${options.shiftStartTime} - ${options.shiftEndTime}</td>
+                        </tr>
+                        ${options.role ? `
+                        <tr>
+                            <td style="padding: 8px 0; color: #64748b; border-bottom: 1px solid #f1f5f9;">Role</td>
+                            <td style="padding: 8px 0; color: #0f172a; text-align: right; border-bottom: 1px solid #f1f5f9;">${options.role}</td>
+                        </tr>
+                        ` : ""}
+                        <tr>
+                            <td style="padding: 8px 0; color: #64748b;">Location</td>
+                            <td style="padding: 8px 0; color: #0f172a; text-align: right;">${options.campgroundName}</td>
+                        </tr>
+                    </table>
+                </div>
+
+                ${options.note ? `
+                <div style="background: #fef3c7; border: 1px solid #fcd34d; border-radius: 12px; padding: 16px; margin-bottom: 24px;">
+                    <p style="margin: 0 0 4px 0; color: #92400e; font-size: 12px; font-weight: 600;">NOTE FROM ${options.requesterName.toUpperCase()}</p>
+                    <p style="margin: 0; color: #78350f;">${options.note}</p>
+                </div>
+                ` : ""}
+
+                ${options.actionUrl ? `
+                <div style="text-align: center; margin-bottom: 24px;">
+                    <a href="${options.actionUrl}" style="display: inline-block; background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%); color: white; padding: 14px 32px; border-radius: 8px; text-decoration: none; font-weight: 600;">
+                        Review Request
+                    </a>
+                </div>
+                ` : ""}
+
+                <div style="text-align: center; padding-top: 20px; border-top: 1px solid #e2e8f0;">
+                    <p style="color: #64748b; font-size: 12px; margin: 0;">
+                        Log in to accept or decline this swap request.
+                    </p>
+                    <p style="color: #94a3b8; font-size: 11px; margin-top: 8px;">
+                        ${options.campgroundName} Staff Scheduling
+                    </p>
+                </div>
+            </div>
+        `;
+
+        await this.sendEmail({
+            to: options.recipientEmail,
+            subject: `Shift Swap Request from ${options.requesterName} - ${options.campgroundName}`,
+            html
+        });
+    }
+
+    /**
+     * Send shift swap decision notification (approved/rejected by manager)
+     */
+    async sendShiftSwapDecision(options: {
+        recipientEmail: string;
+        recipientName: string;
+        approved: boolean;
+        campgroundName: string;
+        shiftDate: Date;
+        shiftStartTime: string;
+        shiftEndTime: string;
+        managerName?: string;
+        note?: string;
+    }): Promise<void> {
+        const shiftDateStr = options.shiftDate.toLocaleDateString("en-US", {
+            weekday: "long",
+            month: "long",
+            day: "numeric"
+        });
+
+        const statusColor = options.approved ? "#10b981" : "#ef4444";
+        const statusText = options.approved ? "Approved" : "Rejected";
+        const statusIcon = options.approved ? "✓" : "✕";
+
+        const html = `
+            <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+                <div style="text-align: center; margin-bottom: 30px;">
+                    <div style="background: ${statusColor}; width: 60px; height: 60px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 16px;">
+                        <span style="color: white; font-size: 28px;">${statusIcon}</span>
+                    </div>
+                    <h1 style="color: #0f172a; margin: 0;">Shift Swap ${statusText}</h1>
+                    <p style="color: #64748b; margin-top: 8px;">Your swap request has been ${statusText.toLowerCase()}</p>
+                </div>
+
+                <div style="background: ${options.approved ? "#ecfdf5" : "#fef2f2"}; border-radius: 12px; padding: 20px; margin-bottom: 24px;">
+                    <p style="margin: 0; color: #334155;">
+                        Hi ${options.recipientName}, your shift swap request for <strong>${shiftDateStr}</strong> (${options.shiftStartTime} - ${options.shiftEndTime}) has been <strong style="color: ${statusColor};">${statusText.toLowerCase()}</strong>${options.managerName ? ` by ${options.managerName}` : ""}.
+                    </p>
+                </div>
+
+                ${options.note ? `
+                <div style="background: #f8fafc; border-radius: 12px; padding: 16px; margin-bottom: 24px;">
+                    <p style="margin: 0 0 4px 0; color: #64748b; font-size: 12px; font-weight: 600;">MANAGER NOTE</p>
+                    <p style="margin: 0; color: #334155;">${options.note}</p>
+                </div>
+                ` : ""}
+
+                ${options.approved ? `
+                <div style="background: #ecfdf5; border: 1px solid #10b981; border-radius: 12px; padding: 16px; text-align: center;">
+                    <p style="margin: 0; color: #065f46; font-weight: 500;">
+                        The shift has been reassigned. Check the schedule for your updated shifts.
+                    </p>
+                </div>
+                ` : ""}
+
+                <div style="text-align: center; margin-top: 30px; padding-top: 20px; border-top: 1px solid #e2e8f0;">
+                    <p style="color: #94a3b8; font-size: 11px; margin: 0;">
+                        ${options.campgroundName} Staff Scheduling
+                    </p>
+                </div>
+            </div>
+        `;
+
+        await this.sendEmail({
+            to: options.recipientEmail,
+            subject: `Shift Swap ${statusText} - ${options.campgroundName}`,
+            html
+        });
+    }
+
+    /**
      * Send a scheduled report email
      */
     async sendScheduledReport(options: {

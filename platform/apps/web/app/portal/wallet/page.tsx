@@ -5,9 +5,12 @@ import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { apiClient } from "@/lib/api-client";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Loader2, Wallet, ArrowDownLeft, ArrowUpRight, History, Building2, CreditCard } from "lucide-react";
+import { Wallet, ArrowDownLeft, ArrowUpRight, History, Building2, CreditCard, Loader2 } from "lucide-react";
 import { format } from "date-fns";
+import { cn } from "@/lib/utils";
+import { GUEST_TOKEN_KEY, SPRING_CONFIG, STATUS_VARIANTS } from "@/lib/portal-constants";
+import { PortalPageHeader } from "@/components/portal/PortalPageHeader";
+import { PortalLoadingState, EmptyState } from "@/components/portal/PortalLoadingState";
 
 type WalletBalance = {
     walletId: string;
@@ -41,7 +44,7 @@ export default function WalletPage() {
     const [loadingTransactions, setLoadingTransactions] = useState(false);
 
     useEffect(() => {
-        const storedToken = localStorage.getItem("campreserv:guestToken");
+        const storedToken = localStorage.getItem(GUEST_TOKEN_KEY);
         if (!storedToken) {
             router.push("/portal/login");
             return;
@@ -71,7 +74,7 @@ export default function WalletPage() {
     useEffect(() => {
         if (!selectedWalletId || !selectedWallet) return;
 
-        const storedToken = localStorage.getItem("campreserv:guestToken");
+        const storedToken = localStorage.getItem(GUEST_TOKEN_KEY);
         if (!storedToken) return;
 
         const fetchTransactions = async () => {
@@ -116,29 +119,18 @@ export default function WalletPage() {
     const totalBalanceCents = wallets.reduce((sum, w) => sum + w.balanceCents, 0);
 
     if (loading) {
-        return (
-            <div className="min-h-screen flex items-center justify-center">
-                <Loader2 className="h-8 w-8 animate-spin text-primary" />
-            </div>
-        );
+        return <PortalLoadingState variant="page" />;
     }
 
     return (
         <div className="container mx-auto px-4 py-6 space-y-6">
             {/* Page Header */}
-            <motion.div
-                initial={{ opacity: 0, y: -10 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="flex items-center gap-3"
-            >
-                <div className="h-12 w-12 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center">
-                    <CreditCard className="h-6 w-6 text-white" />
-                </div>
-                <div>
-                    <h1 className="text-2xl font-bold text-foreground">My Wallet</h1>
-                    <p className="text-muted-foreground">Store credit & payment history</p>
-                </div>
-            </motion.div>
+            <PortalPageHeader
+                icon={<CreditCard className="h-6 w-6 text-white" />}
+                title="My Wallet"
+                subtitle="Store credit & payment history"
+                gradient="from-emerald-500 to-teal-600"
+            />
                 {wallets.length === 0 ? (
                     <Card>
                         <CardContent className="py-12 text-center">
@@ -276,41 +268,57 @@ export default function WalletPage() {
                                         Select a wallet to view transaction history
                                     </p>
                                 ) : transactions.length > 0 ? (
-                                    <div className="space-y-4">
-                                        {transactions.map((tx) => (
-                                            <div key={tx.id} className="flex items-center justify-between py-3 border-b last:border-0">
-                                                <div className="flex items-center gap-3">
-                                                    <div className={`p-2 rounded-full ${
-                                                        tx.direction === "credit" || tx.direction === "issue"
-                                                            ? "bg-emerald-100 text-emerald-600"
-                                                            : "bg-red-100 text-red-600"
-                                                    }`}>
-                                                        {tx.direction === "credit" || tx.direction === "issue" ? (
-                                                            <ArrowDownLeft className="h-4 w-4" />
-                                                        ) : (
-                                                            <ArrowUpRight className="h-4 w-4" />
-                                                        )}
+                                    <div className="space-y-1">
+                                        {transactions.map((tx, index) => {
+                                            const isCredit = tx.direction === "credit" || tx.direction === "issue";
+                                            return (
+                                                <motion.div
+                                                    key={tx.id}
+                                                    initial={{ opacity: 0, y: 10 }}
+                                                    animate={{ opacity: 1, y: 0 }}
+                                                    transition={{ delay: index * 0.05 }}
+                                                    className="flex items-center justify-between py-3 border-b border-border last:border-0"
+                                                >
+                                                    <div className="flex items-center gap-3">
+                                                        <div className={cn(
+                                                            "p-2 rounded-full",
+                                                            isCredit
+                                                                ? cn(STATUS_VARIANTS.success.bg, STATUS_VARIANTS.success.text)
+                                                                : cn(STATUS_VARIANTS.error.bg, STATUS_VARIANTS.error.text)
+                                                        )}>
+                                                            {isCredit ? (
+                                                                <ArrowDownLeft className="h-4 w-4" />
+                                                            ) : (
+                                                                <ArrowUpRight className="h-4 w-4" />
+                                                            )}
+                                                        </div>
+                                                        <div>
+                                                            <p className="font-medium text-foreground">
+                                                                {tx.reason || tx.referenceType.replace(/_/g, ' ')}
+                                                            </p>
+                                                            <p className="text-sm text-muted-foreground">
+                                                                {format(new Date(tx.createdAt), "MMM d, yyyy 'at' h:mm a")}
+                                                            </p>
+                                                        </div>
                                                     </div>
-                                                    <div>
-                                                        <p className="font-medium">
-                                                            {tx.reason || tx.referenceType.replace(/_/g, ' ')}
-                                                        </p>
-                                                        <p className="text-sm text-muted-foreground">
-                                                            {format(new Date(tx.createdAt), "MMM d, yyyy 'at' h:mm a")}
-                                                        </p>
+                                                    <div className={cn(
+                                                        "px-3 py-1 rounded-full text-sm font-medium",
+                                                        isCredit
+                                                            ? cn(STATUS_VARIANTS.success.bg, STATUS_VARIANTS.success.text)
+                                                            : cn(STATUS_VARIANTS.error.bg, STATUS_VARIANTS.error.text)
+                                                    )}>
+                                                        {isCredit ? "+" : "-"}{formatCurrency(tx.amountCents)}
                                                     </div>
-                                                </div>
-                                                <Badge variant={tx.direction === "credit" || tx.direction === "issue" ? "default" : "destructive"}>
-                                                    {tx.direction === "credit" || tx.direction === "issue" ? "+" : "-"}
-                                                    {formatCurrency(tx.amountCents)}
-                                                </Badge>
-                                            </div>
-                                        ))}
+                                                </motion.div>
+                                            );
+                                        })}
                                     </div>
                                 ) : (
-                                    <p className="text-muted-foreground text-center py-8">
-                                        No transactions yet
-                                    </p>
+                                    <EmptyState
+                                        icon={<History className="h-12 w-12" />}
+                                        title="No transactions yet"
+                                        description="Your transaction history will appear here once you use your wallet."
+                                    />
                                 )}
                             </CardContent>
                         </Card>

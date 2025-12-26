@@ -5400,20 +5400,26 @@ model ShiftSwapRequest {
 }
 
 model ScheduleTemplate {
-  id           String   @id @default(cuid())
-  campgroundId String
-  name         String
-  description  String?
-  shifts       Json     // Array of template shift definitions
-  createdById  String
-  isActive     Boolean  @default(true)
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  id                 String    @id @default(cuid())
+  campgroundId       String
+  name               String
+  description        String?
+  shifts             Json      // Array of template shift definitions
+  createdById        String
+  isActive           Boolean   @default(true)
+  // Recurring scheduling
+  isRecurring        Boolean   @default(false)
+  recurringDay       Int?      // Day of week to auto-apply (0=Sun, 1=Mon, etc.)
+  recurringWeeksAhead Int?     @default(1) // How many weeks ahead to schedule
+  lastAppliedAt      DateTime?
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
 
   campground Campground @relation(fields: [campgroundId], references: [id], onDelete: Cascade)
   createdBy  User       @relation("ScheduleTemplateCreator", fields: [createdById], references: [id])
 
   @@index([campgroundId, isActive])
+  @@index([isRecurring, recurringDay]) // For cron job queries
 }
 
 model ShiftApproval {

@@ -5,11 +5,10 @@ import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { apiClient } from "@/lib/api-client";
 import { Badge } from "@/components/ui/badge";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { ProductGrid } from "@/components/pos/ProductGrid";
 import { GuestCheckoutModal } from "@/components/portal/GuestCheckoutModal";
-import { ShoppingCart, Loader2, Trash2, Plus, Minus, Store } from "lucide-react";
+import { ShoppingCart, Trash2, Plus, Minus, Store } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { recordTelemetry } from "@/lib/sync-telemetry";
@@ -19,6 +18,10 @@ import { randomId } from "@/lib/random-id";
 import { SyncStatus } from "@/components/sync/SyncStatus";
 import { SyncDetailsDrawer } from "@/components/sync/SyncDetailsDrawer";
 import { useSyncStatus } from "@/contexts/SyncStatusContext";
+import { GUEST_TOKEN_KEY, STATUS_VARIANTS } from "@/lib/portal-constants";
+import { PortalPageHeader } from "@/components/portal/PortalPageHeader";
+import { PortalLoadingState, EmptyState } from "@/components/portal/PortalLoadingState";
+import { cn } from "@/lib/utils";
 
 type GuestData = Awaited<ReturnType<typeof apiClient.getGuestMe>>;
 type Product = Awaited<ReturnType<typeof apiClient.getProducts>>[0];
@@ -150,7 +153,7 @@ export default function PortalStorePage() {
     };
 
     useEffect(() => {
-        const token = localStorage.getItem("campreserv:guestToken");
+        const token = localStorage.getItem(GUEST_TOKEN_KEY);
         if (!token) {
             router.push("/portal/login");
             return;
@@ -281,11 +284,7 @@ export default function PortalStorePage() {
     };
 
     if (loading) {
-        return (
-            <div className="min-h-screen flex items-center justify-center">
-                <Loader2 className="h-8 w-8 animate-spin text-primary" />
-            </div>
-        );
+        return <PortalLoadingState variant="page" />;
     }
 
     if (!guest) return null;
@@ -297,27 +296,26 @@ export default function PortalStorePage() {
     return (
         <div className="container mx-auto px-4 py-6 space-y-6">
             {/* Page Header */}
-            <motion.div
-                initial={{ opacity: 0, y: -10 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="flex items-center justify-between"
-            >
-                <div className="flex items-center gap-3">
-                    <div className="h-12 w-12 rounded-xl bg-gradient-to-br from-purple-500 to-pink-600 flex items-center justify-center">
-                        <Store className="h-6 w-6 text-white" />
-                    </div>
-                    <div>
-                        <h1 className="text-2xl font-bold text-foreground">Camp Store</h1>
-                        <p className="text-muted-foreground">Order to your site or pick up</p>
-                    </div>
-                </div>
+            <div className="flex items-center justify-between">
+                <PortalPageHeader
+                    icon={<Store className="h-6 w-6 text-white" />}
+                    title="Camp Store"
+                    subtitle="Order to your site or pick up"
+                    gradient="from-purple-500 to-pink-600"
+                />
                 <div className="flex items-center gap-2">
                     <SyncStatus
                         variant="badge"
                         showDetails={false}
                         onClick={() => setSyncDrawerOpen(true)}
                     />
-                    <Button variant="outline" size="sm" className="relative" onClick={() => setIsCartOpen(true)}>
+                    <Button
+                        variant="outline"
+                        size="sm"
+                        className="relative min-h-[44px] min-w-[44px]"
+                        onClick={() => setIsCartOpen(true)}
+                        aria-label={`Shopping cart with ${totalItems} items`}
+                    >
                         <ShoppingCart className="h-5 w-5" />
                         {totalItems > 0 && (
                             <Badge className="absolute -top-2 -right-2 h-5 w-5 flex items-center justify-center p-0 rounded-full">
@@ -326,24 +324,29 @@ export default function PortalStorePage() {
                         )}
                     </Button>
                 </div>
-            </motion.div>
+            </div>
 
             {conflicts.length > 0 && (
-                <div className="rounded-lg border border-amber-200 bg-amber-50 dark:bg-amber-900/20 dark:border-amber-800/30 text-amber-900 dark:text-amber-200 p-3 text-sm space-y-2">
-                        <div className="font-semibold">Conflicts detected</div>
-                        {conflicts.map((c) => (
-                            <div key={c.id} className="flex items-center justify-between gap-2">
-                                <span className="truncate text-xs">Order {c.id.slice(0, 8)}…</span>
-                                <div className="flex items-center gap-2">
-                                    <Button size="sm" variant="secondary" onClick={() => retryConflict(c.id)}>
-                                        Retry
-                                    </Button>
-                                    <Button size="sm" variant="outline" onClick={() => discardConflict(c.id)}>
-                                        Discard
-                                    </Button>
-                                </div>
+                <div className={cn(
+                    "rounded-lg border p-3 text-sm space-y-2",
+                    STATUS_VARIANTS.warning.bg,
+                    STATUS_VARIANTS.warning.border,
+                    STATUS_VARIANTS.warning.text
+                )}>
+                    <div className="font-semibold">Conflicts detected</div>
+                    {conflicts.map((c) => (
+                        <div key={c.id} className="flex items-center justify-between gap-2">
+                            <span className="truncate text-xs">Order {c.id.slice(0, 8)}…</span>
+                            <div className="flex items-center gap-2">
+                                <Button size="sm" variant="secondary" onClick={() => retryConflict(c.id)}>
+                                    Retry
+                                </Button>
+                                <Button size="sm" variant="outline" onClick={() => discardConflict(c.id)}>
+                                    Discard
+                                </Button>
                             </div>
-                        ))}
+                        </div>
+                    ))}
                 </div>
             )}
 
@@ -397,18 +400,30 @@ export default function PortalStorePage() {
                             </div>
                         ) : (
                             cart.map((item) => (
-                                <div key={item.id} className="flex items-center justify-between bg-white p-3 rounded-lg border shadow-sm">
+                                <div key={item.id} className="flex items-center justify-between bg-card p-3 rounded-lg border border-border shadow-sm">
                                     <div className="flex-1">
-                                        <p className="font-medium">{item.name}</p>
+                                        <p className="font-medium text-foreground">{item.name}</p>
                                         <p className="text-sm text-muted-foreground">${(item.priceCents / 100).toFixed(2)}</p>
                                     </div>
                                     <div className="flex items-center gap-3">
-                                        <Button variant="outline" size="icon" className="h-8 w-8" onClick={() => updateQty(item.id, -1)}>
-                                            {item.qty === 1 ? <Trash2 className="h-3 w-3" /> : <Minus className="h-3 w-3" />}
+                                        <Button
+                                            variant="outline"
+                                            size="icon"
+                                            className="h-9 w-9"
+                                            onClick={() => updateQty(item.id, -1)}
+                                            aria-label={item.qty === 1 ? `Remove ${item.name} from cart` : `Decrease ${item.name} quantity`}
+                                        >
+                                            {item.qty === 1 ? <Trash2 className="h-4 w-4" /> : <Minus className="h-4 w-4" />}
                                         </Button>
-                                        <span className="w-4 text-center text-sm font-medium">{item.qty}</span>
-                                        <Button variant="outline" size="icon" className="h-8 w-8" onClick={() => updateQty(item.id, 1)}>
-                                            <Plus className="h-3 w-3" />
+                                        <span className="w-6 text-center text-sm font-medium text-foreground">{item.qty}</span>
+                                        <Button
+                                            variant="outline"
+                                            size="icon"
+                                            className="h-9 w-9"
+                                            onClick={() => updateQty(item.id, 1)}
+                                            aria-label={`Increase ${item.name} quantity`}
+                                        >
+                                            <Plus className="h-4 w-4" />
                                         </Button>
                                     </div>
                                 </div>
@@ -416,7 +431,7 @@ export default function PortalStorePage() {
                         )}
                     </div>
 
-                    <div className="p-4 border-t bg-slate-50">
+                    <div className="p-4 border-t border-border bg-muted/50">
                         <div className="flex justify-between items-center mb-4">
                             <span className="font-semibold">Total</span>
                             <span className="font-bold text-lg">${(totalCents / 100).toFixed(2)}</span>

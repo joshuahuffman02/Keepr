@@ -1,20 +1,23 @@
 // @ts-nocheck
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { DashboardShell } from "../../components/ui/layout/DashboardShell";
 import { apiClient } from "../../lib/api-client";
 import { Button } from "../../components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "../../components/ui/card";
-import { Plus, Calendar, Clock, Users, DollarSign, Trash2, AlertTriangle, LayoutGrid, Loader2 } from "lucide-react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter, DialogDescription } from "../../components/ui/dialog";
+import {
+    Plus, Calendar, Clock, Users, DollarSign, Trash2, LayoutGrid, Loader2,
+    Image as ImageIcon, Sparkles, PartyPopper, MapPin, CheckCircle2, Upload,
+    ChevronRight, Star, Tent, Music, Utensils, TreePine, Waves, Sun
+} from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from "../../components/ui/dialog";
 import { Input } from "../../components/ui/input";
 import { Label } from "../../components/ui/label";
 import { Textarea } from "../../components/ui/textarea";
 import { useToast } from "../../components/ui/use-toast";
 import { Badge } from "../../components/ui/badge";
-import { TableEmpty } from "../../components/ui/table";
 import { Switch } from "../../components/ui/switch";
 import { Calendar as BigCalendar, dateFnsLocalizer, Views } from "react-big-calendar";
 import { format, parse, startOfWeek, getDay } from "date-fns";
@@ -22,6 +25,9 @@ import { enUS } from "date-fns/locale";
 import "react-big-calendar/lib/css/react-big-calendar.css";
 import { CreateEventDialog } from "../../components/events/CreateEventDialog";
 import { Event } from "@campreserv/shared";
+import { cn } from "../../lib/utils";
+import { Skeleton } from "../../components/ui/skeleton";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../components/ui/select";
 
 const locales = {
     "en-US": enUS,
@@ -43,6 +49,8 @@ type ActivityRecord = {
     duration: number;
     capacity: number;
     isActive: boolean;
+    imageUrl?: string | null;
+    category?: string | null;
 };
 
 type CapacitySnapshot = {
@@ -57,208 +65,282 @@ type CapacitySnapshot = {
     lastUpdated: string;
 };
 
-type ActivityCardProps = {
+// Category icons for visual variety
+const categoryIcons: Record<string, React.ReactNode> = {
+    recreation: <Tent className="h-5 w-5" />,
+    music: <Music className="h-5 w-5" />,
+    food: <Utensils className="h-5 w-5" />,
+    nature: <TreePine className="h-5 w-5" />,
+    water: <Waves className="h-5 w-5" />,
+    default: <Sun className="h-5 w-5" />
+};
+
+// Loading skeleton for activity cards
+function ActivityCardSkeleton() {
+    return (
+        <Card className="overflow-hidden">
+            <Skeleton className="h-40 w-full" />
+            <CardHeader className="pb-2">
+                <Skeleton className="h-5 w-3/4" />
+                <Skeleton className="h-4 w-1/2 mt-2" />
+            </CardHeader>
+            <CardContent className="space-y-3">
+                <div className="flex gap-4">
+                    <Skeleton className="h-4 w-16" />
+                    <Skeleton className="h-4 w-16" />
+                    <Skeleton className="h-4 w-16" />
+                </div>
+                <Skeleton className="h-10 w-full" />
+            </CardContent>
+        </Card>
+    );
+}
+
+// Enhanced Activity Card with image support
+function ActivityCard({
+    activity,
+    onManageSessions,
+    onDelete
+}: {
     activity: ActivityRecord;
     onManageSessions: (id: string) => void;
     onDelete: (id: string) => void;
-};
-
-function ActivityCard({ activity, onManageSessions, onDelete }: ActivityCardProps) {
+}) {
     const { toast } = useToast();
-    const [capacityInput, setCapacityInput] = useState("");
-    const [waitlistName, setWaitlistName] = useState("");
-    const [waitlistContact, setWaitlistContact] = useState("");
-    const [waitlistPartySize, setWaitlistPartySize] = useState("2");
+    const [isHovered, setIsHovered] = useState(false);
 
     const capacityQuery = useQuery<CapacitySnapshot>({
         queryKey: ["activityCapacity", activity.id],
         queryFn: () => apiClient.getActivityCapacity(activity.id),
     });
 
-    useEffect(() => {
-        if (capacityQuery.data) {
-            setCapacityInput(capacityQuery.data.capacity.toString());
-        }
-    }, [capacityQuery.data]);
-
-    const updateCapacity = useMutation({
-        mutationFn: (payload: Partial<CapacitySnapshot>) => apiClient.updateActivityCapacity(activity.id, payload),
-        onSuccess: (snapshot) => {
-            setCapacityInput(snapshot.capacity.toString());
-            toast({
-                title: "Capacity updated",
-                description: snapshot.overage
-                    ? `Overage alert: over by ${snapshot.overageAmount}`
-                    : `Remaining spots: ${snapshot.remaining}`,
-            });
-            capacityQuery.refetch();
-        },
-        onError: () => toast({ title: "Failed to update capacity", variant: "destructive" }),
-    });
-
-    const addWaitlist = useMutation({
-        mutationFn: () =>
-            apiClient.addActivityWaitlistEntry(activity.id, {
-                guestName: waitlistName || "Walk-up guest",
-                contact: waitlistContact || undefined,
-                partySize: parseInt(waitlistPartySize || "1", 10),
-            }),
-        onSuccess: () => {
-            toast({ title: "Added to waitlist" });
-            setWaitlistName("");
-            setWaitlistContact("");
-            setWaitlistPartySize("2");
-            capacityQuery.refetch();
-        },
-        onError: (err: any) => {
-            toast({ title: err?.message || "Waitlist add failed", variant: "destructive" });
-        },
-    });
-
     const snapshot = capacityQuery.data;
+    const icon = categoryIcons[activity.category || "default"] || categoryIcons.default;
 
     return (
-        <Card key={activity.id}>
-            <CardHeader>
-                <div className="flex justify-between items-start">
-                    <CardTitle>{activity.name}</CardTitle>
-                    <span className="rounded-full border px-2.5 py-0.5 text-xs font-semibold text-slate-700">
+        <Card
+            className={cn(
+                "group overflow-hidden transition-all duration-300 cursor-pointer",
+                "hover:shadow-xl hover:-translate-y-1",
+                "focus-within:ring-2 focus-within:ring-emerald-500 focus-within:ring-offset-2"
+            )}
+            onMouseEnter={() => setIsHovered(true)}
+            onMouseLeave={() => setIsHovered(false)}
+        >
+            {/* Image or Placeholder */}
+            <div className="relative h-40 bg-gradient-to-br from-emerald-100 to-teal-50 overflow-hidden">
+                {activity.imageUrl ? (
+                    <img
+                        src={activity.imageUrl}
+                        alt=""
+                        className={cn(
+                            "w-full h-full object-cover transition-transform duration-500",
+                            isHovered && "scale-110"
+                        )}
+                    />
+                ) : (
+                    <div className="w-full h-full flex items-center justify-center">
+                        <div className={cn(
+                            "p-6 rounded-full bg-white/80 text-emerald-600 transition-transform duration-300",
+                            isHovered && "scale-110"
+                        )}>
+                            {icon}
+                        </div>
+                    </div>
+                )}
+
+                {/* Status badge */}
+                <div className="absolute top-3 right-3">
+                    <Badge
+                        variant={activity.isActive ? "default" : "secondary"}
+                        className={cn(
+                            "transition-all duration-200",
+                            activity.isActive
+                                ? "bg-emerald-500 hover:bg-emerald-600"
+                                : "bg-slate-400"
+                        )}
+                    >
                         {activity.isActive ? "Active" : "Inactive"}
-                    </span>
+                    </Badge>
                 </div>
-                <CardDescription className="line-clamp-2">
-                    {activity.description || "No description"}
+
+                {/* Capacity indicator */}
+                {snapshot && (
+                    <div className="absolute bottom-3 left-3">
+                        <div className={cn(
+                            "px-2.5 py-1 rounded-full text-xs font-medium backdrop-blur-sm",
+                            snapshot.remaining > 5
+                                ? "bg-emerald-500/90 text-white"
+                                : snapshot.remaining > 0
+                                    ? "bg-amber-500/90 text-white"
+                                    : "bg-red-500/90 text-white"
+                        )}>
+                            {snapshot.remaining > 0
+                                ? `${snapshot.remaining} spots left`
+                                : "Fully booked"}
+                        </div>
+                    </div>
+                )}
+
+                {/* Hover overlay */}
+                <div className={cn(
+                    "absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent",
+                    "opacity-0 group-hover:opacity-100 transition-opacity duration-300",
+                    "flex items-end justify-center pb-4"
+                )}>
+                    <Button
+                        size="sm"
+                        className="bg-white text-slate-900 hover:bg-slate-100 shadow-lg"
+                        onClick={() => onManageSessions(activity.id)}
+                    >
+                        <Calendar className="h-4 w-4 mr-1.5" />
+                        Manage Sessions
+                    </Button>
+                </div>
+            </div>
+
+            <CardHeader className="pb-2">
+                <div className="flex items-start justify-between gap-2">
+                    <CardTitle className="text-lg leading-tight">{activity.name}</CardTitle>
+                </div>
+                <CardDescription className="line-clamp-2 text-sm">
+                    {activity.description || "No description provided"}
                 </CardDescription>
             </CardHeader>
+
             <CardContent className="space-y-4">
-                <div className="flex items-center justify-between text-sm text-slate-600">
-                    <div className="flex items-center gap-2">
-                        <DollarSign className="w-4 h-4" />
-                        <span>${(activity.price / 100).toFixed(2)}</span>
+                {/* Quick stats */}
+                <div className="flex items-center gap-4 text-sm text-slate-600">
+                    <div className="flex items-center gap-1.5">
+                        <DollarSign className="h-4 w-4 text-emerald-600" />
+                        <span className="font-medium">${(activity.price / 100).toFixed(2)}</span>
                     </div>
-                    <div className="flex items-center gap-2">
-                        <Clock className="w-4 h-4" />
+                    <div className="flex items-center gap-1.5">
+                        <Clock className="h-4 w-4 text-slate-400" />
                         <span>{activity.duration} mins</span>
                     </div>
-                    <div className="flex items-center gap-2">
-                        <Users className="w-4 h-4" />
+                    <div className="flex items-center gap-1.5">
+                        <Users className="h-4 w-4 text-slate-400" />
                         <span>Max {activity.capacity}</span>
                     </div>
                 </div>
 
-                <div className="rounded-lg border p-4 bg-slate-50 space-y-3">
-                    <div className="flex items-center justify-between text-sm">
-                        <div className="font-medium">
-                            {snapshot ? `${snapshot.remaining} remaining of ${snapshot.capacity}` : "Loading capacity..."}
-                        </div>
-                        {snapshot && (
-                            <span className="rounded-full border px-2 py-1 text-[11px] font-semibold text-slate-700">
-                                {snapshot.overage ? `Over by ${snapshot.overageAmount}` : "Within cap"}
-                            </span>
-                        )}
-                    </div>
-
-                    {snapshot?.overage && null}
-
-                    <div className="grid grid-cols-2 gap-3 items-end">
-                        <div className="grid gap-2">
-                            <Label>Capacity</Label>
-                            <Input
-                                type="number"
-                                value={capacityInput}
-                                onChange={(e) => setCapacityInput(e.target.value)}
-                                placeholder="Capacity"
-                            />
-                        </div>
-                        <div className="flex items-center gap-2">
-                            <Switch
-                                checked={snapshot?.waitlistEnabled ?? false}
-                                onCheckedChange={(checked) => updateCapacity.mutate({ waitlistEnabled: checked })}
-                                disabled={updateCapacity.isPending}
-                            />
-                            <div className="text-sm">
-                                <div className="font-medium">Waitlist</div>
-                                <div className="text-slate-500">{snapshot?.waitlistCount || 0} on list</div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div className="flex gap-2">
-                        <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => capacityQuery.refetch()}
-                            disabled={capacityQuery.isFetching}
-                        >
-                            Refresh
-                        </Button>
-                        <Button
-                            size="sm"
-                            onClick={() => updateCapacity.mutate({ capacity: parseInt(capacityInput || "0", 10) })}
-                            disabled={!capacityInput || updateCapacity.isPending}
-                        >
-                            {updateCapacity.isPending ? "Saving..." : "Save cap"}
-                        </Button>
-                    </div>
-
-                    <div className="border-t pt-3 space-y-2">
-                        <div className="flex items-center justify-between">
-                            <Label className="text-sm">Add to waitlist</Label>
-                            <span className="rounded-full border px-2 py-0.5 text-[11px] font-semibold text-slate-700">Optional stub</span>
-                        </div>
-                        <div className="grid grid-cols-3 gap-2">
-                            <Input
-                                placeholder="Guest name"
-                                value={waitlistName}
-                                onChange={(e) => setWaitlistName(e.target.value)}
-                                disabled={!snapshot?.waitlistEnabled}
-                            />
-                            <Input
-                                placeholder="Contact (email/phone)"
-                                value={waitlistContact}
-                                onChange={(e) => setWaitlistContact(e.target.value)}
-                                disabled={!snapshot?.waitlistEnabled}
-                            />
-                            <Input
-                                type="number"
-                                min={1}
-                                placeholder="Party size"
-                                value={waitlistPartySize}
-                                onChange={(e) => setWaitlistPartySize(e.target.value)}
-                                disabled={!snapshot?.waitlistEnabled}
-                            />
-                        </div>
-                        <div className="flex justify-end">
-                            <Button
-                                size="sm"
-                                onClick={() => addWaitlist.mutate()}
-                                disabled={!snapshot?.waitlistEnabled || addWaitlist.isPending}
-                            >
-                                {addWaitlist.isPending ? "Adding..." : "Add to waitlist"}
-                            </Button>
-                        </div>
-                    </div>
-                </div>
-
+                {/* Actions */}
                 <div className="flex gap-2 pt-2 border-t border-slate-100">
-                    <Button variant="outline" className="flex-1" onClick={() => onManageSessions(activity.id)}>
-                        Manage Sessions
+                    <Button
+                        variant="outline"
+                        className="flex-1 group/btn"
+                        onClick={() => onManageSessions(activity.id)}
+                    >
+                        <span>Sessions</span>
+                        <ChevronRight className="h-4 w-4 ml-1 transition-transform group-hover/btn:translate-x-0.5" />
                     </Button>
                     <Button
                         variant="ghost"
                         size="icon"
-                        className="text-red-500 hover:text-red-600 hover:bg-red-50"
+                        className="text-slate-400 hover:text-red-500 hover:bg-red-50 transition-colors"
                         onClick={() => {
-                            if (confirm("Delete this activity?")) {
+                            if (confirm("Delete this activity? This cannot be undone.")) {
                                 onDelete(activity.id);
                             }
                         }}
+                        aria-label={`Delete ${activity.name}`}
                     >
-                        <Trash2 className="w-4 h-4" />
+                        <Trash2 className="h-4 w-4" />
                     </Button>
                 </div>
             </CardContent>
         </Card>
+    );
+}
+
+// Success celebration modal
+function SuccessCelebration({
+    open,
+    onClose,
+    activityName
+}: {
+    open: boolean;
+    onClose: () => void;
+    activityName: string;
+}) {
+    useEffect(() => {
+        if (open) {
+            const timer = setTimeout(onClose, 3000);
+            return () => clearTimeout(timer);
+        }
+    }, [open, onClose]);
+
+    if (!open) return null;
+
+    return (
+        <div className="fixed inset-0 z-50 flex items-center justify-center pointer-events-none">
+            <div className="bg-white rounded-2xl shadow-2xl p-8 text-center motion-safe:animate-in motion-safe:zoom-in-95 motion-safe:fade-in duration-300">
+                <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-br from-emerald-400 to-teal-500 text-white mb-4 motion-safe:animate-bounce">
+                    <PartyPopper className="h-8 w-8" />
+                </div>
+                <h3 className="text-xl font-bold text-slate-900 mb-2">
+                    Activity Created!
+                </h3>
+                <p className="text-slate-600">
+                    <span className="font-medium text-emerald-600">{activityName}</span> is ready for guests to enjoy
+                </p>
+                <div className="flex items-center justify-center gap-1 mt-3 text-sm text-slate-500">
+                    <Sparkles className="h-4 w-4 text-amber-500" />
+                    <span>Time to schedule some sessions!</span>
+                </div>
+            </div>
+        </div>
+    );
+}
+
+// Empty state component
+function EmptyActivitiesState({ onCreateClick }: { onCreateClick: () => void }) {
+    return (
+        <div className="col-span-full">
+            <div className="relative overflow-hidden rounded-2xl border-2 border-dashed border-slate-200 bg-gradient-to-br from-slate-50 to-white p-12 text-center">
+                {/* Decorative elements */}
+                <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-emerald-100/50 to-teal-100/50 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
+                <div className="absolute bottom-0 left-0 w-48 h-48 bg-gradient-to-br from-amber-100/50 to-orange-100/50 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2" />
+
+                <div className="relative">
+                    <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-gradient-to-br from-emerald-100 to-teal-100 text-emerald-600 mb-6">
+                        <Sparkles className="h-10 w-10" />
+                    </div>
+
+                    <h3 className="text-2xl font-bold text-slate-900 mb-3">
+                        Create Your First Activity
+                    </h3>
+                    <p className="text-slate-600 max-w-md mx-auto mb-8">
+                        Activities make your campground memorable! Add guided tours, yoga sessions,
+                        kayak rentals, or campfire nights for your guests to enjoy.
+                    </p>
+
+                    <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+                        <Button
+                            size="lg"
+                            className="bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white shadow-lg shadow-emerald-500/25 transition-all duration-200 hover:shadow-xl hover:shadow-emerald-500/30 hover:-translate-y-0.5"
+                            onClick={onCreateClick}
+                        >
+                            <Plus className="h-5 w-5 mr-2" />
+                            Create Activity
+                        </Button>
+                    </div>
+
+                    {/* Example activities */}
+                    <div className="mt-10 flex flex-wrap justify-center gap-3">
+                        {["Morning Yoga", "Kayak Rental", "Campfire Night", "Nature Hike", "Fishing Trip"].map((name) => (
+                            <span
+                                key={name}
+                                className="px-3 py-1.5 rounded-full bg-white border border-slate-200 text-sm text-slate-600 shadow-sm"
+                            >
+                                {name}
+                            </span>
+                        ))}
+                    </div>
+                </div>
+            </div>
+        </div>
     );
 }
 
@@ -268,12 +350,19 @@ export default function ActivitiesPage() {
     const [viewMode, setViewMode] = useState<"cards" | "calendar">("cards");
     const [isCreateOpen, setIsCreateOpen] = useState(false);
     const [isCreateEventOpen, setIsCreateEventOpen] = useState(false);
+    const [showCelebration, setShowCelebration] = useState(false);
+    const [celebrationName, setCelebrationName] = useState("");
+    const [uploading, setUploading] = useState(false);
+    const fileInputRef = useRef<HTMLInputElement>(null);
+
     const [newActivity, setNewActivity] = useState({
         name: "",
         description: "",
         price: "",
         duration: "",
-        capacity: ""
+        capacity: "",
+        imageUrl: "",
+        category: "recreation"
     });
 
     const [selectedActivityForSessions, setSelectedActivityForSessions] = useState<string | null>(null);
@@ -322,7 +411,7 @@ export default function ActivitiesPage() {
         onSuccess: () => {
             refetchSessions();
             setNewSession({ startTime: "", endTime: "", capacity: "" });
-            toast({ title: "Session scheduled" });
+            toast({ title: "Session scheduled", description: "Guests can now book this time slot!" });
         },
         onError: () => {
             toast({ title: "Failed to schedule session", variant: "destructive" });
@@ -333,16 +422,19 @@ export default function ActivitiesPage() {
         mutationFn: async () => {
             return apiClient.createActivity(campgroundId, {
                 ...newActivity,
-                price: parseFloat(newActivity.price) * 100, // Convert to cents
+                price: parseFloat(newActivity.price) * 100,
                 duration: parseInt(newActivity.duration),
-                capacity: parseInt(newActivity.capacity)
+                capacity: parseInt(newActivity.capacity),
+                imageUrl: newActivity.imageUrl || undefined
             });
         },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["activities", campgroundId] });
+            setCelebrationName(newActivity.name);
+            setShowCelebration(true);
             setIsCreateOpen(false);
-            setNewActivity({ name: "", description: "", price: "", duration: "", capacity: "" });
-            toast({ title: "Activity created" });
+            setNewActivity({ name: "", description: "", price: "", duration: "", capacity: "", imageUrl: "", category: "recreation" });
+            toast({ title: "Activity created!", description: "Now schedule some sessions to get started." });
         },
         onError: () => {
             toast({ title: "Failed to create activity", variant: "destructive" });
@@ -362,20 +454,22 @@ export default function ActivitiesPage() {
     const selectedActivity = activities?.find((a) => a.id === selectedActivityForSessions);
 
     const handleDelete = (id: string) => {
-        if (confirm("Delete this activity?")) {
-            deleteMutation.mutate(id);
-        }
+        deleteMutation.mutate(id);
     };
 
-    if (isLoading) {
-        return (
-            <DashboardShell>
-                <div className="flex items-center justify-center h-96">Loading activities...</div>
-            </DashboardShell>
-        );
-    }
-
-    // ... (rest of the component)
+    const handleImageUpload = async (file: File) => {
+        setUploading(true);
+        try {
+            const signed = await apiClient.signUpload({ filename: file.name, contentType: file.type });
+            await fetch(signed.uploadUrl, { method: "PUT", body: file, headers: { "Content-Type": file.type } });
+            setNewActivity((s) => ({ ...s, imageUrl: signed.publicUrl }));
+            toast({ title: "Image uploaded!" });
+        } catch (err) {
+            toast({ title: "Upload failed", description: (err as Error).message, variant: "destructive" });
+        } finally {
+            setUploading(false);
+        }
+    };
 
     const calendarEvents = events?.map(event => ({
         id: event.id,
@@ -387,42 +481,57 @@ export default function ActivitiesPage() {
     })) || [];
 
     const handleSelectEvent = (event: any) => {
-        // TODO: Open edit dialog
         console.log("Selected event:", event);
     };
 
     return (
         <DashboardShell>
+            {/* Success Celebration */}
+            <SuccessCelebration
+                open={showCelebration}
+                onClose={() => setShowCelebration(false)}
+                activityName={celebrationName}
+            />
+
             {/* Session Management Dialog */}
             <Dialog open={!!selectedActivityForSessions} onOpenChange={(open) => !open && setSelectedActivityForSessions(null)}>
                 <DialogContent className="max-w-3xl">
                     <DialogHeader>
-                        <DialogTitle>Manage Sessions {selectedActivity ? `– ${selectedActivity.name}` : ""}</DialogTitle>
-                        <DialogDescription>Schedule upcoming sessions for this activity.</DialogDescription>
+                        <DialogTitle className="flex items-center gap-2">
+                            <Calendar className="h-5 w-5 text-emerald-600" />
+                            Manage Sessions {selectedActivity ? `– ${selectedActivity.name}` : ""}
+                        </DialogTitle>
+                        <DialogDescription>Schedule upcoming sessions for guests to book.</DialogDescription>
                     </DialogHeader>
                     <div className="grid gap-6 py-4">
-                        <div className="border rounded-lg p-4 bg-slate-50 space-y-4">
-                            <h4 className="font-medium text-sm">Schedule New Session</h4>
+                        <div className="border rounded-lg p-4 bg-gradient-to-br from-emerald-50 to-teal-50 space-y-4">
+                            <h4 className="font-medium text-sm flex items-center gap-2">
+                                <Plus className="h-4 w-4" />
+                                Schedule New Session
+                            </h4>
                             <div className="grid grid-cols-3 gap-4">
                                 <div className="grid gap-2">
-                                    <Label>Start Time</Label>
+                                    <Label htmlFor="session-start">Start Time</Label>
                                     <Input
+                                        id="session-start"
                                         type="datetime-local"
                                         value={newSession.startTime}
                                         onChange={(e) => setNewSession({ ...newSession, startTime: e.target.value })}
                                     />
                                 </div>
                                 <div className="grid gap-2">
-                                    <Label>End Time</Label>
+                                    <Label htmlFor="session-end">End Time</Label>
                                     <Input
+                                        id="session-end"
                                         type="datetime-local"
                                         value={newSession.endTime}
                                         onChange={(e) => setNewSession({ ...newSession, endTime: e.target.value })}
                                     />
                                 </div>
                                 <div className="grid gap-2">
-                                    <Label>Capacity (Optional)</Label>
+                                    <Label htmlFor="session-capacity">Capacity (Optional)</Label>
                                     <Input
+                                        id="session-capacity"
                                         type="number"
                                         placeholder="Override default"
                                         value={newSession.capacity}
@@ -430,31 +539,54 @@ export default function ActivitiesPage() {
                                     />
                                 </div>
                             </div>
-                            <Button size="sm" onClick={() => createSessionMutation.mutate()} disabled={createSessionMutation.isPending || !newSession.startTime || !newSession.endTime}>
-                                {createSessionMutation.isPending ? "Scheduling..." : "Add Session"}
+                            <Button
+                                size="sm"
+                                onClick={() => createSessionMutation.mutate()}
+                                disabled={createSessionMutation.isPending || !newSession.startTime || !newSession.endTime}
+                                className="bg-emerald-600 hover:bg-emerald-700"
+                            >
+                                {createSessionMutation.isPending ? (
+                                    <>
+                                        <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                                        Scheduling...
+                                    </>
+                                ) : (
+                                    <>
+                                        <Plus className="h-4 w-4 mr-2" />
+                                        Add Session
+                                    </>
+                                )}
                             </Button>
                         </div>
 
                         <div className="space-y-4">
                             <h4 className="font-medium text-sm">Upcoming Sessions</h4>
-                            <div className="border rounded-lg divide-y">
+                            <div className="border rounded-lg divide-y max-h-64 overflow-y-auto">
                                 {sessions?.map((session) => (
-                                    <div key={session.id} className="p-4 flex justify-between items-center">
+                                    <div key={session.id} className="p-4 flex justify-between items-center hover:bg-slate-50 transition-colors">
                                         <div>
                                             <div className="font-medium">
                                                 {new Date(session.startTime).toLocaleString()} - {new Date(session.endTime).toLocaleTimeString()}
                                             </div>
-                                            <div className="text-sm text-slate-500">
+                                            <div className="text-sm text-slate-500 flex items-center gap-2">
+                                                <Users className="h-3.5 w-3.5" />
                                                 {session.bookedCount} / {session.capacity} booked
                                             </div>
                                         </div>
-                                        <span className="rounded-full border px-2 py-0.5 text-[11px] font-semibold text-slate-700">
+                                        <Badge
+                                            variant={session.status === "open" ? "default" : "secondary"}
+                                            className={session.status === "open" ? "bg-emerald-100 text-emerald-700" : ""}
+                                        >
                                             {session.status}
-                                        </span>
+                                        </Badge>
                                     </div>
                                 ))}
                                 {sessions?.length === 0 && (
-                                    <div className="p-8 text-center text-slate-500">No sessions scheduled.</div>
+                                    <div className="p-8 text-center text-slate-500">
+                                        <Calendar className="h-8 w-8 mx-auto mb-2 text-slate-300" />
+                                        <p>No sessions scheduled yet.</p>
+                                        <p className="text-sm">Add your first session above!</p>
+                                    </div>
                                 )}
                             </div>
                         </div>
@@ -464,31 +596,110 @@ export default function ActivitiesPage() {
 
             {/* Create Activity Dialog */}
             <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
-                <DialogContent>
+                <DialogContent className="sm:max-w-[550px] max-h-[90vh] overflow-y-auto">
                     <DialogHeader>
-                        <DialogTitle>Create New Activity</DialogTitle>
+                        <DialogTitle className="flex items-center gap-2">
+                            <Sparkles className="h-5 w-5 text-emerald-600" />
+                            Create New Activity
+                        </DialogTitle>
+                        <DialogDescription>
+                            Add an exciting experience for your guests to enjoy.
+                        </DialogDescription>
                     </DialogHeader>
-                    <div className="grid gap-4 py-4">
+                    <div className="grid gap-5 py-4">
+                        {/* Image Upload */}
+                        <div className="space-y-2">
+                            <Label>Activity Image</Label>
+                            <div
+                                className={cn(
+                                    "relative border-2 border-dashed rounded-lg transition-colors cursor-pointer",
+                                    "hover:border-emerald-400 hover:bg-emerald-50/50",
+                                    newActivity.imageUrl ? "border-emerald-300 bg-emerald-50" : "border-slate-200"
+                                )}
+                                onClick={() => fileInputRef.current?.click()}
+                            >
+                                {newActivity.imageUrl ? (
+                                    <div className="relative aspect-video">
+                                        <img
+                                            src={newActivity.imageUrl}
+                                            alt="Activity preview"
+                                            className="w-full h-full object-cover rounded-lg"
+                                        />
+                                        <div className="absolute inset-0 bg-black/40 opacity-0 hover:opacity-100 transition-opacity rounded-lg flex items-center justify-center">
+                                            <span className="text-white text-sm font-medium">Change Image</span>
+                                        </div>
+                                    </div>
+                                ) : (
+                                    <div className="p-8 text-center">
+                                        {uploading ? (
+                                            <Loader2 className="h-8 w-8 mx-auto text-emerald-600 animate-spin" />
+                                        ) : (
+                                            <>
+                                                <Upload className="h-8 w-8 mx-auto text-slate-400 mb-2" />
+                                                <p className="text-sm text-slate-600 font-medium">Click to upload an image</p>
+                                                <p className="text-xs text-slate-400 mt-1">PNG, JPG up to 5MB</p>
+                                            </>
+                                        )}
+                                    </div>
+                                )}
+                                <input
+                                    ref={fileInputRef}
+                                    type="file"
+                                    accept="image/*"
+                                    className="hidden"
+                                    onChange={(e) => {
+                                        const file = e.target.files?.[0];
+                                        if (file) handleImageUpload(file);
+                                    }}
+                                />
+                            </div>
+                        </div>
+
                         <div className="grid gap-2">
-                            <Label>Name</Label>
+                            <Label htmlFor="activity-name">Activity Name</Label>
                             <Input
+                                id="activity-name"
                                 value={newActivity.name}
                                 onChange={(e) => setNewActivity({ ...newActivity, name: e.target.value })}
-                                placeholder="e.g. Morning Yoga"
+                                placeholder="e.g. Morning Yoga by the Lake"
                             />
                         </div>
+
                         <div className="grid gap-2">
-                            <Label>Description</Label>
+                            <Label htmlFor="activity-category">Category</Label>
+                            <Select
+                                value={newActivity.category}
+                                onValueChange={(val) => setNewActivity({ ...newActivity, category: val })}
+                            >
+                                <SelectTrigger id="activity-category">
+                                    <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="recreation">Recreation</SelectItem>
+                                    <SelectItem value="nature">Nature & Outdoors</SelectItem>
+                                    <SelectItem value="water">Water Activities</SelectItem>
+                                    <SelectItem value="food">Food & Dining</SelectItem>
+                                    <SelectItem value="music">Entertainment</SelectItem>
+                                </SelectContent>
+                            </Select>
+                        </div>
+
+                        <div className="grid gap-2">
+                            <Label htmlFor="activity-description">Description</Label>
                             <Textarea
+                                id="activity-description"
                                 value={newActivity.description}
                                 onChange={(e) => setNewActivity({ ...newActivity, description: e.target.value })}
-                                placeholder="Activity details..."
+                                placeholder="What makes this activity special? What should guests expect?"
+                                rows={3}
                             />
                         </div>
-                        <div className="grid grid-cols-2 gap-4">
+
+                        <div className="grid grid-cols-3 gap-4">
                             <div className="grid gap-2">
-                                <Label>Price ($)</Label>
+                                <Label htmlFor="activity-price">Price ($)</Label>
                                 <Input
+                                    id="activity-price"
                                     type="number"
                                     value={newActivity.price}
                                     onChange={(e) => setNewActivity({ ...newActivity, price: e.target.value })}
@@ -496,29 +707,45 @@ export default function ActivitiesPage() {
                                 />
                             </div>
                             <div className="grid gap-2">
-                                <Label>Duration (mins)</Label>
+                                <Label htmlFor="activity-duration">Duration (mins)</Label>
                                 <Input
+                                    id="activity-duration"
                                     type="number"
                                     value={newActivity.duration}
                                     onChange={(e) => setNewActivity({ ...newActivity, duration: e.target.value })}
                                     placeholder="60"
                                 />
                             </div>
-                        </div>
-                        <div className="grid gap-2">
-                            <Label>Capacity (people)</Label>
-                            <Input
-                                type="number"
-                                value={newActivity.capacity}
-                                onChange={(e) => setNewActivity({ ...newActivity, capacity: e.target.value })}
-                                placeholder="20"
-                            />
+                            <div className="grid gap-2">
+                                <Label htmlFor="activity-capacity">Max Guests</Label>
+                                <Input
+                                    id="activity-capacity"
+                                    type="number"
+                                    value={newActivity.capacity}
+                                    onChange={(e) => setNewActivity({ ...newActivity, capacity: e.target.value })}
+                                    placeholder="20"
+                                />
+                            </div>
                         </div>
                     </div>
                     <DialogFooter>
                         <Button variant="ghost" onClick={() => setIsCreateOpen(false)}>Cancel</Button>
-                        <Button onClick={() => createMutation.mutate()} disabled={createMutation.isPending}>
-                            {createMutation.isPending ? "Creating..." : "Create Activity"}
+                        <Button
+                            onClick={() => createMutation.mutate()}
+                            disabled={createMutation.isPending || !newActivity.name}
+                            className="bg-emerald-600 hover:bg-emerald-700"
+                        >
+                            {createMutation.isPending ? (
+                                <>
+                                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                                    Creating...
+                                </>
+                            ) : (
+                                <>
+                                    <Sparkles className="h-4 w-4 mr-2" />
+                                    Create Activity
+                                </>
+                            )}
                         </Button>
                     </DialogFooter>
                 </DialogContent>
@@ -535,91 +762,146 @@ export default function ActivitiesPage() {
             />
 
             <div className="space-y-6">
-                <div className="flex items-center justify-between">
+                {/* Header */}
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                     <div>
-                        <h1 className="text-2xl font-bold text-slate-900">Activities & Facilities</h1>
-                        <p className="text-slate-500">Manage guided tours, rentals, and facility bookings.</p>
+                        <h1 className="text-2xl font-bold text-slate-900 flex items-center gap-2">
+                            <span className="inline-flex items-center justify-center w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-400 to-teal-500 text-white shadow-lg shadow-emerald-500/25">
+                                <Star className="h-5 w-5" />
+                            </span>
+                            Activities & Events
+                        </h1>
+                        <p className="text-slate-500 mt-1">
+                            Create memorable experiences for your guests
+                        </p>
                     </div>
-                    <Button onClick={() => viewMode === "cards" ? setIsCreateOpen(true) : setIsCreateEventOpen(true)}>
-                        <Plus className="w-4 h-4 mr-2" />
+                    <Button
+                        onClick={() => viewMode === "cards" ? setIsCreateOpen(true) : setIsCreateEventOpen(true)}
+                        className="bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white shadow-lg shadow-emerald-500/25 transition-all duration-200 hover:shadow-xl hover:-translate-y-0.5"
+                    >
+                        <Plus className="h-4 w-4 mr-2" />
                         {viewMode === "cards" ? "New Activity" : "Add Event"}
                     </Button>
                 </div>
 
-                {/* View Toggle */}
-                <div className="flex gap-2 border-b border-slate-200">
+                {/* View Toggle - Proper Tab Pattern */}
+                <div
+                    role="tablist"
+                    aria-label="View options"
+                    className="inline-flex p-1 bg-slate-100 rounded-lg"
+                >
                     <button
+                        role="tab"
+                        id="tab-cards"
+                        aria-selected={viewMode === "cards"}
+                        aria-controls="panel-cards"
                         onClick={() => setViewMode("cards")}
-                        className={`flex items-center gap-2 px-4 py-2 border-b-2 transition-colors ${
+                        className={cn(
+                            "flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition-all duration-200",
                             viewMode === "cards"
-                                ? "border-slate-900 text-slate-900 font-medium"
-                                : "border-transparent text-slate-500 hover:text-slate-700"
-                        }`}
+                                ? "bg-white text-slate-900 shadow-sm"
+                                : "text-slate-600 hover:text-slate-900"
+                        )}
                     >
-                        <LayoutGrid className="w-4 h-4" />
-                        Cards
+                        <LayoutGrid className="h-4 w-4" />
+                        Activities
                     </button>
                     <button
+                        role="tab"
+                        id="tab-calendar"
+                        aria-selected={viewMode === "calendar"}
+                        aria-controls="panel-calendar"
                         onClick={() => setViewMode("calendar")}
-                        className={`flex items-center gap-2 px-4 py-2 border-b-2 transition-colors ${
+                        className={cn(
+                            "flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition-all duration-200",
                             viewMode === "calendar"
-                                ? "border-slate-900 text-slate-900 font-medium"
-                                : "border-transparent text-slate-500 hover:text-slate-700"
-                        }`}
+                                ? "bg-white text-slate-900 shadow-sm"
+                                : "text-slate-600 hover:text-slate-900"
+                        )}
                     >
-                        <Calendar className="w-4 h-4" />
+                        <Calendar className="h-4 w-4" />
                         Calendar
                     </button>
                 </div>
 
+                {/* Live region for announcements */}
+                <div role="status" aria-live="polite" className="sr-only">
+                    {isLoading ? "Loading activities..." : `${activities?.length || 0} activities loaded`}
+                </div>
+
                 {/* Cards View */}
-                {viewMode === "cards" && (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        {activities?.map((activity) => (
-                            <ActivityCard
-                                key={activity.id}
-                                activity={activity}
-                                onManageSessions={setSelectedActivityForSessions}
-                                onDelete={handleDelete}
-                            />
-                        ))}
-                        {activities?.length === 0 && (
-                            <div className="col-span-full text-center py-12 bg-slate-50 rounded-lg border border-dashed border-slate-200">
-                                <LayoutGrid className="w-12 h-12 text-slate-300 mx-auto mb-4" />
-                                <div className="overflow-hidden rounded border border-slate-200 bg-white">
-                                  <table className="w-full text-sm">
-                                    <tbody>
-                                      <TableEmpty>No activities yet</TableEmpty>
-                                    </tbody>
-                                  </table>
+                <div
+                    role="tabpanel"
+                    id="panel-cards"
+                    aria-labelledby="tab-cards"
+                    hidden={viewMode !== "cards"}
+                >
+                    {isLoading ? (
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                            {[1, 2, 3, 4, 5, 6].map((i) => (
+                                <ActivityCardSkeleton key={i} />
+                            ))}
+                        </div>
+                    ) : activities?.length === 0 ? (
+                        <EmptyActivitiesState onCreateClick={() => setIsCreateOpen(true)} />
+                    ) : (
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                            {activities?.map((activity, index) => (
+                                <div
+                                    key={activity.id}
+                                    className="motion-safe:animate-in motion-safe:fade-in motion-safe:slide-in-from-bottom-4"
+                                    style={{ animationDelay: `${index * 50}ms`, animationFillMode: "backwards" }}
+                                >
+                                    <ActivityCard
+                                        activity={activity}
+                                        onManageSessions={setSelectedActivityForSessions}
+                                        onDelete={handleDelete}
+                                    />
                                 </div>
-                                <p className="text-slate-500">Create your first activity to get started.</p>
-                            </div>
-                        )}
-                    </div>
-                )}
+                            ))}
+                        </div>
+                    )}
+                </div>
 
                 {/* Calendar View */}
-                {viewMode === "calendar" && (
-                    <div className="bg-white rounded-lg shadow p-4" style={{ height: "600px" }}>
-                        {eventsLoading ? (
-                            <div className="flex h-full items-center justify-center">
-                                <Loader2 className="h-8 w-8 animate-spin text-slate-500" />
-                            </div>
-                        ) : (
-                            <BigCalendar
-                                localizer={localizer}
-                                events={calendarEvents}
-                                startAccessor="start"
-                                endAccessor="end"
-                                style={{ height: "100%" }}
-                                views={[Views.MONTH, Views.WEEK, Views.DAY, Views.AGENDA]}
-                                defaultView={Views.MONTH}
-                                onSelectEvent={handleSelectEvent}
-                            />
-                        )}
-                    </div>
-                )}
+                <div
+                    role="tabpanel"
+                    id="panel-calendar"
+                    aria-labelledby="tab-calendar"
+                    hidden={viewMode !== "calendar"}
+                >
+                    <Card className="overflow-hidden">
+                        <CardContent className="p-6" style={{ height: "650px" }}>
+                            {eventsLoading ? (
+                                <div className="flex h-full items-center justify-center">
+                                    <div className="text-center">
+                                        <Loader2 className="h-10 w-10 animate-spin text-emerald-500 mx-auto mb-3" />
+                                        <p className="text-slate-500">Loading events...</p>
+                                    </div>
+                                </div>
+                            ) : (
+                                <BigCalendar
+                                    localizer={localizer}
+                                    events={calendarEvents}
+                                    startAccessor="start"
+                                    endAccessor="end"
+                                    style={{ height: "100%" }}
+                                    views={[Views.MONTH, Views.WEEK, Views.DAY, Views.AGENDA]}
+                                    defaultView={Views.MONTH}
+                                    onSelectEvent={handleSelectEvent}
+                                    eventPropGetter={() => ({
+                                        style: {
+                                            backgroundColor: "#10b981",
+                                            borderRadius: "6px",
+                                            border: "none",
+                                            padding: "2px 6px"
+                                        }
+                                    })}
+                                />
+                            )}
+                        </CardContent>
+                    </Card>
+                </div>
             </div>
         </DashboardShell>
     );
