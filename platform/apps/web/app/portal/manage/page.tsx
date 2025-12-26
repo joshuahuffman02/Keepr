@@ -60,7 +60,7 @@ export default function PortalManagePage() {
 
   const fetchGuest = async (t: string) => {
     try {
-      const data = await apiClient.getPortalGuest(t);
+      const data = await apiClient.getGuestMe(t);
       setGuest(data);
       if (data.reservations.length > 0) {
         setSelectedReservation(data.reservations[0]);
