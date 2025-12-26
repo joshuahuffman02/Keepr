@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo, useCallback } from "react";
+import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiClient } from "../../../lib/api-client";
@@ -15,30 +16,78 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { recordTelemetry } from "../../../lib/sync-telemetry";
 import { loadQueue as loadQueueGeneric, saveQueue as saveQueueGeneric, registerBackgroundSync } from "../../../lib/offline-queue";
 import { randomId } from "@/lib/random-id";
-import { TableEmpty } from "@/components/ui/table";
 import { cn } from "@/lib/utils";
 import { GUEST_TOKEN_KEY, SPRING_CONFIG, STATUS_VARIANTS } from "@/lib/portal-constants";
 import { PortalPageHeader } from "@/components/portal/PortalPageHeader";
 import { PortalLoadingState, EmptyState } from "@/components/portal/PortalLoadingState";
+import { ReservationSelector } from "@/components/portal/ReservationSelector";
+
+type GuestData = Awaited<ReturnType<typeof apiClient.getGuestMe>>;
 
 export default function GuestActivitiesPage() {
+    const router = useRouter();
     const { toast } = useToast();
     const queryClient = useQueryClient();
+    const [guest, setGuest] = useState<GuestData | null>(null);
+    const [loading, setLoading] = useState(true);
+    const [selectedReservationId, setSelectedReservationId] = useState<string | null>(null);
     const [selectedActivity, setSelectedActivity] = useState<string | null>(null);
     const [selectedSession, setSelectedSession] = useState<string | null>(null);
     const [quantity, setQuantity] = useState(1);
     const [isBookOpen, setIsBookOpen] = useState(false);
     const [isOnline, setIsOnline] = useState(true);
-    const activitiesCacheKey = "campreserv:portalActivities";
     const sessionsCacheKey = (activityId: string) => `campreserv:portalActivitySessions:${activityId}`;
     const activityQueueKey = "campreserv:portal:activityQueue";
     const [queuedBookings, setQueuedBookings] = useState(0);
     const [conflicts, setConflicts] = useState<any[]>([]);
 
-    // Get campground ID from localStorage
-    const [campgroundId, setCampgroundId] = useState<string>("");
-    // Guest ID would come from guest auth token - for now, try to get from reservation context
-    const [guestId, setGuestId] = useState<string>("");
+    // Get current selected reservation
+    const selectedReservation = useMemo(() => {
+        if (!guest) return null;
+        if (selectedReservationId) {
+            return guest.reservations.find(r => r.id === selectedReservationId) || null;
+        }
+        // Default to first checked-in/confirmed reservation
+        return guest.reservations.find(
+            r => r.status === "checked_in" || r.status === "confirmed"
+        ) || guest.reservations[0] || null;
+    }, [guest, selectedReservationId]);
+
+    const campgroundId = selectedReservation?.campgroundId || "";
+    const guestId = guest?.id || "";
+    const activitiesCacheKey = `campreserv:portalActivities:${campgroundId}`;
+
+    // Load guest data on mount
+    useEffect(() => {
+        const token = localStorage.getItem(GUEST_TOKEN_KEY);
+        if (!token) {
+            router.push("/portal/login");
+            return;
+        }
+
+        const init = async () => {
+            try {
+                const guestData = await apiClient.getGuestMe(token);
+                setGuest(guestData);
+
+                // Set initial selected reservation
+                const activeRes = guestData.reservations.find(
+                    (r) => r.status === "checked_in" || r.status === "confirmed"
+                ) || guestData.reservations[0];
+
+                if (activeRes) {
+                    setSelectedReservationId(activeRes.id);
+                }
+            } catch (err) {
+                console.error(err);
+                router.push("/portal/login");
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        init();
+    }, [router]);
 
     useEffect(() => {
         if (typeof window === "undefined") return;
@@ -56,18 +105,6 @@ export default function GuestActivitiesPage() {
             setConflicts(list.filter((i) => i?.conflict));
         } catch {
             setQueuedBookings(0);
-        }
-
-        const storedCg = localStorage.getItem("campreserv:selectedCampground");
-        if (storedCg) setCampgroundId(storedCg);
-        const storedGuestToken = localStorage.getItem(GUEST_TOKEN_KEY);
-        if (storedGuestToken) {
-            try {
-                const payload = JSON.parse(atob(storedGuestToken.split('.')[1]));
-                if (payload.guestId) setGuestId(payload.guestId);
-            } catch (e) {
-                console.warn("Could not decode guest token");
-            }
         }
 
         return () => {
@@ -245,9 +282,11 @@ export default function GuestActivitiesPage() {
         }
     });
 
-    if (isLoading) {
+    if (loading) {
         return <PortalLoadingState variant="page" />;
     }
+
+    if (!guest) return null;
 
     return (
         <div className="container mx-auto px-4 py-6 space-y-6">
@@ -256,7 +295,7 @@ export default function GuestActivitiesPage() {
                 <PortalPageHeader
                     icon={<Sparkles className="h-6 w-6 text-white" />}
                     title="Activities & Events"
-                    subtitle="Enhance your stay with curated experiences"
+                    subtitle={selectedReservation ? `Events at ${selectedReservation.campground.name}` : "Enhance your stay with curated experiences"}
                     gradient="from-orange-500 to-red-600"
                 />
                 <div className="flex items-center gap-2">
@@ -299,6 +338,16 @@ export default function GuestActivitiesPage() {
                     )}
                 </div>
             </div>
+
+            {/* Reservation Selector for multi-campground guests */}
+            {guest.reservations.length > 1 && selectedReservationId && (
+                <ReservationSelector
+                    reservations={guest.reservations}
+                    selectedId={selectedReservationId}
+                    onSelect={setSelectedReservationId}
+                />
+            )}
+
             {conflicts.length > 0 && (
                 <div className={cn(
                     "rounded-lg border p-3 text-sm space-y-2",
@@ -331,8 +380,19 @@ export default function GuestActivitiesPage() {
                 </Alert>
             )}
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {activities?.filter((a: any) => a.isActive).map((activity: any, index: number) => (
+            {isLoading ? (
+                <div className="py-10">
+                    <PortalLoadingState variant="spinner" message={`Loading activities from ${selectedReservation?.campground.name || 'campground'}...`} />
+                </div>
+            ) : !activities || activities.filter((a: any) => a.isActive).length === 0 ? (
+                <EmptyState
+                    icon={<Sparkles className="h-12 w-12" />}
+                    title="No activities available"
+                    description={selectedReservation ? `${selectedReservation.campground.name} doesn't have any activities scheduled yet.` : "No activities available at this time."}
+                />
+            ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {activities.filter((a: any) => a.isActive).map((activity: any, index: number) => (
                     <motion.div
                         key={activity.id}
                         initial={{ opacity: 0, y: 20 }}
@@ -457,9 +517,10 @@ export default function GuestActivitiesPage() {
                             </Dialog>
                         </CardFooter>
                         </Card>
-                    </motion.div>
-                ))}
-            </div>
+                        </motion.div>
+                    ))}
+                </div>
+            )}
         </div>
     );
 }
