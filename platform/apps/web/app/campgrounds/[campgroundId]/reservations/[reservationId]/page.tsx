@@ -15,6 +15,7 @@ import { Label } from "../../../../../components/ui/label";
 import { format } from "date-fns";
 import { DollarSign, ArrowLeft, MessageSquare, Calculator, ActivitySquare, MapPin, CheckCircle, DoorOpen, Users, AlertTriangle, Clock, ShieldCheck, ClipboardList } from "lucide-react";
 import { AuditLogTimeline } from "../../../../../components/audit/AuditLogTimeline";
+import { ReservationFormsCard } from "../../../../../components/reservations/ReservationFormsCard";
 
 function formatDate(d?: string | Date | null) {
   if (!d) return "—";
@@ -148,12 +149,6 @@ export default function ReservationDetailPage() {
     }
   });
 
-  const formsQuery = useQuery({
-    queryKey: ["form-submissions", reservationId],
-    queryFn: () => apiClient.getFormSubmissionsByReservation(reservationId),
-    enabled: !!reservationId
-  });
-  const pendingForms = (formsQuery.data || []).filter((f: any) => f.status === "pending").length;
 
   const signaturesQuery = useQuery({
     queryKey: ["signatures", reservationId],
@@ -1147,39 +1142,10 @@ export default function ReservationDetailPage() {
               )}
             </CardContent>
           </Card>
-          <Card>
-            <CardHeader className="flex items-center justify-between">
-              <CardTitle className="flex items-center gap-2">
-                Forms
-              </CardTitle>
-              {formsQuery.isLoading ? (
-                <span className="text-xs text-slate-500">Loading…</span>
-              ) : (
-                <Badge variant={pendingForms > 0 ? "destructive" : "secondary"}>
-                  {pendingForms > 0 ? `${pendingForms} pending` : "All complete"}
-                </Badge>
-              )}
-            </CardHeader>
-            <CardContent className="space-y-2 text-sm">
-              {formsQuery.isError && <div className="text-red-600 text-xs">Failed to load forms.</div>}
-              {!formsQuery.isLoading && (formsQuery.data || []).length === 0 && (
-                <div className="text-slate-500 text-xs">No forms attached.</div>
-              )}
-              <div className="space-y-1">
-                {(formsQuery.data || []).map((f: any) => (
-                  <div key={f.id} className="flex items-center justify-between rounded border border-slate-200 px-2 py-1">
-                    <div>
-                      <div className="font-medium text-slate-900 text-sm">{f.formTemplate?.title || "Form"}</div>
-                      <div className="text-xs text-slate-500">{f.formTemplate?.type}</div>
-                    </div>
-                    <Badge variant={f.status === "completed" ? "default" : f.status === "pending" ? "destructive" : "secondary"}>
-                      {f.status}
-                    </Badge>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
+          <ReservationFormsCard
+            campgroundId={campgroundId}
+            reservationId={reservationId}
+          />
           <Card className="md:col-span-3">
             <CardHeader className="flex items-center justify-between">
               <CardTitle className="flex items-center gap-2">

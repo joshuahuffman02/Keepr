@@ -977,7 +977,7 @@ export default function FormsPage() {
       const payload = {
         title: form.title,
         type: form.type,
-        description: form.description || null,
+        description: form.description || undefined,
         fields,
         isActive: form.isActive,
         autoAttachMode: form.autoAttachMode,

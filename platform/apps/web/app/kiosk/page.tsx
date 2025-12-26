@@ -538,7 +538,9 @@ export default function KioskPage() {
                 arrivalDate: format(arrival, "yyyy-MM-dd"),
                 departureDate: format(departure, "yyyy-MM-dd")
             });
-            setAvailableSites(sites as unknown as Site[]);
+            // Only show sites that are actually available
+            const available = (sites as any[]).filter(s => s.status === "available");
+            setAvailableSites(available as unknown as Site[]);
             setState("walkin-sites");
         } catch (err) {
             console.error(err);
