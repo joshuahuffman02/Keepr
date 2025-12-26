@@ -31,6 +31,7 @@ import { Event } from "@campreserv/shared";
 import { cn } from "../../lib/utils";
 import { Skeleton } from "../../components/ui/skeleton";
 import { SessionScheduleWizard } from "../../components/activities/SessionScheduleWizard";
+import { BundlesManager } from "../../components/activities/BundlesManager";
 
 const locales = {
     "en-US": enUS,
@@ -129,6 +130,7 @@ function ActivityCard({
 
     const snapshot = capacityQuery.data;
     const icon = categoryIcons[activity.category || "default"] || categoryIcons.default;
+    const isOpenAvailability = activity.schedulingMode === "open_availability";
 
     return (
         <Card
@@ -162,8 +164,14 @@ function ActivityCard({
                     </div>
                 )}
 
-                {/* Status badge */}
-                <div className="absolute top-3 right-3">
+                {/* Status badges */}
+                <div className="absolute top-3 right-3 flex gap-1.5">
+                    {isOpenAvailability && (
+                        <Badge className="bg-blue-500 hover:bg-blue-600">
+                            <Bike className="h-3 w-3 mr-1" />
+                            Rental
+                        </Badge>
+                    )}
                     <Badge
                         variant={activity.isActive ? "default" : "secondary"}
                         className={cn(
@@ -188,9 +196,9 @@ function ActivityCard({
                                     ? "bg-amber-500/90 text-white"
                                     : "bg-red-500/90 text-white"
                         )}>
-                            {snapshot.remaining > 0
-                                ? `${snapshot.remaining} spots left`
-                                : "Fully booked"}
+                            {isOpenAvailability
+                                ? (snapshot.remaining > 0 ? `${snapshot.remaining} available` : "All rented")
+                                : (snapshot.remaining > 0 ? `${snapshot.remaining} spots left` : "Fully booked")}
                         </div>
                     </div>
                 )}
@@ -201,22 +209,45 @@ function ActivityCard({
                     "opacity-0 group-hover:opacity-100 transition-opacity duration-300",
                     "flex items-end justify-center gap-2 pb-4"
                 )}>
-                    <Button
-                        size="sm"
-                        className="bg-white text-slate-900 hover:bg-slate-100 shadow-lg"
-                        onClick={() => onManageSessions(activity.id)}
-                    >
-                        <Calendar className="h-4 w-4 mr-1.5" />
-                        View Sessions
-                    </Button>
-                    <Button
-                        size="sm"
-                        className="bg-emerald-600 text-white hover:bg-emerald-700 shadow-lg"
-                        onClick={() => onScheduleSessions(activity)}
-                    >
-                        <CalendarPlus className="h-4 w-4 mr-1.5" />
-                        Schedule
-                    </Button>
+                    {isOpenAvailability ? (
+                        <>
+                            <Button
+                                size="sm"
+                                className="bg-white text-slate-900 hover:bg-slate-100 shadow-lg"
+                                onClick={() => onManageSessions(activity.id)}
+                            >
+                                <Clock className="h-4 w-4 mr-1.5" />
+                                View Hours
+                            </Button>
+                            <Button
+                                size="sm"
+                                className="bg-blue-600 text-white hover:bg-blue-700 shadow-lg"
+                                onClick={() => onManageSessions(activity.id)}
+                            >
+                                <Bike className="h-4 w-4 mr-1.5" />
+                                Manage Inventory
+                            </Button>
+                        </>
+                    ) : (
+                        <>
+                            <Button
+                                size="sm"
+                                className="bg-white text-slate-900 hover:bg-slate-100 shadow-lg"
+                                onClick={() => onManageSessions(activity.id)}
+                            >
+                                <Calendar className="h-4 w-4 mr-1.5" />
+                                View Sessions
+                            </Button>
+                            <Button
+                                size="sm"
+                                className="bg-emerald-600 text-white hover:bg-emerald-700 shadow-lg"
+                                onClick={() => onScheduleSessions(activity)}
+                            >
+                                <CalendarPlus className="h-4 w-4 mr-1.5" />
+                                Schedule
+                            </Button>
+                        </>
+                    )}
                 </div>
             </div>
 
@@ -235,14 +266,24 @@ function ActivityCard({
                     <div className="flex items-center gap-1.5">
                         <DollarSign className="h-4 w-4 text-emerald-600" />
                         <span className="font-medium">${(activity.price / 100).toFixed(2)}</span>
+                        {isOpenAvailability && <span className="text-slate-400">/hr</span>}
                     </div>
                     <div className="flex items-center gap-1.5">
                         <Clock className="h-4 w-4 text-slate-400" />
                         <span>{activity.duration} mins</span>
                     </div>
                     <div className="flex items-center gap-1.5">
-                        <Users className="h-4 w-4 text-slate-400" />
-                        <span>Max {activity.capacity}</span>
+                        {isOpenAvailability ? (
+                            <>
+                                <Package className="h-4 w-4 text-slate-400" />
+                                <span>{activity.capacity} units</span>
+                            </>
+                        ) : (
+                            <>
+                                <Users className="h-4 w-4 text-slate-400" />
+                                <span>Max {activity.capacity}</span>
+                            </>
+                        )}
                     </div>
                 </div>
 
@@ -253,7 +294,7 @@ function ActivityCard({
                         className="flex-1 group/btn"
                         onClick={() => onManageSessions(activity.id)}
                     >
-                        <span>Sessions</span>
+                        <span>{isOpenAvailability ? "Hours" : "Sessions"}</span>
                         <ChevronRight className="h-4 w-4 ml-1 transition-transform group-hover/btn:translate-x-0.5" />
                     </Button>
                     <Button
@@ -390,7 +431,7 @@ function EmptyActivitiesState({ onCreateClick }: { onCreateClick: () => void }) 
 export default function ActivitiesPage() {
     const { toast } = useToast();
     const queryClient = useQueryClient();
-    const [viewMode, setViewMode] = useState<"cards" | "calendar">("cards");
+    const [viewMode, setViewMode] = useState<"cards" | "calendar" | "bundles">("cards");
     const [isCreateOpen, setIsCreateOpen] = useState(false);
     const [isCreateEventOpen, setIsCreateEventOpen] = useState(false);
     const [showCelebration, setShowCelebration] = useState(false);
@@ -484,14 +525,23 @@ export default function ActivitiesPage() {
 
     const createMutation = useMutation({
         mutationFn: async () => {
-            const activityData = {
+            const activityData: Record<string, any> = {
                 name: newActivity.name,
                 description: newActivity.description || undefined,
                 price: Math.round(parseFloat(newActivity.price || "0") * 100),
                 duration: parseInt(newActivity.duration) || 60,
                 capacity: parseInt(newActivity.capacity) || 20,
-                images: newActivity.imageUrl ? [newActivity.imageUrl] : []
+                images: newActivity.imageUrl ? [newActivity.imageUrl] : [],
+                schedulingMode: newActivity.schedulingMode,
             };
+
+            // Add open availability specific fields
+            if (newActivity.schedulingMode === "open_availability") {
+                activityData.operatingHours = newActivity.operatingHours;
+                activityData.slotDuration = parseInt(newActivity.slotDuration) || 60;
+                activityData.maxConcurrent = parseInt(newActivity.maxConcurrent) || 3;
+            }
+
             const result = await apiClient.createActivity(campgroundId, activityData);
             return { ...result, inputDuration: activityData.duration };
         },
@@ -506,7 +556,18 @@ export default function ActivitiesPage() {
             });
             setShowCelebration(true);
             setIsCreateOpen(false);
-            setNewActivity({ name: "", description: "", price: "", duration: "60", capacity: "20", imageUrl: "" });
+            setNewActivity({
+                name: "",
+                description: "",
+                price: "",
+                duration: "60",
+                capacity: "20",
+                imageUrl: "",
+                schedulingMode: "scheduled",
+                operatingHours: defaultOperatingHours,
+                slotDuration: "60",
+                maxConcurrent: "3"
+            });
         },
         onError: (err: any) => {
             console.error("Create activity error:", err);
@@ -790,6 +851,49 @@ export default function ActivitiesPage() {
                             />
                         </div>
 
+                        {/* Scheduling Mode Selector */}
+                        <div className="space-y-3">
+                            <Label>Scheduling Type</Label>
+                            <div className="grid grid-cols-2 gap-3">
+                                <button
+                                    type="button"
+                                    onClick={() => setNewActivity({ ...newActivity, schedulingMode: "scheduled" })}
+                                    className={cn(
+                                        "p-4 rounded-lg border-2 text-left transition-all",
+                                        newActivity.schedulingMode === "scheduled"
+                                            ? "border-emerald-500 bg-emerald-50"
+                                            : "border-slate-200 hover:border-slate-300"
+                                    )}
+                                >
+                                    <div className="flex items-center gap-2 mb-1">
+                                        <Calendar className="h-5 w-5 text-emerald-600" />
+                                        <span className="font-medium">Scheduled Sessions</span>
+                                    </div>
+                                    <p className="text-xs text-slate-500">
+                                        Staff-led with specific times (yoga, tours, campfires)
+                                    </p>
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={() => setNewActivity({ ...newActivity, schedulingMode: "open_availability" })}
+                                    className={cn(
+                                        "p-4 rounded-lg border-2 text-left transition-all",
+                                        newActivity.schedulingMode === "open_availability"
+                                            ? "border-emerald-500 bg-emerald-50"
+                                            : "border-slate-200 hover:border-slate-300"
+                                    )}
+                                >
+                                    <div className="flex items-center gap-2 mb-1">
+                                        <Bike className="h-5 w-5 text-emerald-600" />
+                                        <span className="font-medium">Open Availability</span>
+                                    </div>
+                                    <p className="text-xs text-slate-500">
+                                        Self-service rentals during operating hours (kayaks, bikes)
+                                    </p>
+                                </button>
+                            </div>
+                        </div>
+
                         <div className="grid grid-cols-3 gap-4">
                             <div className="grid gap-2">
                                 <Label htmlFor="activity-price">Price ($)</Label>
@@ -802,7 +906,9 @@ export default function ActivitiesPage() {
                                 />
                             </div>
                             <div className="grid gap-2">
-                                <Label htmlFor="activity-duration">Duration (mins)</Label>
+                                <Label htmlFor="activity-duration">
+                                    {newActivity.schedulingMode === "open_availability" ? "Rental Duration (mins)" : "Duration (mins)"}
+                                </Label>
                                 <Input
                                     id="activity-duration"
                                     type="number"
@@ -812,7 +918,9 @@ export default function ActivitiesPage() {
                                 />
                             </div>
                             <div className="grid gap-2">
-                                <Label htmlFor="activity-capacity">Max Guests</Label>
+                                <Label htmlFor="activity-capacity">
+                                    {newActivity.schedulingMode === "open_availability" ? "Inventory Count" : "Max Guests"}
+                                </Label>
                                 <Input
                                     id="activity-capacity"
                                     type="number"
@@ -822,6 +930,86 @@ export default function ActivitiesPage() {
                                 />
                             </div>
                         </div>
+
+                        {/* Open Availability Settings */}
+                        {newActivity.schedulingMode === "open_availability" && (
+                            <div className="space-y-4 p-4 rounded-lg bg-slate-50 border border-slate-200">
+                                <div className="flex items-center gap-2 text-sm font-medium text-slate-700">
+                                    <Settings2 className="h-4 w-4" />
+                                    Operating Hours
+                                </div>
+
+                                <div className="grid gap-3">
+                                    {Object.entries(newActivity.operatingHours).map(([day, hours]) => (
+                                        <div key={day} className="flex items-center gap-3">
+                                            <span className="w-12 text-sm font-medium capitalize text-slate-600">
+                                                {day}
+                                            </span>
+                                            <Input
+                                                type="time"
+                                                value={hours.start}
+                                                onChange={(e) => setNewActivity({
+                                                    ...newActivity,
+                                                    operatingHours: {
+                                                        ...newActivity.operatingHours,
+                                                        [day]: { ...hours, start: e.target.value }
+                                                    }
+                                                })}
+                                                className="w-28"
+                                            />
+                                            <span className="text-slate-400">to</span>
+                                            <Input
+                                                type="time"
+                                                value={hours.end}
+                                                onChange={(e) => setNewActivity({
+                                                    ...newActivity,
+                                                    operatingHours: {
+                                                        ...newActivity.operatingHours,
+                                                        [day]: { ...hours, end: e.target.value }
+                                                    }
+                                                })}
+                                                className="w-28"
+                                            />
+                                        </div>
+                                    ))}
+                                </div>
+
+                                <div className="grid grid-cols-2 gap-4 pt-2 border-t border-slate-200">
+                                    <div className="grid gap-2">
+                                        <Label htmlFor="slot-duration" className="text-xs">
+                                            Booking Slot (mins)
+                                        </Label>
+                                        <Select
+                                            value={newActivity.slotDuration}
+                                            onValueChange={(v) => setNewActivity({ ...newActivity, slotDuration: v })}
+                                        >
+                                            <SelectTrigger id="slot-duration">
+                                                <SelectValue />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                <SelectItem value="30">30 minutes</SelectItem>
+                                                <SelectItem value="60">1 hour</SelectItem>
+                                                <SelectItem value="120">2 hours</SelectItem>
+                                                <SelectItem value="240">4 hours</SelectItem>
+                                                <SelectItem value="480">Full day</SelectItem>
+                                            </SelectContent>
+                                        </Select>
+                                    </div>
+                                    <div className="grid gap-2">
+                                        <Label htmlFor="max-concurrent" className="text-xs">
+                                            Max Concurrent Rentals
+                                        </Label>
+                                        <Input
+                                            id="max-concurrent"
+                                            type="number"
+                                            value={newActivity.maxConcurrent}
+                                            onChange={(e) => setNewActivity({ ...newActivity, maxConcurrent: e.target.value })}
+                                            placeholder="3"
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+                        )}
                     </div>
                     <DialogFooter>
                         <Button variant="ghost" onClick={() => setIsCreateOpen(false)}>Cancel</Button>
@@ -870,13 +1058,15 @@ export default function ActivitiesPage() {
                             Create memorable experiences for your guests
                         </p>
                     </div>
-                    <Button
-                        onClick={() => viewMode === "cards" ? setIsCreateOpen(true) : setIsCreateEventOpen(true)}
-                        className="bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white shadow-lg shadow-emerald-500/25 transition-all duration-200 hover:shadow-xl hover:-translate-y-0.5"
-                    >
-                        <Plus className="h-4 w-4 mr-2" />
-                        {viewMode === "cards" ? "New Activity" : "Add Event"}
-                    </Button>
+                    {viewMode !== "bundles" && (
+                        <Button
+                            onClick={() => viewMode === "cards" ? setIsCreateOpen(true) : setIsCreateEventOpen(true)}
+                            className="bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white shadow-lg shadow-emerald-500/25 transition-all duration-200 hover:shadow-xl hover:-translate-y-0.5"
+                        >
+                            <Plus className="h-4 w-4 mr-2" />
+                            {viewMode === "cards" ? "New Activity" : "Add Event"}
+                        </Button>
+                    )}
                 </div>
 
                 {/* View Toggle - Proper Tab Pattern */}
@@ -916,6 +1106,22 @@ export default function ActivitiesPage() {
                     >
                         <Calendar className="h-4 w-4" />
                         Calendar
+                    </button>
+                    <button
+                        role="tab"
+                        id="tab-bundles"
+                        aria-selected={viewMode === "bundles"}
+                        aria-controls="panel-bundles"
+                        onClick={() => setViewMode("bundles")}
+                        className={cn(
+                            "flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition-all duration-200",
+                            viewMode === "bundles"
+                                ? "bg-white text-slate-900 shadow-sm"
+                                : "text-slate-600 hover:text-slate-900"
+                        )}
+                    >
+                        <Package className="h-4 w-4" />
+                        Bundles
                     </button>
                 </div>
 
@@ -1004,6 +1210,21 @@ export default function ActivitiesPage() {
                             )}
                         </CardContent>
                     </Card>
+                </div>
+
+                {/* Bundles View */}
+                <div
+                    role="tabpanel"
+                    id="panel-bundles"
+                    aria-labelledby="tab-bundles"
+                    hidden={viewMode !== "bundles"}
+                >
+                    {campgroundId && activities && (
+                        <BundlesManager
+                            campgroundId={campgroundId}
+                            activities={activities}
+                        />
+                    )}
                 </div>
             </div>
         </DashboardShell>
