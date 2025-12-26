@@ -1,0 +1,215 @@
+"use client"
+
+import * as React from "react"
+import { cn } from "../../lib/utils"
+
+const AlertDialogContext = React.createContext<{
+    open: boolean
+    onOpenChange: (open: boolean) => void
+}>({ open: false, onOpenChange: () => { } })
+
+const AlertDialog = ({
+    open,
+    onOpenChange,
+    children,
+}: {
+    open?: boolean
+    onOpenChange?: (open: boolean) => void
+    children: React.ReactNode
+}) => {
+    const [isOpen, setIsOpen] = React.useState(open || false)
+
+    React.useEffect(() => {
+        if (open !== undefined) setIsOpen(open)
+    }, [open])
+
+    const handleOpenChange = (newOpen: boolean) => {
+        setIsOpen(newOpen)
+        onOpenChange?.(newOpen)
+    }
+
+    return (
+        <AlertDialogContext.Provider value={{ open: isOpen, onOpenChange: handleOpenChange }}>
+            {children}
+        </AlertDialogContext.Provider>
+    )
+}
+
+const AlertDialogTrigger = ({
+    children,
+    asChild,
+    ...props
+}: React.ButtonHTMLAttributes<HTMLButtonElement> & { asChild?: boolean }) => {
+    const { onOpenChange } = React.useContext(AlertDialogContext)
+
+    if (asChild && React.isValidElement(children)) {
+        return React.cloneElement(children as React.ReactElement<any>, {
+            onClick: () => onOpenChange(true)
+        })
+    }
+
+    return (
+        <button onClick={() => onOpenChange(true)} {...props}>
+            {children}
+        </button>
+    )
+}
+AlertDialogTrigger.displayName = "AlertDialogTrigger"
+
+const AlertDialogContent = React.forwardRef<
+    HTMLDivElement,
+    React.HTMLAttributes<HTMLDivElement>
+>(({ className, children, ...props }, ref) => {
+    const { open } = React.useContext(AlertDialogContext)
+    const contentRef = React.useRef<HTMLDivElement | null>(null)
+    const previousActiveElement = React.useRef<HTMLElement | null>(null)
+
+    React.useEffect(() => {
+        if (!open || !contentRef.current) return
+
+        previousActiveElement.current = document.activeElement as HTMLElement
+
+        const firstFocusable = contentRef.current.querySelector<HTMLElement>(
+            'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+        )
+        firstFocusable?.focus()
+
+        return () => {
+            previousActiveElement.current?.focus()
+        }
+    }, [open])
+
+    if (!open) return null
+
+    return (
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
+            <div
+                className="fixed inset-0 bg-black/50 backdrop-blur-sm transition-opacity"
+                aria-hidden="true"
+            />
+            <div
+                ref={(node) => {
+                    if (typeof ref === 'function') ref(node)
+                    else if (ref) (ref as React.MutableRefObject<HTMLDivElement | null>).current = node
+                    ;(contentRef as React.MutableRefObject<HTMLDivElement | null>).current = node
+                }}
+                className={cn(
+                    "z-50 grid w-full max-w-lg gap-4 border border-slate-200 bg-white p-6 shadow-lg duration-200 sm:rounded-lg md:w-full",
+                    className
+                )}
+                role="alertdialog"
+                aria-modal="true"
+                aria-labelledby="alert-dialog-title"
+                aria-describedby="alert-dialog-description"
+                {...props}
+            >
+                {children}
+            </div>
+        </div>
+    )
+})
+AlertDialogContent.displayName = "AlertDialogContent"
+
+const AlertDialogHeader = ({
+    className,
+    ...props
+}: React.HTMLAttributes<HTMLDivElement>) => (
+    <div
+        className={cn(
+            "flex flex-col space-y-2 text-center sm:text-left",
+            className
+        )}
+        {...props}
+    />
+)
+AlertDialogHeader.displayName = "AlertDialogHeader"
+
+const AlertDialogFooter = ({
+    className,
+    ...props
+}: React.HTMLAttributes<HTMLDivElement>) => (
+    <div
+        className={cn(
+            "flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2",
+            className
+        )}
+        {...props}
+    />
+)
+AlertDialogFooter.displayName = "AlertDialogFooter"
+
+const AlertDialogTitle = React.forwardRef<
+    HTMLHeadingElement,
+    React.HTMLAttributes<HTMLHeadingElement>
+>(({ className, ...props }, ref) => (
+    <h2
+        ref={ref}
+        id="alert-dialog-title"
+        className={cn("text-lg font-semibold", className)}
+        {...props}
+    />
+))
+AlertDialogTitle.displayName = "AlertDialogTitle"
+
+const AlertDialogDescription = React.forwardRef<
+    HTMLParagraphElement,
+    React.HTMLAttributes<HTMLParagraphElement>
+>(({ className, ...props }, ref) => (
+    <p
+        ref={ref}
+        id="alert-dialog-description"
+        className={cn("text-sm text-slate-500", className)}
+        {...props}
+    />
+))
+AlertDialogDescription.displayName = "AlertDialogDescription"
+
+const AlertDialogAction = React.forwardRef<
+    HTMLButtonElement,
+    React.ButtonHTMLAttributes<HTMLButtonElement>
+>(({ className, ...props }, ref) => {
+    const { onOpenChange } = React.useContext(AlertDialogContext)
+    return (
+        <button
+            ref={ref}
+            className={cn(
+                "inline-flex h-10 items-center justify-center rounded-md bg-slate-900 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-slate-400 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50",
+                className
+            )}
+            onClick={() => onOpenChange(false)}
+            {...props}
+        />
+    )
+})
+AlertDialogAction.displayName = "AlertDialogAction"
+
+const AlertDialogCancel = React.forwardRef<
+    HTMLButtonElement,
+    React.ButtonHTMLAttributes<HTMLButtonElement>
+>(({ className, ...props }, ref) => {
+    const { onOpenChange } = React.useContext(AlertDialogContext)
+    return (
+        <button
+            ref={ref}
+            className={cn(
+                "mt-2 inline-flex h-10 items-center justify-center rounded-md border border-slate-200 bg-transparent px-4 py-2 text-sm font-semibold text-slate-900 transition-colors hover:bg-slate-100 focus:outline-none focus:ring-2 focus:ring-slate-400 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 sm:mt-0",
+                className
+            )}
+            onClick={() => onOpenChange(false)}
+            {...props}
+        />
+    )
+})
+AlertDialogCancel.displayName = "AlertDialogCancel"
+
+export {
+    AlertDialog,
+    AlertDialogTrigger,
+    AlertDialogContent,
+    AlertDialogHeader,
+    AlertDialogFooter,
+    AlertDialogTitle,
+    AlertDialogDescription,
+    AlertDialogAction,
+    AlertDialogCancel,
+}

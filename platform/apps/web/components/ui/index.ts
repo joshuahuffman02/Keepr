@@ -2,6 +2,7 @@
 // Usage: import { Button, Badge, FormField } from "@/components/ui"
 
 export { Alert } from "./alert"
+export { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "./alert-dialog"
 export { Badge, badgeVariants, type BadgeProps } from "./badge"
 export { Button, buttonVariants, type ButtonProps } from "./button"
 export { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "./card"
