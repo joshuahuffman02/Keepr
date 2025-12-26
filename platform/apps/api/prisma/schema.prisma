@@ -5170,6 +5170,8 @@ model WaiverTemplate {
 
 enum SignatureDocumentType {
   long_term_stay
+  seasonal            // Seasonal contract
+  monthly             // Monthly rental contract
   park_rules
   deposit
   waiver
@@ -5178,10 +5180,13 @@ enum SignatureDocumentType {
 }
 
 enum SignatureRequestStatus {
+  preview         // Available for preview but not signing yet
   draft
   sent
   viewed
   signed
+  signed_paper    // Signed via paper copy
+  waived          // Signature requirement waived
   declined
   voided
   expired
@@ -5191,6 +5196,21 @@ enum SignatureDeliveryChannel {
   email
   sms
   email_and_sms
+}
+
+enum SignatureMethod {
+  digital
+  paper
+  waived
+}
+
+enum WaiverReason {
+  returning_same_terms
+  corporate_agreement
+  grandfathered
+  family_member
+  owner_discretion
+  other
 }
 
 enum CoiStatus {
@@ -5254,6 +5274,29 @@ model SignatureRequest {
   createdAt         DateTime                 @default(now())
   updatedAt         DateTime                 @updatedAt
 
+  // Signature method - how the contract was/will be signed
+  signatureMethod   SignatureMethod          @default(digital)
+
+  // Paper signing fields
+  paperSignedAt     DateTime?
+  paperReceivedBy   String?                  // Staff user ID who received paper copy
+  paperArtifactUrl  String?                  // Scanned copy upload URL
+
+  // Signature waiver fields
+  signatureWaived   Boolean                  @default(false)
+  waiverReason      WaiverReason?
+  waiverNotes       String?
+  waivedBy          String?                  // Staff user ID who waived
+  waivedAt          DateTime?
+
+  // Preview/Early access fields
+  previewAvailableAt    DateTime?            // When guests can preview (but not sign)
+  availableForSigningAt DateTime?            // When guests can start signing
+
+  // Seasonal/Renewal tracking
+  renewsContractId  String?                  // Previous contract this renews
+  seasonYear        Int?                     // e.g., 2025, 2026
+
   campground Campground      @relation(fields: [campgroundId], references: [id], onDelete: Cascade)
   reservation Reservation?   @relation(fields: [reservationId], references: [id], onDelete: SetNull)
   guest       Guest?         @relation(fields: [guestId], references: [id], onDelete: SetNull)
@@ -5264,6 +5307,8 @@ model SignatureRequest {
   @@index([reservationId])
   @@index([guestId])
   @@index([expiresAt])
+  @@index([campgroundId, seasonYear])
+  @@index([renewsContractId])
 }
 
 model SignatureArtifact {

@@ -9165,6 +9165,519 @@ export const apiClient = {
     });
     return parseResponse<{ id: string }>(res);
   },
+
+  // ============================================================
+  // UNIFIED OPERATIONS / OP-TASKS
+  // ============================================================
+
+  // Tasks
+  async getOpTasks(campgroundId: string, filters?: {
+    categories?: string[];
+    states?: string[];
+    priorities?: string[];
+    assignedToUserId?: string;
+    assignedToTeamId?: string;
+    siteId?: string;
+    slaStatus?: string;
+    dueBefore?: string;
+    dueAfter?: string;
+    limit?: number;
+    offset?: number;
+  }) {
+    const params = new URLSearchParams();
+    if (filters?.categories?.length) params.set("categories", filters.categories.join(","));
+    if (filters?.states?.length) params.set("states", filters.states.join(","));
+    if (filters?.priorities?.length) params.set("priorities", filters.priorities.join(","));
+    if (filters?.assignedToUserId) params.set("assignedToUserId", filters.assignedToUserId);
+    if (filters?.assignedToTeamId) params.set("assignedToTeamId", filters.assignedToTeamId);
+    if (filters?.siteId) params.set("siteId", filters.siteId);
+    if (filters?.slaStatus) params.set("slaStatus", filters.slaStatus);
+    if (filters?.dueBefore) params.set("dueBefore", filters.dueBefore);
+    if (filters?.dueAfter) params.set("dueAfter", filters.dueAfter);
+    if (filters?.limit) params.set("limit", String(filters.limit));
+    if (filters?.offset) params.set("offset", String(filters.offset));
+    const res = await fetch(`${API_BASE}/op-tasks/${campgroundId}/tasks?${params}`, {
+      headers: scopedHeaders(),
+    });
+    return parseResponse<any[]>(res);
+  },
+
+  async getOpTask(campgroundId: string, taskId: string) {
+    const res = await fetch(`${API_BASE}/op-tasks/${campgroundId}/tasks/${taskId}`, {
+      headers: scopedHeaders(),
+    });
+    return parseResponse<any>(res);
+  },
+
+  async getOpTaskStats(campgroundId: string) {
+    const res = await fetch(`${API_BASE}/op-tasks/${campgroundId}/tasks/stats`, {
+      headers: scopedHeaders(),
+    });
+    return parseResponse<any>(res);
+  },
+
+  async getOpTasksDueToday(campgroundId: string) {
+    const res = await fetch(`${API_BASE}/op-tasks/${campgroundId}/tasks/due-today`, {
+      headers: scopedHeaders(),
+    });
+    return parseResponse<any[]>(res);
+  },
+
+  async getOpTasksOverdue(campgroundId: string) {
+    const res = await fetch(`${API_BASE}/op-tasks/${campgroundId}/tasks/overdue`, {
+      headers: scopedHeaders(),
+    });
+    return parseResponse<any[]>(res);
+  },
+
+  async getMyOpTasks(campgroundId: string) {
+    const res = await fetch(`${API_BASE}/op-tasks/${campgroundId}/tasks/my-tasks`, {
+      headers: scopedHeaders(),
+    });
+    return parseResponse<any[]>(res);
+  },
+
+  async createOpTask(campgroundId: string, payload: {
+    category: string;
+    title: string;
+    description?: string;
+    priority?: string;
+    siteId?: string;
+    reservationId?: string;
+    locationDescription?: string;
+    assignedToUserId?: string;
+    assignedToTeamId?: string;
+    slaDueAt?: string;
+    checklist?: Array<{ id: string; text: string; completed: boolean; required?: boolean }>;
+    notes?: string;
+    isBlocking?: boolean;
+    templateId?: string;
+  }) {
+    const res = await fetch(`${API_BASE}/op-tasks/${campgroundId}/tasks`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", ...scopedHeaders() },
+      body: JSON.stringify(payload),
+    });
+    return parseResponse<any>(res);
+  },
+
+  async updateOpTask(campgroundId: string, taskId: string, payload: {
+    state?: string;
+    priority?: string;
+    title?: string;
+    description?: string;
+    assignedToUserId?: string;
+    assignedToTeamId?: string;
+    slaDueAt?: string;
+    checklist?: Array<{ id: string; text: string; completed: boolean }>;
+    notes?: string;
+    isBlocking?: boolean;
+  }) {
+    const res = await fetch(`${API_BASE}/op-tasks/${campgroundId}/tasks/${taskId}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json", ...scopedHeaders() },
+      body: JSON.stringify(payload),
+    });
+    return parseResponse<any>(res);
+  },
+
+  async deleteOpTask(campgroundId: string, taskId: string) {
+    const res = await fetch(`${API_BASE}/op-tasks/${campgroundId}/tasks/${taskId}`, {
+      method: "DELETE",
+      headers: scopedHeaders(),
+    });
+    return parseResponse<void>(res);
+  },
+
+  async assignOpTask(campgroundId: string, taskId: string, payload: { userId?: string; teamId?: string }) {
+    const res = await fetch(`${API_BASE}/op-tasks/${campgroundId}/tasks/${taskId}/assign`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", ...scopedHeaders() },
+      body: JSON.stringify(payload),
+    });
+    return parseResponse<any>(res);
+  },
+
+  async addOpTaskComment(campgroundId: string, taskId: string, content: string) {
+    const res = await fetch(`${API_BASE}/op-tasks/${campgroundId}/tasks/${taskId}/comments`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", ...scopedHeaders() },
+      body: JSON.stringify({ content }),
+    });
+    return parseResponse<any>(res);
+  },
+
+  async bulkUpdateOpTasks(campgroundId: string, ids: string[], state: string) {
+    const res = await fetch(`${API_BASE}/op-tasks/${campgroundId}/tasks/bulk-update`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", ...scopedHeaders() },
+      body: JSON.stringify({ ids, state }),
+    });
+    return parseResponse<any>(res);
+  },
+
+  // Templates
+  async getOpTemplates(campgroundId: string, filters?: { category?: string; isActive?: boolean }) {
+    const params = new URLSearchParams();
+    if (filters?.category) params.set("category", filters.category);
+    if (filters?.isActive !== undefined) params.set("isActive", String(filters.isActive));
+    const res = await fetch(`${API_BASE}/op-tasks/${campgroundId}/templates?${params}`, {
+      headers: scopedHeaders(),
+    });
+    return parseResponse<any[]>(res);
+  },
+
+  async getOpStarterTemplates(campgroundId: string) {
+    const res = await fetch(`${API_BASE}/op-tasks/${campgroundId}/templates/starters`, {
+      headers: scopedHeaders(),
+    });
+    return parseResponse<any[]>(res);
+  },
+
+  async createOpTemplate(campgroundId: string, payload: {
+    name: string;
+    description?: string;
+    category: string;
+    priority?: string;
+    checklistTemplate?: Array<{ id: string; text: string; required?: boolean; category?: string; estimatedMinutes?: number }>;
+    suppliesNeeded?: Array<{ item: string; quantity?: number; notes?: string }>;
+    estimatedMinutes?: number;
+    slaMinutes?: number;
+    defaultTeamId?: string;
+    defaultAssigneeId?: string;
+    siteClassIds?: string[];
+    siteIds?: string[];
+    xpValue?: number;
+  }) {
+    const res = await fetch(`${API_BASE}/op-tasks/${campgroundId}/templates`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", ...scopedHeaders() },
+      body: JSON.stringify(payload),
+    });
+    return parseResponse<any>(res);
+  },
+
+  async updateOpTemplate(campgroundId: string, templateId: string, payload: any) {
+    const res = await fetch(`${API_BASE}/op-tasks/${campgroundId}/templates/${templateId}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json", ...scopedHeaders() },
+      body: JSON.stringify(payload),
+    });
+    return parseResponse<any>(res);
+  },
+
+  async deleteOpTemplate(campgroundId: string, templateId: string) {
+    const res = await fetch(`${API_BASE}/op-tasks/${campgroundId}/templates/${templateId}`, {
+      method: "DELETE",
+      headers: scopedHeaders(),
+    });
+    return parseResponse<void>(res);
+  },
+
+  async duplicateOpTemplate(campgroundId: string, templateId: string, name?: string) {
+    const res = await fetch(`${API_BASE}/op-tasks/${campgroundId}/templates/${templateId}/duplicate`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", ...scopedHeaders() },
+      body: JSON.stringify({ name }),
+    });
+    return parseResponse<any>(res);
+  },
+
+  async seedOpStarterTemplates(campgroundId: string) {
+    const res = await fetch(`${API_BASE}/op-tasks/${campgroundId}/templates/seed`, {
+      method: "POST",
+      headers: scopedHeaders(),
+    });
+    return parseResponse<any[]>(res);
+  },
+
+  // Triggers
+  async getOpTriggers(campgroundId: string, filters?: { event?: string; isActive?: boolean }) {
+    const params = new URLSearchParams();
+    if (filters?.event) params.set("event", filters.event);
+    if (filters?.isActive !== undefined) params.set("isActive", String(filters.isActive));
+    const res = await fetch(`${API_BASE}/op-tasks/${campgroundId}/triggers?${params}`, {
+      headers: scopedHeaders(),
+    });
+    return parseResponse<any[]>(res);
+  },
+
+  async getTriggerSuggestions(campgroundId: string) {
+    const res = await fetch(`${API_BASE}/op-tasks/${campgroundId}/triggers/suggestions`, {
+      headers: scopedHeaders(),
+    });
+    return parseResponse<any[]>(res);
+  },
+
+  async createOpTrigger(campgroundId: string, payload: {
+    name: string;
+    triggerEvent: string;
+    templateId: string;
+    conditions?: {
+      siteClassIds?: string[];
+      siteIds?: string[];
+      minNights?: number;
+      maxNights?: number;
+      hasPets?: boolean;
+      stayType?: string;
+    };
+    slaOffsetMinutes?: number;
+    assignToTeamId?: string;
+    assignToUserId?: string;
+  }) {
+    const res = await fetch(`${API_BASE}/op-tasks/${campgroundId}/triggers`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", ...scopedHeaders() },
+      body: JSON.stringify(payload),
+    });
+    return parseResponse<any>(res);
+  },
+
+  async updateOpTrigger(campgroundId: string, triggerId: string, payload: any) {
+    const res = await fetch(`${API_BASE}/op-tasks/${campgroundId}/triggers/${triggerId}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json", ...scopedHeaders() },
+      body: JSON.stringify(payload),
+    });
+    return parseResponse<any>(res);
+  },
+
+  async deleteOpTrigger(campgroundId: string, triggerId: string) {
+    const res = await fetch(`${API_BASE}/op-tasks/${campgroundId}/triggers/${triggerId}`, {
+      method: "DELETE",
+      headers: scopedHeaders(),
+    });
+    return parseResponse<void>(res);
+  },
+
+  // Recurrence Rules
+  async getOpRecurrenceRules(campgroundId: string, filters?: { pattern?: string; isActive?: boolean }) {
+    const params = new URLSearchParams();
+    if (filters?.pattern) params.set("pattern", filters.pattern);
+    if (filters?.isActive !== undefined) params.set("isActive", String(filters.isActive));
+    const res = await fetch(`${API_BASE}/op-tasks/${campgroundId}/recurrence?${params}`, {
+      headers: scopedHeaders(),
+    });
+    return parseResponse<any[]>(res);
+  },
+
+  async getRecurrenceSuggestions(campgroundId: string) {
+    const res = await fetch(`${API_BASE}/op-tasks/${campgroundId}/recurrence/suggestions`, {
+      headers: scopedHeaders(),
+    });
+    return parseResponse<any[]>(res);
+  },
+
+  async createOpRecurrenceRule(campgroundId: string, payload: {
+    name: string;
+    templateId: string;
+    pattern: string;
+    daysOfWeek?: number[];
+    daysOfMonth?: number[];
+    generateAtHour?: number;
+    generateAtMinute?: number;
+    siteClassIds?: string[];
+    siteIds?: string[];
+    locationFilter?: string;
+    assignToTeamId?: string;
+    assignToUserId?: string;
+  }) {
+    const res = await fetch(`${API_BASE}/op-tasks/${campgroundId}/recurrence`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", ...scopedHeaders() },
+      body: JSON.stringify(payload),
+    });
+    return parseResponse<any>(res);
+  },
+
+  async updateOpRecurrenceRule(campgroundId: string, ruleId: string, payload: any) {
+    const res = await fetch(`${API_BASE}/op-tasks/${campgroundId}/recurrence/${ruleId}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json", ...scopedHeaders() },
+      body: JSON.stringify(payload),
+    });
+    return parseResponse<any>(res);
+  },
+
+  async deleteOpRecurrenceRule(campgroundId: string, ruleId: string) {
+    const res = await fetch(`${API_BASE}/op-tasks/${campgroundId}/recurrence/${ruleId}`, {
+      method: "DELETE",
+      headers: scopedHeaders(),
+    });
+    return parseResponse<void>(res);
+  },
+
+  async triggerRecurrenceRule(campgroundId: string, ruleId: string) {
+    const res = await fetch(`${API_BASE}/op-tasks/${campgroundId}/recurrence/${ruleId}/trigger`, {
+      method: "POST",
+      headers: scopedHeaders(),
+    });
+    return parseResponse<any[]>(res);
+  },
+
+  // Teams
+  async getOpTeams(campgroundId: string, filters?: { isActive?: boolean }) {
+    const params = new URLSearchParams();
+    if (filters?.isActive !== undefined) params.set("isActive", String(filters.isActive));
+    const res = await fetch(`${API_BASE}/op-tasks/${campgroundId}/teams?${params}`, {
+      headers: scopedHeaders(),
+    });
+    return parseResponse<any[]>(res);
+  },
+
+  async getMyOpTeams(campgroundId: string) {
+    const res = await fetch(`${API_BASE}/op-tasks/${campgroundId}/teams/my-teams`, {
+      headers: scopedHeaders(),
+    });
+    return parseResponse<any[]>(res);
+  },
+
+  async getAvailableStaff(campgroundId: string) {
+    const res = await fetch(`${API_BASE}/op-tasks/${campgroundId}/teams/available-staff`, {
+      headers: scopedHeaders(),
+    });
+    return parseResponse<any[]>(res);
+  },
+
+  async getOpTeam(campgroundId: string, teamId: string) {
+    const res = await fetch(`${API_BASE}/op-tasks/${campgroundId}/teams/${teamId}`, {
+      headers: scopedHeaders(),
+    });
+    return parseResponse<any>(res);
+  },
+
+  async getOpTeamStats(campgroundId: string, teamId: string) {
+    const res = await fetch(`${API_BASE}/op-tasks/${campgroundId}/teams/${teamId}/stats`, {
+      headers: scopedHeaders(),
+    });
+    return parseResponse<any>(res);
+  },
+
+  async createOpTeam(campgroundId: string, payload: { name: string; description?: string; color?: string }) {
+    const res = await fetch(`${API_BASE}/op-tasks/${campgroundId}/teams`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", ...scopedHeaders() },
+      body: JSON.stringify(payload),
+    });
+    return parseResponse<any>(res);
+  },
+
+  async updateOpTeam(campgroundId: string, teamId: string, payload: { name?: string; description?: string; color?: string; isActive?: boolean }) {
+    const res = await fetch(`${API_BASE}/op-tasks/${campgroundId}/teams/${teamId}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json", ...scopedHeaders() },
+      body: JSON.stringify(payload),
+    });
+    return parseResponse<any>(res);
+  },
+
+  async deleteOpTeam(campgroundId: string, teamId: string) {
+    const res = await fetch(`${API_BASE}/op-tasks/${campgroundId}/teams/${teamId}`, {
+      method: "DELETE",
+      headers: scopedHeaders(),
+    });
+    return parseResponse<void>(res);
+  },
+
+  async addOpTeamMember(campgroundId: string, teamId: string, payload: { userId: string; role?: string }) {
+    const res = await fetch(`${API_BASE}/op-tasks/${campgroundId}/teams/${teamId}/members`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", ...scopedHeaders() },
+      body: JSON.stringify(payload),
+    });
+    return parseResponse<any>(res);
+  },
+
+  async removeOpTeamMember(campgroundId: string, teamId: string, userId: string) {
+    const res = await fetch(`${API_BASE}/op-tasks/${campgroundId}/teams/${teamId}/members/${userId}`, {
+      method: "DELETE",
+      headers: scopedHeaders(),
+    });
+    return parseResponse<void>(res);
+  },
+
+  async updateOpTeamMemberRole(campgroundId: string, teamId: string, userId: string, role: string) {
+    const res = await fetch(`${API_BASE}/op-tasks/${campgroundId}/teams/${teamId}/members/${userId}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json", ...scopedHeaders() },
+      body: JSON.stringify({ role }),
+    });
+    return parseResponse<any>(res);
+  },
+
+  async seedDefaultOpTeams(campgroundId: string) {
+    const res = await fetch(`${API_BASE}/op-tasks/${campgroundId}/teams/seed`, {
+      method: "POST",
+      headers: scopedHeaders(),
+    });
+    return parseResponse<any[]>(res);
+  },
+
+  // SLA Dashboard
+  async getSlaDashboard(campgroundId: string) {
+    const res = await fetch(`${API_BASE}/op-tasks/${campgroundId}/sla/dashboard`, {
+      headers: scopedHeaders(),
+    });
+    return parseResponse<{
+      current: { onTrack: number; atRisk: number; breached: number; total: number };
+      today: { completed: number; onTime: number; late: number; complianceRate: number };
+      week: { completed: number };
+    }>(res);
+  },
+
+  async getUpcomingDeadlines(campgroundId: string, options?: { limit?: number; hoursAhead?: number }) {
+    const params = new URLSearchParams();
+    if (options?.limit) params.set("limit", String(options.limit));
+    if (options?.hoursAhead) params.set("hoursAhead", String(options.hoursAhead));
+    const res = await fetch(`${API_BASE}/op-tasks/${campgroundId}/sla/upcoming?${params}`, {
+      headers: scopedHeaders(),
+    });
+    return parseResponse<any[]>(res);
+  },
+
+  async getBreachedTasks(campgroundId: string) {
+    const res = await fetch(`${API_BASE}/op-tasks/${campgroundId}/sla/breached`, {
+      headers: scopedHeaders(),
+    });
+    return parseResponse<any[]>(res);
+  },
+
+  async getTeamSlaPerformance(campgroundId: string) {
+    const res = await fetch(`${API_BASE}/op-tasks/${campgroundId}/sla/team-performance`, {
+      headers: scopedHeaders(),
+    });
+    return parseResponse<Array<{
+      teamId: string;
+      teamName: string;
+      totalCompleted: number;
+      onTime: number;
+      late: number;
+      complianceRate: number;
+    }>>(res);
+  },
+
+  async getStaffSlaPerformance(campgroundId: string) {
+    const res = await fetch(`${API_BASE}/op-tasks/${campgroundId}/sla/staff-performance`, {
+      headers: scopedHeaders(),
+    });
+    return parseResponse<Array<{
+      userId: string;
+      userName: string;
+      totalCompleted: number;
+      onTime: number;
+      late: number;
+      complianceRate: number;
+    }>>(res);
+  },
+
+  async escalateTask(campgroundId: string, taskId: string, escalateToUserId: string) {
+    const res = await fetch(`${API_BASE}/op-tasks/${campgroundId}/sla/${taskId}/escalate`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", ...scopedHeaders() },
+      body: JSON.stringify({ escalateToUserId }),
+    });
+    return parseResponse<any>(res);
+  },
 };
 
 export type PublicCampgroundList = z.infer<typeof PublicCampgroundListSchema>;
