@@ -189,7 +189,7 @@ export default function BillingSettingsPage() {
 
     // Sites that already have meters
     const sitesWithMeters = useMemo(() => {
-        return new Set(meters.map((m: UtilityMeter) => m.siteId));
+        return new Set(meters.map((m: any) => m.siteId));
     }, [meters]);
 
     // Sites available for new meters (metered enabled but no meter yet for this type)
