@@ -13,8 +13,10 @@ import { PrismaService } from "../prisma/prisma.service";
 import { GuestsService } from "../guests/guests.service";
 import { ApiTokenGuard } from "./guards/api-token.guard";
 import { ApiScopeGuard } from "./guards/api-scope.guard";
+import { AuditModule } from "../audit/audit.module";
 
 @Module({
+  imports: [AuditModule],
   controllers: [
     ApiAuthController,
     DeveloperAdminController,
