@@ -1187,6 +1187,34 @@ export class PublicReservationsService {
                 const nights = Math.ceil((reservation.departureDate.getTime() - reservation.arrivalDate.getTime()) / (1000 * 60 * 60 * 24));
                 const baseUrl = (process.env.FRONTEND_URL || process.env.APP_BASE_URL || process.env.NEXT_PUBLIC_APP_BASE || "http://localhost:3000").replace(/\/+$/, "");
 
+                // Check for forms that need to be completed after booking
+                const afterBookingForms = await this.prisma.formTemplate.findMany({
+                    where: {
+                        campgroundId: dto.campgroundId,
+                        isActive: true
+                    },
+                    select: { id: true, title: true, showAt: true, isRequired: true }
+                });
+                const formsToComplete = afterBookingForms.filter(f => {
+                    const showAtArray = f.showAt as string[] | null;
+                    return showAtArray?.includes("after_booking");
+                });
+                const formsBlock = formsToComplete.length > 0
+                    ? `
+                    <div style="background: #eff6ff; border: 1px solid #3b82f6; border-radius: 8px; padding: 16px; margin: 20px 0;">
+                        <h3 style="margin: 0 0 8px 0; color: #1e40af; font-size: 14px;">Forms to Complete</h3>
+                        <p style="margin: 0 0 12px 0; color: #1e3a8a; font-size: 13px;">
+                            Please complete the following form${formsToComplete.length > 1 ? 's' : ''} before your arrival:
+                        </p>
+                        <ul style="margin: 0 0 12px 0; padding-left: 20px; color: #1e3a8a; font-size: 13px;">
+                            ${formsToComplete.map(f => `<li style="margin: 4px 0;">${f.title}${f.isRequired !== false ? ' <span style="color: #dc2626;">(Required)</span>' : ''}</li>`).join('')}
+                        </ul>
+                        <div style="text-align: center;">
+                            <a href="${baseUrl}/forms/guest/${reservation.id}" style="display: inline-block; padding: 10px 20px; background: #3b82f6; color: #fff; text-decoration: none; border-radius: 6px; font-weight: 500; font-size: 14px;">Complete Forms Now</a>
+                        </div>
+                    </div>`
+                    : "";
+
                 // Send confirmation email (don't fail booking if email fails)
                 try {
                     await this.emailService.sendEmail({
@@ -1235,6 +1263,8 @@ export class PublicReservationsService {
                                 </div>
 
                                 ${policyBlock}
+
+                                ${formsBlock}
 
                                 <div style="text-align: center; padding: 20px 0; border-top: 1px solid #e2e8f0;">
                                     <p style="color: #64748b; font-size: 13px; margin: 0 0 8px 0;">

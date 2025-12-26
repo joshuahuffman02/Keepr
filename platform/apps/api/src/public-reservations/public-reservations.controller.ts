@@ -55,6 +55,14 @@ export class PublicReservationsController {
     }
 
     /**
+     * Get form submissions for a reservation
+     */
+    @Get("reservations/:id/form-submissions")
+    async getReservationFormSubmissions(@Param("id") id: string) {
+        return this.formsService.getReservationFormSubmissions(id);
+    }
+
+    /**
      * Get active forms for a campground during booking/check-in
      * Query params:
      * - showAt: Filter by timing ("during_booking", "at_checkin", "after_booking")

@@ -180,5 +180,28 @@ export class FormsService {
       include: { formTemplate: { select: { id: true, title: true, type: true } } }
     });
   }
+
+  /**
+   * Get form submissions for a reservation
+   */
+  async getReservationFormSubmissions(reservationId: string) {
+    return this.prisma.formSubmission.findMany({
+      where: { reservationId },
+      select: {
+        id: true,
+        formTemplateId: true,
+        status: true,
+        signedAt: true,
+        formTemplate: {
+          select: {
+            id: true,
+            title: true,
+            type: true
+          }
+        }
+      },
+      orderBy: { signedAt: "desc" }
+    });
+  }
 }
 
