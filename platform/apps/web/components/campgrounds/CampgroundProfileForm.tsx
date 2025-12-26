@@ -13,6 +13,7 @@ import { Badge } from "../ui/badge";
 import { Label } from "../ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
 import Image from "next/image";
+import Link from "next/link";
 import { ImageUpload } from "../ui/image-upload";
 import { cn } from "@/lib/utils";
 import { ChevronDown, Building2, MapPin, Image as ImageIcon, Clock, Settings2, Check } from "lucide-react";
@@ -473,7 +474,7 @@ export function CampgroundProfileForm({ campground }: CampgroundProfileFormProps
                   <p className="font-medium text-foreground">How same-day booking cutoffs work:</p>
                   <p>• RV/tent sites can be booked anytime (no cutoff by default)</p>
                   <p>• Cabins/lodging require booking 60 minutes before office close (for prep time)</p>
-                  <p>• Customize cutoffs per site class in <span className="font-medium">Site Classes</span> settings</p>
+                  <p>• Customize cutoffs per site class in <Link href={`/campgrounds/${campground.id}/classes`} className="font-medium underline hover:no-underline">Site Classes</Link></p>
                 </div>
               </div>
 
