@@ -1,19 +1,15 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState, useCallback } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { DashboardShell } from "@/components/ui/layout/DashboardShell";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import {
-  fetchLeaderboard,
-  fetchStaffDashboard,
-  listBadgeLibrary,
-  listStaff,
-  type GamificationBadge,
-  type GamificationEvent,
-} from "@/lib/gamification/stub-data";
+import { useCampground } from "@/contexts/CampgroundContext";
+import { useWhoami } from "@/hooks/use-whoami";
+import { apiClient } from "@/lib/api-client";
 import { launchConfetti } from "@/lib/gamification/confetti";
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from "recharts";
 import { motion, AnimatePresence } from "framer-motion";
@@ -34,6 +30,7 @@ import {
   Users,
   X,
   Check,
+  Loader2,
 } from "lucide-react";
 
 const categoryLabels: Record<string, string> = {
@@ -80,6 +77,15 @@ const LEVEL_TITLES: Record<number, string> = {
   8: "Master",
   9: "Legend",
   10: "Champion",
+};
+
+// Types for API responses
+type XpEvent = {
+  id: string;
+  category: string;
+  xp: number;
+  reason?: string | null;
+  createdAt: string;
 };
 
 // Level Up Modal Component
@@ -211,7 +217,7 @@ function XpToast({
           animate={{ rotate: [0, -10, 10, -10, 0] }}
           transition={{ duration: 0.5 }}
         >
-          ✨
+          {xp > 0 ? "✨" : "🏅"}
         </motion.div>
 
         <div className="flex-1">
@@ -222,7 +228,7 @@ function XpToast({
               animate={{ scale: [0, 1.3, 1] }}
               transition={{ delay: 0.1 }}
             >
-              +{xp} XP
+              {xp > 0 ? `+${xp} XP` : reason}
             </motion.span>
             <motion.span
               initial={{ opacity: 0, y: -10 }}
@@ -233,11 +239,15 @@ function XpToast({
             </motion.span>
           </div>
 
-          <div className="text-sm opacity-90">
-            {categoryLabels[category] || category}
-          </div>
-          {reason && (
-            <div className="text-xs opacity-75 mt-1">{reason}</div>
+          {xp > 0 && (
+            <>
+              <div className="text-sm opacity-90">
+                {categoryLabels[category] || category}
+              </div>
+              {reason && (
+                <div className="text-xs opacity-75 mt-1">{reason}</div>
+              )}
+            </>
           )}
         </div>
 
@@ -369,7 +379,6 @@ function Podium({ leaderboard }: { leaderboard: any[] }) {
     <div className="flex items-end justify-center gap-4 py-8">
       {podiumOrder.map((person, idx) => {
         if (!person) return null;
-        const actualIdx = idx === 1 ? 0 : idx === 0 ? 1 : 2;
         return (
           <div key={person.userId} className="flex flex-col items-center">
             <div className="mb-2 text-center">
@@ -390,8 +399,14 @@ function Podium({ leaderboard }: { leaderboard: any[] }) {
   );
 }
 
-// Streak display
-function StreakDisplay({ weeklyXp, streak = 0 }: { weeklyXp: number; streak?: number }) {
+// Streak display (approximated from events - we could add proper streak tracking)
+function StreakDisplay({ recentEvents }: { recentEvents: XpEvent[] }) {
+  // Count events from the last 7 days
+  const weekAgo = new Date();
+  weekAgo.setDate(weekAgo.getDate() - 7);
+  const weeklyXp = recentEvents
+    .filter(e => new Date(e.createdAt) >= weekAgo)
+    .reduce((sum, e) => sum + e.xp, 0);
   const hasStreak = weeklyXp > 0;
 
   return (
@@ -404,61 +419,8 @@ function StreakDisplay({ weeklyXp, streak = 0 }: { weeklyXp: number; streak?: nu
   );
 }
 
-// Badge card with visual appeal
-function BadgeCard({ badge, isEarned, large = false }: { badge: any; isEarned: boolean; large?: boolean }) {
-  const emoji = BADGE_EMOJIS[badge.tier?.toLowerCase()] || "🏅";
-
-  return (
-    <div className={`
-      relative overflow-hidden rounded-xl border-2 transition-all duration-300
-      ${isEarned
-        ? "bg-gradient-to-br from-emerald-50 via-white to-cyan-50 border-emerald-200 shadow-md hover:shadow-lg hover:-translate-y-1"
-        : "bg-slate-50 border-slate-200 opacity-60 grayscale"
-      }
-      ${large ? "p-6" : "p-4"}
-    `}>
-      {isEarned && (
-        <div className="absolute top-0 right-0 w-20 h-20 bg-gradient-to-bl from-emerald-200/50 to-transparent rounded-bl-full" />
-      )}
-      <div className="flex items-start gap-3">
-        <div className={`
-          flex items-center justify-center rounded-xl
-          ${large ? "w-16 h-16 text-3xl" : "w-12 h-12 text-2xl"}
-          ${isEarned ? "bg-gradient-to-br from-emerald-100 to-cyan-100" : "bg-slate-200"}
-        `}>
-          {emoji}
-        </div>
-        <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2">
-            <h4 className={`font-semibold text-slate-900 ${large ? "text-lg" : "text-sm"}`}>{badge.name}</h4>
-            {badge.tier && (
-              <Badge variant="outline" className={`text-xs ${isEarned ? "border-emerald-300 text-emerald-700" : ""}`}>
-                {badge.tier}
-              </Badge>
-            )}
-          </div>
-          <p className="text-xs text-slate-500 mt-1 line-clamp-2">{badge.description}</p>
-          {isEarned && badge.earnedAt && (
-            <p className="text-xs text-emerald-600 mt-2 flex items-center gap-1">
-              <Sparkles className="w-3 h-3" />
-              Earned {new Date(badge.earnedAt).toLocaleDateString()}
-            </p>
-          )}
-        </div>
-      </div>
-      {!isEarned && (
-        <div className="absolute inset-0 flex items-center justify-center bg-slate-900/5">
-          <div className="bg-white/90 rounded-full px-3 py-1 text-xs font-medium text-slate-600 shadow">
-            🔒 Locked
-          </div>
-        </div>
-      )}
-    </div>
-  );
-}
-
 // XP Event row
-function XpEventRow({ event }: { event: GamificationEvent }) {
+function XpEventRow({ event }: { event: XpEvent }) {
   const isPositive = event.xp >= 0;
 
   return (
@@ -482,65 +444,13 @@ function XpEventRow({ event }: { event: GamificationEvent }) {
   );
 }
 
-// Challenge card
-function ChallengeCard({ challenge }: { challenge: any }) {
-  const progress = Math.min(100, Math.round((challenge.currentXp / (challenge.challenge?.targetXp || 1)) * 100));
-  const isComplete = challenge.status === "completed";
-
-  return (
-    <div className={`
-      rounded-xl border-2 p-4 transition-all
-      ${isComplete
-        ? "bg-gradient-to-br from-emerald-50 to-cyan-50 border-emerald-300"
-        : "bg-white border-slate-200 hover:border-emerald-200"
-      }
-    `}>
-      <div className="flex items-start justify-between mb-3">
-        <div className="flex items-center gap-2">
-          <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${isComplete ? "bg-emerald-500" : "bg-slate-100"}`}>
-            {isComplete ? <Trophy className="w-5 h-5 text-white" /> : <Target className="w-5 h-5 text-slate-500" />}
-          </div>
-          <div>
-            <h4 className="font-semibold text-slate-900">{challenge.challenge?.title || "Challenge"}</h4>
-            <p className="text-xs text-slate-500">{challenge.challenge?.description}</p>
-          </div>
-        </div>
-        {isComplete && (
-          <Badge className="bg-emerald-500 text-white">Complete!</Badge>
-        )}
-      </div>
-
-      <div className="space-y-2">
-        <div className="flex justify-between text-sm">
-          <span className="text-slate-600">{challenge.currentXp} / {challenge.challenge?.targetXp} XP</span>
-          <span className="font-medium text-emerald-600">{progress}%</span>
-        </div>
-        <div className="h-3 bg-slate-100 rounded-full overflow-hidden">
-          <div
-            className={`h-full rounded-full transition-all duration-500 ${isComplete ? "bg-gradient-to-r from-emerald-400 to-cyan-400" : "bg-gradient-to-r from-emerald-500 to-emerald-400"}`}
-            style={{ width: `${progress}%` }}
-          />
-        </div>
-        <div className="flex items-center gap-1 text-xs text-slate-500">
-          <Gift className="w-3 h-3" />
-          Reward: <span className="font-medium text-emerald-600">{challenge.challenge?.rewardBadge || "Badge"}</span>
-        </div>
-      </div>
-    </div>
-  );
-}
-
 export default function GamificationDashboardPage() {
-  const staffOptions = useMemo(() => listStaff(), []);
-  const [selectedUserId, setSelectedUserId] = useState<string>(staffOptions[0]?.id || "");
-  const [windowKey, setWindowKey] = useState<"weekly" | "seasonal" | "all">("weekly");
-  const [dashboard, setDashboard] = useState<any | null>(null);
-  const [leaderboard, setLeaderboard] = useState<{ leaderboard: any[]; viewer: any | null } | null>(null);
+  const { selectedCampground } = useCampground();
+  const { data: whoami, isLoading: whoamiLoading } = useWhoami();
+  const campgroundId = selectedCampground?.id;
+
+  const [windowKey, setWindowKey] = useState<"weekly" | "monthly" | "all">("weekly");
   const prevLevelRef = useRef<number | null>(null);
-  const prevBadgesRef = useRef<number | null>(null);
-  const [badgeLibrary, setBadgeLibrary] = useState<any[]>([]);
-  const [badgeTierFilter, setBadgeTierFilter] = useState<string>("all");
-  const earnedBadgeNames = useMemo(() => new Set((dashboard?.badges || []).map((b: any) => b.name)), [dashboard?.badges]);
 
   // Level up modal state
   const [showLevelUpModal, setShowLevelUpModal] = useState(false);
@@ -558,84 +468,94 @@ export default function GamificationDashboardPage() {
     setXpToasts((prev) => prev.filter((t) => t.id !== id));
   }, []);
 
-  // Demo function to simulate XP gain (for testing)
-  const simulateXpGain = useCallback(() => {
-    const categories = ["task", "check_in", "maintenance", "review_mention", "assist"];
-    const reasons = [
-      "Completed check-in for Site 12",
-      "Resolved maintenance ticket #45",
-      "Guest mentioned you in 5-star review",
-      "Helped colleague with reservation",
-      "Completed daily checklist"
-    ];
-    const randomCategory = categories[Math.floor(Math.random() * categories.length)];
-    const randomReason = reasons[Math.floor(Math.random() * reasons.length)];
-    const randomXp = Math.floor(Math.random() * 50) + 10;
-    addXpToast(randomXp, randomCategory, randomReason);
-  }, [addXpToast]);
+  // Fetch dashboard data
+  const { data: dashboard, isLoading: dashboardLoading } = useQuery({
+    queryKey: ["gamification-dashboard", campgroundId],
+    queryFn: () => apiClient.getGamificationDashboard(campgroundId!),
+    enabled: !!campgroundId,
+  });
 
+  // Fetch leaderboard
+  const daysMap: Record<string, number | undefined> = { weekly: 7, monthly: 30, all: undefined };
+  const { data: leaderboardData } = useQuery({
+    queryKey: ["gamification-leaderboard", campgroundId, windowKey],
+    queryFn: () => apiClient.getGamificationLeaderboard(campgroundId!, daysMap[windowKey]),
+    enabled: !!campgroundId,
+  });
+
+  // Fetch stats for category breakdown
+  const { data: statsData } = useQuery({
+    queryKey: ["gamification-stats", campgroundId],
+    queryFn: () => apiClient.getGamificationStats(campgroundId!, 30),
+    enabled: !!campgroundId,
+  });
+
+  // Check for level up
   useEffect(() => {
-    let active = true;
-    fetchStaffDashboard(selectedUserId || staffOptions[0]?.id || "").then((res) => {
-      if (!active) return;
-      const levelBefore = prevLevelRef.current;
-      const badgeCountBefore = prevBadgesRef.current;
+    if (!dashboard?.level) return;
+    const currentLevel = dashboard.level.level;
+    const levelBefore = prevLevelRef.current;
 
-      setDashboard(res);
+    if (levelBefore !== null && currentLevel > levelBefore) {
+      const title = LEVEL_TITLES[currentLevel] || "Champion";
+      setLevelUpData({ level: currentLevel, title });
+      setShowLevelUpModal(true);
+    }
 
-      // Show level up modal instead of just confetti
-      if (levelBefore && res.level?.level && res.level.level > levelBefore) {
-        const newLevel = res.level.level;
-        const title = LEVEL_TITLES[newLevel] || "Champion";
-        setLevelUpData({ level: newLevel, title });
-        setShowLevelUpModal(true);
-      }
+    prevLevelRef.current = currentLevel;
+  }, [dashboard?.level]);
 
-      const badgeCountAfter = res.badges?.length ?? 0;
-      if (badgeCountBefore !== null && badgeCountAfter > badgeCountBefore) {
-        launchConfetti({ particles: 150, durationMs: 1500, spread: Math.PI * 1.3 });
-        // Show toast for badge unlock
-        const newBadge = res.badges?.[res.badges.length - 1];
-        if (newBadge) {
-          addXpToast(0, "badge", `Badge Unlocked: ${newBadge.name}`);
-        }
-      }
-      prevLevelRef.current = res.level?.level ?? null;
-      prevBadgesRef.current = badgeCountAfter;
-    });
-    setBadgeLibrary(listBadgeLibrary());
-    return () => { active = false; };
-  }, [selectedUserId, staffOptions, addXpToast]);
-
-  useEffect(() => {
-    let active = true;
-    fetchLeaderboard(windowKey, selectedUserId || staffOptions[0]?.id || "").then((res) => {
-      if (!active) return;
-      setLeaderboard(res);
-    });
-    return () => { active = false; };
-  }, [selectedUserId, staffOptions, windowKey]);
-
-  const progressPercent = dashboard?.level ? Math.round((dashboard.level.progressToNext || 0) * 100) : 0;
   const currentLevel = dashboard?.level?.level ?? 1;
   const levelTitle = LEVEL_TITLES[currentLevel] || "Champion";
   const totalXp = dashboard?.balance?.totalXp ?? 0;
-  const weeklyXp = dashboard?.balance?.weeklyXp ?? 0;
-  const badgeCount = dashboard?.badges?.length ?? 0;
+  const progressPercent = dashboard?.level ? Math.round((dashboard.level.progressToNext || 0) * 100) : 0;
   const xpRemaining = dashboard?.level?.nextMinXp ? dashboard.level.nextMinXp - totalXp : 0;
+  const recentEvents = (dashboard?.recentEvents || []) as XpEvent[];
 
   // Prepare category breakdown for pie chart
   const categoryData = useMemo(() => {
-    const cats = dashboard?.categories || [];
+    const cats = statsData?.categories || [];
     return cats.map((c: any) => ({
       name: categoryLabels[c.category] || c.category,
       value: c.xp,
       color: CATEGORY_COLORS[c.category] || "#94a3b8",
-    }));
-  }, [dashboard?.categories]);
+    })).filter((c: any) => c.value > 0);
+  }, [statsData?.categories]);
 
-  const selectedStaff = staffOptions.find((s) => s.id === selectedUserId);
+  const userName = whoami?.user
+    ? `${whoami.user.firstName || ""} ${whoami.user.lastName || ""}`.trim() || whoami.user.email
+    : "Staff Member";
 
+  // Loading state
+  if (dashboardLoading || whoamiLoading) {
+    return (
+      <DashboardShell>
+        <div className="flex flex-col items-center justify-center py-24">
+          <Loader2 className="w-12 h-12 text-emerald-500 animate-spin mb-4" />
+          <p className="text-slate-500">Loading your stats...</p>
+        </div>
+      </DashboardShell>
+    );
+  }
+
+  // No campground selected
+  if (!campgroundId) {
+    return (
+      <DashboardShell>
+        <div className="flex flex-col items-center justify-center py-24 text-center">
+          <div className="w-24 h-24 rounded-full bg-slate-100 flex items-center justify-center mb-6">
+            <Trophy className="w-12 h-12 text-slate-400" />
+          </div>
+          <h1 className="text-2xl font-bold text-slate-900 mb-2">Select a Campground</h1>
+          <p className="text-slate-500 max-w-md">
+            Please select a campground from the sidebar to view your gamification stats.
+          </p>
+        </div>
+      </DashboardShell>
+    );
+  }
+
+  // Gamification not enabled or not allowed
   if (!dashboard?.enabled || !dashboard?.allowed) {
     return (
       <DashboardShell>
@@ -668,19 +588,6 @@ export default function GamificationDashboardPage() {
       <XpToastContainer toasts={xpToasts} onRemove={removeXpToast} />
 
       <div className="space-y-6 max-w-6xl">
-        {/* Demo button for testing XP toasts */}
-        <div className="flex justify-end">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={simulateXpGain}
-            className="text-emerald-600 border-emerald-200 hover:bg-emerald-50"
-          >
-            <Sparkles className="w-4 h-4 mr-2" />
-            Simulate XP Gain
-          </Button>
-        </div>
-
         {/* Hero Section */}
         <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-emerald-500 via-teal-500 to-cyan-500 p-8 text-white">
           <div className="absolute inset-0 bg-[url('/grid-pattern.svg')] opacity-10" />
@@ -698,24 +605,9 @@ export default function GamificationDashboardPage() {
 
             {/* Stats */}
             <div className="flex-1 text-center md:text-left">
-              <div className="flex items-center justify-center md:justify-start gap-3 mb-2">
-                <h1 className="text-3xl font-bold">
-                  {selectedStaff?.name || "Staff Member"}
-                </h1>
-                <select
-                  value={selectedUserId}
-                  onChange={(e) => setSelectedUserId(e.target.value)}
-                  className="bg-white/20 border border-white/30 rounded-lg px-2 py-1 text-sm backdrop-blur"
-                >
-                  {staffOptions.map((staff) => (
-                    <option key={staff.id} value={staff.id} className="text-slate-900">
-                      {staff.name}
-                    </option>
-                  ))}
-                </select>
-              </div>
+              <h1 className="text-3xl font-bold mb-2">{userName}</h1>
 
-              <div className="grid grid-cols-3 gap-4 mt-6">
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mt-6">
                 <div className="bg-white/10 backdrop-blur rounded-xl p-4">
                   <div className="text-3xl font-bold">
                     <AnimatedNumber value={totalXp} />
@@ -723,17 +615,17 @@ export default function GamificationDashboardPage() {
                   <div className="text-sm opacity-90">Total XP</div>
                 </div>
                 <div className="bg-white/10 backdrop-blur rounded-xl p-4">
-                  <div className="text-3xl font-bold">{badgeCount}</div>
-                  <div className="text-sm opacity-90">Badges</div>
+                  <div className="text-3xl font-bold">{recentEvents.length}</div>
+                  <div className="text-sm opacity-90">Recent Activities</div>
                 </div>
                 <div className="bg-white/10 backdrop-blur rounded-xl p-4">
-                  <div className="text-3xl font-bold">{xpRemaining}</div>
+                  <div className="text-3xl font-bold">{xpRemaining > 0 ? xpRemaining : "MAX"}</div>
                   <div className="text-sm opacity-90">XP to Level {currentLevel + 1}</div>
                 </div>
               </div>
 
               <div className="mt-4 flex justify-center md:justify-start">
-                <StreakDisplay weeklyXp={weeklyXp} />
+                <StreakDisplay recentEvents={recentEvents} />
               </div>
             </div>
           </div>
@@ -741,7 +633,7 @@ export default function GamificationDashboardPage() {
 
         {/* Main Content Tabs */}
         <Tabs defaultValue="overview" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-4 lg:w-auto lg:inline-grid">
+          <TabsList className="grid w-full grid-cols-3 lg:w-auto lg:inline-grid">
             <TabsTrigger value="overview" className="gap-2">
               <Zap className="w-4 h-4" />
               Overview
@@ -749,10 +641,6 @@ export default function GamificationDashboardPage() {
             <TabsTrigger value="leaderboard" className="gap-2">
               <Trophy className="w-4 h-4" />
               Leaderboard
-            </TabsTrigger>
-            <TabsTrigger value="badges" className="gap-2">
-              <Award className="w-4 h-4" />
-              Badges
             </TabsTrigger>
             <TabsTrigger value="activity" className="gap-2">
               <Clock className="w-4 h-4" />
@@ -763,33 +651,6 @@ export default function GamificationDashboardPage() {
           {/* Overview Tab */}
           <TabsContent value="overview" className="space-y-6">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              {/* Challenges */}
-              <Card>
-                <CardHeader>
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <CardTitle className="flex items-center gap-2">
-                        <Target className="w-5 h-5 text-emerald-600" />
-                        Weekly Challenges
-                      </CardTitle>
-                      <CardDescription>Complete challenges to earn badges</CardDescription>
-                    </div>
-                  </div>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  {(dashboard.weeklyChallenges || []).length === 0 ? (
-                    <div className="text-center py-8 text-slate-500">
-                      <Target className="w-12 h-12 mx-auto mb-3 text-slate-300" />
-                      <p>No active challenges this week</p>
-                    </div>
-                  ) : (
-                    (dashboard.weeklyChallenges || []).map((ch: any) => (
-                      <ChallengeCard key={ch.challengeId} challenge={ch} />
-                    ))
-                  )}
-                </CardContent>
-              </Card>
-
               {/* XP Breakdown Chart */}
               <Card>
                 <CardHeader>
@@ -797,7 +658,7 @@ export default function GamificationDashboardPage() {
                     <Star className="w-5 h-5 text-amber-500" />
                     XP Breakdown
                   </CardTitle>
-                  <CardDescription>Where your XP comes from</CardDescription>
+                  <CardDescription>Where your XP comes from (last 30 days)</CardDescription>
                 </CardHeader>
                 <CardContent>
                   {categoryData.length === 0 ? (
@@ -847,39 +708,76 @@ export default function GamificationDashboardPage() {
                   )}
                 </CardContent>
               </Card>
+
+              {/* Recent Activity Preview */}
+              <Card>
+                <CardHeader>
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <CardTitle className="flex items-center gap-2">
+                        <Clock className="w-5 h-5 text-blue-600" />
+                        Recent Activity
+                      </CardTitle>
+                      <CardDescription>Your latest XP earnings</CardDescription>
+                    </div>
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  {recentEvents.length === 0 ? (
+                    <div className="text-center py-8 text-slate-500">
+                      <Clock className="w-12 h-12 mx-auto mb-3 text-slate-300" />
+                      <p>No activity yet. Start earning XP!</p>
+                    </div>
+                  ) : (
+                    <div className="divide-y divide-slate-100">
+                      {recentEvents.slice(0, 5).map((event) => (
+                        <XpEventRow key={event.id} event={event} />
+                      ))}
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
             </div>
 
-            {/* Recent Badges */}
-            <Card>
-              <CardHeader>
-                <div className="flex items-center justify-between">
-                  <div>
-                    <CardTitle className="flex items-center gap-2">
-                      <Award className="w-5 h-5 text-purple-600" />
-                      Recent Badges
-                    </CardTitle>
-                    <CardDescription>Your latest achievements</CardDescription>
+            {/* Quick Stats */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <Card className="bg-gradient-to-br from-emerald-50 to-white">
+                <CardContent className="pt-6">
+                  <div className="text-center">
+                    <TrendingUp className="w-8 h-8 mx-auto text-emerald-600 mb-2" />
+                    <div className="text-2xl font-bold text-slate-900">{totalXp}</div>
+                    <div className="text-sm text-slate-500">Total XP</div>
                   </div>
-                  <Button variant="ghost" size="sm" className="text-emerald-600">
-                    View all <ChevronRight className="w-4 h-4 ml-1" />
-                  </Button>
-                </div>
-              </CardHeader>
-              <CardContent>
-                {(dashboard.badges || []).length === 0 ? (
-                  <div className="text-center py-8 text-slate-500">
-                    <Award className="w-12 h-12 mx-auto mb-3 text-slate-300" />
-                    <p>No badges earned yet. Complete challenges to earn your first badge!</p>
+                </CardContent>
+              </Card>
+              <Card className="bg-gradient-to-br from-blue-50 to-white">
+                <CardContent className="pt-6">
+                  <div className="text-center">
+                    <Target className="w-8 h-8 mx-auto text-blue-600 mb-2" />
+                    <div className="text-2xl font-bold text-slate-900">Level {currentLevel}</div>
+                    <div className="text-sm text-slate-500">{levelTitle}</div>
                   </div>
-                ) : (
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {(dashboard.badges || []).slice(0, 3).map((badge: any) => (
-                      <BadgeCard key={badge.id} badge={badge} isEarned={true} large />
-                    ))}
+                </CardContent>
+              </Card>
+              <Card className="bg-gradient-to-br from-amber-50 to-white">
+                <CardContent className="pt-6">
+                  <div className="text-center">
+                    <Flame className="w-8 h-8 mx-auto text-amber-600 mb-2" />
+                    <div className="text-2xl font-bold text-slate-900">{recentEvents.length}</div>
+                    <div className="text-sm text-slate-500">Activities</div>
                   </div>
-                )}
-              </CardContent>
-            </Card>
+                </CardContent>
+              </Card>
+              <Card className="bg-gradient-to-br from-purple-50 to-white">
+                <CardContent className="pt-6">
+                  <div className="text-center">
+                    <Award className="w-8 h-8 mx-auto text-purple-600 mb-2" />
+                    <div className="text-2xl font-bold text-slate-900">{progressPercent}%</div>
+                    <div className="text-sm text-slate-500">To Next Level</div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
           </TabsContent>
 
           {/* Leaderboard Tab */}
@@ -895,7 +793,7 @@ export default function GamificationDashboardPage() {
                     <CardDescription>See how you stack up against the team</CardDescription>
                   </div>
                   <div className="flex gap-2">
-                    {(["weekly", "seasonal", "all"] as const).map((key) => (
+                    {(["weekly", "monthly", "all"] as const).map((key) => (
                       <Button
                         key={key}
                         size="sm"
@@ -903,7 +801,7 @@ export default function GamificationDashboardPage() {
                         onClick={() => setWindowKey(key)}
                         className={windowKey === key ? "bg-emerald-600 hover:bg-emerald-700" : ""}
                       >
-                        {key === "all" ? "All-time" : key.charAt(0).toUpperCase() + key.slice(1)}
+                        {key === "all" ? "All-time" : key === "monthly" ? "Monthly" : "Weekly"}
                       </Button>
                     ))}
                   </div>
@@ -911,15 +809,15 @@ export default function GamificationDashboardPage() {
               </CardHeader>
               <CardContent>
                 {/* Podium for top 3 */}
-                {(leaderboard?.leaderboard?.length ?? 0) >= 3 && (
-                  <Podium leaderboard={leaderboard?.leaderboard || []} />
+                {(leaderboardData?.leaderboard?.length ?? 0) >= 3 && (
+                  <Podium leaderboard={leaderboardData?.leaderboard || []} />
                 )}
 
                 {/* Full rankings */}
                 <div className="space-y-2 mt-4">
-                  {(leaderboard?.leaderboard || []).map((row, idx) => {
-                    const isViewer = leaderboard?.viewer?.userId === row.userId;
-                    const isTop3 = idx < 3;
+                  {(leaderboardData?.leaderboard || []).map((row: any) => {
+                    const isViewer = leaderboardData?.viewer?.userId === row.userId;
+                    const isTop3 = row.rank <= 3;
 
                     return (
                       <div
@@ -933,13 +831,13 @@ export default function GamificationDashboardPage() {
                           <div className={`
                             w-10 h-10 rounded-full flex items-center justify-center font-bold
                             ${isTop3
-                              ? idx === 0 ? "bg-gradient-to-br from-amber-400 to-yellow-300 text-white"
-                                : idx === 1 ? "bg-gradient-to-br from-slate-300 to-slate-200 text-slate-700"
+                              ? row.rank === 1 ? "bg-gradient-to-br from-amber-400 to-yellow-300 text-white"
+                                : row.rank === 2 ? "bg-gradient-to-br from-slate-300 to-slate-200 text-slate-700"
                                 : "bg-gradient-to-br from-amber-700 to-amber-600 text-white"
                               : "bg-slate-200 text-slate-600"
                             }
                           `}>
-                            {isTop3 ? ["🥇", "🥈", "🥉"][idx] : row.rank}
+                            {isTop3 ? ["", "🥇", "🥈", "🥉"][row.rank] : row.rank}
                           </div>
                           <div>
                             <div className="font-semibold text-slate-900 flex items-center gap-2">
@@ -956,77 +854,12 @@ export default function GamificationDashboardPage() {
                       </div>
                     );
                   })}
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          {/* Badges Tab */}
-          <TabsContent value="badges" className="space-y-6">
-            <Card>
-              <CardHeader>
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                  <div>
-                    <CardTitle className="flex items-center gap-2">
-                      <Award className="w-5 h-5 text-purple-600" />
-                      Badge Collection
-                    </CardTitle>
-                    <CardDescription>
-                      {earnedBadgeNames.size} of {badgeLibrary.length} badges earned
-                    </CardDescription>
-                  </div>
-                  <div className="flex gap-2 flex-wrap">
-                    {["all", "bronze", "silver", "gold", "platinum"].map((tier) => (
-                      <Button
-                        key={tier}
-                        size="sm"
-                        variant={badgeTierFilter === tier ? "default" : "outline"}
-                        onClick={() => setBadgeTierFilter(tier)}
-                        className={badgeTierFilter === tier ? "bg-purple-600 hover:bg-purple-700" : ""}
-                      >
-                        {tier === "all" ? "All" : `${BADGE_EMOJIS[tier] || ""} ${tier}`}
-                      </Button>
-                    ))}
-                  </div>
-                </div>
-              </CardHeader>
-              <CardContent>
-                {/* Progress bar */}
-                <div className="mb-6 p-4 bg-slate-50 rounded-xl">
-                  <div className="flex justify-between text-sm mb-2">
-                    <span className="text-slate-600">Collection Progress</span>
-                    <span className="font-medium text-purple-600">
-                      {Math.round((earnedBadgeNames.size / badgeLibrary.length) * 100)}%
-                    </span>
-                  </div>
-                  <div className="h-3 bg-slate-200 rounded-full overflow-hidden">
-                    <div
-                      className="h-full bg-gradient-to-r from-purple-500 to-pink-500 rounded-full transition-all"
-                      style={{ width: `${(earnedBadgeNames.size / badgeLibrary.length) * 100}%` }}
-                    />
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {badgeLibrary
-                    .filter((badge) => badgeTierFilter === "all" || badge.tier?.toLowerCase() === badgeTierFilter)
-                    .sort((a, b) => {
-                      const aEarned = earnedBadgeNames.has(a.name);
-                      const bEarned = earnedBadgeNames.has(b.name);
-                      if (aEarned !== bEarned) return aEarned ? -1 : 1;
-                      return 0;
-                    })
-                    .map((badge) => {
-                      const isEarned = earnedBadgeNames.has(badge.name);
-                      const earnedBadge = (dashboard?.badges || []).find((b: any) => b.name === badge.name);
-                      return (
-                        <BadgeCard
-                          key={badge.id}
-                          badge={isEarned ? { ...badge, earnedAt: earnedBadge?.earnedAt } : badge}
-                          isEarned={isEarned}
-                        />
-                      );
-                    })}
+                  {(leaderboardData?.leaderboard?.length ?? 0) === 0 && (
+                    <div className="text-center py-12 text-slate-500">
+                      <Trophy className="w-12 h-12 mx-auto mb-3 text-slate-300" />
+                      <p>No leaderboard data yet. Start earning XP!</p>
+                    </div>
+                  )}
                 </div>
               </CardContent>
             </Card>
@@ -1043,14 +876,14 @@ export default function GamificationDashboardPage() {
                 <CardDescription>Your XP earning history</CardDescription>
               </CardHeader>
               <CardContent>
-                {(dashboard.recentEvents || []).length === 0 ? (
+                {recentEvents.length === 0 ? (
                   <div className="text-center py-12 text-slate-500">
                     <Clock className="w-12 h-12 mx-auto mb-3 text-slate-300" />
                     <p>No activity yet. Start earning XP!</p>
                   </div>
                 ) : (
                   <div className="divide-y divide-slate-100">
-                    {(dashboard.recentEvents || []).map((event: GamificationEvent) => (
+                    {recentEvents.map((event) => (
                       <XpEventRow key={event.id} event={event} />
                     ))}
                   </div>

@@ -393,6 +393,37 @@ export class SupplyItemDto {
 // TRIGGER DTOs
 // ============================================================================
 
+// TriggerConditionsDto must be defined before classes that reference it
+export class TriggerConditionsDto {
+  @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
+  siteClassIds?: string[];
+
+  @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
+  siteIds?: string[];
+
+  @IsOptional()
+  @IsInt()
+  @Min(1)
+  minNights?: number;
+
+  @IsOptional()
+  @IsInt()
+  @Min(1)
+  maxNights?: number;
+
+  @IsOptional()
+  @IsBoolean()
+  hasPets?: boolean;
+
+  @IsOptional()
+  @IsString()
+  stayType?: string;
+}
+
 export class CreateOpTaskTriggerDto {
   @IsString()
   name!: string;
@@ -450,36 +481,6 @@ export class UpdateOpTaskTriggerDto {
   @IsOptional()
   @IsBoolean()
   isActive?: boolean;
-}
-
-export class TriggerConditionsDto {
-  @IsOptional()
-  @IsArray()
-  @IsString({ each: true })
-  siteClassIds?: string[];
-
-  @IsOptional()
-  @IsArray()
-  @IsString({ each: true })
-  siteIds?: string[];
-
-  @IsOptional()
-  @IsInt()
-  @Min(1)
-  minNights?: number;
-
-  @IsOptional()
-  @IsInt()
-  @Min(1)
-  maxNights?: number;
-
-  @IsOptional()
-  @IsBoolean()
-  hasPets?: boolean;
-
-  @IsOptional()
-  @IsString()
-  stayType?: string;
 }
 
 // ============================================================================

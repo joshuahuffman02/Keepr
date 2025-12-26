@@ -3,6 +3,9 @@ import {
   ForbiddenException,
   NotFoundException,
   BadRequestException,
+  Logger,
+  Inject,
+  forwardRef,
 } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
 import {
@@ -11,6 +14,7 @@ import {
   OpSlaStatus,
   OpTriggerEvent,
   Prisma,
+  GamificationEventCategory,
 } from '@prisma/client';
 import {
   CreateOpTaskDto,
@@ -18,10 +22,20 @@ import {
   OpTaskQueryDto,
   CreateOpTaskCommentDto,
 } from '../dto/op-task.dto';
+import { GamificationService } from '../../gamification/gamification.service';
+import { OpGamificationService } from './op-gamification.service';
 
 @Injectable()
 export class OpTaskService {
-  constructor(private prisma: PrismaService) {}
+  private readonly logger = new Logger(OpTaskService.name);
+
+  constructor(
+    private prisma: PrismaService,
+    @Inject(forwardRef(() => GamificationService))
+    private gamificationService: GamificationService,
+    @Inject(forwardRef(() => OpGamificationService))
+    private opGamificationService: OpGamificationService,
+  ) {}
 
   /**
    * Create a new task
@@ -231,6 +245,47 @@ export class OpTaskService {
     // Add system comment for state changes
     if (stateChanged) {
       await this.addSystemComment(id, userId, `Status changed to ${dto.state}`);
+    }
+
+    // Process gamification when task is completed
+    if (isCompleting && existing.assignedToUserId) {
+      const completingUserId = existing.assignedToUserId;
+      const wasOnTime = existing.slaStatus !== OpSlaStatus.breached;
+      const completionTimeMinutes = existing.startedAt
+        ? Math.round((Date.now() - new Date(existing.startedAt).getTime()) / (1000 * 60))
+        : undefined;
+
+      // Process Operations gamification (badges, streaks, points)
+      try {
+        const opResult = await this.opGamificationService.processTaskCompletion(
+          id,
+          completingUserId,
+          existing.campgroundId,
+          wasOnTime,
+          completionTimeMinutes,
+        );
+        this.logger.log(
+          `Op gamification: +${opResult.pointsEarned} pts, ${opResult.newBadges.length} badges, ` +
+          `streak=${opResult.streakUpdated}, levelUp=${opResult.levelUp}`,
+        );
+      } catch (error) {
+        this.logger.error(`Op gamification error: ${error}`);
+      }
+
+      // Also record in general gamification system (for unified XP)
+      try {
+        await this.gamificationService.recordEvent({
+          campgroundId: existing.campgroundId,
+          userId: completingUserId,
+          category: GamificationEventCategory.task,
+          reason: `Completed task: ${existing.title}`,
+          sourceType: 'op_task',
+          sourceId: id,
+          eventKey: `op_task_complete:${id}`, // Prevent duplicate awards
+        });
+      } catch (error) {
+        this.logger.error(`General gamification error: ${error}`);
+      }
     }
 
     return updated;
