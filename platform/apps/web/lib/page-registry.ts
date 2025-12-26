@@ -485,15 +485,6 @@ export const PAGE_REGISTRY: PageDefinition[] = [
     keywords: ["todos", "assignments", "work"],
     permissions: ["operationsWrite"],
   },
-  {
-    href: "/operations/rentals",
-    label: "Rentals",
-    icon: "camp",
-    category: "staff",
-    description: "Manage rental equipment",
-    keywords: ["bikes", "kayaks", "golf carts"],
-    permissions: ["operationsWrite"],
-  },
 
   // ============================================
   // DISCOVERY & HELP
