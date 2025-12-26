@@ -985,9 +985,9 @@ export default function FormsPage() {
         showAt: form.showAt,
         isRequired: form.isRequired,
         allowSkipWithNote: form.allowSkipWithNote,
-        validityDays: form.validityDays,
+        validityDays: form.validityDays ?? undefined,
         sendReminder: form.sendReminder,
-        reminderDaysBefore: form.reminderDaysBefore,
+        reminderDaysBefore: form.reminderDaysBefore ?? undefined,
       };
 
       if (editingId) {
