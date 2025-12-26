@@ -62,7 +62,6 @@ type SiteMapEditorProps = {
   isLoading?: boolean;
   onSaved?: () => void;
   className?: string;
-  autoFullscreen?: boolean;
 };
 
 type ShapeDraft = {
@@ -416,8 +415,7 @@ export function SiteMapEditor({
   sites,
   isLoading,
   onSaved,
-  className,
-  autoFullscreen
+  className
 }: SiteMapEditorProps) {
   const { toast } = useToast();
   const svgRef = useRef<SVGSVGElement | null>(null);
@@ -495,15 +493,8 @@ export function SiteMapEditor({
     setDrawTargetId(null);
   }, [selectedShapeId]);
 
-  useEffect(() => {
-    if (!isDrawing) return;
-    setIsFullscreen(true);
-  }, [isDrawing]);
-
-  useEffect(() => {
-    if (!autoFullscreen) return;
-    setIsFullscreen(true);
-  }, [autoFullscreen]);
+  // Note: Removed auto-fullscreen on drawing - it was confusing users
+  // Users can manually toggle fullscreen with F key or button if needed
 
   useEffect(() => {
     if (!isFullscreen) {
@@ -885,6 +876,7 @@ export function SiteMapEditor({
     setDraftPoints([]);
     setHoverPoint(null);
     setDrawTargetId(null);
+    setSelectedPreset("freeform"); // Reset preset so user can now edit the shape
 
     // Celebrate first shape
     if (existingShapes.length === 0 && Object.keys(draftShapes).length === 0) {
