@@ -6,26 +6,46 @@ import { DashboardShell } from "../../components/ui/layout/DashboardShell";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "../../components/ui/card";
 import { Button } from "../../components/ui/button";
 import { Input } from "../../components/ui/input";
-import { Textarea } from "../../components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../components/ui/select";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "../../components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "../../components/ui/dialog";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "../../components/ui/alert-dialog";
 import { Badge } from "../../components/ui/badge";
 import { Skeleton } from "../../components/ui/skeleton";
+import { Switch } from "../../components/ui/switch";
 import { apiClient } from "../../lib/api-client";
 import { useToast } from "../../components/ui/use-toast";
 import {
   FileText, Plus, Sparkles, Shield, Car, ClipboardList,
   FileQuestion, Eye, Trash2, Edit3, PartyPopper, CheckCircle2,
-  AlertTriangle, PawPrint, Loader2
+  AlertTriangle, PawPrint, Loader2, GripVertical, ChevronUp,
+  ChevronDown, Type, Hash, CheckSquare, List, AlignLeft, Phone, Mail, X
 } from "lucide-react";
 import { cn } from "../../lib/utils";
+
+// Question types with friendly labels
+const questionTypes = [
+  { value: "text", label: "Short text", icon: Type, description: "Single line answer" },
+  { value: "textarea", label: "Long text", icon: AlignLeft, description: "Multi-line answer" },
+  { value: "number", label: "Number", icon: Hash, description: "Numeric input" },
+  { value: "checkbox", label: "Agreement", icon: CheckSquare, description: "Yes/No checkbox" },
+  { value: "select", label: "Dropdown", icon: List, description: "Choose from options" },
+  { value: "phone", label: "Phone", icon: Phone, description: "Phone number" },
+  { value: "email", label: "Email", icon: Mail, description: "Email address" },
+];
+
+type Question = {
+  id: string;
+  label: string;
+  type: string;
+  required: boolean;
+  options?: string[];
+};
 
 type FormTemplateInput = {
   title: string;
   type: "waiver" | "vehicle" | "intake" | "custom";
   description: string;
-  fields: string;
+  questions: Question[];
   isActive: boolean;
 };
 
@@ -33,9 +53,12 @@ const emptyForm: FormTemplateInput = {
   title: "",
   type: "waiver",
   description: "",
-  fields: "{\n  \"questions\": []\n}",
+  questions: [],
   isActive: true,
 };
+
+// Generate unique ID for questions
+const generateId = () => `q_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
 
 // Starter templates for quick creation
 const starterTemplates: {
@@ -43,57 +66,51 @@ const starterTemplates: {
   icon: React.ReactNode;
   type: FormTemplateInput["type"];
   description: string;
-  fields: object;
+  questions: Question[];
 }[] = [
   {
     name: "Liability Waiver",
     icon: <Shield className="h-5 w-5" />,
     type: "waiver",
     description: "Standard liability and assumption of risk waiver",
-    fields: {
-      questions: [
-        { label: "I acknowledge the inherent risks of camping activities", type: "checkbox", required: true },
-        { label: "Emergency contact name", type: "text", required: true },
-        { label: "Emergency contact phone", type: "phone", required: true },
-        { label: "Any medical conditions we should know about?", type: "textarea", required: false },
-      ]
-    }
+    questions: [
+      { id: generateId(), label: "I acknowledge the inherent risks of camping activities", type: "checkbox", required: true },
+      { id: generateId(), label: "Emergency contact name", type: "text", required: true },
+      { id: generateId(), label: "Emergency contact phone", type: "phone", required: true },
+      { id: generateId(), label: "Any medical conditions we should know about?", type: "textarea", required: false },
+    ]
   },
   {
     name: "Vehicle Registration",
     icon: <Car className="h-5 w-5" />,
     type: "vehicle",
     description: "Collect RV/vehicle details for registration",
-    fields: {
-      questions: [
-        { label: "Vehicle type", type: "select", options: ["RV/Motorhome", "Travel Trailer", "Fifth Wheel", "Tent", "Car/Truck"], required: true },
-        { label: "Vehicle length (feet)", type: "number", required: true },
-        { label: "License plate number", type: "text", required: true },
-        { label: "License plate state", type: "text", required: true },
-      ]
-    }
+    questions: [
+      { id: generateId(), label: "Vehicle type", type: "select", options: ["RV/Motorhome", "Travel Trailer", "Fifth Wheel", "Tent", "Car/Truck"], required: true },
+      { id: generateId(), label: "Vehicle length (feet)", type: "number", required: true },
+      { id: generateId(), label: "License plate number", type: "text", required: true },
+      { id: generateId(), label: "License plate state", type: "text", required: true },
+    ]
   },
   {
     name: "Pet Policy",
     icon: <PawPrint className="h-5 w-5" />,
     type: "intake",
     description: "Pet information and agreement",
-    fields: {
-      questions: [
-        { label: "Pet type", type: "select", options: ["Dog", "Cat", "Other"], required: true },
-        { label: "Pet breed", type: "text", required: true },
-        { label: "Pet name", type: "text", required: true },
-        { label: "Is your pet up to date on vaccinations?", type: "checkbox", required: true },
-        { label: "I agree to keep my pet on a leash at all times", type: "checkbox", required: true },
-      ]
-    }
+    questions: [
+      { id: generateId(), label: "Pet type", type: "select", options: ["Dog", "Cat", "Other"], required: true },
+      { id: generateId(), label: "Pet breed", type: "text", required: true },
+      { id: generateId(), label: "Pet name", type: "text", required: true },
+      { id: generateId(), label: "Is your pet up to date on vaccinations?", type: "checkbox", required: true },
+      { id: generateId(), label: "I agree to keep my pet on a leash at all times", type: "checkbox", required: true },
+    ]
   },
   {
     name: "Custom Form",
     icon: <FileQuestion className="h-5 w-5" />,
     type: "custom",
     description: "Start from scratch with your own questions",
-    fields: { questions: [] }
+    questions: []
   },
 ];
 
@@ -104,6 +121,227 @@ const typeIcons: Record<string, React.ReactNode> = {
   intake: <ClipboardList className="h-4 w-4" />,
   custom: <FileQuestion className="h-4 w-4" />,
 };
+
+// Visual Question Builder Component
+function QuestionBuilder({
+  questions,
+  onChange
+}: {
+  questions: Question[];
+  onChange: (questions: Question[]) => void;
+}) {
+  const addQuestion = () => {
+    onChange([
+      ...questions,
+      { id: generateId(), label: "", type: "text", required: false }
+    ]);
+  };
+
+  const updateQuestion = (id: string, updates: Partial<Question>) => {
+    onChange(questions.map(q => q.id === id ? { ...q, ...updates } : q));
+  };
+
+  const removeQuestion = (id: string) => {
+    onChange(questions.filter(q => q.id !== id));
+  };
+
+  const moveQuestion = (id: string, direction: "up" | "down") => {
+    const index = questions.findIndex(q => q.id === id);
+    if (index === -1) return;
+    if (direction === "up" && index === 0) return;
+    if (direction === "down" && index === questions.length - 1) return;
+
+    const newQuestions = [...questions];
+    const swapIndex = direction === "up" ? index - 1 : index + 1;
+    [newQuestions[index], newQuestions[swapIndex]] = [newQuestions[swapIndex], newQuestions[index]];
+    onChange(newQuestions);
+  };
+
+  const addOption = (questionId: string) => {
+    const q = questions.find(q => q.id === questionId);
+    if (!q) return;
+    updateQuestion(questionId, { options: [...(q.options || []), ""] });
+  };
+
+  const updateOption = (questionId: string, optionIndex: number, value: string) => {
+    const q = questions.find(q => q.id === questionId);
+    if (!q || !q.options) return;
+    const newOptions = [...q.options];
+    newOptions[optionIndex] = value;
+    updateQuestion(questionId, { options: newOptions });
+  };
+
+  const removeOption = (questionId: string, optionIndex: number) => {
+    const q = questions.find(q => q.id === questionId);
+    if (!q || !q.options) return;
+    updateQuestion(questionId, { options: q.options.filter((_, i) => i !== optionIndex) });
+  };
+
+  const getTypeIcon = (type: string) => {
+    const t = questionTypes.find(qt => qt.value === type);
+    return t ? <t.icon className="h-4 w-4" /> : <Type className="h-4 w-4" />;
+  };
+
+  return (
+    <div className="space-y-3">
+      <div className="flex items-center justify-between">
+        <label className="text-sm font-medium text-slate-900">Questions</label>
+        <span className="text-xs text-slate-500">{questions.length} question{questions.length !== 1 ? "s" : ""}</span>
+      </div>
+
+      {questions.length === 0 ? (
+        <div className="rounded-lg border-2 border-dashed border-slate-200 bg-slate-50 p-6 text-center">
+          <FileQuestion className="h-8 w-8 mx-auto text-slate-300 mb-2" />
+          <p className="text-sm text-slate-600 mb-3">No questions yet</p>
+          <Button size="sm" variant="outline" onClick={addQuestion}>
+            <Plus className="h-4 w-4 mr-1" />
+            Add your first question
+          </Button>
+        </div>
+      ) : (
+        <div className="space-y-2">
+          {questions.map((q, index) => (
+            <div
+              key={q.id}
+              className={cn(
+                "rounded-lg border border-slate-200 bg-white p-3",
+                "transition-all duration-200 hover:border-slate-300"
+              )}
+            >
+              <div className="flex items-start gap-2">
+                {/* Reorder buttons */}
+                <div className="flex flex-col gap-0.5 pt-1">
+                  <button
+                    type="button"
+                    onClick={() => moveQuestion(q.id, "up")}
+                    disabled={index === 0}
+                    className={cn(
+                      "p-0.5 rounded hover:bg-slate-100 transition-colors",
+                      index === 0 && "opacity-30 cursor-not-allowed"
+                    )}
+                    aria-label="Move question up"
+                  >
+                    <ChevronUp className="h-4 w-4 text-slate-400" />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => moveQuestion(q.id, "down")}
+                    disabled={index === questions.length - 1}
+                    className={cn(
+                      "p-0.5 rounded hover:bg-slate-100 transition-colors",
+                      index === questions.length - 1 && "opacity-30 cursor-not-allowed"
+                    )}
+                    aria-label="Move question down"
+                  >
+                    <ChevronDown className="h-4 w-4 text-slate-400" />
+                  </button>
+                </div>
+
+                {/* Question content */}
+                <div className="flex-1 space-y-2">
+                  <div className="flex gap-2">
+                    <Input
+                      value={q.label}
+                      onChange={(e) => updateQuestion(q.id, { label: e.target.value })}
+                      placeholder="Enter your question..."
+                      className="flex-1"
+                    />
+                    <Select
+                      value={q.type}
+                      onValueChange={(value) => updateQuestion(q.id, { type: value, options: value === "select" ? ["Option 1"] : undefined })}
+                    >
+                      <SelectTrigger className="w-[140px]">
+                        <div className="flex items-center gap-2">
+                          {getTypeIcon(q.type)}
+                          <SelectValue />
+                        </div>
+                      </SelectTrigger>
+                      <SelectContent>
+                        {questionTypes.map((type) => (
+                          <SelectItem key={type.value} value={type.value}>
+                            <div className="flex items-center gap-2">
+                              <type.icon className="h-4 w-4 text-slate-500" />
+                              <span>{type.label}</span>
+                            </div>
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  {/* Options for dropdown type */}
+                  {q.type === "select" && (
+                    <div className="pl-4 border-l-2 border-slate-100 space-y-1.5">
+                      <div className="text-xs text-slate-500 font-medium">Dropdown options:</div>
+                      {(q.options || []).map((opt, optIdx) => (
+                        <div key={optIdx} className="flex items-center gap-1.5">
+                          <span className="text-xs text-slate-400 w-4">{optIdx + 1}.</span>
+                          <Input
+                            value={opt}
+                            onChange={(e) => updateOption(q.id, optIdx, e.target.value)}
+                            placeholder={`Option ${optIdx + 1}`}
+                            className="h-8 text-sm flex-1"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => removeOption(q.id, optIdx)}
+                            className="p-1 rounded hover:bg-red-50 text-slate-400 hover:text-red-500 transition-colors"
+                            aria-label="Remove option"
+                          >
+                            <X className="h-3.5 w-3.5" />
+                          </button>
+                        </div>
+                      ))}
+                      <button
+                        type="button"
+                        onClick={() => addOption(q.id)}
+                        className="text-xs text-emerald-600 hover:text-emerald-700 font-medium flex items-center gap-1"
+                      >
+                        <Plus className="h-3 w-3" />
+                        Add option
+                      </button>
+                    </div>
+                  )}
+
+                  {/* Required toggle */}
+                  <div className="flex items-center justify-between pt-1">
+                    <div className="flex items-center gap-2">
+                      <Switch
+                        checked={q.required}
+                        onCheckedChange={(checked) => updateQuestion(q.id, { required: checked })}
+                        id={`required-${q.id}`}
+                      />
+                      <label htmlFor={`required-${q.id}`} className="text-xs text-slate-600">
+                        Required
+                      </label>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Delete button */}
+                <button
+                  type="button"
+                  onClick={() => removeQuestion(q.id)}
+                  className="p-1.5 rounded hover:bg-red-50 text-slate-400 hover:text-red-500 transition-colors"
+                  aria-label="Delete question"
+                >
+                  <Trash2 className="h-4 w-4" />
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {questions.length > 0 && (
+        <Button size="sm" variant="outline" onClick={addQuestion} className="w-full">
+          <Plus className="h-4 w-4 mr-1" />
+          Add question
+        </Button>
+      )}
+    </div>
+  );
+}
 
 // Loading skeleton for form cards
 function FormCardSkeleton() {
@@ -261,9 +499,9 @@ function FormPreview({
           </div>
         </div>
 
-        <DialogFooter>
+        <div className="flex justify-end">
           <Button variant="outline" onClick={() => onClose()}>Close</Button>
-        </DialogFooter>
+        </div>
       </DialogContent>
     </Dialog>
   );
@@ -330,6 +568,35 @@ function EmptyFormsState({ onCreateClick, onTemplateClick }: {
   );
 }
 
+// Convert questions array to API format
+function questionsToFields(questions: Question[]): { questions: any[] } {
+  return {
+    questions: questions.map(q => {
+      const base: any = {
+        label: q.label,
+        type: q.type,
+        required: q.required,
+      };
+      if (q.type === "select" && q.options) {
+        base.options = q.options;
+      }
+      return base;
+    })
+  };
+}
+
+// Convert API fields to questions array
+function fieldsToQuestions(fields: any): Question[] {
+  if (!fields?.questions) return [];
+  return fields.questions.map((q: any) => ({
+    id: generateId(),
+    label: q.label || "",
+    type: q.type || "text",
+    required: q.required || false,
+    options: q.options,
+  }));
+}
+
 export default function FormsPage() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -368,20 +635,14 @@ export default function FormsPage() {
 
   const upsertMutation = useMutation({
     mutationFn: async () => {
-      let parsed: Record<string, any> | undefined;
-      if (form.fields.trim()) {
-        try {
-          parsed = JSON.parse(form.fields);
-        } catch (e) {
-          throw new Error("Fields must be valid JSON");
-        }
-      }
+      const fields = questionsToFields(form.questions);
+
       if (editingId) {
         return apiClient.updateFormTemplate(editingId, {
           title: form.title,
           type: form.type,
           description: form.description || null,
-          fields: parsed,
+          fields,
           isActive: form.isActive,
         });
       }
@@ -390,7 +651,7 @@ export default function FormsPage() {
         title: form.title,
         type: form.type,
         description: form.description || undefined,
-        fields: parsed,
+        fields,
         isActive: form.isActive,
       });
     },
@@ -460,7 +721,7 @@ export default function FormsPage() {
       title: template.name,
       type: template.type,
       description: template.description,
-      fields: JSON.stringify(template.fields, null, 2),
+      questions: template.questions.map(q => ({ ...q, id: generateId() })),
       isActive: true,
     });
     setIsModalOpen(true);
@@ -474,7 +735,7 @@ export default function FormsPage() {
       title: t.title,
       type: t.type as FormTemplateInput["type"],
       description: t.description || "",
-      fields: t.fields ? JSON.stringify(t.fields, null, 2) : "",
+      questions: fieldsToQuestions(t.fields),
       isActive: t.isActive ?? true,
     });
     setIsModalOpen(true);
@@ -607,6 +868,9 @@ export default function FormsPage() {
                           >
                             {t.isActive ? "Active" : "Inactive"}
                           </Badge>
+                          <span className="text-xs text-slate-400">
+                            {t.fields?.questions?.length || 0} questions
+                          </span>
                         </div>
                         {t.description && <div className="text-sm text-slate-600">{t.description}</div>}
                         <div className="text-xs text-slate-500">Updated {new Date(t.updatedAt).toLocaleString()}</div>
@@ -710,49 +974,54 @@ export default function FormsPage() {
 
       {/* Create/Edit modal */}
       <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
-        <DialogContent className="sm:max-w-[640px]">
+        <DialogContent className="sm:max-w-[700px] max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <Sparkles className="h-5 w-5 text-emerald-500" />
               {editingId ? "Edit form" : "New form"}
             </DialogTitle>
-            <DialogDescription>Define the template and optional fields JSON.</DialogDescription>
+            <DialogDescription>
+              {editingId ? "Update your form template" : "Create a form to collect information from guests"}
+            </DialogDescription>
           </DialogHeader>
-          <div className="space-y-4">
+          <div className="space-y-5">
             {/* Quick template buttons when creating */}
             {!editingId && (
-              <div className="flex flex-wrap gap-2">
-                {starterTemplates.map((template) => (
-                  <button
-                    key={template.name}
-                    type="button"
-                    onClick={() => {
-                      setForm({
-                        title: template.name,
-                        type: template.type,
-                        description: template.description,
-                        fields: JSON.stringify(template.fields, null, 2),
-                        isActive: true,
-                      });
-                    }}
-                    className={cn(
-                      "inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium",
-                      "border border-slate-200 bg-slate-50 text-slate-600",
-                      "hover:border-emerald-300 hover:bg-emerald-50 hover:text-emerald-700",
-                      "transition-colors duration-150",
-                      form.title === template.name && "border-emerald-400 bg-emerald-50 text-emerald-700"
-                    )}
-                  >
-                    {template.icon}
-                    {template.name}
-                  </button>
-                ))}
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-slate-900">Start with a template</label>
+                <div className="flex flex-wrap gap-2">
+                  {starterTemplates.map((template) => (
+                    <button
+                      key={template.name}
+                      type="button"
+                      onClick={() => {
+                        setForm({
+                          title: template.name,
+                          type: template.type,
+                          description: template.description,
+                          questions: template.questions.map(q => ({ ...q, id: generateId() })),
+                          isActive: true,
+                        });
+                      }}
+                      className={cn(
+                        "inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium",
+                        "border border-slate-200 bg-slate-50 text-slate-600",
+                        "hover:border-emerald-300 hover:bg-emerald-50 hover:text-emerald-700",
+                        "transition-colors duration-150",
+                        form.title === template.name && "border-emerald-400 bg-emerald-50 text-emerald-700"
+                      )}
+                    >
+                      {template.icon}
+                      {template.name}
+                    </button>
+                  ))}
+                </div>
               </div>
             )}
 
             <div className="grid md:grid-cols-2 gap-3">
               <div className="space-y-2">
-                <label htmlFor="form-title" className="text-sm font-medium text-slate-900">Title</label>
+                <label htmlFor="form-title" className="text-sm font-medium text-slate-900">Form name</label>
                 <Input
                   id="form-title"
                   value={form.title}
@@ -761,7 +1030,7 @@ export default function FormsPage() {
                 />
               </div>
               <div className="space-y-2">
-                <label htmlFor="form-type" className="text-sm font-medium text-slate-900">Type</label>
+                <label htmlFor="form-type" className="text-sm font-medium text-slate-900">Category</label>
                 <Select
                   value={form.type}
                   onValueChange={(v) => setForm((f) => ({ ...f, type: v as FormTemplateInput["type"] }))}
@@ -775,7 +1044,7 @@ export default function FormsPage() {
                       <span className="flex items-center gap-2"><Car className="h-4 w-4" /> Vehicle / rig</span>
                     </SelectItem>
                     <SelectItem value="intake">
-                      <span className="flex items-center gap-2"><ClipboardList className="h-4 w-4" /> Custom intake</span>
+                      <span className="flex items-center gap-2"><ClipboardList className="h-4 w-4" /> Intake</span>
                     </SelectItem>
                     <SelectItem value="custom">
                       <span className="flex items-center gap-2"><FileQuestion className="h-4 w-4" /> Custom</span>
@@ -784,8 +1053,9 @@ export default function FormsPage() {
                 </Select>
               </div>
             </div>
+
             <div className="space-y-2">
-              <label htmlFor="form-description" className="text-sm font-medium text-slate-900">Description</label>
+              <label htmlFor="form-description" className="text-sm font-medium text-slate-900">Description <span className="text-slate-400 font-normal">(optional)</span></label>
               <Input
                 id="form-description"
                 value={form.description}
@@ -793,27 +1063,19 @@ export default function FormsPage() {
                 placeholder="Brief description shown to guests"
               />
             </div>
-            <div className="space-y-2">
-              <label htmlFor="form-fields" className="text-sm font-medium text-slate-900">Fields JSON</label>
-              <Textarea
-                id="form-fields"
-                rows={8}
-                value={form.fields}
-                onChange={(e) => setForm((f) => ({ ...f, fields: e.target.value }))}
-                className="font-mono text-sm"
-              />
-              <div className="text-xs text-slate-500">
-                Define questions as JSON. Example: {`{ "questions": [{ "label": "Name", "type": "text", "required": true }] }`}
-              </div>
-            </div>
-            <div className="flex items-center justify-between pt-2">
+
+            {/* Visual Question Builder */}
+            <QuestionBuilder
+              questions={form.questions}
+              onChange={(questions) => setForm((f) => ({ ...f, questions }))}
+            />
+
+            <div className="flex items-center justify-between pt-2 border-t border-slate-100">
               <div className="flex items-center gap-2">
-                <input
-                  id="form-active"
-                  type="checkbox"
-                  className="h-4 w-4 rounded border-slate-300 text-emerald-600 focus:ring-emerald-500"
+                <Switch
                   checked={form.isActive}
-                  onChange={(e) => setForm((f) => ({ ...f, isActive: e.target.checked }))}
+                  onCheckedChange={(checked) => setForm((f) => ({ ...f, isActive: checked }))}
+                  id="form-active"
                 />
                 <label htmlFor="form-active" className="text-sm text-slate-700">Active</label>
               </div>
