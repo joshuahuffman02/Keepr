@@ -602,7 +602,7 @@ export default function SiteClassDetailPage() {
                         <Input
                           type="number"
                           min="0"
-                          value={editForm.sameDayBookingCutoffMinutes}
+                          value={editForm.sameDayBookingCutoffMinutes ?? ""}
                           onChange={(e) => setEditForm({ ...editForm, sameDayBookingCutoffMinutes: e.target.value === "" ? "" : parseInt(e.target.value) })}
                           placeholder="0"
                           className="bg-background w-24"
