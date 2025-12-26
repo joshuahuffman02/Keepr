@@ -262,7 +262,7 @@ function FormPreview({
         </div>
 
         <DialogFooter>
-          <Button variant="outline" onClick={() => onClose(false)}>Close</Button>
+          <Button variant="outline" onClick={() => onClose()}>Close</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
