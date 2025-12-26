@@ -90,55 +90,64 @@ function EmptyChannelsState({ onCreateClick }: { onCreateClick: () => void }) {
   );
 }
 
-// Success celebration for first channel
+// Success modal for channel creation
 function FirstChannelCelebration({
   open,
   onClose,
-  channelName
+  channelName,
+  provider
 }: {
   open: boolean;
   onClose: () => void;
   channelName: string;
+  provider: string;
 }) {
   if (!open) return null;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/20 backdrop-blur-sm">
       <div className="bg-white rounded-2xl shadow-2xl p-8 text-center motion-safe:animate-in motion-safe:zoom-in-95 motion-safe:fade-in duration-300 max-w-md mx-4">
-        <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-br from-blue-400 to-indigo-500 text-white mb-4 motion-safe:animate-bounce">
-          <PartyPopper className="h-8 w-8" />
+        <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-br from-blue-400 to-indigo-500 text-white mb-4">
+          <CheckCircle2 className="h-8 w-8" />
         </div>
         <h3 className="text-xl font-bold text-slate-900 mb-2">
-          Channel Connected!
+          Channel Created!
         </h3>
         <p className="text-slate-600 mb-6">
-          <span className="font-medium text-blue-600">{channelName}</span> is now ready.
-          Your availability will stay in sync automatically.
+          <span className="font-medium text-blue-600">{channelName}</span> has been set up.
+          Now let's connect it to {provider}.
         </p>
 
-        <div className="bg-blue-50 rounded-lg p-4 mb-6 text-left">
-          <p className="text-sm font-medium text-blue-800 mb-2">Next steps:</p>
-          <ul className="text-sm text-blue-700 space-y-1">
-            <li className="flex items-center gap-2">
-              <CheckCircle2 className="h-4 w-4" />
-              Map your OTA listings to sites
+        <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 mb-6 text-left">
+          <p className="text-sm font-medium text-amber-800 mb-2 flex items-center gap-2">
+            <AlertCircle className="h-4 w-4" />
+            Important: Complete these steps to finish setup
+          </p>
+          <ol className="text-sm text-amber-700 space-y-2 list-decimal list-inside">
+            <li>
+              <strong>Get your iCal URL from {provider}</strong>
+              <p className="text-xs text-amber-600 ml-5">Find this in your {provider} listing settings</p>
             </li>
-            <li className="flex items-center gap-2">
-              <CheckCircle2 className="h-4 w-4" />
-              Set up iCal feeds for calendar sync
+            <li>
+              <strong>Add a mapping below</strong>
+              <p className="text-xs text-amber-600 ml-5">Enter your {provider} listing ID and paste the iCal URL</p>
             </li>
-            <li className="flex items-center gap-2">
-              <CheckCircle2 className="h-4 w-4" />
-              Test a sync to verify connection
+            <li>
+              <strong>Test with "Import now"</strong>
+              <p className="text-xs text-amber-600 ml-5">This will pull reservations from {provider} to verify it works</p>
             </li>
-          </ul>
+          </ol>
         </div>
+
+        <p className="text-xs text-slate-500 mb-4">
+          The channel won't sync until you add at least one mapping with an iCal URL.
+        </p>
 
         <Button
           onClick={onClose}
           className="bg-gradient-to-r from-blue-500 to-indigo-500 hover:from-blue-600 hover:to-indigo-600"
         >
-          Got it, let's go!
+          Got it, let's set up mappings
         </Button>
       </div>
     </div>
@@ -158,6 +167,8 @@ function ChannelCard({
   errorCount: number;
 }) {
   const provider = providerOptions.find(p => p.value === channel.provider);
+  const mappingCount = channel.mappings?.length ?? 0;
+  const needsSetup = mappingCount === 0;
 
   return (
     <button
@@ -173,16 +184,18 @@ function ChannelCard({
         "focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2",
         isSelected
           ? "border-blue-500 bg-blue-50 shadow-md"
-          : "border-slate-200 bg-white hover:border-slate-300 hover:shadow-sm"
+          : needsSetup
+            ? "border-amber-300 bg-amber-50/50 hover:border-amber-400"
+            : "border-slate-200 bg-white hover:border-slate-300 hover:shadow-sm"
       )}
       aria-pressed={isSelected}
-      aria-label={`${channel.name} channel, ${channel.status === "two_way" ? "two-way sync" : channel.status === "pull" ? "pull only" : "disabled"}`}
+      aria-label={`${channel.name} channel, ${channel.status === "two_way" ? "two-way sync" : channel.status === "pull" ? "pull only" : "disabled"}${needsSetup ? ", needs setup" : ""}`}
     >
       <div className="flex items-start justify-between gap-3">
         <div className="flex items-center gap-3">
           <div className={cn(
             "w-12 h-12 rounded-xl flex items-center justify-center text-2xl",
-            isSelected ? "bg-blue-100" : "bg-slate-100"
+            isSelected ? "bg-blue-100" : needsSetup ? "bg-amber-100" : "bg-slate-100"
           )}>
             {provider?.icon || "🔗"}
           </div>
@@ -192,7 +205,14 @@ function ChannelCard({
           </div>
         </div>
         <div className="flex flex-col items-end gap-1">
-          <StatusBadge status={channel.status} />
+          {needsSetup ? (
+            <Badge variant="outline" className="text-amber-700 border-amber-300 bg-amber-100">
+              <AlertCircle className="h-3 w-3 mr-1" />
+              Needs setup
+            </Badge>
+          ) : (
+            <StatusBadge status={channel.status} />
+          )}
           {errorCount > 0 && (
             <Badge variant="outline" className="text-amber-700 border-amber-200 bg-amber-50">
               <AlertCircle className="h-3 w-3 mr-1" />
@@ -202,10 +222,20 @@ function ChannelCard({
         </div>
       </div>
 
-      {channel.lastSyncAt && (
+      {needsSetup ? (
+        <div className="mt-3 pt-3 border-t border-amber-200 flex items-center gap-2 text-xs text-amber-700">
+          <AlertCircle className="h-3 w-3" />
+          Click to add site mappings
+        </div>
+      ) : channel.lastSyncAt ? (
         <div className="mt-3 pt-3 border-t border-slate-100 flex items-center gap-2 text-xs text-slate-500">
           <Clock className="h-3 w-3" />
           Last sync: {new Date(channel.lastSyncAt).toLocaleString()}
+        </div>
+      ) : (
+        <div className="mt-3 pt-3 border-t border-slate-100 flex items-center gap-2 text-xs text-slate-500">
+          <Clock className="h-3 w-3" />
+          {mappingCount} mapping{mappingCount !== 1 ? "s" : ""} · Never synced
         </div>
       )}
     </button>
@@ -307,6 +337,7 @@ export default function OtaSettingsPage() {
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [showCelebration, setShowCelebration] = useState(false);
   const [celebrationChannelName, setCelebrationChannelName] = useState("");
+  const [celebrationProvider, setCelebrationProvider] = useState("");
 
   const [otaConfigDraft, setOtaConfigDraft] = useState({
     provider: "Hipcamp",
@@ -433,18 +464,12 @@ export default function OtaSettingsPage() {
         ignoreCategoryRestrictions: form.ignoreCategoryRestrictions
       }),
     onSuccess: () => {
-      const isFirstChannel = !channelsQuery.data?.length;
       queryClient.invalidateQueries({ queryKey: ["ota-channels", campgroundId] });
 
-      if (isFirstChannel) {
-        setCelebrationChannelName(form.name);
-        setShowCelebration(true);
-      } else {
-        toast({
-          title: "Channel connected!",
-          description: `${form.name} is now ready to sync.`
-        });
-      }
+      // Always show the setup modal - users need to know what to do next
+      setCelebrationChannelName(form.name);
+      setCelebrationProvider(form.provider);
+      setShowCelebration(true);
 
       setForm((f) => ({ ...f, name: "", rateMultiplier: "1.00" }));
       setShowCreateForm(false);
@@ -584,11 +609,12 @@ export default function OtaSettingsPage() {
 
   return (
     <div className="space-y-6">
-      {/* Celebration modal */}
+      {/* Setup instructions modal */}
       <FirstChannelCelebration
         open={showCelebration}
         onClose={() => setShowCelebration(false)}
         channelName={celebrationChannelName}
+        provider={celebrationProvider}
       />
 
       {/* Header */}
