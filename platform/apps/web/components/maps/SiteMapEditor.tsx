@@ -33,7 +33,9 @@ import {
   CheckCircle2,
   HelpCircle,
   Loader2,
-  PartyPopper
+  PartyPopper,
+  Move,
+  RotateCw
 } from "lucide-react";
 
 type Point = { x: number; y: number };
@@ -73,6 +75,62 @@ type ShapeDraft = {
 };
 
 type PresetShape = "rectangle" | "square" | "circle" | "triangle" | "freeform";
+
+type DragMode = "vertex" | "move" | "rotate" | "resize";
+
+// Check if point is inside polygon using ray casting
+const pointInPolygon = (point: Point, polygon: Point[]): boolean => {
+  let inside = false;
+  for (let i = 0, j = polygon.length - 1; i < polygon.length; j = i++) {
+    const xi = polygon[i].x, yi = polygon[i].y;
+    const xj = polygon[j].x, yj = polygon[j].y;
+    if (((yi > point.y) !== (yj > point.y)) &&
+        (point.x < (xj - xi) * (point.y - yi) / (yj - yi) + xi)) {
+      inside = !inside;
+    }
+  }
+  return inside;
+};
+
+// Get bounding box of points
+const getBoundingBox = (points: Point[]): { min: Point; max: Point; center: Point } => {
+  const xs = points.map(p => p.x);
+  const ys = points.map(p => p.y);
+  const min = { x: Math.min(...xs), y: Math.min(...ys) };
+  const max = { x: Math.max(...xs), y: Math.max(...ys) };
+  const center = { x: (min.x + max.x) / 2, y: (min.y + max.y) / 2 };
+  return { min, max, center };
+};
+
+// Rotate points around a center
+const rotatePoints = (points: Point[], center: Point, angleDelta: number): Point[] => {
+  const cos = Math.cos(angleDelta);
+  const sin = Math.sin(angleDelta);
+  return points.map(p => {
+    const dx = p.x - center.x;
+    const dy = p.y - center.y;
+    return {
+      x: center.x + dx * cos - dy * sin,
+      y: center.y + dx * sin + dy * cos
+    };
+  });
+};
+
+// Scale points from a center
+const scalePoints = (points: Point[], center: Point, scaleX: number, scaleY: number): Point[] => {
+  return points.map(p => ({
+    x: center.x + (p.x - center.x) * scaleX,
+    y: center.y + (p.y - center.y) * scaleY
+  }));
+};
+
+// Translate all points by delta
+const translatePoints = (points: Point[], delta: Point): Point[] => {
+  return points.map(p => ({
+    x: p.x + delta.x,
+    y: p.y + delta.y
+  }));
+};
 
 const SPRING_CONFIG = {
   type: "spring" as const,
@@ -375,6 +433,10 @@ export function SiteMapEditor({
   const [gridSize, setGridSize] = useState(10);
   const [editingPoints, setEditingPoints] = useState<Point[] | null>(null);
   const [dragIndex, setDragIndex] = useState<number | null>(null);
+  const [dragMode, setDragMode] = useState<DragMode | null>(null);
+  const [dragStart, setDragStart] = useState<Point | null>(null);
+  const [initialPoints, setInitialPoints] = useState<Point[] | null>(null);
+  const [resizeCorner, setResizeCorner] = useState<number | null>(null); // 0=TL, 1=TR, 2=BR, 3=BL
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [showPanels, setShowPanels] = useState(true);
   const [showShortcuts, setShowShortcuts] = useState(false);
