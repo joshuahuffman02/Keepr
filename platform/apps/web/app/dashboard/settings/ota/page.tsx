@@ -365,6 +365,9 @@ export default function OtaSettingsPage() {
     status: "mapped"
   });
   const [icalUrlDrafts, setIcalUrlDrafts] = useState<Record<string, string>>({});
+  // Bulk site mapping: siteId -> externalId (OTA listing ID)
+  const [siteMappingDrafts, setSiteMappingDrafts] = useState<Record<string, string>>({});
+  const [savingMappings, setSavingMappings] = useState(false);
   const apiBase = process.env.NEXT_PUBLIC_API_BASE || "http://localhost:4000/api";
 
   useEffect(() => {
@@ -432,6 +435,82 @@ export default function OtaSettingsPage() {
     enabled: !!selectedChannelId,
     staleTime: 15_000
   });
+
+  // Sync existing mappings to the drafts when mappings load
+  useEffect(() => {
+    if (!mappingsQuery.data) return;
+    const drafts: Record<string, string> = {};
+    mappingsQuery.data.forEach((m) => {
+      if (m.siteId && m.externalId) {
+        drafts[m.siteId] = m.externalId;
+      }
+    });
+    setSiteMappingDrafts(drafts);
+  }, [mappingsQuery.data]);
+
+  // Save all site mappings at once
+  const saveAllMappings = async () => {
+    if (!selectedChannelId) return;
+    setSavingMappings(true);
+    try {
+      const existingBySiteId = new Map(
+        (mappingsQuery.data || []).filter(m => m.siteId).map(m => [m.siteId, m])
+      );
+
+      const promises: Promise<unknown>[] = [];
+
+      // Process each site
+      for (const site of sitesQuery.data || []) {
+        const newExternalId = siteMappingDrafts[site.id]?.trim() || "";
+        const existing = existingBySiteId.get(site.id);
+
+        if (newExternalId && !existing) {
+          // Create new mapping
+          promises.push(
+            apiClient.upsertOtaMapping(selectedChannelId, {
+              externalId: newExternalId,
+              siteId: site.id,
+              status: "mapped"
+            })
+          );
+        } else if (newExternalId && existing && existing.externalId !== newExternalId) {
+          // Update existing mapping
+          promises.push(
+            apiClient.upsertOtaMapping(selectedChannelId, {
+              externalId: newExternalId,
+              siteId: site.id,
+              status: "mapped"
+            })
+          );
+        }
+        // Note: We don't delete mappings when the field is cleared - user can delete explicitly
+      }
+
+      await Promise.all(promises);
+      queryClient.invalidateQueries({ queryKey: ["ota-mappings", selectedChannelId] });
+      queryClient.invalidateQueries({ queryKey: ["ota-channels", campgroundId] });
+
+      if (promises.length > 0) {
+        toast({
+          title: "Mappings saved",
+          description: `Updated ${promises.length} site mapping${promises.length === 1 ? "" : "s"}.`
+        });
+      } else {
+        toast({
+          title: "No changes",
+          description: "All mappings are already up to date."
+        });
+      }
+    } catch (err: any) {
+      toast({
+        title: "Failed to save mappings",
+        description: err.message || "An error occurred",
+        variant: "destructive"
+      });
+    } finally {
+      setSavingMappings(false);
+    }
+  };
 
   const saveOtaConfig = useMutation({
     mutationFn: () => apiClient.saveOtaConfig(campgroundId, otaConfigDraft),
@@ -954,141 +1033,174 @@ export default function OtaSettingsPage() {
                   </CardHeader>
                 </Card>
 
-                {/* Site mappings */}
+                {/* Site mappings - simplified table view */}
                 <Card>
                   <CardHeader>
-                    <CardTitle className="text-base flex items-center gap-2">
-                      <Link2 className="h-4 w-4 text-blue-600" />
-                      Site Mappings
-                    </CardTitle>
-                    <CardDescription>
-                      Connect your OTA listings to your campground sites
-                    </CardDescription>
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <CardTitle className="text-base flex items-center gap-2">
+                          <Link2 className="h-4 w-4 text-blue-600" />
+                          Site Mappings
+                        </CardTitle>
+                        <CardDescription>
+                          Enter the OTA listing ID for each site you want to sync
+                        </CardDescription>
+                      </div>
+                      <Button
+                        onClick={saveAllMappings}
+                        disabled={savingMappings || !sitesQuery.data?.length}
+                        className="bg-emerald-600 hover:bg-emerald-700"
+                      >
+                        {savingMappings ? (
+                          <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                        ) : (
+                          <CheckCircle2 className="h-4 w-4 mr-2" />
+                        )}
+                        Save All Mappings
+                      </Button>
+                    </div>
                   </CardHeader>
-                  <CardContent className="space-y-4">
-                    {/* Add mapping form */}
-                    <div className="p-4 rounded-lg bg-slate-50 border border-slate-200">
-                      <div className="grid grid-cols-1 md:grid-cols-4 gap-3 items-end">
-                        <div className="md:col-span-2 space-y-2">
-                          <Label htmlFor="external-id">OTA Listing ID</Label>
-                          <Input
-                            id="external-id"
-                            value={mappingForm.externalId}
-                            onChange={(e) => setMappingForm((f) => ({ ...f, externalId: e.target.value }))}
-                            placeholder="From your OTA dashboard"
-                          />
+                  <CardContent>
+                    {/* Help text */}
+                    <div className="mb-4 p-3 rounded-lg bg-blue-50 border border-blue-200 text-sm text-blue-800">
+                      <div className="flex items-start gap-2">
+                        <HelpCircle className="h-4 w-4 mt-0.5 flex-shrink-0" />
+                        <div>
+                          <p className="font-medium">Where to find your OTA Listing IDs:</p>
+                          <p className="mt-1 text-blue-700">
+                            Log into your {selectedChannel?.provider || "OTA"} dashboard and find the unique ID for each listing.
+                            This is usually in the listing URL or settings page.
+                          </p>
                         </div>
-                        <div className="space-y-2">
-                          <Label htmlFor="map-site">Map to Site</Label>
-                          <Select
-                            value={mappingForm.siteId || "__unmapped__"}
-                            onValueChange={(v) => setMappingForm((f) => ({ ...f, siteId: v === "__unmapped__" ? "" : v }))}
-                          >
-                            <SelectTrigger id="map-site">
-                              <SelectValue placeholder="Select site" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="__unmapped__">Unmapped</SelectItem>
-                              {sitesQuery.data?.map((s) => (
-                                <SelectItem key={s.id} value={s.id}>
-                                  {s.name}
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
-                        </div>
-                        <Button
-                          onClick={() => upsertMapping.mutate()}
-                          disabled={!mappingForm.externalId || upsertMapping.isPending}
-                          className="bg-blue-600 hover:bg-blue-700"
-                        >
-                          {upsertMapping.isPending ? (
-                            <Loader2 className="h-4 w-4 animate-spin" />
-                          ) : (
-                            "Add Mapping"
-                          )}
-                        </Button>
                       </div>
                     </div>
 
-                    {/* Mappings table */}
+                    {/* Sites table with inline editing */}
                     <div className="rounded-lg border overflow-hidden">
                       <Table>
                         <TableHeader>
                           <TableRow className="bg-slate-50">
-                            <TableHead>Listing ID</TableHead>
-                            <TableHead>Site</TableHead>
-                            <TableHead>Status</TableHead>
-                            <TableHead>Last Sync</TableHead>
-                            <TableHead>Actions</TableHead>
+                            <TableHead className="w-1/3">Your Site</TableHead>
+                            <TableHead className="w-1/3">OTA Listing ID</TableHead>
+                            <TableHead className="w-1/6">Status</TableHead>
+                            <TableHead className="w-1/6">Actions</TableHead>
                           </TableRow>
                         </TableHeader>
                         <TableBody>
-                          {mappingsQuery.data?.length ? (
-                            mappingsQuery.data.map((m) => (
-                              <TableRow key={m.id}>
-                                <TableCell className="font-mono text-sm">{m.externalId}</TableCell>
-                                <TableCell>
-                                  {m.site?.name ? (
-                                    <span className="font-medium">{m.site.name}</span>
-                                  ) : (
-                                    <Badge variant="outline" className="text-amber-700 border-amber-200 bg-amber-50">
-                                      <AlertCircle className="h-3 w-3 mr-1" />
-                                      Unmapped
-                                    </Badge>
-                                  )}
-                                </TableCell>
-                                <TableCell>
-                                  <Badge
-                                    variant="outline"
-                                    className={m.status === "mapped"
-                                      ? "text-emerald-700 border-emerald-200 bg-emerald-50"
-                                      : "text-slate-600"
-                                    }
-                                  >
-                                    {m.status === "mapped" && <CheckCircle2 className="h-3 w-3 mr-1" />}
-                                    {m.status}
-                                  </Badge>
-                                </TableCell>
-                                <TableCell className="text-sm text-slate-600">
-                                  {m.lastSyncAt ? new Date(m.lastSyncAt).toLocaleString() : "Never"}
-                                </TableCell>
-                                <TableCell>
-                                  <div className="flex items-center gap-2">
-                                    <Button
-                                      size="sm"
-                                      variant="ghost"
-                                      onClick={() => ensureIcalToken.mutate(m.id)}
-                                      disabled={ensureIcalToken.isPending}
-                                      className="text-blue-600"
-                                    >
-                                      <Calendar className="h-4 w-4 mr-1" />
-                                      iCal
-                                    </Button>
-                                    <Button
-                                      size="sm"
-                                      variant="ghost"
-                                      onClick={() => importIcal.mutate(m.id)}
-                                      disabled={importIcal.isPending}
-                                    >
-                                      <Download className="h-4 w-4 mr-1" />
-                                      Import
-                                    </Button>
-                                  </div>
-                                </TableCell>
-                              </TableRow>
-                            ))
+                          {sitesQuery.isLoading ? (
+                            <TableRow>
+                              <TableCell colSpan={4} className="text-center py-8">
+                                <Loader2 className="h-6 w-6 mx-auto animate-spin text-slate-400" />
+                                <p className="mt-2 text-sm text-slate-500">Loading sites...</p>
+                              </TableCell>
+                            </TableRow>
+                          ) : sitesQuery.data?.length ? (
+                            sitesQuery.data.map((site) => {
+                              const existingMapping = mappingsQuery.data?.find(m => m.siteId === site.id);
+                              const currentValue = siteMappingDrafts[site.id] || "";
+                              const hasChanged = existingMapping
+                                ? currentValue !== existingMapping.externalId
+                                : currentValue.trim() !== "";
+
+                              return (
+                                <TableRow key={site.id} className={hasChanged ? "bg-amber-50/50" : ""}>
+                                  <TableCell>
+                                    <div className="font-medium">{site.name}</div>
+                                    {site.siteClass?.name && (
+                                      <div className="text-xs text-slate-500">{site.siteClass.name}</div>
+                                    )}
+                                  </TableCell>
+                                  <TableCell>
+                                    <Input
+                                      value={currentValue}
+                                      onChange={(e) => setSiteMappingDrafts(prev => ({
+                                        ...prev,
+                                        [site.id]: e.target.value
+                                      }))}
+                                      placeholder="Enter listing ID..."
+                                      className={cn(
+                                        "font-mono text-sm",
+                                        hasChanged && "border-amber-400 bg-amber-50"
+                                      )}
+                                    />
+                                  </TableCell>
+                                  <TableCell>
+                                    {existingMapping ? (
+                                      <Badge variant="outline" className="text-emerald-700 border-emerald-200 bg-emerald-50">
+                                        <CheckCircle2 className="h-3 w-3 mr-1" />
+                                        Mapped
+                                      </Badge>
+                                    ) : currentValue.trim() ? (
+                                      <Badge variant="outline" className="text-amber-700 border-amber-200 bg-amber-50">
+                                        <Clock className="h-3 w-3 mr-1" />
+                                        Unsaved
+                                      </Badge>
+                                    ) : (
+                                      <Badge variant="outline" className="text-slate-500">
+                                        Not mapped
+                                      </Badge>
+                                    )}
+                                  </TableCell>
+                                  <TableCell>
+                                    {existingMapping && (
+                                      <div className="flex items-center gap-1">
+                                        <Button
+                                          size="sm"
+                                          variant="ghost"
+                                          onClick={() => ensureIcalToken.mutate(existingMapping.id)}
+                                          disabled={ensureIcalToken.isPending}
+                                          className="text-blue-600 h-8 px-2"
+                                          title="Get iCal feed"
+                                        >
+                                          <Calendar className="h-4 w-4" />
+                                        </Button>
+                                        <Button
+                                          size="sm"
+                                          variant="ghost"
+                                          onClick={() => importIcal.mutate(existingMapping.id)}
+                                          disabled={importIcal.isPending}
+                                          className="h-8 px-2"
+                                          title="Import from iCal"
+                                        >
+                                          <Download className="h-4 w-4" />
+                                        </Button>
+                                      </div>
+                                    )}
+                                  </TableCell>
+                                </TableRow>
+                              );
+                            })
                           ) : (
                             <TableRow>
-                              <TableCell colSpan={5} className="text-center py-8 text-slate-500">
-                                <Link2 className="h-8 w-8 mx-auto mb-2 text-slate-300" />
-                                <p>No mappings yet. Add your first listing above.</p>
+                              <TableCell colSpan={4} className="text-center py-8 text-slate-500">
+                                <AlertCircle className="h-8 w-8 mx-auto mb-2 text-slate-300" />
+                                <p>No sites found in this campground.</p>
+                                <p className="text-sm mt-1">Add sites first, then come back to map them.</p>
                               </TableCell>
                             </TableRow>
                           )}
                         </TableBody>
                       </Table>
                     </div>
+
+                    {/* Summary footer */}
+                    {sitesQuery.data && sitesQuery.data.length > 0 && (
+                      <div className="mt-4 flex items-center justify-between text-sm text-slate-600">
+                        <div>
+                          {mappingsQuery.data?.filter(m => m.siteId).length || 0} of {sitesQuery.data.length} sites mapped
+                        </div>
+                        {Object.keys(siteMappingDrafts).some(siteId => {
+                          const existing = mappingsQuery.data?.find(m => m.siteId === siteId);
+                          const draft = siteMappingDrafts[siteId];
+                          return existing ? draft !== existing.externalId : draft?.trim();
+                        }) && (
+                          <div className="flex items-center gap-2 text-amber-600">
+                            <AlertCircle className="h-4 w-4" />
+                            <span>You have unsaved changes</span>
+                          </div>
+                        )}
+                      </div>
+                    )}
                   </CardContent>
                 </Card>
 

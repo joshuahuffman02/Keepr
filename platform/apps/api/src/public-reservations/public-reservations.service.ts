@@ -298,7 +298,15 @@ export class PublicReservationsService {
     ) {
         const campground = await this.prisma.campground.findUnique({
             where: { slug },
-            select: { id: true, isPublished: true, isBookable: true, isExternal: true, nonBookableReason: true }
+            select: {
+                id: true,
+                isPublished: true,
+                isBookable: true,
+                isExternal: true,
+                nonBookableReason: true,
+                officeClosesAt: true,
+                parkTimeZone: true
+            }
         });
 
         // Check for preview token to bypass publish/bookable checks
@@ -360,12 +368,24 @@ export class PublicReservationsService {
                         petFriendly: true,
                         description: true,
                         rigMaxLength: true,
-                        accessible: true
+                        accessible: true,
+                        sameDayBookingCutoffMinutes: true
                     }
                 }
             },
             orderBy: { name: "asc" }
         });
+
+        // Check if this is a same-day booking and calculate cutoff
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        const arrivalDay = new Date(arrival);
+        arrivalDay.setHours(0, 0, 0, 0);
+        const isSameDayBooking = arrivalDay.getTime() === today.getTime();
+
+        // Parse office close time (default 17:00)
+        const officeCloseTime = campground.officeClosesAt || "17:00";
+        const [closeHour, closeMinute] = officeCloseTime.split(":").map(Number);
 
         // Get conflicting reservations
         const conflictingReservations = await this.prisma.reservation.findMany({
@@ -462,6 +482,31 @@ export class PublicReservationsService {
                 status = 'locked';
             } else if (holdSiteIds.has(site.id)) {
                 status = 'locked';
+            } else if (isSameDayBooking) {
+                // Check same-day booking cutoff
+                const siteType = site.siteType || site.siteClass?.siteType || "rv";
+                let cutoffMinutes = site.siteClass?.sameDayBookingCutoffMinutes;
+
+                // Default cutoffs: RV/tent = 0 (no cutoff), cabin/lodging = 60 minutes
+                if (cutoffMinutes === null || cutoffMinutes === undefined) {
+                    if (siteType === "cabin" || siteType === "lodging" || siteType === "glamping") {
+                        cutoffMinutes = 60; // 1 hour before office close
+                    } else {
+                        cutoffMinutes = 0; // No cutoff for RV/tent
+                    }
+                }
+
+                if (cutoffMinutes > 0) {
+                    // Calculate cutoff time
+                    const now = new Date();
+                    const cutoffTime = new Date();
+                    cutoffTime.setHours(closeHour, closeMinute, 0, 0);
+                    cutoffTime.setMinutes(cutoffTime.getMinutes() - cutoffMinutes);
+
+                    if (now >= cutoffTime) {
+                        status = 'locked';
+                    }
+                }
             }
 
             return {

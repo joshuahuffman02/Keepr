@@ -649,6 +649,7 @@ model SiteClass {
   clientAccount     String?
   minNights         Int?
   maxNights         Int?
+  sameDayBookingCutoffMinutes Int? // Minutes before office close to cut off same-day bookings. null = use default (0 for RV, 60 for cabin/lodging)
   petFriendly       Boolean  @default(true)
   accessible        Boolean  @default(false)
   photos            String[] @default([])
@@ -1070,6 +1071,7 @@ model Campground {
   seasonEnd             DateTime?
   checkInTime           String?   @default("15:00")
   checkOutTime          String?   @default("11:00")
+  officeClosesAt        String?   @default("17:00") // HH:mm - when office closes, used for booking cutoffs
   parkTimeZone          String?
   slaMinutes            Int?      @default(30)
   senderDomain          String?
