@@ -604,7 +604,7 @@ export default function SiteClassDetailPage() {
                           min="0"
                           value={editForm.sameDayBookingCutoffMinutes ?? ""}
                           onChange={(e) => setEditForm({ ...editForm, sameDayBookingCutoffMinutes: e.target.value === "" ? "" : parseInt(e.target.value) })}
-                          placeholder="0"
+                          placeholder={editForm.siteType === "rv" || editForm.siteType === "tent" ? "0" : "60"}
                           className="bg-background w-24"
                         />
                         <span className="text-sm text-muted-foreground">minutes before office close</span>
