@@ -5104,42 +5104,40 @@ export const apiClient = {
   },
   async getConversations(campgroundId: string) {
     const data = await fetchJSON<unknown>(`/campgrounds/${campgroundId}/conversations`);
+    const messageSchema = z.object({
+      id: z.string(),
+      campgroundId: z.string(),
+      reservationId: z.string(),
+      guestId: z.string().nullable(),
+      senderType: z.enum(["guest", "staff"]),
+      content: z.string(),
+      readAt: z.string().nullable(),
+      createdAt: z.string(),
+      guest: z.object({
+        id: z.string(),
+        primaryFirstName: z.string().nullable(),
+        primaryLastName: z.string().nullable()
+      }).nullable()
+    });
     return z.array(z.object({
       reservationId: z.string(),
       guestName: z.string(),
+      guestEmail: z.string().nullable().optional(),
+      guestPhone: z.string().nullable().optional(),
+      guestId: z.string().nullable().optional(),
       siteName: z.string(),
+      siteType: z.string().nullable().optional(),
       status: z.string(),
+      arrivalDate: z.string().nullable().optional(),
+      departureDate: z.string().nullable().optional(),
+      adults: z.number().nullable().optional(),
+      children: z.number().nullable().optional(),
+      pets: z.number().nullable().optional(),
+      totalAmountCents: z.number().nullable().optional(),
+      notes: z.string().nullable().optional(),
       unreadCount: z.number(),
-      messages: z.array(z.object({
-        id: z.string(),
-        campgroundId: z.string(),
-        reservationId: z.string(),
-        guestId: z.string().nullable(),
-        senderType: z.enum(["guest", "staff"]),
-        content: z.string(),
-        readAt: z.string().nullable(),
-        createdAt: z.string(),
-        guest: z.object({
-          id: z.string(),
-          primaryFirstName: z.string().nullable(),
-          primaryLastName: z.string().nullable()
-        }).nullable()
-      })),
-      lastMessage: z.object({
-        id: z.string(),
-        campgroundId: z.string(),
-        reservationId: z.string(),
-        guestId: z.string().nullable(),
-        senderType: z.enum(["guest", "staff"]),
-        content: z.string(),
-        readAt: z.string().nullable(),
-        createdAt: z.string(),
-        guest: z.object({
-          id: z.string(),
-          primaryFirstName: z.string().nullable(),
-          primaryLastName: z.string().nullable()
-        }).nullable()
-      }).nullable()
+      messages: z.array(messageSchema),
+      lastMessage: messageSchema.nullable()
     })).parse(data);
   },
 

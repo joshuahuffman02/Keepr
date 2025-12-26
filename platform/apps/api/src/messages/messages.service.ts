@@ -108,6 +108,7 @@ export class MessagesService {
                 senderType: true,
                 createdAt: true,
                 readAt: true,
+                campgroundId: true,
                 reservationId: true,
                 guestId: true,
                 guest: {
