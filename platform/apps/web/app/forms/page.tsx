@@ -44,6 +44,13 @@ type Question = {
   options?: string[];
 };
 
+type DisplayCondition = {
+  id: string;
+  field: "pets" | "adults" | "children" | "rigType" | "siteClassId" | "addOns" | "stayLength";
+  operator: "equals" | "not_equals" | "greater_than" | "less_than" | "in" | "not_in" | "contains";
+  value: string | number | string[];
+};
+
 type FormTemplateInput = {
   title: string;
   type: "waiver" | "vehicle" | "intake" | "custom";
@@ -59,6 +66,9 @@ type FormTemplateInput = {
   validityDays: number | null;
   sendReminder: boolean;
   reminderDaysBefore: number | null;
+  // Conditional display
+  displayConditions: DisplayCondition[];
+  conditionLogic: "all" | "any";
 };
 
 const emptyForm: FormTemplateInput = {
@@ -75,6 +85,41 @@ const emptyForm: FormTemplateInput = {
   validityDays: null,
   sendReminder: false,
   reminderDaysBefore: 1,
+  displayConditions: [],
+  conditionLogic: "all",
+};
+
+// Condition field options with friendly labels
+const conditionFields = [
+  { value: "pets", label: "Number of pets", type: "number" },
+  { value: "adults", label: "Number of adults", type: "number" },
+  { value: "children", label: "Number of children", type: "number" },
+  { value: "stayLength", label: "Length of stay (nights)", type: "number" },
+  { value: "rigType", label: "Rig type", type: "select", options: ["rv", "trailer", "tent", "car", "motorcycle", "other"] },
+  { value: "siteClassId", label: "Site type", type: "siteClass" },
+  { value: "addOns", label: "Selected add-ons", type: "text" },
+];
+
+const conditionOperators = {
+  number: [
+    { value: "greater_than", label: "is more than" },
+    { value: "less_than", label: "is less than" },
+    { value: "equals", label: "equals" },
+    { value: "not_equals", label: "does not equal" },
+  ],
+  select: [
+    { value: "equals", label: "is" },
+    { value: "not_equals", label: "is not" },
+    { value: "in", label: "is one of" },
+  ],
+  siteClass: [
+    { value: "equals", label: "is" },
+    { value: "in", label: "is one of" },
+  ],
+  text: [
+    { value: "contains", label: "contains" },
+    { value: "equals", label: "equals" },
+  ],
 };
 
 // Generate unique ID for questions
@@ -597,6 +642,283 @@ function FormSettings({
           )}
         </div>
       </div>
+
+      {/* Conditional Display Rules */}
+      <div className="space-y-3">
+        <div className="flex items-center gap-2">
+          <Settings2 className="h-4 w-4 text-indigo-500" />
+          <label className="text-sm font-medium text-slate-900">Conditional display</label>
+        </div>
+        <div className="text-xs text-slate-500 -mt-1">
+          Only show this form when certain conditions are met
+        </div>
+
+        <div className="space-y-3 p-3 rounded-lg border border-slate-200">
+          {form.displayConditions.length === 0 ? (
+            <div className="text-center py-4">
+              <div className="text-sm text-slate-500 mb-2">No conditions set - form shows for all bookings</div>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => {
+                  const newCondition: DisplayCondition = {
+                    id: generateId(),
+                    field: "pets",
+                    operator: "greater_than",
+                    value: 0
+                  };
+                  onChange({ displayConditions: [...form.displayConditions, newCondition] });
+                }}
+              >
+                <Plus className="h-4 w-4 mr-1" />
+                Add condition
+              </Button>
+            </div>
+          ) : (
+            <>
+              {/* Condition Logic Toggle */}
+              {form.displayConditions.length > 1 && (
+                <div className="flex items-center gap-2 pb-2 border-b border-slate-100">
+                  <span className="text-xs text-slate-500">Show when</span>
+                  <Select
+                    value={form.conditionLogic}
+                    onValueChange={(v) => onChange({ conditionLogic: v as "all" | "any" })}
+                  >
+                    <SelectTrigger className="w-[100px] h-7 text-xs">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">ALL match</SelectItem>
+                      <SelectItem value="any">ANY match</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              )}
+
+              {/* Condition List */}
+              <div className="space-y-2">
+                {form.displayConditions.map((condition, index) => {
+                  const fieldConfig = conditionFields.find(f => f.value === condition.field);
+                  const operatorType = fieldConfig?.type || "text";
+                  const operators = conditionOperators[operatorType as keyof typeof conditionOperators] || conditionOperators.text;
+
+                  return (
+                    <div key={condition.id} className="flex items-center gap-2 p-2 rounded bg-slate-50">
+                      {/* Field Select */}
+                      <Select
+                        value={condition.field}
+                        onValueChange={(v) => {
+                          const updated = [...form.displayConditions];
+                          const newField = conditionFields.find(f => f.value === v);
+                          updated[index] = {
+                            ...condition,
+                            field: v as DisplayCondition["field"],
+                            operator: newField?.type === "number" ? "greater_than" : "equals",
+                            value: newField?.type === "number" ? 0 : ""
+                          };
+                          onChange({ displayConditions: updated });
+                        }}
+                      >
+                        <SelectTrigger className="w-[140px] h-8 text-xs">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {conditionFields.map(f => (
+                            <SelectItem key={f.value} value={f.value}>{f.label}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+
+                      {/* Operator Select */}
+                      <Select
+                        value={condition.operator}
+                        onValueChange={(v) => {
+                          const updated = [...form.displayConditions];
+                          updated[index] = { ...condition, operator: v as DisplayCondition["operator"] };
+                          onChange({ displayConditions: updated });
+                        }}
+                      >
+                        <SelectTrigger className="w-[120px] h-8 text-xs">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {operators.map((op: { value: string; label: string }) => (
+                            <SelectItem key={op.value} value={op.value}>{op.label}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+
+                      {/* Value Input */}
+                      {fieldConfig?.type === "number" && (
+                        <Input
+                          type="number"
+                          value={condition.value as number}
+                          onChange={(e) => {
+                            const updated = [...form.displayConditions];
+                            updated[index] = { ...condition, value: parseInt(e.target.value) || 0 };
+                            onChange({ displayConditions: updated });
+                          }}
+                          className="w-[70px] h-8 text-xs"
+                        />
+                      )}
+                      {fieldConfig?.type === "select" && (
+                        <Select
+                          value={condition.value as string}
+                          onValueChange={(v) => {
+                            const updated = [...form.displayConditions];
+                            updated[index] = { ...condition, value: v };
+                            onChange({ displayConditions: updated });
+                          }}
+                        >
+                          <SelectTrigger className="w-[100px] h-8 text-xs">
+                            <SelectValue placeholder="Select..." />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {fieldConfig.options?.map(opt => (
+                              <SelectItem key={opt} value={opt} className="capitalize">{opt}</SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      )}
+                      {fieldConfig?.type === "siteClass" && (
+                        <Select
+                          value={condition.value as string}
+                          onValueChange={(v) => {
+                            const updated = [...form.displayConditions];
+                            updated[index] = { ...condition, value: v };
+                            onChange({ displayConditions: updated });
+                          }}
+                        >
+                          <SelectTrigger className="w-[120px] h-8 text-xs">
+                            <SelectValue placeholder="Select..." />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {siteClasses.map(sc => (
+                              <SelectItem key={sc.id} value={sc.id}>{sc.name}</SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      )}
+                      {fieldConfig?.type === "text" && (
+                        <Input
+                          type="text"
+                          value={condition.value as string}
+                          onChange={(e) => {
+                            const updated = [...form.displayConditions];
+                            updated[index] = { ...condition, value: e.target.value };
+                            onChange({ displayConditions: updated });
+                          }}
+                          placeholder="Value..."
+                          className="w-[100px] h-8 text-xs"
+                        />
+                      )}
+
+                      {/* Remove Button */}
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        className="h-8 w-8 p-0 text-slate-400 hover:text-red-500"
+                        onClick={() => {
+                          onChange({
+                            displayConditions: form.displayConditions.filter((_, i) => i !== index)
+                          });
+                        }}
+                      >
+                        <X className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  );
+                })}
+              </div>
+
+              {/* Add Another Condition */}
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                className="w-full text-slate-600"
+                onClick={() => {
+                  const newCondition: DisplayCondition = {
+                    id: generateId(),
+                    field: "pets",
+                    operator: "greater_than",
+                    value: 0
+                  };
+                  onChange({ displayConditions: [...form.displayConditions, newCondition] });
+                }}
+              >
+                <Plus className="h-4 w-4 mr-1" />
+                Add another condition
+              </Button>
+            </>
+          )}
+        </div>
+
+        {/* Preset Conditions */}
+        {form.displayConditions.length === 0 && (
+          <div className="flex flex-wrap gap-2">
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              className="text-xs"
+              onClick={() => {
+                onChange({
+                  displayConditions: [{
+                    id: generateId(),
+                    field: "pets",
+                    operator: "greater_than",
+                    value: 0
+                  }]
+                });
+              }}
+            >
+              <PawPrint className="h-3 w-3 mr-1" />
+              When pets added
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              className="text-xs"
+              onClick={() => {
+                onChange({
+                  displayConditions: [{
+                    id: generateId(),
+                    field: "rigType",
+                    operator: "equals",
+                    value: "rv"
+                  }]
+                });
+              }}
+            >
+              <Car className="h-3 w-3 mr-1" />
+              For RVs only
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              className="text-xs"
+              onClick={() => {
+                onChange({
+                  displayConditions: [{
+                    id: generateId(),
+                    field: "stayLength",
+                    operator: "greater_than",
+                    value: 7
+                  }]
+                });
+              }}
+            >
+              <Clock className="h-3 w-3 mr-1" />
+              Long stays (7+ nights)
+            </Button>
+          </div>
+        )}
+      </div>
     </div>
   );
 }
@@ -988,6 +1310,12 @@ export default function FormsPage() {
         validityDays: form.validityDays ?? undefined,
         sendReminder: form.sendReminder,
         reminderDaysBefore: form.reminderDaysBefore ?? undefined,
+        displayConditions: form.displayConditions.map(c => ({
+          field: c.field,
+          operator: c.operator,
+          value: c.value
+        })),
+        conditionLogic: form.conditionLogic,
       };
 
       if (editingId) {
@@ -1081,6 +1409,13 @@ export default function FormsPage() {
       validityDays: t.validityDays ?? null,
       sendReminder: t.sendReminder ?? false,
       reminderDaysBefore: t.reminderDaysBefore ?? 1,
+      displayConditions: (t.displayConditions || []).map((c: any) => ({
+        id: generateId(),
+        field: c.field,
+        operator: c.operator,
+        value: c.value
+      })),
+      conditionLogic: t.conditionLogic || "all",
     });
     setModalTab("questions");
     setIsModalOpen(true);

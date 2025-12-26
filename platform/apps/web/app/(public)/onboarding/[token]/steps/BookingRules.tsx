@@ -12,6 +12,8 @@ export interface BookingRulesData {
   longTermEnabled: boolean;
   longTermMinNights?: number;
   longTermAutoApply?: boolean;
+  officeClosesAt: string; // HH:mm format
+  sameDayCutoffEnabled: boolean; // If true, cabins get a cutoff before office close
 }
 
 interface BookingRulesProps {
@@ -58,6 +60,17 @@ const advanceBookingOptions = [
 
 const minNightOptions = [1, 2, 3];
 
+// Generate office close time options (3:00 PM - 9:00 PM)
+const officeCloseTimeOptions = [
+  { value: "15:00", label: "3:00 PM" },
+  { value: "16:00", label: "4:00 PM" },
+  { value: "17:00", label: "5:00 PM" },
+  { value: "18:00", label: "6:00 PM" },
+  { value: "19:00", label: "7:00 PM" },
+  { value: "20:00", label: "8:00 PM" },
+  { value: "21:00", label: "9:00 PM" },
+];
+
 export function BookingRules({
   initialData,
   onSave,
@@ -80,6 +93,12 @@ export function BookingRules({
   const [longTermAutoApply, setLongTermAutoApply] = useState<boolean>(
     initialData?.longTermAutoApply || false
   );
+  const [officeClosesAt, setOfficeClosesAt] = useState<string>(
+    initialData?.officeClosesAt || "17:00"
+  );
+  const [sameDayCutoffEnabled, setSameDayCutoffEnabled] = useState<boolean>(
+    initialData?.sameDayCutoffEnabled ?? true // Default enabled
+  );
   const [saving, setSaving] = useState(false);
 
   const handleSave = async () => {
@@ -91,6 +110,8 @@ export function BookingRules({
         longTermEnabled,
         longTermMinNights: longTermEnabled ? longTermMinNights : undefined,
         longTermAutoApply: longTermEnabled ? longTermAutoApply : undefined,
+        officeClosesAt,
+        sameDayCutoffEnabled,
       });
       onNext();
     } catch (error) {
@@ -392,6 +413,105 @@ export function BookingRules({
                   </div>
                 </div>
               </button>
+            </motion.div>
+          )}
+        </motion.div>
+
+        {/* Same-Day Booking Rules */}
+        <motion.div
+          initial={prefersReducedMotion ? {} : { opacity: 0, y: 10 }}
+          animate={prefersReducedMotion ? {} : { opacity: 1, y: 0 }}
+          transition={{ delay: 0.55 }}
+          className="space-y-4"
+        >
+          <h3 className="text-sm font-medium text-slate-300">
+            Same-Day Booking Cutoff
+          </h3>
+
+          {/* Toggle for same-day cutoff */}
+          <button
+            onClick={() => setSameDayCutoffEnabled(!sameDayCutoffEnabled)}
+            className={cn(
+              "w-full p-4 rounded-xl border-2 text-left transition-all",
+              sameDayCutoffEnabled
+                ? "border-emerald-500 bg-emerald-500/10"
+                : "border-slate-700 bg-slate-800/30 hover:border-slate-600"
+            )}
+          >
+            <div className="flex items-center justify-between">
+              <div className="flex-1">
+                <h4
+                  className={cn(
+                    "font-semibold",
+                    sameDayCutoffEnabled ? "text-emerald-400" : "text-white"
+                  )}
+                >
+                  Require Prep Time for Cabins
+                </h4>
+                <p className="text-sm text-slate-400 mt-0.5">
+                  Cabins and lodging need 1 hour before office close for same-day bookings (for cleaning and key prep)
+                </p>
+              </div>
+
+              <div
+                className={cn(
+                  "relative w-11 h-6 rounded-full transition-colors ml-3",
+                  sameDayCutoffEnabled ? "bg-emerald-500" : "bg-slate-600"
+                )}
+              >
+                <motion.div
+                  layout
+                  transition={SPRING_CONFIG}
+                  className="absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full"
+                  style={{
+                    x: sameDayCutoffEnabled ? 20 : 0,
+                  }}
+                />
+              </div>
+            </div>
+          </button>
+
+          {/* Office close time - always shown since it's useful info */}
+          <div className="space-y-2">
+            <label className="text-sm text-slate-400">
+              Office closes at
+            </label>
+            <div className="flex gap-3">
+              {officeCloseTimeOptions.map((option) => {
+                const isSelected = officeClosesAt === option.value;
+
+                return (
+                  <motion.button
+                    key={option.value}
+                    onClick={() => setOfficeClosesAt(option.value)}
+                    whileHover={prefersReducedMotion ? {} : { scale: 1.05 }}
+                    whileTap={prefersReducedMotion ? {} : { scale: 0.95 }}
+                    className={cn(
+                      "flex-1 p-3 rounded-lg border-2 transition-all text-sm",
+                      isSelected
+                        ? "border-emerald-500 bg-emerald-500/10 text-emerald-400"
+                        : "border-slate-700 bg-slate-800/30 hover:border-slate-600 text-slate-300"
+                    )}
+                  >
+                    {option.label}
+                  </motion.button>
+                );
+              })}
+            </div>
+          </div>
+
+          {sameDayCutoffEnabled && (
+            <motion.div
+              initial={prefersReducedMotion ? {} : { opacity: 0, y: -10 }}
+              animate={prefersReducedMotion ? {} : { opacity: 1, y: 0 }}
+              className="text-xs text-slate-400 bg-slate-800/30 rounded-lg p-3 border border-slate-700"
+            >
+              <p className="mb-1">
+                <span className="text-emerald-400 font-medium">RV and tent sites:</span> Can be booked anytime
+              </p>
+              <p>
+                <span className="text-amber-400 font-medium">Cabins and lodging:</span> Must book at least 1 hour before office close for same-day stays
+              </p>
             </motion.div>
           )}
         </motion.div>

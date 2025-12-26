@@ -1384,6 +1384,13 @@ model FormTemplate {
   isRequired       Boolean            @default(true)
   allowSkipWithNote Boolean           @default(false)
 
+  // Conditional display rules (JSON array of conditions)
+  // Example: [{ "field": "pets", "operator": "greater_than", "value": 0 }]
+  // Fields: pets, adults, children, rigType, siteClassId, addOns
+  // Operators: equals, not_equals, greater_than, less_than, in, not_in, contains
+  displayConditions Json?              @default("[]")
+  conditionLogic    String             @default("all") // "all" = AND, "any" = OR
+
   // Validity settings
   validityDays     Int?               // null = never expires, otherwise days until re-signing needed
 

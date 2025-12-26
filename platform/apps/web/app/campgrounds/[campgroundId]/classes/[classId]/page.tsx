@@ -149,6 +149,7 @@ type EditFormState = {
   hookupsSewer: boolean;
   minNights: number | "";
   maxNights: number | "";
+  sameDayBookingCutoffMinutes: number | "" | null;
   petFriendly: boolean;
   accessible: boolean;
   isActive: boolean;
@@ -235,6 +236,7 @@ export default function SiteClassDetailPage() {
         rigMaxLength: data.rigMaxLength === "" ? null : data.rigMaxLength,
         minNights: data.minNights === "" ? null : data.minNights,
         maxNights: data.maxNights === "" ? null : data.maxNights,
+        sameDayBookingCutoffMinutes: data.sameDayBookingCutoffMinutes === "" ? null : data.sameDayBookingCutoffMinutes,
         hookupsPower: data.hookupsPower,
         hookupsWater: data.hookupsWater,
         hookupsSewer: data.hookupsSewer,
@@ -290,6 +292,7 @@ export default function SiteClassDetailPage() {
       hookupsSewer: !!sc.hookupsSewer,
       minNights: sc.minNights ?? "",
       maxNights: sc.maxNights ?? "",
+      sameDayBookingCutoffMinutes: sc.sameDayBookingCutoffMinutes ?? "",
       petFriendly: sc.petFriendly !== false,
       accessible: !!sc.accessible,
       isActive: sc.isActive !== false,
@@ -589,6 +592,28 @@ export default function SiteClassDetailPage() {
                         placeholder="No maximum"
                         className="bg-background"
                       />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label>Same-Day Booking Cutoff</Label>
+                      <div className="flex items-center gap-2">
+                        <Input
+                          type="number"
+                          min="0"
+                          value={editForm.sameDayBookingCutoffMinutes}
+                          onChange={(e) => setEditForm({ ...editForm, sameDayBookingCutoffMinutes: e.target.value === "" ? "" : parseInt(e.target.value) })}
+                          placeholder="0"
+                          className="bg-background w-24"
+                        />
+                        <span className="text-sm text-muted-foreground">minutes before office close</span>
+                      </div>
+                      <p className="text-xs text-muted-foreground">
+                        {editForm.siteType === "rv" || editForm.siteType === "tent"
+                          ? "Default: No cutoff (RV/tent sites can book anytime)"
+                          : "Default: 60 minutes (cabin/lodging need prep time)"}
+                      </p>
                     </div>
                   </div>
                 </CardContent>
@@ -1025,6 +1050,16 @@ export default function SiteClassDetailPage() {
                     <div>
                       <div className="text-xs text-muted-foreground">Max nights</div>
                       <div className="font-medium">{siteClass.maxNights ?? "—"}</div>
+                    </div>
+                    <div>
+                      <div className="text-xs text-muted-foreground">Same-day cutoff</div>
+                      <div className="font-medium">
+                        {siteClass.sameDayBookingCutoffMinutes != null
+                          ? `${siteClass.sameDayBookingCutoffMinutes} min before close`
+                          : (siteClass.siteType === "cabin" || siteClass.siteType === "lodging" || siteClass.siteType === "glamping")
+                            ? "60 min (default)"
+                            : "No cutoff"}
+                      </div>
                     </div>
                   </CardContent>
                 </Card>

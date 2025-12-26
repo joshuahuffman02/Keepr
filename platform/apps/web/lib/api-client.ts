@@ -4949,6 +4949,16 @@ export const apiClient = {
     description?: string;
     fields?: Record<string, any>;
     isActive?: boolean;
+    autoAttachMode?: "manual" | "all_bookings" | "site_classes";
+    siteClassIds?: string[];
+    showAt?: string[];
+    isRequired?: boolean;
+    allowSkipWithNote?: boolean;
+    validityDays?: number | null;
+    sendReminder?: boolean;
+    reminderDaysBefore?: number | null;
+    displayConditions?: Array<{ field: string; operator: string; value: string | number | string[] }>;
+    conditionLogic?: "all" | "any";
   }) {
     const res = await fetch(`${API_BASE}/forms`, {
       method: "POST",
@@ -4964,6 +4974,16 @@ export const apiClient = {
     description?: string | null;
     fields?: Record<string, any> | null;
     isActive?: boolean;
+    autoAttachMode?: "manual" | "all_bookings" | "site_classes";
+    siteClassIds?: string[];
+    showAt?: string[];
+    isRequired?: boolean;
+    allowSkipWithNote?: boolean;
+    validityDays?: number | null;
+    sendReminder?: boolean;
+    reminderDaysBefore?: number | null;
+    displayConditions?: Array<{ field: string; operator: string; value: string | number | string[] }>;
+    conditionLogic?: "all" | "any";
   }>) {
     const res = await fetch(`${API_BASE}/forms/${id}`, {
       method: "PATCH",

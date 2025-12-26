@@ -462,8 +462,20 @@ export class OnboardingService {
             longTermEnabled: rulesData.longTermEnabled ?? false,
             longTermMinNights: rulesData.longTermMinNights || 28,
             longTermAutoApply: rulesData.longTermAutoApply ?? true,
+            officeClosesAt: rulesData.officeClosesAt || "17:00",
           },
         });
+
+        // If same-day cutoff is disabled, set all site classes to have no cutoff
+        if (rulesData.sameDayCutoffEnabled === false) {
+          await this.prisma.siteClass.updateMany({
+            where: { campgroundId },
+            data: { sameDayBookingCutoffMinutes: 0 },
+          });
+          this.logger.log(`Disabled same-day booking cutoffs for all site classes in campground ${campgroundId}`);
+        }
+        // If enabled, leave as null so defaults apply (RV=0, cabin=60)
+
         this.logger.log(`Updated booking rules for campground ${campgroundId}`);
       }
 

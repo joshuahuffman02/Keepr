@@ -1106,9 +1106,6 @@ export default function OtaSettingsPage() {
                                 <TableRow key={site.id} className={hasChanged ? "bg-amber-50/50" : ""}>
                                   <TableCell>
                                     <div className="font-medium">{site.name}</div>
-                                    {site.siteClass?.name && (
-                                      <div className="text-xs text-slate-500">{site.siteClass.name}</div>
-                                    )}
                                   </TableCell>
                                   <TableCell>
                                     <Input

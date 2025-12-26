@@ -167,6 +167,13 @@ export const FormTemplateSchema = z.object({
   showAt: z.array(z.enum(["during_booking", "at_checkin", "after_booking", "on_demand"])).default(["during_booking"]).optional(),
   isRequired: z.boolean().default(true).optional(),
   allowSkipWithNote: z.boolean().default(false).optional(),
+  // Conditional display rules
+  displayConditions: z.array(z.object({
+    field: z.enum(["pets", "adults", "children", "rigType", "siteClassId", "addOns", "stayLength"]),
+    operator: z.enum(["equals", "not_equals", "greater_than", "less_than", "in", "not_in", "contains"]),
+    value: z.union([z.string(), z.number(), z.array(z.string())])
+  })).default([]).optional(),
+  conditionLogic: z.enum(["all", "any"]).default("all").optional(),
   // Validity settings
   validityDays: z.number().int().nullish(),
   // Reminder settings
