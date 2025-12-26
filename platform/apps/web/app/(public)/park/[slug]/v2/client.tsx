@@ -795,14 +795,15 @@ export function CampgroundV2Client({ slug, initialData, previewToken }: { slug: 
                 </div>
                 <div className="grid gap-3 md:grid-cols-2">
                   {valueStack.bonuses.map((b: any) => {
-                    const IconComponent = {
+                    const bonusIconMap: Record<string, typeof Flame> = {
                       "flame": Flame,
                       "coffee": Coffee,
                       "tent": Tent,
                       "map-pin": MapPin,
                       "gift": Gift,
                       "sparkles": Sparkles,
-                    }[b.iconName] || Gift;
+                    };
+                    const IconComponent = bonusIconMap[b.iconName as string] || Gift;
                     return (
                       <div key={b.id} className="flex items-center gap-3 p-3 bg-white/60 rounded-lg">
                         <div className="w-8 h-8 bg-amber-100 rounded-full flex items-center justify-center flex-shrink-0">
