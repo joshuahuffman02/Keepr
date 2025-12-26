@@ -27,7 +27,6 @@ import { CreateEventDialog } from "../../components/events/CreateEventDialog";
 import { Event } from "@campreserv/shared";
 import { cn } from "../../lib/utils";
 import { Skeleton } from "../../components/ui/skeleton";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../components/ui/select";
 
 const locales = {
     "en-US": enUS,
@@ -359,10 +358,9 @@ export default function ActivitiesPage() {
         name: "",
         description: "",
         price: "",
-        duration: "",
-        capacity: "",
-        imageUrl: "",
-        category: "recreation"
+        duration: "60",
+        capacity: "20",
+        imageUrl: ""
     });
 
     const [selectedActivityForSessions, setSelectedActivityForSessions] = useState<string | null>(null);
@@ -421,11 +419,12 @@ export default function ActivitiesPage() {
     const createMutation = useMutation({
         mutationFn: async () => {
             return apiClient.createActivity(campgroundId, {
-                ...newActivity,
-                price: parseFloat(newActivity.price) * 100,
-                duration: parseInt(newActivity.duration),
-                capacity: parseInt(newActivity.capacity),
-                imageUrl: newActivity.imageUrl || undefined
+                name: newActivity.name,
+                description: newActivity.description || undefined,
+                price: Math.round(parseFloat(newActivity.price || "0") * 100),
+                duration: parseInt(newActivity.duration) || 60,
+                capacity: parseInt(newActivity.capacity) || 20,
+                images: newActivity.imageUrl ? [newActivity.imageUrl] : []
             });
         },
         onSuccess: () => {
@@ -433,11 +432,12 @@ export default function ActivitiesPage() {
             setCelebrationName(newActivity.name);
             setShowCelebration(true);
             setIsCreateOpen(false);
-            setNewActivity({ name: "", description: "", price: "", duration: "", capacity: "", imageUrl: "", category: "recreation" });
+            setNewActivity({ name: "", description: "", price: "", duration: "60", capacity: "20", imageUrl: "" });
             toast({ title: "Activity created!", description: "Now schedule some sessions to get started." });
         },
-        onError: () => {
-            toast({ title: "Failed to create activity", variant: "destructive" });
+        onError: (err: any) => {
+            console.error("Create activity error:", err);
+            toast({ title: "Failed to create activity", description: err?.message || "Please try again", variant: "destructive" });
         }
     });
 
@@ -663,25 +663,6 @@ export default function ActivitiesPage() {
                                 onChange={(e) => setNewActivity({ ...newActivity, name: e.target.value })}
                                 placeholder="e.g. Morning Yoga by the Lake"
                             />
-                        </div>
-
-                        <div className="grid gap-2">
-                            <Label htmlFor="activity-category">Category</Label>
-                            <Select
-                                value={newActivity.category}
-                                onValueChange={(val) => setNewActivity({ ...newActivity, category: val })}
-                            >
-                                <SelectTrigger id="activity-category">
-                                    <SelectValue />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value="recreation">Recreation</SelectItem>
-                                    <SelectItem value="nature">Nature & Outdoors</SelectItem>
-                                    <SelectItem value="water">Water Activities</SelectItem>
-                                    <SelectItem value="food">Food & Dining</SelectItem>
-                                    <SelectItem value="music">Entertainment</SelectItem>
-                                </SelectContent>
-                            </Select>
                         </div>
 
                         <div className="grid gap-2">
