@@ -2,6 +2,7 @@
   "compilerOptions": {
     "rootDir": "./src",
     "module": "CommonJS",
+    "moduleResolution": "node",
     "declaration": true,
     "removeComments": true,
     "emitDecoratorMetadata": true,
@@ -20,6 +21,12 @@
       ],
       "@/shared": [
         "../../../packages/shared/src"
+      ],
+      "@prisma/client": [
+        "src/generated/prisma"
+      ],
+      "@prisma/client/*": [
+        "src/generated/prisma/*"
       ]
     },
     "incremental": true,

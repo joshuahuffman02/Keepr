@@ -1,178 +1,361 @@
-import { Injectable } from "@nestjs/common";
-import { randomUUID } from "crypto";
+import { Injectable, NotFoundException } from "@nestjs/common";
+import { PrismaService } from "../prisma/prisma.service";
+import { ApprovalStatus, Prisma, UserRole } from "@prisma/client";
 
-type ApprovalStatus = "pending" | "pending_second" | "approved" | "rejected";
-
-type ApprovalRequest = {
-  id: string;
-  type: "refund" | "payout" | "config_change";
-  amount: number;
-  currency: string;
-  status: ApprovalStatus;
-  reason: string;
-  requester: string;
-  approvals: { approver: string; at: string }[];
-  requiredApprovals: number;
-  metadata?: Record<string, any>;
-  createdAt: string;
-  updatedAt: string;
-  policyId: string;
-};
-
-type ApprovalPolicy = {
-  id: string;
-  name: string;
-  appliesTo: ("refund" | "payout" | "config_change")[];
-  thresholdCents?: number;
-  currency: string;
-  approversNeeded: number;
-  description: string;
-};
+type ApprovalEntry = { approver: string; at: string };
 
 @Injectable()
 export class ApprovalsService {
-  private readonly policies: ApprovalPolicy[] = [
-    {
-      id: "policy-refund",
-      name: "Refunds over $250",
-      appliesTo: ["refund"],
-      thresholdCents: 25000,
-      currency: "USD",
-      approversNeeded: 2,
-      description: "Dual control for refunds above $250 or cross-currency refunds.",
-    },
-    {
-      id: "policy-payout",
-      name: "Payout releases",
-      appliesTo: ["payout"],
-      approversNeeded: 2,
-      currency: "USD",
-      description: "Require two approvers for operator payouts.",
-    },
-    {
-      id: "policy-config",
-      name: "High-value config",
-      appliesTo: ["config_change"],
-      approversNeeded: 1,
-      currency: "USD",
-      description: "Pricing/tax/currency changes above safe threshold.",
-    },
-  ];
+  constructor(private readonly prisma: PrismaService) {}
 
-  private readonly requests: ApprovalRequest[] = [
-    {
-      id: "ap-001",
-      type: "refund",
-      amount: 27500,
-      currency: "USD",
-      status: "pending",
-      reason: "Refund for early departure (Reservation #R-1042)",
-      requester: "Alex Rivera",
-      approvals: [],
-      requiredApprovals: 2,
-      metadata: { reservationId: "R-1042", guest: "Morgan Lee" },
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-      policyId: "policy-refund",
-    },
-    {
-      id: "ap-002",
-      type: "payout",
-      amount: 128500,
-      currency: "USD",
-      status: "pending_second",
-      reason: "Weekly operator payout",
-      requester: "Finance Bot",
-      approvals: [{ approver: "Dana W.", at: new Date(Date.now() - 5 * 60 * 1000).toISOString() }],
-      requiredApprovals: 2,
-      metadata: { period: "2025-12-01 → 2025-12-07" },
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-      policyId: "policy-payout",
-    },
-    {
-      id: "ap-003",
-      type: "config_change",
-      amount: 0,
-      currency: "USD",
-      status: "pending",
-      reason: "Toggle VAT-inclusive pricing for EU parks",
-      requester: "Compliance",
-      approvals: [],
-      requiredApprovals: 1,
-      metadata: { portfolioId: "pf-continental", parkIds: ["cg-alpine"] },
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-      policyId: "policy-config",
-    },
-  ];
+  async list(campgroundId?: string) {
+    const where: Prisma.ApprovalRequestWhereInput = campgroundId
+      ? { campgroundId }
+      : {};
 
-  list() {
-    return { requests: this.requests, policies: this.policies };
+    const [requests, policies] = await Promise.all([
+      this.prisma.approvalRequest.findMany({
+        where,
+        orderBy: { createdAt: "desc" },
+      }),
+      this.prisma.approvalPolicy.findMany({
+        where: campgroundId ? { OR: [{ campgroundId }, { campgroundId: null }] } : {},
+        orderBy: { createdAt: "desc" },
+      }),
+    ]);
+
+    // Transform to match frontend expectations
+    const transformedRequests = requests.map((r) => ({
+      id: r.id,
+      type: r.action as "refund" | "payout" | "config_change",
+      amount: r.amount,
+      currency: r.currency,
+      status: r.status,
+      reason: r.reason || "",
+      requester: r.requesterName || r.requestedBy,
+      approvals: (r.approvals as ApprovalEntry[]) || [],
+      requiredApprovals: r.requiredApprovals,
+      metadata: r.payload as Record<string, any>,
+      createdAt: r.createdAt.toISOString(),
+      updatedAt: r.updatedAt.toISOString(),
+      policyId: r.policyId,
+    }));
+
+    const transformedPolicies = policies.map((p) => ({
+      id: p.id,
+      name: p.name,
+      appliesTo: p.appliesTo as ("refund" | "payout" | "config_change")[],
+      thresholdCents: p.thresholdCents,
+      currency: p.currency,
+      approversNeeded: p.approversNeeded,
+      description: p.description || "",
+      isActive: p.isActive,
+      approverRoles: p.approverRoles,
+      campgroundId: p.campgroundId,
+    }));
+
+    return { requests: transformedRequests, policies: transformedPolicies };
   }
 
-  create(payload: {
-    type: ApprovalRequest["type"];
+  async create(payload: {
+    type: "refund" | "payout" | "config_change";
     amount: number;
     currency: string;
     reason: string;
     requester: string;
     metadata?: Record<string, any>;
+    campgroundId?: string;
+    requestedBy: string;
   }) {
-    const policy = this.resolvePolicy(payload.type, payload.amount, payload.currency);
+    // Find matching policy
+    const policy = await this.resolvePolicy(
+      payload.type,
+      payload.amount,
+      payload.currency,
+      payload.campgroundId
+    );
+
     const requiredApprovals = policy?.approversNeeded ?? 1;
-    const request: ApprovalRequest = {
-      id: randomUUID(),
-      type: payload.type,
-      amount: payload.amount,
-      currency: payload.currency,
-      status: "pending",
-      reason: payload.reason,
-      requester: payload.requester,
+
+    const request = await this.prisma.approvalRequest.create({
+      data: {
+        campgroundId: payload.campgroundId,
+        action: payload.type,
+        requestedBy: payload.requestedBy,
+        requesterName: payload.requester,
+        amount: Math.round(payload.amount * 100), // Convert to cents
+        currency: payload.currency,
+        reason: payload.reason,
+        payload: payload.metadata ?? {},
+        status: "pending",
+        requiredApprovals,
+        approvals: [],
+        policyId: policy?.id,
+      },
+    });
+
+    return {
+      id: request.id,
+      type: request.action,
+      amount: request.amount,
+      currency: request.currency,
+      status: request.status,
+      reason: request.reason,
+      requester: request.requesterName,
       approvals: [],
-      requiredApprovals,
-      metadata: payload.metadata,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-      policyId: policy?.id ?? "policy-manual",
+      requiredApprovals: request.requiredApprovals,
+      metadata: request.payload,
+      createdAt: request.createdAt.toISOString(),
+      updatedAt: request.updatedAt.toISOString(),
+      policyId: request.policyId,
     };
-    this.requests.unshift(request);
-    return request;
   }
 
-  approve(id: string, approver: string) {
-    const request = this.requests.find((r) => r.id === id);
-    if (!request) return null;
-    const already = request.approvals.some((a) => a.approver === approver);
-    if (!already) {
-      request.approvals.push({ approver, at: new Date().toISOString() });
+  async approve(id: string, approver: string) {
+    const request = await this.prisma.approvalRequest.findUnique({
+      where: { id },
+    });
+
+    if (!request) {
+      throw new NotFoundException(`Approval request ${id} not found`);
     }
-    const approvalsCount = request.approvals.length;
-    request.status = approvalsCount >= request.requiredApprovals ? "approved" : "pending_second";
-    request.updatedAt = new Date().toISOString();
-    return request;
+
+    const existingApprovals = (request.approvals as ApprovalEntry[]) || [];
+    const alreadyApproved = existingApprovals.some((a) => a.approver === approver);
+
+    let newApprovals = existingApprovals;
+    if (!alreadyApproved) {
+      newApprovals = [...existingApprovals, { approver, at: new Date().toISOString() }];
+    }
+
+    const approvalsCount = newApprovals.length;
+    const newStatus: ApprovalStatus =
+      approvalsCount >= request.requiredApprovals ? "approved" : "pending_second";
+
+    const updated = await this.prisma.approvalRequest.update({
+      where: { id },
+      data: {
+        approvals: newApprovals,
+        status: newStatus,
+        decidedBy: newStatus === "approved" ? approver : undefined,
+        decidedAt: newStatus === "approved" ? new Date() : undefined,
+      },
+    });
+
+    return {
+      id: updated.id,
+      type: updated.action,
+      amount: updated.amount,
+      currency: updated.currency,
+      status: updated.status,
+      reason: updated.reason,
+      requester: updated.requesterName,
+      approvals: newApprovals,
+      requiredApprovals: updated.requiredApprovals,
+      metadata: updated.payload,
+      createdAt: updated.createdAt.toISOString(),
+      updatedAt: updated.updatedAt.toISOString(),
+      policyId: updated.policyId,
+    };
   }
 
-  reject(id: string, approver: string, reason?: string) {
-    const request = this.requests.find((r) => r.id === id);
-    if (!request) return null;
-    request.status = "rejected";
-    request.updatedAt = new Date().toISOString();
-    request.metadata = { ...request.metadata, rejectionReason: reason, rejectedBy: approver };
-    return request;
+  async reject(id: string, approver: string, reason?: string) {
+    const request = await this.prisma.approvalRequest.findUnique({
+      where: { id },
+    });
+
+    if (!request) {
+      throw new NotFoundException(`Approval request ${id} not found`);
+    }
+
+    const updated = await this.prisma.approvalRequest.update({
+      where: { id },
+      data: {
+        status: "rejected",
+        decidedBy: approver,
+        decidedAt: new Date(),
+        payload: {
+          ...((request.payload as Record<string, any>) || {}),
+          rejectionReason: reason,
+          rejectedBy: approver,
+        },
+      },
+    });
+
+    return {
+      id: updated.id,
+      type: updated.action,
+      amount: updated.amount,
+      currency: updated.currency,
+      status: updated.status,
+      reason: updated.reason,
+      requester: updated.requesterName,
+      approvals: (updated.approvals as ApprovalEntry[]) || [],
+      requiredApprovals: updated.requiredApprovals,
+      metadata: updated.payload,
+      createdAt: updated.createdAt.toISOString(),
+      updatedAt: updated.updatedAt.toISOString(),
+      policyId: updated.policyId,
+    };
   }
 
-  policiesList() {
-    return this.policies;
+  async policiesList(campgroundId?: string) {
+    const policies = await this.prisma.approvalPolicy.findMany({
+      where: campgroundId
+        ? { OR: [{ campgroundId }, { campgroundId: null }] }
+        : {},
+      orderBy: { createdAt: "desc" },
+    });
+
+    return policies.map((p) => ({
+      id: p.id,
+      name: p.name,
+      appliesTo: p.appliesTo,
+      thresholdCents: p.thresholdCents,
+      currency: p.currency,
+      approversNeeded: p.approversNeeded,
+      description: p.description,
+      isActive: p.isActive,
+      approverRoles: p.approverRoles,
+      campgroundId: p.campgroundId,
+    }));
   }
 
-  private resolvePolicy(type: ApprovalRequest["type"], amount: number, currency: string) {
-    return this.policies.find((p) => {
+  // Policy CRUD operations
+  async createPolicy(payload: {
+    name: string;
+    appliesTo: string[];
+    thresholdCents?: number;
+    currency?: string;
+    approversNeeded?: number;
+    description?: string;
+    approverRoles?: UserRole[];
+    campgroundId?: string;
+    createdById?: string;
+  }) {
+    // Get the primary action (first in appliesTo array)
+    const action = payload.appliesTo[0] || "config_change";
+
+    const policy = await this.prisma.approvalPolicy.create({
+      data: {
+        name: payload.name,
+        action,
+        appliesTo: payload.appliesTo,
+        thresholdCents: payload.thresholdCents,
+        currency: payload.currency ?? "USD",
+        approversNeeded: payload.approversNeeded ?? 1,
+        description: payload.description,
+        approverRoles: payload.approverRoles ?? [],
+        campgroundId: payload.campgroundId,
+        createdById: payload.createdById,
+      },
+    });
+
+    return {
+      id: policy.id,
+      name: policy.name,
+      appliesTo: policy.appliesTo,
+      thresholdCents: policy.thresholdCents,
+      currency: policy.currency,
+      approversNeeded: policy.approversNeeded,
+      description: policy.description,
+      isActive: policy.isActive,
+      approverRoles: policy.approverRoles,
+      campgroundId: policy.campgroundId,
+    };
+  }
+
+  async updatePolicy(
+    id: string,
+    payload: {
+      name?: string;
+      appliesTo?: string[];
+      thresholdCents?: number | null;
+      currency?: string;
+      approversNeeded?: number;
+      description?: string | null;
+      approverRoles?: UserRole[];
+      isActive?: boolean;
+    }
+  ) {
+    const existing = await this.prisma.approvalPolicy.findUnique({
+      where: { id },
+    });
+
+    if (!existing) {
+      throw new NotFoundException(`Policy ${id} not found`);
+    }
+
+    const policy = await this.prisma.approvalPolicy.update({
+      where: { id },
+      data: {
+        name: payload.name,
+        action: payload.appliesTo?.[0] ?? existing.action,
+        appliesTo: payload.appliesTo,
+        thresholdCents: payload.thresholdCents,
+        currency: payload.currency,
+        approversNeeded: payload.approversNeeded,
+        description: payload.description,
+        approverRoles: payload.approverRoles,
+        isActive: payload.isActive,
+      },
+    });
+
+    return {
+      id: policy.id,
+      name: policy.name,
+      appliesTo: policy.appliesTo,
+      thresholdCents: policy.thresholdCents,
+      currency: policy.currency,
+      approversNeeded: policy.approversNeeded,
+      description: policy.description,
+      isActive: policy.isActive,
+      approverRoles: policy.approverRoles,
+      campgroundId: policy.campgroundId,
+    };
+  }
+
+  async deletePolicy(id: string) {
+    const existing = await this.prisma.approvalPolicy.findUnique({
+      where: { id },
+    });
+
+    if (!existing) {
+      throw new NotFoundException(`Policy ${id} not found`);
+    }
+
+    await this.prisma.approvalPolicy.delete({
+      where: { id },
+    });
+
+    return { success: true, id };
+  }
+
+  private async resolvePolicy(
+    type: string,
+    amountCents: number,
+    currency: string,
+    campgroundId?: string
+  ) {
+    // First try campground-specific policies, then fall back to global
+    const policies = await this.prisma.approvalPolicy.findMany({
+      where: {
+        isActive: true,
+        OR: campgroundId
+          ? [{ campgroundId }, { campgroundId: null }]
+          : [{ campgroundId: null }],
+      },
+      orderBy: [
+        { campgroundId: "desc" }, // Campground-specific first
+        { thresholdCents: "desc" }, // Higher thresholds first
+      ],
+    });
+
+    return policies.find((p) => {
       const matchesType = p.appliesTo.includes(type);
       const matchesCurrency = !p.currency || p.currency === currency;
-      const meetsThreshold = p.thresholdCents ? amount * 100 >= p.thresholdCents : true;
+      const meetsThreshold = p.thresholdCents ? amountCents >= p.thresholdCents : true;
       return matchesType && matchesCurrency && meetsThreshold;
     });
   }
 }
-

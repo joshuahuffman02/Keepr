@@ -255,7 +255,6 @@ export default function CampgroundMapPage() {
             isLoading={mapQuery.isLoading || sitesQuery.isLoading}
             onSaved={() => mapQuery.refetch()}
             className="w-full"
-            autoFullscreen
           />
 
           <div className="grid gap-2">

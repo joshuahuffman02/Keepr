@@ -1342,11 +1342,14 @@ const ApprovalRequestSchema = z.object({
 const ApprovalPolicySchema = z.object({
   id: z.string(),
   name: z.string(),
-  appliesTo: z.array(z.enum(["refund", "payout", "config_change"])),
+  appliesTo: z.array(z.string()),
   thresholdCents: z.number().nullable().optional(),
   currency: z.string().nullable().optional(),
   approversNeeded: z.number(),
-  description: z.string(),
+  description: z.string().nullable().optional(),
+  isActive: z.boolean().optional(),
+  approverRoles: z.array(z.string()).optional(),
+  campgroundId: z.string().nullable().optional(),
 });
 
 const ApprovalListSchema = z.object({
@@ -6948,6 +6951,49 @@ export const apiClient = {
     });
     const data = await parseResponse<unknown>(res);
     return ApprovalRequestSchema.parse(data);
+  },
+  async createApprovalPolicy(payload: {
+    name: string;
+    appliesTo: string[];
+    thresholdCents?: number;
+    currency?: string;
+    approversNeeded?: number;
+    description?: string;
+    approverRoles?: string[];
+    campgroundId?: string;
+  }) {
+    const res = await fetch(`${API_BASE}/approvals/policies`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", ...scopedHeaders() },
+      body: JSON.stringify(payload),
+    });
+    const data = await parseResponse<unknown>(res);
+    return ApprovalPolicySchema.parse(data);
+  },
+  async updateApprovalPolicy(id: string, payload: {
+    name?: string;
+    appliesTo?: string[];
+    thresholdCents?: number | null;
+    currency?: string;
+    approversNeeded?: number;
+    description?: string | null;
+    approverRoles?: string[];
+    isActive?: boolean;
+  }) {
+    const res = await fetch(`${API_BASE}/approvals/policies/${id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json", ...scopedHeaders() },
+      body: JSON.stringify(payload),
+    });
+    const data = await parseResponse<unknown>(res);
+    return ApprovalPolicySchema.parse(data);
+  },
+  async deleteApprovalPolicy(id: string) {
+    const res = await fetch(`${API_BASE}/approvals/policies/${id}`, {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json", ...scopedHeaders() },
+    });
+    return parseResponse<{ success: boolean; id: string }>(res);
   },
 
   // ---------------------------------------------------------------------------

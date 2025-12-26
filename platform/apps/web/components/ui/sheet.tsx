@@ -144,7 +144,7 @@ export function SheetContent({ side = "bottom", className, children }: SheetCont
     <div
       ref={contentRef}
       className={cn(
-        "fixed z-50 bg-white shadow-lg",
+        "fixed z-50 bg-white dark:bg-slate-900 shadow-lg border-slate-200 dark:border-slate-800 p-6",
         "data-[state=open]:animate-in data-[state=closed]:animate-out",
         "data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
         "data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95",
@@ -152,7 +152,7 @@ export function SheetContent({ side = "bottom", className, children }: SheetCont
         animationStyles[side],
         side === "bottom" && "rounded-t-2xl max-h-[85vh]",
         side === "top" && "rounded-b-2xl",
-        (side === "left" || side === "right") && "w-3/4 sm:max-w-sm",
+        (side === "left" || side === "right") && "w-3/4 sm:max-w-sm h-full",
         className
       )}
       data-state={isOpen ? "open" : "closed"}
@@ -186,7 +186,7 @@ interface SheetTitleProps {
 
 export function SheetTitle({ className, children }: SheetTitleProps) {
   return (
-    <h2 className={cn("text-lg font-semibold text-slate-900", className)}>
+    <h2 className={cn("text-lg font-semibold text-slate-900 dark:text-slate-100", className)}>
       {children}
     </h2>
   );
@@ -199,8 +199,70 @@ interface SheetDescriptionProps {
 
 export function SheetDescription({ className, children }: SheetDescriptionProps) {
   return (
-    <p className={cn("text-sm text-slate-500", className)}>
+    <p className={cn("text-sm text-slate-500 dark:text-slate-400", className)}>
       {children}
     </p>
+  );
+}
+
+interface SheetTriggerProps {
+  asChild?: boolean;
+  className?: string;
+  children: React.ReactNode;
+  onClick?: () => void;
+}
+
+export function SheetTrigger({ asChild, className, children, onClick }: SheetTriggerProps) {
+  if (asChild && React.isValidElement(children)) {
+    return React.cloneElement(children as React.ReactElement<any>, {
+      onClick: (e: React.MouseEvent) => {
+        (children as React.ReactElement<any>).props.onClick?.(e);
+        onClick?.();
+      },
+    });
+  }
+
+  return (
+    <button className={className} onClick={onClick} type="button">
+      {children}
+    </button>
+  );
+}
+
+interface SheetFooterProps {
+  className?: string;
+  children: React.ReactNode;
+}
+
+export function SheetFooter({ className, children }: SheetFooterProps) {
+  return (
+    <div className={cn("flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2 pt-4", className)}>
+      {children}
+    </div>
+  );
+}
+
+interface SheetCloseProps {
+  asChild?: boolean;
+  className?: string;
+  children: React.ReactNode;
+}
+
+export function SheetClose({ asChild, className, children }: SheetCloseProps) {
+  const { onClose } = useSheet();
+
+  if (asChild && React.isValidElement(children)) {
+    return React.cloneElement(children as React.ReactElement<any>, {
+      onClick: (e: React.MouseEvent) => {
+        (children as React.ReactElement<any>).props.onClick?.(e);
+        onClose();
+      },
+    });
+  }
+
+  return (
+    <button className={className} onClick={onClose} type="button">
+      {children}
+    </button>
   );
 }

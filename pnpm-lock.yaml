@@ -31,6 +31,7 @@ importers:
       '@nestjs/common': ^10.4.7
       '@nestjs/config': ^4.0.2
       '@nestjs/core': ^10.4.7
+      '@nestjs/event-emitter': ^3.0.1
       '@nestjs/jwt': ^11.0.1
       '@nestjs/mapped-types': ^2.1.0
       '@nestjs/passport': ^11.0.5
@@ -97,6 +98,7 @@ importers:
       '@nestjs/common': 10.4.20_26q5nehxwcs3ri7zvy3wttpjeq
       '@nestjs/config': 4.0.2_d7wabo3ln2lhn3a3ctrkkbwyym
       '@nestjs/core': 10.4.20_ckonxzgiymdtimkdiovrfjr6qq
+      '@nestjs/event-emitter': 3.0.1_l3i2k2xw4clhrdvjqjgazkkhem
       '@nestjs/jwt': 11.0.2_@nestjs+common@10.4.20
       '@nestjs/mapped-types': 2.1.0_eiwrp7x4xiudcolzvgiuea32fu
       '@nestjs/passport': 11.0.5_75sjdtrruloki726al4bmxmt4i
@@ -3171,6 +3173,17 @@ packages:
       uid: 2.0.2
     transitivePeerDependencies:
       - encoding
+
+  /@nestjs/event-emitter/3.0.1_l3i2k2xw4clhrdvjqjgazkkhem:
+    resolution: {integrity: sha512-0Ln/x+7xkU6AJFOcQI9tIhUMXVF7D5itiaQGOyJbXtlAfAIt8gzDdJm+Im7cFzKoWkiW5nCXCPh6GSvdQd/3Dw==}
+    peerDependencies:
+      '@nestjs/common': ^10.0.0 || ^11.0.0
+      '@nestjs/core': ^10.0.0 || ^11.0.0
+    dependencies:
+      '@nestjs/common': 10.4.20_26q5nehxwcs3ri7zvy3wttpjeq
+      '@nestjs/core': 10.4.20_ckonxzgiymdtimkdiovrfjr6qq
+      eventemitter2: 6.4.9
+    dev: false
 
   /@nestjs/jwt/11.0.2_@nestjs+common@10.4.20:
     resolution: {integrity: sha512-rK8aE/3/Ma45gAWfCksAXUNbOoSOUudU0Kn3rT39htPF7wsYXtKfjALKeKKJbFrIWbLjsbqfXX5bIJNvgBugGA==}
@@ -8557,6 +8570,10 @@ packages:
   /etag/1.8.1:
     resolution: {integrity: sha512-aIL5Fx7mawVa300al2BnEE4iNvo1qETxLrPI/o05L7z6go7fCw1J6EQmbK4FmJ2AS7kgVF/KEZWufBfdClMcPg==}
     engines: {node: '>= 0.6'}
+
+  /eventemitter2/6.4.9:
+    resolution: {integrity: sha512-JEPTiaOt9f04oa6NOkc4aH+nVp5I3wEjpHbIPqfgCdD5v5bUzy7xQqwcVO2aDQgOWhI28da57HksMrzK9HlRxg==}
+    dev: false
 
   /eventemitter3/4.0.7:
     resolution: {integrity: sha512-8guHBZCwKnFhYdHr2ysuRWErTwhoN2X8XELRlrRwpmfeY2jjuUN4taQMsULKUVo1K4DvZl+0pgfyoysHxvmvEw==}

@@ -1758,6 +1758,70 @@ async function seedCampground(
   return cg;
 }
 
+async function seedApprovalPolicies() {
+  console.log("Seeding approval policies...");
+
+  // Delete existing policies first to avoid duplicates
+  await prisma.approvalPolicy.deleteMany({});
+
+  const policies = await prisma.$transaction([
+    // Global policies (no campgroundId)
+    prisma.approvalPolicy.create({
+      data: {
+        name: "Refunds over $250",
+        action: "refund",
+        appliesTo: ["refund"],
+        thresholdCents: 25000,
+        currency: "USD",
+        approversNeeded: 2,
+        description: "Dual control for refunds above $250. Requires two authorized staff members to approve.",
+        approverRoles: [UserRole.owner, UserRole.manager, UserRole.finance],
+        isActive: true
+      }
+    }),
+    prisma.approvalPolicy.create({
+      data: {
+        name: "Payout releases",
+        action: "payout",
+        appliesTo: ["payout"],
+        currency: "USD",
+        approversNeeded: 2,
+        description: "Require two approvers for all operator payouts to ensure financial oversight.",
+        approverRoles: [UserRole.owner, UserRole.finance],
+        isActive: true
+      }
+    }),
+    prisma.approvalPolicy.create({
+      data: {
+        name: "High-value config changes",
+        action: "config_change",
+        appliesTo: ["config_change"],
+        currency: "USD",
+        approversNeeded: 1,
+        description: "Pricing, tax, and currency changes require approval before taking effect.",
+        approverRoles: [UserRole.owner, UserRole.manager],
+        isActive: true
+      }
+    }),
+    prisma.approvalPolicy.create({
+      data: {
+        name: "Large refunds (over $1000)",
+        action: "refund",
+        appliesTo: ["refund"],
+        thresholdCents: 100000,
+        currency: "USD",
+        approversNeeded: 2,
+        description: "Additional oversight for refunds over $1,000. Requires owner approval.",
+        approverRoles: [UserRole.owner],
+        isActive: true
+      }
+    })
+  ]);
+
+  console.log(`  ✓ Created ${policies.length} approval policies`);
+  return policies;
+}
+
 async function main() {
   console.log("🌱 Starting seed...\n");
 
@@ -1773,6 +1837,9 @@ async function main() {
     });
   }
   console.log(`\n✓ Organization ready: ${org.name}\n`);
+
+  // Seed approval policies (global)
+  await seedApprovalPolicies();
 
   for (const cgConfig of seededCampgrounds) {
     console.log(`Seeding campground: ${cgConfig.name}`);

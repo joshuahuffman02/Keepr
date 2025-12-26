@@ -26,10 +26,10 @@ import {
 
 export class CreateOpTaskDto {
   @IsEnum(OpTaskCategory)
-  category: OpTaskCategory;
+  category!: OpTaskCategory;
 
   @IsString()
-  title: string;
+  title!: string;
 
   @IsOptional()
   @IsString()
@@ -140,13 +140,13 @@ export class UpdateOpTaskDto {
 
 export class ChecklistItemDto {
   @IsString()
-  id: string;
+  id!: string;
 
   @IsString()
-  text: string;
+  text!: string;
 
   @IsBoolean()
-  completed: boolean;
+  completed!: boolean;
 
   @IsOptional()
   @IsDateString()
@@ -163,7 +163,7 @@ export class ChecklistItemDto {
 
 export class PhotoDto {
   @IsString()
-  url: string;
+  url!: string;
 
   @IsOptional()
   @IsString()
@@ -236,14 +236,14 @@ export class OpTaskQueryDto {
 
 export class CreateOpTaskTemplateDto {
   @IsString()
-  name: string;
+  name!: string;
 
   @IsOptional()
   @IsString()
   description?: string;
 
   @IsEnum(OpTaskCategory)
-  category: OpTaskCategory;
+  category!: OpTaskCategory;
 
   @IsOptional()
   @IsEnum(OpTaskPriority)
@@ -356,10 +356,10 @@ export class UpdateOpTaskTemplateDto {
 
 export class ChecklistTemplateItemDto {
   @IsString()
-  id: string;
+  id!: string;
 
   @IsString()
-  text: string;
+  text!: string;
 
   @IsOptional()
   @IsBoolean()
@@ -377,7 +377,7 @@ export class ChecklistTemplateItemDto {
 
 export class SupplyItemDto {
   @IsString()
-  item: string;
+  item!: string;
 
   @IsOptional()
   @IsInt()
@@ -395,13 +395,13 @@ export class SupplyItemDto {
 
 export class CreateOpTaskTriggerDto {
   @IsString()
-  name: string;
+  name!: string;
 
   @IsEnum(OpTriggerEvent)
-  triggerEvent: OpTriggerEvent;
+  triggerEvent!: OpTriggerEvent;
 
   @IsString()
-  templateId: string;
+  templateId!: string;
 
   @IsOptional()
   conditions?: TriggerConditionsDto;
@@ -488,13 +488,13 @@ export class TriggerConditionsDto {
 
 export class CreateOpRecurrenceRuleDto {
   @IsString()
-  name: string;
+  name!: string;
 
   @IsString()
-  templateId: string;
+  templateId!: string;
 
   @IsEnum(OpRecurrencePattern)
-  pattern: OpRecurrencePattern;
+  pattern!: OpRecurrencePattern;
 
   @IsOptional()
   @IsArray()
@@ -609,7 +609,7 @@ export class UpdateOpRecurrenceRuleDto {
 
 export class CreateOpTeamDto {
   @IsString()
-  name: string;
+  name!: string;
 
   @IsOptional()
   @IsString()
@@ -640,7 +640,7 @@ export class UpdateOpTeamDto {
 
 export class AddTeamMemberDto {
   @IsString()
-  userId: string;
+  userId!: string;
 
   @IsOptional()
   @IsString()
@@ -653,5 +653,5 @@ export class AddTeamMemberDto {
 
 export class CreateOpTaskCommentDto {
   @IsString()
-  content: string;
+  content!: string;
 }

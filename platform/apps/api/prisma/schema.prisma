@@ -1,4 +1,4 @@
-// Prisma Client Generator - Cache bust: 2025-12-21-v4
+// Prisma Client Generator - Cache bust: 2025-12-26-v6
 generator client {
   provider = "prisma-client-js"
 }
@@ -3537,14 +3537,20 @@ model PiiFieldTag {
 }
 
 model ApprovalPolicy {
-  id            String     @id @default(cuid())
-  campgroundId  String?
-  resource      String
-  action        String
-  approverRoles UserRole[]
-  rationale     String?
-  createdById   String?
-  createdAt     DateTime   @default(now())
+  id              String     @id @default(cuid())
+  campgroundId    String?
+  name            String
+  action          String     // "refund", "payout", "config_change"
+  appliesTo       String[]   // Array of action types this policy covers
+  thresholdCents  Int?       // Amount threshold in cents (e.g., 25000 = $250)
+  currency        String     @default("USD")
+  approversNeeded Int        @default(1)
+  description     String?
+  isActive        Boolean    @default(true)
+  approverRoles   UserRole[]
+  createdById     String?
+  createdAt       DateTime   @default(now())
+  updatedAt       DateTime   @updatedAt
 
   campground Campground?       @relation(fields: [campgroundId], references: [id], onDelete: SetNull)
   createdBy  User?             @relation(fields: [createdById], references: [id], onDelete: SetNull)
@@ -3552,26 +3558,35 @@ model ApprovalPolicy {
 
   @@unique([campgroundId, action])
   @@index([campgroundId, action])
+  @@index([campgroundId, isActive])
 }
 
 model ApprovalRequest {
-  id            String         @id @default(cuid())
-  campgroundId  String?
-  action        String
-  requestedBy   String
-  resource      String?
-  targetId      String?
-  payload       Json?
-  justification String?
-  status        ApprovalStatus @default(pending)
-  decidedBy     String?
-  decidedAt     DateTime?
-  createdAt     DateTime       @default(now())
+  id                String         @id @default(cuid())
+  campgroundId      String?
+  action            String         // "refund", "payout", "config_change"
+  requestedBy       String
+  requesterName     String?
+  amount            Int            @default(0) // Amount in cents
+  currency          String         @default("USD")
+  reason            String?
+  resource          String?
+  targetId          String?
+  payload           Json?
+  status            ApprovalStatus @default(pending)
+  requiredApprovals Int            @default(1)
+  approvals         Json?          // Array of {approver, at} objects
+  decidedBy         String?
+  decidedAt         DateTime?
+  policyId          String?
+  createdAt         DateTime       @default(now())
+  updatedAt         DateTime       @updatedAt
 
   campground Campground?     @relation(fields: [campgroundId], references: [id], onDelete: Cascade)
   policy     ApprovalPolicy? @relation("ApprovalPolicy_campground_action", fields: [campgroundId, action], references: [campgroundId, action], onDelete: SetNull, onUpdate: Cascade, map: "ApprovalPolicy_campground_action")
 
   @@index([campgroundId, status])
+  @@index([policyId])
 }
 
 model PermissionRule {

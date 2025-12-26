@@ -111,6 +111,7 @@ import { KioskModule } from "./kiosk/kiosk.module";
 import { IdempotencyModule } from "./idempotency/idempotency.module";
 import { SecurityModule } from "./security/security.module";
 import { ValueStackModule } from "./value-stack/value-stack.module";
+import { OpTasksModule } from "./op-tasks/op-tasks.module";
 
 @Module({
   imports: [
@@ -226,6 +227,8 @@ import { ValueStackModule } from "./value-stack/value-stack.module";
     KioskModule,
     IdempotencyModule,
     ValueStackModule,
+    // Unified Operations / Task Management
+    OpTasksModule,
   ],
   providers: []
 })

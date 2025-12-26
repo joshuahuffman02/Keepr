@@ -17,6 +17,9 @@ import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger, SheetFooter, SheetClose } from "@/components/ui/sheet";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Textarea } from "@/components/ui/textarea";
 import { useWhoami } from "@/hooks/use-whoami";
 import { cn } from "@/lib/utils";
 import {
@@ -32,6 +35,10 @@ import {
   Loader2,
   AlertTriangle,
   PartyPopper,
+  Plus,
+  Pencil,
+  Trash2,
+  Shield,
 } from "lucide-react";
 
 const APPROVER_ROLES = new Set(["owner", "manager", "admin", "finance"]);
@@ -56,6 +63,36 @@ const DEFAULT_PREFERENCES: QueuePreferences = {
 };
 
 const SPRING_CONFIG = { type: "spring" as const, stiffness: 300, damping: 25 };
+
+const ACTION_TYPES = ["refund", "payout", "config_change"] as const;
+const ROLE_OPTIONS = [
+  { value: "owner", label: "Owner" },
+  { value: "manager", label: "Manager" },
+  { value: "finance", label: "Finance" },
+  { value: "front_desk", label: "Front Desk" },
+] as const;
+
+type PolicyFormData = {
+  name: string;
+  appliesTo: string[];
+  thresholdCents: string;
+  currency: string;
+  approversNeeded: string;
+  description: string;
+  approverRoles: string[];
+  isActive: boolean;
+};
+
+const DEFAULT_POLICY_FORM: PolicyFormData = {
+  name: "",
+  appliesTo: [],
+  thresholdCents: "",
+  currency: "USD",
+  approversNeeded: "1",
+  description: "",
+  approverRoles: ["owner", "manager"],
+  isActive: true,
+};
 
 function statusVariant(status: string) {
   switch (status) {
@@ -169,6 +206,10 @@ export default function ApprovalsPage() {
   const [processingId, setProcessingId] = useState<string | null>(null);
   const [announcement, setAnnouncement] = useState("");
   const [showCelebration, setShowCelebration] = useState(false);
+  const [policySheetOpen, setPolicySheetOpen] = useState(false);
+  const [editingPolicy, setEditingPolicy] = useState<string | null>(null);
+  const [policyForm, setPolicyForm] = useState<PolicyFormData>(DEFAULT_POLICY_FORM);
+  const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
   const tableRef = useRef<HTMLTableElement>(null);
   const prevOpenCountRef = useRef<number>(0);
 
@@ -282,6 +323,105 @@ export default function ApprovalsPage() {
       setProcessingId(null);
     },
   });
+
+  const createPolicyMutation = useMutation({
+    mutationFn: (data: PolicyFormData) => {
+      const thresholdCents = data.thresholdCents ? Math.round(parseFloat(data.thresholdCents) * 100) : undefined;
+      return apiClient.createApprovalPolicy({
+        name: data.name,
+        appliesTo: data.appliesTo,
+        thresholdCents,
+        currency: data.currency,
+        approversNeeded: parseInt(data.approversNeeded, 10) || 1,
+        description: data.description || undefined,
+        approverRoles: data.approverRoles,
+        campgroundId: campgroundId ?? undefined,
+      });
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["approvals"] });
+      toast({ title: "Policy created", description: "The new policy is now active." });
+      setPolicySheetOpen(false);
+      setPolicyForm(DEFAULT_POLICY_FORM);
+      announce("Policy created successfully");
+    },
+    onError: (err: any) => {
+      toast({ title: "Failed to create policy", description: err?.message ?? "Try again", variant: "destructive" });
+    },
+  });
+
+  const updatePolicyMutation = useMutation({
+    mutationFn: ({ id, data }: { id: string; data: PolicyFormData }) => {
+      const thresholdCents = data.thresholdCents ? Math.round(parseFloat(data.thresholdCents) * 100) : null;
+      return apiClient.updateApprovalPolicy(id, {
+        name: data.name,
+        appliesTo: data.appliesTo,
+        thresholdCents,
+        currency: data.currency,
+        approversNeeded: parseInt(data.approversNeeded, 10) || 1,
+        description: data.description || null,
+        approverRoles: data.approverRoles,
+        isActive: data.isActive,
+      });
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["approvals"] });
+      toast({ title: "Policy updated", description: "Changes have been saved." });
+      setPolicySheetOpen(false);
+      setEditingPolicy(null);
+      setPolicyForm(DEFAULT_POLICY_FORM);
+      announce("Policy updated successfully");
+    },
+    onError: (err: any) => {
+      toast({ title: "Failed to update policy", description: err?.message ?? "Try again", variant: "destructive" });
+    },
+  });
+
+  const deletePolicyMutation = useMutation({
+    mutationFn: (id: string) => apiClient.deleteApprovalPolicy(id),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["approvals"] });
+      toast({ title: "Policy deleted", description: "The policy has been removed." });
+      setDeleteConfirmId(null);
+      announce("Policy deleted successfully");
+    },
+    onError: (err: any) => {
+      toast({ title: "Failed to delete policy", description: err?.message ?? "Try again", variant: "destructive" });
+    },
+  });
+
+  const openPolicyEdit = useCallback((policy: any) => {
+    setPolicyForm({
+      name: policy.name,
+      appliesTo: policy.appliesTo,
+      thresholdCents: policy.thresholdCents ? (policy.thresholdCents / 100).toString() : "",
+      currency: policy.currency || "USD",
+      approversNeeded: policy.approversNeeded.toString(),
+      description: policy.description || "",
+      approverRoles: policy.approverRoles || ["owner", "manager"],
+      isActive: policy.isActive !== false,
+    });
+    setEditingPolicy(policy.id);
+    setPolicySheetOpen(true);
+  }, []);
+
+  const openPolicyCreate = useCallback(() => {
+    setPolicyForm(DEFAULT_POLICY_FORM);
+    setEditingPolicy(null);
+    setPolicySheetOpen(true);
+  }, []);
+
+  const handlePolicySubmit = useCallback(() => {
+    if (!policyForm.name.trim() || policyForm.appliesTo.length === 0) {
+      toast({ title: "Validation error", description: "Name and action types are required.", variant: "destructive" });
+      return;
+    }
+    if (editingPolicy) {
+      updatePolicyMutation.mutate({ id: editingPolicy, data: policyForm });
+    } else {
+      createPolicyMutation.mutate(policyForm);
+    }
+  }, [editingPolicy, policyForm, createPolicyMutation, updatePolicyMutation, toast]);
 
   const policies = approvalsQuery.data?.policies ?? [];
   const policyMap = useMemo(() => new Map(policies.map((policy) => [policy.id, policy])), [policies]);
@@ -978,26 +1118,286 @@ export default function ApprovalsPage() {
 
         <Card className="transition-all duration-200 hover:shadow-md">
           <CardHeader className="pb-3">
-            <CardTitle className="text-base">Policies</CardTitle>
-            <CardDescription>Rules that trigger dual control</CardDescription>
+            <div className="flex items-center justify-between">
+              <div>
+                <CardTitle className="text-base flex items-center gap-2">
+                  <Shield className="h-4 w-4" />
+                  Policies
+                </CardTitle>
+                <CardDescription>Rules that trigger dual control</CardDescription>
+              </div>
+              {canAct && (
+                <Sheet open={policySheetOpen} onOpenChange={setPolicySheetOpen}>
+                  <SheetTrigger asChild>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="h-8 text-xs"
+                      onClick={openPolicyCreate}
+                    >
+                      <Plus className="h-3.5 w-3.5 mr-1" />
+                      Add
+                    </Button>
+                  </SheetTrigger>
+                  <SheetContent className="sm:max-w-md overflow-y-auto">
+                    <SheetHeader>
+                      <SheetTitle>{editingPolicy ? "Edit Policy" : "Create Policy"}</SheetTitle>
+                      <SheetDescription>
+                        {editingPolicy
+                          ? "Update the approval policy settings."
+                          : "Define when dual control is required for sensitive operations."}
+                      </SheetDescription>
+                    </SheetHeader>
+                    <div className="space-y-4 py-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="policy-name">Policy Name *</Label>
+                        <Input
+                          id="policy-name"
+                          value={policyForm.name}
+                          onChange={(e) => setPolicyForm((prev) => ({ ...prev, name: e.target.value }))}
+                          placeholder="e.g., Refunds over $250"
+                        />
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label>Applies To *</Label>
+                        <div className="flex flex-wrap gap-2">
+                          {ACTION_TYPES.map((type) => (
+                            <label
+                              key={type}
+                              className={cn(
+                                "flex items-center gap-2 px-3 py-2 rounded-lg border cursor-pointer transition-all",
+                                policyForm.appliesTo.includes(type)
+                                  ? "border-emerald-500 bg-emerald-50 dark:bg-emerald-900/30"
+                                  : "border-slate-200 dark:border-slate-700 hover:border-slate-300"
+                              )}
+                            >
+                              <Checkbox
+                                checked={policyForm.appliesTo.includes(type)}
+                                onCheckedChange={(checked) => {
+                                  setPolicyForm((prev) => ({
+                                    ...prev,
+                                    appliesTo: checked
+                                      ? [...prev.appliesTo, type]
+                                      : prev.appliesTo.filter((t) => t !== type),
+                                  }));
+                                }}
+                              />
+                              <span className="text-sm capitalize">{type.replace(/_/g, " ")}</span>
+                            </label>
+                          ))}
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-3">
+                        <div className="space-y-2">
+                          <Label htmlFor="policy-threshold">Threshold ($)</Label>
+                          <Input
+                            id="policy-threshold"
+                            type="number"
+                            min="0"
+                            step="0.01"
+                            value={policyForm.thresholdCents}
+                            onChange={(e) => setPolicyForm((prev) => ({ ...prev, thresholdCents: e.target.value }))}
+                            placeholder="e.g., 250"
+                          />
+                          <p className="text-xs text-muted-foreground">Leave empty for all amounts</p>
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="policy-approvers">Approvers Needed</Label>
+                          <Select
+                            value={policyForm.approversNeeded}
+                            onValueChange={(value) => setPolicyForm((prev) => ({ ...prev, approversNeeded: value }))}
+                          >
+                            <SelectTrigger id="policy-approvers">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="1">1 approver</SelectItem>
+                              <SelectItem value="2">2 approvers</SelectItem>
+                              <SelectItem value="3">3 approvers</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label>Who Can Approve</Label>
+                        <div className="flex flex-wrap gap-2">
+                          {ROLE_OPTIONS.map((role) => (
+                            <label
+                              key={role.value}
+                              className={cn(
+                                "flex items-center gap-2 px-3 py-1.5 rounded-md border cursor-pointer transition-all text-sm",
+                                policyForm.approverRoles.includes(role.value)
+                                  ? "border-emerald-500 bg-emerald-50 dark:bg-emerald-900/30"
+                                  : "border-slate-200 dark:border-slate-700 hover:border-slate-300"
+                              )}
+                            >
+                              <Checkbox
+                                checked={policyForm.approverRoles.includes(role.value)}
+                                onCheckedChange={(checked) => {
+                                  setPolicyForm((prev) => ({
+                                    ...prev,
+                                    approverRoles: checked
+                                      ? [...prev.approverRoles, role.value]
+                                      : prev.approverRoles.filter((r) => r !== role.value),
+                                  }));
+                                }}
+                              />
+                              {role.label}
+                            </label>
+                          ))}
+                        </div>
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label htmlFor="policy-description">Description</Label>
+                        <Textarea
+                          id="policy-description"
+                          value={policyForm.description}
+                          onChange={(e) => setPolicyForm((prev) => ({ ...prev, description: e.target.value }))}
+                          placeholder="Explain when and why this policy applies..."
+                          rows={3}
+                        />
+                      </div>
+
+                      {editingPolicy && (
+                        <div className="flex items-center justify-between pt-2 border-t">
+                          <Label htmlFor="policy-active">Policy Active</Label>
+                          <Switch
+                            id="policy-active"
+                            checked={policyForm.isActive}
+                            onCheckedChange={(checked) => setPolicyForm((prev) => ({ ...prev, isActive: checked }))}
+                          />
+                        </div>
+                      )}
+                    </div>
+                    <SheetFooter className="flex gap-2 sm:justify-end">
+                      <SheetClose asChild>
+                        <Button variant="outline">Cancel</Button>
+                      </SheetClose>
+                      <Button
+                        onClick={handlePolicySubmit}
+                        disabled={createPolicyMutation.isPending || updatePolicyMutation.isPending}
+                        className="bg-emerald-600 hover:bg-emerald-700"
+                      >
+                        {(createPolicyMutation.isPending || updatePolicyMutation.isPending) && (
+                          <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                        )}
+                        {editingPolicy ? "Save Changes" : "Create Policy"}
+                      </Button>
+                    </SheetFooter>
+                  </SheetContent>
+                </Sheet>
+              )}
+            </div>
           </CardHeader>
           <CardContent className="space-y-2">
             {policiesMessage && (
               <div className="text-xs text-muted-foreground">{policiesMessage}</div>
             )}
+            {!policiesMessage && policies.length === 0 && (
+              <div className="text-center py-6">
+                <Shield className="h-8 w-8 mx-auto text-muted-foreground/50 mb-2" />
+                <p className="text-sm text-muted-foreground">No policies configured</p>
+                {canAct && (
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="mt-2"
+                    onClick={openPolicyCreate}
+                  >
+                    <Plus className="h-3.5 w-3.5 mr-1" />
+                    Create your first policy
+                  </Button>
+                )}
+              </div>
+            )}
             {!policiesMessage &&
               policies.map((policy) => (
-                <div key={policy.id} className="rounded-lg border bg-muted/50 px-3 py-2.5 space-y-1">
-                  <div className="flex items-center justify-between gap-2">
-                    <span className="text-sm font-medium text-foreground">{policy.name}</span>
-                    <Badge variant="secondary" className="text-[10px]">{policy.approversNeeded} approvers</Badge>
+                <div
+                  key={policy.id}
+                  className={cn(
+                    "rounded-lg border px-3 py-2.5 space-y-1.5 transition-all",
+                    policy.isActive !== false
+                      ? "bg-muted/50"
+                      : "bg-muted/20 border-dashed opacity-60"
+                  )}
+                >
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm font-medium text-foreground truncate">{policy.name}</span>
+                        {policy.isActive === false && (
+                          <Badge variant="secondary" className="text-[10px]">Disabled</Badge>
+                        )}
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-1 shrink-0">
+                      <Badge variant="secondary" className="text-[10px]">{policy.approversNeeded} approvers</Badge>
+                      {canAct && (
+                        <>
+                          <Button
+                            size="icon"
+                            variant="ghost"
+                            className="h-6 w-6"
+                            onClick={() => openPolicyEdit(policy)}
+                          >
+                            <Pencil className="h-3 w-3" />
+                            <span className="sr-only">Edit policy</span>
+                          </Button>
+                          <Popover open={deleteConfirmId === policy.id} onOpenChange={(open) => setDeleteConfirmId(open ? policy.id : null)}>
+                            <PopoverTrigger asChild>
+                              <Button
+                                size="icon"
+                                variant="ghost"
+                                className="h-6 w-6 text-destructive hover:text-destructive"
+                              >
+                                <Trash2 className="h-3 w-3" />
+                                <span className="sr-only">Delete policy</span>
+                              </Button>
+                            </PopoverTrigger>
+                            <PopoverContent className="w-56 p-3" align="end">
+                              <p className="text-sm mb-3">Delete this policy?</p>
+                              <div className="flex gap-2 justify-end">
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  onClick={() => setDeleteConfirmId(null)}
+                                >
+                                  Cancel
+                                </Button>
+                                <Button
+                                  size="sm"
+                                  variant="destructive"
+                                  onClick={() => deletePolicyMutation.mutate(policy.id)}
+                                  disabled={deletePolicyMutation.isPending}
+                                >
+                                  {deletePolicyMutation.isPending ? (
+                                    <Loader2 className="h-3 w-3 animate-spin" />
+                                  ) : (
+                                    "Delete"
+                                  )}
+                                </Button>
+                              </div>
+                            </PopoverContent>
+                          </Popover>
+                        </>
+                      )}
+                    </div>
                   </div>
                   <div className="flex flex-wrap gap-1">
                     {policy.appliesTo.map((type) => (
                       <span key={type} className="text-[10px] uppercase tracking-wide text-muted-foreground bg-background px-1.5 py-0.5 rounded">
-                        {type}
+                        {type.replace(/_/g, " ")}
                       </span>
                     ))}
+                    {policy.thresholdCents && (
+                      <span className="text-[10px] text-muted-foreground bg-background px-1.5 py-0.5 rounded">
+                        ≥ ${(policy.thresholdCents / 100).toLocaleString()}
+                      </span>
+                    )}
                   </div>
                   {policy.description && (
                     <p className="text-xs text-muted-foreground leading-relaxed">{policy.description}</p>
