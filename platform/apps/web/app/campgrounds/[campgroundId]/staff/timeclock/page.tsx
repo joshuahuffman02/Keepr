@@ -16,6 +16,10 @@ import {
   Sparkles,
   Timer,
   Coffee,
+  Play,
+  Pause,
+  Utensils,
+  Loader2,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -27,6 +31,15 @@ type Shift = {
   endTime: string;
   role?: string | null;
   status?: string;
+  timeEntries?: { id: string; clockInAt: string; clockOutAt?: string | null }[];
+};
+
+type BreakType = "paid" | "unpaid" | "meal" | "rest";
+
+type ActiveBreak = {
+  id: string;
+  type: BreakType;
+  startedAt: string;
 };
 
 const SPRING_CONFIG = {
@@ -46,6 +59,9 @@ export default function TimeclockPage({ params }: { params: { campgroundId: stri
   const [clockingIn, setClockingIn] = useState(false);
   const [clockingOut, setClockingOut] = useState(false);
   const [currentTime, setCurrentTime] = useState(new Date());
+  const [activeBreak, setActiveBreak] = useState<ActiveBreak | null>(null);
+  const [breakLoading, setBreakLoading] = useState(false);
+  const [showBreakMenu, setShowBreakMenu] = useState(false);
 
   // Update clock every second
   useEffect(() => {
@@ -122,7 +138,89 @@ export default function TimeclockPage({ params }: { params: { campgroundId: stri
     }
   };
 
+  // Find the selected shift from the shifts array
   const selectedShift = shifts.find(s => s.id === shiftId);
+
+  // Get the active time entry for the selected shift
+  const activeTimeEntry = selectedShift?.timeEntries?.find(
+    (e) => e.clockInAt && !e.clockOutAt
+  );
+
+  const startBreak = async (type: BreakType) => {
+    if (!activeTimeEntry) {
+      setStatus({ type: "error", message: "You must be clocked in to take a break." });
+      return;
+    }
+
+    setBreakLoading(true);
+    setShowBreakMenu(false);
+    try {
+      const res = await fetch(`/api/staff/time-entries/${activeTimeEntry.id}/breaks`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ type }),
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        setActiveBreak({ id: data.id, type: data.type, startedAt: data.startedAt });
+        setStatus({ type: "info", message: `${type.charAt(0).toUpperCase() + type.slice(1)} break started!` });
+      } else {
+        setStatus({ type: "error", message: "Could not start break. Please try again." });
+      }
+    } catch {
+      setStatus({ type: "error", message: "Connection error. Please try again." });
+    } finally {
+      setBreakLoading(false);
+    }
+  };
+
+  const endBreak = async () => {
+    if (!activeBreak) return;
+
+    setBreakLoading(true);
+    try {
+      const res = await fetch(`/api/staff/breaks/${activeBreak.id}/end`, {
+        method: "PATCH",
+      });
+
+      if (res.ok) {
+        setActiveBreak(null);
+        setStatus({ type: "success", message: "Break ended. Back to work!" });
+      } else {
+        setStatus({ type: "error", message: "Could not end break. Please try again." });
+      }
+    } catch {
+      setStatus({ type: "error", message: "Connection error. Please try again." });
+    } finally {
+      setBreakLoading(false);
+    }
+  };
+
+  // Check for active break when shift changes
+  useEffect(() => {
+    const checkActiveBreak = async () => {
+      if (!activeTimeEntry) {
+        setActiveBreak(null);
+        return;
+      }
+
+      try {
+        const res = await fetch(`/api/staff/time-entries/${activeTimeEntry.id}/active-break`);
+        if (res.ok) {
+          const data = await res.json();
+          if (data) {
+            setActiveBreak({ id: data.id, type: data.type, startedAt: data.startedAt });
+          } else {
+            setActiveBreak(null);
+          }
+        }
+      } catch {
+        // Ignore errors
+      }
+    };
+    checkActiveBreak();
+  }, [activeTimeEntry?.id]);
 
   return (
     <DashboardShell>
@@ -364,6 +462,100 @@ export default function TimeclockPage({ params }: { params: { campgroundId: stri
                   <span>Clock Out</span>
                 </motion.button>
               </div>
+
+              {/* Break Section */}
+              {activeTimeEntry && (
+                <div className="pt-4 border-t border-slate-100">
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="flex items-center gap-2">
+                      <Coffee className="w-4 h-4 text-amber-600" />
+                      <span className="text-sm font-medium text-slate-700">Break</span>
+                    </div>
+                    {activeBreak && (
+                      <span className="text-xs text-amber-600 font-medium">
+                        On {activeBreak.type} break since{" "}
+                        {new Date(activeBreak.startedAt).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" })}
+                      </span>
+                    )}
+                  </div>
+
+                  {activeBreak ? (
+                    <motion.button
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                      onClick={endBreak}
+                      disabled={breakLoading}
+                      className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-lg bg-amber-600 text-white font-medium disabled:opacity-50 hover:bg-amber-700 transition-all"
+                    >
+                      {breakLoading ? (
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                      ) : (
+                        <Play className="w-4 h-4" />
+                      )}
+                      End Break
+                    </motion.button>
+                  ) : (
+                    <div className="relative">
+                      <motion.button
+                        whileHover={{ scale: 1.02 }}
+                        whileTap={{ scale: 0.98 }}
+                        onClick={() => setShowBreakMenu(!showBreakMenu)}
+                        disabled={breakLoading}
+                        className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-lg border-2 border-amber-200 bg-amber-50 text-amber-700 font-medium disabled:opacity-50 hover:bg-amber-100 transition-all"
+                      >
+                        {breakLoading ? (
+                          <Loader2 className="w-4 h-4 animate-spin" />
+                        ) : (
+                          <Pause className="w-4 h-4" />
+                        )}
+                        Take a Break
+                      </motion.button>
+
+                      <AnimatePresence>
+                        {showBreakMenu && (
+                          <motion.div
+                            initial={{ opacity: 0, y: -10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: -10 }}
+                            className="absolute top-full mt-2 left-0 right-0 bg-white rounded-lg shadow-lg border border-slate-200 overflow-hidden z-10"
+                          >
+                            <button
+                              onClick={() => startBreak("meal")}
+                              className="w-full flex items-center gap-3 px-4 py-3 text-sm text-left hover:bg-slate-50 transition-colors"
+                            >
+                              <Utensils className="w-4 h-4 text-amber-600" />
+                              <div>
+                                <div className="font-medium text-slate-900">Meal Break</div>
+                                <div className="text-xs text-slate-500">Unpaid lunch/dinner</div>
+                              </div>
+                            </button>
+                            <button
+                              onClick={() => startBreak("rest")}
+                              className="w-full flex items-center gap-3 px-4 py-3 text-sm text-left hover:bg-slate-50 transition-colors border-t border-slate-100"
+                            >
+                              <Coffee className="w-4 h-4 text-teal-600" />
+                              <div>
+                                <div className="font-medium text-slate-900">Rest Break</div>
+                                <div className="text-xs text-slate-500">Paid short break</div>
+                              </div>
+                            </button>
+                            <button
+                              onClick={() => startBreak("unpaid")}
+                              className="w-full flex items-center gap-3 px-4 py-3 text-sm text-left hover:bg-slate-50 transition-colors border-t border-slate-100"
+                            >
+                              <Clock className="w-4 h-4 text-slate-600" />
+                              <div>
+                                <div className="font-medium text-slate-900">Unpaid Break</div>
+                                <div className="text-xs text-slate-500">Other unpaid time</div>
+                              </div>
+                            </button>
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
+                    </div>
+                  )}
+                </div>
+              )}
 
               {/* Tips */}
               <div className="rounded-lg bg-slate-50 border border-slate-200 p-4 mt-4">

@@ -2,12 +2,13 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
+import { motion } from "framer-motion";
 import { apiClient } from "@/lib/api-client";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Calendar, MapPin, Users, LogOut, Loader2, MessageCircle, Gift, CalendarDays, Clock, Flame, Sparkles, Trees, Mail, Package, Truck, Store, CheckCircle, AlertCircle, RefreshCw } from "lucide-react";
+import { Calendar, MapPin, Users, Loader2, MessageCircle, CalendarDays, Clock, Flame, Sparkles, Trees, Mail, Package, Truck, Store, CheckCircle, AlertCircle, RefreshCw } from "lucide-react";
 import { differenceInCalendarDays, format, formatDistanceToNow } from "date-fns";
 import { GuestChatPanel } from "@/components/portal/GuestChatPanel";
 import { Separator } from "@/components/ui/separator";
@@ -280,11 +281,6 @@ export default function MyStayPage() {
         loadComms();
     }, [token, currentReservation]);
 
-    const handleLogout = () => {
-        localStorage.removeItem("campreserv:guestToken");
-        router.push("/portal/login");
-    };
-
     if (loading) {
         return (
             <div className="min-h-screen flex items-center justify-center">
@@ -384,28 +380,18 @@ export default function MyStayPage() {
     };
 
     return (
-        <div className="min-h-screen bg-muted/30 pb-20">
-            {/* Header */}
-            <header className="bg-white border-b sticky top-0 z-10">
-                <div className="container mx-auto px-4 h-16 flex items-center justify-between">
-                    <h1 className="font-bold text-xl">My Stay</h1>
-                    <div className="flex items-center gap-4">
-                        <span className="text-sm text-muted-foreground hidden sm:inline-block">
-                            Welcome, {guest.primaryFirstName}
-                        </span>
-                        <Button variant="outline" size="sm" onClick={() => router.push("/portal/rewards")}>
-                            <Gift className="h-4 w-4 mr-2" />
-                            Rewards
-                        </Button>
-                        <Button variant="ghost" size="sm" onClick={handleLogout}>
-                            <LogOut className="h-4 w-4 mr-2" />
-                            Logout
-                        </Button>
-                    </div>
+        <div className="container mx-auto px-4 py-6 space-y-6">
+            {/* Page Header */}
+            <motion.div
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="flex items-center justify-between"
+            >
+                <div>
+                    <h1 className="text-2xl font-bold text-foreground">Welcome back, {guest.primaryFirstName}</h1>
+                    <p className="text-muted-foreground">Here's everything about your stay</p>
                 </div>
-            </header>
-
-            <main className="container mx-auto px-4 py-8 space-y-8">
+            </motion.div>
                 {!currentReservation ? (
                     <Card>
                         <CardContent className="py-10 text-center space-y-4">
@@ -870,7 +856,6 @@ export default function MyStayPage() {
                         </div>
                     </div>
                 )}
-            </main>
         </div>
     );
 }

@@ -2,11 +2,12 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import { motion } from "framer-motion";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiClient } from "../../../lib/api-client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
-import { Calendar, Clock, Users, DollarSign, Ticket } from "lucide-react";
+import { Calendar, Clock, Users, DollarSign, Ticket, Sparkles } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -247,17 +248,27 @@ export default function GuestActivitiesPage() {
     }
 
     return (
-        <div className="container mx-auto py-8 space-y-8">
-            <div className="flex items-center justify-between">
-                <div className="space-y-2 text-center md:text-left">
-                    <h1 className="text-3xl font-bold text-slate-900">Activities & Events</h1>
-                    <p className="text-lg text-slate-600">Enhance your stay with our curated experiences.</p>
+        <div className="container mx-auto px-4 py-6 space-y-6">
+            {/* Page Header */}
+            <motion.div
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="flex items-center justify-between flex-wrap gap-4"
+            >
+                <div className="flex items-center gap-3">
+                    <div className="h-12 w-12 rounded-xl bg-gradient-to-br from-orange-500 to-red-600 flex items-center justify-center">
+                        <Sparkles className="h-6 w-6 text-white" />
+                    </div>
+                    <div>
+                        <h1 className="text-2xl font-bold text-foreground">Activities & Events</h1>
+                        <p className="text-muted-foreground">Enhance your stay with curated experiences</p>
+                    </div>
                 </div>
                 <div className="flex items-center gap-2">
-                    {!isOnline && <span className="inline-flex items-center rounded-full border border-slate-300 px-2 py-1 text-xs text-slate-700">Offline</span>}
+                    {!isOnline && <span className="inline-flex items-center rounded-full border border-border bg-muted px-2 py-1 text-xs text-muted-foreground">Offline</span>}
                     {queuedBookings > 0 && (
                         <span
-                            className="inline-flex items-center rounded-full border border-amber-300 bg-amber-50 px-2 py-1 text-xs text-amber-800"
+                            className="inline-flex items-center rounded-full border border-amber-300 dark:border-amber-700 bg-amber-50 dark:bg-amber-900/20 px-2 py-1 text-xs text-amber-800 dark:text-amber-300"
                             title={
                                 conflicts.length
                                     ? `${queuedBookings - conflicts.length} queued, ${conflicts.length} conflicts${conflicts[0]?.lastError ? ` (last error: ${conflicts[0].lastError})` : ""}${
@@ -277,13 +288,10 @@ export default function GuestActivitiesPage() {
                             {queuedBookings} queued
                         </span>
                     )}
-                    <Button size="sm" variant="outline" asChild>
-                        <Link href="/pwa/sync-log">Sync log</Link>
-                    </Button>
                 </div>
-            </div>
+            </motion.div>
             {conflicts.length > 0 && (
-                <div className="rounded-lg border border-amber-200 bg-amber-50 text-amber-900 p-3 text-sm space-y-2">
+                <div className="rounded-lg border border-amber-200 dark:border-amber-700 bg-amber-50 dark:bg-amber-900/20 text-amber-900 dark:text-amber-300 p-3 text-sm space-y-2">
                     <div className="font-semibold">Conflicts detected</div>
                     {conflicts.map((c) => (
                         <div key={c.id} className="flex items-center justify-between gap-2">
@@ -324,14 +332,14 @@ export default function GuestActivitiesPage() {
                             </CardDescription>
                         </CardHeader>
                         <CardContent className="flex-1">
-                            <div className="space-y-2 text-sm text-slate-600">
+                            <div className="space-y-2 text-sm text-muted-foreground">
                                 <div className="flex items-center gap-2">
                                     <Clock className="w-4 h-4" />
                                     <span>{activity.duration} minutes</span>
                                 </div>
                                 <div className="flex items-center gap-2">
                                     <DollarSign className="w-4 h-4" />
-                                    <span className="font-semibold text-slate-900">${(activity.price / 100).toFixed(2)}</span> per person
+                                    <span className="font-semibold text-foreground">${(activity.price / 100).toFixed(2)}</span> per person
                                 </div>
                             </div>
                         </CardContent>

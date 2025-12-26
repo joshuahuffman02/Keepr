@@ -2,14 +2,14 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import Link from "next/link";
+import { motion } from "framer-motion";
 import { apiClient } from "@/lib/api-client";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { ProductGrid } from "@/components/pos/ProductGrid";
 import { GuestCheckoutModal } from "@/components/portal/GuestCheckoutModal";
-import { ShoppingCart, ArrowLeft, Loader2, Trash2, Plus, Minus } from "lucide-react";
+import { ShoppingCart, Loader2, Trash2, Plus, Minus, Store } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { recordTelemetry } from "@/lib/sync-telemetry";
@@ -295,37 +295,41 @@ export default function PortalStorePage() {
     ) || guest.reservations[0];
 
     return (
-        <div className="min-h-screen bg-slate-50 pb-24">
-            {/* Header */}
-            <header className="bg-white border-b sticky top-0 z-10">
-                <div className="container mx-auto px-4 h-16 flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                        <Button variant="ghost" size="icon" onClick={() => router.push("/portal/my-stay")}>
-                            <ArrowLeft className="h-5 w-5" />
-                        </Button>
-                        <h1 className="font-bold text-lg">Camp Store</h1>
+        <div className="container mx-auto px-4 py-6 space-y-6">
+            {/* Page Header */}
+            <motion.div
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="flex items-center justify-between"
+            >
+                <div className="flex items-center gap-3">
+                    <div className="h-12 w-12 rounded-xl bg-gradient-to-br from-purple-500 to-pink-600 flex items-center justify-center">
+                        <Store className="h-6 w-6 text-white" />
                     </div>
-                    <div className="flex items-center gap-2">
-                        <SyncStatus
-                            variant="badge"
-                            showDetails={false}
-                            onClick={() => setSyncDrawerOpen(true)}
-                        />
-                        <Button variant="outline" size="sm" className="relative" onClick={() => setIsCartOpen(true)}>
-                            <ShoppingCart className="h-5 w-5" />
-                            {totalItems > 0 && (
-                                <Badge className="absolute -top-2 -right-2 h-5 w-5 flex items-center justify-center p-0 rounded-full">
-                                    {totalItems}
-                                </Badge>
-                            )}
-                        </Button>
+                    <div>
+                        <h1 className="text-2xl font-bold text-foreground">Camp Store</h1>
+                        <p className="text-muted-foreground">Order to your site or pick up</p>
                     </div>
                 </div>
-            </header>
+                <div className="flex items-center gap-2">
+                    <SyncStatus
+                        variant="badge"
+                        showDetails={false}
+                        onClick={() => setSyncDrawerOpen(true)}
+                    />
+                    <Button variant="outline" size="sm" className="relative" onClick={() => setIsCartOpen(true)}>
+                        <ShoppingCart className="h-5 w-5" />
+                        {totalItems > 0 && (
+                            <Badge className="absolute -top-2 -right-2 h-5 w-5 flex items-center justify-center p-0 rounded-full">
+                                {totalItems}
+                            </Badge>
+                        )}
+                    </Button>
+                </div>
+            </motion.div>
 
             {conflicts.length > 0 && (
-                <div className="container mx-auto px-4 mt-4">
-                    <div className="rounded-lg border border-amber-200 bg-amber-50 text-amber-900 p-3 text-sm space-y-2">
+                <div className="rounded-lg border border-amber-200 bg-amber-50 dark:bg-amber-900/20 dark:border-amber-800/30 text-amber-900 dark:text-amber-200 p-3 text-sm space-y-2">
                         <div className="font-semibold">Conflicts detected</div>
                         {conflicts.map((c) => (
                             <div key={c.id} className="flex items-center justify-between gap-2">
@@ -340,12 +344,10 @@ export default function PortalStorePage() {
                                 </div>
                             </div>
                         ))}
-                    </div>
                 </div>
             )}
 
-            <main className="container mx-auto px-4 py-6">
-                {!activeRes ? (
+            {!activeRes ? (
                     <div className="text-center py-10 text-muted-foreground">
                         <p>No active reservation found. You cannot place orders.</p>
                     </div>
@@ -373,7 +375,6 @@ export default function PortalStorePage() {
                         }} />
                     </div>
                 )}
-            </main>
 
             {/* Cart Dialog (Mobile Friendly) */}
             <Dialog open={isCartOpen} onOpenChange={setIsCartOpen}>

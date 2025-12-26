@@ -2,9 +2,9 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { motion } from "framer-motion";
 import { apiClient } from "@/lib/api-client";
-import Link from "next/link";
-import { CalendarDays, Tent, Users, CreditCard, XCircle } from "lucide-react";
+import { CalendarDays, Tent, Users, CreditCard, XCircle, Settings } from "lucide-react";
 
 interface Reservation {
   id: string;
@@ -71,21 +71,22 @@ export default function PortalManagePage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-emerald-900 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-emerald-400" />
+      <div className="flex items-center justify-center py-20">
+        <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-emerald-500" />
       </div>
     );
   }
 
   if (!guest || !selectedReservation) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-emerald-900 flex items-center justify-center text-white">
-        <div className="text-center">
-          <p className="text-lg mb-4">No reservations found</p>
-          <Link href="/portal/login" className="text-emerald-400 hover:text-emerald-300">
-            Back to login
-          </Link>
-        </div>
+      <div className="container mx-auto px-4 py-20 text-center">
+        <p className="text-lg mb-4 text-muted-foreground">No reservations found</p>
+        <button
+          onClick={() => router.push("/portal/login")}
+          className="text-emerald-600 hover:text-emerald-500"
+        >
+          Back to login
+        </button>
       </div>
     );
   }
@@ -93,27 +94,31 @@ export default function PortalManagePage() {
   const balanceDue = selectedReservation.totalCents - selectedReservation.paidCents;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-emerald-900 text-white">
-      {/* Header */}
-      <header className="p-4 flex items-center justify-between border-b border-slate-700/50">
-        <Link href="/portal/my-stay" className="text-emerald-400 hover:text-emerald-300 text-sm">
-          ← Back to My Stay
-        </Link>
-        <h1 className="font-semibold">Manage Reservation</h1>
-        <div />
-      </header>
-
-      <main className="max-w-2xl mx-auto p-6 space-y-6">
+    <div className="container mx-auto px-4 py-6 space-y-6 max-w-2xl">
+      {/* Page Header */}
+      <motion.div
+        initial={{ opacity: 0, y: -10 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="flex items-center gap-3"
+      >
+        <div className="h-12 w-12 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center">
+          <Settings className="h-6 w-6 text-white" />
+        </div>
+        <div>
+          <h1 className="text-2xl font-bold text-foreground">Manage Reservation</h1>
+          <p className="text-muted-foreground">Modify dates, guests, or cancel</p>
+        </div>
+      </motion.div>
         {/* Reservation Selection */}
         {guest.reservations.length > 1 && (
-          <div className="bg-white/5 rounded-xl p-4">
-            <label className="block text-sm text-slate-400 mb-2">Select Reservation</label>
+          <div className="bg-card rounded-xl p-4 border border-border">
+            <label className="block text-sm text-muted-foreground mb-2">Select Reservation</label>
             <select
               value={selectedReservation.id}
               onChange={(e) =>
                 setSelectedReservation(guest.reservations.find((r) => r.id === e.target.value)!)
               }
-              className="w-full bg-slate-800 border border-slate-600 rounded-lg px-4 py-2 text-white"
+              className="w-full bg-background border border-border rounded-lg px-4 py-2 text-foreground"
             >
               {guest.reservations.map((r) => (
                 <option key={r.id} value={r.id}>
@@ -125,18 +130,23 @@ export default function PortalManagePage() {
         )}
 
         {/* Current Reservation Details */}
-        <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/10">
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.1 }}
+          className="bg-card rounded-2xl p-6 border border-border shadow-sm"
+        >
           <div className="flex items-center justify-between mb-4">
             <div>
-              <h2 className="text-xl font-bold">{selectedReservation.campground.name}</h2>
-              <p className="text-slate-400">Site {selectedReservation.site.siteNumber}</p>
+              <h2 className="text-xl font-bold text-foreground">{selectedReservation.campground.name}</h2>
+              <p className="text-muted-foreground">Site {selectedReservation.site.siteNumber}</p>
             </div>
             <span
               className={`px-3 py-1 rounded-full text-xs font-medium ${selectedReservation.status === "confirmed"
-                ? "bg-emerald-500/20 text-emerald-300"
+                ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400"
                 : selectedReservation.status === "checked_in"
-                  ? "bg-blue-500/20 text-blue-300"
-                  : "bg-slate-500/20 text-slate-300"
+                  ? "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400"
+                  : "bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-400"
                 }`}
             >
               {selectedReservation.status.replace("_", " ")}
@@ -145,28 +155,28 @@ export default function PortalManagePage() {
 
           <div className="grid grid-cols-2 gap-4 text-sm">
             <div>
-              <p className="text-slate-400">Check-in</p>
-              <p className="font-medium">{formatDate(selectedReservation.arrivalDate)}</p>
+              <p className="text-muted-foreground">Check-in</p>
+              <p className="font-medium text-foreground">{formatDate(selectedReservation.arrivalDate)}</p>
             </div>
             <div>
-              <p className="text-slate-400">Check-out</p>
-              <p className="font-medium">{formatDate(selectedReservation.departureDate)}</p>
+              <p className="text-muted-foreground">Check-out</p>
+              <p className="font-medium text-foreground">{formatDate(selectedReservation.departureDate)}</p>
             </div>
             <div>
-              <p className="text-slate-400">Guests</p>
-              <p className="font-medium">
+              <p className="text-muted-foreground">Guests</p>
+              <p className="font-medium text-foreground">
                 {selectedReservation.adults} adults
                 {selectedReservation.children > 0 && `, ${selectedReservation.children} children`}
               </p>
             </div>
             <div>
-              <p className="text-slate-400">Balance Due</p>
-              <p className={`font-medium ${balanceDue > 0 ? "text-amber-400" : "text-emerald-400"}`}>
+              <p className="text-muted-foreground">Balance Due</p>
+              <p className={`font-medium ${balanceDue > 0 ? "text-amber-600 dark:text-amber-400" : "text-emerald-600 dark:text-emerald-400"}`}>
                 {balanceDue > 0 ? `$${(balanceDue / 100).toFixed(2)}` : "Paid"}
               </p>
             </div>
           </div>
-        </div>
+        </motion.div>
 
         {/* Self-Service Actions */}
         <div className="space-y-3">
@@ -228,7 +238,6 @@ export default function PortalManagePage() {
             }}
           />
         )}
-      </main>
     </div>
   );
 }
@@ -251,26 +260,28 @@ function ActionButton({
   danger?: boolean;
 }) {
   return (
-    <button
+    <motion.button
+      whileHover={!disabled ? { scale: 1.01 } : undefined}
+      whileTap={!disabled ? { scale: 0.99 } : undefined}
       onClick={onClick}
       disabled={disabled}
       className={`w-full p-4 rounded-xl text-left transition-all ${disabled
-        ? "bg-slate-800/30 text-slate-500 cursor-not-allowed"
+        ? "bg-muted/50 text-muted-foreground cursor-not-allowed opacity-50"
         : danger
-          ? "bg-red-900/20 hover:bg-red-900/30 border border-red-800/30"
+          ? "bg-red-50 hover:bg-red-100 border border-red-200 dark:bg-red-900/20 dark:hover:bg-red-900/30 dark:border-red-800/30"
           : highlight
-            ? "bg-emerald-900/30 hover:bg-emerald-900/40 border border-emerald-700/30"
-            : "bg-white/5 hover:bg-white/10 border border-white/10"
+            ? "bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 dark:bg-emerald-900/20 dark:hover:bg-emerald-900/30 dark:border-emerald-700/30"
+            : "bg-card hover:bg-muted/50 border border-border"
         }`}
     >
       <div className="flex items-center gap-4">
-        <span className="text-emerald-400">{icon}</span>
+        <span className={danger ? "text-red-600 dark:text-red-400" : "text-emerald-600 dark:text-emerald-400"}>{icon}</span>
         <div>
-          <h4 className="font-medium">{title}</h4>
-          <p className="text-sm text-slate-400">{description}</p>
+          <h4 className="font-medium text-foreground">{title}</h4>
+          <p className="text-sm text-muted-foreground">{description}</p>
         </div>
       </div>
-    </button>
+    </motion.button>
   );
 }
 
@@ -340,35 +351,39 @@ function ActionModal({
   };
 
   return (
-    <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
-      <div className="bg-slate-800 rounded-2xl w-full max-w-md p-6 border border-slate-700">
+    <div className="fixed inset-0 bg-black/50 dark:bg-black/70 flex items-center justify-center z-50 p-4">
+      <motion.div
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        className="bg-card rounded-2xl w-full max-w-md p-6 border border-border shadow-xl"
+      >
         <div className="flex items-center justify-between mb-6">
-          <h2 className="text-xl font-bold">{getTitle()}</h2>
-          <button onClick={onClose} className="text-slate-400 hover:text-white">✕</button>
+          <h2 className="text-xl font-bold text-foreground">{getTitle()}</h2>
+          <button onClick={onClose} className="text-muted-foreground hover:text-foreground">✕</button>
         </div>
 
         <div className="space-y-4">
           {action === "modify-dates" && (
             <>
               <div>
-                <label className="block text-sm text-slate-400 mb-1">New Check-in Date</label>
+                <label className="block text-sm text-muted-foreground mb-1">New Check-in Date</label>
                 <input
                   type="date"
                   value={newArrival}
                   onChange={(e) => setNewArrival(e.target.value)}
-                  className="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-2"
+                  className="w-full bg-background border border-border rounded-lg px-4 py-2 text-foreground"
                 />
               </div>
               <div>
-                <label className="block text-sm text-slate-400 mb-1">New Check-out Date</label>
+                <label className="block text-sm text-muted-foreground mb-1">New Check-out Date</label>
                 <input
                   type="date"
                   value={newDeparture}
                   onChange={(e) => setNewDeparture(e.target.value)}
-                  className="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-2"
+                  className="w-full bg-background border border-border rounded-lg px-4 py-2 text-foreground"
                 />
               </div>
-              <p className="text-sm text-slate-400">
+              <p className="text-sm text-muted-foreground">
                 Date changes are subject to availability and may result in price adjustments.
               </p>
             </>
@@ -376,16 +391,16 @@ function ActionModal({
 
           {action === "change-site" && (
             <>
-              <p className="text-sm text-slate-400">
+              <p className="text-sm text-muted-foreground">
                 Submitting a request does not guarantee availability. We'll contact you to confirm options.
               </p>
               <div>
-                <label className="block text-sm text-slate-400 mb-1">Reason / Preferences</label>
+                <label className="block text-sm text-muted-foreground mb-1">Reason / Preferences</label>
                 <textarea
                   value={reason}
                   onChange={(e) => setReason(e.target.value)}
                   rows={3}
-                  className="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-2"
+                  className="w-full bg-background border border-border rounded-lg px-4 py-2 text-foreground"
                   placeholder="e.g., Need hookups, prefer shaded site..."
                 />
               </div>
@@ -396,27 +411,27 @@ function ActionModal({
             <>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm text-slate-400 mb-1">Adults</label>
+                  <label className="block text-sm text-muted-foreground mb-1">Adults</label>
                   <input
                     type="number"
                     min={1}
                     value={adults}
                     onChange={(e) => setAdults(parseInt(e.target.value) || 1)}
-                    className="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-2"
+                    className="w-full bg-background border border-border rounded-lg px-4 py-2 text-foreground"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm text-slate-400 mb-1">Children</label>
+                  <label className="block text-sm text-muted-foreground mb-1">Children</label>
                   <input
                     type="number"
                     min={0}
                     value={children}
                     onChange={(e) => setChildren(parseInt(e.target.value) || 0)}
-                    className="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-2"
+                    className="w-full bg-background border border-border rounded-lg px-4 py-2 text-foreground"
                   />
                 </div>
               </div>
-              <p className="text-sm text-slate-400">
+              <p className="text-sm text-muted-foreground">
                 Additional guests may incur extra fees depending on campground policies.
               </p>
             </>
@@ -424,19 +439,19 @@ function ActionModal({
 
           {action === "cancel" && (
             <>
-              <div className="bg-red-900/30 border border-red-800/30 rounded-lg p-4">
-                <p className="text-sm text-red-300">
+              <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800/30 rounded-lg p-4">
+                <p className="text-sm text-red-700 dark:text-red-300">
                   Cancellation fees may apply based on your booking date and campground policy.
                   This action cannot be undone.
                 </p>
               </div>
               <div>
-                <label className="block text-sm text-slate-400 mb-1">Reason (optional)</label>
+                <label className="block text-sm text-muted-foreground mb-1">Reason (optional)</label>
                 <textarea
                   value={reason}
                   onChange={(e) => setReason(e.target.value)}
                   rows={2}
-                  className="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-2"
+                  className="w-full bg-background border border-border rounded-lg px-4 py-2 text-foreground"
                   placeholder="Tell us why you're canceling..."
                 />
               </div>
@@ -444,7 +459,7 @@ function ActionModal({
           )}
 
           {error && (
-            <div className="bg-red-900/30 border border-red-800/30 rounded-lg p-3 text-sm text-red-300">
+            <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800/30 rounded-lg p-3 text-sm text-red-700 dark:text-red-300">
               {error}
             </div>
           )}
@@ -452,14 +467,14 @@ function ActionModal({
           <div className="flex gap-3 pt-2">
             <button
               onClick={onClose}
-              className="flex-1 px-4 py-2 border border-slate-600 rounded-lg hover:bg-slate-700"
+              className="flex-1 px-4 py-2 border border-border rounded-lg hover:bg-muted text-foreground"
             >
               Cancel
             </button>
             <button
               onClick={handleSubmit}
               disabled={loading}
-              className={`flex-1 px-4 py-2 rounded-lg font-medium ${action === "cancel"
+              className={`flex-1 px-4 py-2 rounded-lg font-medium text-white ${action === "cancel"
                 ? "bg-red-600 hover:bg-red-700"
                 : "bg-emerald-600 hover:bg-emerald-700"
                 } disabled:opacity-50`}
@@ -468,7 +483,7 @@ function ActionModal({
             </button>
           </div>
         </div>
-      </div>
+      </motion.div>
     </div>
   );
 }

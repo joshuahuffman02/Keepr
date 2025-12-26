@@ -2,11 +2,11 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { motion } from "framer-motion";
 import { apiClient } from "@/lib/api-client";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { LogOut, Loader2, Star, ArrowLeft, Gift, Trophy, TrendingUp } from "lucide-react";
+import { Loader2, Star, Gift, Trophy, TrendingUp, Sparkles } from "lucide-react";
 import { format } from "date-fns";
 
 type LoyaltyProfile = {
@@ -74,11 +74,6 @@ export default function RewardsPage() {
         fetchData();
     }, [router, guestId]);
 
-    const handleLogout = () => {
-        localStorage.removeItem("campreserv:guestToken");
-        router.push("/portal/login");
-    };
-
     const getCurrentTier = () => {
         if (!profile) return TIER_THRESHOLDS[0];
         return TIER_THRESHOLDS.find(t => profile.pointsBalance >= t.min && profile.pointsBalance <= t.max) || TIER_THRESHOLDS[0];
@@ -108,25 +103,21 @@ export default function RewardsPage() {
     }
 
     return (
-        <div className="min-h-screen bg-muted/30 pb-20">
-            {/* Header */}
-            <header className="bg-white border-b sticky top-0 z-10">
-                <div className="container mx-auto px-4 h-16 flex items-center justify-between">
-                    <div className="flex items-center gap-4">
-                        <Button variant="ghost" size="sm" onClick={() => router.push("/portal/my-stay")}>
-                            <ArrowLeft className="h-4 w-4 mr-2" />
-                            Back
-                        </Button>
-                        <h1 className="font-bold text-xl">Rewards</h1>
-                    </div>
-                    <Button variant="ghost" size="sm" onClick={handleLogout}>
-                        <LogOut className="h-4 w-4 mr-2" />
-                        Logout
-                    </Button>
+        <div className="container mx-auto px-4 py-6 space-y-6">
+            {/* Page Header */}
+            <motion.div
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="flex items-center gap-3"
+            >
+                <div className="h-12 w-12 rounded-xl bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center">
+                    <Sparkles className="h-6 w-6 text-white" />
                 </div>
-            </header>
-
-            <main className="container mx-auto px-4 py-8 space-y-8">
+                <div>
+                    <h1 className="text-2xl font-bold text-foreground">Rewards</h1>
+                    <p className="text-muted-foreground">Earn points, unlock perks</p>
+                </div>
+            </motion.div>
                 {/* Points Balance Card */}
                 <Card className="overflow-hidden">
                     <div className={`${TIER_COLORS[profile?.tier || "Bronze"]} p-6 text-white`}>
@@ -223,7 +214,6 @@ export default function RewardsPage() {
                         )}
                     </CardContent>
                 </Card>
-            </main>
         </div>
     );
 }

@@ -2,11 +2,11 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { motion } from "framer-motion";
 import { apiClient } from "@/lib/api-client";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { LogOut, Loader2, ArrowLeft, Wallet, ArrowDownLeft, ArrowUpRight, History, Building2 } from "lucide-react";
+import { Loader2, Wallet, ArrowDownLeft, ArrowUpRight, History, Building2, CreditCard } from "lucide-react";
 import { format } from "date-fns";
 
 type WalletBalance = {
@@ -96,11 +96,6 @@ export default function WalletPage() {
         fetchTransactions();
     }, [selectedWalletId, selectedWallet]);
 
-    const handleLogout = () => {
-        localStorage.removeItem("campreserv:guestToken");
-        router.push("/portal/login");
-    };
-
     const formatCurrency = (cents: number) => {
         return new Intl.NumberFormat('en-US', {
             style: 'currency',
@@ -129,25 +124,21 @@ export default function WalletPage() {
     }
 
     return (
-        <div className="min-h-screen bg-muted/30 pb-20">
-            {/* Header */}
-            <header className="bg-white border-b sticky top-0 z-10">
-                <div className="container mx-auto px-4 h-16 flex items-center justify-between">
-                    <div className="flex items-center gap-4">
-                        <Button variant="ghost" size="sm" onClick={() => router.push("/portal/my-stay")}>
-                            <ArrowLeft className="h-4 w-4 mr-2" />
-                            Back
-                        </Button>
-                        <h1 className="font-bold text-xl">My Wallet</h1>
-                    </div>
-                    <Button variant="ghost" size="sm" onClick={handleLogout}>
-                        <LogOut className="h-4 w-4 mr-2" />
-                        Logout
-                    </Button>
+        <div className="container mx-auto px-4 py-6 space-y-6">
+            {/* Page Header */}
+            <motion.div
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="flex items-center gap-3"
+            >
+                <div className="h-12 w-12 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center">
+                    <CreditCard className="h-6 w-6 text-white" />
                 </div>
-            </header>
-
-            <main className="container mx-auto px-4 py-8 space-y-8">
+                <div>
+                    <h1 className="text-2xl font-bold text-foreground">My Wallet</h1>
+                    <p className="text-muted-foreground">Store credit & payment history</p>
+                </div>
+            </motion.div>
                 {wallets.length === 0 ? (
                     <Card>
                         <CardContent className="py-12 text-center">
@@ -325,7 +316,6 @@ export default function WalletPage() {
                         </Card>
                     </>
                 )}
-            </main>
         </div>
     );
 }
