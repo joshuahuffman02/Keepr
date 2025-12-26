@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 import { Button } from "../ui/button";
@@ -27,19 +27,21 @@ interface BookingFormsSectionProps {
   onFormsComplete: (complete: boolean, responses: Record<string, any>) => void;
 }
 
+interface FormQuestion {
+  id: string;
+  label: string;
+  type: string;
+  required: boolean;
+  options?: string[];
+}
+
 interface FormTemplate {
   id: string;
   title: string;
   type: string;
   description?: string;
   fields?: {
-    questions?: Array<{
-      id: string;
-      label: string;
-      type: string;
-      required: boolean;
-      options?: string[];
-    }>;
+    questions?: FormQuestion[];
   };
   isRequired?: boolean;
   allowSkipWithNote?: boolean;
@@ -169,7 +171,7 @@ export function BookingFormsSection({
   );
 
   // Notify parent of completion status
-  useMemo(() => {
+  useEffect(() => {
     onFormsComplete(allRequiredComplete, formResponses);
   }, [allRequiredComplete, formResponses, onFormsComplete]);
 
@@ -199,9 +201,9 @@ export function BookingFormsSection({
     const responses = formResponses[formId] || {};
 
     // Check required questions
-    const missingRequired = questions.filter(q => q.required && !responses[q.id]);
+    const missingRequired = questions.filter((q: FormQuestion) => q.required && !responses[q.id]);
     if (missingRequired.length > 0) {
-      alert(`Please complete all required fields: ${missingRequired.map(q => q.label).join(", ")}`);
+      alert(`Please complete all required fields: ${missingRequired.map((q: FormQuestion) => q.label).join(", ")}`);
       return;
     }
 

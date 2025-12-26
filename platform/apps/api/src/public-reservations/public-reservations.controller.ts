@@ -1,10 +1,14 @@
 import { Body, Controller, Get, Param, Post, Query } from "@nestjs/common";
 import { PublicReservationsService } from "./public-reservations.service";
 import { CreatePublicReservationDto, PublicQuoteDto, CreatePublicWaitlistDto } from "./dto/create-public-reservation.dto";
+import { FormsService } from "../forms/forms.service";
 
 @Controller("public")
 export class PublicReservationsController {
-    constructor(private readonly service: PublicReservationsService) { }
+    constructor(
+        private readonly service: PublicReservationsService,
+        private readonly formsService: FormsService
+    ) { }
 
     @Get("campgrounds/:slug/availability")
     getAvailability(
@@ -48,5 +52,41 @@ export class PublicReservationsController {
     @Get("reservations/:id")
     getReservation(@Param("id") id: string) {
         return this.service.getReservation(id);
+    }
+
+    /**
+     * Get active forms for a campground during booking/check-in
+     * Query params:
+     * - showAt: Filter by timing ("during_booking", "at_checkin", "after_booking")
+     */
+    @Get("campgrounds/:campgroundId/forms")
+    async getPublicForms(
+        @Param("campgroundId") campgroundId: string,
+        @Query("showAt") showAt?: string
+    ) {
+        return this.formsService.listPublicForms(campgroundId, showAt);
+    }
+
+    /**
+     * Get a single form template for filling out
+     */
+    @Get("forms/:id")
+    async getPublicForm(@Param("id") id: string) {
+        return this.formsService.getPublicForm(id);
+    }
+
+    /**
+     * Submit a completed form during booking
+     */
+    @Post("forms/submit")
+    async submitPublicForm(
+        @Body() body: {
+            formTemplateId: string;
+            reservationId?: string;
+            guestEmail?: string;
+            responses: Record<string, any>;
+        }
+    ) {
+        return this.formsService.submitPublicForm(body);
     }
 }

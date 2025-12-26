@@ -19,6 +19,7 @@ import {
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { RoundUpForCharity } from "@/components/checkout/RoundUpForCharity";
+import { BookingFormsSection } from "@/components/booking/BookingFormsSection";
 
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY || "pk_test_placeholder");
 
@@ -1737,6 +1738,21 @@ function ReviewStep({
     // Charity round-up state
     const [charityDonation, setCharityDonation] = useState<{ optedIn: boolean; amountCents: number; charityId: string | null }>({ optedIn: false, amountCents: 0, charityId: null });
 
+    // Forms state
+    const [formsComplete, setFormsComplete] = useState(true); // Default to true until we check if there are forms
+    const [formResponses, setFormResponses] = useState<Record<string, any>>({});
+    const handleFormsComplete = (complete: boolean, responses: Record<string, any>) => {
+        setFormsComplete(complete);
+        setFormResponses(responses);
+    };
+    // Calculate stay length for form conditions
+    const stayLength = useMemo(() => {
+        if (!arrivalDate || !departureDate) return 1;
+        const arrival = new Date(arrivalDate);
+        const departure = new Date(departureDate);
+        return Math.ceil((departure.getTime() - arrival.getTime()) / (1000 * 60 * 60 * 24));
+    }, [arrivalDate, departureDate]);
+
     const { data: quote, isLoading: isLoadingQuote, error: quoteError } = useQuery<Quote>({
         queryKey: [
             "public-quote",
@@ -2061,11 +2077,14 @@ function ReviewStep({
         setBookingError(null);
         createReservationMutation.mutate();
     };
+    const formsBlocking = !formsComplete;
     const proceedDisabledReason = waiverBlocking
         ? "Please sign the tax exemption waiver to continue"
         : policiesBlocking
             ? "Please accept the required policies to continue"
-            : undefined;
+            : formsBlocking
+                ? "Please complete all required forms to continue"
+                : undefined;
 
     const formatDate = (dateStr: string) =>
         new Date(dateStr).toLocaleDateString("en-US", {
@@ -2373,6 +2392,22 @@ function ReviewStep({
                 </div>
             )}
 
+            {/* Required Forms Section */}
+            <div className="mb-6">
+                <BookingFormsSection
+                    campgroundId={campgroundId}
+                    siteClassId={selectedSiteClassId || selectedSite?.siteClass?.id}
+                    guestInfo={{
+                        adults: guestInfo.adults,
+                        children: guestInfo.children,
+                        petCount: guestInfo.petCount,
+                        equipment: guestInfo.equipment
+                    }}
+                    stayLength={stayLength}
+                    onFormsComplete={handleFormsComplete}
+                />
+            </div>
+
             {/* Tax Exemption Waiver Section */}
             {waiverRequired && (
                 <div className="mb-6 p-4 bg-amber-50 border border-amber-200 rounded-xl">
@@ -2492,7 +2527,7 @@ function ReviewStep({
                     </button>
                     <button
                         onClick={handleProceedToPayment}
-                        disabled={createReservationMutation.isPending || !quote || waiverBlocking || policiesBlocking}
+                        disabled={createReservationMutation.isPending || !quote || waiverBlocking || policiesBlocking || formsBlocking}
                         className="flex-1 py-4 bg-emerald-600 text-white font-semibold rounded-xl hover:bg-emerald-700 disabled:bg-slate-400 transition-colors"
                         title={proceedDisabledReason}
                     >

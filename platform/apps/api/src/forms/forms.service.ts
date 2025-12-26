@@ -97,5 +97,88 @@ export class FormsService {
     await this.prisma.formSubmission.delete({ where: { id } });
     return { id };
   }
+
+  /**
+   * List active form templates for public booking/check-in flows
+   * Filters by campground and optionally by showAt timing
+   */
+  async listPublicForms(campgroundId: string, showAt?: string) {
+    const forms = await this.prisma.formTemplate.findMany({
+      where: {
+        campgroundId,
+        isActive: true
+      },
+      select: {
+        id: true,
+        title: true,
+        type: true,
+        description: true,
+        fields: true,
+        isRequired: true,
+        allowSkipWithNote: true,
+        showAt: true,
+        displayConditions: true,
+        conditionLogic: true
+      },
+      orderBy: { sortOrder: "asc" }
+    });
+
+    // Filter by showAt if provided
+    if (showAt) {
+      return forms.filter(f => {
+        const showAtArray = f.showAt as string[] | null;
+        return showAtArray?.includes(showAt);
+      });
+    }
+
+    return forms;
+  }
+
+  /**
+   * Get a single form template for public submission
+   */
+  async getPublicForm(id: string) {
+    const form = await this.prisma.formTemplate.findUnique({
+      where: { id },
+      select: {
+        id: true,
+        title: true,
+        type: true,
+        description: true,
+        fields: true,
+        isRequired: true,
+        allowSkipWithNote: true
+      }
+    });
+    if (!form) throw new NotFoundException("Form not found");
+    return form;
+  }
+
+  /**
+   * Submit a form from public booking flow
+   */
+  async submitPublicForm(data: {
+    formTemplateId: string;
+    reservationId?: string;
+    guestEmail?: string;
+    responses: Record<string, any>;
+  }) {
+    const template = await this.prisma.formTemplate.findUnique({
+      where: { id: data.formTemplateId }
+    });
+    if (!template) throw new NotFoundException("Form template not found");
+
+    return this.prisma.formSubmission.create({
+      data: {
+        formTemplateId: data.formTemplateId,
+        reservationId: data.reservationId ?? null,
+        guestId: null, // Public submissions don't have guest accounts
+        responses: data.responses ?? Prisma.DbNull,
+        status: "completed",
+        signedAt: new Date()
+      },
+      include: { formTemplate: { select: { id: true, title: true, type: true } } }
+    });
+  }
 }
 

@@ -11,6 +11,7 @@ import { AccessControlModule } from "../access-control/access-control.module";
 import { PoliciesModule } from "../policies/policies.module";
 import { PricingV2Module } from "../pricing-v2/pricing-v2.module";
 import { DepositPoliciesModule } from "../deposit-policies/deposit-policies.module";
+import { FormsModule } from "../forms/forms.module";
 
 @Module({
     imports: [
@@ -23,7 +24,8 @@ import { DepositPoliciesModule } from "../deposit-policies/deposit-policies.modu
         PoliciesModule,
         AccessControlModule,
         PricingV2Module,
-        DepositPoliciesModule
+        DepositPoliciesModule,
+        FormsModule
     ],
     controllers: [PublicReservationsController],
     providers: [PublicReservationsService],
