@@ -21,12 +21,6 @@
       ],
       "@/shared": [
         "../../../packages/shared/src"
-      ],
-      "@prisma/client": [
-        "src/generated/prisma"
-      ],
-      "@prisma/client/*": [
-        "src/generated/prisma/*"
       ]
     },
     "incremental": true,
