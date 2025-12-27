@@ -1,4 +1,4 @@
-import { ConflictException, Injectable } from "@nestjs/common";
+import { ConflictException, Injectable, NotFoundException } from "@nestjs/common";
 import { PrismaService } from "../prisma/prisma.service";
 import {
     CreateProductCategoryDto,
@@ -98,7 +98,7 @@ export class StoreService {
 
     async setStock(id: string, stockQty: number, channel?: OrderChannel | null) {
         const product = await this.prisma.product.findUnique({ where: { id } });
-        if (!product) throw new Error("Product not found");
+        if (!product) throw new NotFoundException("Product not found");
         const next = Math.max(0, stockQty);
         if (channel && product.channelInventoryMode === "split") {
             if (channel === "online" || channel === "portal") {
@@ -114,7 +114,7 @@ export class StoreService {
 
     async adjustStock(id: string, adjustment: number, channel?: OrderChannel | null) {
         const product = await this.prisma.product.findUnique({ where: { id } });
-        if (!product) throw new Error("Product not found");
+        if (!product) throw new NotFoundException("Product not found");
 
         if (channel && product.channelInventoryMode === "split") {
             if (channel === "online" || channel === "portal") {

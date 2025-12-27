@@ -416,6 +416,8 @@ export class StoredValueService {
 
     const account = await this.prisma.storedValueAccount.findUnique({ where: { id: dto.accountId } });
     if (!account) throw new NotFoundException("Account not found");
+    const accountScope = this.normalizeScope(account);
+    const transactionCampgroundId = actor?.campgroundId ?? account.campgroundId;
 
     try {
       const result = await this.prisma.$transaction(async (tx: any) => {
@@ -575,6 +577,8 @@ export class StoredValueService {
     const account = await this.prisma.storedValueAccount.findUnique({ where: { id: dto.accountId } });
     if (!account) throw new NotFoundException("Account not found");
     this.ensureActive(account);
+    const accountScope = this.normalizeScope(account);
+    const transactionCampgroundId = actor?.campgroundId ?? account.campgroundId;
 
     try {
       const result = await this.prisma.$transaction(async (tx: any) => {

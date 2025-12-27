@@ -130,12 +130,12 @@ export default function DynamicPricingPage() {
           stackMode: "additive" as const,
           adjustmentType: "percent" as const,
           adjustmentValue,
-          siteClassId: null,
-          dowMask: null,
-          startDate: null,
-          endDate: null,
-          minRateCap: null,
-          maxRateCap: null,
+          siteClassId: undefined,
+          dowMask: undefined,
+          startDate: undefined,
+          endDate: undefined,
+          minRateCap: undefined,
+          maxRateCap: undefined,
           active: dynamicPricingEnabled,
         };
 

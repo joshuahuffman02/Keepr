@@ -1,7 +1,7 @@
 # Feature Audit (Repo-Based)
 
-Date: 2025-12-18
-Scope: Repo scan of docs, UI routes, and API modules. No runtime validation.
+Date: 2025-12-26 (Updated)
+Scope: Repo scan of docs, UI routes, and API modules. Partial runtime validation.
 
 Legend:
 - ✅ Likely complete (UI + API present, no known blockers)
@@ -31,7 +31,7 @@ Sources used:
 | Staff reservations list | `platform/apps/web/app/reservations/page.tsx`, `platform/apps/web/app/campgrounds/[campgroundId]/reservations/page.tsx` | reservations | ⚠️ Unverified | Core UI exists | Validate create/update and conflicts |
 | Reservation detail | `platform/apps/web/app/campgrounds/[campgroundId]/reservations/[reservationId]/page.tsx` | reservations, signatures | ⚠️ Partial | Policy signature section added; still unverified | Validate signatures + policy status |
 | Booking calendar | `platform/apps/web/app/calendar/page.tsx` | reservations | ⏳ Planned | Marked as pending upgrade | Build full-width upgrade + drag/drop |
-| Site map (interactive) | `platform/apps/web/app/campgrounds/[campgroundId]/map/page.tsx` | site-map | ❌ Broken | Explicitly broken in audits | Rebuild map UX + site locks |
+| Site map (interactive) | `platform/apps/web/app/campgrounds/[campgroundId]/map/page.tsx` | site-map | ✅ Working | Full editor (500+ lines), canvas, MapLibre, picker all functional | None - verified 2025-12-26 |
 | Sites management | `platform/apps/web/app/campgrounds/[campgroundId]/sites/page.tsx` | sites | ⚠️ Unverified | UI exists | Verify CRUD + availability |
 | Site classes | `platform/apps/web/app/campgrounds/[campgroundId]/classes/page.tsx` | site-classes | ⚠️ Unverified | UI exists | Validate class rules + pricing |
 | Holds / site holds | (indirect from booking) | holds | 🧩 Backend-only | No obvious UI; used internally | Confirm hold creation/expiry UX |
@@ -92,7 +92,7 @@ Sources used:
 | Ledger | `platform/apps/web/app/ledger/page.tsx` | ledger | ⚠️ Unverified | UI exists | Validate posting rules |
 | Payouts | `platform/apps/web/app/finance/payouts/page.tsx` | payments | ⚠️ Partial | Seed script failing | Fix seed + verify UI |
 | Disputes | `platform/apps/web/app/finance/disputes/page.tsx` | payments | ⚠️ Partial | Seed data missing | Fix seed + verify UI |
-| Gift cards | `platform/apps/web/app/gift-cards/page.tsx`, `/finance/gift-cards/page.tsx` | stored-value, gift-cards | 🧪 Stubbed | UI input error + stubbed | Fix UI + connect processor |
+| Gift cards | `platform/apps/web/app/gift-cards/page.tsx`, `/finance/gift-cards/page.tsx` | stored-value, gift-cards | ⚠️ Partial | Core issue/redeem works; adjust/void bugs fixed 2025-12-26 | Verify end-to-end flow |
 | Repeat charges | `platform/apps/web/app/billing/repeat-charges/page.tsx` | repeat-charges | ⚠️ Unverified | UI exists | Validate schedule execution |
 | Auto-collect | (no clear UI) | auto-collect | 🧩 Backend-only | Module exists | Add controls + audit |
 | Tax rules | `platform/apps/web/app/dashboard/settings/tax-rules/page.tsx` | tax-rules, currency-tax | ⚠️ Unverified | UI exists | Validate waiver + exemptions |
@@ -130,16 +130,16 @@ Sources used:
 | Exports | `platform/apps/web/app/components/reports/*` | reports | ⚠️ Partial | Export job processor done | Validate end-to-end |
 | Audit reporting | `platform/apps/web/app/reports/audit/page.tsx` | audit | ⚠️ Unverified | UI exists | Validate audit data |
 | Anomalies | (no clear UI) | anomalies | 🧩 Backend-only | Module exists | Surface anomalies UI |
-| AI assistant | `platform/apps/web/app/ai/page.tsx`, `/campgrounds/[id]/ai/page.tsx` | ai | 🧪 Stubbed | Requires AI keys | Wire providers + redaction |
-| CampGuide AI | `platform/apps/web/app/campguide/page.tsx` | ai | 🧪 Stubbed | Mock fallback | Add real AI + context |
-| Dynamic pricing AI | `platform/apps/web/app/campgrounds/[campgroundId]/dynamic-pricing/page.tsx` | dynamic-pricing, pricing-v2 | 🧪 Stubbed | Suggestions mock | Implement pricing actions |
+| AI assistant | `platform/apps/web/app/ai/page.tsx`, `/campgrounds/[id]/ai/page.tsx` | ai | ✅ Working | OpenAI integration live; booking assist, reply assist, insights all functional with API key | Set OPENAI_API_KEY in env |
+| CampGuide AI | `platform/apps/web/app/campguide/page.tsx` | ai | ✅ Working | Uses same AI provider service | Set OPENAI_API_KEY in env |
+| Dynamic pricing AI | `platform/apps/web/app/campgrounds/[campgroundId]/dynamic-pricing/page.tsx` | dynamic-pricing, pricing-v2 | 🧪 Stubbed | Suggestions are formula-based mock | Implement real AI pricing |
 | Semantic search | (no clear UI) | ai | 🧪 Stubbed | Known limitation | Add vector search + index |
 
 ## 8) Integrations, Platform, and Admin
 
 | Feature | UI Surface(s) | API Module(s) | Status | Evidence / Notes | Needs Work |
 | --- | --- | --- | --- | --- | --- |
-| OTA settings | `platform/apps/web/app/dashboard/settings/ota/page.tsx` | ota | 🧪 Stubbed | No provider API calls | Implement provider APIs |
+| OTA settings | `platform/apps/web/app/dashboard/settings/ota/page.tsx` | ota | ⚠️ Partial | Inbound works (iCal import, webhook receive); outbound push stubbed | Standard iCal pattern works |
 | Webhooks | `platform/apps/web/app/dashboard/settings/webhooks/page.tsx` | integrations | ⚠️ Unverified | UI exists | Validate delivery + retries |
 | Developer API | `platform/apps/web/app/dashboard/settings/developers/page.tsx` | developer-api | ⚠️ Unverified | UI exists | Validate API keys + docs |
 | Integrations hub | `platform/apps/web/app/dashboard/settings/integrations/page.tsx` | integrations | ⚠️ Unverified | UI exists | Validate connections |
@@ -158,12 +158,12 @@ Sources used:
 
 # Worklist (Top Gaps to Fix)
 
-1) Site map rebuild (broken) + calendar upgrade (pending)
-2) POS inventory/stock endpoints and catalog visibility
+1) ~~Site map rebuild~~ ✅ VERIFIED WORKING (2025-12-26)
+2) POS inventory/stock endpoints and catalog visibility - STILL BROKEN
 3) Public booking payment + abandoned cart end-to-end validation
 4) Guest portal magic link + reservation visibility
 5) Reports export: seed data + verify CSV/XLSX + email delivery
-6) Gift cards UI error + stored value integration (currently stubbed)
+6) ~~Gift cards bugs~~ ✅ FIXED (2025-12-26) - verify end-to-end
 7) Waitlist list rendering and notification flow
 8) Email integration polish (SendGrid) + messaging playbooks validation
 
