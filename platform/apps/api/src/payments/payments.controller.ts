@@ -550,6 +550,129 @@ export class PaymentsController {
   }
 
   /**
+   * Confirm a public payment intent and update reservation status.
+   * Called by frontend after Stripe.confirmPayment() completes successfully.
+   */
+  @Post("public/payments/intents/:id/confirm")
+  async confirmPublicPaymentIntent(
+    @Param("id") paymentIntentId: string,
+    @Body() body: { reservationId: string },
+    @Req() req: any
+  ) {
+    const idempotencyKey = req.headers["idempotency-key"] || `confirm-${paymentIntentId}-${Date.now()}`;
+
+    // Check if already processed (idempotency)
+    const existing = await this.idempotency.start(idempotencyKey, { paymentIntentId, ...body }, null, {
+      endpoint: "public/payments/intents/confirm",
+      requestBody: body,
+      metadata: { paymentIntentId, reservationId: body.reservationId }
+    });
+    if (existing?.status === IdempotencyStatus.succeeded && existing.responseJson) {
+      return existing.responseJson;
+    }
+
+    try {
+      // Get reservation to find the connected account
+      const reservation = await this.prisma.reservation.findUnique({
+        where: { id: body.reservationId },
+        select: {
+          id: true,
+          status: true,
+          totalCents: true,
+          campground: {
+            select: { id: true, stripeAccountId: true as any }
+          }
+        }
+      });
+
+      if (!reservation) {
+        throw new BadRequestException("Reservation not found");
+      }
+
+      const stripeAccountId = (reservation.campground as any)?.stripeAccountId;
+
+      // Retrieve payment intent from Stripe to verify status
+      const intent = await this.stripeService.retrievePaymentIntent(paymentIntentId, stripeAccountId);
+
+      if (intent.status !== "succeeded" && intent.status !== "requires_capture") {
+        const response = {
+          success: false,
+          status: intent.status,
+          message: `Payment not completed. Status: ${intent.status}`,
+          reservationId: body.reservationId
+        };
+        await this.idempotency.complete(idempotencyKey, response);
+        return response;
+      }
+
+      // Check if payment already recorded (prevent duplicates)
+      const existingPayment = await this.prisma.payment.findFirst({
+        where: {
+          stripePaymentIntentId: paymentIntentId,
+          reservationId: body.reservationId
+        }
+      });
+
+      if (existingPayment) {
+        const response = {
+          success: true,
+          status: "already_recorded",
+          paymentId: existingPayment.id,
+          reservationId: body.reservationId,
+          message: "Payment was already recorded"
+        };
+        await this.idempotency.complete(idempotencyKey, response);
+        return response;
+      }
+
+      // Record the payment
+      const amountCents = intent.amount;
+      const payment = await this.prisma.payment.create({
+        data: {
+          reservationId: body.reservationId,
+          campgroundId: reservation.campground.id,
+          amountCents,
+          currency: intent.currency?.toUpperCase() || "USD",
+          status: intent.status === "succeeded" ? "completed" : "authorized",
+          method: "card",
+          stripePaymentIntentId: paymentIntentId,
+          paidAt: new Date(),
+          metadata: {
+            source: "public_checkout_confirm",
+            paymentIntentStatus: intent.status
+          }
+        }
+      });
+
+      // Update reservation status to confirmed
+      await this.prisma.reservation.update({
+        where: { id: body.reservationId },
+        data: {
+          status: "confirmed",
+          confirmedAt: new Date()
+        }
+      });
+
+      const response = {
+        success: true,
+        status: intent.status,
+        paymentId: payment.id,
+        reservationId: body.reservationId,
+        amountCents,
+        message: "Payment confirmed and reservation updated"
+      };
+
+      await this.idempotency.complete(idempotencyKey, response);
+      return response;
+
+    } catch (error) {
+      await this.idempotency.fail(idempotencyKey);
+      this.logger.error(`Payment confirmation failed for ${paymentIntentId}:`, error);
+      throw error;
+    }
+  }
+
+  /**
    * Create/connect a campground Stripe account (Express) and return onboarding link
    */
   @UseGuards(JwtAuthGuard, RolesGuard, ScopeGuard)

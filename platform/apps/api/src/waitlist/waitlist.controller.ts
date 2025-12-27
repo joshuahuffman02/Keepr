@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Param, Delete, Query, UseGuards, Req } from '@nestjs/common';
+import { Controller, Get, Post, Patch, Body, Param, Delete, Query, UseGuards, Req } from '@nestjs/common';
 import { WaitlistService } from './waitlist.service';
 import { CreateWaitlistEntryDto } from '@campreserv/shared';
 import { JwtAuthGuard } from '../auth/guards';
@@ -14,6 +14,28 @@ interface CreateStaffWaitlistDto {
     siteTypeId?: string;
     arrivalDate?: string;
     departureDate?: string;
+    priority?: number;
+    autoOffer?: boolean;
+    maxPrice?: number;
+    flexibleDates?: boolean;
+    flexibleDays?: number;
+}
+
+interface UpdateWaitlistDto {
+    contactName?: string;
+    contactEmail?: string;
+    contactPhone?: string;
+    notes?: string;
+    siteId?: string;
+    siteTypeId?: string;
+    arrivalDate?: string;
+    departureDate?: string;
+    priority?: number;
+    autoOffer?: boolean;
+    maxPrice?: number;
+    flexibleDates?: boolean;
+    flexibleDays?: number;
+    status?: 'waiting' | 'offered' | 'accepted' | 'expired' | 'cancelled';
 }
 
 @UseGuards(JwtAuthGuard)
@@ -48,6 +70,13 @@ export class WaitlistController {
         @Query('type') type?: string,
     ) {
         return this.waitlistService.findAll(campgroundId, type);
+    }
+
+    @Patch(':id')
+    update(@Param('id') id: string, @Body() dto: UpdateWaitlistDto, @Req() req: any) {
+        const idempotencyKey = req.headers["idempotency-key"];
+        const sequence = req.headers["x-client-seq"] ?? req.headers["client-seq"];
+        return this.waitlistService.updateEntry(id, dto);
     }
 
     @Delete(':id')

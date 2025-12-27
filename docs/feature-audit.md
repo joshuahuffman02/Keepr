@@ -102,8 +102,8 @@ Sources used:
 
 | Feature | UI Surface(s) | API Module(s) | Status | Evidence / Notes | Needs Work |
 | --- | --- | --- | --- | --- | --- |
-| POS | `platform/apps/web/app/pos/page.tsx` | pos, payments, store | ⚠️ Partial | Stock endpoints failing | Fix stock API + catalog |
-| Store catalog | `platform/apps/web/app/store/page.tsx` | store | ⚠️ Partial | Seeded product not visible in POS | Fix inventory bridge |
+| POS | `platform/apps/web/app/pos/page.tsx` | pos, payments, store | ✅ Working | Stock endpoints fixed (2025-12-26); proper error handling | None |
+| Store catalog | `platform/apps/web/app/store/page.tsx` | store | ✅ Working | Inventory bridge fixed (2025-12-26) | None |
 | Inventory movements | `platform/apps/web/app/store/inventory/movements/page.tsx` | store | ⚠️ Unverified | UI exists | Validate movement logs |
 | Fulfillment | `platform/apps/web/app/store/fulfillment/page.tsx` | store | ⚠️ Unverified | UI exists | Validate pick/pack/ship |
 | Transfers | `platform/apps/web/app/store/transfers/page.tsx` | store | ⚠️ Unverified | UI exists | Validate transfer actions |
@@ -132,8 +132,8 @@ Sources used:
 | Anomalies | (no clear UI) | anomalies | 🧩 Backend-only | Module exists | Surface anomalies UI |
 | AI assistant | `platform/apps/web/app/ai/page.tsx`, `/campgrounds/[id]/ai/page.tsx` | ai | ✅ Working | OpenAI integration live; booking assist, reply assist, insights all functional with API key | Set OPENAI_API_KEY in env |
 | CampGuide AI | `platform/apps/web/app/campguide/page.tsx` | ai | ✅ Working | Uses same AI provider service | Set OPENAI_API_KEY in env |
-| Dynamic pricing AI | `platform/apps/web/app/campgrounds/[campgroundId]/dynamic-pricing/page.tsx` | dynamic-pricing, pricing-v2 | 🧪 Stubbed | Suggestions are formula-based mock | Implement real AI pricing |
-| Semantic search | (no clear UI) | ai | 🧪 Stubbed | Known limitation | Add vector search + index |
+| Dynamic pricing AI | `platform/apps/web/app/campgrounds/[campgroundId]/dynamic-pricing/page.tsx` | dynamic-pricing, pricing-v2 | ✅ Working | Real AI with occupancy/velocity data; formula fallback when AI unavailable | Set OPENAI_API_KEY in env |
+| Semantic search | (no clear UI) | ai | ✅ Working | AI-powered search across guests/sites/messages; keyword fallback | Set OPENAI_API_KEY in env |
 
 ## 8) Integrations, Platform, and Admin
 
@@ -159,7 +159,7 @@ Sources used:
 # Worklist (Top Gaps to Fix)
 
 1) ~~Site map rebuild~~ ✅ VERIFIED WORKING (2025-12-26)
-2) POS inventory/stock endpoints and catalog visibility - STILL BROKEN
+2) ~~POS inventory/stock endpoints~~ ✅ FIXED (2025-12-26) - proper 404 responses, frontend uses correct API
 3) Public booking payment + abandoned cart end-to-end validation
 4) Guest portal magic link + reservation visibility
 5) Reports export: seed data + verify CSV/XLSX + email delivery

@@ -265,67 +265,357 @@ Return:
 
   async pricingSuggest(dto: PricingSuggestDto, forceMock = false) {
     const useMock = await this.shouldUseMock(dto.campgroundId, forceMock);
-    const demandIndex = dto.demandIndex ?? 0.78;
-    const baseRateCents = 12000;
-    const upliftPercent = Math.round(demandIndex * 20);
-    const suggestedRateCents = Math.round(baseRateCents * (1 + upliftPercent / 100));
-    return {
-      campgroundId: dto.campgroundId,
-      siteClassId: dto.siteClassId ?? null,
-      window: { arrivalDate: dto.arrivalDate ?? null, departureDate: dto.departureDate ?? null },
-      baseRateCents,
-      suggestedRateCents,
-      currency: "USD",
-      demandIndex,
-      factors: [
-        { label: "Occupancy (next 14d)", value: "82%", weight: 0.4 },
-        { label: "Pickup last 7d vs prior", value: "+11%", weight: 0.25 },
-        { label: "Local events", value: "County fair next weekend", weight: 0.2 },
-        { label: "Rules", value: "Weekend +10%, 2-night min", weight: 0.15 },
-      ],
-      comparableSites: [
-        { name: "Premium RV", rateCents: suggestedRateCents + 1500, distanceMiles: 0.4 },
-        { name: "Standard RV", rateCents: suggestedRateCents - 1800, distanceMiles: 0.2 },
-      ],
-      notes: "Stubbed suggestion based on demand, comps, and rules; safe to demo without external keys.",
-      generatedAt: new Date().toISOString(),
-      mode: useMock ? "mock" : "live",
-    };
+
+    // Gather real data for context
+    const cgId = dto.campgroundId;
+    const now = new Date();
+    const next14Days = new Date(now.getTime() + 14 * 24 * 60 * 60 * 1000);
+
+    // Get current base rate from site class if provided
+    let baseRateCents = 12000;
+    let siteClassName = "Standard Site";
+    if (dto.siteClassId) {
+      const siteClass = await this.prisma.siteClass.findUnique({
+        where: { id: dto.siteClassId },
+        select: { name: true, baseRateCents: true },
+      });
+      if (siteClass) {
+        baseRateCents = siteClass.baseRateCents ?? 12000;
+        siteClassName = siteClass.name;
+      }
+    }
+
+    // Calculate real occupancy for next 14 days
+    const totalSites = await this.prisma.site.count({ where: { campgroundId: cgId } });
+    const bookedNights = await this.prisma.reservation.count({
+      where: {
+        campgroundId: cgId,
+        status: { in: ["confirmed", "checked_in"] },
+        arrivalDate: { lte: next14Days },
+        departureDate: { gte: now },
+      },
+    });
+    const occupancyPercent = totalSites > 0 ? Math.round((bookedNights / (totalSites * 14)) * 100) : 0;
+
+    // Get recent booking velocity (last 7 days vs prior 7 days)
+    const last7Days = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+    const prior7Days = new Date(now.getTime() - 14 * 24 * 60 * 60 * 1000);
+    const recentBookings = await this.prisma.reservation.count({
+      where: { campgroundId: cgId, createdAt: { gte: last7Days } },
+    });
+    const priorBookings = await this.prisma.reservation.count({
+      where: { campgroundId: cgId, createdAt: { gte: prior7Days, lt: last7Days } },
+    });
+    const velocityChange = priorBookings > 0 ? Math.round(((recentBookings - priorBookings) / priorBookings) * 100) : 0;
+
+    // Calculate demand index based on real metrics
+    const demandIndex = Math.min(1, Math.max(0, (occupancyPercent / 100) * 0.6 + (velocityChange > 0 ? 0.2 : 0) + 0.2));
+
+    if (useMock) {
+      // Return formula-based result without AI
+      const upliftPercent = Math.round(demandIndex * 20);
+      const suggestedRateCents = Math.round(baseRateCents * (1 + upliftPercent / 100));
+      return {
+        campgroundId: cgId,
+        siteClassId: dto.siteClassId ?? null,
+        window: { arrivalDate: dto.arrivalDate ?? null, departureDate: dto.departureDate ?? null },
+        baseRateCents,
+        suggestedRateCents,
+        currency: "USD",
+        demandIndex,
+        factors: [
+          { label: "Occupancy (next 14d)", value: `${occupancyPercent}%`, weight: 0.4 },
+          { label: "Booking velocity", value: `${velocityChange >= 0 ? "+" : ""}${velocityChange}%`, weight: 0.25 },
+          { label: "Base demand", value: "Standard", weight: 0.2 },
+          { label: "Active rules", value: "None detected", weight: 0.15 },
+        ],
+        comparableSites: [],
+        notes: "Formula-based suggestion. Enable AI for smarter recommendations.",
+        generatedAt: new Date().toISOString(),
+        mode: "mock",
+      };
+    }
+
+    // Use AI for intelligent pricing recommendation
+    const cg = await this.prisma.campground.findUnique({
+      where: { id: cgId },
+      select: { name: true, aiOpenaiApiKey: true as any },
+    });
+
+    const prompt = `You are a revenue management AI for ${cg?.name || "a campground"}. Analyze the data and suggest optimal pricing.
+
+Current Data:
+- Site Class: ${siteClassName}
+- Base Rate: $${(baseRateCents / 100).toFixed(2)}/night
+- Occupancy (next 14 days): ${occupancyPercent}%
+- Booking velocity change (7d vs prior): ${velocityChange >= 0 ? "+" : ""}${velocityChange}%
+- Target dates: ${dto.arrivalDate || "flexible"} to ${dto.departureDate || "flexible"}
+
+Respond with JSON only (no markdown):
+{
+  "suggestedRateCents": <number>,
+  "upliftPercent": <number>,
+  "reasoning": "<brief explanation>",
+  "factors": [{"label": "<factor>", "value": "<value>", "weight": <0-1>}],
+  "confidence": <0-1>
+}`;
+
+    try {
+      const res = await fetch("https://api.openai.com/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${(cg as any).aiOpenaiApiKey}`,
+        },
+        body: JSON.stringify({
+          model: "gpt-4o-mini",
+          messages: [
+            { role: "system", content: "You are a revenue management expert. Return only valid JSON." },
+            { role: "user", content: prompt },
+          ],
+          temperature: 0.3,
+          max_tokens: 300,
+        }),
+      });
+
+      if (!res.ok) {
+        throw new Error(`OpenAI error: ${res.status}`);
+      }
+
+      const json = await res.json();
+      const content = json?.choices?.[0]?.message?.content || "";
+      const parsed = JSON.parse(content.replace(/```json\n?|\n?```/g, "").trim());
+
+      return {
+        campgroundId: cgId,
+        siteClassId: dto.siteClassId ?? null,
+        window: { arrivalDate: dto.arrivalDate ?? null, departureDate: dto.departureDate ?? null },
+        baseRateCents,
+        suggestedRateCents: parsed.suggestedRateCents || baseRateCents,
+        currency: "USD",
+        demandIndex,
+        factors: parsed.factors || [],
+        comparableSites: [],
+        notes: parsed.reasoning || "AI-generated pricing recommendation",
+        confidence: parsed.confidence,
+        generatedAt: new Date().toISOString(),
+        mode: "live",
+      };
+    } catch (error) {
+      this.logger.error("AI pricing suggestion failed, falling back to formula", error);
+      const upliftPercent = Math.round(demandIndex * 20);
+      const suggestedRateCents = Math.round(baseRateCents * (1 + upliftPercent / 100));
+      return {
+        campgroundId: cgId,
+        siteClassId: dto.siteClassId ?? null,
+        window: { arrivalDate: dto.arrivalDate ?? null, departureDate: dto.departureDate ?? null },
+        baseRateCents,
+        suggestedRateCents,
+        currency: "USD",
+        demandIndex,
+        factors: [
+          { label: "Occupancy (next 14d)", value: `${occupancyPercent}%`, weight: 0.4 },
+          { label: "Booking velocity", value: `${velocityChange >= 0 ? "+" : ""}${velocityChange}%`, weight: 0.25 },
+        ],
+        comparableSites: [],
+        notes: "Fallback formula-based suggestion (AI unavailable).",
+        generatedAt: new Date().toISOString(),
+        mode: "fallback",
+      };
+    }
   }
 
   async semanticSearch(dto: SemanticSearchDto, forceMock = false) {
     const useMock = await this.shouldUseMock(dto.campgroundId, forceMock);
     const query = dto.query.trim();
-    const results = [
-      {
+    const cgId = dto.campgroundId;
+
+    if (!query) {
+      return {
+        campgroundId: cgId ?? null,
+        query,
+        results: [],
+        generatedAt: new Date().toISOString(),
+        mode: "empty",
+      };
+    }
+
+    // Gather searchable data from the database
+    const [guests, sites, messages] = await Promise.all([
+      // Get recent/relevant guests
+      this.prisma.guest.findMany({
+        where: cgId ? { campgroundId: cgId } : {},
+        take: 50,
+        orderBy: { updatedAt: "desc" },
+        select: {
+          id: true,
+          firstName: true,
+          lastName: true,
+          email: true,
+          notes: true,
+          loyaltyTier: true,
+          tags: true,
+        },
+      }),
+      // Get sites
+      this.prisma.site.findMany({
+        where: cgId ? { campgroundId: cgId } : {},
+        take: 50,
+        select: {
+          id: true,
+          name: true,
+          description: true,
+          siteType: true,
+          maxRigLength: true,
+          hookups: true,
+          amenities: true,
+        },
+      }),
+      // Get recent messages
+      this.prisma.message.findMany({
+        where: cgId ? { campgroundId: cgId } : {},
+        take: 30,
+        orderBy: { createdAt: "desc" },
+        select: {
+          id: true,
+          subject: true,
+          body: true,
+          guestId: true,
+        },
+      }),
+    ]);
+
+    // Format data for search context
+    const searchableItems = [
+      ...guests.map((g) => ({
         type: "guest",
-        id: "guest-alice",
-        title: "Alice Johnson",
-        snippet: "Prefers shaded pull-through, traveling with 32ft fifth wheel; VIP tier.",
-        score: 0.92,
-      },
-      {
+        id: g.id,
+        title: `${g.firstName} ${g.lastName}`,
+        content: `${g.firstName} ${g.lastName} ${g.email || ""} ${g.notes || ""} ${g.loyaltyTier || ""} ${(g.tags as string[] || []).join(" ")}`.trim(),
+      })),
+      ...sites.map((s) => ({
         type: "site",
-        id: "site-12",
-        title: "Riverside pull-through",
-        snippet: "Full hookups, near dog park, fits 40ft rigs; great for late checkouts.",
-        score: 0.88,
-      },
-      {
+        id: s.id,
+        title: s.name,
+        content: `${s.name} ${s.description || ""} ${s.siteType || ""} ${s.maxRigLength ? `fits ${s.maxRigLength}ft rigs` : ""} ${(s.hookups as string[] || []).join(" ")} ${(s.amenities as string[] || []).join(" ")}`.trim(),
+      })),
+      ...messages.map((m) => ({
         type: "message",
-        id: "msg-482",
-        title: "Thread: late checkout request",
-        snippet: "Guest asked for late checkout due to event; offered $15 add-on.",
-        score: 0.83,
-      },
-    ].filter((r) => r.score > 0.1 && query.length > 0);
-    return {
-      campgroundId: dto.campgroundId ?? null,
-      query,
-      results,
-      generatedAt: new Date().toISOString(),
-      mode: useMock ? "mock" : "live",
-    };
+        id: m.id,
+        title: m.subject || "Message",
+        content: `${m.subject || ""} ${(m.body || "").slice(0, 200)}`.trim(),
+      })),
+    ];
+
+    if (useMock) {
+      // Simple keyword matching without AI
+      const lowerQuery = query.toLowerCase();
+      const results = searchableItems
+        .filter((item) => item.content.toLowerCase().includes(lowerQuery) || item.title.toLowerCase().includes(lowerQuery))
+        .slice(0, 10)
+        .map((item, idx) => ({
+          type: item.type,
+          id: item.id,
+          title: item.title,
+          snippet: item.content.slice(0, 150),
+          score: 0.9 - idx * 0.05,
+        }));
+
+      return {
+        campgroundId: cgId ?? null,
+        query,
+        results,
+        generatedAt: new Date().toISOString(),
+        mode: "mock",
+      };
+    }
+
+    // Use AI for semantic matching
+    const cg = await this.prisma.campground.findUnique({
+      where: { id: cgId! },
+      select: { name: true, aiOpenaiApiKey: true as any },
+    });
+
+    const prompt = `You are a search assistant. Given the user query and items below, return the most relevant matches.
+
+User Query: "${query}"
+
+Available Items (JSON):
+${JSON.stringify(searchableItems.slice(0, 40), null, 2)}
+
+Return JSON array of matches (max 10), ordered by relevance:
+[{"id": "<item id>", "type": "<guest|site|message>", "score": <0-1>, "reason": "<why it matches>"}]
+
+Only include items with score >= 0.5. Return empty array if no good matches.`;
+
+    try {
+      const res = await fetch("https://api.openai.com/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${(cg as any).aiOpenaiApiKey}`,
+        },
+        body: JSON.stringify({
+          model: "gpt-4o-mini",
+          messages: [
+            { role: "system", content: "You are a semantic search engine. Return only valid JSON arrays." },
+            { role: "user", content: prompt },
+          ],
+          temperature: 0.2,
+          max_tokens: 500,
+        }),
+      });
+
+      if (!res.ok) {
+        throw new Error(`OpenAI error: ${res.status}`);
+      }
+
+      const json = await res.json();
+      const content = json?.choices?.[0]?.message?.content || "[]";
+      const parsed = JSON.parse(content.replace(/```json\n?|\n?```/g, "").trim());
+
+      // Enrich results with full data
+      const results = (parsed as any[]).map((match) => {
+        const item = searchableItems.find((i) => i.id === match.id);
+        return {
+          type: match.type,
+          id: match.id,
+          title: item?.title || "Unknown",
+          snippet: match.reason || item?.content?.slice(0, 150) || "",
+          score: match.score,
+        };
+      });
+
+      return {
+        campgroundId: cgId ?? null,
+        query,
+        results,
+        generatedAt: new Date().toISOString(),
+        mode: "live",
+      };
+    } catch (error) {
+      this.logger.error("AI semantic search failed, falling back to keyword", error);
+      // Fallback to keyword search
+      const lowerQuery = query.toLowerCase();
+      const results = searchableItems
+        .filter((item) => item.content.toLowerCase().includes(lowerQuery) || item.title.toLowerCase().includes(lowerQuery))
+        .slice(0, 10)
+        .map((item, idx) => ({
+          type: item.type,
+          id: item.id,
+          title: item.title,
+          snippet: item.content.slice(0, 150),
+          score: 0.9 - idx * 0.05,
+        }));
+
+      return {
+        campgroundId: cgId ?? null,
+        query,
+        results,
+        generatedAt: new Date().toISOString(),
+        mode: "fallback",
+      };
+    }
   }
 
   async copilot(dto: CopilotActionDto, forceMock = false) {

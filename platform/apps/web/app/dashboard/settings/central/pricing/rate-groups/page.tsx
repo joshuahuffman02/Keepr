@@ -94,10 +94,10 @@ export default function RateGroupsPage() {
 
     apiClient.getSeasonalRates(id)
       .then((rates) => {
-        // Assign colors to rates that don't have one
+        // Assign colors to rates (API doesn't return color, so we assign from preset)
         const ratesWithColors = rates.map((rate, index) => ({
           ...rate,
-          color: rate.color || PRESET_COLORS[index % PRESET_COLORS.length],
+          color: PRESET_COLORS[index % PRESET_COLORS.length],
         }));
         setSeasonalRates(ratesWithColors);
         setLoading(false);

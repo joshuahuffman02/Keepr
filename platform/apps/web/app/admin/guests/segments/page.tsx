@@ -70,132 +70,6 @@ interface GuestSegment {
   status: "active" | "archived";
 }
 
-// Mock segments for initial development
-const mockSegments: GuestSegment[] = [
-  {
-    id: "seg-1",
-    name: "Canadian Snowbirds",
-    description: "Canadian guests who typically travel south during winter months",
-    scope: "global",
-    criteria: [
-      { type: "country", operator: "equals", value: "Canada" },
-      { type: "booking_month", operator: "in", value: ["10", "11", "12", "1", "2", "3"] },
-    ],
-    guestCount: 2156,
-    createdAt: "2024-08-15T10:00:00Z",
-    updatedAt: "2024-12-10T14:30:00Z",
-    createdBy: "System",
-    isTemplate: true,
-    status: "active",
-  },
-  {
-    id: "seg-2",
-    name: "Family Campers",
-    description: "Guests traveling with children",
-    scope: "global",
-    criteria: [
-      { type: "has_children", operator: "equals", value: "true" },
-    ],
-    guestCount: 5613,
-    createdAt: "2024-06-01T10:00:00Z",
-    updatedAt: "2024-11-20T09:15:00Z",
-    createdBy: "System",
-    isTemplate: true,
-    status: "active",
-  },
-  {
-    id: "seg-3",
-    name: "Long-Stay Remote Workers",
-    description: "Guests with stays of 7+ nights who may be working remotely",
-    scope: "global",
-    criteria: [
-      { type: "stay_length", operator: "gte", value: 7 },
-      { type: "stay_reason", operator: "equals", value: "work_remote" },
-    ],
-    guestCount: 765,
-    createdAt: "2024-09-10T10:00:00Z",
-    updatedAt: "2024-12-05T11:45:00Z",
-    createdBy: "System",
-    isTemplate: true,
-    status: "active",
-  },
-  {
-    id: "seg-4",
-    name: "Pet Travelers",
-    description: "Guests who travel with pets",
-    scope: "global",
-    criteria: [
-      { type: "has_pets", operator: "equals", value: "true" },
-    ],
-    guestCount: 4521,
-    createdAt: "2024-07-20T10:00:00Z",
-    updatedAt: "2024-11-15T16:20:00Z",
-    createdBy: "System",
-    isTemplate: true,
-    status: "active",
-  },
-  {
-    id: "seg-5",
-    name: "Class A Enthusiasts",
-    description: "Guests with Class A motorhomes",
-    scope: "global",
-    criteria: [
-      { type: "rig_type", operator: "equals", value: "class_a" },
-    ],
-    guestCount: 3421,
-    createdAt: "2024-05-15T10:00:00Z",
-    updatedAt: "2024-10-30T13:00:00Z",
-    createdBy: "System",
-    isTemplate: true,
-    status: "active",
-  },
-  {
-    id: "seg-6",
-    name: "Repeat Visitors",
-    description: "Guests who have stayed 2+ times",
-    scope: "global",
-    criteria: [
-      { type: "repeat_stays", operator: "gte", value: 2 },
-    ],
-    guestCount: 4521,
-    createdAt: "2024-04-01T10:00:00Z",
-    updatedAt: "2024-12-01T10:30:00Z",
-    createdBy: "System",
-    isTemplate: true,
-    status: "active",
-  },
-  {
-    id: "seg-7",
-    name: "Weekend Warriors",
-    description: "Guests who primarily book weekend stays (Fri-Sun)",
-    scope: "global",
-    criteria: [
-      { type: "arrival_day", operator: "in", value: ["Friday", "Saturday"] },
-      { type: "stay_length", operator: "lte", value: 3 },
-    ],
-    guestCount: 3876,
-    createdAt: "2024-08-01T10:00:00Z",
-    updatedAt: "2024-11-28T08:45:00Z",
-    createdBy: "System",
-    isTemplate: true,
-    status: "active",
-  },
-  {
-    id: "seg-8",
-    name: "Texas Locals",
-    description: "Guests from Texas",
-    scope: "organization",
-    criteria: [
-      { type: "state", operator: "equals", value: "TX" },
-    ],
-    guestCount: 1842,
-    createdAt: "2024-10-15T10:00:00Z",
-    updatedAt: "2024-12-08T15:00:00Z",
-    createdBy: "admin@campground.com",
-    isTemplate: false,
-    status: "active",
-  },
-];
 
 const criteriaTypeOptions = [
   { value: "country", label: "Country", icon: Globe },
@@ -327,10 +201,10 @@ export default function GuestSegmentsPage() {
   const { data: whoami, isLoading: whoamiLoading } = useWhoami();
   const [segments, setSegments] = useState<GuestSegment[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [scopeFilter, setScopeFilter] = useState<string>("all");
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
-  const [isUsingMockData, setIsUsingMockData] = useState(false);
 
   // New segment form state
   const [newSegment, setNewSegment] = useState({
@@ -348,6 +222,7 @@ export default function GuestSegmentsPage() {
   const fetchSegments = useCallback(async () => {
     try {
       setLoading(true);
+      setError(null);
       const token = localStorage.getItem("campreserv:authToken");
       const params = new URLSearchParams();
       if (scopeFilter !== "all") params.append("scope", scopeFilter);
@@ -361,11 +236,7 @@ export default function GuestSegmentsPage() {
       });
 
       if (!res.ok) {
-        // Fall back to mock data if API not available
-        console.warn("API not available, using mock data");
-        setSegments(mockSegments);
-        setIsUsingMockData(true);
-        return;
+        throw new Error(`Failed to fetch segments: ${res.statusText}`);
       }
 
       const data = await res.json();
@@ -383,18 +254,11 @@ export default function GuestSegmentsPage() {
         isTemplate: s.isTemplate || false,
         status: s.status,
       }));
-      if (mappedSegments.length === 0) {
-        // No real segments, show mock data
-        setSegments(mockSegments);
-        setIsUsingMockData(true);
-      } else {
-        setSegments(mappedSegments);
-        setIsUsingMockData(false);
-      }
+      setSegments(mappedSegments);
     } catch (err) {
-      console.warn("Failed to fetch segments, using mock data:", err);
-      setSegments(mockSegments);
-      setIsUsingMockData(true);
+      console.error("Failed to fetch segments:", err);
+      setError(err instanceof Error ? err.message : "Unknown error");
+      setSegments([]);
     } finally {
       setLoading(false);
     }
@@ -563,6 +427,24 @@ export default function GuestSegmentsPage() {
     );
   }
 
+  if (error) {
+    return (
+      <div className="p-8">
+        <Card className="bg-rose-900/20 border-rose-700">
+          <CardContent className="p-6">
+            <div className="flex items-center gap-3">
+              <AlertTriangle className="h-6 w-6 text-rose-500" />
+              <div>
+                <h3 className="font-semibold text-rose-200">Error Loading Segments</h3>
+                <p className="text-sm text-rose-300/80">{error}</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
   return (
     <div className="p-6 space-y-6">
       {/* Header */}
@@ -570,16 +452,9 @@ export default function GuestSegmentsPage() {
         <div>
           <div className="flex items-center gap-3">
             <h1 className="text-2xl font-bold text-white">Guest Segments</h1>
-            {isUsingMockData && (
-              <Badge className="bg-amber-600/20 text-amber-400 border border-amber-600/50">
-                Demo Data
-              </Badge>
-            )}
           </div>
           <p className="text-slate-400 mt-1">
-            {isUsingMockData
-              ? "Showing sample segments — create your first segment to get started"
-              : "Create and manage guest segments for targeted messaging and insights"}
+            Create and manage guest segments for targeted messaging and insights
           </p>
         </div>
         <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>

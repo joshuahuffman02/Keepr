@@ -10,80 +10,9 @@ import { randomUUID } from "crypto";
 
 type RequestScope = { campgroundId?: string | null; organizationId?: string | null; userId?: string | null };
 
-const MOCK_MODE = process.env.ANALYTICS_MOCK_MODE === "true";
-type MockEvent = {
-  sessionId: string;
-  eventName: AnalyticsEventName;
-  occurredAt: Date;
-  page?: string;
-  referrer?: string | null;
-  referrerUrl?: string | null;
-  deviceType?: string | null;
-  region?: string | null;
-  campgroundId?: string | null;
-  organizationId?: string | null;
-  reservationId?: string | null;
-  siteId?: string | null;
-  siteClassId?: string | null;
-  promotionId?: string | null;
-  imageId?: string | null;
-  abVariantId?: string | null;
-  metadata?: Record<string, any>;
-};
-
-const mockStore: {
-  events: MockEvent[];
-  aggregates: Map<string, { count: number; sessions: Set<string> }>;
-} = {
-  events: [],
-  aggregates: new Map(),
-};
-
-const MOCK_EVENT_LIMIT = 2000;
-
-function dayKey(d: Date) {
-  const copy = new Date(d);
-  copy.setUTCHours(0, 0, 0, 0);
-  return copy.toISOString();
-}
-
-function recordMockEvent(raw: MockEvent) {
-  const occurredAt = raw.occurredAt || new Date();
-  const event: MockEvent = { ...raw, occurredAt };
-  mockStore.events.push(event);
-  if (mockStore.events.length > MOCK_EVENT_LIMIT) {
-    mockStore.events.shift();
-  }
-
-  const key = `${raw.campgroundId ?? "mock"}|${raw.eventName}|${dayKey(occurredAt)}`;
-  const entry = mockStore.aggregates.get(key) ?? { count: 0, sessions: new Set<string>() };
-  entry.count += 1;
-  if (raw.sessionId) entry.sessions.add(raw.sessionId);
-  mockStore.aggregates.set(key, entry);
-  return event;
-}
-
-function getMockAggregates(campgroundId: string, since: Date) {
-  const results: Array<{ campgroundId: string; eventName: AnalyticsEventName; date: Date; count: number; uniqueSessions: number }> = [];
-  for (const [key, value] of mockStore.aggregates.entries()) {
-    const [cg, eventName, dateStr] = key.split("|");
-    const date = new Date(dateStr);
-    if (cg === (campgroundId ?? "mock") && date >= since) {
-      results.push({
-        campgroundId: cg,
-        eventName: eventName as AnalyticsEventName,
-        date,
-        count: value.count,
-        uniqueSessions: value.sessions.size,
-      });
-    }
-  }
-  return results;
-}
-
-function getMockEvents(campgroundId: string, since: Date) {
-  return mockStore.events.filter((e) => (e.campgroundId ?? "mock") === (campgroundId ?? "mock") && e.occurredAt >= since);
-}
+// MOCK_MODE has been removed - the service now always uses the real database
+// This ensures analytics queries return actual data instead of in-memory mock data
+// that gets cleared on restart
 
 @Injectable()
 export class AnalyticsService {
@@ -93,27 +22,6 @@ export class AnalyticsService {
 
   async ingest(dto: IngestAnalyticsEventDto, scope: RequestScope) {
     const occurredAt = dto.occurredAt ? new Date(dto.occurredAt) : new Date();
-    if (MOCK_MODE) {
-      return recordMockEvent({
-        sessionId: dto.sessionId,
-        eventName: dto.eventName,
-        occurredAt,
-        page: dto.page,
-        referrer: dto.referrer,
-        referrerUrl: dto.referrerUrl,
-        deviceType: dto.deviceType,
-        region: dto.region,
-        campgroundId: dto.campgroundId ?? scope.campgroundId ?? "mock",
-        organizationId: dto.organizationId ?? scope.organizationId ?? undefined,
-        reservationId: dto.reservationId,
-        siteId: dto.siteId,
-        siteClassId: dto.siteClassId,
-        promotionId: dto.promotionId,
-        imageId: dto.imageId,
-        abVariantId: dto.abVariantId,
-        metadata: dto.metadata,
-      });
-    }
 
     const data: Prisma.AnalyticsEventCreateInput = {
       sessionId: dto.sessionId,
@@ -164,9 +72,6 @@ export class AnalyticsService {
     sessionId: string;
     occurredAt: Date;
   }) {
-    if (MOCK_MODE) {
-      return;
-    }
     if (!params.campgroundId && !params.organizationId) {
       return;
     }
@@ -199,9 +104,6 @@ export class AnalyticsService {
 
   @Cron(CronExpression.EVERY_HOUR)
   async refreshDailyAggregates() {
-    if (MOCK_MODE) {
-      return;
-    }
     const rows = await this.prisma.$queryRaw<
       Array<{ campgroundId: string | null; organizationId: string | null; eventName: AnalyticsEventName; date: Date; count: bigint; uniqueSessions: bigint }>
     >`
@@ -247,19 +149,6 @@ export class AnalyticsService {
 
   @Cron(CronExpression.EVERY_DAY_AT_2AM)
   async enforceRetention() {
-    if (MOCK_MODE) {
-      // prune mock events older than retention window
-      const days = Number(process.env.ANALYTICS_RETENTION_DAYS || 395);
-      const cutoff = new Date();
-      cutoff.setDate(cutoff.getDate() - days);
-      mockStore.events = mockStore.events.filter((e) => e.occurredAt >= cutoff);
-      for (const [key] of mockStore.aggregates.entries()) {
-        const [, , dateStr] = key.split("|");
-        const d = new Date(dateStr);
-        if (d < cutoff) mockStore.aggregates.delete(key);
-      }
-      return;
-    }
     const days = Number(process.env.ANALYTICS_RETENTION_DAYS || 395);
     const cutoff = new Date();
     cutoff.setDate(cutoff.getDate() - days);
@@ -279,11 +168,9 @@ export class AnalyticsService {
     const since = new Date();
     since.setDate(since.getDate() - 7);
 
-    const aggregates = MOCK_MODE
-      ? getMockAggregates(campgroundId, since)
-      : await this.prisma.analyticsDailyAggregate.findMany({
-          where: { campgroundId, date: { gte: since } },
-        });
+    const aggregates = await this.prisma.analyticsDailyAggregate.findMany({
+      where: { campgroundId, date: { gte: since } },
+    });
 
     const sum = (event: AnalyticsEventName) =>
       aggregates.filter((a) => a.eventName === event).reduce((acc, cur) => acc + (cur.count || 0), 0);
@@ -389,10 +276,6 @@ export class AnalyticsService {
 
   async applyRecommendation(dto: ApplyRecommendationDto, actor: { id: string; role: UserRole }, scope: RequestScope) {
     if (!dto.campgroundId) throw new BadRequestException("campgroundId is required");
-    if (MOCK_MODE) {
-      this.logger.log(`[MOCK] applyRecommendation ${dto.recommendationId}`);
-      return { status: "applied", recommendationId: dto.recommendationId, mock: true };
-    }
     await this.audit.record({
       campgroundId: dto.campgroundId,
       actorId: actor.id ?? null,
@@ -463,10 +346,6 @@ export class AnalyticsService {
 
   async proposeRecommendation(dto: ProposeRecommendationDto, actor: { id: string; role: UserRole }, scope: RequestScope) {
     if (!dto.campgroundId) throw new BadRequestException("campgroundId is required");
-    if (MOCK_MODE) {
-      this.logger.log(`[MOCK] proposeRecommendation ${dto.recommendationId}`);
-      return { status: "proposed", recommendationId: dto.recommendationId, mock: true };
-    }
     await this.audit.record({
       campgroundId: dto.campgroundId,
       actorId: actor.id ?? null,
@@ -489,11 +368,9 @@ export class AnalyticsService {
     if (!campgroundId) throw new BadRequestException("campgroundId is required");
     const since = new Date();
     since.setDate(since.getDate() - days);
-    const aggregates = MOCK_MODE
-      ? getMockAggregates(campgroundId, since)
-      : await this.prisma.analyticsDailyAggregate.findMany({
-          where: { campgroundId, date: { gte: since } },
-        });
+    const aggregates = await this.prisma.analyticsDailyAggregate.findMany({
+      where: { campgroundId, date: { gte: since } },
+    });
     const sum = (event: AnalyticsEventName) =>
       aggregates.filter((a) => a.eventName === event).reduce((acc, cur) => acc + (cur.count || 0), 0);
 
@@ -513,28 +390,6 @@ export class AnalyticsService {
 
   async getImagePerformance(campgroundId: string, days = 30) {
     if (!campgroundId) throw new BadRequestException("campgroundId is required");
-    if (MOCK_MODE) {
-      const since = new Date();
-      since.setDate(since.getDate() - days);
-      const events = getMockEvents(campgroundId, since);
-      const map = new Map<string, { views: number; clicks: number }>();
-      for (const e of events) {
-        if (!e.imageId) continue;
-        const entry = map.get(e.imageId) ?? { views: 0, clicks: 0 };
-        if (e.eventName === AnalyticsEventName.image_viewed) entry.views += 1;
-        if (e.eventName === AnalyticsEventName.image_clicked) entry.clicks += 1;
-        map.set(e.imageId, entry);
-      }
-      return Array.from(map.entries())
-        .map(([imageId, stats]) => ({
-          imageId,
-          views: stats.views,
-          clicks: stats.clicks,
-          ctr: stats.views ? stats.clicks / stats.views : 0,
-        }))
-        .sort((a, b) => b.views - a.views)
-        .slice(0, 20);
-    }
     const rows = await this.prisma.$queryRaw<
       Array<{ imageId: string; views: bigint; clicks: bigint }>
     >`
@@ -560,28 +415,6 @@ export class AnalyticsService {
 
   async getDealPerformance(campgroundId: string, days = 30) {
     if (!campgroundId) throw new BadRequestException("campgroundId is required");
-    if (MOCK_MODE) {
-      const since = new Date();
-      since.setDate(since.getDate() - days);
-      const events = getMockEvents(campgroundId, since);
-      const map = new Map<string, { views: number; applies: number }>();
-      for (const e of events) {
-        if (!e.promotionId) continue;
-        const entry = map.get(e.promotionId) ?? { views: 0, applies: 0 };
-        if (e.eventName === AnalyticsEventName.deal_viewed) entry.views += 1;
-        if (e.eventName === AnalyticsEventName.deal_applied) entry.applies += 1;
-        map.set(e.promotionId, entry);
-      }
-      return Array.from(map.entries())
-        .map(([promotionId, stats]) => ({
-          promotionId,
-          views: stats.views,
-          applies: stats.applies,
-          applyRate: stats.views ? stats.applies / stats.views : 0,
-        }))
-        .sort((a, b) => b.views - a.views)
-        .slice(0, 20);
-    }
     const rows = await this.prisma.$queryRaw<
       Array<{ promotionId: string; views: bigint; applies: bigint }>
     >`
@@ -607,22 +440,6 @@ export class AnalyticsService {
 
   async getAttribution(campgroundId: string, days = 30) {
     if (!campgroundId) throw new BadRequestException("campgroundId is required");
-    if (MOCK_MODE) {
-      const since = new Date();
-      since.setDate(since.getDate() - days);
-      const events = getMockEvents(campgroundId, since);
-      const map = new Map<string, number>();
-      for (const e of events) {
-        const ref = e.referrer ?? "direct";
-        map.set(ref, (map.get(ref) ?? 0) + 1);
-      }
-      const total = Array.from(map.values()).reduce((acc, cur) => acc + cur, 0);
-      return Array.from(map.entries()).map(([referrer, count]) => ({
-        referrer: referrer === "direct" ? null : referrer,
-        count,
-        share: total ? count / total : 0,
-      }));
-    }
     const rows = await this.prisma.$queryRaw<
       Array<{ referrer: string | null; count: bigint }>
     >`
@@ -646,11 +463,9 @@ export class AnalyticsService {
     if (!campgroundId) throw new BadRequestException("campgroundId is required");
     const since = new Date();
     since.setDate(since.getDate() - days);
-    const aggregates = MOCK_MODE
-      ? getMockAggregates(campgroundId, since)
-      : await this.prisma.analyticsDailyAggregate.findMany({
-          where: { campgroundId, date: { gte: since } },
-        });
+    const aggregates = await this.prisma.analyticsDailyAggregate.findMany({
+      where: { campgroundId, date: { gte: since } },
+    });
     const sum = (event: AnalyticsEventName) =>
       aggregates.filter((a) => a.eventName === event).reduce((acc, cur) => acc + (cur.count || 0), 0);
 
@@ -673,57 +488,6 @@ export class AnalyticsService {
     const targetYear = year ?? new Date().getFullYear();
     const start = new Date(Date.UTC(targetYear, 0, 1));
     const end = new Date(Date.UTC(targetYear + 1, 0, 1));
-    if (MOCK_MODE) {
-      const events = mockStore.events.filter(
-        (e) => (e.campgroundId ?? "mock") === (campgroundId ?? "mock") && e.occurredAt >= start && e.occurredAt < end
-      );
-      const byEvent = new Map<AnalyticsEventName, number>();
-      const dealMap = new Map<string, { views: number; applies: number }>();
-      const imgMap = new Map<string, { views: number; clicks: number }>();
-      for (const e of events) {
-        byEvent.set(e.eventName, (byEvent.get(e.eventName) ?? 0) + 1);
-        if (e.promotionId) {
-          const entry = dealMap.get(e.promotionId) ?? { views: 0, applies: 0 };
-          if (e.eventName === AnalyticsEventName.deal_viewed) entry.views += 1;
-          if (e.eventName === AnalyticsEventName.deal_applied) entry.applies += 1;
-          dealMap.set(e.promotionId, entry);
-        }
-        if (e.imageId) {
-          const entry = imgMap.get(e.imageId) ?? { views: 0, clicks: 0 };
-          if (e.eventName === AnalyticsEventName.image_viewed) entry.views += 1;
-          if (e.eventName === AnalyticsEventName.image_clicked) entry.clicks += 1;
-          imgMap.set(e.imageId, entry);
-        }
-      }
-      const summary = {
-        year: targetYear,
-        range: { start, end },
-        events: Array.from(byEvent.entries()).map(([eventName, count]) => ({ eventName, count })),
-        deals: Array.from(dealMap.entries()).map(([promotionId, stats]) => ({
-          promotionId,
-          views: stats.views,
-          applies: stats.applies,
-        })),
-        images: Array.from(imgMap.entries()).map(([imageId, stats]) => ({
-          imageId,
-          views: stats.views,
-          clicks: stats.clicks,
-        })),
-      };
-      if (format === "csv") {
-        const lines = [
-          ["section", "key", "metric", "value"],
-          ...summary.events.map((e) => ["events", e.eventName, "count", String(e.count)]),
-          ...summary.deals.map((d) => ["deal", d.promotionId, "views", String(d.views)]),
-          ...summary.deals.map((d) => ["deal", d.promotionId, "applies", String(d.applies)]),
-          ...summary.images.map((i) => ["image", i.imageId, "views", String(i.views)]),
-          ...summary.images.map((i) => ["image", i.imageId, "clicks", String(i.clicks)]),
-        ];
-        const csv = lines.map((l) => l.join(",")).join("\n");
-        return { year: targetYear, csv };
-      }
-      return summary;
-    }
 
     const eventCounts = await this.prisma.$queryRaw<
       Array<{ eventName: AnalyticsEventName; count: bigint }>
@@ -794,25 +558,6 @@ export class AnalyticsService {
   async getDeviceBreakdown(campgroundId: string, days: number = 30) {
     const since = new Date();
     since.setDate(since.getDate() - days);
-
-    if (MOCK_MODE) {
-      // Return mock data
-      return {
-        period: { days, since },
-        devices: [
-          { deviceType: "mobile", sessions: 245, bookings: 89, conversionRate: 36.3 },
-          { deviceType: "desktop", sessions: 312, bookings: 156, conversionRate: 50.0 },
-          { deviceType: "tablet", sessions: 43, bookings: 15, conversionRate: 34.9 }
-        ],
-        browsers: [
-          { browser: "Chrome", sessions: 320, percentage: 53.3 },
-          { browser: "Safari", sessions: 180, percentage: 30.0 },
-          { browser: "Firefox", sessions: 60, percentage: 10.0 },
-          { browser: "Edge", sessions: 40, percentage: 6.7 }
-        ],
-        trends: []
-      };
-    }
 
     // Get session counts by device type
     const deviceSessions = await this.prisma.$queryRaw<

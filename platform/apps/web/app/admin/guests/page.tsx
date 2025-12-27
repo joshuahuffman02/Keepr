@@ -103,132 +103,53 @@ interface GuestAnalytics {
   }[];
 }
 
-// Mock data for initial development
-const mockAnalytics: GuestAnalytics = {
+// Empty state data for when no real data exists
+const emptyAnalytics: GuestAnalytics = {
   overview: {
-    totalGuests: 12847,
-    newGuestsThisMonth: 342,
-    newGuestsLastMonth: 298,
-    repeatGuests: 4521,
-    repeatRate: 35.2,
-    avgPartySize: 2.8,
-    avgStayLength: 4.2,
-    avgLeadTime: 21,
+    totalGuests: 0,
+    newGuestsThisMonth: 0,
+    newGuestsLastMonth: 0,
+    repeatGuests: 0,
+    repeatRate: 0,
+    avgPartySize: 0,
+    avgStayLength: 0,
+    avgLeadTime: 0,
   },
   geographic: {
-    byCountry: [
-      { country: "United States", count: 10234, percentage: 79.6 },
-      { country: "Canada", count: 2156, percentage: 16.8 },
-      { country: "Mexico", count: 287, percentage: 2.2 },
-      { country: "Other", count: 170, percentage: 1.4 },
-    ],
-    byState: [
-      { state: "Texas", country: "US", count: 1842, percentage: 14.3 },
-      { state: "California", country: "US", count: 1456, percentage: 11.3 },
-      { state: "Florida", country: "US", count: 1234, percentage: 9.6 },
-      { state: "Ontario", country: "CA", count: 987, percentage: 7.7 },
-      { state: "Arizona", country: "US", count: 876, percentage: 6.8 },
-      { state: "Michigan", country: "US", count: 654, percentage: 5.1 },
-      { state: "Ohio", country: "US", count: 543, percentage: 4.2 },
-      { state: "Alberta", country: "CA", count: 432, percentage: 3.4 },
-    ],
-    topCities: [
-      { city: "Houston", state: "TX", count: 432 },
-      { city: "Phoenix", state: "AZ", count: 387 },
-      { city: "Toronto", state: "ON", count: 345 },
-      { city: "Los Angeles", state: "CA", count: 312 },
-      { city: "Dallas", state: "TX", count: 298 },
-    ],
+    byCountry: [],
+    byState: [],
+    topCities: [],
     snowbirdPatterns: {
-      northernStates: 2341,
-      southernDestinations: 1876,
-      avgMigrationMonth: 10, // October
+      northernStates: 0,
+      southernDestinations: 0,
+      avgMigrationMonth: 0,
     },
   },
   demographics: {
     partyComposition: {
-      adultsOnly: 7234,
-      withChildren: 5613,
-      avgAdults: 2.1,
-      avgChildren: 1.4,
+      adultsOnly: 0,
+      withChildren: 0,
+      avgAdults: 0,
+      avgChildren: 0,
     },
-    rigTypes: [
-      { type: "Class A Motorhome", count: 3421, percentage: 26.6 },
-      { type: "Fifth Wheel", count: 2987, percentage: 23.2 },
-      { type: "Travel Trailer", count: 2654, percentage: 20.7 },
-      { type: "Class C Motorhome", count: 1876, percentage: 14.6 },
-      { type: "Tent", count: 1234, percentage: 9.6 },
-      { type: "Cabin/Other", count: 675, percentage: 5.3 },
-    ],
-    avgRigLength: 32,
-    hasPets: 4521,
-    petPercentage: 35.2,
+    rigTypes: [],
+    avgRigLength: 0,
+    hasPets: 0,
+    petPercentage: 0,
   },
   seasonalTrends: {
-    byMonth: [
-      { month: "Jan", reservations: 456, revenue: 89000, avgStayLength: 5.2 },
-      { month: "Feb", reservations: 523, revenue: 102000, avgStayLength: 4.8 },
-      { month: "Mar", reservations: 876, revenue: 167000, avgStayLength: 4.1 },
-      { month: "Apr", reservations: 1234, revenue: 234000, avgStayLength: 3.8 },
-      { month: "May", reservations: 1567, revenue: 298000, avgStayLength: 3.5 },
-      { month: "Jun", reservations: 2134, revenue: 412000, avgStayLength: 4.2 },
-      { month: "Jul", reservations: 2456, revenue: 478000, avgStayLength: 5.1 },
-      { month: "Aug", reservations: 2234, revenue: 432000, avgStayLength: 4.8 },
-      { month: "Sep", reservations: 1456, revenue: 276000, avgStayLength: 3.9 },
-      { month: "Oct", reservations: 1123, revenue: 213000, avgStayLength: 4.0 },
-      { month: "Nov", reservations: 678, revenue: 128000, avgStayLength: 4.5 },
-      { month: "Dec", reservations: 534, revenue: 98000, avgStayLength: 5.0 },
-    ],
-    peakSeason: "June - August",
-    shoulderSeason: "April - May, September - October",
-    offSeason: "November - March",
+    byMonth: [],
+    peakSeason: "N/A",
+    shoulderSeason: "N/A",
+    offSeason: "N/A",
   },
   travelBehavior: {
-    stayReasons: [
-      { reason: "Vacation", count: 6234, percentage: 48.5 },
-      { reason: "Family Visit", count: 2345, percentage: 18.2 },
-      { reason: "Stopover/Transit", count: 1876, percentage: 14.6 },
-      { reason: "Event/Festival", count: 1234, percentage: 9.6 },
-      { reason: "Remote Work", count: 765, percentage: 6.0 },
-      { reason: "Other", count: 393, percentage: 3.1 },
-    ],
-    bookingSources: [
-      { source: "Direct Website", count: 5432, percentage: 42.3 },
-      { source: "Phone/Walk-in", count: 3210, percentage: 25.0 },
-      { source: "Campspot", count: 1876, percentage: 14.6 },
-      { source: "Hipcamp", count: 1234, percentage: 9.6 },
-      { source: "Recreation.gov", count: 654, percentage: 5.1 },
-      { source: "Other OTA", count: 441, percentage: 3.4 },
-    ],
-    avgBookingWindow: 21,
-    weekdayVsWeekend: { weekday: 45, weekend: 55 },
+    stayReasons: [],
+    bookingSources: [],
+    avgBookingWindow: 0,
+    weekdayVsWeekend: { weekday: 0, weekend: 0 },
   },
-  insights: [
-    {
-      title: "Canadian Snowbirds Booking Earlier",
-      description: "Canadian guests are booking 15% earlier than last year, with peak bookings shifting from November to October.",
-      type: "info",
-      metric: "+15% earlier bookings",
-    },
-    {
-      title: "Family Travel Trending Up",
-      description: "Reservations with children increased 23% year-over-year. Consider family-focused amenities and programming.",
-      type: "success",
-      metric: "+23% YoY",
-    },
-    {
-      title: "Remote Workers Growing Segment",
-      description: "Long-stay remote workers (7+ nights) grew 45% this quarter. WiFi quality and workspace areas are key.",
-      type: "info",
-      metric: "+45% this quarter",
-    },
-    {
-      title: "Pet-Friendly Sites In Demand",
-      description: "35% of guests travel with pets, but only 20% of sites are pet-friendly. Opportunity to expand.",
-      type: "warning",
-      metric: "35% have pets",
-    },
-  ],
+  insights: [],
 };
 
 function TrendIndicator({ current, previous }: { current: number; previous: number }) {
@@ -312,7 +233,6 @@ export default function GuestAnalyticsPage() {
   const [error, setError] = useState<string | null>(null);
   const [dateRange, setDateRange] = useState("last_12_months");
   const [refreshing, setRefreshing] = useState(false);
-  const [isUsingMockData, setIsUsingMockData] = useState(false);
 
   // Export/Share state
   const [exportDialogOpen, setExportDialogOpen] = useState(false);
@@ -347,29 +267,22 @@ export default function GuestAnalyticsPage() {
         });
 
         if (!res.ok) {
-          // Fall back to mock data if API not available
-          console.warn("API not available, using mock data");
-          setAnalytics(mockAnalytics);
-          setIsUsingMockData(true);
-          return;
+          throw new Error(`Failed to fetch analytics: ${res.statusText}`);
         }
 
         const result = await res.json();
+
         // Check if the data is essentially empty (no guests)
         const hasRealData = result.overview?.totalGuests > 0;
         if (!hasRealData) {
-          console.warn("No real data available, using mock data");
-          setAnalytics(mockAnalytics);
-          setIsUsingMockData(true);
+          setAnalytics(emptyAnalytics);
         } else {
           setAnalytics(result);
-          setIsUsingMockData(false);
         }
       } catch (err) {
-        // Fall back to mock data on error
-        console.warn("Failed to fetch analytics, using mock data:", err);
-        setAnalytics(mockAnalytics);
-        setIsUsingMockData(true);
+        console.error("Failed to fetch analytics:", err);
+        setError(err instanceof Error ? err.message : "Unknown error");
+        setAnalytics(emptyAnalytics);
       } finally {
         setLoading(false);
       }
@@ -392,24 +305,19 @@ export default function GuestAnalyticsPage() {
       });
 
       if (!res.ok) {
-        setAnalytics(mockAnalytics);
-        setIsUsingMockData(true);
-        return;
+        throw new Error(`Failed to refresh analytics: ${res.statusText}`);
       }
 
       const result = await res.json();
       const hasRealData = result.overview?.totalGuests > 0;
       if (!hasRealData) {
-        setAnalytics(mockAnalytics);
-        setIsUsingMockData(true);
+        setAnalytics(emptyAnalytics);
       } else {
         setAnalytics(result);
-        setIsUsingMockData(false);
       }
     } catch (err) {
-      console.warn("Failed to refresh analytics:", err);
-      setAnalytics(mockAnalytics);
-      setIsUsingMockData(true);
+      console.error("Failed to refresh analytics:", err);
+      setError(err instanceof Error ? err.message : "Unknown error");
     } finally {
       setRefreshing(false);
     }
@@ -604,7 +512,7 @@ export default function GuestAnalyticsPage() {
     );
   }
 
-  if (error || !analytics) {
+  if (error) {
     return (
       <div className="p-8">
         <Card className="bg-rose-900/20 border-rose-700">
@@ -613,7 +521,7 @@ export default function GuestAnalyticsPage() {
               <AlertTriangle className="h-6 w-6 text-rose-500" />
               <div>
                 <h3 className="font-semibold text-rose-200">Error Loading Analytics</h3>
-                <p className="text-sm text-rose-300/80">{error || "Unknown error occurred"}</p>
+                <p className="text-sm text-rose-300/80">{error}</p>
               </div>
             </div>
           </CardContent>
@@ -622,6 +530,13 @@ export default function GuestAnalyticsPage() {
     );
   }
 
+  if (!analytics) {
+    return null;
+  }
+
+  // Check if we have empty data
+  const hasData = analytics.overview.totalGuests > 0;
+
   return (
     <div className="p-6 space-y-6">
       {/* Header */}
@@ -629,16 +544,16 @@ export default function GuestAnalyticsPage() {
         <div>
           <div className="flex items-center gap-3">
             <h1 className="text-2xl font-bold text-white">Guest Analytics</h1>
-            {isUsingMockData && (
-              <Badge className="bg-amber-600/20 text-amber-400 border border-amber-600/50">
-                Demo Data
+            {!hasData && (
+              <Badge className="bg-slate-600/20 text-slate-400 border border-slate-600/50">
+                No Data
               </Badge>
             )}
           </div>
           <p className="text-slate-400 mt-1">
-            {isUsingMockData
-              ? "Showing sample data — real analytics will appear once you have reservations"
-              : "Platform-wide guest insights across all campgrounds"}
+            {hasData
+              ? "Platform-wide guest insights across all campgrounds"
+              : "Guest analytics will appear once you have reservations"}
           </p>
         </div>
         <div className="flex items-center gap-3">
@@ -689,7 +604,23 @@ export default function GuestAnalyticsPage() {
         </div>
       </div>
 
+      {/* Empty State */}
+      {!hasData && (
+        <Card className="bg-slate-800/30 border-slate-700">
+          <CardContent className="p-12 text-center">
+            <Users className="h-16 w-16 text-slate-600 mx-auto mb-4" />
+            <h3 className="text-xl font-semibold text-slate-300 mb-2">No Guest Data Yet</h3>
+            <p className="text-slate-400 mb-6 max-w-md mx-auto">
+              Guest analytics will be available once you have reservations in your campgrounds.
+              Create your first reservation to start seeing insights about your guests.
+            </p>
+          </CardContent>
+        </Card>
+      )}
+
       {/* KPI Cards */}
+      {hasData && (
+      <>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <Card className="bg-slate-800/50 border-slate-700">
           <CardContent className="p-4">
@@ -990,6 +921,8 @@ export default function GuestAnalyticsPage() {
           </div>
         </CardContent>
       </Card>
+      </>
+      )}
 
       {/* Export Dialog */}
       <Dialog open={exportDialogOpen} onOpenChange={setExportDialogOpen}>

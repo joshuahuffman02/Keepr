@@ -1,6 +1,8 @@
 "use client";
 
 import { useState } from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useCampground } from "@/contexts/CampgroundContext";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -23,6 +25,7 @@ import {
   MoreHorizontal,
   Pencil,
   Trash2,
+  Loader2,
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -32,6 +35,8 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
+
+const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "http://localhost:4000/api";
 
 interface TaxRule {
   id: string;
@@ -43,39 +48,59 @@ interface TaxRule {
   isActive: boolean;
 }
 
-const mockTaxRules: TaxRule[] = [
-  {
-    id: "1",
-    name: "State Sales Tax",
-    rate: 6.5,
-    appliesToAccommodation: true,
-    appliesToStore: true,
-    appliesToServices: true,
-    isActive: true,
-  },
-  {
-    id: "2",
-    name: "County Lodging Tax",
-    rate: 3.0,
-    appliesToAccommodation: true,
-    appliesToStore: false,
-    appliesToServices: false,
-    isActive: true,
-  },
-  {
-    id: "3",
-    name: "Tourism Tax",
-    rate: 1.5,
-    appliesToAccommodation: true,
-    appliesToStore: false,
-    appliesToServices: false,
-    isActive: true,
-  },
-];
+async function fetchTaxRules(campgroundId: string): Promise<TaxRule[]> {
+  const response = await fetch(`${API_BASE}/tax-rules/campground/${campgroundId}`, {
+    credentials: "include",
+  });
+  if (!response.ok) {
+    throw new Error("Failed to fetch tax rules");
+  }
+  return response.json();
+}
+
+async function deleteTaxRule(taxRuleId: string): Promise<void> {
+  const response = await fetch(`${API_BASE}/tax-rules/${taxRuleId}`, {
+    method: "DELETE",
+    credentials: "include",
+  });
+  if (!response.ok) {
+    throw new Error("Failed to delete tax rule");
+  }
+}
 
 export default function TaxRulesPage() {
-  const [taxRules, setTaxRules] = useState<TaxRule[]>(mockTaxRules);
+  const { selectedCampground, isHydrated } = useCampground();
+  const queryClient = useQueryClient();
   const [isEditorOpen, setIsEditorOpen] = useState(false);
+
+  const { data: taxRules = [], isLoading } = useQuery({
+    queryKey: ["tax-rules", selectedCampground?.id],
+    queryFn: () => fetchTaxRules(selectedCampground!.id),
+    enabled: isHydrated && !!selectedCampground?.id,
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: deleteTaxRule,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["tax-rules", selectedCampground?.id] });
+    },
+  });
+
+  if (!isHydrated || !selectedCampground) {
+    return (
+      <div className="flex items-center justify-center py-12">
+        <Loader2 className="h-8 w-8 animate-spin text-slate-400" />
+      </div>
+    );
+  }
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center py-12">
+        <Loader2 className="h-8 w-8 animate-spin text-slate-400" />
+      </div>
+    );
+  }
 
   const totalAccommodationTax = taxRules
     .filter((t) => t.isActive && t.appliesToAccommodation)

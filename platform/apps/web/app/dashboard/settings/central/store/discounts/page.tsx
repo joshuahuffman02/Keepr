@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useCampground } from "@/contexts/CampgroundContext";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -13,6 +14,7 @@ import {
   Trash2,
   Tag,
   Calendar,
+  Loader2,
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -23,6 +25,8 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { SettingsTable } from "@/components/settings/tables";
 import { cn } from "@/lib/utils";
+
+const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "http://localhost:4000/api";
 
 interface Discount {
   id: string;
@@ -36,55 +40,58 @@ interface Discount {
   isActive: boolean;
 }
 
-const mockDiscounts: Discount[] = [
-  {
-    id: "1",
-    name: "Senior Discount",
-    code: "SENIOR",
-    type: "percent",
-    value: 10,
-    appliesTo: "All Store Items",
-    validUntil: null,
-    usageCount: 145,
-    isActive: true,
-  },
-  {
-    id: "2",
-    name: "Military Discount",
-    code: "MILITARY",
-    type: "percent",
-    value: 15,
-    appliesTo: "All Store Items",
-    validUntil: null,
-    usageCount: 89,
-    isActive: true,
-  },
-  {
-    id: "3",
-    name: "Happy Hour",
-    code: "HAPPYHOUR",
-    type: "percent",
-    value: 20,
-    appliesTo: "Beverages",
-    validUntil: "2025-12-31",
-    usageCount: 234,
-    isActive: true,
-  },
-  {
-    id: "4",
-    name: "$5 Off Firewood",
-    code: "FIRE5",
-    type: "fixed",
-    value: 5,
-    appliesTo: "Firewood",
-    validUntil: "2025-03-31",
-    usageCount: 67,
-    isActive: true,
-  },
-];
+async function fetchDiscounts(campgroundId: string): Promise<Discount[]> {
+  const response = await fetch(`${API_BASE}/campgrounds/${campgroundId}/discounts`, {
+    credentials: "include",
+  });
+  if (!response.ok) {
+    throw new Error("Failed to fetch discounts");
+  }
+  return response.json();
+}
+
+async function deleteDiscount(discountId: string): Promise<void> {
+  const response = await fetch(`${API_BASE}/discounts/${discountId}`, {
+    method: "DELETE",
+    credentials: "include",
+  });
+  if (!response.ok) {
+    throw new Error("Failed to delete discount");
+  }
+}
 
 export default function DiscountsPage() {
-  const [discounts] = useState<Discount[]>(mockDiscounts);
+  const { selectedCampground, isHydrated } = useCampground();
+  const queryClient = useQueryClient();
+
+  const { data: discounts = [], isLoading } = useQuery({
+    queryKey: ["discounts", selectedCampground?.id],
+    queryFn: () => fetchDiscounts(selectedCampground!.id),
+    enabled: isHydrated && !!selectedCampground?.id,
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: deleteDiscount,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["discounts", selectedCampground?.id] });
+    },
+  });
+
+  if (!isHydrated || !selectedCampground) {
+    return (
+      <div className="flex items-center justify-center py-12">
+        <Loader2 className="h-8 w-8 animate-spin text-slate-400" />
+      </div>
+    );
+  }
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center py-12">
+        <Loader2 className="h-8 w-8 animate-spin text-slate-400" />
+      </div>
+    );
+  }
 
   const columns = [
     {
@@ -209,7 +216,11 @@ export default function DiscountsPage() {
                 {item.isActive ? "Deactivate" : "Activate"}
               </DropdownMenuItem>
               <DropdownMenuSeparator />
-              <DropdownMenuItem className="text-red-600">
+              <DropdownMenuItem
+                className="text-red-600"
+                onClick={() => deleteMutation.mutate(item.id)}
+                disabled={deleteMutation.isPending}
+              >
                 <Trash2 className="h-4 w-4 mr-2" />
                 Delete
               </DropdownMenuItem>

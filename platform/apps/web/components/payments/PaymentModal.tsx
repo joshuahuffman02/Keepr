@@ -11,7 +11,11 @@ import { apiClient } from "../../lib/api-client";
 import { AlertCircle, RefreshCw } from "lucide-react";
 
 // Initialize Stripe outside of component to avoid recreating object on renders
-const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY || "pk_test_placeholder");
+const stripeKey = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY;
+if (!stripeKey) {
+    console.error("NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY is not configured. Stripe payments will not work.");
+}
+const stripePromise = stripeKey ? loadStripe(stripeKey) : null;
 
 interface PaymentModalProps {
     isOpen: boolean;
@@ -180,6 +184,15 @@ export function PaymentModal({
                     </div>
                 </DialogHeader>
 
+                {!stripePromise && (
+                    <div className="py-6 text-center space-y-4">
+                        <div className="flex items-center justify-center gap-2 text-red-600">
+                            <AlertCircle className="h-5 w-5" />
+                            <span className="text-sm">Stripe is not configured. Please contact support.</span>
+                        </div>
+                    </div>
+                )}
+
                 {initError && (
                     <div className="py-6 text-center space-y-4">
                         <div className="flex items-center justify-center gap-2 text-red-600">
@@ -198,7 +211,7 @@ export function PaymentModal({
                     </div>
                 )}
 
-                {clientSecret && !initError && (
+                {clientSecret && !initError && stripePromise && (
                     <Elements stripe={stripePromise} options={{ clientSecret }}>
                         <CheckoutForm
                             amountCents={amountCents}

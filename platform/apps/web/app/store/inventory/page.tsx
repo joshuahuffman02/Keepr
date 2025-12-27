@@ -58,7 +58,9 @@ export default function InventoryPage() {
             const adjustment = newQty - (product.stockQty || 0);
             if (adjustment === 0) return;
 
-            await apiClient.adjustStock(id, adjustment);
+            const stored = localStorage.getItem("campreserv:selectedCampground");
+            const cgId = stored || campgroundId;
+            await apiClient.updateStoreStock(cgId, id, { delta: adjustment });
 
             toast({
                 title: "Stock Updated",
@@ -66,8 +68,7 @@ export default function InventoryPage() {
             });
 
             // Reload data to refresh low stock list
-            const stored = localStorage.getItem("campreserv:selectedCampground");
-            loadData(stored || campgroundId);
+            loadData(cgId);
 
         } catch (error) {
             console.error(error);

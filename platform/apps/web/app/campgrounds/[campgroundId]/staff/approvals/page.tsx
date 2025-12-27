@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { DashboardShell } from "@/components/ui/layout/DashboardShell";
 import { StaffNavigation } from "@/components/staff/StaffNavigation";
+import { useWhoami } from "@/hooks/use-whoami";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   CheckCircle2,
@@ -38,11 +39,14 @@ const SPRING_CONFIG = {
 };
 
 export default function ApprovalsQueue({ params }: { params: { campgroundId: string } }) {
+  const { data: whoami } = useWhoami();
   const [shifts, setShifts] = useState<Shift[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [processing, setProcessing] = useState<Set<string>>(new Set());
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
+
+  const currentUserId = whoami?.user?.id;
 
   const load = async () => {
     setLoading(true);
@@ -67,12 +71,17 @@ export default function ApprovalsQueue({ params }: { params: { campgroundId: str
   }, []);
 
   const decide = async (shiftId: string, status: "approve" | "reject") => {
+    if (!currentUserId) {
+      setError("You must be logged in to approve or reject shifts");
+      return;
+    }
+
     setProcessing((prev) => new Set([...prev, shiftId]));
     try {
       await fetch(`/api/staff/shifts/${shiftId}/${status}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ approverId: "manager-placeholder" })
+        body: JSON.stringify({ approverId: currentUserId })
       });
       setSuccessMessage(status === "approve" ? "Shift approved!" : "Shift rejected.");
       setTimeout(() => setSuccessMessage(null), 3000);

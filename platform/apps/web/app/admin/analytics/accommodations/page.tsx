@@ -12,46 +12,10 @@ import {
   formatCurrency,
 } from "@/components/analytics";
 
-// Mock data
-const mockAccommodationData = {
-  overview: {
-    totalSites: 1250,
-    activeReservations: 342,
-    overallOccupancy: 67.8,
-    topPerformingType: "rv",
-  },
-  typeDistribution: [
-    { type: "rv", siteCount: 650, reservations: 6475, revenue: 1480300, occupancyRate: 72.5, revenueShare: 52.0 },
-    { type: "tent", siteCount: 350, reservations: 3486, revenue: 797300, occupancyRate: 58.2, revenueShare: 28.0 },
-    { type: "cabin", siteCount: 150, reservations: 1868, revenue: 427125, occupancyRate: 78.4, revenueShare: 15.0 },
-    { type: "glamping", siteCount: 100, reservations: 621, revenue: 142375, occupancyRate: 65.8, revenueShare: 5.0 },
-  ],
-  rigTypes: [
-    { rigType: "Travel Trailer", count: 2850, percentage: 35.2, averageLength: 24, averageSpend: 245 },
-    { rigType: "Fifth Wheel", count: 1620, percentage: 20.0, averageLength: 32, averageSpend: 285 },
-    { rigType: "Class A", count: 1215, percentage: 15.0, averageLength: 38, averageSpend: 320 },
-    { rigType: "Class C", count: 972, percentage: 12.0, averageLength: 28, averageSpend: 265 },
-    { rigType: "Class B / Van", count: 810, percentage: 10.0, averageLength: 22, averageSpend: 225 },
-    { rigType: "Truck Camper", count: 324, percentage: 4.0, averageLength: 18, averageSpend: 195 },
-    { rigType: "Pop-Up", count: 284, percentage: 3.5, averageLength: 16, averageSpend: 175 },
-    { rigType: "Other", count: 25, percentage: 0.3, averageLength: 20, averageSpend: 210 },
-  ],
-  utilizationByType: {
-    months: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
-    byType: {
-      rv: [45, 48, 55, 68, 82, 88, 92, 90, 75, 62, 48, 42],
-      tent: [25, 28, 38, 52, 72, 85, 90, 88, 65, 45, 28, 22],
-      cabin: [55, 58, 62, 72, 80, 85, 88, 86, 78, 68, 58, 52],
-      glamping: [35, 38, 48, 58, 72, 78, 82, 80, 68, 55, 38, 32],
-    },
-  },
-};
-
 export default function AccommodationsPage() {
   const [dateRange, setDateRange] = useState("last_12_months");
-  const [data, setData] = useState(mockAccommodationData);
-  const [loading, setLoading] = useState(false);
-  const [isUsingMockData, setIsUsingMockData] = useState(true);
+  const [data, setData] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -60,10 +24,7 @@ export default function AccommodationsPage() {
         const response = await fetch(`/api/admin/platform-analytics/accommodations?range=${dateRange}`);
         if (response.ok) {
           const result = await response.json();
-          if (result.overview?.totalSites > 0) {
-            setData(result);
-            setIsUsingMockData(false);
-          }
+          setData(result);
         }
       } catch (error) {
         console.error("Failed to fetch accommodation data:", error);
@@ -81,32 +42,50 @@ export default function AccommodationsPage() {
     glamping: <Sparkles className="h-5 w-5 text-purple-400" />,
   };
 
-  const pieData = data.typeDistribution.map((item) => ({
+  const pieData = (data?.typeDistribution || []).map((item: any) => ({
     name: item.type.charAt(0).toUpperCase() + item.type.slice(1),
     value: item.revenueShare,
   }));
 
-  const utilizationData = data.utilizationByType.months.map((month, idx) => ({
+  const utilizationData = (data?.utilizationByType?.months || []).map((month: string, idx: number) => ({
     month,
-    rv: data.utilizationByType.byType.rv[idx],
-    tent: data.utilizationByType.byType.tent[idx],
-    cabin: data.utilizationByType.byType.cabin[idx],
-    glamping: data.utilizationByType.byType.glamping[idx],
+    rv: data?.utilizationByType?.byType?.rv?.[idx] || 0,
+    tent: data?.utilizationByType?.byType?.tent?.[idx] || 0,
+    cabin: data?.utilizationByType?.byType?.cabin?.[idx] || 0,
+    glamping: data?.utilizationByType?.byType?.glamping?.[idx] || 0,
   }));
+
+  const hasData = data && data.overview && data.overview.totalSites > 0;
+
+  if (!loading && !hasData) {
+    return (
+      <div className="space-y-6">
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-bold text-white">Accommodation Mix</h1>
+            <p className="text-slate-400 mt-1">
+              Site types, RV breakdown, and utilization analysis
+            </p>
+          </div>
+          <DateRangePicker value={dateRange} onChange={setDateRange} />
+        </div>
+        <div className="flex flex-col items-center justify-center py-12 text-center">
+          <Building2 className="h-16 w-16 text-slate-600 mb-4" />
+          <h3 className="text-lg font-medium text-white mb-2">No Accommodation Data Available</h3>
+          <p className="text-slate-400 max-w-md">
+            There is no accommodation data for the selected time period. Data will appear here once sites are configured.
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <div className="flex items-center gap-3">
-            <h1 className="text-2xl font-bold text-white">Accommodation Mix</h1>
-            {isUsingMockData && (
-              <Badge className="bg-amber-600/20 text-amber-400 border border-amber-600/50">
-                Demo Data
-              </Badge>
-            )}
-          </div>
+          <h1 className="text-2xl font-bold text-white">Accommodation Mix</h1>
           <p className="text-slate-400 mt-1">
             Site types, RV breakdown, and utilization analysis
           </p>
@@ -118,26 +97,26 @@ export default function AccommodationsPage() {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <KpiCard
           title="Total Sites"
-          value={data.overview.totalSites}
+          value={data?.overview?.totalSites || 0}
           format="number"
           loading={loading}
           icon={<Building2 className="h-5 w-5 text-blue-400" />}
         />
         <KpiCard
           title="Active Reservations"
-          value={data.overview.activeReservations}
+          value={data?.overview?.activeReservations || 0}
           format="number"
           loading={loading}
         />
         <KpiCard
           title="Overall Occupancy"
-          value={data.overview.overallOccupancy}
+          value={data?.overview?.overallOccupancy || 0}
           format="percent"
           loading={loading}
         />
         <KpiCard
           title="Top Performer"
-          value={data.overview.topPerformingType.toUpperCase()}
+          value={data?.overview?.topPerformingType?.toUpperCase() || "N/A"}
           loading={loading}
           subtitle="Highest revenue type"
         />
@@ -165,7 +144,7 @@ export default function AccommodationsPage() {
               { key: "revenue", label: "Revenue", align: "right", format: (v) => formatCurrency(v) },
               { key: "occupancyRate", label: "Occupancy", align: "right", format: (v) => `${v.toFixed(1)}%` },
             ]}
-            data={data.typeDistribution}
+            data={data?.typeDistribution || []}
             loading={loading}
           />
         </div>
@@ -209,7 +188,7 @@ export default function AccommodationsPage() {
           { key: "averageLength", label: "Avg Length (ft)", align: "right", format: (v) => v.toString() },
           { key: "averageSpend", label: "Avg Spend", align: "right", format: (v) => formatCurrency(v) },
         ]}
-        data={data.rigTypes}
+        data={data?.rigTypes || []}
         loading={loading}
       />
     </div>

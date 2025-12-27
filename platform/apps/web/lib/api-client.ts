@@ -3108,7 +3108,12 @@ export const apiClient = {
     const data = await parseResponse<unknown>(res);
     return ReservationSchema.parse(data);
   },
+  /**
+   * @deprecated Use updateStoreStock(campgroundId, id, { delta }) instead.
+   * This method uses an incorrect endpoint path missing the campgroundId.
+   */
   async adjustStock(id: string, adjustment: number) {
+    console.warn("adjustStock is deprecated. Use updateStoreStock(campgroundId, id, { delta }) instead.");
     const res = await fetch(`${API_BASE}/store/products/${id}/stock`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
@@ -3779,6 +3784,25 @@ export const apiClient = {
       amountCents: z.number(),
       currency: z.string(),
       status: z.string()
+    }).parse(data);
+  },
+
+  /**
+   * Confirm a payment intent after Stripe payment succeeds (public/guest checkout)
+   * This records the payment in our database and updates the reservation status
+   */
+  async confirmPublicPaymentIntent(paymentIntentId: string, reservationId: string) {
+    const res = await fetch(`${API_BASE}/public/payments/intents/${paymentIntentId}/confirm`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ reservationId })
+    });
+    const data = await parseResponse<unknown>(res);
+    return z.object({
+      success: z.boolean(),
+      status: z.string(),
+      paymentId: z.string().optional(),
+      reservationId: z.string()
     }).parse(data);
   },
 

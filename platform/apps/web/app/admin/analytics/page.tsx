@@ -61,76 +61,32 @@ interface AnalyticsOverview {
   generatedAt: string;
 }
 
-// Mock data for demo
-const mockOverview: AnalyticsOverview = {
-  dateRange: {
-    start: new Date(Date.now() - 365 * 24 * 60 * 60 * 1000).toISOString(),
-    end: new Date().toISOString(),
-  },
-  revenue: {
-    totalRevenue: 2847500,
-    totalReservations: 12450,
-    averageOrderValue: 228.71,
-    revenuePerAvailableNight: 45.32,
-    yoyGrowth: 18.5,
-  },
-  guests: {
-    totalGuests: 8234,
-    newGuests: 3456,
-    returningGuests: 4778,
-    returnRate: 58.0,
-    averageStaysPerGuest: 1.51,
-  },
-  accommodations: {
-    totalSites: 1250,
-    activeReservations: 342,
-    overallOccupancy: 67.8,
-    topPerformingType: "rv",
-  },
-  booking: {
-    totalBookings: 12450,
-    averageLeadTime: 21.5,
-    cancellationRate: 8.2,
-    lastMinutePercentage: 15.3,
-  },
-  los: {
-    averageLos: 3.8,
-    medianLos: 3,
-    weeklyStayPercentage: 22.5,
-    monthlyStayPercentage: 4.2,
-  },
-  generatedAt: new Date().toISOString(),
+interface RevenueTrend {
+  month: string;
+  revenue: number;
+  reservations: number;
+}
+
+interface AccommodationMixItem {
+  name: string;
+  value: number;
+  color: string;
+}
+
+interface TopCampground {
+  name: string;
+  state: string;
+  revenue: number;
+  reservations: number;
+}
+
+const ACCOMMODATION_COLORS: Record<string, string> = {
+  rv: "#3b82f6",
+  tent: "#10b981",
+  cabin: "#f59e0b",
+  glamping: "#8b5cf6",
+  default: "#6b7280",
 };
-
-const mockRevenueTrends = [
-  { month: "2024-01", revenue: 185000, reservations: 820 },
-  { month: "2024-02", revenue: 195000, reservations: 890 },
-  { month: "2024-03", revenue: 245000, reservations: 1050 },
-  { month: "2024-04", revenue: 312000, reservations: 1340 },
-  { month: "2024-05", revenue: 385000, reservations: 1650 },
-  { month: "2024-06", revenue: 420000, reservations: 1780 },
-  { month: "2024-07", revenue: 445000, reservations: 1890 },
-  { month: "2024-08", revenue: 432000, reservations: 1820 },
-  { month: "2024-09", revenue: 298000, reservations: 1280 },
-  { month: "2024-10", revenue: 245000, reservations: 1050 },
-  { month: "2024-11", revenue: 178000, reservations: 780 },
-  { month: "2024-12", revenue: 165000, reservations: 720 },
-];
-
-const mockAccommodationMix = [
-  { name: "RV Sites", value: 52, color: "#3b82f6" },
-  { name: "Tent Sites", value: 28, color: "#10b981" },
-  { name: "Cabins", value: 15, color: "#f59e0b" },
-  { name: "Glamping", value: 5, color: "#8b5cf6" },
-];
-
-const mockTopCampgrounds = [
-  { name: "Sunset Ridge RV Park", state: "TX", revenue: 425000, reservations: 1850 },
-  { name: "Mountain View Camping", state: "CO", revenue: 387000, reservations: 1620 },
-  { name: "Lakeside Resort", state: "FL", revenue: 356000, reservations: 1480 },
-  { name: "Pine Forest Camp", state: "CA", revenue: 312000, reservations: 1340 },
-  { name: "Desert Oasis RV", state: "AZ", revenue: 298000, reservations: 1250 },
-];
 
 interface AiInsights {
   summary: string;
@@ -147,32 +103,76 @@ export default function AnalyticsOverviewPage() {
   const [dateRange, setDateRange] = useState("last_12_months");
   const [data, setData] = useState<AnalyticsOverview | null>(null);
   const [loading, setLoading] = useState(true);
-  const [isUsingMockData, setIsUsingMockData] = useState(false);
+  const [hasData, setHasData] = useState(false);
   const [aiInsights, setAiInsights] = useState<AiInsights | null>(null);
   const [aiLoading, setAiLoading] = useState(true);
+  const [revenueTrends, setRevenueTrends] = useState<RevenueTrend[]>([]);
+  const [accommodationMix, setAccommodationMix] = useState<AccommodationMixItem[]>([]);
+  const [topCampgrounds, setTopCampgrounds] = useState<TopCampground[]>([]);
 
   const fetchData = async () => {
     setLoading(true);
     try {
-      const response = await fetch(`/api/admin/platform-analytics/overview?range=${dateRange}`);
-      if (response.ok) {
-        const result = await response.json();
-        // Check if we have meaningful data
-        if (result.revenue?.totalRevenue > 0) {
-          setData(result);
-          setIsUsingMockData(false);
-        } else {
-          setData(mockOverview);
-          setIsUsingMockData(true);
+      // Fetch all data in parallel
+      const [overviewRes, trendsRes, accommodationsRes, benchmarksRes] = await Promise.all([
+        fetch(`/api/admin/platform-analytics/overview?range=${dateRange}`),
+        fetch(`/api/admin/platform-analytics/revenue/trends?range=${dateRange}`),
+        fetch(`/api/admin/platform-analytics/accommodations?range=${dateRange}`),
+        fetch(`/api/admin/platform-analytics/benchmarks?range=${dateRange}`),
+      ]);
+
+      // Process overview
+      if (overviewRes.ok) {
+        const result = await overviewRes.json();
+        setData(result);
+        setHasData(result.revenue?.totalRevenue > 0);
+      }
+
+      // Process revenue trends
+      if (trendsRes.ok) {
+        const trendsData = await trendsRes.json();
+        if (trendsData.monthlyTrends && Array.isArray(trendsData.monthlyTrends)) {
+          setRevenueTrends(trendsData.monthlyTrends.map((t: any) => ({
+            month: t.month || t.period,
+            revenue: t.revenue || t.totalRevenue || 0,
+            reservations: t.reservations || t.bookings || 0,
+          })));
         }
-      } else {
-        setData(mockOverview);
-        setIsUsingMockData(true);
+      }
+
+      // Process accommodation mix
+      if (accommodationsRes.ok) {
+        const accData = await accommodationsRes.json();
+        if (accData.distribution && Array.isArray(accData.distribution)) {
+          setAccommodationMix(accData.distribution.map((item: any) => ({
+            name: item.type || item.name || "Unknown",
+            value: Math.round(item.percentage || item.value || 0),
+            color: ACCOMMODATION_COLORS[item.type?.toLowerCase()] || ACCOMMODATION_COLORS.default,
+          })));
+        } else if (accData.byType && Array.isArray(accData.byType)) {
+          setAccommodationMix(accData.byType.map((item: any) => ({
+            name: item.type || item.name || "Unknown",
+            value: Math.round(item.percentage || item.value || 0),
+            color: ACCOMMODATION_COLORS[item.type?.toLowerCase()] || ACCOMMODATION_COLORS.default,
+          })));
+        }
+      }
+
+      // Process top campgrounds from benchmarks
+      if (benchmarksRes.ok) {
+        const benchData = await benchmarksRes.json();
+        if (benchData.topPerformers && Array.isArray(benchData.topPerformers)) {
+          setTopCampgrounds(benchData.topPerformers.slice(0, 5).map((c: any) => ({
+            name: c.name || c.campgroundName || "Unknown",
+            state: c.state || c.location?.state || "—",
+            revenue: c.revenue || c.totalRevenue || 0,
+            reservations: c.reservations || c.bookings || 0,
+          })));
+        }
       }
     } catch (error) {
       console.error("Failed to fetch analytics:", error);
-      setData(mockOverview);
-      setIsUsingMockData(true);
+      setHasData(false);
     } finally {
       setLoading(false);
     }
@@ -275,9 +275,9 @@ export default function AnalyticsOverviewPage() {
         <div>
           <div className="flex items-center gap-3">
             <h1 className="text-2xl font-bold text-white">Analytics Hub</h1>
-            {isUsingMockData && (
-              <Badge className="bg-amber-600/20 text-amber-400 border border-amber-600/50">
-                Demo Data
+            {!hasData && !loading && (
+              <Badge className="bg-slate-600/20 text-slate-400 border border-slate-600/50">
+                No Data Yet
               </Badge>
             )}
           </div>
@@ -434,55 +434,82 @@ export default function AnalyticsOverviewPage() {
       {/* Charts Row */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2">
-          <TrendChart
-            title="Revenue Trends"
-            description="Monthly revenue over time"
-            data={mockRevenueTrends}
-            dataKeys={[
-              { key: "revenue", color: "#3b82f6", name: "Revenue" },
-            ]}
-            xAxisKey="month"
-            type="area"
+          {revenueTrends.length > 0 ? (
+            <TrendChart
+              title="Revenue Trends"
+              description="Monthly revenue over time"
+              data={revenueTrends}
+              dataKeys={[
+                { key: "revenue", color: "#3b82f6", name: "Revenue" },
+              ]}
+              xAxisKey="month"
+              type="area"
+              height={300}
+              formatYAxis={(v) => `$${(v / 1000).toFixed(0)}K`}
+              formatTooltip={(v) => formatCurrency(v)}
+              loading={loading}
+            />
+          ) : (
+            <div className="bg-slate-800/50 border border-slate-700 rounded-lg p-8 h-[300px] flex items-center justify-center">
+              <div className="text-center">
+                <TrendingUp className="h-12 w-12 text-slate-600 mx-auto mb-3" />
+                <p className="text-slate-400">No revenue data available yet</p>
+                <p className="text-sm text-slate-500 mt-1">Revenue trends will appear once you have bookings</p>
+              </div>
+            </div>
+          )}
+        </div>
+        {accommodationMix.length > 0 ? (
+          <BreakdownPie
+            title="Accommodation Mix"
+            description="Revenue distribution by type"
+            data={accommodationMix}
             height={300}
-            formatYAxis={(v) => `$${(v / 1000).toFixed(0)}K`}
-            formatTooltip={(v) => formatCurrency(v)}
+            formatValue={(v) => `${v}%`}
             loading={loading}
           />
-        </div>
-        <BreakdownPie
-          title="Accommodation Mix"
-          description="Revenue distribution by type"
-          data={mockAccommodationMix}
-          height={300}
-          formatValue={(v) => `${v}%`}
-          loading={loading}
-        />
+        ) : (
+          <div className="bg-slate-800/50 border border-slate-700 rounded-lg p-8 h-[300px] flex items-center justify-center">
+            <div className="text-center">
+              <Building2 className="h-12 w-12 text-slate-600 mx-auto mb-3" />
+              <p className="text-slate-400">No accommodation data yet</p>
+              <p className="text-sm text-slate-500 mt-1">Distribution will appear with bookings</p>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Top Campgrounds Table */}
-      <DataTable
-        title="Top Performing Campgrounds"
-        description="Ranked by total revenue"
-        columns={[
-          { key: "name", label: "Campground" },
-          { key: "state", label: "State", align: "center" },
-          {
-            key: "revenue",
-            label: "Revenue",
-            align: "right",
-            format: (v) => formatCurrency(v),
-          },
-          {
-            key: "reservations",
-            label: "Reservations",
-            align: "right",
-            format: (v) => v.toLocaleString(),
-          },
-        ]}
-        data={mockTopCampgrounds}
-        loading={loading}
-        maxRows={5}
-      />
+      {topCampgrounds.length > 0 ? (
+        <DataTable
+          title="Top Performing Campgrounds"
+          description="Ranked by total revenue"
+          columns={[
+            { key: "name", label: "Campground" },
+            { key: "state", label: "State", align: "center" },
+            {
+              key: "revenue",
+              label: "Revenue",
+              align: "right",
+              format: (v) => formatCurrency(v),
+            },
+            {
+              key: "reservations",
+              label: "Reservations",
+              align: "right",
+              format: (v) => v.toLocaleString(),
+            },
+          ]}
+          data={topCampgrounds}
+          loading={loading}
+          maxRows={5}
+        />
+      ) : (
+        <div className="bg-slate-800/50 border border-slate-700 rounded-lg p-6">
+          <h3 className="text-lg font-semibold text-white mb-2">Top Performing Campgrounds</h3>
+          <p className="text-slate-400">No campground performance data available yet. Rankings will appear once you have active campgrounds with bookings.</p>
+        </div>
+      )}
 
       {/* Quick Stats Footer */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 pt-4 border-t border-slate-700">

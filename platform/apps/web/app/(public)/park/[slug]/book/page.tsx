@@ -21,7 +21,11 @@ import { motion, AnimatePresence } from "framer-motion";
 import { RoundUpForCharity } from "@/components/checkout/RoundUpForCharity";
 import { BookingFormsSection } from "@/components/booking/BookingFormsSection";
 
-const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY || "pk_test_placeholder");
+const stripeKey = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY;
+if (!stripeKey) {
+    console.error("NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY is not configured. Stripe payments will not work.");
+}
+const stripePromise = stripeKey ? loadStripe(stripeKey) : null;
 
 type BookingStep = 1 | 2 | 3 | 4;
 
@@ -1534,6 +1538,8 @@ function GuestStep({
 // Payment Form with Stripe
 function PaymentForm({
     amountCents,
+    paymentIntentId,
+    reservationId,
     onSuccess,
     onBack,
     isProcessing,
@@ -1543,6 +1549,8 @@ function PaymentForm({
     capabilitiesStale
 }: {
     amountCents: number;
+    paymentIntentId: string;
+    reservationId?: string;
     onSuccess: () => void;
     onBack: () => void;
     isProcessing: boolean;
@@ -1580,9 +1588,20 @@ function PaymentForm({
         if (confirmError) {
             setError(confirmError.message || "Payment failed");
             setIsProcessing(false);
-        } else {
-            onSuccess();
+            return;
         }
+
+        // Confirm payment with our backend to record the payment and update reservation
+        if (reservationId) {
+            try {
+                await apiClient.confirmPublicPaymentIntent(paymentIntentId, reservationId);
+            } catch (err) {
+                console.error("Failed to confirm payment with backend:", err);
+                // Payment succeeded with Stripe, so we still proceed - backend can reconcile later
+            }
+        }
+
+        onSuccess();
     };
 
     return (
@@ -1696,6 +1715,7 @@ function ReviewStep({
     previewToken?: string;
 }) {
     const [clientSecret, setClientSecret] = useState<string | null>(null);
+    const [paymentIntentId, setPaymentIntentId] = useState<string | null>(null);
     const [reservationId, setReservationId] = useState<string | null>(null);
     const [reservation, setReservation] = useState<any>(null);
     const [isProcessing, setIsProcessing] = useState(false);
@@ -2079,6 +2099,7 @@ function ReviewStep({
                     reservationId: reservation.id,
                     guestEmail: guestInfo.email
                 });
+                setPaymentIntentId(intent.id);
                 setClientSecret(intent.clientSecret);
             } catch (err) {
                 console.error("Failed to create payment intent", err);
@@ -2517,7 +2538,13 @@ function ReviewStep({
             </div>
 
             {/* Payment Section */}
-            {clientSecret ? (
+            {!stripePromise ? (
+                <div className="rounded-lg border border-red-200 bg-red-50 p-4 text-center">
+                    <AlertCircle className="h-6 w-6 text-red-600 mx-auto mb-2" />
+                    <p className="text-sm font-medium text-red-800">Payment processing is not configured</p>
+                    <p className="text-xs text-red-600 mt-1">Please contact support to complete your booking</p>
+                </div>
+            ) : clientSecret ? (
                 <Elements stripe={stripePromise} options={{ clientSecret }}>
                     {holdCountdown && (
                         <div className="mb-3 flex items-center gap-2 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-800">
@@ -2529,6 +2556,8 @@ function ReviewStep({
                     )}
                     <PaymentForm
                         amountCents={finalTotalWithFees}
+                        paymentIntentId={paymentIntentId!}
+                        reservationId={reservation?.id}
                         onSuccess={() => onComplete(reservation)}
                         onBack={onBack}
                         isProcessing={isProcessing}
