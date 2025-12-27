@@ -13,7 +13,7 @@ import { Roles, RolesGuard } from "../auth/guards/roles.guard";
 import { JwtAuthGuard } from "../auth/guards";
 import { ScopeGuard } from "../permissions/scope.guard";
 import { RequireScope } from "../permissions/scope.decorator";
-import { UserRole, SeasonalStatus, RenewalIntent } from "@prisma/client";
+import { UserRole, SeasonalStatus, RenewalIntent } from ".prisma/client";
 import { SeasonalsService } from "./seasonals.service";
 import { SeasonalPricingService } from "./seasonal-pricing.service";
 import {

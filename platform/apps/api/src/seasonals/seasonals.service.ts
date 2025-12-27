@@ -8,49 +8,14 @@ import {
   SeasonalPaymentMethod,
   SeasonalBillingFrequency,
   Prisma,
-} from "@prisma/client";
+} from ".prisma/client";
+import {
+  CreateSeasonalGuestDto,
+  UpdateSeasonalGuestDto,
+} from "./dto";
 
-// DTOs
-export interface CreateSeasonalGuestDto {
-  campgroundId: string;
-  guestId: string;
-  firstSeasonYear: number;
-  currentSiteId?: string;
-  preferredSites?: string[];
-  preferredPaymentMethod?: SeasonalPaymentMethod;
-  paysInFull?: boolean;
-  autoPayEnabled?: boolean;
-  paymentDay?: number;
-  isMetered?: boolean;
-  meteredElectric?: boolean;
-  meteredWater?: boolean;
-  notes?: string;
-  tags?: string[];
-}
-
-export interface UpdateSeasonalGuestDto {
-  currentSiteId?: string;
-  preferredSites?: string[];
-  status?: SeasonalStatus;
-  renewalIntent?: RenewalIntent;
-  renewalNotes?: string;
-  preferredPaymentMethod?: SeasonalPaymentMethod;
-  paysInFull?: boolean;
-  autoPayEnabled?: boolean;
-  paymentDay?: number;
-  isMetered?: boolean;
-  meteredElectric?: boolean;
-  meteredWater?: boolean;
-  coiExpiresAt?: Date;
-  coiDocumentUrl?: string;
-  vehiclePlates?: string[];
-  petCount?: number;
-  petNotes?: string;
-  emergencyContact?: string;
-  emergencyPhone?: string;
-  notes?: string;
-  tags?: string[];
-}
+// Re-export for backwards compatibility
+export { CreateSeasonalGuestDto, UpdateSeasonalGuestDto };
 
 export interface SeasonalGuestFilters {
   status?: SeasonalStatus | SeasonalStatus[];
@@ -279,12 +244,15 @@ export class SeasonalsService {
       this.prisma.seasonalGuest.count({ where }),
     ]);
 
+    type SeasonalListItem = (typeof seasonals)[number];
+    type PaymentListItem = SeasonalListItem["payments"][number];
+
     // Post-filter by payment status if needed
-    let filteredSeasonals = seasonals;
+    let filteredSeasonals: SeasonalListItem[] = seasonals;
     if (filters.paymentStatus) {
-      filteredSeasonals = seasonals.filter((s) => {
-        const hasPastDue = s.payments.some((p) => p.status === SeasonalPaymentStatus.past_due);
-        const hasDue = s.payments.some((p) => p.status === SeasonalPaymentStatus.due);
+      filteredSeasonals = seasonals.filter((s: SeasonalListItem) => {
+        const hasPastDue = s.payments.some((p: PaymentListItem) => p.status === SeasonalPaymentStatus.past_due);
+        const hasDue = s.payments.some((p: PaymentListItem) => p.status === SeasonalPaymentStatus.due);
 
         switch (filters.paymentStatus) {
           case "past_due":
@@ -367,7 +335,10 @@ export class SeasonalsService {
       },
     });
 
-    const activeSeasonals = seasonals.filter((s) => s.status === SeasonalStatus.active);
+    type SeasonalWithRelations = (typeof seasonals)[number];
+    type PaymentRecord = SeasonalWithRelations["payments"][number];
+
+    const activeSeasonals = seasonals.filter((s: SeasonalWithRelations) => s.status === SeasonalStatus.active);
 
     // Calculate payment stats
     let paymentsCurrent = 0;
@@ -376,9 +347,9 @@ export class SeasonalsService {
     let totalMonthlyRevenue = 0;
 
     for (const seasonal of activeSeasonals) {
-      const hasPastDue = seasonal.payments.some((p) => p.status === SeasonalPaymentStatus.past_due);
+      const hasPastDue = seasonal.payments.some((p: PaymentRecord) => p.status === SeasonalPaymentStatus.past_due);
       const allPaid = seasonal.payments.every(
-        (p) => p.status === SeasonalPaymentStatus.paid || p.dueDate > now
+        (p: PaymentRecord) => p.status === SeasonalPaymentStatus.paid || p.dueDate > now
       );
 
       if (hasPastDue) {
@@ -398,10 +369,10 @@ export class SeasonalsService {
 
     // Calculate renewal stats by intent
     const renewalsByIntent = {
-      committed: seasonals.filter((s) => s.renewalIntent === RenewalIntent.committed).length,
-      likely: seasonals.filter((s) => s.renewalIntent === RenewalIntent.likely).length,
-      undecided: seasonals.filter((s) => s.renewalIntent === RenewalIntent.undecided || s.renewalIntent === null).length,
-      not_renewing: seasonals.filter((s) => s.renewalIntent === RenewalIntent.not_renewing).length,
+      committed: seasonals.filter((s: SeasonalWithRelations) => s.renewalIntent === RenewalIntent.committed).length,
+      likely: seasonals.filter((s: SeasonalWithRelations) => s.renewalIntent === RenewalIntent.likely).length,
+      undecided: seasonals.filter((s: SeasonalWithRelations) => s.renewalIntent === RenewalIntent.undecided || s.renewalIntent === null).length,
+      not_renewing: seasonals.filter((s: SeasonalWithRelations) => s.renewalIntent === RenewalIntent.not_renewing).length,
     };
 
     const renewalRate = activeSeasonals.length > 0
@@ -417,7 +388,8 @@ export class SeasonalsService {
       },
     });
 
-    const contractsSigned = contracts.filter((c) =>
+    type ContractRecord = (typeof contracts)[number];
+    const contractsSigned = contracts.filter((c: ContractRecord) =>
       ["signed", "signed_paper", "waived"].includes(c.status)
     ).length;
 
@@ -461,10 +433,10 @@ export class SeasonalsService {
     });
 
     // Calculate tenure stats
-    const totalTenure = seasonals.reduce((sum, s) => sum + s.totalSeasons, 0);
+    const totalTenure = seasonals.reduce((sum: number, s: SeasonalWithRelations) => sum + s.totalSeasons, 0);
     const averageTenure = seasonals.length > 0 ? totalTenure / seasonals.length : 0;
     const longestTenure = seasonals.length > 0
-      ? Math.max(...seasonals.map((s) => s.totalSeasons))
+      ? Math.max(...seasonals.map((s: SeasonalWithRelations) => s.totalSeasons))
       : 0;
 
     // Find milestone guests (5, 10, 15, 20 years) - only active
@@ -737,8 +709,10 @@ export class SeasonalsService {
       ],
     });
 
+    type SeasonalRecord = (typeof seasonals)[number];
+
     // Update seniority ranks
-    const updates = seasonals.map((seasonal, index) =>
+    const updates = seasonals.map((seasonal: SeasonalRecord, index: number) =>
       this.prisma.seasonalGuest.update({
         where: { id: seasonal.id },
         data: { seniorityRank: index + 1 },

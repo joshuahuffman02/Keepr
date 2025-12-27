@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, BadRequestException, UseGuards, Query, InternalServerErrorException, Patch, Param, HttpCode } from "@nestjs/common";
+import { Body, Controller, Get, Post, BadRequestException, UseGuards, Query, InternalServerErrorException, Patch, Param, HttpCode, Logger } from "@nestjs/common";
 import { Cron } from "@nestjs/schedule";
 import { PrismaService } from "../prisma/prisma.service";
 import { CreateCommunicationDto } from "./dto/create-communication.dto";
@@ -16,16 +16,20 @@ import { BadRequestException as NestBadRequestException } from "@nestjs/common";
 import { NpsService } from "../nps/nps.service";
 import { ObservabilityService } from "../observability/observability.service";
 import { AlertingService } from "../observability/alerting.service";
+import { AiAutoReplyService } from "../ai/ai-auto-reply.service";
 
 @Controller()
 export class CommunicationsController {
+  private readonly logger = new Logger(CommunicationsController.name);
+
   constructor(
     private readonly prisma: PrismaService,
     private readonly emailService: EmailService,
     private readonly smsService: SmsService,
     private readonly npsService: NpsService,
     private readonly observability: ObservabilityService,
-    private readonly alerting: AlertingService
+    private readonly alerting: AlertingService,
+    private readonly aiAutoReplyService: AiAutoReplyService
   ) { }
 
   private readonly commsMetricsEnabled =
@@ -563,6 +567,13 @@ export class CommunicationsController {
       }
     });
 
+    // Trigger AI auto-reply processing (fire and forget)
+    if (communication.campgroundId) {
+      this.aiAutoReplyService.processInboundMessage(communication.id).catch((err) => {
+        this.logger.warn(`AI auto-reply processing failed for ${communication.id}: ${err.message}`);
+      });
+    }
+
     return { ok: true, id: communication.id };
   }
 
@@ -656,6 +667,13 @@ export class CommunicationsController {
         receivedAt: new Date()
       }
     });
+
+    // Trigger AI auto-reply processing (fire and forget)
+    if (communication.campgroundId) {
+      this.aiAutoReplyService.processInboundMessage(communication.id).catch((err) => {
+        this.logger.warn(`AI auto-reply processing failed for ${communication.id}: ${err.message}`);
+      });
+    }
 
     return { ok: true, id: communication.id };
   }

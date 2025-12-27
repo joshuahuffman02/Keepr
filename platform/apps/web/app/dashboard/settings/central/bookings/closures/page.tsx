@@ -135,6 +135,56 @@ async function deleteClosure(closureId: string): Promise<void> {
   }
 }
 
+interface CreateClosureData {
+  campgroundId: string;
+  name: string;
+  reason: string;
+  startDate: string;
+  endDate: string;
+  notes?: string;
+  siteIds?: string[];
+  siteClassIds?: string[];
+}
+
+async function createClosure(data: CreateClosureData): Promise<any> {
+  const response = await fetch(`${API_BASE}/blackouts`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    credentials: "include",
+    body: JSON.stringify(data),
+  });
+  if (!response.ok) {
+    throw new Error("Failed to create closure");
+  }
+  return response.json();
+}
+
+async function updateClosure(id: string, data: Partial<CreateClosureData>): Promise<any> {
+  const response = await fetch(`${API_BASE}/blackouts/${id}`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    credentials: "include",
+    body: JSON.stringify(data),
+  });
+  if (!response.ok) {
+    throw new Error("Failed to update closure");
+  }
+  return response.json();
+}
+
+async function toggleClosure(id: string, isActive: boolean): Promise<any> {
+  const response = await fetch(`${API_BASE}/blackouts/${id}`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    credentials: "include",
+    body: JSON.stringify({ isActive }),
+  });
+  if (!response.ok) {
+    throw new Error("Failed to toggle closure");
+  }
+  return response.json();
+}
+
 export default function SiteClosuresPage() {
   const { selectedCampground, isHydrated } = useCampground();
   const queryClient = useQueryClient();
@@ -155,6 +205,27 @@ export default function SiteClosuresPage() {
 
   const deleteMutation = useMutation({
     mutationFn: deleteClosure,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["closures", selectedCampground?.id] });
+    },
+  });
+
+  const saveMutation = useMutation({
+    mutationFn: async (data: { id?: string; payload: CreateClosureData }) => {
+      if (data.id) {
+        return updateClosure(data.id, data.payload);
+      }
+      return createClosure(data.payload);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["closures", selectedCampground?.id] });
+    },
+  });
+
+  const toggleMutation = useMutation({
+    mutationFn: async ({ id, isActive }: { id: string; isActive: boolean }) => {
+      return toggleClosure(id, isActive);
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["closures", selectedCampground?.id] });
     },
@@ -197,19 +268,40 @@ export default function SiteClosuresPage() {
   }, [resetForm]);
 
   const handleSave = useCallback(() => {
-    if (!formName.trim() || !formStartDate || !formEndDate) return;
-    // TODO: Implement save mutation
-    setIsEditorOpen(false);
-    resetForm();
-  }, [formName, formStartDate, formEndDate, resetForm]);
+    if (!formName.trim() || !formStartDate || !formEndDate || !selectedCampground) return;
+
+    const payload: CreateClosureData = {
+      campgroundId: selectedCampground.id,
+      name: formName.trim(),
+      reason: formReason,
+      startDate: formStartDate,
+      endDate: formEndDate,
+      notes: formNotes || undefined,
+      siteIds: formSites.length > 0 ? formSites : undefined,
+      siteClassIds: formSiteClasses.length > 0 ? formSiteClasses : undefined,
+    };
+
+    saveMutation.mutate(
+      { id: editingClosure?.id, payload },
+      {
+        onSuccess: () => {
+          setIsEditorOpen(false);
+          resetForm();
+        },
+      }
+    );
+  }, [formName, formStartDate, formEndDate, formReason, formNotes, formSites, formSiteClasses, selectedCampground, editingClosure, saveMutation, resetForm]);
 
   const handleDelete = useCallback((id: string) => {
     deleteMutation.mutate(id);
   }, [deleteMutation]);
 
   const handleToggleActive = useCallback((id: string) => {
-    // TODO: Implement toggle mutation
-  }, []);
+    const closure = closures.find((c) => c.id === id);
+    if (closure) {
+      toggleMutation.mutate({ id, isActive: !closure.isActive });
+    }
+  }, [closures, toggleMutation]);
 
   if (!isHydrated || !selectedCampground) {
     return (

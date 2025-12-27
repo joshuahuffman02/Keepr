@@ -9844,6 +9844,245 @@ export const apiClient = {
       badgeCount: number;
     }>>(res);
   },
+
+  // ==================== AI AUTOPILOT ====================
+
+  async getAutopilotConfig(campgroundId: string) {
+    return fetchJSON<{
+      id: string;
+      campgroundId: string;
+      autoReplyEnabled: boolean;
+      autoReplyMode: string;
+      autoReplyConfidenceThreshold: number;
+      autoReplyDelayMinutes: number;
+      autoReplyExcludeCategories: string[];
+      smartWaitlistEnabled: boolean;
+      smartWaitlistMode: string;
+      waitlistGuestValueWeight: number;
+      waitlistLikelihoodWeight: number;
+      waitlistSeasonalWeight: number;
+      anomalyDetectionEnabled: boolean;
+      anomalyAlertMode: string;
+      anomalyDigestSchedule: string;
+      anomalyDigestTime: string;
+      anomalySensitivity: string;
+      noShowPredictionEnabled: boolean;
+      noShowThreshold: number;
+      noShowAutoReminder: boolean;
+      noShowReminderDaysBefore: number;
+    }>(`/ai/autopilot/campgrounds/${campgroundId}/config`);
+  },
+
+  async updateAutopilotConfig(campgroundId: string, config: Record<string, unknown>) {
+    const res = await fetch(`${API_BASE}/ai/autopilot/campgrounds/${campgroundId}/config`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json", ...scopedHeaders() },
+      body: JSON.stringify(config),
+    });
+    return parseResponse<unknown>(res);
+  },
+
+  async getAutopilotContext(campgroundId: string, type?: string, category?: string) {
+    const params = new URLSearchParams();
+    if (type) params.set("type", type);
+    if (category) params.set("category", category);
+    return fetchJSON<Array<{
+      id: string;
+      type: string;
+      question?: string;
+      answer: string;
+      category?: string;
+      priority: number;
+      isActive: boolean;
+      source: string;
+    }>>(`/ai/autopilot/campgrounds/${campgroundId}/context?${params}`);
+  },
+
+  async createAutopilotContext(campgroundId: string, data: { type: string; question?: string; answer: string; category?: string; priority?: number }) {
+    const res = await fetch(`${API_BASE}/ai/autopilot/campgrounds/${campgroundId}/context`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", ...scopedHeaders() },
+      body: JSON.stringify(data),
+    });
+    return parseResponse<unknown>(res);
+  },
+
+  async updateAutopilotContext(id: string, data: Record<string, unknown>) {
+    const res = await fetch(`${API_BASE}/ai/autopilot/context/${id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json", ...scopedHeaders() },
+      body: JSON.stringify(data),
+    });
+    return parseResponse<unknown>(res);
+  },
+
+  async deleteAutopilotContext(id: string) {
+    const res = await fetch(`${API_BASE}/ai/autopilot/context/${id}`, {
+      method: "DELETE",
+      headers: scopedHeaders(),
+    });
+    return parseResponse<unknown>(res);
+  },
+
+  async autoPopulateContext(campgroundId: string) {
+    const res = await fetch(`${API_BASE}/ai/autopilot/campgrounds/${campgroundId}/context/auto-populate`, {
+      method: "POST",
+      headers: scopedHeaders(),
+    });
+    return parseResponse<{ success: boolean; created: number }>(res);
+  },
+
+  async getReplyDrafts(campgroundId: string, status?: string) {
+    const params = new URLSearchParams();
+    if (status) params.set("status", status);
+    return fetchJSON<Array<{
+      id: string;
+      communicationId: string;
+      inboundSubject?: string;
+      inboundPreview?: string;
+      draftContent: string;
+      confidence: number;
+      detectedIntent?: string;
+      detectedTone?: string;
+      status: string;
+      createdAt: string;
+      autoSendScheduledAt?: string;
+    }>>(`/ai/autopilot/campgrounds/${campgroundId}/reply-drafts?${params}`);
+  },
+
+  async reviewReplyDraft(id: string, action: "approve" | "edit" | "reject", editedContent?: string, rejectionReason?: string) {
+    const res = await fetch(`${API_BASE}/ai/autopilot/reply-drafts/${id}/review`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", ...scopedHeaders() },
+      body: JSON.stringify({ action, editedContent, rejectionReason }),
+    });
+    return parseResponse<unknown>(res);
+  },
+
+  async sendReplyDraft(id: string) {
+    const res = await fetch(`${API_BASE}/ai/autopilot/reply-drafts/${id}/send`, {
+      method: "POST",
+      headers: scopedHeaders(),
+    });
+    return parseResponse<unknown>(res);
+  },
+
+  async getAnomalyAlerts(campgroundId: string, status?: string, severity?: string) {
+    const params = new URLSearchParams();
+    if (status) params.set("status", status);
+    if (severity) params.set("severity", severity);
+    return fetchJSON<Array<{
+      id: string;
+      type: string;
+      severity: string;
+      title: string;
+      summary: string;
+      aiAnalysis?: string;
+      suggestedAction?: string;
+      metric: string;
+      currentValue: number;
+      expectedValue: number;
+      deviation: number;
+      status: string;
+      detectedAt: string;
+    }>>(`/ai/autopilot/campgrounds/${campgroundId}/anomalies?${params}`);
+  },
+
+  async updateAnomalyStatus(id: string, status: "acknowledged" | "resolved" | "dismissed", dismissedReason?: string) {
+    const res = await fetch(`${API_BASE}/ai/autopilot/anomalies/${id}/status`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json", ...scopedHeaders() },
+      body: JSON.stringify({ status, dismissedReason }),
+    });
+    return parseResponse<unknown>(res);
+  },
+
+  async runAnomalyCheck(campgroundId: string) {
+    const res = await fetch(`${API_BASE}/ai/autopilot/campgrounds/${campgroundId}/anomalies/check`, {
+      method: "POST",
+      headers: scopedHeaders(),
+    });
+    return parseResponse<{ checked: boolean; alerts: unknown[] }>(res);
+  },
+
+  async getNoShowRisks(campgroundId: string, flaggedOnly?: boolean, daysAhead?: number) {
+    const params = new URLSearchParams();
+    if (flaggedOnly) params.set("flaggedOnly", "true");
+    if (daysAhead) params.set("daysAhead", String(daysAhead));
+    return fetchJSON<Array<{
+      id: string;
+      reservationId: string;
+      riskScore: number;
+      paymentStatusScore: number;
+      leadTimeScore: number;
+      guestHistoryScore: number;
+      communicationScore: number;
+      bookingSourceScore: number;
+      riskReason?: string;
+      flagged: boolean;
+      guestConfirmed: boolean;
+      reminderSentAt?: string;
+      reservation: {
+        id: string;
+        confirmationNumber: string;
+        arrivalDate: string;
+        departureDate: string;
+        status: string;
+        guest: {
+          id: string;
+          primaryFirstName?: string;
+          primaryLastName?: string;
+          email?: string;
+        };
+        site?: { id: string; name: string };
+      };
+    }>>(`/ai/autopilot/campgrounds/${campgroundId}/no-show-risks?${params}`);
+  },
+
+  async sendNoShowReminder(reservationId: string) {
+    const res = await fetch(`${API_BASE}/ai/autopilot/reservations/${reservationId}/no-show-risk/remind`, {
+      method: "POST",
+      headers: scopedHeaders(),
+    });
+    return parseResponse<{ sent: boolean; to: string }>(res);
+  },
+
+  async markNoShowConfirmed(reservationId: string, source?: string) {
+    const res = await fetch(`${API_BASE}/ai/autopilot/reservations/${reservationId}/no-show-risk/confirm`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", ...scopedHeaders() },
+      body: JSON.stringify({ source }),
+    });
+    return parseResponse<unknown>(res);
+  },
+
+  async getWaitlistAiScores(campgroundId: string) {
+    return fetchJSON<Array<{
+      id: string;
+      waitlistEntryId: string;
+      aiScore: number;
+      baseScore: number;
+      guestLtvScore: number;
+      bookingLikelihood: number;
+      seasonalFitScore: number;
+      communicationScore: number;
+      aiReason?: string;
+      waitlistEntry: {
+        id: string;
+        guest: { id: string; primaryFirstName?: string; primaryLastName?: string; email?: string };
+        site?: { id: string; name: string };
+        siteClass?: { id: string; name: string };
+      };
+    }>>(`/ai/autopilot/campgrounds/${campgroundId}/waitlist/ai-scores`);
+  },
+
+  async rescoreWaitlist(campgroundId: string) {
+    const res = await fetch(`${API_BASE}/ai/autopilot/campgrounds/${campgroundId}/waitlist/rescore`, {
+      method: "POST",
+      headers: scopedHeaders(),
+    });
+    return parseResponse<{ scored: number; total: number }>(res);
+  },
 };
 
 export type PublicCampgroundList = z.infer<typeof PublicCampgroundListSchema>;

@@ -1262,8 +1262,8 @@ export default function SeasonalsPage() {
               <TabsTrigger value="waitlist" className="flex items-center gap-1.5">
                 <Clock className="h-4 w-4" />
                 Waitlist
-                {stats?.waitlistCount > 0 && (
-                  <Badge variant="secondary" className="ml-1 text-xs px-1.5">{stats.waitlistCount}</Badge>
+                {(stats?.waitlistCount ?? 0) > 0 && (
+                  <Badge variant="secondary" className="ml-1 text-xs px-1.5">{stats?.waitlistCount}</Badge>
                 )}
               </TabsTrigger>
               <TabsTrigger value="config" className="flex items-center gap-1.5">

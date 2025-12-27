@@ -63,41 +63,60 @@ export function SettingsProvider({ children }: SettingsProviderProps) {
     (i) => i.severity !== "info"
   ).length;
 
-  // Fetch system check issues
+  // Fetch system check issues from the API
   const refreshSystemCheck = useCallback(async () => {
     setIsLoadingSystemCheck(true);
     try {
-      // TODO: Replace with actual API call
-      // const response = await fetch("/api/system-check");
-      // const data = await response.json();
-      // setSystemCheckIssues(data.issues);
+      const campgroundId = localStorage.getItem("selectedCampgroundId");
+      if (!campgroundId) {
+        setSystemCheckIssues([]);
+        return;
+      }
 
-      // Mock data for now
-      setSystemCheckIssues([
-        {
-          id: "1",
-          severity: "warning",
-          message: "Tax rules not configured for some site types",
-          actionLabel: "Configure",
-          actionHref: "/dashboard/settings/central/pricing/taxes",
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000"}/api/system-check/${campgroundId}`, {
+        headers: {
+          "Content-Type": "application/json",
+          "X-Campground-Id": campgroundId,
         },
-        {
-          id: "2",
-          severity: "warning",
-          message: "No rate groups defined for 2026",
-          actionLabel: "Add rate groups",
-          actionHref: "/dashboard/settings/central/pricing/rate-groups",
-        },
-        {
-          id: "3",
-          severity: "info",
-          message: "Grid optimization is disabled",
-          actionLabel: "Enable",
-          actionHref: "/dashboard/settings/central/bookings/optimization",
-        },
-      ]);
+        credentials: "include",
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch system check");
+      }
+
+      const data = await response.json();
+
+      // Map API response to component format
+      const issues: SystemCheckIssue[] = [
+        ...data.errors.map((e: any, idx: number) => ({
+          id: `error-${idx}`,
+          severity: "error" as const,
+          message: e.message,
+          actionLabel: e.action,
+          actionHref: e.href,
+        })),
+        ...data.warnings.map((w: any, idx: number) => ({
+          id: `warning-${idx}`,
+          severity: "warning" as const,
+          message: w.message,
+          actionLabel: w.action,
+          actionHref: w.href,
+        })),
+        ...data.suggestions.map((s: any, idx: number) => ({
+          id: `info-${idx}`,
+          severity: "info" as const,
+          message: s.message,
+          actionLabel: s.action,
+          actionHref: s.href,
+        })),
+      ];
+
+      setSystemCheckIssues(issues);
     } catch (error) {
       console.error("Failed to fetch system check:", error);
+      // Fall back to empty state on error
+      setSystemCheckIssues([]);
     } finally {
       setIsLoadingSystemCheck(false);
     }

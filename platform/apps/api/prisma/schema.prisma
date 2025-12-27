@@ -471,6 +471,7 @@ model User {
   auditLogs                        AuditLog[]
   storeOrdersCompleted             StoreOrder[]                      @relation("OrderCompletedBy")
   storeOrdersAssigned              StoreOrder[]                      @relation("OrderAssignedBy")
+  storeAdjustmentsCreated          StoreOrderAdjustment[]            @relation("StoreAdjustmentCreatedBy")
   supportReportsAuthored           SupportReport[]                   @relation("ReportAuthor")
   supportReportsAssigned           SupportReport[]                   @relation("ReportAssignee")
   uploadedAssets                   SocialContentAsset[]              @relation("AssetUploader")
@@ -3156,6 +3157,10 @@ model StoreOrder {
   totalCents            Int                         @default(0)
   notes                 String?
   createdBy             String? // Staff user ID
+  // Status timestamps
+  seenAt                DateTime? // When staff first viewed the order
+  readyAt               DateTime? // When order was marked ready for pickup/delivery
+  deliveredAt           DateTime? // When order was delivered to customer
   completedAt           DateTime?
   completedById         String?
   // Multi-location fulfillment
@@ -3166,13 +3171,14 @@ model StoreOrder {
   createdAt             DateTime                    @default(now())
   updatedAt             DateTime                    @default(now()) @updatedAt
 
-  campground          Campground       @relation(fields: [campgroundId], references: [id], onDelete: Cascade)
-  reservation         Reservation?     @relation(fields: [reservationId], references: [id], onDelete: SetNull)
-  guest               Guest?           @relation(fields: [guestId], references: [id], onDelete: SetNull)
-  completedBy         User?            @relation("OrderCompletedBy", fields: [completedById], references: [id], onDelete: SetNull)
-  fulfillmentLocation StoreLocation?   @relation("FulfillmentLocation", fields: [fulfillmentLocationId], references: [id], onDelete: SetNull)
-  assignedBy          User?            @relation("OrderAssignedBy", fields: [assignedById], references: [id], onDelete: SetNull)
+  campground          Campground              @relation(fields: [campgroundId], references: [id], onDelete: Cascade)
+  reservation         Reservation?            @relation(fields: [reservationId], references: [id], onDelete: SetNull)
+  guest               Guest?                  @relation(fields: [guestId], references: [id], onDelete: SetNull)
+  completedBy         User?                   @relation("OrderCompletedBy", fields: [completedById], references: [id], onDelete: SetNull)
+  fulfillmentLocation StoreLocation?          @relation("FulfillmentLocation", fields: [fulfillmentLocationId], references: [id], onDelete: SetNull)
+  assignedBy          User?                   @relation("OrderAssignedBy", fields: [assignedById], references: [id], onDelete: SetNull)
   items               StoreOrderItem[]
+  adjustments         StoreOrderAdjustment[]
 
   @@index([campgroundId])
   @@index([reservationId])
@@ -3180,6 +3186,7 @@ model StoreOrder {
   @@index([status])
   @@index([fulfillmentLocationId])
   @@index([fulfillmentStatus])
+  @@index([seenAt])
 }
 
 model StoreOrderItem {
@@ -3200,6 +3207,30 @@ model StoreOrderItem {
   @@index([orderId])
   @@index([productId])
   @@index([addOnId])
+}
+
+enum StoreAdjustmentType {
+  refund
+  exchange
+  discount
+}
+
+model StoreOrderAdjustment {
+  id          String              @id @default(cuid())
+  orderId     String
+  type        StoreAdjustmentType @default(refund)
+  amountCents Int
+  note        String?
+  items       Json? // Array of affected items: [{itemId, name, qty, amountCents}]
+  createdById String?
+  createdAt   DateTime            @default(now())
+
+  order     StoreOrder @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  createdBy User?      @relation("StoreAdjustmentCreatedBy", fields: [createdById], references: [id], onDelete: SetNull)
+
+  @@index([orderId])
+  @@index([type])
+  @@index([createdAt])
 }
 
 model BlackoutDate {

@@ -12,6 +12,8 @@
     "web": "pnpm --dir platform/apps/web dev",
     "dev": "concurrently -n api,web -c cyan,magenta \"pnpm --dir platform/apps/api dev\" \"pnpm --dir platform/apps/web dev\"",
     "prisma:reset-seed": "pnpm --dir platform/apps/api prisma migrate reset --force && pnpm --dir platform/apps/api prisma:generate && pnpm --dir platform/apps/api prisma:seed",
+    "prisma:link": "node scripts/link-prisma-client.js",
+    "postinstall": "pnpm prisma:link",
     "lint:web": "pnpm --dir platform/apps/web lint",
     "ci:e2e": "pnpm --dir platform/apps/web test:e2e",
     "ci:sdk": "pnpm --filter @campreserv/sdk test && pnpm --filter @campreserv/integrations-sdk test",

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { DashboardShell } from "@/components/ui/layout/DashboardShell";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -10,26 +10,18 @@ import { Product, ProductCategory } from "@campreserv/shared";
 import { useToast } from "@/components/ui/use-toast";
 import { Loader2, AlertTriangle, Package } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { useCampground } from "@/contexts/CampgroundContext";
 
 export default function InventoryPage() {
     const [products, setProducts] = useState<(Product & { category?: ProductCategory | null })[]>([]);
     const [lowStockProducts, setLowStockProducts] = useState<(Product & { category?: ProductCategory | null })[]>([]);
     const [loading, setLoading] = useState(true);
     const { toast } = useToast();
+    const { selectedCampground, isHydrated } = useCampground();
 
-    // TODO: Get from context or URL
-    const campgroundId = "default-campground-id";
+    const campgroundId = selectedCampground?.id;
 
-    useEffect(() => {
-        const stored = localStorage.getItem("campreserv:selectedCampground");
-        if (stored) {
-            loadData(stored);
-        } else {
-            loadData(campgroundId);
-        }
-    }, []);
-
-    const loadData = async (cgId: string) => {
+    const loadData = useCallback(async (cgId: string) => {
         try {
             setLoading(true);
             const [allProducts, lowStock] = await Promise.all([
@@ -48,9 +40,17 @@ export default function InventoryPage() {
         } finally {
             setLoading(false);
         }
-    };
+    }, [toast]);
+
+    useEffect(() => {
+        if (isHydrated && campgroundId) {
+            loadData(campgroundId);
+        }
+    }, [isHydrated, campgroundId, loadData]);
 
     const handleStockUpdate = async (id: string, newQty: number) => {
+        if (!campgroundId) return;
+
         try {
             const product = products.find(p => p.id === id);
             if (!product) return;
@@ -58,9 +58,7 @@ export default function InventoryPage() {
             const adjustment = newQty - (product.stockQty || 0);
             if (adjustment === 0) return;
 
-            const stored = localStorage.getItem("campreserv:selectedCampground");
-            const cgId = stored || campgroundId;
-            await apiClient.updateStoreStock(cgId, id, { delta: adjustment });
+            await apiClient.updateStoreStock(campgroundId, id, { delta: adjustment });
 
             toast({
                 title: "Stock Updated",
@@ -68,7 +66,7 @@ export default function InventoryPage() {
             });
 
             // Reload data to refresh low stock list
-            loadData(cgId);
+            loadData(campgroundId);
 
         } catch (error) {
             console.error(error);

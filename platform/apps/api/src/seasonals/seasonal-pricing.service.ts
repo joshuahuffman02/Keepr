@@ -6,7 +6,7 @@ import {
   SeasonalIncentiveType,
   SeasonalBillingFrequency,
   SeasonalPaymentMethod,
-} from "@prisma/client";
+} from ".prisma/client";
 
 export interface GuestPricingContext {
   isMetered: boolean;

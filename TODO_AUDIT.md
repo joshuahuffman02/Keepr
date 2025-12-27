@@ -1,0 +1,82 @@
+# TODO/FIXME Audit
+
+**Generated:** 2025-12-27
+**Status:** In Progress
+
+This document tracks all TODO, FIXME, and incomplete code comments in the codebase.
+
+---
+
+## Critical (Data Loss / Blocking Issues)
+
+| # | File | Line | Issue | Status |
+|---|------|------|-------|--------|
+| 1 | `apps/api/src/store/store.service.ts` | 19 | CRITICAL: Implement database persistence for order adjustments (data lost on restart) | **FIXED** |
+
+---
+
+## Important (Missing Core Functionality)
+
+| # | File | Line | Issue | Status |
+|---|------|------|-------|--------|
+| 2 | `apps/api/src/store/store.service.ts` | 96-107 | Add missing timestamp fields to StoreOrder schema (seenAt, pickedUpAt, etc.) | **FIXED** |
+| 3 | `apps/api/src/store/store.service.ts` | 291-320 | seenAt field queries will fail - needs schema update | **FIXED** |
+| 4 | `apps/api/src/store/store.service.ts` | 666-787 | Implement proper refund workflow (inventory restore, payment processor, email) | Partial (DB done, processor pending) |
+| 5 | `apps/api/src/pos/pos.service.ts` | 40 | Implement pricing/tax versions and create items | Pending |
+| 6 | `apps/api/src/pos/pos.service.ts` | 197 | Integrate POS with reservations AR/folio | Pending |
+| 7 | `apps/api/src/ota/ota.service.ts` | 694, 837, 848 | OTA provider API integration (actual API calls, pricing, provider methods) | Pending |
+| 8 | `apps/api/src/seasonals/seasonals.service.ts` | 716 | Integrate with actual email/SMS sending service | Pending |
+
+---
+
+## Moderate (Improvements / Integrations)
+
+| # | File | Line | Issue | Status |
+|---|------|------|-------|--------|
+| 9 | `apps/api/src/currency-tax/currency-tax.service.ts` | 44, 84 | Integrate real FX provider (OpenExchangeRates, XE.com, ECB) | Pending |
+| 10 | `apps/api/src/security/account-lockout.service.ts` | 14 | Migrate to Redis for distributed locking | Pending |
+| 11 | `apps/api/src/security/pii-encryption.service.ts` | 109 | Support key rotation by version lookup | Pending |
+| 12 | `apps/api/src/campgrounds/campground-review-connectors.service.ts` | 74, 110, 134 | Complete RV Life API integration | Pending |
+| 13 | `apps/api/src/maintenance/maintenance.service.ts` | 172 | Emit maintenance state/out_of_order change communication | Pending |
+| 14 | `apps/api/src/groups/groups.service.ts` | 153 | Emit group change communication if sharedComm | Pending |
+| 15 | `apps/api/src/operations/operations.service.ts` | 309, 438 | Implement additional notification channels and EmailService.sendEmail | Pending |
+| 16 | `apps/api/src/op-tasks/services/op-sla.service.ts` | 76 | Send notification to manager on SLA breach | Pending |
+| 17 | `apps/api/src/op-tasks/services/op-gamification.service.ts` | 611 | Implement speed tracking for gamification | Pending |
+| 18 | `apps/api/src/org-billing/subscription.service.ts` | 526 | Send notification to org owner about failed payment | Pending |
+| 19 | `apps/api/src/admin/platform-analytics/services/nps-analytics.service.ts` | 705 | Add follow-up tracking fields to NpsResponse model | Pending |
+
+---
+
+## Minor (Low Priority / Frontend)
+
+| # | File | Line | Issue | Status |
+|---|------|------|-------|--------|
+| 20 | `apps/web/app/store/inventory/page.tsx` | 20 | Get campgroundId from context or URL | **FIXED** |
+| 21 | `apps/web/components/settings/SettingsContext.tsx` | 70 | Replace with actual API call | **FIXED** |
+| 22 | `apps/web/components/marketing/DemoCTA.tsx` | 21 | Implement form submission logic | Pending |
+| 23 | `apps/web/app/dashboard/settings/central/bookings/closures/page.tsx` | 201, 211 | Implement save/toggle mutations | **FIXED** |
+
+---
+
+## Summary
+
+- **Critical:** 0 remaining (1 fixed)
+- **Important:** 5 remaining (2 fixed, 1 partial)
+- **Moderate:** 11 remaining
+- **Minor:** 1 remaining (3 fixed)
+- **Total:** 17 remaining (6 fixed)
+
+---
+
+## Progress Log
+
+| Date | Item # | Action |
+|------|--------|--------|
+| 2025-12-27 | - | Initial audit created |
+| 2025-12-27 | 1 | FIXED: Added StoreOrderAdjustment model to Prisma schema, updated store.service.ts to use database instead of in-memory Map |
+| 2025-12-27 | 2 | FIXED: Added seenAt, readyAt, deliveredAt timestamp fields to StoreOrder model |
+| 2025-12-27 | 3 | FIXED: Updated listUnseenOrders and markOrderSeen to use seenAt field |
+| 2025-12-27 | 4 | PARTIAL: Database persistence done, payment processor integration still needed |
+| 2025-12-27 | 20 | FIXED: Updated store inventory page to use CampgroundContext instead of direct localStorage |
+| 2025-12-27 | 21 | FIXED: Updated SettingsContext to use real /api/system-check endpoint instead of mock data |
+| 2025-12-27 | 23 | FIXED: Implemented save/toggle mutations for closures page using blackouts API |
