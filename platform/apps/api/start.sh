@@ -40,5 +40,8 @@ fi
 echo "=== Generating Prisma client ==="
 npx prisma generate
 
+echo "=== Linking Prisma client for pnpm ==="
+node /app/scripts/link-prisma-client.js || echo "Link script not found, skipping"
+
 echo "=== Starting app ==="
 exec node -r tsconfig-paths/register dist/main.js
