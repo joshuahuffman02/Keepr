@@ -76,7 +76,7 @@ export default function AuditLogPage() {
       return;
     }
 
-    apiClient.getCampgroundAudit(id, { limit: 100 })
+    apiClient.getAuditLogs(id, { limit: 100 })
       .then((entries: any[]) => {
         const mapped: AuditEntry[] = entries.map((e: any) => ({
           id: e.id,
