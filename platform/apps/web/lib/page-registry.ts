@@ -510,11 +510,21 @@ export const PAGE_REGISTRY: PageDefinition[] = [
   // SETTINGS - Configuration pages
   // ============================================
   {
-    href: "/dashboard/settings",
-    label: "Settings Hub",
+    href: "/dashboard/settings/central",
+    label: "Central Settings",
     icon: "policy",
     category: "settings",
-    description: "All settings and configuration",
+    description: "Centralized settings hub with all configuration options",
+    keywords: ["configure", "preferences", "options", "central", "hub", "all settings"],
+    permissions: ["settingsWrite"],
+    defaultForRoles: ["manager", "owner", "admin"],
+  },
+  {
+    href: "/dashboard/settings",
+    label: "Settings Overview",
+    icon: "policy",
+    category: "settings",
+    description: "Quick access to individual settings pages",
     keywords: ["configure", "preferences", "options"],
     permissions: ["settingsWrite"],
   },

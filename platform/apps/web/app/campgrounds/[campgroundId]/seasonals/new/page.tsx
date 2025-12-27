@@ -41,7 +41,7 @@ type Guest = {
 type Site = {
   id: string;
   name: string;
-  siteClassId: string;
+  siteClassId?: string | null;
   siteClass?: { name: string };
 };
 
