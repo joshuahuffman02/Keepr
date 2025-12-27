@@ -37,21 +37,100 @@ export class PosService {
   ) {}
 
   async createCart(dto: CreateCartDto, actor: any) {
-    // TODO: pricing/tax versions; create items
+    const campgroundId = actor?.campgroundId;
+
+    // Get terminal and its location for price lookups
+    let locationId: string | null = null;
+    let terminalPriceVersion: string | null = null;
+    let terminalTaxVersion: string | null = null;
+
+    if (dto.terminalId) {
+      const terminal = await this.prisma.posTerminal.findUnique({
+        where: { id: dto.terminalId },
+        select: { locationId: true, priceVersion: true, taxVersion: true }
+      });
+      if (terminal) {
+        locationId = terminal.locationId;
+        terminalPriceVersion = terminal.priceVersion;
+        terminalTaxVersion = terminal.taxVersion;
+      }
+    }
+
+    // Use provided versions or fall back to terminal/system defaults
+    const pricingVersion = dto.pricingVersion ?? terminalPriceVersion ?? new Date().toISOString().split('T')[0];
+    const taxVersion = dto.taxVersion ?? terminalTaxVersion ?? new Date().toISOString().split('T')[0];
+
+    // Fetch all products for this cart
+    const productIds = dto.items.map(i => i.productId);
+    const products = await this.prisma.product.findMany({
+      where: { id: { in: productIds } },
+      select: { id: true, priceCents: true, name: true }
+    });
+    const productMap = new Map(products.map(p => [p.id, p]));
+
+    // Fetch location price overrides if we have a location
+    const priceOverrides = new Map<string, number>();
+    if (locationId) {
+      const overrides = await this.prisma.locationPriceOverride.findMany({
+        where: {
+          productId: { in: productIds },
+          locationId,
+          isActive: true
+        }
+      });
+      for (const o of overrides) {
+        priceOverrides.set(o.productId, o.priceCents);
+      }
+    }
+
+    // Fetch tax rules for goods/general
+    const taxRules = campgroundId ? await this.prisma.taxRule.findMany({
+      where: {
+        campgroundId,
+        isActive: true,
+        category: { in: ['general', 'goods'] }
+      }
+    }) : [];
+
+    // Calculate effective tax rate (sum of all applicable percentage rates)
+    let effectiveTaxRate = 0;
+    for (const rule of taxRules) {
+      if (rule.type === 'percentage' && rule.rate) {
+        effectiveTaxRate += Number(rule.rate);
+      }
+    }
+
+    // Build cart items with proper pricing and tax
+    const cartItemsData = dto.items.map((item) => {
+      const product = productMap.get(item.productId);
+      // Priority: override from DTO > location override > product base price
+      const unitPriceCents = item.overridePriceCents
+        ?? priceOverrides.get(item.productId)
+        ?? product?.priceCents
+        ?? 0;
+      const subtotalCents = unitPriceCents * item.qty;
+      const taxCents = Math.round(subtotalCents * effectiveTaxRate);
+      const totalCents = subtotalCents + taxCents;
+
+      return {
+        productId: item.productId,
+        qty: item.qty,
+        unitPriceCents,
+        taxCents,
+        totalCents,
+        originalPriceCents: product?.priceCents ?? unitPriceCents
+      };
+    });
+
     return this.prisma.posCart.create({
       data: {
-        campgroundId: actor?.campgroundId,
+        campgroundId,
         terminalId: dto.terminalId,
         currency: actor?.currency ?? "usd",
-        pricingVersion: dto.pricingVersion,
-        taxVersion: dto.taxVersion,
+        pricingVersion,
+        taxVersion,
         items: {
-          create: dto.items.map((item) => ({
-            productId: item.productId,
-            qty: item.qty,
-            unitPriceCents: item.overridePriceCents ?? 0,
-            totalCents: (item.overridePriceCents ?? 0) * item.qty
-          }))
+          create: cartItemsData
         }
       },
       include: { items: true }
@@ -59,16 +138,77 @@ export class PosService {
   }
 
   async updateCart(cartId: string, dto: UpdateCartDto, actor: any) {
-    // Minimal stub; real implementation should validate ownership and recompute totals
+    // Fetch cart with terminal for location-based pricing
+    const cart = await this.prisma.posCart.findUnique({
+      where: { id: cartId },
+      select: { campgroundId: true, terminalId: true }
+    });
+    if (!cart) throw new NotFoundException("Cart not found");
+
     const ops: any = {};
-    if (dto.add) {
-      ops.create = dto.add.map((item) => ({
-        productId: item.productId,
-        qty: item.qty,
-        unitPriceCents: item.overridePriceCents ?? 0,
-        totalCents: (item.overridePriceCents ?? 0) * item.qty
-      }));
+
+    if (dto.add && dto.add.length > 0) {
+      // Get location from terminal
+      let locationId: string | null = null;
+      if (cart.terminalId) {
+        const terminal = await this.prisma.posTerminal.findUnique({
+          where: { id: cart.terminalId },
+          select: { locationId: true }
+        });
+        locationId = terminal?.locationId ?? null;
+      }
+
+      // Fetch products
+      const productIds = dto.add.map(i => i.productId);
+      const products = await this.prisma.product.findMany({
+        where: { id: { in: productIds } },
+        select: { id: true, priceCents: true }
+      });
+      const productMap = new Map(products.map(p => [p.id, p]));
+
+      // Fetch location price overrides
+      const priceOverrides = new Map<string, number>();
+      if (locationId) {
+        const overrides = await this.prisma.locationPriceOverride.findMany({
+          where: { productId: { in: productIds }, locationId, isActive: true }
+        });
+        for (const o of overrides) {
+          priceOverrides.set(o.productId, o.priceCents);
+        }
+      }
+
+      // Fetch tax rules
+      const taxRules = cart.campgroundId ? await this.prisma.taxRule.findMany({
+        where: { campgroundId: cart.campgroundId, isActive: true, category: { in: ['general', 'goods'] } }
+      }) : [];
+      let effectiveTaxRate = 0;
+      for (const rule of taxRules) {
+        if (rule.type === 'percentage' && rule.rate) {
+          effectiveTaxRate += Number(rule.rate);
+        }
+      }
+
+      ops.create = dto.add.map((item) => {
+        const product = productMap.get(item.productId);
+        const unitPriceCents = item.overridePriceCents
+          ?? priceOverrides.get(item.productId)
+          ?? product?.priceCents
+          ?? 0;
+        const subtotalCents = unitPriceCents * item.qty;
+        const taxCents = Math.round(subtotalCents * effectiveTaxRate);
+        const totalCents = subtotalCents + taxCents;
+
+        return {
+          productId: item.productId,
+          qty: item.qty,
+          unitPriceCents,
+          taxCents,
+          totalCents,
+          originalPriceCents: product?.priceCents ?? unitPriceCents
+        };
+      });
     }
+
     if (dto.update) {
       ops.update = dto.update.map((item) => ({
         where: { id: item.cartItemId },
@@ -78,14 +218,14 @@ export class PosService {
         }
       }));
     }
+
     if (dto.remove) {
       ops.deleteMany = dto.remove.map((item) => ({ id: item.cartItemId }));
     }
+
     return this.prisma.posCart.update({
       where: { id: cartId },
-      data: {
-        items: ops
-      },
+      data: { items: ops },
       include: { items: true }
     });
   }
@@ -97,7 +237,7 @@ export class PosService {
       throw new ConflictException("Request already in progress");
     }
 
-    // Basic reprice: TODO replace with real pricing/tax engines
+    // Reprice cart items using stored prices and tax
     const cart = await this.prisma.posCart.findUnique({
       where: { id: cartId },
       include: { items: { include: { product: true } }, payments: true }
