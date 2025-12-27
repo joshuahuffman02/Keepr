@@ -28,7 +28,6 @@ export const categorySections: Record<string, Section[]> = {
     { id: "blackouts", label: "Blackouts", href: "/dashboard/settings/blackout-dates" },
     { id: "closures", label: "Site Closures", href: "/dashboard/settings/central/bookings/closures" },
     { id: "custom-fields", label: "Custom Fields", href: "/dashboard/settings/central/bookings/custom-fields" },
-    { id: "lock-codes", label: "Lock Codes", href: "/dashboard/settings/central/bookings/lock-codes" },
     { id: "promotions", label: "Promotions", href: "/dashboard/settings/promotions" },
     { id: "optimization", label: "Optimization", href: "/dashboard/settings/central/bookings/optimization" },
   ],
@@ -44,6 +43,7 @@ export const categorySections: Record<string, Section[]> = {
   access: [
     { id: "users", label: "Users", href: "/dashboard/settings/central/access/users" },
     { id: "roles", label: "Roles", href: "/dashboard/settings/central/access/roles" },
+    { id: "lock-codes", label: "Lock Codes", href: "/dashboard/settings/central/access/lock-codes" },
     { id: "permissions", label: "Permissions", href: "/dashboard/settings/permissions" },
     { id: "security", label: "Security", href: "/dashboard/settings/security" },
     { id: "audit", label: "Audit Log", href: "/dashboard/settings/central/access/audit" },

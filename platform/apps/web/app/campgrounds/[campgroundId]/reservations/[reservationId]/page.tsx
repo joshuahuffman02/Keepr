@@ -432,7 +432,7 @@ export default function ReservationDetailPage() {
               Message
             </Button>
             {/* Show Convert to Seasonal button for long-term stays (28+ nights) */}
-            {(quote?.nights ?? 0) >= 28 && !reservation.seasonalGuestId && (
+            {(quote?.nights ?? 0) >= 28 && !(reservation as { seasonalGuestId?: string }).seasonalGuestId && (
               <Button
                 size="sm"
                 variant="outline"
@@ -443,7 +443,7 @@ export default function ReservationDetailPage() {
                 Convert to Seasonal
               </Button>
             )}
-            {reservation.seasonalGuestId && (
+            {(reservation as { seasonalGuestId?: string }).seasonalGuestId && (
               <Button
                 size="sm"
                 variant="outline"
