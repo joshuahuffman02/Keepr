@@ -1,4 +1,4 @@
-import { Module } from "@nestjs/common";
+import { Module, forwardRef } from "@nestjs/common";
 import { PublicReservationsController } from "./public-reservations.controller";
 import { PublicReservationsService } from "./public-reservations.service";
 import { PrismaModule } from "../prisma/prisma.module";
@@ -12,6 +12,7 @@ import { PoliciesModule } from "../policies/policies.module";
 import { PricingV2Module } from "../pricing-v2/pricing-v2.module";
 import { DepositPoliciesModule } from "../deposit-policies/deposit-policies.module";
 import { FormsModule } from "../forms/forms.module";
+import { PaymentsModule } from "../payments/payments.module";
 
 @Module({
     imports: [
@@ -25,7 +26,8 @@ import { FormsModule } from "../forms/forms.module";
         AccessControlModule,
         PricingV2Module,
         DepositPoliciesModule,
-        FormsModule
+        FormsModule,
+        forwardRef(() => PaymentsModule),
     ],
     controllers: [PublicReservationsController],
     providers: [PublicReservationsService],

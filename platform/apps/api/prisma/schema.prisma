@@ -1230,6 +1230,8 @@ model Campground {
   utilityMeters             UtilityMeter[]
   smartLocks                SmartLock[]
   qrCodes                   QRCode[]
+  lockCodes                 LockCode[]
+  stayRules                 StayRule[]
   lateFeeRules              LateFeeRule[]
   analyticsEvents           AnalyticsEvent[]
   analyticsDailyAggregates  AnalyticsDailyAggregate[]
@@ -1313,6 +1315,12 @@ model Campground {
   campgroundAwards       CampgroundAward[]
   charitySettings        CampgroundCharity?
   charityDonations       CharityDonation[]
+
+  // AI Autopilot relations
+  aiAutopilotConfig      AiAutopilotConfig?
+  aiContextItems         AiCampgroundContext[]
+  aiReplyDrafts          AiReplyDraft[]
+  aiAnomalyAlerts        AiAnomalyAlert[]
 
   // Organization billing relations
   orgBillingLineItems OrganizationBillingLineItem[]
@@ -2229,6 +2237,9 @@ model Reservation {
   // Link to Seasonal Guest (if converted from reservation)
   seasonalGuestId String?
   seasonalGuest   SeasonalGuest? @relation("SeasonalGuestReservations", fields: [seasonalGuestId], references: [id], onDelete: SetNull)
+
+  // AI Autopilot: No-show risk prediction
+  aiNoShowRisk AiNoShowRisk?
 
   @@index([campgroundId])
   @@index([seasonalGuestId])
@@ -3331,6 +3342,7 @@ model WaitlistEntry {
   siteClass  SiteClass?              @relation(fields: [siteTypeId], references: [id], onDelete: SetNull)
   offers     WaitlistOffer[]
   holds      WaitlistInventoryHold[]
+  aiScore    AiWaitlistScore?
 
   @@index([campgroundId])
   @@index([guestId])
@@ -9073,4 +9085,261 @@ model SeasonalCommunication {
   @@index([seasonalGuestId, createdAt])
   @@index([campgroundId, createdAt])
   @@index([campaignId])
+}
+
+// ==================== LOCK CODES ====================
+
+enum LockCodeType {
+  gate
+  cabin
+  amenity
+  wifi
+  master
+}
+
+enum LockCodeRotationSchedule {
+  none
+  daily
+  weekly
+  monthly
+  per_guest
+}
+
+model LockCode {
+  id           String                   @id @default(cuid())
+  campgroundId String
+  campground   Campground               @relation(fields: [campgroundId], references: [id], onDelete: Cascade)
+
+  name               String
+  code               String // Encrypted in production
+  type               LockCodeType
+  rotationSchedule   LockCodeRotationSchedule @default(none)
+  showOnConfirmation Boolean                  @default(true)
+  showAtCheckin      Boolean                  @default(true)
+  appliesTo          String[]                 @default([]) // Site IDs or "all"
+  isActive           Boolean                  @default(true)
+  lastRotatedAt      DateTime?
+  notes              String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([campgroundId])
+  @@index([campgroundId, type])
+}
+
+// ==================== STAY RULES ====================
+
+model StayRule {
+  id           String     @id @default(cuid())
+  campgroundId String
+  campground   Campground @relation(fields: [campgroundId], references: [id], onDelete: Cascade)
+
+  name            String
+  minNights       Int       @default(1)
+  maxNights       Int       @default(28)
+  siteClasses     String[]  @default([]) // Empty = applies to all
+  dateRanges      Json      @default("[]") // Array of {start, end} date strings
+  ignoreDaysBefore Int      @default(0) // Allow last-minute bookings to bypass min
+  isActive        Boolean   @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([campgroundId])
+  @@index([campgroundId, isActive])
+}
+
+// ==================== AI AUTOPILOT ====================
+
+// Master configuration per campground for AI Autopilot features
+model AiAutopilotConfig {
+  id           String     @id @default(cuid())
+  campgroundId String     @unique
+  campground   Campground @relation(fields: [campgroundId], references: [id], onDelete: Cascade)
+
+  // Auto-Reply Settings
+  autoReplyEnabled            Boolean @default(false)
+  autoReplyMode               String  @default("draft") // "draft" | "auto"
+  autoReplyConfidenceThreshold Float  @default(0.8)
+  autoReplyDelayMinutes       Int     @default(5)
+  autoReplyExcludeCategories  String[] @default([]) // Categories to skip
+
+  // Smart Waitlist Settings
+  smartWaitlistEnabled    Boolean @default(false)
+  smartWaitlistMode       String  @default("suggest") // "suggest" | "auto"
+  waitlistGuestValueWeight Float  @default(0.3)
+  waitlistLikelihoodWeight Float  @default(0.3)
+  waitlistSeasonalWeight   Float  @default(0.2)
+
+  // Anomaly Detection Settings
+  anomalyDetectionEnabled Boolean @default(false)
+  anomalyAlertMode        String  @default("digest") // "realtime" | "digest" | "both"
+  anomalyDigestSchedule   String  @default("daily") // "daily" | "weekly"
+  anomalyDigestTime       String  @default("08:00")
+  anomalySensitivity      String  @default("medium") // "low" | "medium" | "high"
+
+  // No-Show Prediction Settings
+  noShowPredictionEnabled Boolean @default(false)
+  noShowThreshold         Float   @default(0.7)
+  noShowAutoReminder      Boolean @default(false)
+  noShowReminderDaysBefore Int    @default(2)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// Campground knowledge base for AI context (FAQs, policies, training examples)
+model AiCampgroundContext {
+  id           String     @id @default(cuid())
+  campgroundId String
+  campground   Campground @relation(fields: [campgroundId], references: [id], onDelete: Cascade)
+
+  type      String  // "faq" | "policy" | "training_example" | "common_question"
+  question  String? @db.Text // For FAQs and training examples
+  answer    String  @db.Text // The content/response
+  category  String? // "check_in" | "amenities" | "pets" | "cancellation" | etc.
+  priority  Int     @default(0)
+  isActive  Boolean @default(true)
+  source    String? // "auto_import" | "manual" - track where it came from
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([campgroundId])
+  @@index([campgroundId, type])
+  @@index([campgroundId, category])
+  @@index([campgroundId, isActive])
+}
+
+// AI reply drafts pending review or auto-sent
+model AiReplyDraft {
+  id              String     @id @default(cuid())
+  campgroundId    String
+  campground      Campground @relation(fields: [campgroundId], references: [id], onDelete: Cascade)
+  communicationId String // Reference to inbound Communication
+  guestId         String?
+  reservationId   String?
+
+  inboundSubject  String? // Original message subject
+  inboundPreview  String? @db.Text // Preview of inbound message
+  draftContent    String  @db.Text
+  confidence      Float // 0-1 confidence score
+  detectedIntent  String? // "question" | "complaint" | "change_request" | "cancellation" | etc.
+  detectedTone    String? // "friendly" | "neutral" | "upset"
+  usedContextIds  String[] @default([]) // IDs of AiCampgroundContext used
+  usedContextSummary String? @db.Text // Human-readable summary of what was used
+
+  status          String   @default("pending") // "pending" | "approved" | "edited" | "rejected" | "sent" | "auto_sent"
+  reviewedById    String?
+  reviewedAt      DateTime?
+  editedContent   String?  @db.Text
+  rejectionReason String?
+  sentAt          DateTime?
+  autoSendScheduledAt DateTime? // When auto-send is scheduled for
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([campgroundId])
+  @@index([campgroundId, status])
+  @@index([communicationId])
+  @@index([autoSendScheduledAt, status])
+}
+
+// AI waitlist scoring for smart matching
+model AiWaitlistScore {
+  id              String        @id @default(cuid())
+  waitlistEntryId String
+  waitlistEntry   WaitlistEntry @relation(fields: [waitlistEntryId], references: [id], onDelete: Cascade)
+  campgroundId    String
+
+  // Component scores (0-100 each)
+  baseScore          Int // From existing priority calculation
+  guestLtvScore      Int // Lifetime value score
+  bookingLikelihood  Int // Probability to book if offered
+  seasonalFitScore   Int // How well dates match demand patterns
+  communicationScore Int @default(50) // Guest responsiveness
+
+  // Final weighted score and explanation
+  aiScore   Float
+  aiReason  String? @db.Text // Explanation of scoring
+
+  calculatedAt DateTime @default(now())
+
+  @@unique([waitlistEntryId])
+  @@index([campgroundId])
+  @@index([campgroundId, aiScore])
+}
+
+// Anomaly alerts detected by AI
+model AiAnomalyAlert {
+  id           String     @id @default(cuid())
+  campgroundId String
+  campground   Campground @relation(fields: [campgroundId], references: [id], onDelete: Cascade)
+
+  type          String // "revenue_drop" | "revenue_spike" | "occupancy_drop" | "booking_velocity_change" | etc.
+  severity      String // "low" | "medium" | "high" | "critical"
+  title         String
+  summary       String  @db.Text
+  aiAnalysis    String? @db.Text // AI-generated explanation
+  suggestedAction String? @db.Text
+
+  metric        String
+  currentValue  Float
+  expectedValue Float
+  deviation     Float // Percentage deviation
+  comparisonPeriod String? // "last_week" | "last_month" | "last_year"
+
+  status           String    @default("new") // "new" | "acknowledged" | "resolved" | "dismissed"
+  acknowledgedById String?
+  acknowledgedAt   DateTime?
+  resolvedAt       DateTime?
+  dismissedReason  String?
+
+  detectedAt      DateTime
+  digestIncluded  Boolean  @default(false)
+  digestSentAt    DateTime?
+
+  metadata Json? // Additional context data
+
+  createdAt DateTime @default(now())
+
+  @@index([campgroundId])
+  @@index([campgroundId, status])
+  @@index([campgroundId, detectedAt])
+  @@index([campgroundId, severity])
+}
+
+// No-show risk scores for reservations
+model AiNoShowRisk {
+  id            String      @id @default(cuid())
+  reservationId String      @unique
+  reservation   Reservation @relation(fields: [reservationId], references: [id], onDelete: Cascade)
+  campgroundId  String
+
+  riskScore Float // 0-1 probability of no-show
+
+  // Factor scores (0-100 each, higher = more risk)
+  paymentStatusScore   Int // Unpaid = higher risk
+  leadTimeScore        Int // Very early or last-minute = pattern dependent
+  guestHistoryScore    Int // Past no-shows = higher risk
+  communicationScore   Int // No communication = higher risk
+  bookingPatternScore  Int // Unusual patterns = higher risk
+
+  factors Json? // Detailed breakdown for UI display
+
+  flagged          Boolean   @default(false) // Above threshold
+  staffNotifiedAt  DateTime?
+  reminderSentAt   DateTime?
+  guestConfirmedAt DateTime?
+  outcome          String?   // "showed" | "no_show" | "cancelled" | null (pending)
+
+  calculatedAt DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@index([campgroundId])
+  @@index([campgroundId, riskScore])
+  @@index([campgroundId, flagged])
+  @@index([reservationId])
 }

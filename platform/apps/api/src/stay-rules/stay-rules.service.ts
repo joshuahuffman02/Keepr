@@ -1,0 +1,136 @@
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { PrismaService } from '../prisma/prisma.service';
+
+interface DateRange {
+    start: string;
+    end: string;
+}
+
+@Injectable()
+export class StayRulesService {
+    constructor(private readonly prisma: PrismaService) { }
+
+    async create(data: {
+        campgroundId: string;
+        name: string;
+        minNights?: number;
+        maxNights?: number;
+        siteClasses?: string[];
+        dateRanges?: DateRange[];
+        ignoreDaysBefore?: number;
+    }) {
+        return this.prisma.stayRule.create({
+            data: {
+                campgroundId: data.campgroundId,
+                name: data.name,
+                minNights: data.minNights ?? 1,
+                maxNights: data.maxNights ?? 28,
+                siteClasses: data.siteClasses ?? [],
+                dateRanges: data.dateRanges ?? [],
+                ignoreDaysBefore: data.ignoreDaysBefore ?? 0,
+            },
+        });
+    }
+
+    async findAllByCampground(campgroundId: string) {
+        return this.prisma.stayRule.findMany({
+            where: { campgroundId },
+            orderBy: { createdAt: 'desc' },
+        });
+    }
+
+    async findOne(id: string) {
+        const rule = await this.prisma.stayRule.findUnique({ where: { id } });
+        if (!rule) throw new NotFoundException('Stay rule not found');
+        return rule;
+    }
+
+    async update(id: string, data: Partial<{
+        name: string;
+        minNights: number;
+        maxNights: number;
+        siteClasses: string[];
+        dateRanges: DateRange[];
+        ignoreDaysBefore: number;
+        isActive: boolean;
+    }>) {
+        return this.prisma.stayRule.update({
+            where: { id },
+            data,
+        });
+    }
+
+    async remove(id: string) {
+        return this.prisma.stayRule.delete({ where: { id } });
+    }
+
+    async duplicate(id: string) {
+        const existing = await this.findOne(id);
+        return this.prisma.stayRule.create({
+            data: {
+                campgroundId: existing.campgroundId,
+                name: `${existing.name} (Copy)`,
+                minNights: existing.minNights,
+                maxNights: existing.maxNights,
+                siteClasses: existing.siteClasses,
+                dateRanges: existing.dateRanges as DateRange[],
+                ignoreDaysBefore: existing.ignoreDaysBefore,
+                isActive: false, // Start as inactive
+            },
+        });
+    }
+
+    // Evaluate applicable stay rules for a booking
+    async evaluateRules(campgroundId: string, siteClass: string, arrivalDate: Date, nights: number) {
+        const rules = await this.prisma.stayRule.findMany({
+            where: {
+                campgroundId,
+                isActive: true,
+            },
+        });
+
+        const daysUntilArrival = Math.ceil(
+            (arrivalDate.getTime() - Date.now()) / (1000 * 60 * 60 * 24)
+        );
+
+        for (const rule of rules) {
+            // Check if rule applies to this site class
+            if (rule.siteClasses.length > 0 && !rule.siteClasses.includes(siteClass)) {
+                continue;
+            }
+
+            // Check if date ranges apply
+            const dateRanges = rule.dateRanges as DateRange[];
+            if (dateRanges.length > 0) {
+                const arrivalStr = arrivalDate.toISOString().split('T')[0];
+                const inRange = dateRanges.some(range =>
+                    arrivalStr >= range.start && arrivalStr <= range.end
+                );
+                if (!inRange) continue;
+            }
+
+            // Check ignore days before (allows last-minute bookings)
+            const effectiveMinNights = daysUntilArrival <= rule.ignoreDaysBefore
+                ? 1
+                : rule.minNights;
+
+            // Check constraints
+            if (nights < effectiveMinNights) {
+                return {
+                    valid: false,
+                    rule,
+                    reason: `Minimum ${effectiveMinNights} nights required`,
+                };
+            }
+            if (nights > rule.maxNights) {
+                return {
+                    valid: false,
+                    rule,
+                    reason: `Maximum ${rule.maxNights} nights allowed`,
+                };
+            }
+        }
+
+        return { valid: true, rule: null };
+    }
+}

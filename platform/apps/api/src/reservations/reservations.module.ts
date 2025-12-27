@@ -1,4 +1,4 @@
-import { Module } from "@nestjs/common";
+import { Module, forwardRef } from "@nestjs/common";
 import { ReservationsService } from "./reservations.service";
 import { ReservationsController } from "./reservations.controller";
 import { PrismaService } from "../prisma/prisma.service";
@@ -27,9 +27,10 @@ import { UsageTrackerModule } from "../org-billing/usage-tracker.module";
 import { RepeatChargesModule } from "../repeat-charges/repeat-charges.module";
 import { PoliciesModule } from "../policies/policies.module";
 import { GuestWalletModule } from "../guest-wallet/guest-wallet.module";
+import { PaymentsModule } from "../payments/payments.module";
 
 @Module({
-  imports: [WaitlistModule, LoyaltyModule, SeasonalRatesModule, TaxRulesModule, GamificationModule, AuditModule, AccessControlModule, SignaturesModule, PoliciesModule, ApprovalsModule, UsageTrackerModule, RepeatChargesModule, GuestWalletModule, IdempotencyModule],
+  imports: [WaitlistModule, LoyaltyModule, SeasonalRatesModule, TaxRulesModule, GamificationModule, AuditModule, AccessControlModule, SignaturesModule, PoliciesModule, ApprovalsModule, UsageTrackerModule, RepeatChargesModule, GuestWalletModule, IdempotencyModule, forwardRef(() => PaymentsModule)],
   controllers: [ReservationsController],
   providers: [
     ReservationsService,

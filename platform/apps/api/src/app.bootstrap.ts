@@ -6,7 +6,7 @@ import { AppModule } from "./app.module";
 import { PrismaService } from "./prisma/prisma.service";
 import * as dotenv from "dotenv";
 import helmet from "helmet";
-import cookieParser from "cookie-parser";
+import * as cookieParser from "cookie-parser";
 import { PerfInterceptor } from "./perf/perf.interceptor";
 import { RateLimitInterceptor } from "./perf/rate-limit.interceptor";
 import { PerfService } from "./perf/perf.service";
@@ -90,7 +90,8 @@ export async function createApp(): Promise<INestApplication> {
     app.useGlobalPipes(new ValidationPipe({ whitelist: true, transform: true }));
 
     // Cookie parser for CSRF and session handling
-    app.use(cookieParser(process.env.COOKIE_SECRET || process.env.JWT_SECRET));
+    const cookieParserFn = (cookieParser as any).default || cookieParser;
+    app.use(cookieParserFn(process.env.COOKIE_SECRET || process.env.JWT_SECRET));
 
     // Security headers via helmet
     const isProduction = process.env.NODE_ENV === "production";

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -51,6 +51,9 @@ import {
 import { SettingsTable } from "@/components/settings/tables";
 import { cn } from "@/lib/utils";
 import { useToast } from "@/components/ui/use-toast";
+import { useCampground } from "@/contexts/CampgroundContext";
+
+const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "http://localhost:4000/api";
 
 interface LockCode {
   id: string;
@@ -106,83 +109,88 @@ const rotationLabels = {
   "per-guest": "Per Guest",
 };
 
-// API functions - Replace these with actual API endpoints
+// API functions
 const fetchLockCodes = async (campgroundId: string): Promise<LockCode[]> => {
-  // TODO: Replace with actual API call
-  // const response = await fetch(`/api/campgrounds/${campgroundId}/lock-codes`);
-  // if (!response.ok) throw new Error('Failed to fetch lock codes');
-  // return response.json();
-  
-  // For now, return empty array until API is implemented
-  return [];
+  const response = await fetch(`${API_BASE}/campgrounds/${campgroundId}/lock-codes`, {
+    credentials: 'include',
+  });
+  if (!response.ok) throw new Error('Failed to fetch lock codes');
+  const data = await response.json();
+  // Transform backend data to frontend format
+  return data.map((item: any) => ({
+    id: item.id,
+    name: item.name,
+    code: item.code,
+    type: item.type,
+    appliesTo: item.appliesTo || [],
+    rotationSchedule: item.rotationSchedule?.replace('_', '-') || 'none',
+    showOnConfirmation: item.showOnConfirmation,
+    showAtCheckin: item.showAtCheckin,
+    isActive: item.isActive,
+    lastRotated: item.lastRotatedAt,
+  }));
 };
 
 const createLockCode = async (campgroundId: string, data: Partial<LockCode>): Promise<LockCode> => {
-  // TODO: Replace with actual API call
-  // const response = await fetch(`/api/campgrounds/${campgroundId}/lock-codes`, {
-  //   method: 'POST',
-  //   headers: { 'Content-Type': 'application/json' },
-  //   body: JSON.stringify(data),
-  // });
-  // if (!response.ok) throw new Error('Failed to create lock code');
-  // return response.json();
-  
-  throw new Error('API not implemented - lock codes must be configured through the backend');
+  const response = await fetch(`${API_BASE}/campgrounds/${campgroundId}/lock-codes`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    credentials: 'include',
+    body: JSON.stringify({
+      ...data,
+      rotationSchedule: data.rotationSchedule?.replace('-', '_') || 'none',
+    }),
+  });
+  if (!response.ok) throw new Error('Failed to create lock code');
+  return response.json();
 };
 
 const updateLockCode = async (campgroundId: string, id: string, data: Partial<LockCode>): Promise<LockCode> => {
-  // TODO: Replace with actual API call
-  // const response = await fetch(`/api/campgrounds/${campgroundId}/lock-codes/${id}`, {
-  //   method: 'PATCH',
-  //   headers: { 'Content-Type': 'application/json' },
-  //   body: JSON.stringify(data),
-  // });
-  // if (!response.ok) throw new Error('Failed to update lock code');
-  // return response.json();
-  
-  throw new Error('API not implemented - lock codes must be configured through the backend');
+  const payload = { ...data };
+  if (payload.rotationSchedule) {
+    (payload as any).rotationSchedule = payload.rotationSchedule.replace('-', '_');
+  }
+  const response = await fetch(`${API_BASE}/campgrounds/${campgroundId}/lock-codes/${id}`, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    credentials: 'include',
+    body: JSON.stringify(payload),
+  });
+  if (!response.ok) throw new Error('Failed to update lock code');
+  return response.json();
 };
 
 const deleteLockCode = async (campgroundId: string, id: string): Promise<void> => {
-  // TODO: Replace with actual API call
-  // const response = await fetch(`/api/campgrounds/${campgroundId}/lock-codes/${id}`, {
-  //   method: 'DELETE',
-  // });
-  // if (!response.ok) throw new Error('Failed to delete lock code');
-  
-  throw new Error('API not implemented - lock codes must be configured through the backend');
+  const response = await fetch(`${API_BASE}/campgrounds/${campgroundId}/lock-codes/${id}`, {
+    method: 'DELETE',
+    credentials: 'include',
+  });
+  if (!response.ok) throw new Error('Failed to delete lock code');
 };
 
 const rotateLockCode = async (campgroundId: string, id: string): Promise<LockCode> => {
-  // TODO: Replace with actual API call
-  // const response = await fetch(`/api/campgrounds/${campgroundId}/lock-codes/${id}/rotate`, {
-  //   method: 'POST',
-  // });
-  // if (!response.ok) throw new Error('Failed to rotate lock code');
-  // return response.json();
-  
-  throw new Error('API not implemented - lock codes must be configured through the backend');
+  const response = await fetch(`${API_BASE}/campgrounds/${campgroundId}/lock-codes/${id}/rotate`, {
+    method: 'POST',
+    credentials: 'include',
+  });
+  if (!response.ok) throw new Error('Failed to rotate lock code');
+  return response.json();
 };
 
 export default function LockCodesPage() {
-  const [campgroundId, setCampgroundId] = useState<string | null>(null);
+  const { selectedCampground, isHydrated } = useCampground();
+  const campgroundId = selectedCampground?.id || null;
   const [isEditorOpen, setIsEditorOpen] = useState(false);
   const [editingCode, setEditingCode] = useState<LockCode | null>(null);
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  // Get campground ID from localStorage
-  useEffect(() => {
-    const id = localStorage.getItem("campreserv:selectedCampground");
-    setCampgroundId(id);
-  }, []);
-
   // Fetch lock codes from API
   const { data: codes = [], isLoading, error } = useQuery({
     queryKey: ["lock-codes", campgroundId],
     queryFn: () => fetchLockCodes(campgroundId!),
-    enabled: !!campgroundId,
+    enabled: isHydrated && !!campgroundId,
   });
 
   // Form state
@@ -433,7 +441,7 @@ export default function LockCodesPage() {
     },
   ];
 
-  if (isLoading) {
+  if (!isHydrated || !campgroundId || isLoading) {
     return (
       <div className="max-w-5xl space-y-6">
         <div className="flex items-center justify-center py-12">

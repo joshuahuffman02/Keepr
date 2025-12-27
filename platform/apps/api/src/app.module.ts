@@ -113,6 +113,9 @@ import { SecurityModule } from "./security/security.module";
 import { ValueStackModule } from "./value-stack/value-stack.module";
 import { OpTasksModule } from "./op-tasks/op-tasks.module";
 import { SeasonalsModule } from "./seasonals/seasonals.module";
+import { LockCodesModule } from "./lock-codes/lock-codes.module";
+import { StayRulesModule } from "./stay-rules/stay-rules.module";
+import { SystemCheckModule } from "./system-check/system-check.module";
 
 @Module({
   imports: [
@@ -232,6 +235,12 @@ import { SeasonalsModule } from "./seasonals/seasonals.module";
     OpTasksModule,
     // Seasonals Management
     SeasonalsModule,
+    // Lock Codes Management
+    LockCodesModule,
+    // Stay Rules Management
+    StayRulesModule,
+    // System Check
+    SystemCheckModule,
   ],
   providers: []
 })

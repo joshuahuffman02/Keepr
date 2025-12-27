@@ -1,4 +1,4 @@
-import { Module } from "@nestjs/common";
+import { Module, forwardRef } from "@nestjs/common";
 import { PaymentsController } from "./payments.controller";
 import { ReservationsModule } from "../reservations/reservations.module";
 import { StripeService } from "./stripe.service";
@@ -13,7 +13,7 @@ import { AuditModule } from "../audit/audit.module";
 import { LedgerModule } from "../ledger/ledger.module";
 
 @Module({
-  imports: [ReservationsModule, PermissionsModule, AuditModule, LedgerModule, IdempotencyModule],
+  imports: [forwardRef(() => ReservationsModule), PermissionsModule, AuditModule, LedgerModule, IdempotencyModule],
   controllers: [PaymentsController, GatewayConfigController],
   providers: [StripeService, PaymentsReconciliationService, PaymentsScheduler, GatewayConfigService],
   exports: [StripeService, PaymentsReconciliationService, IdempotencyModule, GatewayConfigService]
