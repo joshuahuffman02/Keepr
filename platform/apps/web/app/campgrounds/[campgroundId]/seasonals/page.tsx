@@ -828,7 +828,7 @@ function RateCardDisplay({
             <div>
               <p className="text-xs text-slate-500 uppercase tracking-wide mb-1">Included</p>
               <div className="flex flex-wrap gap-1">
-                {rateCard.includedUtilities.map((u) => (
+                {rateCard.includedUtilities?.map((u) => (
                   <Badge key={u} variant="secondary" className="text-xs">{u}</Badge>
                 ))}
               </div>
@@ -839,7 +839,7 @@ function RateCardDisplay({
             <div>
               <p className="text-xs text-slate-500 uppercase tracking-wide mb-1">Discounts</p>
               <div className="space-y-1">
-                {rateCard.discounts.map((d, i) => (
+                {rateCard.discounts?.map((d, i) => (
                   <div key={i} className="text-sm flex items-center gap-2">
                     <Sparkles className="h-3 w-3 text-emerald-500" />
                     <span>{d.name}</span>
@@ -852,11 +852,11 @@ function RateCardDisplay({
             </div>
           )}
 
-          {rateCard.incentives?.length > 0 && (
+          {(rateCard.incentives?.length ?? 0) > 0 && (
             <div>
               <p className="text-xs text-slate-500 uppercase tracking-wide mb-1">Incentives</p>
               <div className="space-y-1">
-                {rateCard.incentives.map((inc, i) => (
+                {rateCard.incentives?.map((inc, i) => (
                   <div key={i} className="text-sm flex items-center gap-2">
                     <Zap className="h-3 w-3 text-amber-500" />
                     <span>{inc.name}</span>
@@ -1244,15 +1244,15 @@ export default function SeasonalsPage() {
               <TabsTrigger value="renewals" className="flex items-center gap-1.5">
                 <RefreshCw className="h-4 w-4" />
                 Renewals
-                {stats?.needsAttention.pendingRenewals > 0 && (
-                  <Badge className="ml-1 bg-amber-500 text-white text-xs px-1.5">{stats.needsAttention.pendingRenewals}</Badge>
+                {(stats?.needsAttention?.pendingRenewals ?? 0) > 0 && (
+                  <Badge className="ml-1 bg-amber-500 text-white text-xs px-1.5">{stats?.needsAttention?.pendingRenewals}</Badge>
                 )}
               </TabsTrigger>
               <TabsTrigger value="payments" className="flex items-center gap-1.5">
                 <DollarSign className="h-4 w-4" />
                 Payments
-                {stats?.needsAttention.pastDuePayments > 0 && (
-                  <Badge className="ml-1 bg-rose-500 text-white text-xs px-1.5">{stats.needsAttention.pastDuePayments}</Badge>
+                {(stats?.needsAttention?.pastDuePayments ?? 0) > 0 && (
+                  <Badge className="ml-1 bg-rose-500 text-white text-xs px-1.5">{stats?.needsAttention?.pastDuePayments}</Badge>
                 )}
               </TabsTrigger>
               <TabsTrigger value="contracts" className="flex items-center gap-1.5">
