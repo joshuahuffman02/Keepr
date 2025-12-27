@@ -4,9 +4,10 @@ import { OperationsController } from './operations.controller';
 import { PrismaModule } from '../prisma/prisma.module';
 import { GamificationModule } from '../gamification/gamification.module';
 import { PermissionsModule } from '../permissions/permissions.module';
+import { EmailModule } from '../email/email.module';
 
 @Module({
-    imports: [PrismaModule, GamificationModule, PermissionsModule],
+    imports: [PrismaModule, GamificationModule, PermissionsModule, EmailModule],
     controllers: [OperationsController],
     providers: [OperationsService],
     exports: [OperationsService],

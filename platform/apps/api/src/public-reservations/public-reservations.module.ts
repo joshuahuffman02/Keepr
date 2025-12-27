@@ -13,6 +13,7 @@ import { PricingV2Module } from "../pricing-v2/pricing-v2.module";
 import { DepositPoliciesModule } from "../deposit-policies/deposit-policies.module";
 import { FormsModule } from "../forms/forms.module";
 import { PaymentsModule } from "../payments/payments.module";
+import { EmailModule } from "../email/email.module";
 
 @Module({
     imports: [
@@ -28,6 +29,7 @@ import { PaymentsModule } from "../payments/payments.module";
         DepositPoliciesModule,
         FormsModule,
         forwardRef(() => PaymentsModule),
+        EmailModule,
     ],
     controllers: [PublicReservationsController],
     providers: [PublicReservationsService],

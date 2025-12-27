@@ -4,9 +4,10 @@ import { SeasonalsService } from "./seasonals.service";
 import { SeasonalPricingService } from "./seasonal-pricing.service";
 import { PrismaModule } from "../prisma/prisma.module";
 import { PermissionsModule } from "../permissions/permissions.module";
+import { EmailModule } from "../email/email.module";
 
 @Module({
-  imports: [PrismaModule, PermissionsModule],
+  imports: [PrismaModule, PermissionsModule, EmailModule],
   controllers: [SeasonalsController],
   providers: [SeasonalsService, SeasonalPricingService],
   exports: [SeasonalsService, SeasonalPricingService],

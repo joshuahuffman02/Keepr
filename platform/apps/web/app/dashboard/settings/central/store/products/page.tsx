@@ -65,8 +65,8 @@ export default function ProductsPage() {
       apiClient.getProducts(id).catch(() => []),
       apiClient.getProductCategories(id).catch(() => [])
     ]).then(([productList, categoryList]) => {
-      setProducts(Array.isArray(productList) ? productList : []);
-      setCategories(Array.isArray(categoryList) ? categoryList : []);
+      setProducts(Array.isArray(productList) ? productList as unknown as Product[] : []);
+      setCategories(Array.isArray(categoryList) ? categoryList as unknown as Category[] : []);
       setLoading(false);
     });
   }, []);
@@ -285,11 +285,11 @@ export default function ProductsPage() {
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
-                      <DropdownMenuItem asChild>
-                        <Link href="/pos">Edit Product</Link>
+                      <DropdownMenuItem>
+                        <Link href="/pos" className="w-full">Edit Product</Link>
                       </DropdownMenuItem>
-                      <DropdownMenuItem asChild>
-                        <Link href="/store">Update Inventory</Link>
+                      <DropdownMenuItem>
+                        <Link href="/store" className="w-full">Update Inventory</Link>
                       </DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>

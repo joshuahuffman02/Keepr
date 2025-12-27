@@ -145,10 +145,13 @@ export const DropdownMenuContent = React.forwardRef<HTMLDivElement, DropdownMenu
 );
 DropdownMenuContent.displayName = "DropdownMenuContent";
 
-type DropdownMenuItemProps = React.ButtonHTMLAttributes<HTMLButtonElement>;
+type DropdownMenuItemProps = React.ButtonHTMLAttributes<HTMLButtonElement> & {
+  asChild?: boolean;
+  children?: React.ReactNode;
+};
 
 export const DropdownMenuItem = React.forwardRef<HTMLButtonElement, DropdownMenuItemProps>(
-  ({ className, onClick, disabled, ...props }, ref) => {
+  ({ className, onClick, disabled, asChild, children, ...props }, ref) => {
     const { setOpen } = useDropdownMenuContext("DropdownMenuItem");
 
     const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
@@ -159,6 +162,26 @@ export const DropdownMenuItem = React.forwardRef<HTMLButtonElement, DropdownMenu
       }
     };
 
+    const itemClassName = cn(
+      "flex w-full items-center gap-2 rounded-sm px-3 py-2 text-left text-sm text-slate-700 hover:bg-slate-100",
+      disabled && "cursor-not-allowed opacity-50",
+      className
+    );
+
+    if (asChild && React.isValidElement(children)) {
+      return React.cloneElement(children as React.ReactElement<any>, {
+        role: "menuitem",
+        onClick: (event: React.MouseEvent) => {
+          if (disabled) return;
+          (children as React.ReactElement<any>).props.onClick?.(event);
+          if (!event.defaultPrevented) {
+            setOpen(false);
+          }
+        },
+        className: cn(itemClassName, (children as React.ReactElement<any>).props.className),
+      });
+    }
+
     return (
       <button
         type="button"
@@ -166,13 +189,11 @@ export const DropdownMenuItem = React.forwardRef<HTMLButtonElement, DropdownMenu
         ref={ref}
         disabled={disabled}
         onClick={handleClick}
-        className={cn(
-          "flex w-full items-center gap-2 rounded-sm px-3 py-2 text-left text-sm text-slate-700 hover:bg-slate-100",
-          disabled && "cursor-not-allowed opacity-50",
-          className
-        )}
+        className={itemClassName}
         {...props}
-      />
+      >
+        {children}
+      </button>
     );
   }
 );

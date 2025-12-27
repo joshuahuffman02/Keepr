@@ -9374,3 +9374,27 @@ model AiNoShowRisk {
   @@index([campgroundId, flagged])
   @@index([reservationId])
 }
+
+
+// Demo/sales lead requests from marketing website
+model DemoRequest {
+  id        String   @id @default(cuid())
+  name      String
+  email     String
+  phone     String?
+  campgroundName String
+  siteCount String
+  message   String? @db.Text
+  
+  status    String   @default("new") // "new" | "contacted" | "scheduled" | "completed" | "closed"
+  notes     String?  @db.Text
+  assignedTo String?
+  
+  source    String   @default("website") // "website" | "referral" | etc.
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  @@index([status])
+  @@index([createdAt])
+}

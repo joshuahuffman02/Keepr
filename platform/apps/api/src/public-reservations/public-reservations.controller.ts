@@ -1,13 +1,17 @@
 import { Body, Controller, Get, Param, Post, Query } from "@nestjs/common";
 import { PublicReservationsService } from "./public-reservations.service";
-import { CreatePublicReservationDto, PublicQuoteDto, CreatePublicWaitlistDto } from "./dto/create-public-reservation.dto";
+import { CreatePublicReservationDto, PublicQuoteDto, CreatePublicWaitlistDto, CreateDemoRequestDto } from "./dto/create-public-reservation.dto";
 import { FormsService } from "../forms/forms.service";
+import { PrismaService } from "../prisma/prisma.service";
+import { EmailService } from "../email/email.service";
 
 @Controller("public")
 export class PublicReservationsController {
     constructor(
         private readonly service: PublicReservationsService,
-        private readonly formsService: FormsService
+        private readonly formsService: FormsService,
+        private readonly prisma: PrismaService,
+        private readonly emailService: EmailService,
     ) { }
 
     @Get("campgrounds/:slug/availability")
@@ -96,5 +100,49 @@ export class PublicReservationsController {
         }
     ) {
         return this.formsService.submitPublicForm(body);
+    }
+
+    /**
+     * Submit a demo request from the marketing website
+     */
+    @Post("demo-request")
+    async submitDemoRequest(@Body() dto: CreateDemoRequestDto) {
+        // Store the demo request in the database
+        const demoRequest = await this.prisma.demoRequest.create({
+            data: {
+                name: dto.name,
+                email: dto.email,
+                phone: dto.phone || null,
+                campgroundName: dto.campgroundName,
+                siteCount: dto.sites,
+                message: dto.message || null,
+                source: "website",
+            },
+        });
+
+        // Send notification email to sales team
+        try {
+            await this.emailService.sendEmail({
+                to: "sales@campeveryday.com",
+                subject: `New Demo Request: ${dto.campgroundName}`,
+                html: `
+                    <h2>New Demo Request</h2>
+                    <table style="border-collapse: collapse; margin: 16px 0;">
+                        <tr><td style="padding: 8px; font-weight: bold;">Name:</td><td style="padding: 8px;">${dto.name}</td></tr>
+                        <tr><td style="padding: 8px; font-weight: bold;">Email:</td><td style="padding: 8px;"><a href="mailto:${dto.email}">${dto.email}</a></td></tr>
+                        <tr><td style="padding: 8px; font-weight: bold;">Phone:</td><td style="padding: 8px;">${dto.phone || "Not provided"}</td></tr>
+                        <tr><td style="padding: 8px; font-weight: bold;">Campground:</td><td style="padding: 8px;">${dto.campgroundName}</td></tr>
+                        <tr><td style="padding: 8px; font-weight: bold;">Site Count:</td><td style="padding: 8px;">${dto.sites}</td></tr>
+                        ${dto.message ? `<tr><td style="padding: 8px; font-weight: bold; vertical-align: top;">Message:</td><td style="padding: 8px;">${dto.message}</td></tr>` : ""}
+                    </table>
+                    <p style="color: #666; font-size: 12px;">Request ID: ${demoRequest.id}</p>
+                `,
+            });
+        } catch {
+            // Don't fail the request if email fails - the data is already stored
+            console.error("Failed to send demo request notification email");
+        }
+
+        return { success: true, id: demoRequest.id };
     }
 }

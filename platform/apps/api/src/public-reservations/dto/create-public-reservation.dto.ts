@@ -306,3 +306,28 @@ export class PublicQuoteDto {
     @IsString()
     previewToken?: string;
 }
+
+export class CreateDemoRequestDto {
+    @IsString()
+    @IsNotEmpty()
+    name!: string;
+
+    @IsEmail()
+    email!: string;
+
+    @IsString()
+    @IsOptional()
+    phone?: string;
+
+    @IsString()
+    @IsNotEmpty()
+    campgroundName!: string;
+
+    @IsString()
+    @IsNotEmpty()
+    sites!: string;
+
+    @IsString()
+    @IsOptional()
+    message?: string;
+}

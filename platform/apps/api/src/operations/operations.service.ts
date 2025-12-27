@@ -2,12 +2,14 @@ import { ForbiddenException, Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { GamificationEventCategory, OperationalTask } from '@prisma/client';
 import { GamificationService } from '../gamification/gamification.service';
+import { EmailService } from '../email/email.service';
 
 @Injectable()
 export class OperationsService {
     constructor(
         private prisma: PrismaService,
         private gamification: GamificationService,
+        private emailService: EmailService,
     ) { }
 
     async findAllTasks(campgroundId: string, type?: string, status?: string): Promise<OperationalTask[]> {
@@ -435,23 +437,21 @@ export class OperationsService {
             throw new Error("OPS_ALERT_EMAIL not configured and no campground email available");
         }
 
-        // TODO: Implement EmailService.sendEmail method
-        // For now, log that we would send an email
-        throw new Error("Email alert not implemented - EmailService integration pending");
-
-        // Future implementation:
-        // await this.emailService.sendEmail({
-        //     to: alertEmail,
-        //     subject: `Operations Alert - ${campground?.name || 'Campground'}`,
-        //     html: `
-        //         <h2>Operations Alert</h2>
-        //         <p><strong>Campground:</strong> ${campground?.name}</p>
-        //         <p><strong>Target:</strong> ${payload.target}</p>
-        //         <p><strong>Time:</strong> ${new Date(payload.at).toLocaleString()}</p>
-        //         <p><strong>Message:</strong></p>
-        //         <p>${payload.message}</p>
-        //     `,
-        // });
+        await this.emailService.sendEmail({
+            to: alertEmail,
+            subject: `Operations Alert - ${campground?.name || 'Campground'}`,
+            html: `
+                <h2 style="color: #dc2626;">Operations Alert</h2>
+                <table style="border-collapse: collapse; margin: 16px 0;">
+                    <tr><td style="padding: 8px; font-weight: bold;">Campground:</td><td style="padding: 8px;">${campground?.name || 'N/A'}</td></tr>
+                    <tr><td style="padding: 8px; font-weight: bold;">Target:</td><td style="padding: 8px;">${payload.target}</td></tr>
+                    <tr><td style="padding: 8px; font-weight: bold;">Time:</td><td style="padding: 8px;">${new Date(payload.at).toLocaleString()}</td></tr>
+                </table>
+                <p><strong>Message:</strong></p>
+                <p style="background: #f3f4f6; padding: 16px; border-radius: 8px;">${payload.message}</p>
+            `,
+            campgroundId: payload.campgroundId,
+        });
     }
 
     private ensureCampgroundAccess(user: any, campgroundId?: string | null) {

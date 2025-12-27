@@ -25,7 +25,7 @@ This document tracks all TODO, FIXME, and incomplete code comments in the codeba
 | 5 | `apps/api/src/pos/pos.service.ts` | 40 | Implement pricing/tax versions and create items | Pending |
 | 6 | `apps/api/src/pos/pos.service.ts` | 197 | Integrate POS with reservations AR/folio | Pending |
 | 7 | `apps/api/src/ota/ota.service.ts` | 694, 837, 848 | OTA provider API integration (actual API calls, pricing, provider methods) | Pending |
-| 8 | `apps/api/src/seasonals/seasonals.service.ts` | 716 | Integrate with actual email/SMS sending service | Pending |
+| 8 | `apps/api/src/seasonals/seasonals.service.ts` | 716 | Integrate with actual email/SMS sending service | **FIXED** (email done, SMS pending provider) |
 
 ---
 
@@ -39,7 +39,7 @@ This document tracks all TODO, FIXME, and incomplete code comments in the codeba
 | 12 | `apps/api/src/campgrounds/campground-review-connectors.service.ts` | 74, 110, 134 | Complete RV Life API integration | Pending |
 | 13 | `apps/api/src/maintenance/maintenance.service.ts` | 172 | Emit maintenance state/out_of_order change communication | **FIXED** |
 | 14 | `apps/api/src/groups/groups.service.ts` | 153 | Emit group change communication if sharedComm | **FIXED** |
-| 15 | `apps/api/src/operations/operations.service.ts` | 309, 438 | Implement additional notification channels and EmailService.sendEmail | Pending |
+| 15 | `apps/api/src/operations/operations.service.ts` | 309, 438 | Implement additional notification channels and EmailService.sendEmail | **FIXED** |
 | 16 | `apps/api/src/op-tasks/services/op-sla.service.ts` | 76 | Send notification to manager on SLA breach | **FIXED** |
 | 17 | `apps/api/src/op-tasks/services/op-gamification.service.ts` | 611 | Implement speed tracking for gamification | Pending |
 | 18 | `apps/api/src/org-billing/subscription.service.ts` | 526 | Send notification to org owner about failed payment | **FIXED** |
@@ -53,7 +53,7 @@ This document tracks all TODO, FIXME, and incomplete code comments in the codeba
 |---|------|------|-------|--------|
 | 20 | `apps/web/app/store/inventory/page.tsx` | 20 | Get campgroundId from context or URL | **FIXED** |
 | 21 | `apps/web/components/settings/SettingsContext.tsx` | 70 | Replace with actual API call | **FIXED** |
-| 22 | `apps/web/components/marketing/DemoCTA.tsx` | 21 | Implement form submission logic | Pending |
+| 22 | `apps/web/components/marketing/DemoCTA.tsx` | 21 | Implement form submission logic | **FIXED** |
 | 23 | `apps/web/app/dashboard/settings/central/bookings/closures/page.tsx` | 201, 211 | Implement save/toggle mutations | **FIXED** |
 
 ---
@@ -61,10 +61,10 @@ This document tracks all TODO, FIXME, and incomplete code comments in the codeba
 ## Summary
 
 - **Critical:** 0 remaining (1 fixed)
-- **Important:** 5 remaining (2 fixed, 1 partial)
-- **Moderate:** 7 remaining (4 fixed)
-- **Minor:** 1 remaining (3 fixed)
-- **Total:** 13 remaining (10 fixed)
+- **Important:** 4 remaining (3 fixed, 1 partial)
+- **Moderate:** 6 remaining (5 fixed)
+- **Minor:** 0 remaining (4 fixed)
+- **Total:** 10 remaining (13 fixed)
 
 ---
 
@@ -84,3 +84,6 @@ This document tracks all TODO, FIXME, and incomplete code comments in the codeba
 | 2025-12-27 | 14 | FIXED: Added EmailModule to groups.module.ts, implemented notifyGroupChange() in groups.service.ts for sharedComm groups |
 | 2025-12-27 | 16 | FIXED: Added EmailModule to op-tasks.module.ts, implemented notifyManagerSlaBreach() in op-sla.service.ts |
 | 2025-12-27 | 18 | FIXED: Added EmailModule to org-billing.module.ts, implemented notifyOrgOwnerPaymentFailed() in subscription.service.ts |
+| 2025-12-27 | 22 | FIXED: Added DemoRequest model, /public/demo-request endpoint, updated DemoCTA with API call, loading state, and error handling |
+| 2025-12-27 | 8 | FIXED: Added EmailModule to seasonals.module.ts, integrated EmailService for bulk email sending in sendBulkMessage() |
+| 2025-12-27 | 15 | FIXED: Added EmailModule to operations.module.ts, implemented sendEmailAlert() in operations.service.ts |
