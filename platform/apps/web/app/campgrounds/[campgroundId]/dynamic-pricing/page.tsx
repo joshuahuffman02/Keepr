@@ -1,66 +1,67 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { DashboardShell } from "@/components/ui/layout/DashboardShell";
 import { Breadcrumbs } from "@/components/breadcrumbs";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { apiClient } from "@/lib/api-client";
+import { Plus, Pencil, Trash2, TrendingUp, Info, ExternalLink, Loader2 } from "lucide-react";
+import Link from "next/link";
 
-type Rule = {
+type PricingRuleV2 = {
   id: string;
   name: string;
-  trigger: string;
-  adjustmentType: string;
+  type: "season" | "weekend" | "holiday" | "event" | "demand";
+  priority: number;
+  stackMode: "additive" | "max" | "override";
+  adjustmentType: "percent" | "flat";
   adjustmentValue: number;
-  isActive: boolean;
+  active: boolean;
+};
+
+const typeLabels: Record<string, string> = {
+  season: "Seasonal",
+  weekend: "Weekend",
+  holiday: "Holiday",
+  event: "Event",
+  demand: "Demand-Based",
 };
 
 export default function DynamicPricingPage({ params }: { params: { campgroundId: string } }) {
-  const [rules, setRules] = useState<Rule[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [form, setForm] = useState({
-    name: "",
-    trigger: "occupancy_high",
-    adjustmentType: "percent",
-    adjustmentValue: 10,
-  });
-
-  const load = async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      const res = await fetch(`/api/dynamic-pricing/rules?campgroundId=${params.campgroundId}`);
-      if (!res.ok) throw new Error("Failed to load rules");
-      const data = await res.json();
-      setRules(data || []);
-    } catch (err) {
-      console.error(err);
-      setError("Unable to load rules. Please retry.");
-    } finally {
-      setLoading(false);
-    }
-  };
+  const router = useRouter();
+  const [rules, setRules] = useState<PricingRuleV2[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    load();
-  }, []);
+    // Store the campground ID for the pricing rules page
+    localStorage.setItem("campreserv:selectedCampground", params.campgroundId);
 
-  const createRule = async () => {
-    setError(null);
-    const res = await fetch(`/api/dynamic-pricing/rules`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        campgroundId: params.campgroundId,
-        ...form,
-        adjustmentValue: Number(form.adjustmentValue),
-      }),
-    });
-    if (!res.ok) {
-      setError("Could not save rule. Try again.");
-      return;
+    // Fetch pricing rules using the new V2 API
+    apiClient.getPricingRulesV2(params.campgroundId)
+      .then((data: PricingRuleV2[]) => {
+        setRules(data || []);
+        setLoading(false);
+      })
+      .catch((err) => {
+        console.error("Failed to load pricing rules:", err);
+        setLoading(false);
+      });
+  }, [params.campgroundId]);
+
+  const formatAdjustment = (rule: PricingRuleV2) => {
+    if (rule.adjustmentType === "percent") {
+      const pct = rule.adjustmentValue * 100;
+      return pct >= 0 ? `+${pct.toFixed(0)}%` : `${pct.toFixed(0)}%`;
     }
-    await load();
+    const flat = rule.adjustmentValue / 100;
+    return flat >= 0 ? `+$${flat.toFixed(2)}` : `-$${Math.abs(flat).toFixed(2)}`;
   };
+
+  const demandRules = rules.filter(r => r.type === "demand" && r.active);
+  const otherRules = rules.filter(r => r.type !== "demand" || !r.active);
 
   return (
     <DashboardShell>
@@ -72,96 +73,158 @@ export default function DynamicPricingPage({ params }: { params: { campgroundId:
             { label: "Dynamic Pricing" }
           ]}
         />
-        <div>
-          <h1 className="text-2xl font-semibold">Dynamic Pricing</h1>
-          <p className="text-slate-500">Configure occupancy and demand-based adjustments.</p>
-        </div>
 
-      <div className="grid gap-4 md:grid-cols-2">
-        <div className="rounded-lg border p-4">
-          <h2 className="text-lg font-medium mb-2">Create Rule</h2>
-          <div className="space-y-2">
-            <label className="block text-sm font-medium">Name</label>
-            <input
-              className="w-full rounded border px-3 py-2"
-              value={form.name}
-              onChange={(e) => setForm({ ...form, name: e.target.value })}
-            />
-            <label className="block text-sm font-medium">Trigger</label>
-            <select
-              className="w-full rounded border px-3 py-2"
-              value={form.trigger}
-              onChange={(e) => setForm({ ...form, trigger: e.target.value })}
-            >
-              <option value="occupancy_high">Occupancy High</option>
-              <option value="occupancy_low">Occupancy Low</option>
-              <option value="demand_surge">Demand Surge</option>
-              <option value="last_minute">Last Minute</option>
-              <option value="advance_booking">Advance Booking</option>
-              <option value="manual">Manual</option>
-            </select>
-            <label className="block text-sm font-medium">Adjustment</label>
-            <div className="flex gap-2">
-              <select
-                className="rounded border px-3 py-2"
-                value={form.adjustmentType}
-                onChange={(e) => setForm({ ...form, adjustmentType: e.target.value })}
-              >
-                <option value="percent">% Percent</option>
-                <option value="flat">Flat (cents)</option>
-              </select>
-              <input
-                type="number"
-                className="w-24 rounded border px-3 py-2"
-                value={form.adjustmentValue}
-                onChange={(e) => setForm({ ...form, adjustmentValue: Number(e.target.value) })}
-              />
-            </div>
-            <button
-              className="mt-2 rounded bg-emerald-600 px-4 py-2 text-white"
-              onClick={createRule}
-            >
-              Save Rule
-            </button>
+        <div className="flex items-start justify-between">
+          <div>
+            <h1 className="text-2xl font-semibold">Dynamic Pricing</h1>
+            <p className="text-slate-500">
+              Configure occupancy and demand-based pricing adjustments
+            </p>
+          </div>
+          <div className="flex gap-2">
+            <Button variant="outline" asChild>
+              <Link href="/dashboard/settings/central/pricing/dynamic">
+                <TrendingUp className="h-4 w-4 mr-2" />
+                Quick Settings
+              </Link>
+            </Button>
+            <Button asChild>
+              <Link href="/dashboard/settings/pricing-rules">
+                <ExternalLink className="h-4 w-4 mr-2" />
+                Advanced Rules
+              </Link>
+            </Button>
           </div>
         </div>
 
-        <div className="rounded-lg border p-4">
-          <div className="flex items-center justify-between mb-3">
-            <h2 className="text-lg font-medium">Rules</h2>
-            {loading && <span className="text-sm text-slate-500">Loading…</span>}
+        <Alert className="bg-purple-50 border-purple-200">
+          <Info className="h-4 w-4 text-purple-500" />
+          <AlertDescription className="text-purple-800">
+            Dynamic pricing rules automatically adjust your rates based on occupancy,
+            demand, and booking patterns. Use the Quick Settings for common adjustments
+            or Advanced Rules for full control.
+          </AlertDescription>
+        </Alert>
+
+        {loading ? (
+          <div className="flex items-center justify-center py-12">
+            <Loader2 className="h-8 w-8 animate-spin text-slate-400" />
           </div>
-          {error && (
-            <div className="rounded border border-red-200 bg-red-50 p-2 text-sm text-red-700" role="alert" aria-live="polite">
-              {error}
-            </div>
-          )}
-          <div className="space-y-2" aria-busy={loading}>
-            {loading && (
-              <div className="space-y-2 animate-pulse" data-testid="dynamic-pricing-skeleton">
-                <div className="h-4 rounded bg-slate-200" />
-                <div className="h-4 w-3/4 rounded bg-slate-200" />
-                <div className="h-4 w-2/3 rounded bg-slate-200" />
-              </div>
-            )}
-            {!loading &&
-              rules.map((r) => (
-                <div key={r.id} className="rounded border px-3 py-2 flex justify-between">
-                  <div>
-                    <div className="font-semibold">{r.name}</div>
-                    <div className="text-xs text-slate-500">
-                      {r.trigger} · {r.adjustmentType} {r.adjustmentValue}
-                    </div>
+        ) : (
+          <>
+            {/* Active Demand Rules */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg">Active Demand-Based Rules</CardTitle>
+                <CardDescription>
+                  These rules automatically adjust prices based on occupancy and booking lead time
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                {demandRules.length === 0 ? (
+                  <div className="text-center py-8 text-slate-500">
+                    <TrendingUp className="h-12 w-12 mx-auto mb-3 text-slate-300" />
+                    <p className="font-medium">No active demand-based rules</p>
+                    <p className="text-sm mt-1">
+                      Enable dynamic pricing in Quick Settings to get started
+                    </p>
+                    <Button className="mt-4" asChild>
+                      <Link href="/dashboard/settings/central/pricing/dynamic">
+                        Enable Dynamic Pricing
+                      </Link>
+                    </Button>
                   </div>
-                  <div className="text-xs text-emerald-700">{r.isActive ? "Active" : "Inactive"}</div>
-                </div>
-              ))}
-            {!loading && !rules.length && <div className="text-sm text-slate-500">No rules yet.</div>}
-          </div>
-        </div>
-      </div>
+                ) : (
+                  <div className="space-y-3">
+                    {demandRules.sort((a, b) => a.priority - b.priority).map((rule) => (
+                      <div
+                        key={rule.id}
+                        className="flex items-center justify-between p-4 rounded-lg border bg-white"
+                      >
+                        <div>
+                          <div className="flex items-center gap-2">
+                            <span className="font-semibold text-slate-900">{rule.name}</span>
+                            <span className="text-xs px-2 py-0.5 rounded-full bg-slate-100 text-slate-600">
+                              Priority {rule.priority}
+                            </span>
+                          </div>
+                          <div className="text-sm text-slate-500 mt-1">
+                            {typeLabels[rule.type] || rule.type} • {rule.stackMode}
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-4">
+                          <span className={`text-lg font-bold ${
+                            rule.adjustmentValue >= 0 ? "text-emerald-600" : "text-rose-600"
+                          }`}>
+                            {formatAdjustment(rule)}
+                          </span>
+                          <Button variant="ghost" size="sm" asChild>
+                            <Link href="/dashboard/settings/pricing-rules">
+                              <Pencil className="h-4 w-4" />
+                            </Link>
+                          </Button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+
+            {/* Other Rules Summary */}
+            {otherRules.length > 0 && (
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-lg">Other Pricing Rules</CardTitle>
+                  <CardDescription>
+                    Seasonal, weekend, holiday, and event-based pricing rules
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-2">
+                    {otherRules.slice(0, 5).map((rule) => (
+                      <div
+                        key={rule.id}
+                        className={`flex items-center justify-between p-3 rounded-lg border ${
+                          rule.active ? "bg-white" : "bg-slate-50 opacity-60"
+                        }`}
+                      >
+                        <div className="flex items-center gap-3">
+                          <span className={`font-medium ${rule.active ? "text-slate-900" : "text-slate-500"}`}>
+                            {rule.name}
+                          </span>
+                          <span className="text-xs px-2 py-0.5 rounded-full bg-slate-100 text-slate-600">
+                            {typeLabels[rule.type] || rule.type}
+                          </span>
+                          {!rule.active && (
+                            <span className="text-xs px-2 py-0.5 rounded-full bg-amber-100 text-amber-700">
+                              Inactive
+                            </span>
+                          )}
+                        </div>
+                        <span className={`font-semibold ${
+                          rule.adjustmentValue >= 0 ? "text-emerald-600" : "text-rose-600"
+                        }`}>
+                          {formatAdjustment(rule)}
+                        </span>
+                      </div>
+                    ))}
+                    {otherRules.length > 5 && (
+                      <div className="text-center pt-2">
+                        <Button variant="link" asChild>
+                          <Link href="/dashboard/settings/pricing-rules">
+                            View all {otherRules.length} rules →
+                          </Link>
+                        </Button>
+                      </div>
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+          </>
+        )}
       </div>
     </DashboardShell>
   );
 }
-

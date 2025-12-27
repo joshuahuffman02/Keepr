@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -12,6 +12,9 @@ import {
   MoreHorizontal,
   Pencil,
   Trash2,
+  Loader2,
+  ExternalLink,
+  DollarSign,
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -21,30 +24,115 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { SettingsTable } from "@/components/settings/tables";
+import { apiClient } from "@/lib/api-client";
+import Link from "next/link";
 
 interface ChargeCode {
   id: string;
   code: string;
   name: string;
   category: string;
-  defaultAmount: number;
-  taxable: boolean;
+  source: "product" | "fee" | "ledger" | "system";
+  usageCount: number;
   isActive: boolean;
 }
 
-const mockChargeCodes: ChargeCode[] = [
-  { id: "1", code: "SITE", name: "Site Rental", category: "Accommodation", defaultAmount: 0, taxable: true, isActive: true },
-  { id: "2", code: "EXTRA", name: "Extra Person Fee", category: "Accommodation", defaultAmount: 10, taxable: true, isActive: true },
-  { id: "3", code: "PET", name: "Pet Fee", category: "Accommodation", defaultAmount: 15, taxable: true, isActive: true },
-  { id: "4", code: "EARLY", name: "Early Check-in", category: "Services", defaultAmount: 25, taxable: true, isActive: true },
-  { id: "5", code: "LATE", name: "Late Check-out", category: "Services", defaultAmount: 25, taxable: true, isActive: true },
-  { id: "6", code: "FIRE", name: "Firewood Bundle", category: "Store", defaultAmount: 8, taxable: true, isActive: true },
-  { id: "7", code: "GOLF", name: "Golf Cart Rental", category: "Rentals", defaultAmount: 50, taxable: true, isActive: true },
-  { id: "8", code: "CANC", name: "Cancellation Fee", category: "Fees", defaultAmount: 25, taxable: false, isActive: true },
+// Standard system charge codes that campgrounds typically use
+const SYSTEM_CHARGE_CODES = [
+  { code: "SITE", name: "Site Rental", category: "Accommodation" },
+  { code: "TAX", name: "Sales Tax", category: "Taxes" },
+  { code: "LODGING_TAX", name: "Lodging Tax", category: "Taxes" },
+  { code: "DEPOSIT", name: "Security Deposit", category: "Deposits" },
+  { code: "REFUND", name: "Refund", category: "Adjustments" },
+  { code: "DISCOUNT", name: "Discount", category: "Adjustments" },
+  { code: "PAYMENT", name: "Payment Received", category: "Payments" },
 ];
 
 export default function ChargeCodesPage() {
-  const [chargeCodes] = useState<ChargeCode[]>(mockChargeCodes);
+  const [loading, setLoading] = useState(true);
+  const [campgroundId, setCampgroundId] = useState<string | null>(null);
+  const [chargeCodes, setChargeCodes] = useState<ChargeCode[]>([]);
+
+  useEffect(() => {
+    const id = localStorage.getItem("campreserv:selectedCampground");
+    setCampgroundId(id);
+
+    if (!id) {
+      setLoading(false);
+      return;
+    }
+
+    // Fetch products and ledger summary to build charge codes list
+    Promise.all([
+      apiClient.getProducts(id).catch(() => []),
+      apiClient.getLedgerSummary(id, {}).catch(() => []),
+    ]).then(([products, ledgerSummary]) => {
+      const codesMap = new Map<string, ChargeCode>();
+
+      // Add system charge codes
+      SYSTEM_CHARGE_CODES.forEach((sc) => {
+        codesMap.set(sc.code, {
+          id: `system-${sc.code}`,
+          code: sc.code,
+          name: sc.name,
+          category: sc.category,
+          source: "system",
+          usageCount: 0,
+          isActive: true,
+        });
+      });
+
+      // Add GL codes from products
+      const productList = Array.isArray(products) ? products : [];
+      productList.forEach((product: any) => {
+        if (product.glCode) {
+          const existing = codesMap.get(product.glCode);
+          if (existing) {
+            existing.usageCount += 1;
+          } else {
+            codesMap.set(product.glCode, {
+              id: `product-${product.id}`,
+              code: product.glCode,
+              name: product.name || product.glCode,
+              category: product.category?.name || "Store",
+              source: "product",
+              usageCount: 1,
+              isActive: product.isActive !== false,
+            });
+          }
+        }
+      });
+
+      // Add GL codes from ledger entries
+      const summaryList = Array.isArray(ledgerSummary) ? ledgerSummary : [];
+      summaryList.forEach((entry: { glCode: string; netCents: number }) => {
+        if (entry.glCode && entry.glCode !== "Unassigned") {
+          const existing = codesMap.get(entry.glCode);
+          if (existing) {
+            existing.usageCount += 1;
+          } else {
+            codesMap.set(entry.glCode, {
+              id: `ledger-${entry.glCode}`,
+              code: entry.glCode,
+              name: entry.glCode,
+              category: "Ledger",
+              source: "ledger",
+              usageCount: 1,
+              isActive: true,
+            });
+          }
+        }
+      });
+
+      // Convert map to array and sort by code
+      const codes = Array.from(codesMap.values()).sort((a, b) =>
+        a.code.localeCompare(b.code)
+      );
+
+      setChargeCodes(codes);
+      setLoading(false);
+    });
+  }, []);
 
   const columns = [
     {
@@ -72,21 +160,38 @@ export default function ChargeCodesPage() {
       ),
     },
     {
-      key: "amount",
-      label: "Default Amount",
+      key: "source",
+      label: "Source",
       render: (item: ChargeCode) => (
-        <span className="font-medium">
-          {item.defaultAmount === 0 ? "Variable" : `$${item.defaultAmount.toFixed(2)}`}
-        </span>
+        <Badge
+          variant="outline"
+          className={
+            item.source === "system"
+              ? "bg-purple-50 text-purple-700 border-purple-200"
+              : item.source === "product"
+              ? "bg-blue-50 text-blue-700 border-blue-200"
+              : item.source === "ledger"
+              ? "bg-amber-50 text-amber-700 border-amber-200"
+              : "bg-slate-50 text-slate-700"
+          }
+        >
+          {item.source === "system"
+            ? "System"
+            : item.source === "product"
+            ? "Product"
+            : item.source === "ledger"
+            ? "Ledger"
+            : "Other"}
+        </Badge>
       ),
     },
     {
-      key: "taxable",
-      label: "Taxable",
+      key: "usage",
+      label: "Usage",
       render: (item: ChargeCode) => (
-        <Badge variant={item.taxable ? "default" : "secondary"} className={item.taxable ? "bg-emerald-100 text-emerald-800" : ""}>
-          {item.taxable ? "Yes" : "No"}
-        </Badge>
+        <span className="text-sm text-slate-500">
+          {item.usageCount > 0 ? `${item.usageCount} items` : "Not used"}
+        </span>
       ),
     },
     {
@@ -103,28 +208,136 @@ export default function ChargeCodesPage() {
     },
   ];
 
+  if (loading) {
+    return (
+      <div className="max-w-5xl space-y-6">
+        <div>
+          <h2 className="text-2xl font-bold text-slate-900">Charge Codes / GL Codes</h2>
+          <p className="text-slate-500 mt-1">
+            Define charge codes used for billing and accounting
+          </p>
+        </div>
+        <div className="flex items-center justify-center py-12">
+          <Loader2 className="h-8 w-8 animate-spin text-slate-400" />
+        </div>
+      </div>
+    );
+  }
+
+  if (!campgroundId) {
+    return (
+      <div className="max-w-5xl space-y-6">
+        <div>
+          <h2 className="text-2xl font-bold text-slate-900">Charge Codes / GL Codes</h2>
+          <p className="text-slate-500 mt-1">
+            Define charge codes used for billing and accounting
+          </p>
+        </div>
+        <Card>
+          <CardContent className="py-8 text-center">
+            <Info className="h-8 w-8 text-amber-500 mx-auto mb-3" />
+            <p className="text-slate-600">Please select a campground first.</p>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
   return (
     <div className="max-w-5xl space-y-6">
       <div className="flex items-start justify-between">
         <div>
-          <h2 className="text-2xl font-bold text-slate-900">Charge Codes</h2>
+          <h2 className="text-2xl font-bold text-slate-900">Charge Codes / GL Codes</h2>
           <p className="text-slate-500 mt-1">
-            Define charge codes used for billing and reporting
+            Define charge codes used for billing and accounting
           </p>
         </div>
-        <Button>
-          <Plus className="h-4 w-4 mr-2" />
-          Add Charge Code
-        </Button>
+        <div className="flex gap-2">
+          <Button variant="outline" size="sm" asChild>
+            <Link href="/ledger">
+              <DollarSign className="h-4 w-4 mr-2" />
+              View Ledger
+            </Link>
+          </Button>
+          <Button>
+            <Plus className="h-4 w-4 mr-2" />
+            Add Charge Code
+          </Button>
+        </div>
       </div>
 
       <Alert className="bg-blue-50 border-blue-200">
         <Info className="h-4 w-4 text-blue-500" />
         <AlertDescription className="text-blue-800">
-          Charge codes categorize different types of revenue for reporting and accounting.
-          Each transaction is associated with a charge code.
+          Charge codes (also called GL codes) categorize different types of revenue for
+          reporting and accounting. Each transaction is associated with a charge code.
+          Codes are pulled from products, fees, and ledger entries.
         </AlertDescription>
       </Alert>
+
+      {/* Summary Cards */}
+      <div className="grid grid-cols-4 gap-4">
+        <Card>
+          <CardContent className="pt-6">
+            <div className="flex items-center gap-3">
+              <div className="p-2 rounded-lg bg-purple-100">
+                <Receipt className="h-5 w-5 text-purple-600" />
+              </div>
+              <div>
+                <p className="text-2xl font-bold text-slate-900">
+                  {chargeCodes.filter((c) => c.source === "system").length}
+                </p>
+                <p className="text-sm text-slate-500">System</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="pt-6">
+            <div className="flex items-center gap-3">
+              <div className="p-2 rounded-lg bg-blue-100">
+                <Receipt className="h-5 w-5 text-blue-600" />
+              </div>
+              <div>
+                <p className="text-2xl font-bold text-slate-900">
+                  {chargeCodes.filter((c) => c.source === "product").length}
+                </p>
+                <p className="text-sm text-slate-500">From Products</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="pt-6">
+            <div className="flex items-center gap-3">
+              <div className="p-2 rounded-lg bg-amber-100">
+                <Receipt className="h-5 w-5 text-amber-600" />
+              </div>
+              <div>
+                <p className="text-2xl font-bold text-slate-900">
+                  {chargeCodes.filter((c) => c.source === "ledger").length}
+                </p>
+                <p className="text-sm text-slate-500">From Ledger</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="pt-6">
+            <div className="flex items-center gap-3">
+              <div className="p-2 rounded-lg bg-emerald-100">
+                <Receipt className="h-5 w-5 text-emerald-600" />
+              </div>
+              <div>
+                <p className="text-2xl font-bold text-slate-900">
+                  {chargeCodes.length}
+                </p>
+                <p className="text-sm text-slate-500">Total</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
 
       <SettingsTable
         data={chargeCodes}
@@ -149,11 +362,15 @@ export default function ChargeCodesPage() {
               <DropdownMenuItem>
                 {item.isActive ? "Deactivate" : "Activate"}
               </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem className="text-red-600">
-                <Trash2 className="h-4 w-4 mr-2" />
-                Delete
-              </DropdownMenuItem>
+              {item.source !== "system" && (
+                <>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem className="text-red-600">
+                    <Trash2 className="h-4 w-4 mr-2" />
+                    Delete
+                  </DropdownMenuItem>
+                </>
+              )}
             </DropdownMenuContent>
           </DropdownMenu>
         )}
