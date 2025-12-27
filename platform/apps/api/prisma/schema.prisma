@@ -1,4 +1,4 @@
-// Prisma Client Generator - Cache bust: 2025-12-26-v6
+// Prisma Client Generator - Cache bust: 2025-12-27-v9
 generator client {
   provider = "prisma-client-js"
 }
@@ -1143,6 +1143,13 @@ model Campground {
   perBookingFeeCents          Int?           @default(300) // If null, fall back to plan default
   monthlyFeeCents             Int? // For enterprise plans (e.g., 50000 = $500)
   feeMode                     PaymentFeeMode @default(absorb)
+
+  // Pricing controls
+  maxDiscountFraction         Decimal?       @db.Decimal(4, 3) @default(0.4) // Max discount cap (0.4 = 40%)
+  managerApprovalThreshold    Decimal?       @db.Decimal(4, 3) @default(0.25) // Discounts above this need manager approval
+  minOverrideRateCents        Int? // Minimum allowed rate when manually overriding
+  maxOverrideRateCents        Int? // Maximum allowed rate when manually overriding
+
   stripeCapabilities          Json?
   stripeCapabilitiesFetchedAt DateTime?
   reviewScore                 Decimal?       @db.Decimal(4, 2)

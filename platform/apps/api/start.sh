@@ -37,8 +37,13 @@ else
     echo "The app will attempt to connect when handling requests"
 fi
 
+echo "=== Cleaning up corrupted Prisma client ==="
+rm -rf /app/node_modules/.prisma
+rm -rf /app/node_modules/.pnpm/@prisma+client*/node_modules/.prisma
+
 echo "=== Generating Prisma client ==="
-npx prisma generate
+cd /app/platform/apps/api && npx prisma generate
+cd /app/platform/apps/api
 
 echo "=== Linking Prisma client for pnpm ==="
 node /app/scripts/link-prisma-client.js || echo "Link script not found, skipping"
