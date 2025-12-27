@@ -285,44 +285,106 @@ function PaymentStatusBadge({ seasonal }: { seasonal: SeasonalGuest }) {
 }
 
 function TenureBadge({ years, showCelebration = false }: { years: number; showCelebration?: boolean }) {
+  // Legendary: 20+ years - rainbow shimmer with glow
   if (years >= 20) {
     return (
-      <Badge className="bg-gradient-to-r from-purple-500 via-pink-500 to-rose-500 text-white border-0 shadow-lg animate-pulse">
-        <Crown className="h-3 w-3 mr-1" />
-        {years} Years - Legend!
-        {showCelebration && <PartyPopper className="h-3 w-3 ml-1" />}
+      <Badge
+        className="relative overflow-hidden bg-gradient-to-r from-purple-500 via-pink-500 to-rose-500 text-white border-0 shadow-lg shadow-purple-300/50 animate-pulse hover:scale-110 transition-transform cursor-default"
+        style={{
+          animation: "pulse 2s infinite, shimmer 3s infinite",
+        }}
+      >
+        <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent animate-shimmer"
+          style={{
+            animation: "shimmer 2s infinite",
+            backgroundSize: "200% 100%",
+          }}
+        />
+        <Crown className="h-3 w-3 mr-1 relative z-10" />
+        <span className="relative z-10">{years} Years - Legend!</span>
+        {showCelebration && <PartyPopper className="h-3 w-3 ml-1 relative z-10 animate-bounce" />}
       </Badge>
     );
   }
+
+  // Gold Elite: 15+ years - gold shimmer
   if (years >= 15) {
     return (
-      <Badge className="bg-gradient-to-r from-amber-400 via-yellow-400 to-amber-500 text-white border-0 shadow-md">
-        <Crown className="h-3 w-3 mr-1" />
-        {years} Years
+      <Badge
+        className="relative overflow-hidden bg-gradient-to-r from-amber-400 via-yellow-400 to-amber-500 text-white border-0 shadow-md shadow-amber-300/50 hover:scale-105 transition-transform cursor-default"
+      >
+        <span
+          className="absolute inset-0 bg-gradient-to-r from-transparent via-white/25 to-transparent"
+          style={{
+            animation: "shimmer 2.5s infinite",
+            backgroundSize: "200% 100%",
+          }}
+        />
+        <Crown className="h-3 w-3 mr-1 relative z-10" />
+        <span className="relative z-10">{years} Years</span>
+        {showCelebration && <Sparkles className="h-3 w-3 ml-1 relative z-10" />}
       </Badge>
     );
   }
+
+  // Gold: 10+ years - subtle gold shine
   if (years >= 10) {
     return (
-      <Badge className="bg-gradient-to-r from-amber-400 to-yellow-500 text-white border-0">
-        <Award className="h-3 w-3 mr-1" />
-        {years} Years
+      <Badge
+        className="relative overflow-hidden bg-gradient-to-r from-amber-400 to-yellow-500 text-white border-0 shadow-sm hover:scale-105 transition-transform cursor-default"
+      >
+        <span
+          className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent"
+          style={{
+            animation: "shimmer 3s infinite",
+            backgroundSize: "200% 100%",
+          }}
+        />
+        <Award className="h-3 w-3 mr-1 relative z-10" />
+        <span className="relative z-10">{years} Years</span>
       </Badge>
     );
   }
+
+  // Silver: 5+ years - subtle silver effect
   if (years >= 5) {
     return (
-      <Badge className="bg-gradient-to-r from-slate-400 to-slate-500 text-white border-0">
+      <Badge className="bg-gradient-to-r from-slate-400 to-slate-500 text-white border-0 hover:scale-105 transition-transform cursor-default">
         <Star className="h-3 w-3 mr-1" />
         {years} Years
       </Badge>
     );
   }
+
+  // Standard: Under 5 years
   return (
-    <Badge variant="outline" className="bg-slate-50">
+    <Badge variant="outline" className="bg-slate-50 hover:bg-slate-100 transition-colors cursor-default">
       {years} {years === 1 ? "Year" : "Years"}
     </Badge>
   );
+}
+
+// Shimmer animation component - renders styles safely for SSR
+function ShimmerStyles() {
+  useEffect(() => {
+    if (!document.getElementById('tenure-shimmer-styles')) {
+      const style = document.createElement('style');
+      style.id = 'tenure-shimmer-styles';
+      style.textContent = `
+        @keyframes shimmer {
+          0% { background-position: -200% 0; }
+          100% { background-position: 200% 0; }
+        }
+        @keyframes float {
+          0%, 100% { transform: translateY(0); }
+          50% { transform: translateY(-3px); }
+        }
+        .animate-float { animation: float 3s ease-in-out infinite; }
+      `;
+      document.head.appendChild(style);
+    }
+  }, []);
+  return null;
 }
 
 function ContractStatusBadge({ status }: { status?: ContractStatus }) {
@@ -485,37 +547,84 @@ function MilestonesCelebration({ milestones }: { milestones: DashboardStats["mil
 
   const getColor = (type: string) => {
     switch (type) {
-      case "20year": return "from-purple-500 to-pink-500";
-      case "15year": return "from-amber-400 to-yellow-400";
+      case "20year": return "from-purple-500 via-pink-500 to-rose-500";
+      case "15year": return "from-amber-400 via-yellow-400 to-amber-500";
       case "10year": return "from-amber-400 to-yellow-500";
       case "5year": return "from-slate-400 to-slate-500";
       default: return "from-slate-300 to-slate-400";
     }
   };
 
+  const getAnimation = (type: string, index: number) => {
+    const baseDelay = index * 0.1;
+    switch (type) {
+      case "20year": return { animationDelay: `${baseDelay}s`, animation: "pulse 2s infinite" };
+      case "15year": return { animationDelay: `${baseDelay}s` };
+      default: return { animationDelay: `${baseDelay}s` };
+    }
+  };
+
+  const getShadow = (type: string) => {
+    switch (type) {
+      case "20year": return "shadow-lg shadow-purple-300/50";
+      case "15year": return "shadow-md shadow-amber-300/50";
+      case "10year": return "shadow-sm shadow-amber-200/50";
+      default: return "shadow-sm";
+    }
+  };
+
   return (
-    <Card className="bg-gradient-to-br from-amber-50 via-yellow-50 to-orange-50 border-amber-200">
+    <Card className="bg-gradient-to-br from-amber-50 via-yellow-50 to-orange-50 border-amber-200 overflow-hidden relative">
+      {/* Subtle celebration sparkles */}
+      <div className="absolute top-2 right-2 opacity-50">
+        <Sparkles className="h-5 w-5 text-amber-400 animate-pulse" />
+      </div>
+      <div className="absolute bottom-2 left-2 opacity-30">
+        <Star className="h-4 w-4 text-amber-400 animate-pulse" style={{ animationDelay: "0.5s" }} />
+      </div>
+
       <CardHeader className="pb-2">
         <CardTitle className="text-sm flex items-center gap-2 text-amber-800">
-          <PartyPopper className="h-4 w-4" />
+          <PartyPopper className="h-4 w-4 animate-bounce" style={{ animationDuration: "2s" }} />
           Tenure Milestones This Season
+          <Badge variant="secondary" className="bg-amber-100 text-amber-700 text-xs">
+            {milestones.length} celebration{milestones.length !== 1 ? "s" : ""}!
+          </Badge>
         </CardTitle>
       </CardHeader>
       <CardContent>
         <div className="flex flex-wrap gap-2">
           {milestones.slice(0, 5).map((m, i) => {
             const Icon = getIcon(m.type);
+            const animStyle = getAnimation(m.type, i);
             return (
               <div
                 key={i}
-                className={`flex items-center gap-2 px-3 py-1.5 bg-gradient-to-r ${getColor(m.type)} text-white rounded-full text-sm font-medium shadow-sm`}
+                className={`relative overflow-hidden flex items-center gap-2 px-3 py-1.5 bg-gradient-to-r ${getColor(m.type)} text-white rounded-full text-sm font-medium ${getShadow(m.type)} hover:scale-105 transition-transform cursor-default`}
+                style={animStyle}
               >
-                <Icon className="h-3.5 w-3.5" />
-                {m.guestName} - {m.years} yrs
+                {/* Shimmer overlay for top milestones */}
+                {(m.type === "20year" || m.type === "15year") && (
+                  <span
+                    className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent"
+                    style={{
+                      animation: "shimmer 2.5s infinite",
+                      backgroundSize: "200% 100%",
+                    }}
+                  />
+                )}
+                <Icon className="h-3.5 w-3.5 relative z-10" />
+                <span className="relative z-10">{m.guestName} - {m.years} yrs</span>
               </div>
             );
           })}
         </div>
+        {milestones.length > 5 && (
+          <p className="text-xs text-amber-600 mt-2 flex items-center gap-1">
+            <Gift className="h-3 w-3" />
+            +{milestones.length - 5} more milestone{milestones.length - 5 !== 1 ? "s" : ""} to celebrate!
+          </p>
+        )}
       </CardContent>
     </Card>
   );
@@ -797,7 +906,7 @@ function FloatingActionPanel({
                 <ChevronDown className="h-3 w-3 ml-1" />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="center">
+            <DropdownMenuContent align="end">
               <DropdownMenuItem onClick={() => onBulkUpdate("committed")}>
                 <CheckCircle className="h-4 w-4 mr-2 text-emerald-600" />
                 Mark Committed
@@ -866,129 +975,239 @@ function SeasonalRow({
 
   return (
     <div className={`border rounded-lg transition-all duration-200 ${isSelected ? "ring-2 ring-blue-500 bg-blue-50/30" : "hover:shadow-md bg-white"}`}>
-      {/* Main Row */}
-      <div className="p-4 flex items-center gap-4">
-        <input
-          type="checkbox"
-          checked={isSelected}
-          onChange={onSelect}
-          className="rounded border-slate-300"
-          onClick={(e) => e.stopPropagation()}
-        />
-
-        {/* Avatar with tenure indicator */}
-        <div className="relative">
-          <div className={`w-11 h-11 rounded-full flex items-center justify-center text-white font-medium ${
-            seasonal.totalSeasons >= 10
-              ? "bg-gradient-to-br from-amber-400 to-yellow-500 shadow-lg"
-              : seasonal.totalSeasons >= 5
-                ? "bg-gradient-to-br from-slate-400 to-slate-500"
-                : "bg-gradient-to-br from-blue-500 to-purple-600"
-          }`}>
-            {seasonal.guest.primaryFirstName[0]}{seasonal.guest.primaryLastName[0]}
-          </div>
-          {seasonal.seniorityRank && seasonal.seniorityRank <= 3 && (
-            <div className="absolute -top-1 -right-1 w-5 h-5 bg-amber-500 rounded-full flex items-center justify-center text-white text-xs font-bold shadow">
-              {seasonal.seniorityRank}
+      {/* Mobile Card View */}
+      <div className="md:hidden p-4 space-y-3">
+        <div className="flex items-start justify-between">
+          <div className="flex items-center gap-3">
+            <input
+              type="checkbox"
+              checked={isSelected}
+              onChange={onSelect}
+              className="rounded border-slate-300 mt-1"
+              onClick={(e) => e.stopPropagation()}
+            />
+            {/* Avatar with tenure indicator */}
+            <div className="relative">
+              <div className={`w-12 h-12 rounded-full flex items-center justify-center text-white font-medium text-lg ${
+                seasonal.totalSeasons >= 10
+                  ? "bg-gradient-to-br from-amber-400 to-yellow-500 shadow-lg"
+                  : seasonal.totalSeasons >= 5
+                    ? "bg-gradient-to-br from-slate-400 to-slate-500"
+                    : "bg-gradient-to-br from-blue-500 to-purple-600"
+              }`}>
+                {seasonal.guest.primaryFirstName[0]}{seasonal.guest.primaryLastName[0]}
+              </div>
+              {seasonal.seniorityRank && seasonal.seniorityRank <= 3 && (
+                <div className="absolute -top-1 -right-1 w-5 h-5 bg-amber-500 rounded-full flex items-center justify-center text-white text-xs font-bold shadow">
+                  {seasonal.seniorityRank}
+                </div>
+              )}
             </div>
-          )}
+            <div>
+              <p className="font-semibold text-slate-900">
+                {seasonal.guest.primaryFirstName} {seasonal.guest.primaryLastName}
+              </p>
+              <div className="flex items-center gap-2 mt-1">
+                <TenureBadge years={seasonal.totalSeasons} />
+                {seasonal.currentSite && (
+                  <span className="text-sm text-slate-500 flex items-center gap-1">
+                    <MapPin className="h-3 w-3" />
+                    {seasonal.currentSite.name}
+                  </span>
+                )}
+              </div>
+            </div>
+          </div>
+          <Button size="sm" variant="ghost" onClick={() => setExpanded(!expanded)}>
+            <ChevronDown className={`h-5 w-5 transition-transform ${expanded ? "rotate-180" : ""}`} />
+          </Button>
         </div>
 
-        {/* Info */}
-        <div className="flex-1 min-w-0" onClick={() => setExpanded(!expanded)}>
-          <div className="flex items-center gap-2 flex-wrap cursor-pointer">
-            <span className="font-medium text-slate-900">
-              {seasonal.guest.primaryFirstName} {seasonal.guest.primaryLastName}
-            </span>
-            <TenureBadge years={seasonal.totalSeasons} />
-          </div>
-          <div className="flex items-center gap-3 text-sm text-slate-500 mt-0.5">
-            {seasonal.currentSite && (
-              <span className="flex items-center gap-1">
-                <MapPin className="h-3 w-3" />
-                {seasonal.currentSite.name}
-              </span>
-            )}
-            <span className="flex items-center gap-1">
-              <Mail className="h-3 w-3" />
-              {seasonal.guest.email}
-            </span>
-          </div>
-        </div>
-
-        {/* Status Badges */}
-        <div className="flex items-center gap-2 flex-shrink-0">
+        {/* Mobile Status Badges - Stacked */}
+        <div className="flex flex-wrap gap-2 pl-9">
           <StatusBadge status={seasonal.status} />
           <RenewalIntentBadge intent={seasonal.renewalIntent} />
           <PaymentStatusBadge seasonal={seasonal} />
           <ContractStatusBadge status={currentContract?.status} />
         </div>
 
-        {/* Actions */}
-        <div className="flex items-center gap-1">
-          <Button size="sm" variant="ghost" onClick={() => setExpanded(!expanded)}>
-            <ChevronDown className={`h-4 w-4 transition-transform ${expanded ? "rotate-180" : ""}`} />
-          </Button>
-          <Button size="sm" variant="ghost" onClick={onViewDetails}>
-            <Eye className="h-4 w-4" />
-          </Button>
-        </div>
+        {/* Mobile Expanded */}
+        {expanded && (
+          <div className="space-y-3 pt-3 border-t">
+            <div className="grid grid-cols-2 gap-3 text-sm">
+              <div>
+                <p className="text-xs text-slate-400 uppercase">Email</p>
+                <p className="font-medium truncate">{seasonal.guest.email}</p>
+              </div>
+              <div>
+                <p className="text-xs text-slate-400 uppercase">Phone</p>
+                <p className="font-medium">{seasonal.guest.phone || "—"}</p>
+              </div>
+              <div>
+                <p className="text-xs text-slate-400 uppercase">Rate</p>
+                <p className="font-medium">${seasonal.pricing?.[0]?.finalRate?.toLocaleString() || "—"}/mo</p>
+              </div>
+              <div>
+                <p className="text-xs text-slate-400 uppercase">Since</p>
+                <p className="font-medium">{seasonal.firstSeasonYear}</p>
+              </div>
+            </div>
+            <div className="flex flex-wrap gap-2 pt-2">
+              <Button size="sm" className="flex-1" onClick={() => onQuickAction("message")}>
+                <Mail className="h-4 w-4 mr-1" />
+                Message
+              </Button>
+              <Button size="sm" variant="outline" className="flex-1" onClick={() => onQuickAction("payment")}>
+                <CreditCard className="h-4 w-4 mr-1" />
+                Payment
+              </Button>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              <Button size="sm" variant="outline" className="flex-1" onClick={() => onQuickAction("contract")}>
+                <FileSignature className="h-4 w-4 mr-1" />
+                Contract
+              </Button>
+              {seasonal.renewalIntent !== "committed" && (
+                <Button
+                  size="sm"
+                  variant="outline"
+                  className="flex-1 text-emerald-600 border-emerald-200 hover:bg-emerald-50"
+                  onClick={() => onQuickAction("renewal", "committed")}
+                >
+                  <CheckCircle className="h-4 w-4 mr-1" />
+                  Committed
+                </Button>
+              )}
+            </div>
+          </div>
+        )}
       </div>
 
-      {/* Expanded Details */}
-      {expanded && (
-        <div className="px-4 pb-4 pt-0 border-t bg-slate-50/50">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 py-3">
-            <div>
-              <p className="text-xs text-slate-500 uppercase tracking-wide">Phone</p>
-              <p className="text-sm font-medium">{seasonal.guest.phone || "—"}</p>
+      {/* Desktop Row View */}
+      <div className="hidden md:block">
+        <div className="p-4 flex items-center gap-4">
+          <input
+            type="checkbox"
+            checked={isSelected}
+            onChange={onSelect}
+            className="rounded border-slate-300"
+            onClick={(e) => e.stopPropagation()}
+          />
+
+          {/* Avatar with tenure indicator */}
+          <div className="relative">
+            <div className={`w-11 h-11 rounded-full flex items-center justify-center text-white font-medium ${
+              seasonal.totalSeasons >= 10
+                ? "bg-gradient-to-br from-amber-400 to-yellow-500 shadow-lg"
+                : seasonal.totalSeasons >= 5
+                  ? "bg-gradient-to-br from-slate-400 to-slate-500"
+                  : "bg-gradient-to-br from-blue-500 to-purple-600"
+            }`}>
+              {seasonal.guest.primaryFirstName[0]}{seasonal.guest.primaryLastName[0]}
             </div>
-            <div>
-              <p className="text-xs text-slate-500 uppercase tracking-wide">Current Rate</p>
-              <p className="text-sm font-medium">
-                ${seasonal.pricing?.[0]?.finalRate?.toLocaleString() || "—"}/mo
-              </p>
+            {seasonal.seniorityRank && seasonal.seniorityRank <= 3 && (
+              <div className="absolute -top-1 -right-1 w-5 h-5 bg-amber-500 rounded-full flex items-center justify-center text-white text-xs font-bold shadow">
+                {seasonal.seniorityRank}
+              </div>
+            )}
+          </div>
+
+          {/* Info */}
+          <div className="flex-1 min-w-0" onClick={() => setExpanded(!expanded)}>
+            <div className="flex items-center gap-2 flex-wrap cursor-pointer">
+              <span className="font-medium text-slate-900">
+                {seasonal.guest.primaryFirstName} {seasonal.guest.primaryLastName}
+              </span>
+              <TenureBadge years={seasonal.totalSeasons} />
             </div>
-            <div>
-              <p className="text-xs text-slate-500 uppercase tracking-wide">Billing</p>
-              <p className="text-sm font-medium">
-                {seasonal.paysInFull ? "Paid in Full" : "Monthly"} • {seasonal.isMetered ? "Metered" : "Flat Rate"}
-              </p>
-            </div>
-            <div>
-              <p className="text-xs text-slate-500 uppercase tracking-wide">Member Since</p>
-              <p className="text-sm font-medium">{seasonal.firstSeasonYear}</p>
+            <div className="flex items-center gap-3 text-sm text-slate-500 mt-0.5">
+              {seasonal.currentSite && (
+                <span className="flex items-center gap-1">
+                  <MapPin className="h-3 w-3" />
+                  {seasonal.currentSite.name}
+                </span>
+              )}
+              <span className="flex items-center gap-1 truncate max-w-[200px]">
+                <Mail className="h-3 w-3 flex-shrink-0" />
+                {seasonal.guest.email}
+              </span>
             </div>
           </div>
 
-          {/* Quick Actions */}
-          <div className="flex flex-wrap gap-2 pt-2 border-t">
-            <Button size="sm" variant="outline" onClick={() => onQuickAction("message")}>
-              <Mail className="h-4 w-4 mr-1" />
-              Message
+          {/* Status Badges */}
+          <div className="flex items-center gap-2 flex-shrink-0">
+            <StatusBadge status={seasonal.status} />
+            <RenewalIntentBadge intent={seasonal.renewalIntent} />
+            <PaymentStatusBadge seasonal={seasonal} />
+            <ContractStatusBadge status={currentContract?.status} />
+          </div>
+
+          {/* Actions */}
+          <div className="flex items-center gap-1">
+            <Button size="sm" variant="ghost" onClick={() => setExpanded(!expanded)}>
+              <ChevronDown className={`h-4 w-4 transition-transform ${expanded ? "rotate-180" : ""}`} />
             </Button>
-            <Button size="sm" variant="outline" onClick={() => onQuickAction("payment")}>
-              <CreditCard className="h-4 w-4 mr-1" />
-              Record Payment
+            <Button size="sm" variant="ghost" onClick={onViewDetails}>
+              <Eye className="h-4 w-4" />
             </Button>
-            <Button size="sm" variant="outline" onClick={() => onQuickAction("contract")}>
-              <FileSignature className="h-4 w-4 mr-1" />
-              Send Contract
-            </Button>
-            {seasonal.renewalIntent !== "committed" && (
-              <Button
-                size="sm"
-                variant="outline"
-                className="text-emerald-600 hover:bg-emerald-50"
-                onClick={() => onQuickAction("renewal", "committed")}
-              >
-                <CheckCircle className="h-4 w-4 mr-1" />
-                Mark Committed
-              </Button>
-            )}
           </div>
         </div>
-      )}
+
+        {/* Desktop Expanded Details */}
+        {expanded && (
+          <div className="px-4 pb-4 pt-0 border-t bg-slate-50/50">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 py-3">
+              <div>
+                <p className="text-xs text-slate-500 uppercase tracking-wide">Phone</p>
+                <p className="text-sm font-medium">{seasonal.guest.phone || "—"}</p>
+              </div>
+              <div>
+                <p className="text-xs text-slate-500 uppercase tracking-wide">Current Rate</p>
+                <p className="text-sm font-medium">
+                  ${seasonal.pricing?.[0]?.finalRate?.toLocaleString() || "—"}/mo
+                </p>
+              </div>
+              <div>
+                <p className="text-xs text-slate-500 uppercase tracking-wide">Billing</p>
+                <p className="text-sm font-medium">
+                  {seasonal.paysInFull ? "Paid in Full" : "Monthly"} • {seasonal.isMetered ? "Metered" : "Flat Rate"}
+                </p>
+              </div>
+              <div>
+                <p className="text-xs text-slate-500 uppercase tracking-wide">Member Since</p>
+                <p className="text-sm font-medium">{seasonal.firstSeasonYear}</p>
+              </div>
+            </div>
+
+            {/* Quick Actions */}
+            <div className="flex flex-wrap gap-2 pt-2 border-t">
+              <Button size="sm" variant="outline" onClick={() => onQuickAction("message")}>
+                <Mail className="h-4 w-4 mr-1" />
+                Message
+              </Button>
+              <Button size="sm" variant="outline" onClick={() => onQuickAction("payment")}>
+                <CreditCard className="h-4 w-4 mr-1" />
+                Record Payment
+              </Button>
+              <Button size="sm" variant="outline" onClick={() => onQuickAction("contract")}>
+                <FileSignature className="h-4 w-4 mr-1" />
+                Send Contract
+              </Button>
+              {seasonal.renewalIntent !== "committed" && (
+                <Button
+                  size="sm"
+                  variant="outline"
+                  className="text-emerald-600 hover:bg-emerald-50"
+                  onClick={() => onQuickAction("renewal", "committed")}
+                >
+                  <CheckCircle className="h-4 w-4 mr-1" />
+                  Mark Committed
+                </Button>
+              )}
+            </div>
+          </div>
+        )}
+      </div>
     </div>
   );
 }
@@ -1438,6 +1657,7 @@ export default function SeasonalsPage() {
 
   return (
     <DashboardShell>
+      <ShimmerStyles />
       <div className="space-y-4">
         <Breadcrumbs
           items={[

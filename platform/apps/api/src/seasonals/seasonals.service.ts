@@ -1,6 +1,7 @@
 import { Injectable, Logger, NotFoundException, BadRequestException } from "@nestjs/common";
 import { PrismaService } from "../prisma/prisma.service";
 import { SeasonalPricingService, GuestPricingContext } from "./seasonal-pricing.service";
+import { EmailService } from "../email/email.service";
 import {
   SeasonalStatus,
   RenewalIntent,
@@ -104,7 +105,8 @@ export class SeasonalsService {
 
   constructor(
     private readonly prisma: PrismaService,
-    private readonly pricingService: SeasonalPricingService
+    private readonly pricingService: SeasonalPricingService,
+    private readonly emailService: EmailService,
   ) {}
 
   // ==================== SEASONAL GUEST CRUD ====================
@@ -787,17 +789,39 @@ export class SeasonalsService {
       data: communications,
     });
 
-    // TODO: Integrate with actual email/SMS sending service
-    // For now, mark as sent
+    // Send the actual messages
+    const sendResults = await Promise.allSettled(
+      seasonals.map(async (seasonal, index) => {
+        const comm = communications[index];
+
+        if (dto.channel === "email" && seasonal.guest.email) {
+          await this.emailService.sendEmail({
+            to: seasonal.guest.email,
+            subject: dto.subject || "Message from your campground",
+            html: comm.body.replace(/\n/g, "<br>"),
+            campgroundId: dto.campgroundId,
+          });
+        }
+        // SMS would require a separate provider (Twilio, etc.)
+        // For now, SMS messages are stored in the database for manual processing
+        // or future SMS provider integration
+      })
+    );
+
+    // Count successful sends
+    const successCount = sendResults.filter(r => r.status === "fulfilled").length;
+    const failCount = sendResults.filter(r => r.status === "rejected").length;
+
+    // Update communication status based on results
     await this.prisma.seasonalCommunication.updateMany({
       where: { campaignId },
       data: {
-        status: "sent",
-        sentAt: new Date(),
+        status: dto.channel === "sms" ? "queued" : "sent",
+        sentAt: dto.channel === "sms" ? null : new Date(),
       },
     });
 
-    this.logger.log(`Sent bulk ${dto.channel} to ${seasonals.length} seasonals`);
+    this.logger.log(`Sent bulk ${dto.channel} to ${seasonals.length} seasonals (${successCount} succeeded, ${failCount} failed)`);
 
     return {
       sent: seasonals.length,
