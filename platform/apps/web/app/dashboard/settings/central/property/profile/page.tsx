@@ -69,7 +69,7 @@ export default function ProfilePage() {
     if (!profile || !campgroundId) return;
     setSaving(true);
     try {
-      await apiClient.updateCampground(campgroundId, {
+      await apiClient.updateCampgroundProfile(campgroundId, {
         name: profile.name,
         tagline: profile.tagline,
         description: profile.description,
@@ -80,7 +80,7 @@ export default function ProfilePage() {
         address2: profile.address2,
         city: profile.city,
         state: profile.state,
-        zip: profile.zip,
+        postalCode: profile.zip,
         country: profile.country,
       });
     } catch (err) {
