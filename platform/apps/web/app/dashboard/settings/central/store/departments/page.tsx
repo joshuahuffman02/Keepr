@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -11,7 +11,7 @@ import {
   MoreHorizontal,
   Pencil,
   Trash2,
-  GripVertical,
+  Loader2,
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -22,6 +22,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { SettingsTable } from "@/components/settings/tables";
 import { cn } from "@/lib/utils";
+import { apiClient } from "@/lib/api-client";
 
 interface Department {
   id: string;
@@ -31,17 +32,45 @@ interface Department {
   isActive: boolean;
 }
 
-const mockDepartments: Department[] = [
-  { id: "1", name: "Camp Store", color: "#10b981", productCount: 24, isActive: true },
-  { id: "2", name: "Firewood", color: "#f59e0b", productCount: 3, isActive: true },
-  { id: "3", name: "Ice & Beverages", color: "#3b82f6", productCount: 8, isActive: true },
-  { id: "4", name: "Rentals", color: "#8b5cf6", productCount: 12, isActive: true },
-  { id: "5", name: "Services", color: "#ec4899", productCount: 6, isActive: true },
-  { id: "6", name: "Snacks & Food", color: "#ef4444", productCount: 15, isActive: true },
-];
-
 export default function DepartmentsPage() {
-  const [departments] = useState<Department[]>(mockDepartments);
+  const [departments, setDepartments] = useState<Department[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const campgroundId = localStorage.getItem("campreserv:selectedCampground");
+    if (!campgroundId) {
+      setLoading(false);
+      return;
+    }
+
+    Promise.all([
+      apiClient.getProductCategories(campgroundId).catch(() => []),
+      apiClient.getProducts(campgroundId).catch(() => [])
+    ]).then(([categories, products]) => {
+      const categoryList = Array.isArray(categories) ? categories : [];
+      const productList = Array.isArray(products) ? products : [];
+
+      // Count products per category
+      const productCounts: Record<string, number> = {};
+      productList.forEach((p: any) => {
+        if (p.categoryId) {
+          productCounts[p.categoryId] = (productCounts[p.categoryId] || 0) + 1;
+        }
+      });
+
+      // Map categories to departments
+      const depts: Department[] = categoryList.map((cat: any) => ({
+        id: cat.id,
+        name: cat.name,
+        color: cat.color || "#6b7280",
+        productCount: productCounts[cat.id] || 0,
+        isActive: cat.isActive !== false,
+      }));
+
+      setDepartments(depts);
+      setLoading(false);
+    });
+  }, []);
 
   const columns = [
     {
@@ -83,6 +112,24 @@ export default function DepartmentsPage() {
       ),
     },
   ];
+
+  if (loading) {
+    return (
+      <div className="max-w-4xl space-y-6">
+        <div className="flex items-start justify-between">
+          <div>
+            <h2 className="text-2xl font-bold text-slate-900">Departments</h2>
+            <p className="text-slate-500 mt-1">
+              Organize your store products into categories
+            </p>
+          </div>
+        </div>
+        <div className="flex items-center justify-center py-12">
+          <Loader2 className="h-8 w-8 animate-spin text-slate-400" />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-4xl space-y-6">

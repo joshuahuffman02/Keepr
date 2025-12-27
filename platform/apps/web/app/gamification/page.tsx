@@ -546,20 +546,21 @@ export default function GamificationDashboardPage() {
     : "Staff Member";
 
   // Wait for hydration before showing content to avoid hydration mismatch
-  const isLoading = !isHydrated || dashboardLoading || whoamiLoading;
+  // If hydrated but no campgroundId, don't wait on dashboard (it won't run)
+  const isLoading = !isHydrated || whoamiLoading || (campgroundId && dashboardLoading);
 
   // Debug logging
   useEffect(() => {
-    console.log("[Gamification] State:", {
+    console.log("[Gamification] State:", JSON.stringify({
       isHydrated,
-      campgroundId,
+      campgroundId: campgroundId || "NONE",
       dashboardLoading,
       whoamiLoading,
       isLoading,
       loadingTimedOut,
-      dashboardError: dashboardError?.message,
-      whoamiError: whoamiError?.message,
-    });
+      dashboardError: dashboardError?.message || null,
+      whoamiError: whoamiError?.message || null,
+    }));
   }, [isHydrated, campgroundId, dashboardLoading, whoamiLoading, isLoading, loadingTimedOut, dashboardError, whoamiError]);
 
   if (isLoading && !loadingTimedOut) {

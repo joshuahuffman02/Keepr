@@ -1,19 +1,46 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { ArrowRight, Package, ShoppingCart, Tags, Info } from "lucide-react";
-
-const stats = [
-  { label: "Total Products", value: "68", icon: Package },
-  { label: "Active", value: "62", icon: ShoppingCart },
-  { label: "Categories", value: "6", icon: Tags },
-];
+import { ArrowRight, Package, ShoppingCart, Tags, Info, Loader2 } from "lucide-react";
+import { apiClient } from "@/lib/api-client";
 
 export default function ProductsPage() {
+  const [loading, setLoading] = useState(true);
+  const [productCount, setProductCount] = useState(0);
+  const [activeCount, setActiveCount] = useState(0);
+  const [categoryCount, setCategoryCount] = useState(0);
+
+  useEffect(() => {
+    const campgroundId = localStorage.getItem("campreserv:selectedCampground");
+    if (!campgroundId) {
+      setLoading(false);
+      return;
+    }
+
+    Promise.all([
+      apiClient.getProducts(campgroundId).catch(() => []),
+      apiClient.getProductCategories(campgroundId).catch(() => [])
+    ]).then(([products, categories]) => {
+      const productList = Array.isArray(products) ? products : [];
+      const categoryList = Array.isArray(categories) ? categories : [];
+
+      setProductCount(productList.length);
+      setActiveCount(productList.filter((p: any) => p.isActive !== false).length);
+      setCategoryCount(categoryList.length);
+      setLoading(false);
+    });
+  }, []);
+
+  const stats = [
+    { label: "Total Products", value: loading ? "..." : productCount.toString(), icon: Package },
+    { label: "Active", value: loading ? "..." : activeCount.toString(), icon: ShoppingCart },
+    { label: "Categories", value: loading ? "..." : categoryCount.toString(), icon: Tags },
+  ];
+
   return (
     <div className="max-w-4xl space-y-6">
       <div className="flex items-start justify-between">
@@ -24,7 +51,7 @@ export default function ProductsPage() {
           </p>
         </div>
         <Button asChild>
-          <Link href="/dashboard/pos/products">
+          <Link href="/pos">
             Manage Products
           </Link>
         </Button>
@@ -47,7 +74,11 @@ export default function ProductsPage() {
               <CardContent className="pt-6">
                 <div className="flex items-center gap-3">
                   <div className="p-2 rounded-lg bg-slate-100">
-                    <Icon className="h-5 w-5 text-slate-600" />
+                    {loading ? (
+                      <Loader2 className="h-5 w-5 text-slate-600 animate-spin" />
+                    ) : (
+                      <Icon className="h-5 w-5 text-slate-600" />
+                    )}
                   </div>
                   <div>
                     <p className="text-2xl font-bold text-slate-900">{stat.value}</p>
@@ -65,7 +96,7 @@ export default function ProductsPage() {
         <CardContent className="pt-6">
           <div className="space-y-3">
             <Link
-              href="/dashboard/pos/products"
+              href="/pos"
               className="flex items-center justify-between p-4 rounded-lg border hover:bg-slate-50 transition-colors"
             >
               <div className="flex items-center gap-3">
@@ -81,15 +112,15 @@ export default function ProductsPage() {
             </Link>
 
             <Link
-              href="/dashboard/pos/products/new"
+              href="/store"
               className="flex items-center justify-between p-4 rounded-lg border hover:bg-slate-50 transition-colors"
             >
               <div className="flex items-center gap-3">
                 <ShoppingCart className="h-5 w-5 text-slate-600" />
                 <div>
-                  <p className="font-medium text-slate-900">Add New Product</p>
+                  <p className="font-medium text-slate-900">Manage Inventory</p>
                   <p className="text-sm text-slate-500">
-                    Create a new product for your store
+                    Manage stock levels and inventory
                   </p>
                 </div>
               </div>
