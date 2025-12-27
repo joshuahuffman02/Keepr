@@ -2,10 +2,14 @@ import { Injectable, NotFoundException, BadRequestException } from '@nestjs/comm
 import { PrismaService } from '../prisma/prisma.service';
 import { ChargeStatus, PaymentSchedule, ReservationStatus } from '@prisma/client';
 import { addDays, addMonths, addWeeks, startOfDay } from 'date-fns';
+import { StripeService } from '../payments/stripe.service';
 
 @Injectable()
 export class RepeatChargesService {
-    constructor(private readonly prisma: PrismaService) { }
+    constructor(
+        private readonly prisma: PrismaService,
+        private readonly stripeService: StripeService
+    ) { }
 
     async generateCharges(reservationId: string) {
         const reservation = await this.prisma.reservation.findUnique({
@@ -121,44 +125,171 @@ export class RepeatChargesService {
     async processCharge(chargeId: string) {
         const charge = await this.prisma.repeatCharge.findUnique({
             where: { id: chargeId },
-            include: { reservation: true }
+            include: {
+                reservation: {
+                    include: {
+                        campground: {
+                            select: {
+                                stripeAccountId: true,
+                                perBookingFeeCents: true
+                            }
+                        }
+                    }
+                }
+            }
         });
 
         if (!charge) throw new NotFoundException('Charge not found');
         if (charge.status === ChargeStatus.paid) throw new BadRequestException('Charge already paid');
 
-        // Mock payment processing for now
-        // In real implementation, we'd use the saved card on the reservation/guest
+        try {
+            // Get the most recent successful payment to extract payment method details
+            const lastPayment = await this.prisma.payment.findFirst({
+                where: {
+                    reservationId: charge.reservationId,
+                    stripePaymentIntentId: { not: null }
+                },
+                orderBy: { createdAt: 'desc' }
+            });
 
-        // Simulate success
-        const updated = await this.prisma.repeatCharge.update({
-            where: { id: chargeId },
-            data: {
-                status: ChargeStatus.paid,
-                paidAt: new Date()
+            if (!lastPayment?.stripePaymentIntentId) {
+                const failureReason = 'No payment method on file';
+                await this.prisma.repeatCharge.update({
+                    where: { id: chargeId },
+                    data: {
+                        status: ChargeStatus.failed,
+                        failedAt: new Date(),
+                        failureReason
+                    }
+                });
+                throw new BadRequestException(failureReason);
             }
-        });
 
-        // Also record a Payment and LedgerEntry
-        await this.prisma.payment.create({
-            data: {
-                campgroundId: charge.reservation.campgroundId,
-                reservationId: charge.reservationId,
-                amountCents: charge.amount,
-                method: 'card', // stored card
-                direction: 'charge',
-                note: `Repeat charge for ${charge.dueDate.toISOString().split('T')[0]}`
+            // Retrieve the original payment intent to get customer and payment method
+            const originalIntent = await this.stripeService.retrievePaymentIntent(lastPayment.stripePaymentIntentId);
+
+            if (!originalIntent.customer || !originalIntent.payment_method) {
+                const failureReason = 'Payment method information not available';
+                await this.prisma.repeatCharge.update({
+                    where: { id: chargeId },
+                    data: {
+                        status: ChargeStatus.failed,
+                        failedAt: new Date(),
+                        failureReason
+                    }
+                });
+                throw new BadRequestException(failureReason);
             }
-        });
 
-        // Update reservation paid amount
-        await this.prisma.reservation.update({
-            where: { id: charge.reservationId },
-            data: {
-                paidAmount: { increment: charge.amount }
+            const customerId = typeof originalIntent.customer === 'string'
+                ? originalIntent.customer
+                : originalIntent.customer.id;
+            const paymentMethodId = typeof originalIntent.payment_method === 'string'
+                ? originalIntent.payment_method
+                : originalIntent.payment_method.id;
+
+            if (!charge.reservation.campground.stripeAccountId) {
+                const failureReason = 'Payment processing not configured for this campground';
+                await this.prisma.repeatCharge.update({
+                    where: { id: chargeId },
+                    data: {
+                        status: ChargeStatus.failed,
+                        failedAt: new Date(),
+                        failureReason
+                    }
+                });
+                throw new BadRequestException(failureReason);
             }
-        });
 
-        return updated;
+            const applicationFeeCents = charge.reservation.campground.perBookingFeeCents || 0;
+
+            // Charge the saved payment method
+            const paymentIntent = await this.stripeService.chargeOffSession(
+                charge.amount,
+                'usd',
+                customerId,
+                paymentMethodId,
+                charge.reservation.campground.stripeAccountId,
+                {
+                    reservationId: charge.reservationId,
+                    campgroundId: charge.reservation.campgroundId,
+                    source: 'repeat_charge',
+                    type: 'recurring_payment',
+                    chargeId,
+                    dueDate: charge.dueDate.toISOString()
+                },
+                applicationFeeCents,
+                `repeat-charge-${chargeId}-${Date.now()}`
+            );
+
+            if (paymentIntent.status !== 'succeeded') {
+                const failureReason = `Payment failed: ${paymentIntent.status}`;
+                await this.prisma.repeatCharge.update({
+                    where: { id: chargeId },
+                    data: {
+                        status: ChargeStatus.failed,
+                        failedAt: new Date(),
+                        failureReason
+                    }
+                });
+                throw new BadRequestException(failureReason);
+            }
+
+            // Update charge status
+            const updated = await this.prisma.repeatCharge.update({
+                where: { id: chargeId },
+                data: {
+                    status: ChargeStatus.paid,
+                    paidAt: new Date()
+                }
+            });
+
+            // Record the payment
+            await this.prisma.payment.create({
+                data: {
+                    campgroundId: charge.reservation.campgroundId,
+                    reservationId: charge.reservationId,
+                    amountCents: charge.amount,
+                    method: 'card',
+                    direction: 'charge',
+                    note: `Repeat charge for ${charge.dueDate.toISOString().split('T')[0]}`,
+                    stripePaymentIntentId: paymentIntent.id,
+                    stripeChargeId: paymentIntent.latest_charge as string | undefined,
+                    applicationFeeCents,
+                    capturedAt: new Date()
+                }
+            });
+
+            // Update reservation paid amount
+            await this.prisma.reservation.update({
+                where: { id: charge.reservationId },
+                data: {
+                    paidAmount: { increment: charge.amount }
+                }
+            });
+
+            return updated;
+        } catch (error: any) {
+            console.error(`[RepeatCharge] Payment failed for charge ${chargeId}:`, error.message);
+
+            // If not already marked as failed, update the charge status
+            const currentCharge = await this.prisma.repeatCharge.findUnique({
+                where: { id: chargeId },
+                select: { status: true }
+            });
+
+            if (currentCharge?.status !== ChargeStatus.failed) {
+                await this.prisma.repeatCharge.update({
+                    where: { id: chargeId },
+                    data: {
+                        status: ChargeStatus.failed,
+                        failedAt: new Date(),
+                        failureReason: error.message || 'Payment processing error'
+                    }
+                });
+            }
+
+            throw error;
+        }
     }
 }

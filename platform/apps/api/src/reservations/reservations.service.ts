@@ -29,6 +29,7 @@ import { GuestWalletService } from "../guest-wallet/guest-wallet.service";
 import { assertSiteLockValid } from "./reservation-guards";
 import { evaluatePricingV2 } from "./reservation-pricing";
 import { assertReservationDepositV2, calculateReservationDepositV2 } from "./reservation-deposit";
+import { StripeService } from "../payments/stripe.service";
 
 @Injectable()
 export class ReservationsService {
@@ -51,7 +52,8 @@ export class ReservationsService {
     private readonly usageTracker: UsageTrackerService,
     private readonly repeatChargesService: RepeatChargesService,
     private readonly policiesService: PoliciesService,
-    private readonly guestWalletService: GuestWalletService
+    private readonly guestWalletService: GuestWalletService,
+    private readonly stripeService: StripeService
   ) { }
 
   async getMatchedSites(campgroundId: string, guestId: string) {
@@ -2321,15 +2323,105 @@ export class ReservationsService {
 
     console.log(`[Kiosk] New Total: ${newTotal}, Balance Due: ${balanceDue}`);
 
-    // In a real app, we would charge the card here using StripeService
-    // const charge = await this.stripeService.chargeCustomer(reservation.guestId, balanceDue);
+    // Process payment if there's a balance due
+    let paymentIntentId: string | undefined;
+    if (balanceDue > 0) {
+      try {
+        // Get the most recent successful payment to extract payment method details
+        const lastPayment = await this.prisma.payment.findFirst({
+          where: {
+            reservationId: id,
+            stripePaymentIntentId: { not: null }
+          },
+          orderBy: { createdAt: 'desc' }
+        });
+
+        if (!lastPayment?.stripePaymentIntentId) {
+          throw new BadRequestException('No payment method on file. Please provide payment details.');
+        }
+
+        // Retrieve the original payment intent to get customer and payment method
+        const originalIntent = await this.stripeService.retrievePaymentIntent(lastPayment.stripePaymentIntentId);
+
+        if (!originalIntent.customer || !originalIntent.payment_method) {
+          throw new BadRequestException('Payment method information not available. Please provide payment details.');
+        }
+
+        const customerId = typeof originalIntent.customer === 'string'
+          ? originalIntent.customer
+          : originalIntent.customer.id;
+        const paymentMethodId = typeof originalIntent.payment_method === 'string'
+          ? originalIntent.payment_method
+          : originalIntent.payment_method.id;
+
+        // Get campground's Stripe account
+        const campground = await this.prisma.campground.findUnique({
+          where: { id: reservation.campgroundId },
+          select: { stripeAccountId: true, perBookingFeeCents: true }
+        });
+
+        if (!campground?.stripeAccountId) {
+          throw new BadRequestException('Payment processing not configured for this campground.');
+        }
+
+        const applicationFeeCents = campground.perBookingFeeCents || 0;
+
+        // Charge the saved payment method
+        const paymentIntent = await this.stripeService.chargeOffSession(
+          balanceDue,
+          'usd',
+          customerId,
+          paymentMethodId,
+          campground.stripeAccountId,
+          {
+            reservationId: id,
+            campgroundId: reservation.campgroundId,
+            source: 'kiosk_checkin',
+            type: 'balance_due',
+            upsellAmount: String(upsellTotalCents),
+            override: String(isOverride)
+          },
+          applicationFeeCents,
+          `kiosk-checkin-${id}-${Date.now()}`
+        );
+
+        if (paymentIntent.status !== 'succeeded') {
+          throw new BadRequestException(`Payment failed: ${paymentIntent.status}. Please contact staff for assistance.`);
+        }
+
+        paymentIntentId = paymentIntent.id;
+
+        // Record the payment
+        await this.prisma.payment.create({
+          data: {
+            campgroundId: reservation.campgroundId,
+            reservationId: id,
+            amountCents: balanceDue,
+            method: 'card',
+            direction: 'charge',
+            note: `Kiosk check-in balance charge. Upsell: $${(upsellTotalCents / 100).toFixed(2)}${isOverride ? ' (override)' : ''}`,
+            stripePaymentIntentId: paymentIntent.id,
+            stripeChargeId: paymentIntent.latest_charge as string | undefined,
+            applicationFeeCents,
+            capturedAt: new Date()
+          }
+        });
+
+        console.log(`[Kiosk] Payment successful: ${paymentIntent.id}`);
+      } catch (error: any) {
+        console.error(`[Kiosk] Payment failed for ${id}:`, error.message);
+        throw new BadRequestException(
+          `Payment processing failed: ${error.message}. Please contact staff for assistance.`
+        );
+      }
+    }
 
     try {
       const now = new Date();
       const overrideNote = isOverride
         ? `[Override ${now.toISOString()}] ${options?.overrideReason ?? "No reason provided"}`
         : null;
-      const kioskNote = `[Kiosk] Checked in${isOverride ? " (override)" : ""}. Upsell: $${(upsellTotalCents / 100).toFixed(2)}. Charged card on file.`;
+      const kioskNote = `[Kiosk] Checked in${isOverride ? " (override)" : ""}. Upsell: $${(upsellTotalCents / 100).toFixed(2)}. ${balanceDue > 0 ? `Charged card on file (${paymentIntentId}).` : 'No balance due.'}`;
       const notes = [reservation.notes, overrideNote, kioskNote].filter(Boolean).join("\n");
 
       const updated = await this.prisma.reservation.update({
@@ -2340,7 +2432,7 @@ export class ReservationsService {
           checkInAt: now,
           feesAmount: { increment: upsellTotalCents },
           totalAmount: newTotal,
-          paidAmount: newTotal, // Assume full payment successful
+          paidAmount: newTotal,
           // Add a note about the upsell/kiosk check-in
           notes
         }

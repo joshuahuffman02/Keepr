@@ -3,6 +3,7 @@
 import { useEffect, useState, useMemo } from "react";
 import { DashboardShell } from "@/components/ui/layout/DashboardShell";
 import { StaffNavigation } from "@/components/staff/StaffNavigation";
+import { useWhoami } from "@/hooks/use-whoami";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Download,
@@ -100,6 +101,7 @@ const DATE_PRESETS = [
 ];
 
 export default function PayrollExportPage({ params }: { params: { campgroundId: string } }) {
+  const { data: whoami } = useWhoami();
   const [provider, setProvider] = useState<Provider>("generic");
   const [periodStart, setPeriodStart] = useState("");
   const [periodEnd, setPeriodEnd] = useState("");
@@ -112,6 +114,8 @@ export default function PayrollExportPage({ params }: { params: { campgroundId: 
   const [error, setError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<"export" | "history">("export");
+
+  const currentUserId = whoami?.user?.id;
 
   // Set default date range
   useEffect(() => {
@@ -185,6 +189,10 @@ export default function PayrollExportPage({ params }: { params: { campgroundId: 
       setError("Please select a date range");
       return;
     }
+    if (!currentUserId) {
+      setError("You must be logged in to generate payroll exports");
+      return;
+    }
     setExporting(true);
     setError(null);
 
@@ -196,7 +204,7 @@ export default function PayrollExportPage({ params }: { params: { campgroundId: 
           campgroundId: params.campgroundId,
           periodStart,
           periodEnd,
-          requestedById: "current-user", // TODO: Get from auth context
+          requestedById: currentUserId,
           provider,
           format: "csv",
         }),

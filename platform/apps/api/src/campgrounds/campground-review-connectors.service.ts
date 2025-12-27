@@ -68,11 +68,86 @@ export class CampgroundReviewConnectors {
     }
   }
 
+  /**
+   * Fetch reviews from RV Life API
+   *
+   * TODO: Complete RV Life API integration
+   *
+   * Required environment variables:
+   * - RV_LIFE_API_KEY: Your RV Life API key
+   * - RV_LIFE_API_URL: Base URL (default: https://api.rvlife.com/v1)
+   *
+   * API Documentation: Contact RV Life for API access
+   * Rate Limits: Unknown - implement rate limiting when credentials are obtained
+   *
+   * Integration steps:
+   * 1. Obtain API credentials from RV Life
+   * 2. Set environment variables
+   * 3. Implement authentication (likely Bearer token)
+   * 4. Map RV Life park IDs to campground records
+   * 5. Parse response format (structure unknown until API access)
+   * 6. Handle errors and rate limiting
+   *
+   * Example implementation structure:
+   * const apiKey = process.env.RV_LIFE_API_KEY;
+   * const baseUrl = process.env.RV_LIFE_API_URL || 'https://api.rvlife.com/v1';
+   * const url = `${baseUrl}/campgrounds/${parkId}/reviews`;
+   * const response = await fetch(url, {
+   *   headers: { 'Authorization': `Bearer ${apiKey}` }
+   * });
+   */
   async fetchRvLifeReviews(parkId?: string): Promise<ExternalReview | null> {
     if (!parkId) return null;
-    // Placeholder: actual API call not implemented
-    this.logger.warn(`RV Life connector stubbed; no fetch performed for parkId=${parkId}`);
-    return { source: "rv_life", rating: null, count: null, reviews: [] };
+
+    const apiKey = process.env.RV_LIFE_API_KEY;
+
+    // Return empty if API not configured
+    if (!apiKey) {
+      this.logger.debug(`RV Life API not configured (missing RV_LIFE_API_KEY) for parkId=${parkId}`);
+      return { source: "rv_life", rating: null, count: null, reviews: [] };
+    }
+
+    // TODO: Implement actual API call once credentials and documentation are available
+    this.logger.warn(`RV Life API integration pending - credentials configured but implementation incomplete for parkId=${parkId}`);
+
+    try {
+      // Placeholder for future implementation:
+      // const baseUrl = process.env.RV_LIFE_API_URL || 'https://api.rvlife.com/v1';
+      // const url = `${baseUrl}/campgrounds/${encodeURIComponent(parkId)}/reviews`;
+      // const response = await this.fetchWithTimeout(url);
+      // if (!response.ok) {
+      //   this.logger.warn(`RV Life API fetch failed status=${response.status}`);
+      //   return { source: "rv_life", rating: null, count: null, reviews: [] };
+      // }
+      // const data = await response.json();
+      // return this.parseRvLifeResponse(data);
+
+      return { source: "rv_life", rating: null, count: null, reviews: [] };
+    } catch (err: any) {
+      this.logger.error(`RV Life API error: ${err?.message || err}`);
+      return { source: "rv_life", rating: null, count: null, reviews: [] };
+    }
+  }
+
+  /**
+   * Parse RV Life API response
+   * TODO: Implement based on actual API response format
+   */
+  private parseRvLifeResponse(data: any): ExternalReview {
+    // This will need to be implemented based on RV Life's actual response format
+    return {
+      source: "rv_life",
+      rating: data?.rating ?? null,
+      count: data?.review_count ?? null,
+      reviews: Array.isArray(data?.reviews)
+        ? data.reviews.slice(0, 10).map((r: any) => ({
+            author: r.author_name,
+            rating: r.rating,
+            text: r.review_text,
+            date: r.created_at,
+          }))
+        : [],
+    };
   }
 
   async collectExternalReviews(opts: { googlePlaceId?: string; rvLifeId?: string }) {

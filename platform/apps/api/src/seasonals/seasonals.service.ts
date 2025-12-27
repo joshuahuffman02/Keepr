@@ -76,11 +76,26 @@ export interface SeasonalDashboardStats {
   paymentsPaidAhead: number;
   totalMonthlyRevenue: number;
   averageTenure: number;
+  longestTenure: number;
+  waitlistCount: number;
+  renewalsByIntent: {
+    committed: number;
+    likely: number;
+    undecided: number;
+    not_renewing: number;
+  };
+  milestones: Array<{
+    guestId: string;
+    guestName: string;
+    years: number;
+    type: "5year" | "10year" | "15year" | "20year";
+  }>;
   needsAttention: {
     pastDuePayments: number;
     expiringContracts: number;
     expiredInsurance: number;
     pendingRenewals: number;
+    unsignedContracts: number;
   };
 }
 
@@ -338,10 +353,11 @@ export class SeasonalsService {
     const currentYear = seasonYear || new Date().getFullYear();
     const now = new Date();
 
-    // Get all seasonals
+    // Get all seasonals with guest info for milestones
     const seasonals = await this.prisma.seasonalGuest.findMany({
       where: { campgroundId },
       include: {
+        guest: true,
         payments: {
           where: { seasonYear: currentYear },
         },
@@ -380,11 +396,16 @@ export class SeasonalsService {
       }
     }
 
-    // Calculate renewal stats
-    const renewalCommitted = seasonals.filter((s) => s.renewalIntent === RenewalIntent.committed).length;
-    const renewalLikely = seasonals.filter((s) => s.renewalIntent === RenewalIntent.likely).length;
+    // Calculate renewal stats by intent
+    const renewalsByIntent = {
+      committed: seasonals.filter((s) => s.renewalIntent === RenewalIntent.committed).length,
+      likely: seasonals.filter((s) => s.renewalIntent === RenewalIntent.likely).length,
+      undecided: seasonals.filter((s) => s.renewalIntent === RenewalIntent.undecided || s.renewalIntent === null).length,
+      not_renewing: seasonals.filter((s) => s.renewalIntent === RenewalIntent.not_renewing).length,
+    };
+
     const renewalRate = activeSeasonals.length > 0
-      ? ((renewalCommitted + renewalLikely * 0.7) / activeSeasonals.length) * 100
+      ? ((renewalsByIntent.committed + renewalsByIntent.likely * 0.7) / activeSeasonals.length) * 100
       : 0;
 
     // Get contract stats (from signature requests)
@@ -399,6 +420,9 @@ export class SeasonalsService {
     const contractsSigned = contracts.filter((c) =>
       ["signed", "signed_paper", "waived"].includes(c.status)
     ).length;
+
+    // Count unsigned contracts (sent but not signed, or not sent at all)
+    const unsignedContracts = activeSeasonals.length - contractsSigned;
 
     // Calculate needs attention
     const pastDuePayments = await this.prisma.seasonalPayment.count({
@@ -436,9 +460,48 @@ export class SeasonalsService {
       },
     });
 
-    // Calculate average tenure
+    // Calculate tenure stats
     const totalTenure = seasonals.reduce((sum, s) => sum + s.totalSeasons, 0);
     const averageTenure = seasonals.length > 0 ? totalTenure / seasonals.length : 0;
+    const longestTenure = seasonals.length > 0
+      ? Math.max(...seasonals.map((s) => s.totalSeasons))
+      : 0;
+
+    // Find milestone guests (5, 10, 15, 20 years) - only active
+    const milestoneYears = [5, 10, 15, 20];
+    const milestones: SeasonalDashboardStats["milestones"] = [];
+
+    for (const seasonal of activeSeasonals) {
+      if (milestoneYears.includes(seasonal.totalSeasons)) {
+        const guestName = seasonal.guest
+          ? `${seasonal.guest.primaryFirstName} ${seasonal.guest.primaryLastName}`
+          : "Unknown Guest";
+
+        let type: "5year" | "10year" | "15year" | "20year";
+        if (seasonal.totalSeasons >= 20) type = "20year";
+        else if (seasonal.totalSeasons >= 15) type = "15year";
+        else if (seasonal.totalSeasons >= 10) type = "10year";
+        else type = "5year";
+
+        milestones.push({
+          guestId: seasonal.id,
+          guestName,
+          years: seasonal.totalSeasons,
+          type,
+        });
+      }
+    }
+
+    // Sort milestones by years descending
+    milestones.sort((a, b) => b.years - a.years);
+
+    // Get waitlist count (seasonals with waitlist status)
+    const waitlistCount = await this.prisma.seasonalGuest.count({
+      where: {
+        campgroundId,
+        status: SeasonalStatus.waitlist,
+      },
+    });
 
     return {
       totalSeasonals: seasonals.length,
@@ -451,11 +514,16 @@ export class SeasonalsService {
       paymentsPaidAhead,
       totalMonthlyRevenue: Math.round(totalMonthlyRevenue),
       averageTenure: Math.round(averageTenure * 10) / 10,
+      longestTenure,
+      waitlistCount,
+      renewalsByIntent,
+      milestones,
       needsAttention: {
         pastDuePayments,
         expiringContracts,
         expiredInsurance,
         pendingRenewals,
+        unsignedContracts: Math.max(0, unsignedContracts),
       },
     };
   }

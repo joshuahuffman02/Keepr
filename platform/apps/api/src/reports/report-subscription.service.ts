@@ -229,49 +229,316 @@ export class ReportSubscriptionService {
         }
 
         // Generate data based on report type
-        // For now, return placeholder data - in production, you'd query real metrics
         switch (type) {
             case "occupancy_summary":
-                return {
-                    summary: "Your campground occupancy performance for the period.",
-                    metrics: [
-                        { label: "Average Occupancy", value: "75%" },
-                        { label: "Peak Occupancy", value: "92%" },
-                        { label: "Total Nights Sold", value: "156" },
-                    ],
-                };
+                return await this.generateOccupancyReport(campgroundId, startDate, now);
             case "revenue_summary":
-                return {
-                    summary: "Revenue breakdown for the reporting period.",
-                    metrics: [
-                        { label: "Total Revenue", value: "$12,450" },
-                        { label: "Reservation Revenue", value: "$10,200" },
-                        { label: "Fees & Add-ons", value: "$2,250" },
-                    ],
-                };
+                return await this.generateRevenueReport(campgroundId, startDate, now);
             case "arrivals_departures":
-                return {
-                    summary: "Arrivals and departures summary.",
-                    metrics: [
-                        { label: "Arrivals", value: "23" },
-                        { label: "Departures", value: "19" },
-                        { label: "Current Guests", value: "45" },
-                    ],
-                };
+                return await this.generateArrivalsReport(campgroundId, startDate, now);
             case "maintenance_summary":
-                return {
-                    summary: "Maintenance activity for the period.",
-                    metrics: [
-                        { label: "Open Tickets", value: "3" },
-                        { label: "Resolved", value: "12" },
-                        { label: "Avg Resolution Time", value: "4.2 hours" },
-                    ],
-                };
+                return await this.generateMaintenanceReport(campgroundId, startDate, now);
+            case "reservation_activity":
+                return await this.generateReservationActivityReport(campgroundId, startDate, now);
+            case "guest_activity":
+                return await this.generateGuestActivityReport(campgroundId, startDate, now);
+            case "financial_summary":
+                return await this.generateFinancialReport(campgroundId, startDate, now);
             default:
                 return {
                     summary: `Your ${this.getReportDisplayName(type)} for the period.`,
                     metrics: [],
                 };
         }
+    }
+
+    private async generateOccupancyReport(campgroundId: string | null, startDate: Date, endDate: Date) {
+        if (!campgroundId) {
+            return { summary: "No campground specified.", metrics: [] };
+        }
+
+        // Get total sites
+        const totalSites = await this.prisma.site.count({ where: { campgroundId } });
+
+        // Get reservations in period
+        const reservations = await this.prisma.reservation.findMany({
+            where: {
+                campgroundId,
+                status: { in: ["confirmed", "checked_in", "checked_out"] },
+                OR: [
+                    { startDate: { gte: startDate, lte: endDate } },
+                    { endDate: { gte: startDate, lte: endDate } },
+                    { AND: [{ startDate: { lte: startDate } }, { endDate: { gte: endDate } }] },
+                ],
+            },
+            select: { startDate: true, endDate: true },
+        });
+
+        // Calculate occupied nights
+        const days = Math.ceil((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
+        let occupiedNights = 0;
+
+        for (const res of reservations) {
+            const resStart = new Date(res.startDate).getTime();
+            const resEnd = new Date(res.endDate).getTime();
+            const periodStart = startDate.getTime();
+            const periodEnd = endDate.getTime();
+
+            const overlapStart = Math.max(resStart, periodStart);
+            const overlapEnd = Math.min(resEnd, periodEnd);
+            const overlapDays = Math.max(0, Math.ceil((overlapEnd - overlapStart) / (1000 * 60 * 60 * 24)));
+
+            occupiedNights += overlapDays;
+        }
+
+        const totalAvailableNights = totalSites * days;
+        const avgOccupancy = totalAvailableNights > 0 ? (occupiedNights / totalAvailableNights) * 100 : 0;
+
+        return {
+            summary: "Your campground occupancy performance for the period.",
+            metrics: [
+                { label: "Average Occupancy", value: `${avgOccupancy.toFixed(1)}%` },
+                { label: "Total Sites", value: totalSites.toString() },
+                { label: "Occupied Nights", value: occupiedNights.toString() },
+                { label: "Available Nights", value: totalAvailableNights.toString() },
+            ],
+        };
+    }
+
+    private async generateRevenueReport(campgroundId: string | null, startDate: Date, endDate: Date) {
+        if (!campgroundId) {
+            return { summary: "No campground specified.", metrics: [] };
+        }
+
+        const ledgerEntries = await this.prisma.ledgerEntry.findMany({
+            where: {
+                campgroundId,
+                createdAt: { gte: startDate, lte: endDate },
+            },
+            select: { amountCents: true, glCode: true, direction: true },
+        });
+
+        let totalRevenue = 0;
+        let reservationRevenue = 0;
+        let addonRevenue = 0;
+        let storeRevenue = 0;
+
+        for (const entry of ledgerEntries) {
+            const amount = entry.direction === "credit" ? entry.amountCents : -entry.amountCents;
+            totalRevenue += amount;
+
+            if (entry.glCode === "RESERVATION") reservationRevenue += amount;
+            else if (entry.glCode === "ADDON") addonRevenue += amount;
+            else if (entry.glCode === "STORE") storeRevenue += amount;
+        }
+
+        return {
+            summary: "Revenue breakdown for the reporting period.",
+            metrics: [
+                { label: "Total Revenue", value: `$${(totalRevenue / 100).toFixed(2)}` },
+                { label: "Reservation Revenue", value: `$${(reservationRevenue / 100).toFixed(2)}` },
+                { label: "Add-on Revenue", value: `$${(addonRevenue / 100).toFixed(2)}` },
+                { label: "Store Revenue", value: `$${(storeRevenue / 100).toFixed(2)}` },
+            ],
+        };
+    }
+
+    private async generateArrivalsReport(campgroundId: string | null, startDate: Date, endDate: Date) {
+        if (!campgroundId) {
+            return { summary: "No campground specified.", metrics: [] };
+        }
+
+        const [arrivals, departures, current] = await Promise.all([
+            this.prisma.reservation.count({
+                where: {
+                    campgroundId,
+                    startDate: { gte: startDate, lte: endDate },
+                    status: { in: ["confirmed", "checked_in", "checked_out"] },
+                },
+            }),
+            this.prisma.reservation.count({
+                where: {
+                    campgroundId,
+                    endDate: { gte: startDate, lte: endDate },
+                    status: { in: ["checked_out"] },
+                },
+            }),
+            this.prisma.reservation.count({
+                where: {
+                    campgroundId,
+                    status: "checked_in",
+                },
+            }),
+        ]);
+
+        return {
+            summary: "Arrivals and departures summary.",
+            metrics: [
+                { label: "Arrivals", value: arrivals.toString() },
+                { label: "Departures", value: departures.toString() },
+                { label: "Current Guests", value: current.toString() },
+            ],
+        };
+    }
+
+    private async generateMaintenanceReport(campgroundId: string | null, startDate: Date, endDate: Date) {
+        if (!campgroundId) {
+            return { summary: "No campground specified.", metrics: [] };
+        }
+
+        const [open, resolved, all] = await Promise.all([
+            this.prisma.operationalTask.count({
+                where: {
+                    campgroundId,
+                    type: "maintenance",
+                    status: { in: ["pending", "in_progress"] },
+                },
+            }),
+            this.prisma.operationalTask.count({
+                where: {
+                    campgroundId,
+                    type: "maintenance",
+                    status: "completed",
+                    updatedAt: { gte: startDate, lte: endDate },
+                },
+            }),
+            this.prisma.operationalTask.findMany({
+                where: {
+                    campgroundId,
+                    type: "maintenance",
+                    status: "completed",
+                    updatedAt: { gte: startDate, lte: endDate },
+                    createdAt: { not: null },
+                },
+                select: { createdAt: true, updatedAt: true },
+            }),
+        ]);
+
+        // Calculate average resolution time
+        let totalMinutes = 0;
+        for (const task of all) {
+            const created = new Date(task.createdAt).getTime();
+            const updated = new Date(task.updatedAt).getTime();
+            totalMinutes += (updated - created) / (1000 * 60);
+        }
+        const avgHours = all.length > 0 ? (totalMinutes / all.length / 60).toFixed(1) : "N/A";
+
+        return {
+            summary: "Maintenance activity for the period.",
+            metrics: [
+                { label: "Open Tickets", value: open.toString() },
+                { label: "Resolved", value: resolved.toString() },
+                { label: "Avg Resolution Time", value: avgHours === "N/A" ? avgHours : `${avgHours} hours` },
+            ],
+        };
+    }
+
+    private async generateReservationActivityReport(campgroundId: string | null, startDate: Date, endDate: Date) {
+        if (!campgroundId) {
+            return { summary: "No campground specified.", metrics: [] };
+        }
+
+        const [created, cancelled, modified] = await Promise.all([
+            this.prisma.reservation.count({
+                where: {
+                    campgroundId,
+                    createdAt: { gte: startDate, lte: endDate },
+                },
+            }),
+            this.prisma.reservation.count({
+                where: {
+                    campgroundId,
+                    status: "cancelled",
+                    updatedAt: { gte: startDate, lte: endDate },
+                },
+            }),
+            this.prisma.reservation.count({
+                where: {
+                    campgroundId,
+                    updatedAt: { gte: startDate, lte: endDate, gt: startDate },
+                    status: { not: "cancelled" },
+                },
+            }),
+        ]);
+
+        return {
+            summary: "Reservation activity for the period.",
+            metrics: [
+                { label: "New Reservations", value: created.toString() },
+                { label: "Cancellations", value: cancelled.toString() },
+                { label: "Modifications", value: modified.toString() },
+            ],
+        };
+    }
+
+    private async generateGuestActivityReport(campgroundId: string | null, startDate: Date, endDate: Date) {
+        if (!campgroundId) {
+            return { summary: "No campground specified.", metrics: [] };
+        }
+
+        const [newGuests, returningGuests] = await Promise.all([
+            this.prisma.guest.count({
+                where: {
+                    createdAt: { gte: startDate, lte: endDate },
+                    reservations: { some: { campgroundId } },
+                },
+            }),
+            this.prisma.guest.count({
+                where: {
+                    createdAt: { lt: startDate },
+                    reservations: {
+                        some: {
+                            campgroundId,
+                            createdAt: { gte: startDate, lte: endDate },
+                        },
+                    },
+                },
+            }),
+        ]);
+
+        return {
+            summary: "Guest activity for the period.",
+            metrics: [
+                { label: "New Guests", value: newGuests.toString() },
+                { label: "Returning Guests", value: returningGuests.toString() },
+                { label: "Total Active Guests", value: (newGuests + returningGuests).toString() },
+            ],
+        };
+    }
+
+    private async generateFinancialReport(campgroundId: string | null, startDate: Date, endDate: Date) {
+        if (!campgroundId) {
+            return { summary: "No campground specified.", metrics: [] };
+        }
+
+        const ledgerEntries = await this.prisma.ledgerEntry.findMany({
+            where: {
+                campgroundId,
+                createdAt: { gte: startDate, lte: endDate },
+            },
+            select: { amountCents: true, direction: true },
+        });
+
+        let credits = 0;
+        let debits = 0;
+
+        for (const entry of ledgerEntries) {
+            if (entry.direction === "credit") {
+                credits += entry.amountCents;
+            } else {
+                debits += entry.amountCents;
+            }
+        }
+
+        const netIncome = credits - debits;
+
+        return {
+            summary: "Financial summary for the period.",
+            metrics: [
+                { label: "Total Credits", value: `$${(credits / 100).toFixed(2)}` },
+                { label: "Total Debits", value: `$${(debits / 100).toFixed(2)}` },
+                { label: "Net Income", value: `$${(netIncome / 100).toFixed(2)}` },
+            ],
+        };
     }
 }

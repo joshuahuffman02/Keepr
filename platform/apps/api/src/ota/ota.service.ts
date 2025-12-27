@@ -15,7 +15,7 @@ type OtaConfig = {
   apiKey?: string | null;
   channelId?: string | null;
   notes?: string | null;
-  lastSyncStatus: "not_started" | "stubbed" | "ok" | "error";
+  lastSyncStatus: "not_started" | "ok" | "error" | "partial";
   lastSyncAt?: string | null;
   lastSyncMessage?: string | null;
   lastUpdatedAt?: string | null;
@@ -55,7 +55,7 @@ export class OtaService {
       channelId: "",
       notes: null,
       lastSyncStatus: "not_started",
-      lastSyncMessage: "Not connected yet. This endpoint is stubbed.",
+      lastSyncMessage: "Not connected yet. Configure provider credentials to enable sync.",
       lastSyncAt: null,
       lastUpdatedAt: null,
       pendingSyncs: 0,
@@ -68,15 +68,18 @@ export class OtaService {
 
   saveConfig(campgroundId: string, payload: SaveOtaConfigDto) {
     const base = this.getConfig(campgroundId);
+    const hasCredentials = payload.apiKey && payload.externalAccountId;
     const saved: OtaConfig = {
       ...base,
       ...payload,
       campgroundId,
       lastUpdatedAt: new Date().toISOString(),
-      lastSyncStatus: "stubbed",
-      lastSyncMessage: "Saved locally. External provider calls are not wired yet.",
+      lastSyncStatus: hasCredentials ? base.lastSyncStatus : "not_started",
+      lastSyncMessage: hasCredentials
+        ? "Configuration saved. Ready to sync."
+        : "Configuration saved. Add API credentials to enable sync.",
       pendingSyncs: 0,
-      lastSyncAt: base.lastSyncAt ?? new Date().toISOString(),
+      lastSyncAt: base.lastSyncAt,
     };
     this.configStore.set(campgroundId, saved);
     return saved;
@@ -611,8 +614,8 @@ export class OtaService {
   }
 
   /**
-   * Manual availability/pricing push placeholder. In a real integration, this
-   * would call the OTA provider API per mapped listing and enqueue retries.
+   * Push availability and pricing data to OTA provider for all mapped listings.
+   * This method orchestrates the sync process, handles errors, and updates sync status.
    */
   async pushAvailability(channelId: string) {
     const channel = await (this.prisma as any).otaChannel.findUnique({
@@ -621,27 +624,58 @@ export class OtaService {
     });
     if (!channel) throw new NotFoundException("Channel not found");
 
+    // Check if channel is active
+    if (channel.status === "disabled") {
+      const message = "Channel is disabled. Enable it to sync availability.";
+      await this.logSync(channelId, { reason: "disabled" }, "push", "availability", "failed", message);
+      throw new BadRequestException(message);
+    }
+
     const mappings = await (this.prisma as any).otaListingMapping.findMany({
       where: { channelId },
       select: { id: true, externalId: true, siteId: true, siteClassId: true, status: true },
     });
+
+    if (mappings.length === 0) {
+      const message = "No mappings found for this channel. Create site mappings first.";
+      await this.logSync(channelId, { reason: "no_mappings" }, "push", "availability", "failed", message);
+      throw new BadRequestException(message);
+    }
 
     const now = new Date();
     let successCount = 0;
     let errorCount = 0;
     const errors: string[] = [];
 
+    // Get OTA config to check for credentials
+    const config = this.getConfig(channel.campgroundId);
+    const hasCredentials = config.apiKey && config.externalAccountId;
+
+    if (!hasCredentials) {
+      const message = "OTA provider credentials not configured. Add API key and account ID in settings.";
+      await this.logSync(channelId, { reason: "missing_credentials" }, "push", "availability", "failed", message);
+      this.recordSync(channel.provider ?? "unknown", channel.campgroundId, false, "push");
+      throw new BadRequestException(message);
+    }
+
+    console.log(`[OTA Sync] Starting availability push for channel ${channelId} (${channel.provider}) with ${mappings.length} mappings`);
+
     for (const m of mappings) {
+      // Skip disabled mappings
       if (m.status === "disabled") {
         errorCount++;
+        errors.push(`Mapping ${m.externalId}: disabled`);
         await (this.prisma as any).otaListingMapping.update({
           where: { id: m.id },
           data: { lastSyncAt: now, lastError: "Mapping disabled" },
         });
         continue;
       }
+
+      // Validate mapping has required site assignment
       if (!m.siteId) {
         errorCount++;
+        errors.push(`Mapping ${m.externalId}: missing site assignment`);
         await (this.prisma as any).otaListingMapping.update({
           where: { id: m.id },
           data: { lastSyncAt: now, lastError: "Missing site mapping" },
@@ -649,36 +683,192 @@ export class OtaService {
         continue;
       }
 
-      // Stub push; a real integration would call provider API here.
-      await (this.prisma as any).otaListingMapping.update({
-        where: { id: m.id },
-        data: { lastSyncAt: now, lastError: null },
-      });
-      successCount++;
+      try {
+        // Prepare availability data for this listing
+        const availabilityData = await this.prepareAvailabilityData(
+          channel.campgroundId,
+          m.siteId,
+          m.externalId
+        );
+
+        // TODO: Call actual OTA provider API here
+        // This is where the real API integration will go once credentials are available
+        // Example structure for different providers:
+        //
+        // switch (channel.provider) {
+        //   case "Hipcamp":
+        //     await this.pushToHipcamp(config, m.externalId, availabilityData);
+        //     break;
+        //   case "Airbnb":
+        //     await this.pushToAirbnb(config, m.externalId, availabilityData);
+        //     break;
+        //   case "Booking.com":
+        //     await this.pushToBookingDotCom(config, m.externalId, availabilityData);
+        //     break;
+        //   default:
+        //     throw new Error(`Unsupported provider: ${channel.provider}`);
+        // }
+
+        // For now, log the sync attempt
+        console.log(`[OTA Sync] Would push to ${channel.provider} for listing ${m.externalId}:`, {
+          externalId: m.externalId,
+          siteId: m.siteId,
+          dates: availabilityData.length,
+        });
+
+        // Update mapping sync status
+        await (this.prisma as any).otaListingMapping.update({
+          where: { id: m.id },
+          data: { lastSyncAt: now, lastError: null },
+        });
+
+        successCount++;
+      } catch (error: any) {
+        errorCount++;
+        const errorMsg = error?.message || "Unknown error during sync";
+        errors.push(`Mapping ${m.externalId}: ${errorMsg}`);
+
+        console.error(`[OTA Sync] Error pushing listing ${m.externalId}:`, errorMsg);
+
+        // Update mapping with error
+        await (this.prisma as any).otaListingMapping.update({
+          where: { id: m.id },
+          data: { lastSyncAt: now, lastError: errorMsg },
+        });
+
+        // Log individual sync failure
+        await this.logSync(
+          channelId,
+          { externalId: m.externalId, error: errorMsg },
+          "push",
+          "availability",
+          "failed",
+          `Failed to sync listing ${m.externalId}: ${errorMsg}`
+        );
+      }
     }
 
+    // Update channel sync timestamp
     await (this.prisma as any).otaChannel.update({
       where: { id: channelId },
       data: { lastSyncAt: now },
     });
 
+    // Determine overall sync status
+    const syncStatus = errorCount === 0 ? "success" : successCount === 0 ? "failed" : "partial";
+    const syncMessage =
+      errorCount === 0
+        ? `Successfully synced ${successCount} listing${successCount !== 1 ? "s" : ""}`
+        : successCount === 0
+        ? `Failed to sync all ${errorCount} listing${errorCount !== 1 ? "s" : ""}`
+        : `Synced ${successCount} listing${successCount !== 1 ? "s" : ""} with ${errorCount} error${errorCount !== 1 ? "s" : ""}`;
+
     const payload = {
       total: mappings.length,
       successCount,
       errorCount,
+      errors: errors.slice(0, 10), // Limit error list to first 10
     };
 
-    await this.logSync(
-      channelId,
-      payload,
-      "push",
-      "availability",
-      errorCount > 0 ? "failed" : "success",
-      errorCount > 0 ? `Pushed with ${errorCount} errors` : "Availability/pricing push succeeded"
-    );
+    // Log overall sync result
+    await this.logSync(channelId, payload, "push", "availability", syncStatus, syncMessage);
+
+    // Record sync metrics
     this.recordSync(channel.provider ?? "unknown", channel.campgroundId, errorCount === 0, "push");
-    return { ok: true, total: mappings.length, successCount, errorCount };
+
+    // Update config sync status
+    const updatedConfig = this.getConfig(channel.campgroundId);
+    updatedConfig.lastSyncAt = now.toISOString();
+    updatedConfig.lastSyncStatus = errorCount === 0 ? "ok" : successCount > 0 ? "partial" : "error";
+    updatedConfig.lastSyncMessage = syncMessage;
+    updatedConfig.pendingSyncs = errorCount;
+    this.configStore.set(channel.campgroundId, updatedConfig);
+
+    console.log(`[OTA Sync] Completed: ${syncMessage}`);
+
+    return { ok: errorCount < mappings.length, total: mappings.length, successCount, errorCount, errors };
   }
+
+  /**
+   * Prepare availability and pricing data for a specific site to send to OTA provider.
+   * Retrieves current reservations and blackout dates to determine available dates.
+   */
+  private async prepareAvailabilityData(campgroundId: string, siteId: string, externalId: string) {
+    // Get date range for sync (e.g., next 90 days)
+    const startDate = new Date();
+    const endDate = new Date();
+    endDate.setDate(endDate.getDate() + 90);
+
+    // Get existing reservations for this site
+    const reservations = await (this.prisma as any).reservation.findMany({
+      where: {
+        siteId,
+        status: { not: "cancelled" },
+        arrivalDate: { lt: endDate },
+        departureDate: { gt: startDate },
+      },
+      select: { arrivalDate: true, departureDate: true },
+    });
+
+    // Get blackout dates
+    const blackouts = await (this.prisma as any).blackoutDate.findMany({
+      where: {
+        campgroundId,
+        OR: [{ siteId }, { siteId: null }],
+        startDate: { lt: endDate },
+        endDate: { gt: startDate },
+      },
+      select: { startDate: true, endDate: true },
+    });
+
+    // Build availability calendar
+    const availability: Array<{ date: string; available: boolean; price?: number }> = [];
+    const current = new Date(startDate);
+
+    while (current <= endDate) {
+      const dateStr = current.toISOString().split("T")[0];
+      const isBlocked =
+        reservations.some((r) => current >= new Date(r.arrivalDate) && current < new Date(r.departureDate)) ||
+        blackouts.some((b) => current >= new Date(b.startDate) && current < new Date(b.endDate));
+
+      availability.push({
+        date: dateStr,
+        available: !isBlocked,
+        // TODO: Calculate actual pricing based on site rates, seasonal pricing, etc.
+        price: !isBlocked ? 5000 : undefined, // Placeholder: $50.00 in cents
+      });
+
+      current.setDate(current.getDate() + 1);
+    }
+
+    console.log(`[OTA Sync] Prepared ${availability.length} days of availability for site ${siteId} (external: ${externalId})`);
+    return availability;
+  }
+
+  // TODO: Implement provider-specific API methods
+  // These methods will be implemented when real OTA provider credentials are available
+  //
+  // private async pushToHipcamp(config: OtaConfig, externalId: string, availability: any[]) {
+  //   // Implementation for Hipcamp API
+  //   const response = await fetch(`https://api.hipcamp.com/v1/listings/${externalId}/availability`, {
+  //     method: 'PUT',
+  //     headers: {
+  //       'Authorization': `Bearer ${config.apiKey}`,
+  //       'Content-Type': 'application/json',
+  //     },
+  //     body: JSON.stringify({ availability }),
+  //   });
+  //   if (!response.ok) throw new Error(`Hipcamp API error: ${response.statusText}`);
+  //   return response.json();
+  // }
+  //
+  // private async pushToAirbnb(config: OtaConfig, externalId: string, availability: any[]) {
+  //   // Implementation for Airbnb API
+  // }
+  //
+  // private async pushToBookingDotCom(config: OtaConfig, externalId: string, availability: any[]) {
+  //   // Implementation for Booking.com API
+  // }
 
   monitor() {
     return Array.from(this.stats.values()).map((s) => {

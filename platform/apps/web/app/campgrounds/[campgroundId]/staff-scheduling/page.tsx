@@ -345,12 +345,17 @@ export default function StaffSchedulingPage({ params }: { params: { campgroundId
   };
 
   const approveShift = async (id: string) => {
+    if (!currentUserId) {
+      setError("You must be logged in to approve shifts");
+      return;
+    }
+
     setProcessing((prev) => new Set([...prev, id]));
     try {
       await fetch(`/api/staff/shifts/${id}/approve`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ approverId: "manager-placeholder" })
+        body: JSON.stringify({ approverId: currentUserId })
       });
       showSuccess("Shift approved!");
       await load();
@@ -364,12 +369,17 @@ export default function StaffSchedulingPage({ params }: { params: { campgroundId
   };
 
   const rejectShift = async (id: string) => {
+    if (!currentUserId) {
+      setError("You must be logged in to reject shifts");
+      return;
+    }
+
     setProcessing((prev) => new Set([...prev, id]));
     try {
       await fetch(`/api/staff/shifts/${id}/reject`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ approverId: "manager-placeholder" })
+        body: JSON.stringify({ approverId: currentUserId })
       });
       showSuccess("Shift rejected");
       await load();

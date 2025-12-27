@@ -598,7 +598,7 @@ export default function GuestTrendsPage() {
         )}
 
         {/* Stay Length Trends */}
-        {trendsData.monthlyTrends.some(m => m.avgStayLength) && (
+        {trendsData.monthlyTrends.some(m => m.avgStay) && (
         <Card className="bg-slate-800/50 border-slate-700">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
@@ -608,7 +608,7 @@ export default function GuestTrendsPage() {
             <CardDescription>How long guests are staying each month</CardDescription>
           </CardHeader>
           <CardContent>
-            <SimpleAreaChart data={trendsData.monthlyTrends} dataKey="avgStayLength" color="bg-amber-600" />
+            <SimpleAreaChart data={trendsData.monthlyTrends} dataKey="avgStay" color="bg-amber-600" />
             <div className="flex justify-between text-xs text-slate-500 mt-2">
               <span>{trendsData.monthlyTrends[0]?.month}</span>
               <span>{trendsData.monthlyTrends[trendsData.monthlyTrends.length - 1]?.month}</span>
@@ -616,19 +616,19 @@ export default function GuestTrendsPage() {
             <div className="grid grid-cols-3 gap-4 mt-4 pt-4 border-t border-slate-700">
               <div className="text-center">
                 <div className="text-lg font-bold text-white">
-                  {Math.min(...trendsData.monthlyTrends.map(m => m.avgStayLength || 0)).toFixed(1)}
+                  {Math.min(...trendsData.monthlyTrends.map(m => m.avgStay || 0)).toFixed(1)}
                 </div>
                 <div className="text-xs text-slate-400">Min (nights)</div>
               </div>
               <div className="text-center">
                 <div className="text-lg font-bold text-white">
-                  {(trendsData.monthlyTrends.reduce((sum, m) => sum + (m.avgStayLength || 0), 0) / trendsData.monthlyTrends.length).toFixed(1)}
+                  {(trendsData.monthlyTrends.reduce((sum, m) => sum + (m.avgStay || 0), 0) / trendsData.monthlyTrends.length).toFixed(1)}
                 </div>
                 <div className="text-xs text-slate-400">Average (nights)</div>
               </div>
               <div className="text-center">
                 <div className="text-lg font-bold text-white">
-                  {Math.max(...trendsData.monthlyTrends.map(m => m.avgStayLength || 0)).toFixed(1)}
+                  {Math.max(...trendsData.monthlyTrends.map(m => m.avgStay || 0)).toFixed(1)}
                 </div>
                 <div className="text-xs text-slate-400">Max (nights)</div>
               </div>

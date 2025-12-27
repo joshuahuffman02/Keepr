@@ -298,6 +298,19 @@ export class OperationsService {
         };
     }
 
+    /**
+     * Send operations health alerts via configured channels
+     *
+     * Supported channels:
+     * - webhook: POST to OPS_ALERT_WEBHOOK_URL environment variable
+     * - slack: POST to Slack webhook (requires SLACK_OPS_WEBHOOK_URL)
+     * - email: Send via EmailService (requires OPS_ALERT_EMAIL)
+     *
+     * TODO: Implement additional channels as needed:
+     * - SMS via Twilio (TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN, TWILIO_PHONE_FROM, OPS_ALERT_PHONE)
+     * - PagerDuty (PAGERDUTY_INTEGRATION_KEY)
+     * - Microsoft Teams (TEAMS_OPS_WEBHOOK_URL)
+     */
     async sendOpsHealthAlert(
         campgroundId: string,
         channel = "webhook",
@@ -314,11 +327,131 @@ export class OperationsService {
             at: new Date().toISOString(),
         };
 
-        // Stubbed hook; in production this could call Slack/webhook/Email.
-        // eslint-disable-next-line no-console
-        console.log("[ops-health-alert]", payload);
+        // Get campground details for context
+        const campground = await this.prisma.campground.findUnique({
+            where: { id: campgroundId },
+            select: { name: true, email: true },
+        });
 
-        return { sent: true, ...payload };
+        try {
+            switch (channel) {
+                case "webhook":
+                    await this.sendWebhookAlert(payload, campground);
+                    break;
+                case "slack":
+                    await this.sendSlackAlert(payload, campground);
+                    break;
+                case "email":
+                    await this.sendEmailAlert(payload, campground);
+                    break;
+                default:
+                    throw new Error(`Unsupported alert channel: ${channel}`);
+            }
+
+            return { sent: true, ...payload };
+        } catch (error: any) {
+            // Log error but don't throw - alerts should fail gracefully
+            this.prisma.$executeRawUnsafe(
+                `INSERT INTO system_logs (level, message, metadata, created_at) VALUES ('error', 'Failed to send ops alert', '${JSON.stringify({ error: error.message, payload })}', NOW())`
+            ).catch(() => {
+                // If logging fails, just log to console
+                // eslint-disable-next-line no-console
+                console.error("[ops-health-alert] Failed to send and log:", error.message, payload);
+            });
+
+            return { sent: false, error: error.message, ...payload };
+        }
+    }
+
+    private async sendWebhookAlert(payload: any, campground: any) {
+        const webhookUrl = process.env.OPS_ALERT_WEBHOOK_URL;
+
+        if (!webhookUrl) {
+            throw new Error("OPS_ALERT_WEBHOOK_URL not configured");
+        }
+
+        const response = await fetch(webhookUrl, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                ...payload,
+                campgroundName: campground?.name,
+                timestamp: payload.at,
+            }),
+        });
+
+        if (!response.ok) {
+            throw new Error(`Webhook request failed: ${response.status} ${response.statusText}`);
+        }
+    }
+
+    private async sendSlackAlert(payload: any, campground: any) {
+        const slackUrl = process.env.SLACK_OPS_WEBHOOK_URL;
+
+        if (!slackUrl) {
+            throw new Error("SLACK_OPS_WEBHOOK_URL not configured");
+        }
+
+        const response = await fetch(slackUrl, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                text: `*Operations Alert - ${campground?.name || "Campground"}*`,
+                blocks: [
+                    {
+                        type: "header",
+                        text: {
+                            type: "plain_text",
+                            text: `Operations Alert - ${campground?.name || "Campground"}`,
+                        },
+                    },
+                    {
+                        type: "section",
+                        fields: [
+                            { type: "mrkdwn", text: `*Target:*\n${payload.target}` },
+                            { type: "mrkdwn", text: `*Time:*\n${new Date(payload.at).toLocaleString()}` },
+                        ],
+                    },
+                    {
+                        type: "section",
+                        text: {
+                            type: "mrkdwn",
+                            text: `*Message:*\n${payload.message}`,
+                        },
+                    },
+                ],
+            }),
+        });
+
+        if (!response.ok) {
+            throw new Error(`Slack webhook failed: ${response.status} ${response.statusText}`);
+        }
+    }
+
+    private async sendEmailAlert(payload: any, campground: any) {
+        const alertEmail = process.env.OPS_ALERT_EMAIL || campground?.email;
+
+        if (!alertEmail) {
+            throw new Error("OPS_ALERT_EMAIL not configured and no campground email available");
+        }
+
+        // TODO: Implement EmailService.sendEmail method
+        // For now, log that we would send an email
+        throw new Error("Email alert not implemented - EmailService integration pending");
+
+        // Future implementation:
+        // await this.emailService.sendEmail({
+        //     to: alertEmail,
+        //     subject: `Operations Alert - ${campground?.name || 'Campground'}`,
+        //     html: `
+        //         <h2>Operations Alert</h2>
+        //         <p><strong>Campground:</strong> ${campground?.name}</p>
+        //         <p><strong>Target:</strong> ${payload.target}</p>
+        //         <p><strong>Time:</strong> ${new Date(payload.at).toLocaleString()}</p>
+        //         <p><strong>Message:</strong></p>
+        //         <p>${payload.message}</p>
+        //     `,
+        // });
     }
 
     private ensureCampgroundAccess(user: any, campgroundId?: string | null) {

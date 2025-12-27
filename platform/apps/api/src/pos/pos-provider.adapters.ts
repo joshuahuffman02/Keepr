@@ -65,14 +65,31 @@ abstract class BasePosProviderAdapter implements PosProviderAdapter {
   }
 
   async processPayment(config: IntegrationRecord, request: ProviderPaymentRequest): Promise<ProviderPaymentResult | null> {
-    this.logger.log(`Routing payment via ${config.provider} (stub)`);
+    // This base implementation is a stub. Each POS provider adapter (Clover, Square, Toast, etc.)
+    // should override this method to implement actual payment processing through their API.
+    //
+    // For example:
+    // - CloverAdapter should call the Clover Payments API
+    // - SquareAdapter should call the Square Payments API
+    // - ToastAdapter should call the Toast Payments API
+    //
+    // This stub returns a failed status to prevent accidental use without proper implementation.
+
+    this.logger.warn(
+      `Payment processing not implemented for ${config.provider}. ` +
+      `Provider adapters must override processPayment() to handle real payments.`
+    );
+
     return {
-      status: "pending",
+      status: "failed",
       processorIds: {
         provider: config.provider,
         idempotencyKey: request.idempotencyKey
       },
-      raw: { note: "stubbed payment response" }
+      raw: {
+        error: "Payment processing not implemented for this provider",
+        note: "This is a stub implementation. Provider-specific adapters must override processPayment()."
+      }
     };
   }
 

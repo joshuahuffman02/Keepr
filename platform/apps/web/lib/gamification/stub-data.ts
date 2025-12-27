@@ -1,5 +1,13 @@
-// Lightweight in-memory stub data for staff gamification.
-// No external dependencies; safe for story/demo flows.
+// ============================================================================
+// STUB DATA - FOR TESTING AND STORYBOOK ONLY
+// ============================================================================
+// This file contains stub data for gamification features.
+// It is NOT used in production - the real app uses the backend API.
+// Only imported by: tests and storybook stories.
+//
+// Production code uses: apiClient.getGamificationDashboard() and related endpoints
+// Backend implementation: platform/apps/api/src/gamification/
+// ============================================================================
 
 export type GamificationCategory =
   | "task"

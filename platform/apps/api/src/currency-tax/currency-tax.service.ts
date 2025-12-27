@@ -41,7 +41,10 @@ export class CurrencyTaxService {
   private config: CurrencyTaxConfig = {
     baseCurrency: "USD",
     reportingCurrency: "USD",
-    fxProvider: "stub",
+    // TODO: Integrate real FX provider (OpenExchangeRates, XE.com, or ECB)
+    // Set FX_PROVIDER environment variable and implement provider-specific fetching
+    // For now, using manual rates for testing - update via API or implement scheduled refresh
+    fxProvider: process.env.FX_PROVIDER || "manual",
     fxRates: [
       { base: "USD", quote: "CAD", rate: 1.34, asOf: new Date().toISOString() },
       { base: "USD", quote: "EUR", rate: 0.92, asOf: new Date().toISOString() },
@@ -74,6 +77,28 @@ export class CurrencyTaxService {
       updatedAt: new Date().toISOString(),
     };
     return this.config;
+  }
+
+  /**
+   * Fetch latest FX rates from configured provider
+   * TODO: Implement provider integrations:
+   * - OpenExchangeRates: requires OPEN_EXCHANGE_RATES_API_KEY
+   * - XE.com: requires XE_API_KEY and XE_ACCOUNT_ID
+   * - ECB (European Central Bank): free but EUR-based only
+   *
+   * Example implementation:
+   * async refreshRates(): Promise<void> {
+   *   const provider = process.env.FX_PROVIDER;
+   *   if (provider === 'openexchangerates') {
+   *     const apiKey = process.env.OPEN_EXCHANGE_RATES_API_KEY;
+   *     const response = await fetch(`https://openexchangerates.org/api/latest.json?app_id=${apiKey}`);
+   *     const data = await response.json();
+   *     // Update this.config.fxRates with data.rates
+   *   }
+   * }
+   */
+  async refreshRates(): Promise<void> {
+    throw new Error('FX rate refresh not implemented. Configure FX_PROVIDER and implement provider-specific logic.');
   }
 
   convert(amount: number, from: string, to: string): ConversionResult {

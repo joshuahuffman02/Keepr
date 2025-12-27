@@ -209,6 +209,56 @@ export class StripeService {
     }
 
     /**
+     * Charge a saved payment method (off-session payment)
+     * Used for kiosk check-in, repeat charges, and other automated payments
+     *
+     * @param amountCents - Amount to charge in cents
+     * @param currency - Currency code (e.g., 'usd')
+     * @param customerId - Stripe customer ID (from connected account)
+     * @param paymentMethodId - Saved payment method ID
+     * @param stripeAccountId - Connected Stripe account ID
+     * @param metadata - Metadata for the payment intent
+     * @param applicationFeeCents - Application fee in cents
+     * @param idempotencyKey - Optional idempotency key for safe retries
+     */
+    async chargeOffSession(
+        amountCents: number,
+        currency: string,
+        customerId: string,
+        paymentMethodId: string,
+        stripeAccountId: string,
+        metadata: Record<string, string>,
+        applicationFeeCents: number = 0,
+        idempotencyKey?: string
+    ) {
+        const stripe = this.assertConfigured("charge off-session");
+
+        const params: Stripe.PaymentIntentCreateParams = {
+            amount: amountCents,
+            currency,
+            customer: customerId,
+            payment_method: paymentMethodId,
+            off_session: true,
+            confirm: true,
+            metadata,
+            application_fee_amount: applicationFeeCents,
+            transfer_data: {
+                destination: stripeAccountId
+            }
+        };
+
+        const requestOptions: Stripe.RequestOptions = {
+            stripeAccount: stripeAccountId
+        };
+
+        if (idempotencyKey) {
+            requestOptions.idempotencyKey = idempotencyKey;
+        }
+
+        return stripe.paymentIntents.create(params, requestOptions);
+    }
+
+    /**
      * Create a payment intent with authorization hold (capture_method: manual)
      * Used for deposit flows where payment is authorized but not captured immediately
      */
