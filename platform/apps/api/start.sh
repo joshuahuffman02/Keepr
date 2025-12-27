@@ -37,5 +37,8 @@ else
     echo "The app will attempt to connect when handling requests"
 fi
 
+echo "=== Generating Prisma client ==="
+npx prisma generate
+
 echo "=== Starting app ==="
 exec node -r tsconfig-paths/register dist/main.js
