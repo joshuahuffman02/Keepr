@@ -211,7 +211,7 @@ export default function DynamicPricingPage({ params }: { params: { campgroundId:
                     ))}
                     {otherRules.length > 5 && (
                       <div className="text-center pt-2">
-                        <Button variant="link" asChild>
+                        <Button variant="ghost" asChild>
                           <Link href="/dashboard/settings/pricing-rules">
                             View all {otherRules.length} rules →
                           </Link>
