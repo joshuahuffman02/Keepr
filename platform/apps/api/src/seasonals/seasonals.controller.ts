@@ -260,6 +260,40 @@ export class SeasonalsController {
     return this.seasonals.sendBulkMessage(dto, req.user?.id);
   }
 
+  // ==================== CONVERT RESERVATION TO SEASONAL ====================
+  // NOTE: These endpoints are STAFF-ONLY - guests cannot convert themselves
+
+  @UseGuards(JwtAuthGuard, RolesGuard, ScopeGuard)
+  @Roles(UserRole.owner, UserRole.manager, UserRole.front_desk) // NO guest role - staff only
+  @RequireScope({ resource: "reservations", action: "write" })
+  @Post("convert-from-reservation/:reservationId")
+  async convertReservationToSeasonal(
+    @Req() req: any,
+    @Param("reservationId") reservationId: string,
+    @Body() dto: { rateCardId?: string; isMetered?: boolean; paysInFull?: boolean; notes?: string }
+  ) {
+    return this.seasonals.convertReservationToSeasonal(
+      reservationId,
+      dto,
+      req.user?.id
+    );
+  }
+
+  @UseGuards(JwtAuthGuard, RolesGuard, ScopeGuard)
+  @Roles(UserRole.owner, UserRole.manager, UserRole.front_desk) // NO guest role - staff only
+  @RequireScope({ resource: "reservations", action: "write" })
+  @Post("link-reservation")
+  async linkReservationToSeasonal(
+    @Req() req: any,
+    @Body() dto: { reservationId: string; seasonalGuestId: string }
+  ) {
+    return this.seasonals.linkReservationToSeasonal(
+      dto.reservationId,
+      dto.seasonalGuestId,
+      req.user?.id
+    );
+  }
+
   // ==================== ADMIN OPERATIONS ====================
 
   @UseGuards(JwtAuthGuard, RolesGuard, ScopeGuard)

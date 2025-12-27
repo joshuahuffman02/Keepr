@@ -682,6 +682,194 @@ export class SeasonalsService {
     this.logger.log(`Recalculated seniority for ${seasonals.length} seasonals in campground ${campgroundId}`);
   }
 
+  // ==================== CONVERT RESERVATION TO SEASONAL ====================
+
+  /**
+   * Convert a reservation to a seasonal guest record
+   * This is a STAFF-ONLY operation - guests cannot convert themselves
+   */
+  async convertReservationToSeasonal(
+    reservationId: string,
+    options: {
+      rateCardId?: string;
+      isMetered?: boolean;
+      paysInFull?: boolean;
+      notes?: string;
+    },
+    convertedBy: string
+  ) {
+    // Fetch the reservation with guest and site info
+    const reservation = await this.prisma.reservation.findUnique({
+      where: { id: reservationId },
+      include: {
+        guest: true,
+        site: true,
+        campground: true,
+      },
+    });
+
+    if (!reservation) {
+      throw new NotFoundException(`Reservation ${reservationId} not found`);
+    }
+
+    // Validate this is a suitable reservation for conversion
+    const stayDays = Math.ceil(
+      (reservation.departureDate.getTime() - reservation.arrivalDate.getTime()) / (1000 * 60 * 60 * 24)
+    );
+
+    if (stayDays < 28) {
+      throw new BadRequestException(
+        "Only long-term reservations (28+ days) can be converted to seasonal guests"
+      );
+    }
+
+    // Check if already linked to a seasonal
+    if (reservation.seasonalGuestId) {
+      throw new BadRequestException("This reservation is already linked to a seasonal guest");
+    }
+
+    // Check if guest already has a seasonal record at this campground
+    const existingSeasonal = await this.prisma.seasonalGuest.findUnique({
+      where: {
+        guestId_campgroundId: {
+          guestId: reservation.guestId,
+          campgroundId: reservation.campgroundId,
+        },
+      },
+    });
+
+    if (existingSeasonal) {
+      // Link the reservation to existing seasonal and return
+      await this.prisma.reservation.update({
+        where: { id: reservationId },
+        data: { seasonalGuestId: existingSeasonal.id },
+      });
+
+      this.logger.log(
+        `Linked reservation ${reservationId} to existing seasonal guest ${existingSeasonal.id}`
+      );
+
+      return {
+        seasonalGuest: await this.findById(existingSeasonal.id),
+        created: false,
+        linked: true,
+      };
+    }
+
+    // Calculate first season year from arrival date
+    const firstSeasonYear = reservation.arrivalDate.getFullYear();
+
+    // Get seniority rank
+    const count = await this.prisma.seasonalGuest.count({
+      where: { campgroundId: reservation.campgroundId },
+    });
+
+    // Create the seasonal guest record
+    const seasonalGuest = await this.prisma.seasonalGuest.create({
+      data: {
+        campgroundId: reservation.campgroundId,
+        guestId: reservation.guestId,
+        firstSeasonYear,
+        totalSeasons: 1,
+        seniorityRank: count + 1,
+        currentSiteId: reservation.siteId,
+        preferredSites: [reservation.siteId],
+        status: SeasonalStatus.active,
+        isMetered: options.isMetered || false,
+        paysInFull: options.paysInFull || false,
+        vehiclePlates: reservation.vehiclePlate ? [reservation.vehiclePlate] : [],
+        petCount: reservation.petCount || 0,
+        originReservationId: reservationId,
+        convertedAt: new Date(),
+        convertedBy,
+        notes: options.notes,
+        createdBy: convertedBy,
+      },
+      include: {
+        guest: true,
+        currentSite: true,
+      },
+    });
+
+    // Link the reservation to the seasonal guest
+    await this.prisma.reservation.update({
+      where: { id: reservationId },
+      data: { seasonalGuestId: seasonalGuest.id },
+    });
+
+    // If a rate card is provided, apply pricing
+    if (options.rateCardId) {
+      const guestContext: GuestPricingContext = {
+        isMetered: options.isMetered || false,
+        paysInFull: options.paysInFull || false,
+        tenureYears: 1,
+        isReturning: false,
+      };
+
+      await this.pricingService.applyPricingToGuest(
+        seasonalGuest.id,
+        options.rateCardId,
+        firstSeasonYear
+      );
+    }
+
+    this.logger.log(
+      `Converted reservation ${reservationId} to seasonal guest ${seasonalGuest.id} by ${convertedBy}`
+    );
+
+    return {
+      seasonalGuest: await this.findById(seasonalGuest.id),
+      created: true,
+      linked: true,
+    };
+  }
+
+  /**
+   * Link an existing reservation to an existing seasonal guest
+   */
+  async linkReservationToSeasonal(
+    reservationId: string,
+    seasonalGuestId: string,
+    linkedBy: string
+  ) {
+    const reservation = await this.prisma.reservation.findUnique({
+      where: { id: reservationId },
+    });
+
+    if (!reservation) {
+      throw new NotFoundException(`Reservation ${reservationId} not found`);
+    }
+
+    const seasonalGuest = await this.prisma.seasonalGuest.findUnique({
+      where: { id: seasonalGuestId },
+    });
+
+    if (!seasonalGuest) {
+      throw new NotFoundException(`Seasonal guest ${seasonalGuestId} not found`);
+    }
+
+    // Verify same campground and guest
+    if (reservation.campgroundId !== seasonalGuest.campgroundId) {
+      throw new BadRequestException("Reservation and seasonal guest must be at the same campground");
+    }
+
+    if (reservation.guestId !== seasonalGuest.guestId) {
+      throw new BadRequestException("Reservation guest must match seasonal guest");
+    }
+
+    // Link them
+    await this.prisma.reservation.update({
+      where: { id: reservationId },
+      data: { seasonalGuestId },
+    });
+
+    this.logger.log(
+      `Linked reservation ${reservationId} to seasonal guest ${seasonalGuestId} by ${linkedBy}`
+    );
+
+    return this.findById(seasonalGuestId);
+  }
+
   // ==================== SEASON ROLLOVER ====================
 
   async rolloverSeason(campgroundId: string, fromYear: number, toYear: number) {

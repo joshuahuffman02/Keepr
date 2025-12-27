@@ -478,7 +478,17 @@ export default function GamificationDashboardPage() {
   // Fetch dashboard data
   const { data: dashboard, isLoading: dashboardLoading, error: dashboardError } = useQuery({
     queryKey: ["gamification-dashboard", campgroundId],
-    queryFn: () => apiClient.getGamificationDashboard(campgroundId!),
+    queryFn: async () => {
+      console.log("[Gamification] Fetching dashboard for campground:", campgroundId);
+      try {
+        const result = await apiClient.getGamificationDashboard(campgroundId!);
+        console.log("[Gamification] Dashboard loaded successfully");
+        return result;
+      } catch (err) {
+        console.error("[Gamification] Dashboard fetch failed:", err);
+        throw err;
+      }
+    },
     enabled: !!campgroundId,
     retry: 1,
     staleTime: 30000,
@@ -537,6 +547,20 @@ export default function GamificationDashboardPage() {
 
   // Wait for hydration before showing content to avoid hydration mismatch
   const isLoading = !isHydrated || dashboardLoading || whoamiLoading;
+
+  // Debug logging
+  useEffect(() => {
+    console.log("[Gamification] State:", {
+      isHydrated,
+      campgroundId,
+      dashboardLoading,
+      whoamiLoading,
+      isLoading,
+      loadingTimedOut,
+      dashboardError: dashboardError?.message,
+      whoamiError: whoamiError?.message,
+    });
+  }, [isHydrated, campgroundId, dashboardLoading, whoamiLoading, isLoading, loadingTimedOut, dashboardError, whoamiError]);
 
   if (isLoading && !loadingTimedOut) {
     return (

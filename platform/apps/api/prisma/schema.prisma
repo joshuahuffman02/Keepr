@@ -2226,7 +2226,12 @@ model Reservation {
   // Unified Operations / Task Management
   opTasks OpTask[] @relation("OpTaskReservation")
 
+  // Link to Seasonal Guest (if converted from reservation)
+  seasonalGuestId String?
+  seasonalGuest   SeasonalGuest? @relation("SeasonalGuestReservations", fields: [seasonalGuestId], references: [id], onDelete: SetNull)
+
   @@index([campgroundId])
+  @@index([seasonalGuestId])
   @@index([groupBookingId])
   @@index([siteId])
   @@index([guestId])
@@ -8929,6 +8934,11 @@ model SeasonalGuest {
   notes String?
   tags  String[] @default([])
 
+  // Conversion tracking
+  originReservationId String? // The reservation this seasonal was converted from
+  convertedAt         DateTime? // When conversion happened
+  convertedBy         String? // User ID who converted
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   createdBy String?
@@ -8937,6 +8947,7 @@ model SeasonalGuest {
   pricing        SeasonalGuestPricing[]
   payments       SeasonalPayment[]
   communications SeasonalCommunication[]
+  reservations   Reservation[] @relation("SeasonalGuestReservations") // All linked reservations
 
   @@unique([guestId, campgroundId])
   @@index([campgroundId, status])
