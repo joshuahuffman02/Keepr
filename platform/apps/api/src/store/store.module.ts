@@ -10,9 +10,10 @@ import { FulfillmentController } from "./fulfillment.controller";
 import { PrismaModule } from "../prisma/prisma.module";
 import { EmailService } from "../email/email.service";
 import { InventoryModule } from "../inventory/inventory.module";
+import { PaymentsModule } from "../payments/payments.module";
 
 @Module({
-    imports: [PrismaModule, forwardRef(() => InventoryModule)],
+    imports: [PrismaModule, forwardRef(() => InventoryModule), PaymentsModule],
     controllers: [StoreController, LocationController, TransferController, FulfillmentController],
     providers: [StoreService, LocationService, TransferService, FulfillmentService, EmailService],
     exports: [StoreService, LocationService, TransferService, FulfillmentService],

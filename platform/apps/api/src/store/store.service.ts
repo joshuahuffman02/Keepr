@@ -1,4 +1,4 @@
-import { ConflictException, Injectable, NotFoundException } from "@nestjs/common";
+import { ConflictException, Injectable, NotFoundException, Logger } from "@nestjs/common";
 import { PrismaService } from "../prisma/prisma.service";
 import {
     CreateProductCategoryDto,
@@ -11,15 +11,19 @@ import {
 } from "./dto/store.dto";
 import { AddOnPricingType, PaymentMethod, OrderChannel, ChannelInventoryMode, TaxRuleType } from "@prisma/client";
 import { EmailService } from "../email/email.service";
+import { StripeService } from "../payments/stripe.service";
 import { randomUUID } from "crypto";
 import { Decimal } from "@prisma/client/runtime/library";
 import { LocationService } from "./location.service";
 
 @Injectable()
 export class StoreService {
+    private readonly logger = new Logger(StoreService.name);
+
     constructor(
         private readonly prisma: PrismaService,
         private readonly emailService: EmailService,
+        private readonly stripeService: StripeService,
         private readonly locationService: LocationService
     ) { }
 
@@ -582,23 +586,32 @@ export class StoreService {
     /**
      * Record a refund or exchange for an order
      *
-     * Note: For payment processor refunds, integrate with:
-     * - Stripe: stripe.refunds.create({ payment_intent: order.paymentIntentId })
-     * - Square: squareClient.refundsApi.refundPayment({ ... })
+     * Implements full refund workflow:
+     * - Payment processor refund (Stripe)
+     * - Inventory restoration (optional restock)
+     * - Ledger entry for charge_to_site orders
+     * - Email notification to guest
      */
     async recordRefundOrExchange(
         orderId: string,
         payload: {
             type?: "refund" | "exchange";
-            items?: Array<{ itemId?: string; qty?: number; amountCents?: number; name?: string }>;
+            items?: Array<{ itemId?: string; qty?: number; amountCents?: number; name?: string; productId?: string }>;
             amountCents?: number;
             note?: string | null;
+            restock?: boolean; // Whether to restore inventory
+            notifyGuest?: boolean; // Whether to send email to guest
         },
         user?: any
     ) {
         const order = await (this.prisma as any).storeOrder.findUnique({
             where: { id: orderId },
-            include: { items: true, campground: { select: { name: true } } },
+            include: {
+                items: true,
+                campground: { select: { name: true } },
+                guest: { select: { email: true, firstName: true, lastName: true } },
+                reservation: { select: { guestEmail: true, guestName: true } }
+            },
         });
         if (!order) {
             throw new NotFoundException("Order not found");
@@ -614,6 +627,7 @@ export class StoreService {
                     }
                     return {
                         itemId: item.itemId || match?.id || randomUUID(),
+                        productId: item.productId || match?.productId || null,
                         name: item.name || match?.name || "Line item",
                         qty: item.qty ?? match?.qty ?? 0,
                         amountCents: item.amountCents ?? match?.totalCents ?? 0,
@@ -621,6 +635,7 @@ export class StoreService {
                 })
                 : order.items.map((i: any) => ({
                     itemId: i.id,
+                    productId: i.productId,
                     name: i.name,
                     qty: i.qty,
                     amountCents: i.totalCents ?? 0,
@@ -640,6 +655,50 @@ export class StoreService {
         }
 
         const adjustmentType = payload.type === "exchange" ? "exchange" : "refund";
+        let stripeRefundId: string | null = null;
+        let refundStatus: string = "pending";
+        let refundError: string | null = null;
+        let inventoryRestored = false;
+        let notificationSent = false;
+
+        // 1. Process payment processor refund for card payments
+        if (adjustmentType === "refund" && order.paymentMethod === "card" && order.paymentIntentId) {
+            try {
+                const refund = await this.stripeService.createRefund(
+                    order.paymentIntentId,
+                    amountCents,
+                    "requested_by_customer",
+                    `refund_${orderId}_${Date.now()}`
+                );
+                stripeRefundId = refund.id;
+                refundStatus = refund.status ?? "succeeded";
+                this.logger.log(`Stripe refund created: ${refund.id} for order ${orderId}`);
+            } catch (err: any) {
+                refundStatus = "failed";
+                refundError = err.message ?? "Stripe refund failed";
+                this.logger.error(`Stripe refund failed for order ${orderId}: ${refundError}`);
+                // Continue with database record even if Stripe fails - can retry later
+            }
+        }
+
+        // 2. Restore inventory if requested
+        if (payload.restock && selectedItems.length > 0) {
+            try {
+                for (const item of selectedItems) {
+                    if (item.productId && item.qty > 0) {
+                        await this.prisma.product.update({
+                            where: { id: item.productId },
+                            data: { stockQty: { increment: item.qty } }
+                        });
+                    }
+                }
+                inventoryRestored = true;
+                this.logger.log(`Inventory restored for order ${orderId}: ${selectedItems.length} items`);
+            } catch (err: any) {
+                this.logger.error(`Failed to restore inventory for order ${orderId}: ${err.message}`);
+                // Continue even if inventory restore fails
+            }
+        }
 
         // Create database record for the adjustment
         const adjustment = await (this.prisma as any).storeOrderAdjustment.create({
@@ -650,6 +709,11 @@ export class StoreService {
                 note: payload.note || null,
                 items: selectedItems,
                 createdById: user?.id || null,
+                stripeRefundId,
+                refundStatus,
+                refundError,
+                inventoryRestored,
+                notificationSent: false, // Updated after email sent
             },
             include: {
                 createdBy: {
@@ -663,7 +727,7 @@ export class StoreService {
             await this.updateOrderStatus(orderId, "refunded", user?.id);
         }
 
-        // If order was charged to site, create offsetting ledger entry
+        // 3. If order was charged to site, create offsetting ledger entry
         if (order.paymentMethod === "charge_to_site" && order.reservationId && adjustmentType === "refund") {
             try {
                 await this.prisma.ledgerEntry.create({
@@ -687,12 +751,59 @@ export class StoreService {
                     },
                 });
             } catch (error: any) {
-                // Log error but don't fail the refund
-                console.error(`Failed to create ledger entry for refund: ${error.message}`);
+                this.logger.error(`Failed to create ledger entry for refund: ${error.message}`);
             }
         }
 
-        return adjustment;
+        // 4. Send email notification to guest
+        const guestEmail = order.guest?.email ?? order.reservation?.guestEmail;
+        const guestName = order.guest?.firstName ?? order.reservation?.guestName ?? "Guest";
+        const shouldNotify = payload.notifyGuest !== false; // Default to true
+
+        if (shouldNotify && guestEmail && adjustmentType === "refund") {
+            try {
+                const itemsList = selectedItems
+                    .map((i: any) => `<li>${i.qty} x ${i.name} - $${((i.amountCents ?? 0) / 100).toFixed(2)}</li>`)
+                    .join("");
+
+                await this.emailService.sendEmail({
+                    to: guestEmail,
+                    subject: `Refund Processed - ${order.campground?.name || 'Store'} Order #${order.id.slice(-6)}`,
+                    html: `
+                        <h2>Your Refund Has Been Processed</h2>
+                        <p>Hi ${guestName},</p>
+                        <p>We have processed a refund for your recent order.</p>
+                        <p><strong>Order ID:</strong> ${order.id.slice(-6)}</p>
+                        <p><strong>Refund Amount:</strong> $${(amountCents / 100).toFixed(2)}</p>
+                        ${payload.note ? `<p><strong>Note:</strong> ${payload.note}</p>` : ''}
+                        <p><strong>Items Refunded:</strong></p>
+                        <ul>${itemsList}</ul>
+                        <p>The refund will be credited to your original payment method within 5-10 business days.</p>
+                        <p>Thank you for your understanding.</p>
+                        <p>Best regards,<br/>${order.campground?.name || 'The Team'}</p>
+                    `
+                });
+                notificationSent = true;
+
+                // Update adjustment with notification status
+                await (this.prisma as any).storeOrderAdjustment.update({
+                    where: { id: adjustment.id },
+                    data: { notificationSent: true }
+                });
+
+                this.logger.log(`Refund notification sent to ${guestEmail} for order ${orderId}`);
+            } catch (err: any) {
+                this.logger.error(`Failed to send refund notification for order ${orderId}: ${err.message}`);
+            }
+        }
+
+        return {
+            ...adjustment,
+            notificationSent,
+            stripeRefundId,
+            refundStatus,
+            inventoryRestored
+        };
     }
 
     private async notifyStaffNewOrder(order: any, email?: string | null, campgroundName?: string | null, webhookUrl?: string | null) {

@@ -3152,6 +3152,7 @@ model StoreOrder {
   prepTimeMinutes       Int?
   status                OrderStatus                 @default(pending)
   paymentMethod         PaymentMethod               @default(card)
+  paymentIntentId       String? // Stripe payment intent ID for card refunds
   subtotalCents         Int                         @default(0)
   taxCents              Int                         @default(0)
   totalCents            Int                         @default(0)
@@ -3216,14 +3217,22 @@ enum StoreAdjustmentType {
 }
 
 model StoreOrderAdjustment {
-  id          String              @id @default(cuid())
-  orderId     String
-  type        StoreAdjustmentType @default(refund)
-  amountCents Int
-  note        String?
-  items       Json? // Array of affected items: [{itemId, name, qty, amountCents}]
-  createdById String?
-  createdAt   DateTime            @default(now())
+  id                 String              @id @default(cuid())
+  orderId            String
+  type               StoreAdjustmentType @default(refund)
+  amountCents        Int
+  note               String?
+  items              Json? // Array of affected items: [{itemId, name, qty, amountCents}]
+  createdById        String?
+  // Payment processor refund tracking
+  stripeRefundId     String? // Stripe refund ID if processed via Stripe
+  refundStatus       String? // pending, succeeded, failed
+  refundError        String? // Error message if refund failed
+  // Inventory restoration
+  inventoryRestored  Boolean @default(false) // Whether inventory was restocked
+  // Guest notification
+  notificationSent   Boolean @default(false) // Whether guest was notified
+  createdAt          DateTime            @default(now())
 
   order     StoreOrder @relation(fields: [orderId], references: [id], onDelete: Cascade)
   createdBy User?      @relation("StoreAdjustmentCreatedBy", fields: [createdById], references: [id], onDelete: SetNull)

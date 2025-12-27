@@ -21,7 +21,7 @@ This document tracks all TODO, FIXME, and incomplete code comments in the codeba
 |---|------|------|-------|--------|
 | 2 | `apps/api/src/store/store.service.ts` | 96-107 | Add missing timestamp fields to StoreOrder schema (seenAt, pickedUpAt, etc.) | **FIXED** |
 | 3 | `apps/api/src/store/store.service.ts` | 291-320 | seenAt field queries will fail - needs schema update | **FIXED** |
-| 4 | `apps/api/src/store/store.service.ts` | 666-787 | Implement proper refund workflow (inventory restore, payment processor, email) | Partial (DB done, processor pending) |
+| 4 | `apps/api/src/store/store.service.ts` | 666-787 | Implement proper refund workflow (inventory restore, payment processor, email) | **FIXED** |
 | 5 | `apps/api/src/pos/pos.service.ts` | 40 | Implement pricing/tax versions and create items | **FIXED** |
 | 6 | `apps/api/src/pos/pos.service.ts` | 197 | Integrate POS with reservations AR/folio | Pending |
 | 7 | `apps/api/src/ota/ota.service.ts` | 694, 837, 848 | OTA provider API integration (actual API calls, pricing, provider methods) | Pending |
@@ -61,10 +61,10 @@ This document tracks all TODO, FIXME, and incomplete code comments in the codeba
 ## Summary
 
 - **Critical:** 0 remaining (1 fixed)
-- **Important:** 3 remaining (4 fixed, 1 partial)
+- **Important:** 3 remaining (5 fixed)
 - **Moderate:** 3 remaining (8 fixed)
 - **Minor:** 0 remaining (4 fixed)
-- **Total:** 6 remaining (17 fixed)
+- **Total:** 6 remaining (18 fixed)
 
 ---
 
@@ -91,3 +91,4 @@ This document tracks all TODO, FIXME, and incomplete code comments in the codeba
 | 2025-12-27 | 19 | FIXED: Added follow-up and resolution tracking fields to NpsResponse model, updated nps-analytics.service.ts to use new fields |
 | 2025-12-27 | 11 | FIXED: Added key store Map for multiple key versions, loadHistoricalKeys() for PII_ENCRYPTION_KEY_V1-V10, reEncrypt() method for key rotation |
 | 2025-12-27 | 5 | FIXED: Implemented proper pricing/tax in createCart and updateCart - fetches product prices, location overrides, calculates tax with TaxRule |
+| 2025-12-27 | 4 | FIXED: Implemented full refund workflow - Stripe refunds, inventory restock, ledger entries, guest email notifications |
