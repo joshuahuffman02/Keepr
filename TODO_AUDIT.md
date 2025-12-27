@@ -23,7 +23,7 @@ This document tracks all TODO, FIXME, and incomplete code comments in the codeba
 | 3 | `apps/api/src/store/store.service.ts` | 291-320 | seenAt field queries will fail - needs schema update | **FIXED** |
 | 4 | `apps/api/src/store/store.service.ts` | 666-787 | Implement proper refund workflow (inventory restore, payment processor, email) | **FIXED** |
 | 5 | `apps/api/src/pos/pos.service.ts` | 40 | Implement pricing/tax versions and create items | **FIXED** |
-| 6 | `apps/api/src/pos/pos.service.ts` | 197 | Integrate POS with reservations AR/folio | Pending |
+| 6 | `apps/api/src/pos/pos.service.ts` | 197 | Integrate POS with reservations AR/folio | **FIXED** |
 | 7 | `apps/api/src/ota/ota.service.ts` | 694, 837, 848 | OTA provider API integration (actual API calls, pricing, provider methods) | Pending |
 | 8 | `apps/api/src/seasonals/seasonals.service.ts` | 716 | Integrate with actual email/SMS sending service | **FIXED** (email done, SMS pending provider) |
 
@@ -61,10 +61,10 @@ This document tracks all TODO, FIXME, and incomplete code comments in the codeba
 ## Summary
 
 - **Critical:** 0 remaining (1 fixed)
-- **Important:** 3 remaining (5 fixed)
+- **Important:** 2 remaining (6 fixed)
 - **Moderate:** 3 remaining (8 fixed)
 - **Minor:** 0 remaining (4 fixed)
-- **Total:** 6 remaining (18 fixed)
+- **Total:** 5 remaining (19 fixed)
 
 ---
 
@@ -92,3 +92,4 @@ This document tracks all TODO, FIXME, and incomplete code comments in the codeba
 | 2025-12-27 | 11 | FIXED: Added key store Map for multiple key versions, loadHistoricalKeys() for PII_ENCRYPTION_KEY_V1-V10, reEncrypt() method for key rotation |
 | 2025-12-27 | 5 | FIXED: Implemented proper pricing/tax in createCart and updateCart - fetches product prices, location overrides, calculates tax with TaxRule |
 | 2025-12-27 | 4 | FIXED: Implemented full refund workflow - Stripe refunds, inventory restock, ledger entries, guest email notifications |
+| 2025-12-27 | 6 | FIXED: Integrated POS charge_to_site with reservations AR/folio - creates ledger entries, updates reservation balance |

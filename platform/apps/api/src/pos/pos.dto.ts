@@ -116,6 +116,10 @@ export class CheckoutCartDto {
 
   @IsOptional()
   @IsString()
+  reservationId?: string; // For charge_to_site - links to guest's active reservation
+
+  @IsOptional()
+  @IsString()
   giftCode?: string;
 
   @IsOptional()

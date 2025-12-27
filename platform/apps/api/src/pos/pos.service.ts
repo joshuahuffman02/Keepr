@@ -334,19 +334,70 @@ export class PosService {
         // Process non-stored-value tenders
         for (const p of dto.payments.filter((p) => p.method !== "gift" && p.method !== "store_credit" && p.method !== "guest_wallet")) {
           if (p.method === "charge_to_site") {
-            // TODO: integrate with reservations AR/folio; mark pending for now
+            // Integrate with reservations AR/folio
+            const reservationId = dto.reservationId ?? p.referenceId;
+            if (!reservationId) {
+              throw new BadRequestException("reservationId required for charge_to_site payment");
+            }
+
+            // Validate reservation exists and is active
+            const reservation = await tx.reservation.findUnique({
+              where: { id: reservationId },
+              select: { id: true, status: true, siteId: true, guestName: true, site: { select: { name: true } } }
+            });
+            if (!reservation) {
+              throw new BadRequestException("Reservation not found");
+            }
+            if (!["confirmed", "checked_in", "pending"].includes(reservation.status)) {
+              throw new BadRequestException(`Cannot charge to site - reservation status is ${reservation.status}`);
+            }
+
+            // Create ledger entry for the charge
+            await tx.ledgerEntry.create({
+              data: {
+                campgroundId: cart.campgroundId,
+                reservationId,
+                glCode: "POS",
+                account: "POS Charges",
+                description: `POS charge from cart #${cartId.slice(-6)}`,
+                amountCents: p.amountCents,
+                direction: "debit", // Debit increases guest balance owed
+                dedupeKey: `pos_cart_${cartId}_${p.idempotencyKey}`
+              }
+            });
+
+            // Update reservation balance
+            await tx.reservation.update({
+              where: { id: reservationId },
+              data: {
+                balanceAmount: { increment: p.amountCents },
+                totalAmount: { increment: p.amountCents }
+              }
+            });
+
+            // Record the payment as succeeded
             await tx.posPayment.create({
               data: {
                 cartId,
                 method: p.method,
                 amountCents: p.amountCents,
                 currency: p.currency.toLowerCase(),
-                status: PosPaymentStatus.pending,
+                status: PosPaymentStatus.succeeded,
                 idempotencyKey: p.idempotencyKey,
-                referenceType: p.referenceType,
-                referenceId: p.referenceId
+                referenceType: "reservation",
+                referenceId: reservationId
               }
             });
+
+            await this.audit.record({
+              campgroundId: actor?.campgroundId ?? cart.campgroundId,
+              actorId: actor?.id ?? null,
+              action: "pos.payment.charge_to_site",
+              entity: "reservation",
+              entityId: reservationId,
+              after: { cartId, amountCents: p.amountCents, siteName: reservation.site?.name }
+            });
+
             continue;
           }
 
