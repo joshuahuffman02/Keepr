@@ -1329,6 +1329,14 @@ model Campground {
   aiContextItems         AiCampgroundContext[]
   aiReplyDrafts          AiReplyDraft[]
   aiAnomalyAlerts        AiAnomalyAlert[]
+  // AI Autonomous features
+  aiPricingRecommendations AiPricingRecommendation[]
+  aiRevenueInsights        AiRevenueInsight[]
+  aiMaintenanceAlerts      AiMaintenanceAlert[]
+  aiWeatherAlerts          AiWeatherAlert[]
+  aiPhoneSessions          AiPhoneSession[]
+  aiDashboardMetrics       AiDashboardMetrics[]
+  aiAutonomousActions      AiAutonomousAction[]
 
   // Organization billing relations
   orgBillingLineItems OrganizationBillingLineItem[]
@@ -2491,7 +2499,7 @@ model Payment {
   method                     String    @default("card")
   direction                  String    @default("charge") // charge or refund
   note                       String?
-  stripePaymentIntentId      String?
+  stripePaymentIntentId      String?   @unique
   stripeChargeId             String?
   stripeBalanceTransactionId String?
   stripePayoutId             String?
@@ -9249,6 +9257,48 @@ model AiAutopilotConfig {
   noShowAutoReminder      Boolean @default(false)
   noShowReminderDaysBefore Int    @default(2)
 
+  // ===== AUTONOMOUS CONTROL =====
+
+  // Auto-Reply Autonomous Mode
+  autoReplyAutoSendEnabled    Boolean @default(false) // Send without human review
+  autoReplyMaxDailyAutoSends  Int     @default(50)    // Daily limit for auto-sends
+
+  // Waitlist Autonomous Mode
+  waitlistAutoOfferEnabled    Boolean @default(false) // Auto-offer spots
+  waitlistAutoOfferMinScore   Float   @default(75)    // Min score to auto-offer
+  waitlistAutoOfferHoldMinutes Int    @default(30)    // Hold time for offer
+
+  // Anomaly Auto-Fix
+  anomalyAutoFixEnabled       Boolean @default(false) // One-click fixes
+  anomalyAutoFixCategories    String[] @default([])   // Categories to auto-fix
+
+  // No-Show Auto-Release
+  noShowAutoReleaseEnabled    Boolean @default(false)
+  noShowAutoConfirmHours      Int     @default(24)    // Hours before to confirm
+  noShowAutoReleaseHours      Int     @default(4)     // Hours after check-in to release
+
+  // ===== DYNAMIC PRICING =====
+  dynamicPricingAiEnabled     Boolean @default(false)
+  dynamicPricingMode          String  @default("suggest") // "suggest" | "auto"
+  dynamicPricingMaxAdjust     Float   @default(50)        // Max % adjustment
+
+  // ===== PREDICTIVE MAINTENANCE =====
+  predictiveMaintenanceEnabled Boolean @default(false)
+  maintenanceAlertThreshold    Int     @default(3)   // Incidents before alert
+
+  // ===== WEATHER ALERTS =====
+  weatherAlertsEnabled        Boolean @default(false)
+  weatherApiKey               String?               // OpenWeatherMap API key
+  weatherTriggers             Json?                 // Storm thresholds, etc.
+
+  // ===== AI PHONE AGENT =====
+  phoneAgentEnabled           Boolean @default(false)
+  phoneAgentNumber            String?               // Twilio phone number
+  phoneAgentTransferNumber    String?               // Staff transfer number
+  phoneAgentHoursStart        String?               // "09:00"
+  phoneAgentHoursEnd          String?               // "21:00"
+  phoneAgentVoice             String  @default("alloy") // OpenAI voice
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
@@ -9406,6 +9456,272 @@ model AiNoShowRisk {
   @@index([campgroundId, riskScore])
   @@index([campgroundId, flagged])
   @@index([reservationId])
+}
+
+// ========================================
+// AI AUTONOMOUS FEATURES - NEW MODELS
+// ========================================
+
+// Dynamic pricing recommendations from AI
+model AiPricingRecommendation {
+  id                  String     @id @default(cuid())
+  campgroundId        String
+  campground          Campground @relation(fields: [campgroundId], references: [id], onDelete: Cascade)
+  siteClassId         String?
+
+  dateStart           DateTime
+  dateEnd             DateTime
+  recommendationType  String   // "underpriced" | "overpriced" | "event_opportunity" | "demand_surge"
+  currentPriceCents   Int
+  suggestedPriceCents Int
+  adjustmentPercent   Float
+  confidence          Float    // 0-1
+  reasoning           String   @db.Text
+  factors             Json     // Detailed breakdown (occupancy, competitors, events, etc.)
+
+  status              String   @default("pending") // "pending" | "applied" | "dismissed" | "expired"
+  appliedAt           DateTime?
+  appliedById         String?
+  dismissedAt         DateTime?
+  dismissedById       String?
+  dismissedReason     String?
+
+  estimatedRevenueDelta Int?   // Cents - estimated revenue impact
+
+  createdAt           DateTime @default(now())
+  expiresAt           DateTime
+
+  @@index([campgroundId])
+  @@index([campgroundId, status])
+  @@index([campgroundId, dateStart])
+  @@index([siteClassId])
+}
+
+// AI-identified revenue opportunities and gaps
+model AiRevenueInsight {
+  id              String     @id @default(cuid())
+  campgroundId    String
+  campground      Campground @relation(fields: [campgroundId], references: [id], onDelete: Cascade)
+
+  insightType     String   // "revenue_gap" | "underutilized_site" | "missed_upsell" | "pricing_opportunity" | "occupancy_gap"
+  title           String
+  summary         String   @db.Text
+  impactCents     Int      // Estimated monthly revenue impact
+  difficulty      String   // "easy" | "medium" | "hard"
+  priority        Int      @default(50) // 0-100
+  recommendations Json     // Actionable steps
+
+  status          String   @default("new") // "new" | "in_progress" | "completed" | "dismissed"
+  completedAt     DateTime?
+  dismissedAt     DateTime?
+  dismissedReason String?
+
+  metadata        Json?    // Additional context
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([campgroundId])
+  @@index([campgroundId, status])
+  @@index([campgroundId, insightType])
+}
+
+// Predictive maintenance alerts based on incident patterns
+model AiMaintenanceAlert {
+  id              String     @id @default(cuid())
+  campgroundId    String
+  campground      Campground @relation(fields: [campgroundId], references: [id], onDelete: Cascade)
+  siteId          String?
+
+  alertType       String   // "pattern_detected" | "failure_predicted" | "scheduled_due"
+  severity        String   // "low" | "medium" | "high" | "critical"
+  category        String   // "electrical" | "plumbing" | "hvac" | "structural" | "grounds"
+  title           String
+  summary         String   @db.Text
+
+  incidentCount   Int      // Number of related incidents
+  incidentIds     String[] // References to maintenance incidents
+  predictedFailure DateTime? // When failure is predicted
+  confidence      Float    // 0-1
+
+  suggestedAction String   @db.Text
+  estimatedCostCents Int?  // Repair cost estimate
+
+  status          String   @default("new") // "new" | "acknowledged" | "scheduled" | "resolved" | "dismissed"
+  acknowledgedAt  DateTime?
+  acknowledgedById String?
+  maintenanceTicketId String? // Link to created ticket
+  resolvedAt      DateTime?
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([campgroundId])
+  @@index([campgroundId, status])
+  @@index([campgroundId, severity])
+  @@index([siteId])
+}
+
+// Weather alerts and automated guest notifications
+model AiWeatherAlert {
+  id              String     @id @default(cuid())
+  campgroundId    String
+  campground      Campground @relation(fields: [campgroundId], references: [id], onDelete: Cascade)
+
+  alertType       String   // "storm" | "extreme_heat" | "extreme_cold" | "flood" | "fire_risk" | "snow"
+  severity        String   // "advisory" | "watch" | "warning" | "emergency"
+  weatherData     Json     // Raw weather API data
+
+  title           String
+  message         String   @db.Text // Generated message for guests
+  startTime       DateTime
+  endTime         DateTime?
+  affectedDates   DateTime[] // Reservation dates affected
+
+  guestsAffected  Int      @default(0)
+  guestsNotified  Int      @default(0)
+  notificationsSent Json?  // Log of sent notifications
+
+  status          String   @default("active") // "active" | "expired" | "cancelled"
+  autoNotifyEnabled Boolean @default(false)
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([campgroundId])
+  @@index([campgroundId, status])
+  @@index([startTime])
+}
+
+// AI Phone Agent call sessions
+model AiPhoneSession {
+  id              String     @id @default(cuid())
+  campgroundId    String
+  campground      Campground @relation(fields: [campgroundId], references: [id], onDelete: Cascade)
+
+  twilioCallSid   String   @unique
+  callerPhone     String
+  guestId         String?  // Linked if caller identified
+  reservationId   String?  // Linked if about specific reservation
+
+  status          String   // "ringing" | "in_progress" | "completed" | "transferred" | "voicemail" | "failed"
+
+  startedAt       DateTime @default(now())
+  connectedAt     DateTime?
+  endedAt         DateTime?
+  durationSeconds Int?
+
+  transcript      String?  @db.Text
+  summary         String?  @db.Text // AI-generated summary
+  intents         String[] // Detected intents: ["check_availability", "make_reservation", etc.]
+  actionsPerformed Json?   // What the AI did: [{action: "checked_availability", result: {...}}]
+
+  transferredAt   DateTime?
+  transferReason  String?
+  transferredTo   String?  // Phone number transferred to
+
+  voicemailUrl    String?  // If voicemail recorded
+  voicemailTranscript String? @db.Text
+
+  sentiment       String?  // "positive" | "neutral" | "negative"
+  resolutionStatus String? // "resolved" | "transferred" | "callback_needed" | "voicemail"
+
+  tokensUsed      Int      @default(0)
+  costCents       Int      @default(0)
+
+  metadata        Json?
+
+  @@index([campgroundId])
+  @@index([campgroundId, status])
+  @@index([callerPhone])
+  @@index([guestId])
+  @@index([startedAt])
+}
+
+// Aggregated AI dashboard metrics
+model AiDashboardMetrics {
+  id                    String     @id @default(cuid())
+  campgroundId          String
+  campground            Campground @relation(fields: [campgroundId], references: [id], onDelete: Cascade)
+
+  periodStart           DateTime
+  periodEnd             DateTime
+
+  // Message handling
+  messagesReceived      Int      @default(0)
+  messagesHandled       Int      @default(0) // AI drafted
+  messagesAutoSent      Int      @default(0) // Autonomous
+  avgResponseTimeMinutes Float?
+
+  // Risk management
+  risksIdentified       Int      @default(0)
+  noShowsPrevented      Int      @default(0)
+  anomaliesDetected     Int      @default(0)
+  anomaliesResolved     Int      @default(0)
+
+  // Pricing
+  pricingSuggestions    Int      @default(0)
+  pricingSuggestionsApplied Int  @default(0)
+  pricingRevenueDelta   Int      @default(0) // Cents
+
+  // Phone
+  phoneCallsReceived    Int      @default(0)
+  phoneCallsHandled     Int      @default(0) // Completed by AI
+  phoneCallsTransferred Int      @default(0)
+  avgCallDurationSeconds Int?
+
+  // Waitlist
+  waitlistOffersGenerated Int    @default(0)
+  waitlistOffersAccepted  Int    @default(0)
+
+  // Revenue impact
+  estimatedRevenueSavedCents Int @default(0)
+  estimatedRevenueGeneratedCents Int @default(0)
+
+  // Costs
+  aiTokensUsed          Int      @default(0)
+  aiCostCents           Int      @default(0)
+
+  // ROI
+  roiPercent            Float?   // (revenue - cost) / cost * 100
+
+  calculatedAt          DateTime @default(now())
+
+  @@unique([campgroundId, periodStart, periodEnd])
+  @@index([campgroundId])
+  @@index([periodStart])
+}
+
+// Audit log for all autonomous AI actions
+model AiAutonomousAction {
+  id              String     @id @default(cuid())
+  campgroundId    String
+  campground      Campground @relation(fields: [campgroundId], references: [id], onDelete: Cascade)
+
+  actionType      String   // "auto_reply_sent" | "waitlist_auto_offered" | "site_released" | "price_adjusted" | "guest_notified"
+  entityType      String   // "communication" | "waitlist" | "reservation" | "pricing" | etc.
+  entityId        String
+
+  description     String
+  details         Json     // Full action details
+
+  confidence      Float?   // AI confidence for this action
+  reasoning       String?  @db.Text // Why AI took this action
+
+  reversible      Boolean  @default(false)
+  reversedAt      DateTime?
+  reversedById    String?
+  reversedReason  String?
+
+  outcome         String?  // "success" | "partial" | "failed"
+  outcomeDetails  String?  @db.Text
+
+  createdAt       DateTime @default(now())
+
+  @@index([campgroundId])
+  @@index([campgroundId, actionType])
+  @@index([campgroundId, createdAt])
+  @@index([entityType, entityId])
 }
 
 

@@ -57,9 +57,23 @@ export class ReservationsService {
   ) { }
 
   async getMatchedSites(campgroundId: string, guestId: string) {
+    // Fetch guest with only the fields needed for matching (not all reservations)
     const guest = await this.prisma.guest.findUnique({
       where: { id: guestId },
-      include: { reservations: { include: { site: true } } }
+      select: {
+        id: true,
+        rigLength: true,
+        preferences: true,
+        // Only fetch distinct site history for this campground, not all reservations
+        reservations: {
+          where: { campgroundId },
+          select: {
+            siteId: true,
+            site: { select: { siteClassId: true } }
+          },
+          distinct: ['siteId']
+        }
+      }
     });
     if (!guest) throw new NotFoundException("Guest not found");
 
@@ -69,7 +83,7 @@ export class ReservationsService {
     });
 
     const matches = sites.map(site => {
-      const { score, reasons } = this.matchScoreService.calculateMatchScore(guest, site);
+      const { score, reasons } = this.matchScoreService.calculateMatchScore(guest as any, site);
       return {
         site,
         score,
@@ -304,43 +318,75 @@ export class ReservationsService {
 
   @Cron("0 */12 * * *") // every 12 hours
   async enqueueUnpaidSweep() {
-    const reservations = await this.prisma.reservation.findMany({
-      where: {
-        status: { not: ReservationStatus.cancelled },
-        totalAmount: { gt: 0 }
-      },
-      select: { id: true, campgroundId: true, guestId: true, totalAmount: true, paidAmount: true }
-    });
-    const due = reservations.filter(r => Number(r.paidAmount || 0) < Number(r.totalAmount || 0));
+    // Use raw SQL to filter unpaid reservations in the database instead of fetching all
+    const due = await this.prisma.$queryRaw<{ id: string; campgroundId: string; guestId: string }[]>`
+      SELECT id, "campgroundId", "guestId"
+      FROM "Reservation"
+      WHERE status != 'cancelled'
+        AND "totalAmount" > 0
+        AND COALESCE("paidAmount", 0) < "totalAmount"
+    `;
     if (!due.length) return;
 
+    // Fetch playbooks with their templates in a single query (join)
     const playbooks = await (this.prisma as any).communicationPlaybook.findMany({
       where: {
         type: "unpaid",
         enabled: true,
         templateId: { not: null }
+      },
+      include: {
+        template: { select: { id: true, status: true } }
       }
     });
 
-    for (const pb of playbooks as CommunicationPlaybook[]) {
-      const tpl = await (this.prisma as any).communicationTemplate.findFirst({ where: { id: pb.templateId, status: "approved" } });
-      if (!tpl) continue;
-      for (const r of due.filter(d => d.campgroundId === pb.campgroundId)) {
+    // Filter to only playbooks with approved templates
+    const validPlaybooks = (playbooks as any[]).filter(pb => pb.template?.status === "approved");
+    if (!validPlaybooks.length) return;
+
+    // Group due reservations by campgroundId for O(1) lookup
+    const dueByCampground = new Map<string, typeof due>();
+    for (const r of due) {
+      if (!dueByCampground.has(r.campgroundId)) {
+        dueByCampground.set(r.campgroundId, []);
+      }
+      dueByCampground.get(r.campgroundId)!.push(r);
+    }
+
+    // Batch create all jobs at once
+    const jobsToCreate: {
+      playbookId: string;
+      campgroundId: string;
+      reservationId: string;
+      guestId: string;
+      status: string;
+      scheduledAt: Date;
+    }[] = [];
+
+    for (const pb of validPlaybooks) {
+      const campgroundReservations = dueByCampground.get(pb.campgroundId) ?? [];
+      for (const r of campgroundReservations) {
         const scheduledAt = new Date();
         if (pb.offsetMinutes && Number.isFinite(pb.offsetMinutes)) {
           scheduledAt.setMinutes(scheduledAt.getMinutes() + pb.offsetMinutes);
         }
-        await (this.prisma as any).communicationPlaybookJob.create({
-          data: {
-            playbookId: pb.id,
-            campgroundId: r.campgroundId,
-            reservationId: r.id,
-            guestId: r.guestId,
-            status: "pending",
-            scheduledAt
-          }
+        jobsToCreate.push({
+          playbookId: pb.id,
+          campgroundId: r.campgroundId,
+          reservationId: r.id,
+          guestId: r.guestId,
+          status: "pending",
+          scheduledAt
         });
       }
+    }
+
+    // Single batch insert instead of N individual creates
+    if (jobsToCreate.length > 0) {
+      await (this.prisma as any).communicationPlaybookJob.createMany({
+        data: jobsToCreate,
+        skipDuplicates: true
+      });
     }
   }
 
@@ -350,6 +396,7 @@ export class ReservationsService {
 
   /**
    * Find an available site in a given site class for the specified date range.
+   * Uses batch query to check availability for all sites at once instead of N sequential queries.
    */
   private async findAvailableSiteInClass(
     campgroundId: string,
@@ -367,34 +414,87 @@ export class ReservationsService {
       holdId?: string | null;
     }
   ): Promise<string | null> {
-    // Get all sites in the class with metadata needed for scoring/validation
-    const sites = await this.prisma.site.findMany({
-      where: {
-        campgroundId,
-        siteClassId,
-        isActive: true
-      },
-      include: {
-        siteClass: true
-      }
-    });
+    const now = new Date();
+    const ignoreHoldId = options?.holdId ?? null;
 
-    if (!sites || sites.length === 0) {
+    // Single query to get all available site IDs (no reservation/hold/maintenance/blackout conflicts)
+    const availableSiteIds = await this.prisma.$queryRaw<{ id: string }[]>`
+      SELECT s.id
+      FROM "Site" s
+      WHERE s."campgroundId" = ${campgroundId}
+        AND s."siteClassId" = ${siteClassId}
+        AND s."isActive" = true
+        -- No overlapping reservations
+        AND NOT EXISTS (
+          SELECT 1 FROM "Reservation" r
+          WHERE r."siteId" = s.id
+            AND r.status != 'cancelled'
+            AND tstzrange(r."arrivalDate", r."departureDate", '[)') && tstzrange(${arrival}, ${departure}, '[)')
+        )
+        -- No active holds (unless it's the one we're using)
+        AND NOT EXISTS (
+          SELECT 1 FROM "SiteHold" h
+          WHERE h."siteId" = s.id
+            AND h.status = 'active'
+            AND (h."expiresAt" IS NULL OR h."expiresAt" > ${now})
+            AND h."arrivalDate" < ${departure}
+            AND h."departureDate" > ${arrival}
+            ${ignoreHoldId ? Prisma.sql`AND h.id != ${ignoreHoldId}` : Prisma.sql``}
+        )
+        -- No blocking maintenance
+        AND NOT EXISTS (
+          SELECT 1 FROM "MaintenanceTicket" m
+          WHERE m."siteId" = s.id
+            AND m.status IN ('open', 'in_progress')
+            AND (m."isBlocking" = true OR m."outOfOrder" = true OR m."outOfOrderUntil" > ${arrival})
+        )
+        -- No blackout dates
+        AND NOT EXISTS (
+          SELECT 1 FROM "BlackoutDate" b
+          WHERE b."campgroundId" = ${campgroundId}
+            AND (b."siteId" = s.id OR b."siteId" IS NULL)
+            AND b."startDate" < ${departure}
+            AND b."endDate" > ${arrival}
+        )
+    `;
+
+    if (!availableSiteIds.length) {
       return null;
     }
 
+    const availableIds = availableSiteIds.map(s => s.id);
+
+    // Fetch full site details only for available sites
+    const sites = await this.prisma.site.findMany({
+      where: { id: { in: availableIds } },
+      include: { siteClass: true }
+    });
+
+    if (!sites.length) {
+      return null;
+    }
+
+    // Fetch guest for scoring (optimized: only distinct site history for this campground)
     const guest = options?.guestId
       ? await this.prisma.guest.findUnique({
-        where: { id: options.guestId },
-        include: { reservations: { include: { site: true } } }
-      })
+          where: { id: options.guestId },
+          select: {
+            id: true,
+            rigLength: true,
+            preferences: true,
+            reservations: {
+              where: { campgroundId },
+              select: { siteId: true, site: { select: { siteClassId: true } } },
+              distinct: ['siteId']
+            }
+          }
+        })
       : null;
 
     const candidates: { site: (typeof sites)[number]; score: number }[] = [];
 
     for (const site of sites) {
       try {
-        await this.assertSiteAvailable(site.id, arrival, departure, undefined, options?.holdId ?? undefined);
         this.validateAssignmentConstraints(
           {
             siteType: site.siteType,
@@ -416,13 +516,13 @@ export class ReservationsService {
         const match = guest ? this.matchScoreService.calculateMatchScore(guest as any, site as any) : { score: 0 };
         candidates.push({ site, score: match.score });
       } catch {
-        // Skip ineligible or unavailable site
+        // Skip sites that don't meet constraints
         continue;
       }
     }
 
     if (!candidates.length) {
-      return null; // No available sites found
+      return null;
     }
 
     candidates.sort((a, b) => b.score - a.score);
@@ -852,10 +952,30 @@ export class ReservationsService {
     });
   }
 
-  listByCampground(campgroundId: string) {
+  listByCampground(
+    campgroundId: string,
+    options?: {
+      limit?: number;
+      offset?: number;
+      status?: string;
+      fromDate?: Date;
+      toDate?: Date;
+    }
+  ) {
+    const limit = Math.min(options?.limit ?? 100, 500); // Cap at 500
+    const offset = options?.offset ?? 0;
+
     return this.prisma.reservation.findMany({
-      where: { campgroundId },
-      include: { guest: true, site: true }
+      where: {
+        campgroundId,
+        ...(options?.status && { status: options.status as any }),
+        ...(options?.fromDate && { arrivalDate: { gte: options.fromDate } }),
+        ...(options?.toDate && { departureDate: { lte: options.toDate } })
+      },
+      include: { guest: true, site: true },
+      orderBy: { arrivalDate: 'desc' },
+      take: limit,
+      skip: offset
     });
   }
 
@@ -1896,62 +2016,68 @@ export class ReservationsService {
     const newPaid = (reservation.paidAmount ?? 0) + totalTenderCents;
     const paymentFields = this.buildPaymentFields(reservation.totalAmount, newPaid);
 
-    const updated = await this.prisma.reservation.update({
-      where: { id },
-      data: {
-        paidAmount: newPaid,
-        ...paymentFields
-      }
-    });
-
     const revenueGl = reservation.site?.siteClass?.glCode ?? "REVENUE_UNMAPPED";
     const revenueAccount = reservation.site?.siteClass?.clientAccount ?? "Revenue";
     const externalRef = options?.stripeBalanceTransactionId ?? options?.stripeChargeId ?? options?.stripePaymentIntentId ?? options?.transactionId ?? null;
 
-    for (const tender of tenderList) {
-      await this.prisma.payment.create({
+    // Wrap reservation update, payment creation, and ledger entries in a single transaction
+    // to ensure atomic consistency - either all succeed or all rollback
+    const updated = await this.prisma.$transaction(async (tx) => {
+      const updatedReservation = await tx.reservation.update({
+        where: { id },
         data: {
-          campgroundId: reservation.campgroundId,
-          reservationId: reservation.id,
-          amountCents: tender.amountCents,
-          method: tender.method || options?.paymentMethod || "card",
-          direction: "charge",
-          note: tender.note ?? "Reservation payment",
-          stripePaymentIntentId: options?.stripePaymentIntentId,
-          stripeChargeId: options?.stripeChargeId,
-          stripeBalanceTransactionId: options?.stripeBalanceTransactionId,
-          stripePayoutId: options?.stripePayoutId,
-          applicationFeeCents: options?.applicationFeeCents,
-          stripeFeeCents: options?.stripeFeeCents,
-          methodType: options?.methodType,
-          capturedAt: options?.capturedAt
+          paidAmount: newPaid,
+          ...paymentFields
         }
       });
-      await postBalancedLedgerEntries(this.prisma, [
-        {
-          campgroundId: reservation.campgroundId,
-          reservationId: reservation.id,
-          glCode: "CASH",
-          account: "Cash",
-          description: options?.transactionId ? `Payment ${options.transactionId}` : `Reservation payment (${tender.method})`,
-          amountCents: tender.amountCents,
-          direction: "debit",
-          externalRef,
-          dedupeKey: externalRef ? `res:${reservation.id}:payment:${externalRef}:${tender.method}:debit` : `res:${reservation.id}:payment:${tender.method}:debit`
-        },
-        {
-          campgroundId: reservation.campgroundId,
-          reservationId: reservation.id,
-          glCode: revenueGl,
-          account: revenueAccount,
-          description: `Reservation payment (${tender.method})`,
-          amountCents: tender.amountCents,
-          direction: "credit",
-          externalRef,
-          dedupeKey: externalRef ? `res:${reservation.id}:payment:${externalRef}:${tender.method}:credit` : `res:${reservation.id}:payment:${tender.method}:credit`
-        }
-      ]);
-    }
+
+      for (const tender of tenderList) {
+        await tx.payment.create({
+          data: {
+            campgroundId: reservation.campgroundId,
+            reservationId: reservation.id,
+            amountCents: tender.amountCents,
+            method: tender.method || options?.paymentMethod || "card",
+            direction: "charge",
+            note: tender.note ?? "Reservation payment",
+            stripePaymentIntentId: options?.stripePaymentIntentId,
+            stripeChargeId: options?.stripeChargeId,
+            stripeBalanceTransactionId: options?.stripeBalanceTransactionId,
+            stripePayoutId: options?.stripePayoutId,
+            applicationFeeCents: options?.applicationFeeCents,
+            stripeFeeCents: options?.stripeFeeCents,
+            methodType: options?.methodType,
+            capturedAt: options?.capturedAt
+          }
+        });
+        await postBalancedLedgerEntries(tx, [
+          {
+            campgroundId: reservation.campgroundId,
+            reservationId: reservation.id,
+            glCode: "CASH",
+            account: "Cash",
+            description: options?.transactionId ? `Payment ${options.transactionId}` : `Reservation payment (${tender.method})`,
+            amountCents: tender.amountCents,
+            direction: "debit",
+            externalRef,
+            dedupeKey: externalRef ? `res:${reservation.id}:payment:${externalRef}:${tender.method}:debit` : `res:${reservation.id}:payment:${tender.method}:debit`
+          },
+          {
+            campgroundId: reservation.campgroundId,
+            reservationId: reservation.id,
+            glCode: revenueGl,
+            account: revenueAccount,
+            description: `Reservation payment (${tender.method})`,
+            amountCents: tender.amountCents,
+            direction: "credit",
+            externalRef,
+            dedupeKey: externalRef ? `res:${reservation.id}:payment:${externalRef}:${tender.method}:credit` : `res:${reservation.id}:payment:${tender.method}:credit`
+          }
+        ]);
+      }
+
+      return updatedReservation;
+    });
 
     // Send payment receipt email
     try {
@@ -2004,73 +2130,80 @@ export class ReservationsService {
     const newPaid = (reservation.paidAmount ?? 0) - amountCents;
     const paymentFields = this.buildPaymentFields(reservation.totalAmount, newPaid);
     const destination = options?.destination ?? "card";
-
-    const updated = await this.prisma.reservation.update({
-      where: { id },
-      data: {
-        paidAmount: newPaid,
-        ...paymentFields
-      }
-    });
-
-    // Handle wallet refund
-    if (destination === "wallet" && reservation.guestId) {
-      await this.guestWalletService.creditFromRefund(
-        reservation.campgroundId,
-        reservation.id,
-        reservation.guestId,
-        amountCents,
-        options?.reason ?? "Reservation refund"
-      );
-
-      await this.prisma.payment.create({
-        data: {
-          campgroundId: reservation.campgroundId,
-          reservationId: reservation.id,
-          amountCents,
-          method: "wallet_credit",
-          direction: "refund",
-          note: options?.reason ?? "Reservation refund - credited to wallet"
-        }
-      });
-    } else {
-      // Standard card refund
-      await this.prisma.payment.create({
-        data: {
-          campgroundId: reservation.campgroundId,
-          reservationId: reservation.id,
-          amountCents,
-          method: "card",
-          direction: "refund",
-          note: options?.reason ?? "Reservation refund"
-        }
-      });
-    }
-
     const revenueGl = reservation.site?.siteClass?.glCode ?? "REVENUE_UNMAPPED";
     const revenueAccount = reservation.site?.siteClass?.clientAccount ?? "Revenue";
-    await postBalancedLedgerEntries(this.prisma, [
-      {
-        campgroundId: reservation.campgroundId,
-        reservationId: reservation.id,
-        glCode: destination === "wallet" ? "GUEST_WALLET" : "CASH",
-        account: destination === "wallet" ? "Guest Wallet Liability" : "Cash",
-        description: options?.reason ?? "Reservation refund",
-        amountCents,
-        direction: "credit",
-        dedupeKey: `res:${reservation.id}:refund:${amountCents}:credit:${Date.now()}`
-      },
-      {
-        campgroundId: reservation.campgroundId,
-        reservationId: reservation.id,
-        glCode: revenueGl,
-        account: revenueAccount,
-        description: options?.reason ?? "Reservation refund",
-        amountCents,
-        direction: "debit",
-        dedupeKey: `res:${reservation.id}:refund:${amountCents}:debit:${Date.now()}`
+    const refundTimestamp = Date.now();
+
+    // Wrap reservation update, payment creation, and ledger entries in a single transaction
+    // to ensure atomic consistency - either all succeed or all rollback
+    const updated = await this.prisma.$transaction(async (tx) => {
+      const updatedReservation = await tx.reservation.update({
+        where: { id },
+        data: {
+          paidAmount: newPaid,
+          ...paymentFields
+        }
+      });
+
+      // Handle wallet refund
+      if (destination === "wallet" && reservation.guestId) {
+        await this.guestWalletService.creditFromRefund(
+          reservation.campgroundId,
+          reservation.id,
+          reservation.guestId,
+          amountCents,
+          options?.reason ?? "Reservation refund"
+        );
+
+        await tx.payment.create({
+          data: {
+            campgroundId: reservation.campgroundId,
+            reservationId: reservation.id,
+            amountCents,
+            method: "wallet_credit",
+            direction: "refund",
+            note: options?.reason ?? "Reservation refund - credited to wallet"
+          }
+        });
+      } else {
+        // Standard card refund
+        await tx.payment.create({
+          data: {
+            campgroundId: reservation.campgroundId,
+            reservationId: reservation.id,
+            amountCents,
+            method: "card",
+            direction: "refund",
+            note: options?.reason ?? "Reservation refund"
+          }
+        });
       }
-    ]);
+
+      await postBalancedLedgerEntries(tx, [
+        {
+          campgroundId: reservation.campgroundId,
+          reservationId: reservation.id,
+          glCode: destination === "wallet" ? "GUEST_WALLET" : "CASH",
+          account: destination === "wallet" ? "Guest Wallet Liability" : "Cash",
+          description: options?.reason ?? "Reservation refund",
+          amountCents,
+          direction: "credit",
+          dedupeKey: `res:${reservation.id}:refund:${amountCents}:credit:${refundTimestamp}`
+        },
+        {
+          campgroundId: reservation.campgroundId,
+          reservationId: reservation.id,
+          glCode: revenueGl,
+          account: revenueAccount,
+          description: options?.reason ?? "Reservation refund",
+          amountCents,
+          direction: "debit",
+          dedupeKey: `res:${reservation.id}:refund:${amountCents}:debit:${refundTimestamp}`
+        }
+      ]);
+
+      return updatedReservation;
+    });
 
     // Send refund receipt
     try {

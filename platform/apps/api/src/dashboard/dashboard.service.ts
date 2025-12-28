@@ -13,12 +13,40 @@ export class DashboardService {
     if (!campground) throw new NotFoundException("Campground not found");
 
     const now = new Date();
-    const [sites, reservations, maintenanceOpen, maintenanceOverdue] = await Promise.all([
+    const windowEnd = new Date(now);
+    windowEnd.setDate(windowEnd.getDate() + 30);
+
+    // Run all queries in parallel - use SQL aggregation instead of fetching all rows
+    const [sites, reservationStats, maintenanceOpen, maintenanceOverdue] = await Promise.all([
       this.prisma.site.count({ where: { campgroundId } }),
-      this.prisma.reservation.findMany({
-        where: { campgroundId },
-        select: { arrivalDate: true, departureDate: true, totalAmount: true, paidAmount: true, status: true }
-      }),
+      this.prisma.$queryRaw<[{
+        future_reservations: bigint;
+        booked_nights: bigint;
+        total_nights: bigint;
+        revenue_cents: bigint;
+        overdue_cents: bigint;
+      }]>`
+        SELECT
+          COUNT(*) FILTER (WHERE "arrivalDate" >= ${now}) as future_reservations,
+          COALESCE(SUM(
+            GREATEST(0,
+              EXTRACT(EPOCH FROM (
+                LEAST("departureDate", ${windowEnd}::timestamp) -
+                GREATEST("arrivalDate", ${now}::timestamp)
+              )) / 86400
+            )::int
+          ) FILTER (WHERE "departureDate" > ${now} AND "arrivalDate" < ${windowEnd}), 0) as booked_nights,
+          COALESCE(SUM(
+            GREATEST(0, EXTRACT(EPOCH FROM ("departureDate" - "arrivalDate")) / 86400)::int
+          ), 0) as total_nights,
+          COALESCE(SUM("totalAmount"), 0) as revenue_cents,
+          COALESCE(SUM(
+            GREATEST(0, "totalAmount" - COALESCE("paidAmount", 0))
+          ) FILTER (WHERE "arrivalDate" < ${now} AND "totalAmount" > COALESCE("paidAmount", 0)), 0) as overdue_cents
+        FROM "Reservation"
+        WHERE "campgroundId" = ${campgroundId}
+          AND "status" != 'cancelled'
+      `,
       this.prisma.maintenanceTicket.count({
         where: { campgroundId, status: { not: "closed" } }
       }),
@@ -31,40 +59,12 @@ export class DashboardService {
       })
     ]);
 
-    // Next 30 days by default
-    const windowEnd = new Date(now);
-    windowEnd.setDate(windowEnd.getDate() + 30);
-
-    let bookedNights = 0;
-    let totalNights = 0;
-    let revenueCents = 0;
-    let futureReservations = 0;
-    let overdueBalancesCents = 0;
-
-    for (const r of reservations) {
-      const arrival = new Date(r.arrivalDate);
-      const departure = new Date(r.departureDate);
-      // future reservation count
-      if (arrival >= now) futureReservations += 1;
-
-      const start = arrival > now ? arrival : now;
-      const end = departure < windowEnd ? departure : windowEnd;
-      const ms = end.getTime() - start.getTime();
-      const nights = Math.max(0, Math.round(ms / (1000 * 60 * 60 * 24)));
-      bookedNights += nights;
-
-      const stayNights = Math.max(
-        0,
-        Math.round((departure.getTime() - arrival.getTime()) / (1000 * 60 * 60 * 24))
-      );
-      totalNights += stayNights;
-      revenueCents += r.totalAmount ?? 0;
-
-      const balance = (r.totalAmount ?? 0) - (r.paidAmount ?? 0);
-      if (balance > 0 && arrival < now) {
-        overdueBalancesCents += balance;
-      }
-    }
+    const stats = reservationStats[0];
+    const futureReservations = Number(stats?.future_reservations ?? 0);
+    const bookedNights = Number(stats?.booked_nights ?? 0);
+    const totalNights = Number(stats?.total_nights ?? 0);
+    const revenueCents = Number(stats?.revenue_cents ?? 0);
+    const overdueBalancesCents = Number(stats?.overdue_cents ?? 0);
 
     const occupancy = sites > 0 ? Math.min(100, Math.round((bookedNights / (sites * 30)) * 100)) : 0;
     const adr = totalNights > 0 ? revenueCents / 100 / totalNights : 0;

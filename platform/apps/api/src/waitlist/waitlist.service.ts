@@ -204,16 +204,30 @@ export class WaitlistService {
     }
 
     async getStats(campgroundId: string) {
-        const [active, offered, converted, fulfilled, expired, cancelled] = await Promise.all([
-            this.prisma.waitlistEntry.count({ where: { campgroundId, status: WaitlistStatus.active } }),
-            this.prisma.waitlistEntry.count({ where: { campgroundId, status: 'offered' as WaitlistStatus } }),
-            this.prisma.waitlistEntry.count({ where: { campgroundId, status: 'converted' as WaitlistStatus } }),
-            this.prisma.waitlistEntry.count({ where: { campgroundId, status: WaitlistStatus.fulfilled } }),
-            this.prisma.waitlistEntry.count({ where: { campgroundId, status: 'expired' as WaitlistStatus } }),
-            this.prisma.waitlistEntry.count({ where: { campgroundId, status: WaitlistStatus.cancelled } }),
-        ]);
-        const convertedTotal = converted + fulfilled;
-        const expiredTotal = expired + cancelled;
+        // Single query with conditional aggregation instead of 6 separate count queries
+        const result = await this.prisma.$queryRaw<[{
+            active: bigint;
+            offered: bigint;
+            converted: bigint;
+            fulfilled: bigint;
+            expired: bigint;
+            cancelled: bigint;
+        }]>`
+            SELECT
+                COUNT(*) FILTER (WHERE status = 'active') as active,
+                COUNT(*) FILTER (WHERE status = 'offered') as offered,
+                COUNT(*) FILTER (WHERE status = 'converted') as converted,
+                COUNT(*) FILTER (WHERE status = 'fulfilled') as fulfilled,
+                COUNT(*) FILTER (WHERE status = 'expired') as expired,
+                COUNT(*) FILTER (WHERE status = 'cancelled') as cancelled
+            FROM "WaitlistEntry"
+            WHERE "campgroundId" = ${campgroundId}
+        `;
+        const stats = result[0];
+        const active = Number(stats?.active ?? 0);
+        const offered = Number(stats?.offered ?? 0);
+        const convertedTotal = Number(stats?.converted ?? 0) + Number(stats?.fulfilled ?? 0);
+        const expiredTotal = Number(stats?.expired ?? 0) + Number(stats?.cancelled ?? 0);
         return {
             active,
             offered,

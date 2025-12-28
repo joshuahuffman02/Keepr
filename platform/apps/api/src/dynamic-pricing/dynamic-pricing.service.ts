@@ -258,49 +258,83 @@ export class DynamicPricingService {
    * Generate revenue forecast
    */
   async generateForecast(campgroundId: string, daysAhead = 30) {
-    const forecasts = [];
     const now = new Date();
+    now.setHours(0, 0, 0, 0);
+    const endDate = new Date(now);
+    endDate.setDate(endDate.getDate() + daysAhead);
 
-    for (let i = 0; i < daysAhead; i++) {
-      const targetDate = new Date(now);
-      targetDate.setDate(now.getDate() + i);
-      targetDate.setHours(0, 0, 0, 0);
+    // Get site count once (not per day!)
+    const totalSites = await this.prisma.site.count({
+      where: { campgroundId, isActive: true },
+    });
 
-      // Get confirmed reservations for the date
-      const reservations = await this.prisma.reservation.findMany({
-        where: {
-          campgroundId,
-          arrivalDate: { lte: targetDate },
-          departureDate: { gt: targetDate },
-          status: { in: ['confirmed', 'checked_in'] },
-        },
-        select: { totalAmount: true },
-      });
+    // Single query: generate date series and compute stats for all days at once
+    const dailyStats = await this.prisma.$queryRaw<{
+      forecast_date: Date;
+      reservation_count: bigint;
+      projected_rev: bigint;
+      day_offset: number;
+    }[]>`
+      WITH date_series AS (
+        SELECT generate_series(
+          ${now}::date,
+          ${endDate}::date - interval '1 day',
+          interval '1 day'
+        )::date as forecast_date
+      ),
+      daily_reservations AS (
+        SELECT
+          d.forecast_date,
+          COUNT(r.id) as reservation_count,
+          COALESCE(SUM(r."totalAmount"), 0) as projected_rev
+        FROM date_series d
+        LEFT JOIN "Reservation" r ON
+          r."campgroundId" = ${campgroundId}
+          AND r."arrivalDate" <= d.forecast_date
+          AND r."departureDate" > d.forecast_date
+          AND r.status IN ('confirmed', 'checked_in')
+        GROUP BY d.forecast_date
+      )
+      SELECT
+        forecast_date,
+        reservation_count,
+        projected_rev,
+        (forecast_date - ${now}::date) as day_offset
+      FROM daily_reservations
+      ORDER BY forecast_date
+    `;
 
-      const projectedRev = reservations.reduce((sum, r) => sum + r.totalAmount, 0);
-      const totalSites = await this.prisma.site.count({
-        where: { campgroundId, isActive: true },
-      });
-      const occupancyPct = totalSites > 0 ? (reservations.length / totalSites) * 100 : 0;
+    // Build forecast records
+    const forecastData = dailyStats.map(day => {
+      const dayOffset = Number(day.day_offset);
+      const occupancyPct = totalSites > 0
+        ? (Number(day.reservation_count) / totalSites) * 100
+        : 0;
+      const confidence = dayOffset < 7 ? 0.9 : dayOffset < 14 ? 0.7 : 0.5;
 
-      const forecast = await this.prisma.revenueForecast.upsert({
-        where: { campgroundId_forecastDate: { campgroundId, forecastDate: targetDate } },
-        update: {
-          projectedRev,
-          occupancyPct,
-          confidence: i < 7 ? 0.9 : i < 14 ? 0.7 : 0.5,
-        },
-        create: {
-          campgroundId,
-          forecastDate: targetDate,
-          projectedRev,
-          occupancyPct,
-          confidence: i < 7 ? 0.9 : i < 14 ? 0.7 : 0.5,
-        },
-      });
+      return {
+        campgroundId,
+        forecastDate: day.forecast_date,
+        projectedRev: Number(day.projected_rev),
+        occupancyPct,
+        confidence,
+      };
+    });
 
-      forecasts.push(forecast);
-    }
+    // Batch upsert using a transaction
+    const forecasts = await this.prisma.$transaction(
+      forecastData.map(data =>
+        this.prisma.revenueForecast.upsert({
+          where: { campgroundId_forecastDate: { campgroundId, forecastDate: data.forecastDate } },
+          update: {
+            projectedRev: data.projectedRev,
+            occupancyPct: data.occupancyPct,
+            confidence: data.confidence,
+          },
+          create: data,
+        })
+      )
+    );
 
     return forecasts;
   }
