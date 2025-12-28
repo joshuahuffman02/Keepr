@@ -67,6 +67,7 @@ export default function CheckInOutPage() {
   const [paymentMethod, setPaymentMethod] = useState("cash"); // Default to cash for manual entry
   const [isStripePaymentOpen, setIsStripePaymentOpen] = useState(false);
   const [checkInAfterPayment, setCheckInAfterPayment] = useState(false);
+  const [checkOutAfterPayment, setCheckOutAfterPayment] = useState(false);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -208,15 +209,25 @@ export default function CheckInOutPage() {
   const formatMoney = (cents?: number) =>
     new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format((cents ?? 0) / 100);
 
+  // Open old dialog for arrivals (allows cash/check recording inline)
   const openPayment = (res: Reservation) => {
     setSelectedReservation(res);
     setPaymentAmount(res.balanceAmount ?? 0);
     setIsPaymentOpen(true);
   };
 
+  // Open unified payment modal directly (for departures)
+  const openUnifiedPayment = (res: Reservation, checkoutAfter = false) => {
+    setSelectedReservation(res);
+    setPaymentAmount(res.balanceAmount ?? 0);
+    setCheckOutAfterPayment(checkoutAfter);
+    setCheckInAfterPayment(false);
+    setIsStripePaymentOpen(true);
+  };
+
   const handlePayAndCheckout = (res: Reservation) => {
     if ((res.balanceAmount ?? 0) > 0) {
-      openPayment(res);
+      openUnifiedPayment(res, true);
     } else {
       checkOutMutation.mutate(res.id);
     }
@@ -463,7 +474,7 @@ export default function CheckInOutPage() {
                     ) : (
                       <div className="flex flex-wrap gap-2 justify-end">
                         {res.balanceAmount > 0 && (
-                          <Button variant="outline" className="text-amber-700 border-amber-200 hover:bg-amber-50" onClick={() => openPayment(res)}>
+                          <Button variant="outline" className="text-amber-700 border-amber-200 hover:bg-amber-50" onClick={() => openUnifiedPayment(res, false)}>
                             Settle Balance
                           </Button>
                         )}
@@ -609,6 +620,7 @@ export default function CheckInOutPage() {
           onClose={() => {
             setIsStripePaymentOpen(false);
             setCheckInAfterPayment(false);
+            setCheckOutAfterPayment(false);
           }}
           campgroundId={campgroundId}
           amountDueCents={paymentAmount}
@@ -629,10 +641,18 @@ export default function CheckInOutPage() {
               } catch {
                 toast({ title: "Payment successful but check-in failed", variant: "destructive" });
               }
+            } else if (checkOutAfterPayment) {
+              try {
+                await apiClient.checkOutReservation(selectedReservation.id);
+                toast({ title: "Payment successful and guest checked out" });
+              } catch {
+                toast({ title: "Payment successful but check-out failed", variant: "destructive" });
+              }
             } else {
               toast({ title: `Payment of $${(result.totalPaidCents / 100).toFixed(2)} successful` });
             }
             setCheckInAfterPayment(false);
+            setCheckOutAfterPayment(false);
           }}
           onError={(error) => {
             toast({ title: "Payment failed", description: error.message, variant: "destructive" });
