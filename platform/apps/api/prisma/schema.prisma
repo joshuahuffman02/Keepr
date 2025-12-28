@@ -1396,6 +1396,11 @@ model Campground {
   seasonalPayments          SeasonalPayment[]         @relation("CampgroundSeasonalPayments")
   seasonalCommunications    SeasonalCommunication[]   @relation("CampgroundSeasonalCommunications")
 
+  // Stripe Payment Infrastructure (per-campground)
+  stripeCustomers           StripeCustomer[]
+  stripeTerminalLocations   StripeTerminalLocation[]
+  stripeTerminalReaders     StripeTerminalReader[]
+
   // Soft delete
   deletedAt DateTime?
   deletedBy String?
@@ -2049,6 +2054,9 @@ model Guest {
   // Seasonals
   seasonalRecords SeasonalGuest[] @relation("GuestSeasonalRecords")
 
+  // Stripe Payment Methods (per campground)
+  stripeCustomers StripeCustomer[]
+
   // Soft delete
   deletedAt DateTime?
   deletedBy String?
@@ -2509,6 +2517,20 @@ model Payment {
   capturedAt                 DateTime?
   createdAt                  DateTime  @default(now())
 
+  // Payment method tracking for refunds (ensures refunds go to original method)
+  stripePaymentMethodId String? // pm_xxx - the payment method used
+  stripeCustomerId      String? // cus_xxx - if customer was attached
+  paymentMethodType     String? // card, card_present, us_bank_account
+  paymentMethodLast4    String? // Last 4 digits for display
+  paymentMethodBrand    String? // visa, mastercard, amex
+  terminalReaderId      String? // If paid via terminal reader
+  paymentSource         String? // online, terminal, saved_card, manual
+
+  // Refund tracking
+  refundedAmountCents Int?      @default(0) // Track partial refunds
+  refundedAt          DateTime?
+  originalPaymentId   String? // For refund records, links to original payment
+
   // Use Restrict to prevent accidental deletion of financial records
   // Payment history must be preserved for auditing and reconciliation
   reservation Reservation @relation(fields: [reservationId], references: [id], onDelete: Restrict)
@@ -2519,6 +2541,8 @@ model Payment {
   @@index([stripePaymentIntentId])
   @@index([stripeChargeId])
   @@index([stripePayoutId])
+  @@index([stripePaymentMethodId])
+  @@index([stripeCustomerId])
 }
 
 model RepeatCharge {
@@ -9736,16 +9760,136 @@ model DemoRequest {
   campgroundName String
   siteCount String
   message   String? @db.Text
-  
+
   status    String   @default("new") // "new" | "contacted" | "scheduled" | "completed" | "closed"
   notes     String?  @db.Text
   assignedTo String?
-  
+
   source    String   @default("website") // "website" | "referral" | etc.
-  
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  
+
   @@index([status])
   @@index([createdAt])
+}
+
+// =============================================================================
+// STRIPE PAYMENT INFRASTRUCTURE - Card Storage, Terminal, Refunds
+// =============================================================================
+
+// Stripe Customer - Links a guest to a Stripe customer on a specific campground's connected account
+// Each campground has their own connected Stripe account, so customers are per-campground
+model StripeCustomer {
+  id                     String   @id @default(cuid())
+  campgroundId           String
+  guestId                String
+  stripeCustomerId       String   // Stripe customer ID on the connected account (cus_xxx)
+  email                  String?
+  defaultPaymentMethodId String?  // Default pm_xxx ID
+  metadata               Json?
+  createdAt              DateTime @default(now())
+  updatedAt              DateTime @updatedAt
+
+  campground     Campground           @relation(fields: [campgroundId], references: [id], onDelete: Cascade)
+  guest          Guest                @relation(fields: [guestId], references: [id], onDelete: Cascade)
+  paymentMethods GuestPaymentMethod[]
+
+  @@unique([campgroundId, guestId]) // One customer per guest per campground
+  @@unique([campgroundId, stripeCustomerId]) // Ensure unique Stripe customer per campground
+  @@index([guestId])
+  @@index([stripeCustomerId])
+}
+
+// Guest Payment Method - Saved cards/bank accounts for a guest
+model GuestPaymentMethod {
+  id                    String   @id @default(cuid())
+  stripeCustomerId      String   // FK to StripeCustomer
+  stripePaymentMethodId String   // Stripe payment method ID (pm_xxx)
+  type                  String   // "card", "us_bank_account", "card_present"
+  last4                 String?
+  brand                 String?  // "visa", "mastercard", "amex", "discover"
+  expMonth              Int?
+  expYear               Int?
+  bankName              String?  // For ACH
+  isDefault             Boolean  @default(false)
+  nickname              String?  // User-friendly label: "Business Card", "Personal Visa"
+  addedBy               String   // "guest" | "staff" | "auto" (auto-saved after payment)
+  addedByUserId         String?  // Staff user ID if added by staff
+  metadata              Json?
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+
+  stripeCustomer StripeCustomer @relation(fields: [stripeCustomerId], references: [id], onDelete: Cascade)
+
+  @@unique([stripeCustomerId, stripePaymentMethodId])
+  @@index([stripePaymentMethodId])
+}
+
+// Stripe Terminal Location - Physical location for terminal readers (per campground)
+model StripeTerminalLocation {
+  id               String   @id @default(cuid())
+  campgroundId     String
+  stripeLocationId String   // Stripe terminal location ID (tml_xxx)
+  displayName      String   // "Front Office", "Camp Store", "Pool House"
+  address          Json?    // { line1, line2, city, state, postal_code, country }
+  metadata         Json?
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  campground Campground             @relation(fields: [campgroundId], references: [id], onDelete: Cascade)
+  readers    StripeTerminalReader[]
+
+  @@unique([campgroundId, stripeLocationId])
+  @@index([campgroundId])
+}
+
+// Stripe Terminal Reader - Physical card reader device (per campground)
+model StripeTerminalReader {
+  id               String    @id @default(cuid())
+  campgroundId     String
+  locationId       String?   // FK to StripeTerminalLocation
+  stripeReaderId   String    // Stripe reader ID (tmr_xxx)
+  label            String    // User-friendly name: "Front Desk Reader 1"
+  registrationCode String?   // Used during initial registration
+  deviceType       String    // "bbpos_wisepos_e", "verifone_P400", "stripe_m2", etc.
+  serialNumber     String?
+  status           String    @default("offline") // "online" | "offline" | "busy"
+  lastSeenAt       DateTime?
+  ipAddress        String?
+  firmwareVersion  String?
+  metadata         Json?
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+
+  campground Campground              @relation(fields: [campgroundId], references: [id], onDelete: Cascade)
+  location   StripeTerminalLocation? @relation(fields: [locationId], references: [id], onDelete: SetNull)
+
+  @@unique([campgroundId, stripeReaderId])
+  @@index([campgroundId, status])
+  @@index([locationId])
+}
+
+// Payment Audit Log - Track all payment-related operations for security
+model PaymentAuditLog {
+  id           String   @id @default(cuid())
+  campgroundId String
+  actorId      String?  // User ID or "system" for automated operations
+  actorEmail   String?
+  actorRole    String?
+  action       String   // payment_method.saved, payment_method.deleted, payment.refunded, etc.
+  entityType   String   // payment, payment_method, refund, terminal
+  entityId     String
+  before       Json?    // State before the action
+  after        Json?    // State after the action
+  metadata     Json?    // Additional context
+  ip           String?
+  userAgent    String?
+  createdAt    DateTime @default(now())
+
+  @@index([campgroundId])
+  @@index([campgroundId, action])
+  @@index([campgroundId, createdAt])
+  @@index([entityType, entityId])
+  @@index([actorId])
 }

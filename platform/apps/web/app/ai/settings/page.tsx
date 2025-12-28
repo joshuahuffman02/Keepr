@@ -112,7 +112,7 @@ export default function AISettingsPage() {
   // Update config mutation
   const updateMutation = useMutation({
     mutationFn: (updates: Partial<AutopilotConfig>) =>
-      apiClient.updateAiAutopilotConfig(campground!.id, updates),
+      apiClient.updateAutopilotConfig(campground!.id, updates),
     onSuccess: () => {
       toast({ title: "Settings saved", description: "Your AI settings have been updated." });
       queryClient.invalidateQueries({ queryKey: ["ai-autopilot-config"] });

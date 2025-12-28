@@ -103,7 +103,7 @@ export default function AIPricingPage() {
   // Apply recommendation mutation
   const applyMutation = useMutation({
     mutationFn: (recommendationId: string) =>
-      apiClient.applyPricingRecommendation(campground!.id, recommendationId),
+      apiClient.applyPricingRecommendation(recommendationId),
     onSuccess: () => {
       toast({ title: "Pricing applied", description: "The pricing recommendation has been applied." });
       refetch();
@@ -117,7 +117,7 @@ export default function AIPricingPage() {
   // Dismiss recommendation mutation
   const dismissMutation = useMutation({
     mutationFn: (recommendationId: string) =>
-      apiClient.dismissPricingRecommendation(campground!.id, recommendationId),
+      apiClient.dismissPricingRecommendation(recommendationId),
     onSuccess: () => {
       toast({ title: "Recommendation dismissed" });
       refetch();

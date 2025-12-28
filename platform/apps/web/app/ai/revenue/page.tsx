@@ -39,17 +39,19 @@ const SPRING_CONFIG = {
 
 type RevenueInsight = {
   id: string;
-  insightType: "revenue_gap" | "underutilized_site" | "missed_upsell" | "pricing_opportunity";
+  insightType: "revenue_gap" | "underutilized_site" | "missed_upsell" | "pricing_opportunity" | string;
   title: string;
   summary: string;
   impactCents: number;
-  difficulty: "easy" | "medium" | "hard";
+  difficulty: "easy" | "medium" | "hard" | string;
+  priority?: number;
   recommendations: Array<{
     action: string;
-    detail: string;
+    detail?: string;
+    details?: string;
   }>;
-  status: "new" | "in_progress" | "completed" | "dismissed";
-  createdAt: string;
+  status: "new" | "in_progress" | "completed" | "dismissed" | string;
+  createdAt?: string;
 };
 
 function getInsightIcon(type: string) {
@@ -117,7 +119,7 @@ export default function AIRevenuePage() {
   // Start working on insight
   const startMutation = useMutation({
     mutationFn: (insightId: string) =>
-      apiClient.startRevenueInsight(campground!.id, insightId),
+      apiClient.startRevenueInsight(insightId),
     onSuccess: () => {
       toast({ title: "Started", description: "Insight marked as in progress." });
       refetch();
@@ -130,7 +132,7 @@ export default function AIRevenuePage() {
   // Complete insight
   const completeMutation = useMutation({
     mutationFn: (insightId: string) =>
-      apiClient.completeRevenueInsight(campground!.id, insightId),
+      apiClient.completeRevenueInsight(insightId),
     onSuccess: () => {
       toast({ title: "Completed", description: "Insight marked as completed." });
       refetch();
@@ -382,8 +384,8 @@ export default function AIRevenuePage() {
                                       <ChevronRight className="h-4 w-4 text-muted-foreground mt-0.5 flex-shrink-0" />
                                       <div>
                                         <span className="font-medium text-foreground">{rec.action}</span>
-                                        {rec.detail && (
-                                          <span className="text-muted-foreground"> - {rec.detail}</span>
+                                        {(rec.detail || rec.details) && (
+                                          <span className="text-muted-foreground"> - {rec.detail || rec.details}</span>
                                         )}
                                       </div>
                                     </div>
@@ -431,10 +433,12 @@ export default function AIRevenuePage() {
                           </div>
 
                           <div className="flex items-center gap-4 mt-4 pt-4 border-t text-xs text-muted-foreground">
-                            <div className="flex items-center gap-1">
-                              <Clock className="h-3 w-3" />
-                              {formatDistanceToNow(new Date(insight.createdAt), { addSuffix: true })}
-                            </div>
+                            {insight.createdAt && (
+                              <div className="flex items-center gap-1">
+                                <Clock className="h-3 w-3" />
+                                {formatDistanceToNow(new Date(insight.createdAt), { addSuffix: true })}
+                              </div>
+                            )}
                             <Badge variant="outline" className="text-xs capitalize">
                               {insight.insightType.replace("_", " ")}
                             </Badge>

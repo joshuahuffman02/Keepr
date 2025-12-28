@@ -37,25 +37,35 @@ const SPRING_CONFIG = {
 };
 
 type WeatherData = {
-  temperature: number;
+  temp?: number;
+  temperature?: number;
   feelsLike: number;
   humidity: number;
   windSpeed: number;
+  windGust?: number;
   description: string;
   icon: string;
-  updatedAt: string;
+  updatedAt?: string;
+  alerts?: Array<{
+    event: string;
+    severity: string;
+    headline: string;
+    start: string;
+    end: string;
+  }>;
 };
 
 type WeatherAlert = {
   id: string;
-  alertType: "storm" | "extreme_heat" | "extreme_cold" | "flood" | "wind";
-  severity: "advisory" | "watch" | "warning";
+  alertType: string;
+  severity: string;
   title: string;
   message: string;
+  guestsAffected?: number;
   guestsNotified: number;
   startTime: string;
-  status: "active" | "expired";
-  createdAt: string;
+  status: string;
+  createdAt?: string;
 };
 
 function getWeatherIcon(icon: string) {
@@ -160,8 +170,8 @@ export default function AIWeatherPage() {
             </div>
           </div>
           <div className="flex items-center gap-2">
-            <Badge variant={autopilotConfig?.weatherAlertsEnabled ? "default" : "secondary"}>
-              {autopilotConfig?.weatherAlertsEnabled ? "Active" : "Disabled"}
+            <Badge variant={(autopilotConfig as any)?.weatherAlertsEnabled ? "default" : "secondary"}>
+              {(autopilotConfig as any)?.weatherAlertsEnabled ? "Active" : "Disabled"}
             </Badge>
             <Link href="/ai/settings">
               <Button variant="outline" size="sm" className="gap-2">
@@ -220,8 +230,8 @@ export default function AIWeatherPage() {
               <CardTitle>Current Conditions</CardTitle>
               <CardDescription>
                 {weather && (weather as WeatherData).updatedAt
-                  ? `Updated ${formatDistanceToNow(new Date((weather as WeatherData).updatedAt), { addSuffix: true })}`
-                  : "Loading..."}
+                  ? `Updated ${formatDistanceToNow(new Date((weather as WeatherData).updatedAt as string), { addSuffix: true })}`
+                  : "Current weather conditions"}
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -237,7 +247,7 @@ export default function AIWeatherPage() {
                     </div>
                     <div>
                       <div className="text-4xl font-bold text-foreground">
-                        {Math.round((weather as WeatherData).temperature)}°F
+                        {Math.round((weather as any).temp || (weather as any).temperature || 0)}°F
                       </div>
                       <p className="text-sm text-muted-foreground capitalize">
                         {(weather as WeatherData).description}
@@ -357,7 +367,7 @@ export default function AIWeatherPage() {
                           {alert.status}
                         </Badge>
                         <p className="text-xs text-muted-foreground mt-1">
-                          {formatDistanceToNow(new Date(alert.createdAt), { addSuffix: true })}
+                          {alert.createdAt && formatDistanceToNow(new Date(alert.createdAt), { addSuffix: true })}
                         </p>
                       </div>
                     </div>

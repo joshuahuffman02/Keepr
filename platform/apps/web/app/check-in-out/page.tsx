@@ -136,8 +136,15 @@ export default function CheckInOutPage() {
 
   const reservations = (reservationsQuery.data as Reservation[]) || [];
 
-  const arrivals = reservations.filter((r) => r.status !== "cancelled" && r.arrivalDate.split("T")[0] === date);
-  const departures = reservations.filter((r) => r.status !== "cancelled" && r.departureDate.split("T")[0] === date);
+  // Helper to compare dates in local timezone (handles UTC offset)
+  const isSameLocalDate = (isoDateStr: string, targetDate: string) => {
+    const d = new Date(isoDateStr);
+    const localDate = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+    return localDate === targetDate;
+  };
+
+  const arrivals = reservations.filter((r) => r.status !== "cancelled" && isSameLocalDate(r.arrivalDate, date));
+  const departures = reservations.filter((r) => r.status !== "cancelled" && isSameLocalDate(r.departureDate, date));
 
   const filteredList = useMemo(() => {
     const list = tab === "arrivals" ? arrivals : departures;
@@ -424,8 +431,22 @@ export default function CheckInOutPage() {
                               Assign Site
                             </Button>
                           )}
-                          <Button onClick={() => checkInMutation.mutate(res.id)} disabled={checkInMutation.isPending} className="bg-emerald-600 hover:bg-emerald-700">
-                            {checkInMutation.isPending ? "Checking..." : "Check In"}
+                          {res.balanceAmount > 0 && (
+                            <Button
+                              variant="outline"
+                              className="text-amber-700 border-amber-200 hover:bg-amber-50"
+                              onClick={() => openPayment(res)}
+                            >
+                              <CreditCard className="h-4 w-4 mr-2" />
+                              Pay Balance
+                            </Button>
+                          )}
+                          <Button
+                            onClick={() => checkInMutation.mutate(res.id)}
+                            disabled={checkInMutation.isPending}
+                            className={res.balanceAmount > 0 ? "bg-amber-600 hover:bg-amber-700" : "bg-emerald-600 hover:bg-emerald-700"}
+                          >
+                            {checkInMutation.isPending ? "Checking..." : res.balanceAmount > 0 ? "Check In Anyway" : "Check In"}
                           </Button>
                         </div>
                       )
@@ -470,7 +491,10 @@ export default function CheckInOutPage() {
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Collect Outstanding Balance</DialogTitle>
-            <DialogDescription>Guest owes {formatMoney(selectedReservation?.balanceAmount)}. Record payment to proceed with checkout.</DialogDescription>
+            <DialogDescription>
+              {selectedReservation?.guest.primaryFirstName} {selectedReservation?.guest.primaryLastName} owes {formatMoney(selectedReservation?.balanceAmount)}.
+              {tab === "arrivals" ? " Collect payment before or during check-in." : " Record payment to proceed with checkout."}
+            </DialogDescription>
           </DialogHeader>
 
           <div className="grid gap-4 py-4">
@@ -502,13 +526,37 @@ export default function CheckInOutPage() {
             </div>
           </div>
 
-          <DialogFooter>
+          <DialogFooter className="flex-col sm:flex-row gap-2">
             <Button variant="outline" onClick={() => setIsPaymentOpen(false)}>
               Cancel
             </Button>
-            <Button onClick={() => selectedReservation && paymentMutation.mutate({ id: selectedReservation.id, amount: paymentAmount })} disabled={paymentMutation.isPending}>
-              {paymentMutation.isPending ? "Processing..." : "Record Payment"}
+            <Button
+              onClick={() => selectedReservation && paymentMutation.mutate({ id: selectedReservation.id, amount: paymentAmount })}
+              disabled={paymentMutation.isPending}
+              variant="outline"
+            >
+              {paymentMutation.isPending ? "Processing..." : "Record Payment Only"}
             </Button>
+            {tab === "arrivals" && selectedReservation?.status !== "checked_in" && (
+              <Button
+                onClick={async () => {
+                  if (!selectedReservation) return;
+                  try {
+                    await apiClient.recordReservationPayment(selectedReservation.id, paymentAmount);
+                    await apiClient.checkInReservation(selectedReservation.id);
+                    queryClient.invalidateQueries({ queryKey: ["reservations", campgroundId] });
+                    toast({ title: "Payment recorded and guest checked in" });
+                    setIsPaymentOpen(false);
+                  } catch {
+                    toast({ title: "Failed to complete operation", variant: "destructive" });
+                  }
+                }}
+                disabled={paymentMutation.isPending}
+                className="bg-emerald-600 hover:bg-emerald-700"
+              >
+                Pay & Check In
+              </Button>
+            )}
           </DialogFooter>
         </DialogContent>
       </Dialog>
