@@ -100,7 +100,7 @@ export function HelpPanel({ open, onClose }: HelpPanelProps) {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
+          Authorization: `Bearer ${localStorage.getItem("campreserv:authToken")}`,
         },
         body: JSON.stringify({
           query: searchQuery,

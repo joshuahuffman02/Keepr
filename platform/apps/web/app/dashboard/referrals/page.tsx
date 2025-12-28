@@ -76,7 +76,7 @@ export default function ReferralsPage() {
     queryKey: ["referral-stats", organizationId],
     queryFn: async () => {
       const res = await fetch(`${API_BASE}/organizations/${organizationId}/referrals`, {
-        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` }
+        headers: { Authorization: `Bearer ${localStorage.getItem("campreserv:authToken")}` }
       });
       if (!res.ok) {
         // Return mock data if endpoint doesn't exist yet

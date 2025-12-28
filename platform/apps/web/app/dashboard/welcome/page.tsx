@@ -70,7 +70,7 @@ export default function WelcomePage() {
       try {
         const res = await fetch(
           `${API_BASE}/early-access/enrollment/${selectedCampground.organizationId}`,
-          { headers: { Authorization: `Bearer ${localStorage.getItem("token")}` } }
+          { headers: { Authorization: `Bearer ${localStorage.getItem("campreserv:authToken")}` } }
         );
         if (res.ok) {
           const data = await res.json();
