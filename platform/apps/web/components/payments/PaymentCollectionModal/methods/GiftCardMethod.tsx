@@ -69,11 +69,7 @@ export default function GiftCardMethod({
         actions.addTenderEntry({
           method: "gift_card",
           amountCents: result.amountRedeemedCents,
-          reference: result.transactionId,
-          details: {
-            giftCardCode: giftCard.code,
-            remainingBalance: result.remainingBalanceCents,
-          },
+          reference: `${giftCard.code} (${result.transactionId})`,
         });
 
         onSuccess(result.transactionId);

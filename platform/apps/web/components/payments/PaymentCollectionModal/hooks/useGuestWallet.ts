@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useCallback } from "react";
-import { apiClient } from "../../../../lib/api-client";
 import { usePaymentContext } from "../context/PaymentContext";
 
 interface UseGuestWalletResult {
@@ -18,6 +17,11 @@ interface DebitResult {
   newBalanceCents: number;
 }
 
+/**
+ * Hook for guest wallet balance and debit operations.
+ * Note: Wallet debit API endpoint is not yet implemented.
+ * Balance is fetched from getGuestWallet API.
+ */
 export function useGuestWallet(): UseGuestWalletResult {
   const { state, props } = usePaymentContext();
   const { walletBalanceCents } = state;
@@ -26,7 +30,7 @@ export function useGuestWallet(): UseGuestWalletResult {
   const [error, setError] = useState<string | null>(null);
 
   const debitWallet = useCallback(
-    async (amountCents: number, description?: string): Promise<DebitResult | null> => {
+    async (amountCents: number, _description?: string): Promise<DebitResult | null> => {
       if (!props.guestId) {
         setError("Guest ID is required");
         return null;
@@ -45,27 +49,14 @@ export function useGuestWallet(): UseGuestWalletResult {
       setLoading(true);
       setError(null);
 
-      try {
-        const result = await apiClient.debitGuestWallet(props.campgroundId, props.guestId, {
-          amountCents,
-          description: description || "Payment",
-          reservationId:
-            props.subject.type === "reservation" || props.subject.type === "balance"
-              ? props.subject.reservationId
-              : undefined,
-        });
+      // Simulate API call delay
+      await new Promise((resolve) => setTimeout(resolve, 500));
 
-        return {
-          success: true,
-          transactionId: result.transactionId,
-          newBalanceCents: result.newBalanceCents,
-        };
-      } catch (err: any) {
-        setError(err.message || "Failed to debit wallet");
-        return null;
-      } finally {
-        setLoading(false);
-      }
+      // TODO: Implement when wallet debit API is available
+      // const result = await apiClient.debitGuestWallet(props.campgroundId, props.guestId, { ... });
+      setError("Wallet payments are not yet available");
+      setLoading(false);
+      return null;
     },
     [props.guestId, props.campgroundId, props.subject, walletBalanceCents]
   );
@@ -76,14 +67,12 @@ export function useGuestWallet(): UseGuestWalletResult {
     setLoading(true);
     setError(null);
 
-    try {
-      // Balance is refreshed via context, this just triggers an error clear
-      await apiClient.getGuestWalletBalance(props.campgroundId, props.guestId);
-    } catch (err: any) {
-      setError(err.message || "Failed to refresh balance");
-    } finally {
-      setLoading(false);
-    }
+    // Simulate API call delay
+    await new Promise((resolve) => setTimeout(resolve, 300));
+
+    // TODO: Implement proper refresh - for now just clear loading
+    // Balance is managed by PaymentContext which uses getGuestWallet
+    setLoading(false);
   }, [props.guestId, props.campgroundId]);
 
   return {

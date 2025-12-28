@@ -197,7 +197,7 @@ function WalletPaymentButton({
                 paymentRequest,
                 style: {
                   paymentRequestButton: {
-                    type: walletType === "apple_pay" ? "plain" : "default",
+                    type: "default",
                     theme: "dark",
                     height: "48px",
                   },

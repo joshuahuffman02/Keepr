@@ -1,36 +1,23 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
-import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Badge } from "@/components/ui/badge";
-import { useToast } from "@/components/ui/use-toast";
-import { apiClient } from "@/lib/api-client";
-import { cn } from "@/lib/utils";
+import { Label } from "@/components/ui/label";
+import { Button } from "@/components/ui/button";
 import {
   CreditCard,
   Smartphone,
+  Building2,
   Banknote,
-  FileText,
-  Home,
-  Building,
-  Wallet,
-  Gift,
-  Lock,
   Receipt,
-  Apple,
-  Loader2,
+  Tent,
+  Gift,
+  Info
 } from "lucide-react";
 
-interface PaymentMethodsConfigProps {
-  campgroundId: string;
-}
-
-type CardBrand = "visa" | "mastercard" | "amex" | "discover" | "diners" | "jcb" | "unionpay";
+type CardBrand = "visa" | "mastercard" | "amex" | "discover" | "diners" | "jcb";
 
 interface PaymentMethodSettings {
   enableCardPayments: boolean;
@@ -46,20 +33,25 @@ interface PaymentMethodSettings {
   showFeeBreakdown: boolean;
 }
 
-const CARD_BRANDS: { id: CardBrand; name: string; icon: string }[] = [
-  { id: "visa", name: "Visa", icon: "💳" },
-  { id: "mastercard", name: "Mastercard", icon: "💳" },
-  { id: "amex", name: "American Express", icon: "💳" },
-  { id: "discover", name: "Discover", icon: "💳" },
-  { id: "diners", name: "Diners Club", icon: "💳" },
-  { id: "jcb", name: "JCB", icon: "💳" },
-  { id: "unionpay", name: "UnionPay", icon: "💳" },
+interface PaymentMethodsConfigProps {
+  campgroundId: string;
+}
+
+const CARD_BRANDS: { id: CardBrand; label: string; icon: string }[] = [
+  { id: "visa", label: "Visa", icon: "💳" },
+  { id: "mastercard", label: "Mastercard", icon: "💳" },
+  { id: "amex", label: "American Express", icon: "💳" },
+  { id: "discover", label: "Discover", icon: "💳" },
+  { id: "diners", label: "Diners Club", icon: "💳" },
+  { id: "jcb", label: "JCB", icon: "💳" },
 ];
 
+/**
+ * Payment Methods Configuration Component
+ * Note: This component displays the available payment method toggles.
+ * Full API integration for saving settings is coming soon.
+ */
 export function PaymentMethodsConfig({ campgroundId }: PaymentMethodsConfigProps) {
-  const { toast } = useToast();
-  const queryClient = useQueryClient();
-
   const [settings, setSettings] = useState<PaymentMethodSettings>({
     enableCardPayments: true,
     enableApplePay: true,
@@ -72,42 +64,6 @@ export function PaymentMethodsConfig({ campgroundId }: PaymentMethodsConfigProps
     enableExternalPOS: false,
     allowedCardBrands: ["visa", "mastercard", "amex", "discover"],
     showFeeBreakdown: false,
-  });
-
-  const { data, isLoading } = useQuery({
-    queryKey: ["payment-method-settings", campgroundId],
-    queryFn: () => apiClient.getPaymentMethodSettings(campgroundId),
-    enabled: !!campgroundId,
-  });
-
-  useEffect(() => {
-    if (data) {
-      setSettings({
-        enableCardPayments: data.enableCardPayments ?? true,
-        enableApplePay: data.enableApplePay ?? true,
-        enableGooglePay: data.enableGooglePay ?? true,
-        enableACH: data.enableACH ?? true,
-        enableCash: data.enableCash ?? true,
-        enableCheck: data.enableCheck ?? true,
-        enableFolio: data.enableFolio ?? true,
-        enableGiftCards: data.enableGiftCards ?? false,
-        enableExternalPOS: data.enableExternalPOS ?? false,
-        allowedCardBrands: data.allowedCardBrands ?? ["visa", "mastercard", "amex", "discover"],
-        showFeeBreakdown: data.showFeeBreakdown ?? false,
-      });
-    }
-  }, [data]);
-
-  const updateMutation = useMutation({
-    mutationFn: (payload: PaymentMethodSettings) =>
-      apiClient.updatePaymentMethodSettings(campgroundId, payload),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["payment-method-settings", campgroundId] });
-      toast({ title: "Saved", description: "Payment method settings updated." });
-    },
-    onError: (err: Error) => {
-      toast({ title: "Error", description: err.message, variant: "destructive" });
-    },
   });
 
   const handleToggle = (key: keyof PaymentMethodSettings, value: boolean) => {
@@ -123,23 +79,23 @@ export function PaymentMethodsConfig({ campgroundId }: PaymentMethodsConfigProps
     });
   };
 
-  const handleSave = () => {
-    updateMutation.mutate(settings);
-  };
-
-  if (isLoading) {
-    return (
-      <Card>
-        <CardContent className="flex items-center justify-center py-8">
-          <Loader2 className="h-6 w-6 animate-spin text-slate-400" />
-        </CardContent>
-      </Card>
-    );
-  }
-
   return (
-    <div className="space-y-4">
-      {/* Card Payment Methods */}
+    <div className="space-y-6">
+      {/* Info Banner */}
+      <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
+        <div className="flex items-start gap-3">
+          <Info className="h-5 w-5 text-blue-600 mt-0.5" />
+          <div>
+            <p className="font-medium text-blue-800">Preview Mode</p>
+            <p className="text-sm text-blue-700 mt-1">
+              Payment method configuration is in preview. Changes here show how the
+              settings will appear but are not saved to the database yet.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {/* Card Payments */}
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
@@ -147,50 +103,38 @@ export function PaymentMethodsConfig({ campgroundId }: PaymentMethodsConfigProps
             Card Payments
           </CardTitle>
           <CardDescription>
-            Configure which card payment methods guests can use
+            Accept credit and debit card payments via Stripe
           </CardDescription>
         </CardHeader>
-        <CardContent className="space-y-6">
-          {/* Enable card payments */}
+        <CardContent className="space-y-4">
           <div className="flex items-center justify-between">
-            <div className="space-y-0.5">
-              <Label>Credit/Debit Cards</Label>
-              <p className="text-sm text-slate-500">
-                Accept card payments via Stripe
-              </p>
-            </div>
+            <Label htmlFor="enable-cards" className="flex-1">
+              Enable card payments
+            </Label>
             <Switch
+              id="enable-cards"
               checked={settings.enableCardPayments}
-              onCheckedChange={(v) => handleToggle("enableCardPayments", v)}
+              onCheckedChange={(checked) => handleToggle("enableCardPayments", checked)}
             />
           </div>
 
-          {/* Card Brands */}
           {settings.enableCardPayments && (
-            <div className="space-y-3 pl-4 border-l-2 border-slate-100">
-              <Label className="text-sm font-medium">Accepted Card Brands</Label>
-              <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+            <div className="pl-4 border-l-2 border-slate-200 space-y-3">
+              <p className="text-sm font-medium text-slate-700">Accepted Card Brands</p>
+              <div className="grid grid-cols-2 gap-3">
                 {CARD_BRANDS.map((brand) => (
                   <label
                     key={brand.id}
-                    className={cn(
-                      "flex items-center gap-2 p-2 rounded-lg border cursor-pointer transition-colors",
-                      settings.allowedCardBrands.includes(brand.id)
-                        ? "border-emerald-300 bg-emerald-50"
-                        : "border-slate-200 hover:border-slate-300"
-                    )}
+                    className="flex items-center gap-2 cursor-pointer"
                   >
                     <Checkbox
                       checked={settings.allowedCardBrands.includes(brand.id)}
                       onCheckedChange={() => handleCardBrandToggle(brand.id)}
                     />
-                    <span className="text-sm">{brand.name}</span>
+                    <span className="text-sm">{brand.label}</span>
                   </label>
                 ))}
               </div>
-              <p className="text-xs text-slate-500">
-                Unselected brands will be rejected at checkout
-              </p>
             </div>
           )}
         </CardContent>
@@ -204,43 +148,28 @@ export function PaymentMethodsConfig({ campgroundId }: PaymentMethodsConfigProps
             Digital Wallets
           </CardTitle>
           <CardDescription>
-            Enable mobile wallet payment options
+            Apple Pay, Google Pay, and Stripe Link
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="h-8 w-8 rounded-lg bg-black flex items-center justify-center">
-                <Apple className="h-5 w-5 text-white" />
-              </div>
-              <div className="space-y-0.5">
-                <Label>Apple Pay</Label>
-                <p className="text-sm text-slate-500">
-                  iOS and Safari users
-                </p>
-              </div>
-            </div>
+            <Label htmlFor="enable-apple-pay" className="flex-1">
+              Apple Pay
+            </Label>
             <Switch
+              id="enable-apple-pay"
               checked={settings.enableApplePay}
-              onCheckedChange={(v) => handleToggle("enableApplePay", v)}
+              onCheckedChange={(checked) => handleToggle("enableApplePay", checked)}
             />
           </div>
-
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="h-8 w-8 rounded-lg bg-white border flex items-center justify-center">
-                <span className="text-lg">G</span>
-              </div>
-              <div className="space-y-0.5">
-                <Label>Google Pay</Label>
-                <p className="text-sm text-slate-500">
-                  Android and Chrome users
-                </p>
-              </div>
-            </div>
+            <Label htmlFor="enable-google-pay" className="flex-1">
+              Google Pay
+            </Label>
             <Switch
+              id="enable-google-pay"
               checked={settings.enableGooglePay}
-              onCheckedChange={(v) => handleToggle("enableGooglePay", v)}
+              onCheckedChange={(checked) => handleToggle("enableGooglePay", checked)}
             />
           </div>
         </CardContent>
@@ -250,30 +179,28 @@ export function PaymentMethodsConfig({ campgroundId }: PaymentMethodsConfigProps
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <Building className="h-5 w-5" />
+            <Building2 className="h-5 w-5" />
             Bank Payments
           </CardTitle>
           <CardDescription>
-            Enable bank transfer options
+            ACH bank transfers for US customers
           </CardDescription>
         </CardHeader>
         <CardContent>
           <div className="flex items-center justify-between">
-            <div className="space-y-0.5">
-              <Label>ACH Bank Transfer</Label>
-              <p className="text-sm text-slate-500">
-                US bank account payments (lower fees, slower settlement)
-              </p>
-            </div>
+            <Label htmlFor="enable-ach" className="flex-1">
+              Enable ACH payments
+            </Label>
             <Switch
+              id="enable-ach"
               checked={settings.enableACH}
-              onCheckedChange={(v) => handleToggle("enableACH", v)}
+              onCheckedChange={(checked) => handleToggle("enableACH", checked)}
             />
           </div>
         </CardContent>
       </Card>
 
-      {/* Manual Payment Methods */}
+      {/* Manual Payments */}
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
@@ -281,55 +208,41 @@ export function PaymentMethodsConfig({ campgroundId }: PaymentMethodsConfigProps
             Manual Payments
           </CardTitle>
           <CardDescription>
-            Cash, check, and other offline payment options
+            Cash, check, and charge-to-site options for staff
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <Banknote className="h-5 w-5 text-emerald-600" />
-              <div className="space-y-0.5">
-                <Label>Cash</Label>
-                <p className="text-sm text-slate-500">
-                  Accept cash payments at check-in/POS
-                </p>
-              </div>
-            </div>
+            <Label htmlFor="enable-cash" className="flex-1">
+              Cash payments
+            </Label>
             <Switch
+              id="enable-cash"
               checked={settings.enableCash}
-              onCheckedChange={(v) => handleToggle("enableCash", v)}
+              onCheckedChange={(checked) => handleToggle("enableCash", checked)}
             />
           </div>
-
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <FileText className="h-5 w-5 text-blue-600" />
-              <div className="space-y-0.5">
-                <Label>Check</Label>
-                <p className="text-sm text-slate-500">
-                  Accept check payments
-                </p>
-              </div>
-            </div>
+            <Label htmlFor="enable-check" className="flex-1">
+              Check payments
+            </Label>
             <Switch
+              id="enable-check"
               checked={settings.enableCheck}
-              onCheckedChange={(v) => handleToggle("enableCheck", v)}
+              onCheckedChange={(checked) => handleToggle("enableCheck", checked)}
             />
           </div>
-
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <Home className="h-5 w-5 text-amber-600" />
-              <div className="space-y-0.5">
-                <Label>Charge to Folio/Site</Label>
-                <p className="text-sm text-slate-500">
-                  Add charges to guest's site folio
-                </p>
-              </div>
+            <div className="flex-1">
+              <Label htmlFor="enable-folio">Charge to site/folio</Label>
+              <p className="text-xs text-slate-500">
+                Allow guests to charge purchases to their reservation
+              </p>
             </div>
             <Switch
+              id="enable-folio"
               checked={settings.enableFolio}
-              onCheckedChange={(v) => handleToggle("enableFolio", v)}
+              onCheckedChange={(checked) => handleToggle("enableFolio", checked)}
             />
           </div>
         </CardContent>
@@ -343,49 +256,38 @@ export function PaymentMethodsConfig({ campgroundId }: PaymentMethodsConfigProps
             Special Payment Methods
           </CardTitle>
           <CardDescription>
-            Gift cards, external terminals, and more
+            Gift cards and external POS integration
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <Gift className="h-5 w-5 text-pink-600" />
-              <div className="space-y-0.5">
-                <Label>Gift Cards</Label>
-                <p className="text-sm text-slate-500">
-                  Accept campground-issued gift cards
-                </p>
-              </div>
-            </div>
-            <div className="flex items-center gap-2">
-              <Badge variant="outline" className="text-xs">Coming Soon</Badge>
-              <Switch
-                checked={settings.enableGiftCards}
-                onCheckedChange={(v) => handleToggle("enableGiftCards", v)}
-                disabled
-              />
-            </div>
-          </div>
-
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <Receipt className="h-5 w-5 text-purple-600" />
-              <div className="space-y-0.5">
-                <Label>External POS (Square, Clover)</Label>
-                <p className="text-sm text-slate-500">
-                  Record payments from external terminals
-                </p>
-              </div>
+            <div className="flex-1">
+              <Label htmlFor="enable-gift-cards">Gift cards</Label>
+              <p className="text-xs text-slate-500">Coming soon</p>
             </div>
             <Switch
+              id="enable-gift-cards"
+              checked={settings.enableGiftCards}
+              onCheckedChange={(checked) => handleToggle("enableGiftCards", checked)}
+              disabled
+            />
+          </div>
+          <div className="flex items-center justify-between">
+            <div className="flex-1">
+              <Label htmlFor="enable-external-pos">External POS</Label>
+              <p className="text-xs text-slate-500">Square, Clover, etc. - Coming soon</p>
+            </div>
+            <Switch
+              id="enable-external-pos"
               checked={settings.enableExternalPOS}
-              onCheckedChange={(v) => handleToggle("enableExternalPOS", v)}
+              onCheckedChange={(checked) => handleToggle("enableExternalPOS", checked)}
+              disabled
             />
           </div>
         </CardContent>
       </Card>
 
-      {/* Fee Display Settings */}
+      {/* Fee Display */}
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
@@ -393,40 +295,31 @@ export function PaymentMethodsConfig({ campgroundId }: PaymentMethodsConfigProps
             Fee Display
           </CardTitle>
           <CardDescription>
-            Control how fees are shown to guests
+            Control how processing fees are shown to guests
           </CardDescription>
         </CardHeader>
         <CardContent>
           <div className="flex items-center justify-between">
-            <div className="space-y-0.5">
-              <Label>Show Fee Breakdown</Label>
-              <p className="text-sm text-slate-500">
-                Display processing fees as a separate line item (only applies in pass-through mode)
+            <div className="flex-1">
+              <Label htmlFor="show-fee-breakdown">Show fee breakdown</Label>
+              <p className="text-xs text-slate-500">
+                When enabled, guests see processing fees as a separate line item
+                (only applies when fee mode is set to "pass through")
               </p>
             </div>
             <Switch
+              id="show-fee-breakdown"
               checked={settings.showFeeBreakdown}
-              onCheckedChange={(v) => handleToggle("showFeeBreakdown", v)}
+              onCheckedChange={(checked) => handleToggle("showFeeBreakdown", checked)}
             />
           </div>
         </CardContent>
       </Card>
 
-      {/* Save Button */}
+      {/* Save Button - Disabled in Preview */}
       <div className="flex justify-end">
-        <Button
-          onClick={handleSave}
-          disabled={updateMutation.isPending}
-          className="bg-emerald-600 hover:bg-emerald-700"
-        >
-          {updateMutation.isPending ? (
-            <>
-              <Loader2 className="h-4 w-4 animate-spin mr-2" />
-              Saving...
-            </>
-          ) : (
-            "Save Payment Settings"
-          )}
+        <Button disabled className="opacity-50">
+          Save Changes (Coming Soon)
         </Button>
       </div>
     </div>

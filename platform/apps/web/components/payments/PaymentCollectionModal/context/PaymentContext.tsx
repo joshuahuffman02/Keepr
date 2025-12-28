@@ -326,7 +326,7 @@ export function PaymentProvider({ children, modalProps }: PaymentProviderProps) 
     if (!modalProps.isOpen || !modalProps.campgroundId || !modalProps.guestId) return;
 
     apiClient
-      .getGuestWalletBalance(modalProps.campgroundId, modalProps.guestId)
+      .getGuestWallet(modalProps.campgroundId, modalProps.guestId)
       .then((data: any) => {
         dispatch({ type: "SET_WALLET_BALANCE", payload: data.balanceCents || 0 });
       })
@@ -363,25 +363,23 @@ export function PaymentProvider({ children, modalProps }: PaymentProviderProps) 
       try {
         dispatch({ type: "SET_LOADING", payload: true });
 
-        const result = await apiClient.validatePromoCode(modalProps.campgroundId, code, {
-          amountCents: state.originalAmountCents,
-          reservationId:
-            modalProps.subject.type === "reservation" || modalProps.subject.type === "balance"
-              ? modalProps.subject.reservationId
-              : undefined,
-        });
+        const result = await apiClient.validatePromoCode(
+          modalProps.campgroundId,
+          code,
+          state.originalAmountCents
+        );
 
         if (!result.valid) {
-          dispatch({ type: "SET_ERROR", payload: result.message || "Invalid promo code" });
+          dispatch({ type: "SET_ERROR", payload: "Invalid promo code" });
           return null;
         }
 
         const discount: AppliedDiscount = {
-          promoCodeId: result.promoCodeId,
+          promoCodeId: result.promotionId,
           code: code.toUpperCase(),
-          type: result.discountType,
+          type: "fixed_amount", // API returns discountCents directly
           discountCents: result.discountCents,
-          description: result.description || `Promo code ${code.toUpperCase()}`,
+          description: `Promo code ${code.toUpperCase()}`,
         };
 
         dispatch({ type: "ADD_DISCOUNT", payload: discount });

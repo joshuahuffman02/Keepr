@@ -110,7 +110,7 @@ export function TerminalMethod({ onSuccess, onError, onCancel }: TerminalMethodP
         },
       });
 
-      onSuccess?.(result.paymentId);
+      onSuccess?.(result.paymentId || "terminal_payment");
     } catch (err: any) {
       setStatus("error");
       setError(err.message || "Terminal payment failed");

@@ -316,7 +316,7 @@ export interface PaymentContextState {
 
 export interface PaymentContextActions {
   // Method selection
-  selectMethod: (method: PaymentMethodType) => void;
+  selectMethod: (method: PaymentMethodType | null) => void;
 
   // Split tender
   addTenderEntry: (entry: Omit<TenderEntry, "id" | "status">) => void;

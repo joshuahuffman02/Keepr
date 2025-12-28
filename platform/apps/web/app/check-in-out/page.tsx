@@ -44,7 +44,7 @@ type Reservation = {
   children?: number;
   siteId?: string | null;
   site?: { name?: string };
-  guest: { primaryFirstName: string; primaryLastName: string };
+  guest: { id?: string; email?: string; primaryFirstName: string; primaryLastName: string };
   notes?: string | null;
 };
 
