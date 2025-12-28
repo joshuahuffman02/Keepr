@@ -874,7 +874,8 @@ export default function BillingPage() {
               </div>
             </div>
 
-            {/* Setup Services Section */}
+            {/* Setup Services Section - only show if has active pay-over-time balance OR still in setup phase */}
+            {((setupServices && setupServices.some(s => s.balanceRemainingCents > 0)) || summary.usage.bookingCount === 0) && (
             <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
               <div className="p-6 border-b border-slate-100">
                 <div className="flex items-center justify-between">
@@ -933,7 +934,8 @@ export default function BillingPage() {
                 </div>
               )}
 
-              {/* Purchase Options */}
+              {/* Purchase Options - only show if still in setup phase (no bookings yet) */}
+              {summary.usage.bookingCount === 0 && (
               <div className="p-6">
                 <div className="grid md:grid-cols-2 gap-4">
                   {/* Quick Start */}
@@ -1023,7 +1025,9 @@ export default function BillingPage() {
                   Pay-over-time: Add $1/booking until paid off. No interest, no pressure.
                 </p>
               </div>
+              )}
             </div>
+            )}
 
             {/* Purchase Confirmation Modal */}
             {purchaseType && (
