@@ -25,6 +25,7 @@ import { Label } from "../../components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../components/ui/select";
 import { Switch } from "../../components/ui/switch";
 import { Badge } from "../../components/ui/badge";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../../components/ui/dialog";
 import { cn } from "../../lib/utils";
 
 import { useCalendarData } from "../calendar/useCalendarData";
@@ -120,9 +121,103 @@ export default function CalendarLabPage() {
   }, [state.startDate, state.dayCount]);
 
   const [todayKey, setTodayKey] = useState("");
+  const [showShortcuts, setShowShortcuts] = useState(false);
+  const searchInputRef = useRef<HTMLInputElement>(null);
+
   useEffect(() => {
     setTodayKey(formatLocalDateInput(new Date()));
   }, []);
+
+  // Keyboard shortcuts
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Ignore if typing in an input
+      const target = e.target as HTMLElement;
+      if (target.tagName === "INPUT" || target.tagName === "TEXTAREA" || target.isContentEditable) {
+        // Only handle Escape in inputs
+        if (e.key === "Escape") {
+          (target as HTMLInputElement).blur();
+          return;
+        }
+        return;
+      }
+
+      // Arrow keys: navigate days
+      if (e.key === "ArrowLeft") {
+        e.preventDefault();
+        const d = parseLocalDateInput(state.startDate);
+        d.setDate(d.getDate() - state.dayCount);
+        actions.setStartDate(formatLocalDateInput(d));
+        return;
+      }
+      if (e.key === "ArrowRight") {
+        e.preventDefault();
+        const d = parseLocalDateInput(state.startDate);
+        d.setDate(d.getDate() + state.dayCount);
+        actions.setStartDate(formatLocalDateInput(d));
+        return;
+      }
+
+      // T: Jump to today
+      if (e.key === "t" || e.key === "T") {
+        e.preventDefault();
+        actions.setStartDate(formatLocalDateInput(new Date()));
+        return;
+      }
+
+      // N: New reservation (focus search or show message)
+      if (e.key === "n" || e.key === "N") {
+        e.preventDefault();
+        router.push("/booking");
+        return;
+      }
+
+      // R: Refresh
+      if (e.key === "r" || e.key === "R") {
+        e.preventDefault();
+        queries.sites.refetch();
+        queries.reservations.refetch();
+        return;
+      }
+
+      // /: Focus search
+      if (e.key === "/") {
+        e.preventDefault();
+        searchInputRef.current?.focus();
+        return;
+      }
+
+      // Escape: Clear selection
+      if (e.key === "Escape") {
+        e.preventDefault();
+        actions.setSelectedReservationId(null);
+        setShowShortcuts(false);
+        return;
+      }
+
+      // 1-9: Set day range
+      if (e.key >= "1" && e.key <= "9") {
+        e.preventDefault();
+        const idx = parseInt(e.key, 10) - 1;
+        const dayRanges = [7, 14, 21, 30];
+        if (idx < dayRanges.length) {
+          actions.setDayCount(dayRanges[idx]);
+        }
+        return;
+      }
+
+      // ?: Show shortcuts
+      if (e.key === "?") {
+        e.preventDefault();
+        setShowShortcuts(true);
+        return;
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [state.startDate, state.dayCount, actions, router, queries]);
+
   const todayDate = useMemo(() => (todayKey ? parseLocalDateInput(todayKey) : null), [todayKey]);
   const arrivalsToday = useMemo(() => {
     if (!todayKey) return 0;
@@ -246,8 +341,9 @@ export default function CalendarLabPage() {
                 <div className="relative">
                   <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
                   <Input
+                    ref={searchInputRef}
                     className="h-10 pl-9"
-                    placeholder="Name, phone, email..."
+                    placeholder="Name, phone, email... (Press / to search)"
                     value={state.guestSearch}
                     onChange={(e) => actions.setGuestSearch(e.target.value)}
                   />
@@ -404,7 +500,47 @@ export default function CalendarLabPage() {
           </div>
         )}
       </div>
+
+      {/* Keyboard Shortcuts Dialog */}
+      <Dialog open={showShortcuts} onOpenChange={setShowShortcuts}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <CalendarDays className="h-5 w-5" />
+              Keyboard Shortcuts
+            </DialogTitle>
+          </DialogHeader>
+          <div className="grid grid-cols-2 gap-3 text-sm py-4">
+            <ShortcutItem keys={["←", "→"]} desc="Navigate periods" />
+            <ShortcutItem keys={["T"]} desc="Jump to today" />
+            <ShortcutItem keys={["N"]} desc="New reservation" />
+            <ShortcutItem keys={["R"]} desc="Refresh data" />
+            <ShortcutItem keys={["/"]} desc="Focus search" />
+            <ShortcutItem keys={["Esc"]} desc="Clear selection" />
+            <ShortcutItem keys={["1-4"]} desc="Set day range (7/14/21/30)" />
+            <ShortcutItem keys={["?"]} desc="Show this help" />
+          </div>
+          <div className="text-xs text-slate-500 border-t pt-3">
+            Press <kbd className="px-1.5 py-0.5 bg-slate-100 rounded text-xs font-mono">Esc</kbd> to close
+          </div>
+        </DialogContent>
+      </Dialog>
     </DashboardShell>
+  );
+}
+
+function ShortcutItem({ keys, desc }: { keys: string[]; desc: string }) {
+  return (
+    <div className="flex items-center justify-between gap-2 py-1">
+      <span className="text-slate-600">{desc}</span>
+      <div className="flex gap-1">
+        {keys.map((k) => (
+          <kbd key={k} className="px-2 py-1 bg-slate-100 rounded text-xs font-mono text-slate-700 shadow-sm border border-slate-200">
+            {k}
+          </kbd>
+        ))}
+      </div>
+    </div>
   );
 }
 

@@ -28,6 +28,8 @@ import {
   Calculator,
   Gift,
   Percent,
+  Plus,
+  X,
 } from "lucide-react";
 
 type Guest = {
@@ -309,62 +311,176 @@ export default function NewSeasonalGuestPage() {
           {/* Guest Selection */}
           <Card>
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <User className="h-5 w-5" />
-                Guest
-              </CardTitle>
-              <CardDescription>Select an existing guest or create a new one</CardDescription>
+              <div className="flex items-center justify-between">
+                <div>
+                  <CardTitle className="flex items-center gap-2">
+                    <User className="h-5 w-5" />
+                    Guest
+                  </CardTitle>
+                  <CardDescription>Select an existing guest or create a new one</CardDescription>
+                </div>
+                {!showCreateGuest && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setShowCreateGuest(true)}
+                  >
+                    <Plus className="h-4 w-4 mr-1" />
+                    New Guest
+                  </Button>
+                )}
+              </div>
             </CardHeader>
             <CardContent className="space-y-4">
-              <Input
-                placeholder="Search guests by name or email (min 2 characters)..."
-                value={guestSearch}
-                onChange={(e) => setGuestSearch(e.target.value)}
-              />
-              {guestSearch.length === 1 ? (
-                <p className="text-sm text-muted-foreground text-center py-4">
-                  Type at least 2 characters to search...
-                </p>
-              ) : loadingGuests ? (
-                <div className="flex justify-center py-4">
-                  <Loader2 className="h-5 w-5 animate-spin" />
-                </div>
-              ) : guests.length === 0 && guestSearch.length >= 2 ? (
-                <p className="text-sm text-muted-foreground text-center py-4">
-                  No guests found for "{guestSearch}". Try a different search or create a new guest.
-                </p>
-              ) : guests.length === 0 ? (
-                <p className="text-sm text-muted-foreground text-center py-4">
-                  Start typing to search for guests...
-                </p>
-              ) : (
-                <div className="max-h-48 overflow-y-auto border rounded-md divide-y">
-                  {guests.slice(0, 20).map((guest) => (
-                    <div
-                      key={guest.id}
-                      className={`p-3 cursor-pointer hover:bg-muted transition-colors ${
-                        selectedGuestId === guest.id ? "bg-primary/10 border-l-2 border-primary" : ""
-                      }`}
-                      onClick={() => setSelectedGuestId(guest.id)}
+              {showCreateGuest ? (
+                /* Create New Guest Form */
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between pb-2 border-b">
+                    <h4 className="font-medium">Create New Guest</h4>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => {
+                        setShowCreateGuest(false);
+                        setNewGuestFirstName("");
+                        setNewGuestLastName("");
+                        setNewGuestEmail("");
+                        setNewGuestPhone("");
+                      }}
                     >
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <span className="font-medium">
-                            {guest.primaryFirstName} {guest.primaryLastName}
-                          </span>
-                          {guest.email && (
-                            <span className="text-sm text-muted-foreground ml-2">
-                              {guest.email}
-                            </span>
-                          )}
-                        </div>
-                        {selectedGuestId === guest.id && (
-                          <Check className="h-4 w-4 text-primary" />
-                        )}
-                      </div>
+                      <X className="h-4 w-4 mr-1" />
+                      Cancel
+                    </Button>
+                  </div>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label>First Name *</Label>
+                      <Input
+                        placeholder="John"
+                        value={newGuestFirstName}
+                        onChange={(e) => setNewGuestFirstName(e.target.value)}
+                      />
                     </div>
-                  ))}
+                    <div className="space-y-2">
+                      <Label>Last Name *</Label>
+                      <Input
+                        placeholder="Smith"
+                        value={newGuestLastName}
+                        onChange={(e) => setNewGuestLastName(e.target.value)}
+                      />
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Email</Label>
+                    <Input
+                      type="email"
+                      placeholder="john.smith@example.com"
+                      value={newGuestEmail}
+                      onChange={(e) => setNewGuestEmail(e.target.value)}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Phone</Label>
+                    <Input
+                      type="tel"
+                      placeholder="(555) 123-4567"
+                      value={newGuestPhone}
+                      onChange={(e) => setNewGuestPhone(e.target.value)}
+                    />
+                  </div>
+                  {createGuestMutation.isError && (
+                    <p className="text-sm text-destructive">
+                      {(createGuestMutation.error as Error).message || "Failed to create guest"}
+                    </p>
+                  )}
+                  <Button
+                    className="w-full"
+                    disabled={!newGuestFirstName || !newGuestLastName || createGuestMutation.isPending}
+                    onClick={() => createGuestMutation.mutate()}
+                  >
+                    {createGuestMutation.isPending ? (
+                      <>
+                        <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                        Creating...
+                      </>
+                    ) : (
+                      <>
+                        <Plus className="h-4 w-4 mr-2" />
+                        Create Guest
+                      </>
+                    )}
+                  </Button>
                 </div>
+              ) : (
+                /* Search Existing Guests */
+                <>
+                  <Input
+                    placeholder="Search guests by name or email (min 2 characters)..."
+                    value={guestSearch}
+                    onChange={(e) => setGuestSearch(e.target.value)}
+                  />
+                  {guestSearch.length === 1 ? (
+                    <p className="text-sm text-muted-foreground text-center py-4">
+                      Type at least 2 characters to search...
+                    </p>
+                  ) : loadingGuests ? (
+                    <div className="flex justify-center py-4">
+                      <Loader2 className="h-5 w-5 animate-spin" />
+                    </div>
+                  ) : guests.length === 0 && guestSearch.length >= 2 ? (
+                    <div className="text-center py-4 space-y-3">
+                      <p className="text-sm text-muted-foreground">
+                        No guests found for "{guestSearch}".
+                      </p>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => {
+                          setShowCreateGuest(true);
+                          // Pre-fill name from search if it looks like a name
+                          const parts = guestSearch.trim().split(/\s+/);
+                          if (parts.length >= 1) setNewGuestFirstName(parts[0]);
+                          if (parts.length >= 2) setNewGuestLastName(parts.slice(1).join(" "));
+                        }}
+                      >
+                        <Plus className="h-4 w-4 mr-1" />
+                        Create "{guestSearch}" as New Guest
+                      </Button>
+                    </div>
+                  ) : guests.length === 0 ? (
+                    <p className="text-sm text-muted-foreground text-center py-4">
+                      Start typing to search for guests...
+                    </p>
+                  ) : (
+                    <div className="max-h-48 overflow-y-auto border rounded-md divide-y">
+                      {guests.slice(0, 20).map((guest) => (
+                        <div
+                          key={guest.id}
+                          className={`p-3 cursor-pointer hover:bg-muted transition-colors ${
+                            selectedGuestId === guest.id ? "bg-primary/10 border-l-2 border-primary" : ""
+                          }`}
+                          onClick={() => setSelectedGuestId(guest.id)}
+                        >
+                          <div className="flex items-center justify-between">
+                            <div>
+                              <span className="font-medium">
+                                {guest.primaryFirstName} {guest.primaryLastName}
+                              </span>
+                              {guest.email && (
+                                <span className="text-sm text-muted-foreground ml-2">
+                                  {guest.email}
+                                </span>
+                              )}
+                            </div>
+                            {selectedGuestId === guest.id && (
+                              <Check className="h-4 w-4 text-primary" />
+                            )}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </>
               )}
             </CardContent>
           </Card>
