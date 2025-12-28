@@ -10,12 +10,21 @@ export class GuestsController {
   constructor(private readonly guests: GuestsService) { }
 
   @Get()
-  findAll(@Query("campgroundId") campgroundId?: string) {
+  findAll(
+    @Query("campgroundId") campgroundId?: string,
+    @Query("limit") limit?: string,
+    @Query("offset") offset?: string,
+    @Query("search") search?: string
+  ) {
     // Require campgroundId to prevent cross-tenant data access
     if (!campgroundId) {
       throw new ForbiddenException("campgroundId is required to list guests");
     }
-    return this.guests.findAllByCampground(campgroundId);
+    return this.guests.findAllByCampground(campgroundId, {
+      limit: limit ? parseInt(limit, 10) : undefined,
+      offset: offset ? parseInt(offset, 10) : undefined,
+      search
+    });
   }
 
   @Get(":id")

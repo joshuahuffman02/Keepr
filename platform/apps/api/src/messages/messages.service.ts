@@ -6,10 +6,18 @@ import { CreateMessageDto } from './dto/create-message.dto';
 export class MessagesService {
     constructor(private readonly prisma: PrismaService) { }
 
-    async listByReservation(reservationId: string) {
+    async listByReservation(
+        reservationId: string,
+        options?: { limit?: number; offset?: number }
+    ) {
+        const limit = Math.min(options?.limit ?? 100, 500);
+        const offset = options?.offset ?? 0;
+
         return this.prisma.message.findMany({
             where: { reservationId },
             orderBy: { createdAt: 'asc' },
+            take: limit,
+            skip: offset,
             include: {
                 guest: {
                     select: {

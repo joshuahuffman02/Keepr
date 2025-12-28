@@ -17,10 +17,22 @@ export class SitesService {
     });
   }
 
-  listByCampground(campgroundId: string) {
+  listByCampground(
+    campgroundId: string,
+    options?: { limit?: number; offset?: number; isActive?: boolean }
+  ) {
+    const limit = Math.min(options?.limit ?? 200, 500);
+    const offset = options?.offset ?? 0;
+
     return this.prisma.site.findMany({
-      where: { campgroundId },
-      include: { siteClass: true }
+      where: {
+        campgroundId,
+        ...(options?.isActive !== undefined ? { isActive: options.isActive } : {})
+      },
+      include: { siteClass: true },
+      orderBy: { siteNumber: 'asc' },
+      take: limit,
+      skip: offset
     });
   }
 

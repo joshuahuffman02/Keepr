@@ -37,9 +37,21 @@ export class GuestsService {
     });
   }
 
-  findAll() {
+  findAll(options?: { limit?: number; offset?: number; search?: string }) {
+    const limit = Math.min(options?.limit ?? 100, 500);
+    const offset = options?.offset ?? 0;
+
     return this.prisma.guest.findMany({
+      where: options?.search ? {
+        OR: [
+          { primaryFirstName: { contains: options.search, mode: 'insensitive' } },
+          { primaryLastName: { contains: options.search, mode: 'insensitive' } },
+          { email: { contains: options.search, mode: 'insensitive' } }
+        ]
+      } : undefined,
       orderBy: { primaryLastName: "asc" },
+      take: limit,
+      skip: offset,
       include: {
         loyaltyProfile: true,
         reservations: {
@@ -56,16 +68,35 @@ export class GuestsService {
     });
   }
 
-  findAllByCampground(campgroundId: string) {
+  findAllByCampground(
+    campgroundId: string,
+    options?: { limit?: number; offset?: number; search?: string }
+  ) {
+    const limit = Math.min(options?.limit ?? 100, 500);
+    const offset = options?.offset ?? 0;
     const campgroundTag = `campground:${campgroundId}`;
+
     return this.prisma.guest.findMany({
       where: {
-        OR: [
-          { reservations: { some: { campgroundId } } },
-          { tags: { has: campgroundTag } }
+        AND: [
+          {
+            OR: [
+              { reservations: { some: { campgroundId } } },
+              { tags: { has: campgroundTag } }
+            ]
+          },
+          ...(options?.search ? [{
+            OR: [
+              { primaryFirstName: { contains: options.search, mode: 'insensitive' as const } },
+              { primaryLastName: { contains: options.search, mode: 'insensitive' as const } },
+              { email: { contains: options.search, mode: 'insensitive' as const } }
+            ]
+          }] : [])
         ]
       },
       orderBy: { primaryLastName: "asc" },
+      take: limit,
+      skip: offset,
       include: {
         loyaltyProfile: true,
         reservations: {

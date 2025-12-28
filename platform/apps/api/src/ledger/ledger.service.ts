@@ -59,33 +59,53 @@ class LedgerGuard {
 export class LedgerService {
   constructor(private readonly prisma: PrismaService) {}
 
-  list(campgroundId: string, start?: Date, end?: Date, glCode?: string) {
+  list(
+    campgroundId: string,
+    options?: {
+      start?: Date;
+      end?: Date;
+      glCode?: string;
+      limit?: number;
+      offset?: number;
+    }
+  ) {
+    const limit = Math.min(options?.limit ?? 100, 1000);
+    const offset = options?.offset ?? 0;
+
     return this.prisma.ledgerEntry.findMany({
       where: {
         campgroundId,
-        glCode: glCode || undefined,
-        ...(start || end
+        glCode: options?.glCode || undefined,
+        ...(options?.start || options?.end
           ? {
               occurredAt: {
-                gte: start,
-                lte: end
+                gte: options?.start,
+                lte: options?.end
               }
             }
           : {})
       },
-      orderBy: { occurredAt: "desc" }
+      orderBy: { occurredAt: "desc" },
+      take: limit,
+      skip: offset
     });
   }
 
-  listByReservation(reservationId: string) {
+  listByReservation(reservationId: string, options?: { limit?: number; offset?: number }) {
+    const limit = Math.min(options?.limit ?? 100, 500);
+    const offset = options?.offset ?? 0;
+
     return this.prisma.ledgerEntry.findMany({
       where: { reservationId },
-      orderBy: { occurredAt: "desc" }
+      orderBy: { occurredAt: "desc" },
+      take: limit,
+      skip: offset
     });
   }
 
   async summaryByGl(campgroundId: string, start?: Date, end?: Date) {
-    const rows = await this.list(campgroundId, start, end);
+    // For summary, we need all entries - use a high limit
+    const rows = await this.list(campgroundId, { start, end, limit: 10000 });
     const map: Record<string, number> = {};
     for (const r of rows) {
       const key = r.glCode || "Unassigned";

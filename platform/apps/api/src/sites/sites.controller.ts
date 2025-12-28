@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post, UseGuards } from "@nestjs/common";
+import { Body, Controller, Delete, Get, Param, Patch, Post, Query, UseGuards } from "@nestjs/common";
 import { SitesService } from "./sites.service";
 import { CreateSiteDto } from "./dto/create-site.dto";
 import { JwtAuthGuard } from "../auth/guards";
@@ -9,8 +9,17 @@ export class SitesController {
   constructor(private readonly sites: SitesService) { }
 
   @Get("campgrounds/:campgroundId/sites")
-  list(@Param("campgroundId") campgroundId: string) {
-    return this.sites.listByCampground(campgroundId);
+  list(
+    @Param("campgroundId") campgroundId: string,
+    @Query("limit") limit?: string,
+    @Query("offset") offset?: string,
+    @Query("isActive") isActive?: string
+  ) {
+    return this.sites.listByCampground(campgroundId, {
+      limit: limit ? parseInt(limit, 10) : undefined,
+      offset: offset ? parseInt(offset, 10) : undefined,
+      isActive: isActive === 'true' ? true : isActive === 'false' ? false : undefined
+    });
   }
 
   getById(@Param("id") id: string) {

@@ -237,7 +237,14 @@ export class WaitlistService {
         };
     }
 
-    async findAll(campgroundId: string, type?: string) {
+    async findAll(
+        campgroundId: string,
+        options?: { type?: string; limit?: number; offset?: number }
+    ) {
+        const limit = Math.min(options?.limit ?? 100, 500);
+        const offset = options?.offset ?? 0;
+        const type = options?.type;
+
         return this.prisma.waitlistEntry.findMany({
             where: {
                 campgroundId,
@@ -245,6 +252,8 @@ export class WaitlistService {
             },
             include: { guest: true, site: true, siteClass: true },
             orderBy: { createdAt: 'desc' },
+            take: limit,
+            skip: offset,
         });
     }
 

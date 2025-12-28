@@ -50,7 +50,15 @@ export class FormsService {
     return { id };
   }
 
-  listSubmissions(filters: { reservationId?: string; guestId?: string }) {
+  listSubmissions(filters: {
+    reservationId?: string;
+    guestId?: string;
+    limit?: number;
+    offset?: number;
+  }) {
+    const limit = Math.min(filters.limit ?? 100, 500);
+    const offset = filters.offset ?? 0;
+
     return this.prisma.formSubmission.findMany({
       where: {
         reservationId: filters.reservationId,
@@ -59,7 +67,9 @@ export class FormsService {
       include: {
         formTemplate: { select: { id: true, title: true, type: true } }
       },
-      orderBy: { createdAt: "desc" }
+      orderBy: { createdAt: "desc" },
+      take: limit,
+      skip: offset
     });
   }
 

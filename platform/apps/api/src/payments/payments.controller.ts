@@ -1154,15 +1154,22 @@ export class PaymentsController {
   async listPayouts(
     @Param("campgroundId") campgroundId: string,
     @Query("status") status?: PayoutStatus,
+    @Query("limit") limitStr?: string,
+    @Query("offset") offsetStr?: string,
     @Req() req?: any
   ) {
     this.ensureCampgroundMembership(req?.user, campgroundId);
+    const limit = Math.min(parseInt(limitStr ?? "100", 10) || 100, 500);
+    const offset = parseInt(offsetStr ?? "0", 10) || 0;
+
     const payouts = await (this.prisma as any).payout.findMany({
       where: {
         campgroundId,
         status: status ? (status as string) : undefined
       },
       orderBy: { createdAt: "desc" },
+      take: limit,
+      skip: offset,
       include: {
         lines: true
       }
@@ -1284,15 +1291,22 @@ export class PaymentsController {
   async listDisputes(
     @Param("campgroundId") campgroundId: string,
     @Query("status") status?: DisputeStatus,
+    @Query("limit") limitStr?: string,
+    @Query("offset") offsetStr?: string,
     @Req() req?: any
   ) {
     this.ensureCampgroundMembership(req?.user, campgroundId);
+    const limit = Math.min(parseInt(limitStr ?? "100", 10) || 100, 500);
+    const offset = parseInt(offsetStr ?? "0", 10) || 0;
+
     const disputes = await (this.prisma as any).dispute.findMany({
       where: {
         campgroundId,
         status: status ? (status as string) : undefined
       },
-      orderBy: { createdAt: "desc" }
+      orderBy: { createdAt: "desc" },
+      take: limit,
+      skip: offset
     });
     return disputes;
   }

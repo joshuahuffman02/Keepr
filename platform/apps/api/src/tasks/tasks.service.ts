@@ -69,8 +69,13 @@ export class TasksService {
       slaStatus?: SlaStatus;
       type?: TaskType;
       assignedToUserId?: string;
+      limit?: number;
+      offset?: number;
     },
   ) {
+    const limit = Math.min(filters?.limit ?? 100, 500);
+    const offset = filters?.offset ?? 0;
+
     return this.prisma.task.findMany({
       where: {
         tenantId,
@@ -81,6 +86,8 @@ export class TasksService {
         assignedToUserId: filters?.assignedToUserId,
       },
       orderBy: [{ slaDueAt: 'asc' }, { createdAt: 'desc' }],
+      take: limit,
+      skip: offset,
     });
   }
 

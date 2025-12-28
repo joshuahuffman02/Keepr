@@ -68,8 +68,14 @@ export class WaitlistController {
     findAll(
         @Query('campgroundId') campgroundId: string,
         @Query('type') type?: string,
+        @Query('limit') limit?: string,
+        @Query('offset') offset?: string,
     ) {
-        return this.waitlistService.findAll(campgroundId, type);
+        return this.waitlistService.findAll(campgroundId, {
+            type,
+            limit: limit ? parseInt(limit, 10) : undefined,
+            offset: offset ? parseInt(offset, 10) : undefined
+        });
     }
 
     @Patch(':id')
