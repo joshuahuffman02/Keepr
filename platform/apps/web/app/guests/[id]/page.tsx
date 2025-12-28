@@ -61,10 +61,20 @@ export default function GuestDetailPage() {
     const [composeTo, setComposeTo] = useState("");
     const [composeFrom, setComposeFrom] = useState("");
 
-    // Use global campground selector, fallback to guest's campground
+    // Get all unique campground IDs from the guest's reservations
+    const guestCampgroundIds = useMemo(() => {
+        const reservations = (guestQuery.data as any)?.reservations || [];
+        const ids = new Set<string>();
+        reservations.forEach((r: any) => {
+            if (r.campgroundId) ids.add(r.campgroundId);
+        });
+        return Array.from(ids);
+    }, [guestQuery.data]);
+
+    // Use global campground selector, fallback to guest's first reservation campground
     const campgroundIdForGuest = useMemo(
-        () => selectedCampground?.id || (guestQuery.data as any)?.campgroundId || (guestQuery.data as any)?.campgrounds?.[0]?.id || "",
-        [selectedCampground?.id, guestQuery.data]
+        () => selectedCampground?.id || guestCampgroundIds[0] || (guestQuery.data as any)?.campgroundId || "",
+        [selectedCampground?.id, guestCampgroundIds, guestQuery.data]
     );
 
     // Wallet state and queries
@@ -409,12 +419,16 @@ export default function GuestDetailPage() {
                     </TabsContent>
 
                     <TabsContent value="payment-methods" className="space-y-4">
-                        {campgroundIdForGuest ? (
-                            <GuestPaymentMethods guestId={guestId} campgroundId={campgroundIdForGuest} />
+                        {campgroundIdForGuest || guestCampgroundIds.length > 0 ? (
+                            <GuestPaymentMethods
+                                guestId={guestId}
+                                campgroundId={campgroundIdForGuest || guestCampgroundIds[0]}
+                                additionalCampgroundIds={guestCampgroundIds.filter(id => id !== campgroundIdForGuest)}
+                            />
                         ) : (
                             <Card>
                                 <CardContent className="py-8 text-center text-slate-500">
-                                    Select a campground to view payment methods.
+                                    No saved payment methods. Cards are saved when the guest makes a reservation.
                                 </CardContent>
                             </Card>
                         )}

@@ -16,6 +16,8 @@ import { format } from "date-fns";
 interface GuestPaymentMethodsProps {
   guestId: string;
   campgroundId: string;
+  /** Additional campground IDs to fetch payment methods from (for multi-park guests) */
+  additionalCampgroundIds?: string[];
 }
 
 type PaymentMethod = {
@@ -45,7 +47,7 @@ function getCardBrandColor(brand: string | null): string {
   return CARD_BRAND_COLORS[brand.toLowerCase()] || CARD_BRAND_COLORS.default;
 }
 
-export function GuestPaymentMethods({ guestId, campgroundId }: GuestPaymentMethodsProps) {
+export function GuestPaymentMethods({ guestId, campgroundId, additionalCampgroundIds = [] }: GuestPaymentMethodsProps) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -54,19 +56,39 @@ export function GuestPaymentMethods({ guestId, campgroundId }: GuestPaymentMetho
   const [editingNickname, setEditingNickname] = useState<string | null>(null);
   const [nickname, setNickname] = useState("");
 
-  // Fetch payment methods
-  const { data: paymentMethods, isLoading } = useQuery({
-    queryKey: ["guest-payment-methods", campgroundId, guestId],
-    queryFn: () => apiClient.getGuestPaymentMethods(campgroundId, guestId),
-    enabled: !!campgroundId && !!guestId,
+  // Get all unique campground IDs to fetch from
+  const allCampgroundIds = [campgroundId, ...additionalCampgroundIds].filter(Boolean);
+  const uniqueCampgroundIds = [...new Set(allCampgroundIds)];
+
+  // Fetch payment methods from all campgrounds
+  const { data: paymentMethodsResults, isLoading } = useQuery({
+    queryKey: ["guest-payment-methods-all", uniqueCampgroundIds, guestId],
+    queryFn: async () => {
+      const results = await Promise.all(
+        uniqueCampgroundIds.map(cgId =>
+          apiClient.getGuestPaymentMethods(cgId, guestId).catch(() => [])
+        )
+      );
+      // Aggregate and deduplicate by stripePaymentMethodId
+      const allMethods: PaymentMethod[] = results.flat();
+      const seen = new Set<string>();
+      return allMethods.filter(pm => {
+        if (seen.has(pm.stripePaymentMethodId)) return false;
+        seen.add(pm.stripePaymentMethodId);
+        return true;
+      });
+    },
+    enabled: uniqueCampgroundIds.length > 0 && !!guestId,
   });
+
+  const paymentMethods = paymentMethodsResults;
 
   // Delete mutation
   const deleteMutation = useMutation({
     mutationFn: (paymentMethodId: string) =>
       apiClient.deletePaymentMethod(campgroundId, paymentMethodId),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["guest-payment-methods", campgroundId, guestId] });
+      queryClient.invalidateQueries({ queryKey: ["guest-payment-methods-all"] });
       toast({ title: "Card removed", description: "Payment method deleted successfully." });
       setDeleteConfirm(null);
     },
@@ -80,7 +102,7 @@ export function GuestPaymentMethods({ guestId, campgroundId }: GuestPaymentMetho
     mutationFn: (paymentMethodId: string) =>
       apiClient.setDefaultPaymentMethod(campgroundId, guestId, paymentMethodId),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["guest-payment-methods", campgroundId, guestId] });
+      queryClient.invalidateQueries({ queryKey: ["guest-payment-methods-all"] });
       toast({ title: "Default updated", description: "Default payment method changed." });
     },
     onError: (err: Error) => {
@@ -93,7 +115,7 @@ export function GuestPaymentMethods({ guestId, campgroundId }: GuestPaymentMetho
     mutationFn: ({ id, nickname }: { id: string; nickname: string }) =>
       apiClient.updatePaymentMethod(campgroundId, id, { nickname }),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["guest-payment-methods", campgroundId, guestId] });
+      queryClient.invalidateQueries({ queryKey: ["guest-payment-methods-all"] });
       toast({ title: "Updated", description: "Card nickname updated." });
       setEditingNickname(null);
       setNickname("");
