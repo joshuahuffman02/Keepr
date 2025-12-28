@@ -191,14 +191,11 @@ function PaymentMethodRenderer({ method }: PaymentMethodRendererProps) {
   const { state, actions, props } = usePaymentContext();
 
   const handleSuccess = (paymentId: string) => {
-    // Check if payment is complete or if more is needed (split tender)
-    if (state.remainingCents <= 0 || !props.enableSplitTender) {
-      // Payment complete - show success view (onSuccess called when user clicks Done)
-      actions.completePayment();
-    } else {
-      // More payment needed - go back to method selection
-      actions.selectMethod(null);
-    }
+    // Always show success view when a payment method completes
+    // Note: We can't check state.remainingCents here because React state
+    // updates from addTenderEntry haven't propagated yet (stale closure)
+    // The success view will show appropriate options based on remaining balance
+    actions.completePayment();
   };
 
   const handleError = (error: string) => {
