@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useRef, useState, type KeyboardEvent } from "react";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { motion, useReducedMotion } from "framer-motion";
-import { Bot, Send, User, Sparkles, TrendingUp, DollarSign, Calendar, ArrowLeft, Brain } from "lucide-react";
+import { Bot, Send, User, Sparkles, TrendingUp, DollarSign, Calendar, ArrowLeft, Brain, CloudRain, Wrench, BarChart3, Phone, AlertTriangle, Activity } from "lucide-react";
 import Link from "next/link";
 import { DashboardShell } from "@/components/ui/layout/DashboardShell";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -70,7 +70,21 @@ export default function AiChatPage() {
         {
           id: "welcome",
           role: "assistant",
-          content: `Hi! I'm your AI assistant for ${campground.name}. I can help you with:\n\n- Drafting replies to guest messages\n- Getting pricing suggestions based on demand\n- Analyzing occupancy trends and insights\n- Answering questions about your campground data\n\nWhat can I help you with today?`,
+          content: `Hi! I'm your AI assistant for ${campground.name}. I can help you with:
+
+**AI Features**
+- \`get_ai_dashboard\` - Full AI status, metrics & activity
+- \`get_pricing_recommendations\` - Dynamic pricing suggestions
+- \`get_revenue_insights\` - Revenue opportunities you might be missing
+- \`get_weather\` - Current weather & alerts
+- \`get_maintenance_alerts\` - Predictive maintenance issues
+
+**Actions**
+- Draft replies to guest messages
+- Apply or dismiss pricing recommendations
+- Analyze trends and patterns
+
+Type \`help\` to see all available commands, or just ask me anything!`,
           timestamp: new Date(),
         },
       ]);
@@ -82,20 +96,125 @@ export default function AiChatPage() {
     [messages]
   );
 
+  // Detect if message is a copilot action command
+  const isActionCommand = (message: string): boolean => {
+    const actionPatterns = [
+      /^get_/,
+      /^analyze_/,
+      /^apply_/,
+      /^dismiss_/,
+      /^check_/,
+      /^help$/,
+      /^list_actions$/,
+    ];
+    const cleanMessage = message.trim().toLowerCase();
+    return actionPatterns.some((pattern) => pattern.test(cleanMessage));
+  };
+
+  // Format copilot response for display
+  const formatCopilotResponse = (data: any): string => {
+    if (data?.error) {
+      return `Error: ${data.error}`;
+    }
+
+    let response = data?.message || data?.preview || "";
+
+    // Add metrics summary if present
+    if (data?.metrics) {
+      const m = data.metrics;
+      response += `\n\n**AI Performance (Last 30 Days)**\n`;
+      response += `- Messages Handled: ${m.messagesHandled || 0}\n`;
+      response += `- No-Shows Prevented: ${m.noShowsPrevented || 0}\n`;
+      response += `- Revenue Saved: $${((m.estimatedRevenueSavedCents || 0) / 100).toLocaleString()}\n`;
+      response += `- ROI: ${m.roiPercent || 0}%`;
+    }
+
+    // Add quick stats if present
+    if (data?.quickStats) {
+      const q = data.quickStats;
+      response += `\n\n**Needs Attention**\n`;
+      if (q.pendingReplies > 0) response += `- ${q.pendingReplies} pending replies\n`;
+      if (q.activeAnomalies > 0) response += `- ${q.activeAnomalies} anomalies\n`;
+      if (q.pendingPricing > 0) response += `- ${q.pendingPricing} pricing recommendations\n`;
+      if (q.activeMaintenanceAlerts > 0) response += `- ${q.activeMaintenanceAlerts} maintenance alerts\n`;
+      if (q.activeWeatherAlerts > 0) response += `- ${q.activeWeatherAlerts} weather alerts`;
+    }
+
+    // Add recommendations summary if present
+    if (data?.recommendations?.length > 0) {
+      response += `\n\n**Recommendations (${data.recommendations.length})**\n`;
+      data.recommendations.slice(0, 3).forEach((r: any, i: number) => {
+        const change = r.adjustmentPercent > 0 ? `+${r.adjustmentPercent}%` : `${r.adjustmentPercent}%`;
+        response += `${i + 1}. ${r.siteClassName || "Sites"}: ${change} (${r.recommendationType})\n`;
+      });
+    }
+
+    // Add insights summary if present
+    if (data?.insights?.length > 0) {
+      response += `\n\n**Revenue Insights (${data.insights.length})**\n`;
+      data.insights.slice(0, 3).forEach((i: any, idx: number) => {
+        const impact = i.impactCents ? `$${(i.impactCents / 100).toLocaleString()}` : "TBD";
+        response += `${idx + 1}. ${i.title} (${impact})\n`;
+      });
+    }
+
+    // Add weather if present
+    if (data?.weather) {
+      const w = data.weather;
+      response += `\n\n**Current Weather**\n`;
+      response += `- Temperature: ${w.temp}°F (feels like ${w.feelsLike}°F)\n`;
+      response += `- Conditions: ${w.description}\n`;
+      response += `- Wind: ${w.windSpeed} mph\n`;
+      response += `- Humidity: ${w.humidity}%`;
+    }
+
+    // Add maintenance alerts if present
+    if (data?.alerts?.length > 0 && data?.summary?.activeAlerts !== undefined) {
+      response += `\n\n**Maintenance Alerts (${data.alerts.length})**\n`;
+      data.alerts.slice(0, 3).forEach((a: any, i: number) => {
+        response += `${i + 1}. ${a.title} (${a.severity})\n`;
+      });
+    }
+
+    // Add available actions if help
+    if (data?.availableActions) {
+      response += `\n\n**Available Actions**\n`;
+      data.availableActions.forEach((a: any) => {
+        response += `- \`${a.action}\`: ${a.description}\n`;
+      });
+    }
+
+    return response || "I processed your request. What else can I help with?";
+  };
+
   // Chat mutation using the copilot endpoint
   const chatMutation = useMutation({
-    mutationFn: (payload: { message: string; history: { role: "user" | "assistant"; content: string }[] }) =>
-      apiClient.runCopilot({
+    mutationFn: (payload: { message: string; history: { role: "user" | "assistant"; content: string }[] }) => {
+      const cleanMessage = payload.message.trim();
+
+      // If it looks like a copilot action, send as action
+      if (isActionCommand(cleanMessage)) {
+        return apiClient.runCopilot({
+          campgroundId: campgroundId!,
+          action: cleanMessage.toLowerCase(),
+          payload: {},
+        });
+      }
+
+      // Otherwise, send as chat
+      return apiClient.runCopilot({
         campgroundId: campgroundId!,
         action: "chat",
-        prompt: payload.message,
+        prompt: cleanMessage,
         payload: { history: payload.history },
-      }),
+      });
+    },
     onSuccess: (data) => {
+      const responseContent = formatCopilotResponse(data);
       const assistantMessage: Message = {
         id: `msg_${Date.now()}`,
         role: "assistant",
-        content: data?.preview || "I'm here to help. What would you like to know?",
+        content: responseContent,
         timestamp: new Date(),
       };
       setMessages((prev) => [...prev, assistantMessage]);
@@ -143,25 +262,46 @@ export default function AiChatPage() {
 
   const quickActions: QuickAction[] = [
     {
+      id: "dashboard",
+      label: "AI Dashboard",
+      icon: <Activity className="h-4 w-4" />,
+      prompt: "get_ai_dashboard",
+      description: "Get full AI status & metrics",
+    },
+    {
+      id: "pricing-recommendations",
+      label: "Pricing AI",
+      icon: <DollarSign className="h-4 w-4" />,
+      prompt: "get_pricing_recommendations",
+      description: "View pricing recommendations",
+    },
+    {
+      id: "revenue",
+      label: "Revenue Insights",
+      icon: <TrendingUp className="h-4 w-4" />,
+      prompt: "get_revenue_insights",
+      description: "Find missed revenue opportunities",
+    },
+    {
+      id: "weather",
+      label: "Weather",
+      icon: <CloudRain className="h-4 w-4" />,
+      prompt: "get_weather",
+      description: "Check current conditions & alerts",
+    },
+    {
+      id: "maintenance",
+      label: "Maintenance",
+      icon: <Wrench className="h-4 w-4" />,
+      prompt: "get_maintenance_alerts",
+      description: "View predictive maintenance alerts",
+    },
+    {
       id: "draft-reply",
       label: "Draft Reply",
       icon: <Send className="h-4 w-4" />,
       prompt: "Draft a friendly reply to a guest asking about late checkout options",
       description: "Generate professional guest responses",
-    },
-    {
-      id: "pricing",
-      label: "Pricing Insights",
-      icon: <DollarSign className="h-4 w-4" />,
-      prompt: "What are the pricing suggestions for next weekend based on current demand?",
-      description: "Get rate optimization suggestions",
-    },
-    {
-      id: "occupancy",
-      label: "Occupancy Analysis",
-      icon: <TrendingUp className="h-4 w-4" />,
-      prompt: "Show me occupancy trends and insights for the next 30 days",
-      description: "Analyze booking patterns",
     },
   ];
 
@@ -244,7 +384,7 @@ export default function AiChatPage() {
               <CardDescription>Get started with common tasks</CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
                 {quickActions.map((action) => (
                   <motion.button
                     key={action.id}

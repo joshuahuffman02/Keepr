@@ -20,6 +20,7 @@ import { AiPredictiveMaintenanceService } from './ai-predictive-maintenance.serv
 import { AiWeatherService } from './ai-weather.service';
 import { AiPhoneAgentService } from './ai-phone-agent.service';
 import { AiDashboardService } from './ai-dashboard.service';
+import { AiService } from './ai.service';
 import { AiController } from './ai.controller';
 import { AiAutopilotController } from './ai-autopilot.controller';
 import { PrismaModule } from '../prisma/prisma.module';
@@ -76,6 +77,7 @@ import { AnomaliesModule } from '../anomalies/anomalies.module';
     AiWeatherService,
     AiPhoneAgentService,
     AiDashboardService,
+    AiService,
   ],
   exports: [
     AiPrivacyService,
@@ -100,6 +102,7 @@ import { AnomaliesModule } from '../anomalies/anomalies.module';
     AiWeatherService,
     AiPhoneAgentService,
     AiDashboardService,
+    AiService,
   ],
 })
 export class AiModule { }

@@ -9,12 +9,24 @@ import { RecommendDto } from "./dto/recommend.dto";
 import { PricingSuggestDto } from "./dto/pricing-suggest.dto";
 import { SemanticSearchDto } from "./dto/semantic-search.dto";
 import { CopilotActionDto } from "./dto/copilot-action.dto";
+import { AiDynamicPricingService } from "./ai-dynamic-pricing.service";
+import { AiRevenueManagerService } from "./ai-revenue-manager.service";
+import { AiWeatherService } from "./ai-weather.service";
+import { AiPredictiveMaintenanceService } from "./ai-predictive-maintenance.service";
+import { AiDashboardService } from "./ai-dashboard.service";
 
 @Injectable()
 export class AiService {
   private readonly logger = new Logger(AiService.name);
 
-  constructor(private readonly prisma: PrismaService) { }
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly dynamicPricingService: AiDynamicPricingService,
+    private readonly revenueService: AiRevenueManagerService,
+    private readonly weatherService: AiWeatherService,
+    private readonly maintenanceService: AiPredictiveMaintenanceService,
+    private readonly dashboardService: AiDashboardService
+  ) { }
 
   private async shouldUseMock(campgroundId?: string, forceMock?: boolean) {
     if (forceMock) return true;
@@ -621,6 +633,269 @@ Only include items with score >= 0.5. Return empty array if no good matches.`;
   async copilot(dto: CopilotActionDto, forceMock = false) {
     const useMock = await this.shouldUseMock(dto.campgroundId, forceMock);
     const action = dto.action.toLowerCase();
+    const campgroundId = dto.campgroundId;
+
+    // ==================== DYNAMIC PRICING ACTIONS ====================
+    if (action === "get_pricing_recommendations" || action === "pricing_recommendations") {
+      if (!campgroundId) {
+        return { action, error: "campgroundId is required", generatedAt: new Date().toISOString() };
+      }
+      const recommendations = await this.dynamicPricingService.getRecommendations(campgroundId, {
+        status: dto.payload?.status || "pending",
+        limit: dto.payload?.limit || 10,
+      });
+      const summary = await this.dynamicPricingService.getPricingSummary(campgroundId);
+      return {
+        action,
+        recommendations,
+        summary,
+        message: recommendations.length > 0
+          ? `Found ${recommendations.length} pricing recommendations. ${summary.pendingRecommendations} pending review.`
+          : "No pending pricing recommendations.",
+        generatedAt: new Date().toISOString(),
+        mode: "live",
+      };
+    }
+
+    if (action === "apply_pricing" || action === "apply_pricing_recommendation") {
+      const { recommendationId, userId } = dto.payload || {};
+      if (!recommendationId) {
+        return { action, error: "recommendationId is required", generatedAt: new Date().toISOString() };
+      }
+      const result = await this.dynamicPricingService.applyRecommendation(recommendationId, userId || "system");
+      return {
+        action,
+        result,
+        message: `Applied pricing adjustment of ${result.adjustmentPercent}% for ${result.siteClassName || "sites"}`,
+        generatedAt: new Date().toISOString(),
+        mode: "live",
+      };
+    }
+
+    if (action === "dismiss_pricing" || action === "dismiss_pricing_recommendation") {
+      const { recommendationId, userId, reason } = dto.payload || {};
+      if (!recommendationId) {
+        return { action, error: "recommendationId is required", generatedAt: new Date().toISOString() };
+      }
+      const result = await this.dynamicPricingService.dismissRecommendation(recommendationId, userId || "system", reason);
+      return {
+        action,
+        result,
+        message: "Pricing recommendation dismissed",
+        generatedAt: new Date().toISOString(),
+        mode: "live",
+      };
+    }
+
+    if (action === "analyze_pricing") {
+      if (!campgroundId) {
+        return { action, error: "campgroundId is required", generatedAt: new Date().toISOString() };
+      }
+      const recommendations = await this.dynamicPricingService.analyzePricing(campgroundId);
+      return {
+        action,
+        recommendations,
+        message: `Generated ${recommendations.length} new pricing recommendations`,
+        generatedAt: new Date().toISOString(),
+        mode: "live",
+      };
+    }
+
+    // ==================== REVENUE INSIGHTS ACTIONS ====================
+    if (action === "get_revenue_insights" || action === "revenue_insights") {
+      if (!campgroundId) {
+        return { action, error: "campgroundId is required", generatedAt: new Date().toISOString() };
+      }
+      const insights = await this.revenueService.getInsights(campgroundId, {
+        status: dto.payload?.status || "new",
+        limit: dto.payload?.limit || 10,
+      });
+      const summary = await this.revenueService.getRevenueSummary(campgroundId);
+      return {
+        action,
+        insights,
+        summary,
+        message: summary.totalOpportunityCents > 0
+          ? `You're leaving ${summary.totalOpportunityFormatted} on the table. ${summary.activeInsights} opportunities identified.`
+          : "No revenue opportunities identified at this time.",
+        generatedAt: new Date().toISOString(),
+        mode: "live",
+      };
+    }
+
+    if (action === "analyze_revenue") {
+      if (!campgroundId) {
+        return { action, error: "campgroundId is required", generatedAt: new Date().toISOString() };
+      }
+      const insights = await this.revenueService.analyzeRevenue(campgroundId);
+      return {
+        action,
+        insights,
+        message: `Generated ${insights.length} new revenue insights`,
+        generatedAt: new Date().toISOString(),
+        mode: "live",
+      };
+    }
+
+    // ==================== WEATHER ACTIONS ====================
+    if (action === "get_weather" || action === "current_weather") {
+      if (!campgroundId) {
+        return { action, error: "campgroundId is required", generatedAt: new Date().toISOString() };
+      }
+      const weather = await this.weatherService.getCurrentWeather(campgroundId);
+      const activeAlerts = await this.weatherService.getAlerts(campgroundId, { status: "active" });
+      return {
+        action,
+        weather,
+        activeAlerts,
+        message: weather
+          ? `Current: ${weather.temp}°F, ${weather.description}. ${activeAlerts.length} active alerts.`
+          : "Weather data unavailable. Check API configuration.",
+        generatedAt: new Date().toISOString(),
+        mode: "live",
+      };
+    }
+
+    if (action === "get_weather_forecast" || action === "weather_forecast") {
+      if (!campgroundId) {
+        return { action, error: "campgroundId is required", generatedAt: new Date().toISOString() };
+      }
+      const forecast = await this.weatherService.getForecast(campgroundId);
+      return {
+        action,
+        forecast,
+        message: forecast.length > 0
+          ? `7-day forecast retrieved. Next day: ${forecast[0]?.tempHigh}°F high.`
+          : "Forecast unavailable.",
+        generatedAt: new Date().toISOString(),
+        mode: "live",
+      };
+    }
+
+    if (action === "get_weather_alerts" || action === "weather_alerts") {
+      if (!campgroundId) {
+        return { action, error: "campgroundId is required", generatedAt: new Date().toISOString() };
+      }
+      const alerts = await this.weatherService.getAlerts(campgroundId, {
+        status: dto.payload?.status,
+        limit: dto.payload?.limit || 10,
+      });
+      return {
+        action,
+        alerts,
+        message: alerts.length > 0
+          ? `${alerts.length} weather alerts found.`
+          : "No weather alerts.",
+        generatedAt: new Date().toISOString(),
+        mode: "live",
+      };
+    }
+
+    if (action === "check_weather") {
+      if (!campgroundId) {
+        return { action, error: "campgroundId is required", generatedAt: new Date().toISOString() };
+      }
+      const alerts = await this.weatherService.checkWeatherConditions(campgroundId);
+      return {
+        action,
+        newAlerts: alerts,
+        message: alerts.length > 0
+          ? `Created ${alerts.length} new weather alerts. Guests will be notified.`
+          : "No severe weather conditions detected.",
+        generatedAt: new Date().toISOString(),
+        mode: "live",
+      };
+    }
+
+    // ==================== MAINTENANCE ACTIONS ====================
+    if (action === "get_maintenance_alerts" || action === "maintenance_alerts") {
+      if (!campgroundId) {
+        return { action, error: "campgroundId is required", generatedAt: new Date().toISOString() };
+      }
+      const alerts = await this.maintenanceService.getAlerts(campgroundId, {
+        status: dto.payload?.status,
+        severity: dto.payload?.severity,
+        limit: dto.payload?.limit || 10,
+      });
+      const summary = await this.maintenanceService.getMaintenanceSummary(campgroundId);
+      return {
+        action,
+        alerts,
+        summary,
+        message: summary.activeAlerts > 0
+          ? `${summary.activeAlerts} maintenance issues detected. ${summary.critical + summary.high} need immediate attention.`
+          : "No maintenance issues detected.",
+        generatedAt: new Date().toISOString(),
+        mode: "live",
+      };
+    }
+
+    if (action === "analyze_maintenance") {
+      if (!campgroundId) {
+        return { action, error: "campgroundId is required", generatedAt: new Date().toISOString() };
+      }
+      const alerts = await this.maintenanceService.analyzePatterns(campgroundId);
+      return {
+        action,
+        newAlerts: alerts,
+        message: alerts.length > 0
+          ? `Detected ${alerts.length} maintenance patterns requiring attention.`
+          : "No new maintenance patterns detected.",
+        generatedAt: new Date().toISOString(),
+        mode: "live",
+      };
+    }
+
+    // ==================== DASHBOARD ACTIONS ====================
+    if (action === "get_ai_dashboard" || action === "ai_dashboard" || action === "dashboard") {
+      if (!campgroundId) {
+        return { action, error: "campgroundId is required", generatedAt: new Date().toISOString() };
+      }
+      const [metrics, quickStats, activity] = await Promise.all([
+        this.dashboardService.getMetrics(campgroundId, dto.payload?.periodDays || 30),
+        this.dashboardService.getQuickStats(campgroundId),
+        this.dashboardService.getActivityFeed(campgroundId, dto.payload?.activityLimit || 10),
+      ]);
+      return {
+        action,
+        metrics,
+        quickStats,
+        activity,
+        message: `AI handled ${metrics.messagesHandled} messages, prevented ${metrics.noShowsPrevented} no-shows. ROI: ${metrics.roiPercent}%.`,
+        generatedAt: new Date().toISOString(),
+        mode: "live",
+      };
+    }
+
+    if (action === "get_ai_activity" || action === "ai_activity") {
+      if (!campgroundId) {
+        return { action, error: "campgroundId is required", generatedAt: new Date().toISOString() };
+      }
+      const activity = await this.dashboardService.getActivityFeed(campgroundId, dto.payload?.limit || 20);
+      return {
+        action,
+        activity,
+        message: `Retrieved ${activity.length} recent AI activities.`,
+        generatedAt: new Date().toISOString(),
+        mode: "live",
+      };
+    }
+
+    if (action === "get_ai_metrics" || action === "ai_metrics") {
+      if (!campgroundId) {
+        return { action, error: "campgroundId is required", generatedAt: new Date().toISOString() };
+      }
+      const metrics = await this.dashboardService.getMetrics(campgroundId, dto.payload?.periodDays || 30);
+      return {
+        action,
+        metrics,
+        message: `Revenue saved: $${(metrics.estimatedRevenueSavedCents / 100).toFixed(2)}, AI cost: $${(metrics.aiCostCents / 100).toFixed(2)}, ROI: ${metrics.roiPercent}%.`,
+        generatedAt: new Date().toISOString(),
+        mode: "live",
+      };
+    }
+
+    // ==================== ORIGINAL ACTIONS ====================
     if (action === "adjust_rates") {
       return {
         action,
@@ -631,15 +906,20 @@ Only include items with score >= 0.5. Return empty array if no good matches.`;
         mode: useMock ? "mock" : "live",
       };
     }
+
     if (action === "draft_reply") {
       const { guestName, lastMessage, reservationContext } = dto.payload || {};
+      const cg = campgroundId ? await this.prisma.campground.findUnique({
+        where: { id: campgroundId },
+        select: { aiOpenaiApiKey: true as any },
+      }) : null;
 
       const prompt = `
       You are a helpful campground concierge. Draft a friendly, professional reply to a guest.
       Guest Name: ${guestName || "Guest"}
       Last Message: "${lastMessage || "N/A"}"
       Context: ${reservationContext || "General inquiry"}
-      
+
       Guidelines:
       - Be concise and warm.
       - Address their specific question if clear.
@@ -659,17 +939,27 @@ Only include items with score >= 0.5. Return empty array if no good matches.`;
       };
 
       try {
+        const apiKey = (cg as any)?.aiOpenaiApiKey;
+        if (!apiKey) {
+          return {
+            action,
+            preview: `(AI Mock) Hi ${guestName || "Guest"}, thanks for your message! regarding "${lastMessage}", we'd be happy to help. Let us know if you need anything else!`,
+            tone: "friendly",
+            generatedAt: new Date().toISOString(),
+            mode: "mock",
+          };
+        }
+
         const res = await fetch("https://api.openai.com/v1/chat/completions", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${(cg as any).aiOpenaiApiKey}`,
+            Authorization: `Bearer ${apiKey}`,
           },
           body: JSON.stringify(body),
         });
 
         if (!res.ok) {
-          // Fallback for demo if no key or error
           return {
             action,
             preview: `(AI Mock) Hi ${guestName || "Guest"}, thanks for your message! regarding "${lastMessage}", we'd be happy to help. Let us know if you need anything else!`,
@@ -684,13 +974,12 @@ Only include items with score >= 0.5. Return empty array if no good matches.`;
 
         return {
           action,
-          preview: content.replace(/^"|"$/g, ''), // remove quotes if AI adds them
+          preview: content.replace(/^"|"$/g, ''),
           tone: "friendly",
           generatedAt: new Date().toISOString(),
           mode: "live",
         };
       } catch (err) {
-        // Fallback
         return {
           action,
           preview: `(Fallback) Hi ${guestName || "Guest"}, received your message: "${lastMessage}". We will get back to you shortly.`,
@@ -700,6 +989,42 @@ Only include items with score >= 0.5. Return empty array if no good matches.`;
         };
       }
     }
+
+    // ==================== HELP ACTION ====================
+    if (action === "help" || action === "list_actions") {
+      return {
+        action,
+        availableActions: [
+          // Pricing
+          { action: "get_pricing_recommendations", description: "Get AI pricing recommendations" },
+          { action: "apply_pricing", description: "Apply a pricing recommendation", params: ["recommendationId"] },
+          { action: "dismiss_pricing", description: "Dismiss a pricing recommendation", params: ["recommendationId"] },
+          { action: "analyze_pricing", description: "Trigger new pricing analysis" },
+          // Revenue
+          { action: "get_revenue_insights", description: "Get revenue opportunity insights" },
+          { action: "analyze_revenue", description: "Trigger new revenue analysis" },
+          // Weather
+          { action: "get_weather", description: "Get current weather conditions" },
+          { action: "get_weather_forecast", description: "Get 7-day weather forecast" },
+          { action: "get_weather_alerts", description: "Get weather alerts" },
+          { action: "check_weather", description: "Check for severe weather and create alerts" },
+          // Maintenance
+          { action: "get_maintenance_alerts", description: "Get maintenance alerts" },
+          { action: "analyze_maintenance", description: "Analyze maintenance patterns" },
+          // Dashboard
+          { action: "get_ai_dashboard", description: "Get full AI dashboard with metrics and activity" },
+          { action: "get_ai_activity", description: "Get recent AI activity feed" },
+          { action: "get_ai_metrics", description: "Get AI performance metrics" },
+          // Messages
+          { action: "draft_reply", description: "Draft a reply to a guest message" },
+          { action: "adjust_rates", description: "Get rate adjustment recommendations" },
+        ],
+        generatedAt: new Date().toISOString(),
+        mode: "live",
+      };
+    }
+
+    // Default fallback
     return {
       action,
       preview: "What-if: add 10% rate during county fair and auto-apply late checkout bundle to Saturday departures.",

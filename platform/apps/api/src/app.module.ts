@@ -117,6 +117,7 @@ import { SeasonalsModule } from "./seasonals/seasonals.module";
 import { LockCodesModule } from "./lock-codes/lock-codes.module";
 import { StayRulesModule } from "./stay-rules/stay-rules.module";
 import { SystemCheckModule } from "./system-check/system-check.module";
+import { StripePaymentsModule } from "./stripe-payments/stripe-payments.module";
 
 @Module({
   imports: [
@@ -141,6 +142,7 @@ import { SystemCheckModule } from "./system-check/system-check.module";
     MembershipsModule,
     LedgerModule,
     PaymentsModule,
+    StripePaymentsModule,
     DepositPoliciesModule,
     UpsellsModule,
     GiftCardsModule,
