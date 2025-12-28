@@ -315,4 +315,41 @@ export class SeasonalsController {
   ) {
     return this.seasonals.rolloverSeason(campgroundId, dto.fromYear, dto.toYear);
   }
+
+  // ==================== BULK OPERATIONS ====================
+
+  @UseGuards(JwtAuthGuard, RolesGuard, ScopeGuard)
+  @Roles(UserRole.owner, UserRole.manager, UserRole.front_desk)
+  @RequireScope({ resource: "reservations", action: "write" })
+  @Post("contracts/bulk")
+  async sendBulkContracts(
+    @Req() req: any,
+    @Body() dto: { seasonalGuestIds: string[]; templateId?: string; campgroundId: string }
+  ) {
+    return this.seasonals.sendBulkContracts(dto, req.user?.id);
+  }
+
+  @UseGuards(JwtAuthGuard, RolesGuard, ScopeGuard)
+  @Roles(UserRole.owner, UserRole.manager, UserRole.front_desk, UserRole.finance)
+  @RequireScope({ resource: "reservations", action: "write" })
+  @Post("payments/bulk")
+  async recordBulkPayments(
+    @Req() req: any,
+    @Body() dto: { seasonalGuestIds: string[]; amountCents: number; method: string; note?: string }
+  ) {
+    return this.seasonals.recordBulkPayments(dto, req.user?.id);
+  }
+
+  @UseGuards(JwtAuthGuard, RolesGuard, ScopeGuard)
+  @Roles(UserRole.owner, UserRole.manager, UserRole.front_desk, UserRole.finance, UserRole.readonly)
+  @RequireScope({ resource: "reservations", action: "read" })
+  @Get("campground/:campgroundId/export")
+  async exportSeasonals(
+    @Param("campgroundId") campgroundId: string,
+    @Query() query: { seasonYear?: string; ids?: string }
+  ) {
+    const seasonYear = query.seasonYear ? parseInt(query.seasonYear, 10) : new Date().getFullYear();
+    const ids = query.ids ? query.ids.split(",") : undefined;
+    return this.seasonals.exportToCsv(campgroundId, seasonYear, ids);
+  }
 }

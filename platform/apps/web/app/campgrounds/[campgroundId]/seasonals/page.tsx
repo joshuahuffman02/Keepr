@@ -2461,23 +2461,55 @@ export default function SeasonalsPage() {
         selectedCount={selectedIds.length}
         onSendMessage={() => setShowMessageModal(true)}
         onBulkUpdate={handleBulkUpdate}
-        onSendContracts={() => {
-          // TODO: Implement bulk send contracts
-          toast({
-            title: "Sending contracts...",
-            description: `Preparing contracts for ${selectedIds.length} guest${selectedIds.length !== 1 ? "s" : ""}`,
-          });
+        onSendContracts={async () => {
+          try {
+            const response = await fetch("/api/seasonals/contracts/bulk", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                seasonalGuestIds: selectedIds,
+                campgroundId,
+              }),
+            });
+            const result = await response.json();
+            if (!response.ok) throw new Error(result.message || "Failed to send contracts");
+            toast({
+              title: "Contracts sent",
+              description: `Sent ${result.sent} contract${result.sent !== 1 ? "s" : ""}${result.failed > 0 ? `, ${result.failed} failed` : ""}`,
+            });
+            setSelectedIds([]);
+          } catch (err: any) {
+            toast({ title: "Error", description: err.message, variant: "destructive" });
+          }
         }}
         onRecordPayment={() => {
-          // TODO: Implement bulk payment recording
           setShowPaymentModal(true);
         }}
-        onExport={() => {
-          // TODO: Implement export
-          toast({
-            title: "Exporting...",
-            description: `Exporting ${selectedIds.length} guest${selectedIds.length !== 1 ? "s" : ""} to CSV`,
-          });
+        onExport={async () => {
+          try {
+            const params = new URLSearchParams({ ids: selectedIds.join(",") });
+            const response = await fetch(`/api/seasonals/campground/${campgroundId}/export?${params}`);
+            const result = await response.json();
+            if (!response.ok) throw new Error(result.message || "Failed to export");
+
+            // Trigger download
+            const blob = new Blob([result.content], { type: "text/csv" });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = result.filename;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            window.URL.revokeObjectURL(url);
+
+            toast({
+              title: "Export complete",
+              description: `Exported ${result.count} guest${result.count !== 1 ? "s" : ""} to CSV`,
+            });
+          } catch (err: any) {
+            toast({ title: "Error", description: err.message, variant: "destructive" });
+          }
         }}
         onClear={() => setSelectedIds([])}
       />
@@ -2549,6 +2581,100 @@ export default function SeasonalsPage() {
               )}
             </Button>
           </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Bulk Payment Modal */}
+      <Dialog open={showPaymentModal} onOpenChange={setShowPaymentModal}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Record Payment for {selectedIds.length} Guest{selectedIds.length !== 1 ? "s" : ""}</DialogTitle>
+            <DialogDescription>
+              Enter payment details to record for all selected guests.
+            </DialogDescription>
+          </DialogHeader>
+          <form
+            onSubmit={async (e) => {
+              e.preventDefault();
+              const form = e.target as HTMLFormElement;
+              const formData = new FormData(form);
+              const amountCents = Math.round(parseFloat(formData.get("amount") as string) * 100);
+              const method = formData.get("method") as string;
+              const note = formData.get("note") as string;
+
+              try {
+                const response = await fetch("/api/seasonals/payments/bulk", {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({
+                    seasonalGuestIds: selectedIds,
+                    amountCents,
+                    method,
+                    note: note || undefined,
+                  }),
+                });
+                const result = await response.json();
+                if (!response.ok) throw new Error(result.message || "Failed to record payments");
+                toast({
+                  title: "Payments recorded",
+                  description: `Recorded ${result.recorded} payment${result.recorded !== 1 ? "s" : ""}${result.failed > 0 ? `, ${result.failed} failed` : ""}`,
+                });
+                setShowPaymentModal(false);
+                setSelectedIds([]);
+                queryClient.invalidateQueries({ queryKey: ["seasonals"] });
+              } catch (err: any) {
+                toast({ title: "Error", description: err.message, variant: "destructive" });
+              }
+            }}
+            className="space-y-4"
+          >
+            <div>
+              <Label htmlFor="amount">Amount ($)</Label>
+              <Input
+                id="amount"
+                name="amount"
+                type="number"
+                step="0.01"
+                min="0"
+                placeholder="0.00"
+                required
+                className="mt-1"
+              />
+            </div>
+            <div>
+              <Label htmlFor="method">Payment Method</Label>
+              <select
+                id="method"
+                name="method"
+                required
+                className="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-sm"
+              >
+                <option value="check">Check</option>
+                <option value="cash">Cash</option>
+                <option value="card">Credit/Debit Card</option>
+                <option value="ach">ACH/Bank Transfer</option>
+                <option value="other">Other</option>
+              </select>
+            </div>
+            <div>
+              <Label htmlFor="note">Note (optional)</Label>
+              <Input
+                id="note"
+                name="note"
+                placeholder="e.g., Check #1234"
+                className="mt-1"
+              />
+            </div>
+            <DialogFooter>
+              <Button type="button" variant="outline" onClick={() => setShowPaymentModal(false)}>
+                Cancel
+              </Button>
+              <Button type="submit">
+                <CreditCard className="h-4 w-4 mr-1" />
+                Record Payment
+              </Button>
+            </DialogFooter>
+          </form>
         </DialogContent>
       </Dialog>
     </DashboardShell>

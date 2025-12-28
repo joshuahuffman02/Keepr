@@ -364,6 +364,11 @@ export class SeasonalsService {
           },
           pricing: {
             where: { seasonYear: currentYear },
+            include: {
+              rateCard: {
+                select: { seasonStartDate: true, seasonEndDate: true },
+              },
+            },
           },
         },
       }),
@@ -470,10 +475,22 @@ export class SeasonalsService {
         paymentsCurrent++;
       }
 
-      // Sum up monthly revenue from pricing (configurable season length)
+      // Sum up monthly revenue from pricing (calculated from rate card dates)
       if (seasonal.pricing[0]) {
-        const SEASON_LENGTH_MONTHS = 6; // TODO: Make configurable per campground
-        const monthlyRate = seasonal.pricing[0].finalRate.toNumber() / SEASON_LENGTH_MONTHS;
+        const pricing = seasonal.pricing[0] as any;
+        let seasonLengthMonths = 6; // Default fallback
+
+        if (pricing.rateCard?.seasonStartDate && pricing.rateCard?.seasonEndDate) {
+          const start = new Date(pricing.rateCard.seasonStartDate);
+          const end = new Date(pricing.rateCard.seasonEndDate);
+          // Calculate months between dates
+          seasonLengthMonths = Math.max(1,
+            (end.getFullYear() - start.getFullYear()) * 12 +
+            (end.getMonth() - start.getMonth()) + 1
+          );
+        }
+
+        const monthlyRate = pricing.finalRate.toNumber() / seasonLengthMonths;
         totalMonthlyRevenue += monthlyRate;
       }
     }
@@ -1090,5 +1107,215 @@ export class SeasonalsService {
     this.logger.log(`Rolled over ${rolledOver} seasonals from ${fromYear} to ${toYear}`);
 
     return { rolledOver };
+  }
+
+  // ==================== BULK OPERATIONS ====================
+
+  /**
+   * Send contracts to multiple seasonal guests
+   */
+  async sendBulkContracts(
+    dto: { seasonalGuestIds: string[]; templateId?: string; campgroundId: string },
+    sentBy: string
+  ) {
+    const seasonals = await this.prisma.seasonalGuest.findMany({
+      where: { id: { in: dto.seasonalGuestIds } },
+      include: { guest: true, site: true },
+    });
+
+    if (seasonals.length === 0) {
+      return { sent: 0, failed: 0 };
+    }
+
+    // Find default contract template if not specified
+    let templateId = dto.templateId;
+    if (!templateId) {
+      const template = await this.prisma.documentTemplate.findFirst({
+        where: { campgroundId: dto.campgroundId, category: "seasonal_contract", isActive: true },
+        orderBy: { createdAt: "desc" },
+      });
+      templateId = template?.id;
+    }
+
+    if (!templateId) {
+      return { sent: 0, failed: seasonals.length, error: "No contract template found" };
+    }
+
+    let sent = 0;
+    let failed = 0;
+
+    for (const seasonal of seasonals) {
+      if (!seasonal.guest?.email) {
+        failed++;
+        continue;
+      }
+
+      try {
+        // Create signature request for each seasonal
+        await this.prisma.signatureRequest.create({
+          data: {
+            campgroundId: dto.campgroundId,
+            templateId,
+            recipientEmail: seasonal.guest.email,
+            recipientName: `${seasonal.guest.firstName} ${seasonal.guest.lastName}`,
+            recipientType: "seasonal",
+            referenceType: "seasonal_guest",
+            referenceId: seasonal.id,
+            status: "pending",
+            createdBy: sentBy,
+            expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 days
+          },
+        });
+
+        // Send email notification
+        await this.emailService.sendEmail({
+          to: seasonal.guest.email,
+          subject: "Please sign your seasonal contract",
+          html: `
+            <h2>Seasonal Contract Ready for Signature</h2>
+            <p>Hi ${seasonal.guest.firstName},</p>
+            <p>Your seasonal contract for site ${seasonal.site?.name || "your site"} is ready for review and signature.</p>
+            <p>Please log in to your guest portal to review and sign the contract.</p>
+            <p>This contract will expire in 30 days.</p>
+          `,
+          campgroundId: dto.campgroundId,
+        });
+
+        sent++;
+      } catch (err) {
+        this.logger.error(`Failed to send contract to ${seasonal.guest.email}: ${err}`);
+        failed++;
+      }
+    }
+
+    this.logger.log(`Bulk contracts: ${sent} sent, ${failed} failed`);
+    return { sent, failed };
+  }
+
+  /**
+   * Record payments for multiple seasonal guests
+   */
+  async recordBulkPayments(
+    dto: { seasonalGuestIds: string[]; amountCents: number; method: string; note?: string },
+    recordedBy: string
+  ) {
+    const seasonals = await this.prisma.seasonalGuest.findMany({
+      where: { id: { in: dto.seasonalGuestIds } },
+    });
+
+    if (seasonals.length === 0) {
+      return { recorded: 0, failed: 0 };
+    }
+
+    let recorded = 0;
+    let failed = 0;
+
+    for (const seasonal of seasonals) {
+      try {
+        await this.prisma.seasonalPayment.create({
+          data: {
+            seasonalGuestId: seasonal.id,
+            amountCents: dto.amountCents,
+            method: dto.method,
+            status: "paid",
+            paidAt: new Date(),
+            note: dto.note,
+            recordedBy,
+          },
+        });
+        recorded++;
+      } catch (err) {
+        this.logger.error(`Failed to record payment for seasonal ${seasonal.id}: ${err}`);
+        failed++;
+      }
+    }
+
+    this.logger.log(`Bulk payments: ${recorded} recorded, ${failed} failed`);
+    return { recorded, failed };
+  }
+
+  /**
+   * Export seasonal guests to CSV format
+   */
+  async exportToCsv(campgroundId: string, seasonYear: number, ids?: string[]) {
+    const where: any = { campgroundId };
+    if (ids && ids.length > 0) {
+      where.id = { in: ids };
+    }
+
+    const seasonals = await this.prisma.seasonalGuest.findMany({
+      where,
+      include: {
+        guest: true,
+        site: true,
+        rateCard: true,
+        payments: {
+          orderBy: { createdAt: "desc" },
+          take: 1,
+        },
+      },
+      orderBy: [{ site: { name: "asc" } }, { guest: { lastName: "asc" } }],
+    });
+
+    // Build CSV header
+    const headers = [
+      "Site",
+      "First Name",
+      "Last Name",
+      "Email",
+      "Phone",
+      "Status",
+      "Renewal Intent",
+      "Total Seasons",
+      "Seniority Rank",
+      "Rate Card",
+      "Total Due",
+      "Total Paid",
+      "Balance",
+      "Last Payment Date",
+      "Contract Status",
+      "Notes",
+    ];
+
+    // Build CSV rows
+    const rows = seasonals.map((s) => {
+      const totalPaid = s.payments?.reduce((sum, p) => sum + (p.amountCents || 0), 0) || 0;
+      const balance = (s.totalDueCents || 0) - totalPaid;
+      const lastPayment = s.payments?.[0];
+
+      return [
+        s.site?.name || "",
+        s.guest?.firstName || "",
+        s.guest?.lastName || "",
+        s.guest?.email || "",
+        s.guest?.phone || "",
+        s.status || "",
+        s.renewalIntent || "",
+        s.totalSeasons?.toString() || "0",
+        s.seniorityRank?.toString() || "",
+        s.rateCard?.name || "",
+        ((s.totalDueCents || 0) / 100).toFixed(2),
+        (totalPaid / 100).toFixed(2),
+        (balance / 100).toFixed(2),
+        lastPayment?.paidAt ? new Date(lastPayment.paidAt).toLocaleDateString() : "",
+        s.contractSigned ? "Signed" : "Pending",
+        s.notes || "",
+      ];
+    });
+
+    // Convert to CSV string
+    const csvContent = [
+      headers.join(","),
+      ...rows.map((row) =>
+        row.map((cell) => `"${String(cell).replace(/"/g, '""')}"`).join(",")
+      ),
+    ].join("\n");
+
+    return {
+      filename: `seasonals-${campgroundId}-${seasonYear}.csv`,
+      content: csvContent,
+      contentType: "text/csv",
+      count: seasonals.length,
+    };
   }
 }

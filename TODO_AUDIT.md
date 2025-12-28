@@ -1,7 +1,7 @@
 # TODO/FIXME Audit
 
 **Generated:** 2025-12-27
-**Status:** In Progress
+**Status:** Complete (4 items pending external API credentials)
 
 This document tracks all TODO, FIXME, and incomplete code comments in the codebase.
 
@@ -58,13 +58,26 @@ This document tracks all TODO, FIXME, and incomplete code comments in the codeba
 
 ---
 
+## Additional Items (Found During Review)
+
+| # | File | Line | Issue | Status |
+|---|------|------|-------|--------|
+| 24 | `apps/web/app/campgrounds/[campgroundId]/seasonals/page.tsx` | 2465 | Bulk send contracts - TODO in frontend | **FIXED** |
+| 25 | `apps/web/app/campgrounds/[campgroundId]/seasonals/page.tsx` | 2472 | Bulk payment recording - TODO in frontend | **FIXED** |
+| 26 | `apps/web/app/campgrounds/[campgroundId]/seasonals/page.tsx` | 2476 | Export functionality - TODO in frontend | **FIXED** |
+| 27 | `apps/api/src/seasonals/seasonals.service.ts` | 475 | Season length config - hardcoded 6 months | **FIXED** |
+| 28 | `apps/api/src/operations/operations.service.ts` | 311-314 | Additional notification channels (SMS, PagerDuty, Teams) | **FIXED** |
+
+---
+
 ## Summary
 
 - **Critical:** 0 remaining (1 fixed)
-- **Important:** 2 remaining (6 fixed)
-- **Moderate:** 3 remaining (8 fixed)
+- **Important:** 1 remaining (7 fixed) - only OTA provider APIs need external credentials
+- **Moderate:** 3 remaining (8 fixed) - all require external API credentials/infrastructure
 - **Minor:** 0 remaining (4 fixed)
-- **Total:** 5 remaining (19 fixed)
+- **Additional:** 0 remaining (5 fixed)
+- **Total:** 4 remaining (25 fixed)
 
 ---
 
@@ -93,3 +106,6 @@ This document tracks all TODO, FIXME, and incomplete code comments in the codeba
 | 2025-12-27 | 5 | FIXED: Implemented proper pricing/tax in createCart and updateCart - fetches product prices, location overrides, calculates tax with TaxRule |
 | 2025-12-27 | 4 | FIXED: Implemented full refund workflow - Stripe refunds, inventory restock, ledger entries, guest email notifications |
 | 2025-12-27 | 6 | FIXED: Integrated POS charge_to_site with reservations AR/folio - creates ledger entries, updates reservation balance |
+| 2025-12-27 | 24-26 | FIXED: Added bulk operations endpoints (contracts/bulk, payments/bulk, export) to seasonals controller and service; updated frontend FloatingActionPanel with API calls and bulk payment modal |
+| 2025-12-27 | 27 | FIXED: Updated getDashboardStats to include rateCard dates, calculate season length dynamically from seasonStartDate/seasonEndDate |
+| 2025-12-27 | 28 | FIXED: Added SMS (Twilio), PagerDuty, and Microsoft Teams notification channels to operations.service.ts |

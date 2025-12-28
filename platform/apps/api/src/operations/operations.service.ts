@@ -307,11 +307,9 @@ export class OperationsService {
      * - webhook: POST to OPS_ALERT_WEBHOOK_URL environment variable
      * - slack: POST to Slack webhook (requires SLACK_OPS_WEBHOOK_URL)
      * - email: Send via EmailService (requires OPS_ALERT_EMAIL)
-     *
-     * TODO: Implement additional channels as needed:
-     * - SMS via Twilio (TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN, TWILIO_PHONE_FROM, OPS_ALERT_PHONE)
-     * - PagerDuty (PAGERDUTY_INTEGRATION_KEY)
-     * - Microsoft Teams (TEAMS_OPS_WEBHOOK_URL)
+     * - sms: Send via Twilio (requires TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN, TWILIO_PHONE_FROM, OPS_ALERT_PHONE)
+     * - pagerduty: Send via PagerDuty Events API (requires PAGERDUTY_INTEGRATION_KEY)
+     * - teams: POST to Microsoft Teams webhook (requires TEAMS_OPS_WEBHOOK_URL)
      */
     async sendOpsHealthAlert(
         campgroundId: string,
@@ -345,6 +343,15 @@ export class OperationsService {
                     break;
                 case "email":
                     await this.sendEmailAlert(payload, campground);
+                    break;
+                case "sms":
+                    await this.sendSmsAlert(payload, campground);
+                    break;
+                case "pagerduty":
+                    await this.sendPagerDutyAlert(payload, campground);
+                    break;
+                case "teams":
+                    await this.sendTeamsAlert(payload, campground);
                     break;
                 default:
                     throw new Error(`Unsupported alert channel: ${channel}`);
@@ -452,6 +459,110 @@ export class OperationsService {
             `,
             campgroundId: payload.campgroundId,
         });
+    }
+
+    private async sendSmsAlert(payload: any, campground: any) {
+        const accountSid = process.env.TWILIO_ACCOUNT_SID;
+        const authToken = process.env.TWILIO_AUTH_TOKEN;
+        const fromPhone = process.env.TWILIO_PHONE_FROM;
+        const toPhone = process.env.OPS_ALERT_PHONE;
+
+        if (!accountSid || !authToken || !fromPhone || !toPhone) {
+            throw new Error("Twilio SMS configuration incomplete. Required: TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN, TWILIO_PHONE_FROM, OPS_ALERT_PHONE");
+        }
+
+        const message = `[OPS ALERT] ${campground?.name || 'Campground'}: ${payload.message}`;
+
+        const response = await fetch(
+            `https://api.twilio.com/2010-04-01/Accounts/${accountSid}/Messages.json`,
+            {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/x-www-form-urlencoded",
+                    Authorization: `Basic ${Buffer.from(`${accountSid}:${authToken}`).toString("base64")}`,
+                },
+                body: new URLSearchParams({
+                    To: toPhone,
+                    From: fromPhone,
+                    Body: message.substring(0, 1600), // SMS limit
+                }),
+            }
+        );
+
+        if (!response.ok) {
+            const error = await response.text();
+            throw new Error(`Twilio SMS failed: ${response.status} - ${error}`);
+        }
+    }
+
+    private async sendPagerDutyAlert(payload: any, campground: any) {
+        const integrationKey = process.env.PAGERDUTY_INTEGRATION_KEY;
+
+        if (!integrationKey) {
+            throw new Error("PAGERDUTY_INTEGRATION_KEY not configured");
+        }
+
+        const response = await fetch("https://events.pagerduty.com/v2/enqueue", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                routing_key: integrationKey,
+                event_action: "trigger",
+                dedup_key: `ops-alert-${payload.campgroundId}-${payload.target}`,
+                payload: {
+                    summary: `[${campground?.name || 'Campground'}] Operations Alert: ${payload.message}`,
+                    source: `campreserv-${payload.campgroundId}`,
+                    severity: "warning",
+                    timestamp: payload.at,
+                    custom_details: {
+                        campground_id: payload.campgroundId,
+                        campground_name: campground?.name,
+                        target: payload.target,
+                        message: payload.message,
+                    },
+                },
+            }),
+        });
+
+        if (!response.ok) {
+            const error = await response.text();
+            throw new Error(`PagerDuty request failed: ${response.status} - ${error}`);
+        }
+    }
+
+    private async sendTeamsAlert(payload: any, campground: any) {
+        const teamsUrl = process.env.TEAMS_OPS_WEBHOOK_URL;
+
+        if (!teamsUrl) {
+            throw new Error("TEAMS_OPS_WEBHOOK_URL not configured");
+        }
+
+        const response = await fetch(teamsUrl, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                "@type": "MessageCard",
+                "@context": "http://schema.org/extensions",
+                themeColor: "dc2626",
+                summary: `Operations Alert - ${campground?.name || 'Campground'}`,
+                sections: [
+                    {
+                        activityTitle: `Operations Alert - ${campground?.name || 'Campground'}`,
+                        activitySubtitle: new Date(payload.at).toLocaleString(),
+                        facts: [
+                            { name: "Target", value: payload.target },
+                            { name: "Campground ID", value: payload.campgroundId },
+                        ],
+                        text: payload.message,
+                        markdown: true,
+                    },
+                ],
+            }),
+        });
+
+        if (!response.ok) {
+            throw new Error(`Teams webhook failed: ${response.status} ${response.statusText}`);
+        }
     }
 
     private ensureCampgroundAccess(user: any, campgroundId?: string | null) {
