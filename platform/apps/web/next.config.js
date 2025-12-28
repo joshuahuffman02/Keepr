@@ -159,6 +159,23 @@ const nextConfig = {
     ];
   },
 
+  // Rewrites to proxy API requests to the backend
+  async rewrites() {
+    // In production, use the Railway API backend URL
+    // In development, use localhost
+    const isProduction = process.env.NODE_ENV === "production";
+    const backendUrl = isProduction
+      ? "https://camp-everydayapi-production.up.railway.app"
+      : "http://localhost:4000";
+
+    return [
+      {
+        source: "/api/:path*",
+        destination: `${backendUrl}/api/:path*`,
+      },
+    ];
+  },
+
   // Experimental features for performance
   experimental: {
     outputFileTracingRoot: path.join(__dirname, "../../"),

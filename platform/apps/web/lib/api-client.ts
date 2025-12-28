@@ -633,11 +633,10 @@ const OtaLogSchema = z.object({
 }).passthrough();
 
 function resolveApiBase() {
+  // NEXT_PUBLIC_API_BASE can override for specific environments
   if (process.env.NEXT_PUBLIC_API_BASE) return process.env.NEXT_PUBLIC_API_BASE;
-  if (typeof window !== "undefined" && window.location?.origin) {
-    return `${window.location.origin}/api`;
-  }
-  return "http://localhost:4000/api";
+  // Use relative /api path - Next.js rewrites will proxy to the backend
+  return "/api";
 }
 
 const API_BASE = resolveApiBase();
