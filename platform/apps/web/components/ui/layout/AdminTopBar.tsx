@@ -455,6 +455,19 @@ export function AdminTopBar({
                                     Settings
                                 </Link>
 
+                                {/* Billing */}
+                                <Link
+                                    href="/dashboard/settings/billing"
+                                    className="flex items-center gap-3 px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50 transition-colors"
+                                    onClick={() => setIsMenuOpen(false)}
+                                >
+                                    <svg className="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">
+                                        <rect x="3" y="5" width="18" height="14" rx="2" />
+                                        <path d="M3 10h18M7 15h2" />
+                                    </svg>
+                                    Billing & Usage
+                                </Link>
+
                                 {/* Keyboard Shortcuts */}
                                 <button
                                     onClick={() => {
