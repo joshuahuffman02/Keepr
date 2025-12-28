@@ -37,16 +37,22 @@ else
     echo "The app will attempt to connect when handling requests"
 fi
 
-echo "=== Cleaning up corrupted Prisma client ==="
-rm -rf /app/node_modules/.prisma
-rm -rf /app/node_modules/.pnpm/@prisma+client*/node_modules/.prisma
+echo "=== Checking Prisma client ==="
+# Check if Prisma client was already generated at build time
+PRISMA_CLIENT_PATH=$(find /app/node_modules/.pnpm -name ".prisma" -type d 2>/dev/null | grep "@prisma+client" | head -1)
 
-echo "=== Generating Prisma client ==="
-cd /app/platform/apps/api && npx prisma generate
-cd /app/platform/apps/api
+if [ -n "$PRISMA_CLIENT_PATH" ] && [ -f "$PRISMA_CLIENT_PATH/client/default.js" ]; then
+    echo "Prisma client found at: $PRISMA_CLIENT_PATH"
+    echo "Skipping regeneration - using pre-built client"
+else
+    echo "Prisma client not found, generating..."
+    cd /app/platform/apps/api && npx prisma generate
+    cd /app/platform/apps/api
+fi
 
 echo "=== Linking Prisma client for pnpm ==="
 node /app/scripts/link-prisma-client.js || echo "Link script not found, skipping"
 
 echo "=== Starting app ==="
-exec node -r tsconfig-paths/register dist/main.js
+cd /app/platform/apps/api
+exec node dist/main.js
