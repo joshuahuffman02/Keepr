@@ -305,7 +305,11 @@ export const GuestSchema = z.object({
     pointsBalance: z.number()
   }).optional().nullable(),
   reservations: z.array(z.object({
+    id: z.string(),
+    campgroundId: z.string(),
+    arrivalDate: z.string(),
     departureDate: z.string(),
+    status: z.string().optional(),
     site: z.object({
       id: z.string(),
       name: z.string(),

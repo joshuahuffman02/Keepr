@@ -337,12 +337,12 @@ export default function NewSeasonalGuestPage() {
               <CardDescription>Assign a site for the season (optional)</CardDescription>
             </CardHeader>
             <CardContent>
-              <Select value={selectedSiteId} onValueChange={setSelectedSiteId}>
+              <Select value={selectedSiteId || "__none__"} onValueChange={(v) => setSelectedSiteId(v === "__none__" ? "" : v)}>
                 <SelectTrigger>
                   <SelectValue placeholder="Select a site..." />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">No site assigned yet</SelectItem>
+                  <SelectItem value="__none__">No site assigned yet</SelectItem>
                   {sites.map((site) => (
                     <SelectItem key={site.id} value={site.id}>
                       {site.name}
@@ -459,12 +459,12 @@ export default function NewSeasonalGuestPage() {
 
                 <div className="space-y-2">
                   <Label>Preferred Payment Method</Label>
-                  <Select value={preferredPaymentMethod} onValueChange={setPreferredPaymentMethod}>
+                  <Select value={preferredPaymentMethod || "__any__"} onValueChange={(v) => setPreferredPaymentMethod(v === "__any__" ? "" : v)}>
                     <SelectTrigger>
                       <SelectValue placeholder="Any method" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="">Any method</SelectItem>
+                      <SelectItem value="__any__">Any method</SelectItem>
                       <SelectItem value="card">Credit/Debit Card</SelectItem>
                       <SelectItem value="ach">ACH/Bank Transfer</SelectItem>
                       <SelectItem value="check">Check</SelectItem>

@@ -15,7 +15,7 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../../../components/ui/table";
 import { Badge } from "../../../components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../../components/ui/select";
-import { Trophy, Star, History, ArrowLeft, Trash2, Plus, Car, Truck, Mail, MessageSquare, GitBranch, RotateCcw, PlusCircle, Send, Wallet, DollarSign, ClipboardList, CreditCard } from "lucide-react";
+import { Trophy, Star, History, ArrowLeft, Trash2, Plus, Car, Truck, Mail, MessageSquare, GitBranch, RotateCcw, PlusCircle, Send, Wallet, DollarSign, ClipboardList, CreditCard, Calendar, ExternalLink } from "lucide-react";
 import { GuestPaymentMethods } from "../../../components/guests/GuestPaymentMethods";
 import { AuditLogTimeline } from "../../../components/audit/AuditLogTimeline";
 import { cn } from "../../../lib/utils";
@@ -338,6 +338,10 @@ export default function GuestDetailPage() {
                 <Tabs defaultValue="overview" className="space-y-4">
                     <TabsList>
                         <TabsTrigger value="overview">Overview</TabsTrigger>
+                        <TabsTrigger value="reservations" className="gap-1">
+                            <Calendar className="h-3.5 w-3.5" />
+                            Reservations
+                        </TabsTrigger>
                         <TabsTrigger value="equipment">Equipment</TabsTrigger>
                         <TabsTrigger value="wallet">Wallet</TabsTrigger>
                         <TabsTrigger value="payment-methods" className="gap-1">
@@ -410,6 +414,83 @@ export default function GuestDetailPage() {
                                         </div>
                                     ))}
                                 </div>
+                            </CardContent>
+                        </Card>
+                    </TabsContent>
+
+                    <TabsContent value="reservations" className="space-y-4">
+                        <Card>
+                            <CardHeader className="flex flex-row items-center justify-between">
+                                <div>
+                                    <CardTitle className="flex items-center gap-2">
+                                        <Calendar className="h-5 w-5" />
+                                        Reservations
+                                    </CardTitle>
+                                    <CardDescription>
+                                        All reservations for this guest
+                                    </CardDescription>
+                                </div>
+                                <Button
+                                    variant="outline"
+                                    className="gap-2"
+                                    onClick={() => router.push(`/booking?guestId=${guest.id}`)}
+                                >
+                                    <Plus className="h-4 w-4" />
+                                    New Reservation
+                                </Button>
+                            </CardHeader>
+                            <CardContent>
+                                {(guest as any).reservations?.length > 0 ? (
+                                    <Table>
+                                        <TableHeader>
+                                            <TableRow>
+                                                <TableHead>Dates</TableHead>
+                                                <TableHead>Site</TableHead>
+                                                <TableHead>Status</TableHead>
+                                                <TableHead className="text-right">Actions</TableHead>
+                                            </TableRow>
+                                        </TableHeader>
+                                        <TableBody>
+                                            {(guest as any).reservations.map((res: any) => (
+                                                <TableRow key={res.id}>
+                                                    <TableCell>
+                                                        <div className="font-medium">
+                                                            {new Date(res.arrivalDate).toLocaleDateString()} - {new Date(res.departureDate).toLocaleDateString()}
+                                                        </div>
+                                                    </TableCell>
+                                                    <TableCell>
+                                                        {res.site?.siteNumber || res.site?.name || "—"}
+                                                    </TableCell>
+                                                    <TableCell>
+                                                        <Badge variant={
+                                                            res.status === "checked_in" ? "default" :
+                                                            res.status === "confirmed" ? "secondary" :
+                                                            res.status === "checked_out" ? "outline" :
+                                                            res.status === "cancelled" ? "destructive" : "secondary"
+                                                        }>
+                                                            {res.status?.replace("_", " ")}
+                                                        </Badge>
+                                                    </TableCell>
+                                                    <TableCell className="text-right">
+                                                        <Button
+                                                            variant="ghost"
+                                                            size="sm"
+                                                            onClick={() => router.push(`/reservations/${res.id}`)}
+                                                            className="gap-1"
+                                                        >
+                                                            View <ExternalLink className="h-3 w-3" />
+                                                        </Button>
+                                                    </TableCell>
+                                                </TableRow>
+                                            ))}
+                                        </TableBody>
+                                    </Table>
+                                ) : (
+                                    <div className="text-center py-8 text-muted-foreground">
+                                        <Calendar className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                                        <p>No reservations found for this guest</p>
+                                    </div>
+                                )}
                             </CardContent>
                         </Card>
                     </TabsContent>
