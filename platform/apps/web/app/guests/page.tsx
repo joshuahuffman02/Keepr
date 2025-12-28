@@ -318,9 +318,24 @@ import { useRouter } from "next/navigation";
 
 export default function GuestsPage() {
   const router = useRouter();
+
+  // Get campgroundId from localStorage (needed for the API call)
+  const [campgroundId, setCampgroundId] = useState<string | null>(null);
+  const [campgroundChecked, setCampgroundChecked] = useState(false);
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const stored = localStorage.getItem("campreserv:selectedCampground");
+      setCampgroundId(stored);
+      setCampgroundChecked(true);
+    }
+  }, []);
+
   const guestsQuery = useQuery({
-    queryKey: ["guests"],
-    queryFn: () => apiClient.getGuests()
+    queryKey: ["guests", campgroundId],
+    queryFn: () => apiClient.getGuests(campgroundId || undefined),
+    enabled: campgroundChecked && !!campgroundId,
+    retry: 1, // Only retry once on failure
   });
   const queryClient = useQueryClient();
   const { toast } = useToast();
@@ -1020,7 +1035,17 @@ export default function GuestsPage() {
               ))}
               {filteredAndSortedGuests.length === 0 && (
                 <TableEmpty colSpan={6}>
-                  {guestsQuery.isLoading ? "Loading guests..." : hasFilters ? "No guests match the current filters." : "No guests yet."}
+                  {!campgroundChecked
+                    ? "Loading..."
+                    : !campgroundId
+                      ? "No campground selected. Please select a campground from the sidebar."
+                      : guestsQuery.isLoading
+                        ? "Loading guests..."
+                        : guestsQuery.isError
+                          ? `Error loading guests: ${guestsQuery.error?.message || "Unknown error"}`
+                          : hasFilters
+                            ? "No guests match the current filters."
+                            : "No guests yet."}
                 </TableEmpty>
               )}
             </tbody>
