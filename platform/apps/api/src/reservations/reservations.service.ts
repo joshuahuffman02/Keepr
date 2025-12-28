@@ -2795,6 +2795,161 @@ export class ReservationsService {
   }
 
   /**
+   * Staff check-in from dashboard
+   * Unlike kiosk check-in, this doesn't require payment but warns about balance
+   */
+  async staffCheckIn(
+    id: string,
+    options?: { force?: boolean; actorId?: string | null }
+  ): Promise<{ reservation: Reservation; warning?: string }> {
+    const reservation = await this.prisma.reservation.findUnique({
+      where: { id },
+      include: { guest: true, site: true, campground: true }
+    });
+
+    if (!reservation) {
+      throw new NotFoundException("Reservation not found");
+    }
+
+    if (reservation.status === ReservationStatus.checked_in) {
+      throw new ConflictException("Reservation is already checked in");
+    }
+
+    if (reservation.status === ReservationStatus.cancelled) {
+      throw new BadRequestException("Cannot check in a cancelled reservation");
+    }
+
+    // Check for pending forms
+    const pendingForms = await (this.prisma as any).formSubmission?.count?.({
+      where: { reservationId: id, status: "pending" }
+    }) ?? 0;
+
+    if (pendingForms > 0 && !options?.force) {
+      throw new ConflictException(
+        "Forms must be completed before check-in. Use force=true to override."
+      );
+    }
+
+    // Check balance
+    const balance = (reservation.totalAmount ?? 0) - (reservation.paidAmount ?? 0);
+    let warning: string | undefined;
+
+    if (balance > 0) {
+      warning = `Guest has outstanding balance of $${(balance / 100).toFixed(2)}`;
+    }
+
+    const now = new Date();
+    const updated = await this.prisma.reservation.update({
+      where: { id },
+      data: {
+        status: ReservationStatus.checked_in,
+        checkInStatus: CheckInStatus.completed,
+        checkInAt: now
+      },
+      include: { guest: true, site: true, campground: true }
+    });
+
+    // Audit
+    await this.audit.log({
+      action: "reservation.checkin",
+      campgroundId: reservation.campgroundId,
+      actorId: options?.actorId ?? null,
+      targetType: "reservation",
+      targetId: id,
+      before: { status: reservation.status },
+      after: { status: updated.status, checkInAt: now, source: "staff" }
+    });
+
+    // Trigger playbooks and access control
+    await this.enqueuePlaybooksForReservation("upsell", id);
+    await this.accessControl.autoGrantForReservation(id);
+
+    // Gamification
+    if (reservation.createdBy) {
+      const membership = await this.prisma.campgroundMembership.findFirst({
+        where: { userId: reservation.createdBy, campgroundId: reservation.campgroundId }
+      });
+      await this.gamification.recordEvent({
+        campgroundId: reservation.campgroundId,
+        staffMembershipId: membership?.id || null,
+        category: GamificationEventCategory.operational,
+        eventType: "smooth_checkin",
+        points: 5,
+        reason: "Smooth check-in (staff)",
+        sourceType: "reservation",
+        sourceId: reservation.id,
+        eventKey: `reservation:${reservation.id}:checkin`
+      });
+    }
+
+    return { reservation: updated, warning };
+  }
+
+  /**
+   * Staff check-out from dashboard
+   */
+  async staffCheckOut(
+    id: string,
+    options?: { force?: boolean; actorId?: string | null }
+  ): Promise<{ reservation: Reservation; warning?: string }> {
+    const reservation = await this.prisma.reservation.findUnique({
+      where: { id },
+      include: { guest: true, site: true, campground: true }
+    });
+
+    if (!reservation) {
+      throw new NotFoundException("Reservation not found");
+    }
+
+    if (reservation.status === ReservationStatus.checked_out) {
+      throw new ConflictException("Reservation is already checked out");
+    }
+
+    if (reservation.status === ReservationStatus.cancelled) {
+      throw new BadRequestException("Cannot check out a cancelled reservation");
+    }
+
+    // Check balance
+    const balance = (reservation.totalAmount ?? 0) - (reservation.paidAmount ?? 0);
+    let warning: string | undefined;
+
+    if (balance > 0 && !options?.force) {
+      throw new BadRequestException(
+        `Cannot check out with outstanding balance of $${(balance / 100).toFixed(2)}. ` +
+        `Collect payment first or use force=true to override.`
+      );
+    } else if (balance > 0) {
+      warning = `Guest checked out with outstanding balance of $${(balance / 100).toFixed(2)}`;
+    }
+
+    const now = new Date();
+    const updated = await this.prisma.reservation.update({
+      where: { id },
+      data: {
+        status: ReservationStatus.checked_out,
+        checkOutAt: now
+      },
+      include: { guest: true, site: true, campground: true }
+    });
+
+    // Audit
+    await this.audit.log({
+      action: "reservation.checkout",
+      campgroundId: reservation.campgroundId,
+      actorId: options?.actorId ?? null,
+      targetType: "reservation",
+      targetId: id,
+      before: { status: reservation.status },
+      after: { status: updated.status, checkOutAt: now, source: "staff" }
+    });
+
+    // Trigger departure playbook
+    await this.enqueuePlaybooksForReservation("post_departure", id);
+
+    return { reservation: updated, warning };
+  }
+
+  /**
    * Split a reservation into multiple site segments.
    * Allows a guest to stay on different sites during their reservation.
    * Each segment has its own siteId and price based on that site's rates.

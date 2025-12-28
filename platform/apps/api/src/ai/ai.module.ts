@@ -12,6 +12,14 @@ import { AiAutoReplyService } from './ai-auto-reply.service';
 import { AiSmartWaitlistService } from './ai-smart-waitlist.service';
 import { AiAnomalyDetectionService } from './ai-anomaly-detection.service';
 import { AiNoShowPredictionService } from './ai-no-show-prediction.service';
+// AI Autonomous Features
+import { AiAutonomousActionService } from './ai-autonomous-action.service';
+import { AiDynamicPricingService } from './ai-dynamic-pricing.service';
+import { AiRevenueManagerService } from './ai-revenue-manager.service';
+import { AiPredictiveMaintenanceService } from './ai-predictive-maintenance.service';
+import { AiWeatherService } from './ai-weather.service';
+import { AiPhoneAgentService } from './ai-phone-agent.service';
+import { AiDashboardService } from './ai-dashboard.service';
 import { AiController } from './ai.controller';
 import { AiAutopilotController } from './ai-autopilot.controller';
 import { PrismaModule } from '../prisma/prisma.module';
@@ -60,6 +68,14 @@ import { AnomaliesModule } from '../anomalies/anomalies.module';
     AiSmartWaitlistService,
     AiAnomalyDetectionService,
     AiNoShowPredictionService,
+    // AI Autonomous Features
+    AiAutonomousActionService,
+    AiDynamicPricingService,
+    AiRevenueManagerService,
+    AiPredictiveMaintenanceService,
+    AiWeatherService,
+    AiPhoneAgentService,
+    AiDashboardService,
   ],
   exports: [
     AiPrivacyService,
@@ -76,6 +92,14 @@ import { AnomaliesModule } from '../anomalies/anomalies.module';
     AiSmartWaitlistService,
     AiAnomalyDetectionService,
     AiNoShowPredictionService,
+    // AI Autonomous Features
+    AiAutonomousActionService,
+    AiDynamicPricingService,
+    AiRevenueManagerService,
+    AiPredictiveMaintenanceService,
+    AiWeatherService,
+    AiPhoneAgentService,
+    AiDashboardService,
   ],
 })
 export class AiModule { }

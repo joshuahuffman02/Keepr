@@ -18,6 +18,14 @@ import { AiAutoReplyService } from "./ai-auto-reply.service";
 import { AiSmartWaitlistService } from "./ai-smart-waitlist.service";
 import { AiAnomalyDetectionService } from "./ai-anomaly-detection.service";
 import { AiNoShowPredictionService } from "./ai-no-show-prediction.service";
+// Autonomous Features
+import { AiAutonomousActionService } from "./ai-autonomous-action.service";
+import { AiDynamicPricingService } from "./ai-dynamic-pricing.service";
+import { AiRevenueManagerService } from "./ai-revenue-manager.service";
+import { AiPredictiveMaintenanceService } from "./ai-predictive-maintenance.service";
+import { AiWeatherService } from "./ai-weather.service";
+import { AiPhoneAgentService } from "./ai-phone-agent.service";
+import { AiDashboardService } from "./ai-dashboard.service";
 import {
   UpdateAutopilotConfigDto,
   CreateContextItemDto,
@@ -36,7 +44,15 @@ export class AiAutopilotController {
     private readonly autoReplyService: AiAutoReplyService,
     private readonly smartWaitlistService: AiSmartWaitlistService,
     private readonly anomalyService: AiAnomalyDetectionService,
-    private readonly noShowService: AiNoShowPredictionService
+    private readonly noShowService: AiNoShowPredictionService,
+    // Autonomous Features
+    private readonly autonomousActionService: AiAutonomousActionService,
+    private readonly dynamicPricingService: AiDynamicPricingService,
+    private readonly revenueManagerService: AiRevenueManagerService,
+    private readonly predictiveMaintenanceService: AiPredictiveMaintenanceService,
+    private readonly weatherService: AiWeatherService,
+    private readonly phoneAgentService: AiPhoneAgentService,
+    private readonly dashboardService: AiDashboardService
   ) {}
 
   // ==================== CONFIG ENDPOINTS ====================
@@ -245,6 +261,342 @@ export class AiAutopilotController {
     return this.noShowService.recalculateAll(
       campgroundId,
       daysAhead ? parseInt(daysAhead) : undefined
+    );
+  }
+
+  // ==================== AI DASHBOARD ENDPOINTS ====================
+
+  @Get("campgrounds/:campgroundId/dashboard")
+  @Roles(UserRole.owner, UserRole.manager)
+  async getDashboard(@Param("campgroundId") campgroundId: string) {
+    const [quickStats, metrics, activity] = await Promise.all([
+      this.dashboardService.getQuickStats(campgroundId),
+      this.dashboardService.getMetrics(campgroundId, 30),
+      this.dashboardService.getActivityFeed(campgroundId, 20),
+    ]);
+
+    return { quickStats, metrics, activity };
+  }
+
+  @Get("campgrounds/:campgroundId/dashboard/activity")
+  @Roles(UserRole.owner, UserRole.manager, UserRole.front_desk)
+  async getActivityFeed(
+    @Param("campgroundId") campgroundId: string,
+    @Query("limit") limit?: string
+  ) {
+    return this.dashboardService.getActivityFeed(
+      campgroundId,
+      limit ? parseInt(limit) : 20
+    );
+  }
+
+  @Get("campgrounds/:campgroundId/dashboard/metrics")
+  @Roles(UserRole.owner, UserRole.manager)
+  async getMetrics(
+    @Param("campgroundId") campgroundId: string,
+    @Query("days") days?: string
+  ) {
+    return this.dashboardService.getMetrics(
+      campgroundId,
+      days ? parseInt(days) : 30
+    );
+  }
+
+  // ==================== DYNAMIC PRICING ENDPOINTS ====================
+
+  @Get("campgrounds/:campgroundId/pricing/recommendations")
+  @Roles(UserRole.owner, UserRole.manager)
+  async getPricingRecommendations(
+    @Param("campgroundId") campgroundId: string,
+    @Query("status") status?: string,
+    @Query("siteClassId") siteClassId?: string
+  ) {
+    return this.dynamicPricingService.getRecommendations(campgroundId, {
+      status,
+      siteClassId,
+    });
+  }
+
+  @Get("pricing/recommendations/:id")
+  @Roles(UserRole.owner, UserRole.manager)
+  async getPricingRecommendation(@Param("id") id: string) {
+    return this.dynamicPricingService.getRecommendation(id);
+  }
+
+  @Post("pricing/recommendations/:id/apply")
+  @Roles(UserRole.owner, UserRole.manager)
+  async applyPricingRecommendation(
+    @Param("id") id: string,
+    @Req() req: Request
+  ) {
+    const user = (req as any).user;
+    return this.dynamicPricingService.applyRecommendation(id, user?.id);
+  }
+
+  @Post("pricing/recommendations/:id/dismiss")
+  @Roles(UserRole.owner, UserRole.manager)
+  async dismissPricingRecommendation(
+    @Param("id") id: string,
+    @Body("reason") reason: string,
+    @Req() req: Request
+  ) {
+    const user = (req as any).user;
+    return this.dynamicPricingService.dismissRecommendation(id, user?.id, reason);
+  }
+
+  @Post("campgrounds/:campgroundId/pricing/analyze")
+  @Roles(UserRole.owner, UserRole.manager)
+  async analyzePricing(@Param("campgroundId") campgroundId: string) {
+    return this.dynamicPricingService.analyzePricing(campgroundId);
+  }
+
+  @Get("campgrounds/:campgroundId/pricing/summary")
+  @Roles(UserRole.owner, UserRole.manager)
+  async getPricingSummary(@Param("campgroundId") campgroundId: string) {
+    return this.dynamicPricingService.getPricingSummary(campgroundId);
+  }
+
+  // ==================== REVENUE MANAGER ENDPOINTS ====================
+
+  @Get("campgrounds/:campgroundId/revenue/insights")
+  @Roles(UserRole.owner, UserRole.manager)
+  async getRevenueInsights(
+    @Param("campgroundId") campgroundId: string,
+    @Query("status") status?: string,
+    @Query("type") insightType?: string
+  ) {
+    return this.revenueManagerService.getInsights(campgroundId, {
+      status,
+      insightType,
+    });
+  }
+
+  @Get("revenue/insights/:id")
+  @Roles(UserRole.owner, UserRole.manager)
+  async getRevenueInsight(@Param("id") id: string) {
+    return this.revenueManagerService.getInsight(id);
+  }
+
+  @Post("revenue/insights/:id/start")
+  @Roles(UserRole.owner, UserRole.manager)
+  async startRevenueInsight(@Param("id") id: string) {
+    return this.revenueManagerService.startInsight(id);
+  }
+
+  @Post("revenue/insights/:id/complete")
+  @Roles(UserRole.owner, UserRole.manager)
+  async completeRevenueInsight(@Param("id") id: string) {
+    return this.revenueManagerService.completeInsight(id);
+  }
+
+  @Post("revenue/insights/:id/dismiss")
+  @Roles(UserRole.owner, UserRole.manager)
+  async dismissRevenueInsight(
+    @Param("id") id: string,
+    @Body("reason") reason?: string
+  ) {
+    return this.revenueManagerService.dismissInsight(id, reason);
+  }
+
+  @Post("campgrounds/:campgroundId/revenue/analyze")
+  @Roles(UserRole.owner, UserRole.manager)
+  async analyzeRevenue(@Param("campgroundId") campgroundId: string) {
+    return this.revenueManagerService.analyzeRevenue(campgroundId);
+  }
+
+  @Get("campgrounds/:campgroundId/revenue/summary")
+  @Roles(UserRole.owner, UserRole.manager)
+  async getRevenueSummary(@Param("campgroundId") campgroundId: string) {
+    return this.revenueManagerService.getRevenueSummary(campgroundId);
+  }
+
+  // ==================== PREDICTIVE MAINTENANCE ENDPOINTS ====================
+
+  @Get("campgrounds/:campgroundId/maintenance/alerts")
+  @Roles(UserRole.owner, UserRole.manager, UserRole.maintenance)
+  async getMaintenanceAlerts(
+    @Param("campgroundId") campgroundId: string,
+    @Query("status") status?: string,
+    @Query("severity") severity?: string,
+    @Query("category") category?: string
+  ) {
+    return this.predictiveMaintenanceService.getAlerts(campgroundId, {
+      status,
+      severity,
+      category,
+    });
+  }
+
+  @Get("maintenance/alerts/:id")
+  @Roles(UserRole.owner, UserRole.manager, UserRole.maintenance)
+  async getMaintenanceAlert(@Param("id") id: string) {
+    return this.predictiveMaintenanceService.getAlert(id);
+  }
+
+  @Post("maintenance/alerts/:id/acknowledge")
+  @Roles(UserRole.owner, UserRole.manager, UserRole.maintenance)
+  async acknowledgeMaintenanceAlert(
+    @Param("id") id: string,
+    @Req() req: Request
+  ) {
+    const user = (req as any).user;
+    return this.predictiveMaintenanceService.acknowledgeAlert(id, user?.id);
+  }
+
+  @Post("maintenance/alerts/:id/schedule")
+  @Roles(UserRole.owner, UserRole.manager, UserRole.maintenance)
+  async scheduleMaintenanceAlert(
+    @Param("id") id: string,
+    @Body("ticketId") ticketId: string
+  ) {
+    return this.predictiveMaintenanceService.scheduleAlert(id, ticketId);
+  }
+
+  @Post("maintenance/alerts/:id/resolve")
+  @Roles(UserRole.owner, UserRole.manager, UserRole.maintenance)
+  async resolveMaintenanceAlert(@Param("id") id: string) {
+    return this.predictiveMaintenanceService.resolveAlert(id);
+  }
+
+  @Post("maintenance/alerts/:id/dismiss")
+  @Roles(UserRole.owner, UserRole.manager)
+  async dismissMaintenanceAlert(@Param("id") id: string) {
+    return this.predictiveMaintenanceService.dismissAlert(id);
+  }
+
+  @Post("campgrounds/:campgroundId/maintenance/analyze")
+  @Roles(UserRole.owner, UserRole.manager)
+  async analyzeMaintenancePatterns(@Param("campgroundId") campgroundId: string) {
+    return this.predictiveMaintenanceService.analyzePatterns(campgroundId);
+  }
+
+  @Get("campgrounds/:campgroundId/maintenance/summary")
+  @Roles(UserRole.owner, UserRole.manager, UserRole.maintenance)
+  async getMaintenanceSummary(@Param("campgroundId") campgroundId: string) {
+    return this.predictiveMaintenanceService.getMaintenanceSummary(campgroundId);
+  }
+
+  // ==================== WEATHER ENDPOINTS ====================
+
+  @Get("campgrounds/:campgroundId/weather/current")
+  @Roles(UserRole.owner, UserRole.manager, UserRole.front_desk)
+  async getCurrentWeather(@Param("campgroundId") campgroundId: string) {
+    return this.weatherService.getCurrentWeather(campgroundId);
+  }
+
+  @Get("campgrounds/:campgroundId/weather/forecast")
+  @Roles(UserRole.owner, UserRole.manager, UserRole.front_desk)
+  async getWeatherForecast(@Param("campgroundId") campgroundId: string) {
+    return this.weatherService.getForecast(campgroundId);
+  }
+
+  @Get("campgrounds/:campgroundId/weather/alerts")
+  @Roles(UserRole.owner, UserRole.manager, UserRole.front_desk)
+  async getWeatherAlerts(
+    @Param("campgroundId") campgroundId: string,
+    @Query("status") status?: string
+  ) {
+    return this.weatherService.getAlerts(campgroundId, { status });
+  }
+
+  @Get("weather/alerts/:id")
+  @Roles(UserRole.owner, UserRole.manager, UserRole.front_desk)
+  async getWeatherAlert(@Param("id") id: string) {
+    return this.weatherService.getAlert(id);
+  }
+
+  @Post("weather/alerts/:id/notify")
+  @Roles(UserRole.owner, UserRole.manager)
+  async sendWeatherNotifications(@Param("id") id: string) {
+    return this.weatherService.sendAlertNotifications(id);
+  }
+
+  @Post("campgrounds/:campgroundId/weather/check")
+  @Roles(UserRole.owner, UserRole.manager)
+  async checkWeatherConditions(@Param("campgroundId") campgroundId: string) {
+    return this.weatherService.checkWeatherConditions(campgroundId);
+  }
+
+  @Get("campgrounds/:campgroundId/weather/summary")
+  @Roles(UserRole.owner, UserRole.manager, UserRole.front_desk)
+  async getWeatherSummary(@Param("campgroundId") campgroundId: string) {
+    return this.weatherService.getWeatherSummary(campgroundId);
+  }
+
+  // ==================== PHONE AGENT ENDPOINTS ====================
+
+  @Get("campgrounds/:campgroundId/phone/sessions")
+  @Roles(UserRole.owner, UserRole.manager)
+  async getPhoneSessions(
+    @Param("campgroundId") campgroundId: string,
+    @Query("status") status?: string,
+    @Query("limit") limit?: string
+  ) {
+    return this.phoneAgentService.getSessions(campgroundId, {
+      status,
+      limit: limit ? parseInt(limit) : undefined,
+    });
+  }
+
+  @Get("phone/sessions/:id")
+  @Roles(UserRole.owner, UserRole.manager)
+  async getPhoneSession(@Param("id") id: string) {
+    return this.phoneAgentService.getSession(id);
+  }
+
+  @Get("campgrounds/:campgroundId/phone/summary")
+  @Roles(UserRole.owner, UserRole.manager)
+  async getPhoneSummary(
+    @Param("campgroundId") campgroundId: string,
+    @Query("days") days?: string
+  ) {
+    return this.phoneAgentService.getPhoneSummary(
+      campgroundId,
+      days ? parseInt(days) : 30
+    );
+  }
+
+  // ==================== AUTONOMOUS ACTIONS ENDPOINTS ====================
+
+  @Get("campgrounds/:campgroundId/autonomous-actions")
+  @Roles(UserRole.owner, UserRole.manager)
+  async getAutonomousActions(
+    @Param("campgroundId") campgroundId: string,
+    @Query("actionType") actionType?: string,
+    @Query("limit") limit?: string
+  ) {
+    return this.autonomousActionService.getRecentActions(campgroundId, {
+      actionType,
+      limit: limit ? parseInt(limit) : 50,
+    });
+  }
+
+  @Get("autonomous-actions/:id")
+  @Roles(UserRole.owner, UserRole.manager)
+  async getAutonomousAction(@Param("id") id: string) {
+    return this.autonomousActionService.getAction(id);
+  }
+
+  @Post("autonomous-actions/:id/reverse")
+  @Roles(UserRole.owner, UserRole.manager)
+  async reverseAutonomousAction(
+    @Param("id") id: string,
+    @Body("reason") reason: string,
+    @Req() req: Request
+  ) {
+    const user = (req as any).user;
+    return this.autonomousActionService.reverseAction(id, user?.id, reason);
+  }
+
+  @Get("campgrounds/:campgroundId/autonomous-actions/summary")
+  @Roles(UserRole.owner, UserRole.manager)
+  async getAutonomousActionsSummary(
+    @Param("campgroundId") campgroundId: string,
+    @Query("days") days?: string
+  ) {
+    return this.autonomousActionService.getActionsSummary(
+      campgroundId,
+      days ? parseInt(days) : 30
     );
   }
 }

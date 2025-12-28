@@ -10083,6 +10083,319 @@ export const apiClient = {
     });
     return parseResponse<{ scored: number; total: number }>(res);
   },
+
+  // ==================== AI AUTONOMOUS FEATURES ====================
+
+  // Dashboard
+  async getAiDashboard(campgroundId: string) {
+    return fetchJSON<{
+      quickStats: {
+        needsAttention: number;
+        pendingReplies: number;
+        activeAnomalies: number;
+        pendingPricing: number;
+        activeMaintenanceAlerts: number;
+        activeWeatherAlerts: number;
+        todayCalls: number;
+      };
+      metrics: {
+        messagesHandled: number;
+        messagesAutoSent: number;
+        risksIdentified: number;
+        noShowsPrevented: number;
+        pricingSuggestions: number;
+        phoneCallsHandled: number;
+        estimatedRevenueSavedCents: number;
+        aiCostCents: number;
+        roiPercent: number;
+      };
+      activity: Array<{
+        id: string;
+        type: string;
+        title: string;
+        subtitle: string;
+        timestamp: string;
+        icon: string;
+        color: string;
+      }>;
+    }>(`/ai/autopilot/campgrounds/${campgroundId}/dashboard`);
+  },
+
+  async getAiActivityFeed(campgroundId: string, limit?: number) {
+    const params = limit ? `?limit=${limit}` : "";
+    return fetchJSON<Array<{
+      id: string;
+      type: string;
+      title: string;
+      subtitle: string;
+      timestamp: string;
+      icon: string;
+      color: string;
+    }>>(`/ai/autopilot/campgrounds/${campgroundId}/dashboard/activity${params}`);
+  },
+
+  // Dynamic Pricing
+  async getPricingRecommendations(campgroundId: string, status?: string) {
+    const params = status ? `?status=${status}` : "";
+    return fetchJSON<Array<{
+      id: string;
+      siteClassId: string | null;
+      dateStart: string;
+      dateEnd: string;
+      recommendationType: string;
+      currentPriceCents: number;
+      suggestedPriceCents: number;
+      adjustmentPercent: number;
+      confidence: number;
+      reasoning: string;
+      status: string;
+      estimatedRevenueDelta: number | null;
+    }>>(`/ai/autopilot/campgrounds/${campgroundId}/pricing/recommendations${params}`);
+  },
+
+  async applyPricingRecommendation(id: string) {
+    const res = await fetch(`${API_BASE}/ai/autopilot/pricing/recommendations/${id}/apply`, {
+      method: "POST",
+      headers: scopedHeaders(),
+    });
+    return parseResponse<unknown>(res);
+  },
+
+  async dismissPricingRecommendation(id: string, reason?: string) {
+    const res = await fetch(`${API_BASE}/ai/autopilot/pricing/recommendations/${id}/dismiss`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", ...scopedHeaders() },
+      body: JSON.stringify({ reason }),
+    });
+    return parseResponse<unknown>(res);
+  },
+
+  async getPricingSummary(campgroundId: string) {
+    return fetchJSON<{
+      pendingRecommendations: number;
+      appliedLast30Days: number;
+      estimatedRevenueDeltaCents: number;
+      averageAdjustmentPercent: number;
+    }>(`/ai/autopilot/campgrounds/${campgroundId}/pricing/summary`);
+  },
+
+  // Revenue Insights
+  async getRevenueInsights(campgroundId: string, status?: string) {
+    const params = status ? `?status=${status}` : "";
+    return fetchJSON<Array<{
+      id: string;
+      insightType: string;
+      title: string;
+      summary: string;
+      impactCents: number;
+      difficulty: string;
+      priority: number;
+      recommendations: Array<{ action: string; details: string }>;
+      status: string;
+    }>>(`/ai/autopilot/campgrounds/${campgroundId}/revenue/insights${params}`);
+  },
+
+  async startRevenueInsight(id: string) {
+    const res = await fetch(`${API_BASE}/ai/autopilot/revenue/insights/${id}/start`, {
+      method: "POST",
+      headers: scopedHeaders(),
+    });
+    return parseResponse<unknown>(res);
+  },
+
+  async completeRevenueInsight(id: string) {
+    const res = await fetch(`${API_BASE}/ai/autopilot/revenue/insights/${id}/complete`, {
+      method: "POST",
+      headers: scopedHeaders(),
+    });
+    return parseResponse<unknown>(res);
+  },
+
+  async dismissRevenueInsight(id: string, reason?: string) {
+    const res = await fetch(`${API_BASE}/ai/autopilot/revenue/insights/${id}/dismiss`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", ...scopedHeaders() },
+      body: JSON.stringify({ reason }),
+    });
+    return parseResponse<unknown>(res);
+  },
+
+  async getRevenueSummary(campgroundId: string) {
+    return fetchJSON<{
+      totalOpportunityCents: number;
+      activeInsights: number;
+      newInsights: number;
+      byType: Record<string, { count: number; impact: number }>;
+    }>(`/ai/autopilot/campgrounds/${campgroundId}/revenue/summary`);
+  },
+
+  // Predictive Maintenance
+  async getMaintenanceAlerts(campgroundId: string, status?: string) {
+    const params = status ? `?status=${status}` : "";
+    return fetchJSON<Array<{
+      id: string;
+      siteId: string | null;
+      alertType: string;
+      severity: string;
+      category: string;
+      title: string;
+      summary: string;
+      incidentCount: number;
+      confidence: number;
+      suggestedAction: string;
+      estimatedCostCents: number | null;
+      status: string;
+    }>>(`/ai/autopilot/campgrounds/${campgroundId}/maintenance/alerts${params}`);
+  },
+
+  async acknowledgeMaintenanceAlert(id: string) {
+    const res = await fetch(`${API_BASE}/ai/autopilot/maintenance/alerts/${id}/acknowledge`, {
+      method: "POST",
+      headers: scopedHeaders(),
+    });
+    return parseResponse<unknown>(res);
+  },
+
+  async resolveMaintenanceAlert(id: string) {
+    const res = await fetch(`${API_BASE}/ai/autopilot/maintenance/alerts/${id}/resolve`, {
+      method: "POST",
+      headers: scopedHeaders(),
+    });
+    return parseResponse<unknown>(res);
+  },
+
+  async getMaintenanceSummary(campgroundId: string) {
+    return fetchJSON<{
+      activeAlerts: number;
+      critical: number;
+      high: number;
+      medium: number;
+      low: number;
+      requiresAttention: number;
+    }>(`/ai/autopilot/campgrounds/${campgroundId}/maintenance/summary`);
+  },
+
+  // Weather
+  async getCurrentWeather(campgroundId: string) {
+    return fetchJSON<{
+      temp: number;
+      feelsLike: number;
+      humidity: number;
+      windSpeed: number;
+      windGust?: number;
+      description: string;
+      icon: string;
+      alerts: Array<{
+        event: string;
+        severity: string;
+        headline: string;
+        start: string;
+        end: string;
+      }>;
+    } | null>(`/ai/autopilot/campgrounds/${campgroundId}/weather/current`);
+  },
+
+  async getWeatherForecast(campgroundId: string) {
+    return fetchJSON<Array<{
+      date: string;
+      tempHigh: number;
+      tempLow: number;
+      description: string;
+      icon: string;
+      pop: number;
+      windSpeed: number;
+    }>>(`/ai/autopilot/campgrounds/${campgroundId}/weather/forecast`);
+  },
+
+  async getWeatherAlerts(campgroundId: string) {
+    return fetchJSON<Array<{
+      id: string;
+      alertType: string;
+      severity: string;
+      title: string;
+      message: string;
+      startTime: string;
+      guestsAffected: number;
+      guestsNotified: number;
+      status: string;
+    }>>(`/ai/autopilot/campgrounds/${campgroundId}/weather/alerts`);
+  },
+
+  async sendWeatherNotifications(alertId: string) {
+    const res = await fetch(`${API_BASE}/ai/autopilot/weather/alerts/${alertId}/notify`, {
+      method: "POST",
+      headers: scopedHeaders(),
+    });
+    return parseResponse<{ sent: number; total: number }>(res);
+  },
+
+  // Phone Agent
+  async getPhoneSessions(campgroundId: string, status?: string, limit?: number) {
+    const params = new URLSearchParams();
+    if (status) params.set("status", status);
+    if (limit) params.set("limit", String(limit));
+    const query = params.toString() ? `?${params}` : "";
+    return fetchJSON<Array<{
+      id: string;
+      callerPhone: string;
+      status: string;
+      startedAt: string;
+      endedAt: string | null;
+      durationSeconds: number | null;
+      intents: string[];
+      summary: string | null;
+      resolutionStatus: string | null;
+    }>>(`/ai/autopilot/campgrounds/${campgroundId}/phone/sessions${query}`);
+  },
+
+  async getPhoneSummary(campgroundId: string, days?: number) {
+    const params = days ? `?days=${days}` : "";
+    return fetchJSON<{
+      totalCalls: number;
+      callsHandled: number;
+      callsTransferred: number;
+      voicemails: number;
+      avgDurationSeconds: number;
+      totalCostCents: number;
+      resolutionRate: number;
+    }>(`/ai/autopilot/campgrounds/${campgroundId}/phone/summary${params}`);
+  },
+
+  // Autonomous Actions
+  async getAutonomousActions(campgroundId: string, actionType?: string, limit?: number) {
+    const params = new URLSearchParams();
+    if (actionType) params.set("actionType", actionType);
+    if (limit) params.set("limit", String(limit));
+    const query = params.toString() ? `?${params}` : "";
+    return fetchJSON<Array<{
+      id: string;
+      actionType: string;
+      entityType: string;
+      entityId: string;
+      description: string;
+      confidence: number | null;
+      reversible: boolean;
+      reversedAt: string | null;
+      outcome: string | null;
+      createdAt: string;
+    }>>(`/ai/autopilot/campgrounds/${campgroundId}/autonomous-actions${query}`);
+  },
+
+  async reverseAutonomousAction(id: string, reason: string) {
+    const res = await fetch(`${API_BASE}/ai/autopilot/autonomous-actions/${id}/reverse`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", ...scopedHeaders() },
+      body: JSON.stringify({ reason }),
+    });
+    return parseResponse<unknown>(res);
+  },
+
+  async getAutonomousActionsSummary(campgroundId: string, days?: number) {
+    const params = days ? `?days=${days}` : "";
+    return fetchJSON<Record<string, { total: number; success: number; reversed: number }>>(
+      `/ai/autopilot/campgrounds/${campgroundId}/autonomous-actions/summary${params}`
+    );
+  },
 };
 
 export type PublicCampgroundList = z.infer<typeof PublicCampgroundListSchema>;

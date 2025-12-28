@@ -235,6 +235,39 @@ export class ReservationsController {
     });
   }
 
+  /**
+   * Check in a guest (staff dashboard)
+   * Allows checking in with balance due, but returns a warning
+   */
+  @Post("reservations/:id/check-in")
+  async checkIn(
+    @Param("id") id: string,
+    @Body() body: { force?: boolean } = {},
+    @Req() req: any
+  ) {
+    await this.assertReservationAccess(id, req.user);
+    return this.reservations.staffCheckIn(id, {
+      force: body.force ?? false,
+      actorId: req?.user?.id ?? null
+    });
+  }
+
+  /**
+   * Check out a guest (staff dashboard)
+   */
+  @Post("reservations/:id/check-out")
+  async checkOut(
+    @Param("id") id: string,
+    @Body() body: { force?: boolean } = {},
+    @Req() req: any
+  ) {
+    await this.assertReservationAccess(id, req.user);
+    return this.reservations.staffCheckOut(id, {
+      force: body.force ?? false,
+      actorId: req?.user?.id ?? null
+    });
+  }
+
   @Get("campgrounds/:campgroundId/matches")
   getMatches(
     @Param("campgroundId") campgroundId: string,
