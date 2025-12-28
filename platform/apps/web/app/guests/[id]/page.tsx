@@ -22,6 +22,7 @@ import { cn } from "../../../lib/utils";
 import { useToast } from "../../../components/ui/use-toast";
 import { formatDistanceToNow } from "date-fns";
 import { useInfiniteQuery } from "@tanstack/react-query";
+import { useCampground } from "../../../contexts/CampgroundContext";
 
 const TIER_COLORS: Record<string, string> = {
     Bronze: "bg-amber-600",
@@ -37,21 +38,8 @@ export default function GuestDetailPage() {
     const { toast } = useToast();
     const queryClient = useQueryClient();
 
-    // Fetch Guest Data
-    // Note: We might need a getGuest(id) method, but currently we only have getGuests().
-    // Let's check if we can filter or if we need to add getGuest(id).
-    // The current apiClient has getGuests() which returns all guests.
-    // Ideally we should have getGuest(id).
-    // For now, I'll use getGuests and find the guest, but I should probably add getGuest(id) to API client if it exists in backend.
-    // Backend has `Get('guests/:guestId')` in LoyaltyController but that's for loyalty profile.
-    // There is likely a GuestsController.
-    // Let's assume for now we can use getGuests() and filter client side, or better, add getGuest to apiClient if the backend supports it.
-    // Looking at apiClient.ts, there is `updateGuest` which takes ID.
-    // There is `deleteGuest`.
-    // There is `getGuests`.
-    // Let's check if there is a `getGuest` in backend.
-    // I'll assume for now I can just use getGuests() and find it, to avoid blocking.
-    // Wait, `getLoyaltyProfile` is available.
+    // Use the global campground selector
+    const { selectedCampground } = useCampground();
 
     const guestQuery = useQuery({
         queryKey: ["guest", guestId],
@@ -73,9 +61,10 @@ export default function GuestDetailPage() {
     const [composeTo, setComposeTo] = useState("");
     const [composeFrom, setComposeFrom] = useState("");
 
+    // Use global campground selector, fallback to guest's campground
     const campgroundIdForGuest = useMemo(
-        () => (guestQuery.data as any)?.campgroundId || (guestQuery.data as any)?.campgrounds?.[0]?.id || "",
-        [guestQuery.data]
+        () => selectedCampground?.id || (guestQuery.data as any)?.campgroundId || (guestQuery.data as any)?.campgrounds?.[0]?.id || "",
+        [selectedCampground?.id, guestQuery.data]
     );
 
     // Wallet state and queries
