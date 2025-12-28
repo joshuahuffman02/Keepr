@@ -15,7 +15,8 @@ import {
   Search,
   Tag,
   Users,
-  UserCheck
+  UserCheck,
+  Home
 } from "lucide-react";
 import { DashboardShell } from "@/components/ui/layout/DashboardShell";
 import { apiClient } from "@/lib/api-client";
@@ -55,7 +56,7 @@ export default function CheckInOutPage() {
   const [campgroundId, setCampgroundId] = useState<string>("");
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState<"all" | "balance" | "unassigned">("all");
-  const [tab, setTab] = useState<"arrivals" | "departures">("arrivals");
+  const [tab, setTab] = useState<"arrivals" | "departures" | "onsite">("arrivals");
 
   // Bulk selection
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
@@ -152,9 +153,10 @@ export default function CheckInOutPage() {
 
   const arrivals = reservations.filter((r) => r.status !== "cancelled" && isSameLocalDate(r.arrivalDate, date));
   const departures = reservations.filter((r) => r.status !== "cancelled" && isSameLocalDate(r.departureDate, date));
+  const onsite = reservations.filter((r) => r.status === "checked_in");
 
   const filteredList = useMemo(() => {
-    const list = tab === "arrivals" ? arrivals : departures;
+    const list = tab === "arrivals" ? arrivals : tab === "departures" ? departures : onsite;
     const lower = search.toLowerCase();
     return list
       .filter((r) => {
@@ -170,7 +172,7 @@ export default function CheckInOutPage() {
         if (statusFilter === "unassigned") return !r.siteId;
         return true;
       });
-  }, [arrivals, departures, search, statusFilter, tab]);
+  }, [arrivals, departures, onsite, search, statusFilter, tab]);
 
   // Get eligible reservations for bulk check-in (arrivals that are not yet checked in)
   const eligibleForBulkCheckIn = useMemo(() => {
@@ -262,9 +264,16 @@ export default function CheckInOutPage() {
         </div>
 
         {/* Summary strip */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3">
-          <SummaryCard label="Arrivals today" value={arrivals.length} icon={<UserCheck className="h-4 w-4" />} href="/check-in-out" />
-          <SummaryCard label="Departures today" value={departures.length} icon={<LogOut className="h-4 w-4" />} href="/check-in-out" />
+        <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-5 gap-3">
+          <SummaryCard
+            label="On Site Now"
+            value={onsite.length}
+            icon={<Home className="h-4 w-4" />}
+            onClick={() => setTab("onsite")}
+            highlight
+          />
+          <SummaryCard label="Arrivals today" value={arrivals.length} icon={<UserCheck className="h-4 w-4" />} onClick={() => setTab("arrivals")} />
+          <SummaryCard label="Departures today" value={departures.length} icon={<LogOut className="h-4 w-4" />} onClick={() => setTab("departures")} />
           <SummaryCard
             label="Outstanding balance"
             value={formatMoney(arrivals.concat(departures).reduce((sum, r) => sum + (r.balanceAmount ?? 0), 0))}
@@ -297,8 +306,14 @@ export default function CheckInOutPage() {
                 <SelectItem value="unassigned">Unassigned site</SelectItem>
               </SelectContent>
             </Select>
-            <Tabs value={tab} onValueChange={(v) => setTab(v as "arrivals" | "departures")} className="space-y-0">
+            <Tabs value={tab} onValueChange={(v) => setTab(v as "arrivals" | "departures" | "onsite")} className="space-y-0">
               <TabsList>
+                <TabsTrigger value="onsite" className="gap-1">
+                  On Site
+                  <Badge variant="secondary" className="ml-1 bg-emerald-100 text-emerald-700">
+                    {onsite.length}
+                  </Badge>
+                </TabsTrigger>
                 <TabsTrigger value="arrivals" className="gap-1">
                   Arrivals
                   <Badge variant="secondary" className="ml-1">
@@ -375,7 +390,9 @@ export default function CheckInOutPage() {
                     )}
                     <div
                       className={`p-3 rounded-full ${
-                        tab === "arrivals"
+                        tab === "onsite"
+                          ? "bg-emerald-100 text-emerald-700"
+                          : tab === "arrivals"
                           ? res.status === "checked_in"
                             ? "bg-emerald-100 text-emerald-700"
                             : "bg-blue-100 text-blue-700"
@@ -384,7 +401,7 @@ export default function CheckInOutPage() {
                           : "bg-orange-100 text-orange-700"
                       }`}
                     >
-                      {tab === "arrivals" ? (res.status === "checked_in" ? <CheckCircle className="h-5 w-5" /> : <Clock className="h-5 w-5" />) : <LogOut className="h-5 w-5" />}
+                      {tab === "onsite" ? <Home className="h-5 w-5" /> : tab === "arrivals" ? (res.status === "checked_in" ? <CheckCircle className="h-5 w-5" /> : <Clock className="h-5 w-5" />) : <LogOut className="h-5 w-5" />}
                     </div>
                     <div>
                       <div className="flex flex-wrap items-center gap-2">
@@ -414,12 +431,18 @@ export default function CheckInOutPage() {
                             <span>{res.nights} nights</span>
                           </>
                         ) : null}
-                        {tab === "departures" ? (
+                        {tab === "departures" && (
                           <>
                             <span>•</span>
                             <span>Arrived {new Date(res.arrivalDate).toLocaleDateString()}</span>
                           </>
-                        ) : null}
+                        )}
+                        {tab === "onsite" && (
+                          <>
+                            <span>•</span>
+                            <span>Departs {new Date(res.departureDate).toLocaleDateString()}</span>
+                          </>
+                        )}
                       </div>
                       {res.notes ? (
                         <p className="text-sm text-amber-700 mt-2 bg-amber-50 p-2 rounded border border-amber-100 inline-block">Note: {res.notes}</p>
