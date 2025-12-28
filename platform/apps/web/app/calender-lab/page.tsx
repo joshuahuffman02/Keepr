@@ -13,7 +13,20 @@ import {
   Search,
   Sparkles,
   Users,
-  Wrench
+  Wrench,
+  User,
+  Mail,
+  Phone,
+  CreditCard,
+  Tent,
+  LogIn,
+  LogOut,
+  Pencil,
+  ExternalLink,
+  XCircle,
+  CheckCircle,
+  Clock,
+  DollarSign
 } from "lucide-react";
 
 import { DashboardShell } from "../../components/ui/layout/DashboardShell";
@@ -105,6 +118,14 @@ export default function CalendarLabPage() {
     }
     return { count, samples };
   }, [guests, state.guestSearch]);
+
+  // Get the selected reservation for the popup
+  const selectedReservation = useMemo(() => {
+    if (!state.selectedReservationId) return null;
+    // Look in all reservations (not just filtered)
+    const allReservations = queries.reservations.data || [];
+    return allReservations.find((r: any) => r.id === state.selectedReservationId) || null;
+  }, [state.selectedReservationId, queries.reservations.data]);
   const visibleSiteTypes = useMemo(() => {
     const types = new Set<string>();
     visibleSites.forEach((site) => {
@@ -500,6 +521,175 @@ export default function CalendarLabPage() {
           </div>
         )}
       </div>
+
+      {/* Reservation Detail Popup */}
+      <Dialog open={!!selectedReservation} onOpenChange={(open) => !open && actions.setSelectedReservationId(null)}>
+        <DialogContent className="sm:max-w-md">
+          {selectedReservation && (() => {
+            const res = selectedReservation as any;
+            const guestName = `${res.guest?.primaryFirstName || ""} ${res.guest?.primaryLastName || ""}`.trim() || "Guest";
+            const nights = Math.ceil((new Date(res.departureDate).getTime() - new Date(res.arrivalDate).getTime()) / (1000 * 60 * 60 * 24));
+            const total = res.totalAmount ?? 0;
+            const paid = res.paidAmount ?? 0;
+            const balance = total - paid;
+            const statusColors: Record<string, string> = {
+              confirmed: "bg-emerald-100 text-emerald-700 border-emerald-200",
+              checked_in: "bg-blue-100 text-blue-700 border-blue-200",
+              checked_out: "bg-slate-100 text-slate-700 border-slate-200",
+              cancelled: "bg-rose-100 text-rose-700 border-rose-200",
+              pending: "bg-amber-100 text-amber-700 border-amber-200"
+            };
+            const statusIcons: Record<string, React.ReactNode> = {
+              confirmed: <CheckCircle className="h-3.5 w-3.5" />,
+              checked_in: <Clock className="h-3.5 w-3.5" />,
+              checked_out: <LogOut className="h-3.5 w-3.5" />,
+              cancelled: <XCircle className="h-3.5 w-3.5" />,
+              pending: <Clock className="h-3.5 w-3.5" />
+            };
+
+            return (
+              <>
+                <DialogHeader>
+                  <DialogTitle className="flex items-center justify-between gap-3">
+                    <div className="flex items-center gap-2">
+                      <User className="h-5 w-5 text-slate-400" />
+                      <span>{guestName}</span>
+                    </div>
+                    <div className={cn("flex items-center gap-1.5 px-2.5 py-1 rounded-full border text-xs font-medium", statusColors[res.status] || statusColors.pending)}>
+                      {statusIcons[res.status] || statusIcons.pending}
+                      <span className="capitalize">{res.status?.replace(/_/g, " ") || "Pending"}</span>
+                    </div>
+                  </DialogTitle>
+                </DialogHeader>
+
+                <div className="space-y-4 py-4">
+                  {/* Site & Dates */}
+                  <div className="flex items-start gap-3">
+                    <Tent className="h-4 w-4 text-slate-400 mt-0.5" />
+                    <div className="flex-1">
+                      <div className="font-medium text-slate-900">
+                        {res.site?.name || res.site?.siteNumber || "Unassigned"}
+                      </div>
+                      <div className="text-sm text-slate-500">
+                        {format(new Date(res.arrivalDate), "MMM d")} → {format(new Date(res.departureDate), "MMM d, yyyy")} • {nights} night{nights !== 1 ? "s" : ""}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Contact Info */}
+                  {(res.guest?.email || res.guest?.phone) && (
+                    <div className="space-y-2">
+                      {res.guest?.email && (
+                        <div className="flex items-center gap-3 text-sm">
+                          <Mail className="h-4 w-4 text-slate-400" />
+                          <span className="text-slate-600">{res.guest.email}</span>
+                        </div>
+                      )}
+                      {res.guest?.phone && (
+                        <div className="flex items-center gap-3 text-sm">
+                          <Phone className="h-4 w-4 text-slate-400" />
+                          <span className="text-slate-600">{res.guest.phone}</span>
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  {/* Payment Summary */}
+                  <div className="flex items-start gap-3">
+                    <CreditCard className="h-4 w-4 text-slate-400 mt-0.5" />
+                    <div className="flex-1">
+                      <div className="flex items-center justify-between">
+                        <span className="font-medium text-slate-900">${(total / 100).toFixed(2)}</span>
+                        {balance > 0 ? (
+                          <span className="text-xs font-medium text-amber-600">${(balance / 100).toFixed(2)} due</span>
+                        ) : paid > 0 ? (
+                          <span className="text-xs font-medium text-emerald-600">Paid in full</span>
+                        ) : null}
+                      </div>
+                      {paid > 0 && paid < total && (
+                        <div className="mt-2 h-1.5 bg-slate-100 rounded-full overflow-hidden">
+                          <div
+                            className="h-full bg-emerald-500 rounded-full"
+                            style={{ width: `${Math.min(100, (paid / total) * 100)}%` }}
+                          />
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Action Buttons */}
+                <div className="flex flex-wrap gap-2 pt-2 border-t">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="flex-1"
+                    onClick={() => {
+                      router.push(`/reservations/${res.id}`);
+                      actions.setSelectedReservationId(null);
+                    }}
+                  >
+                    <ExternalLink className="h-4 w-4 mr-1.5" />
+                    View Details
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="flex-1"
+                    onClick={() => {
+                      router.push(`/campgrounds/${state.selectedCampground}/reservations/${res.id}`);
+                      actions.setSelectedReservationId(null);
+                    }}
+                  >
+                    <Pencil className="h-4 w-4 mr-1.5" />
+                    Edit
+                  </Button>
+                  {res.status === "confirmed" && (
+                    <Button
+                      size="sm"
+                      className="flex-1 bg-emerald-600 hover:bg-emerald-700"
+                      onClick={() => {
+                        router.push(`/check-in-out?reservationId=${res.id}`);
+                        actions.setSelectedReservationId(null);
+                      }}
+                    >
+                      <LogIn className="h-4 w-4 mr-1.5" />
+                      Check In
+                    </Button>
+                  )}
+                  {res.status === "checked_in" && (
+                    <Button
+                      size="sm"
+                      className="flex-1"
+                      onClick={() => {
+                        router.push(`/check-in-out?reservationId=${res.id}`);
+                        actions.setSelectedReservationId(null);
+                      }}
+                    >
+                      <LogOut className="h-4 w-4 mr-1.5" />
+                      Check Out
+                    </Button>
+                  )}
+                  {balance > 0 && (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="flex-1"
+                      onClick={() => {
+                        router.push(`/reservations/${res.id}?action=payment`);
+                        actions.setSelectedReservationId(null);
+                      }}
+                    >
+                      <DollarSign className="h-4 w-4 mr-1.5" />
+                      Collect Payment
+                    </Button>
+                  )}
+                </div>
+              </>
+            );
+          })()}
+        </DialogContent>
+      </Dialog>
 
       {/* Keyboard Shortcuts Dialog */}
       <Dialog open={showShortcuts} onOpenChange={setShowShortcuts}>
