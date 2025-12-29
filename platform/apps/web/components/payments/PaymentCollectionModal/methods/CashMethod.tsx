@@ -65,10 +65,15 @@ export function CashMethod({ onSuccess, onError, onCancel }: CashMethodProps) {
       const reference = `CASH-${Date.now()}`;
       const amountCents = state.remainingCents;
 
-      // Get reservation ID from subject if available
+      // Get reservation ID from subject - required for balance/reservation payments
       const reservationId = props.subject?.type === "reservation" || props.subject?.type === "balance"
         ? props.subject.reservationId
         : undefined;
+
+      // For reservation/balance payments, we MUST have a reservation ID
+      if ((props.subject?.type === "reservation" || props.subject?.type === "balance") && !reservationId) {
+        throw new Error("Missing reservation ID - cannot record payment");
+      }
 
       // Record the payment in the database
       if (reservationId) {
