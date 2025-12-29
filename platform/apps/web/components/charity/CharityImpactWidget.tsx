@@ -80,6 +80,7 @@ export function CharityImpactWidget({ campgroundId }: CharityImpactWidgetProps) 
     placeholderData: keepPreviousData,
     refetchOnWindowFocus: false, // Don't refetch when window regains focus
     refetchOnMount: false, // Don't refetch on mount if data exists
+    retry: 1, // Only retry once on failure
   });
 
   // Get donation stats
@@ -92,6 +93,7 @@ export function CharityImpactWidget({ campgroundId }: CharityImpactWidgetProps) 
     placeholderData: keepPreviousData,
     refetchOnWindowFocus: false,
     refetchOnMount: false,
+    retry: 1,
   });
 
   // Trigger animation after stats load (don't block on settings)

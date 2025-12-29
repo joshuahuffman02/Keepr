@@ -81,8 +81,12 @@ export default function CharitySettingsPage() {
     queryKey: ["charities"],
     queryFn: () => apiClient.listCharities({ activeOnly: true }),
     enabled: !!campgroundId,
-    staleTime: 60000, // 1 minute
+    staleTime: 5 * 60 * 1000, // 5 minutes - charity list rarely changes
+    gcTime: 10 * 60 * 1000,
     placeholderData: keepPreviousData,
+    refetchOnWindowFocus: false,
+    refetchOnMount: false,
+    retry: 1, // Only retry once on failure
   });
 
   // Fetch current campground charity settings
@@ -98,8 +102,12 @@ export default function CharitySettingsPage() {
     queryKey: ["campground-charity", campgroundId],
     queryFn: () => apiClient.getCampgroundCharity(campgroundId!),
     enabled: !!campgroundId,
-    staleTime: 30000,
+    staleTime: 5 * 60 * 1000,
+    gcTime: 10 * 60 * 1000,
     placeholderData: keepPreviousData,
+    refetchOnWindowFocus: false,
+    refetchOnMount: false,
+    retry: 1,
   });
 
   // Fetch donation stats
@@ -112,8 +120,12 @@ export default function CharitySettingsPage() {
     queryKey: ["campground-charity-stats", campgroundId],
     queryFn: () => apiClient.getCampgroundCharityStats(campgroundId!),
     enabled: !!campgroundId,
-    staleTime: 30000,
+    staleTime: 5 * 60 * 1000,
+    gcTime: 10 * 60 * 1000,
     placeholderData: keepPreviousData,
+    refetchOnWindowFocus: false,
+    refetchOnMount: false,
+    retry: 1,
   });
 
   // Load current settings into form - only run once after initial data load
