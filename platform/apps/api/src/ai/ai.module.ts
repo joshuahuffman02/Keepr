@@ -25,6 +25,7 @@ import { AiSentimentService } from './ai-sentiment.service';
 import { AiMorningBriefingService } from './ai-morning-briefing.service';
 import { AiReportQueryService } from './ai-report-query.service';
 import { AiCampaignService } from './ai-campaign.service';
+import { AiYieldService } from './ai-yield.service';
 import { AiService } from './ai.service';
 import { AiController } from './ai.controller';
 import { AiAutopilotController } from './ai-autopilot.controller';
@@ -87,6 +88,7 @@ import { AnomaliesModule } from '../anomalies/anomalies.module';
     AiMorningBriefingService,
     AiReportQueryService,
     AiCampaignService,
+    AiYieldService,
     AiService,
   ],
   exports: [
@@ -117,6 +119,7 @@ import { AnomaliesModule } from '../anomalies/anomalies.module';
     AiMorningBriefingService,
     AiReportQueryService,
     AiCampaignService,
+    AiYieldService,
     AiService,
   ],
 })

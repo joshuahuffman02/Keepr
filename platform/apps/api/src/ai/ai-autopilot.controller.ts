@@ -26,6 +26,7 @@ import { AiPredictiveMaintenanceService } from "./ai-predictive-maintenance.serv
 import { AiWeatherService } from "./ai-weather.service";
 import { AiPhoneAgentService } from "./ai-phone-agent.service";
 import { AiDashboardService } from "./ai-dashboard.service";
+import { AiYieldService } from "./ai-yield.service";
 import {
   UpdateAutopilotConfigDto,
   CreateContextItemDto,
@@ -52,7 +53,8 @@ export class AiAutopilotController {
     private readonly predictiveMaintenanceService: AiPredictiveMaintenanceService,
     private readonly weatherService: AiWeatherService,
     private readonly phoneAgentService: AiPhoneAgentService,
-    private readonly dashboardService: AiDashboardService
+    private readonly dashboardService: AiDashboardService,
+    private readonly yieldService: AiYieldService
   ) {}
 
   // ==================== CONFIG ENDPOINTS ====================
@@ -598,5 +600,76 @@ export class AiAutopilotController {
       campgroundId,
       days ? parseInt(days) : 30
     );
+  }
+
+  // ==================== YIELD MANAGEMENT ENDPOINTS ====================
+
+  @Get("campgrounds/:campgroundId/yield/dashboard")
+  @Roles(UserRole.owner, UserRole.manager)
+  async getYieldDashboard(@Param("campgroundId") campgroundId: string) {
+    return this.yieldService.getYieldDashboard(campgroundId);
+  }
+
+  @Get("campgrounds/:campgroundId/yield/metrics")
+  @Roles(UserRole.owner, UserRole.manager, UserRole.front_desk)
+  async getYieldMetrics(
+    @Param("campgroundId") campgroundId: string,
+    @Query("startDate") startDate?: string,
+    @Query("endDate") endDate?: string
+  ) {
+    return this.yieldService.getYieldMetrics(campgroundId, {
+      startDate: startDate ? new Date(startDate) : undefined,
+      endDate: endDate ? new Date(endDate) : undefined,
+    });
+  }
+
+  @Get("campgrounds/:campgroundId/yield/occupancy-trend")
+  @Roles(UserRole.owner, UserRole.manager, UserRole.front_desk)
+  async getOccupancyTrend(
+    @Param("campgroundId") campgroundId: string,
+    @Query("days") days?: string
+  ) {
+    return this.yieldService.getOccupancyTrend(
+      campgroundId,
+      days ? parseInt(days) : 30
+    );
+  }
+
+  @Get("campgrounds/:campgroundId/yield/forecast")
+  @Roles(UserRole.owner, UserRole.manager, UserRole.front_desk)
+  async getOccupancyForecast(
+    @Param("campgroundId") campgroundId: string,
+    @Query("days") days?: string
+  ) {
+    return this.yieldService.forecastOccupancy(
+      campgroundId,
+      days ? parseInt(days) : 30
+    );
+  }
+
+  @Post("campgrounds/:campgroundId/yield/record-snapshot")
+  @Roles(UserRole.owner, UserRole.manager)
+  async recordSnapshot(
+    @Param("campgroundId") campgroundId: string,
+    @Body("date") date?: string
+  ) {
+    await this.yieldService.recordSnapshot(
+      campgroundId,
+      date ? new Date(date) : new Date()
+    );
+    return { success: true };
+  }
+
+  @Post("campgrounds/:campgroundId/yield/backfill")
+  @Roles(UserRole.owner)
+  async backfillSnapshots(
+    @Param("campgroundId") campgroundId: string,
+    @Body("days") days?: number
+  ) {
+    const recorded = await this.yieldService.backfillSnapshots(
+      campgroundId,
+      days || 90
+    );
+    return { success: true, recordedDays: recorded };
   }
 }
