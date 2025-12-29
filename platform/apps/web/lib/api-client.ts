@@ -3026,8 +3026,11 @@ export const apiClient = {
     const data = await parseResponse<unknown>(res);
     return CommunicationSchema.parse(data);
   },
-  async createGuest(payload: Omit<z.input<typeof GuestSchema>, "id">) {
-    const res = await fetch(`${API_BASE}/guests`, {
+  async createGuest(payload: Omit<z.input<typeof GuestSchema>, "id">, campgroundId?: string) {
+    const params = new URLSearchParams();
+    if (campgroundId) params.set("campgroundId", campgroundId);
+    const query = params.toString() ? `?${params.toString()}` : "";
+    const res = await fetch(`${API_BASE}/guests${query}`, {
       method: "POST",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
       body: JSON.stringify(payload)
@@ -8321,6 +8324,86 @@ export const apiClient = {
       body: JSON.stringify(payload),
     });
     return parseResponse<{ id: string; amountCents: number; status: string }>(res);
+  },
+
+  async listCharities(options?: { category?: string; activeOnly?: boolean }) {
+    const params = new URLSearchParams();
+    if (options?.category) params.set("category", options.category);
+    if (options?.activeOnly !== undefined) params.set("activeOnly", String(options.activeOnly));
+    const data = await fetchJSON<unknown>(`/charity?${params.toString()}`);
+    return data as {
+      id: string;
+      name: string;
+      description: string | null;
+      logoUrl: string | null;
+      taxId: string | null;
+      website: string | null;
+      category: string | null;
+      isActive: boolean;
+      isVerified: boolean;
+      _count: { campgroundCharities: number; donations: number };
+    }[];
+  },
+
+  async setCampgroundCharity(campgroundId: string, payload: {
+    charityId?: string;
+    newCharity?: {
+      name: string;
+      description?: string;
+      taxId?: string;
+      website?: string;
+    };
+    isEnabled?: boolean;
+    customMessage?: string;
+    roundUpType?: string;
+    roundUpOptions?: { values: number[] };
+    defaultOptIn?: boolean;
+  }) {
+    const res = await fetch(`${API_BASE}/campgrounds/${campgroundId}/charity`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json", ...scopedHeaders() },
+      body: JSON.stringify(payload),
+    });
+    const data = await parseResponse<unknown>(res);
+    return data as {
+      id: string;
+      campgroundId: string;
+      charityId: string;
+      isEnabled: boolean;
+      customMessage: string | null;
+      roundUpType: string;
+      roundUpOptions: Record<string, unknown> | null;
+      defaultOptIn: boolean;
+      charity: {
+        id: string;
+        name: string;
+        description: string | null;
+        logoUrl: string | null;
+      };
+    };
+  },
+
+  async disableCampgroundCharity(campgroundId: string) {
+    const res = await fetch(`${API_BASE}/campgrounds/${campgroundId}/charity`, {
+      method: "DELETE",
+      headers: scopedHeaders(),
+    });
+    return parseResponse<{ isEnabled: boolean }>(res);
+  },
+
+  async getCampgroundCharityStats(campgroundId: string, startDate?: string, endDate?: string) {
+    const params = new URLSearchParams();
+    if (startDate) params.set("startDate", startDate);
+    if (endDate) params.set("endDate", endDate);
+    const data = await fetchJSON<unknown>(`/campgrounds/${campgroundId}/charity/stats?${params.toString()}`);
+    return data as {
+      totalDonations: number;
+      totalAmountCents: number;
+      donorCount: number;
+      optInRate: number;
+      averageDonationCents: number;
+      byStatus: { status: string; count: number; amountCents: number }[];
+    };
   },
 
   // Data Import
