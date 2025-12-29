@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
+import { motion, useReducedMotion } from "framer-motion";
 import { Button } from "../../../ui/button";
 import {
   Check,
@@ -21,10 +22,13 @@ import {
   LogOut,
   Loader2,
   CheckCircle,
+  Sparkles,
 } from "lucide-react";
 import { usePaymentContext } from "../context/PaymentContext";
 import { PaymentMethodType, PAYMENT_METHOD_INFO, TenderEntry, PaymentResult } from "../context/types";
 import { cn } from "../../../../lib/utils";
+
+const SPRING_CONFIG = { type: "spring" as const, stiffness: 200, damping: 15 };
 // import { apiClient } from "../../../../lib/api-client"; // TODO: Enable when email API is implemented
 
 interface SuccessViewProps {
@@ -121,20 +125,61 @@ export function SuccessView({
     onDone(buildPaymentResult());
   };
 
+  const prefersReducedMotion = useReducedMotion();
+
   return (
     <div className="flex flex-col items-center py-6 space-y-6">
-      {/* Success Icon */}
-      <div className="h-20 w-20 rounded-full bg-emerald-100 flex items-center justify-center">
-        <Check className="h-10 w-10 text-emerald-600" strokeWidth={3} />
-      </div>
+      {/* Success Icon with Animation */}
+      <motion.div
+        className="relative"
+        initial={prefersReducedMotion ? { opacity: 0 } : { opacity: 0, scale: 0.5, rotate: -180 }}
+        animate={prefersReducedMotion ? { opacity: 1 } : { opacity: 1, scale: 1, rotate: 0 }}
+        transition={SPRING_CONFIG}
+      >
+        {/* Decorative sparkles */}
+        {!prefersReducedMotion && (
+          <>
+            <motion.div
+              className="absolute -top-2 -right-2"
+              initial={{ opacity: 0, scale: 0 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: 0.3, ...SPRING_CONFIG }}
+            >
+              <Sparkles className="h-5 w-5 text-amber-400" />
+            </motion.div>
+            <motion.div
+              className="absolute -bottom-1 -left-3"
+              initial={{ opacity: 0, scale: 0 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: 0.4, ...SPRING_CONFIG }}
+            >
+              <Sparkles className="h-4 w-4 text-emerald-400" />
+            </motion.div>
+          </>
+        )}
+        {/* Main success circle */}
+        <motion.div
+          className="h-20 w-20 rounded-full bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center shadow-lg shadow-emerald-200"
+          initial={prefersReducedMotion ? {} : { boxShadow: "0 0 0 0 rgba(16, 185, 129, 0.4)" }}
+          animate={prefersReducedMotion ? {} : { boxShadow: "0 0 0 20px rgba(16, 185, 129, 0)" }}
+          transition={{ duration: 0.6, delay: 0.2 }}
+        >
+          <Check className="h-10 w-10 text-white" strokeWidth={3} />
+        </motion.div>
+      </motion.div>
 
-      {/* Title */}
-      <div className="text-center">
+      {/* Title with Animation */}
+      <motion.div
+        className="text-center"
+        initial={prefersReducedMotion ? { opacity: 0 } : { opacity: 0, y: 10 }}
+        animate={prefersReducedMotion ? { opacity: 1 } : { opacity: 1, y: 0 }}
+        transition={{ delay: 0.2, ...SPRING_CONFIG }}
+      >
         <h2 className="text-2xl font-bold text-slate-900">Payment Complete!</h2>
         <p className="mt-1 text-slate-600">
           Thank you for your payment
         </p>
-      </div>
+      </motion.div>
 
       {/* Email sent indicator */}
       {emailSending && (
@@ -151,7 +196,12 @@ export function SuccessView({
       )}
 
       {/* Payment Summary */}
-      <div className="w-full max-w-sm space-y-4">
+      <motion.div
+        className="w-full max-w-sm space-y-4"
+        initial={prefersReducedMotion ? { opacity: 0 } : { opacity: 0, y: 15 }}
+        animate={prefersReducedMotion ? { opacity: 1 } : { opacity: 1, y: 0 }}
+        transition={{ delay: 0.3, ...SPRING_CONFIG }}
+      >
         {/* Payment Breakdown */}
         <div className="bg-slate-50 rounded-lg p-4 space-y-3">
           {/* Original amount */}
@@ -214,10 +264,15 @@ export function SuccessView({
             </div>
           </div>
         )}
-      </div>
+      </motion.div>
 
       {/* Actions */}
-      <div className="w-full max-w-sm space-y-3">
+      <motion.div
+        className="w-full max-w-sm space-y-3"
+        initial={prefersReducedMotion ? { opacity: 0 } : { opacity: 0, y: 15 }}
+        animate={prefersReducedMotion ? { opacity: 1 } : { opacity: 1, y: 0 }}
+        transition={{ delay: 0.4, ...SPRING_CONFIG }}
+      >
         {/* Print receipt */}
         {onPrintReceipt && (
           <Button
@@ -256,7 +311,7 @@ export function SuccessView({
         >
           {onCheckInOut ? "Close" : "Done"}
         </Button>
-      </div>
+      </motion.div>
 
       {/* Transaction reference */}
       {completedEntries.length > 0 && completedEntries[0].reference && (

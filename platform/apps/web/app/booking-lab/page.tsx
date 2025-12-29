@@ -30,6 +30,7 @@ import { Badge } from "../../components/ui/badge";
 import { Textarea } from "../../components/ui/textarea";
 import { useToast } from "../../components/ui/use-toast";
 import { PaymentCollectionModal } from "../../components/payments/PaymentCollectionModal";
+import { BookingSuccessDialog, BookingReceiptData } from "../../components/booking/BookingSuccessDialog";
 import { apiClient } from "../../lib/api-client";
 import { cn } from "../../lib/utils";
 import { useWhoami } from "@/hooks/use-whoami";
@@ -203,17 +204,7 @@ function BookingLabPageInner() {
   });
   const [paymentModal, setPaymentModal] = useState<{ reservationId: string; amountCents: number } | null>(null);
   const paymentCompletedRef = useRef(false);
-  const [receiptData, setReceiptData] = useState<{
-    reservationId: string;
-    guestName: string;
-    siteName: string;
-    arrivalDate: string;
-    departureDate: string;
-    amountCents: number;
-    method: string;
-    cashReceivedCents?: number;
-    changeDueCents?: number;
-  } | null>(null);
+  const [receiptData, setReceiptData] = useState<BookingReceiptData | null>(null);
 
   useEffect(() => {
     if (!paymentModal) {
@@ -1354,92 +1345,20 @@ function BookingLabPageInner() {
           }}
         />
       )}
-      {receiptData && (
-        <Dialog open={!!receiptData} onOpenChange={() => {
+      <BookingSuccessDialog
+        open={!!receiptData}
+        receiptData={receiptData}
+        onClose={() => {
           if (!receiptData) return;
           const reservationId = receiptData.reservationId;
           setReceiptData(null);
           router.push(`/reservations/${reservationId}`);
-        }}>
-          <DialogContent className="sm:max-w-md">
-            <DialogHeader>
-              <DialogTitle>Payment Receipt</DialogTitle>
-            </DialogHeader>
-            <div className="space-y-3 text-sm">
-              <div className="flex items-center justify-between">
-                <span className="text-slate-500">Reservation</span>
-                <span className="font-semibold text-slate-900">#{receiptData.reservationId.slice(0, 8)}</span>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-slate-500">Guest</span>
-                <span className="font-semibold text-slate-900">{receiptData.guestName}</span>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-slate-500">Site</span>
-                <span className="font-semibold text-slate-900">{receiptData.siteName}</span>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-slate-500">Dates</span>
-                <span className="font-semibold text-slate-900">{receiptData.arrivalDate} → {receiptData.departureDate}</span>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-slate-500">Method</span>
-                <span className="font-semibold text-slate-900">{receiptData.method}</span>
-              </div>
-              <div className="flex items-center justify-between text-base">
-                <span className="font-semibold text-slate-700">Amount</span>
-                <span className="font-black text-slate-900">${(receiptData.amountCents / 100).toFixed(2)}</span>
-              </div>
-              {receiptData.cashReceivedCents !== undefined && (
-                <div className="flex items-center justify-between">
-                  <span className="text-slate-500">Cash received</span>
-                  <span className="font-semibold text-slate-900">${(receiptData.cashReceivedCents / 100).toFixed(2)}</span>
-                </div>
-              )}
-              {receiptData.changeDueCents ? (
-                <div className="flex items-center justify-between">
-                  <span className="text-slate-500">Change due</span>
-                  <span className="font-semibold text-slate-900">${(receiptData.changeDueCents / 100).toFixed(2)}</span>
-                </div>
-              ) : null}
-            </div>
-            <div className="mt-4 flex flex-col gap-2">
-              <Button
-                variant="outline"
-                onClick={() => {
-                  const receiptText = [
-                    `Reservation #${receiptData.reservationId.slice(0, 8)}`,
-                    `Guest: ${receiptData.guestName}`,
-                    `Site: ${receiptData.siteName}`,
-                    `Dates: ${receiptData.arrivalDate} → ${receiptData.departureDate}`,
-                    `Method: ${receiptData.method}`,
-                    `Amount: $${(receiptData.amountCents / 100).toFixed(2)}`,
-                    receiptData.cashReceivedCents !== undefined
-                      ? `Cash received: $${(receiptData.cashReceivedCents / 100).toFixed(2)}`
-                      : "",
-                    receiptData.changeDueCents
-                      ? `Change due: $${(receiptData.changeDueCents / 100).toFixed(2)}`
-                      : ""
-                  ].filter(Boolean).join("\n");
-                  if (navigator?.clipboard?.writeText) {
-                    navigator.clipboard.writeText(receiptText).catch(() => undefined);
-                    toast({ title: "Receipt copied", description: "Receipt details copied to clipboard." });
-                  }
-                }}
-              >
-                Copy receipt
-              </Button>
-              <Button onClick={() => {
-                const reservationId = receiptData.reservationId;
-                setReceiptData(null);
-                router.push(`/reservations/${reservationId}`);
-              }}>
-                Done
-              </Button>
-            </div>
-          </DialogContent>
-        </Dialog>
-      )}
+        }}
+        onDone={(reservationId) => {
+          setReceiptData(null);
+          router.push(`/reservations/${reservationId}`);
+        }}
+      />
     </DashboardShell>
   );
 }

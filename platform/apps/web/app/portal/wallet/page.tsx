@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { apiClient } from "@/lib/api-client";
@@ -13,6 +13,7 @@ import { cn } from "@/lib/utils";
 import { GUEST_TOKEN_KEY, SPRING_CONFIG, STATUS_VARIANTS } from "@/lib/portal-constants";
 import { PortalPageHeader } from "@/components/portal/PortalPageHeader";
 import { PortalLoadingState, EmptyState } from "@/components/portal/PortalLoadingState";
+import { PullToRefresh } from "@/components/ui/pull-to-refresh";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from "@/components/ui/dialog";
 import { useToast } from "@/components/ui/use-toast";
 
@@ -69,6 +70,7 @@ export default function WalletPage() {
     const [selectedWalletId, setSelectedWalletId] = useState<string | null>(null);
     const [loading, setLoading] = useState(true);
     const [loadingTransactions, setLoadingTransactions] = useState(false);
+    const [token, setToken] = useState<string | null>(null);
 
     // Payment methods state
     const [paymentMethods, setPaymentMethods] = useState<SavedPaymentMethod[]>([]);
@@ -76,44 +78,50 @@ export default function WalletPage() {
     const [deleteCardConfirm, setDeleteCardConfirm] = useState<string | null>(null);
     const [deletingCard, setDeletingCard] = useState(false);
 
+    const fetchWallets = useCallback(async (authToken: string) => {
+        try {
+            const walletsData = await apiClient.getPortalWallets(authToken);
+            setWallets(walletsData || []);
+            // If there's only one wallet, auto-select it
+            if (walletsData && walletsData.length === 1) {
+                setSelectedWalletId(walletsData[0].walletId);
+            }
+        } catch (err) {
+            console.error(err);
+            setWallets([]);
+        } finally {
+            setLoading(false);
+        }
+    }, []);
+
+    const fetchPaymentMethods = useCallback(async (authToken: string) => {
+        try {
+            const methods = await apiClient.getPortalPaymentMethods(authToken);
+            setPaymentMethods(methods || []);
+        } catch (err) {
+            console.error(err);
+            setPaymentMethods([]);
+        } finally {
+            setLoadingPaymentMethods(false);
+        }
+    }, []);
+
     useEffect(() => {
         const storedToken = localStorage.getItem(GUEST_TOKEN_KEY);
         if (!storedToken) {
             router.push("/portal/login");
             return;
         }
+        setToken(storedToken);
+        fetchWallets(storedToken);
+        fetchPaymentMethods(storedToken);
+    }, [router, fetchWallets, fetchPaymentMethods]);
 
-        const fetchWallets = async () => {
-            try {
-                const walletsData = await apiClient.getPortalWallets(storedToken);
-                setWallets(walletsData || []);
-                // If there's only one wallet, auto-select it
-                if (walletsData && walletsData.length === 1) {
-                    setSelectedWalletId(walletsData[0].walletId);
-                }
-            } catch (err) {
-                console.error(err);
-                setWallets([]);
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        const fetchPaymentMethods = async () => {
-            try {
-                const methods = await apiClient.getPortalPaymentMethods(storedToken);
-                setPaymentMethods(methods || []);
-            } catch (err) {
-                console.error(err);
-                setPaymentMethods([]);
-            } finally {
-                setLoadingPaymentMethods(false);
-            }
-        };
-
-        fetchWallets();
-        fetchPaymentMethods();
-    }, [router]);
+    // Pull-to-refresh handler
+    const handleRefresh = useCallback(async () => {
+        if (!token) return;
+        await Promise.all([fetchWallets(token), fetchPaymentMethods(token)]);
+    }, [token, fetchWallets, fetchPaymentMethods]);
 
     const handleDeleteCard = async (paymentMethodId: string) => {
         const storedToken = localStorage.getItem(GUEST_TOKEN_KEY);
@@ -196,6 +204,7 @@ export default function WalletPage() {
     }
 
     return (
+        <PullToRefresh onRefresh={handleRefresh} className="min-h-screen">
         <div className="container mx-auto px-4 py-6 space-y-6">
             {/* Page Header */}
             <PortalPageHeader
@@ -515,5 +524,6 @@ export default function WalletPage() {
                 </DialogContent>
             </Dialog>
         </div>
+        </PullToRefresh>
     );
 }

@@ -20,6 +20,7 @@ import { cn } from "@/lib/utils";
 import { GUEST_TOKEN_KEY, SPRING_CONFIG, STATUS_VARIANTS } from "@/lib/portal-constants";
 import { PortalPageHeader } from "@/components/portal/PortalPageHeader";
 import { PortalLoadingState, EmptyState } from "@/components/portal/PortalLoadingState";
+import { PullToRefresh } from "@/components/ui/pull-to-refresh";
 import { ReservationSelector } from "@/components/portal/ReservationSelector";
 
 type GuestData = Awaited<ReturnType<typeof apiClient.getGuestMe>>;
@@ -303,6 +304,11 @@ export default function GuestActivitiesPage() {
         }
     });
 
+    // Pull-to-refresh handler
+    const handleRefresh = useCallback(async () => {
+        await queryClient.invalidateQueries({ queryKey: ["activities", campgroundId] });
+    }, [queryClient, campgroundId]);
+
     if (loading) {
         return <PortalLoadingState variant="page" />;
     }
@@ -310,6 +316,7 @@ export default function GuestActivitiesPage() {
     if (!guest) return null;
 
     return (
+        <PullToRefresh onRefresh={handleRefresh} className="min-h-screen">
         <div className="container mx-auto px-4 py-6 space-y-6">
             {/* Page Header */}
             <div className="flex items-center justify-between flex-wrap gap-4">
@@ -543,5 +550,6 @@ export default function GuestActivitiesPage() {
                 </div>
             )}
         </div>
+        </PullToRefresh>
     );
 }

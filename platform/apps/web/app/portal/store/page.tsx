@@ -20,6 +20,7 @@ import { useSyncStatus } from "@/contexts/SyncStatusContext";
 import { GUEST_TOKEN_KEY, STATUS_VARIANTS } from "@/lib/portal-constants";
 import { PortalPageHeader } from "@/components/portal/PortalPageHeader";
 import { PortalLoadingState, EmptyState } from "@/components/portal/PortalLoadingState";
+import { PullToRefresh } from "@/components/ui/pull-to-refresh";
 import { ReservationSelector } from "@/components/portal/ReservationSelector";
 import { cn } from "@/lib/utils";
 
@@ -316,6 +317,13 @@ export default function PortalStorePage() {
         });
     };
 
+    // Pull-to-refresh handler
+    const handleRefresh = useCallback(async () => {
+        if (selectedReservation?.campgroundId) {
+            await loadProducts(selectedReservation.campgroundId);
+        }
+    }, [selectedReservation?.campgroundId, loadProducts]);
+
     if (loading) {
         return <PortalLoadingState variant="page" />;
     }
@@ -323,6 +331,7 @@ export default function PortalStorePage() {
     if (!guest) return null;
 
     return (
+        <PullToRefresh onRefresh={handleRefresh} className="min-h-screen">
         <div className="container mx-auto px-4 py-6 space-y-6">
             {/* Page Header */}
             <div className="flex items-center justify-between">
@@ -529,5 +538,6 @@ export default function PortalStorePage() {
 
             <SyncDetailsDrawer open={syncDrawerOpen} onOpenChange={setSyncDrawerOpen} />
         </div>
+        </PullToRefresh>
     );
 }

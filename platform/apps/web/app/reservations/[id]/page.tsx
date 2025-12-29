@@ -21,6 +21,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
+import { CheckInCelebrationDialog } from "@/components/reservations/CheckInCelebrationDialog";
 
 type ReservationWithGroup = Reservation & {
     groupId?: string | null;
@@ -45,6 +47,7 @@ export default function ReservationDetailPage() {
     const [composeFrom, setComposeFrom] = useState("");
     const [selectedGroupId, setSelectedGroupId] = useState<string>("");
     const [groupRole, setGroupRole] = useState<"primary" | "member">("member");
+    const [showCheckInCelebration, setShowCheckInCelebration] = useState(false);
 
     useEffect(() => {
         if (params.id) {
@@ -227,7 +230,7 @@ export default function ReservationDetailPage() {
         try {
             const updated = await apiClient.checkInReservation(reservation.id);
             setReservation(updated);
-            toast({ title: "Success", description: "Guest checked in successfully" });
+            setShowCheckInCelebration(true);
         } catch (error) {
             toast({ title: "Error", description: "Failed to check in guest", variant: "destructive" });
         } finally {
@@ -261,9 +264,6 @@ export default function ReservationDetailPage() {
 
     const handleCancel = async () => {
         if (!reservation) return;
-
-        if (!confirm("Are you sure you want to cancel this reservation?")) return;
-
         setProcessing(true);
         try {
             const updated = await apiClient.cancelReservation(reservation.id);
@@ -683,6 +683,20 @@ export default function ReservationDetailPage() {
                     </div>
                 </div>
             </div>
+
+            {/* Check-in celebration dialog */}
+            <CheckInCelebrationDialog
+                open={showCheckInCelebration}
+                onClose={() => setShowCheckInCelebration(false)}
+                guestName={
+                    reservation.guest
+                        ? `${reservation.guest.primaryFirstName || ""} ${reservation.guest.primaryLastName || ""}`.trim() || "Guest"
+                        : "Guest"
+                }
+                siteName={reservation.site?.name || "Site"}
+                arrivalDate={reservation.arrivalDate}
+                departureDate={reservation.departureDate}
+            />
         </DashboardShell>
     );
 }

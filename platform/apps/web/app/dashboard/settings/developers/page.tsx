@@ -48,6 +48,7 @@ import {
     TableRow,
 } from "@/components/ui/table";
 import { useToast } from "@/components/ui/use-toast";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { format, formatDistanceToNow } from "date-fns";
 
 // Animation variants
@@ -672,34 +673,43 @@ export default function DevelopersSettingsPage() {
                                     </TableCell>
                                     <TableCell className="text-right">
                                         <div className="flex justify-end gap-1">
-                                            <Button
-                                                variant="ghost"
-                                                size="icon"
-                                                className="h-8 w-8"
-                                                onClick={() => {
-                                                    if (confirm("Rotate client secret? The old secret will stop working immediately.")) {
-                                                        rotateMutation.mutate(client.id);
-                                                    }
-                                                }}
-                                                title="Rotate Secret"
-                                                aria-label={`Rotate secret for ${client.name}`}
-                                            >
-                                                <RefreshCw className="h-4 w-4 text-slate-500" />
-                                            </Button>
-                                            <Button
-                                                variant="ghost"
-                                                size="icon"
-                                                className="h-8 w-8 hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-900/20"
-                                                onClick={() => {
-                                                    if (confirm("Delete this API key permanently? Any integrations using it will stop working.")) {
-                                                        deleteMutation.mutate(client.id);
-                                                    }
-                                                }}
-                                                title="Delete"
-                                                aria-label={`Delete ${client.name}`}
-                                            >
-                                                <Trash2 className="h-4 w-4" />
-                                            </Button>
+                                            <ConfirmDialog
+                                                trigger={
+                                                    <Button
+                                                        variant="ghost"
+                                                        size="icon"
+                                                        className="h-8 w-8"
+                                                        title="Rotate Secret"
+                                                        aria-label={`Rotate secret for ${client.name}`}
+                                                    >
+                                                        <RefreshCw className="h-4 w-4 text-slate-500" />
+                                                    </Button>
+                                                }
+                                                title="Rotate client secret?"
+                                                description="The old secret will stop working immediately. Make sure to update your integrations with the new secret."
+                                                confirmLabel="Rotate"
+                                                onConfirm={() => rotateMutation.mutate(client.id)}
+                                                isPending={rotateMutation.isPending}
+                                            />
+                                            <ConfirmDialog
+                                                trigger={
+                                                    <Button
+                                                        variant="ghost"
+                                                        size="icon"
+                                                        className="h-8 w-8 hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-900/20"
+                                                        title="Delete"
+                                                        aria-label={`Delete ${client.name}`}
+                                                    >
+                                                        <Trash2 className="h-4 w-4" />
+                                                    </Button>
+                                                }
+                                                title="Delete API key?"
+                                                description="This action is permanent. Any integrations using this key will stop working immediately."
+                                                confirmLabel="Delete"
+                                                variant="destructive"
+                                                onConfirm={() => deleteMutation.mutate(client.id)}
+                                                isPending={deleteMutation.isPending}
+                                            />
                                         </div>
                                     </TableCell>
                                 </motion.tr>

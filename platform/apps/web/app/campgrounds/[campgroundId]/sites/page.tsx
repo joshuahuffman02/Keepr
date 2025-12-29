@@ -12,6 +12,7 @@ import { DashboardShell } from "../../../../components/ui/layout/DashboardShell"
 import { ImageUpload } from "../../../../components/ui/image-upload";
 import { useToast } from "../../../../components/ui/use-toast";
 import { ToastAction } from "../../../../components/ui/toast";
+import { ConfirmDialog } from "../../../../components/ui/confirm-dialog";
 import { Card, CardContent } from "../../../../components/ui/card";
 import { Badge } from "../../../../components/ui/badge";
 import { Label } from "../../../../components/ui/label";
@@ -379,13 +380,6 @@ export default function SitesPage() {
     } else {
       // Select all on current page
       setSelectedSites((prev) => new Set([...prev, ...pageIds]));
-    }
-  };
-
-  // Handle delete with confirmation
-  const handleDelete = (siteId: string, siteName: string) => {
-    if (window.confirm(`Are you sure you want to delete "${siteName}"? This action cannot be undone.`)) {
-      deleteSite.mutate(siteId);
     }
   };
 
@@ -1333,16 +1327,25 @@ export default function SitesPage() {
                           >
                             <Pencil className="h-4 w-4" />
                           </Button>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            className="h-8 w-8 p-0 text-red-600 hover:text-red-700 hover:bg-red-50"
-                            onClick={() => handleDelete(site.id, site.name)}
-                            disabled={deleteSite.isPending}
-                            title="Delete"
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
+                          <ConfirmDialog
+                            trigger={
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                className="h-8 w-8 p-0 text-red-600 hover:text-red-700 hover:bg-red-50"
+                                disabled={deleteSite.isPending}
+                                title="Delete"
+                              >
+                                <Trash2 className="h-4 w-4" />
+                              </Button>
+                            }
+                            title={`Delete "${site.name}"?`}
+                            description="This action cannot be undone. All reservations and history for this site will be preserved."
+                            confirmLabel="Delete"
+                            variant="destructive"
+                            onConfirm={() => deleteSite.mutate(site.id)}
+                            isPending={deleteSite.isPending}
+                          />
                         </div>
                       </TableCell>
                     </TableRow>

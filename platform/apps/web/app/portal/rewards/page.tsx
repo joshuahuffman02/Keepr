@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState, useMemo, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { apiClient } from "@/lib/api-client";
@@ -11,6 +11,7 @@ import { cn } from "@/lib/utils";
 import { GUEST_TOKEN_KEY, SPRING_CONFIG, STATUS_VARIANTS } from "@/lib/portal-constants";
 import { PortalPageHeader } from "@/components/portal/PortalPageHeader";
 import { PortalLoadingState, EmptyState } from "@/components/portal/PortalLoadingState";
+import { PullToRefresh } from "@/components/ui/pull-to-refresh";
 
 type LoyaltyProfile = {
     id: string;
@@ -61,6 +62,29 @@ export default function RewardsPage() {
     const [profile, setProfile] = useState<LoyaltyProfile | null>(null);
     const [loading, setLoading] = useState(true);
     const [guestId, setGuestId] = useState<string | null>(null);
+    const [token, setToken] = useState<string | null>(null);
+
+    const fetchData = useCallback(async (authToken: string, currentGuestId?: string | null) => {
+        try {
+            const guestData = await apiClient.getGuestMe(authToken);
+            setGuestId(guestData.id);
+
+            const loyaltyProfile = await apiClient.getLoyaltyProfile(guestData.id);
+            setProfile(loyaltyProfile);
+        } catch (err) {
+            console.error(err);
+            // Profile may not exist yet, show empty state
+            setProfile({
+                id: "",
+                guestId: currentGuestId || "",
+                pointsBalance: 0,
+                tier: "Bronze",
+                transactions: []
+            });
+        } finally {
+            setLoading(false);
+        }
+    }, []);
 
     useEffect(() => {
         const storedToken = localStorage.getItem(GUEST_TOKEN_KEY);
@@ -68,31 +92,15 @@ export default function RewardsPage() {
             router.push("/portal/login");
             return;
         }
+        setToken(storedToken);
+        fetchData(storedToken, guestId);
+    }, [router, guestId, fetchData]);
 
-        const fetchData = async () => {
-            try {
-                const guestData = await apiClient.getGuestMe(storedToken);
-                setGuestId(guestData.id);
-
-                const loyaltyProfile = await apiClient.getLoyaltyProfile(guestData.id);
-                setProfile(loyaltyProfile);
-            } catch (err) {
-                console.error(err);
-                // Profile may not exist yet, show empty state
-                setProfile({
-                    id: "",
-                    guestId: guestId || "",
-                    pointsBalance: 0,
-                    tier: "Bronze",
-                    transactions: []
-                });
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        fetchData();
-    }, [router, guestId]);
+    // Pull-to-refresh handler
+    const handleRefresh = useCallback(async () => {
+        if (!token) return;
+        await fetchData(token, guestId);
+    }, [token, guestId, fetchData]);
 
     // Memoized tier calculations
     const currentTier = useMemo(() => {
@@ -119,6 +127,7 @@ export default function RewardsPage() {
     }
 
     return (
+        <PullToRefresh onRefresh={handleRefresh} className="min-h-screen">
         <div className="container mx-auto px-4 py-6 space-y-6">
             {/* Page Header */}
             <PortalPageHeader
@@ -291,5 +300,6 @@ export default function RewardsPage() {
                 </Card>
             </motion.div>
         </div>
+        </PullToRefresh>
     );
 }

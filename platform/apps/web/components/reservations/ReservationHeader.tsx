@@ -1,6 +1,7 @@
 import { Reservation } from "@campreserv/shared";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { format } from "date-fns";
 import Link from "next/link";
 import { Pencil } from "lucide-react";
@@ -69,9 +70,19 @@ export function ReservationHeader({ reservation, onCheckIn, onCheckOut, onCancel
                     </Button>
                 )}
                 {canCancel && (
-                    <Button variant="outline" onClick={onCancel} disabled={isProcessing} className="text-red-600 hover:text-red-700 hover:bg-red-50 border-red-200">
-                        Cancel Reservation
-                    </Button>
+                    <ConfirmDialog
+                        trigger={
+                            <Button variant="outline" disabled={isProcessing} className="text-red-600 hover:text-red-700 hover:bg-red-50 border-red-200">
+                                Cancel Reservation
+                            </Button>
+                        }
+                        title="Cancel reservation?"
+                        description="This will cancel the reservation. This action cannot be undone."
+                        confirmLabel="Cancel Reservation"
+                        variant="destructive"
+                        onConfirm={onCancel}
+                        isPending={isProcessing}
+                    />
                 )}
             </div>
         </div>

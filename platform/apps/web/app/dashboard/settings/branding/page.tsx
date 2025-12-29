@@ -1,13 +1,18 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../../../../components/ui/card";
-import { Input } from "../../../../components/ui/input";
 import { Textarea } from "../../../../components/ui/textarea";
 import { Button } from "../../../../components/ui/button";
+import { Label } from "../../../../components/ui/label";
 import { useToast } from "../../../../components/ui/use-toast";
+import { SettingsPageLayout } from "../../../../components/settings/SettingsPageLayout";
+import { FormField } from "../../../../components/ui/form-field";
+import { useFormValidation, validators } from "../../../../hooks/use-form-validation";
 import { apiClient } from "../../../../lib/api-client";
+import { Loader2, Palette } from "lucide-react";
+import { useState } from "react";
 
 type BrandingForm = {
   logoUrl: string;
@@ -33,11 +38,33 @@ const emptyForm: BrandingForm = {
   brandingNote: ""
 };
 
+// Field validation configuration
+const fieldConfigs = {
+  logoUrl: { rules: [validators.url("Please enter a valid URL for your logo")] },
+  primaryColor: { rules: [validators.hexColor()] },
+  accentColor: { rules: [validators.hexColor()] },
+  secondaryColor: { rules: [validators.hexColor()] },
+  buttonColor: { rules: [validators.hexColor()] },
+  brandFont: { rules: [validators.maxLength(100, "Font name is too long")] },
+  emailHeader: { rules: [validators.maxLength(500, "Email header is too long")] },
+  receiptFooter: { rules: [validators.maxLength(500, "Receipt footer is too long")] },
+  brandingNote: { rules: [validators.maxLength(1000, "Notes are too long")] },
+};
+
 export default function BrandingPage() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [campgroundId, setCampgroundId] = useState<string | null>(null);
-  const [form, setForm] = useState<BrandingForm>(emptyForm);
+
+  const {
+    values: form,
+    getFieldProps,
+    validateAll,
+    resetForm,
+    setFieldValue,
+    isValid,
+    isDirty,
+  } = useFormValidation(fieldConfigs, emptyForm);
 
   useEffect(() => {
     const cg = typeof window !== "undefined" ? localStorage.getItem("campreserv:selectedCampground") : null;
@@ -64,7 +91,7 @@ export default function BrandingPage() {
     };
 
     const cgWithBranding = cg as CampgroundWithBranding;
-    setForm({
+    resetForm({
       logoUrl: cg.logoUrl || "",
       primaryColor: cg.primaryColor || "",
       accentColor: cg.accentColor || "",
@@ -75,7 +102,7 @@ export default function BrandingPage() {
       receiptFooter: cgWithBranding.receiptFooter || "",
       brandingNote: cg.brandingNote || ""
     });
-  }, [campgroundQuery.data]);
+  }, [campgroundQuery.data, resetForm]);
 
   const saveMutation = useMutation({
     mutationFn: () =>
@@ -97,71 +124,119 @@ export default function BrandingPage() {
     onError: () => toast({ title: "Failed to update branding", variant: "destructive" })
   });
 
-  const update = (key: keyof BrandingForm, value: string) => setForm((f) => ({ ...f, [key]: value }));
+  const handleSave = () => {
+    if (!validateAll()) {
+      toast({ title: "Please fix validation errors", variant: "destructive" });
+      return;
+    }
+    saveMutation.mutate();
+  };
 
   return (
-    <div className="space-y-4">
+    <SettingsPageLayout
+      title="Branding"
+      description="Customize your logo, colors, and brand elements for emails and receipts."
+      icon={Palette}
+      isLoading={campgroundQuery.isLoading}
+      hasCampground={!!campgroundId}
+      emptyMessage="Select a campground to edit branding."
+    >
       <Card>
-          <CardHeader>
-            <CardTitle>Branding</CardTitle>
-            <CardDescription>Logos, colors, email/receipt touches, and brand notes.</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            {!campgroundId && (
-              <div className="text-sm text-slate-500">Select a campground to edit branding.</div>
-            )}
-            {campgroundQuery.isLoading && <div className="text-sm text-slate-500">Loading…</div>}
-            {campgroundId && !campgroundQuery.isLoading && (
-              <div className="space-y-4">
-                <div className="grid md:grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium text-slate-900">Logo URL</label>
-                    <Input value={form.logoUrl} onChange={(e) => update("logoUrl", e.target.value)} placeholder="https://..." />
-                  </div>
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium text-slate-900">Primary color</label>
-                    <Input value={form.primaryColor} onChange={(e) => update("primaryColor", e.target.value)} placeholder="#0F766E" />
-                  </div>
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium text-slate-900">Accent color</label>
-                    <Input value={form.accentColor} onChange={(e) => update("accentColor", e.target.value)} placeholder="#22C55E" />
-                  </div>
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium text-slate-900">Secondary color</label>
-                    <Input value={form.secondaryColor} onChange={(e) => update("secondaryColor", e.target.value)} placeholder="#0EA5E9" />
-                  </div>
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium text-slate-900">Button color</label>
-                    <Input value={form.buttonColor} onChange={(e) => update("buttonColor", e.target.value)} placeholder="#15803D" />
-                  </div>
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium text-slate-900">Brand font</label>
-                    <Input value={form.brandFont} onChange={(e) => update("brandFont", e.target.value)} placeholder="Inter, sans-serif" />
-                  </div>
-                </div>
+        <CardHeader>
+          <CardTitle>Colors & Logo</CardTitle>
+          <CardDescription>Define your brand colors and logo for guest-facing pages.</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="grid md:grid-cols-2 gap-4">
+            <FormField
+              {...getFieldProps("logoUrl")}
+              label="Logo URL"
+              placeholder="https://..."
+              helperText="Enter the URL to your logo image"
+            />
+            <FormField
+              {...getFieldProps("primaryColor")}
+              label="Primary Color"
+              placeholder="#0F766E"
+              helperText="Hex color code (e.g., #0F766E)"
+            />
+            <FormField
+              {...getFieldProps("accentColor")}
+              label="Accent Color"
+              placeholder="#22C55E"
+              helperText="Hex color code for accents"
+            />
+            <FormField
+              {...getFieldProps("secondaryColor")}
+              label="Secondary Color"
+              placeholder="#0EA5E9"
+              helperText="Hex color code for secondary elements"
+            />
+            <FormField
+              {...getFieldProps("buttonColor")}
+              label="Button Color"
+              placeholder="#15803D"
+              helperText="Hex color code for buttons"
+            />
+            <FormField
+              {...getFieldProps("brandFont")}
+              label="Brand Font"
+              placeholder="Inter, sans-serif"
+              helperText="Font family for your brand"
+            />
+          </div>
+        </CardContent>
+      </Card>
 
-                <div className="space-y-2">
-                  <label className="text-sm font-medium text-slate-900">Email header</label>
-                  <Textarea value={form.emailHeader} onChange={(e) => update("emailHeader", e.target.value)} rows={3} />
-                </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-medium text-slate-900">Receipt footer</label>
-                  <Textarea value={form.receiptFooter} onChange={(e) => update("receiptFooter", e.target.value)} rows={3} />
-                </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-medium text-slate-900">Branding notes</label>
-                  <Textarea value={form.brandingNote} onChange={(e) => update("brandingNote", e.target.value)} rows={3} />
-                </div>
+      <Card>
+        <CardHeader>
+          <CardTitle>Email & Receipts</CardTitle>
+          <CardDescription>Custom content for automated emails and receipts.</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="space-y-2">
+            <Label>Email Header</Label>
+            <Textarea
+              value={form.emailHeader}
+              onChange={(e) => setFieldValue("emailHeader", e.target.value)}
+              rows={3}
+              placeholder="Custom header text for emails..."
+            />
+          </div>
+          <div className="space-y-2">
+            <Label>Receipt Footer</Label>
+            <Textarea
+              value={form.receiptFooter}
+              onChange={(e) => setFieldValue("receiptFooter", e.target.value)}
+              rows={3}
+              placeholder="Footer text for printed receipts..."
+            />
+          </div>
+          <div className="space-y-2">
+            <Label>Branding Notes</Label>
+            <Textarea
+              value={form.brandingNote}
+              onChange={(e) => setFieldValue("brandingNote", e.target.value)}
+              rows={3}
+              placeholder="Internal notes about brand guidelines..."
+            />
+          </div>
+        </CardContent>
+      </Card>
 
-                <div className="flex justify-end">
-                  <Button onClick={() => saveMutation.mutate()} disabled={saveMutation.isPending}>
-                    {saveMutation.isPending ? "Saving..." : "Save branding"}
-                  </Button>
-                </div>
-              </div>
-            )}
-          </CardContent>
-        </Card>
+      <div className="flex justify-end gap-3">
+        <Button
+          variant="outline"
+          onClick={() => resetForm()}
+          disabled={!isDirty || saveMutation.isPending}
+        >
+          Reset
+        </Button>
+        <Button onClick={handleSave} disabled={saveMutation.isPending || !isValid}>
+          {saveMutation.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+          {saveMutation.isPending ? "Saving..." : "Save Changes"}
+        </Button>
       </div>
+    </SettingsPageLayout>
   );
 }

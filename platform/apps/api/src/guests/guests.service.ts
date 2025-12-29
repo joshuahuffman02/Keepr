@@ -279,4 +279,149 @@ export class GuestsService {
 
     return deleted;
   }
+
+  /**
+   * Merge two guests into one. The primary guest is kept, and all related records
+   * from the secondary guest are transferred to the primary guest.
+   */
+  async merge(
+    primaryId: string,
+    secondaryId: string,
+    options?: { actorId?: string; campgroundId?: string }
+  ) {
+    if (primaryId === secondaryId) {
+      throw new Error("Cannot merge a guest with itself");
+    }
+
+    const [primary, secondary] = await Promise.all([
+      this.prisma.guest.findUnique({
+        where: { id: primaryId },
+        include: { loyaltyProfile: true }
+      }),
+      this.prisma.guest.findUnique({
+        where: { id: secondaryId },
+        include: { loyaltyProfile: true }
+      })
+    ]);
+
+    if (!primary) throw new Error("Primary guest not found");
+    if (!secondary) throw new Error("Secondary guest not found");
+
+    const campgroundId = options?.campgroundId ||
+      (primary.tags as string[] | null)?.find((t) => t.startsWith("campground:"))?.replace("campground:", "");
+
+    // Use a transaction to ensure data integrity
+    const result = await this.prisma.$transaction(async (tx) => {
+      // 1. Transfer all reservations from secondary to primary
+      await tx.reservation.updateMany({
+        where: { guestId: secondaryId },
+        data: { guestId: primaryId }
+      });
+
+      // 2. Transfer all messages from secondary to primary
+      await tx.message.updateMany({
+        where: { guestId: secondaryId },
+        data: { guestId: primaryId }
+      });
+
+      // 3. Transfer all equipment from secondary to primary
+      await tx.guestEquipment.updateMany({
+        where: { guestId: secondaryId },
+        data: { guestId: primaryId }
+      });
+
+      // 4. Merge loyalty profiles if both exist
+      if (secondary.loyaltyProfile && primary.loyaltyProfile) {
+        // Add secondary's points to primary
+        await tx.loyaltyProfile.update({
+          where: { id: primary.loyaltyProfile.id },
+          data: {
+            pointsBalance: primary.loyaltyProfile.pointsBalance + secondary.loyaltyProfile.pointsBalance,
+            lifetimePoints: primary.loyaltyProfile.lifetimePoints + secondary.loyaltyProfile.lifetimePoints
+          }
+        });
+        // Delete secondary's loyalty profile
+        await tx.loyaltyProfile.delete({ where: { id: secondary.loyaltyProfile.id } });
+      } else if (secondary.loyaltyProfile && !primary.loyaltyProfile) {
+        // Transfer loyalty profile to primary
+        await tx.loyaltyProfile.update({
+          where: { id: secondary.loyaltyProfile.id },
+          data: { guestId: primaryId }
+        });
+      }
+
+      // 5. Merge tags (combine unique tags from both)
+      const primaryTags = (primary.tags as string[]) || [];
+      const secondaryTags = (secondary.tags as string[]) || [];
+      const mergedTags = [...new Set([...primaryTags, ...secondaryTags])];
+
+      // 6. Update primary guest with merged notes
+      const mergedNotes = [primary.notes, secondary.notes].filter(Boolean).join("\n---\n");
+
+      const updatedPrimary = await tx.guest.update({
+        where: { id: primaryId },
+        data: {
+          tags: mergedTags,
+          notes: mergedNotes || primary.notes,
+          // Use secondary's data if primary is missing it
+          address1: primary.address1 || secondary.address1,
+          address2: primary.address2 || secondary.address2,
+          city: primary.city || secondary.city,
+          state: primary.state || secondary.state,
+          postalCode: primary.postalCode || secondary.postalCode,
+          country: primary.country || secondary.country,
+          preferredContact: primary.preferredContact || secondary.preferredContact,
+          preferredLanguage: primary.preferredLanguage || secondary.preferredLanguage,
+          rigType: primary.rigType || secondary.rigType,
+          rigLength: primary.rigLength ?? secondary.rigLength,
+          vehiclePlate: primary.vehiclePlate || secondary.vehiclePlate,
+          vehicleState: primary.vehicleState || secondary.vehicleState,
+          leadSource: primary.leadSource || secondary.leadSource,
+          // Keep VIP status if either guest had it
+          vip: primary.vip || secondary.vip,
+          // Keep marketing opt-in if either guest had it
+          marketingOptIn: primary.marketingOptIn || secondary.marketingOptIn,
+          // Sum repeat stays
+          repeatStays: (primary.repeatStays || 0) + (secondary.repeatStays || 0)
+        }
+      });
+
+      // 7. Delete the secondary guest
+      await tx.guest.delete({ where: { id: secondaryId } });
+
+      return updatedPrimary;
+    });
+
+    // Audit the merge
+    if (campgroundId) {
+      await this.audit.record({
+        campgroundId,
+        actorId: options?.actorId ?? null,
+        action: "guest.merge",
+        entity: "guest",
+        entityId: primaryId,
+        before: {
+          primaryGuest: {
+            id: primary.id,
+            name: `${primary.primaryFirstName} ${primary.primaryLastName}`,
+            email: primary.email
+          },
+          secondaryGuest: {
+            id: secondary.id,
+            name: `${secondary.primaryFirstName} ${secondary.primaryLastName}`,
+            email: secondary.email
+          }
+        },
+        after: {
+          mergedGuest: {
+            id: result.id,
+            name: `${result.primaryFirstName} ${result.primaryLastName}`,
+            email: result.email
+          }
+        }
+      });
+    }
+
+    return result;
+  }
 }

@@ -14,6 +14,7 @@ import { useToast } from "@/components/ui/use-toast";
 import { apiClient } from "@/lib/api-client";
 import { Loader2, Shield, Trash2, Users } from "lucide-react";
 import { HelpAnchor } from "@/components/help/HelpAnchor";
+import { StaggeredItem } from "@/components/ui/staggered-list";
 
 type Role = "owner" | "manager" | "front_desk" | "maintenance" | "finance" | "marketing" | "readonly";
 
@@ -320,10 +321,11 @@ export default function UsersPage() {
               <div className="text-sm text-muted-foreground">No members yet. Invite your first teammate above.</div>
             ) : (
               <div className="space-y-3">
-                {(membersQuery.data as Member[]).map((member) => {
+                {(membersQuery.data as Member[]).map((member, index) => {
                   const invitePending = !!member.lastInviteSentAt && !member.lastInviteRedeemedAt;
                   return (
-                    <div key={member.id} className="flex flex-col md:flex-row md:items-center justify-between rounded-lg border px-4 py-3 gap-3">
+                    <StaggeredItem key={member.id} delay={index * 0.05} variant="fadeUp">
+                    <div className="flex flex-col md:flex-row md:items-center justify-between rounded-lg border px-4 py-3 gap-3">
                       <div className="space-y-1">
                         <div className="flex items-center gap-2">
                           <span className="font-medium">{member.user.firstName} {member.user.lastName}</span>
@@ -380,6 +382,7 @@ export default function UsersPage() {
                         </Button>
                       </div>
                     </div>
+                    </StaggeredItem>
                   );
                 })}
               </div>

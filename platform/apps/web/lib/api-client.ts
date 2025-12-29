@@ -3205,6 +3205,15 @@ export const apiClient = {
     if (!res.ok) throw new Error("Failed to delete guest");
     return true;
   },
+  async mergeGuests(primaryId: string, secondaryId: string) {
+    const res = await fetch(`${API_BASE}/guests/merge`, {
+      method: "POST",
+      headers: scopedHeaders(),
+      body: JSON.stringify({ primaryId, secondaryId })
+    });
+    const data = await parseResponse<unknown>(res);
+    return GuestSchema.parse(data);
+  },
   async getAvailability(
     campgroundId: string,
     payload: { arrivalDate: string; departureDate: string; rigType?: string; rigLength?: string | number }

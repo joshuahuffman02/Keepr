@@ -9,6 +9,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { apiClient } from "@/lib/api-client";
 import { Plus, Pencil, Trash2, Loader2, Calendar, Moon, CalendarRange, Sun, CreditCard, Repeat } from "lucide-react";
 import { format } from "date-fns";
@@ -197,7 +198,6 @@ export default function SeasonalRatesSettingsPage() {
     };
 
     const handleDelete = async (id: string) => {
-        if (!confirm("Are you sure you want to delete this seasonal rate?")) return;
         try {
             await apiClient.deleteSeasonalRate(id);
             if (campgroundId) loadData(campgroundId);
@@ -391,9 +391,18 @@ export default function SeasonalRatesSettingsPage() {
                                             <Button variant="ghost" size="icon" onClick={() => openEditModal(rate)}>
                                                 <Pencil className="h-4 w-4" />
                                             </Button>
-                                            <Button variant="ghost" size="icon" onClick={() => handleDelete(rate.id)}>
-                                                <Trash2 className="h-4 w-4 text-destructive" />
-                                            </Button>
+                                            <ConfirmDialog
+                                                trigger={
+                                                    <Button variant="ghost" size="icon">
+                                                        <Trash2 className="h-4 w-4 text-destructive" />
+                                                    </Button>
+                                                }
+                                                title="Delete seasonal rate?"
+                                                description="This will permanently remove this seasonal rate. Existing reservations using this rate will not be affected."
+                                                confirmLabel="Delete"
+                                                variant="destructive"
+                                                onConfirm={() => handleDelete(rate.id)}
+                                            />
                                         </div>
                                     </div>
                                 </CardContent>

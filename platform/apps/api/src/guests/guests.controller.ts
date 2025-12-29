@@ -68,4 +68,20 @@ export class GuestsController {
     }
     return this.guests.remove(id, { actorId: user?.id, campgroundId });
   }
+
+  @Post("merge")
+  merge(
+    @Body() body: { primaryId: string; secondaryId: string },
+    @Query("campgroundId") campgroundId: string,
+    @CurrentUser() user?: any
+  ) {
+    // SECURITY: Require campgroundId to prevent cross-tenant guest merging
+    if (!campgroundId) {
+      throw new ForbiddenException("campgroundId is required to merge guests");
+    }
+    return this.guests.merge(body.primaryId, body.secondaryId, {
+      actorId: user?.id,
+      campgroundId
+    });
+  }
 }

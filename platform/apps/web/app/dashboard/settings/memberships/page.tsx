@@ -12,6 +12,7 @@ import { Label } from "../../../../components/ui/label";
 import { Textarea } from "../../../../components/ui/textarea";
 import { useToast } from "../../../../components/ui/use-toast";
 import { Badge } from "../../../../components/ui/badge";
+import { ConfirmDialog } from "../../../../components/ui/confirm-dialog";
 
 export default function MembershipSettingsPage() {
     const { toast } = useToast();
@@ -207,18 +208,23 @@ export default function MembershipSettingsPage() {
                                         </div>
                                     </div>
                                     <div className="flex gap-2 pt-4 border-t border-slate-100 justify-end">
-                                        <Button
-                                            variant="ghost"
-                                            size="icon"
-                                            className="text-red-500 hover:text-red-600 hover:bg-red-50"
-                                            onClick={() => {
-                                                if (confirm("Delete this membership type?")) {
-                                                    deleteMutation.mutate(type.id);
-                                                }
-                                            }}
-                                        >
-                                            <Trash2 className="w-4 h-4" />
-                                        </Button>
+                                        <ConfirmDialog
+                                            trigger={
+                                                <Button
+                                                    variant="ghost"
+                                                    size="icon"
+                                                    className="text-red-500 hover:text-red-600 hover:bg-red-50"
+                                                >
+                                                    <Trash2 className="w-4 h-4" />
+                                                </Button>
+                                            }
+                                            title="Delete membership type?"
+                                            description="This will remove this membership type. Existing members will keep their memberships until they expire."
+                                            confirmLabel="Delete"
+                                            variant="destructive"
+                                            onConfirm={() => deleteMutation.mutate(type.id)}
+                                            isPending={deleteMutation.isPending}
+                                        />
                                     </div>
                                 </div>
                             </CardContent>

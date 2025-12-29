@@ -25,6 +25,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { apiClient } from "@/lib/api-client";
+import { StaggeredList, StaggeredItem } from "@/components/ui/staggered-list";
 
 interface Product {
   id: string;
@@ -149,7 +150,7 @@ export default function ProductsPage() {
       </Alert>
 
       {/* Stats */}
-      <div className="grid grid-cols-4 gap-4">
+      <StaggeredList className="grid grid-cols-4 gap-4" variant="scale" staggerDelay={0.08}>
         <Card>
           <CardContent className="pt-6">
             <div className="flex items-center gap-3">
@@ -202,7 +203,7 @@ export default function ProductsPage() {
             </div>
           </CardContent>
         </Card>
-      </div>
+      </StaggeredList>
 
       {/* Products List */}
       {products.length === 0 ? (
@@ -237,9 +238,9 @@ export default function ProductsPage() {
             </Button>
           </CardHeader>
           <CardContent className="p-0 divide-y">
-            {products.slice(0, 10).map((product) => (
+            {products.slice(0, 10).map((product, index) => (
+              <StaggeredItem key={product.id} delay={0.1 + index * 0.04} variant="slideRight">
               <div
-                key={product.id}
                 className="flex items-center justify-between px-4 py-3 hover:bg-slate-50 transition-colors group"
               >
                 <div className="flex items-center gap-3">
@@ -295,6 +296,7 @@ export default function ProductsPage() {
                   </DropdownMenu>
                 </div>
               </div>
+              </StaggeredItem>
             ))}
             {products.length > 10 && (
               <div className="px-4 py-3 text-center">

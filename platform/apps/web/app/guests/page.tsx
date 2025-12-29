@@ -8,10 +8,13 @@ import { useState, useMemo, useEffect, Fragment } from "react";
 import { Button } from "../../components/ui/button";
 import { Badge } from "../../components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/card";
-import { Trophy, Star, Car, Plus, Trash2, Download, ChevronDown, ChevronUp, Users, Crown, UserPlus } from "lucide-react";
+import { Trophy, Star, Car, Plus, Trash2, Download, ChevronDown, ChevronUp, Users, Crown, UserPlus, Merge } from "lucide-react";
+import { MergeGuestsDialog } from "../../components/guests/MergeGuestsDialog";
+import { Checkbox } from "../../components/ui/checkbox";
 import { cn } from "../../lib/utils";
 import { TableEmpty } from "../../components/ui/table";
 import { useToast } from "../../components/ui/use-toast";
+import { ConfirmDialog } from "../../components/ui/confirm-dialog";
 
 const TIER_COLORS: Record<string, string> = {
   Bronze: "bg-amber-600",
@@ -526,6 +529,8 @@ export default function GuestsPage() {
   const [showAddForm, setShowAddForm] = useState(false);
   const [flash, setFlash] = useState<{ type: "success" | "error" | "info"; message: string } | null>(null);
   const [expandedGuestId, setExpandedGuestId] = useState<string | null>(null);
+  const [selectedGuestIds, setSelectedGuestIds] = useState<Set<string>>(new Set());
+  const [showMergeDialog, setShowMergeDialog] = useState(false);
 
   useEffect(() => {
     if (!flash) return;
@@ -582,6 +587,29 @@ export default function GuestsPage() {
   const totalGuests = guestsQuery.data?.length || 0;
   const vipGuests = guestsQuery.data?.filter((g) => (g as GuestWithExtras).vip).length || 0;
   const optedInGuests = guestsQuery.data?.filter((g) => (g as GuestWithExtras).marketingOptIn).length || 0;
+
+  const toggleGuestSelection = (guestId: string) => {
+    setSelectedGuestIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(guestId)) {
+        next.delete(guestId);
+      } else {
+        next.add(guestId);
+      }
+      return next;
+    });
+  };
+
+  const toggleSelectAll = () => {
+    if (selectedGuestIds.size === filteredAndSortedGuests.length) {
+      setSelectedGuestIds(new Set());
+    } else {
+      setSelectedGuestIds(new Set(filteredAndSortedGuests.map((g) => g.id)));
+    }
+  };
+
+  const selectedGuests = filteredAndSortedGuests.filter((g) => selectedGuestIds.has(g.id));
+  const canMerge = selectedGuestIds.size === 2;
 
   const handleSort = (column: "name" | "email" | "phone" | "vip") => {
     if (sortBy === column) {
@@ -712,6 +740,29 @@ export default function GuestsPage() {
               VIP guests
             </Button>
             <div className="flex-1" />
+            {selectedGuestIds.size > 0 && (
+              <div className="flex items-center gap-2 px-2 py-1 bg-slate-100 rounded-md text-sm">
+                <span className="text-slate-600">{selectedGuestIds.size} selected</span>
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  className="h-7 px-2"
+                  onClick={() => setSelectedGuestIds(new Set())}
+                >
+                  Clear
+                </Button>
+              </div>
+            )}
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setShowMergeDialog(true)}
+              disabled={!canMerge}
+              title={canMerge ? "Merge selected guests" : "Select exactly 2 guests to merge"}
+            >
+              <Merge className="h-4 w-4 mr-1" />
+              Merge
+            </Button>
             <Button variant="outline" size="sm" onClick={handleExportCSV}>
               <Download className="h-4 w-4 mr-1" />
               Export CSV
@@ -897,6 +948,13 @@ export default function GuestsPage() {
           <table className="min-w-full text-sm">
             <thead className="bg-slate-50 text-slate-600">
               <tr>
+                <th className="px-3 py-2 w-10">
+                  <Checkbox
+                    checked={selectedGuestIds.size === filteredAndSortedGuests.length && filteredAndSortedGuests.length > 0}
+                    onCheckedChange={toggleSelectAll}
+                    aria-label="Select all guests"
+                  />
+                </th>
                 <th
                   className="px-3 py-2 text-left font-semibold cursor-pointer select-none"
                   onClick={() => handleSort("name")}
@@ -928,7 +986,14 @@ export default function GuestsPage() {
             <tbody className="divide-y">
               {filteredAndSortedGuests.map((g) => (
                 <Fragment key={g.id}>
-                <tr className="hover:bg-slate-50">
+                <tr className={cn("hover:bg-slate-50", selectedGuestIds.has(g.id) && "bg-emerald-50")}>
+                  <td className="px-3 py-2">
+                    <Checkbox
+                      checked={selectedGuestIds.has(g.id)}
+                      onCheckedChange={() => toggleGuestSelection(g.id)}
+                      aria-label={`Select ${g.primaryFirstName} ${g.primaryLastName}`}
+                    />
+                  </td>
                   <td className="px-3 py-2 text-slate-800">
                     <div className="font-medium">{g.primaryLastName}, {g.primaryFirstName}</div>
                     {(g as GuestWithExtras).city && (g as GuestWithExtras).state && (
@@ -969,26 +1034,31 @@ export default function GuestsPage() {
                       >
                         {expandedGuestId === g.id ? "Hide" : "Expand"}
                       </Button>
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        className="text-red-600 hover:text-red-700 hover:bg-red-50"
-                        onClick={() => {
-                          if (confirm("Delete this guest?")) {
-                            deleteGuest.mutate(g.id);
-                          }
-                        }}
-                        disabled={deleteGuest.isPending}
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
+                      <ConfirmDialog
+                        trigger={
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                            disabled={deleteGuest.isPending}
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        }
+                        title="Delete guest?"
+                        description="This will permanently remove this guest and their history. This action cannot be undone."
+                        confirmLabel="Delete"
+                        variant="destructive"
+                        onConfirm={() => deleteGuest.mutate(g.id)}
+                        isPending={deleteGuest.isPending}
+                      />
                     </div>
                   </td>
                 </tr>
                 {/* Expanded row for additional details */}
                 {expandedGuestId === g.id && (
                   <tr className="bg-slate-50">
-                    <td colSpan={6} className="px-3 py-4">
+                    <td colSpan={7} className="px-3 py-4">
                       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                         <div>
                           <h4 className="text-xs font-semibold text-slate-500 uppercase mb-2">Contact Info</h4>
@@ -1058,7 +1128,7 @@ export default function GuestsPage() {
                 </Fragment>
               ))}
               {filteredAndSortedGuests.length === 0 && (
-                <TableEmpty colSpan={6}>
+                <TableEmpty colSpan={7}>
                   {!campgroundChecked
                     ? "Loading..."
                     : !campgroundId
@@ -1076,6 +1146,15 @@ export default function GuestsPage() {
           </table>
         </div>
       </div>
+
+      {/* Merge Guests Dialog */}
+      <MergeGuestsDialog
+        open={showMergeDialog}
+        onOpenChange={setShowMergeDialog}
+        guests={selectedGuests as any}
+        campgroundId={campgroundId || ""}
+        onSuccess={() => setSelectedGuestIds(new Set())}
+      />
     </DashboardShell>
   );
 }
