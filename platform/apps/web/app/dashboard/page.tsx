@@ -298,7 +298,6 @@ function CelebrationBadge({
 export default function Dashboard() {
   const [search, setSearch] = useState("");
   const prefersReducedMotion = useReducedMotion();
-  const timeOfDay = getTimeOfDayGreeting();
 
   const { data: campgrounds = [] } = useQuery({
     queryKey: ["campgrounds"],
@@ -319,6 +318,21 @@ export default function Dashboard() {
     }
     setHasMounted(true);
   }, []);
+
+  // Get time-of-day greeting only after mount to prevent hydration mismatch
+  // (server time may differ from client time)
+  const timeOfDay = useMemo(() => {
+    if (!hasMounted) {
+      // Return a neutral default during SSR to prevent mismatch
+      return {
+        greeting: "Welcome",
+        icon: <Sun className="h-8 w-8 text-amber-500" />,
+        message: "Here's what's happening at the park",
+        tone: "from-slate-50 to-slate-100 dark:from-slate-900/50 dark:to-slate-800/50 border-slate-200 dark:border-slate-700"
+      };
+    }
+    return getTimeOfDayGreeting();
+  }, [hasMounted]);
 
   // Update selection when campgrounds load (if no valid selection yet)
   useEffect(() => {
