@@ -278,8 +278,8 @@ export const GuestSchema = z.object({
   id: z.string().cuid(),
   primaryFirstName: z.string().min(1),
   primaryLastName: z.string().min(1),
-  email: z.string().email(),
-  phone: z.string().min(3),
+  email: z.string(),
+  phone: z.string().nullish(),
   address1: z.string().nullish(),
   address2: z.string().nullish(),
   city: z.string().nullish(),
@@ -440,8 +440,8 @@ export type CreateSiteDto = z.infer<typeof CreateSiteSchema>;
 export const CreateGuestSchema = z.object({
   primaryFirstName: z.string().min(1),
   primaryLastName: z.string().min(1),
-  email: z.string().email(),
-  phone: z.string().min(3),
+  email: z.string().optional(),
+  phone: z.string().optional(),
   notes: z.string().optional(),
   tags: z.array(z.string()).optional()
 });
