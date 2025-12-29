@@ -37,8 +37,8 @@ type Guest = {
   id: string;
   primaryFirstName: string;
   primaryLastName: string;
-  email: string;
-  phone: string;
+  email?: string | null;
+  phone?: string | null;
 };
 
 type Site = {
@@ -132,7 +132,7 @@ export default function NewSeasonalGuestPage() {
   const [newGuestPhone, setNewGuestPhone] = useState("");
 
   // Fetch guests with backend search - always load some guests by default
-  const { data: guests = [], isLoading: loadingGuests, refetch: refetchGuests } = useQuery<Guest[]>({
+  const { data: guests = [], isLoading: loadingGuests, refetch: refetchGuests } = useQuery({
     queryKey: ["guests-search", campgroundId, guestSearch],
     queryFn: async () => {
       return apiClient.getGuests(campgroundId, {
