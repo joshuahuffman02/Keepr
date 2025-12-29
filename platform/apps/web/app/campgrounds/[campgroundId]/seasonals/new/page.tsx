@@ -150,8 +150,8 @@ export default function NewSeasonalGuestPage() {
         campgroundId,
         primaryFirstName: newGuestFirstName,
         primaryLastName: newGuestLastName,
-        email: newGuestEmail || null,
-        phone: newGuestPhone || null,
+        email: newGuestEmail || "",
+        phone: newGuestPhone || "",
       });
     },
     onSuccess: (newGuest) => {
