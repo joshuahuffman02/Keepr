@@ -116,45 +116,48 @@ Before any V2 work, V1 must be solid.
 
 ---
 
-### 1.2 AI-Enhanced Messaging
+### 1.2 AI-Enhanced Messaging - DONE
 
 **Goal**: Auto-draft replies, sentiment flagging on guest messages
 
-#### 1.2.1 Sentiment Analysis
-- [ ] **Analyze incoming messages** - Flag negative sentiment for priority
-- [ ] **Tag urgency** - Complaints, emergencies, praise
-- [ ] **Dashboard indicators** - Show sentiment trends
+#### 1.2.1 Sentiment Analysis - DONE
+- [x] **Analyze incoming messages** - AiSentimentService with Claude API + fallback
+- [x] **Tag urgency** - Urgency levels (low/normal/high/critical), intent detection
+- [x] **Dashboard indicators** - SentimentBadge, SentimentScore, SentimentSummary components
+- [x] **Webhook integration** - Auto-analyzes Twilio SMS and Postmark email inbound
 
-#### 1.2.2 Auto-Draft Replies
-- [ ] **Generate draft responses** - Staff reviews before sending
-- [ ] **Context-aware** - Include reservation details, guest history
-- [ ] **Tone matching** - Professional, friendly, apologetic as needed
-- [ ] **Template library** - AI-suggested templates for common scenarios
+#### 1.2.2 Auto-Draft Replies - EXISTING
+- [x] **Generate draft responses** - AiReplyAssistService already exists
+- [x] **Context-aware** - AiAutoReplyService with reservation context
+- [x] **Tone matching** - AI-powered via AiProviderService
+- [x] **Template library** - AutopilotConfig manages templates
 
-#### 1.2.3 Smart Compose
-- [ ] **Inline suggestions** - As staff types, offer completions
+#### 1.2.3 Smart Compose - DEFERRED
+- [ ] **Inline suggestions** - As staff types, offer completions (low priority)
 - [ ] **Grammar/tone check** - Flag potentially problematic phrasing
 
 ---
 
-### 1.3 AI Dashboard Insights
+### 1.3 AI Dashboard Insights - DONE
 
 **Goal**: "Revenue down 15% vs last year - here's why"
 
-#### 1.3.1 Anomaly Narratives
-- [ ] **Generate explanations** - When metrics change, AI explains likely causes
-- [ ] **Compare to benchmarks** - "Your occupancy is below similar parks"
-- [ ] **Suggest actions** - "Consider a promotion for these empty dates"
+#### 1.3.1 Anomaly Narratives - EXISTING
+- [x] **Generate explanations** - AiAnomalyDetectionService generates AI explanations with context
+- [x] **Suggest actions** - suggestedAction field with AI-powered recommendations
+- [ ] **Compare to benchmarks** - Would need external data sources (deferred)
 
-#### 1.3.2 Morning Briefing
-- [ ] **Daily AI summary** - What happened yesterday, what to watch today
-- [ ] **Arrivals preview** - Special requests, VIPs, potential issues
-- [ ] **Weather impact** - Rain forecast may affect bookings
+#### 1.3.2 Morning Briefing - DONE
+- [x] **Daily AI summary** - AiMorningBriefingService generates comprehensive briefing
+- [x] **Arrivals preview** - Special requests, VIPs, guest counts
+- [x] **Weather impact** - Integrates weather alerts if available
+- [x] **Cron email delivery** - Daily at 7 AM with beautiful HTML email
 
-#### 1.3.3 Proactive Alerts
-- [ ] **Revenue at risk** - "3 reservations might cancel based on patterns"
-- [ ] **Opportunity alerts** - "High demand period coming, raise prices?"
-- [ ] **Operational heads-up** - "Maintenance ticket overdue, affects check-in"
+#### 1.3.3 Proactive Alerts - DONE
+- [x] **Opportunity alerts** - Detects high demand periods, gap nights, last-minute availability
+- [x] **Maintenance reminders** - High-priority overdue tickets
+- [x] **Revenue potential** - Shows estimated revenue for each opportunity
+- [ ] **Revenue at risk** - AiNoShowPredictionService exists but not yet in briefing
 
 ---
 
@@ -346,6 +349,8 @@ Before any V2 work, V1 must be solid.
 | 2024-12-29 | WebSockets | Fully implemented | High | RealtimeGateway + RealtimeService (global module). Integrated with ReservationsService. Frontend useRealtime hook created. |
 | 2024-12-29 | Seasonal Scheduler | Enhanced | Medium | Added EmailService, payment reminder emails (weekly + urgent), past-due notifications. Scheduler was already partially implemented. |
 | 2024-12-29 | NL Search | Full implementation | High | AiNaturalSearchService with Claude API parsing, fallback regex, site scoring. Frontend component with animated results. |
+| 2024-12-29 | Sentiment Analysis | Full implementation | High | AiSentimentService with Claude API analysis, webhook integration, SentimentBadge components. Urgency/intent detection. |
+| 2024-12-29 | Dashboard Insights | Mostly existing | Medium | AiInsightsService, AiAnomalyDetectionService, AiDashboardService already comprehensive. Added AiMorningBriefingService for daily email. |
 
 ---
 
@@ -354,9 +359,9 @@ Before any V2 work, V1 must be solid.
 | Feature | Approach | AI Provider | Cost Model | Status |
 |---------|----------|-------------|------------|--------|
 | Natural Language Search | Query parsing | Claude API | Per query | DONE |
-| Message Sentiment | Classification | Claude API | Per message | Phase 1.2 |
-| Reply Drafts | Generation | Claude API | Per draft | Phase 1.2 |
-| Dashboard Insights | Analysis | Claude API | Daily batch | Phase 1.3 |
+| Message Sentiment | Classification | Claude API | Per message | DONE |
+| Reply Drafts | Generation | Claude API | Per draft | EXISTING |
+| Dashboard Insights | Analysis | Claude API | Daily batch | DONE |
 | Report Queries | Parsing | Claude API | Per query | Phase 1.4 |
 | Demand Forecasting | Time series | Custom ML | Training cost | Phase 2.2 |
 | Dynamic Pricing | Optimization | Custom ML | Training cost | Phase 2.3 |
@@ -368,6 +373,8 @@ Before any V2 work, V1 must be solid.
 | Date | Phase | Task | Summary |
 |------|-------|------|---------|
 | 2024-12-29 | 1.1 | Natural Language Search | Complete AI-powered search with Claude API parsing, fallback regex, site scoring algorithm, frontend component |
+| 2024-12-29 | 1.2 | AI-Enhanced Messaging | Sentiment analysis with urgency/intent detection, webhook integration, SentimentBadge components. Auto-reply already existed. |
+| 2024-12-29 | 1.3 | AI Dashboard Insights | Morning briefing service with cron email, opportunity detection, arrivals preview. Anomaly narratives already existed. |
 
 ---
 

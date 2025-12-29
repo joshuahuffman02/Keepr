@@ -9375,6 +9375,10 @@ model AiAutopilotConfig {
   phoneAgentHoursEnd          String?               // "21:00"
   phoneAgentVoice             String  @default("alloy") // OpenAI voice
 
+  // ===== MORNING BRIEFING =====
+  morningBriefingEnabled      Boolean @default(false)
+  morningBriefingTime         String  @default("07:00")
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }

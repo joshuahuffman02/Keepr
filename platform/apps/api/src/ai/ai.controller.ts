@@ -8,6 +8,7 @@ import { AiBookingAssistService } from './ai-booking-assist.service';
 import { AiSupportService } from './ai-support.service';
 import { AiPartnerService } from './ai-partner.service';
 import { AiSentimentService } from './ai-sentiment.service';
+import { AiMorningBriefingService } from './ai-morning-briefing.service';
 import type { Request } from 'express';
 
 interface UpdateAiSettingsDto {
@@ -65,6 +66,7 @@ export class AiController {
     private readonly supportService: AiSupportService,
     private readonly partnerService: AiPartnerService,
     private readonly sentimentService: AiSentimentService,
+    private readonly morningBriefingService: AiMorningBriefingService,
   ) { }
 
   // ==================== PUBLIC ENDPOINTS ====================
@@ -408,5 +410,63 @@ export class AiController {
     @Param('communicationId') communicationId: string,
   ) {
     return this.sentimentService.analyzeCommunication(communicationId);
+  }
+
+  // ==================== MORNING BRIEFING ====================
+
+  /**
+   * Get today's morning briefing
+   */
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.owner, UserRole.manager, UserRole.front_desk)
+  @Get('campgrounds/:campgroundId/briefing')
+  async getMorningBriefing(
+    @Param('campgroundId') campgroundId: string,
+    @Req() req: Request,
+  ) {
+    const org = (req as any).organizationId || null;
+
+    const campground = await this.prisma.campground.findUnique({
+      where: { id: campgroundId },
+      select: { organizationId: true },
+    });
+
+    if (!campground) {
+      throw new ForbiddenException('Campground not found');
+    }
+
+    if (org && campground.organizationId !== org) {
+      throw new ForbiddenException('Access denied');
+    }
+
+    return this.morningBriefingService.getBriefingForApi(campgroundId);
+  }
+
+  /**
+   * Manually send morning briefing emails
+   */
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.owner, UserRole.manager)
+  @Post('campgrounds/:campgroundId/briefing/send')
+  async sendMorningBriefing(
+    @Param('campgroundId') campgroundId: string,
+    @Req() req: Request,
+  ) {
+    const org = (req as any).organizationId || null;
+
+    const campground = await this.prisma.campground.findUnique({
+      where: { id: campgroundId },
+      select: { organizationId: true },
+    });
+
+    if (!campground) {
+      throw new ForbiddenException('Campground not found');
+    }
+
+    if (org && campground.organizationId !== org) {
+      throw new ForbiddenException('Access denied');
+    }
+
+    return this.morningBriefingService.sendBriefingEmail(campgroundId);
   }
 }
