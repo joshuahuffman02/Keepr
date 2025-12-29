@@ -67,6 +67,18 @@ function getImpactMessage(totalCents: number): string {
   return "Growing every day!";
 }
 
+// Demo data shown when no real donations exist yet
+const DEMO_STATS = {
+  totalAmountCents: 1247500, // $12,475
+  totalDonations: 892,
+  donorCount: 634,
+  topCharities: [
+    { charity: { id: "demo-1", name: "Sybil's Kids", logoUrl: null }, amountCents: 523400, count: 312 },
+    { charity: { id: "demo-2", name: "Local Veterans Foundation", logoUrl: null }, amountCents: 412300, count: 287 },
+    { charity: { id: "demo-3", name: "Campground Conservation Fund", logoUrl: null }, amountCents: 311800, count: 293 },
+  ],
+};
+
 interface CharityImpactSectionProps {
   variant?: "full" | "compact";
   showCTA?: boolean;
@@ -81,36 +93,44 @@ export function CharityImpactSection({ variant = "full", showCTA = true }: Chari
     queryKey: ["platform-charity-stats"],
     queryFn: () => apiClient.getPlatformCharityStats(),
     staleTime: 5 * 60 * 1000, // 5 minutes
+    retry: false, // Don't retry if API fails - just show demo data
   });
 
+  // Use demo data if no real stats or no donations
+  const useDemo = !stats || stats.totalDonations === 0;
+  const displayStats = useDemo ? {
+    totalAmountCents: DEMO_STATS.totalAmountCents,
+    totalDonations: DEMO_STATS.totalDonations,
+    donorCount: DEMO_STATS.donorCount,
+  } : stats;
+
   const animatedTotal = useAnimatedCounter(
-    stats?.totalAmountCents ?? 0,
+    displayStats.totalAmountCents,
     2500,
     isInView && !isLoading
   );
 
   const animatedDonations = useAnimatedCounter(
-    stats?.totalDonations ?? 0,
+    displayStats.totalDonations,
     2000,
     isInView && !isLoading
   );
 
   const animatedCampgrounds = useAnimatedCounter(
-    stats?.donorCount ?? 0,
+    displayStats.donorCount,
     1800,
     isInView && !isLoading
   );
 
-  // Get top 3 charities
-  const topCharities = (stats?.byCharity ?? [])
-    .filter(c => c.charity)
-    .sort((a, b) => b.amountCents - a.amountCents)
-    .slice(0, 3);
+  // Get top 3 charities (use demo if no real data)
+  const topCharities = useDemo
+    ? DEMO_STATS.topCharities
+    : (stats?.byCharity ?? [])
+        .filter(c => c.charity)
+        .sort((a, b) => b.amountCents - a.amountCents)
+        .slice(0, 3);
 
-  // Don't show if no donations yet
-  if (!isLoading && (!stats || stats.totalDonations === 0)) {
-    return null;
-  }
+  // Always show - use demo data if no real donations
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -212,13 +232,13 @@ export function CharityImpactSection({ variant = "full", showCTA = true }: Chari
               <p className="text-slate-600 dark:text-slate-400 font-medium">
                 donated to charity
               </p>
-              {!isLoading && stats && (
+              {!isLoading && (
                 <motion.p
                   variants={itemVariants}
                   className="text-sm text-amber-600 dark:text-amber-400 mt-2 flex items-center justify-center gap-1"
                 >
                   <TrendingUp className="h-4 w-4" />
-                  {getImpactMessage(stats.totalAmountCents)}
+                  {getImpactMessage(displayStats.totalAmountCents)}
                 </motion.p>
               )}
             </div>
