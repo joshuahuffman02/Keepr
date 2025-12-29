@@ -60,7 +60,7 @@ export class AuthService {
 
         try {
             // Check if account is locked before attempting login
-            const isLocked = this.accountLockout.isLocked(normalizedEmail);
+            const isLocked = await this.accountLockout.isLocked(normalizedEmail);
             if (isLocked) {
                 await this.securityEvents.logEvent({
                     type: SecurityEventType.LOGIN_BLOCKED,
@@ -69,7 +69,7 @@ export class AuthService {
                     userAgent,
                     details: { email: normalizedEmail, reason: "account_locked" },
                 });
-                this.accountLockout.checkAndThrowIfLocked(normalizedEmail);
+                await this.accountLockout.checkAndThrowIfLocked(normalizedEmail);
             }
 
             this.logger.log(`Attempting login for ${normalizedEmail}`);
@@ -137,7 +137,7 @@ export class AuthService {
                 } else {
                     this.logger.log(`User not found: ${normalizedEmail}`);
                     // Record failed attempt even for non-existent users (prevents enumeration)
-                    this.accountLockout.handleFailedLogin(normalizedEmail);
+                    await this.accountLockout.handleFailedLogin(normalizedEmail);
                     await this.securityEvents.logLoginAttempt(false, normalizedEmail, ipAddress, userAgent, undefined, "user_not_found");
                     throw new UnauthorizedException('Invalid credentials');
                 }
@@ -145,7 +145,7 @@ export class AuthService {
 
             if (!user.isActive) {
                 this.logger.log(`User not active: ${normalizedEmail}`);
-                this.accountLockout.handleFailedLogin(normalizedEmail);
+                await this.accountLockout.handleFailedLogin(normalizedEmail);
                 await this.securityEvents.logLoginAttempt(false, normalizedEmail, ipAddress, userAgent, user.id, "user_inactive");
                 throw new UnauthorizedException('Invalid credentials');
             }
@@ -155,7 +155,7 @@ export class AuthService {
             if (!passwordValid) {
                 this.logger.log(`Invalid password for ${normalizedEmail}`);
                 // Record failed attempt and check if now locked
-                const lockStatus = this.accountLockout.handleFailedLogin(normalizedEmail);
+                const lockStatus = await this.accountLockout.handleFailedLogin(normalizedEmail);
                 await this.securityEvents.logLoginAttempt(false, normalizedEmail, ipAddress, userAgent, user.id, "invalid_password");
 
                 // Check if account just got locked
@@ -166,7 +166,7 @@ export class AuthService {
             }
 
             // Successful login - clear any lockout tracking
-            this.accountLockout.recordSuccessfulLogin(normalizedEmail);
+            await this.accountLockout.recordSuccessfulLogin(normalizedEmail);
             await this.securityEvents.logLoginAttempt(true, normalizedEmail, ipAddress, userAgent, user.id);
 
             this.logger.log(`Password valid, generating token`);

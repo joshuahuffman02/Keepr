@@ -1,4 +1,5 @@
 import { Injectable, UnauthorizedException, Logger } from "@nestjs/common";
+import { RedisService } from "../redis/redis.service";
 
 /**
  * Account Lockout Service
@@ -11,7 +12,7 @@ import { Injectable, UnauthorizedException, Logger } from "@nestjs/common";
  * - Lock duration: 15 minutes
  * - Reset on successful login
  *
- * TODO: Migrate to Redis for distributed locking
+ * Storage: Redis (distributed) with in-memory fallback
  */
 interface LockoutRecord {
     attempts: number;
@@ -23,9 +24,10 @@ interface LockoutRecord {
 @Injectable()
 export class AccountLockoutService {
     private readonly logger = new Logger(AccountLockoutService.name);
+    private readonly keyPrefix = "lockout:";
 
-    // In-memory store - should migrate to Redis for production
-    private readonly attempts = new Map<string, LockoutRecord>();
+    // In-memory fallback when Redis unavailable
+    private readonly memoryFallback = new Map<string, LockoutRecord>();
 
     // Configuration
     private readonly maxAttempts = parseInt(process.env.LOCKOUT_MAX_ATTEMPTS || "5", 10);
@@ -33,13 +35,60 @@ export class AccountLockoutService {
     private readonly attemptWindowMs = parseInt(process.env.LOCKOUT_WINDOW_MS || String(60 * 60 * 1000), 10); // 1 hour
     private readonly maxMapSize = parseInt(process.env.LOCKOUT_MAX_ENTRIES || "10000", 10);
 
-    // Cleanup interval (every 5 minutes)
+    // Cleanup interval (every 5 minutes) - only for memory fallback
     private cleanupInterval: NodeJS.Timeout | null = null;
 
-    constructor() {
-        // Start cleanup interval to prevent memory leaks
-        this.cleanupInterval = setInterval(() => this.cleanup(), 5 * 60 * 1000);
-        this.logger.log(`Account lockout enabled: ${this.maxAttempts} attempts, ${this.lockDurationMs / 1000}s lock`);
+    constructor(private readonly redis: RedisService) {
+        // Start cleanup interval for memory fallback
+        this.cleanupInterval = setInterval(() => this.cleanupMemory(), 5 * 60 * 1000);
+        const mode = this.redis.isEnabled ? "Redis" : "in-memory fallback";
+        this.logger.log(`Account lockout enabled (${mode}): ${this.maxAttempts} attempts, ${this.lockDurationMs / 1000}s lock`);
+    }
+
+    private redisKey(identifier: string): string {
+        return `${this.keyPrefix}${identifier.toLowerCase()}`;
+    }
+
+    private async getRecord(identifier: string): Promise<LockoutRecord | null> {
+        const client = this.redis.getClient();
+        if (client) {
+            const data = await client.get(this.redisKey(identifier));
+            if (data) {
+                try {
+                    return JSON.parse(data) as LockoutRecord;
+                } catch {
+                    return null;
+                }
+            }
+            return null;
+        }
+        // Fallback to memory
+        return this.memoryFallback.get(identifier.toLowerCase()) || null;
+    }
+
+    private async setRecord(identifier: string, record: LockoutRecord): Promise<void> {
+        const client = this.redis.getClient();
+        const ttlSeconds = Math.ceil(Math.max(this.attemptWindowMs, this.lockDurationMs) / 1000) + 60;
+
+        if (client) {
+            await client.setex(
+                this.redisKey(identifier),
+                ttlSeconds,
+                JSON.stringify(record)
+            );
+        } else {
+            // Fallback to memory
+            this.memoryFallback.set(identifier.toLowerCase(), record);
+        }
+    }
+
+    private async deleteRecord(identifier: string): Promise<void> {
+        const client = this.redis.getClient();
+        if (client) {
+            await client.del(this.redisKey(identifier));
+        } else {
+            this.memoryFallback.delete(identifier.toLowerCase());
+        }
     }
 
     /**
@@ -47,8 +96,8 @@ export class AccountLockoutService {
      * @param identifier Email address or IP address
      * @returns Whether the account is locked
      */
-    isLocked(identifier: string): boolean {
-        const record = this.attempts.get(identifier.toLowerCase());
+    async isLocked(identifier: string): Promise<boolean> {
+        const record = await this.getRecord(identifier);
 
         if (!record || !record.lockedUntil) {
             return false;
@@ -59,7 +108,7 @@ export class AccountLockoutService {
         // Check if lock has expired
         if (record.lockedUntil <= now) {
             // Lock expired, remove it
-            this.attempts.delete(identifier.toLowerCase());
+            await this.deleteRecord(identifier);
             return false;
         }
 
@@ -69,8 +118,8 @@ export class AccountLockoutService {
     /**
      * Get remaining lockout time in seconds
      */
-    getRemainingLockoutTime(identifier: string): number {
-        const record = this.attempts.get(identifier.toLowerCase());
+    async getRemainingLockoutTime(identifier: string): Promise<number> {
+        const record = await this.getRecord(identifier);
 
         if (!record || !record.lockedUntil) {
             return 0;
@@ -85,11 +134,10 @@ export class AccountLockoutService {
      * @param identifier Email address or IP address
      * @returns Whether the account is now locked
      */
-    recordFailedAttempt(identifier: string): { locked: boolean; attemptsRemaining: number; lockDuration?: number } {
-        const key = identifier.toLowerCase();
+    async recordFailedAttempt(identifier: string): Promise<{ locked: boolean; attemptsRemaining: number; lockDuration?: number }> {
         const now = Date.now();
 
-        let record = this.attempts.get(key);
+        let record = await this.getRecord(identifier);
 
         // Check if we need to start fresh
         if (!record || (now - record.firstAttempt > this.attemptWindowMs)) {
@@ -106,7 +154,7 @@ export class AccountLockoutService {
             return {
                 locked: true,
                 attemptsRemaining: 0,
-                lockDuration: this.getRemainingLockoutTime(key),
+                lockDuration: await this.getRemainingLockoutTime(identifier),
             };
         }
 
@@ -117,7 +165,7 @@ export class AccountLockoutService {
         // Check if we should lock
         if (record.attempts >= this.maxAttempts) {
             record.lockedUntil = now + this.lockDurationMs;
-            this.attempts.set(key, record);
+            await this.setRecord(identifier, record);
 
             this.logger.log(`Account locked: ${this.maskIdentifier(identifier)} for ${this.lockDurationMs / 1000}s after ${record.attempts} failed attempts`);
 
@@ -128,7 +176,7 @@ export class AccountLockoutService {
             };
         }
 
-        this.attempts.set(key, record);
+        await this.setRecord(identifier, record);
 
         return {
             locked: false,
@@ -140,8 +188,8 @@ export class AccountLockoutService {
      * Record a successful login - resets the lockout counter
      * @param identifier Email address or IP address
      */
-    recordSuccessfulLogin(identifier: string): void {
-        this.attempts.delete(identifier.toLowerCase());
+    async recordSuccessfulLogin(identifier: string): Promise<void> {
+        await this.deleteRecord(identifier);
     }
 
     /**
@@ -149,9 +197,9 @@ export class AccountLockoutService {
      * @param identifier Email address or IP address
      * @throws UnauthorizedException if account is locked
      */
-    checkAndThrowIfLocked(identifier: string): void {
-        if (this.isLocked(identifier)) {
-            const remaining = this.getRemainingLockoutTime(identifier);
+    async checkAndThrowIfLocked(identifier: string): Promise<void> {
+        if (await this.isLocked(identifier)) {
+            const remaining = await this.getRemainingLockoutTime(identifier);
             throw new UnauthorizedException(
                 `Account temporarily locked due to too many failed attempts. Try again in ${remaining} seconds.`
             );
@@ -163,9 +211,9 @@ export class AccountLockoutService {
      * @param identifier Email address or IP address
      * @returns Lock status with attempt count
      */
-    handleFailedLogin(identifier: string): { locked: boolean; attempts: number; lockDuration?: number } {
-        const result = this.recordFailedAttempt(identifier);
-        const record = this.attempts.get(identifier.toLowerCase());
+    async handleFailedLogin(identifier: string): Promise<{ locked: boolean; attempts: number; lockDuration?: number }> {
+        const result = await this.recordFailedAttempt(identifier);
+        const record = await this.getRecord(identifier);
 
         return {
             locked: result.locked,
@@ -179,8 +227,8 @@ export class AccountLockoutService {
      * @param identifier Email address or IP address
      * @throws UnauthorizedException with remaining attempts info
      */
-    handleFailedLoginAndThrow(identifier: string): void {
-        const result = this.recordFailedAttempt(identifier);
+    async handleFailedLoginAndThrow(identifier: string): Promise<void> {
+        const result = await this.recordFailedAttempt(identifier);
 
         if (result.locked) {
             throw new UnauthorizedException(
@@ -192,13 +240,13 @@ export class AccountLockoutService {
     /**
      * Get attempt statistics for an identifier
      */
-    getAttemptInfo(identifier: string): {
+    async getAttemptInfo(identifier: string): Promise<{
         attempts: number;
         remaining: number;
         locked: boolean;
         lockExpiresIn?: number;
-    } {
-        const record = this.attempts.get(identifier.toLowerCase());
+    }> {
+        const record = await this.getRecord(identifier);
 
         if (!record) {
             return {
@@ -222,12 +270,11 @@ export class AccountLockoutService {
     /**
      * Manually unlock an account (admin function)
      */
-    unlockAccount(identifier: string): boolean {
-        const key = identifier.toLowerCase();
-        const record = this.attempts.get(key);
+    async unlockAccount(identifier: string): Promise<boolean> {
+        const record = await this.getRecord(identifier);
 
         if (record) {
-            this.attempts.delete(key);
+            await this.deleteRecord(identifier);
             this.logger.log(`Account manually unlocked: ${this.maskIdentifier(identifier)}`);
             return true;
         }
@@ -253,13 +300,17 @@ export class AccountLockoutService {
     }
 
     /**
-     * Cleanup expired records to prevent memory leaks
+     * Cleanup expired records in memory fallback to prevent memory leaks
+     * Note: Redis handles TTL automatically, so this only cleans the memory fallback
      */
-    private cleanup(): void {
+    private cleanupMemory(): void {
+        // Only needed when using memory fallback
+        if (this.redis.isEnabled) return;
+
         const now = Date.now();
         let cleaned = 0;
 
-        for (const [key, record] of this.attempts.entries()) {
+        for (const [key, record] of this.memoryFallback.entries()) {
             // Remove if:
             // 1. Lock has expired and attempts window has passed
             // 2. No lock and attempts window has passed
@@ -267,43 +318,45 @@ export class AccountLockoutService {
             const lockExpired = !record.lockedUntil || record.lockedUntil <= now;
 
             if (windowExpired && lockExpired) {
-                this.attempts.delete(key);
+                this.memoryFallback.delete(key);
                 cleaned++;
             }
         }
 
         // Hard limit: if still over max size, remove oldest entries
-        if (this.attempts.size > this.maxMapSize) {
-            const entriesToRemove = this.attempts.size - this.maxMapSize;
-            const keys = Array.from(this.attempts.keys()).slice(0, entriesToRemove);
+        if (this.memoryFallback.size > this.maxMapSize) {
+            const entriesToRemove = this.memoryFallback.size - this.maxMapSize;
+            const keys = Array.from(this.memoryFallback.keys()).slice(0, entriesToRemove);
             for (const key of keys) {
-                this.attempts.delete(key);
+                this.memoryFallback.delete(key);
                 cleaned++;
             }
-            this.logger.warn(`Map size exceeded ${this.maxMapSize}, removed ${entriesToRemove} oldest entries`);
+            this.logger.warn(`Memory fallback size exceeded ${this.maxMapSize}, removed ${entriesToRemove} oldest entries`);
         }
 
         if (cleaned > 0) {
-            this.logger.log(`Cleaned up ${cleaned} expired lockout records`);
+            this.logger.log(`Cleaned up ${cleaned} expired lockout records from memory fallback`);
         }
     }
 
     /**
      * Get current stats for monitoring
+     * Note: When using Redis, this only shows memory fallback stats
      */
-    getStats(): { trackedAccounts: number; lockedAccounts: number } {
+    getStats(): { trackedAccounts: number; lockedAccounts: number; storageMode: string } {
         const now = Date.now();
         let lockedCount = 0;
 
-        for (const record of this.attempts.values()) {
+        for (const record of this.memoryFallback.values()) {
             if (record.lockedUntil && record.lockedUntil > now) {
                 lockedCount++;
             }
         }
 
         return {
-            trackedAccounts: this.attempts.size,
+            trackedAccounts: this.memoryFallback.size,
             lockedAccounts: lockedCount,
+            storageMode: this.redis.isEnabled ? "redis" : "memory",
         };
     }
 

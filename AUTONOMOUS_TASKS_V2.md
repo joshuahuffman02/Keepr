@@ -57,12 +57,12 @@ Before any V2 work, V1 must be solid.
 - [x] **Multi-currency FX** - DONE: OpenExchangeRates integration with hourly cron, graceful degradation to manual rates
 
 ### 0.3 Infrastructure Upgrades
-- [ ] **Redis Migration**
-  - [ ] Session storage (replace in-memory)
-  - [ ] Rate limiting state
-  - [ ] Distributed locks (replace LockService Map)
-  - [ ] Account lockout state
-  - [ ] Job queues (BullMQ)
+- [x] **Redis Migration** - DONE: All critical services now use Redis with graceful fallback
+  - [x] Session storage - Already uses RedisService
+  - [x] Rate limiting state - RedisRateLimitService already complete
+  - [x] Distributed locks - LockService already uses Redis
+  - [x] Account lockout state - MIGRATED to Redis with memory fallback
+  - [ ] Job queues (BullMQ) - Not critical, deferred
 - [ ] **WebSockets (Socket.io)**
   - [ ] Real-time calendar updates (eliminate polling)
   - [ ] Dashboard live metrics
@@ -338,6 +338,7 @@ Before any V2 work, V1 must be solid.
 | 2024-12-29 | Wallet/Gift Card UI | Already complete | None | Backend: GuestWalletController + Service. Frontend: apiClient methods, PaymentContext, GuestWalletMethod.tsx |
 | 2024-12-29 | OTA Integrations | API-ready, providers stubbed | None | Full channel/mapping/webhook/iCal/monitoring implementation. Only provider HTTP calls await credentials. |
 | 2024-12-29 | Multi-currency FX | Implemented | Medium | OpenExchangeRates integration. Hourly cron refresh. Endpoints: GET /status, POST /refresh. Env: OPEN_EXCHANGE_RATES_API_KEY |
+| 2024-12-29 | Redis Migration | Mostly already done | Low | RedisService, LockService, RedisRateLimitService were complete. Only AccountLockoutService needed migration (now done). |
 
 ---
 
