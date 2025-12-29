@@ -30,6 +30,7 @@ import { assertSiteLockValid } from "./reservation-guards";
 import { evaluatePricingV2 } from "./reservation-pricing";
 import { assertReservationDepositV2, calculateReservationDepositV2 } from "./reservation-deposit";
 import { StripeService } from "../payments/stripe.service";
+import { RealtimeService, ReservationEventData } from "../realtime";
 
 @Injectable()
 export class ReservationsService {
@@ -55,7 +56,8 @@ export class ReservationsService {
     private readonly repeatChargesService: RepeatChargesService,
     private readonly policiesService: PoliciesService,
     private readonly guestWalletService: GuestWalletService,
-    private readonly stripeService: StripeService
+    private readonly stripeService: StripeService,
+    private readonly realtime: RealtimeService
   ) { }
 
   async getMatchedSites(campgroundId: string, guestId: string) {
@@ -1485,6 +1487,20 @@ export class ReservationsService {
           guestId: reservation.guestId,
         });
 
+        // Emit real-time event for new reservation
+        this.realtime.emitReservationCreated(data.campgroundId, {
+          reservationId: reservation.id,
+          guestId: reservation.guestId,
+          guestName: `${reservation.guest.primaryFirstName} ${reservation.guest.primaryLastName}`,
+          siteId: reservation.siteId ?? undefined,
+          siteName: reservation.site?.siteNumber ?? undefined,
+          arrivalDate: reservation.arrivalDate.toISOString(),
+          departureDate: reservation.departureDate.toISOString(),
+          status: reservation.status,
+          totalCents: reservation.totalAmount,
+          balanceCents: reservation.balanceAmount
+        });
+
         return reservation;
       });
     } catch (err) {
@@ -1872,6 +1888,36 @@ export class ReservationsService {
             sourceId: existing.id,
             eventKey: `reservation:${existing.id}:checkin`
           });
+        }
+
+        // Emit real-time events based on status changes
+        const eventData: ReservationEventData = {
+          reservationId: updatedReservation.id,
+          guestId: updatedReservation.guestId,
+          guestName: `${updatedReservation.guest.primaryFirstName} ${updatedReservation.guest.primaryLastName}`,
+          siteId: updatedReservation.siteId ?? undefined,
+          siteName: updatedReservation.site?.siteNumber ?? undefined,
+          arrivalDate: updatedReservation.arrivalDate.toISOString(),
+          departureDate: updatedReservation.departureDate.toISOString(),
+          status: updatedReservation.status,
+          totalCents: updatedReservation.totalAmount,
+          balanceCents: updatedReservation.balanceAmount
+        };
+
+        const statusChanged = data.status && data.status !== existing.status;
+        if (statusChanged) {
+          if (data.status === ReservationStatus.cancelled) {
+            this.realtime.emitReservationCancelled(existing.campgroundId, eventData);
+          } else if (data.status === ReservationStatus.checked_in) {
+            this.realtime.emitReservationCheckedIn(existing.campgroundId, eventData);
+          } else if (data.status === ReservationStatus.checked_out) {
+            this.realtime.emitReservationCheckedOut(existing.campgroundId, eventData);
+          } else {
+            this.realtime.emitReservationUpdated(existing.campgroundId, eventData);
+          }
+        } else {
+          // General update (dates, site, guest, etc.)
+          this.realtime.emitReservationUpdated(existing.campgroundId, eventData);
         }
 
         return updatedReservation;
@@ -2842,6 +2888,18 @@ export class ReservationsService {
         });
       }
 
+      // Emit real-time event for kiosk check-in
+      this.realtime.emitReservationCheckedIn(reservation.campgroundId, {
+        reservationId: updated.id,
+        guestId: reservation.guestId,
+        guestName: `${reservation.guest.primaryFirstName} ${reservation.guest.primaryLastName}`,
+        siteId: reservation.siteId ?? undefined,
+        siteName: reservation.site?.siteNumber ?? undefined,
+        arrivalDate: reservation.arrivalDate.toISOString(),
+        departureDate: reservation.departureDate.toISOString(),
+        status: updated.status
+      });
+
       return updated;
     } catch (e) {
       this.logger.error(`Kiosk - Update failed for ${id}:`, e instanceof Error ? e.stack : e);
@@ -2937,6 +2995,18 @@ export class ReservationsService {
       });
     }
 
+    // Emit real-time event for staff check-in
+    this.realtime.emitReservationCheckedIn(reservation.campgroundId, {
+      reservationId: updated.id,
+      guestId: updated.guestId,
+      guestName: `${updated.guest.primaryFirstName} ${updated.guest.primaryLastName}`,
+      siteId: updated.siteId ?? undefined,
+      siteName: updated.site?.siteNumber ?? undefined,
+      arrivalDate: updated.arrivalDate.toISOString(),
+      departureDate: updated.departureDate.toISOString(),
+      status: updated.status
+    });
+
     return { reservation: updated, warning };
   }
 
@@ -3000,6 +3070,18 @@ export class ReservationsService {
 
     // Trigger departure playbook
     await this.enqueuePlaybooksForReservation("post_departure", id);
+
+    // Emit real-time event for staff check-out
+    this.realtime.emitReservationCheckedOut(reservation.campgroundId, {
+      reservationId: updated.id,
+      guestId: updated.guestId,
+      guestName: `${updated.guest.primaryFirstName} ${updated.guest.primaryLastName}`,
+      siteId: updated.siteId ?? undefined,
+      siteName: updated.site?.siteNumber ?? undefined,
+      arrivalDate: updated.arrivalDate.toISOString(),
+      departureDate: updated.departureDate.toISOString(),
+      status: updated.status
+    });
 
     return { reservation: updated, warning };
   }

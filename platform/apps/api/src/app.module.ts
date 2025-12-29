@@ -118,6 +118,7 @@ import { LockCodesModule } from "./lock-codes/lock-codes.module";
 import { StayRulesModule } from "./stay-rules/stay-rules.module";
 import { SystemCheckModule } from "./system-check/system-check.module";
 import { StripePaymentsModule } from "./stripe-payments/stripe-payments.module";
+import { RealtimeModule } from "./realtime/realtime.module";
 
 @Module({
   imports: [
@@ -128,6 +129,7 @@ import { StripePaymentsModule } from "./stripe-payments/stripe-payments.module";
     AuthModule,
     GuestAuthModule,
     RedisModule,
+    RealtimeModule, // WebSocket real-time updates (global)
     OrganizationsModule,
     CampgroundsModule,
     SitesModule,

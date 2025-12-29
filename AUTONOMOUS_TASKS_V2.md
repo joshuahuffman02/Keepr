@@ -63,11 +63,14 @@ Before any V2 work, V1 must be solid.
   - [x] Distributed locks - LockService already uses Redis
   - [x] Account lockout state - MIGRATED to Redis with memory fallback
   - [ ] Job queues (BullMQ) - Not critical, deferred
-- [ ] **WebSockets (Socket.io)**
-  - [ ] Real-time calendar updates (eliminate polling)
-  - [ ] Dashboard live metrics
-  - [ ] Reservation status changes
-  - [ ] Staff notifications
+- [x] **WebSockets (Socket.io)** - DONE: Full implementation with JWT auth
+  - [x] RealtimeGateway with JWT authentication and room-based subscriptions
+  - [x] RealtimeService for emitting events from services
+  - [x] Integrated with ReservationsService (create, update, cancel, check-in/out)
+  - [x] Frontend useRealtime hook with TypeScript types
+  - [x] Real-time reservation status changes
+  - [x] Dashboard live metrics support
+  - [x] Staff notifications support
 - [ ] **Observability Wiring**
   - [ ] PagerDuty/Slack alert sinks
   - [ ] Grafana/Prometheus dashboards
@@ -339,6 +342,7 @@ Before any V2 work, V1 must be solid.
 | 2024-12-29 | OTA Integrations | API-ready, providers stubbed | None | Full channel/mapping/webhook/iCal/monitoring implementation. Only provider HTTP calls await credentials. |
 | 2024-12-29 | Multi-currency FX | Implemented | Medium | OpenExchangeRates integration. Hourly cron refresh. Endpoints: GET /status, POST /refresh. Env: OPEN_EXCHANGE_RATES_API_KEY |
 | 2024-12-29 | Redis Migration | Mostly already done | Low | RedisService, LockService, RedisRateLimitService were complete. Only AccountLockoutService needed migration (now done). |
+| 2024-12-29 | WebSockets | Fully implemented | High | RealtimeGateway + RealtimeService (global module). Integrated with ReservationsService. Frontend useRealtime hook created. |
 
 ---
 
