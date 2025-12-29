@@ -50,9 +50,21 @@ export class ScopeGuard implements CanActivate {
         // Get campground ID from header or request property
         const campgroundId = request.campgroundId || request.headers['x-campground-id'];
 
-        // If no campground specified, skip validation
-        if (!campgroundId) {
+        // Get campgroundId from route params if not in header (for routes like /campgrounds/:campgroundId/*)
+        const routeCampgroundId = request.params?.campgroundId;
+        const effectiveCampgroundId = campgroundId || routeCampgroundId;
+
+        // If no campground specified, skip validation for routes that don't require it
+        // Note: Critical routes should use @Roles() which requires a specific campground membership
+        if (!effectiveCampgroundId) {
             return true;
+        }
+
+        // If header and route param both exist and don't match, reject
+        if (campgroundId && routeCampgroundId && campgroundId !== routeCampgroundId) {
+            throw new ForbiddenException(
+                'Campground ID mismatch between header and route parameter'
+            );
         }
 
         // Platform admins can access any campground
@@ -68,12 +80,12 @@ export class ScopeGuard implements CanActivate {
         }
 
         const hasMembership = user.memberships.some(
-            (m: any) => m.campgroundId === campgroundId
+            (m: any) => m.campgroundId === effectiveCampgroundId
         );
 
         if (!hasMembership) {
             throw new ForbiddenException(
-                `You do not have access to campground ${campgroundId}`
+                `You do not have access to campground ${effectiveCampgroundId}`
             );
         }
 

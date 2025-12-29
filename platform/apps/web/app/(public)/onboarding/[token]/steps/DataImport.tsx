@@ -146,15 +146,44 @@ export function DataImport({
       event.preventDefault();
       const file = event.dataTransfer.files[0];
       if (file && file.name.endsWith(".csv")) {
-        const input = document.createElement("input");
-        input.type = "file";
-        const dataTransfer = new DataTransfer();
-        dataTransfer.items.add(file);
-        input.files = dataTransfer.files;
-        handleFileUpload({ target: input } as any);
+        setFileName(file.name);
+        setError(null);
+
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          const content = e.target?.result as string;
+          setCsvContent(content);
+          const headers = parseCSVHeaders(content);
+          setSourceFields(headers);
+
+          // Auto-suggest mappings based on field name similarity
+          const autoMappings: FieldMapping[] = [];
+          headers.forEach((header) => {
+            const normalizedHeader = header.toLowerCase().replace(/[_\s-]/g, "");
+            const match = SITE_TARGET_FIELDS.find((field) => {
+              const normalizedTarget = field.value.toLowerCase();
+              const normalizedLabel = field.label.toLowerCase().replace(/[_\s-]/g, "");
+              return (
+                normalizedHeader.includes(normalizedTarget) ||
+                normalizedTarget.includes(normalizedHeader) ||
+                normalizedHeader.includes(normalizedLabel) ||
+                normalizedLabel.includes(normalizedHeader)
+              );
+            });
+            if (match) {
+              autoMappings.push({
+                sourceField: header,
+                targetField: match.value,
+              });
+            }
+          });
+          setMappings(autoMappings);
+          setStep("mapping");
+        };
+        reader.readAsText(file);
       }
     },
-    [handleFileUpload]
+    []
   );
 
   // Update mapping

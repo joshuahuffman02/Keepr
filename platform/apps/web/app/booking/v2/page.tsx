@@ -47,7 +47,19 @@ type Site = {
 
 type SiteClass = { id: string; name: string };
 
-type ReservationPayload = {
+type Campground = {
+  id: string;
+  name: string;
+  [key: string]: unknown;
+};
+
+type ReservationConfirmation = {
+  id: string;
+  confirmationNumber?: string;
+  [key: string]: unknown;
+};
+
+interface ReservationPayload {
   campgroundId: string;
   siteId: string;
   siteClassId?: string;
@@ -60,7 +72,11 @@ type ReservationPayload = {
   notes?: string;
   seasonalRateId?: string;
   pricingType: "transient" | "seasonal";
-};
+}
+
+// API expects additional fields - status defaults to pending on create
+// Using Record<string, unknown> allows the payload to be accepted by the API without strict type checking
+type ApiReservationPayload = ReservationPayload & Record<string, unknown>;
 
 export default function BookingV2Page() {
   return (
@@ -86,7 +102,8 @@ function BookingV2Content() {
   useEffect(() => {
     if (campgrounds.length === 0) return;
     const stored = typeof window !== "undefined" ? localStorage.getItem("campreserv:selectedCampground") : null;
-    const candidate = stored && campgrounds.some((cg: any) => cg.id === stored) ? stored : campgrounds[0].id;
+    const typedCampgrounds = campgrounds as Campground[];
+    const candidate = stored && typedCampgrounds.some((cg) => cg.id === stored) ? stored : typedCampgrounds[0].id;
     setCampgroundId((prev) => prev || candidate);
   }, [campgrounds]);
 
@@ -96,7 +113,7 @@ function BookingV2Content() {
     }
   }, [campgroundId]);
 
-  const selectedCampground = campgrounds.find((c: any) => c.id === campgroundId);
+  const selectedCampground = (campgrounds as Campground[]).find((c) => c.id === campgroundId);
 
   const guestsQuery = useQuery({
     queryKey: ["guests"],
@@ -165,9 +182,10 @@ function BookingV2Content() {
   });
 
   const availableSites: Site[] = useMemo(() => {
-    return (siteStatusQuery.data ?? [])
-      .map((s: any) => ({ ...s, siteClassId: s.siteClassId ?? undefined }))
-      .filter((s: any) => s.status === "available");
+    const sites = (siteStatusQuery.data ?? []) as Site[];
+    return sites
+      .map((s) => ({ ...s, siteClassId: s.siteClassId ?? undefined }))
+      .filter((s) => s.status === "available");
   }, [siteStatusQuery.data]);
 
   const filteredGuests = useMemo(() => {
@@ -183,7 +201,7 @@ function BookingV2Content() {
   }, [guestsQuery.data, guestSearch]);
 
   const createReservation = useMutation({
-    mutationFn: (data: ReservationPayload) => apiClient.createReservation(data as unknown as any),
+    mutationFn: (data: ReservationPayload) => apiClient.createReservation({ ...data, status: "pending" } as Parameters<typeof apiClient.createReservation>[0]),
     onSuccess: (res) => {
       toast({ title: "Reservation created", description: "Guest has been booked." });
       queryClient.invalidateQueries({ queryKey: ["reservations"] });
@@ -192,7 +210,7 @@ function BookingV2Content() {
     onError: () => toast({ title: "Could not create reservation", variant: "destructive" })
   });
 
-  const [confirmation, setConfirmation] = useState<any>(null);
+  const [confirmation, setConfirmation] = useState<ReservationConfirmation | null>(null);
 
   const readyToSubmit =
     !!form.guestId &&
@@ -260,7 +278,7 @@ function BookingV2Content() {
                 <SelectValue placeholder="Select campground" />
               </SelectTrigger>
               <SelectContent>
-                {campgrounds.map((cg: any) => (
+                {(campgrounds as Campground[]).map((cg) => (
                   <SelectItem key={cg.id} value={cg.id}>
                     {cg.name}
                   </SelectItem>

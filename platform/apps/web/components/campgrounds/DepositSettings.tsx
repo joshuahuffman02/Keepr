@@ -1,10 +1,10 @@
 "use client";
 
-import { Campground } from "@campreserv/shared";
+import { Campground, DepositConfig } from "@campreserv/shared";
 import { DepositSettingsForm } from "../settings/DepositSettingsForm";
 
 interface DepositSettingsProps {
-    campground: Campground;
+    campground: Campground & { depositConfig?: DepositConfig | null };
 }
 
 export function DepositSettings({ campground }: DepositSettingsProps) {
@@ -19,7 +19,7 @@ export function DepositSettings({ campground }: DepositSettingsProps) {
                 campgroundId={campground.id}
                 initialRule={campground.depositRule || "none"}
                 initialPercentage={campground.depositPercentage || null}
-                initialConfig={(campground as any).depositConfig || null}
+                initialConfig={campground.depositConfig || null}
             />
         </div>
     );

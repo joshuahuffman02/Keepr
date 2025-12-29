@@ -1,5 +1,4 @@
 import { Controller, Post, Body, Get, UseGuards, Request, Headers, Req } from '@nestjs/common';
-import { Throttle } from '@nestjs/throttler';
 import { AuthService } from './auth.service';
 import { RegisterDto, LoginDto } from './dto';
 import { JwtAuthGuard } from './guards';
@@ -10,13 +9,11 @@ export class AuthController {
     constructor(private readonly authService: AuthService) { }
 
     @Post('register')
-    @Throttle({ default: { limit: 3, ttl: 60000 } })
     register(@Body() dto: RegisterDto) {
         return this.authService.register(dto);
     }
 
     @Post('login')
-    @Throttle({ default: { limit: 5, ttl: 60000 } })
     login(
         @Body() dto: LoginDto,
         @Req() req: any,
@@ -35,7 +32,6 @@ export class AuthController {
     }
 
   @Post('invitations/accept')
-  @Throttle({ default: { limit: 5, ttl: 60000 } })
   acceptInvite(@Body() dto: AcceptInviteDto) {
     return this.authService.acceptInvite(dto);
   }

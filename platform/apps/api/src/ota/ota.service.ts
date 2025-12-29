@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable, NotFoundException } from "@nestjs/common";
+import { BadRequestException, Injectable, NotFoundException, Logger } from "@nestjs/common";
 import { PrismaService } from "../prisma/prisma.service";
 import { CreateOtaChannelDto } from "./dto/create-ota-channel.dto";
 import { UpdateOtaChannelDto } from "./dto/update-ota-channel.dto";
@@ -37,6 +37,7 @@ type OtaStats = {
 
 @Injectable()
 export class OtaService {
+  private readonly logger = new Logger(OtaService.name);
   private readonly configStore = new Map<string, OtaConfig>();
   private readonly stats = new Map<string, OtaStats>();
   private readonly freshnessMinutes = Number(process.env.OTA_SYNC_MAX_AGE_MINUTES ?? 15);
@@ -658,7 +659,7 @@ export class OtaService {
       throw new BadRequestException(message);
     }
 
-    console.log(`[OTA Sync] Starting availability push for channel ${channelId} (${channel.provider}) with ${mappings.length} mappings`);
+    this.logger.log(`Starting availability push for channel ${channelId} (${channel.provider}) with ${mappings.length} mappings`);
 
     for (const m of mappings) {
       // Skip disabled mappings
@@ -710,11 +711,11 @@ export class OtaService {
         // }
 
         // For now, log the sync attempt
-        console.log(`[OTA Sync] Would push to ${channel.provider} for listing ${m.externalId}:`, {
+        this.logger.log(`Would push to ${channel.provider} for listing ${m.externalId}: ${JSON.stringify({
           externalId: m.externalId,
           siteId: m.siteId,
           dates: availabilityData.length,
-        });
+        })}`);
 
         // Update mapping sync status
         await (this.prisma as any).otaListingMapping.update({
@@ -728,7 +729,7 @@ export class OtaService {
         const errorMsg = error?.message || "Unknown error during sync";
         errors.push(`Mapping ${m.externalId}: ${errorMsg}`);
 
-        console.error(`[OTA Sync] Error pushing listing ${m.externalId}:`, errorMsg);
+        this.logger.error(`Error pushing listing ${m.externalId}: ${errorMsg}`);
 
         // Update mapping with error
         await (this.prisma as any).otaListingMapping.update({
@@ -784,7 +785,7 @@ export class OtaService {
     updatedConfig.pendingSyncs = errorCount;
     this.configStore.set(channel.campgroundId, updatedConfig);
 
-    console.log(`[OTA Sync] Completed: ${syncMessage}`);
+    this.logger.log(`Completed: ${syncMessage}`);
 
     return { ok: errorCount < mappings.length, total: mappings.length, successCount, errorCount, errors };
   }
@@ -841,7 +842,7 @@ export class OtaService {
       current.setDate(current.getDate() + 1);
     }
 
-    console.log(`[OTA Sync] Prepared ${availability.length} days of availability for site ${siteId} (external: ${externalId})`);
+    this.logger.log(`Prepared ${availability.length} days of availability for site ${siteId} (external: ${externalId})`);
     return availability;
   }
 

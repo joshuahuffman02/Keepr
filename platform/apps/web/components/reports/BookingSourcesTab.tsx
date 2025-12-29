@@ -3,6 +3,12 @@ import { apiClient } from "@/lib/api-client";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "../ui/card";
 import { Loader2, Monitor, User, Store, Phone, Footprints } from "lucide-react";
 
+interface BookingSourcesData {
+    totalBookings: number;
+    bySource: Record<string, { count: number; revenue: number }>;
+    byLeadTime: Record<string, number>;
+}
+
 interface BookingSourcesTabProps {
     campgroundId: string;
     dateRange: { start: string; end: string };
@@ -28,7 +34,8 @@ export function BookingSourcesTab({ campgroundId, dateRange }: BookingSourcesTab
 
     if (!data) return <div>No data available</div>;
 
-    const totalBookings = data.totalBookings || 0;
+    const typedData = data as unknown as BookingSourcesData;
+    const totalBookings = typedData.totalBookings || 0;
 
     // Helper for percentage
     const getPercent = (val: number) => totalBookings > 0 ? (val / totalBookings) * 100 : 0;
@@ -58,7 +65,7 @@ export function BookingSourcesTab({ campgroundId, dateRange }: BookingSourcesTab
             <h3 className="text-lg font-semibold text-slate-900">Booking Channels</h3>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 {sourceConfig.map((source) => {
-                    const stats = data.bySource[source.key] || { count: 0, revenue: 0 };
+                    const stats = typedData.bySource[source.key] || { count: 0, revenue: 0 };
                     return (
                         <Card key={source.key}>
                             <CardContent className="pt-6">
@@ -99,7 +106,7 @@ export function BookingSourcesTab({ campgroundId, dateRange }: BookingSourcesTab
                 <CardContent>
                     <div className="space-y-4">
                         {leadTimeConfig.map((item) => {
-                            const count = data.byLeadTime[item.key] || 0;
+                            const count = typedData.byLeadTime[item.key] || 0;
                             const percent = getPercent(count);
                             return (
                                 <div key={item.key} className="space-y-1">

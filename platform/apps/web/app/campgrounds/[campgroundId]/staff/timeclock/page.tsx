@@ -34,6 +34,14 @@ type Shift = {
   timeEntries?: { id: string; clockInAt: string; clockOutAt?: string | null }[];
 };
 
+interface WhoamiUser {
+  id: string;
+  email: string;
+  name?: string;
+  firstName?: string;
+  lastName?: string;
+}
+
 type BreakType = "paid" | "unpaid" | "meal" | "rest";
 
 type ActiveBreak = {
@@ -88,7 +96,8 @@ export default function TimeclockPage({ params }: { params: { campgroundId: stri
         );
         if (res.ok) {
           const data: Shift[] = await res.json();
-          const mine = data.filter((s) => s.userId === (whoami.user as any)?.id);
+          const currentUser = whoami.user as WhoamiUser | undefined;
+          const mine = data.filter((s) => s.userId === currentUser?.id);
           setShifts(mine);
         }
       } catch (err) {
@@ -272,7 +281,10 @@ export default function TimeclockPage({ params }: { params: { campgroundId: stri
             <div className="mt-4 flex items-center justify-center gap-2 text-slate-300">
               <User className="w-4 h-4" />
               <span className="text-sm">
-                {(whoami as any)?.user?.name || (whoami as any)?.user?.email || "Staff Member"}
+                {(() => {
+                  const user = whoami.user as WhoamiUser | undefined;
+                  return user?.name || user?.email || "Staff Member";
+                })()}
               </span>
             </div>
           )}

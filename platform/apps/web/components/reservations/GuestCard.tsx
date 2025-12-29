@@ -8,7 +8,8 @@ interface GuestCardProps {
 }
 
 export function GuestCard({ guest }: GuestCardProps) {
-    const createdYear = (guest as any).createdAt ? new Date((guest as any).createdAt).getFullYear() : "—";
+    const guestWithTimestamp = guest as Guest & { createdAt?: string };
+    const createdYear = guestWithTimestamp.createdAt ? new Date(guestWithTimestamp.createdAt).getFullYear() : "—";
     return (
         <Card>
             <CardHeader className="flex flex-row items-center justify-between">

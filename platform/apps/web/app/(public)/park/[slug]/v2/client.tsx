@@ -9,7 +9,7 @@ import { apiClient } from "@/lib/api-client";
 import {
   ArrowRight, Calendar, MapPin, Search, Sparkles, Users, AlertCircle,
   Shield, Gift, ChevronLeft, ChevronRight, Mail, Check, Flame, Coffee,
-  Tent, ShieldCheck, CloudRain, DollarSign, Umbrella, BadgeCheck, Clock
+  Tent, ShieldCheck, CloudRain, DollarSign, Umbrella, BadgeCheck, Clock, Star
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -117,10 +117,29 @@ export function CampgroundV2Client({ slug, initialData, previewToken }: { slug: 
   // Gallery state for keyboard navigation
   const [galleryIndex, setGalleryIndex] = useState(0);
 
+  type Review = {
+    id: string;
+    rating: number;
+    comment: string;
+    reviewerName?: string;
+    stayDate?: string;
+  };
+
+  type FAQ = {
+    question: string;
+    answer: string;
+  };
+
+  type CampgroundWithExtras = typeof campground & {
+    reviews?: Review[];
+    faqs?: FAQ[];
+  };
+
+  const campgroundExtended = campground as CampgroundWithExtras;
   const events = campground?.events ?? [];
   const promotions = campground?.promotions ?? [];
-  const reviews = (campground as { reviews?: unknown[] })?.reviews ?? [];
-  const faq = (campground as { faqs?: unknown[] })?.faqs ?? [];
+  const reviews = (campgroundExtended?.reviews ?? []) as Review[];
+  const faq = campgroundExtended?.faqs ?? [];
   const siteClasses = campground?.siteClasses ?? [];
   const photos = campground?.photos ?? [];
   const hero = campground?.heroImageUrl || photos[0];
@@ -131,7 +150,22 @@ export function CampgroundV2Client({ slug, initialData, previewToken }: { slug: 
     }
   }, [campground?.id, slug]);
 
-  const filteredSiteClasses = siteClasses.filter((sc: any) => {
+  type SiteClassWithType = {
+    id: string;
+    name: string;
+    siteType?: string | null;
+    description?: string | null;
+    defaultRate?: number | null;
+    maxOccupancy?: number | null;
+    hookupsPower?: boolean | null;
+    hookupsWater?: boolean | null;
+    hookupsSewer?: boolean | null;
+    petFriendly?: boolean | null;
+    photoUrl?: string | null;
+  };
+
+  const typedSiteClasses = siteClasses as SiteClassWithType[];
+  const filteredSiteClasses = typedSiteClasses.filter((sc) => {
     if (typeFilter === "all") return true;
     return (sc.siteType || "").toLowerCase() === typeFilter;
   });
@@ -180,8 +214,8 @@ export function CampgroundV2Client({ slug, initialData, previewToken }: { slug: 
                 {campground?.city}, {campground?.state}
               </Badge>
               {campground?.reviewScore ? (
-                <Badge variant="secondary" className="bg-white/15 border-white/20 text-white">
-                  ⭐ {Number(campground.reviewScore).toFixed(1)} ({campground.reviewCount ?? 0})
+                <Badge variant="secondary" className="bg-white/15 border-white/20 text-white flex items-center gap-1">
+                  <Star className="h-3 w-3 fill-amber-400 text-amber-400" /> {Number(campground.reviewScore).toFixed(1)} ({campground.reviewCount ?? 0})
                 </Badge>
               ) : null}
             </div>
@@ -344,11 +378,11 @@ export function CampgroundV2Client({ slug, initialData, previewToken }: { slug: 
             </div>
             {reviews && reviews.length > 0 ? (
               <div className="space-y-2">
-                {reviews.slice(0, 1).map((rev: any) => (
+                {reviews.slice(0, 1).map((rev) => (
                   <div key={rev.id} className="space-y-1">
                     <div className="flex items-center justify-between">
                       <div className="font-semibold text-slate-900">{rev.reviewerName || "Guest"}</div>
-                      {rev.rating && <Badge variant="secondary">⭐ {rev.rating}</Badge>}
+                      {rev.rating && <Badge variant="secondary" className="flex items-center gap-1"><Star className="h-3 w-3 fill-amber-400 text-amber-400" /> {rev.rating}</Badge>}
                     </div>
                     <p className="text-sm text-slate-700 line-clamp-2">{rev.comment}</p>
                   </div>
@@ -373,7 +407,7 @@ export function CampgroundV2Client({ slug, initialData, previewToken }: { slug: 
             </div>
             {faq && faq.length > 0 ? (
               <div className="space-y-1">
-                {faq.slice(0, 2).map((item: any, idx: number) => (
+                {faq.slice(0, 2).map((item, idx: number) => (
                   <div key={idx} className="space-y-1">
                     <div className="font-semibold text-slate-900">{item.question}</div>
                     <p className="text-sm text-slate-700 line-clamp-2">{item.answer}</p>
@@ -387,16 +421,16 @@ export function CampgroundV2Client({ slug, initialData, previewToken }: { slug: 
         </section>
 
         {/* Featured Review - highlight top review */}
-        {reviews && reviews.length > 0 && (reviews[0] as any).rating >= 4 && (
+        {reviews && reviews.length > 0 && reviews[0].rating >= 4 && (
           <section className="grid md:grid-cols-3 gap-4">
             <div className="md:col-span-2">
               <FeaturedReview
                 review={{
-                  id: (reviews[0] as any).id,
-                  rating: (reviews[0] as any).rating || 5,
-                  comment: (reviews[0] as any).comment || "",
-                  guestName: (reviews[0] as any).reviewerName || "Guest",
-                  stayDate: (reviews[0] as any).stayDate,
+                  id: reviews[0].id,
+                  rating: reviews[0].rating || 5,
+                  comment: reviews[0].comment || "",
+                  guestName: reviews[0].reviewerName || "Guest",
+                  stayDate: reviews[0].stayDate,
                   isVerified: true,
                 }}
                 variant="light"
@@ -415,7 +449,7 @@ export function CampgroundV2Client({ slug, initialData, previewToken }: { slug: 
             <h2 className="text-xl font-semibold text-slate-900">FAQ</h2>
             {faq && faq.length > 0 ? (
               <div className="space-y-3">
-                {faq.slice(0, 6).map((item: any, idx: number) => (
+                {faq.slice(0, 6).map((item, idx: number) => (
                   <Card key={idx} className="p-4 border-slate-200">
                     <div className="font-semibold text-slate-900">{item.question}</div>
                     <p className="text-sm text-slate-600 mt-1">{item.answer}</p>
@@ -431,11 +465,11 @@ export function CampgroundV2Client({ slug, initialData, previewToken }: { slug: 
           <div className="space-y-3">
             <h2 className="text-xl font-semibold text-slate-900">Guest reviews</h2>
             {reviews && reviews.length > 0 ? (
-              reviews.slice(0, 3).map((rev: any) => (
+              reviews.slice(0, 3).map((rev) => (
                 <Card key={rev.id} className="p-4 border-slate-200 space-y-2">
                   <div className="flex items-center justify-between">
                     <div className="font-semibold text-slate-900">{rev.reviewerName || "Guest"}</div>
-                    {rev.rating && <Badge variant="secondary">⭐ {rev.rating}</Badge>}
+                    {rev.rating && <Badge variant="secondary" className="flex items-center gap-1"><Star className="h-3 w-3 fill-amber-400 text-amber-400" /> {rev.rating}</Badge>}
                   </div>
                   <p className="text-sm text-slate-700 line-clamp-3">{rev.comment}</p>
                   {rev.stayDate && <div className="text-xs text-slate-500">Stayed {rev.stayDate}</div>}
@@ -462,7 +496,7 @@ export function CampgroundV2Client({ slug, initialData, previewToken }: { slug: 
             </div>
             <div className="grid gap-4 lg:grid-cols-3">
               <div className="space-y-3 lg:col-span-2">
-                {events.map((event: any) => {
+                {events.map((event) => {
                   const eventStart = event.startDate?.split("T")[0];
                   const eventEnd = event.endDate ? event.endDate.split("T")[0] : eventStart;
                   return (
@@ -591,7 +625,7 @@ export function CampgroundV2Client({ slug, initialData, previewToken }: { slug: 
             <div className="text-sm text-slate-500">Based on your dates and filters</div>
           </div>
           <div className="grid gap-4 md:grid-cols-2">
-            {filteredSiteClasses.map((sc: any, idx: number) => {
+            {filteredSiteClasses.map((sc: SiteClassWithType, idx: number) => {
               // Stub scarcity data - in production this would come from availability API
               const stubbedAvailability = [3, 5, 2, 8, 4, 1, 6, 7][idx % 8];
               const pricePerNight = ((sc.defaultRate || 0) / 100).toFixed(0);
@@ -750,7 +784,7 @@ export function CampgroundV2Client({ slug, initialData, previewToken }: { slug: 
                   <h2 className="text-lg font-semibold text-slate-900">Our Guarantees</h2>
                 </div>
                 <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                  {valueStack.guarantees.map((g: any) => {
+                  {valueStack.guarantees.map((g: { id: string; title: string; description: string; iconName?: string }) => {
                     const iconMap: Record<string, typeof ShieldCheck> = {
                       "shield-check": ShieldCheck,
                       "cloud-rain": CloudRain,
@@ -794,7 +828,7 @@ export function CampgroundV2Client({ slug, initialData, previewToken }: { slug: 
                   )}
                 </div>
                 <div className="grid gap-3 md:grid-cols-2">
-                  {valueStack.bonuses.map((b: any) => {
+                  {valueStack.bonuses.map((b: { id: string; name: string; valueCents: number; description?: string; iconName?: string }) => {
                     const bonusIconMap: Record<string, typeof Flame> = {
                       "flame": Flame,
                       "coffee": Coffee,
@@ -837,7 +871,7 @@ export function CampgroundV2Client({ slug, initialData, previewToken }: { slug: 
       {/* Sticky Booking Bar - mobile only */}
       <StickyBookingBar
         campgroundName={campground?.name || "Campground"}
-        priceFrom={siteClasses.length > 0 ? Math.min(...siteClasses.map((sc: any) => (sc.defaultRate || 0) / 100)) : undefined}
+        priceFrom={typedSiteClasses.length > 0 ? Math.min(...typedSiteClasses.map((sc) => (sc.defaultRate || 0) / 100)) : undefined}
         onBookClick={() => {
           trackEvent("sticky_booking_cta", { campgroundId: campground?.id, page: `/park/${slug}/v2` });
           const q = new URLSearchParams({

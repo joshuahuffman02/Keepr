@@ -60,11 +60,11 @@ Visual indicator component with three variants:
    ```
 
 **Visual States:**
-- ✓ **Synced** (green) - All items synchronized
-- ⟳ **Syncing** (blue, animated) - Sync in progress
-- ⚠ **Pending (X items)** (amber) - Items waiting to sync
-- ✗ **Offline** (red) - No internet connection
-- ✗ **Error** (red) - Sync conflicts need attention
+- [OK] **Synced** (green) - All items synchronized
+- [SYNC] **Syncing** (blue, animated) - Sync in progress
+- [WARN] **Pending (X items)** (amber) - Items waiting to sync
+- [ERR] **Offline** (red) - No internet connection
+- [ERR] **Error** (red) - Sync conflicts need attention
 
 ### 3. SyncDetailsDrawer (`/components/sync/SyncDetailsDrawer.tsx`)
 

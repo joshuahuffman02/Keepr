@@ -21,6 +21,36 @@ type HelpPanelProps = {
 
 type Feedback = { helpful: boolean; note?: string };
 
+type TicketSubmitter = {
+  id: string | null;
+  name: string | null;
+  email: string | null;
+};
+
+type DeviceType = "mobile" | "desktop" | "tablet";
+
+type TicketClient = {
+  userAgent: string;
+  platform: string | null;
+  language: string | null;
+  deviceType: DeviceType;
+};
+
+type WhoamiUser = {
+  id: string;
+  email: string;
+  firstName?: string | null;
+  lastName?: string | null;
+  name?: string;
+};
+
+type WhoamiData = {
+  user?: WhoamiUser;
+  id?: string;
+  email?: string;
+  name?: string;
+};
+
 const LS_PINS = "campreserv:help:pins";
 const LS_RECENT = "campreserv:help:recent";
 const LS_FEEDBACK = "campreserv:help:feedback";
@@ -227,26 +257,30 @@ export function HelpPanel({ open, onClose }: HelpPanelProps) {
       return;
     }
 
-    const submitter = {
-      id: (whoami as any)?.id ?? (whoami as any)?.user?.id ?? null,
+    const whoamiData = whoami as WhoamiData | undefined;
+    const submitter: TicketSubmitter = {
+      id: whoamiData?.id ?? whoamiData?.user?.id ?? null,
       name:
-        (whoami as any)?.name ??
-        (whoami as any)?.user?.name ??
-        (whoami as any)?.email ??
-        (whoami as any)?.user?.email ??
+        whoamiData?.name ??
+        whoamiData?.user?.name ??
+        whoamiData?.user?.firstName ??
+        whoamiData?.email ??
+        whoamiData?.user?.email ??
         null,
-      email: (whoami as any)?.email ?? (whoami as any)?.user?.email ?? null
+      email: whoamiData?.email ?? whoamiData?.user?.email ?? null
     };
 
     const ua = typeof navigator !== "undefined" ? navigator.userAgent : "";
-    const platform = typeof navigator !== "undefined" ? (navigator as any)?.platform ?? null : null;
+    const platform = typeof navigator !== "undefined" ? (navigator.platform as string | undefined) ?? null : null;
     const language = typeof navigator !== "undefined" ? navigator.language ?? null : null;
-    const deviceType = (() => {
-      const lower = ua.toLowerCase();
+
+    const detectDeviceType = (userAgent: string): DeviceType => {
+      const lower = userAgent.toLowerCase();
       if (/ipad|tablet/.test(lower)) return "tablet";
       if (/mobi|android|iphone/.test(lower)) return "mobile";
       return "desktop";
-    })();
+    };
+    const deviceType = detectDeviceType(ua);
 
     const notesParts = [
       steps ? `Steps/details:\n${steps}` : null,

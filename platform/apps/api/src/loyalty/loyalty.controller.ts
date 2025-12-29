@@ -12,6 +12,11 @@ export class LoyaltyController {
         return this.loyaltyService.getProfile(guestId);
     }
 
+    @Post('batch')
+    async getProfilesBatch(@Body() body: { guestIds: string[] }) {
+        return this.loyaltyService.getProfilesBatch(body.guestIds || []);
+    }
+
     @Post('guests/:guestId/points')
     async awardPoints(
         @Param('guestId') guestId: string,

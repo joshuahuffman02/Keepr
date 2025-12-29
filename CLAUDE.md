@@ -64,6 +64,12 @@ pnpm lint:web               # Lint web app
 2. **Build Tool** - API uses `tsup` (not `tsc`) - see `tsup.config.ts`
 3. **Multi-tenant isolation** - Always scope queries by `campgroundId`
 4. **Money in cents** - All amounts are integers (e.g., `9999` = $99.99)
+5. **NO EMOJIS EVER** - Never use emojis anywhere in this project:
+   - No emojis in code (comments, strings, variables)
+   - No emojis in markdown files
+   - No emojis in frontend UI text
+   - Use SVG icons instead for visual elements (Lucide icons are preferred)
+   - SVGs are professional and scalable; emojis are not
 
 ---
 
@@ -403,6 +409,7 @@ DATABASE_URL="..." npx prisma migrate resolve --applied "migration_name"
 - Don't nest transactions
 - Don't use floating-point for money
 - Don't skip auth guards on new endpoints
+- **Don't use emojis** - Use Lucide SVG icons for visual elements instead
 
 ---
 

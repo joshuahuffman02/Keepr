@@ -63,16 +63,23 @@ export function GuestChatPanel({ reservationId, token }: GuestChatPanelProps) {
             if (hasNewStaffMessages && !isInitialLoadRef.current) {
                 try {
                     // Simple beep using Web Audio API
-                    const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
-                    const oscillator = audioContext.createOscillator();
-                    const gainNode = audioContext.createGain();
-                    oscillator.connect(gainNode);
-                    gainNode.connect(audioContext.destination);
-                    oscillator.frequency.value = 800;
-                    oscillator.type = "sine";
-                    gainNode.gain.value = 0.1;
-                    oscillator.start();
-                    oscillator.stop(audioContext.currentTime + 0.1);
+                    interface WindowWithWebkitAudioContext extends Window {
+                        webkitAudioContext?: typeof AudioContext;
+                    }
+                    const win = window as WindowWithWebkitAudioContext;
+                    const AudioContextConstructor = window.AudioContext || win.webkitAudioContext;
+                    if (AudioContextConstructor) {
+                        const audioContext = new AudioContextConstructor();
+                        const oscillator = audioContext.createOscillator();
+                        const gainNode = audioContext.createGain();
+                        oscillator.connect(gainNode);
+                        gainNode.connect(audioContext.destination);
+                        oscillator.frequency.value = 800;
+                        oscillator.type = "sine";
+                        gainNode.gain.value = 0.1;
+                        oscillator.start();
+                        oscillator.stop(audioContext.currentTime + 0.1);
+                    }
                 } catch (e) {
                     // Audio not available, ignore
                 }

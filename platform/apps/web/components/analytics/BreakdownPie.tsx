@@ -1,7 +1,28 @@
 "use client";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from "recharts";
+import { useEffect, useState } from "react";
+
+// Dynamic import for recharts to reduce initial bundle size
+let PieChart: any = null;
+let Pie: any = null;
+let Cell: any = null;
+let ResponsiveContainer: any = null;
+let Legend: any = null;
+let Tooltip: any = null;
+
+const loadRecharts = async () => {
+  if (!PieChart) {
+    const rechartsModule = await import("recharts");
+    PieChart = rechartsModule.PieChart;
+    Pie = rechartsModule.Pie;
+    Cell = rechartsModule.Cell;
+    ResponsiveContainer = rechartsModule.ResponsiveContainer;
+    Legend = rechartsModule.Legend;
+    Tooltip = rechartsModule.Tooltip;
+  }
+  return { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip };
+};
 
 interface BreakdownPieProps {
   title: string;
@@ -33,7 +54,13 @@ export function BreakdownPie({
   formatValue = (v) => v.toLocaleString(),
   loading = false,
 }: BreakdownPieProps) {
-  if (loading) {
+  const [isRechartsLoaded, setIsRechartsLoaded] = useState(false);
+
+  useEffect(() => {
+    loadRecharts().then(() => setIsRechartsLoaded(true));
+  }, []);
+
+  if (loading || !isRechartsLoaded) {
     return (
       <Card className="bg-slate-800/50 border-slate-700">
         <CardHeader>

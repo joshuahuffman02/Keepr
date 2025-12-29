@@ -31,6 +31,7 @@ export class AccountLockoutService {
     private readonly maxAttempts = parseInt(process.env.LOCKOUT_MAX_ATTEMPTS || "5", 10);
     private readonly lockDurationMs = parseInt(process.env.LOCKOUT_DURATION_MS || String(15 * 60 * 1000), 10); // 15 minutes
     private readonly attemptWindowMs = parseInt(process.env.LOCKOUT_WINDOW_MS || String(60 * 60 * 1000), 10); // 1 hour
+    private readonly maxMapSize = parseInt(process.env.LOCKOUT_MAX_ENTRIES || "10000", 10);
 
     // Cleanup interval (every 5 minutes)
     private cleanupInterval: NodeJS.Timeout | null = null;
@@ -269,6 +270,17 @@ export class AccountLockoutService {
                 this.attempts.delete(key);
                 cleaned++;
             }
+        }
+
+        // Hard limit: if still over max size, remove oldest entries
+        if (this.attempts.size > this.maxMapSize) {
+            const entriesToRemove = this.attempts.size - this.maxMapSize;
+            const keys = Array.from(this.attempts.keys()).slice(0, entriesToRemove);
+            for (const key of keys) {
+                this.attempts.delete(key);
+                cleaned++;
+            }
+            this.logger.warn(`Map size exceeded ${this.maxMapSize}, removed ${entriesToRemove} oldest entries`);
         }
 
         if (cleaned > 0) {

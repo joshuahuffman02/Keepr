@@ -1,4 +1,4 @@
-import { Injectable } from "@nestjs/common";
+import { Injectable, Logger } from "@nestjs/common";
 import { PrismaService } from "../prisma/prisma.service";
 
 /**
@@ -80,6 +80,7 @@ export interface SecurityEvent {
 
 @Injectable()
 export class SecurityEventsService {
+    private readonly logger = new Logger(SecurityEventsService.name);
     private readonly alertWebhookUrl: string | null;
     private readonly alertingEnabled: boolean;
 
@@ -94,7 +95,7 @@ export class SecurityEventsService {
         // Cleanup old event counts every 5 minutes
         this.cleanupInterval = setInterval(() => this.cleanupEventCounts(), 5 * 60 * 1000);
 
-        console.log(`[SECURITY] Security events service initialized (alerting: ${this.alertingEnabled})`);
+        this.logger.log(`Security events service initialized (alerting: ${this.alertingEnabled})`);
     }
 
     /**
@@ -104,7 +105,7 @@ export class SecurityEventsService {
         const timestamp = event.timestamp || new Date();
 
         // Log to console (structured logging)
-        console.log(JSON.stringify({
+        this.logger.log(JSON.stringify({
             type: "SECURITY_EVENT",
             event: event.type,
             severity: event.severity,
@@ -135,7 +136,7 @@ export class SecurityEventsService {
                 },
             });
         } catch (error) {
-            console.error("[SECURITY] Failed to log security event:", error);
+            this.logger.error("Failed to log security event", error);
         }
 
         // Track for anomaly detection
@@ -318,7 +319,7 @@ export class SecurityEventsService {
                 }),
             });
         } catch (error) {
-            console.error("[SECURITY] Failed to send alert:", error);
+            this.logger.error("Failed to send alert", error);
         }
     }
 

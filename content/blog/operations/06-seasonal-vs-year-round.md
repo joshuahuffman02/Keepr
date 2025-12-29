@@ -253,19 +253,19 @@ Full conversion requires:
 
 ### Choose Seasonal If:
 
-- ✅ Your location has harsh, extended winters
-- ✅ Tourist demand drops to near zero in winter
-- ✅ You value significant time off
-- ✅ Infrastructure isn't winterized
-- ✅ Staff availability is seasonal
+- Your location has harsh, extended winters
+- Tourist demand drops to near zero in winter
+- You value significant time off
+- Infrastructure isn't winterized
+- Staff availability is seasonal
 
 ### Choose Year-Round If:
 
-- ✅ Your location has mild winters or winter attractions
-- ✅ Long-term guest demand exists
-- ✅ You want maximum revenue opportunity
-- ✅ Facilities are or can be winterized
-- ✅ You prefer consistent operations over intensity
+- Your location has mild winters or winter attractions
+- Long-term guest demand exists
+- You want maximum revenue opportunity
+- Facilities are or can be winterized
+- You prefer consistent operations over intensity
 
 ### Consider Hybrid Approaches:
 

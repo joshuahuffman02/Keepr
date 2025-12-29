@@ -1,4 +1,4 @@
-import { Injectable, Logger } from "@nestjs/common";
+import { Injectable, Logger, NotFoundException } from "@nestjs/common";
 import { GlAccountType } from "@prisma/client";
 import { PrismaService } from "../prisma/prisma.service";
 import { StripeService } from "./stripe.service";
@@ -339,7 +339,7 @@ export class PaymentsReconciliationService {
       where: { id: payoutId, campgroundId },
       include: { lines: true }
     });
-    if (!payout) throw new Error("Payout not found");
+    if (!payout) throw new NotFoundException("Payout not found");
 
     const lineSum = (payout.lines || []).reduce((acc: number, l: any) => acc + l.amountCents, 0);
     const reservationIds = Array.from(new Set((payout.lines || []).map((l: any) => l.reservationId).filter(Boolean)));

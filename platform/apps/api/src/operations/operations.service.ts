@@ -1,4 +1,4 @@
-import { ForbiddenException, Injectable } from '@nestjs/common';
+import { ForbiddenException, Injectable, Logger } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { GamificationEventCategory, OperationalTask } from '@prisma/client';
 import { GamificationService } from '../gamification/gamification.service';
@@ -6,6 +6,8 @@ import { EmailService } from '../email/email.service';
 
 @Injectable()
 export class OperationsService {
+    private readonly logger = new Logger(OperationsService.name);
+
     constructor(
         private prisma: PrismaService,
         private gamification: GamificationService,
@@ -354,18 +356,20 @@ export class OperationsService {
                     await this.sendTeamsAlert(payload, campground);
                     break;
                 default:
-                    throw new Error(`Unsupported alert channel: ${channel}`);
+                    throw new BadRequestException(`Unsupported alert channel: ${channel}`);
             }
 
             return { sent: true, ...payload };
         } catch (error: any) {
             // Log error but don't throw - alerts should fail gracefully
-            this.prisma.$executeRawUnsafe(
-                `INSERT INTO system_logs (level, message, metadata, created_at) VALUES ('error', 'Failed to send ops alert', '${JSON.stringify({ error: error.message, payload })}', NOW())`
-            ).catch(() => {
-                // If logging fails, just log to console
-                // eslint-disable-next-line no-console
-                console.error("[ops-health-alert] Failed to send and log:", error.message, payload);
+            // Use parameterized query to prevent SQL injection
+            const metadata = JSON.stringify({ error: error.message, payload });
+            this.prisma.$executeRaw`
+                INSERT INTO system_logs (level, message, metadata, created_at)
+                VALUES ('error', 'Failed to send ops alert', ${metadata}::jsonb, NOW())
+            `.catch(() => {
+                // If logging fails, use logger as fallback
+                this.logger?.error?.("Failed to send ops alert and log:", error.message, payload);
             });
 
             return { sent: false, error: error.message, ...payload };
@@ -376,7 +380,7 @@ export class OperationsService {
         const webhookUrl = process.env.OPS_ALERT_WEBHOOK_URL;
 
         if (!webhookUrl) {
-            throw new Error("OPS_ALERT_WEBHOOK_URL not configured");
+            throw new BadRequestException("OPS_ALERT_WEBHOOK_URL not configured");
         }
 
         const response = await fetch(webhookUrl, {
@@ -390,7 +394,7 @@ export class OperationsService {
         });
 
         if (!response.ok) {
-            throw new Error(`Webhook request failed: ${response.status} ${response.statusText}`);
+            throw new BadRequestException(`Webhook request failed: ${response.status} ${response.statusText}`);
         }
     }
 
@@ -398,7 +402,7 @@ export class OperationsService {
         const slackUrl = process.env.SLACK_OPS_WEBHOOK_URL;
 
         if (!slackUrl) {
-            throw new Error("SLACK_OPS_WEBHOOK_URL not configured");
+            throw new BadRequestException("SLACK_OPS_WEBHOOK_URL not configured");
         }
 
         const response = await fetch(slackUrl, {
@@ -433,7 +437,7 @@ export class OperationsService {
         });
 
         if (!response.ok) {
-            throw new Error(`Slack webhook failed: ${response.status} ${response.statusText}`);
+            throw new BadRequestException(`Slack webhook failed: ${response.status} ${response.statusText}`);
         }
     }
 
@@ -441,7 +445,7 @@ export class OperationsService {
         const alertEmail = process.env.OPS_ALERT_EMAIL || campground?.email;
 
         if (!alertEmail) {
-            throw new Error("OPS_ALERT_EMAIL not configured and no campground email available");
+            throw new BadRequestException("OPS_ALERT_EMAIL not configured and no campground email available");
         }
 
         await this.emailService.sendEmail({
@@ -468,7 +472,7 @@ export class OperationsService {
         const toPhone = process.env.OPS_ALERT_PHONE;
 
         if (!accountSid || !authToken || !fromPhone || !toPhone) {
-            throw new Error("Twilio SMS configuration incomplete. Required: TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN, TWILIO_PHONE_FROM, OPS_ALERT_PHONE");
+            throw new BadRequestException("Twilio SMS configuration incomplete. Required: TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN, TWILIO_PHONE_FROM, OPS_ALERT_PHONE");
         }
 
         const message = `[OPS ALERT] ${campground?.name || 'Campground'}: ${payload.message}`;
@@ -491,7 +495,7 @@ export class OperationsService {
 
         if (!response.ok) {
             const error = await response.text();
-            throw new Error(`Twilio SMS failed: ${response.status} - ${error}`);
+            throw new BadRequestException(`Twilio SMS failed: ${response.status} - ${error}`);
         }
     }
 
@@ -499,7 +503,7 @@ export class OperationsService {
         const integrationKey = process.env.PAGERDUTY_INTEGRATION_KEY;
 
         if (!integrationKey) {
-            throw new Error("PAGERDUTY_INTEGRATION_KEY not configured");
+            throw new BadRequestException("PAGERDUTY_INTEGRATION_KEY not configured");
         }
 
         const response = await fetch("https://events.pagerduty.com/v2/enqueue", {
@@ -526,7 +530,7 @@ export class OperationsService {
 
         if (!response.ok) {
             const error = await response.text();
-            throw new Error(`PagerDuty request failed: ${response.status} - ${error}`);
+            throw new BadRequestException(`PagerDuty request failed: ${response.status} - ${error}`);
         }
     }
 
@@ -534,7 +538,7 @@ export class OperationsService {
         const teamsUrl = process.env.TEAMS_OPS_WEBHOOK_URL;
 
         if (!teamsUrl) {
-            throw new Error("TEAMS_OPS_WEBHOOK_URL not configured");
+            throw new BadRequestException("TEAMS_OPS_WEBHOOK_URL not configured");
         }
 
         const response = await fetch(teamsUrl, {
@@ -561,7 +565,7 @@ export class OperationsService {
         });
 
         if (!response.ok) {
-            throw new Error(`Teams webhook failed: ${response.status} ${response.statusText}`);
+            throw new BadRequestException(`Teams webhook failed: ${response.status} ${response.statusText}`);
         }
     }
 

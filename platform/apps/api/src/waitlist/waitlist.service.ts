@@ -370,14 +370,14 @@ export class WaitlistService {
 
             try {
                 const isAutoOffer = entry.autoOffer === true;
-                const subject = isAutoOffer 
-                    ? `🎉 Auto-Reserved: Site ${siteNumber} is yours!`
+                const subject = isAutoOffer
+                    ? `Auto-Reserved: Site ${siteNumber} is yours!`
                     : `Good News! Site ${siteNumber} is available!`;
 
                 const html = isAutoOffer ? `
                     <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto;">
                         <div style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); border-radius: 12px; padding: 24px; text-align: center; color: white;">
-                            <h1 style="margin: 0;">🎉 You're In!</h1>
+                            <h1 style="margin: 0;">You're In!</h1>
                             <p style="margin: 8px 0 0 0; opacity: 0.9;">We auto-reserved this site for you</p>
                         </div>
                         <div style="padding: 24px;">
@@ -385,7 +385,7 @@ export class WaitlistService {
                             <p>Great news! Based on your auto-offer preference, we've automatically reserved <strong>Site ${siteNumber}</strong> at <strong>${campgroundName}</strong> for you.</p>
                             <p><strong>Dates:</strong> ${arrival.toLocaleDateString()} - ${departure.toLocaleDateString()}</p>
                             <p style="background: #fef3c7; border-radius: 8px; padding: 16px; margin: 20px 0;">
-                                ⏰ <strong>Important:</strong> Please confirm and complete payment within 24 hours or this reservation will be released.
+                                <strong>Important:</strong> Please confirm and complete payment within 24 hours or this reservation will be released.
                             </p>
                             <a href="#" style="display: inline-block; background: #10b981; color: white; text-decoration: none; padding: 12px 24px; border-radius: 8px; font-weight: 600;">Confirm & Pay Now</a>
                         </div>

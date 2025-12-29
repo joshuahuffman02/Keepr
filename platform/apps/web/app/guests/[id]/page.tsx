@@ -23,12 +23,25 @@ import { useToast } from "../../../components/ui/use-toast";
 import { formatDistanceToNow } from "date-fns";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { useCampground } from "../../../contexts/CampgroundContext";
+import { Guest } from "@campreserv/shared";
 
 const TIER_COLORS: Record<string, string> = {
     Bronze: "bg-amber-600",
     Silver: "bg-slate-400",
     Gold: "bg-yellow-500",
     Platinum: "bg-gradient-to-r from-slate-300 to-slate-500"
+};
+
+type GuestWithReservations = Guest & {
+    reservations?: Array<{
+        id: string;
+        campgroundId?: string;
+        arrivalDate?: string;
+        departureDate?: string;
+        status?: string;
+        site?: { id: string; name: string; siteNumber?: string | null; siteClassId?: string | null } | null;
+    }>;
+    campgroundId?: string;
 };
 
 export default function GuestDetailPage() {
@@ -61,20 +74,20 @@ export default function GuestDetailPage() {
     const [composeTo, setComposeTo] = useState("");
     const [composeFrom, setComposeFrom] = useState("");
 
-    // Get all unique campground IDs from the guest's reservations
+    const guestWithReservations = guestQuery.data as GuestWithReservations | undefined;
+
     const guestCampgroundIds = useMemo(() => {
-        const reservations = (guestQuery.data as any)?.reservations || [];
+        const reservations = guestWithReservations?.reservations || [];
         const ids = new Set<string>();
-        reservations.forEach((r: any) => {
+        reservations.forEach((r) => {
             if (r.campgroundId) ids.add(r.campgroundId);
         });
         return Array.from(ids);
-    }, [guestQuery.data]);
+    }, [guestWithReservations]);
 
-    // Use global campground selector, fallback to guest's first reservation campground
     const campgroundIdForGuest = useMemo(
-        () => selectedCampground?.id || guestCampgroundIds[0] || (guestQuery.data as any)?.campgroundId || "",
-        [selectedCampground?.id, guestCampgroundIds, guestQuery.data]
+        () => selectedCampground?.id || guestCampgroundIds[0] || guestWithReservations?.campgroundId || "",
+        [selectedCampground?.id, guestCampgroundIds, guestWithReservations]
     );
 
     // Wallet state and queries
@@ -440,7 +453,7 @@ export default function GuestDetailPage() {
                                 </Button>
                             </CardHeader>
                             <CardContent>
-                                {(guest as any).reservations?.length > 0 ? (
+                                {guestWithReservations?.reservations && guestWithReservations.reservations.length > 0 ? (
                                     <Table>
                                         <TableHeader>
                                             <TableRow>
@@ -451,11 +464,11 @@ export default function GuestDetailPage() {
                                             </TableRow>
                                         </TableHeader>
                                         <TableBody>
-                                            {(guest as any).reservations.map((res: any) => (
+                                            {guestWithReservations.reservations.map((res) => (
                                                 <TableRow key={res.id}>
                                                     <TableCell>
                                                         <div className="font-medium">
-                                                            {new Date(res.arrivalDate).toLocaleDateString()} - {new Date(res.departureDate).toLocaleDateString()}
+                                                            {res.arrivalDate ? new Date(res.arrivalDate).toLocaleDateString() : "—"} - {res.departureDate ? new Date(res.departureDate).toLocaleDateString() : "—"}
                                                         </div>
                                                     </TableCell>
                                                     <TableCell>
@@ -970,7 +983,7 @@ export default function GuestDetailPage() {
                                                 <select
                                                     className="w-full h-9 rounded border border-slate-200 bg-white px-2 text-sm"
                                                     value={composeType}
-                                                    onChange={(e) => setComposeType(e.target.value as any)}
+                                                    onChange={(e) => setComposeType(e.target.value as "email" | "sms" | "note" | "call")}
                                                 >
                                                     <option value="email">Email</option>
                                                     <option value="sms">SMS</option>
@@ -983,7 +996,7 @@ export default function GuestDetailPage() {
                                                 <select
                                                     className="w-full h-9 rounded border border-slate-200 bg-white px-2 text-sm"
                                                     value={composeDirection}
-                                                    onChange={(e) => setComposeDirection(e.target.value as any)}
+                                                    onChange={(e) => setComposeDirection(e.target.value as "inbound" | "outbound")}
                                                 >
                                                     <option value="outbound">Outbound</option>
                                                     <option value="inbound">Inbound</option>

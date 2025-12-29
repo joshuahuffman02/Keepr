@@ -1,4 +1,4 @@
-import { Injectable, Logger, NotFoundException } from "@nestjs/common";
+import { Injectable, Logger, NotFoundException, BadRequestException } from "@nestjs/common";
 import { Cron } from "@nestjs/schedule";
 import { PrismaService } from "../prisma/prisma.service";
 import { AiAutopilotConfigService } from "./ai-autopilot-config.service";
@@ -333,7 +333,7 @@ export class AiWeatherService {
     const alert = await this.getAlert(alertId);
 
     if (!alert.autoNotifyEnabled) {
-      throw new Error("Auto-notify is disabled for this alert");
+      throw new BadRequestException("Auto-notify is disabled for this alert");
     }
 
     // Get affected reservations
@@ -430,7 +430,7 @@ export class AiWeatherService {
 </head>
 <body>
   <div class="alert-box">
-    <p class="alert-title">⚠️ ${alert.title}</p>
+    <p class="alert-title">${alert.title}</p>
     <p class="alert-message">${alert.message}</p>
   </div>
 

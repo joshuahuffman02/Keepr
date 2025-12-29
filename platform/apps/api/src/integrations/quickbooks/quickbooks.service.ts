@@ -1,4 +1,4 @@
-import { Injectable, Logger } from "@nestjs/common";
+import { Injectable, Logger, BadRequestException, NotFoundException } from "@nestjs/common";
 import { PrismaService } from "../../prisma/prisma.service";
 
 export interface QuickBooksConfig {
@@ -48,7 +48,7 @@ export class QuickBooksService {
   async getAuthorizationUrl(campgroundId: string, redirectUri: string): Promise<string> {
     const clientId = process.env.QUICKBOOKS_CLIENT_ID;
     if (!clientId) {
-      throw new Error("QuickBooks client ID not configured");
+      throw new BadRequestException("QuickBooks client ID not configured");
     }
 
     const scope = "com.intuit.quickbooks.accounting";
@@ -65,7 +65,7 @@ export class QuickBooksService {
     const clientSecret = process.env.QUICKBOOKS_CLIENT_SECRET;
 
     if (!clientId || !clientSecret) {
-      throw new Error("QuickBooks credentials not configured");
+      throw new BadRequestException("QuickBooks credentials not configured");
     }
 
     // In production, use fetch to exchange code for tokens
@@ -107,7 +107,7 @@ export class QuickBooksService {
     });
 
     if (!reservation) {
-      return { success: false, error: "Reservation not found" };
+      throw new NotFoundException("Reservation not found");
     }
 
     // Check if already synced
@@ -166,7 +166,7 @@ export class QuickBooksService {
     });
 
     if (!payment) {
-      return { success: false, error: "Payment not found" };
+      throw new NotFoundException("Payment not found");
     }
 
     // Check if already synced

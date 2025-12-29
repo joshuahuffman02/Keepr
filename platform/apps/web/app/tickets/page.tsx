@@ -9,6 +9,19 @@ import { Input } from "@/components/ui/input";
 import { Plus, X, Search, Loader2, CheckCircle, Send } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
+type TicketSubmitter = {
+  id?: string | null;
+  name?: string | null;
+  email?: string | null;
+};
+
+type TicketClient = {
+  userAgent?: string | null;
+  platform?: string | null;
+  language?: string | null;
+  deviceType?: "mobile" | "desktop" | "tablet" | "unknown";
+};
+
 type Ticket = {
   id: string;
   createdAt: string;
@@ -27,22 +40,24 @@ type Ticket = {
   votes?: number;
   voteCount?: number; // compat
   area?: string;
-  submitter?: {
-    id?: string | null;
-    name?: string | null;
-    email?: string | null;
-  };
-  upvoters?: Array<{
-    id?: string | null;
-    name?: string | null;
-    email?: string | null;
-  }>;
-  client?: {
-    userAgent?: string | null;
-    platform?: string | null;
-    language?: string | null;
-    deviceType?: "mobile" | "desktop" | "tablet" | "unknown";
-  };
+  submitter?: TicketSubmitter;
+  upvoters?: Array<TicketSubmitter>;
+  client?: TicketClient;
+};
+
+type WhoamiUser = {
+  id: string;
+  email: string;
+  firstName?: string | null;
+  lastName?: string | null;
+  name?: string;
+};
+
+type WhoamiData = {
+  user?: WhoamiUser;
+  id?: string;
+  email?: string;
+  name?: string;
 };
 
 export default function TicketsPage() {
@@ -215,15 +230,17 @@ export default function TicketsPage() {
   const upvote = async (ticket: Ticket) => {
     setUpvotingId(ticket.id);
     try {
-      const actor = {
-        id: (whoami as any)?.id ?? (whoami as any)?.user?.id ?? null,
+      const whoamiData = whoami as WhoamiData | undefined;
+      const actor: TicketSubmitter = {
+        id: whoamiData?.id ?? whoamiData?.user?.id ?? null,
         name:
-          (whoami as any)?.name ??
-          (whoami as any)?.user?.name ??
-          (whoami as any)?.email ??
-          (whoami as any)?.user?.email ??
+          whoamiData?.name ??
+          whoamiData?.user?.name ??
+          whoamiData?.user?.firstName ??
+          whoamiData?.email ??
+          whoamiData?.user?.email ??
           null,
-        email: (whoami as any)?.email ?? (whoami as any)?.user?.email ?? null,
+        email: whoamiData?.email ?? whoamiData?.user?.email ?? null,
       };
 
       const res = await fetch("/api/tickets", {
@@ -280,6 +297,7 @@ export default function TicketsPage() {
     if (!newTicket.title.trim()) return;
     setCreating(true);
     try {
+      const whoamiData = whoami as WhoamiData | undefined;
       const res = await fetch("/api/tickets", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -290,9 +308,9 @@ export default function TicketsPage() {
           area: newTicket.area,
           status: "open",
           submitter: {
-            id: (whoami as any)?.id,
-            name: newTicket.name || (whoami as any)?.name,
-            email: newTicket.email || (whoami as any)?.email
+            id: whoamiData?.id ?? whoamiData?.user?.id ?? null,
+            name: newTicket.name || whoamiData?.name || whoamiData?.user?.name || whoamiData?.user?.firstName || null,
+            email: newTicket.email || whoamiData?.email || whoamiData?.user?.email || null
           },
           extra: {
             campground: newTicket.campground,
@@ -858,7 +876,7 @@ export default function TicketsPage() {
                   <label className="text-sm font-medium text-slate-700">Category</label>
                   <Select
                     value={newTicket.category}
-                    onValueChange={(val: any) => setNewTicket(prev => ({ ...prev, category: val }))}
+                    onValueChange={(val: "issue" | "question" | "feature" | "other") => setNewTicket(prev => ({ ...prev, category: val }))}
                   >
                     <SelectTrigger>
                       <SelectValue />

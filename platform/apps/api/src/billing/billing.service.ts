@@ -1,4 +1,4 @@
-import { Injectable, Logger } from "@nestjs/common";
+import { Injectable, Logger, NotFoundException, BadRequestException } from "@nestjs/common";
 import { PrismaService } from "../prisma/prisma.service";
 import { postBalancedLedgerEntries } from "../ledger/ledger-posting.util";
 
@@ -145,8 +145,8 @@ export class BillingService {
         ratePlan: true
       }
     });
-    if (!meter) throw new Error("Meter not found");
-    if (!meter.active) throw new Error("Meter inactive");
+    if (!meter) throw new NotFoundException("Meter not found");
+    if (!meter.active) throw new BadRequestException("Meter inactive");
 
     const reservation = await this.prisma.reservation.findFirst({
       where: {
@@ -155,10 +155,10 @@ export class BillingService {
       },
       orderBy: { arrivalDate: "desc" }
     });
-    if (!reservation) throw new Error("No active reservation on this site");
+    if (!reservation) throw new NotFoundException("No active reservation on this site");
 
     const reads = meter.reads;
-    if (!reads || reads.length < 2) throw new Error("Need at least two reads to bill");
+    if (!reads || reads.length < 2) throw new BadRequestException("Need at least two reads to bill");
 
     const lastBilledAt = meter.lastBilledReadAt ? new Date(meter.lastBilledReadAt) : null;
     const candidates = lastBilledAt ? reads.filter((r) => r.readAt > lastBilledAt) : reads.slice(-1);
@@ -171,7 +171,7 @@ export class BillingService {
     const billedUsage = usage * (Number.isFinite(multiplier) ? multiplier : 1);
     const rate = meter.ratePlan?.baseRateCents ?? 0;
     const amountCents = Math.round(billedUsage * rate);
-    if (amountCents <= 0) throw new Error("No billable usage");
+    if (amountCents <= 0) throw new BadRequestException("No billable usage");
 
     const cadence = meter.billingMode || "per_reading";
     const cycle = await this.prisma.billingCycle.create({
@@ -244,9 +244,9 @@ export class BillingService {
       where: { id: siteClassId },
       include: { sites: true }
     });
-    if (!siteClass) throw new Error("Site class not found");
+    if (!siteClass) throw new NotFoundException("Site class not found");
     if (!siteClass.meteredEnabled || !siteClass.meteredType) {
-      throw new Error("Site class is not marked as metered");
+      throw new BadRequestException("Site class is not marked as metered");
     }
     const type = siteClass.meteredType;
     const sites = siteClass.sites;
@@ -279,7 +279,7 @@ export class BillingService {
 
   async createBillingCycle(reservationId: string, cadence: string, periodStart: Date, periodEnd: Date) {
     const reservation = await this.prisma.reservation.findUnique({ where: { id: reservationId } });
-    if (!reservation) throw new Error("Reservation not found");
+    if (!reservation) throw new NotFoundException("Reservation not found");
     return this.prisma.billingCycle.create({
       data: {
         reservationId,
@@ -293,7 +293,7 @@ export class BillingService {
 
   async upsertCurrentCycle(reservationId: string, cadence: string) {
     const reservation = await this.prisma.reservation.findUnique({ where: { id: reservationId } });
-    if (!reservation) throw new Error("Reservation not found");
+    if (!reservation) throw new NotFoundException("Reservation not found");
 
     const now = new Date();
     const anchor = reservation.billingAnchorDate || reservation.arrivalDate;
@@ -440,7 +440,7 @@ export class BillingService {
       where: { id: cycleId },
       include: { reservation: true }
     });
-    if (!cycle) throw new Error("Cycle not found");
+    if (!cycle) throw new NotFoundException("Cycle not found");
 
     const existing = await this.prisma.invoice.findFirst({ where: { billingCycleId: cycleId } });
     if (existing) return existing;
@@ -600,7 +600,7 @@ export class BillingService {
 
   async writeOffInvoice(invoiceId: string, reason: string, actorId?: string) {
     const invoice = await this.prisma.invoice.findUnique({ where: { id: invoiceId } });
-    if (!invoice) throw new Error("Invoice not found");
+    if (!invoice) throw new NotFoundException("Invoice not found");
     if (invoice.status === "written_off") return invoice;
 
     const amount = invoice.balanceCents;
@@ -674,9 +674,9 @@ export class BillingService {
 
   async overrideInvoiceLine(invoiceId: string, lineId: string, amountCents: number, note: string, actorId?: string) {
     const invoice = await this.prisma.invoice.findUnique({ where: { id: invoiceId } });
-    if (!invoice) throw new Error("Invoice not found");
+    if (!invoice) throw new NotFoundException("Invoice not found");
     const line = await this.prisma.invoiceLine.findUnique({ where: { id: lineId } });
-    if (!line || line.invoiceId !== invoiceId) throw new Error("Line not found");
+    if (!line || line.invoiceId !== invoiceId) throw new NotFoundException("Line not found");
 
     const before = { ...line };
     await this.prisma.invoiceLine.update({

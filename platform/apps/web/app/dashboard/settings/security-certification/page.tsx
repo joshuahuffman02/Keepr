@@ -136,7 +136,18 @@ export default function SecurityCertificationPage() {
     const cg = campgroundQuery.data;
     if (!cg) return;
 
-    const securityData = (cg as any).securityAssessment as SecurityAssessmentData | null;
+    // Type assertion for extended campground fields not in base schema
+    type CampgroundWithSecurity = typeof cg & {
+      securityAssessment?: SecurityAssessmentData;
+      securityVerified?: boolean;
+      securityVerifiedBy?: string;
+      securityAuditorEmail?: string;
+      securityAuditorOrg?: string;
+      securityCertificationLevel?: string;
+    };
+
+    const cgWithSecurity = cg as CampgroundWithSecurity;
+    const securityData = cgWithSecurity.securityAssessment;
     if (securityData) {
       const items = new Set(securityData.completedItems || []);
       setCompletedItems(items);
@@ -147,13 +158,13 @@ export default function SecurityCertificationPage() {
     }
 
     // Load auditor info
-    setIsVerified((cg as any).securityVerified || false);
-    setAuditorName((cg as any).securityVerifiedBy || "");
-    setAuditorEmail((cg as any).securityAuditorEmail || "");
-    setAuditorOrg((cg as any).securityAuditorOrg || "");
+    setIsVerified(cgWithSecurity.securityVerified || false);
+    setAuditorName(cgWithSecurity.securityVerifiedBy || "");
+    setAuditorEmail(cgWithSecurity.securityAuditorEmail || "");
+    setAuditorOrg(cgWithSecurity.securityAuditorOrg || "");
 
     // Set previous level for comparison
-    const savedLevel = (cg as any).securityCertificationLevel || "none";
+    const savedLevel = cgWithSecurity.securityCertificationLevel || "none";
     setPreviousLevel(savedLevel);
   }, [campgroundQuery.data]);
 
@@ -205,7 +216,7 @@ export default function SecurityCertificationPage() {
         if (prev.size === 0 && !hasCompletedFirstItem) {
           setHasCompletedFirstItem(true);
           toast({
-            title: "Great start! 🎯",
+            title: "Great start!",
             description: "You've taken your first step toward security certification. Keep going!",
           });
         }
@@ -866,7 +877,7 @@ export default function SecurityCertificationPage() {
                             <div className="flex items-center gap-2">
                               <CheckCircle2 className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
                               <span className="text-sm font-medium text-emerald-800 dark:text-emerald-200">
-                                Category complete! You&apos;ve mastered {categoryInfo.label} 🎉
+                                Category complete! You&apos;ve mastered {categoryInfo.label}
                               </span>
                             </div>
                           </div>

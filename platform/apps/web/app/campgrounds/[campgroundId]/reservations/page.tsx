@@ -11,7 +11,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "../../../../components
 import { DashboardShell } from "../../../../components/ui/layout/DashboardShell";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../../../components/ui/tabs";
 import { TableEmpty } from "../../../../components/ui/table";
-import { ReservationSchema, computeDepositDue } from "@campreserv/shared";
+import { ReservationSchema, computeDepositDue, CreateCommunicationSchema, DepositConfig } from "@campreserv/shared";
 import type { z } from "zod";
 import { useGanttStore } from "../../../../lib/gantt-store";
 import { BulkMessageModal } from "../../../../components/reservations/BulkMessageModal";
@@ -20,6 +20,43 @@ type ReservationStatus = z.infer<typeof ReservationSchema>["status"];
 type ReservationUpdate = Partial<z.infer<typeof ReservationSchema>> & {
   overrideReason?: string;
   overrideApprovedBy?: string;
+};
+
+// Extended types for entities with populated relations
+type SiteWithClass = {
+  id: string;
+  siteClassId?: string | null;
+  siteClass?: { id: string; name: string; defaultRate?: number; maxOccupancy?: number } | null;
+  [key: string]: unknown;
+};
+
+type HoldResponse = {
+  id: string;
+  [key: string]: unknown;
+};
+
+type ReservationWithGuest = {
+  id: string;
+  guest?: { primaryFirstName: string; primaryLastName: string; email?: string } | null;
+  site?: SiteWithClass | null;
+  feesAmount?: number;
+  taxesAmount?: number;
+  discountsAmount?: number;
+  promoCode?: string;
+  source?: string;
+  checkInWindowStart?: string;
+  checkInWindowEnd?: string;
+  vehiclePlate?: string;
+  vehicleState?: string;
+  rigType?: string;
+  rigLength?: number;
+  [key: string]: unknown;
+};
+
+type CampgroundWithConfig = {
+  id: string;
+  depositConfig?: DepositConfig | null;
+  [key: string]: unknown;
 };
 
 export default function ReservationsPage() {
@@ -191,8 +228,8 @@ export default function ReservationsPage() {
     mutationFn: async () => {
       const selectedSite = sitesQuery.data?.find((s) => s.id === formState.siteId);
       const selectedClass =
-        siteClassesQuery.data?.find((cls) => cls.id === (selectedSite as any)?.siteClassId) ||
-        (selectedSite as any)?.siteClass ||
+        siteClassesQuery.data?.find((cls) => cls.id === (selectedSite as SiteWithClass)?.siteClassId) ||
+        (selectedSite as SiteWithClass)?.siteClass ||
         null;
       const nights =
         formState.arrivalDate && formState.departureDate
@@ -224,7 +261,7 @@ export default function ReservationsPage() {
             arrivalDate: formState.arrivalDate,
             departureDate: formState.departureDate
           });
-          holdId = (hold as any)?.id;
+          holdId = (hold as HoldResponse)?.id;
         } catch {
           // If hold creation fails, proceed without blocking reservation
         }
@@ -341,7 +378,7 @@ export default function ReservationsPage() {
   });
 
   const createCommunication = useMutation({
-    mutationFn: (payload: any) => apiClient.createCommunication(payload),
+    mutationFn: (payload: z.infer<typeof CreateCommunicationSchema>) => apiClient.createCommunication(payload),
     onError: (err) => {
       setFlash({ type: "error", message: err instanceof Error ? err.message : "Failed to save note." });
     }
@@ -533,8 +570,8 @@ export default function ReservationsPage() {
 
   const selectedSite = sitesQuery.data?.find((s) => s.id === formState.siteId);
   const selectedClass =
-    siteClassesQuery.data?.find((cls) => cls.id === (selectedSite as any)?.siteClassId) ||
-    (selectedSite as any)?.siteClass ||
+    siteClassesQuery.data?.find((cls) => cls.id === (selectedSite as SiteWithClass)?.siteClassId) ||
+    (selectedSite as SiteWithClass)?.siteClass ||
     null;
   const nights =
     formState.arrivalDate && formState.departureDate
@@ -576,7 +613,7 @@ export default function ReservationsPage() {
         arrivalDate: formState.arrivalDate || undefined,
         depositRule: campgroundQuery.data.depositRule,
         depositPercentage: campgroundQuery.data.depositPercentage ?? null,
-        depositConfig: (campgroundQuery.data as any).depositConfig ?? null
+        depositConfig: (campgroundQuery.data as CampgroundWithConfig).depositConfig ?? null
       })
       : null;
   const requiredDeposit = suggestedDeposit ?? 0;
@@ -675,7 +712,7 @@ export default function ReservationsPage() {
     if (!reservationsQuery.data) return [];
     return reservationsQuery.data.filter((res) => {
       const term = search.toLowerCase();
-      const guest = `${(res as any).guest?.primaryFirstName || ""} ${(res as any).guest?.primaryLastName || ""}`.toLowerCase();
+      const guest = `${(res as ReservationWithGuest).guest?.primaryFirstName || ""} ${(res as ReservationWithGuest).guest?.primaryLastName || ""}`.toLowerCase();
       const site = `${res.site?.name || res.site?.siteNumber || ""}`.toLowerCase();
       const status = res.status.toLowerCase();
       const matchesTerm = term ? guest.includes(term) || site.includes(term) || status.includes(term) : true;
@@ -699,7 +736,7 @@ export default function ReservationsPage() {
               arrivalDate: res.arrivalDate,
               depositRule: campgroundQuery.data.depositRule,
               depositPercentage: campgroundQuery.data.depositPercentage ?? null,
-              depositConfig: (campgroundQuery.data as any)?.depositConfig ?? null
+              depositConfig: (campgroundQuery.data as CampgroundWithConfig)?.depositConfig ?? null
             })
           : 0;
       const depositDue = requiredDeposit > paid;
@@ -824,7 +861,7 @@ export default function ReservationsPage() {
       const arrival = new Date(r.arrivalDate);
       const departure = new Date(r.departureDate);
       const nights = Math.max(1, Math.round((departure.getTime() - arrival.getTime()) / (1000 * 60 * 60 * 24)));
-      const guest = `${(r as any).guest?.primaryFirstName || ""} ${(r as any).guest?.primaryLastName || ""}`.trim();
+      const guest = `${(r as ReservationWithGuest).guest?.primaryFirstName || ""} ${(r as ReservationWithGuest).guest?.primaryLastName || ""}`.trim();
       const site = r.site?.name || r.site?.siteNumber || "";
       const total = (r.totalAmount ?? 0) / 100;
       const paid = (r.paidAmount ?? 0) / 100;
@@ -859,7 +896,7 @@ export default function ReservationsPage() {
       const arrival = new Date(r.arrivalDate);
       const departure = new Date(r.departureDate);
       const nights = Math.max(1, Math.round((departure.getTime() - arrival.getTime()) / (1000 * 60 * 60 * 24)));
-      const guest = `${(r as any).guest?.primaryFirstName || ""} ${(r as any).guest?.primaryLastName || ""}`.trim();
+      const guest = `${(r as ReservationWithGuest).guest?.primaryFirstName || ""} ${(r as ReservationWithGuest).guest?.primaryLastName || ""}`.trim();
       const site = r.site?.name || r.site?.siteNumber || "";
       const total = (r.totalAmount ?? 0) / 100;
       const paid = (r.paidAmount ?? 0) / 100;
@@ -1162,7 +1199,7 @@ export default function ReservationsPage() {
                   const total = (res.totalAmount ?? 0) / 100;
                   const paid = (res.paidAmount ?? 0) / 100;
                   const balance = Math.max(0, total - paid);
-                  const guestName = `${(res as any).guest?.primaryFirstName || ""} ${(res as any).guest?.primaryLastName || ""}`.trim() || "Unassigned";
+                  const guestName = `${(res as ReservationWithGuest).guest?.primaryFirstName || ""} ${(res as ReservationWithGuest).guest?.primaryLastName || ""}`.trim() || "Unassigned";
                   const statusClass = statusBadge(res.status as ReservationStatus);
                   const balanceClass =
                     balance > 0
@@ -1300,7 +1337,7 @@ export default function ReservationsPage() {
                   const total = (res.totalAmount ?? 0) / 100;
                   const paid = (res.paidAmount ?? 0) / 100;
                   const balance = Math.max(0, total - paid);
-                  const guestName = `${(res as any).guest?.primaryFirstName || ""} ${(res as any).guest?.primaryLastName || ""}`.trim() || "Unassigned";
+                  const guestName = `${(res as ReservationWithGuest).guest?.primaryFirstName || ""} ${(res as ReservationWithGuest).guest?.primaryLastName || ""}`.trim() || "Unassigned";
                   const statusClass = statusBadge(res.status as ReservationStatus);
                   const balanceClass =
                     balance > 0
@@ -1656,17 +1693,17 @@ export default function ReservationsPage() {
             )}
             {tabFilteredReservations.filter((res) => openDetails[res.id] || focusId === res.id).map((res) => {
               const siteClassName =
-                siteClassesQuery.data?.find((cls) => cls.id === (res.site as any)?.siteClassId)?.name || "";
-              const siteClass = siteClassesQuery.data?.find((cls) => cls.id === (res.site as any)?.siteClassId);
+                siteClassesQuery.data?.find((cls) => cls.id === (res.site as SiteWithClass)?.siteClassId)?.name || "";
+              const siteClass = siteClassesQuery.data?.find((cls) => cls.id === (res.site as SiteWithClass)?.siteClassId);
               const arrival = new Date(res.arrivalDate);
               const departure = new Date(res.departureDate);
               const nights = Math.max(1, Math.round((departure.getTime() - arrival.getTime()) / (1000 * 60 * 60 * 24)));
               const total = (res.totalAmount ?? 0) / 100;
               const paid = (res.paidAmount ?? 0) / 100;
               const balance = Math.max(0, total - paid);
-              const feesAmount = ((res as any).feesAmount ?? 0) / 100;
-              const taxesAmount = ((res as any).taxesAmount ?? 0) / 100;
-              const discountsAmount = ((res as any).discountsAmount ?? 0) / 100;
+              const feesAmount = ((res as ReservationWithGuest).feesAmount ?? 0) / 100;
+              const taxesAmount = ((res as ReservationWithGuest).taxesAmount ?? 0) / 100;
+              const discountsAmount = ((res as ReservationWithGuest).discountsAmount ?? 0) / 100;
               const shouldAutoOpen = focusId === res.id;
               const resOccupancy = (res.adults ?? 0) + (res.children ?? 0);
               const resMaxOccupancy = siteClass?.maxOccupancy ?? null;
@@ -1689,7 +1726,7 @@ export default function ReservationsPage() {
                     arrivalDate: res.arrivalDate,
                     depositRule: campgroundQuery.data.depositRule,
                     depositPercentage: campgroundQuery.data.depositPercentage ?? null,
-                    depositConfig: (campgroundQuery.data as any).depositConfig ?? null
+                    depositConfig: (campgroundQuery.data as CampgroundWithConfig).depositConfig ?? null
                   })
                   : 0;
               const editedTotalCents = editing[res.id]?.totalAmount ?? res.totalAmount ?? 0;
@@ -1702,7 +1739,7 @@ export default function ReservationsPage() {
                     arrivalDate: res.arrivalDate,
                     depositRule: campgroundQuery.data.depositRule,
                     depositPercentage: campgroundQuery.data.depositPercentage ?? null,
-                    depositConfig: (campgroundQuery.data as any).depositConfig ?? null
+                    depositConfig: (campgroundQuery.data as CampgroundWithConfig).depositConfig ?? null
                   })
                   : suggestedDeposit;
               const depositShortfall = Math.max(0, editedDepositDue - editedPaidCents / 100);
@@ -1710,12 +1747,12 @@ export default function ReservationsPage() {
               const depositPaymentTooLow = depositShortfall > 0 && paymentAmount < depositShortfall;
               const conflict = conflictByReservation[res.id];
               const manualOverride =
-                editedTotalCents !== (res.totalAmount ?? 0) || (editing[res.id]?.discountsAmount ?? (res as any).discountsAmount ?? 0) !== ((res as any).discountsAmount ?? 0);
+                editedTotalCents !== (res.totalAmount ?? 0) || (editing[res.id]?.discountsAmount ?? (res as ReservationWithGuest).discountsAmount ?? 0) !== ((res as ReservationWithGuest).discountsAmount ?? 0);
               const overrideMissing =
                 manualOverride &&
                 (!(editing[res.id]?.overrideReason || "").trim() ||
                   !(editing[res.id]?.overrideApprovedBy || "").trim());
-              const guestName = `${(res as any).guest?.primaryFirstName || ""} ${(res as any).guest?.primaryLastName || ""}`.trim();
+              const guestName = `${(res as ReservationWithGuest).guest?.primaryFirstName || ""} ${(res as ReservationWithGuest).guest?.primaryLastName || ""}`.trim();
               const isOpen = !!openDetails[res.id];
               const wasSkipped =
                 !!bulkFeedback &&
@@ -2241,7 +2278,7 @@ export default function ReservationsPage() {
                           <input
                             type="number"
                             className="rounded-md border border-slate-200 px-2 py-1 w-28"
-                            value={((editing[res.id]?.totalAmount ?? res.totalAmount) / 100).toFixed(2) as any}
+                            value={((editing[res.id]?.totalAmount ?? res.totalAmount) / 100).toFixed(2)}
                             onChange={(e) =>
                               setEditing((prev) => ({
                                 ...prev,
@@ -2258,7 +2295,7 @@ export default function ReservationsPage() {
                           <input
                             type="number"
                             className="rounded-md border border-slate-200 px-2 py-1 w-28"
-                            value={((editing[res.id]?.paidAmount ?? res.paidAmount ?? 0) / 100).toFixed(2) as any}
+                            value={((editing[res.id]?.paidAmount ?? res.paidAmount ?? 0) / 100).toFixed(2)}
                             onChange={(e) =>
                               setEditing((prev) => ({
                                 ...prev,
@@ -2437,19 +2474,19 @@ export default function ReservationsPage() {
                                 status: editing[res.id]?.status ?? res.status,
                                 siteId: editing[res.id]?.siteId ?? res.siteId,
                                 guestId: editing[res.id]?.guestId ?? res.guestId,
-                                promoCode: editing[res.id]?.promoCode ?? (res as any).promoCode ?? undefined,
-                                source: editing[res.id]?.source ?? (res as any).source ?? undefined,
+                                promoCode: editing[res.id]?.promoCode ?? (res as ReservationWithGuest).promoCode ?? undefined,
+                                source: editing[res.id]?.source ?? (res as ReservationWithGuest).source ?? undefined,
                                 checkInWindowStart:
-                                  editing[res.id]?.checkInWindowStart ?? (res as any).checkInWindowStart ?? undefined,
-                                checkInWindowEnd: editing[res.id]?.checkInWindowEnd ?? (res as any).checkInWindowEnd ?? undefined,
-                                vehiclePlate: editing[res.id]?.vehiclePlate ?? (res as any).vehiclePlate ?? undefined,
-                                vehicleState: editing[res.id]?.vehicleState ?? (res as any).vehicleState ?? undefined,
-                                rigType: editing[res.id]?.rigType ?? (res as any).rigType ?? undefined,
-                                rigLength: editing[res.id]?.rigLength ?? (res as any).rigLength ?? undefined,
+                                  editing[res.id]?.checkInWindowStart ?? (res as ReservationWithGuest).checkInWindowStart ?? undefined,
+                                checkInWindowEnd: editing[res.id]?.checkInWindowEnd ?? (res as ReservationWithGuest).checkInWindowEnd ?? undefined,
+                                vehiclePlate: editing[res.id]?.vehiclePlate ?? (res as ReservationWithGuest).vehiclePlate ?? undefined,
+                                vehicleState: editing[res.id]?.vehicleState ?? (res as ReservationWithGuest).vehicleState ?? undefined,
+                                rigType: editing[res.id]?.rigType ?? (res as ReservationWithGuest).rigType ?? undefined,
+                                rigLength: editing[res.id]?.rigLength ?? (res as ReservationWithGuest).rigLength ?? undefined,
                                 baseSubtotal: editing[res.id]?.totalAmount ?? res.totalAmount,
-                                feesAmount: (res as any).feesAmount ?? 0,
-                                taxesAmount: (res as any).taxesAmount ?? 0,
-                                discountsAmount: (res as any).discountsAmount ?? 0,
+                                feesAmount: (res as ReservationWithGuest).feesAmount ?? 0,
+                                taxesAmount: (res as ReservationWithGuest).taxesAmount ?? 0,
+                                discountsAmount: (res as ReservationWithGuest).discountsAmount ?? 0,
                                 overrideReason: editing[res.id]?.overrideReason ?? undefined,
                                 overrideApprovedBy: editing[res.id]?.overrideApprovedBy ?? undefined
                               }
@@ -2614,7 +2651,7 @@ export default function ReservationsPage() {
                               <input
                                 className="flex-1 rounded-md border border-slate-200 px-2 py-1 text-xs"
                                 placeholder="To email"
-                                value={commDraft.toAddress ?? (res as any)?.guest?.email ?? ""}
+                                value={commDraft.toAddress ?? (res as ReservationWithGuest)?.guest?.email ?? ""}
                                 onChange={(e) =>
                                   setNewComm((prev) => ({
                                     ...prev,
@@ -2682,7 +2719,7 @@ export default function ReservationsPage() {
                                     direction: "outbound",
                                     subject: commDraft.subject || undefined,
                                     body: commDraft.body || ""
-                                  } as any);
+                                  });
                                   setCommsByRes((prev) => ({
                                     ...prev,
                                     [res.id]: [created, ...(prev[res.id] || [])]

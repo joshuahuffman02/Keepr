@@ -110,23 +110,23 @@ Weather policies should consider when the decision is made:
 ```markdown
 WEATHER POLICY
 
-🌧️ ORDINARY WEATHER
-Rain, heat, cold, and other normal conditions are part of 
+ORDINARY WEATHER
+Rain, heat, cold, and other normal conditions are part of
 camping. We do not offer refunds for ordinary bad weather.
 Standard cancellation policy applies.
 
-⛈️ SEVERE WEATHER WATCHES
+SEVERE WEATHER WATCHES
 If a severe weather watch (thunderstorm, flood, heat advisory)
 is issued for our area, we will offer date changes or credits
 for guests who wish to reschedule. Refunds are not automatically
 provided but may be considered case-by-case.
 
-🌪️ SEVERE WEATHER WARNINGS
+SEVERE WEATHER WARNINGS
 If a severe weather warning (tornado, hurricane, dangerous
-conditions) is issued, you may cancel for a full refund or 
+conditions) is issued, you may cancel for a full refund or
 credit. Your safety is our priority.
 
-🚨 CAMPGROUND CLOSURE / EVACUATION
+CAMPGROUND CLOSURE / EVACUATION
 If we close the campground or a mandatory evacuation is issued,
 you will receive a full refund or credit for all affected nights—
 no questions asked.

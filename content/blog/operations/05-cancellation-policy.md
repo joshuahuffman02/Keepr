@@ -256,9 +256,9 @@ Your cancellation policy should appear:
 
 We keep things simple:
 
-✅ **Book with confidence** — Cancel 14+ days out for a full refund
-✅ **Life happens** — Cancel 7-13 days out and get 50% back
-⚠️ **Last minute?** — Less than 7 days, we can't refund, but we'll
+[OK] **Book with confidence** — Cancel 14+ days out for a full refund
+[OK] **Life happens** — Cancel 7-13 days out and get 50% back
+[WARN] **Last minute?** — Less than 7 days, we can't refund, but we'll
    try to rebook your site for you
 
 Questions? Call us at [phone] or email [email]—we're happy to help!

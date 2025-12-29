@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException, Logger } from '@nestjs/common';
 import { Cron, CronExpression } from '@nestjs/schedule';
 import { PrismaService } from '../prisma/prisma.service';
 import { WorkflowTrigger, WorkflowStatus, WorkflowExecutionStatus } from '@prisma/client';
@@ -23,6 +23,8 @@ interface WorkflowStepDto {
 
 @Injectable()
 export class WorkflowsService {
+  private readonly logger = new Logger(WorkflowsService.name);
+
   constructor(private readonly prisma: PrismaService) {}
 
   async createWorkflow(dto: CreateWorkflowDto) {
@@ -112,7 +114,7 @@ export class WorkflowsService {
   ) {
     const workflow = await this.getWorkflow(workflowId);
     if (workflow.status !== 'active') {
-      throw new Error('Workflow is not active');
+      throw new BadRequestException('Workflow is not active');
     }
 
     return this.prisma.workflowExecution.create({
@@ -201,19 +203,19 @@ export class WorkflowsService {
     switch (step.actionType) {
       case 'send_email':
         // Queue email (integrate with email service)
-        console.log(`[Workflow] Would send email: ${config.templateId} to ${execution.guestId}`);
+        this.logger.log(`Would send email: ${config.templateId} to ${execution.guestId}`);
         break;
 
       case 'send_sms':
         // Queue SMS
-        console.log(`[Workflow] Would send SMS to ${execution.guestId}`);
+        this.logger.log(`Would send SMS to ${execution.guestId}`);
         break;
 
       case 'wait':
         // Schedule next execution after delay
         const delayMs = (config.delayMinutes ?? 60) * 60 * 1000;
         // In production, use a job queue with delay
-        console.log(`[Workflow] Would wait ${config.delayMinutes} minutes`);
+        this.logger.log(`Would wait ${config.delayMinutes} minutes`);
         break;
 
       case 'webhook':
@@ -231,14 +233,14 @@ export class WorkflowsService {
               }),
             });
           } catch (e) {
-            console.error('[Workflow] Webhook failed:', e);
+            this.logger.error('Webhook failed:', e instanceof Error ? e.stack : e);
           }
         }
         break;
 
       case 'condition':
         // Evaluate condition and potentially skip steps
-        console.log(`[Workflow] Would evaluate condition`);
+        this.logger.log('Would evaluate condition');
         break;
     }
   }

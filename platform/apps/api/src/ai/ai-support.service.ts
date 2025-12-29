@@ -1,4 +1,4 @@
-import { Injectable, Logger } from "@nestjs/common";
+import { Injectable, Logger, NotFoundException } from "@nestjs/common";
 import { AiProviderService } from "./ai-provider.service";
 import { PrismaService } from "../prisma/prisma.service";
 import { AiFeatureType } from "@prisma/client";
@@ -305,7 +305,7 @@ If the user's question is outside your knowledge, suggest they:
         select: { id: true }
       });
       if (!anyCampground) {
-        throw new Error("No campgrounds available for AI support");
+        throw new NotFoundException("No campgrounds available for AI support");
       }
       return anyCampground.id;
     }

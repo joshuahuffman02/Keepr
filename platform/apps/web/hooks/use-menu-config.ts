@@ -14,6 +14,25 @@ export interface MenuConfig {
   updatedAt: string;
 }
 
+interface SessionWithToken {
+  apiToken?: string;
+  user?: {
+    id: string;
+    email?: string;
+    name?: string;
+  };
+}
+
+interface WhoamiResponse {
+  user?: {
+    id: string;
+    email?: string;
+    name?: string;
+    platformRole?: string | null;
+  };
+  allowed?: Record<string, boolean>;
+}
+
 const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "http://localhost:4000/api";
 
 async function fetchWithAuth<T>(
@@ -48,7 +67,8 @@ export function useMenuConfig() {
   const migrationAttempted = useRef(false);
 
   const token = isBrowser ? localStorage.getItem("campreserv:authToken") : null;
-  const sessionToken = (session as any)?.apiToken as string | undefined;
+  const sessionWithToken = session as SessionWithToken | null;
+  const sessionToken = sessionWithToken?.apiToken;
   const authToken = sessionToken || token || "";
   const hasAuth = Boolean(authToken);
 
@@ -58,8 +78,9 @@ export function useMenuConfig() {
     : null;
 
   // Infer user's role from permissions
-  const permissions = (whoami?.allowed as Record<string, boolean>) || {};
-  const platformRole = (whoami?.user as any)?.platformRole as string | null;
+  const whoamiData = whoami as WhoamiResponse | undefined;
+  const permissions = whoamiData?.allowed || {};
+  const platformRole = whoamiData?.user?.platformRole || null;
   const inferredRole = inferRoleFromPermissions(permissions, platformRole);
 
   // Fetch menu config from API

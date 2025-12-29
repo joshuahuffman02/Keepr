@@ -11,6 +11,7 @@ import { Loader2, AlertCircle, RefreshCw } from "lucide-react";
 import { usePaymentContext } from "../context/PaymentContext";
 import { usePaymentIntent } from "../hooks/usePaymentIntent";
 import { cn } from "../../../../lib/utils";
+import { apiClient } from "../../../../lib/api-client";
 
 // Initialize Stripe
 const stripeKey = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY;
@@ -92,6 +93,24 @@ function CardPaymentForm({
 
       // Payment succeeded
       if (paymentIntent) {
+        // Record payment in our database (don't rely on webhook alone)
+        // This ensures payment is recorded even if webhook fails/is delayed
+        // The webhook has idempotency check on stripePaymentIntentId to prevent duplicates
+        const reservationId = props.subject?.type === "reservation" || props.subject?.type === "balance"
+          ? props.subject.reservationId
+          : undefined;
+
+        if (reservationId) {
+          try {
+            await apiClient.recordReservationPayment(reservationId, amountCents, [
+              { method: "card", amountCents, note: `Stripe PI: ${paymentIntent.id}` }
+            ]);
+          } catch (recordError) {
+            // Log but don't fail - webhook can still pick it up
+            console.error("Failed to record payment synchronously:", recordError);
+          }
+        }
+
         // Add tender entry for split tender support
         actions.addTenderEntry({
           method: "card",

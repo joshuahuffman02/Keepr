@@ -65,6 +65,8 @@ type FormType =
 const isLegalDocumentType = (type: string): boolean =>
   ["park_rules", "liability_waiver", "long_term_stay", "legal_agreement"].includes(type);
 
+type EnforcementType = "none" | "pre_booking" | "pre_checkin" | "post_booking";
+
 type FormTemplateInput = {
   title: string;
   type: FormType;
@@ -86,11 +88,19 @@ type FormTemplateInput = {
   // Legal document fields (for Policies backend)
   documentContent?: string;
   requireSignature?: boolean;
-  enforcement?: "none" | "pre_booking" | "pre_checkin" | "post_booking";
+  enforcement?: EnforcementType;
   // Track which backend this came from (for editing)
   _backend?: "form" | "policy";
   _originalId?: string;
 };
+
+type ModalTab = "questions" | "settings";
+
+type CreateFormPayload = Omit<FormTemplateInput, "_backend" | "_originalId"> & {
+  campgroundId?: string;
+};
+
+type UpdateFormPayload = Omit<FormTemplateInput, "_backend" | "_originalId">;
 
 const emptyForm: FormTemplateInput = {
   title: "",
@@ -1623,12 +1633,12 @@ export default function FormsPage() {
           // Check if we're editing a form or converting a policy to a form
           const existingTemplate = allTemplates.find(t => t.id === editingId);
           if (existingTemplate?._backend === "form") {
-            return apiClient.updateFormTemplate(editingId, payload as any);
+            return apiClient.updateFormTemplate(editingId, payload as Parameters<typeof apiClient.updateFormTemplate>[1]);
           }
           // If converting from policy to form, create new form
-          return apiClient.createFormTemplate({ campgroundId: campgroundId!, ...payload } as any);
+          return apiClient.createFormTemplate({ campgroundId: campgroundId!, ...payload } as Parameters<typeof apiClient.createFormTemplate>[0]);
         }
-        return apiClient.createFormTemplate({ campgroundId: campgroundId!, ...payload } as any);
+        return apiClient.createFormTemplate({ campgroundId: campgroundId!, ...payload } as Parameters<typeof apiClient.createFormTemplate>[0]);
       }
     },
     onSuccess: () => {
@@ -1941,7 +1951,7 @@ export default function FormsPage() {
             </DialogDescription>
           </DialogHeader>
 
-          <Tabs value={modalTab} onValueChange={(v) => setModalTab(v as any)} className="flex-1 flex flex-col overflow-hidden">
+          <Tabs value={modalTab} onValueChange={(v) => setModalTab(v as ModalTab)} className="flex-1 flex flex-col overflow-hidden">
             <TabsList className="grid w-full grid-cols-2">
               <TabsTrigger value="questions" className="flex items-center gap-2">
                 <FileQuestion className="h-4 w-4" />
@@ -2095,7 +2105,7 @@ export default function FormsPage() {
                         <label className="text-xs font-medium text-blue-800">When is signature required?</label>
                         <Select
                           value={form.enforcement || "post_booking"}
-                          onValueChange={(v) => setForm(f => ({ ...f, enforcement: v as any }))}
+                          onValueChange={(v: EnforcementType) => setForm(f => ({ ...f, enforcement: v }))}
                         >
                           <SelectTrigger className="bg-white">
                             <SelectValue />

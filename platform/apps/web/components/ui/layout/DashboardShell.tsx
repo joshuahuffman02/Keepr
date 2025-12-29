@@ -284,6 +284,20 @@ const Icon = ({ name, active }: { name: IconName; active?: boolean }) => {
   }
 };
 
+// Extended user type with platform role
+interface UserWithPlatformRole {
+  platformRole?: string | null;
+  memberships?: Array<{ campgroundId: string }>;
+}
+
+// Extended session type with API token
+interface SessionWithApiToken {
+  apiToken?: string;
+  user?: {
+    id?: string;
+  };
+}
+
 export function DashboardShell({ children, className, title, subtitle }: { children: ReactNode; className?: string; title?: string; subtitle?: string }) {
   const { data: session } = useSession();
   const { data: whoami } = useWhoami();
@@ -355,7 +369,7 @@ export function DashboardShell({ children, className, title, subtitle }: { child
   // Permission helpers
   const memberships = whoami?.user?.memberships ?? [];
   const hasCampgroundAccess = memberships.length > 0;
-  const platformRole = (whoami?.user as any)?.platformRole as string | null;
+  const platformRole = (whoami?.user as UserWithPlatformRole | undefined)?.platformRole ?? null;
   const supportAllowed =
     whoami?.allowed?.supportRead || whoami?.allowed?.supportAssign || whoami?.allowed?.supportAnalytics;
   const allowSupport = !!supportAllowed && (platformRole ? true : hasCampgroundAccess);
@@ -382,7 +396,8 @@ export function DashboardShell({ children, className, title, subtitle }: { child
 
   // Sync API token from session to localStorage
   useEffect(() => {
-    const apiToken = (session as any)?.apiToken;
+    const extendedSession = session as SessionWithApiToken | null;
+    const apiToken = extendedSession?.apiToken;
     if (apiToken) {
       localStorage.setItem("campreserv:authToken", apiToken);
     }
@@ -457,7 +472,6 @@ export function DashboardShell({ children, className, title, subtitle }: { child
   useEffect(() => {
     if (typeof window === "undefined") return;
     if (!selected) return;
-    const currentUserId = (session as any)?.user?.id as string | undefined;
 
     const loadUnread = async () => {
       try {

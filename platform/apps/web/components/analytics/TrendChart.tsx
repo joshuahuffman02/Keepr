@@ -1,20 +1,40 @@
 "use client";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import {
-  LineChart,
-  Line,
-  AreaChart,
-  Area,
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
-  Legend,
-} from "recharts";
+import { useEffect, useState } from "react";
+
+// Dynamic import for recharts to reduce initial bundle size
+let LineChart: any = null;
+let Line: any = null;
+let AreaChart: any = null;
+let Area: any = null;
+let BarChart: any = null;
+let Bar: any = null;
+let XAxis: any = null;
+let YAxis: any = null;
+let CartesianGrid: any = null;
+let Tooltip: any = null;
+let ResponsiveContainer: any = null;
+let Legend: any = null;
+
+const loadRecharts = async () => {
+  if (!LineChart) {
+    const rechartsModule = await import("recharts");
+    LineChart = rechartsModule.LineChart;
+    Line = rechartsModule.Line;
+    AreaChart = rechartsModule.AreaChart;
+    Area = rechartsModule.Area;
+    BarChart = rechartsModule.BarChart;
+    Bar = rechartsModule.Bar;
+    XAxis = rechartsModule.XAxis;
+    YAxis = rechartsModule.YAxis;
+    CartesianGrid = rechartsModule.CartesianGrid;
+    Tooltip = rechartsModule.Tooltip;
+    ResponsiveContainer = rechartsModule.ResponsiveContainer;
+    Legend = rechartsModule.Legend;
+  }
+  return { LineChart, Line, AreaChart, Area, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend };
+};
 
 interface TrendChartProps {
   title: string;
@@ -60,7 +80,13 @@ export function TrendChart({
   formatTooltip = formatNumber,
   loading = false,
 }: TrendChartProps) {
-  if (loading) {
+  const [isRechartsLoaded, setIsRechartsLoaded] = useState(false);
+
+  useEffect(() => {
+    loadRecharts().then(() => setIsRechartsLoaded(true));
+  }, []);
+
+  if (loading || !isRechartsLoaded) {
     return (
       <Card className="bg-slate-800/50 border-slate-700">
         <CardHeader>

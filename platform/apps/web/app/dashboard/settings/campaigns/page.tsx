@@ -242,7 +242,7 @@ export default function CampaignsPage() {
                 <div className="flex items-center justify-between">
                   <Label>HTML body</Label>
                   <div className="text-xs text-slate-500 flex items-center gap-2">
-                    <Tabs value={htmlMode} onValueChange={(v) => setHtmlMode(v as any)}>
+                    <Tabs value={htmlMode} onValueChange={(v) => setHtmlMode(v as "visual" | "html")}>
                       <TabsList className="h-7">
                         <TabsTrigger value="visual" className="text-xs h-7 px-2">Visual</TabsTrigger>
                         <TabsTrigger value="html" className="text-xs h-7 px-2">HTML</TabsTrigger>

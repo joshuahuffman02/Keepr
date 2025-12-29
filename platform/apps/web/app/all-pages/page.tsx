@@ -33,8 +33,8 @@ export default function AllPagesPage() {
   );
 
   // Filter by permissions (basic check)
-  const permissions = (whoami?.allowed as Record<string, boolean>) || {};
-  const platformRole = (whoami?.user as any)?.platformRole as string | null;
+  const permissions = (whoami?.allowed as Record<string, boolean> | undefined) || {};
+  const platformRole = (whoami?.user as { platformRole?: string | null } | undefined)?.platformRole ?? null;
   const accessiblePages = useMemo(() => {
     return allPages.filter((page) => {
       if (!page.permissions || page.permissions.length === 0) return true;

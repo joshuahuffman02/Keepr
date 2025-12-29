@@ -561,7 +561,7 @@ function Step2Mapping({
               {field.required && <span className="text-red-400 ml-1">*</span>}
             </Label>
             <Select
-              value={(mapping as any)[field.key] || ""}
+              value={mapping[field.key as keyof ReservationImportColumnMapping] || ""}
               onValueChange={(v) => updateMapping(field.key, v)}
             >
               <SelectTrigger className="bg-slate-800 border-slate-600 text-white">

@@ -23,6 +23,25 @@ export class LoyaltyService {
         return profile;
     }
 
+    async getProfilesBatch(guestIds: string[]) {
+        if (!guestIds.length) return [];
+
+        const profiles = await this.prisma.loyaltyProfile.findMany({
+            where: { guestId: { in: guestIds } },
+            select: {
+                guestId: true,
+                tier: true,
+                pointsBalance: true,
+            },
+        });
+
+        // Return a map for easy lookup
+        const profileMap = new Map(profiles.map(p => [p.guestId, p]));
+
+        // Return array with same order, defaulting missing profiles
+        return guestIds.map(id => profileMap.get(id) || { guestId: id, tier: 'Bronze', pointsBalance: 0 });
+    }
+
     async createProfile(guestId: string) {
         return this.prisma.loyaltyProfile.create({
             data: {

@@ -35,6 +35,19 @@ type Staff = {
   memberships?: { campgroundId: string; role?: string | null }[];
 };
 
+interface UserWithPlatformRole {
+  memberships?: Array<{ campgroundId: string; role?: string | null }>;
+  platformRole?: string | null;
+  platformRegion?: string | null;
+  region?: string | null;
+}
+
+interface WhoamiAllowed {
+  supportRead?: boolean;
+  supportAssign?: boolean;
+  supportAnalytics?: boolean;
+}
+
 type Report = {
   id: string;
   createdAt: string;
@@ -78,10 +91,12 @@ export default function SupportAdminPage() {
   const { toast } = useToast();
   const { data: session } = useSession();
   const { data: whoami, isLoading: whoamiLoading, error: whoamiError } = useWhoami();
-  const hasMembership = (whoami?.user?.memberships?.length ?? 0) > 0;
-  const platformRole = (whoami?.user as any)?.platformRole as string | undefined;
+  const hasMembership = ((whoami?.user as UserWithPlatformRole | undefined)?.memberships?.length ?? 0) > 0;
+  const platformRole = (whoami?.user as UserWithPlatformRole | undefined)?.platformRole;
   const supportAllowed =
-    whoami?.allowed?.supportRead || whoami?.allowed?.supportAssign || whoami?.allowed?.supportAnalytics;
+    (whoami?.allowed as WhoamiAllowed | undefined)?.supportRead ||
+    (whoami?.allowed as WhoamiAllowed | undefined)?.supportAssign ||
+    (whoami?.allowed as WhoamiAllowed | undefined)?.supportAnalytics;
   const allowSupport = !!supportAllowed && (!!platformRole || hasMembership);
 
   useEffect(() => {
@@ -121,10 +136,11 @@ export default function SupportAdminPage() {
 
   useEffect(() => {
     if (whoamiLoading) return;
-    const viewerRegion = (whoami?.user as any)?.platformRegion ?? whoami?.user?.region ?? null;
+    const user = whoami?.user as UserWithPlatformRole | undefined;
+    const viewerRegion = user?.platformRegion ?? user?.region ?? null;
     const regionAllowed = regionFilter === "all" || !viewerRegion || viewerRegion === regionFilter;
     const campgroundAllowed =
-      !campgroundId || platformRole || whoami?.user?.memberships?.some((m: any) => m.campgroundId === campgroundId);
+      !campgroundId || platformRole || user?.memberships?.some((m) => m.campgroundId === campgroundId);
 
     if (!allowSupport || !regionAllowed || !campgroundAllowed) {
       setReports([]);
@@ -157,10 +173,11 @@ export default function SupportAdminPage() {
 
   useEffect(() => {
     if (whoamiLoading) return;
-    const viewerRegion = (whoami?.user as any)?.platformRegion ?? whoami?.user?.region ?? null;
+    const user = whoami?.user as UserWithPlatformRole | undefined;
+    const viewerRegion = user?.platformRegion ?? user?.region ?? null;
     const regionAllowed = regionFilter === "all" || !viewerRegion || viewerRegion === regionFilter;
     const campgroundAllowed =
-      !campgroundId || platformRole || whoami?.user?.memberships?.some((m: any) => m.campgroundId === campgroundId);
+      !campgroundId || platformRole || user?.memberships?.some((m) => m.campgroundId === campgroundId);
 
     if (!allowSupport || !regionAllowed || !campgroundAllowed) {
       setStaff([]);
@@ -199,9 +216,10 @@ export default function SupportAdminPage() {
   const resolvedCount = reports.filter((r) => r.status === "resolved" || r.status === "closed").length;
 
   // Permission checks
-  const regionAllowed = regionFilter === "all" || !whoami?.user?.region || whoami?.user?.region === regionFilter;
+  const user = whoami?.user as UserWithPlatformRole | undefined;
+  const regionAllowed = regionFilter === "all" || !user?.region || user?.region === regionFilter;
   const campgroundAllowed =
-    !campgroundId || platformRole || whoami?.user?.memberships?.some((m: any) => m.campgroundId === campgroundId);
+    !campgroundId || platformRole || user?.memberships?.some((m) => m.campgroundId === campgroundId);
   const canMutate = !!whoami && regionAllowed && campgroundAllowed && allowSupport;
   const canReadSupport = !!whoami && allowSupport && regionAllowed && campgroundAllowed;
   const openReports = reports.filter((r) => r.status !== "closed").length;
@@ -342,7 +360,7 @@ export default function SupportAdminPage() {
               </Button>
             </div>
             <div className="text-xs text-slate-500">
-              Scope: {whoamiLoading ? "Loading..." : whoami?.user ? `Region ${whoami.user.region ?? "Any"} • Campgrounds ${whoami.user.memberships?.length || 0}` : "Unavailable"}
+              Scope: {whoamiLoading ? "Loading..." : user ? `Region ${user.region ?? "Any"} • Campgrounds ${user.memberships?.length || 0}` : "Unavailable"}
             </div>
           </div>
         </div>

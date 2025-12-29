@@ -428,7 +428,7 @@ export default function SeasonalRatesSettingsPage() {
                                     <Label>Rate Type</Label>
                                     <Select
                                         value={formData.rateType}
-                                        onValueChange={(val) => setFormData({ ...formData, rateType: val as any })}
+                                        onValueChange={(val) => setFormData({ ...formData, rateType: val as "nightly" | "weekly" | "monthly" | "seasonal" })}
                                     >
                                         <SelectTrigger>
                                             <SelectValue />

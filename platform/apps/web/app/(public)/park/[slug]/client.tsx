@@ -303,8 +303,13 @@ function SiteClassCard({
     onSelect?: (siteType?: string) => void;
 }) {
     // Get top amenities to display (max 4 additional beyond hookups)
-    const amenityTags = (siteClass as any).amenityTags as string[] | undefined;
-    const electricAmps = (siteClass as any).electricAmps as number[] | undefined;
+    type SiteClassWithExtras = typeof siteClass & {
+        amenityTags?: string[];
+        electricAmps?: number[];
+    };
+    const siteClassExtended = siteClass as SiteClassWithExtras;
+    const amenityTags = siteClassExtended.amenityTags;
+    const electricAmps = siteClassExtended.electricAmps;
     const displayAmenities = useMemo(() => {
         if (!amenityTags || amenityTags.length === 0) return [];
         return amenityTags.slice(0, 4).map(tag => {
@@ -902,7 +907,7 @@ export function CampgroundDetailClient({
                                 {[campground.city, campground.state, campground.country].filter(Boolean).join(", ")}
                             </p>
                             <div className="flex flex-wrap items-center gap-3 mt-3">
-                                <ReviewBadge score={campground.reviewScore as any} count={campground.reviewCount as any} />
+                                <ReviewBadge score={campground.reviewScore} count={campground.reviewCount} />
                                 {externalHref && (
                                     <a
                                         href={externalHref}
@@ -1036,7 +1041,7 @@ export function CampgroundDetailClient({
                                 <label className="text-sm text-slate-600">Rating</label>
                                 <select
                                     value={ratingFilter}
-                                    onChange={(e) => setRatingFilter(e.target.value as any)}
+                                    onChange={(e) => setRatingFilter(e.target.value as "all" | "5" | "4" | "3" | "2" | "1")}
                                     className="border border-slate-200 rounded-lg px-3 py-2 text-sm"
                                 >
                                     <option value="all">All</option>
@@ -1051,7 +1056,7 @@ export function CampgroundDetailClient({
                                 <label className="text-sm text-slate-600">Sort</label>
                                 <select
                                     value={sortOption}
-                                    onChange={(e) => setSortOption(e.target.value as any)}
+                                    onChange={(e) => setSortOption(e.target.value as "relevant" | "newest" | "highest" | "lowest" | "photos")}
                                     className="border border-slate-200 rounded-lg px-3 py-2 text-sm"
                                 >
                                     <option value="relevant">Most relevant</option>
@@ -1247,7 +1252,9 @@ export function CampgroundDetailClient({
                                             SAVE {promo.type === 'percentage' ? `${promo.value}%` : formatPrice(promo.value)}
                                         </div>
                                         <div className="mb-4">
-                                            <div className="text-4xl mb-2">🏷️</div>
+                                            <div className="w-12 h-12 rounded-full bg-rose-100 flex items-center justify-center mb-2">
+                                                <Zap className="h-6 w-6 text-rose-600" />
+                                            </div>
                                             <h3 className="font-bold text-slate-900 text-lg">{promo.code}</h3>
                                             <p className="text-slate-600 text-sm mt-1">{promo.description || "Special offer for our guests!"}</p>
                                         </div>
@@ -1255,7 +1262,7 @@ export function CampgroundDetailClient({
                                         <div className="space-y-2 mb-4">
                                             {promo.validTo && (
                                                 <div className="text-xs text-rose-700 font-medium flex items-center gap-1">
-                                                    <span>⏳</span>
+                                                    <Clock className="h-3 w-3" />
                                                     <span>Expires {formatDate(promo.validTo)}</span>
                                                 </div>
                                             )}

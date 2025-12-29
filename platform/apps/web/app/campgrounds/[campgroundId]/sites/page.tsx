@@ -79,6 +79,29 @@ const siteTypeConfig: Record<string, { icon: React.ReactNode; label: string; col
 // Standard power amp options for RV sites
 const POWER_AMP_OPTIONS = [15, 20, 30, 50, 100] as const;
 
+type Site = {
+  id: string;
+  name: string;
+  siteNumber: string;
+  siteType: "rv" | "tent" | "cabin" | "group" | "glamping";
+  siteClassId?: string | null;
+  maxOccupancy?: number;
+  rigMaxLength?: number | null;
+  hookupsPower?: boolean;
+  hookupsWater?: boolean;
+  hookupsSewer?: boolean;
+  powerAmps?: number[];
+  petFriendly?: boolean;
+  accessible?: boolean;
+  minNights?: number | null;
+  maxNights?: number | null;
+  photos?: string[];
+  description?: string;
+  tags?: string[];
+  isActive?: boolean;
+  zone?: string | null;
+};
+
 type SiteFormState = {
   name: string;
   siteNumber: string;
@@ -212,7 +235,7 @@ export default function SitesPage() {
     return {
       name: state.name,
       siteNumber: state.siteNumber,
-      siteType: state.siteType as any,
+      siteType: state.siteType as "rv" | "tent" | "cabin" | "group" | "glamping",
       maxOccupancy: Number(state.maxOccupancy),
       rigMaxLength: parseOptionalNumber(state.rigMaxLength),
       hookupsPower: state.hookupsPower,
@@ -1113,7 +1136,8 @@ export default function SitesPage() {
             </TableHeader>
             <TableBody>
               {paginatedSites.map((site, index) => {
-                const cls = classesQuery.data?.find((c) => c.id === (site as any).siteClassId) || null;
+                const typedSite = site as Site;
+                const cls = classesQuery.data?.find((c) => c.id === typedSite.siteClassId) || null;
                 const isEditing = editingId === site.id;
                 const isSelected = selectedSites.has(site.id);
                 const isInactive = site.isActive === false;
@@ -1166,10 +1190,10 @@ export default function SitesPage() {
                       </TableCell>
                       <TableCell>
                         <Select
-                          value={(site as any).siteClassId ?? "none"}
+                          value={typedSite.siteClassId ?? "none"}
                           onValueChange={(value) => {
                             const newClassId = value === "none" ? null : value;
-                            const prevClassId = (site as any).siteClassId ?? null;
+                            const prevClassId = typedSite.siteClassId ?? null;
                             const newClassName = classesQuery.data?.find(c => c.id === newClassId)?.name || "No class";
                             quickUpdateSite.mutate({
                               id: site.id,

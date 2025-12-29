@@ -24,10 +24,10 @@ async function testPassword() {
     const testPassword = 'password123';
     const matches = await bcrypt.compare(testPassword, user.passwordHash);
 
-    console.log(`\nTesting password "${testPassword}": ${matches ? '✓ MATCH' : '✗ NO MATCH'}`);
+    console.log(`\nTesting password "${testPassword}": ${matches ? 'MATCH' : 'NO MATCH'}`);
 
     if (!matches) {
-      console.log('\n⚠️  Password does not match! Need to reset user password.');
+      console.log('\nWARNING: Password does not match! Need to reset user password.');
     }
   } catch (error) {
     console.error('Error:', error.message);

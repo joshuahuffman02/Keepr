@@ -1,10 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/auth';
+import type { Session } from 'next-auth';
 
 const API_BASE = process.env.NEXT_PUBLIC_API_BASE || 'http://localhost:4001/api';
 
+interface AuthSession extends Session {
+    apiToken?: string;
+}
+
 export async function GET(request: NextRequest) {
-    const session = await auth();
+    const session = await auth() as AuthSession | null;
     if (!session?.user) {
         return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
@@ -15,7 +20,7 @@ export async function GET(request: NextRequest) {
     try {
         const response = await fetch(`${API_BASE}/internal-messages?limit=${limit}`, {
             headers: {
-                'Authorization': `Bearer ${(session as any).apiToken}`,
+                'Authorization': `Bearer ${session.apiToken}`,
             },
         });
         const data = await response.json();
@@ -27,7 +32,7 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
-    const session = await auth();
+    const session = await auth() as AuthSession | null;
     if (!session?.user) {
         return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
@@ -38,7 +43,7 @@ export async function POST(request: NextRequest) {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': `Bearer ${(session as any).apiToken}`,
+                'Authorization': `Bearer ${session.apiToken}`,
             },
             body: JSON.stringify(body),
         });

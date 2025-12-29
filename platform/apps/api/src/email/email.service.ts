@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger, BadRequestException } from '@nestjs/common';
 import nodemailer from 'nodemailer';
 import fetch from 'node-fetch';
 import { PrismaService } from '../prisma/prisma.service';
@@ -92,7 +92,7 @@ export class EmailService {
             });
             const data: any = await res.json();
             if (!res.ok) {
-                throw new Error(`Resend send failed: ${res.status} ${JSON.stringify(data)}`);
+                throw new BadRequestException(`Resend send failed: ${res.status} ${JSON.stringify(data)}`);
             }
             this.logger.log(`Email sent via Resend to ${options.to} (${options.subject})`);
             return { providerMessageId: data.id, provider: "resend" };
@@ -115,7 +115,7 @@ export class EmailService {
             });
             const data: any = await res.json();
             if (!res.ok) {
-                throw new Error(`Postmark send failed: ${res.status} ${JSON.stringify(data)}`);
+                throw new BadRequestException(`Postmark send failed: ${res.status} ${JSON.stringify(data)}`);
             }
             this.logger.log(`Email sent via Postmark to ${options.to} (${options.subject})`);
             return { providerMessageId: data.MessageID, provider: "postmark" };
@@ -361,7 +361,7 @@ ${options.html}
             <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
                 <div style="text-align: center; margin-bottom: 30px;">
                     <div style="background: #10b981; width: 60px; height: 60px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 16px;">
-                        <span style="color: white; font-size: 28px;">✓</span>
+                        <span style="color: white; font-size: 18px; font-weight: bold;">OK</span>
                     </div>
                     <h1 style="color: #0f172a; margin: 0;">Your Ticket Has Been Resolved</h1>
                     <p style="color: #64748b; margin-top: 8px;">Thank you for your feedback!</p>
@@ -428,7 +428,7 @@ ${options.html}
             <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
                 <div style="text-align: center; margin-bottom: 30px;">
                     <div style="background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%); width: 60px; height: 60px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 16px;">
-                        <span style="color: white; font-size: 24px;">⇄</span>
+                        <span style="color: white; font-size: 18px; font-weight: bold;">SWAP</span>
                     </div>
                     <h1 style="color: #0f172a; margin: 0;">Shift Swap Request</h1>
                     <p style="color: #64748b; margin-top: 8px;">Someone wants to swap shifts with you</p>
@@ -523,7 +523,7 @@ ${options.html}
 
         const statusColor = options.approved ? "#10b981" : "#ef4444";
         const statusText = options.approved ? "Approved" : "Rejected";
-        const statusIcon = options.approved ? "✓" : "✕";
+        const statusIcon = options.approved ? "OK" : "X";
 
         const html = `
             <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">

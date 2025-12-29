@@ -60,8 +60,8 @@ const numberish = <T extends z.ZodTypeAny>(schema: T) =>
       return Number.isNaN(parsed) ? val : parsed;
     }
     if (typeof val === "number") return val;
-    if (typeof val === "object" && typeof (val as any)?.toString === "function") {
-      const str = (val as any).toString();
+    if (typeof val === "object" && val !== null && "toString" in val && typeof val.toString === "function") {
+      const str = val.toString();
       const parsed = Number(str);
       return Number.isNaN(parsed) ? val : parsed;
     }
@@ -214,6 +214,12 @@ const StoredValueCodeSchema = z.object({
 });
 
 const StoredValueScopeSchema = z.enum(["campground", "organization", "global"]);
+
+// Additional response types for API methods
+const StayReasonReportSchema = z.unknown(); // Generic report data structure
+const DailyScheduleSchema = z.unknown(); // Housekeeping schedule structure
+const FlexCheckPolicySchema = z.unknown(); // Flex check policy structure
+const GroupBookingSchema = z.unknown(); // Group booking structure
 
 const StoredValueAccountSchema = z.object({
   id: z.string(),
@@ -3707,8 +3713,7 @@ export const apiClient = {
     if (payload?.endDate) params.set("endDate", payload.endDate);
     const qs = params.toString();
     const data = await fetchJSON<unknown>(`/campgrounds/${campgroundId}/reports/booking-sources${qs ? `?${qs}` : ""}`);
-    // Return raw data as the structure is complex and we control the API
-    return data as any;
+    return data as Record<string, unknown>;
   },
   async getGuestOrigins(campgroundId: string, payload?: { startDate?: string; endDate?: string }) {
     const params = new URLSearchParams();
@@ -3716,7 +3721,7 @@ export const apiClient = {
     if (payload?.endDate) params.set("endDate", payload.endDate);
     const qs = params.toString();
     const data = await fetchJSON<unknown>(`/campgrounds/${campgroundId}/reports/guest-origins${qs ? `?${qs}` : ""}`);
-    return data as any;
+    return data as Record<string, unknown>;
   },
   async getReferralPerformance(campgroundId: string, payload?: { startDate?: string; endDate?: string }) {
     const params = new URLSearchParams();
@@ -3724,7 +3729,7 @@ export const apiClient = {
     if (payload?.endDate) params.set("endDate", payload.endDate);
     const qs = params.toString();
     const data = await fetchJSON<unknown>(`/campgrounds/${campgroundId}/reports/referrals${qs ? `?${qs}` : ""}`);
-    return data as any;
+    return data as Record<string, unknown>;
   },
   async getStayReasonBreakdown(campgroundId: string, payload?: { startDate?: string; endDate?: string }) {
     const params = new URLSearchParams();
@@ -3732,7 +3737,7 @@ export const apiClient = {
     if (payload?.endDate) params.set("endDate", payload.endDate);
     const qs = params.toString();
     const data = await fetchJSON<unknown>(`/campgrounds/${campgroundId}/reports/stay-reasons${qs ? `?${qs}` : ""}`);
-    return data as any;
+    return StayReasonReportSchema.parse(data);
   },
   async listReferralPrograms(campgroundId: string) {
     const data = await fetchJSON<unknown>(`/campgrounds/${campgroundId}/referral-programs`);
@@ -4436,6 +4441,14 @@ export const apiClient = {
   async getLoyaltyProfile(guestId: string) {
     const data = await fetchJSON<unknown>(`/loyalty/guests/${guestId}`);
     return LoyaltyProfileSchema.parse(data);
+  },
+  async getLoyaltyProfilesBatch(guestIds: string[]): Promise<{ guestId: string; tier: string; pointsBalance: number }[]> {
+    const res = await fetch(`${API_BASE}/loyalty/batch`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", ...scopedHeaders() },
+      body: JSON.stringify({ guestIds })
+    });
+    return parseResponse<{ guestId: string; tier: string; pointsBalance: number }[]>(res);
   },
   async awardPoints(guestId: string, amount: number, reason: string) {
     const res = await fetch(`${API_BASE}/loyalty/guests/${guestId}/points`, {
@@ -8567,7 +8580,7 @@ export const apiClient = {
     const query = new URLSearchParams({ campgroundId });
     if (date) query.set("date", date);
     const data = await fetchJSON<unknown>(`/housekeeping/schedule/daily?${query.toString()}`);
-    return data as any;
+    return DailyScheduleSchema.parse(data);
   },
 
   async getStaffWorkload(campgroundId: string, date?: string) {
@@ -8676,7 +8689,7 @@ export const apiClient = {
 
   async getFlexCheckPolicy(campgroundId: string) {
     const data = await fetchJSON<unknown>(`/flex-check/policy?campgroundId=${campgroundId}`);
-    return data as any;
+    return FlexCheckPolicySchema.parse(data);
   },
 
   async updateFlexCheckPolicy(campgroundId: string, payload: {
@@ -8809,7 +8822,7 @@ export const apiClient = {
 
   async getGroupBooking(id: string) {
     const data = await fetchJSON<unknown>(`/group-bookings/${id}`);
-    return data as any;
+    return GroupBookingSchema.parse(data);
   },
 
   async createGroupBooking(payload: {

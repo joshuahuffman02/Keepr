@@ -149,7 +149,7 @@ const staffChatMessages = [
 ];
 
 async function main() {
-    console.log('🌱 Seeding Messaging Data...\n');
+    console.log('Seeding Messaging Data...\n');
 
     // Get the first campground
     const campground = await prisma.campground.findFirst({
@@ -241,7 +241,7 @@ async function main() {
         console.log(`  Created conversation with ${reservation.guest.primaryFirstName} ${reservation.guest.primaryLastName}`);
     }
 
-    console.log(`\n✓ Created ${guestMessageCount} guest messages\n`);
+    console.log(`\nCreated ${guestMessageCount} guest messages\n`);
 
     // ============ SEED INTERNAL STAFF MESSAGES ============
     console.log('Creating internal staff chat...');
@@ -284,7 +284,7 @@ async function main() {
         chatTime = addMinutes(chatTime, Math.floor(Math.random() * 6) + 2);
     }
 
-    console.log(`✓ Created ${internalMessageCount} internal staff messages\n`);
+    console.log(`Created ${internalMessageCount} internal staff messages\n`);
 
     // ============ ADD UNREAD MESSAGES ============
     console.log('Adding recent unread guest messages...');
@@ -311,10 +311,10 @@ async function main() {
         });
     }
 
-    console.log(`✓ Added ${recentReservations.length} unread messages\n`);
+    console.log(`Added ${recentReservations.length} unread messages\n`);
 
-    console.log('✅ Messaging seed complete!');
-    console.log(`\n📊 Summary:`);
+    console.log('Messaging seed complete!');
+    console.log(`\nSummary:`);
     console.log(`   Guest messages: ${guestMessageCount + recentReservations.length}`);
     console.log(`   Internal staff messages: ${internalMessageCount}`);
 }

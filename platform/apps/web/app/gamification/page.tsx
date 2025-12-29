@@ -11,8 +11,26 @@ import { useCampground } from "@/contexts/CampgroundContext";
 import { useWhoami } from "@/hooks/use-whoami";
 import { apiClient } from "@/lib/api-client";
 import { launchConfetti } from "@/lib/gamification/confetti";
-import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from "recharts";
 import { motion, AnimatePresence } from "framer-motion";
+
+// Dynamic import for recharts to reduce initial bundle size
+let PieChart: any = null;
+let Pie: any = null;
+let Cell: any = null;
+let ResponsiveContainer: any = null;
+let Tooltip: any = null;
+
+const loadRecharts = async () => {
+  if (!PieChart) {
+    const rechartsModule = await import("recharts");
+    PieChart = rechartsModule.PieChart;
+    Pie = rechartsModule.Pie;
+    Cell = rechartsModule.Cell;
+    ResponsiveContainer = rechartsModule.ResponsiveContainer;
+    Tooltip = rechartsModule.Tooltip;
+  }
+  return { PieChart, Pie, Cell, ResponsiveContainer, Tooltip };
+};
 import {
   Trophy,
   Flame,
@@ -59,11 +77,11 @@ const CATEGORY_COLORS: Record<string, string> = {
   other: "#94a3b8",
 };
 
-const BADGE_EMOJIS: Record<string, string> = {
-  bronze: "🥉",
-  silver: "🥈",
-  gold: "🥇",
-  platinum: "💎",
+const BADGE_ICONS: Record<string, string> = {
+  bronze: "medal",
+  silver: "medal",
+  gold: "trophy",
+  platinum: "gem",
 };
 
 const LEVEL_TITLES: Record<number, string> = {
@@ -217,7 +235,7 @@ function XpToast({
           animate={{ rotate: [0, -10, 10, -10, 0] }}
           transition={{ duration: 0.5 }}
         >
-          {xp > 0 ? "✨" : "🏅"}
+          {xp > 0 ? "+" : ""}
         </motion.div>
 
         <div className="flex-1">
@@ -451,6 +469,12 @@ export default function GamificationDashboardPage() {
 
   const [windowKey, setWindowKey] = useState<"weekly" | "monthly" | "all">("weekly");
   const prevLevelRef = useRef<number | null>(null);
+  const [isRechartsLoaded, setIsRechartsLoaded] = useState(false);
+
+  // Load recharts library
+  useEffect(() => {
+    loadRecharts().then(() => setIsRechartsLoaded(true));
+  }, []);
 
   // Level up modal state
   const [showLevelUpModal, setShowLevelUpModal] = useState(false);
@@ -722,7 +746,14 @@ export default function GamificationDashboardPage() {
                   <CardDescription>Where your XP comes from (last 30 days)</CardDescription>
                 </CardHeader>
                 <CardContent>
-                  {categoryData.length === 0 ? (
+                  {!isRechartsLoaded ? (
+                    <div className="text-center py-8 text-slate-500">
+                      <div className="flex items-center justify-center gap-2">
+                        <div className="h-4 w-4 animate-spin rounded-full border-2 border-emerald-500 border-t-transparent" />
+                        <p>Loading chart...</p>
+                      </div>
+                    </div>
+                  ) : categoryData.length === 0 ? (
                     <div className="text-center py-8 text-slate-500">
                       <Star className="w-12 h-12 mx-auto mb-3 text-slate-300" />
                       <p>No XP earned yet</p>

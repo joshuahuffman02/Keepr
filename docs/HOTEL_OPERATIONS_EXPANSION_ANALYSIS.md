@@ -607,31 +607,31 @@ interface EarlyArrivalWorkflow {
 │  HOUSEKEEPING STAFF MOBILE APP          │
 ├─────────────────────────────────────────┤
 │                                         │
-│  📋 MY TASKS                            │
+│  MY TASKS                            │
 │  ├─ Today's Assignments (12)            │
 │  ├─ Completed (5)                       │
 │  └─ Priority Queue                      │
 │                                         │
-│  🔄 CURRENT TASK                        │
+│  CURRENT TASK                        │
 │  ├─ Unit: Cabin 14                      │
 │  ├─ Type: Turnover Clean                │
 │  ├─ Time: Started 2:34 PM               │
-│  ├─ SLA: Due by 3:30 PM ⏱️              │
+│  ├─ SLA: Due by 3:30 PM              │
 │  └─ [Checklist Progress: 8/12]          │
 │                                         │
-│  ☑️ CHECKLIST                           │
-│  ├─ ☑ Strip beds                        │
-│  ├─ ☑ Clean bathroom                    │
-│  ├─ ☐ Vacuum floors                     │
-│  ├─ ☐ Restock supplies                  │
-│  └─ ☐ Final inspection                  │
+│  CHECKLIST                           │
+│  ├─ [x] Strip beds                      │
+│  ├─ [x] Clean bathroom                  │
+│  ├─ [ ] Vacuum floors                   │
+│  ├─ [ ] Restock supplies                │
+│  └─ [ ] Final inspection                │
 │                                         │
-│  📸 REPORT ISSUE                        │
+│  REPORT ISSUE                        │
 │  ├─ [Take Photo]                        │
 │  ├─ Issue Type: [Dropdown]              │
 │  └─ [Submit to Maintenance]             │
 │                                         │
-│  ⏸️ PAUSE / ✓ COMPLETE                  │
+│  [PAUSE] / [COMPLETE]                  │
 │                                         │
 └─────────────────────────────────────────┘
 ```
@@ -774,18 +774,18 @@ model MaintenanceTicket {
 │  └─────────┴─────────┘      │  └─────────────────────────────────┘ │
 │                                                                     │
 │  SLA STATUS                                                         │
-│  🟢 On Track: 35    🟡 At Risk: 5    🔴 Breached: 2                 │
+│  [OK] On Track: 35    [WARN] At Risk: 5    [ERR] Breached: 2                 │
 │                                                                     │
 │  PRIORITY UNITS (Arrivals < 2 hours)                               │
 │  ┌─────────────────────────────────────────────────────────────┐   │
-│  │ 🔴 Cabin 7    │ Turnover │ VIP Arrival 3:00 PM │ Unassigned │   │
-│  │ 🟡 Room 204   │ Cleaning │ Arrival 3:30 PM     │ Maria S.   │   │
-│  │ 🟢 Yurt 3     │ Inspecting│ Arrival 4:00 PM    │ James K.   │   │
+│  │ [ERR] Cabin 7  │ Turnover │ VIP Arrival 3:00 PM │ Unassigned │   │
+│  │ [WARN] Room 204│ Cleaning │ Arrival 3:30 PM     │ Maria S.   │   │
+│  │ [OK] Yurt 3   │ Inspecting│ Arrival 4:00 PM    │ James K.   │   │
 │  └─────────────────────────────────────────────────────────────┘   │
 │                                                                     │
 │  BOTTLENECKS                                                        │
-│  ⚠️ Building B Floor 3: 4 units pending, 0 staff assigned          │
-│  ⚠️ Deep cleans behind schedule (2 of 5 complete)                  │
+│  [WARN] Building B Floor 3: 4 units pending, 0 staff assigned      │
+│  [WARN] Deep cleans behind schedule (2 of 5 complete)              │
 │                                                                     │
 │  [Reassign Tasks]  [Add Staff]  [View Full Board]                  │
 │                                                                     │
@@ -831,15 +831,15 @@ interface HousekeepingMetrics {
 
 | Capability | Current State | Required for Hotels |
 |------------|---------------|---------------------|
-| Room blocking | `SiteHold` model exists | ✅ Adequate, extend for reasons |
-| Out-of-order | `MaintenanceTicket.outOfOrder` | ✅ Adequate |
-| Early check-in | Not implemented | ❌ Need pricing + workflow |
-| Late checkout | Not implemented | ❌ Need pricing + workflow |
-| Room moves | Not implemented | ❌ Need mid-stay transfer flow |
-| Multi-room booking | Separate reservations | ❌ Need linked group booking |
-| Room preferences | Not implemented | ❌ Need preference matching |
-| Walk-in handling | Basic booking | ⚠️ Needs optimization UI |
-| Key/access codes | `SmartLock` + `AccessGrant` | ✅ Foundation exists |
+| Room blocking | `SiteHold` model exists | [OK] Adequate, extend for reasons |
+| Out-of-order | `MaintenanceTicket.outOfOrder` | [OK] Adequate |
+| Early check-in | Not implemented | [GAP] Need pricing + workflow |
+| Late checkout | Not implemented | [GAP] Need pricing + workflow |
+| Room moves | Not implemented | [GAP] Need mid-stay transfer flow |
+| Multi-room booking | Separate reservations | [GAP] Need linked group booking |
+| Room preferences | Not implemented | [GAP] Need preference matching |
+| Walk-in handling | Basic booking | [PARTIAL] Needs optimization UI |
+| Key/access codes | `SmartLock` + `AccessGrant` | [OK] Foundation exists |
 
 ### 4.2 Room Blocking and Out-of-Order Management
 

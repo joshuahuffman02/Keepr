@@ -1,4 +1,4 @@
-import { BadRequestException, Body, Controller, Get, Headers, Param, Patch, Post, Query, Req, UseGuards } from "@nestjs/common";
+import { BadRequestException, Body, Controller, Get, Headers, Param, Patch, Post, Query, Req, UseGuards, Logger } from "@nestjs/common";
 import { JwtAuthGuard } from "../auth/guards";
 import { OnboardingService } from "./onboarding.service";
 import { CreateOnboardingInviteDto, StartOnboardingDto, UpdateOnboardingStepDto } from "./dto";
@@ -7,6 +7,8 @@ import { PrismaService } from "../prisma/prisma.service";
 
 @Controller("onboarding")
 export class OnboardingController {
+  private readonly logger = new Logger(OnboardingController.name);
+
   constructor(
     private readonly onboarding: OnboardingService,
     private readonly stripe: StripeService,
@@ -139,7 +141,7 @@ export class OnboardingController {
         charges_enabled: account.charges_enabled
       };
     } catch (err) {
-      console.error("[Onboarding] Stripe account retrieval error:", err);
+      this.logger.error("Stripe account retrieval error:", err instanceof Error ? err.stack : err);
       return { connected: false, reason: "account_error" };
     }
   }

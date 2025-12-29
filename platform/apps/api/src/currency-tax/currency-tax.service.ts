@@ -1,4 +1,4 @@
-import { Injectable } from "@nestjs/common";
+import { Injectable, BadRequestException } from "@nestjs/common";
 
 type FxRate = {
   base: string;
@@ -98,7 +98,7 @@ export class CurrencyTaxService {
    * }
    */
   async refreshRates(): Promise<void> {
-    throw new Error('FX rate refresh not implemented. Configure FX_PROVIDER and implement provider-specific logic.');
+    throw new BadRequestException('FX rate refresh not implemented. Configure FX_PROVIDER and implement provider-specific logic.');
   }
 
   convert(amount: number, from: string, to: string): ConversionResult {

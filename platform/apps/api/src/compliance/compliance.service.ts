@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 
 @Injectable()
@@ -16,7 +16,7 @@ export class ComplianceService {
         });
 
         if (!org) {
-            throw new Error('Organization not found');
+            throw new NotFoundException('Organization not found');
         }
 
         const currentRegion = process.env.AWS_REGION || 'us-east-1';

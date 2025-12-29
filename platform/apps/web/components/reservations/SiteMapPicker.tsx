@@ -37,11 +37,11 @@ const statusColors: Record<SiteStatus, { bg: string; border: string; text: strin
 };
 
 const siteTypeIcons: Record<string, string> = {
-    rv: "🚐",
-    tent: "⛺",
-    cabin: "🏠",
-    group: "👥",
-    glamping: "✨"
+    rv: "truck",
+    tent: "tent",
+    cabin: "home",
+    group: "users",
+    glamping: "sparkles"
 };
 
 export function SiteMapPicker({
@@ -130,7 +130,7 @@ export function SiteMapPicker({
                             const colors = statusColors[site.status];
                             const isSelected = site.id === selectedSiteId;
                             const isClickable = site.status === "available";
-                            const icon = siteTypeIcons[site.siteType] || "📍";
+                            const icon = siteTypeIcons[site.siteType] || "pin";
 
                             return (
                                 <button
@@ -167,8 +167,8 @@ export function SiteMapPicker({
                                         )}
                                     </div>
                                     {isSelected && (
-                                        <div className="absolute -right-1 -top-1 flex h-4 w-4 items-center justify-center rounded-full bg-blue-500 text-[10px] text-white">
-                                            ✓
+                                        <div className="absolute -right-1 -top-1 flex h-4 w-4 items-center justify-center rounded-full bg-blue-500">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
                                         </div>
                                     )}
                                 </button>

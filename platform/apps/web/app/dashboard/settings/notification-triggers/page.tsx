@@ -307,8 +307,8 @@ export default function NotificationTriggersPage() {
                       key={trigger.id}
                       trigger={trigger}
                       onToggle={(enabled) => toggleMutation.mutate({ id: trigger.id, enabled })}
-                      onEdit={() => setEditingTrigger(trigger as any)}
-                      onTest={() => setShowTestModal(trigger as any)}
+                      onEdit={() => setEditingTrigger(trigger)}
+                      onTest={() => setShowTestModal(trigger)}
                       onDelete={() => deleteMutation.mutate(trigger.id)}
                     />
                   ))}

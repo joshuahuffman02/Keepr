@@ -70,7 +70,7 @@ Key platforms for campground visibility:
 **Same-day email:**
 
 ```
-Subject: Thanks for staying with us! 🏕️
+Subject: Thanks for staying with us!
 
 Hi [Name],
 

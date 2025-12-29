@@ -46,7 +46,7 @@ async function main() {
         const hasDefault = cg.storeLocations.some((l) => l.isDefault);
 
         if (hasDefault) {
-            console.log(`✓ ${cg.name}: Already has default location, skipping`);
+            console.log(`${cg.name}: Already has default location, skipping`);
             skipped++;
             continue;
         }

@@ -1,8 +1,10 @@
 import {
+    BadRequestException,
     Body,
     Controller,
     Delete,
     Get,
+    NotFoundException,
     Param,
     Patch,
     Post,
@@ -187,11 +189,11 @@ export class StoreController {
         const guest = req.user as any;
         // Validate reservation belongs to this guest
         if (!body.reservationId) {
-            throw new Error("reservationId is required");
+            throw new BadRequestException("reservationId is required");
         }
         const reservation = await this.store.findReservationForGuest(body.reservationId, guest.id);
         if (!reservation) {
-            throw new Error("Reservation not found for this guest");
+            throw new NotFoundException("Reservation not found for this guest");
         }
 
         return this.store.createOrder({

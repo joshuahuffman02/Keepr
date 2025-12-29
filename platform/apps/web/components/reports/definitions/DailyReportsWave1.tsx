@@ -224,7 +224,10 @@ export function DueOutsReport({ campgroundId, dateRange }: DailyReportProps) {
                 </CardHeader>
                 <CardContent>
                     {reportData.length === 0 ? (
-                        <div className="text-center py-8 text-emerald-600">✓ No overstays</div>
+                        <div className="text-center py-8 text-emerald-600 flex items-center justify-center gap-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                            No overstays
+                        </div>
                     ) : (
                         <div className="space-y-2">
                             {reportData.map(r => (

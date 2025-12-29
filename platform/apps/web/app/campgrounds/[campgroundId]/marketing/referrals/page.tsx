@@ -58,6 +58,32 @@ type ReferralProgram = {
     notes: string | null;
 };
 
+type ReferralPerformance = {
+    totalBookings?: number;
+    totalRevenue?: number;
+    totalRevenueCents?: number;
+    totalReferralDiscountCents?: number;
+    averageOrderValue?: number;
+    conversionRate?: number;
+    programs?: Array<{
+        programId?: string;
+        programCode?: string;
+        bookings?: number;
+        revenueCents?: number;
+        discountCents?: number;
+    }>;
+};
+
+type StayReasonData = {
+    breakdown?: Array<{
+        reason?: string;
+        count?: number;
+        percentage?: number;
+    }>;
+    total?: number;
+    otherReasons?: string[];
+};
+
 export default function ReferralsPage() {
     const params = useParams();
     const campgroundId = params?.campgroundId as string;
@@ -141,8 +167,8 @@ export default function ReferralsPage() {
 
     const cg = campgroundQuery.data;
     const programs = programsQuery.data ?? [];
-    const performance = performanceQuery.data;
-    const stayReasons = stayReasonQuery.data;
+    const performance = performanceQuery.data as ReferralPerformance | undefined;
+    const stayReasons = stayReasonQuery.data as StayReasonData | undefined;
 
     const incentiveLabel = (type: string, value: number) => {
         if (type === "percent_discount") return `${value}% off`;
@@ -617,7 +643,7 @@ export default function ReferralsPage() {
                                                     <div className="h-2 bg-muted rounded-full overflow-hidden">
                                                         <motion.div
                                                             initial={{ width: 0 }}
-                                                            animate={{ width: `${Math.min(100, (r.count / Math.max(...stayReasons.breakdown.map((b: any) => b.count))) * 100)}%` }}
+                                                            animate={{ width: `${Math.min(100, (r.count / Math.max(...(stayReasons?.breakdown ?? []).map((b: { count?: number }) => b.count ?? 0), 1)) * 100)}%` }}
                                                             transition={{ ...SPRING_CONFIG, delay: i * 0.05 }}
                                                             className="h-full bg-emerald-500 rounded-full"
                                                         />

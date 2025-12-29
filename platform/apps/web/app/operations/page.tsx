@@ -149,20 +149,20 @@ const STATE_CONFIG: Record<OpTaskState, { label: string; color: string; bgColor:
 };
 
 const SLA_CONFIG: Record<OpSlaStatus, { label: string; color: string; icon: string }> = {
-  on_track: { label: "On Track", color: "bg-emerald-500", icon: "✓" },
-  at_risk: { label: "At Risk", color: "bg-amber-500", icon: "⚠" },
-  breached: { label: "Breached", color: "bg-red-500", icon: "!" },
+  on_track: { label: "On Track", color: "bg-emerald-500", icon: "check" },
+  at_risk: { label: "At Risk", color: "bg-amber-500", icon: "alert-triangle" },
+  breached: { label: "Breached", color: "bg-red-500", icon: "x" },
 };
 
 const CATEGORY_CONFIG: Record<OpTaskCategory, { label: string; icon: string; color: string }> = {
-  turnover: { label: "Turnover", icon: "🛏️", color: "text-purple-600" },
-  housekeeping: { label: "Housekeeping", icon: "🧹", color: "text-blue-600" },
-  maintenance: { label: "Maintenance", icon: "🔧", color: "text-orange-600" },
-  inspection: { label: "Inspection", icon: "🔍", color: "text-indigo-600" },
-  grounds: { label: "Grounds", icon: "🌳", color: "text-green-600" },
-  pool: { label: "Pool", icon: "🏊", color: "text-cyan-600" },
-  front_desk: { label: "Front Desk", icon: "🎫", color: "text-pink-600" },
-  custom: { label: "Custom", icon: "📋", color: "text-slate-600" },
+  turnover: { label: "Turnover", icon: "bed", color: "text-purple-600" },
+  housekeeping: { label: "Housekeeping", icon: "sparkles", color: "text-blue-600" },
+  maintenance: { label: "Maintenance", icon: "wrench", color: "text-orange-600" },
+  inspection: { label: "Inspection", icon: "search", color: "text-indigo-600" },
+  grounds: { label: "Grounds", icon: "trees", color: "text-green-600" },
+  pool: { label: "Pool", icon: "waves", color: "text-cyan-600" },
+  front_desk: { label: "Front Desk", icon: "ticket", color: "text-pink-600" },
+  custom: { label: "Custom", icon: "clipboard-list", color: "text-slate-600" },
 };
 
 const PRIORITY_CONFIG: Record<OpTaskPriority, { label: string; color: string; dot: string }> = {
@@ -355,11 +355,11 @@ export default function OperationsPage() {
         {/* Tabs - horizontally scrollable on mobile */}
         <div className="flex gap-1 mb-6 border-b border-slate-200 overflow-x-auto scrollbar-hide -mx-4 px-4 md:mx-0 md:px-0">
           {[
-            { id: "board" as const, label: "Tasks", fullLabel: "Task Board", icon: "📋" },
-            { id: "sla" as const, label: "SLA", fullLabel: "SLA Dashboard", icon: "⏱️" },
-            { id: "templates" as const, label: "Templates", fullLabel: "Templates & Automation", icon: "⚙️" },
-            { id: "teams" as const, label: "Teams", fullLabel: "Teams", icon: "👥" },
-            { id: "leaderboard" as const, label: "Ranks", fullLabel: "Leaderboard", icon: "🏆" },
+            { id: "board" as const, label: "Tasks", fullLabel: "Task Board", icon: "" },
+            { id: "sla" as const, label: "SLA", fullLabel: "SLA Dashboard", icon: "" },
+            { id: "templates" as const, label: "Templates", fullLabel: "Templates & Automation", icon: "" },
+            { id: "teams" as const, label: "Teams", fullLabel: "Teams", icon: "" },
+            { id: "leaderboard" as const, label: "Ranks", fullLabel: "Leaderboard", icon: "" },
           ].map(tab => (
             <button
               key={tab.id}
@@ -523,24 +523,24 @@ function TaskBoardTab({
         <StatsCard
           label="Active"
           value={stats.total}
-          icon="📋"
+          icon=""
         />
         <StatsCard
           label="Pending"
           value={stats.pending}
-          icon="⏳"
+          icon=""
           color="text-amber-600"
         />
         <StatsCard
           label="In Progress"
           value={stats.inProgress}
-          icon="🔄"
+          icon=""
           color="text-blue-600"
         />
         <StatsCard
           label="Breached"
           value={stats.breached}
-          icon="🚨"
+          icon=""
           color="text-red-600"
           subtext={stats.atRisk > 0 ? `${stats.atRisk} at risk` : undefined}
         />
@@ -551,7 +551,7 @@ function TaskBoardTab({
             t.completedAt &&
             new Date(t.completedAt).toDateString() === new Date().toDateString()
           ).length}
-          icon="✅"
+          icon=""
           color="text-emerald-600"
         />
       </div>
@@ -567,7 +567,7 @@ function TaskBoardTab({
             }`}
           >
             <span className="hidden sm:inline">Board</span>
-            <span className="sm:hidden">📊</span>
+            <span className="sm:hidden">B</span>
           </button>
           <button
             onClick={() => setViewMode('list')}
@@ -576,7 +576,7 @@ function TaskBoardTab({
             }`}
           >
             <span className="hidden sm:inline">List</span>
-            <span className="sm:hidden">📝</span>
+            <span className="sm:hidden">L</span>
           </button>
         </div>
 
@@ -597,9 +597,9 @@ function TaskBoardTab({
           className="px-2 md:px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm min-h-[44px]"
         >
           <option value="">All SLA</option>
-          <option value="on_track">✓ On Track</option>
-          <option value="at_risk">⚠ At Risk</option>
-          <option value="breached">! Breached</option>
+          <option value="on_track">On Track</option>
+          <option value="at_risk">At Risk</option>
+          <option value="breached">Breached</option>
         </select>
 
         {teams.length > 0 && (
@@ -700,7 +700,7 @@ function TaskBoardTab({
           {/* Task list */}
           {filteredTasks.length === 0 ? (
             <div className="text-center py-12 text-slate-400">
-              <div className="text-4xl mb-2">📋</div>
+              <div className="text-4xl mb-2 text-slate-300">Tasks</div>
               <p>No tasks to show</p>
             </div>
           ) : (
@@ -832,8 +832,8 @@ function TaskCard({
       <div className="space-y-2 text-xs mb-3">
         {/* Location */}
         <div className="flex items-center gap-2 text-slate-600">
-          <span>📍</span>
-          <span>{task.site?.name || task.locationDescription || "—"}</span>
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+          <span>{task.site?.name || task.locationDescription || "-"}</span>
         </div>
 
         {/* Priority */}
@@ -848,7 +848,7 @@ function TaskCard({
             task.slaStatus === "breached" ? "text-red-600 font-medium" :
             task.slaStatus === "at_risk" ? "text-amber-600" : "text-slate-600"
           }`}>
-            <span>⏰</span>
+            <span>Due:</span>
             <span>{timeRemaining}</span>
           </div>
         )}
@@ -856,7 +856,7 @@ function TaskCard({
         {/* Team/Assignee */}
         {(task.assignedToTeam || task.assignedToUser) && (
           <div className="flex items-center gap-2 text-slate-600">
-            <span>👤</span>
+            <span>Assigned:</span>
             <span>
               {task.assignedToUser
                 ? `${task.assignedToUser.firstName} ${task.assignedToUser.lastName}`
@@ -978,10 +978,10 @@ function MobileTaskRow({
             <span className={`px-1.5 py-0.5 rounded ${stateConfig.bgColor} ${stateConfig.color} text-[10px] font-medium`}>
               {stateConfig.label}
             </span>
-            {task.site?.name && <span>📍 {task.site.name}</span>}
+            {task.site?.name && <span>Site: {task.site.name}</span>}
             {timeRemaining && (
               <span className={task.slaStatus === 'breached' ? 'text-red-600 font-medium' : task.slaStatus === 'at_risk' ? 'text-amber-600' : ''}>
-                ⏰ {timeRemaining}
+                Due: {timeRemaining}
               </span>
             )}
           </div>
@@ -989,7 +989,7 @@ function MobileTaskRow({
 
         {/* Expand indicator */}
         <span className={`text-slate-400 transition-transform ${expanded ? 'rotate-180' : ''}`}>
-          ▼
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
         </span>
       </button>
 
@@ -1008,12 +1008,12 @@ function MobileTaskRow({
             </span>
             {task.assignedToTeam && (
               <span className="px-2 py-1 rounded-full bg-slate-100 text-slate-600">
-                👥 {task.assignedToTeam.name}
+                Team: {task.assignedToTeam.name}
               </span>
             )}
             {task.assignedToUser && (
               <span className="px-2 py-1 rounded-full bg-slate-100 text-slate-600">
-                👤 {task.assignedToUser.firstName} {task.assignedToUser.lastName}
+                {task.assignedToUser.firstName} {task.assignedToUser.lastName}
               </span>
             )}
           </div>
@@ -1168,7 +1168,8 @@ function SlaDashboardTab({
       {breachedTasks.length > 0 && (
         <div className="bg-white rounded-xl border border-red-200 p-6">
           <h3 className="text-lg font-semibold text-red-700 mb-4 flex items-center gap-2">
-            <span>🚨</span> SLA Breached ({breachedTasks.length})
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>
+            SLA Breached ({breachedTasks.length})
           </h3>
           <div className="space-y-3">
             {breachedTasks.map(task => (
@@ -1182,7 +1183,7 @@ function SlaDashboardTab({
       {atRiskTasks.length > 0 && (
         <div className="bg-white rounded-xl border border-amber-200 p-6">
           <h3 className="text-lg font-semibold text-amber-700 mb-4 flex items-center gap-2">
-            <span>⚠️</span> At Risk ({atRiskTasks.length})
+            At Risk ({atRiskTasks.length})
           </h3>
           <div className="space-y-3">
             {atRiskTasks.map(task => (
@@ -1194,7 +1195,6 @@ function SlaDashboardTab({
 
       {breachedTasks.length === 0 && atRiskTasks.length === 0 && (
         <div className="bg-emerald-50 rounded-xl border border-emerald-200 p-8 text-center">
-          <div className="text-4xl mb-4">🎉</div>
           <h3 className="text-lg font-semibold text-emerald-800">All Clear!</h3>
           <p className="text-emerald-600 mt-1">No SLA issues at the moment. Great work!</p>
         </div>
@@ -1257,7 +1257,6 @@ function TemplatesTab({
       {/* Info Banner */}
       <div className="bg-blue-50 rounded-xl border border-blue-200 p-4">
         <div className="flex items-start gap-3">
-          <span className="text-xl">💡</span>
           <div>
             <h4 className="font-medium text-blue-900">Task Templates & Automation</h4>
             <p className="text-sm text-blue-700 mt-1">
@@ -1271,7 +1270,6 @@ function TemplatesTab({
       {/* Templates Grid */}
       {templates.length === 0 ? (
         <div className="text-center py-12 border-2 border-dashed border-slate-200 rounded-xl">
-          <div className="text-4xl mb-4">📋</div>
           <h3 className="text-lg font-medium text-slate-900">No Templates Yet</h3>
           <p className="text-slate-500 mt-1 mb-4">Create your first template to standardize common tasks</p>
         </div>
@@ -1321,10 +1319,10 @@ function TemplateCard({
           {priorityConfig.label}
         </span>
         {template.slaMinutes && (
-          <span>⏱️ {template.slaMinutes}min SLA</span>
+          <span>{template.slaMinutes}min SLA</span>
         )}
         {template.checklistTemplate && (
-          <span>✓ {template.checklistTemplate.length} items</span>
+          <span>{template.checklistTemplate.length} items</span>
         )}
       </div>
 
@@ -1361,7 +1359,6 @@ function TeamsTab({
     <div className="space-y-6">
       {teams.length === 0 ? (
         <div className="text-center py-12 border-2 border-dashed border-slate-200 rounded-xl">
-          <div className="text-4xl mb-4">👥</div>
           <h3 className="text-lg font-medium text-slate-900">No Teams Yet</h3>
           <p className="text-slate-500 mt-1 mb-4">Create teams to organize your staff and assign tasks</p>
         </div>
@@ -1400,8 +1397,8 @@ function TeamCard({
       <h4 className="font-semibold text-slate-900 mb-3">{team.name}</h4>
 
       <div className="flex items-center gap-4 text-sm text-slate-500">
-        <span>👤 {team._count?.members || 0} members</span>
-        <span>📋 {team._count?.tasks || 0} tasks</span>
+        <span>{team._count?.members || 0} members</span>
+        <span>{team._count?.tasks || 0} tasks</span>
       </div>
 
       <div className="flex justify-end mt-4 pt-3 border-t border-slate-100">
@@ -1987,7 +1984,6 @@ function LeaderboardTab({
   if (badges.length === 0) {
     return (
       <div className="text-center py-16">
-        <div className="text-6xl mb-4">🏆</div>
         <h3 className="text-xl font-semibold text-slate-900 mb-2">Set Up Gamification</h3>
         <p className="text-slate-500 mb-6 max-w-md mx-auto">
           Motivate your team with points, badges, and leaderboards. Track performance and celebrate achievements!
@@ -2040,7 +2036,7 @@ function LeaderboardTab({
               <div className="text-sm text-emerald-100">Tasks Done</div>
             </div>
             <div className="bg-white/10 rounded-lg p-3 text-center">
-              <div className="text-2xl font-bold">{myStats.currentStreak}🔥</div>
+              <div className="text-2xl font-bold">{myStats.currentStreak} days</div>
               <div className="text-sm text-emerald-100">Day Streak</div>
             </div>
             <div className="bg-white/10 rounded-lg p-3 text-center">
@@ -2078,7 +2074,7 @@ function LeaderboardTab({
       <div className="bg-white rounded-xl border border-slate-200 overflow-hidden">
         <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
           <h3 className="font-semibold text-slate-900 flex items-center gap-2">
-            🏆 Team Leaderboard
+            Team Leaderboard
           </h3>
           <select
             value={period}
@@ -2103,11 +2099,11 @@ function LeaderboardTab({
                 {/* Rank */}
                 <div className="w-10 text-center">
                   {index === 0 ? (
-                    <span className="text-2xl">🥇</span>
+                    <span className="text-lg font-bold text-amber-500">#1</span>
                   ) : index === 1 ? (
-                    <span className="text-2xl">🥈</span>
+                    <span className="text-lg font-bold text-slate-400">#2</span>
                   ) : index === 2 ? (
-                    <span className="text-2xl">🥉</span>
+                    <span className="text-lg font-bold text-amber-600">#3</span>
                   ) : (
                     <span className="text-lg font-bold text-slate-400">#{index + 1}</span>
                   )}
@@ -2122,7 +2118,7 @@ function LeaderboardTab({
                     </span>
                     {entry.streak >= 3 && (
                       <span className="text-xs px-2 py-0.5 bg-orange-100 text-orange-600 rounded-full">
-                        {entry.streak}🔥
+                        {entry.streak} day streak
                       </span>
                     )}
                   </div>
@@ -2146,7 +2142,7 @@ function LeaderboardTab({
       <div className="bg-white rounded-xl border border-slate-200 overflow-hidden">
         <div className="px-6 py-4 border-b border-slate-100">
           <h3 className="font-semibold text-slate-900 flex items-center gap-2">
-            🎖️ Available Badges
+            Available Badges
           </h3>
         </div>
         <div className="p-6 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">

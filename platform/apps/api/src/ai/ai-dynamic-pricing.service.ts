@@ -1,4 +1,4 @@
-import { Injectable, Logger, NotFoundException } from "@nestjs/common";
+import { Injectable, Logger, NotFoundException, BadRequestException } from "@nestjs/common";
 import { Cron } from "@nestjs/schedule";
 import { PrismaService } from "../prisma/prisma.service";
 import { AiProviderService } from "./ai-provider.service";
@@ -428,14 +428,14 @@ Current date: ${startDate.toISOString().split("T")[0]}`;
     const rec = await this.getRecommendation(id);
 
     if (rec.status !== "pending") {
-      throw new Error(`Cannot apply recommendation with status: ${rec.status}`);
+      throw new BadRequestException(`Cannot apply recommendation with status: ${rec.status}`);
     }
 
     const config = await this.configService.getConfig(rec.campgroundId);
 
     // Check max adjustment limit
     if (Math.abs(rec.adjustmentPercent) > config.dynamicPricingMaxAdjust) {
-      throw new Error(
+      throw new BadRequestException(
         `Adjustment of ${rec.adjustmentPercent}% exceeds maximum allowed ${config.dynamicPricingMaxAdjust}%`
       );
     }
@@ -485,7 +485,7 @@ Current date: ${startDate.toISOString().split("T")[0]}`;
     const rec = await this.getRecommendation(id);
 
     if (rec.status !== "pending") {
-      throw new Error(`Cannot dismiss recommendation with status: ${rec.status}`);
+      throw new BadRequestException(`Cannot dismiss recommendation with status: ${rec.status}`);
     }
 
     return this.prisma.aiPricingRecommendation.update({

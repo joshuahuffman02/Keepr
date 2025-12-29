@@ -1,4 +1,4 @@
-import { Injectable, ConflictException } from '@nestjs/common';
+import { Injectable, ConflictException, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 
 @Injectable()
@@ -133,7 +133,7 @@ export class BlocksService {
     });
 
     if (!existing) {
-      throw new Error('Block not found');
+      throw new NotFoundException('Block not found');
     }
 
     // If extending window, check for new conflicts

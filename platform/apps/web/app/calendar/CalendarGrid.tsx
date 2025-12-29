@@ -256,8 +256,7 @@ export function CalendarGrid({ data, onSelectionComplete, onReservationMove }: C
         <div
             id="calendar-grid-root"
             className={cn(
-                "rounded-xl border border-slate-200 bg-white shadow-sm overflow-hidden select-none",
-                state.viewMode === ("timeline" as any) ? "cursor-crosshair" : ""
+                "rounded-xl border border-slate-200 bg-white shadow-sm overflow-hidden select-none"
             )}
         >
             <div className="overflow-x-auto">

@@ -1,7 +1,9 @@
-import { Controller, Get, Query } from '@nestjs/common';
+import { Controller, Get, Query, UseGuards } from '@nestjs/common';
 import { EmailService } from './email.service';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 
 @Controller('email')
+@UseGuards(JwtAuthGuard)
 export class EmailController {
     constructor(private readonly emailService: EmailService) {}
 
@@ -13,16 +15,16 @@ export class EmailController {
 
         const result = await this.emailService.sendEmail({
             to,
-            subject: '🏕️ Camp Everyday - Test Email',
+            subject: 'Camp Everyday - Test Email',
             html: `
                 <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
                     <div style="text-align: center; margin-bottom: 30px;">
-                        <h1 style="color: #10b981; margin: 0;">✅ Email is Working!</h1>
+                        <h1 style="color: #10b981; margin: 0;">Email is Working!</h1>
                         <p style="color: #64748b; margin-top: 8px;">Your Resend integration is set up correctly.</p>
                     </div>
 
                     <div style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); border-radius: 12px; padding: 24px; text-align: center; margin-bottom: 24px;">
-                        <p style="color: white; margin: 0; font-size: 18px;">Camp Everyday is ready to send emails! 🎉</p>
+                        <p style="color: white; margin: 0; font-size: 18px;">Camp Everyday is ready to send emails!</p>
                     </div>
 
                     <div style="background: #f8fafc; border-radius: 8px; padding: 16px; margin-bottom: 20px;">

@@ -177,10 +177,10 @@ export default function GroupsPage() {
                         </div>
                         <div className="flex items-center gap-2">
                           {group.sharedPayment && (
-                            <span className="px-2 py-0.5 bg-emerald-100 text-emerald-700 rounded text-xs">💳</span>
+                            <span className="px-2 py-0.5 bg-emerald-100 text-emerald-700 rounded text-xs">Shared Pay</span>
                           )}
                           {group.sharedComm && (
-                            <span className="px-2 py-0.5 bg-blue-100 text-blue-700 rounded text-xs">📧</span>
+                            <span className="px-2 py-0.5 bg-blue-100 text-blue-700 rounded text-xs">Shared Comm</span>
                           )}
                         </div>
                       </div>
@@ -302,7 +302,7 @@ export default function GroupsPage() {
             ) : (
               <div className="bg-white rounded-xl border border-slate-200 flex items-center justify-center h-[400px]">
                 <div className="text-center text-slate-400">
-                  <div className="text-4xl mb-3">👥</div>
+                  <div className="text-4xl mb-3 text-slate-300">Groups</div>
                   <p>Select a group to view details</p>
                 </div>
               </div>
@@ -393,7 +393,7 @@ function CreateGroupModal({
           </div>
 
           <p className="text-sm text-slate-500 bg-slate-50 p-3 rounded-lg">
-            💡 After creating, you can link existing reservations to this group from the reservation detail page.
+            Tip: After creating, you can link existing reservations to this group from the reservation detail page.
           </p>
 
           <div className="flex gap-3 pt-4">

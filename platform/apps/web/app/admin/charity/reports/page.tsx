@@ -238,14 +238,14 @@ export default function CharityReportsPage() {
       <div className="bg-white border-b border-slate-200">
         <div className="max-w-7xl mx-auto px-6">
           <div className="flex gap-6">
-            {[
-              { id: "overview", label: "Overview", icon: TrendingUp },
-              { id: "donations", label: "Donations", icon: Heart },
-              { id: "payouts", label: "Payouts", icon: DollarSign },
-            ].map((tab) => (
+            {([
+              { id: "overview" as const, label: "Overview", icon: TrendingUp },
+              { id: "donations" as const, label: "Donations", icon: Heart },
+              { id: "payouts" as const, label: "Payouts", icon: DollarSign },
+            ] as const).map((tab) => (
               <button
                 key={tab.id}
-                onClick={() => setActiveTab(tab.id as any)}
+                onClick={() => setActiveTab(tab.id)}
                 className={`flex items-center gap-2 px-4 py-3 border-b-2 transition-colors ${
                   activeTab === tab.id
                     ? "border-pink-500 text-pink-600"

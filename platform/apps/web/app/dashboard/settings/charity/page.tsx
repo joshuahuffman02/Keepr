@@ -43,10 +43,10 @@ const SYBILS_KIDS = {
 // Milestone messages based on donation totals
 function getMilestoneMessage(totalCents: number): { milestone: string; next: string; progress: number } | null {
   const dollars = totalCents / 100;
-  if (dollars >= 1000) return { milestone: "🎉 Over $1,000 raised!", next: "Keep the momentum going!", progress: 100 };
-  if (dollars >= 500) return { milestone: "🌟 $500 milestone reached!", next: `$${(1000 - dollars).toFixed(0)} to reach $1,000`, progress: 50 };
-  if (dollars >= 100) return { milestone: "💫 First $100 raised!", next: `$${(500 - dollars).toFixed(0)} to reach $500`, progress: 20 };
-  if (dollars > 0) return { milestone: "🎊 First donations received!", next: `$${(100 - dollars).toFixed(0)} to reach $100`, progress: Math.min(dollars, 10) };
+  if (dollars >= 1000) return { milestone: "Over $1,000 raised!", next: "Keep the momentum going!", progress: 100 };
+  if (dollars >= 500) return { milestone: "$500 milestone reached!", next: `$${(1000 - dollars).toFixed(0)} to reach $1,000`, progress: 50 };
+  if (dollars >= 100) return { milestone: "First $100 raised!", next: `$${(500 - dollars).toFixed(0)} to reach $500`, progress: 20 };
+  if (dollars > 0) return { milestone: "First donations received!", next: `$${(100 - dollars).toFixed(0)} to reach $100`, progress: Math.min(dollars, 10) };
   return null;
 }
 
@@ -84,14 +84,27 @@ export default function CharitySettingsPage() {
   });
 
   // Fetch current campground charity settings
-  const { data: currentSettings, isLoading: loadingSettings } = useQuery({
+  const { data: currentSettings, isLoading: loadingSettings } = useQuery<{
+    isEnabled: boolean;
+    charityId: string;
+    customMessage?: string | null;
+    roundUpType: string;
+    defaultOptIn: boolean;
+    glCode?: string;
+    charity?: { name: string };
+  } | null>({
     queryKey: ["campground-charity", campgroundId],
     queryFn: () => apiClient.getCampgroundCharity(campgroundId!),
     enabled: !!campgroundId,
   });
 
   // Fetch donation stats
-  const { data: stats } = useQuery({
+  const { data: stats } = useQuery<{
+    totalAmountCents: number;
+    totalDonations: number;
+    donorCount: number;
+    optInRate: number;
+  }>({
     queryKey: ["campground-charity-stats", campgroundId],
     queryFn: () => apiClient.getCampgroundCharityStats(campgroundId!),
     enabled: !!campgroundId,
@@ -106,8 +119,8 @@ export default function CharitySettingsPage() {
       setCustomMessage(currentSettings.customMessage || "");
       setRoundUpType(currentSettings.roundUpType);
       setDefaultOptIn(currentSettings.defaultOptIn);
-      if ((currentSettings as any).glCode) {
-        setGlCode((currentSettings as any).glCode);
+      if (currentSettings.glCode) {
+        setGlCode(currentSettings.glCode);
       }
       setCharityMode("existing");
     }

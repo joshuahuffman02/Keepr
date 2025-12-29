@@ -6,11 +6,14 @@ import {
     Body,
     Param,
     NotFoundException,
+    UseGuards,
 } from "@nestjs/common";
 import { TicketsService } from "./tickets.service";
 import { CreateTicketDto, UpdateTicketDto } from "./dto";
+import { JwtAuthGuard } from "../auth/guards/jwt-auth.guard";
 
 @Controller("tickets")
+@UseGuards(JwtAuthGuard)
 export class TicketsController {
     constructor(private readonly ticketsService: TicketsService) { }
 

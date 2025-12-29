@@ -83,7 +83,7 @@ See you soon!
 ### Monthly Newsletter
 
 ```
-Subject: [Month] at [Campground] 🏕️
+Subject: [Month] at [Campground]
 
 WHAT'S NEW
 [Brief campground update]

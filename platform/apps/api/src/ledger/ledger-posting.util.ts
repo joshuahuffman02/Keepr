@@ -1,3 +1,4 @@
+import { BadRequestException } from "@nestjs/common";
 import type { PrismaService } from "../prisma/prisma.service";
 
 type PrismaLike = PrismaService | any;
@@ -49,7 +50,7 @@ async function assertPeriodsOpen(prisma: PrismaLike, entries: LedgerEntryInput[]
     });
     if (blocked) {
       const rangeLabel = `${blocked.startDate?.toISOString?.() ?? "start"} → ${blocked.endDate?.toISOString?.() ?? "end"}`;
-      throw new Error(`Ledger period is ${blocked.status} for campground ${campgroundId} (${rangeLabel}); posting blocked.`);
+      throw new BadRequestException(`Ledger period is ${blocked.status} for campground ${campgroundId} (${rangeLabel}); posting blocked.`);
     }
   }
 }
@@ -62,7 +63,7 @@ function normalizeEntries(entries: LedgerEntryInput[], opts?: PostLedgerOptions)
     const occurredAt = entry.occurredAt ?? new Date();
     const glCode = (entry.glCode ?? defaultGl).trim();
     if (requireGlCode && !glCode) {
-      throw new Error("GL code is required for all ledger entries");
+      throw new BadRequestException("GL code is required for all ledger entries");
     }
     const dedupeKey =
       entry.dedupeKey ??
@@ -90,7 +91,7 @@ export async function postBalancedLedgerEntries(
   opts?: PostLedgerOptions
 ) {
   if (!entries.length) {
-    throw new Error("No ledger entries to post");
+    throw new BadRequestException("No ledger entries to post");
   }
 
   const normalized = normalizeEntries(entries, opts);
@@ -101,7 +102,7 @@ export async function postBalancedLedgerEntries(
       0
     );
     if (net !== 0) {
-      throw new Error(`Ledger batch must balance; net=${net}¢`);
+      throw new BadRequestException(`Ledger batch must balance; net=${net}¢`);
     }
   }
 

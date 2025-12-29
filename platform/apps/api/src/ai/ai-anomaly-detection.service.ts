@@ -302,7 +302,7 @@ Response in JSON:
         const html = `
           <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
             <div style="background: ${severityColors[alert.severity] || "#f59e0b"}; border-radius: 12px; padding: 24px; margin-bottom: 24px;">
-              <h1 style="color: white; margin: 0 0 8px 0; font-size: 24px;">⚠️ ${alert.title}</h1>
+              <h1 style="color: white; margin: 0 0 8px 0; font-size: 24px;">${alert.title}</h1>
               <p style="color: rgba(255,255,255,0.9); margin: 0; font-size: 14px;">${campground?.name} • ${new Date().toLocaleDateString()}</p>
             </div>
 

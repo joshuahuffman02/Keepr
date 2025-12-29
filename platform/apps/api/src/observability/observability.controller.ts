@@ -1,7 +1,13 @@
-import { Controller, Get } from "@nestjs/common";
+import { Controller, Get, UseGuards } from "@nestjs/common";
 import { ObservabilityService } from "./observability.service";
+import { JwtAuthGuard } from "../auth/guards/jwt-auth.guard";
+import { RolesGuard } from "../auth/guards/roles.guard";
+import { Roles } from "../auth/decorators/roles.decorator";
+import { PlatformRole } from "@prisma/client";
 
 @Controller("observability")
+@UseGuards(JwtAuthGuard, RolesGuard)
+@Roles(PlatformRole.platform_admin)
 export class ObservabilityController {
   constructor(private readonly observability: ObservabilityService) { }
 

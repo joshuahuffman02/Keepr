@@ -449,7 +449,7 @@ export class StaffService {
       }
     } else {
       // Environment or opt-in not present; log only
-      console.log(`[Push] (noop) ${type}: ${title} to user ${userId ?? 'n/a'}`);
+      this.logger.log(`[Push] (noop) ${type}: ${title} to user ${userId ?? 'n/a'}`);
     }
 
     return notification;

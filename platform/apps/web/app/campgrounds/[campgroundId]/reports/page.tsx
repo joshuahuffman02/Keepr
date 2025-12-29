@@ -39,9 +39,12 @@ export default function ReportsPage({ params }: { params: { campgroundId: string
         category: category === "All" ? undefined : category,
         search
       });
-      setCatalog(res.catalog as CatalogEntry[]);
-      if (!selected && res.catalog.length) {
-        setSelected(res.catalog[0] as CatalogEntry);
+
+      if (Array.isArray(res.catalog)) {
+        setCatalog(res.catalog as CatalogEntry[]);
+        if (!selected && res.catalog.length > 0) {
+          setSelected(res.catalog[0] as CatalogEntry);
+        }
       }
     } catch (err) {
       console.error(err);
@@ -60,7 +63,10 @@ export default function ReportsPage({ params }: { params: { campgroundId: string
         reportId: entry.id,
         sample: true
       });
-      setRun(data as ReportRun);
+
+      if (data && typeof data === "object") {
+        setRun(data as ReportRun);
+      }
       setSelected(entry);
     } catch (err) {
       console.error(err);
@@ -150,7 +156,10 @@ export default function ReportsPage({ params }: { params: { campgroundId: string
           </div>
 
           {run?.series?.length ? (
-            <ReportChart series={run.series as any} chart={(run.series[0].chart as any) ?? "line"} />
+            <ReportChart
+              series={run.series}
+              chart={(run.series[0]?.chart ?? "line") as "line" | "bar" | "pie"}
+            />
           ) : (
             <div className="rounded border border-dashed border-slate-200 p-6 text-sm text-slate-500">
               {running ? "Generating chart..." : "Run the report to see a chart."}
@@ -172,11 +181,17 @@ export default function ReportsPage({ params }: { params: { campgroundId: string
               <tbody>
                 {run?.rows?.map((row, idx) => (
                   <tr key={idx} className="border-t border-slate-100">
-                    {Object.keys(row).map((key) => (
-                      <td key={key} className="px-3 py-2 text-slate-700">
-                        {row[key] as any}
-                      </td>
-                    ))}
+                    {Object.keys(row).map((key) => {
+                      const value = row[key];
+                      const displayValue = value !== null && value !== undefined
+                        ? String(value)
+                        : "";
+                      return (
+                        <td key={key} className="px-3 py-2 text-slate-700">
+                          {displayValue}
+                        </td>
+                      );
+                    })}
                   </tr>
                 ))}
                 {!run?.rows?.length && (

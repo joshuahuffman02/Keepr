@@ -9,6 +9,7 @@ import { SetupProgress } from "./components/SetupProgress";
 import { StepContainer } from "./components/StepContainer";
 import { SetupCelebration } from "./components/SetupCelebration";
 import { ParkProfile } from "./steps/ParkProfile";
+import type { ParkProfileData } from "./steps/ParkProfile";
 import { OperationalHours, OperationalHoursData } from "./steps/OperationalHours";
 import { StripeConnect } from "./steps/StripeConnect";
 import { ImportOrManual } from "./steps/ImportOrManual";
@@ -97,9 +98,15 @@ interface WizardState {
     }>;
   };
   taxRules?: Array<{ name: string; type: string; rate: number }>;
-  depositPolicy?: { strategy: string };
+  depositPolicy?: { strategy: "first_night" | "percent" | "full"; percentValue?: number };
   cancellationRules?: CancellationRule[];
-  parkRules?: { content: string; requireSignature: boolean };
+  parkRules?: {
+    useTemplate: boolean;
+    templateId?: string;
+    customRules?: string;
+    requireSignature: boolean;
+    enforcement: "pre_booking" | "pre_checkin" | "informational";
+  };
   teamMembers?: TeamMember[];
   integrations?: IntegrationsData;
   // New step data
@@ -324,7 +331,7 @@ export default function OnboardingPage() {
 
   // Save step mutation
   const saveMutation = useMutation({
-    mutationFn: async (payload: { step: OnboardingStepKey; data: Record<string, any> }) => {
+    mutationFn: async (payload: { step: OnboardingStepKey; data: Record<string, unknown> }) => {
       if (!sessionQuery.data) throw new Error("Session not ready");
       const idempotencyKey = crypto.randomUUID();
       return apiClient.saveOnboardingStep(
@@ -368,21 +375,26 @@ export default function OnboardingPage() {
   }
 
   // Step handlers
-  const handleParkProfileSave = async (data: any) => {
+  const handleParkProfileSave = async (data: ParkProfileData) => {
     const result = await saveMutation.mutateAsync({
       step: "park_profile",
       data: { campground: data },
     });
     // Extract slug from the API response (server generates slug when creating campground)
-    const savedCampground = result?.session?.data?.park_profile?.campground || {};
+    const savedCampground = (result?.session?.data?.park_profile?.campground as Record<string, unknown>) || {};
     const campgroundId = result?.session?.campgroundId || sessionQuery.data?.session.campgroundId || "";
 
     setState((prev) => ({
       ...prev,
       campground: {
         id: campgroundId,
-        slug: savedCampground.slug || data.slug,
-        ...data,
+        name: data.name,
+        slug: (savedCampground.slug as string | undefined),
+        phone: data.phone,
+        email: data.email,
+        city: data.city,
+        state: data.state,
+        amenities: data.amenities,
       },
     }));
     completeStep("park_profile");
@@ -831,28 +843,38 @@ export default function OnboardingPage() {
       case "site_classes":
         return (
           <SiteClasses
-            initialClasses={state.siteClasses?.map((c) => ({
-              name: c.name,
-              siteType: c.siteType as "rv" | "tent" | "cabin" | "glamping",
-              rentalType: (c.rentalType as "transient" | "seasonal" | "flexible") || "transient",
-              defaultRate: c.defaultRate / 100,
-              maxOccupancy: c.maxOccupancy || 6,
-              hookupsWater: c.hookupsWater ?? true,
-              hookupsSewer: c.hookupsSewer ?? false,
-              petFriendly: c.petFriendly ?? true,
-              electricAmps: c.electricAmps || [],
-              equipmentTypes: c.equipmentTypes || [],
-              slideOutsAccepted: c.slideOutsAccepted || null,
-              rvOrientation: c.rvOrientation as "back_in" | "pull_through" | undefined,
-              occupantsIncluded: c.occupantsIncluded || 2,
-              extraAdultFee: c.extraAdultFee ?? null,
-              extraChildFee: c.extraChildFee ?? null,
-              amenityTags: c.amenityTags || [],
-              photos: c.photos || [],
-              meteredEnabled: (c as any).meteredEnabled || false,
-              meteredType: (c as any).meteredType || null,
-              meteredBillingMode: (c as any).meteredBillingMode || null,
-            }))}
+            initialClasses={state.siteClasses?.map((c) => {
+              // Extended type for metered fields
+              type SiteClassWithMetered = typeof c & {
+                meteredEnabled?: boolean;
+                meteredType?: "power" | "water" | "sewer" | null;
+                meteredBillingMode?: "per_reading" | "cycle" | "manual" | null;
+              };
+              const cWithMetered = c as SiteClassWithMetered;
+
+              return {
+                name: c.name,
+                siteType: c.siteType as "rv" | "tent" | "cabin" | "glamping",
+                rentalType: (c.rentalType as "transient" | "seasonal" | "flexible") || "transient",
+                defaultRate: c.defaultRate / 100,
+                maxOccupancy: c.maxOccupancy || 6,
+                hookupsWater: c.hookupsWater ?? true,
+                hookupsSewer: c.hookupsSewer ?? false,
+                petFriendly: c.petFriendly ?? true,
+                electricAmps: c.electricAmps || [],
+                equipmentTypes: c.equipmentTypes || [],
+                slideOutsAccepted: c.slideOutsAccepted || null,
+                rvOrientation: c.rvOrientation as "back_in" | "pull_through" | undefined,
+                occupantsIncluded: c.occupantsIncluded || 2,
+                extraAdultFee: c.extraAdultFee ?? null,
+                extraChildFee: c.extraChildFee ?? null,
+                amenityTags: c.amenityTags || [],
+                photos: c.photos || [],
+                meteredEnabled: cWithMetered.meteredEnabled || false,
+                meteredType: cWithMetered.meteredType || null,
+                meteredBillingMode: cWithMetered.meteredBillingMode || null,
+              };
+            })}
             onSave={handleSiteClassesSave}
             onNext={() => goToStep("sites_builder")}
           />
@@ -970,7 +992,7 @@ export default function OnboardingPage() {
       case "deposit_policy":
         return (
           <DepositPolicy
-            initialData={state.depositPolicy as any}
+            initialData={state.depositPolicy}
             onSave={handleDepositPolicySave}
             onNext={() => goToStep("booking_rules")}
           />
@@ -1024,7 +1046,7 @@ export default function OnboardingPage() {
       case "park_rules":
         return (
           <ParkRules
-            initialData={state.parkRules as any}
+            initialData={state.parkRules}
             onSave={handleParkRulesSave}
             onSkip={handleParkRulesSkip}
             onNext={() => goToStep("team_setup")}

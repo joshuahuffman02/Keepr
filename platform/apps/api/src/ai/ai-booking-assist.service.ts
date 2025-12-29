@@ -1,4 +1,4 @@
-import { Injectable, Inject, forwardRef } from '@nestjs/common';
+import { Injectable, Inject, forwardRef, Logger } from '@nestjs/common';
 import { AiProviderService } from './ai-provider.service';
 import { AiPrivacyService } from './ai-privacy.service';
 import { AiFeatureGateService } from './ai-feature-gate.service';
@@ -43,6 +43,8 @@ interface BookingAssistResponse {
 
 @Injectable()
 export class AiBookingAssistService {
+    private readonly logger = new Logger(AiBookingAssistService.name);
+
     constructor(
         private readonly provider: AiProviderService,
         private readonly privacy: AiPrivacyService,
@@ -168,7 +170,7 @@ export class AiBookingAssistService {
                         .map((site: any) => site.siteClass.name)
                 );
             } catch (err) {
-                console.error("Failed to check availability for AI chat:", err);
+                this.logger.error("Failed to check availability for AI chat", err);
                 // Fallback: assume everything is available if check fails, or handle gracefully
             }
         }

@@ -28,6 +28,17 @@ type Staff = {
   memberships?: { campgroundId: string; role?: string | null }[];
 };
 
+interface UserWithPlatformRole {
+  memberships?: Array<{ campgroundId: string; role?: string | null }>;
+  platformRole?: string | null;
+}
+
+interface WhoamiAllowed {
+  supportRead?: boolean;
+  supportAssign?: boolean;
+  supportAnalytics?: boolean;
+}
+
 export default function SupportStaffDirectoryPage() {
   const [staff, setStaff] = useState<Staff[]>([]);
   const [loading, setLoading] = useState(false);
@@ -37,10 +48,12 @@ export default function SupportStaffDirectoryPage() {
   const [drafts, setDrafts] = useState<Record<string, { region: string; ownershipRoles: string }>>({});
   const { toast } = useToast();
   const { data: whoami, isLoading: whoamiLoading, error: whoamiError } = useWhoami();
-  const hasMembership = (whoami?.user?.memberships?.length ?? 0) > 0;
-  const platformRole = (whoami?.user as any)?.platformRole as string | undefined;
+  const hasMembership = ((whoami?.user as UserWithPlatformRole | undefined)?.memberships?.length ?? 0) > 0;
+  const platformRole = (whoami?.user as UserWithPlatformRole | undefined)?.platformRole;
   const supportAllowed =
-    whoami?.allowed?.supportRead || whoami?.allowed?.supportAssign || whoami?.allowed?.supportAnalytics;
+    (whoami?.allowed as WhoamiAllowed | undefined)?.supportRead ||
+    (whoami?.allowed as WhoamiAllowed | undefined)?.supportAssign ||
+    (whoami?.allowed as WhoamiAllowed | undefined)?.supportAnalytics;
   const allowSupport = !!supportAllowed && (!!platformRole || hasMembership);
 
   useEffect(() => {

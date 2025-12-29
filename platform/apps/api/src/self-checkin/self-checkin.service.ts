@@ -78,7 +78,7 @@ export class SelfCheckinService {
       try {
         await Promise.all(ops);
       } catch (err) {
-        console.warn("Failed to attach waiver artifacts to reservation", err);
+        this.logger.warn("Failed to attach waiver artifacts to reservation", err);
       }
     }
   }
@@ -136,7 +136,7 @@ export class SelfCheckinService {
         }
       });
     } catch (err) {
-      console.warn("Failed to attach ID verification to reservation", err);
+      this.logger.warn("Failed to attach ID verification to reservation", err);
     }
   }
 
@@ -286,7 +286,7 @@ export class SelfCheckinService {
           });
         }
       } catch (err) {
-        console.error('Failed to create checkin-failed communication:', err);
+        this.logger.error('Failed to create checkin-failed communication:', err);
       }
 
       return { status: 'failed', reason: validation.reason, signingUrl };
@@ -304,7 +304,7 @@ export class SelfCheckinService {
           after: { override: true, reason: options?.overrideReason ?? null }
         });
       } catch (err) {
-        console.error("Failed to audit check-in override", err);
+        this.logger.error("Failed to audit check-in override", err);
       }
     }
 
@@ -323,7 +323,7 @@ export class SelfCheckinService {
     try {
       await this.accessControl.autoGrantForReservation(reservationId, options?.actorId ?? null);
     } catch (err) {
-      console.error("Failed to auto-grant access on self-checkin", err);
+      this.logger.error("Failed to auto-grant access on self-checkin", err);
     }
 
     // Emit check-in success communication
@@ -341,7 +341,7 @@ export class SelfCheckinService {
         },
       });
     } catch (err) {
-      console.error('Failed to create checkin-success communication:', err);
+      this.logger.error('Failed to create checkin-success communication:', err);
     }
 
     return { status: 'completed', selfCheckInAt: now };
@@ -398,7 +398,7 @@ export class SelfCheckinService {
     try {
       await this.accessControl.revokeAllForReservation(reservationId, "checked_out", options?.actorId ?? null);
     } catch (err) {
-      console.error("Failed to revoke access on self-checkout", err);
+      this.logger.error("Failed to revoke access on self-checkout", err);
     }
 
     // Emit checkout success communication with receipt
@@ -416,7 +416,7 @@ export class SelfCheckinService {
         },
       });
     } catch (err) {
-      console.error('Failed to create checkout-success communication:', err);
+      this.logger.error('Failed to create checkout-success communication:', err);
     }
 
     // If damage reported, create a follow-up task
@@ -437,7 +437,7 @@ export class SelfCheckinService {
           },
         });
       } catch (err) {
-        console.error('Failed to create damage inspection task:', err);
+        this.logger.error('Failed to create damage inspection task:', err);
       }
     }
 

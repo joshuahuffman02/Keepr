@@ -27,10 +27,15 @@ function formatMoney(cents: number | null | undefined, currency = "USD") {
 
 const DRIFT_THRESHOLD_CENTS = 100;
 
+interface PayoutRecon {
+  driftVsLedgerCents: number;
+  driftVsLinesCents: number;
+}
+
 export default function PayoutsPage() {
   const [campgroundId, setCampgroundId] = useState<string>("");
   const [status, setStatus] = useState<string | undefined>();
-  const [reconMap, setReconMap] = useState<Record<string, any>>({});
+  const [reconMap, setReconMap] = useState<Record<string, PayoutRecon>>({});
   const { toast } = useToast();
 
   useEffect(() => {
@@ -41,7 +46,14 @@ export default function PayoutsPage() {
 
   const { data, isLoading, refetch } = useQuery({
     queryKey: ["payouts", campgroundId, status],
-    queryFn: () => apiClient.listPayouts(campgroundId, status as any),
+    queryFn: () => {
+      const validStatuses = ["pending", "in_transit", "paid", "failed", "canceled"] as const;
+      type ValidStatus = typeof validStatuses[number];
+      const payoutStatus = status && validStatuses.includes(status as ValidStatus)
+        ? (status as ValidStatus)
+        : undefined;
+      return apiClient.listPayouts(campgroundId, payoutStatus);
+    },
     enabled: !!campgroundId,
     staleTime: 30_000
   });

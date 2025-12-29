@@ -7,6 +7,7 @@ import {
   Body,
   Param,
   Query,
+  UseGuards,
 } from "@nestjs/common";
 import {
   CharityService,
@@ -14,9 +15,15 @@ import {
   UpdateCharityDto,
   SetCampgroundCharityDto,
 } from "./charity.service";
-import { DonationStatus, CharityPayoutStatus } from "@prisma/client";
+import { DonationStatus, CharityPayoutStatus, PlatformRole } from "@prisma/client";
+import { JwtAuthGuard } from "../auth/guards/jwt-auth.guard";
+import { RolesGuard } from "../auth/guards/roles.guard";
+import { Roles } from "../auth/decorators/roles.decorator";
+import { ScopeGuard } from "../auth/guards/scope.guard";
 
 @Controller("charity")
+@UseGuards(JwtAuthGuard, RolesGuard)
+@Roles(PlatformRole.platform_admin)
 export class CharityController {
   constructor(private charityService: CharityService) {}
 
@@ -112,6 +119,8 @@ export class CharityController {
 
 // Admin charity endpoints (platform-wide)
 @Controller("admin/charity")
+@UseGuards(JwtAuthGuard, RolesGuard)
+@Roles(PlatformRole.platform_admin)
 export class AdminCharityController {
   constructor(private charityService: CharityService) {}
 
@@ -169,6 +178,7 @@ export class AdminCharityController {
 
 // Campground-specific charity endpoints
 @Controller("campgrounds/:campgroundId/charity")
+@UseGuards(JwtAuthGuard, ScopeGuard)
 export class CampgroundCharityController {
   constructor(private charityService: CharityService) {}
 

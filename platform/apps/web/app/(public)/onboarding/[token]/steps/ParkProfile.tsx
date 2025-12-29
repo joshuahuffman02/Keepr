@@ -32,7 +32,7 @@ import { cn } from "@/lib/utils";
 import { AmenityPicker } from "@/components/onboarding/AmenityPicker";
 import { PARK_AMENITIES } from "@/lib/amenities";
 
-interface ParkProfileData {
+export interface ParkProfileData {
   name: string;
   phone: string;
   email: string;

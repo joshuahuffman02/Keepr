@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { Cron, CronExpression } from '@nestjs/schedule';
 import { PrismaService } from '../prisma/prisma.service';
 import { EmailService } from '../email/email.service';
@@ -400,7 +400,7 @@ export class NotificationTriggersService {
     });
 
     if (!trigger) {
-      throw new Error('Trigger not found');
+      throw new NotFoundException('Trigger not found');
     }
 
     // Create sample payload with test data
@@ -430,7 +430,7 @@ export class NotificationTriggersService {
     // Add test notice banner
     const testBanner = `
       <div style="background: #FEF3C7; border: 1px solid #F59E0B; padding: 12px; margin-bottom: 16px; border-radius: 8px;">
-        <strong>🧪 This is a test notification</strong><br/>
+        <strong>TEST: This is a test notification</strong><br/>
         <span style="font-size: 14px; color: #92400E;">This is a preview of what your guests will receive when the "${trigger.event}" event is triggered.</span>
       </div>
     `;

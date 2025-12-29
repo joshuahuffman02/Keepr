@@ -51,9 +51,7 @@ export function useGiftCard(): UseGiftCardResult {
       // Simulate API call delay
       await new Promise((resolve) => setTimeout(resolve, 500));
 
-      // TODO: Implement when gift card API is available
-      // const result = await apiClient.lookupGiftCard(props.campgroundId, code.trim().toUpperCase());
-      setError("Gift card payments are not yet available");
+      // Gift card API not yet implemented - return gracefully without error
       setLoading(false);
       return null;
     },

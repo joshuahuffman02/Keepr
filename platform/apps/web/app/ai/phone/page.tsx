@@ -61,12 +61,27 @@ type PhoneSession = {
   transcript?: string;
   summary?: string | null;
   intents: string[];
-  actionsPerformed?: Record<string, any>;
+  actionsPerformed?: Record<string, unknown>;
   transferredAt?: string;
   transferReason?: string;
   resolutionStatus?: string | null;
   tokensUsed?: number;
   costCents?: number;
+};
+
+type PhoneSummary = {
+  totalCalls: number;
+  callsHandled: number;
+  totalCostCents: number;
+  topIntents?: Array<{ name: string; count: number }>;
+  resolutionRate?: number;
+};
+
+type AutopilotConfig = {
+  phoneAgentEnabled?: boolean;
+  phoneAgentNumber?: string;
+  phoneAgentHoursStart?: string;
+  phoneAgentHoursEnd?: string;
 };
 
 function getStatusIcon(status: string) {
@@ -127,22 +142,21 @@ export default function AIPhonePage() {
   });
 
   // Get phone summary
-  const { data: summaryData, isLoading: loadingSummary } = useQuery({
+  const { data: summary, isLoading: loadingSummary } = useQuery<PhoneSummary>({
     queryKey: ["phone-summary", campground?.id],
     queryFn: () => apiClient.getPhoneSummary(campground!.id),
     enabled: !!campground?.id,
   });
-  // Cast to any to access extended fields
-  const summary = summaryData as any;
 
   // Get autopilot config
-  const { data: autopilotConfigData, refetch: refetchConfig } = useQuery({
+  const { data: autopilotConfig, refetch: refetchConfig } = useQuery({
     queryKey: ["ai-autopilot-config", campground?.id],
-    queryFn: () => apiClient.getAutopilotConfig(campground!.id),
+    queryFn: async () => {
+      const result = await apiClient.getAutopilotConfig(campground!.id);
+      return result as AutopilotConfig;
+    },
     enabled: !!campground?.id,
   });
-  // Cast config to access new fields not in base type
-  const autopilotConfig = autopilotConfigData as any;
 
   const activeCalls = (sessions as PhoneSession[]).filter(s => s.status === "in_progress");
   const completedCalls = (sessions as PhoneSession[]).filter(s => s.status !== "in_progress");
@@ -438,7 +452,7 @@ export default function AIPhonePage() {
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-3">
-                    {summary?.topIntents?.length > 0 ? (
+                    {summary?.topIntents && summary.topIntents.length > 0 ? (
                       summary.topIntents.map((intent: { name: string; count: number }, i: number) => (
                         <div key={i} className="flex items-center justify-between">
                           <span className="text-sm text-foreground">{intent.name}</span>

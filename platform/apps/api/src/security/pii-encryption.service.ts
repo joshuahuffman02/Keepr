@@ -1,4 +1,4 @@
-import { Injectable } from "@nestjs/common";
+import { Injectable, InternalServerErrorException, BadRequestException, Logger } from "@nestjs/common";
 import { createCipheriv, createDecipheriv, randomBytes, createHash } from "crypto";
 
 /**
@@ -18,6 +18,7 @@ import { createCipheriv, createDecipheriv, randomBytes, createHash } from "crypt
  */
 @Injectable()
 export class PiiEncryptionService {
+    private readonly logger = new Logger(PiiEncryptionService.name);
     private readonly algorithm = "aes-256-gcm";
     private readonly primaryKey: Buffer;
     private readonly keyVersion: string;
@@ -44,7 +45,7 @@ export class PiiEncryptionService {
         this.keyVersion = process.env.PII_ENCRYPTION_KEY_VERSION || "v1";
 
         if (keyString.length < 32 && process.env.NODE_ENV === "production") {
-            console.error("[SECURITY] PII_ENCRYPTION_KEY must be at least 32 characters in production");
+            this.logger.error("PII_ENCRYPTION_KEY must be at least 32 characters in production");
         }
 
         // Derive a proper 256-bit key using SHA-256
@@ -57,7 +58,7 @@ export class PiiEncryptionService {
         // Format: PII_ENCRYPTION_KEY_V1, PII_ENCRYPTION_KEY_V2, etc.
         this.loadHistoricalKeys();
 
-        console.log(`[SECURITY] PII encryption initialized with key version: ${this.keyVersion}, ${this.keyStore.size} key(s) loaded`);
+        this.logger.log(`PII encryption initialized with key version: ${this.keyVersion}, ${this.keyStore.size} key(s) loaded`);
     }
 
     /**
@@ -108,8 +109,8 @@ export class PiiEncryptionService {
             // Format: keyVersion:iv:authTag:ciphertext
             return `${this.keyVersion}:${iv.toString("hex")}:${authTag.toString("hex")}:${encrypted}`;
         } catch (error) {
-            console.error("[SECURITY] PII encryption failed:", error);
-            throw new Error("Encryption failed");
+            this.logger.error("PII encryption failed:", error instanceof Error ? error.stack : error);
+            throw new InternalServerErrorException("Encryption failed");
         }
     }
 
@@ -142,12 +143,12 @@ export class PiiEncryptionService {
             // Get the appropriate key for this version
             const decryptionKey = this.getKeyForVersion(version);
             if (!decryptionKey) {
-                console.error(`[SECURITY] No key found for version: ${version}. Available versions: ${Array.from(this.keyStore.keys()).join(", ")}`);
-                throw new Error(`Encryption key not found for version: ${version}`);
+                this.logger.error(`No key found for version: ${version}. Available versions: ${Array.from(this.keyStore.keys()).join(", ")}`);
+                throw new BadRequestException(`Encryption key not found for version: ${version}`);
             }
 
             if (version !== this.keyVersion) {
-                console.info(`[SECURITY] Decrypting data from older key version: ${version} (current: ${this.keyVersion})`);
+                this.logger.log(`Decrypting data from older key version: ${version} (current: ${this.keyVersion})`);
             }
 
             const iv = Buffer.from(ivHex, "hex");
@@ -161,7 +162,7 @@ export class PiiEncryptionService {
 
             return decrypted;
         } catch (error) {
-            console.error("[SECURITY] PII decryption failed:", error);
+            this.logger.error("PII decryption failed:", error instanceof Error ? error.stack : error);
             // Return original value if decryption fails (might not be encrypted)
             return encrypted;
         }

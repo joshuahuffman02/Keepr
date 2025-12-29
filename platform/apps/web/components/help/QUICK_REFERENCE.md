@@ -246,7 +246,7 @@ if (isVisible) {
 
 ## Best Practices
 
-### Do's ✅
+### Do's
 - Keep content concise (1-3 sentences)
 - Provide specific examples
 - Use formatting (lists, sections)
@@ -254,7 +254,7 @@ if (isVisible) {
 - Test on mobile and desktop
 - Include formulas for calculations
 
-### Don'ts ❌
+### Don'ts
 - Don't write paragraphs
 - Don't use for critical info
 - Don't nest tooltips

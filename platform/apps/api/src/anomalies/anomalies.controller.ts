@@ -1,10 +1,10 @@
 import { Controller, Get, Query, UseGuards } from "@nestjs/common";
 import { AnomaliesService } from "./anomalies.service";
 import { AnomalyCheckDto } from "./dto/anomaly-check.dto";
-// import { JwtAuthGuard } from "../auth/jwt-auth.guard"; 
-// Guard commented out for initial testing ease, or use standard patterns
+import { JwtAuthGuard } from "../auth/guards/jwt-auth.guard";
 
 @Controller("anomalies")
+@UseGuards(JwtAuthGuard)
 export class AnomaliesController {
     constructor(private readonly service: AnomaliesService) { }
 

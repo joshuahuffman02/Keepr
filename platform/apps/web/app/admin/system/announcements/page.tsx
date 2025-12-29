@@ -3,14 +3,17 @@
 import { useState, useEffect } from "react";
 import { Megaphone, Send, Clock, CheckCircle, Users, Plus, X, RefreshCw } from "lucide-react";
 
+type AnnouncementType = "info" | "warning" | "success";
+type AnnouncementTarget = "all" | "admins" | "campground";
+
 type Announcement = {
     id: string;
     createdAt: string;
     updatedAt: string;
     title: string;
     message: string;
-    type: "info" | "warning" | "success";
-    target: "all" | "admins" | "campground";
+    type: AnnouncementType;
+    target: AnnouncementTarget;
     campgroundId: string | null;
     status: "draft" | "scheduled" | "sent";
     scheduledAt: string | null;
@@ -36,11 +39,16 @@ export default function AnnouncementsPage() {
     const [error, setError] = useState<string | null>(null);
     const [showNew, setShowNew] = useState(false);
     const [creating, setCreating] = useState(false);
-    const [newAnnouncement, setNewAnnouncement] = useState({
+    const [newAnnouncement, setNewAnnouncement] = useState<{
+        title: string;
+        message: string;
+        type: AnnouncementType;
+        target: AnnouncementTarget;
+    }>({
         title: "",
         message: "",
-        type: "info" as const,
-        target: "all" as const,
+        type: "info",
+        target: "all",
     });
 
     const loadAnnouncements = async () => {
@@ -168,7 +176,10 @@ export default function AnnouncementsPage() {
                                 <label className="block text-sm text-slate-400 mb-1">Type</label>
                                 <select
                                     value={newAnnouncement.type}
-                                    onChange={(e) => setNewAnnouncement({ ...newAnnouncement, type: e.target.value as any })}
+                                    onChange={(e) => {
+                                        const value = e.target.value as AnnouncementType;
+                                        setNewAnnouncement({ ...newAnnouncement, type: value });
+                                    }}
                                     className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
                                 >
                                     <option value="info">Info</option>
@@ -180,7 +191,10 @@ export default function AnnouncementsPage() {
                                 <label className="block text-sm text-slate-400 mb-1">Target</label>
                                 <select
                                     value={newAnnouncement.target}
-                                    onChange={(e) => setNewAnnouncement({ ...newAnnouncement, target: e.target.value as any })}
+                                    onChange={(e) => {
+                                        const value = e.target.value as AnnouncementTarget;
+                                        setNewAnnouncement({ ...newAnnouncement, target: value });
+                                    }}
                                     className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
                                 >
                                     <option value="all">All Staff</option>

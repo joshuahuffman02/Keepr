@@ -1,4 +1,4 @@
-import { ConflictException, Injectable, NotFoundException, ForbiddenException, BadRequestException } from "@nestjs/common";
+import { ConflictException, Injectable, NotFoundException, ForbiddenException, BadRequestException, Logger } from "@nestjs/common";
 import { PrismaService } from "../prisma/prisma.service";
 import { CreateCampgroundDto } from "./dto/create-campground.dto";
 import * as bcrypt from "bcryptjs";
@@ -15,6 +15,8 @@ import dns from "dns/promises";
 
 @Injectable()
 export class CampgroundsService {
+  private readonly logger = new Logger(CampgroundsService.name);
+
   constructor(
     private readonly prisma: PrismaService,
     private readonly emailService: EmailService,
@@ -1254,7 +1256,7 @@ export class CampgroundsService {
         `
       }).catch((err) => {
         // best-effort email; don't block - but log for debugging
-        console.warn('[Campground] Failed to send invite email:', err instanceof Error ? err.message : err);
+        this.logger.warn(`Failed to send invite email: ${err instanceof Error ? err.message : err}`);
       });
     }
 
@@ -1327,7 +1329,7 @@ export class CampgroundsService {
           </div>
         </div>
       `
-    }).catch((err) => console.warn('[Campground] Failed to send invite email:', err instanceof Error ? err.message : err));
+    }).catch((err) => this.logger.warn(`Failed to send invite email: ${err instanceof Error ? err.message : err}`));
 
     await this.audit.record({
       campgroundId,

@@ -86,14 +86,29 @@ export function CreateTicketDialog({ open, onOpenChange, onSuccess, campgroundId
                 setLoading(false);
                 return;
             }
-            await apiClient.createMaintenanceTicket({
+            interface CreateMaintenanceTicketPayload {
+                title: string;
+                description: string;
+                priority: MaintenancePriority;
+                campgroundId: string;
+                siteId?: string;
+                status: "open";
+                isBlocking: boolean;
+                outOfOrder: boolean;
+                outOfOrderReason?: string;
+                dueDate?: string;
+            }
+
+            const payload: CreateMaintenanceTicketPayload = {
                 ...formData,
                 siteId: formData.siteId === "none" ? undefined : formData.siteId,
                 campgroundId: selectedCampgroundId,
                 status: "open",
                 outOfOrder: formData.outOfOrder,
                 outOfOrderReason: formData.outOfOrder ? formData.outOfOrderReason : undefined,
-            } as any);
+            };
+
+            await apiClient.createMaintenanceTicket(payload);
 
             toast({
                 title: "Ticket created",

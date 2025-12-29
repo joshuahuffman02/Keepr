@@ -170,8 +170,8 @@ export default function AIWeatherPage() {
             </div>
           </div>
           <div className="flex items-center gap-2">
-            <Badge variant={(autopilotConfig as any)?.weatherAlertsEnabled ? "default" : "secondary"}>
-              {(autopilotConfig as any)?.weatherAlertsEnabled ? "Active" : "Disabled"}
+            <Badge variant={(autopilotConfig as { weatherAlertsEnabled?: boolean })?.weatherAlertsEnabled ? "default" : "secondary"}>
+              {(autopilotConfig as { weatherAlertsEnabled?: boolean })?.weatherAlertsEnabled ? "Active" : "Disabled"}
             </Badge>
             <Link href="/ai/settings">
               <Button variant="outline" size="sm" className="gap-2">
@@ -247,7 +247,7 @@ export default function AIWeatherPage() {
                     </div>
                     <div>
                       <div className="text-4xl font-bold text-foreground">
-                        {Math.round((weather as any).temp || (weather as any).temperature || 0)}°F
+                        {Math.round((weather as WeatherData).temp || (weather as WeatherData).temperature || 0)}°F
                       </div>
                       <p className="text-sm text-muted-foreground capitalize">
                         {(weather as WeatherData).description}
@@ -300,18 +300,20 @@ export default function AIWeatherPage() {
                 <div className="flex items-center justify-center py-8">
                   <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
                 </div>
-              ) : (forecast as any[]).length > 0 ? (
+              ) : Array.isArray(forecast) && forecast.length > 0 ? (
                 <div className="grid grid-cols-5 gap-4">
-                  {(forecast as any[]).slice(0, 5).map((day: any, i: number) => {
-                    const DayIcon = getWeatherIcon(day.icon || "");
+                  {forecast.slice(0, 5).map((day: Record<string, unknown>, i: number) => {
+                    const DayIcon = getWeatherIcon((day.icon as string | undefined) || "");
+                    const high = (day.high as number | undefined) || (day.tempHigh as number | undefined) || 0;
+                    const low = (day.low as number | undefined) || (day.tempLow as number | undefined) || 0;
                     return (
                       <div key={i} className="text-center p-3 rounded-lg bg-muted/50">
                         <p className="text-xs font-medium text-muted-foreground mb-2">
-                          {i === 0 ? "Today" : format(new Date(day.date), "EEE")}
+                          {i === 0 ? "Today" : format(new Date(day.date as string), "EEE")}
                         </p>
                         <DayIcon className="h-8 w-8 mx-auto text-muted-foreground mb-2" />
-                        <p className="font-bold text-foreground">{Math.round(day.high)}°</p>
-                        <p className="text-sm text-muted-foreground">{Math.round(day.low)}°</p>
+                        <p className="font-bold text-foreground">{Math.round(high)}°</p>
+                        <p className="text-sm text-muted-foreground">{Math.round(low)}°</p>
                       </div>
                     );
                   })}

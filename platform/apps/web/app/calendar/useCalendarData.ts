@@ -168,9 +168,13 @@ export function useCalendarData() {
     }, [isReady, selectedCampground, campgroundsQuery.data]);
 
     // Permissions
-    const memberships = whoami?.user?.memberships ?? [];
+    interface Membership {
+        campgroundId: string;
+        role: string;
+    }
+    const memberships = (whoami?.user?.memberships ?? []) as Membership[];
     const hasCampgroundAccess = selectedCampground
-        ? memberships.some((m: any) => m.campgroundId === selectedCampground)
+        ? memberships.some((m) => m.campgroundId === selectedCampground)
         : memberships.length > 0;
     const allowOps = (whoami?.allowed?.operationsWrite ?? false) && hasCampgroundAccess;
 
@@ -197,9 +201,17 @@ export function useCalendarData() {
         [reservationsQuery.data]
     );
 
+    interface GuestData {
+        id: string;
+        primaryFirstName?: string | null;
+        primaryLastName?: string | null;
+        email?: string | null;
+        phone?: string | null;
+    }
+
     const guestLookup = useMemo(() => {
         const map = new Map<string, { firstName: string; lastName: string; email: string; phone: string; fullName: string }>();
-        (guestsQuery.data || []).forEach((guest: any) => {
+        ((guestsQuery.data || []) as GuestData[]).forEach((guest) => {
             const firstName = (guest.primaryFirstName || "").toLowerCase();
             const lastName = (guest.primaryLastName || "").toLowerCase();
             const email = (guest.email || "").toLowerCase();
@@ -219,7 +231,14 @@ export function useCalendarData() {
             if (assignmentFilter === "assigned" && !res.siteId) return false;
             if (assignmentFilter === "unassigned" && res.siteId) return false;
             if (channelFilter !== "all") {
-                const channel = (res as any).channel || (res as any).bookingChannel || (res as any).source;
+                interface ReservationWithChannel {
+                    channel?: string;
+                    bookingChannel?: string;
+                    source?: string;
+                }
+                const channel = (res as unknown as ReservationWithChannel).channel ||
+                               (res as unknown as ReservationWithChannel).bookingChannel ||
+                               (res as unknown as ReservationWithChannel).source;
                 if (channel !== channelFilter) return false;
             }
             if (arrivalsNowOnly) {
@@ -228,11 +247,11 @@ export function useCalendarData() {
                 if (arr.getTime() !== today.getTime()) return false;
             }
             if (searchLower) {
-                const guest = (res.guest || {}) as any;
-                const firstName = (guest.primaryFirstName || "").toLowerCase();
-                const lastName = (guest.primaryLastName || "").toLowerCase();
-                const email = (guest.email || "").toLowerCase();
-                const phone = (guest.phone || "").toLowerCase();
+                const guest = res.guest;
+                const firstName = (guest?.primaryFirstName || "").toLowerCase();
+                const lastName = (guest?.primaryLastName || "").toLowerCase();
+                const email = (guest?.email || "").toLowerCase();
+                const phone = (guest?.phone || "").toLowerCase();
                 const siteName = (res.site?.name || "").toLowerCase();
                 const fullName = `${firstName} ${lastName}`.toLowerCase();
 
@@ -275,7 +294,7 @@ export function useCalendarData() {
     }, [filteredReservations]);
 
     const conflicts = useMemo(() => {
-        const bySite: Record<string, any[]> = {};
+        const bySite: Record<string, typeof filteredReservations> = {};
         filteredReservations.forEach((res) => {
             if (!res.siteId) return;
             if (!bySite[res.siteId]) bySite[res.siteId] = [];
@@ -283,7 +302,7 @@ export function useCalendarData() {
         });
         const results: ReservationConflict[] = [];
         Object.entries(bySite).forEach(([siteId, list]) => {
-            const sorted = [...list].sort((a: any, b: any) => new Date(a.arrivalDate).getTime() - new Date(b.arrivalDate).getTime());
+            const sorted = [...list].sort((a, b) => new Date(a.arrivalDate).getTime() - new Date(b.arrivalDate).getTime());
             for (let i = 1; i < sorted.length; i++) {
                 const prev = sorted[i - 1];
                 const cur = sorted[i];
@@ -318,7 +337,7 @@ export function useCalendarData() {
     const selectRange = async (siteId: string, arrival: Date, departure: Date) => {
         const arrivalStr = formatLocalDateInput(arrival);
         const departureStr = formatLocalDateInput(departure);
-        const site = sitesQuery.data?.find((s: any) => s.id === siteId) as CalendarSite | undefined;
+        const site = (sitesQuery.data || []).find((s) => s.id === siteId) as CalendarSite | undefined;
 
         if (!site || !selectedCampground) return;
 

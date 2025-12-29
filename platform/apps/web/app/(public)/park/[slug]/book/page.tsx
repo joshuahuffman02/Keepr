@@ -601,7 +601,14 @@ function SiteStep({
             }
             if (filters.petFriendly && !sc?.petFriendly) return false;
             if (filters.accessible && !(site.accessible || sc?.accessible)) return false;
-            if (filters.pullThrough && !(site as any).pullThrough && !(sc as any)?.rvOrientation?.includes("pull")) return false;
+
+            // Type-safe access to optional properties
+            type SiteWithOptional = typeof site & { pullThrough?: boolean };
+            type SiteClassWithOptional = typeof sc & { rvOrientation?: string };
+            const siteExtended = site as SiteWithOptional;
+            const scExtended = sc as SiteClassWithOptional;
+
+            if (filters.pullThrough && !siteExtended.pullThrough && !scExtended?.rvOrientation?.includes("pull")) return false;
             return true;
         });
     }, [sites, filters]);
@@ -779,19 +786,19 @@ function SiteStep({
                     />
                     <FilterChip
                         label="Pet Friendly"
-                        icon={<span className="text-sm">🐕</span>}
+                        icon={<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="4" r="2"/><circle cx="18" cy="8" r="2"/><circle cx="20" cy="16" r="2"/><path d="M9 10a5 5 0 0 1 5 5v3.5a3.5 3.5 0 0 1-6.84 1.045Q6.52 17.48 4.46 16.84A3.5 3.5 0 0 1 5.5 10Z"/></svg>}
                         active={filters.petFriendly}
                         onClick={() => setFilters(f => ({ ...f, petFriendly: !f.petFriendly }))}
                     />
                     <FilterChip
                         label="ADA Accessible"
-                        icon={<span className="text-sm">♿</span>}
+                        icon={<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="16" cy="4" r="1"/><path d="m18 19 1-7-6 1"/><path d="m5 8 3-3 5.5 3-2.36 3.5"/><path d="M4.24 14.5a5 5 0 1 0 6.88 6"/><path d="M13.76 17.5a5 5 0 0 0-6.88-6"/></svg>}
                         active={filters.accessible}
                         onClick={() => setFilters(f => ({ ...f, accessible: !f.accessible }))}
                     />
                     <FilterChip
                         label="Pull-Through"
-                        icon={<span className="text-sm">🚐</span>}
+                        icon={<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M10 17h4V5H2v12h3"/><path d="M20 17h2v-3.34a4 4 0 0 0-1.17-2.83L19 9h-5"/><path d="M14 17h1"/><circle cx="7.5" cy="17.5" r="2.5"/><circle cx="17.5" cy="17.5" r="2.5"/></svg>}
                         active={filters.pullThrough}
                         onClick={() => setFilters(f => ({ ...f, pullThrough: !f.pullThrough }))}
                     />
@@ -825,7 +832,11 @@ function SiteStep({
                         {classSites.map((site) => {
                             const isAvailable = site.status === 'available';
                             const selected = selectedSiteId === site.id;
-                            const cardImage = (site.siteClass as any)?.photoUrl || heroImage || "/placeholder.png";
+
+                            // Type-safe access to optional photoUrl property
+                            type SiteClassWithPhoto = typeof site.siteClass & { photoUrl?: string };
+                            const siteClassExtended = site.siteClass as SiteClassWithPhoto;
+                            const cardImage = siteClassExtended?.photoUrl || heroImage || "/placeholder.png";
                             const selectionFeeDisplay = siteSelectionFeeCents && siteSelectionFeeCents > 0
                                 ? `$${(siteSelectionFeeCents / 100).toFixed(2)} site selection fee`
                                 : null;
@@ -1983,15 +1994,16 @@ function ReviewStep({
             let holdId: string | undefined = undefined;
             if (!assignOnArrival && campgroundId && selectedSite && arrivalDate && departureDate) {
                 try {
+                    type HoldResponse = { id: string; expiresAt?: string };
                     const hold = await apiClient.createHold({
                         campgroundId,
                         siteId: selectedSite.id,
                         arrivalDate,
                         departureDate
-                    });
-                    holdId = (hold as any)?.id;
-                    if ((hold as any)?.expiresAt) {
-                        updateHoldExpiresAt(new Date((hold as any).expiresAt));
+                    }) as HoldResponse;
+                    holdId = hold?.id;
+                    if (hold?.expiresAt) {
+                        updateHoldExpiresAt(new Date(hold.expiresAt));
                     } else {
                         const defaultExpiry = new Date();
                         defaultExpiry.setMinutes(defaultExpiry.getMinutes() + 10);
@@ -2269,7 +2281,7 @@ function ReviewStep({
                         {appliedDiscountCents > 0 && (
                             <div className="flex justify-between text-sm text-green-600">
                                 <span className="flex items-center gap-1">
-                                    <span aria-hidden>🏷️</span>
+                                    <svg className="w-4 h-4" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2H2v10l9.29 9.29c.94.94 2.48.94 3.42 0l6.58-6.58c.94-.94.94-2.48 0-3.42L12 2Z"/><path d="M7 7h.01"/></svg>
                                     {promoApplied ? `Promo: ${promoCode}` : "Discounts"}
                                 </span>
                                 <span className="font-medium">-${(appliedDiscountCents / 100).toFixed(2)}</span>
@@ -2297,7 +2309,7 @@ function ReviewStep({
                         {charityAmountCents > 0 && (
                             <div className="flex justify-between text-sm text-pink-600">
                                 <span className="flex items-center gap-1">
-                                    <span aria-hidden>💝</span>
+                                    <svg className="w-4 h-4" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>
                                     Charity donation
                                 </span>
                                 <span className="font-medium">+${(charityAmountCents / 100).toFixed(2)}</span>
@@ -2323,7 +2335,7 @@ function ReviewStep({
                 {promoApplied ? (
                     <div className="flex items-center justify-between p-3 bg-green-50 border border-green-200 rounded-lg">
                         <div className="flex items-center gap-2">
-                            <span className="text-green-600">✓</span>
+                            <svg className="w-4 h-4 text-green-600" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
                             <span className="font-mono font-medium text-green-700">{promoCode}</span>
                             <span className="text-sm text-green-600">applied!</span>
                         </div>
@@ -2455,7 +2467,7 @@ function ReviewStep({
             {waiverRequired && (
                 <div className="mb-6 p-4 bg-amber-50 border border-amber-200 rounded-xl">
                     <div className="flex items-start gap-3">
-                        <span className="text-2xl">📋</span>
+                        <svg className="w-6 h-6 text-amber-700" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="8" height="4" x="8" y="2" rx="1" ry="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="M12 11h4"/><path d="M12 16h4"/><path d="M8 11h.01"/><path d="M8 16h.01"/></svg>
                         <div className="flex-1">
                             <h4 className="font-semibold text-amber-900 mb-2">Tax Exemption Waiver</h4>
                             <p className="text-sm text-amber-800 mb-4 whitespace-pre-wrap">
@@ -2548,7 +2560,7 @@ function ReviewStep({
                 <Elements stripe={stripePromise} options={{ clientSecret }}>
                     {holdCountdown && (
                         <div className="mb-3 flex items-center gap-2 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-800">
-                            <span>⏳</span>
+                            <svg className="w-4 h-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M5 22h14"/><path d="M5 2h14"/><path d="M17 22v-4.172a2 2 0 0 0-.586-1.414L12 12l-4.414 4.414A2 2 0 0 0 7 17.828V22"/><path d="M7 2v4.172a2 2 0 0 0 .586 1.414L12 12l4.414-4.414A2 2 0 0 0 17 6.172V2"/></svg>
                             <span>
                                 We’re holding this site for you {holdCountdown === "Expired" ? "(hold expired — try again)" : `for ${holdCountdown} more`} before it releases.
                             </span>
@@ -2994,7 +3006,8 @@ export default function BookingPage() {
     });
 
     const siteSelectionFeeCents = useMemo(() => {
-        const fee = (campground as any)?.siteSelectionFeeCents;
+        type CampgroundWithFee = typeof campground & { siteSelectionFeeCents?: number };
+        const fee = (campground as CampgroundWithFee)?.siteSelectionFeeCents;
         return typeof fee === "number" ? fee : null;
     }, [campground]);
 

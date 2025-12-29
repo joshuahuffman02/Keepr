@@ -2,7 +2,26 @@ import NextAuth from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 import type { User } from "next-auth";
 
+interface Campground {
+  id: string;
+  name: string;
+}
 
+interface LoginResponse {
+  id: string;
+  email: string;
+  firstName: string;
+  lastName: string;
+  token: string;
+  platformRole?: string;
+  campgrounds?: Campground[];
+}
+
+interface ExtendedUser extends User {
+  apiToken: string;
+  platformRole?: string;
+  campgrounds?: Campground[];
+}
 
 const API_BASE = (process.env.NEXT_PUBLIC_API_BASE || process.env.API_BASE || "http://localhost:4000/api").replace(/\/$/, "");
 
@@ -54,9 +73,9 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
             return null;
           }
 
-          let data: any;
+          let data: LoginResponse;
           try {
-            data = await res.json();
+            data = await res.json() as LoginResponse;
           } catch {
             console.warn("[auth] login response not json", { apiBase: API_BASE });
             return null;
@@ -66,14 +85,15 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
             return null;
           }
 
-          return {
+          const user: ExtendedUser = {
             id: data.id,
             email: data.email,
             name: `${data.firstName} ${data.lastName}`,
             apiToken: data.token,
             platformRole: data.platformRole,
             campgrounds: data.campgrounds || []
-          } as any;
+          };
+          return user;
         } catch (error) {
           console.error("Auth error:", error, { apiBase: API_BASE });
           return null;
@@ -92,19 +112,24 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
   callbacks: {
     async jwt({ token, user }) {
       if (user) {
-        token.id = user.id;
-        token.apiToken = (user as any).apiToken;
-        token.platformRole = (user as any).platformRole;
-        token.campgrounds = (user as any).campgrounds;
+        const extendedUser = user as ExtendedUser;
+        token.id = extendedUser.id;
+        token.apiToken = extendedUser.apiToken;
+        token.platformRole = extendedUser.platformRole;
+        token.campgrounds = extendedUser.campgrounds;
       }
       return token;
     },
     async session({ session, token }) {
       if (session.user) {
         session.user.id = token.id as string;
-        (session as any).apiToken = token.apiToken;
-        (session.user as any).platformRole = token.platformRole;
-        (session as any).campgrounds = token.campgrounds;
+        Object.assign(session, {
+          apiToken: token.apiToken,
+          campgrounds: token.campgrounds
+        });
+        Object.assign(session.user, {
+          platformRole: token.platformRole
+        });
       }
       return session;
     }

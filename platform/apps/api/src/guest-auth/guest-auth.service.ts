@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
+import { Injectable, NotFoundException, UnauthorizedException, Logger } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { PrismaService } from '../prisma/prisma.service';
 import { randomBytes } from 'crypto';
@@ -6,6 +6,8 @@ import { EmailService } from '../email/email.service';
 
 @Injectable()
 export class GuestAuthService {
+    private readonly logger = new Logger(GuestAuthService.name);
+
     constructor(
         private readonly prisma: PrismaService,
         private readonly jwtService: JwtService,
@@ -86,7 +88,7 @@ export class GuestAuthService {
             });
         } catch (err) {
             // Fallback: still log the link for debugging if email fails
-        console.log(`[MAGIC LINK] For ${normalizedEmail}: ${link}`);
+            this.logger.log(`Magic link for ${normalizedEmail}: ${link}`);
         }
 
         return { message: 'Magic link sent' };

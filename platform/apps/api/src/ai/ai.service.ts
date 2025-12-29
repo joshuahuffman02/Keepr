@@ -391,7 +391,7 @@ Respond with JSON only (no markdown):
       });
 
       if (!res.ok) {
-        throw new Error(`OpenAI error: ${res.status}`);
+        throw new BadRequestException(`OpenAI error: ${res.status}`);
       }
 
       const json = await res.json();
@@ -579,7 +579,7 @@ Only include items with score >= 0.5. Return empty array if no good matches.`;
       });
 
       if (!res.ok) {
-        throw new Error(`OpenAI error: ${res.status}`);
+        throw new BadRequestException(`OpenAI error: ${res.status}`);
       }
 
       const json = await res.json();

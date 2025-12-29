@@ -1,4 +1,4 @@
-import { BadRequestException, ConflictException, Injectable, NotFoundException } from "@nestjs/common";
+import { BadRequestException, ConflictException, Injectable, NotFoundException, Logger } from "@nestjs/common";
 import { CheckInStatus, GamificationEventCategory, MaintenanceStatus, Prisma, ReferralIncentiveType, Reservation, ReservationStatus } from "@prisma/client";
 import { PrismaService } from "../prisma/prisma.service";
 import { CreateReservationDto } from "./dto/create-reservation.dto";
@@ -33,6 +33,8 @@ import { StripeService } from "../payments/stripe.service";
 
 @Injectable()
 export class ReservationsService {
+  private readonly logger = new Logger(ReservationsService.name);
+
   constructor(
     private readonly prisma: PrismaService,
     private readonly locks: LockService,
@@ -146,7 +148,7 @@ export class ReservationsService {
       try {
         await Promise.all(ops);
       } catch (err) {
-        console.warn("Failed to attach waiver artifacts to reservation", err);
+        this.logger.warn("Failed to attach waiver artifacts to reservation", err);
       }
     }
   }
@@ -204,7 +206,7 @@ export class ReservationsService {
         }
       });
     } catch (err) {
-      console.warn("Failed to attach ID verification to reservation", err);
+      this.logger.warn("Failed to attach ID verification to reservation", err);
     }
   }
 
@@ -1355,7 +1357,7 @@ export class ReservationsService {
           try {
             await this.repeatChargesService.generateCharges(reservation.id);
           } catch (err) {
-            console.error(`Failed to generate repeat charges for reservation ${reservation.id}:`, err);
+            this.logger.error(`Failed to generate repeat charges for reservation ${reservation.id}:`, err instanceof Error ? err.stack : err);
           }
         }
 
@@ -1424,7 +1426,7 @@ export class ReservationsService {
               kind: "payment"
             });
           } catch (emailError) {
-            console.error("Failed to send payment receipt email:", emailError);
+            this.logger.error("Failed to send payment receipt email:", emailError instanceof Error ? emailError.stack : emailError);
           }
         }
 
@@ -1473,7 +1475,7 @@ export class ReservationsService {
             acceptances: policyAcceptances
           });
         } catch (err) {
-          console.warn(`[Policies] Auto-apply failed for reservation ${reservation.id}:`, err);
+          this.logger.warn(`Policies auto-apply failed for reservation ${reservation.id}:`, err);
         }
 
         // Track usage for billing (non-blocking)
@@ -1839,7 +1841,7 @@ export class ReservationsService {
             });
           } catch (taskErr) {
             // Log but don't fail the checkout
-            console.error('Failed to create turnover task:', taskErr);
+            this.logger.error('Failed to create turnover task:', taskErr instanceof Error ? taskErr.stack : taskErr);
           }
 
           await this.accessControl.blockAccessForReservation(id, "checked_out");
@@ -2062,6 +2064,10 @@ export class ReservationsService {
       };
 
       for (const tender of tenderList) {
+        // Create unique payment ref for deduplication
+        // Use tender.note if provided (e.g., "CASH-1234567890"), otherwise generate one
+        const paymentRef = externalRef ?? tender.note ?? `${tender.method}-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+
         await tx.payment.create({
           data: {
             campgroundId: fullReservation.campgroundId,
@@ -2089,8 +2095,8 @@ export class ReservationsService {
             description: options?.transactionId ? `Payment ${options.transactionId}` : `Reservation payment (${tender.method})`,
             amountCents: tender.amountCents,
             direction: "debit",
-            externalRef,
-            dedupeKey: externalRef ? `res:${fullReservation.id}:payment:${externalRef}:${tender.method}:debit` : `res:${fullReservation.id}:payment:${tender.method}:debit`
+            externalRef: externalRef ?? paymentRef,
+            dedupeKey: `res:${fullReservation.id}:payment:${paymentRef}:${tender.method}:debit`
           },
           {
             campgroundId: fullReservation.campgroundId,
@@ -2100,8 +2106,8 @@ export class ReservationsService {
             description: `Reservation payment (${tender.method})`,
             amountCents: tender.amountCents,
             direction: "credit",
-            externalRef,
-            dedupeKey: externalRef ? `res:${fullReservation.id}:payment:${externalRef}:${tender.method}:credit` : `res:${fullReservation.id}:payment:${tender.method}:credit`
+            externalRef: externalRef ?? paymentRef,
+            dedupeKey: `res:${fullReservation.id}:payment:${paymentRef}:${tender.method}:credit`
           }
         ]);
       }
@@ -2133,7 +2139,7 @@ export class ReservationsService {
       });
     } catch (emailError) {
       // Log but don't fail the payment if email fails
-      console.error('Failed to send payment receipt email:', emailError);
+      this.logger.error('Failed to send payment receipt email:', emailError instanceof Error ? emailError.stack : emailError);
     }
 
     return updated;
@@ -2281,7 +2287,7 @@ export class ReservationsService {
         totalCents: amountCents
       });
     } catch (err) {
-      console.warn("Failed to send refund receipt email", err);
+      this.logger.warn("Failed to send refund receipt email", err);
     }
 
     return updated;
@@ -2318,7 +2324,7 @@ export class ReservationsService {
       }
     });
     if (!reservation) {
-      console.error(`[Stripe Refund] Reservation ${id} not found for refund recording`);
+      this.logger.error(`Stripe Refund - Reservation ${id} not found for refund recording`);
       return;
     }
 
@@ -2393,7 +2399,7 @@ export class ReservationsService {
         totalCents: options?.totalCents ?? amountCents
       });
     } catch (err) {
-      console.warn("Failed to send refund receipt email", err);
+      this.logger.warn("Failed to send refund receipt email", err);
     }
 
     return updated;
@@ -2558,7 +2564,7 @@ export class ReservationsService {
     upsellTotalCents: number,
     options?: { override?: boolean; overrideReason?: string; actorId?: string | null }
   ) {
-    console.log(`[Kiosk] Check-in request for ${id}, upsell: ${upsellTotalCents}`);
+    this.logger.log(`Kiosk - Check-in request for ${id}, upsell: ${upsellTotalCents}`);
     const reservation = await this.prisma.reservation.findUnique({
       where: { id },
       include: {
@@ -2568,14 +2574,14 @@ export class ReservationsService {
       }
     });
     if (!reservation) {
-      console.error(`[Kiosk] Reservation ${id} not found`);
+      this.logger.error(`Kiosk - Reservation ${id} not found`);
       throw new NotFoundException("Reservation not found");
     }
 
-    console.log(`[Kiosk] Found reservation: ${reservation.status}, Total: ${reservation.totalAmount}, Paid: ${reservation.paidAmount}`);
+    this.logger.log(`Kiosk - Found reservation: ${reservation.status}, Total: ${reservation.totalAmount}, Paid: ${reservation.paidAmount}`);
 
     if (reservation.status === ReservationStatus.checked_in) {
-      console.warn(`[Kiosk] Reservation ${id} already checked in`);
+      this.logger.warn(`Kiosk - Reservation ${id} already checked in`);
       throw new ConflictException("Reservation is already checked in");
     }
 
@@ -2622,14 +2628,14 @@ export class ReservationsService {
           after: { override: true, reason: options?.overrideReason ?? null }
         });
       } catch (err) {
-        console.error("[Kiosk] Failed to audit check-in override", err);
+        this.logger.error("Kiosk - Failed to audit check-in override", err instanceof Error ? err.stack : err);
       }
     }
 
     const newTotal = reservation.totalAmount + upsellTotalCents;
     const balanceDue = newTotal - (reservation.paidAmount || 0);
 
-    console.log(`[Kiosk] New Total: ${newTotal}, Balance Due: ${balanceDue}`);
+    this.logger.log(`Kiosk - New Total: ${newTotal}, Balance Due: ${balanceDue}`);
 
     // Process payment if there's a balance due
     let paymentIntentId: string | undefined;
@@ -2715,9 +2721,9 @@ export class ReservationsService {
           }
         });
 
-        console.log(`[Kiosk] Payment successful: ${paymentIntent.id}`);
+        this.logger.log(`Kiosk - Payment successful: ${paymentIntent.id}`);
       } catch (error: any) {
-        console.error(`[Kiosk] Payment failed for ${id}:`, error.message);
+        this.logger.error(`Kiosk - Payment failed for ${id}:`, error.message);
         throw new BadRequestException(
           `Payment processing failed: ${error.message}. Please contact staff for assistance.`
         );
@@ -2745,7 +2751,7 @@ export class ReservationsService {
           notes
         }
       });
-      console.log(`[Kiosk] Check-in successful for ${id}`);
+      this.logger.log(`Kiosk - Check-in successful for ${id}`);
 
       // Audit successful kiosk check-in
       await this.audit.record({
@@ -2770,7 +2776,7 @@ export class ReservationsService {
       try {
         await this.accessControl.autoGrantForReservation(id, options?.actorId ?? null);
       } catch (err) {
-        console.error(`[Kiosk] Access grant failed for ${id}:`, err);
+        this.logger.error(`Kiosk - Access grant failed for ${id}:`, err instanceof Error ? err.stack : err);
       }
 
       if (reservation.createdBy) {
@@ -2791,7 +2797,7 @@ export class ReservationsService {
 
       return updated;
     } catch (e) {
-      console.error(`[Kiosk] Update failed for ${id}:`, e);
+      this.logger.error(`Kiosk - Update failed for ${id}:`, e instanceof Error ? e.stack : e);
       throw e;
     }
   }
@@ -3135,7 +3141,7 @@ export class ReservationsService {
           }
         });
       } catch (err) {
-        console.warn("Failed to send split booking notification:", err);
+        this.logger.warn("Failed to send split booking notification:", err);
       }
     }
 

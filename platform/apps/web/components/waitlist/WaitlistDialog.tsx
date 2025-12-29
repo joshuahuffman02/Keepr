@@ -1,8 +1,7 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { CreateWaitlistEntrySchema, CreateWaitlistEntryDto } from "@campreserv/shared";
-import { apiClient } from "@/lib/api-client";
+import { apiClient, CreatePublicWaitlistSchema, type CreatePublicWaitlistDto } from "@/lib/api-client";
 import { Button } from "@/components/ui/button";
 import {
     Dialog,
@@ -36,28 +35,25 @@ export function WaitlistDialog({
 }: WaitlistDialogProps) {
     const [open, setOpen] = useState(false);
     const { toast } = useToast();
-    const form = useForm<CreateWaitlistEntryDto>({
-        resolver: zodResolver(CreateWaitlistEntrySchema as any) as any,
+    const form = useForm<CreatePublicWaitlistDto>({
+        // Type assertion needed due to Zod version compatibility with react-hook-form
+        resolver: zodResolver(CreatePublicWaitlistSchema as never),
         defaultValues: {
             campgroundId,
-            type: "regular",
             siteId: siteId || undefined,
-            siteTypeId: siteTypeId || undefined,
+            siteClassId: siteTypeId || undefined,
             arrivalDate,
             departureDate,
+            firstName: "",
+            lastName: "",
+            email: "",
+            phone: "",
         },
     });
 
-    const onSubmit = async (data: any) => {
+    const onSubmit = async (data: CreatePublicWaitlistDto) => {
         try {
-            await apiClient.createPublicWaitlistEntry({
-                ...data,
-                campgroundId,
-                siteId: siteId || undefined,
-                siteClassId: siteTypeId || undefined, // Map siteTypeId to siteClassId for public API
-                arrivalDate,
-                departureDate,
-            });
+            await apiClient.createPublicWaitlistEntry(data);
 
             toast({
                 title: "Joined Waitlist",
@@ -92,7 +88,7 @@ export function WaitlistDialog({
                             <Label htmlFor="firstName">First Name</Label>
                             <Input
                                 id="firstName"
-                                {...form.register("firstName" as any, { required: true })}
+                                {...form.register("firstName", { required: true })}
                                 required
                             />
                         </div>
@@ -100,7 +96,7 @@ export function WaitlistDialog({
                             <Label htmlFor="lastName">Last Name</Label>
                             <Input
                                 id="lastName"
-                                {...form.register("lastName" as any, { required: true })}
+                                {...form.register("lastName", { required: true })}
                                 required
                             />
                         </div>
@@ -110,7 +106,7 @@ export function WaitlistDialog({
                         <Input
                             id="email"
                             type="email"
-                            {...form.register("email" as any, { required: true })}
+                            {...form.register("email", { required: true })}
                             required
                         />
                     </div>
@@ -119,7 +115,7 @@ export function WaitlistDialog({
                         <Input
                             id="phone"
                             type="tel"
-                            {...form.register("phone" as any)}
+                            {...form.register("phone")}
                         />
                     </div>
                     <DialogFooter>

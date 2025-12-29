@@ -291,8 +291,8 @@ export class SlowMovingInventoryService {
             hasSlowMoving: summary.totalProducts > 0,
             subject:
                 summary.totalProducts > 0
-                    ? `📦 ${summary.totalProducts} slow-moving items (${(summary.totalValueCents / 100).toFixed(2)} tied up)`
-                    : "✅ No slow-moving inventory this week",
+                    ? `${summary.totalProducts} slow-moving items ($${(summary.totalValueCents / 100).toFixed(2)} tied up)`
+                    : "No slow-moving inventory this week",
             summary,
             recommendations: recommendations.slice(0, 10),
         };

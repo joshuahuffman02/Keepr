@@ -382,14 +382,14 @@ export default function CalendarPage() {
 
 ### When to Use Tooltips
 
-✅ **Good Use Cases:**
+**Good Use Cases:**
 - Explaining metrics or calculations
 - Clarifying form field requirements
 - Providing examples or tips
 - Explaining complex features
 - Showing keyboard shortcuts
 
-❌ **Avoid Using For:**
+**Avoid Using For:**
 - Basic labels that are self-explanatory
 - Content that should be visible by default
 - Critical information users must see
@@ -423,21 +423,21 @@ export default function CalendarPage() {
 The following pages currently have help tooltips implemented:
 
 ### Dashboard (`/app/dashboard/page.tsx`)
-- ✅ Page onboarding hint (first visit)
-- ✅ Today's Numbers section explanation
-- ✅ Individual metric tooltips (Arrivals, Departures, In-house, Occupancy, Balance due)
-- ✅ Quick Actions section tooltip
-- ✅ Needs Attention section tooltip
+- [OK] Page onboarding hint (first visit)
+- [OK] Today's Numbers section explanation
+- [OK] Individual metric tooltips (Arrivals, Departures, In-house, Occupancy, Balance due)
+- [OK] Quick Actions section tooltip
+- [OK] Needs Attention section tooltip
 
 ### Calendar (`/app/calendar/page.tsx`)
-- ✅ Page onboarding hint (drag-to-book feature)
-- ✅ Statistics tooltips (Reservations, Revenue, Occupancy, Avg Daily Rate)
+- [OK] Page onboarding hint (drag-to-book feature)
+- [OK] Statistics tooltips (Reservations, Revenue, Occupancy, Avg Daily Rate)
 
 ### Pricing Rules (`/app/settings/pricing-rules/page.tsx`)
-- ✅ Page onboarding hint (dynamic pricing intro)
-- ✅ Priority field tooltip
-- ✅ Stacking mode tooltip
-- ✅ Min/Max rate cap tooltips
+- [OK] Page onboarding hint (dynamic pricing intro)
+- [OK] Priority field tooltip
+- [OK] Stacking mode tooltip
+- [OK] Min/Max rate cap tooltips
 
 ## Adding Tooltips to New Pages
 

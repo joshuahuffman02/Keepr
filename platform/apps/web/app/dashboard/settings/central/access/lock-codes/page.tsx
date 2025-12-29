@@ -146,9 +146,9 @@ const createLockCode = async (campgroundId: string, data: Partial<LockCode>): Pr
 };
 
 const updateLockCode = async (campgroundId: string, id: string, data: Partial<LockCode>): Promise<LockCode> => {
-  const payload = { ...data };
-  if (payload.rotationSchedule) {
-    (payload as any).rotationSchedule = payload.rotationSchedule.replace('-', '_');
+  const payload: Record<string, unknown> = { ...data };
+  if (payload.rotationSchedule && typeof payload.rotationSchedule === 'string') {
+    payload.rotationSchedule = payload.rotationSchedule.replace('-', '_');
   }
   const response = await fetch(`${API_BASE}/campgrounds/${campgroundId}/lock-codes/${id}`, {
     method: 'PATCH',

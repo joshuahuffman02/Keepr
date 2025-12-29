@@ -1,3 +1,4 @@
+import { BadRequestException } from "@nestjs/common";
 import { ReservationImportRecord } from "../dto/reservation-import.dto";
 
 /**
@@ -46,7 +47,7 @@ export type NewbookImportResult = {
 export function parseNewbookDate(dateStr: string): string {
     const parsed = new Date(dateStr);
     if (isNaN(parsed.getTime())) {
-        throw new Error(`Invalid date: ${dateStr}`);
+        throw new BadRequestException(`Invalid date: ${dateStr}`);
     }
     return parsed.toISOString().split("T")[0];
 }

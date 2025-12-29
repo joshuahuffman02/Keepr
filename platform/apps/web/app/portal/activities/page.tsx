@@ -24,6 +24,26 @@ import { ReservationSelector } from "@/components/portal/ReservationSelector";
 
 type GuestData = Awaited<ReturnType<typeof apiClient.getGuestMe>>;
 
+type QueuedBooking = {
+  id: string;
+  sessionId: string;
+  payload: {
+    guestId: string;
+    quantity: number;
+  };
+  attempt: number;
+  nextAttemptAt: number;
+  createdAt: string;
+  lastError: string | null;
+  idempotencyKey: string;
+  conflict: boolean;
+};
+
+type BookingResponse = {
+  queued?: boolean;
+  [key: string]: unknown;
+};
+
 export default function GuestActivitiesPage() {
     const router = useRouter();
     const { toast } = useToast();
@@ -39,7 +59,7 @@ export default function GuestActivitiesPage() {
     const sessionsCacheKey = (activityId: string) => `campreserv:portalActivitySessions:${activityId}`;
     const activityQueueKey = "campreserv:portal:activityQueue";
     const [queuedBookings, setQueuedBookings] = useState(0);
-    const [conflicts, setConflicts] = useState<any[]>([]);
+    const [conflicts, setConflicts] = useState<QueuedBooking[]>([]);
 
     // Get current selected reservation
     const selectedReservation = useMemo(() => {
@@ -113,15 +133,15 @@ export default function GuestActivitiesPage() {
         };
     }, []);
 
-    const loadQueue = () => loadQueueGeneric<any>(activityQueueKey);
-    const saveQueue = (items: any[]) => {
+    const loadQueue = () => loadQueueGeneric<QueuedBooking>(activityQueueKey);
+    const saveQueue = (items: QueuedBooking[]) => {
         saveQueueGeneric(activityQueueKey, items);
         setQueuedBookings(items.length);
         setConflicts(items.filter((i) => i?.conflict));
     };
 
-    const queueBooking = (sessionId: string, payload: any) => {
-        const item = {
+    const queueBooking = (sessionId: string, payload: { guestId: string; quantity: number }) => {
+        const item: QueuedBooking = {
             id: randomId(),
             sessionId,
             payload,
@@ -142,7 +162,7 @@ export default function GuestActivitiesPage() {
         const now = Date.now();
         const items = loadQueue();
         if (!items.length) return;
-        const remaining: any[] = [];
+        const remaining: QueuedBooking[] = [];
         for (const item of items) {
             if (item.nextAttemptAt && item.nextAttemptAt > now) {
                 remaining.push(item);
@@ -251,7 +271,7 @@ export default function GuestActivitiesPage() {
     });
 
     const bookMutation = useMutation({
-        mutationFn: async () => {
+        mutationFn: async (): Promise<BookingResponse> => {
             if (!selectedSession) throw new Error("No session selected");
             const payload = { guestId, quantity };
             if (!isOnline) {
@@ -259,10 +279,11 @@ export default function GuestActivitiesPage() {
                 recordTelemetry({ source: "portal-activities", type: "queue", status: "pending", message: "Booking queued offline", meta: { sessionId: selectedSession } });
                 return { queued: true };
             }
-            return apiClient.bookActivity(selectedSession, payload);
+            const result = await apiClient.bookActivity(selectedSession, payload);
+            return result as BookingResponse;
         },
-        onSuccess: (res: any) => {
-            if (!(res as any)?.queued) {
+        onSuccess: (res: BookingResponse) => {
+            if (!res.queued) {
                 queryClient.invalidateQueries({ queryKey: ["sessions", selectedActivity] });
                 toast({ title: "Booking confirmed!", description: "We've sent you a confirmation email." });
                 recordTelemetry({ source: "portal-activities", type: "sync", status: "success", message: "Booking completed", meta: { sessionId: selectedSession } });

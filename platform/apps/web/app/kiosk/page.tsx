@@ -95,6 +95,20 @@ type FieldErrors = {
     zipCode?: string;
 };
 
+interface CheckinForm {
+    id: string;
+    displayConditions?: CheckinFormCondition[];
+    conditionLogic?: "all" | "any";
+    isRequired?: boolean;
+    allowSkipWithNote?: boolean;
+}
+
+interface CheckinFormCondition {
+    field: string;
+    operator: "equals" | "not_equals" | "greater_than" | "less_than" | "in" | "not_in" | "contains";
+    value: unknown;
+}
+
 const INACTIVITY_TIMEOUT = 120000; // 120 seconds (increased for better UX)
 const WARNING_THRESHOLD = 15000; // Show warning at 15 seconds
 
@@ -329,13 +343,14 @@ export default function KioskPage() {
             })()
         };
 
-        return (checkinForms as any[]).filter((form: any) => {
+        const typedForms = checkinForms as CheckinForm[];
+        return typedForms.filter((form) => {
             const conditions = form.displayConditions || [];
             if (conditions.length === 0) return true;
 
             const logic = form.conditionLogic || "all";
-            const results = conditions.map((cond: any) => {
-                let fieldValue: any;
+            const results = conditions.map((cond) => {
+                let fieldValue: unknown;
                 switch (cond.field) {
                     case "pets": fieldValue = context.pets; break;
                     case "adults": fieldValue = context.adults; break;
@@ -348,11 +363,11 @@ export default function KioskPage() {
                 switch (cond.operator) {
                     case "equals": return fieldValue === cond.value;
                     case "not_equals": return fieldValue !== cond.value;
-                    case "greater_than": return typeof fieldValue === "number" && fieldValue > cond.value;
-                    case "less_than": return typeof fieldValue === "number" && fieldValue < cond.value;
+                    case "greater_than": return typeof fieldValue === "number" && typeof cond.value === "number" && fieldValue > cond.value;
+                    case "less_than": return typeof fieldValue === "number" && typeof cond.value === "number" && fieldValue < cond.value;
                     case "in": return Array.isArray(cond.value) && cond.value.includes(fieldValue);
                     case "not_in": return Array.isArray(cond.value) && !cond.value.includes(fieldValue);
-                    case "contains": return typeof fieldValue === "string" && fieldValue.includes(cond.value);
+                    case "contains": return typeof fieldValue === "string" && typeof cond.value === "string" && fieldValue.includes(cond.value);
                     default: return true;
                 }
             });
@@ -361,12 +376,15 @@ export default function KioskPage() {
     }, [checkinForms, reservation, guestInfo.vehicleType]);
 
     // Check if all required forms are complete
-    const requiredForms = useMemo(() =>
-        applicableForms.filter((f: any) => f.isRequired !== false),
-        [applicableForms]
-    );
-    const allFormsComplete = useMemo(() =>
-        requiredForms.every((f: any) => completedForms.has(f.id) || (f.allowSkipWithNote && skipNotes[f.id])),
+    const requiredForms = useMemo(() => {
+        const typedForms = applicableForms as CheckinForm[];
+        return typedForms.filter((f) => f.isRequired !== false);
+    }, [applicableForms]);
+
+    const allFormsComplete = useMemo(() => {
+        const typedForms = requiredForms as CheckinForm[];
+        return typedForms.every((f) => completedForms.has(f.id) || (f.allowSkipWithNote && skipNotes[f.id]));
+    },
         [requiredForms, completedForms, skipNotes]
     );
 
@@ -627,8 +645,10 @@ export default function KioskPage() {
                 departureDate: format(departure, "yyyy-MM-dd")
             });
             // Only show sites that are actually available
-            const available = (sites as any[]).filter(s => s.status === "available");
-            setAvailableSites(available as unknown as Site[]);
+            if (Array.isArray(sites)) {
+                const available = sites.filter((s: { status?: string }) => s.status === "available");
+                setAvailableSites(available as Site[]);
+            }
             setState("walkin-sites");
         } catch (err) {
             console.error(err);
@@ -755,8 +775,15 @@ export default function KioskPage() {
             triggerCelebration();
         } catch (err) {
             console.error(err);
+            const error = err as { message?: string };
             setError("Check-in couldn't be completed. Please visit the front desk for assistance.");
-            recordTelemetry({ source: "kiosk", type: "error", status: "failed", message: "Check-in failed", meta: { error: (err as any)?.message } });
+            recordTelemetry({
+                source: "kiosk",
+                type: "error",
+                status: "failed",
+                message: "Check-in failed",
+                meta: { error: error?.message ?? "Unknown error" }
+            });
         } finally {
             setLoading(false);
         }

@@ -69,11 +69,12 @@ export default function AccessControlSettingsPage() {
   });
 
   const handleSave = () => {
-    let credentials: any = {};
+    let credentials: Record<string, unknown> = {};
     try {
       credentials = credentialsText ? JSON.parse(credentialsText) : {};
-    } catch (err: any) {
-      toast({ title: "Invalid JSON", description: err?.message ?? "Check credentials JSON", variant: "destructive" });
+    } catch (err: unknown) {
+      const errorMessage = err instanceof Error ? err.message : "Check credentials JSON";
+      toast({ title: "Invalid JSON", description: errorMessage, variant: "destructive" });
       return;
     }
     saveMutation.mutate({
@@ -151,7 +152,7 @@ export default function AccessControlSettingsPage() {
               <select
                 className="border border-slate-200 rounded px-2 py-1 text-sm"
                 value={selectedProvider}
-                onChange={(e) => setSelectedProvider(e.target.value as any)}
+                onChange={(e) => setSelectedProvider(e.target.value as typeof selectedProvider)}
               >
                 {PROVIDERS.map((p) => (
                   <option key={p} value={p}>

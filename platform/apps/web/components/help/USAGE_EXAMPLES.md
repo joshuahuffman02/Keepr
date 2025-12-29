@@ -322,7 +322,7 @@ export default function DashboardPage() {
         <li>Click "Book Now" to create the reservation</li>
       </ol>
       <div className="mt-3 p-2 bg-blue-50 border border-blue-200 rounded text-xs text-blue-800">
-        💡 Hold Shift while dragging to extend an existing booking
+        Tip: Hold Shift while dragging to extend an existing booking
       </div>
     </div>
   }

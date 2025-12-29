@@ -1,4 +1,4 @@
-import { Injectable, Logger } from "@nestjs/common";
+import { Injectable, Logger, NotFoundException, BadRequestException } from "@nestjs/common";
 import { PrismaService } from "../prisma/prisma.service";
 
 export interface LogAutonomousActionParams {
@@ -104,15 +104,15 @@ export class AiAutonomousActionService {
     });
 
     if (!action) {
-      throw new Error("Action not found");
+      throw new NotFoundException("Action not found");
     }
 
     if (!action.reversible) {
-      throw new Error("This action cannot be reversed");
+      throw new BadRequestException("This action cannot be reversed");
     }
 
     if (action.reversedAt) {
-      throw new Error("This action has already been reversed");
+      throw new BadRequestException("This action has already been reversed");
     }
 
     // Update the action record

@@ -1,4 +1,4 @@
-import { Injectable, BadRequestException } from "@nestjs/common";
+import { Injectable, BadRequestException, Logger } from "@nestjs/common";
 import { PrismaService } from "../prisma/prisma.service";
 import { UpsertIntegrationConnectionDto } from "./dto/upsert-integration-connection.dto";
 import { CreateExportJobDto } from "./dto/create-export-job.dto";
@@ -7,6 +7,8 @@ import * as crypto from "crypto";
 
 @Injectable()
 export class IntegrationsService {
+  private readonly logger = new Logger(IntegrationsService.name);
+
   constructor(private readonly prisma: PrismaService) { }
 
   private prismaClient() {
@@ -253,7 +255,7 @@ export class IntegrationsService {
 
       if (!tokenResponse.ok) {
         const errorData = await tokenResponse.text();
-        console.error(`OAuth token exchange failed for ${provider}:`, errorData);
+        this.logger.error(`OAuth token exchange failed for ${provider}: ${errorData}`);
         return { success: false, error: "token_exchange_failed" };
       }
 
@@ -314,7 +316,7 @@ export class IntegrationsService {
 
       return { success: true, connectionId: connection.id };
     } catch (err: any) {
-      console.error(`OAuth callback error for ${provider}:`, err);
+      this.logger.error(`OAuth callback error for ${provider}: ${err?.message || "unknown_error"}`, err.stack);
       return { success: false, error: err?.message || "unknown_error" };
     }
   }

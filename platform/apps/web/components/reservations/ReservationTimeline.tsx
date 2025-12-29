@@ -7,12 +7,24 @@ interface ReservationTimelineProps {
     reservation: Reservation;
 }
 
+interface PaymentRecord {
+    createdAt?: string | Date;
+    date?: string | Date;
+    amountCents?: number;
+    direction?: "payment" | "refund";
+}
+
+interface ReservationWithPayments extends Reservation {
+    payments?: PaymentRecord[];
+}
+
 export function ReservationTimeline({ reservation }: ReservationTimelineProps) {
     const normalizeDate = (d?: string | Date | null) => (d ? new Date(d) : new Date());
     const paidCents = reservation.paidAmount ?? 0;
 
     // Get payments from reservation if available
-    const payments = (reservation as any).payments || [];
+    const reservationWithPayments = reservation as ReservationWithPayments;
+    const payments = reservationWithPayments.payments || [];
     const firstPaymentDate = payments.length > 0
         ? normalizeDate(payments[0].createdAt || payments[0].date)
         : null;
@@ -29,7 +41,7 @@ export function ReservationTimeline({ reservation }: ReservationTimelineProps) {
 
     // Add payment events from actual payments array if available
     if (payments.length > 0) {
-        payments.forEach((payment: any, index: number) => {
+        payments.forEach((payment) => {
             const paymentDate = payment.createdAt || payment.date;
             const direction = payment.direction || "payment";
             events.push({

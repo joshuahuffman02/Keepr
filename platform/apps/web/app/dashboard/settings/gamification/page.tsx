@@ -114,8 +114,8 @@ export default function GamificationSettingsPage() {
     mutationFn: () => apiClient.updateGamificationSettings({
       campgroundId: campgroundId!,
       enabled,
-      enabledRoles: enabledRoles as any[],
-    }),
+      enabledRoles,
+    } as Parameters<typeof apiClient.updateGamificationSettings>[0]),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["gamification-settings", campgroundId] });
       toast({ title: "Settings saved", description: "Gamification settings have been updated." });
@@ -136,10 +136,10 @@ export default function GamificationSettingsPage() {
     mutationFn: () => apiClient.manualGamificationAward({
       campgroundId: campgroundId!,
       targetUserId: awardTarget,
-      category: awardCategory as any,
+      category: awardCategory,
       xp: parseInt(awardXp, 10),
       reason: awardReason,
-    }),
+    } as Parameters<typeof apiClient.manualGamificationAward>[0]),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["gamification-leaderboard", campgroundId] });
       queryClient.invalidateQueries({ queryKey: ["gamification-stats", campgroundId] });

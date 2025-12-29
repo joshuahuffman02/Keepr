@@ -51,7 +51,7 @@ const SPRING_CONFIG = {
 const DEFAULT_PERIODS: Omit<RatePeriod, "id">[] = [
   {
     name: "Peak Season",
-    icon: "☀️",
+    icon: "sun",
     dateRanges: [
       { startDate: "2025-05-25", endDate: "2025-09-02" },
     ],
@@ -59,7 +59,7 @@ const DEFAULT_PERIODS: Omit<RatePeriod, "id">[] = [
   },
   {
     name: "Shoulder Season",
-    icon: "🍂",
+    icon: "leaf",
     dateRanges: [
       { startDate: "2025-04-15", endDate: "2025-05-24" },
       { startDate: "2025-09-03", endDate: "2025-10-15" },
@@ -68,7 +68,7 @@ const DEFAULT_PERIODS: Omit<RatePeriod, "id">[] = [
   },
   {
     name: "Holidays",
-    icon: "🎄",
+    icon: "gift",
     dateRanges: [
       { startDate: "2025-11-27", endDate: "2025-11-30" }, // Thanksgiving
       { startDate: "2025-12-20", endDate: "2026-01-02" }, // Christmas/New Year
@@ -80,7 +80,7 @@ const DEFAULT_PERIODS: Omit<RatePeriod, "id">[] = [
   },
   {
     name: "Off Season",
-    icon: "❄️",
+    icon: "snowflake",
     dateRanges: [],
     isDefault: true,
   },
@@ -206,7 +206,13 @@ function PeriodCard({
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3 flex-1">
-          <div className="text-2xl">{period.icon || "📅"}</div>
+          <div className="text-2xl">
+            {period.icon === "sun" && <Sun className="w-6 h-6 text-amber-500" />}
+            {period.icon === "leaf" && <Cloud className="w-6 h-6 text-orange-500" />}
+            {period.icon === "snowflake" && <Snowflake className="w-6 h-6 text-blue-400" />}
+            {period.icon === "gift" && <Sparkles className="w-6 h-6 text-purple-500" />}
+            {!period.icon && <Calendar className="w-6 h-6 text-slate-400" />}
+          </div>
           {isEditing ? (
             <div className="flex items-center gap-2 flex-1">
               <Input
@@ -326,7 +332,7 @@ function AddPeriodForm({
 }) {
   const prefersReducedMotion = useReducedMotion();
   const [name, setName] = useState("");
-  const [icon, setIcon] = useState("📅");
+  const [icon, setIcon] = useState("calendar");
 
   const handleAdd = () => {
     if (name.trim()) {
@@ -339,11 +345,11 @@ function AddPeriodForm({
         isDefault: false,
       });
       setName("");
-      setIcon("📅");
+      setIcon("calendar");
     }
   };
 
-  const iconOptions = ["📅", "🎉", "🎄", "🏖️", "🍂", "❄️", "☀️", "🌸", "🎃"];
+  const iconOptions = ["calendar", "sun", "leaf", "snowflake", "gift"];
 
   return (
     <motion.div
@@ -378,18 +384,22 @@ function AddPeriodForm({
         <div className="space-y-2">
           <Label className="text-sm text-slate-300">Icon</Label>
           <div className="flex gap-2 flex-wrap">
-            {iconOptions.map((emoji) => (
+            {iconOptions.map((iconName) => (
               <button
-                key={emoji}
-                onClick={() => setIcon(emoji)}
+                key={iconName}
+                onClick={() => setIcon(iconName)}
                 className={cn(
-                  "w-10 h-10 rounded-lg border-2 transition-all flex items-center justify-center text-xl",
-                  icon === emoji
+                  "w-10 h-10 rounded-lg border-2 transition-all flex items-center justify-center",
+                  icon === iconName
                     ? "border-emerald-500 bg-emerald-500/20"
                     : "border-slate-700 bg-slate-800/50 hover:border-slate-600"
                 )}
               >
-                {emoji}
+                {iconName === "calendar" && <Calendar className="w-5 h-5 text-slate-300" />}
+                {iconName === "sun" && <Sun className="w-5 h-5 text-amber-400" />}
+                {iconName === "leaf" && <Cloud className="w-5 h-5 text-orange-400" />}
+                {iconName === "snowflake" && <Snowflake className="w-5 h-5 text-blue-400" />}
+                {iconName === "gift" && <Sparkles className="w-5 h-5 text-purple-400" />}
               </button>
             ))}
           </div>
@@ -461,7 +471,7 @@ export function RatePeriods({
       const offSeasonPeriod: RatePeriod = {
         id: generateId(),
         name: "Standard Rate",
-        icon: "📅",
+        icon: "calendar",
         dateRanges: [],
         isDefault: true,
       };

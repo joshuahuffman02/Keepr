@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { GamificationEventCategory, MaintenancePriority, MaintenanceStatus } from '@prisma/client';
 import { GamificationService } from '../gamification/gamification.service';
@@ -108,7 +108,7 @@ export class MaintenanceService {
       where: { id },
     });
 
-    if (!existing) throw new Error('Ticket not found');
+    if (!existing) throw new NotFoundException('Ticket not found');
 
     // If status is closed, set resolvedAt if not provided
     let resolvedAt = data.resolvedAt ? new Date(data.resolvedAt) : undefined;

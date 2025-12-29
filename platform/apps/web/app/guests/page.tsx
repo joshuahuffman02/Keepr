@@ -78,7 +78,7 @@ function GuestRewardsSection({ guestId, expanded, onToggle }: { guestId: string;
                   </div>
                   <div>
                     <div className="text-lg font-bold text-slate-900">{loyalty.tier} Member</div>
-                    <div className="text-sm text-slate-500">Member since {new Date((loyalty as any).createdAt || Date.now()).toLocaleDateString()}</div>
+                    <div className="text-sm text-slate-500">Member since {new Date(Date.now()).toLocaleDateString()}</div>
                   </div>
                 </div>
                 <div className="text-right">
@@ -118,7 +118,7 @@ function GuestRewardsSection({ guestId, expanded, onToggle }: { guestId: string;
                 <div className="mt-4">
                   <h5 className="text-sm font-semibold text-slate-700 mb-2">Recent Activity</h5>
                   <div className="space-y-2 max-h-40 overflow-y-auto">
-                    {loyalty.transactions.slice(0, 10).map((tx: any) => (
+                    {loyalty.transactions.slice(0, 10).map((tx) => (
                       <div key={tx.id} className="flex items-center justify-between text-sm p-2 bg-white rounded border border-slate-100">
                         <div>
                           <div className="font-medium text-slate-800">{tx.reason}</div>
@@ -316,6 +316,32 @@ function GuestEquipmentSection({ guestId, expanded, onToggle }: { guestId: strin
 
 import { useRouter } from "next/navigation";
 
+// Extended guest type with optional fields
+type GuestWithExtras = {
+  id: string;
+  primaryFirstName: string;
+  primaryLastName: string;
+  email: string;
+  phone: string;
+  notes?: string | null;
+  vip?: boolean;
+  marketingOptIn?: boolean;
+  city?: string | null;
+  state?: string | null;
+  preferredContact?: string | null;
+  preferredLanguage?: string | null;
+  address1?: string | null;
+  address2?: string | null;
+  postalCode?: string | null;
+  rigType?: string | null;
+  rigLength?: number | null;
+  vehiclePlate?: string | null;
+  vehicleState?: string | null;
+  leadSource?: string | null;
+  tags?: string[];
+  repeatStays?: number;
+};
+
 export default function GuestsPage() {
   const router = useRouter();
 
@@ -377,22 +403,20 @@ export default function GuestsPage() {
     const csvRows = [];
     csvRows.push(["First Name", "Last Name", "Email", "Phone", "Tier", "Points", "Total Stays", "Last Visit"]);
 
-    // This is going to be slow if we have many guests.
-    // But for a prototype/MVP it might be okay.
-    // Better approach: Backend export endpoint.
-    // Given the constraints, I'll do client side fetching.
+    // Batch fetch loyalty profiles in a single API call
+    const guestIds = guests.map((g) => g.id);
+    let loyaltyMap = new Map<string, { tier: string; pointsBalance: number }>();
+    try {
+      const loyaltyProfiles = await apiClient.getLoyaltyProfilesBatch(guestIds);
+      loyaltyMap = new Map(loyaltyProfiles.map((p) => [p.guestId, p]));
+    } catch (e) {
+      console.error("Failed to fetch loyalty profiles:", e);
+    }
 
-    // Actually, let's just export basic data first and maybe skip tier if it's too hard, 
-    // OR do a Promise.all to fetch loyalty for all guests.
-
-    const guestsWithLoyalty = await Promise.all(guests.map(async (g) => {
-      try {
-        const loyalty = await apiClient.getLoyaltyProfile(g.id);
-        return { ...g, tier: loyalty.tier, points: loyalty.pointsBalance };
-      } catch (e) {
-        return { ...g, tier: "N/A", points: 0 };
-      }
-    }));
+    const guestsWithLoyalty = guests.map((g) => {
+      const loyalty = loyaltyMap.get(g.id);
+      return { ...g, tier: loyalty?.tier || "N/A", points: loyalty?.pointsBalance || 0 };
+    });
 
     guestsWithLoyalty.forEach((g) => {
       csvRows.push([
@@ -402,7 +426,7 @@ export default function GuestsPage() {
         g.phone,
         g.tier,
         g.points,
-        (g as any).repeatStays || 0,
+        (g as GuestWithExtras).repeatStays || 0,
         "N/A" // Last visit not easily available without more queries
       ]);
     });
@@ -485,7 +509,7 @@ export default function GuestsPage() {
     return emailValid && phoneValid && !!form.primaryFirstName.trim() && !!form.primaryLastName.trim();
   };
   const updateGuest = useMutation({
-    mutationFn: (payload: { id: string; data: any }) => apiClient.updateGuest(payload.id, payload.data),
+    mutationFn: (payload: { id: string; data: Partial<GuestWithExtras> }) => apiClient.updateGuest(payload.id, payload.data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["guests"] });
     }
@@ -525,9 +549,9 @@ export default function GuestsPage() {
 
     // Apply VIP filter
     if (vipFilter === "vip") {
-      data = data.filter((g) => (g as any).vip === true);
+      data = data.filter((g) => (g as GuestWithExtras).vip === true);
     } else if (vipFilter === "regular") {
-      data = data.filter((g) => !(g as any).vip);
+      data = data.filter((g) => !(g as GuestWithExtras).vip);
     }
 
     // Apply sorting
@@ -543,8 +567,8 @@ export default function GuestsPage() {
         case "phone":
           return dir * (a.phone || "").localeCompare(b.phone || "");
         case "vip":
-          const vipA = (a as any).vip ? 1 : 0;
-          const vipB = (b as any).vip ? 1 : 0;
+          const vipA = (a as GuestWithExtras).vip ? 1 : 0;
+          const vipB = (b as GuestWithExtras).vip ? 1 : 0;
           return dir * (vipB - vipA);
         default:
           return 0;
@@ -556,8 +580,8 @@ export default function GuestsPage() {
 
   const hasFilters = search || vipFilter !== "all";
   const totalGuests = guestsQuery.data?.length || 0;
-  const vipGuests = guestsQuery.data?.filter((g) => (g as any).vip).length || 0;
-  const optedInGuests = guestsQuery.data?.filter((g) => (g as any).marketingOptIn).length || 0;
+  const vipGuests = guestsQuery.data?.filter((g) => (g as GuestWithExtras).vip).length || 0;
+  const optedInGuests = guestsQuery.data?.filter((g) => (g as GuestWithExtras).marketingOptIn).length || 0;
 
   const handleSort = (column: "name" | "email" | "phone" | "vip") => {
     if (sortBy === column) {
@@ -673,7 +697,7 @@ export default function GuestsPage() {
             <select
               className="rounded-md border border-slate-200 px-2 py-1 text-sm"
               value={vipFilter}
-              onChange={(e) => setVipFilter(e.target.value as any)}
+              onChange={(e) => setVipFilter(e.target.value as "all" | "vip" | "regular")}
             >
               <option value="all">All guests</option>
               <option value="vip">VIP only</option>
@@ -907,25 +931,25 @@ export default function GuestsPage() {
                 <tr className="hover:bg-slate-50">
                   <td className="px-3 py-2 text-slate-800">
                     <div className="font-medium">{g.primaryLastName}, {g.primaryFirstName}</div>
-                    {(g as any).city && (g as any).state && (
-                      <div className="text-xs text-slate-500">{(g as any).city}, {(g as any).state}</div>
+                    {(g as GuestWithExtras).city && (g as GuestWithExtras).state && (
+                      <div className="text-xs text-slate-500">{(g as GuestWithExtras).city}, {(g as GuestWithExtras).state}</div>
                     )}
                   </td>
                   <td className="px-3 py-2 text-slate-800">{g.email}</td>
                   <td className="px-3 py-2 text-slate-800">{g.phone}</td>
                   <td className="px-3 py-2">
                     <div className="flex flex-wrap gap-1">
-                      {(g as any).vip && (
+                      {(g as GuestWithExtras).vip && (
                         <span className="rounded-full border border-amber-300 bg-amber-50 text-amber-800 px-2 py-0.5 text-xs font-medium flex items-center gap-1">
                           <Crown className="h-3 w-3" /> VIP
                         </span>
                       )}
-                      {(g as any).marketingOptIn && (
+                      {(g as GuestWithExtras).marketingOptIn && (
                         <span className="rounded-full border border-emerald-300 bg-emerald-50 text-emerald-800 px-2 py-0.5 text-xs">
                           Opt-in
                         </span>
                       )}
-                      {!(g as any).vip && !(g as any).marketingOptIn && (
+                      {!(g as GuestWithExtras).vip && !(g as GuestWithExtras).marketingOptIn && (
                         <span className="text-slate-400 text-xs">—</span>
                       )}
                     </div>
@@ -969,19 +993,19 @@ export default function GuestsPage() {
                         <div>
                           <h4 className="text-xs font-semibold text-slate-500 uppercase mb-2">Contact Info</h4>
                           <div className="text-sm space-y-1">
-                            {(g as any).preferredContact && (
-                              <div><span className="text-slate-500">Preferred:</span> {(g as any).preferredContact}</div>
+                            {(g as GuestWithExtras).preferredContact && (
+                              <div><span className="text-slate-500">Preferred:</span> {(g as GuestWithExtras).preferredContact}</div>
                             )}
-                            {(g as any).preferredLanguage && (
-                              <div><span className="text-slate-500">Language:</span> {(g as any).preferredLanguage}</div>
+                            {(g as GuestWithExtras).preferredLanguage && (
+                              <div><span className="text-slate-500">Language:</span> {(g as GuestWithExtras).preferredLanguage}</div>
                             )}
-                            {(g as any).address1 && (
+                            {(g as GuestWithExtras).address1 && (
                               <div className="text-slate-600">
-                                {(g as any).address1}
-                                {(g as any).address2 && <>, {(g as any).address2}</>}
-                                {(g as any).city && <>, {(g as any).city}</>}
-                                {(g as any).state && <>, {(g as any).state}</>}
-                                {(g as any).postalCode && <> {(g as any).postalCode}</>}
+                                {(g as GuestWithExtras).address1}
+                                {(g as GuestWithExtras).address2 && <>, {(g as GuestWithExtras).address2}</>}
+                                {(g as GuestWithExtras).city && <>, {(g as GuestWithExtras).city}</>}
+                                {(g as GuestWithExtras).state && <>, {(g as GuestWithExtras).state}</>}
+                                {(g as GuestWithExtras).postalCode && <> {(g as GuestWithExtras).postalCode}</>}
                               </div>
                             )}
                           </div>
@@ -989,13 +1013,13 @@ export default function GuestsPage() {
                         <div>
                           <h4 className="text-xs font-semibold text-slate-500 uppercase mb-2">Equipment</h4>
                           <div className="text-sm space-y-1">
-                            {(g as any).rigType && (
-                              <div><span className="text-slate-500">Rig:</span> {(g as any).rigType} {(g as any).rigLength ? `• ${(g as any).rigLength}ft` : ""}</div>
+                            {(g as GuestWithExtras).rigType && (
+                              <div><span className="text-slate-500">Rig:</span> {(g as GuestWithExtras).rigType} {(g as GuestWithExtras).rigLength ? `• ${(g as GuestWithExtras).rigLength}ft` : ""}</div>
                             )}
-                            {(g as any).vehiclePlate && (
-                              <div><span className="text-slate-500">Vehicle:</span> {(g as any).vehiclePlate} {(g as any).vehicleState ? `(${(g as any).vehicleState})` : ""}</div>
+                            {(g as GuestWithExtras).vehiclePlate && (
+                              <div><span className="text-slate-500">Vehicle:</span> {(g as GuestWithExtras).vehiclePlate} {(g as GuestWithExtras).vehicleState ? `(${(g as GuestWithExtras).vehicleState})` : ""}</div>
                             )}
-                            {!(g as any).rigType && !(g as any).vehiclePlate && (
+                            {!(g as GuestWithExtras).rigType && !(g as GuestWithExtras).vehiclePlate && (
                               <div className="text-slate-400">No equipment on file</div>
                             )}
                           </div>
@@ -1008,14 +1032,14 @@ export default function GuestsPage() {
                         <div>
                           <h4 className="text-xs font-semibold text-slate-500 uppercase mb-2">Other Info</h4>
                           <div className="text-sm space-y-1">
-                            {(g as any).leadSource && (
-                              <div><span className="text-slate-500">Source:</span> {(g as any).leadSource}</div>
+                            {(g as GuestWithExtras).leadSource && (
+                              <div><span className="text-slate-500">Source:</span> {(g as GuestWithExtras).leadSource}</div>
                             )}
-                            {(g as any).tags && (g as any).tags.length > 0 && (
-                              <div><span className="text-slate-500">Tags:</span> {(g as any).tags.join(", ")}</div>
+                            {(g as GuestWithExtras).tags && ((g as GuestWithExtras).tags?.length ?? 0) > 0 && (
+                              <div><span className="text-slate-500">Tags:</span> {(g as GuestWithExtras).tags?.join(", ")}</div>
                             )}
-                            {(g as any).repeatStays > 0 && (
-                              <div><span className="text-slate-500">Repeat stays:</span> {(g as any).repeatStays}</div>
+                            {(g as GuestWithExtras).repeatStays && ((g as GuestWithExtras).repeatStays ?? 0) > 0 && (
+                              <div><span className="text-slate-500">Repeat stays:</span> {(g as GuestWithExtras).repeatStays}</div>
                             )}
                             {g.notes && (
                               <div><span className="text-slate-500">Notes:</span> {g.notes}</div>

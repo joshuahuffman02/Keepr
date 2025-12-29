@@ -23,11 +23,11 @@ import {
 } from "lucide-react";
 
 const providerOptions = [
-  { value: "Hipcamp", label: "Hipcamp", icon: "🏕️" },
-  { value: "Spot2Nite", label: "Spot2Nite", icon: "🌙" },
-  { value: "Outdoorsy", label: "Outdoorsy", icon: "🚐" },
-  { value: "Airbnb", label: "Airbnb", icon: "🏠" },
-  { value: "Other", label: "Other", icon: "🔗" }
+  { value: "Hipcamp", label: "Hipcamp", icon: "tent" },
+  { value: "Spot2Nite", label: "Spot2Nite", icon: "moon" },
+  { value: "Outdoorsy", label: "Outdoorsy", icon: "truck" },
+  { value: "Airbnb", label: "Airbnb", icon: "home" },
+  { value: "Other", label: "Other", icon: "link" }
 ];
 
 const statusOptions = [

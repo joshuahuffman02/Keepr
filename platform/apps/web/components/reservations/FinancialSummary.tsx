@@ -26,12 +26,12 @@ export function FinancialSummary({ reservation }: FinancialSummaryProps) {
     const taxCents = reservation.taxesAmount ?? 0;
     const feesCents = reservation.feesAmount ?? 0;
     const discountsCents = reservation.discountsAmount ?? 0;
-    const feeMode = (reservation as any)?.feeMode ?? (reservation as any)?.metadata?.feeMode ?? null;
+    const reservationExtended = reservation as Reservation & { feeMode?: string | null; metadata?: { feeMode?: string | null } };
+    const feeMode = reservationExtended?.feeMode ?? reservationExtended?.metadata?.feeMode ?? null;
 
     const isPaid = balanceCents <= 0;
 
-    // Get guest info from reservation
-    const guest = (reservation as any).guest;
+    const guest = reservation.guest;
     const guestId = guest?.id;
     const guestEmail = guest?.email;
     const guestName = guest
@@ -107,7 +107,7 @@ export function FinancialSummary({ reservation }: FinancialSummaryProps) {
             <PaymentCollectionModal
                 isOpen={isPaymentModalOpen}
                 onClose={() => setIsPaymentModalOpen(false)}
-                campgroundId={(reservation as any).campgroundId}
+                campgroundId={reservation.campgroundId}
                 amountDueCents={balanceCents}
                 subject={{ type: "balance", reservationId: reservation.id }}
                 context="staff_checkin"

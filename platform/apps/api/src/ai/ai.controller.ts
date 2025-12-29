@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Patch, Param, Body, UseGuards, Req, ForbiddenException } from '@nestjs/common';
+import { Controller, Get, Post, Patch, Param, Body, UseGuards, Req, ForbiddenException, Logger } from '@nestjs/common';
 import { JwtAuthGuard } from '../auth/guards';
 import { RolesGuard, Roles } from '../auth/guards/roles.guard';
 import { UserRole } from '@prisma/client';
@@ -55,6 +55,8 @@ interface PartnerConfirmDto {
 
 @Controller('ai')
 export class AiController {
+  private readonly logger = new Logger(AiController.name);
+
   constructor(
     private readonly prisma: PrismaService,
     private readonly gate: AiFeatureGateService,
@@ -85,7 +87,7 @@ export class AiController {
         history: body.history,
       });
     } catch (error) {
-      console.error('Chat endpoint error:', error);
+      this.logger.error('Chat endpoint error:', error instanceof Error ? error.stack : error);
       // Return the error message for debugging (in production you'd want to sanitize this)
       return {
         message: `Error: ${error instanceof Error ? error.message : 'Unknown error'}`,
@@ -136,7 +138,7 @@ export class AiController {
         userId,
       });
     } catch (error) {
-      console.error('Support chat error:', error);
+      this.logger.error('Support chat error:', error instanceof Error ? error.stack : error);
       // Return graceful fallback
       return {
         message:
@@ -175,7 +177,7 @@ export class AiController {
         user,
       });
     } catch (error) {
-      console.error('AI partner chat error:', error);
+      this.logger.error('AI partner chat error:', error instanceof Error ? error.stack : error);
       return {
         mode: 'staff',
         message: "I'm having trouble completing that request right now.",
@@ -200,7 +202,7 @@ export class AiController {
         user,
       });
     } catch (error) {
-      console.error('AI partner confirm error:', error);
+      this.logger.error('AI partner confirm error:', error instanceof Error ? error.stack : error);
       return {
         mode: 'staff',
         message: "I'm having trouble confirming that request right now.",

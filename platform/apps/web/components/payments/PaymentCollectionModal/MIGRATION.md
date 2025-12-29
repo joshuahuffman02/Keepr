@@ -182,13 +182,13 @@ import { PortalCheckoutFlow } from "@/components/portal/PortalCheckoutFlow";
 
 | Context | Card | Saved | Terminal | Wallet | Cash | Check | Folio | ACH | Digital |
 |---------|------|-------|----------|--------|------|-------|-------|-----|---------|
-| public_booking | ✓ | ✓ | - | - | - | - | - | ✓ | ✓ |
-| portal | ✓ | ✓ | - | ✓ | - | - | ✓ | - | ✓ |
-| kiosk | ✓ | - | ✓ | - | ✓ | - | - | - | ✓ |
-| staff_checkin | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | - |
-| staff_booking | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | - |
-| pos | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | - | - |
-| seasonal | ✓ | ✓ | - | - | - | ✓ | - | ✓ | - |
+| public_booking | Yes | Yes | - | - | - | - | - | Yes | Yes |
+| portal | Yes | Yes | - | Yes | - | - | Yes | - | Yes |
+| kiosk | Yes | - | Yes | - | Yes | - | - | - | Yes |
+| staff_checkin | Yes | Yes | Yes | Yes | Yes | Yes | Yes | Yes | - |
+| staff_booking | Yes | Yes | Yes | Yes | Yes | Yes | Yes | Yes | - |
+| pos | Yes | Yes | Yes | Yes | Yes | Yes | Yes | - | - |
+| seasonal | Yes | Yes | - | - | - | Yes | - | Yes | - |
 
 ## PaymentResult Structure
 

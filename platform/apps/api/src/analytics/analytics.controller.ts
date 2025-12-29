@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, Query, Req, UseGuards } from "@nestjs/common";
+import { Body, Controller, Get, Post, Query, Req, UseGuards, UnauthorizedException, BadRequestException } from "@nestjs/common";
 import { AnalyticsService } from "./analytics.service";
 import { IngestAnalyticsEventDto } from "./dto/ingest-analytics-event.dto";
 import { ApplyRecommendationDto } from "./dto/apply-recommendation.dto";
@@ -33,9 +33,9 @@ export class AnalyticsController {
   @Post("recommendations/apply")
   async applyRecommendation(@Body() dto: ApplyRecommendationDto, @Req() req: Request & { user?: any; campgroundId?: string }) {
     const user = (req as any).user;
-    if (!user) throw new Error("Unauthorized");
+    if (!user) throw new UnauthorizedException("Unauthorized");
     const campId = dto.campgroundId || (req as any)?.campgroundId || (req.headers as any)["x-campground-id"];
-    if (!campId) throw new Error("campgroundId required");
+    if (!campId) throw new BadRequestException("campgroundId required");
     return this.analyticsService.applyRecommendation(dto, req?.user, {
       campgroundId: campId,
       organizationId: (req as any)?.organizationId || null,

@@ -51,7 +51,7 @@ export function CampgroundProfileForm({ campground }: CampgroundProfileFormProps
     seasonEnd: campground.seasonEnd || "",
     checkInTime: campground.checkInTime || "",
     checkOutTime: campground.checkOutTime || "",
-    officeClosesAt: (campground as any).officeClosesAt || "17:00",
+    officeClosesAt: (campground as Campground & { officeClosesAt?: string }).officeClosesAt || "17:00",
     timezone: campground.timezone || "",
     slaMinutes: campground.slaMinutes?.toString() || "30",
     senderDomain: campground.senderDomain || "",
@@ -71,7 +71,35 @@ export function CampgroundProfileForm({ campground }: CampgroundProfileFormProps
 
   const mutation = useMutation({
     mutationFn: async () => {
-      const profile = await apiClient.updateCampgroundProfile(campground.id, {
+      interface CampgroundProfileUpdate {
+        name?: string;
+        slug?: string;
+        phone?: string | null;
+        email?: string | null;
+        website?: string | null;
+        facebookUrl?: string | null;
+        instagramUrl?: string | null;
+        address1?: string | null;
+        address2?: string | null;
+        city?: string | null;
+        state?: string | null;
+        country?: string | null;
+        postalCode?: string | null;
+        latitude?: number | null;
+        longitude?: number | null;
+        description?: string | null;
+        tagline?: string | null;
+        heroImageUrl?: string | null;
+        photos?: string[];
+        seasonStart?: string | null;
+        seasonEnd?: string | null;
+        checkInTime?: string | null;
+        checkOutTime?: string | null;
+        timezone?: string | null;
+        isPublished?: boolean;
+      }
+
+      const profileUpdate: CampgroundProfileUpdate = {
         name: form.name || undefined,
         slug: form.slug || undefined,
         phone: form.phone || null,
@@ -97,7 +125,9 @@ export function CampgroundProfileForm({ campground }: CampgroundProfileFormProps
         checkOutTime: form.checkOutTime || null,
         timezone: form.timezone || null,
         isPublished: form.isPublished
-      } as any);
+      };
+
+      const profile = await apiClient.updateCampgroundProfile(campground.id, profileUpdate);
       const sla = form.slaMinutes ? Number(form.slaMinutes) : null;
       if (sla && Number.isFinite(sla)) {
         await apiClient.updateCampgroundSla(campground.id, sla);

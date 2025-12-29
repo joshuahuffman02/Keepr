@@ -22,11 +22,16 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 
+type ReservationWithGroup = Reservation & {
+    groupId?: string | null;
+    groupRole?: "primary" | "member" | null;
+};
+
 export default function ReservationDetailPage() {
     const params = useParams();
     const router = useRouter();
     const { toast } = useToast();
-    const [reservation, setReservation] = useState<Reservation | null>(null);
+    const [reservation, setReservation] = useState<ReservationWithGroup | null>(null);
     const [loading, setLoading] = useState(true);
     const [processing, setProcessing] = useState(false);
     const [commTypeFilter, setCommTypeFilter] = useState<string>("all");
@@ -49,10 +54,10 @@ export default function ReservationDetailPage() {
 
     const loadReservation = async (id: string) => {
         try {
-            const data = await apiClient.getReservation(id);
+            const data = await apiClient.getReservation(id) as ReservationWithGroup;
             setReservation(data);
-            setSelectedGroupId((data as any).groupId ?? "");
-            setGroupRole(((data as any).groupRole as "primary" | "member" | null) === "primary" ? "primary" : "member");
+            setSelectedGroupId(data.groupId ?? "");
+            setGroupRole((data.groupRole === "primary" ? "primary" : "member"));
         } catch (error) {
             toast({
                 title: "Error",
@@ -193,9 +198,10 @@ export default function ReservationDetailPage() {
             return apiClient.updateReservationGroup(reservation.id, payload);
         },
         onSuccess: (updated) => {
-            setReservation(updated);
-            setSelectedGroupId((updated as any).groupId ?? "");
-            setGroupRole(((updated as any).groupRole as "primary" | "member" | null) === "primary" ? "primary" : "member");
+            const updatedWithGroup = updated as ReservationWithGroup;
+            setReservation(updatedWithGroup);
+            setSelectedGroupId(updatedWithGroup.groupId ?? "");
+            setGroupRole((updatedWithGroup.groupRole === "primary" ? "primary" : "member"));
             groupsQuery.refetch();
             toast({ title: "Saved", description: "Group assignment updated" });
         },
@@ -205,9 +211,9 @@ export default function ReservationDetailPage() {
     });
 
     useEffect(() => {
-        setSelectedGroupId((reservation as any)?.groupId ?? "");
-        setGroupRole(((reservation as any)?.groupRole as "primary" | "member" | null) === "primary" ? "primary" : "member");
-    }, [(reservation as any)?.groupId, (reservation as any)?.groupRole]);
+        setSelectedGroupId(reservation?.groupId ?? "");
+        setGroupRole((reservation?.groupRole === "primary" ? "primary" : "member"));
+    }, [reservation?.groupId, reservation?.groupRole]);
 
     useEffect(() => {
         if (!selectedGroupId) {
@@ -304,12 +310,12 @@ export default function ReservationDetailPage() {
                         {/* Left Column - Main Info */}
                         <div className="lg:col-span-2 space-y-6">
                             {reservation.guest && <GuestCard guest={reservation.guest} />}
-                            <StayDetails reservation={reservation} site={reservation.site as any} />
+                            {reservation.site && <StayDetails reservation={reservation} site={reservation.site as Parameters<typeof StayDetails>[0]["site"]} />}
                             <div className="bg-white rounded-lg border border-slate-200 p-4 space-y-3">
                                 <div className="flex items-center justify-between gap-2">
                                     <h2 className="text-lg font-semibold text-slate-900">Group assignment</h2>
-                                    <Badge variant={(reservation as any).groupId ? "secondary" : "outline"} className="text-xs">
-                                        {(reservation as any).groupId ? `Group #${(reservation as any).groupId.slice(0, 8)}` : "Not assigned"}
+                                    <Badge variant={reservation.groupId ? "secondary" : "outline"} className="text-xs">
+                                        {reservation.groupId ? `Group #${reservation.groupId.slice(0, 8)}` : "Not assigned"}
                                     </Badge>
                                 </div>
 
@@ -328,7 +334,7 @@ export default function ReservationDetailPage() {
                                                 Go to Groups
                                             </Link>
                                         </div>
-                                        {(reservation as any).groupId && (
+                                        {reservation.groupId && (
                                             <div className="flex">
                                                 <Button
                                                     variant="ghost"
@@ -490,7 +496,7 @@ export default function ReservationDetailPage() {
                                                 <select
                                                     className="w-full h-9 rounded border border-slate-200 bg-white px-2 text-sm"
                                                     value={composeType}
-                                                    onChange={(e) => setComposeType(e.target.value as any)}
+                                                    onChange={(e) => setComposeType(e.target.value as "email" | "sms" | "note" | "call")}
                                                 >
                                                     <option value="email">Email</option>
                                                     <option value="sms">SMS</option>
@@ -503,7 +509,7 @@ export default function ReservationDetailPage() {
                                                 <select
                                                     className="w-full h-9 rounded border border-slate-200 bg-white px-2 text-sm"
                                                     value={composeDirection}
-                                                    onChange={(e) => setComposeDirection(e.target.value as any)}
+                                                    onChange={(e) => setComposeDirection(e.target.value as "inbound" | "outbound")}
                                                 >
                                                     <option value="outbound">Outbound</option>
                                                     <option value="inbound">Inbound</option>

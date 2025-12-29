@@ -189,7 +189,7 @@ If there are no additional charges, guests can simply leave:
 Automate a thank-you message within 24 hours:
 
 ```
-Subject: Thanks for Staying at [Campground]! 🏕️
+Subject: Thanks for Staying at [Campground]!
 
 Hi [Name],
 

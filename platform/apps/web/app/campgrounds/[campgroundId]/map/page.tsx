@@ -31,8 +31,15 @@ export default function CampgroundMapPage() {
     enabled: !!campgroundId
   });
 
+  interface MapLayers {
+    baseImageUrl?: string;
+    baseImage?: { url?: string };
+    background?: { url?: string };
+    image?: string;
+  }
+
   const mapBaseImageUrl = useMemo(() => {
-    const layers = mapQuery.data?.config?.layers as any;
+    const layers = mapQuery.data?.config?.layers as MapLayers | undefined;
     if (!layers || typeof layers !== "object") return null;
     if (typeof layers.baseImageUrl === "string") return layers.baseImageUrl;
     if (typeof layers.baseImage?.url === "string") return layers.baseImage.url;

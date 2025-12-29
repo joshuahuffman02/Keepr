@@ -47,16 +47,16 @@ export function HeroSection() {
             {/* Pain Points */}
             <div className="flex flex-wrap gap-3 text-sm">
               <span className="inline-flex items-center px-3 py-1 rounded-full bg-red-50 text-red-700 border border-red-100">
-                <span className="mr-1.5">✗</span> No contracts
+                <svg className="mr-1.5 w-3 h-3" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg> No contracts
               </span>
               <span className="inline-flex items-center px-3 py-1 rounded-full bg-red-50 text-red-700 border border-red-100">
-                <span className="mr-1.5">✗</span> No setup fees
+                <svg className="mr-1.5 w-3 h-3" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg> No setup fees
               </span>
               <span className="inline-flex items-center px-3 py-1 rounded-full bg-red-50 text-red-700 border border-red-100">
-                <span className="mr-1.5">✗</span> No hidden costs
+                <svg className="mr-1.5 w-3 h-3" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg> No hidden costs
               </span>
               <span className="inline-flex items-center px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-100">
-                <span className="mr-1.5">✓</span> Go live in 48 hours
+                <svg className="mr-1.5 w-3 h-3" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Go live in 48 hours
               </span>
             </div>
 
@@ -92,7 +92,7 @@ export function HeroSection() {
               <div className="text-sm text-slate-600">
                 <div className="font-semibold text-slate-900">Switching from Campspot or Newbook?</div>
                 <div className="flex items-center gap-1">
-                  <span className="text-emerald-600">✦</span>
+                  <svg className="w-3 h-3 text-emerald-600" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
                   <span className="text-slate-600">We migrate your data for free</span>
                 </div>
               </div>

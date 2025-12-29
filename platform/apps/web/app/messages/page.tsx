@@ -169,7 +169,9 @@ export default function MessagesPage() {
     });
     const campground = campgrounds[0];
     const DEFAULT_SLA_MINUTES = Number(process.env.NEXT_PUBLIC_SLA_MINUTES || 30);
-    const SLA_MINUTES = (campground as any)?.slaMinutes ?? DEFAULT_SLA_MINUTES;
+    const SLA_MINUTES = (campground && 'slaMinutes' in campground && typeof campground.slaMinutes === 'number')
+        ? campground.slaMinutes
+        : DEFAULT_SLA_MINUTES;
 
     // Get reservations
     const { data: reservations = [] } = useQuery({
@@ -288,7 +290,9 @@ export default function MessagesPage() {
     // Play notification sound helper
     const playNotificationSound = () => {
         try {
-            const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+            const AudioContextClass = window.AudioContext || (window as Window & { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
+            if (!AudioContextClass) return;
+            const audioContext = new AudioContextClass();
             const oscillator = audioContext.createOscillator();
             const gainNode = audioContext.createGain();
             oscillator.connect(gainNode);
@@ -350,7 +354,7 @@ export default function MessagesPage() {
             if (!old) return old;
             return old.map(conv =>
                 conv.reservationId === reservationId
-                    ? { ...conv, messages: [...conv.messages, newMessage as any], lastMessage: newMessage as any }
+                    ? { ...conv, messages: [...conv.messages, newMessage], lastMessage: newMessage }
                     : conv
             );
         });
@@ -629,13 +633,21 @@ export default function MessagesPage() {
         const messageContent = newMessage.trim();
         try {
             const guestId = conv.messages[0]?.guest?.id || "";
-            const message = await apiClient.sendReservationMessage(
+            const messageResult = await apiClient.sendReservationMessage(
                 selectedReservationId,
                 messageContent,
                 "staff",
                 guestId
             );
-            updateConversationMessages(selectedReservationId, message as any);
+            // API returns minimal object; construct full message for UI
+            const message: Message = {
+                id: messageResult.id,
+                content: messageContent,
+                senderType: "staff",
+                createdAt: new Date().toISOString(),
+                readAt: null
+            };
+            updateConversationMessages(selectedReservationId, message);
             setNewMessage("");
             setSendSuccess(true);
             setTimeout(() => setSendSuccess(false), 1500);

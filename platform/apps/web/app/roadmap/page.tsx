@@ -209,13 +209,18 @@ function PhaseCard({ phase, index }: { phase: RoadmapPhase; index: number }) {
     );
 }
 
+type UserWithPlatformRole = {
+    platformRole?: string;
+    [key: string]: unknown;
+};
+
 export default function RoadmapPage() {
     const { status } = useSession();
     const router = useRouter();
     const { data: whoami, isLoading: whoamiLoading } = useWhoami();
 
     const isStaff =
-        !!(whoami?.user as any)?.platformRole ||
+        !!(whoami?.user as UserWithPlatformRole)?.platformRole ||
         (whoami?.user?.memberships && whoami.user.memberships.length > 0);
 
     useEffect(() => {

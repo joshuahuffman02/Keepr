@@ -45,17 +45,35 @@ type CommandItem = {
     subtitle?: string;
 };
 
+// Types
+type Notification = {
+    id: string;
+    type: string;
+    title: string;
+    body?: string;
+    readAt?: string | null;
+    createdAt: string;
+};
+
+type WindowWithKeyboardShortcuts = Window & {
+    __keyboardShortcuts?: {
+        onSearch: (callback: () => void) => void;
+        onHelp: (callback: () => void) => void;
+        onCloseModal: (callback: () => void) => void;
+    };
+};
+
 // Notification type configuration
 const notificationConfig: Record<string, { icon: string; color: string; href: string }> = {
-    arrival: { icon: "📥", color: "emerald", href: "/check-in-out" },
-    departure: { icon: "📤", color: "blue", href: "/check-in-out" },
-    task_assigned: { icon: "📋", color: "purple", href: "/tasks" },
-    task_sla_warning: { icon: "⚠️", color: "amber", href: "/tasks" },
-    maintenance_urgent: { icon: "🔧", color: "red", href: "/maintenance" },
-    payment_received: { icon: "💵", color: "emerald", href: "/finance/payouts" },
-    payment_failed: { icon: "❌", color: "red", href: "/finance/payouts" },
-    message_received: { icon: "💬", color: "blue", href: "/messages" },
-    general: { icon: "🔔", color: "slate", href: "/notifications" },
+    arrival: { icon: "log-in", color: "emerald", href: "/check-in-out" },
+    departure: { icon: "log-out", color: "blue", href: "/check-in-out" },
+    task_assigned: { icon: "clipboard-list", color: "purple", href: "/tasks" },
+    task_sla_warning: { icon: "alert-triangle", color: "amber", href: "/tasks" },
+    maintenance_urgent: { icon: "wrench", color: "red", href: "/maintenance" },
+    payment_received: { icon: "dollar-sign", color: "emerald", href: "/finance/payouts" },
+    payment_failed: { icon: "x-circle", color: "red", href: "/finance/payouts" },
+    message_received: { icon: "message-square", color: "blue", href: "/messages" },
+    general: { icon: "bell", color: "slate", href: "/notifications" },
 };
 
 export function AdminTopBar({
@@ -83,17 +101,20 @@ export function AdminTopBar({
 
     // Register callbacks with keyboard shortcuts system
     useEffect(() => {
-        if (typeof window !== "undefined" && (window as any).__keyboardShortcuts) {
-            (window as any).__keyboardShortcuts.onSearch(() => setIsSearchOpen(true));
-            (window as any).__keyboardShortcuts.onHelp(() => {
-                setIsHelpPanelOpen(true);
-                setIsNotificationsOpen(false);
-            });
-            (window as any).__keyboardShortcuts.onCloseModal(() => {
-                setIsSearchOpen(false);
-                setIsNotificationsOpen(false);
-                setIsHelpPanelOpen(false);
-            });
+        if (typeof window !== "undefined") {
+            const windowWithShortcuts = window as WindowWithKeyboardShortcuts;
+            if (windowWithShortcuts.__keyboardShortcuts) {
+                windowWithShortcuts.__keyboardShortcuts.onSearch(() => setIsSearchOpen(true));
+                windowWithShortcuts.__keyboardShortcuts.onHelp(() => {
+                    setIsHelpPanelOpen(true);
+                    setIsNotificationsOpen(false);
+                });
+                windowWithShortcuts.__keyboardShortcuts.onCloseModal(() => {
+                    setIsSearchOpen(false);
+                    setIsNotificationsOpen(false);
+                    setIsHelpPanelOpen(false);
+                });
+            }
         }
     }, []);
 
@@ -206,8 +227,8 @@ export function AdminTopBar({
         refetchInterval: 30000, // Refresh every 30 seconds
     });
 
-    const notifications = notificationsData || [];
-    const unreadCount = notifications.filter((n: any) => !n.readAt).length;
+    const notifications = (notificationsData || []) as Notification[];
+    const unreadCount = notifications.filter((n) => !n.readAt).length;
 
     // Mark notification as read mutation
     const markReadMutation = useMutation({
@@ -231,7 +252,7 @@ export function AdminTopBar({
         }
     };
 
-    const handleNotificationClick = (notification: any) => {
+    const handleNotificationClick = (notification: Notification) => {
         if (!notification.readAt) {
             markReadMutation.mutate(notification.id);
         }
@@ -358,14 +379,13 @@ export function AdminTopBar({
                                 <div className="max-h-80 overflow-y-auto">
                                     {notifications.length === 0 ? (
                                         <div className="px-4 py-8 text-center">
-                                            <div className="text-2xl mb-2">🔔</div>
                                             <div className="text-sm text-muted-foreground">No notifications yet</div>
                                             <div className="text-xs text-muted-foreground mt-1">
                                                 You'll see arrivals, payments, and alerts here
                                             </div>
                                         </div>
                                     ) : (
-                                        notifications.map((notif: any) => {
+                                        notifications.map((notif) => {
                                             const config = notificationConfig[notif.type] || notificationConfig.general;
                                             const isUnread = !notif.readAt;
                                             return (

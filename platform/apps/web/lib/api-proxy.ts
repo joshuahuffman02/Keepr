@@ -1,6 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/auth";
 
+interface SessionWithToken {
+  apiToken?: string;
+  user?: {
+    id: string;
+    email?: string;
+    name?: string;
+  };
+}
+
 export const API_BASE =
   process.env.NEXT_PUBLIC_API_BASE ||
   (process.env.NODE_ENV === "production"
@@ -22,14 +31,15 @@ export async function proxyToBackend(
   try {
     // Get session and API token
     const session = await auth();
+    const sessionWithToken = session as SessionWithToken | null;
 
     const headers: Record<string, string> = {
       "Content-Type": "application/json",
     };
 
     // Use session API token for auth
-    if (session && (session as any).apiToken) {
-      headers["Authorization"] = `Bearer ${(session as any).apiToken}`;
+    if (sessionWithToken?.apiToken) {
+      headers["Authorization"] = `Bearer ${sessionWithToken.apiToken}`;
     } else {
       // Fallback: forward authorization header if present
       const authHeader = req.headers.get("authorization");

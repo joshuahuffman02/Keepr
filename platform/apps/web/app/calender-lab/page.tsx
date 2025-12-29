@@ -120,11 +120,14 @@ export default function CalendarLabPage() {
   }, [guests, state.guestSearch]);
 
   // Get the selected reservation for the popup
+  interface ReservationWithId {
+    id: string;
+  }
   const selectedReservation = useMemo(() => {
     if (!state.selectedReservationId) return null;
     // Look in all reservations (not just filtered)
-    const allReservations = queries.reservations.data || [];
-    return allReservations.find((r: any) => r.id === state.selectedReservationId) || null;
+    const allReservations = (queries.reservations.data || []) as ReservationWithId[];
+    return allReservations.find((r) => r.id === state.selectedReservationId) || null;
   }, [state.selectedReservationId, queries.reservations.data]);
   const visibleSiteTypes = useMemo(() => {
     const types = new Set<string>();

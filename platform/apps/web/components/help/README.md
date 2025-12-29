@@ -229,14 +229,14 @@ export default function MyPage() {
 
 ## Best Practices
 
-### Do's ✅
+### Do's
 - Keep tooltips concise (1-3 sentences)
 - Provide specific examples
 - Use formatting (lists, sections)
 - Test on mobile and desktop
 - Position appropriately
 
-### Don'ts ❌
+### Don'ts
 - Don't write long paragraphs
 - Don't use for critical information
 - Don't nest tooltips

@@ -518,7 +518,7 @@ async function main() {
     await seedNps(reservations);
     await seedReviews(reservations);
 
-    console.log("\n✅ Demo data seeded successfully!");
+    console.log("\nDemo data seeded successfully!");
     console.log("\nSummary:");
     console.log(`  Sites: ${sites.length}`);
     console.log(`  Guests: ${guests.length}`);

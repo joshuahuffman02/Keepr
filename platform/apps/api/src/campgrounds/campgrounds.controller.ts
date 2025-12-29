@@ -3,9 +3,11 @@ import { CampgroundsService } from "./campgrounds.service";
 import { CreateCampgroundDto } from "./dto/create-campground.dto";
 import type { Request } from "express";
 import { JwtAuthGuard } from "../auth/guards";
+import { ScopeGuard } from "../auth/guards/scope.guard";
+import { CurrentUser } from "../auth/decorators/current-user.decorator";
 import { AddMemberDto, UpdateMemberRoleDto } from "./dto/membership.dto";
 import { RolesGuard, Roles } from "../auth/guards/roles.guard";
-import { UserRole } from "@prisma/client";
+import { UserRole, PlatformRole } from "@prisma/client";
 import { ExternalCampgroundUpsertDto, OsmIngestRequestDto } from "./dto/external-campground.dto";
 import { UpdatePhotosDto } from "./dto/update-photos.dto";
 import { DepositConfigSchema, DepositRule } from "@campreserv/shared";
@@ -346,9 +348,20 @@ export class CampgroundsController {
     return this.campgrounds.create({ organizationId, ...body });
   }
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard, ScopeGuard)
+  @Roles(UserRole.owner, PlatformRole.platform_admin)
   @Delete("campgrounds/:id")
-  remove(@Param("id") id: string) {
+  async remove(@Param("id") id: string, @CurrentUser() user: any) {
+    // SECURITY: Only owners and platform admins can delete campgrounds
+    // Additional ownership check for non-platform-admins
+    if (user.platformRole !== 'platform_admin' && user.platformRole !== 'platform_superadmin') {
+      const hasOwnership = user.memberships?.some(
+        (m: any) => m.campgroundId === id && m.role === 'owner'
+      );
+      if (!hasOwnership) {
+        throw new ForbiddenException('Only campground owners can delete their campground');
+      }
+    }
     return this.campgrounds.remove(id);
   }
 

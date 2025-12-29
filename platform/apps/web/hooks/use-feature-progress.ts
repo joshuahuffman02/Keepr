@@ -40,13 +40,22 @@ async function fetchWithAuth<T>(
 /**
  * Hook for managing user's feature discovery progress
  */
+interface SessionWithToken {
+  apiToken?: string;
+  user?: {
+    id: string;
+    email?: string;
+    name?: string;
+  };
+}
+
 export function useFeatureProgress() {
   const isBrowser = typeof window !== "undefined";
   const { data: session } = useSession();
   const queryClient = useQueryClient();
 
   const token = isBrowser ? localStorage.getItem("campreserv:authToken") : null;
-  const sessionToken = (session as any)?.apiToken as string | undefined;
+  const sessionToken = (session as SessionWithToken | null)?.apiToken;
   const authToken = sessionToken || token || "";
   const hasAuth = Boolean(authToken);
 

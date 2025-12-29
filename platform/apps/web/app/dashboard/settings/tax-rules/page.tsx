@@ -92,7 +92,7 @@ export default function TaxRulesSettingsPage() {
             qc.invalidateQueries({ queryKey: ["currency-tax"] });
             toast({ title: "Currency settings saved" });
         },
-        onError: (err: any) => toast({ title: "Save failed", description: err?.message ?? "Try again", variant: "destructive" }),
+        onError: (err: Error) => toast({ title: "Save failed", description: err?.message ?? "Try again", variant: "destructive" }),
     });
 
     const convertMutation = useMutation({
@@ -100,11 +100,11 @@ export default function TaxRulesSettingsPage() {
         onSuccess: (data) => {
             toast({ title: "Conversion", description: `${conversion.amount} ${conversion.from} → ${data.converted} ${conversion.to} @ ${data.rate}` });
         },
-        onError: (err: any) => toast({ title: "Conversion failed", description: err?.message ?? "Try again", variant: "destructive" }),
+        onError: (err: Error) => toast({ title: "Conversion failed", description: err?.message ?? "Try again", variant: "destructive" }),
     });
 
     const currencies = useMemo(() => {
-        const fxCurrencies = configQuery.data?.fxRates?.flatMap((r: any) => [r.base, r.quote]) ?? [];
+        const fxCurrencies = configQuery.data?.fxRates?.flatMap((r: { base: string; quote: string }) => [r.base, r.quote]) ?? [];
         return Array.from(new Set([...(fxCurrencies ?? []), baseCurrency, reportingCurrency]));
     }, [configQuery.data?.fxRates, baseCurrency, reportingCurrency]);
 
@@ -471,7 +471,7 @@ export default function TaxRulesSettingsPage() {
                                 <Label>Type</Label>
                                 <Select
                                     value={formData.type}
-                                    onValueChange={(val) => setFormData({ ...formData, type: val as any })}
+                                    onValueChange={(val) => setFormData({ ...formData, type: val as "percentage" | "flat" | "exemption" })}
                                 >
                                     <SelectTrigger>
                                         <SelectValue />

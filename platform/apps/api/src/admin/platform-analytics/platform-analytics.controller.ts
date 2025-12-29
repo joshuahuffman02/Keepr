@@ -1,6 +1,10 @@
-import { Controller, Get, Post, Put, Delete, Query, Param, Body, Res } from "@nestjs/common";
+import { Controller, Get, Post, Put, Delete, Query, Param, Body, Res, UseGuards } from "@nestjs/common";
 import { Response } from "express";
 import { PlatformAnalyticsService, AnalyticsQueryParams } from "./platform-analytics.service";
+import { JwtAuthGuard } from "../../auth/guards/jwt-auth.guard";
+import { RolesGuard } from "../../auth/guards/roles.guard";
+import { Roles } from "../../auth/decorators/roles.decorator";
+import { PlatformRole } from "@prisma/client";
 import { RevenueIntelligenceService } from "./services/revenue-intelligence.service";
 import { GuestJourneyService } from "./services/guest-journey.service";
 import { AccommodationMixService } from "./services/accommodation-mix.service";
@@ -16,6 +20,8 @@ import { AiSuggestionsService } from "./services/ai-suggestions.service";
 import { GoalsService, CreateGoalDto, UpdateGoalDto } from "./services/goals.service";
 
 @Controller("admin/platform-analytics")
+@UseGuards(JwtAuthGuard, RolesGuard)
+@Roles(PlatformRole.platform_admin)
 export class PlatformAnalyticsController {
   constructor(
     private analyticsService: PlatformAnalyticsService,

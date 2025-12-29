@@ -1,4 +1,4 @@
-import { Injectable, HttpException, HttpStatus } from "@nestjs/common";
+import { Injectable, HttpException, HttpStatus, Logger } from "@nestjs/common";
 import { RedisService } from "../redis/redis.service";
 
 /**
@@ -29,6 +29,7 @@ export interface RateLimitResult {
 
 @Injectable()
 export class RedisRateLimitService {
+    private readonly logger = new Logger(RedisRateLimitService.name);
     private readonly defaultConfig: RateLimitConfig = {
         windowMs: 60 * 1000, // 1 minute
         maxRequests: 100,
@@ -76,7 +77,7 @@ export class RedisRateLimitService {
     };
 
     constructor(private readonly redis: RedisService) {
-        console.log("[SECURITY] Redis rate limiting initialized");
+        this.logger.log("Redis rate limiting initialized");
     }
 
     /**
@@ -99,7 +100,7 @@ export class RedisRateLimitService {
             const client = this.redis.getClient();
             if (!client) {
                 // Redis unavailable, allow request but log warning
-                console.warn("[RATE_LIMIT] Redis unavailable, allowing request");
+                this.logger.warn("Redis unavailable, allowing request");
                 return {
                     allowed: true,
                     remaining: config.maxRequests,
@@ -154,7 +155,7 @@ export class RedisRateLimitService {
                 resetTime: now + config.windowMs,
             };
         } catch (error) {
-            console.error("[RATE_LIMIT] Redis error:", error);
+            this.logger.error("Redis error", error);
             // On error, allow the request
             return {
                 allowed: true,
@@ -175,8 +176,8 @@ export class RedisRateLimitService {
         const result = await this.checkLimit(identifier, limitType);
 
         if (!result.allowed) {
-            console.log(
-                `[RATE_LIMIT] Limit exceeded for ${identifier} (${limitType}${context ? `: ${context}` : ""})`
+            this.logger.log(
+                `Limit exceeded for ${identifier} (${limitType}${context ? `: ${context}` : ""})`
             );
 
             throw new HttpException(
@@ -217,7 +218,7 @@ export class RedisRateLimitService {
                 await client.del(key);
             }
         } catch (error) {
-            console.error("[RATE_LIMIT] Failed to reset limit:", error);
+            this.logger.error("Failed to reset limit", error);
         }
     }
 

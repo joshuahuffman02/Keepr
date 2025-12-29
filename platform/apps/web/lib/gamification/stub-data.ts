@@ -86,7 +86,7 @@ export type GamificationNotification = {
   type: "xp_award" | "badge_unlock" | "generic" | "override";
   userId?: string;
   message: string;
-  meta?: Record<string, any>;
+  meta?: Record<string, unknown>;
   createdAt: string;
 };
 
@@ -483,13 +483,14 @@ export async function fetchStaffDashboard(userId: string, campgroundId?: string)
 export async function fetchLeaderboard(window: "weekly" | "seasonal" | "all", viewerId?: string) {
   await delay();
   const key = window === "weekly" ? "weeklyXp" : window === "seasonal" ? "seasonalXp" : "totalXp";
+  type XpKey = "weeklyXp" | "seasonalXp" | "totalXp";
   const ranked = [...state.staff]
-    .sort((a, b) => (b as any)[key] - (a as any)[key])
+    .sort((a, b) => b[key as XpKey] - a[key as XpKey])
     .map((s, idx) => ({
       userId: s.id,
       name: s.name,
       role: s.role,
-      xp: (s as any)[key],
+      xp: s[key as XpKey],
       rank: idx + 1,
     }));
   const viewer = viewerId ? ranked.find((r) => r.userId === viewerId) || null : null;
@@ -595,11 +596,11 @@ export function listHistoryEntries(limit = 12): GamificationHistoryEntry[] {
     .filter((n) => n.type === "override")
     .map((n) => ({
       id: n.id,
-      type: "override",
+      type: "override" as const,
       userId: n.userId,
       userName: staffMap.get(n.userId || "")?.name,
       role: staffMap.get(n.userId || "")?.role,
-      xp: n.meta?.nextTotalXp,
+      xp: (n.meta?.nextTotalXp as number | undefined),
       createdAt: n.createdAt,
     }));
 

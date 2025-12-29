@@ -54,12 +54,22 @@ export function GlobalCommandPalette() {
   const { setShowShortcutsDialog } = useKeyboardShortcuts();
   const { setTheme, theme } = useTheme();
 
+  // Define keyboard shortcuts window interface
+  interface WindowWithKeyboardShortcuts extends Window {
+    __keyboardShortcuts?: {
+      onSearch: (callback: () => void) => void;
+    };
+  }
+
   // Register the search callback with keyboard shortcuts system
   React.useEffect(() => {
-    if (typeof window !== "undefined" && (window as any).__keyboardShortcuts) {
-      (window as any).__keyboardShortcuts.onSearch(() => {
-        setOpen(true);
-      });
+    if (typeof window !== "undefined") {
+      const win = window as WindowWithKeyboardShortcuts;
+      if (win.__keyboardShortcuts) {
+        win.__keyboardShortcuts.onSearch(() => {
+          setOpen(true);
+        });
+      }
     }
   }, []);
 

@@ -79,17 +79,17 @@ A single reminder isn't enough:
 
 ### Booking Confirmation (Immediate)
 
-**Subject:** Your Reservation at [Campground] is Confirmed! ✅
+**Subject:** Your Reservation at [Campground] is Confirmed!
 
 ```
 Hi [First Name],
 
 Great news—you're all set for [Campground Name]!
 
-📅 Arrival: [Date] 
-📍 Site: [Site Number/Type]
-🚗 Check-in: [Time]
-💵 Total: [Amount] (Paid/Balance Due)
+Arrival: [Date]
+Site: [Site Number/Type]
+Check-in: [Time]
+Total: [Amount] (Paid/Balance Due)
 
 IMPORTANT DATES TO REMEMBER:
 • Cancel by [Date] for full refund
@@ -104,15 +104,15 @@ We can't wait to see you!
 
 ### 7-Day Reminder
 
-**Subject:** One Week Until Your Camping Trip! 🏕️
+**Subject:** One Week Until Your Camping Trip!
 
 ```
 Hi [First Name],
 
 Your camping adventure at [Campground] is just 7 days away!
 
-📅 [Date] - [Date]
-📍 Site [Number/Type]
+[Date] - [Date]
+Site [Number/Type]
 
 A FEW THINGS TO HELP YOU PREPARE:
 • Check-in begins at [Time]
@@ -131,8 +131,8 @@ See you soon!
 ### 2-3 Day SMS Reminder
 
 ```
-🏕️ [Campground]: Your camping trip is in [X] days! 
-Site [Number], check-in at [Time]. 
+[Campground]: Your camping trip is in [X] days!
+Site [Number], check-in at [Time].
 
 Reply HELP for directions or CANCEL if plans changed.
 ```
@@ -149,9 +149,9 @@ Hi [First Name],
 Tomorrow's the day! Here's everything you need for a smooth arrival:
 
 CHECK-IN DETAILS:
-📍 Address: [Full Address]
-🕐 Time: [Check-in window]
-🚗 Look for: [Entrance description]
+Address: [Full Address]
+Time: [Check-in window]
+Look for: [Entrance description]
 
 YOUR SITE:
 [Site Number] - [Brief description/directions within campground]
@@ -175,13 +175,13 @@ See you soon!
 ### Day-Of Welcome (Optional but Effective)
 
 ```
-🎉 Welcome day! We're excited to host you at [Campground]!
+Welcome day! We're excited to host you at [Campground]!
 
 Check-in opens at [Time]. Your site [Number] is ready.
 
 Running late? Just text us at [Number].
 
-Safe travels! 🚗
+Safe travels!
 ```
 
 ---

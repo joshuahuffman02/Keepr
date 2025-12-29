@@ -1,4 +1,4 @@
-import { Injectable, Logger } from "@nestjs/common";
+import { Injectable, Logger, BadRequestException } from "@nestjs/common";
 import Stripe from "stripe";
 
 @Injectable()
@@ -43,7 +43,7 @@ export class StripeService {
 
     private assertConfigured(action: string): Stripe {
         if (!this.configured || !this.stripe) {
-            throw new Error(`Stripe is not configured; cannot ${action}. Set STRIPE_SECRET_KEY to enable payments.`);
+            throw new BadRequestException(`Stripe is not configured; cannot ${action}. Set STRIPE_SECRET_KEY to enable payments.`);
         }
         return this.stripe;
     }
@@ -147,7 +147,7 @@ export class StripeService {
         const stripe = this.assertConfigured("construct webhook events");
         const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
         if (!webhookSecret) {
-            throw new Error("STRIPE_WEBHOOK_SECRET is not set");
+            throw new BadRequestException("STRIPE_WEBHOOK_SECRET is not set");
         }
         return stripe.webhooks.constructEvent(payload, signature, webhookSecret);
     }

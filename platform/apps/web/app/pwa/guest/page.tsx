@@ -8,7 +8,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { apiClient } from "@/lib/api-client";
 import { recordTelemetry } from "@/lib/sync-telemetry";
-import { BookingMap } from "@/components/maps/BookingMap";
+import { BookingMap, MapSite } from "@/components/maps/BookingMap";
 import { loadQueue as loadQueueGeneric, saveQueue as saveQueueGeneric, registerBackgroundSync } from "@/lib/offline-queue";
 import { randomId } from "@/lib/random-id";
 import { TableEmpty } from "@/components/ui/table";
@@ -52,6 +52,15 @@ type QueuedMessage = {
   conflict?: boolean;
 };
 
+type SiteStatusData = {
+  id: string;
+  name: string;
+  siteNumber?: string;
+  status: "available" | "occupied" | "maintenance";
+  latitude?: number | null;
+  longitude?: number | null;
+};
+
 export default function GuestPwaPage() {
   const [stay, setStay] = useState<Stay | null>(null);
   const [loading, setLoading] = useState(true);
@@ -67,7 +76,7 @@ export default function GuestPwaPage() {
   const [queued, setQueued] = useState<number>(0);
   const [lastSync, setLastSync] = useState<string | null>(null);
   const [conflicts, setConflicts] = useState<QueuedMessage[]>([]);
-  const [siteStatus, setSiteStatus] = useState<any[]>([]);
+  const [siteStatus, setSiteStatus] = useState<SiteStatusData[]>([]);
   const [mapLoading, setMapLoading] = useState(false);
   const [campgroundCenter, setCampgroundCenter] = useState<{ latitude: number | null; longitude: number | null }>({
     latitude: null,
@@ -201,10 +210,10 @@ export default function GuestPwaPage() {
           apiClient.getSitesWithStatus(stay.campgroundId, {
             arrivalDate: stay.arrivalDate,
             departureDate: stay.departureDate
-          }).catch(() => []),
+          }).catch(() => [] as SiteStatusData[]),
           apiClient.getCampground?.(stay.campgroundId).catch(() => null)
         ]);
-        setSiteStatus(statusData as any[]);
+        setSiteStatus(statusData as SiteStatusData[]);
         if (campground) {
           setCampgroundCenter({
             latitude: campground.latitude ? Number(campground.latitude) : null,
@@ -362,12 +371,12 @@ export default function GuestPwaPage() {
 
   const offline = typeof navigator !== "undefined" && !navigator.onLine;
 
-  const mapSites = useMemo(() => {
-    return (siteStatus || []).map((s: any, idx: number) => ({
+  const mapSites: MapSite[] = useMemo(() => {
+    return (siteStatus || []).map((s, idx: number) => ({
       id: s.id,
       name: s.name,
-      siteNumber: s.siteNumber,
-      status: s.status as "available" | "occupied" | "maintenance",
+      siteNumber: s.siteNumber || "",
+      status: s.status,
       latitude: s.latitude ?? (Number.isFinite(campgroundCenter.latitude) ? (campgroundCenter.latitude as number) + 0.0004 * Math.sin(idx) : null),
       longitude: s.longitude ?? (Number.isFinite(campgroundCenter.longitude) ? (campgroundCenter.longitude as number) + 0.0004 * Math.cos(idx) : null)
     }));

@@ -741,7 +741,7 @@ function TemplateEditor({
     setSaved(false);
   }, [template, reset]);
 
-  const onSubmit = async (data: any) => {
+  const onSubmit = async (data: TemplateEditorFormData) => {
     try {
       await apiClient.updateCampaignTemplate(template.id, {
         name: data.name,
@@ -970,7 +970,9 @@ function CreateTemplateModal({
             {...nameRegister}
             ref={(e) => {
               nameRegister.ref(e);
-              (firstInputRef as any).current = e;
+              if (firstInputRef) {
+                (firstInputRef as React.MutableRefObject<HTMLInputElement | null>).current = e;
+              }
             }}
           />
 

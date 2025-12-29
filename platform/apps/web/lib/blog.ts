@@ -2,11 +2,12 @@ import fs from 'fs';
 import path from 'path';
 import matter from 'gray-matter';
 
-const DEBUG_LOGS: string[] = [];
+const isDev = process.env.NODE_ENV === 'development';
 
 function log(msg: string) {
-    DEBUG_LOGS.push(msg);
-    console.log(msg);
+    if (isDev) {
+        console.log(msg);
+    }
 }
 
 // Robust directory finding
@@ -49,7 +50,6 @@ export function getDebugInfo() {
     return {
         cwd: process.cwd(),
         blogDir: BLOG_DIR,
-        logs: DEBUG_LOGS
     };
 }
 

@@ -138,7 +138,7 @@ async function main() {
         process.exit(1);
     }
 
-    console.log('Verification Successful! 🎉');
+    console.log('Verification Successful!');
 }
 
 main()

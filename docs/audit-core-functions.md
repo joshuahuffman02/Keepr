@@ -230,7 +230,7 @@
     loading={metricsQuery.isLoading}
     color="amber"
   />
-  <QuickStat label="Outstanding Balance" value={metrics ? formatCurrency(metrics.balances.outstandingCents) : "—"} icon="💰" href="/billing/repeat-charges" />
+  <QuickStat label="Outstanding Balance" value={metrics ? formatCurrency(metrics.balances.outstandingCents) : "—"} icon="dollar" href="/billing/repeat-charges" />
 ```
 
 ```410:434:platform/apps/api/src/reports/reports.service.ts

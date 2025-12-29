@@ -147,7 +147,10 @@ export default function DataOperationsPage() {
                 source: "import"
             };
             const line = headers.join(",");
-            const sample = headers.map((h) => (sampleRow as any)[h] ?? "").join(",");
+            const sample = headers.map((h) => {
+                const value = sampleRow[h];
+                return value !== undefined ? String(value) : "";
+            }).join(",");
             const csv = `${line}\n${sample}\n`;
             downloadBlob(csv, "reservation-import-template.csv", "text/csv");
             setImportMessage({ type: "success", text: "Template downloaded! Fill it out and import above." });

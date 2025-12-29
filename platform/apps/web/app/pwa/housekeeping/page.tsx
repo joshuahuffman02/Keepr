@@ -34,6 +34,11 @@ type SiteStatus = {
   zone?: string;
 };
 
+type HousekeepingApiClient = {
+  getHousekeepingTasks?: () => Promise<unknown[]>;
+  getSiteStatuses?: () => Promise<unknown[]>;
+};
+
 export default function HousekeepingPwaPage() {
   const [tasks, setTasks] = useState<CleaningTask[]>([]);
   const [siteStatuses, setSiteStatuses] = useState<SiteStatus[]>([]);
@@ -84,9 +89,10 @@ export default function HousekeepingPwaPage() {
       }
       try {
         // Fetch housekeeping tasks and site statuses
+        const housekeepingClient = apiClient as unknown as HousekeepingApiClient;
         const [tasksData, sitesData] = await Promise.all([
-          (apiClient as any).getHousekeepingTasks?.().catch(() => []),
-          (apiClient as any).getSiteStatuses?.().catch(() => []),
+          housekeepingClient.getHousekeepingTasks?.().catch(() => []),
+          housekeepingClient.getSiteStatuses?.().catch(() => []),
         ]);
 
         if (!isMounted) return;

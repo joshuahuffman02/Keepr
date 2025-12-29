@@ -332,11 +332,11 @@ export class ExpirationAlertService {
 
         let subject = "Daily Inventory Expiration Report";
         if (summary.expired > 0) {
-            subject = `⚠️ ${summary.expired} EXPIRED items require attention`;
+            subject = `ALERT: ${summary.expired} EXPIRED items require attention`;
         } else if (summary.critical > 0) {
-            subject = `🔴 ${summary.critical} items critically close to expiration`;
+            subject = `CRITICAL: ${summary.critical} items critically close to expiration`;
         } else if (summary.warning > 0) {
-            subject = `🟡 ${summary.warning} items approaching expiration`;
+            subject = `WARNING: ${summary.warning} items approaching expiration`;
         }
 
         // Sort by urgency

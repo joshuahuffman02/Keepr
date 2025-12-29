@@ -9,6 +9,7 @@ import {
   Headers,
   UseGuards,
   Request,
+  BadRequestException,
 } from "@nestjs/common";
 import { JwtAuthGuard } from "../auth/guards/jwt-auth.guard";
 import { KioskService } from "./kiosk.service";
@@ -82,7 +83,7 @@ export class KioskController {
     }
   ) {
     if (!deviceToken) {
-      throw new Error("No device token provided");
+      throw new BadRequestException("No device token provided");
     }
     return this.kioskService.createReservation(deviceToken, body, userAgent);
   }

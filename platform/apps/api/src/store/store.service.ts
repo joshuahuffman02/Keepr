@@ -1,4 +1,4 @@
-import { ConflictException, Injectable, NotFoundException, Logger } from "@nestjs/common";
+import { ConflictException, Injectable, NotFoundException, Logger, BadRequestException } from "@nestjs/common";
 import { PrismaService } from "../prisma/prisma.service";
 import {
     CreateProductCategoryDto,
@@ -483,7 +483,7 @@ export class StoreService {
 
         // Fire-and-forget notifications - log errors but don't block the order
         this.notifyStaffNewOrder(order, campground?.email, campground?.name, (campground as any)?.orderWebhookUrl)
-          .catch((err) => console.warn('[Store] Failed to notify staff of new order:', err instanceof Error ? err.message : err));
+          .catch((err) => this.logger.warn(`Failed to notify staff of new order: ${err instanceof Error ? err.message : err}`));
 
         const perLocationItems: Array<{ productId: string; qty: number }> = [];
         const channelItems: Array<{ product: any; qty: number }> = [];
@@ -624,7 +624,7 @@ export class StoreService {
                 ? payload.items.map((item) => {
                     const match = order.items.find((i: any) => i.id === item.itemId);
                     if (item.itemId && !match) {
-                        throw new Error(`Item ${item.itemId} not found in order`);
+                        throw new NotFoundException(`Item ${item.itemId} not found in order`);
                     }
                     return {
                         itemId: item.itemId || match?.id || randomUUID(),
@@ -648,11 +648,11 @@ export class StoreService {
 
         // Validate refund amount
         if (amountCents > order.totalCents) {
-            throw new Error(`Refund amount (${amountCents}) cannot exceed order total (${order.totalCents})`);
+            throw new BadRequestException(`Refund amount (${amountCents}) cannot exceed order total (${order.totalCents})`);
         }
 
         if (amountCents <= 0) {
-            throw new Error("Refund amount must be greater than zero");
+            throw new BadRequestException("Refund amount must be greater than zero");
         }
 
         const adjustmentType = payload.type === "exchange" ? "exchange" : "refund";

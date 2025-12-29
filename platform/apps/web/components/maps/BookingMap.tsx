@@ -1,11 +1,27 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import maplibregl, { Map as MapLibreMap, Marker } from "maplibre-gl";
-import "maplibre-gl/dist/maplibre-gl.css";
+import dynamic from "next/dynamic";
 import { Caravan, Tent, Home, Users, Sparkles, MapPin } from "lucide-react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { cn } from "@/lib/utils";
+
+// Dynamic import for maplibre-gl to reduce initial bundle size
+let maplibregl: any = null;
+let MapLibreMap: any = null;
+let Marker: any = null;
+
+const loadMapLibre = async () => {
+  if (!maplibregl) {
+    const mapLibreModule = await import("maplibre-gl");
+    // @ts-expect-error CSS module import has no type declarations
+    await import("maplibre-gl/dist/maplibre-gl.css");
+    maplibregl = mapLibreModule.default;
+    MapLibreMap = mapLibreModule.Map;
+    Marker = mapLibreModule.Marker;
+  }
+  return { maplibregl, MapLibreMap, Marker };
+};
 
 export type MapSite = {
   id: string;
@@ -59,15 +75,17 @@ export function BookingMap({
   className
 }: BookingMapProps) {
   const containerRef = useRef<HTMLDivElement | null>(null);
-  const mapRef = useRef<MapLibreMap | null>(null);
-  const markersRef = useRef<Marker[]>([]);
+  const mapRef = useRef<any>(null);
+  const markersRef = useRef<any[]>([]);
   const [isReady, setIsReady] = useState(false);
+  const [isMapLibreLoaded, setIsMapLibreLoaded] = useState(false);
   const heightStyle = {
     height: typeof height === "number" ? `${height}px` : height ?? "420px"
   };
 
   useEffect(() => {
     setIsReady(true);
+    loadMapLibre().then(() => setIsMapLibreLoaded(true));
   }, []);
 
   const fallbackCenter = useMemo<[number, number]>(() => {
@@ -109,7 +127,7 @@ export function BookingMap({
   }, [validSites, fallbackCenter, selectedSiteId]);
 
   useEffect(() => {
-    if (!isReady || typeof window === "undefined" || !containerRef.current || mapRef.current) return;
+    if (!isReady || !isMapLibreLoaded || typeof window === "undefined" || !containerRef.current || mapRef.current) return;
 
     try {
       mapRef.current = new maplibregl.Map({
@@ -131,7 +149,7 @@ export function BookingMap({
         mapRef.current = null;
       }
     };
-  }, [isReady]);
+  }, [isReady, isMapLibreLoaded, mapCenter, validSites.length]);
 
   // Handle center updates
   useEffect(() => {
@@ -141,7 +159,7 @@ export function BookingMap({
 
   // Markers update
   useEffect(() => {
-    if (!mapRef.current || !isReady) return;
+    if (!mapRef.current || !isReady || !isMapLibreLoaded) return;
 
     markersRef.current.forEach((marker) => marker.remove());
     markersRef.current = [];
@@ -179,9 +197,20 @@ export function BookingMap({
       markersRef.current.forEach((marker) => marker.remove());
       markersRef.current = [];
     };
-  }, [validSites, onSelectSite, selectedSiteId, isReady]);
+  }, [validSites, onSelectSite, selectedSiteId, isReady, isMapLibreLoaded]);
 
-  if (!isReady) return <div className={className} style={heightStyle} />;
+  if (!isReady || !isMapLibreLoaded) {
+    return (
+      <div className={className} style={heightStyle}>
+        <div className="absolute inset-0 flex items-center justify-center bg-slate-50 text-sm text-slate-600">
+          <div className="flex items-center gap-2">
+            <div className="h-4 w-4 animate-spin rounded-full border-2 border-emerald-500 border-t-transparent" />
+            Loading map library…
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div

@@ -132,9 +132,14 @@ function BookingLabPageInner() {
     }
   }, [campgrounds, selectedCampgroundId]);
 
+  interface CampgroundWithFees {
+    id: string;
+    name?: string;
+    siteSelectionFeeCents?: number;
+  }
   const selectedCampground = campgrounds.find((cg) => cg.id === selectedCampgroundId) || null;
   const campgroundGuestTag = selectedCampground?.id ? `campground:${selectedCampground.id}` : null;
-  const siteLockFeeCents = (selectedCampground as any)?.siteSelectionFeeCents ?? 0;
+  const siteLockFeeCents = (selectedCampground as CampgroundWithFees)?.siteSelectionFeeCents ?? 0;
 
   const guestsQuery = useQuery({
     queryKey: ["booking-lab-guests", selectedCampground?.id],

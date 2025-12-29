@@ -1,4 +1,4 @@
-import { Injectable } from "@nestjs/common";
+import { Injectable, InternalServerErrorException } from "@nestjs/common";
 import { randomBytes, timingSafeEqual, createHmac } from "crypto";
 
 /**
@@ -21,11 +21,15 @@ export class CsrfService {
 
     constructor() {
         // Use a secret for HMAC signing of tokens
-        this.secret = process.env.CSRF_SECRET || process.env.JWT_SECRET || "csrf-secret-change-me";
+        const isProduction = process.env.NODE_ENV === "production";
+        const envSecret = process.env.CSRF_SECRET || process.env.JWT_SECRET;
 
-        if (this.secret === "csrf-secret-change-me" && process.env.NODE_ENV === "production") {
-            console.warn("[SECURITY] CSRF_SECRET not set in production - using fallback (NOT SECURE)");
+        if (!envSecret && isProduction) {
+            throw new InternalServerErrorException("[SECURITY] CSRF_SECRET or JWT_SECRET must be set in production");
         }
+
+        // In development, use a random secret (tokens won't persist across restarts, but that's fine for dev)
+        this.secret = envSecret || require("crypto").randomBytes(32).toString("hex");
     }
 
     /**

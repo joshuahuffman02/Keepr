@@ -1,4 +1,4 @@
-import { BadRequestException, Body, Controller, Delete, Get, Param, Post, Put, Query, UseGuards } from "@nestjs/common";
+import { BadRequestException, Body, Controller, Delete, Get, Param, Post, Put, Query, UseGuards, Logger } from "@nestjs/common";
 import { JwtAuthGuard } from "../auth/guards";
 import { SiteMapService } from "./site-map.service";
 import { UpsertMapDto } from "./dto/upsert-map.dto";
@@ -29,6 +29,8 @@ const parseDataUrl = (dataUrl: string) => {
 @UseGuards(JwtAuthGuard)
 @Controller()
 export class SiteMapController {
+  private readonly logger = new Logger(SiteMapController.name);
+
   constructor(
     private readonly siteMap: SiteMapService,
     private readonly uploads: UploadsService
@@ -109,7 +111,7 @@ export class SiteMapController {
     } catch (err) {
       const message = err instanceof Error ? err.message : "Upload failed";
       if (process.env.UPLOADS_DATA_URL_FALLBACK !== "false") {
-        console.warn(`[SiteMap] Upload failed, storing data URL instead: ${message}`);
+        this.logger.warn(`Upload failed, storing data URL instead: ${message}`);
         return this.siteMap.setBaseImage(campgroundId, body.dataUrl);
       }
       throw err;

@@ -74,12 +74,23 @@ class UpdatePaymentSettingsDto {
 
 // DTO for refund request
 class RefundPaymentIntentDto {
+  @IsOptional()
+  @IsInt()
+  @Min(1)
+  @Type(() => Number)
   amountCents?: number;
+
+  @IsOptional()
+  @IsString()
   reason?: 'duplicate' | 'fraudulent' | 'requested_by_customer';
 }
 
 // DTO for capture request
 class CapturePaymentIntentDto {
+  @IsOptional()
+  @IsInt()
+  @Min(1)
+  @Type(() => Number)
   amountCents?: number;
 }
 
@@ -646,32 +657,37 @@ export class PaymentsController {
         return response;
       }
 
-      // Record the payment
+      // Record the payment AND update reservation atomically
       const amountCents = intent.amount;
-      const payment = await this.prisma.payment.create({
-        data: {
-          reservationId: body.reservationId,
-          campgroundId: reservation.campground.id,
-          amountCents,
-          currency: intent.currency?.toUpperCase() || "USD",
-          status: intent.status === "succeeded" ? "completed" : "authorized",
-          method: "card",
-          stripePaymentIntentId: paymentIntentId,
-          paidAt: new Date(),
-          metadata: {
-            source: "public_checkout_confirm",
-            paymentIntentStatus: intent.status
+      const { payment, updatedReservation } = await this.prisma.$transaction(async (tx) => {
+        // Create payment record
+        const payment = await tx.payment.create({
+          data: {
+            reservationId: body.reservationId,
+            campgroundId: reservation.campground.id,
+            amountCents,
+            currency: intent.currency?.toUpperCase() || "USD",
+            status: intent.status === "succeeded" ? "completed" : "authorized",
+            method: "card",
+            stripePaymentIntentId: paymentIntentId,
+            paidAt: new Date(),
+            metadata: {
+              source: "public_checkout_confirm",
+              paymentIntentStatus: intent.status
+            }
           }
-        }
-      });
+        });
 
-      // Update reservation status to confirmed
-      await this.prisma.reservation.update({
-        where: { id: body.reservationId },
-        data: {
-          status: "confirmed",
-          confirmedAt: new Date()
-        }
+        // Update reservation status to confirmed
+        const updatedReservation = await tx.reservation.update({
+          where: { id: body.reservationId },
+          data: {
+            status: "confirmed",
+            confirmedAt: new Date()
+          }
+        });
+
+        return { payment, updatedReservation };
       });
 
       const response = {

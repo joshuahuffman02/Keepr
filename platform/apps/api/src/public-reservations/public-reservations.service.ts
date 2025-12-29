@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException, ConflictException, BadRequestException } from "@nestjs/common";
+import { Injectable, NotFoundException, ConflictException, BadRequestException, Logger } from "@nestjs/common";
 import { ReservationStatus, ReferralIncentiveType } from "@prisma/client";
 import { PrismaService } from "../prisma/prisma.service";
 import { CreatePublicReservationDto, PublicQuoteDto, CreatePublicWaitlistDto } from './dto/create-public-reservation.dto';
@@ -22,6 +22,8 @@ import { StripeService } from "../payments/stripe.service";
 
 @Injectable()
 export class PublicReservationsService {
+    private readonly logger = new Logger(PublicReservationsService.name);
+
     constructor(
         private readonly prisma: PrismaService,
         private readonly locks: LockService,
@@ -1164,7 +1166,7 @@ export class PublicReservationsService {
                         acceptances: dto.policyAcceptances ?? []
                     });
                 } catch (err) {
-                    console.warn(`[Policies] Auto-apply failed for reservation ${reservation.id}:`, err);
+                    this.logger.warn(`Policies auto-apply failed for reservation ${reservation.id}:`, err);
                 }
 
                 // Send confirmation email with cancellation policy
@@ -1291,7 +1293,7 @@ export class PublicReservationsService {
                         `
                     });
                 } catch (emailError) {
-                    console.error('[Booking] Failed to send confirmation email:', emailError);
+                    this.logger.error('Booking - Failed to send confirmation email:', emailError instanceof Error ? emailError.stack : emailError);
                 }
 
                 if (dto.holdId) {
@@ -1308,7 +1310,7 @@ export class PublicReservationsService {
                     discountCapped: quote.discountCapped ?? false
                 };
             } catch (error: any) {
-                console.error("Error creating reservation:", error);
+                this.logger.error("Error creating reservation:", error instanceof Error ? error.stack : error);
                 throw new BadRequestException(`Failed to create reservation: ${error.message} `);
 
             }
@@ -1443,10 +1445,10 @@ export class PublicReservationsService {
             throw new NotFoundException("Reservation not found");
         }
 
-        console.log(`[Kiosk] Found reservation: ${reservation.status}, Total: ${reservation.totalAmount}, Paid: ${reservation.paidAmount} `);
+        this.logger.log(`Kiosk - Found reservation: ${reservation.status}, Total: ${reservation.totalAmount}, Paid: ${reservation.paidAmount}`);
 
         if (reservation.status === ReservationStatus.checked_in) {
-            console.warn(`[Kiosk] Reservation ${id} already checked in `);
+            this.logger.warn(`Kiosk - Reservation ${id} already checked in`);
             throw new ConflictException("Reservation is already checked in");
         }
 
@@ -1479,7 +1481,7 @@ export class PublicReservationsService {
         const newTotal = reservation.totalAmount + upsellTotalCents;
         const balanceDue = newTotal - (reservation.paidAmount || 0);
 
-        console.log(`[Kiosk] New Total: ${newTotal}, Balance Due: ${balanceDue} `);
+        this.logger.log(`Kiosk - New Total: ${newTotal}, Balance Due: ${balanceDue}`);
 
         // Process payment if there's a balance due
         let paymentIntentId: string | undefined;
@@ -1564,9 +1566,9 @@ export class PublicReservationsService {
                     }
                 });
 
-                console.log(`[Kiosk] Payment successful: ${paymentIntent.id}`);
+                this.logger.log(`Kiosk - Payment successful: ${paymentIntent.id}`);
             } catch (error: any) {
-                console.error(`[Kiosk] Payment failed for ${id}:`, error.message);
+                this.logger.error(`Kiosk - Payment failed for ${id}:`, error.message);
                 throw new BadRequestException(
                     `Payment processing failed: ${error.message}. Please contact staff for assistance.`
                 );
@@ -1588,7 +1590,7 @@ export class PublicReservationsService {
                         : `[Kiosk] Checked in. Upsell: $${(upsellTotalCents / 100).toFixed(2)}. ${balanceDue > 0 ? `Charged card on file (${paymentIntentId}).` : 'No balance due.'}`
                 }
             });
-            console.log(`[Kiosk] Check -in successful for ${id}`);
+            this.logger.log(`Kiosk - Check-in successful for ${id}`);
 
             // Send payment receipt if there was a balance charged
             if (balanceDue > 0) {
@@ -1606,19 +1608,19 @@ export class PublicReservationsService {
                         source: 'kiosk'
                     });
                 } catch (emailError) {
-                    console.error('[Kiosk] Failed to send payment receipt email:', emailError);
+                    this.logger.error('Kiosk - Failed to send payment receipt email:', emailError instanceof Error ? emailError.stack : emailError);
                 }
             }
 
             try {
                 await this.accessControl.autoGrantForReservation(id);
             } catch (err) {
-                console.error(`[Kiosk] Access grant failed for ${id}: `, err);
+                this.logger.error(`Kiosk - Access grant failed for ${id}:`, err instanceof Error ? err.stack : err);
             }
 
             return updated;
         } catch (e) {
-            console.error(`[Kiosk] Update failed for ${id}: `, e);
+            this.logger.error(`Kiosk - Update failed for ${id}:`, e instanceof Error ? e.stack : e);
             throw e;
         }
     }
@@ -1670,7 +1672,7 @@ export class PublicReservationsService {
             };
         } catch (error) {
             // Fall back silently if we cannot recompute pricing details
-            console.warn("Failed to recompute reservation discounts", error);
+            this.logger.warn("Failed to recompute reservation discounts", error);
         }
 
         return { ...reservation, ...discountsInfo };

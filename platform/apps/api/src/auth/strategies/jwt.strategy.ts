@@ -1,4 +1,4 @@
-import { Injectable, UnauthorizedException, Logger } from '@nestjs/common';
+import { Injectable, UnauthorizedException, Logger, InternalServerErrorException } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { ConfigService } from '@nestjs/config';
@@ -23,7 +23,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
         if (!jwtSecret) {
             const isProduction = process.env.NODE_ENV === 'production';
             if (isProduction) {
-                throw new Error('CRITICAL: JWT_SECRET environment variable is required in production');
+                throw new InternalServerErrorException('CRITICAL: JWT_SECRET environment variable is required in production');
             }
             // In development, use a random secret (tokens won't persist across restarts)
             const devSecret = `dev-${Date.now()}-${Math.random().toString(36)}`;

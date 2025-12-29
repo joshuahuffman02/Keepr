@@ -349,11 +349,23 @@ export function KeyboardShortcutsProvider({ children }: KeyboardShortcutsProvide
     };
   }, [shortcuts, executeAction]);
 
+interface KeyboardShortcutsCallbacks {
+  onSearch: (fn: () => void) => void;
+  onHelp: (fn: () => void) => void;
+  onNewBooking: (fn: () => void) => void;
+  onCloseModal: (fn: () => void) => void;
+}
+
+interface WindowWithKeyboardShortcuts extends Window {
+  __keyboardShortcuts?: KeyboardShortcutsCallbacks;
+}
+
   // Expose refs for external components to register callbacks
   useEffect(() => {
     // Store these in window for easy access from other components
     if (typeof window !== "undefined") {
-      (window as any).__keyboardShortcuts = {
+      const win = window as WindowWithKeyboardShortcuts;
+      win.__keyboardShortcuts = {
         onSearch: (fn: () => void) => {
           onSearchRef.current = fn;
         },

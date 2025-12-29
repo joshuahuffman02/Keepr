@@ -348,81 +348,114 @@ export default function Dashboard() {
   const reservations = reservationsQuery.data as Reservation[] | undefined;
   const isLoading = reservationsQuery.isLoading || sitesQuery.isLoading;
   const isError = reservationsQuery.isError || sitesQuery.isError;
-
-  const todayArrivals = useMemo(() => {
-    if (!reservations) return [];
-    return reservations.filter((r) => {
-      const arrival = new Date(r.arrivalDate);
-      arrival.setHours(0, 0, 0, 0);
-      return arrival.getTime() === today.getTime() && r.status !== "cancelled";
-    });
-  }, [reservations, today]);
-
-  const todayDepartures = useMemo(() => {
-    if (!reservations) return [];
-    return reservations.filter((r) => {
-      const departure = new Date(r.departureDate);
-      departure.setHours(0, 0, 0, 0);
-      return departure.getTime() === today.getTime() && r.status !== "cancelled";
-    });
-  }, [reservations, today]);
-
-  const inHouse = useMemo(() => {
-    if (!reservations) return [];
-    return reservations.filter((r) => {
-      const arrival = new Date(r.arrivalDate);
-      const departure = new Date(r.departureDate);
-      return arrival <= today && departure > today && r.status !== "cancelled";
-    });
-  }, [reservations, today]);
-
   const totalSites = sitesQuery.data?.length ?? 0;
+
+  // Single-pass computation of all dashboard metrics
+  const dashboardMetrics = useMemo(() => {
+    const todayTime = today.getTime();
+    const todayArrivals: Reservation[] = [];
+    const todayDepartures: Reservation[] = [];
+    const inHouse: Reservation[] = [];
+    const withBalance: Array<Reservation & { balance: number }> = [];
+    let outstandingBalanceCents = 0;
+    let futureReservationsCount = 0;
+
+    // Pre-compute 14-day range for occupancy chart
+    const days14: Date[] = [];
+    const occupancy14Counts = new Array(14).fill(0);
+    for (let i = 0; i < 14; i++) {
+      const d = new Date(today);
+      d.setDate(d.getDate() + i);
+      days14.push(d);
+    }
+
+    if (reservations) {
+      for (const r of reservations) {
+        if (r.status === "cancelled") continue;
+
+        const arrival = new Date(r.arrivalDate);
+        const departure = new Date(r.departureDate);
+        arrival.setHours(0, 0, 0, 0);
+        departure.setHours(0, 0, 0, 0);
+        const arrivalTime = arrival.getTime();
+        const departureTime = departure.getTime();
+
+        // Today's arrivals
+        if (arrivalTime === todayTime) {
+          todayArrivals.push(r);
+        }
+
+        // Today's departures
+        if (departureTime === todayTime) {
+          todayDepartures.push(r);
+        }
+
+        // In-house (arrival <= today && departure > today)
+        if (arrivalTime <= todayTime && departureTime > todayTime) {
+          inHouse.push(r);
+        }
+
+        // Future reservations
+        if (arrivalTime > todayTime) {
+          futureReservationsCount++;
+        }
+
+        // Outstanding balance
+        const balance = (r.totalAmount ?? 0) - (r.paidAmount ?? 0);
+        if (balance > 0) {
+          outstandingBalanceCents += balance;
+          withBalance.push({ ...r, balance });
+        }
+
+        // 14-day occupancy (check each day the reservation spans)
+        for (let i = 0; i < 14; i++) {
+          const dayTime = days14[i].getTime();
+          if (arrivalTime <= dayTime && departureTime > dayTime) {
+            occupancy14Counts[i]++;
+          }
+        }
+      }
+    }
+
+    // Sort and slice attention list
+    const attentionList = withBalance
+      .sort((a, b) => b.balance - a.balance)
+      .slice(0, 4);
+
+    // Build occupancy chart data
+    const occupancy14 = totalSites > 0
+      ? days14.map((day, i) => ({
+          label: day.toLocaleDateString(undefined, { month: "short", day: "numeric" }),
+          rate: Math.round((occupancy14Counts[i] / totalSites) * 100)
+        }))
+      : [];
+
+    return {
+      todayArrivals,
+      todayDepartures,
+      inHouse,
+      outstandingBalanceCents,
+      futureReservationsCount,
+      attentionList,
+      occupancy14,
+    };
+  }, [reservations, today, totalSites]);
+
+  const {
+    todayArrivals,
+    todayDepartures,
+    inHouse,
+    outstandingBalanceCents,
+    futureReservationsCount: futureReservations,
+    attentionList,
+    occupancy14,
+  } = dashboardMetrics;
+
   const occupiedSites = inHouse.length;
   const occupancyRate = totalSites > 0 ? Math.round((occupiedSites / totalSites) * 100) : 0;
 
-  const outstandingBalanceCents =
-    reservations?.reduce((sum, r) => {
-      const balance = (r.totalAmount ?? 0) - (r.paidAmount ?? 0);
-      return sum + (balance > 0 ? balance : 0);
-    }, 0) ?? 0;
-
-  const futureReservations =
-    reservations?.filter((r) => new Date(r.arrivalDate) > today && r.status !== "cancelled").length ?? 0;
-
   const formatMoney = (cents?: number) =>
     `$${((cents ?? 0) / 100).toLocaleString("en-US", { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`;
-
-  const attentionList = useMemo(() => {
-    if (!reservations) return [];
-    return reservations
-      .map((r) => ({
-        ...r,
-        balance: (r.totalAmount ?? 0) - (r.paidAmount ?? 0)
-      }))
-      .filter((r) => (r.balance ?? 0) > 0)
-      .sort((a, b) => (b.balance ?? 0) - (a.balance ?? 0))
-      .slice(0, 4);
-  }, [reservations]);
-
-  const occupancy14 = useMemo(() => {
-    if (!reservations || totalSites === 0) return [];
-    const start = new Date(today);
-    return Array.from({ length: 14 }).map((_, i) => {
-      const day = new Date(start);
-      day.setDate(day.getDate() + i);
-      const inhouse = reservations.filter((r) => {
-        const arr = new Date(r.arrivalDate);
-        const dep = new Date(r.departureDate);
-        arr.setHours(0, 0, 0, 0);
-        dep.setHours(0, 0, 0, 0);
-        return arr <= day && dep > day && r.status !== "cancelled";
-      }).length;
-      return {
-        label: day.toLocaleDateString(undefined, { month: "short", day: "numeric" }),
-        rate: Math.round((inhouse / totalSites) * 100)
-      };
-    });
-  }, [reservations, today, totalSites]);
 
   const alerts = useMemo(() => {
     const list: { id: string; label: string; href: string }[] = [];

@@ -1,4 +1,4 @@
-import { Injectable, ConflictException, UnauthorizedException } from '@nestjs/common';
+import { Injectable, ConflictException, UnauthorizedException, Logger } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcryptjs';
 import { PrismaService } from '../prisma/prisma.service';
@@ -10,6 +10,8 @@ import { SecurityEventsService, SecurityEventType, SecurityEventSeverity } from 
 
 @Injectable()
 export class AuthService {
+    private readonly logger = new Logger(AuthService.name);
+
     constructor(
         private readonly prisma: PrismaService,
         private readonly jwtService: JwtService,
@@ -70,7 +72,7 @@ export class AuthService {
                 this.accountLockout.checkAndThrowIfLocked(normalizedEmail);
             }
 
-            console.log(`[AuthService] Attempting login for ${normalizedEmail}`);
+            this.logger.log(`Attempting login for ${normalizedEmail}`);
             let user = await this.prisma.user.findUnique({
                 where: { email: normalizedEmail },
                 include: {
@@ -81,13 +83,26 @@ export class AuthService {
             });
 
             if (!user) {
-                const allowBootstrap = process.env.NODE_ENV !== "production" || process.env.ALLOW_BOOTSTRAP_ADMIN === "true";
+                // SECURITY: Bootstrap admin creation is disabled by default in production
+                // Must explicitly set ALLOW_BOOTSTRAP_ADMIN=true to enable
+                const isProduction = process.env.NODE_ENV === "production";
+                const allowBootstrap = !isProduction || process.env.ALLOW_BOOTSTRAP_ADMIN === "true";
+
+                // Only check for active users if bootstrap is allowed
                 const activeUsers = allowBootstrap
                     ? await this.prisma.user.count({ where: { isActive: true } })
-                    : 0;
+                    : 1; // Pretend there are users to skip bootstrap
 
                 if (activeUsers === 0 && allowBootstrap) {
-                    console.warn(`[AuthService] Bootstrapping first admin user: ${normalizedEmail}`);
+                    // SECURITY: Validate password strength for bootstrap admin
+                    if (dto.password.length < 12) {
+                        throw new UnauthorizedException('Bootstrap admin password must be at least 12 characters');
+                    }
+                    if (!/[A-Z]/.test(dto.password) || !/[a-z]/.test(dto.password) || !/[0-9]/.test(dto.password)) {
+                        throw new UnauthorizedException('Bootstrap admin password must contain uppercase, lowercase, and numbers');
+                    }
+
+                    this.logger.warn(`SECURITY: Bootstrapping first admin user: ${normalizedEmail}`);
                     const passwordHash = await bcrypt.hash(dto.password, 12);
                     user = await this.prisma.user.create({
                         data: {
@@ -105,8 +120,22 @@ export class AuthService {
                             }
                         }
                     });
+
+                    // Log security event for bootstrap admin creation
+                    await this.securityEvents.logEvent({
+                        type: SecurityEventType.ADMIN_ACTION,
+                        severity: SecurityEventSeverity.HIGH,
+                        ipAddress,
+                        userAgent,
+                        userId: user.id,
+                        details: {
+                            action: "bootstrap_admin_created",
+                            email: normalizedEmail,
+                            warning: "First platform admin created via bootstrap"
+                        },
+                    });
                 } else {
-                    console.log(`[AuthService] User not found: ${normalizedEmail}`);
+                    this.logger.log(`User not found: ${normalizedEmail}`);
                     // Record failed attempt even for non-existent users (prevents enumeration)
                     this.accountLockout.handleFailedLogin(normalizedEmail);
                     await this.securityEvents.logLoginAttempt(false, normalizedEmail, ipAddress, userAgent, undefined, "user_not_found");
@@ -115,16 +144,16 @@ export class AuthService {
             }
 
             if (!user.isActive) {
-                console.log(`[AuthService] User not active: ${normalizedEmail}`);
+                this.logger.log(`User not active: ${normalizedEmail}`);
                 this.accountLockout.handleFailedLogin(normalizedEmail);
                 await this.securityEvents.logLoginAttempt(false, normalizedEmail, ipAddress, userAgent, user.id, "user_inactive");
                 throw new UnauthorizedException('Invalid credentials');
             }
 
-            console.log(`[AuthService] User found, comparing password hash for ${user.id}`);
+            this.logger.log(`User found, comparing password hash for ${user.id}`);
             const passwordValid = await bcrypt.compare(dto.password, user.passwordHash);
             if (!passwordValid) {
-                console.log(`[AuthService] Invalid password for ${normalizedEmail}`);
+                this.logger.log(`Invalid password for ${normalizedEmail}`);
                 // Record failed attempt and check if now locked
                 const lockStatus = this.accountLockout.handleFailedLogin(normalizedEmail);
                 await this.securityEvents.logLoginAttempt(false, normalizedEmail, ipAddress, userAgent, user.id, "invalid_password");
@@ -140,7 +169,7 @@ export class AuthService {
             this.accountLockout.recordSuccessfulLogin(normalizedEmail);
             await this.securityEvents.logLoginAttempt(true, normalizedEmail, ipAddress, userAgent, user.id);
 
-            console.log(`[AuthService] Password valid, generating token`);
+            this.logger.log(`Password valid, generating token`);
             const token = this.generateToken(user.id, user.email);
 
             return {
@@ -158,7 +187,7 @@ export class AuthService {
                 token
             };
         } catch (error) {
-            console.error(`[AuthService] Login error for ${normalizedEmail}:`, error);
+            this.logger.error(`Login error for ${normalizedEmail}:`, error instanceof Error ? error.stack : error);
             throw error;
         }
     }

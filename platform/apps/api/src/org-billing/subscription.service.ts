@@ -1,4 +1,4 @@
-import { Injectable, Logger } from "@nestjs/common";
+import { Injectable, Logger, NotFoundException, BadRequestException } from "@nestjs/common";
 import { PrismaService } from "../prisma/prisma.service";
 import { StripeService } from "../payments/stripe.service";
 import { EmailService } from "../email/email.service";
@@ -140,7 +140,7 @@ export class SubscriptionService {
     }
 
     if (items.length === 0) {
-      throw new Error(`No valid Stripe prices configured for tier: ${tier}`);
+      throw new BadRequestException(`No valid Stripe prices configured for tier: ${tier}`);
     }
 
     // Create the subscription
@@ -201,7 +201,7 @@ export class SubscriptionService {
     });
 
     if (!org.stripeSubscriptionId) {
-      throw new Error("Organization has no active subscription");
+      throw new NotFoundException("Organization has no active subscription");
     }
 
     const result = await this.stripe.cancelSubscription(

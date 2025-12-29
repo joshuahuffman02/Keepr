@@ -12,10 +12,34 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 
 type StoreOrder = Awaited<ReturnType<typeof apiClient.getStoreOrders>>[0];
 
+// Extended type with additional properties from the API
+type StoreOrderWithExtras = StoreOrder & {
+  seenAt?: string | null;
+  siteNumber?: string | null;
+  createdAt?: string;
+  completedBy?: {
+    firstName?: string | null;
+    lastName?: string | null;
+    email?: string;
+  } | null;
+  completedAt?: string | null;
+  reservation?: {
+    site?: {
+      siteNumber?: string;
+    } | null;
+  } | null;
+  items: Array<{
+    name: string;
+    qty: number;
+    totalCents?: number;
+  }>;
+  notes?: string | null;
+};
+
 export default function StoreOrdersPage() {
   const { toast } = useToast();
   const [campgroundId, setCampgroundId] = useState<string | null>(null);
-  const [orders, setOrders] = useState<StoreOrder[]>([]);
+  const [orders, setOrders] = useState<StoreOrderWithExtras[]>([]);
   const [unseen, setUnseen] = useState<number>(0);
   const [loading, setLoading] = useState(true);
   const [statusFilter, setStatusFilter] = useState<"pending" | "completed" | "all">("pending");
@@ -94,9 +118,9 @@ export default function StoreOrdersPage() {
   }, [unseen]);
 
   const [detailOpen, setDetailOpen] = useState(false);
-  const [detailOrder, setDetailOrder] = useState<StoreOrder | null>(null);
+  const [detailOrder, setDetailOrder] = useState<StoreOrderWithExtras | null>(null);
 
-  const showDetails = (order: StoreOrder) => {
+  const showDetails = (order: StoreOrderWithExtras) => {
     setDetailOrder(order);
     setDetailOpen(true);
   };
@@ -172,17 +196,17 @@ export default function StoreOrdersPage() {
                       <Badge variant={order.status === "completed" ? "outline" : "default"}>
                         {order.status}
                       </Badge>
-                      {!((order as any).seenAt) && order.status === "pending" && (
+                      {!order.seenAt && order.status === "pending" && (
                         <Badge variant="destructive" className="ml-2">New</Badge>
                       )}
                     </TableCell>
-                    <TableCell>{(order as any).siteNumber || (order as any).reservation?.site?.siteNumber || "—"}</TableCell>
+                    <TableCell>{order.siteNumber || order.reservation?.site?.siteNumber || "—"}</TableCell>
                     <TableCell>${(order.totalCents / 100).toFixed(2)}</TableCell>
-                    <TableCell>{new Date((order as any).createdAt).toLocaleString()}</TableCell>
+                    <TableCell>{order.createdAt ? new Date(order.createdAt).toLocaleString() : "—"}</TableCell>
                     <TableCell>
-                      {(order as any).completedBy
-                        ? `${(order as any).completedBy.firstName || ""} ${(order as any).completedBy.lastName || ""}`.trim() || (order as any).completedBy.email
-                        : (order as any).completedAt
+                      {order.completedBy
+                        ? `${order.completedBy.firstName || ""} ${order.completedBy.lastName || ""}`.trim() || order.completedBy.email
+                        : order.completedAt
                           ? "Completed"
                           : "—"}
                     </TableCell>
@@ -192,7 +216,7 @@ export default function StoreOrdersPage() {
                       </Button>
                       {order.status === "pending" && (
                         <>
-                          {!((order as any).seenAt) && (
+                          {!order.seenAt && (
                             <Button size="sm" variant="outline" onClick={() => markSeen(order.id)}>
                               <Eye className="h-3 w-3 mr-1" /> Mark seen
                             </Button>
@@ -235,7 +259,7 @@ export default function StoreOrdersPage() {
                 <Badge variant={detailOrder.status === "completed" ? "outline" : "default"}>
                   {detailOrder.status}
                 </Badge>
-                {(detailOrder as any).siteNumber && <Badge variant="secondary">Site {(detailOrder as any).siteNumber}</Badge>}
+                {detailOrder.siteNumber && <Badge variant="secondary">Site {detailOrder.siteNumber}</Badge>}
               </div>
               <div className="text-sm">
                 Total: <span className="font-semibold">${(detailOrder.totalCents / 100).toFixed(2)}</span>
@@ -243,18 +267,18 @@ export default function StoreOrdersPage() {
               <div className="space-y-1">
                 <div className="text-sm font-medium">Items</div>
                 <ul className="space-y-1 text-sm">
-                  {(detailOrder as any).items.map((item: any) => (
+                  {detailOrder.items.map((item) => (
                     <li key={`${item.name}-${item.qty}`} className="flex justify-between">
                       <span>{item.qty} × {item.name}</span>
-                      <span>${(item.totalCents / 100).toFixed(2)}</span>
+                      <span>${((item.totalCents ?? 0) / 100).toFixed(2)}</span>
                     </li>
                   ))}
                 </ul>
               </div>
-              {(detailOrder as any).notes && (
+              {detailOrder.notes && (
                 <div className="text-sm">
                   <div className="font-medium">Notes</div>
-                  <div className="text-muted-foreground whitespace-pre-line">{(detailOrder as any).notes}</div>
+                  <div className="text-muted-foreground whitespace-pre-line">{detailOrder.notes}</div>
                 </div>
               )}
             </div>

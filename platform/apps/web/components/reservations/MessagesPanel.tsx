@@ -8,6 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Send, Loader2, MessageCircle, Sparkles } from "lucide-react";
 import { format } from "date-fns";
+import { useToast } from "@/components/ui/use-toast";
 
 type Message = {
     id: string;
@@ -35,6 +36,7 @@ export function MessagesPanel({ reservationId, guestId }: MessagesPanelProps) {
     const [sending, setSending] = useState(false);
     const [generatingAI, setGeneratingAI] = useState(false);
     const messagesEndRef = useRef<HTMLDivElement>(null);
+    const { toast } = useToast();
 
     const scrollToBottom = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -51,9 +53,16 @@ export function MessagesPanel({ reservationId, guestId }: MessagesPanelProps) {
     useEffect(() => {
         // Mark guest messages as read when viewing
         if (messages.some(m => m.senderType === "guest" && !m.readAt)) {
-            apiClient.markMessagesAsRead(reservationId, "staff").catch(console.error);
+            apiClient.markMessagesAsRead(reservationId, "staff").catch((error) => {
+                console.error("Failed to mark messages as read:", error);
+                toast({
+                    title: "Error",
+                    description: "Failed to mark messages as read",
+                    variant: "destructive"
+                });
+            });
         }
-    }, [messages, reservationId]);
+    }, [messages, reservationId, toast]);
 
     const loadMessages = async () => {
         try {
@@ -61,6 +70,11 @@ export function MessagesPanel({ reservationId, guestId }: MessagesPanelProps) {
             setMessages(data);
         } catch (error) {
             console.error("Failed to load messages:", error);
+            toast({
+                title: "Error",
+                description: "Failed to load messages",
+                variant: "destructive"
+            });
         } finally {
             setLoading(false);
         }
@@ -79,8 +93,18 @@ export function MessagesPanel({ reservationId, guestId }: MessagesPanelProps) {
             );
             setNewMessage("");
             await loadMessages();
+            toast({
+                title: "Success",
+                description: "Message sent successfully",
+                variant: "default"
+            });
         } catch (error) {
             console.error("Failed to send message:", error);
+            toast({
+                title: "Error",
+                description: "Failed to send message. Please try again.",
+                variant: "destructive"
+            });
         } finally {
             setSending(false);
         }
@@ -99,6 +123,11 @@ export function MessagesPanel({ reservationId, guestId }: MessagesPanelProps) {
             const campgroundId = messages[0]?.campgroundId;
             if (!campgroundId) {
                 console.warn("No campground ID found in messages");
+                toast({
+                    title: "Error",
+                    description: "Cannot generate reply: missing campground information",
+                    variant: "destructive"
+                });
                 setGeneratingAI(false);
                 return;
             }
@@ -115,9 +144,19 @@ export function MessagesPanel({ reservationId, guestId }: MessagesPanelProps) {
 
             if (res.preview) {
                 setNewMessage(res.preview);
+                toast({
+                    title: "Success",
+                    description: "AI reply generated successfully",
+                    variant: "default"
+                });
             }
         } catch (error) {
             console.error("Failed to generate AI reply:", error);
+            toast({
+                title: "Error",
+                description: "Failed to generate AI reply. Please try again.",
+                variant: "destructive"
+            });
         } finally {
             setGeneratingAI(false);
         }

@@ -13,6 +13,7 @@ import {
   SheetTitle,
 } from "@/components/ui/sheet";
 import { useState } from "react";
+import { Check, RefreshCw, AlertTriangle, X } from "lucide-react";
 
 interface SyncDetailsDrawerProps {
   open: boolean;
@@ -36,31 +37,31 @@ export function SyncDetailsDrawer({ open, onOpenChange }: SyncDetailsDrawerProps
 
   const stateConfig = {
     synced: {
-      icon: "✓",
+      icon: <Check className="h-6 w-6" />,
       label: "All Synced",
       description: "All changes have been synchronized",
       color: "text-emerald-600 bg-emerald-50 border-emerald-200",
     },
     syncing: {
-      icon: "⟳",
+      icon: <RefreshCw className="h-6 w-6 animate-spin" />,
       label: "Syncing",
       description: "Synchronizing changes...",
       color: "text-blue-600 bg-blue-50 border-blue-200",
     },
     pending: {
-      icon: "⚠",
+      icon: <AlertTriangle className="h-6 w-6" />,
       label: `${status.totalPending} Pending`,
       description: "Changes waiting to sync",
       color: "text-amber-700 bg-amber-50 border-amber-200",
     },
     offline: {
-      icon: "✗",
+      icon: <X className="h-6 w-6" />,
       label: "Offline",
       description: "No internet connection",
       color: "text-red-700 bg-red-50 border-red-200",
     },
     error: {
-      icon: "✗",
+      icon: <X className="h-6 w-6" />,
       label: `${status.totalConflicts} Conflicts`,
       description: "Some items need attention",
       color: "text-red-700 bg-red-50 border-red-200",
@@ -83,7 +84,7 @@ export function SyncDetailsDrawer({ open, onOpenChange }: SyncDetailsDrawerProps
           {/* Current Status */}
           <div className={cn("rounded-lg border p-4", config.color)}>
             <div className="flex items-start gap-3">
-              <span className="text-2xl">{config.icon}</span>
+              <span>{config.icon}</span>
               <div className="flex-1">
                 <div className="font-semibold text-base">{config.label}</div>
                 <div className="text-sm opacity-80 mt-0.5">{config.description}</div>
@@ -195,7 +196,9 @@ export function SyncDetailsDrawer({ open, onOpenChange }: SyncDetailsDrawerProps
           {/* Empty State */}
           {status.queues.every((q) => q.count === 0) && status.state === "synced" && (
             <div className="text-center py-8">
-              <div className="text-4xl mb-2">✓</div>
+              <div className="flex justify-center mb-2">
+                <Check className="h-10 w-10 text-emerald-600" />
+              </div>
               <div className="text-sm font-medium text-slate-900">All caught up!</div>
               <div className="text-xs text-slate-500 mt-1">
                 No pending changes to sync

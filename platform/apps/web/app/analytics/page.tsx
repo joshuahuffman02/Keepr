@@ -54,11 +54,16 @@ export default function AnalyticsPage() {
           setExportError(job.lastError ?? "Export failed");
           clearInterval(interval);
         } else {
-          setExportStatus(job.status as any);
+          const validStatuses: Array<"idle" | "queued" | "processing" | "ready" | "error"> = ["idle", "queued", "processing", "ready", "error"];
+          const jobStatus = job.status as string;
+          if (validStatuses.includes(jobStatus as typeof validStatuses[number])) {
+            setExportStatus(jobStatus as typeof validStatuses[number]);
+          }
         }
-      } catch (err: any) {
+      } catch (err: unknown) {
+        const error = err as { message?: string };
         setExportStatus("error");
-        setExportError(err?.message ?? "Failed to fetch export");
+        setExportError(error?.message ?? "Failed to fetch export");
         clearInterval(interval);
       }
     }, 1500);

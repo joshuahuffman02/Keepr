@@ -1,9 +1,22 @@
 "use client";
 
-import { useEffect, useMemo, useRef } from "react";
-import maplibregl, { Map as MapLibreMap } from "maplibre-gl";
-import "maplibre-gl/dist/maplibre-gl.css";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { resolvePoints, RawPoint } from "./heatmap-utils";
+
+// Dynamic import for maplibre-gl to reduce initial bundle size
+let maplibregl: any = null;
+let MapLibreMap: any = null;
+
+const loadMapLibre = async () => {
+  if (!maplibregl) {
+    const mapLibreModule = await import("maplibre-gl");
+    // @ts-expect-error CSS module import has no type declarations
+    await import("maplibre-gl/dist/maplibre-gl.css");
+    maplibregl = mapLibreModule.default;
+    MapLibreMap = mapLibreModule.Map;
+  }
+  return { maplibregl, MapLibreMap };
+};
 
 type HeatmapCardProps = {
   title: string;
@@ -16,30 +29,35 @@ type HeatmapCardProps = {
 
 export function HeatmapCard({ title, subtitle, points, center, maxValue, isLoading }: HeatmapCardProps) {
   const containerRef = useRef<HTMLDivElement | null>(null);
-  const mapRef = useRef<MapLibreMap | null>(null);
+  const mapRef = useRef<any>(null);
+  const [isMapLibreLoaded, setIsMapLibreLoaded] = useState(false);
+
+  useEffect(() => {
+    loadMapLibre().then(() => setIsMapLibreLoaded(true));
+  }, []);
 
   const resolvedPoints = useMemo(() => resolvePoints(points, center), [points, center]);
   const data = useMemo(() => {
     const max = maxValue ?? Math.max(...resolvedPoints.map(p => p.value), 1);
     return {
-      type: "FeatureCollection",
+      type: "FeatureCollection" as const,
       features: resolvedPoints.map(p => ({
-        type: "Feature",
+        type: "Feature" as const,
         properties: {
           weight: p.value,
           normalized: max > 0 ? p.value / max : 0,
           label: p.label || p.id
         },
         geometry: {
-          type: "Point",
+          type: "Point" as const,
           coordinates: [p.longitude, p.latitude]
         }
       }))
-    } as const;
-  }, [resolvedPoints, maxValue]) as any;
+    };
+  }, [resolvedPoints, maxValue]);
 
   useEffect(() => {
-    if (typeof window === "undefined" || !containerRef.current || mapRef.current) return;
+    if (!isMapLibreLoaded || typeof window === "undefined" || !containerRef.current || mapRef.current) return;
 
     mapRef.current = new maplibregl.Map({
       container: containerRef.current,
@@ -50,14 +68,19 @@ export function HeatmapCard({ title, subtitle, points, center, maxValue, isLoadi
     });
 
     mapRef.current.addControl(new maplibregl.NavigationControl({ visualizePitch: true }), "top-right");
-  }, [center]);
+  }, [isMapLibreLoaded, center]);
 
   useEffect(() => {
     if (!mapRef.current) return;
 
+    interface GeoJSONSource {
+      setData: (data: unknown) => void;
+    }
+
     const map = mapRef.current;
     if (map.getSource("heatmap")) {
-      (map.getSource("heatmap") as any).setData(data);
+      const source = map.getSource("heatmap") as GeoJSONSource;
+      source.setData(data);
     } else {
       map.addSource("heatmap", {
         type: "geojson",
@@ -135,9 +158,9 @@ export function HeatmapCard({ title, subtitle, points, center, maxValue, isLoadi
       </div>
       <div className="relative h-[360px] w-full overflow-hidden rounded-lg border border-slate-200 bg-slate-50">
         <div ref={containerRef} className="absolute inset-0" />
-        {isLoading && (
+        {(isLoading || !isMapLibreLoaded) && (
           <div className="absolute inset-0 z-10 flex items-center justify-center bg-white/70 text-sm text-slate-600">
-            Loading heatmap…
+            {!isMapLibreLoaded ? "Loading map library…" : "Loading heatmap…"}
           </div>
         )}
       </div>

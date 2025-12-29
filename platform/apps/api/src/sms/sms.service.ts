@@ -1,4 +1,4 @@
-import { Injectable, Logger } from "@nestjs/common";
+import { Injectable, Logger, BadRequestException } from "@nestjs/common";
 import fetch from "node-fetch";
 import { AlertingService } from "../observability/alerting.service";
 import { UsageTrackerService } from "../org-billing/usage-tracker.service";
@@ -168,7 +168,7 @@ export class SmsService {
       });
       const data: any = await res.json();
       if (!res.ok) {
-        throw new Error(`Twilio send failed: ${res.status} ${JSON.stringify(data)}`);
+        throw new BadRequestException(`Twilio send failed: ${res.status} ${JSON.stringify(data)}`);
       }
       this.telemetry.sent++;
       this.logger.log(`SMS sent to ${opts.to} via Twilio (${credentials.source}, sid: ${data.sid})`);

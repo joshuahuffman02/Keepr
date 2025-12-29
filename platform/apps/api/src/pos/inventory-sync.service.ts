@@ -1,4 +1,4 @@
-import { Injectable, Logger, NotFoundException } from "@nestjs/common";
+import { Injectable, Logger, NotFoundException, BadRequestException } from "@nestjs/common";
 import { Cron, CronExpression } from "@nestjs/schedule";
 import { PosProviderType } from "@prisma/client";
 import { PrismaService } from "../prisma/prisma.service";
@@ -100,7 +100,7 @@ export class InventorySyncService {
 
         const adapter = this.registry.getAdapter(integration.provider);
         if (!adapter || !adapter.fetchProducts) {
-            throw new Error(`Provider ${integration.provider} does not support product sync`);
+            throw new BadRequestException(`Provider ${integration.provider} does not support product sync`);
         }
 
         const config = {
@@ -226,7 +226,7 @@ export class InventorySyncService {
 
         const adapter = this.registry.getAdapter(integration.provider);
         if (!adapter || !adapter.fetchSales) {
-            throw new Error(`Provider ${integration.provider} does not support sales sync`);
+            throw new BadRequestException(`Provider ${integration.provider} does not support sales sync`);
         }
 
         // Default to last sync time or 24 hours ago
@@ -412,7 +412,7 @@ export class InventorySyncService {
 
         const adapter = this.registry.getAdapter(integration.provider);
         if (!adapter || !adapter.pushInventoryUpdate) {
-            throw new Error(`Provider ${integration.provider} does not support inventory push`);
+            throw new BadRequestException(`Provider ${integration.provider} does not support inventory push`);
         }
 
         // Get product mappings to sync
@@ -522,7 +522,7 @@ export class InventorySyncService {
 
         const adapter = this.registry.getAdapter(integration.provider);
         if (!adapter || !adapter.pushPriceUpdate) {
-            throw new Error(`Provider ${integration.provider} does not support price push`);
+            throw new BadRequestException(`Provider ${integration.provider} does not support price push`);
         }
 
         // Get mapping

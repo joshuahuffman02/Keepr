@@ -1,5 +1,8 @@
 import "reflect-metadata";
+import { Logger } from "@nestjs/common";
 import { createApp, initializePrismaShutdownHooks } from "./app.bootstrap";
+
+const logger = new Logger('Bootstrap');
 
 async function bootstrap() {
   const app = await createApp();
@@ -10,7 +13,7 @@ async function bootstrap() {
 
   const port = process.env.PORT || 4000;
   await app.listen(port);
-  console.log(`Platform API running on http://localhost:${port}/api`);
+  logger.log(`Platform API running on http://localhost:${port}/api`);
 }
 
 bootstrap();

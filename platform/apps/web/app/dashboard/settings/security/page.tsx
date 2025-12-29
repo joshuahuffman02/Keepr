@@ -261,7 +261,7 @@ export default function SecuritySettingsPage() {
               </div>
               <Separator />
               <div className="space-y-2">
-                {piiTagsPreview.slice(0, 4).map((tag: any) => (
+                {piiTagsPreview.slice(0, 4).map((tag: { resource: string; field: string; classification: string; redactionMode?: string | null }) => (
                   <div key={`${tag.resource}:${tag.field}`} className="flex items-center justify-between text-sm">
                     <span className="text-slate-700">{tag.resource}.{tag.field}</span>
                     <Badge variant="outline" className="text-[11px] uppercase">
@@ -323,7 +323,7 @@ export default function SecuritySettingsPage() {
                       <div className="text-sm font-semibold text-slate-800">Restore simulation (stub)</div>
                       <p className="text-xs text-slate-600">Records a drill only — no data moved.</p>
                     </div>
-                    {restoreStatusBadge(backupStatus.restoreSimulation?.status as any)}
+                    {restoreStatusBadge(backupStatus.restoreSimulation?.status as "idle" | "running" | "ok" | "error" | undefined)}
                   </div>
                   <div className="text-xs text-slate-600 mt-2">
                     Last run: {formatDate(backupStatus.restoreSimulation?.lastRunAt)}

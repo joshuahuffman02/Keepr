@@ -46,11 +46,11 @@ Complete implementation of Phases 1-4 of the platform roadmap including dynamic 
 ## Test Log
 
 ```
-✓ Schema sync: "Your database is now in sync with your Prisma schema"
-✓ Prisma Client: Generated v5.22.0
-✓ API started: [NestApplication] Nest application successfully started
-✓ Health check: {"message":"Unauthorized","statusCode":401} (expected)
-✓ Routes registered:
+[OK] Schema sync: "Your database is now in sync with your Prisma schema"
+[OK] Prisma Client: Generated v5.22.0
+[OK] API started: [NestApplication] Nest application successfully started
+[OK] Health check: {"message":"Unauthorized","statusCode":401} (expected)
+[OK] Routes registered:
   - NotificationTriggersController {/api/campgrounds/:campgroundId/notification-triggers}
   - DepositPoliciesController {/api/campgrounds/:campgroundId/deposit-policies}
   - UpsellsController {/api/campgrounds/:campgroundId/upsells}

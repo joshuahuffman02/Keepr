@@ -21,6 +21,36 @@ type TicketForm = {
   selection?: string;
 };
 
+type TicketSubmitter = {
+  id: string | null;
+  name: string | null;
+  email: string | null;
+};
+
+type DeviceType = "mobile" | "desktop" | "tablet";
+
+type TicketClient = {
+  userAgent: string;
+  platform: string | null;
+  language: string | null;
+  deviceType: DeviceType;
+};
+
+type WhoamiUser = {
+  id: string;
+  email: string;
+  firstName?: string | null;
+  lastName?: string | null;
+  name?: string;
+};
+
+type WhoamiData = {
+  user?: WhoamiUser;
+  id?: string;
+  email?: string;
+  name?: string;
+};
+
 const LS_TICKET_DRAFT = "campreserv:ticket:draft";
 const LS_TICKET_OPEN = "campreserv:ticket:open";
 
@@ -98,16 +128,34 @@ export function FloatingTicketWidget() {
   const handleSubmit = async () => {
     setIsSubmitting(true);
     try {
-      const submitter = {
-        id: (whoami as any)?.id ?? (whoami as any)?.user?.id ?? null,
+      const whoamiData = whoami as WhoamiData | undefined;
+      const submitter: TicketSubmitter = {
+        id: whoamiData?.id ?? whoamiData?.user?.id ?? null,
         name:
-          (whoami as any)?.name ??
-          (whoami as any)?.user?.name ??
-          (whoami as any)?.email ??
-          (whoami as any)?.user?.email ??
+          whoamiData?.name ??
+          whoamiData?.user?.name ??
+          whoamiData?.user?.firstName ??
+          whoamiData?.email ??
+          whoamiData?.user?.email ??
           null,
-        email: (whoami as any)?.email ?? (whoami as any)?.user?.email ?? null,
+        email: whoamiData?.email ?? whoamiData?.user?.email ?? null,
       };
+
+      const detectDeviceType = (ua: string): DeviceType => {
+        if (/ipad|tablet/i.test(ua)) return "tablet";
+        if (/mobi|android|iphone/i.test(ua)) return "mobile";
+        return "desktop";
+      };
+
+      const client: TicketClient | undefined =
+        typeof window !== "undefined"
+          ? {
+              userAgent: navigator.userAgent,
+              platform: (navigator.platform as string | undefined) ?? null,
+              language: navigator.language ?? null,
+              deviceType: detectDeviceType(navigator.userAgent),
+            }
+          : undefined;
 
       const payload = {
         ...form,
@@ -117,19 +165,7 @@ export function FloatingTicketWidget() {
         },
         submitter,
         category: form.category,
-        client:
-          typeof window !== "undefined"
-            ? {
-                userAgent: navigator.userAgent,
-                platform: (navigator as any)?.platform ?? null,
-                language: navigator.language ?? null,
-                deviceType: /ipad|tablet/i.test(navigator.userAgent)
-                  ? "tablet"
-                  : /mobi|android|iphone/i.test(navigator.userAgent)
-                  ? "mobile"
-                  : "desktop",
-              }
-            : undefined,
+        client,
       };
 
       const res = await fetch("/api/tickets", {
@@ -191,7 +227,7 @@ export function FloatingTicketWidget() {
             <div className="flex items-start justify-between gap-3">
               <div>
                 <p className="text-xs font-semibold uppercase tracking-wide text-emerald-700">Fast lane</p>
-                <DialogTitle className="text-xl">Report, ask, or request ✨</DialogTitle>
+                <DialogTitle className="text-xl">Report, ask, or request</DialogTitle>
                 <p className="text-sm text-slate-600">We auto-capture URL, device, and page context for you.</p>
               </div>
               <div className="rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-700 border border-emerald-100">

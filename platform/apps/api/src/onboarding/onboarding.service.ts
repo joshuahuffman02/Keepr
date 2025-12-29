@@ -774,7 +774,6 @@ I have read and understand this waiver and agree to its terms.`;
     return `
       <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
         <div style="text-align: center; margin-bottom: 30px;">
-          <div style="font-size: 64px; margin-bottom: 16px;">🎉</div>
           <h1 style="color: #0f172a; margin: 0 0 8px 0;">You're Live!</h1>
           ${tierBadge}
         </div>

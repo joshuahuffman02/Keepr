@@ -6,7 +6,7 @@ import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import { Label } from "../ui/label";
 import { Textarea } from "../ui/textarea";
-import { DepositConfig, DepositRule, computeDepositDue, parseDepositConfig } from "@campreserv/shared";
+import { DepositConfig, DepositRule, DepositTier, DepositSeason, computeDepositDue, parseDepositConfig } from "@campreserv/shared";
 
 type PresetKey = "simple" | "standard" | "enterprise";
 
@@ -83,7 +83,7 @@ export function DepositSettingsForm({ campgroundId, initialRule, initialPercenta
     setConfig((prev) => ({ ...prev, defaultRule: { ...prev.defaultRule, ...partial } }));
   };
 
-  const updateTier = (idx: number, partial: any) => {
+  const updateTier = (idx: number, partial: Partial<DepositTier>) => {
     setConfig((prev) => {
       const next = [...(prev.lengthTiers || [])];
       next[idx] = { ...next[idx], ...partial };
@@ -91,7 +91,7 @@ export function DepositSettingsForm({ campgroundId, initialRule, initialPercenta
     });
   };
 
-  const updateSeason = (idx: number, partial: any) => {
+  const updateSeason = (idx: number, partial: Partial<DepositSeason>) => {
     setConfig((prev) => {
       const next = [...(prev.seasons || [])];
       next[idx] = { ...next[idx], ...partial };

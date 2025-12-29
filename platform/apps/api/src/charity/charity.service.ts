@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from "@nestjs/common";
+import { Injectable, NotFoundException, BadRequestException, Logger } from "@nestjs/common";
 import { PrismaService } from "../prisma/prisma.service";
 import { Prisma, DonationStatus, CharityPayoutStatus } from "@prisma/client";
 import { postBalancedLedgerEntries } from "../ledger/ledger-posting.util";
@@ -61,6 +61,8 @@ export interface CharityStats {
 
 @Injectable()
 export class CharityService {
+  private readonly logger = new Logger(CharityService.name);
+
   constructor(private prisma: PrismaService) {}
 
   // ==========================================================================
@@ -188,7 +190,7 @@ export class CharityService {
     }
 
     if (!charityId) {
-      throw new Error("Either charityId or newCharity must be provided");
+      throw new BadRequestException("Either charityId or newCharity must be provided");
     }
 
     // Verify charity exists
@@ -286,7 +288,7 @@ export class CharityService {
           });
         }
       } catch (err) {
-        console.error("Failed to post charity donation ledger entries:", err);
+        this.logger.error("Failed to post charity donation ledger entries:", err);
         // Continue without ledger entries for now - they can be reconciled later
       }
 
@@ -345,7 +347,7 @@ export class CharityService {
           },
         ]);
       } catch (err) {
-        console.error("Failed to post charity refund ledger entries:", err);
+        this.logger.error("Failed to post charity refund ledger entries:", err);
       }
 
       return updatedDonation;
@@ -525,7 +527,7 @@ export class CharityService {
     });
 
     if (donations.length === 0) {
-      throw new Error("No donations available for payout");
+      throw new BadRequestException("No donations available for payout");
     }
 
     const totalAmountCents = donations.reduce((sum, d) => sum + d.amountCents, 0);
@@ -628,7 +630,7 @@ export class CharityService {
             },
           ]);
         } catch (err) {
-          console.error(`Failed to post payout ledger entries for campground ${campgroundId}:`, err);
+          this.logger.error(`Failed to post payout ledger entries for campground ${campgroundId}:`, err);
         }
       }
 

@@ -1,4 +1,4 @@
-import { Injectable, BadRequestException } from "@nestjs/common";
+import { Injectable, BadRequestException, Logger } from "@nestjs/common";
 import { createHash } from "crypto";
 
 /**
@@ -17,6 +17,7 @@ import { createHash } from "crypto";
  */
 @Injectable()
 export class PasswordBreachService {
+    private readonly logger = new Logger(PasswordBreachService.name);
     private readonly apiUrl = "https://api.pwnedpasswords.com/range/";
     private readonly enabled: boolean;
     private readonly blockBreached: boolean;
@@ -29,7 +30,7 @@ export class PasswordBreachService {
         this.minBreachCount = parseInt(process.env.HIBP_MIN_BREACH_COUNT || "1", 10);
 
         if (this.enabled) {
-            console.log(`[SECURITY] Password breach checking enabled (block: ${this.blockBreached}, threshold: ${this.minBreachCount})`);
+            this.logger.log(`Password breach checking enabled (block: ${this.blockBreached}, threshold: ${this.minBreachCount})`);
         }
     }
 
@@ -69,7 +70,7 @@ export class PasswordBreachService {
 
             if (!response.ok) {
                 // If API fails, don't block the user - just log it
-                console.warn(`[SECURITY] HIBP API returned ${response.status}`);
+                this.logger.warn(`HIBP API returned ${response.status}`);
                 return { breached: false, count: 0 };
             }
 
@@ -95,7 +96,7 @@ export class PasswordBreachService {
             return { breached: false, count: 0 };
         } catch (error) {
             // Log but don't block on API errors
-            console.error("[SECURITY] HIBP check failed:", error);
+            this.logger.error("HIBP check failed", error);
             return { breached: false, count: 0 };
         }
     }

@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { AiProviderService } from './ai-provider.service';
 import { AiPrivacyService } from './ai-privacy.service';
 import { AiFeatureGateService } from './ai-feature-gate.service';
@@ -55,7 +55,7 @@ export class AiReplyAssistService {
         });
 
         if (!campground) {
-            throw new Error('Campground not found');
+            throw new NotFoundException('Campground not found');
         }
 
         // Anonymize conversation context

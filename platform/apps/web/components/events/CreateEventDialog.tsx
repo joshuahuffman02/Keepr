@@ -40,11 +40,13 @@ export function CreateEventDialog({ open, onOpenChange, onSuccess, campgroundId 
         setLoading(true);
 
         try {
+            type EventType = z.infer<typeof EventTypeSchema>;
+
             await apiClient.createEvent({
                 campgroundId,
                 title: formData.title!,
                 description: formData.description,
-                eventType: formData.eventType as any,
+                eventType: formData.eventType as EventType,
                 startDate: formData.startDate!,
                 endDate: formData.endDate,
                 startTime: formData.startTime,
@@ -108,7 +110,7 @@ export function CreateEventDialog({ open, onOpenChange, onSuccess, campgroundId 
                             <Label htmlFor="type">Type</Label>
                             <Select
                                 value={formData.eventType}
-                                onValueChange={(val) => setFormData({ ...formData, eventType: val as any })}
+                                onValueChange={(val) => setFormData({ ...formData, eventType: val as z.infer<typeof EventTypeSchema> })}
                             >
                                 <SelectTrigger>
                                     <SelectValue />

@@ -48,6 +48,19 @@ type AnalyticsResponse = {
   needsAttention: AttentionRow[];
 };
 
+interface UserWithPlatformRole {
+  memberships?: Array<{ campgroundId: string; role?: string | null }>;
+  platformRole?: string | null;
+  platformRegion?: string | null;
+  region?: string | null;
+}
+
+interface WhoamiAllowed {
+  supportRead?: boolean;
+  supportAssign?: boolean;
+  supportAnalytics?: boolean;
+}
+
 const percent = (value: number) => Math.round((value || 0) * 100);
 
 export default function SupportAnalyticsPage() {
@@ -60,15 +73,18 @@ export default function SupportAnalyticsPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const hasMembership = (whoami?.user?.memberships?.length ?? 0) > 0;
-  const platformRole = (whoami?.user as any)?.platformRole as string | undefined;
+  const user = whoami?.user as UserWithPlatformRole | undefined;
+  const hasMembership = (user?.memberships?.length ?? 0) > 0;
+  const platformRole = user?.platformRole;
   const supportAllowed =
-    whoami?.allowed?.supportRead || whoami?.allowed?.supportAssign || whoami?.allowed?.supportAnalytics;
+    (whoami?.allowed as WhoamiAllowed | undefined)?.supportRead ||
+    (whoami?.allowed as WhoamiAllowed | undefined)?.supportAssign ||
+    (whoami?.allowed as WhoamiAllowed | undefined)?.supportAnalytics;
   const allowSupport = !!supportAllowed && (!!platformRole || hasMembership);
-  const viewerRegion = (whoami?.user as any)?.platformRegion ?? whoami?.user?.region ?? null;
+  const viewerRegion = user?.platformRegion ?? user?.region ?? null;
   const regionAllowed = regionFilter === "all" || !viewerRegion || viewerRegion === regionFilter;
   const campgroundAllowed =
-    !campgroundId || platformRole || whoami?.user?.memberships?.some((m: any) => m.campgroundId === campgroundId);
+    !campgroundId || platformRole || user?.memberships?.some((m) => m.campgroundId === campgroundId);
   const inScope = allowSupport && regionAllowed && campgroundAllowed;
 
   useEffect(() => {

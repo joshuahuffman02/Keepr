@@ -49,6 +49,14 @@ type TimeOffRequest = {
   } | null;
 };
 
+interface WhoamiUser {
+  id: string;
+  email: string;
+  name?: string;
+  firstName?: string;
+  lastName?: string;
+}
+
 const SPRING_CONFIG = {
   type: "spring" as const,
   stiffness: 200,
@@ -56,13 +64,13 @@ const SPRING_CONFIG = {
 };
 
 const TIME_OFF_TYPES: { value: TimeOffType; label: string; icon: string }[] = [
-  { value: "vacation", label: "Vacation", icon: "🏖️" },
-  { value: "sick", label: "Sick", icon: "🤒" },
-  { value: "personal", label: "Personal", icon: "🏠" },
-  { value: "bereavement", label: "Bereavement", icon: "🕯️" },
-  { value: "jury_duty", label: "Jury Duty", icon: "⚖️" },
-  { value: "unpaid", label: "Unpaid Leave", icon: "📋" },
-  { value: "other", label: "Other", icon: "📝" },
+  { value: "vacation", label: "Vacation", icon: "palmtree" },
+  { value: "sick", label: "Sick", icon: "thermometer" },
+  { value: "personal", label: "Personal", icon: "home" },
+  { value: "bereavement", label: "Bereavement", icon: "heart" },
+  { value: "jury_duty", label: "Jury Duty", icon: "scale" },
+  { value: "unpaid", label: "Unpaid Leave", icon: "clipboard" },
+  { value: "other", label: "Other", icon: "file-text" },
 ];
 
 const STATUS_STYLES: Record<TimeOffStatus, { bg: string; text: string; icon: React.ReactNode }> = {
@@ -109,7 +117,8 @@ export default function TimeOffPage({ params }: { params: { campgroundId: string
 
   const myRequests = useMemo(() => {
     if (!whoami?.user) return [];
-    return requests.filter((r) => r.user?.id === (whoami.user as any)?.id);
+    const currentUser = whoami.user as WhoamiUser | undefined;
+    return requests.filter((r) => r.user?.id === currentUser?.id);
   }, [requests, whoami?.user]);
 
   const pendingRequests = useMemo(() => {
@@ -126,12 +135,13 @@ export default function TimeOffPage({ params }: { params: { campgroundId: string
     setError(null);
 
     try {
+      const currentUser = whoami?.user as WhoamiUser | undefined;
       const res = await fetch("/api/staff/time-off", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           campgroundId: params.campgroundId,
-          userId: (whoami?.user as any)?.id,
+          userId: currentUser?.id,
           type: formType,
           startDate: formStartDate,
           endDate: formEndDate,
@@ -159,11 +169,12 @@ export default function TimeOffPage({ params }: { params: { campgroundId: string
   const reviewRequest = async (id: string, status: "approved" | "rejected") => {
     setProcessing((prev) => new Set([...prev, id]));
     try {
+      const currentUser = whoami?.user as WhoamiUser | undefined;
       await fetch(`/api/staff/time-off/${id}/review`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          reviewerId: (whoami?.user as any)?.id,
+          reviewerId: currentUser?.id,
           status,
         }),
       });

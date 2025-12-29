@@ -4,6 +4,25 @@ import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../ui/table";
 import { Loader2 } from "lucide-react";
 
+interface ZipCodeData {
+    zipCode: string;
+    city?: string;
+    state?: string;
+    count: number;
+    revenue: number;
+}
+
+interface StateData {
+    state: string;
+    count: number;
+    revenue: number;
+}
+
+interface GuestOriginsData {
+    byZipCode: ZipCodeData[];
+    byState: StateData[];
+}
+
 interface GuestOriginsTabProps {
     campgroundId: string;
     dateRange: { start: string; end: string };
@@ -29,6 +48,8 @@ export function GuestOriginsTab({ campgroundId, dateRange }: GuestOriginsTabProp
 
     if (!data) return <div>No data available</div>;
 
+    const typedData = data as unknown as GuestOriginsData;
+
     return (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <Card>
@@ -46,7 +67,7 @@ export function GuestOriginsTab({ campgroundId, dateRange }: GuestOriginsTabProp
                             </TableRow>
                         </TableHeader>
                         <TableBody>
-                            {data.byZipCode.slice(0, 10).map((item: any) => (
+                            {typedData.byZipCode.slice(0, 10).map((item) => (
                                 <TableRow key={item.zipCode}>
                                     <TableCell className="font-medium">{item.zipCode}</TableCell>
                                     <TableCell>
@@ -58,7 +79,7 @@ export function GuestOriginsTab({ campgroundId, dateRange }: GuestOriginsTabProp
                                     </TableCell>
                                 </TableRow>
                             ))}
-                            {data.byZipCode.length === 0 && (
+                            {typedData.byZipCode.length === 0 && (
                                 <TableRow>
                                     <TableCell colSpan={4} className="text-center py-6 text-slate-500">
                                         No location data found matching these dates.
@@ -84,7 +105,7 @@ export function GuestOriginsTab({ campgroundId, dateRange }: GuestOriginsTabProp
                             </TableRow>
                         </TableHeader>
                         <TableBody>
-                            {data.byState.slice(0, 10).map((item: any) => (
+                            {typedData.byState.slice(0, 10).map((item) => (
                                 <TableRow key={item.state}>
                                     <TableCell className="font-medium">{item.state}</TableCell>
                                     <TableCell className="text-right">{item.count}</TableCell>
@@ -93,7 +114,7 @@ export function GuestOriginsTab({ campgroundId, dateRange }: GuestOriginsTabProp
                                     </TableCell>
                                 </TableRow>
                             ))}
-                            {data.byState.length === 0 && (
+                            {typedData.byState.length === 0 && (
                                 <TableRow>
                                     <TableCell colSpan={3} className="text-center py-6 text-slate-500">
                                         No state data found matching these dates.

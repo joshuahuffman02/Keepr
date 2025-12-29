@@ -6,7 +6,7 @@ import { useEffect, useState } from "react";
 import { DashboardShell } from "../../../../../components/ui/layout/DashboardShell";
 import { Breadcrumbs } from "../../../../../components/breadcrumbs";
 import { apiClient } from "../../../../../lib/api-client";
-import { computeDepositDue } from "@campreserv/shared";
+import { computeDepositDue, DepositConfig } from "@campreserv/shared";
 import { Card, CardContent, CardHeader, CardTitle } from "../../../../../components/ui/card";
 import { Badge } from "../../../../../components/ui/badge";
 import { Button } from "../../../../../components/ui/button";
@@ -30,6 +30,58 @@ function formatDateTime(d?: string | Date | null) {
   const date = typeof d === "string" ? new Date(d) : d;
   return isNaN(date.getTime()) ? "—" : format(date, "MMM d, yyyy h:mma");
 }
+
+// Extended reservation type with optional fields from API responses
+type ReservationWithExtras = {
+  id: string;
+  campgroundId: string;
+  siteId: string;
+  guestId: string;
+  arrivalDate: string;
+  departureDate: string;
+  status: string;
+  totalAmount: number;
+  paidAmount: number;
+  adults?: number | null;
+  children?: number | null;
+  notes?: string | null;
+  vehiclePlate?: string | null;
+  vehicleState?: string | null;
+  rigType?: string | null;
+  rigLength?: number | null;
+  guest?: {
+    primaryFirstName: string;
+    primaryLastName: string;
+    email?: string;
+  } | null;
+  site?: {
+    name?: string | null;
+    siteNumber?: string | null;
+    siteClass?: {
+      name?: string;
+    } | null;
+  } | null;
+  payments?: Array<{
+    id: string;
+    amountCents: number;
+    direction: string;
+    createdAt?: string;
+    date?: string;
+  }>;
+  depositRule?: string | null;
+  depositPercentage?: number | null;
+  depositConfig?: {
+    rule?: string;
+    depositPercentage?: number;
+  } | null;
+  seasonalRateId?: string | null;
+  balanceAmount?: number;
+  createdAt?: string;
+  updatedAt?: string;
+  checkInAt?: string | null;
+  checkOutAt?: string | null;
+  seasonalGuestId?: string | null;
+};
 
 export default function ReservationDetailPage() {
   const params = useParams();
@@ -121,7 +173,7 @@ export default function ReservationDetailPage() {
   });
 
   const updateReservation = useMutation({
-    mutationFn: (data: any) => apiClient.updateReservation(reservationId, data),
+    mutationFn: (data: Parameters<typeof apiClient.updateReservation>[1]) => apiClient.updateReservation(reservationId, data),
     onSuccess: (data, variables) => {
       queryClient.invalidateQueries({ queryKey: ["reservation", reservationId] });
       queryClient.invalidateQueries({ queryKey: ["reservations", campgroundId] });
@@ -134,7 +186,7 @@ export default function ReservationDetailPage() {
   });
 
   const vehicleMutation = useMutation({
-    mutationFn: (payload: any) => apiClient.upsertVehicle(reservationId, payload),
+    mutationFn: (payload: { plate?: string; state?: string; rigType?: string; rigLength?: number }) => apiClient.upsertVehicle(reservationId, payload),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["access-status", reservationId] });
       queryClient.invalidateQueries({ queryKey: ["reservation", reservationId] });
@@ -142,14 +194,14 @@ export default function ReservationDetailPage() {
   });
 
   const grantAccessMutation = useMutation({
-    mutationFn: (payload: any) => apiClient.grantAccess(reservationId, payload),
+    mutationFn: (payload: { provider: string; credentialType: string; credentialValue?: string; idempotencyKey: string }) => apiClient.grantAccess(reservationId, payload),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["access-status", reservationId] });
     }
   });
 
   const revokeAccessMutation = useMutation({
-    mutationFn: (payload: any) => apiClient.revokeAccess(reservationId, payload),
+    mutationFn: (payload: { provider: string; providerAccessId?: string }) => apiClient.revokeAccess(reservationId, payload),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["access-status", reservationId] });
     }
@@ -295,17 +347,32 @@ export default function ReservationDetailPage() {
     ? `${reservation.site.name || ""} #${reservation.site.siteNumber || ""}`.trim()
     : "Site";
 
-  const payments = (reservation as any).payments || [];
+  const reservationWithExtras = reservation as ReservationWithExtras;
+  const payments = reservationWithExtras.payments || [];
   const quote = quoteQuery.data;
   const comms = commsQuery.data?.items || [];
-  const related = (relatedQuery.data || []).filter((r: any) => r.id !== reservationId && r.guestId === reservation.guestId).slice(0, 3);
+
+  type RelatedReservation = {
+    id: string;
+    guestId: string;
+    arrivalDate: string;
+    departureDate: string;
+    status: string;
+    siteId: string;
+    site?: {
+      name?: string | null;
+      siteNumber?: string | null;
+    } | null;
+  };
+
+  const related = (relatedQuery.data || []).filter((r: RelatedReservation) => r.id !== reservationId && r.guestId === reservation.guestId).slice(0, 3);
   const total = (reservation.totalAmount ?? 0) / 100;
   const paid = (reservation.paidAmount ?? 0) / 100;
   const balance = Math.max(0, total - paid);
-  const depositRule = (reservation as any).depositRule ?? (reservation as any).depositConfig?.rule ?? null;
+  const depositRule = reservationWithExtras.depositRule ?? reservationWithExtras.depositConfig?.rule ?? null;
   const depositPercentage =
-    (reservation as any).depositPercentage ?? (reservation as any).depositConfig?.depositPercentage ?? null;
-  const depositConfig = (reservation as any).depositConfig ?? null;
+    reservationWithExtras.depositPercentage ?? reservationWithExtras.depositConfig?.depositPercentage ?? null;
+  const depositConfig = (reservationWithExtras.depositConfig as DepositConfig | undefined) ?? null;
   const requiredDeposit =
     quote?.totalCents && quote?.nights
       ? computeDepositDue({
@@ -330,7 +397,29 @@ export default function ReservationDetailPage() {
         }
       ]
       : [];
-  const getRequestMetadata = (req: any) => {
+  type SignatureRequest = {
+    id: string;
+    documentType: string;
+    status: string;
+    recipientEmail?: string;
+    sentAt?: string;
+    signedAt?: string;
+    token?: string;
+    artifact?: {
+      pdfUrl?: string;
+    };
+    template?: {
+      name?: string;
+      policyConfig?: {
+        enforcement?: string;
+      };
+    };
+    subject?: string;
+    metadata?: string | Record<string, unknown>;
+    children?: unknown[];
+  };
+
+  const getRequestMetadata = (req: SignatureRequest) => {
     const raw = req?.metadata;
     if (!raw) return {};
     if (typeof raw === "string") {
@@ -340,14 +429,14 @@ export default function ReservationDetailPage() {
         return {};
       }
     }
-    return raw;
+    return raw as Record<string, unknown>;
   };
-  const isPolicyRequest = (req: any) => {
+  const isPolicyRequest = (req: SignatureRequest) => {
     const meta = getRequestMetadata(req);
     return Boolean(meta?.policyId || meta?.policyName || meta?.enforcement || req?.template?.policyConfig);
   };
   const policyRequests = signatureRequests.filter(isPolicyRequest);
-  const otherSignatureRequests = signatureRequests.filter((req: any) => !isPolicyRequest(req));
+  const otherSignatureRequests = signatureRequests.filter((req: SignatureRequest) => !isPolicyRequest(req));
 
   const statusBadge =
     reservation.status === "confirmed"
@@ -360,19 +449,27 @@ export default function ReservationDetailPage() {
             ? "bg-rose-100 text-rose-700 border-rose-200"
             : "bg-amber-100 text-amber-700 border-amber-200";
 
+  type CommunicationItem = {
+    id: string;
+    subject?: string | null;
+    type?: string;
+    status?: string;
+    createdAt?: string;
+  };
+
   const activity = [
-    ...payments.map((p: any, idx: number) => ({
+    ...payments.map((p, idx: number) => ({
       id: `pay-${idx}`,
       label: `${p.direction === "refund" ? "Refund" : "Payment"} $${((p.amountCents ?? 0) / 100).toFixed(2)}`,
-      at: p.createdAt || p.date || reservation.updatedAt
+      at: p.createdAt || p.date || reservationWithExtras.updatedAt
     })),
-    ...comms.map((c: any, idx: number) => ({
+    ...comms.map((c: CommunicationItem, idx: number) => ({
       id: `comm-${idx}`,
       label: c.subject || c.type || "Message",
       at: c.createdAt || reservation.updatedAt
     }))
   ]
-    .filter((a) => !!a.at)
+    .filter((a): a is { id: string; label: string; at: string } => !!a.at)
     .sort((a, b) => new Date(b.at).getTime() - new Date(a.at).getTime())
     .slice(0, 8);
 
@@ -432,7 +529,7 @@ export default function ReservationDetailPage() {
               Message
             </Button>
             {/* Show Convert to Seasonal button for long-term stays (28+ nights) */}
-            {(quote?.nights ?? 0) >= 28 && !(reservation as { seasonalGuestId?: string }).seasonalGuestId && (
+            {(quote?.nights ?? 0) >= 28 && !reservationWithExtras.seasonalGuestId && (
               <Button
                 size="sm"
                 variant="outline"
@@ -443,7 +540,7 @@ export default function ReservationDetailPage() {
                 Convert to Seasonal
               </Button>
             )}
-            {(reservation as { seasonalGuestId?: string }).seasonalGuestId && (
+            {reservationWithExtras.seasonalGuestId && (
               <Button
                 size="sm"
                 variant="outline"
@@ -473,7 +570,7 @@ export default function ReservationDetailPage() {
               <div>
                 <div className="text-xs text-slate-500">Site</div>
                 <div className="font-medium">{siteLabel}</div>
-                <div className="text-xs text-slate-500">{(reservation.site as any)?.siteClass?.name || "—"}</div>
+                <div className="text-xs text-slate-500">{(reservation.site as { siteClass?: { name?: string } } | undefined)?.siteClass?.name || "—"}</div>
               </div>
               <div>
                 <div className="text-xs text-slate-500">Dates</div>
@@ -496,13 +593,13 @@ export default function ReservationDetailPage() {
               <div>
                 <div className="text-xs text-slate-500">Occupancy</div>
                 <div className="font-medium">
-                  {(reservation.adults ?? 0) + (reservation.children ?? 0)} / {(reservation.site as any)?.siteClass?.maxOccupancy || "—"}
+                  {(reservation.adults ?? 0) + (reservation.children ?? 0)} / {(reservation.site as { siteClass?: { maxOccupancy?: number } } | undefined)?.siteClass?.maxOccupancy || "—"}
                 </div>
               </div>
             </CardContent>
           </Card>
 
-          {((reservation as any).seasonalRateId || (chargesQuery.data?.length ?? 0) > 0) && (
+          {(reservationWithExtras.seasonalRateId || (chargesQuery.data?.length ?? 0) > 0) && (
             <Card className="md:col-span-2">
               <CardHeader className="flex flex-row items-center justify-between pb-2">
                 <CardTitle className="flex items-center gap-2 text-blue-700">
@@ -619,13 +716,13 @@ export default function ReservationDetailPage() {
               <div className="flex items-center justify-between">
                 <span>Balance</span>
                 <span className="text-slate-900 font-semibold">
-                  ${(((reservation as any).balanceAmount ?? Math.max(0, reservation.totalAmount - (reservation.paidAmount ?? 0))) / 100).toFixed(2)}
+                  ${((reservationWithExtras.balanceAmount ?? Math.max(0, reservation.totalAmount - (reservation.paidAmount ?? 0))) / 100).toFixed(2)}
                 </span>
               </div>
               <div className="h-px bg-slate-200 my-2" />
               <div className="space-y-1 max-h-48 overflow-auto pr-1">
                 {payments.length === 0 && <div className="text-slate-500 text-xs">No payments yet.</div>}
-                {payments.map((p: any) => (
+                {payments.map((p) => (
                   <div key={p.id} className="flex items-center justify-between text-xs border border-slate-200 rounded px-2 py-1">
                     <span className="capitalize">{p.direction}</span>
                     <span className={p.direction === "refund" ? "text-red-600" : "text-emerald-700"}>
@@ -752,7 +849,7 @@ export default function ReservationDetailPage() {
                   <select
                     className="w-full rounded-md border border-slate-200 px-3 py-2 text-sm"
                     value={deliveryChannel}
-                    onChange={(e) => setDeliveryChannel(e.target.value as any)}
+                    onChange={(e) => setDeliveryChannel(e.target.value as "email" | "email_and_sms" | "sms")}
                   >
                     <option value="email">Email</option>
                     <option value="email_and_sms">Email + SMS fallback</option>
@@ -997,7 +1094,7 @@ export default function ReservationDetailPage() {
                   </div>
                   <select
                     value={accessProvider}
-                    onChange={(e) => setAccessProvider(e.target.value as any)}
+                    onChange={(e) => setAccessProvider(e.target.value as "kisi" | "brivo" | "cloudkey")}
                     className="text-sm border border-slate-200 rounded px-2 py-1"
                   >
                     <option value="kisi">Kisi</option>
@@ -1035,7 +1132,7 @@ export default function ReservationDetailPage() {
                       onClick={() =>
                         revokeAccessMutation.mutate({
                           provider: accessProvider,
-                          providerAccessId: accessStatus?.grants?.find((g: any) => g.provider === accessProvider)?.providerAccessId
+                          providerAccessId: accessStatus?.grants?.find((g: { provider?: string; providerAccessId?: string | null }) => g.provider === accessProvider)?.providerAccessId ?? undefined
                         })
                       }
                       disabled={revokeAccessMutation.isPending}
@@ -1049,7 +1146,7 @@ export default function ReservationDetailPage() {
                   {(accessStatus?.grants ?? []).length === 0 && (
                     <div className="text-xs text-slate-500">No access grants yet.</div>
                   )}
-                  {(accessStatus?.grants ?? []).map((g: any) => (
+                  {(accessStatus?.grants ?? []).map((g: { id: string; provider: string; providerAccessId?: string | null; status: string }) => (
                     <div
                       key={g.id}
                       className="flex items-center justify-between rounded border border-slate-200 px-2 py-1 text-xs"
@@ -1125,7 +1222,7 @@ export default function ReservationDetailPage() {
               {comms && comms.length > 0 && (
                 <div className="space-y-1">
                   {comms
-                    .filter((c: any) => {
+                    .filter((c: CommunicationItem) => {
                       if (commsFilter === "notes") return (c.type || "").toLowerCase() === "note";
                       if (commsFilter === "messages") return (c.type || "").toLowerCase() !== "note";
                       if (commsFilter === "failed") {
@@ -1135,7 +1232,7 @@ export default function ReservationDetailPage() {
                       return true;
                     })
                     .slice(0, 5)
-                    .map((c: any) => (
+                    .map((c: CommunicationItem & { status?: string }) => (
                       <div key={c.id} className="flex items-center justify-between rounded border border-slate-200 px-2 py-1">
                         <div className="flex flex-col min-w-0">
                           <span className="font-semibold text-slate-900 truncate">{c.subject || c.type || "Message"}</span>
@@ -1214,7 +1311,7 @@ export default function ReservationDetailPage() {
               {relatedQuery.isError && <div className="text-red-600 text-xs">Failed to load related reservations.</div>}
               {!relatedQuery.isLoading && related.length === 0 && <div className="text-slate-500 text-xs">No other stays for this guest.</div>}
               <div className="space-y-2">
-                {related.map((r: any) => (
+                {related.map((r: RelatedReservation) => (
                   <div key={r.id} className="flex flex-wrap items-center gap-2 rounded border border-slate-200 px-3 py-2">
                     <span className="rounded-full border px-2 py-0.5 text-[11px]">
                       {formatDate(r.arrivalDate)} → {formatDate(r.departureDate)}
@@ -1350,19 +1447,19 @@ export default function ReservationDetailPage() {
               </div>
               <div className="flex items-center justify-between">
                 <span>Created</span>
-                <span className="font-medium">{formatDateTime((reservation as any).createdAt)}</span>
+                <span className="font-medium">{formatDateTime(reservationWithExtras.createdAt)}</span>
               </div>
               <div className="flex items-center justify-between">
                 <span>Updated</span>
-                <span className="font-medium">{formatDateTime((reservation as any).updatedAt)}</span>
+                <span className="font-medium">{formatDateTime(reservationWithExtras.updatedAt)}</span>
               </div>
               <div className="flex items-center justify-between">
                 <span>Checked in</span>
-                <span className="font-medium">{formatDateTime((reservation as any).checkInAt)}</span>
+                <span className="font-medium">{formatDateTime(reservationWithExtras.checkInAt)}</span>
               </div>
               <div className="flex items-center justify-between">
                 <span>Checked out</span>
-                <span className="font-medium">{formatDateTime((reservation as any).checkOutAt)}</span>
+                <span className="font-medium">{formatDateTime(reservationWithExtras.checkOutAt)}</span>
               </div>
             </CardContent>
           </Card>

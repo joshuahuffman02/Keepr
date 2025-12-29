@@ -39,10 +39,18 @@ export function LoyaltyMembershipReport({ campgroundId }: LoyaltyMembershipRepor
         ];
 
         let totalPoints = 0;
+        interface GuestWithLoyalty {
+            loyaltyProfile?: {
+                tier?: string;
+                pointsBalance?: number;
+            };
+        }
+
         let membersCount = 0;
 
         guests.forEach(guest => {
-            const profile = (guest as any).loyaltyProfile;
+            const guestWithLoyalty = guest as GuestWithLoyalty;
+            const profile = guestWithLoyalty.loyaltyProfile;
             if (profile) {
                 membersCount++;
                 const tier = profile.tier || 'Bronze';

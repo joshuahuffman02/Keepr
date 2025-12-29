@@ -1,4 +1,4 @@
-import { Injectable } from "@nestjs/common";
+import { Injectable, NotFoundException } from "@nestjs/common";
 import { PrismaService } from "../../../prisma/prisma.service";
 import { DateRange } from "../platform-analytics.service";
 
@@ -242,7 +242,7 @@ export class BenchmarkService {
     });
 
     if (!campground) {
-      throw new Error("Campground not found");
+      throw new NotFoundException("Campground not found");
     }
 
     // Get platform benchmarks

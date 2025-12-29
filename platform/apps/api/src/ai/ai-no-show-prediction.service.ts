@@ -1,4 +1,4 @@
-import { Injectable, Logger, NotFoundException } from "@nestjs/common";
+import { Injectable, Logger, NotFoundException, BadRequestException } from "@nestjs/common";
 import { Cron } from "@nestjs/schedule";
 import { PrismaService } from "../prisma/prisma.service";
 import { AiAutopilotConfigService } from "./ai-autopilot-config.service";
@@ -398,7 +398,7 @@ export class AiNoShowPredictionService {
     const guestEmail = (reservation as any).guest?.email;
 
     if (!guestEmail) {
-      throw new Error("Guest has no email address");
+      throw new BadRequestException("Guest has no email address");
     }
 
     const campground = await this.prisma.campground.findUnique({

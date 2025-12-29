@@ -2080,8 +2080,8 @@ model Guest {
   deletedAt DateTime?
   deletedBy String?
 
-  @@unique([email])
-  @@index([emailNormalized])
+  @@unique([emailNormalized])
+  @@index([email])
   @@index([phoneNormalized])
   @@index([deletedAt])
 }

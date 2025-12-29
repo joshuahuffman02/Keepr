@@ -179,10 +179,10 @@ import { KeyboardHint } from '@/components/ui/keyboard-hint';
 
 ## Browser Compatibility
 
-- Chrome/Edge: ✅ Full support
-- Firefox: ✅ Full support
-- Safari: ✅ Full support
-- Mobile browsers: ⚠️ Shortcuts not applicable (UI hints hidden)
+- Chrome/Edge: [OK] Full support
+- Firefox: [OK] Full support
+- Safari: [OK] Full support
+- Mobile browsers: [WARN] Shortcuts not applicable (UI hints hidden)
 
 ## Performance
 

@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post, Query, BadRequestException } from "@nestjs/common";
+import { Body, Controller, Get, Param, Post, Query, BadRequestException, Logger } from "@nestjs/common";
 import { PublicReservationsService } from "./public-reservations.service";
 import { CreatePublicReservationDto, PublicQuoteDto, CreatePublicWaitlistDto, CreateDemoRequestDto } from "./dto/create-public-reservation.dto";
 import { FormsService } from "../forms/forms.service";
@@ -9,6 +9,8 @@ import { Throttle } from "@nestjs/throttler";
 @Controller("public")
 @Throttle({ default: { limit: 60, ttl: 60000 } }) // 60 requests per minute per IP
 export class PublicReservationsController {
+    private readonly logger = new Logger(PublicReservationsController.name);
+
     constructor(
         private readonly service: PublicReservationsService,
         private readonly formsService: FormsService,
@@ -152,9 +154,9 @@ export class PublicReservationsController {
                     <p style="color: #666; font-size: 12px;">Request ID: ${demoRequest.id}</p>
                 `,
             });
-        } catch {
+        } catch (error) {
             // Don't fail the request if email fails - the data is already stored
-            console.error("Failed to send demo request notification email");
+            this.logger.error("Failed to send demo request notification email", error instanceof Error ? error.stack : error);
         }
 
         return { success: true, id: demoRequest.id };

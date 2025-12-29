@@ -1,4 +1,4 @@
-import { Injectable } from "@nestjs/common";
+import { Injectable, NotFoundException } from "@nestjs/common";
 import { PrismaService } from "../prisma/prisma.service";
 import { SegmentScope, SegmentStatus, Prisma } from "@prisma/client";
 
@@ -112,7 +112,7 @@ export class GuestSegmentService {
 
     async duplicate(id: string, userId: string, userEmail: string) {
         const original = await this.findOne(id);
-        if (!original) throw new Error("Segment not found");
+        if (!original) throw new NotFoundException("Segment not found");
 
         return this.create({
             name: `${original.name} (Copy)`,

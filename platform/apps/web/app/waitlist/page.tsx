@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { DashboardShell } from "@/components/ui/layout/DashboardShell";
 import { apiClient } from "@/lib/api-client";
@@ -98,15 +98,19 @@ export default function WaitlistPage() {
   });
 
   const normalizeStatus = (status: WaitlistEntry["status"]) => (status === "fulfilled" ? "converted" : status);
-  const entries = ((entriesQuery.data ?? []) as any[]).filter((e: WaitlistEntry) =>
+  const entries = ((entriesQuery.data ?? []) as WaitlistEntry[]).filter((e) =>
     statusFilter === "all" || normalizeStatus(e.status) === statusFilter
   );
   const stats = statsQuery.data as WaitlistStats | undefined;
 
+  // Auto-switch from "active" to "all" only once when there are no active entries
+  const hasAutoSwitchedRef = React.useRef(false);
   useEffect(() => {
+    if (hasAutoSwitchedRef.current) return;
     if (!stats) return;
     if (statusFilter !== "active") return;
     if (stats.active === 0 && stats.total > 0) {
+      hasAutoSwitchedRef.current = true;
       setStatusFilter("all");
     }
   }, [stats, statusFilter]);
@@ -250,7 +254,7 @@ export default function WaitlistPage() {
                         </td>
                         <td className="px-4 py-3">
                           {entry.autoOffer ? (
-                            <span className="text-emerald-600 font-medium">✓ Yes</span>
+                            <span className="text-emerald-600 font-medium">Yes</span>
                           ) : (
                             <span className="text-slate-400">No</span>
                           )}
@@ -414,7 +418,9 @@ function WaitlistModal({
           <h2 className="text-xl font-bold text-slate-900">
             {entry ? "Edit Waitlist Entry" : "Add to Waitlist"}
           </h2>
-          <button onClick={onClose} className="text-slate-400 hover:text-slate-600">✕</button>
+          <button onClick={onClose} className="text-slate-400 hover:text-slate-600">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+          </button>
         </div>
 
         <form onSubmit={handleSubmit} className="p-6 space-y-4 max-h-[70vh] overflow-y-auto">

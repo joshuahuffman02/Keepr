@@ -36,6 +36,7 @@ import {
   SkipForward,
   ChevronDown,
 } from "lucide-react";
+import { useToast } from "../ui/use-toast";
 
 interface ReservationFormsCardProps {
   campgroundId: string;
@@ -53,6 +54,7 @@ export function ReservationFormsCard({
   reservationId,
 }: ReservationFormsCardProps) {
   const queryClient = useQueryClient();
+  const { toast } = useToast();
   const [attachModalOpen, setAttachModalOpen] = useState(false);
   const [viewModalOpen, setViewModalOpen] = useState(false);
   const [skipModalOpen, setSkipModalOpen] = useState(false);
@@ -369,7 +371,10 @@ export function ReservationFormsCard({
                       {submission.status === "pending" && (
                         <DropdownMenuItem
                           onClick={() =>
-                            alert("Send reminder email - TODO")
+                            toast({
+                              title: "Coming Soon",
+                              description: "Reminder email functionality is under development.",
+                            })
                           }
                         >
                           <Send className="h-4 w-4 mr-2" />

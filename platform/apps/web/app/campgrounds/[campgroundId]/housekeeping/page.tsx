@@ -34,6 +34,40 @@ type TaskState = "pending" | "in_progress" | "blocked" | "done" | "failed" | "ex
 type SlaStatus = "on_track" | "at_risk" | "breached";
 type TaskType = "turnover" | "inspection" | "deep_clean" | "touch_up" | "vip_prep" | "linen_change" | "other";
 
+type ListTasksParams = {
+  state?: TaskState;
+  slaStatus?: SlaStatus;
+  type?: TaskType;
+};
+
+type UpdateTaskPayload = {
+  state: TaskState;
+};
+
+type CreateTaskPayload = {
+  type: string;
+  siteId: string;
+  priority?: string;
+  notes?: string;
+  createdBy: string;
+};
+
+type DailyScheduleData = {
+  summary?: {
+    checkouts?: number;
+    checkins?: number;
+    turnovers?: number;
+    priorityCount?: number;
+    stayoverCount?: number;
+  };
+  expectedCheckouts?: Array<{ id: string; siteName?: string; guestName?: string; time?: string }>;
+  expectedCheckins?: Array<{ id: string; siteName?: string; guestName?: string; time?: string }>;
+  expectedTurnovers?: Array<{ id: string; siteName?: string; arrivalTime?: string; departureTime?: string }>;
+  stayovers?: Array<{ id: string; siteName?: string; guestName?: string }>;
+  prioritySites?: Array<{ id: string; siteName?: string; priority?: string; reason?: string }>;
+  priorityUnits?: string[];
+};
+
 function formatDateTime(d?: string | Date | null) {
   if (!d) return "—";
   const date = typeof d === "string" ? new Date(d) : d;
@@ -175,7 +209,7 @@ export default function HousekeepingPage() {
         state: stateFilter === "all" ? undefined : stateFilter,
         slaStatus: slaFilter === "all" ? undefined : slaFilter,
         type: typeFilter === "all" ? undefined : typeFilter,
-      } as any),
+      } as ListTasksParams),
     enabled: !!campgroundId,
   });
 
@@ -205,20 +239,14 @@ export default function HousekeepingPage() {
 
   const updateTaskMutation = useMutation({
     mutationFn: ({ id, state }: { id: string; state: TaskState }) =>
-      apiClient.updateTask(id, { state } as any),
+      apiClient.updateTask(id, { state } as Parameters<typeof apiClient.updateTask>[1]),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["tasks", campgroundId] });
     },
   });
 
   const createTaskMutation = useMutation({
-    mutationFn: (payload: {
-      type: string;
-      siteId: string;
-      priority?: string;
-      notes?: string;
-      createdBy: string;
-    }) => apiClient.createTask(campgroundId, payload as any),
+    mutationFn: (payload: CreateTaskPayload) => apiClient.createTask(campgroundId, payload as Parameters<typeof apiClient.createTask>[1]),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["tasks", campgroundId] });
       setShowCreateModal(false);
@@ -234,7 +262,7 @@ export default function HousekeepingPage() {
   const sites = sitesQuery.data || [];
 
   const tasks = tasksQuery.data || [];
-  const dailySchedule = dailyScheduleQuery.data;
+  const dailySchedule = dailyScheduleQuery.data as DailyScheduleData | undefined;
   const staffWorkload = staffWorkloadQuery.data || {};
   const housekeepingStats = housekeepingStatsQuery.data;
   const inspectionStats = inspectionStatsQuery.data;

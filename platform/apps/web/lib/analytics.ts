@@ -13,6 +13,30 @@ function getDeviceType() {
   return "desktop";
 }
 
+interface AnalyticsMockEntry {
+  sessionId: string;
+  eventName: string;
+  page?: string;
+  referrer?: string;
+  referrerUrl?: string;
+  deviceType?: string;
+  region?: string;
+  campgroundId?: string;
+  organizationId?: string;
+  reservationId?: string;
+  siteId?: string;
+  siteClassId?: string;
+  promotionId?: string;
+  imageId?: string;
+  metadata?: Record<string, unknown>;
+  occurredAt?: string;
+  at: string;
+}
+
+interface WindowWithAnalytics extends Window {
+  __analyticsMock?: AnalyticsMockEntry[];
+}
+
 export function getAnalyticsSessionId() {
   if (typeof window === "undefined") return "server";
   const existing = localStorage.getItem(SESSION_KEY);
@@ -36,7 +60,7 @@ export async function trackEvent(eventName: string, payload: Partial<{
   deviceType: string;
   region: string;
   source: string;
-  metadata: Record<string, any>;
+  metadata: Record<string, unknown>;
   occurredAt: string;
 }>) {
   if (ANALYTICS_DISABLED) return;
@@ -67,10 +91,11 @@ export async function trackEvent(eventName: string, payload: Partial<{
   if (ANALYTICS_MODE === "mock") {
     // Mock/no-op mode for local validation without hitting the API
     if (typeof window !== "undefined") {
-      const existing = (window as any).__analyticsMock as any[] | undefined;
+      const win = window as WindowWithAnalytics;
+      const existing = win.__analyticsMock;
       const list = existing ?? [];
       list.push({ ...body, at: new Date().toISOString() });
-      (window as any).__analyticsMock = list.slice(-200);
+      win.__analyticsMock = list.slice(-200);
     }
     console.debug("[analytics:mock]", eventName, body);
     return;
@@ -88,39 +113,39 @@ export function trackPageView(payload: Partial<{ campgroundId: string; organizat
   return trackEvent("page_view", payload);
 }
 
-export function trackAddToStay(payload: Partial<{ campgroundId: string; reservationId: string; siteId: string; siteClassId: string; region: string; metadata: Record<string, any> }>) {
+export function trackAddToStay(payload: Partial<{ campgroundId: string; reservationId: string; siteId: string; siteClassId: string; region: string; metadata: Record<string, unknown> }>) {
   return trackEvent("add_to_stay", payload);
 }
 
-export function trackReservationStart(payload: Partial<{ campgroundId: string; reservationId: string; siteId: string; siteClassId: string; region: string; metadata: Record<string, any> }>) {
+export function trackReservationStart(payload: Partial<{ campgroundId: string; reservationId: string; siteId: string; siteClassId: string; region: string; metadata: Record<string, unknown> }>) {
   return trackEvent("reservation_start", payload);
 }
 
-export function trackReservationCompleted(payload: Partial<{ campgroundId: string; reservationId: string; siteId: string; siteClassId: string; region: string; metadata: Record<string, any> }>) {
+export function trackReservationCompleted(payload: Partial<{ campgroundId: string; reservationId: string; siteId: string; siteClassId: string; region: string; metadata: Record<string, unknown> }>) {
   return trackEvent("reservation_completed", payload);
 }
 
-export function trackReservationAbandoned(payload: Partial<{ campgroundId: string; reservationId: string; siteId: string; siteClassId: string; region: string; metadata: Record<string, any> }>) {
+export function trackReservationAbandoned(payload: Partial<{ campgroundId: string; reservationId: string; siteId: string; siteClassId: string; region: string; metadata: Record<string, unknown> }>) {
   return trackEvent("reservation_abandoned", payload);
 }
 
-export function trackAvailabilityCheck(payload: Partial<{ campgroundId: string; siteClassId: string; region: string; metadata: Record<string, any> }>) {
+export function trackAvailabilityCheck(payload: Partial<{ campgroundId: string; siteClassId: string; region: string; metadata: Record<string, unknown> }>) {
   return trackEvent("availability_check", payload);
 }
 
-export function trackImageViewed(payload: Partial<{ campgroundId: string; imageId: string; siteId: string; siteClassId: string; region: string; metadata: Record<string, any> }>) {
+export function trackImageViewed(payload: Partial<{ campgroundId: string; imageId: string; siteId: string; siteClassId: string; region: string; metadata: Record<string, unknown> }>) {
   return trackEvent("image_viewed", payload);
 }
 
-export function trackImageClicked(payload: Partial<{ campgroundId: string; imageId: string; siteId: string; siteClassId: string; region: string; metadata: Record<string, any> }>) {
+export function trackImageClicked(payload: Partial<{ campgroundId: string; imageId: string; siteId: string; siteClassId: string; region: string; metadata: Record<string, unknown> }>) {
   return trackEvent("image_clicked", payload);
 }
 
-export function trackDealViewed(payload: Partial<{ campgroundId: string; promotionId: string; region: string; metadata: Record<string, any> }>) {
+export function trackDealViewed(payload: Partial<{ campgroundId: string; promotionId: string; region: string; metadata: Record<string, unknown> }>) {
   return trackEvent("deal_viewed", payload);
 }
 
-export function trackDealApplied(payload: Partial<{ campgroundId: string; promotionId: string; region: string; metadata: Record<string, any> }>) {
+export function trackDealApplied(payload: Partial<{ campgroundId: string; promotionId: string; region: string; metadata: Record<string, unknown> }>) {
   return trackEvent("deal_applied", payload);
 }
 

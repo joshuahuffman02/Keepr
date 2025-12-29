@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException, Logger } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { ChargeStatus, PaymentSchedule, ReservationStatus } from '@prisma/client';
 import { addDays, addMonths, addWeeks, startOfDay } from 'date-fns';
@@ -6,6 +6,8 @@ import { StripeService } from '../payments/stripe.service';
 
 @Injectable()
 export class RepeatChargesService {
+    private readonly logger = new Logger(RepeatChargesService.name);
+
     constructor(
         private readonly prisma: PrismaService,
         private readonly stripeService: StripeService
@@ -270,7 +272,7 @@ export class RepeatChargesService {
 
             return updated;
         } catch (error: any) {
-            console.error(`[RepeatCharge] Payment failed for charge ${chargeId}:`, error.message);
+            this.logger.error(`Payment failed for charge ${chargeId}: ${error.message}`, error.stack);
 
             // If not already marked as failed, update the charge status
             const currentCharge = await this.prisma.repeatCharge.findUnique({

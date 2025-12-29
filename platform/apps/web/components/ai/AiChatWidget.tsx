@@ -213,11 +213,15 @@ export function AiChatWidget({ campgroundId, campgroundName }: AiChatWidgetProps
                     </p>
                     <div className="text-xs text-slate-500 mb-6 p-3 bg-slate-50 rounded-lg">
                         <div className="flex items-center gap-2 mb-1">
-                            <span className="w-4 h-4 bg-emerald-500 rounded-full flex items-center justify-center text-white text-[10px]">✓</span>
+                            <span className="w-4 h-4 bg-emerald-500 rounded-full flex items-center justify-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                            </span>
                             <span>Your data stays private</span>
                         </div>
                         <div className="flex items-center gap-2">
-                            <span className="w-4 h-4 bg-emerald-500 rounded-full flex items-center justify-center text-white text-[10px]">✓</span>
+                            <span className="w-4 h-4 bg-emerald-500 rounded-full flex items-center justify-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                            </span>
                             <span>No personal info shared with Host</span>
                         </div>
                     </div>

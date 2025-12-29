@@ -74,6 +74,36 @@ const siteTypeConfig: Record<string, { icon: React.ReactNode; label: string; col
   glamping: { icon: <Sparkles className="h-4 w-4" />, label: "Glamping", color: "bg-pink-100 text-pink-700 dark:bg-pink-900/50 dark:text-pink-400" },
 };
 
+type Site = {
+  id: string;
+  siteClassId?: string | null;
+};
+
+type SiteClass = {
+  id: string;
+  name: string;
+  description?: string;
+  defaultRate?: number;
+  siteType: "rv" | "tent" | "cabin" | "group" | "glamping";
+  maxOccupancy?: number;
+  hookupsPower?: boolean;
+  hookupsWater?: boolean;
+  hookupsSewer?: boolean;
+  amenityTags?: string[];
+  isActive?: boolean;
+  // Extended fields from onboarding
+  rentalType?: string;
+  rvOrientation?: string;
+  electricAmps?: number[];
+  equipmentTypes?: string[];
+  slideOutsAccepted?: string | null;
+  occupantsIncluded?: number;
+  extraAdultFee?: number | null;
+  extraChildFee?: number | null;
+  meteredEnabled?: boolean;
+  meteredType?: string;
+};
+
 type SiteClassFormState = {
   name: string;
   description: string;
@@ -142,7 +172,8 @@ export default function SiteClassesPage() {
   const sitesPerClass = useMemo(() => {
     if (!sitesQuery.data) return {};
     return sitesQuery.data.reduce((acc, site) => {
-      const classId = (site as any).siteClassId;
+      const typedSite = site as Site;
+      const classId = typedSite.siteClassId;
       if (classId) {
         acc[classId] = (acc[classId] || 0) + 1;
       }
@@ -178,7 +209,7 @@ export default function SiteClassesPage() {
       name: state.name,
       description: state.description || undefined,
       defaultRate: Math.round(Number(state.defaultRate) * 100),
-      siteType: state.siteType as any,
+      siteType: state.siteType as "rv" | "tent" | "cabin" | "group" | "glamping",
       maxOccupancy: Number(state.maxOccupancy || 0),
       rigMaxLength: parseOptionalNumber(state.rigMaxLength),
       hookupsPower: state.hookupsPower,
@@ -707,24 +738,24 @@ export default function SiteClassesPage() {
                 animate="animate"
               >
                 {classesQuery.data?.map((cls, index) => {
-                  const typeConfig = siteTypeConfig[cls.siteType] || siteTypeConfig.rv;
-                  const isInactive = cls.isActive === false;
-                  const siteCount = sitesPerClass[cls.id] || 0;
-                  const hasHookups = cls.hookupsPower || cls.hookupsWater || cls.hookupsSewer;
+                  const typedCls = cls as SiteClass;
+                  const typeConfig = siteTypeConfig[typedCls.siteType] || siteTypeConfig.rv;
+                  const isInactive = typedCls.isActive === false;
+                  const siteCount = sitesPerClass[typedCls.id] || 0;
+                  const hasHookups = typedCls.hookupsPower || typedCls.hookupsWater || typedCls.hookupsSewer;
 
                   // Extended fields from onboarding
-                  const extCls = cls as any;
-                  const rentalType = extCls.rentalType || "transient";
-                  const rvOrientation = extCls.rvOrientation;
-                  const electricAmps = extCls.electricAmps as number[] | undefined;
-                  const equipmentTypes = extCls.equipmentTypes as string[] | undefined;
-                  const slideOutsAccepted = extCls.slideOutsAccepted;
-                  const occupantsIncluded = extCls.occupantsIncluded;
-                  const extraAdultFee = extCls.extraAdultFee;
-                  const extraChildFee = extCls.extraChildFee;
-                  const meteredEnabled = extCls.meteredEnabled;
-                  const meteredType = extCls.meteredType;
-                  const amenityTags = extCls.amenityTags as string[] | undefined;
+                  const rentalType = typedCls.rentalType || "transient";
+                  const rvOrientation = typedCls.rvOrientation;
+                  const electricAmps = typedCls.electricAmps;
+                  const equipmentTypes = typedCls.equipmentTypes;
+                  const slideOutsAccepted = typedCls.slideOutsAccepted;
+                  const occupantsIncluded = typedCls.occupantsIncluded;
+                  const extraAdultFee = typedCls.extraAdultFee;
+                  const extraChildFee = typedCls.extraChildFee;
+                  const meteredEnabled = typedCls.meteredEnabled;
+                  const meteredType = typedCls.meteredType;
+                  const amenityTags = typedCls.amenityTags;
 
                   const rentalTypeLabels: Record<string, string> = {
                     transient: "Nightly",
@@ -741,7 +772,7 @@ export default function SiteClassesPage() {
 
                   return (
                     <motion.div
-                      key={cls.id}
+                      key={typedCls.id}
                       initial={prefersReducedMotion ? {} : { opacity: 0, y: 20 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: index * 0.05 }}
@@ -763,7 +794,7 @@ export default function SiteClassesPage() {
                                   {rentalTypeLabels[rentalType] || rentalType}
                                 </Badge>
                               )}
-                              {!cls.isActive && (
+                              {!typedCls.isActive && (
                                 <Badge variant="outline" className="text-xs text-muted-foreground">
                                   Inactive
                                 </Badge>

@@ -80,6 +80,22 @@ type DashboardMetrics = {
   periodEnd: string;
 };
 
+type AutopilotConfig = {
+  autoReplyEnabled?: boolean;
+  autoReplyAutoSendEnabled?: boolean;
+  smartWaitlistEnabled?: boolean;
+  waitlistAutoOfferEnabled?: boolean;
+  anomalyDetectionEnabled?: boolean;
+  anomalyAutoFixEnabled?: boolean;
+  noShowPredictionEnabled?: boolean;
+  noShowAutoReleaseEnabled?: boolean;
+  dynamicPricingAiEnabled?: boolean;
+  predictiveMaintenanceEnabled?: boolean;
+  weatherAlertsEnabled?: boolean;
+  phoneAgentEnabled?: boolean;
+  [key: string]: boolean | string | number | undefined;
+};
+
 const featureCards = [
   {
     id: "pricing",
@@ -232,8 +248,8 @@ export default function AICommandCenterPage() {
     ? (metrics.estimatedRevenueSaved || 0) / metrics.aiCostCents
     : null;
 
-  // Calculate enabled features count (cast to any for new fields not in base type)
-  const config = autopilotConfig as Record<string, unknown> | undefined;
+  // Calculate enabled features count
+  const config = autopilotConfig as AutopilotConfig | undefined;
   const enabledFeatures = config
     ? [
         config.autoReplyEnabled,
@@ -497,8 +513,8 @@ export default function AICommandCenterPage() {
                 {featureCards.map((feature, index) => {
                   const Icon = feature.icon;
                   let statValue: string | number = 0;
-                  const isEnabled = feature.configKey && autopilotConfig
-                    ? (autopilotConfig as any)[feature.configKey]
+                  const isEnabled = feature.configKey && config
+                    ? Boolean(config[feature.configKey])
                     : true;
 
                   if (feature.stats.key === "featuresEnabled") {

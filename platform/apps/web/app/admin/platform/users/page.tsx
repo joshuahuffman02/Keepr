@@ -20,6 +20,10 @@ type Staff = {
   platformActive?: boolean | null;
 };
 
+interface UserWithPlatformRole {
+  platformRole?: string | null;
+}
+
 const PLATFORM_ROLE_OPTIONS = [
   { value: "support_agent", label: "Support Agent" },
   { value: "support_lead", label: "Support Lead" },
@@ -37,7 +41,7 @@ export default function PlatformUsersPage() {
   const [regionFilter, setRegionFilter] = useState<string>("all");
   const [search, setSearch] = useState("");
 
-  const platformRole = (whoami?.user as any)?.platformRole as string | undefined;
+  const platformRole = (whoami?.user as UserWithPlatformRole | undefined)?.platformRole;
   const canManage = !!platformRole;
 
   const filteredStaff = useMemo(() => {

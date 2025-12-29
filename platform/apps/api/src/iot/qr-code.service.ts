@@ -1,4 +1,4 @@
-import { Injectable } from "@nestjs/common";
+import { Injectable, NotFoundException, BadRequestException, Logger } from "@nestjs/common";
 import { PrismaService } from "../prisma/prisma.service";
 import { createHash, randomBytes } from "crypto";
 import * as QRCode from "qrcode";
@@ -33,6 +33,7 @@ interface QRCodeResult {
 
 @Injectable()
 export class QRCodeService {
+  private readonly logger = new Logger(QRCodeService.name);
   private readonly baseUrl: string;
 
   constructor(private readonly prisma: PrismaService) {
@@ -49,7 +50,7 @@ export class QRCodeService {
     });
 
     if (!reservation) {
-      throw new Error("Reservation not found");
+      throw new NotFoundException("Reservation not found");
     }
 
     // Generate a secure, short-lived token
@@ -96,7 +97,7 @@ export class QRCodeService {
     });
 
     if (!site) {
-      throw new Error("Site not found");
+      throw new NotFoundException("Site not found");
     }
 
     // Check if site already has a QR code
@@ -336,8 +337,8 @@ export class QRCodeService {
         errorCorrectionLevel: "M",
       });
     } catch (error) {
-      console.error("Failed to generate QR code image:", error);
-      throw new Error("Failed to generate QR code");
+      this.logger.error("Failed to generate QR code image:", error instanceof Error ? error.stack : error);
+      throw new BadRequestException("Failed to generate QR code");
     }
   }
 }

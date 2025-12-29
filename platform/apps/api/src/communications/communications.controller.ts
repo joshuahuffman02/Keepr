@@ -896,10 +896,10 @@ export class CommunicationsController {
       await (this.prisma as any).communicationPlaybookJob.update({ where: { id: job.id }, data: { status: "processing", attempts: job.attempts + 1 } });
 
       if (playbook.type === "nps") {
-        if (!toEmail) throw new Error("Missing recipient email");
+        if (!toEmail) throw new BadRequestException("Missing recipient email");
         const metadata = job.metadata || {};
         const surveyId = metadata.surveyId;
-        if (!surveyId) throw new Error("Missing surveyId for NPS job");
+        if (!surveyId) throw new BadRequestException("Missing surveyId for NPS job");
         const templateId = metadata.templateId || playbook.templateId || null;
         await this.npsService.createInvite({
           surveyId,
@@ -912,14 +912,14 @@ export class CommunicationsController {
           expireDays: 30
         });
       } else if (playbook.channel === "email") {
-        if (!toEmail) throw new Error("Missing recipient email");
+        if (!toEmail) throw new BadRequestException("Missing recipient email");
         await this.emailService.sendEmail({
           to: toEmail,
           subject: playbook.template.subject || "Message from campground",
           html: playbook.template.bodyHtml || ""
         });
       } else if (playbook.channel === "sms") {
-        if (!toPhone) throw new Error("Missing recipient phone");
+        if (!toPhone) throw new BadRequestException("Missing recipient phone");
         await this.smsService.sendSms({ to: toPhone, body: playbook.template.bodyHtml || playbook.template.subject || "Message" });
       }
 

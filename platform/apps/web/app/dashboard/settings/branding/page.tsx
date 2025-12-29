@@ -53,15 +53,26 @@ export default function BrandingPage() {
   useEffect(() => {
     const cg = campgroundQuery.data;
     if (!cg) return;
+
+    // Type assertion for extended branding fields not in base schema
+    type CampgroundWithBranding = typeof cg & {
+      secondaryColor?: string;
+      buttonColor?: string;
+      brandFont?: string;
+      emailHeader?: string;
+      receiptFooter?: string;
+    };
+
+    const cgWithBranding = cg as CampgroundWithBranding;
     setForm({
       logoUrl: cg.logoUrl || "",
       primaryColor: cg.primaryColor || "",
       accentColor: cg.accentColor || "",
-      secondaryColor: (cg as any).secondaryColor || "",
-      buttonColor: (cg as any).buttonColor || "",
-      brandFont: (cg as any).brandFont || "",
-      emailHeader: (cg as any).emailHeader || "",
-      receiptFooter: (cg as any).receiptFooter || "",
+      secondaryColor: cgWithBranding.secondaryColor || "",
+      buttonColor: cgWithBranding.buttonColor || "",
+      brandFont: cgWithBranding.brandFont || "",
+      emailHeader: cgWithBranding.emailHeader || "",
+      receiptFooter: cgWithBranding.receiptFooter || "",
       brandingNote: cg.brandingNote || ""
     });
   }, [campgroundQuery.data]);

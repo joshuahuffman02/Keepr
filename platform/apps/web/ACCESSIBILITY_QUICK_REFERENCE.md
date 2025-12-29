@@ -272,7 +272,7 @@ lighthouse https://localhost:3000 --view
 
 ## Common Mistakes to Avoid
 
-### ❌ Don't
+### Don't
 
 ```tsx
 // Using divs instead of buttons
@@ -295,7 +295,7 @@ lighthouse https://localhost:3000 --view
 <input type="text" placeholder="Name" />
 ```
 
-### ✅ Do
+### Do
 
 ```tsx
 // Semantic button

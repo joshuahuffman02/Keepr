@@ -168,6 +168,38 @@ type EditFormState = {
   amenityTags: string[];
 };
 
+type SiteClass = {
+  id: string;
+  name: string;
+  description?: string;
+  defaultRate: number;
+  siteType: "rv" | "tent" | "cabin" | "group" | "glamping";
+  maxOccupancy: number;
+  rigMaxLength?: number | null;
+  hookupsPower?: boolean;
+  hookupsWater?: boolean;
+  hookupsSewer?: boolean;
+  minNights?: number | null;
+  maxNights?: number | null;
+  sameDayBookingCutoffMinutes?: number | null;
+  petFriendly?: boolean;
+  accessible?: boolean;
+  isActive?: boolean;
+  rentalType?: string;
+  rvOrientation?: string;
+  electricAmps?: number[];
+  equipmentTypes?: string[];
+  slideOutsAccepted?: string | null;
+  occupantsIncluded?: number;
+  extraAdultFee?: number | null;
+  extraChildFee?: number | null;
+  meteredEnabled?: boolean;
+  meteredType?: string;
+  meteredBillingMode?: string;
+  amenityTags?: string[];
+  photos?: string[];
+};
+
 export default function SiteClassDetailPage() {
   const params = useParams();
   const router = useRouter();
@@ -257,7 +289,7 @@ export default function SiteClassDetailPage() {
         meteredBillingMode: data.meteredBillingMode,
         amenityTags: data.amenityTags,
       };
-      return apiClient.updateSiteClass(classId, payload as any);
+      return apiClient.updateSiteClass(classId, payload);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["site-class", classId] });
@@ -279,7 +311,7 @@ export default function SiteClassDetailPage() {
   // Initialize edit form when entering edit mode
   const startEditing = () => {
     if (!classQuery.data) return;
-    const sc = classQuery.data as any;
+    const sc = classQuery.data as SiteClass;
     setEditForm({
       name: sc.name || "",
       description: sc.description || "",
@@ -367,7 +399,7 @@ export default function SiteClassDetailPage() {
     );
   }
 
-  const siteClass = classQuery.data as any;
+  const siteClass = classQuery.data as SiteClass;
 
   if (!siteClass) {
     return (
@@ -1056,7 +1088,7 @@ export default function SiteClassDetailPage() {
                       <div className="font-medium">
                         {siteClass.sameDayBookingCutoffMinutes != null
                           ? `${siteClass.sameDayBookingCutoffMinutes} min before close`
-                          : (siteClass.siteType === "cabin" || siteClass.siteType === "lodging" || siteClass.siteType === "glamping")
+                          : siteClass.siteType === "glamping"
                             ? "60 min (default)"
                             : "No cutoff"}
                       </div>
@@ -1083,16 +1115,19 @@ export default function SiteClassDetailPage() {
                       <div className="flex items-center justify-between">
                         <span className="text-muted-foreground">Electric amps</span>
                         <div className="flex gap-1">
-                          {(siteClass.electricAmps || []).length > 0 ? (
-                            siteClass.electricAmps.map((amp: number) => (
-                              <Badge key={amp} variant="secondary" className="gap-1">
-                                <Zap className="h-3 w-3 text-amber-500" />
-                                {amp}A
-                              </Badge>
-                            ))
-                          ) : (
-                            <span className="text-muted-foreground">—</span>
-                          )}
+                          {(() => {
+                            const amps = siteClass.electricAmps || [];
+                            return amps.length > 0 ? (
+                              amps.map((amp: number) => (
+                                <Badge key={amp} variant="secondary" className="gap-1">
+                                  <Zap className="h-3 w-3 text-amber-500" />
+                                  {amp}A
+                                </Badge>
+                              ))
+                            ) : (
+                              <span className="text-muted-foreground">-</span>
+                            );
+                          })()}
                         </div>
                       </div>
                       <div className="flex items-center justify-between">
@@ -1103,18 +1138,21 @@ export default function SiteClassDetailPage() {
                         <span className="text-muted-foreground">Slide-outs</span>
                         <span className="font-medium capitalize">{siteClass.slideOutsAccepted?.replace("_", " ") || "Any"}</span>
                       </div>
-                      {(siteClass.equipmentTypes || []).length > 0 && (
-                        <div className="pt-2 border-t border-border">
-                          <div className="text-xs text-muted-foreground mb-2">Accepted equipment</div>
-                          <div className="flex flex-wrap gap-1">
-                            {siteClass.equipmentTypes.map((type: string) => (
-                              <Badge key={type} variant="outline" className="text-xs capitalize">
-                                {type.replace("_", " ")}
-                              </Badge>
-                            ))}
+                      {(() => {
+                        const types = siteClass.equipmentTypes || [];
+                        return types.length > 0 && (
+                          <div className="pt-2 border-t border-border">
+                            <div className="text-xs text-muted-foreground mb-2">Accepted equipment</div>
+                            <div className="flex flex-wrap gap-1">
+                              {types.map((type: string) => (
+                                <Badge key={type} variant="outline" className="text-xs capitalize">
+                                  {type.replace("_", " ")}
+                                </Badge>
+                              ))}
+                            </div>
                           </div>
-                        </div>
-                      )}
+                        );
+                      })()}
                     </CardContent>
                   </Card>
                 </motion.div>
@@ -1163,30 +1201,33 @@ export default function SiteClassDetailPage() {
                     </div>
 
                     {/* Site Amenities */}
-                    {(siteClass.amenityTags || []).length > 0 && (
-                      <div className="mt-4 pt-4 border-t border-border">
-                        <div className="text-xs text-muted-foreground mb-2">Site Amenities</div>
-                        <div className="flex flex-wrap gap-2">
-                          {siteClass.amenityTags.map((tag: string) => {
-                            const amenity = SITE_CLASS_AMENITIES.find(a => a.id === tag) || CABIN_AMENITIES.find(a => a.id === tag);
-                            const isCabinAmenity = CABIN_AMENITIES.some(a => a.id === tag);
-                            return (
-                              <Badge
-                                key={tag}
-                                variant="outline"
-                                className={cn(
-                                  "gap-1",
-                                  isCabinAmenity && "border-amber-300 bg-amber-50 dark:bg-amber-900/20"
-                                )}
-                              >
-                                {amenityIconMap[tag]}
-                                {amenity?.label || tag}
-                              </Badge>
-                            );
-                          })}
+                    {(() => {
+                      const tags = siteClass.amenityTags || [];
+                      return tags.length > 0 && (
+                        <div className="mt-4 pt-4 border-t border-border">
+                          <div className="text-xs text-muted-foreground mb-2">Site Amenities</div>
+                          <div className="flex flex-wrap gap-2">
+                            {tags.map((tag: string) => {
+                              const amenity = SITE_CLASS_AMENITIES.find(a => a.id === tag) || CABIN_AMENITIES.find(a => a.id === tag);
+                              const isCabinAmenity = CABIN_AMENITIES.some(a => a.id === tag);
+                              return (
+                                <Badge
+                                  key={tag}
+                                  variant="outline"
+                                  className={cn(
+                                    "gap-1",
+                                    isCabinAmenity && "border-amber-300 bg-amber-50 dark:bg-amber-900/20"
+                                  )}
+                                >
+                                  {amenityIconMap[tag]}
+                                  {amenity?.label || tag}
+                                </Badge>
+                              );
+                            })}
+                          </div>
                         </div>
-                      </div>
-                    )}
+                      );
+                    })()}
                   </CardContent>
                 </Card>
               </motion.div>

@@ -1,4 +1,4 @@
-import { Injectable, Logger, NotFoundException } from "@nestjs/common";
+import { Injectable, Logger, NotFoundException, BadRequestException } from "@nestjs/common";
 import { Cron } from "@nestjs/schedule";
 import { PrismaService } from "../prisma/prisma.service";
 import { AiProviderService } from "./ai-provider.service";
@@ -285,7 +285,7 @@ ${communication.guest ? `Guest name: ${communication.guest.primaryFirstName || "
     const draft = await this.getDraft(id);
 
     if (!["approved", "edited", "pending"].includes(draft.status)) {
-      throw new Error(`Cannot send draft with status: ${draft.status}`);
+      throw new BadRequestException(`Cannot send draft with status: ${draft.status}`);
     }
 
     // Get the original communication for reply-to address
@@ -295,14 +295,14 @@ ${communication.guest ? `Guest name: ${communication.guest.primaryFirstName || "
     });
 
     if (!communication) {
-      throw new Error("Original communication not found");
+      throw new NotFoundException("Original communication not found");
     }
 
     const replyContent = draft.editedContent || draft.draftContent;
     const toAddress = communication.fromAddress || communication.guest?.email;
 
     if (!toAddress) {
-      throw new Error("No recipient address available");
+      throw new BadRequestException("No recipient address available");
     }
 
     // Send via email service

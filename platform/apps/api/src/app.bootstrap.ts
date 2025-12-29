@@ -1,6 +1,6 @@
 import "reflect-metadata";
 import { NestFactory } from "@nestjs/core";
-import { ValidationPipe, INestApplication } from "@nestjs/common";
+import { ValidationPipe, INestApplication, Logger } from "@nestjs/common";
 import { HttpAdapterHost } from "@nestjs/core";
 import { AppModule } from "./app.module";
 import { PrismaService } from "./prisma/prisma.service";
@@ -16,6 +16,8 @@ import { RedactingLogger } from "./logger/redacting.logger";
 import { AllExceptionsFilter } from "./common/filters/all-exceptions.filter";
 import type { Request, Response, NextFunction } from "express";
 import { DeveloperApiModule } from "./developer-api/developer-api.module";
+
+const logger = new Logger('AppBootstrap');
 
 // Shared app configuration - used by both local dev and serverless
 export async function createApp(): Promise<INestApplication> {
@@ -166,7 +168,7 @@ export async function createApp(): Promise<INestApplication> {
             crossOriginResourcePolicy: { policy: "cross-origin" }, // Allow API access
         })
     );
-    console.log("[BOOTSTRAP] Security headers (helmet) enabled");
+    logger.log("Security headers (helmet) enabled");
 
     // Scope middleware
     app.use((req: Request, _res: Response, next: NextFunction) => {
@@ -207,9 +209,9 @@ export async function createApp(): Promise<INestApplication> {
             new RateLimitInterceptor(rateLimitService, perfService),
             new PerfInterceptor(perfService, observabilityService)
         );
-        console.log("[BOOTSTRAP] Global interceptors enabled: RateLimit, Perf");
+        logger.log("Global interceptors enabled: RateLimit, Perf");
     } catch (err) {
-        console.error("[BOOTSTRAP] Failed to initialize global interceptors:", err);
+        logger.error("Failed to initialize global interceptors:", err instanceof Error ? err.stack : err);
         // Continue without interceptors rather than crashing
     }
 
@@ -217,9 +219,9 @@ export async function createApp(): Promise<INestApplication> {
     try {
         const httpAdapterHost = app.get(HttpAdapterHost);
         app.useGlobalFilters(new AllExceptionsFilter(httpAdapterHost));
-        console.log("[BOOTSTRAP] Global exception filter enabled");
+        logger.log("Global exception filter enabled");
     } catch (err) {
-        console.error("[BOOTSTRAP] Failed to initialize global exception filter:", err);
+        logger.error("Failed to initialize global exception filter:", err instanceof Error ? err.stack : err);
     }
 
     return app;

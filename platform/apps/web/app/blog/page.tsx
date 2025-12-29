@@ -31,10 +31,6 @@ export default function BlogPage() {
           <p><strong>CWD:</strong> {debug.cwd}</p>
           <p><strong>Resolved Blog Dir:</strong> {String(debug.blogDir)}</p>
         </div>
-        <h2 className="text-lg font-bold mb-2">Logs:</h2>
-        <pre className="whitespace-pre-wrap text-sm border border-slate-700 p-4 rounded bg-black">
-          {debug.logs.join('\n')}
-        </pre>
       </div>
     );
   }

@@ -142,7 +142,7 @@ export function DemoCTA() {
                   We'll be in touch within 24 hours to schedule your personalized demo.
                 </p>
                 <div className="bg-emerald-50 border border-emerald-200 rounded-lg p-3 text-sm text-emerald-800">
-                  <strong>📧 What happens next:</strong><br />
+                  <strong>What happens next:</strong><br />
                   Your request has been sent to our sales team at <strong>sales@campeveryday.com</strong>.
                   You'll receive a confirmation email shortly, followed by a call from our onboarding specialist.
                 </div>

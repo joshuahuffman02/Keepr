@@ -89,12 +89,17 @@ export const DropdownMenuTrigger = React.forwardRef<HTMLElement, DropdownMenuTri
       setOpen(!open);
     };
 
+    // Extract className from children if it's a valid React element
+    const childClassName = React.isValidElement(children) && children.props && 'className' in children.props
+      ? (children.props.className as string | undefined)
+      : undefined;
+
     const sharedProps = {
       ...props,
       onClick: handleClick,
       "aria-expanded": open,
       "aria-haspopup": "menu",
-      className: cn(className, (children.props as any)?.className),
+      className: cn(className, childClassName),
       ref: mergeRefs(ref, triggerRef as React.Ref<HTMLElement>),
     };
 

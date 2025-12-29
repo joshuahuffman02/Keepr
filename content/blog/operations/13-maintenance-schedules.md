@@ -102,12 +102,12 @@ Assign maintenance intervals to each item:
 
 | Item | Daily | Weekly | Monthly | Seasonal | Annual |
 |------|:-----:|:------:|:-------:|:--------:|:------:|
-| Restroom cleaning | ✓ | Deep | — | — | — |
-| Trash collection | ✓ | — | — | — | — |
-| Mowing | — | ✓ | — | — | — |
-| Road grading | — | — | — | ✓ | — |
+| Restroom cleaning | Yes | Deep | — | — | — |
+| Trash collection | Yes | — | — | — | — |
+| Mowing | — | Yes | — | — | — |
+| Road grading | — | — | — | Yes | — |
 | Electric testing | — | Sample | — | Full | — |
-| Tree trimming | — | — | — | — | ✓ |
+| Tree trimming | — | — | — | — | Yes |
 
 ### Step 3: Create the Calendar
 

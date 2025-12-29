@@ -83,6 +83,11 @@ type PolicyFormData = {
   isActive: boolean;
 };
 
+type UserWithPlatformRole = {
+  platformRole?: string;
+  [key: string]: unknown;
+};
+
 const DEFAULT_POLICY_FORM: PolicyFormData = {
   name: "",
   appliesTo: [],
@@ -244,7 +249,7 @@ export default function ApprovalsPage() {
 
   const memberships = whoami?.user?.memberships ?? [];
   const ownershipRoles = whoami?.user?.ownershipRoles ?? [];
-  const platformRole = (whoami?.user as any)?.platformRole as string | undefined;
+  const platformRole = (whoami?.user as UserWithPlatformRole)?.platformRole;
   const scopedMembership = memberships.find((m) => m.campgroundId === campgroundId) || null;
   const scopedRole = scopedMembership?.role ?? null;
   const approverId = whoami?.user?.email || whoami?.user?.id || "";
@@ -546,7 +551,7 @@ export default function ApprovalsPage() {
         : !scopeAllowed
           ? "You do not have access to this campground."
           : approvalsQuery.isError
-            ? (approvalsQuery.error as any)?.message ?? "Failed to load approvals."
+            ? (approvalsQuery.error as Error)?.message ?? "Failed to load approvals."
             : null;
 
   const policiesMessage = !scopeReady

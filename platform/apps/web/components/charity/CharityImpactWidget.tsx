@@ -256,7 +256,7 @@ export function CharityImpactWidget({ campgroundId }: CharityImpactWidgetProps) 
           className="mt-4 p-3 rounded-lg bg-gradient-to-r from-amber-100 to-rose-100 dark:from-amber-900/30 dark:to-rose-900/30 text-center"
         >
           <p className="text-sm font-medium text-amber-700 dark:text-amber-300">
-            🎉 You just crossed $100 in donations!
+            You just crossed $100 in donations!
           </p>
         </motion.div>
       )}

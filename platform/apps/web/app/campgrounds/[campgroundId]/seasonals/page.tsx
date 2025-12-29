@@ -1594,7 +1594,7 @@ export default function SeasonalsPage() {
       setMessageSubject("");
       setMessageBody("");
       toast({
-        title: "Messages sent! 🎉",
+        title: "Messages sent!",
         description: `Successfully sent ${messageChannel === "email" ? "emails" : "SMS"} to ${selectedIds.length} guest${selectedIds.length !== 1 ? "s" : ""}`,
       });
     },

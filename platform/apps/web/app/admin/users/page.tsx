@@ -21,6 +21,10 @@ type Staff = {
     memberships?: Array<{ campgroundId: string; role: string }>;
 };
 
+interface UserWithPlatformRole {
+    platformRole?: string | null;
+}
+
 export default function AdminUsersPage() {
     const { data: whoami, isLoading: whoamiLoading } = useWhoami();
     const { toast } = useToast();
@@ -28,7 +32,7 @@ export default function AdminUsersPage() {
     const [users, setUsers] = useState<Staff[]>([]);
     const [search, setSearch] = useState("");
 
-    const platformRole = (whoami?.user as any)?.platformRole as string | undefined;
+    const platformRole = (whoami?.user as UserWithPlatformRole | undefined)?.platformRole;
     const canManage = platformRole === "platform_admin";
 
     const filteredUsers = useMemo(() => {

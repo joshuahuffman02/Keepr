@@ -831,7 +831,7 @@ async function seedSocialPlanner(campgroundId: string, seasonStart: Date) {
     }
   });
 
-  console.log("  ✓ Social planner demo data seeded");
+  console.log("  Social planner demo data seeded");
 }
 
 async function seedPosData(
@@ -961,7 +961,7 @@ async function seedPosData(
     )
   );
 
-  console.log("  ✓ POS products and orders seeded");
+  console.log("  POS products and orders seeded");
 }
 
 async function seedActivitiesData(
@@ -1041,7 +1041,7 @@ async function seedActivitiesData(
     })
   );
 
-  console.log(`  ✓ Activities seeded (${activities.length} activities, ${bookings.length} bookings)`);
+  console.log(`  Activities seeded (${activities.length} activities, ${bookings.length} bookings)`);
 }
 
 async function seedWaitlistAndHolds(
@@ -1127,7 +1127,7 @@ async function seedWaitlistAndHolds(
     ]
   });
 
-  console.log("  ✓ Waitlist, holds, and blackout dates seeded");
+  console.log("  Waitlist, holds, and blackout dates seeded");
 }
 
 async function seedMemberships(
@@ -1164,7 +1164,7 @@ async function seedMemberships(
     )
   );
 
-  console.log("  ✓ Memberships seeded");
+  console.log("  Memberships seeded");
 }
 
 async function seedGamification(
@@ -1228,7 +1228,7 @@ async function seedGamification(
     )
   );
 
-  console.log(`  ✓ Gamification seeded (${xpRules.length} rules, ${xpBalances.length} balances)`);
+  console.log(`  Gamification seeded (${xpRules.length} rules, ${xpBalances.length} balances)`);
 }
 
 async function seedDisputes(
@@ -1255,7 +1255,7 @@ async function seedDisputes(
     )
   );
 
-  console.log("  ✓ Disputes seeded");
+  console.log("  Disputes seeded");
 }
 
 async function seedReservationsWithFinancials(
@@ -1754,7 +1754,7 @@ async function seedCampground(
   await seedGamification(cg.id, memberships);
   await seedDisputes(cg.id, reservations);
 
-  console.log(`  ✅ Finished seeding campground ${config.name}\n`);
+  console.log(`  Finished seeding campground ${config.name}\n`);
   return cg;
 }
 
@@ -1818,12 +1818,12 @@ async function seedApprovalPolicies() {
     })
   ]);
 
-  console.log(`  ✓ Created ${policies.length} approval policies`);
+  console.log(`  Created ${policies.length} approval policies`);
   return policies;
 }
 
 async function main() {
-  console.log("🌱 Starting seed...\n");
+  console.log("Starting seed...\n");
 
   // Create users first
   console.log("Creating users...");
@@ -1836,7 +1836,7 @@ async function main() {
       data: { name: "Camp Everyday" }
     });
   }
-  console.log(`\n✓ Organization ready: ${org.name}\n`);
+  console.log(`\nOrganization ready: ${org.name}\n`);
 
   // Seed approval policies (global)
   await seedApprovalPolicies();
@@ -1846,8 +1846,8 @@ async function main() {
     await seedCampground(cgConfig, org.id, users);
   }
 
-  console.log("\n✅ Seed complete!");
-  console.log("\n📋 Test Login Credentials:");
+  console.log("\nSeed complete!");
+  console.log("\nTest Login Credentials:");
   console.log("   Email: admin@campeveryday.com");
   console.log("   Password: password123");
   console.log("\n   (All users share the same password)");

@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger, BadRequestException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { AiPrivacyService } from './ai-privacy.service';
 import { AiFeatureType } from '@prisma/client';
@@ -58,7 +58,7 @@ export class AiProviderService {
         });
 
         if (!campground?.aiEnabled) {
-            throw new Error('AI features are not enabled for this campground');
+            throw new BadRequestException('AI features are not enabled for this campground');
         }
 
         const provider = campground.aiProvider || 'openai';
@@ -144,7 +144,7 @@ export class AiProviderService {
         });
 
         if (!campground?.aiEnabled) {
-            throw new Error('AI features are not enabled for this campground');
+            throw new BadRequestException('AI features are not enabled for this campground');
         }
 
         const provider = campground.aiProvider || 'openai';
@@ -277,7 +277,7 @@ export class AiProviderService {
     }): Promise<{ content: string; tokensUsed: number; model: string }> {
         const apiKey = options.apiKey || process.env.OPENAI_API_KEY;
         if (!apiKey) {
-            throw new Error('OpenAI API key not configured');
+            throw new BadRequestException('OpenAI API key not configured');
         }
 
         const response = await fetch('https://api.openai.com/v1/chat/completions', {
@@ -300,7 +300,7 @@ export class AiProviderService {
         if (!response.ok) {
             const error = await response.text();
             this.logger.error(`OpenAI API error: ${error}`);
-            throw new Error(`OpenAI API error: ${response.status}`);
+            throw new BadRequestException(`OpenAI API error: ${response.status}`);
         }
 
         const data = await response.json() as {
@@ -327,7 +327,7 @@ export class AiProviderService {
     }): Promise<{ content: string; tokensUsed: number; model: string; toolCalls?: { id?: string; name: string; arguments: string }[] }> {
         const apiKey = options.apiKey || process.env.OPENAI_API_KEY;
         if (!apiKey) {
-            throw new Error('OpenAI API key not configured');
+            throw new BadRequestException('OpenAI API key not configured');
         }
 
         const response = await fetch('https://api.openai.com/v1/chat/completions', {
@@ -352,7 +352,7 @@ export class AiProviderService {
         if (!response.ok) {
             const error = await response.text();
             this.logger.error(`OpenAI API error: ${error}`);
-            throw new Error(`OpenAI API error: ${response.status}`);
+            throw new BadRequestException(`OpenAI API error: ${response.status}`);
         }
 
         const data = await response.json() as {
@@ -385,7 +385,7 @@ export class AiProviderService {
     }): Promise<{ content: string; tokensUsed: number; model: string }> {
         const apiKey = options.apiKey || process.env.ANTHROPIC_API_KEY;
         if (!apiKey) {
-            throw new Error('Anthropic API key not configured');
+            throw new BadRequestException('Anthropic API key not configured');
         }
 
         const response = await fetch('https://api.anthropic.com/v1/messages', {
@@ -408,7 +408,7 @@ export class AiProviderService {
         if (!response.ok) {
             const error = await response.text();
             this.logger.error(`Anthropic API error: ${error}`);
-            throw new Error(`Anthropic API error: ${response.status}`);
+            throw new BadRequestException(`Anthropic API error: ${response.status}`);
         }
 
         const data = await response.json() as {
@@ -444,7 +444,7 @@ export class AiProviderService {
         });
 
         if (!response.ok) {
-            throw new Error(`Local AI API error: ${response.status}`);
+            throw new BadRequestException(`Local AI API error: ${response.status}`);
         }
 
         const data = await response.json() as { response: string };

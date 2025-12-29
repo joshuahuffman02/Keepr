@@ -394,7 +394,7 @@ export default function MyStayPage() {
 
       setCart({});
       toast({
-        title: isFirstOrder ? "🎉 First order placed!" : "Order placed!",
+        title: isFirstOrder ? "First order placed!" : "Order placed!",
         description:
           deliveryMode === "delivery"
             ? `Your order will be delivered to Site ${currentReservation.site.siteNumber}. ${isFirstOrder ? "Sit back and relax!" : ""}`

@@ -459,7 +459,7 @@ export default function DataImportPage() {
                       <span key={field}>
                         <span className={isMapped ? "text-emerald-600" : "text-red-600"}>
                           {field}
-                          {isMapped ? " ✓" : " ✗"}
+                          {isMapped ? "" : " (missing)"}
                         </span>
                         {i < schemaQuery.data!.requiredFields.length - 1 && ", "}
                       </span>

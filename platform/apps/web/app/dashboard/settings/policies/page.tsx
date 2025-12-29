@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { DepositSettingsForm } from "../../../../components/settings/DepositSettingsForm";
 import { apiClient } from "../../../../lib/api-client";
+import type { DepositConfig } from "@campreserv/shared";
 import { HelpAnchor } from "@/components/help/HelpAnchor";
 import { Input } from "../../../../components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../../../components/ui/select";
@@ -38,7 +39,14 @@ export default function BookingRulesPage() {
   });
 
   useEffect(() => {
-    const cg: any = campgroundQuery.data;
+    const cg = campgroundQuery.data as {
+      cancellationPolicyType?: string | null;
+      cancellationWindowHours?: number | null;
+      cancellationFeeType?: string | null;
+      cancellationFeeFlatCents?: number | null;
+      cancellationFeePercent?: number | null;
+      cancellationNotes?: string | null;
+    } | undefined;
     if (!cg) return;
     setPolicyForm({
       cancellationPolicyType: cg.cancellationPolicyType || "",
@@ -119,7 +127,7 @@ export default function BookingRulesPage() {
               campgroundId={campgroundId}
               initialRule={campgroundQuery.data.depositRule ?? ""}
               initialPercentage={campgroundQuery.data.depositPercentage ?? null}
-              initialConfig={(campgroundQuery.data as any).depositConfig ?? null}
+              initialConfig={(campgroundQuery.data as { depositConfig?: DepositConfig | null }).depositConfig ?? null}
             />
           </div>
 

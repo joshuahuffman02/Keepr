@@ -18,6 +18,7 @@ import {
   getAdaBadgeInfo,
   type AdaAssessmentData,
   type AdaCategory,
+  type AdaCertificationLevel,
 } from "@/lib/ada-accessibility";
 import {
   Accessibility,
@@ -77,18 +78,21 @@ export default function AccessibilitySettingsPage() {
   // Calculate site counts from actual site data
   const sites = sitesQuery.data ?? [];
   const totalSiteCount = sites.length;
-  const accessibleSiteCount = sites.filter((site: any) => site.accessible === true).length;
+  const accessibleSiteCount = sites.filter((site: { accessible?: boolean }) => site.accessible === true).length;
   const accessibleSiteNames = sites
-    .filter((site: any) => site.accessible === true)
-    .map((site: any) => site.name || site.siteNumber)
+    .filter((site: { accessible?: boolean }) => site.accessible === true)
+    .map((site: { name?: string; siteNumber?: string }) => site.name || site.siteNumber)
     .slice(0, 10);
 
   // Initialize form from campground data
   useEffect(() => {
-    const cg = campgroundQuery.data;
+    const cg = campgroundQuery.data as {
+      adaAssessment?: AdaAssessmentData | null;
+      adaCertificationLevel?: string | null;
+    } | undefined;
     if (!cg) return;
 
-    const adaData = (cg as any).adaAssessment as AdaAssessmentData | null;
+    const adaData = cg.adaAssessment;
     if (adaData) {
       const items = new Set(adaData.completedItems || []);
       setCompletedItems(items);
@@ -97,7 +101,7 @@ export default function AccessibilitySettingsPage() {
     }
 
     // Set previous level for comparison
-    const savedLevel = (cg as any).adaCertificationLevel || "none";
+    const savedLevel = cg.adaCertificationLevel || "none";
     setPreviousLevel(savedLevel);
 
     // Expand guide for new users
@@ -382,7 +386,7 @@ export default function AccessibilitySettingsPage() {
                 <Sparkles className="w-5 h-5 text-amber-600 dark:text-amber-400" />
               </motion.div>
               <p className="text-sm font-medium text-amber-800 dark:text-amber-200">
-                You&apos;re only {nextTierInfo.pointsNeeded} points away from {getAdaBadgeInfo(nextTierInfo.tier as any)?.label}!
+                You&apos;re only {nextTierInfo.pointsNeeded} points away from {getAdaBadgeInfo(nextTierInfo.tier as AdaCertificationLevel)?.label}!
               </p>
             </div>
           </motion.div>
@@ -571,14 +575,14 @@ export default function AccessibilitySettingsPage() {
                       Accessible Sites
                     </div>
                     <div className="flex flex-wrap gap-2">
-                      {accessibleSiteNames.map((name: string, idx: number) => (
+                      {accessibleSiteNames.filter((n): n is string => !!n).map((name, idx) => (
                         <span key={idx} className="px-2 py-1 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 text-xs rounded-md font-medium">
                           {name}
                         </span>
                       ))}
-                      {sites.filter((s: any) => s.accessible).length > 10 && (
+                      {sites.filter((s: { accessible?: boolean }) => s.accessible).length > 10 && (
                         <span className="px-2 py-1 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 text-xs rounded-md">
-                          +{sites.filter((s: any) => s.accessible).length - 10} more
+                          +{sites.filter((s: { accessible?: boolean }) => s.accessible).length - 10} more
                         </span>
                       )}
                     </div>

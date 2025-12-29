@@ -121,7 +121,14 @@ export default function DevelopersSettingsPage() {
         if (stored) setCampgroundId(stored);
     }, []);
 
-    const { data: clients, isLoading } = useQuery({
+    const { data: clients, isLoading } = useQuery<Array<{
+        id: string;
+        name: string;
+        clientId: string;
+        isActive: boolean;
+        createdAt: string;
+        lastUsedAt?: string | null;
+    }>>({
         queryKey: ["api-clients", campgroundId],
         queryFn: () => apiClient.listApiClients(campgroundId!),
         enabled: !!campgroundId,
@@ -643,8 +650,8 @@ export default function DevelopersSettingsPage() {
                                         </div>
                                     </TableCell>
                                     <TableCell className="text-slate-500">
-                                        {(client as any).lastUsedAt ? (
-                                            formatDistanceToNow(new Date((client as any).lastUsedAt), { addSuffix: true })
+                                        {client.lastUsedAt ? (
+                                            formatDistanceToNow(new Date(client.lastUsedAt), { addSuffix: true })
                                         ) : (
                                             <span className="text-slate-400">Never</span>
                                         )}

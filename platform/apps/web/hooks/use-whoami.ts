@@ -2,12 +2,22 @@ import { useQuery } from "@tanstack/react-query";
 import { apiClient } from "@/lib/api-client";
 import { useSession } from "next-auth/react";
 
+interface SessionWithToken {
+  apiToken?: string;
+  user?: {
+    id: string;
+    email?: string;
+    name?: string;
+  };
+}
+
 export function useWhoami() {
   const isBrowser = typeof window !== "undefined";
   const { data: session } = useSession();
   const token = isBrowser ? localStorage.getItem("campreserv:authToken") : null;
-  const sessionToken = (session as any)?.apiToken as string | undefined;
-  const hasAuth = Boolean((session as any)?.apiToken || token);
+  const sessionWithToken = session as SessionWithToken | null;
+  const sessionToken = sessionWithToken?.apiToken;
+  const hasAuth = Boolean(sessionToken || token);
 
   return useQuery({
     queryKey: ["permissions-whoami"],
