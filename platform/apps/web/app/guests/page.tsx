@@ -9,6 +9,7 @@ import { Button } from "../../components/ui/button";
 import { Badge } from "../../components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/card";
 import { Trophy, Star, Car, Plus, Trash2, Download, ChevronDown, ChevronUp, Users, Crown, UserPlus, Merge } from "lucide-react";
+import { StaggeredTableRow } from "../../components/ui/staggered-list";
 import { MergeGuestsDialog } from "../../components/guests/MergeGuestsDialog";
 import { Checkbox } from "../../components/ui/checkbox";
 import { cn } from "../../lib/utils";
@@ -984,9 +985,9 @@ export default function GuestsPage() {
               </tr>
             </thead>
             <tbody className="divide-y">
-              {filteredAndSortedGuests.map((g) => (
+              {filteredAndSortedGuests.map((g, index) => (
                 <Fragment key={g.id}>
-                <tr className={cn("hover:bg-slate-50", selectedGuestIds.has(g.id) && "bg-emerald-50")}>
+                <StaggeredTableRow index={index} className={cn("hover:bg-slate-50", selectedGuestIds.has(g.id) && "bg-emerald-50")}>
                   <td className="px-3 py-2">
                     <Checkbox
                       checked={selectedGuestIds.has(g.id)}
@@ -1054,7 +1055,7 @@ export default function GuestsPage() {
                       />
                     </div>
                   </td>
-                </tr>
+                </StaggeredTableRow>
                 {/* Expanded row for additional details */}
                 {expandedGuestId === g.id && (
                   <tr className="bg-slate-50">

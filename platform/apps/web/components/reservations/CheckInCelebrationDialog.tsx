@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect } from "react";
 import { motion, useReducedMotion } from "framer-motion";
 import {
   Dialog,
@@ -16,6 +17,9 @@ import {
   User,
   PartyPopper,
 } from "lucide-react";
+import { useAchievement } from "@/hooks/use-achievement";
+import { AchievementCelebration } from "@/components/ui/achievement-celebration";
+import { haptic } from "@/hooks/use-haptic";
 
 const SPRING_CONFIG = { type: "spring" as const, stiffness: 200, damping: 15 };
 
@@ -37,15 +41,46 @@ export function CheckInCelebrationDialog({
   departureDate,
 }: CheckInCelebrationDialogProps) {
   const prefersReducedMotion = useReducedMotion();
+  const achievement = useAchievement();
+
+  // Trigger haptic and achievement on dialog open
+  useEffect(() => {
+    if (open) {
+      haptic.success();
+
+      // Check for first check-in achievement
+      const firstCheckInKey = "first_check_in_completed";
+      if (!achievement.isUnlocked(firstCheckInKey)) {
+        achievement.unlockOnce(firstCheckInKey, {
+          type: "first_booking",
+          title: "First Check-In!",
+          subtitle: "You've welcomed your first guest",
+        });
+      }
+    }
+  }, [open]);
 
   return (
-    <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-md">
-        <DialogHeader className="sr-only">
-          <DialogTitle>Guest Checked In</DialogTitle>
-        </DialogHeader>
+    <>
+      {/* Achievement Celebration */}
+      {achievement.isShowing && achievement.currentAchievement && (
+        <AchievementCelebration
+          show={achievement.isShowing}
+          type={achievement.currentAchievement.type}
+          title={achievement.currentAchievement.title}
+          subtitle={achievement.currentAchievement.subtitle}
+          onComplete={achievement.dismiss}
+          variant="toast"
+        />
+      )}
 
-        <div className="flex flex-col items-center py-6 space-y-5">
+      <Dialog open={open} onOpenChange={onClose}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader className="sr-only">
+            <DialogTitle>Guest Checked In</DialogTitle>
+          </DialogHeader>
+
+          <div className="flex flex-col items-center py-6 space-y-5">
           {/* Celebration Icon with Animation */}
           <motion.div
             className="relative"
@@ -206,5 +241,6 @@ export function CheckInCelebrationDialog({
         </div>
       </DialogContent>
     </Dialog>
+    </>
   );
 }

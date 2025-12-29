@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { apiClient } from "@/lib/api-client";
@@ -10,6 +10,7 @@ import { PortalLoadingState } from "@/components/portal/PortalLoadingState";
 import { PortalPageHeader } from "@/components/portal/PortalPageHeader";
 import { StatusBadge, getReservationStatusVariant, getStatusLabel } from "@/components/portal/StatusBadge";
 import { useToast } from "@/hooks/use-toast";
+import { PullToRefresh } from "@/components/ui/pull-to-refresh";
 
 type GuestData = Awaited<ReturnType<typeof apiClient.getGuestMe>>;
 type Reservation = GuestData["reservations"][number];
@@ -25,6 +26,23 @@ export default function PortalManagePage() {
   const [selectedReservation, setSelectedReservation] = useState<Reservation | null>(null);
   const [activeAction, setActiveAction] = useState<ActionType>(null);
 
+  const fetchGuest = useCallback(async (t: string) => {
+    try {
+      const data = await apiClient.getGuestMe(t);
+      setGuest(data);
+      if (data.reservations.length > 0) {
+        // Preserve selection if possible
+        const currentId = selectedReservation?.id;
+        const updated = data.reservations.find((r) => r.id === currentId);
+        setSelectedReservation(updated || data.reservations[0]);
+      }
+    } catch {
+      router.replace("/portal/login");
+    } finally {
+      setLoading(false);
+    }
+  }, [router, selectedReservation?.id]);
+
   useEffect(() => {
     const storedToken = localStorage.getItem(GUEST_TOKEN_KEY);
     if (!storedToken) {
@@ -35,19 +53,12 @@ export default function PortalManagePage() {
     fetchGuest(storedToken);
   }, []);
 
-  const fetchGuest = async (t: string) => {
-    try {
-      const data = await apiClient.getGuestMe(t);
-      setGuest(data);
-      if (data.reservations.length > 0) {
-        setSelectedReservation(data.reservations[0]);
-      }
-    } catch {
-      router.replace("/portal/login");
-    } finally {
-      setLoading(false);
+  // Pull-to-refresh handler
+  const handleRefresh = useCallback(async () => {
+    if (token) {
+      await fetchGuest(token);
     }
-  };
+  }, [token, fetchGuest]);
 
   const formatDate = (d: string) =>
     new Date(d).toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" });
@@ -73,6 +84,7 @@ export default function PortalManagePage() {
   const balanceDue = selectedReservation.totalAmount - (selectedReservation.paidAmount ?? 0);
 
   return (
+    <PullToRefresh onRefresh={handleRefresh} className="min-h-screen">
     <div className="container mx-auto px-4 py-6 space-y-6 max-w-2xl">
       {/* Page Header */}
       <PortalPageHeader
@@ -225,6 +237,7 @@ export default function PortalManagePage() {
         />
       )}
     </div>
+    </PullToRefresh>
   );
 }
 
