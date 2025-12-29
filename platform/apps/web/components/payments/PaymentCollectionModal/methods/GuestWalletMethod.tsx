@@ -72,10 +72,10 @@ export default function GuestWalletMethod({
 
       // Add tender entry for tracking
       actions.addTenderEntry({
-        method: "wallet",
+        method: "guest_wallet",
         amountCents: paymentAmountCents,
         status: "completed",
-        referenceId: result.transactionId,
+        reference: result.transactionId,
         metadata: {
           walletId: result.walletId,
           newBalance: result.balanceCents,
