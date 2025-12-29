@@ -21,13 +21,12 @@ import { RolesGuard, Roles } from "../auth/guards/roles.guard";
 import { ScopeGuard } from "../auth/guards/scope.guard";
 
 @Controller("charity")
-@UseGuards(JwtAuthGuard, RolesGuard)
-@Roles(PlatformRole.platform_admin)
+@UseGuards(JwtAuthGuard)
 export class CharityController {
   constructor(private charityService: CharityService) {}
 
   // ==========================================================================
-  // CHARITY CRUD (Platform Admin)
+  // CHARITY LISTING (All authenticated users can view charities)
   // ==========================================================================
 
   @Get()
@@ -35,11 +34,16 @@ export class CharityController {
     @Query("category") category?: string,
     @Query("activeOnly") activeOnly?: string
   ) {
+    // All authenticated users can list available charities
     return this.charityService.listCharities({
       category,
       activeOnly: activeOnly !== "false",
     });
   }
+
+  // ==========================================================================
+  // CHARITY CRUD (Platform Admin only)
+  // ==========================================================================
 
   @Get("categories")
   async getCategories() {
@@ -52,25 +56,33 @@ export class CharityController {
   }
 
   @Post()
+  @UseGuards(RolesGuard)
+  @Roles(PlatformRole.platform_admin)
   async createCharity(@Body() data: CreateCharityDto) {
     return this.charityService.createCharity(data);
   }
 
   @Put(":id")
+  @UseGuards(RolesGuard)
+  @Roles(PlatformRole.platform_admin)
   async updateCharity(@Param("id") id: string, @Body() data: UpdateCharityDto) {
     return this.charityService.updateCharity(id, data);
   }
 
   @Delete(":id")
+  @UseGuards(RolesGuard)
+  @Roles(PlatformRole.platform_admin)
   async deleteCharity(@Param("id") id: string) {
     return this.charityService.deleteCharity(id);
   }
 
   // ==========================================================================
-  // PLATFORM STATS
+  // PLATFORM STATS (Platform Admin only)
   // ==========================================================================
 
   @Get("stats/platform")
+  @UseGuards(RolesGuard)
+  @Roles(PlatformRole.platform_admin)
   async getPlatformStats(
     @Query("startDate") startDate?: string,
     @Query("endDate") endDate?: string
@@ -82,10 +94,12 @@ export class CharityController {
   }
 
   // ==========================================================================
-  // PAYOUTS
+  // PAYOUTS (Platform Admin only)
   // ==========================================================================
 
   @Get("payouts")
+  @UseGuards(RolesGuard)
+  @Roles(PlatformRole.platform_admin)
   async listPayouts(
     @Query("charityId") charityId?: string,
     @Query("status") status?: CharityPayoutStatus,
@@ -101,6 +115,8 @@ export class CharityController {
   }
 
   @Post("payouts")
+  @UseGuards(RolesGuard)
+  @Roles(PlatformRole.platform_admin)
   async createPayout(
     @Body() data: { charityId: string; createdBy?: string }
   ) {
@@ -108,6 +124,8 @@ export class CharityController {
   }
 
   @Put("payouts/:id/complete")
+  @UseGuards(RolesGuard)
+  @Roles(PlatformRole.platform_admin)
   async completePayout(
     @Param("id") id: string,
     @Body() data: { reference?: string; notes?: string }
