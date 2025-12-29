@@ -77,8 +77,12 @@ Before any V2 work, V1 must be solid.
   - [ ] Synthetic checks for critical paths
 
 ### 0.4 Seasonal Auto-Scheduler
-- [ ] Create cron job to mark SeasonalPayment status to "past_due" when dueDate passes
-- [ ] Send reminder notifications before due dates
+- [x] **Cron job for past_due status** - DONE: Daily at 1:00 AM, also sends overdue notification emails
+- [x] **Payment reminder notifications** - DONE:
+  - Weekly reminders (Mondays 9 AM) for payments due within 7 days
+  - Daily urgent reminders (9 AM) for payments due within 3 days
+  - Past-due notifications when payments are marked overdue
+  - Professional HTML email templates
 
 ---
 
@@ -343,6 +347,7 @@ Before any V2 work, V1 must be solid.
 | 2024-12-29 | Multi-currency FX | Implemented | Medium | OpenExchangeRates integration. Hourly cron refresh. Endpoints: GET /status, POST /refresh. Env: OPEN_EXCHANGE_RATES_API_KEY |
 | 2024-12-29 | Redis Migration | Mostly already done | Low | RedisService, LockService, RedisRateLimitService were complete. Only AccountLockoutService needed migration (now done). |
 | 2024-12-29 | WebSockets | Fully implemented | High | RealtimeGateway + RealtimeService (global module). Integrated with ReservationsService. Frontend useRealtime hook created. |
+| 2024-12-29 | Seasonal Scheduler | Enhanced | Medium | Added EmailService, payment reminder emails (weekly + urgent), past-due notifications. Scheduler was already partially implemented. |
 
 ---
 
