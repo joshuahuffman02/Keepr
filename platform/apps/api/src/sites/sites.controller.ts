@@ -3,7 +3,7 @@ import { SitesService } from "./sites.service";
 import { CreateSiteDto } from "./dto/create-site.dto";
 import { JwtAuthGuard, RolesGuard, ScopeGuard } from "../auth/guards";
 import { CurrentUser } from "../auth/decorators/current-user.decorator";
-import { Roles } from "../auth/decorators/roles.decorator";
+import { Roles } from "../auth/guards/roles.guard";
 import { UserRole } from "@prisma/client";
 
 @UseGuards(JwtAuthGuard, RolesGuard, ScopeGuard)

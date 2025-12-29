@@ -17,8 +17,7 @@ import {
 } from "./charity.service";
 import { DonationStatus, CharityPayoutStatus, PlatformRole } from "@prisma/client";
 import { JwtAuthGuard } from "../auth/guards/jwt-auth.guard";
-import { RolesGuard } from "../auth/guards/roles.guard";
-import { Roles } from "../auth/decorators/roles.decorator";
+import { RolesGuard, Roles } from "../auth/guards/roles.guard";
 import { ScopeGuard } from "../auth/guards/scope.guard";
 
 @Controller("charity")

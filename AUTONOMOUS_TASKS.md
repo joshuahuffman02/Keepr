@@ -87,20 +87,20 @@ Josh knows nothing about security and wants peace of mind. This phase verifies a
 - [x] **Verify RolesGuard on sensitive endpoints** - Payments has 17 protected endpoints with owner/manager/finance roles
 
 ### 2.3 Multi-Tenant Isolation
-- [ ] **Campground A can't see Campground B** - Verify all queries include campgroundId filter
-- [ ] **ScopeGuard in place** - All campground-scoped endpoints use ScopeGuard
-- [ ] **Test cross-tenant access** - Attempt to access another campground's data, verify 403
+- [x] **Campground A can't see Campground B** - CRITICAL VULNERABILITIES FOUND (see security audit report)
+- [x] **ScopeGuard in place** - CRITICAL: 14 controllers missing ScopeGuard
+- [x] **Test cross-tenant access** - CRITICAL: Services allow cross-tenant access by ID manipulation
 
 ### 2.4 Data Protection
-- [ ] **PII not logged** - Verify RedactingLogger is used, no emails/phones in logs
-- [ ] **Payment info never stored** - Only Stripe tokens, never raw card numbers
-- [ ] **Passwords hashed** - Verify bcrypt hashing, no plain text
-- [ ] **SQL injection scan** - Review Prisma queries for any raw SQL with user input
+- [x] **PII not logged** - VERIFIED: RedactingLogger redacts emails, phones, card last4
+- [x] **Payment info never stored** - VERIFIED: Only stripePaymentMethodId (pm_xxx tokens), no raw card data
+- [x] **Passwords hashed** - VERIFIED: bcrypt with cost 12
+- [x] **SQL injection scan** - VERIFIED: All $queryRaw use tagged template literals (parameterized)
 
 ### 2.5 API Security
-- [ ] **Rate limiting in place** - Check for throttling on auth endpoints
-- [ ] **CSRF protection** - Verify CSRF guard is active
-- [ ] **CORS configured** - Only allowed origins can call API
+- [x] **Rate limiting in place** - VERIFIED: @Throttle on auth (3-5/min), public routes (10-60/min)
+- [x] **CSRF protection** - VERIFIED: CsrfGuard with Double Submit Cookie pattern
+- [x] **CORS configured** - VERIFIED: Whitelist + env var, strict dev patterns for ngrok/Railway
 
 ---
 
@@ -324,6 +324,7 @@ Verify reporting works for daily operations and accounting.
 | Wallet payments for reservations | GuestWalletMethod.tsx shows "Coming Soon" but backend API is fully implemented. Do you want this wired up for launch, or is it OK to defer? | Open |
 | Seasonal past_due scheduler | No cron job to auto-mark SeasonalPayment as past_due when dueDate passes. Payments are only marked past_due when staff views/updates. Need a daily scheduler? | Open |
 | **7 Unprotected Controllers** | Auth guards added to all 7 controllers. Verified protection in place. | FIXED |
+| **CRITICAL: Multi-Tenant Isolation** | 14 controllers missing ScopeGuard. Services allow cross-tenant access by ID. Lock codes can be accessed across campgrounds (physical security risk). Full audit report: `SECURITY_AUDIT_MULTI_TENANT_2024-12-28.md` | **BLOCKING** |
 
 ---
 
@@ -350,6 +351,14 @@ Verify reporting works for daily operations and accounting.
 | 2024-12-28 | 2 | 2.2.1 Platform roles | **BUG FOUND**: Controllers used UserRole.platform_admin (doesn't exist). Fixed to use PlatformRole.platform_admin. |
 | 2024-12-28 | 2 | 2.2.1 Platform roles | Files fixed: roles.guard.ts, platform-analytics, observability, perf, charity, campgrounds controllers | Info | FIXED |
 | 2024-12-28 | 2 | 2.2.2 Sensitive endpoints | Payments controller has 17 protected endpoints requiring owner/manager/finance roles. Webhook uses Stripe signature verification. | Info | OK |
+| 2024-12-28 | 2 | 2.3.1 Multi-tenant | **CRITICAL**: 14 controllers missing ScopeGuard - full audit report at SECURITY_AUDIT_MULTI_TENANT_2024-12-28.md | Critical | VULN |
+| 2024-12-28 | 2 | 2.3.2 Lock codes | **CRITICAL**: Lock codes (gate codes, door codes) can be accessed/modified across campgrounds - physical security risk | Critical | VULN |
+| 2024-12-28 | 2 | 2.3.3 Service layer | **HIGH**: NotificationTriggersByIdController, ValueStack, BatchInventory services allow cross-tenant manipulation | High | VULN |
+| 2024-12-28 | 2 | 2.3.4 Guest segments | **HIGH**: getSegmentGuests() missing campgroundId filter - could leak PII across tenants | High | VULN |
+| 2024-12-28 | 2 | 2.3 Multi-tenant | Full security audit complete. 14 controllers missing ScopeGuard. Service-layer validation inconsistent. Report generated. | Critical | AUDIT DONE |
+| 2024-12-28 | 2 | 2.4 Data protection | VERIFIED: RedactingLogger (email/phone/card), bcrypt cost 12, Stripe tokens only, parameterized SQL | Info | OK |
+| 2024-12-28 | 2 | 2.5 API security | VERIFIED: Rate limiting (@Throttle), CSRF guard (Double Submit Cookie), CORS whitelist | Info | OK |
+| 2024-12-28 | 2 | PHASE 2 COMPLETE | Security audit done. Critical multi-tenant issues need fixing. Auth/data protection/API security all OK. | Mixed | DONE |
 
 ---
 
