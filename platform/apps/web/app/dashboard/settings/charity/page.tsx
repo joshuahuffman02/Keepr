@@ -740,8 +740,8 @@ export default function CharitySettingsPage() {
           onClick={() => saveMutation.mutate()}
           disabled={
             saveMutation.isPending ||
-            // For existing charity mode: need a charity selected OR already have settings saved
-            (charityMode === "existing" && !selectedCharityId && !currentSettings?.charityId) ||
+            // For existing charity mode: need either a charity selected OR existing settings
+            (charityMode === "existing" && !selectedCharityId && !currentSettings) ||
             // For custom charity mode: need a name entered
             (charityMode === "custom" && !customCharity.name)
           }
