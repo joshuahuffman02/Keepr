@@ -854,6 +854,15 @@ export const PAGE_REGISTRY: PageDefinition[] = [
     permissions: ["settingsWrite"],
   },
   {
+    href: "/dashboard/settings/charity",
+    label: "Charity Round-Up",
+    icon: "star",
+    category: "settings",
+    description: "Let guests round up payments to donate to charity",
+    keywords: ["charity", "donation", "round up", "giving", "nonprofit", "sybils kids"],
+    permissions: ["settingsWrite"],
+  },
+  {
     href: "/dashboard/settings/developers",
     label: "Developer Portal",
     icon: "brand",

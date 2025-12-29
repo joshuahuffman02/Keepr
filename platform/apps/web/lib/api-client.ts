@@ -8406,6 +8406,26 @@ export const apiClient = {
     };
   },
 
+  async getPlatformCharityStats(startDate?: string, endDate?: string) {
+    const params = new URLSearchParams();
+    if (startDate) params.set("startDate", startDate);
+    if (endDate) params.set("endDate", endDate);
+    const data = await fetchJSON<unknown>(`/charity/stats/platform?${params.toString()}`);
+    return data as {
+      totalDonations: number;
+      totalAmountCents: number;
+      donorCount: number;
+      optInRate: number;
+      averageDonationCents: number;
+      byStatus: { status: string; count: number; amountCents: number }[];
+      byCharity: {
+        charity: { id: string; name: string; logoUrl: string | null } | undefined;
+        count: number;
+        amountCents: number;
+      }[];
+    };
+  },
+
   // Data Import
   async getImportSchema(campgroundId: string, entityType: string) {
     const data = await fetchJSON<unknown>(`/campgrounds/${campgroundId}/import/schema/${entityType}`);

@@ -47,6 +47,7 @@ import {
   reducedMotion as reducedMotionVariants
 } from "@/lib/animations";
 import { cn } from "@/lib/utils";
+import { CharityImpactWidget } from "@/components/charity/CharityImpactWidget";
 
 type Reservation = {
   id: string;
@@ -598,6 +599,11 @@ export default function Dashboard() {
             reservationsCount={reservations?.length ?? 0}
             prefersReducedMotion={prefersReducedMotion}
           />
+        )}
+
+        {/* Charity Impact Widget */}
+        {selectedId && (
+          <CharityImpactWidget campgroundId={selectedId} />
         )}
 
         {/* Error State */}

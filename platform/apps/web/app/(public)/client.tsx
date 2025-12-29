@@ -12,6 +12,7 @@ import { HeroBanner } from "../../components/public/HeroBanner";
 import { ValueStack } from "../../components/public/ValueStack";
 import { UrgencySection } from "../../components/public/UrgencySection";
 import { OwnerCTA } from "../../components/public/OwnerCTA";
+import { CharityImpactSection } from "../../components/charity/CharityImpactSection";
 
 // Animation variants for scroll reveal
 const fadeInUp = {
@@ -481,6 +482,9 @@ export function HomeClient() {
 
             {/* Blog CTA Section */}
             <BlogSection prefersReducedMotion={prefersReducedMotion} />
+
+            {/* Charity Impact Section */}
+            <CharityImpactSection />
 
             {/* Owner CTA Section */}
             <OwnerCTA />

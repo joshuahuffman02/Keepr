@@ -26,12 +26,20 @@ export interface UpdateCharityDto extends Partial<CreateCharityDto> {
 }
 
 export interface SetCampgroundCharityDto {
-  charityId: string;
+  charityId?: string;
+  // Allow creating a new charity inline
+  newCharity?: {
+    name: string;
+    description?: string;
+    taxId?: string;
+    website?: string;
+  };
   isEnabled?: boolean;
   customMessage?: string;
   roundUpType?: string;
   roundUpOptions?: { values: number[] };
   defaultOptIn?: boolean;
+  glCode?: string; // For QuickBooks integration
 }
 
 export interface CreateDonationDto {
@@ -162,14 +170,35 @@ export class CharityService {
   }
 
   async setCampgroundCharity(campgroundId: string, data: SetCampgroundCharityDto) {
+    let charityId = data.charityId;
+
+    // If creating a new charity inline
+    if (data.newCharity && !charityId) {
+      const newCharity = await this.prisma.charity.create({
+        data: {
+          name: data.newCharity.name,
+          description: data.newCharity.description,
+          taxId: data.newCharity.taxId,
+          website: data.newCharity.website,
+          isActive: true,
+          isVerified: false, // Campground-created charities aren't platform-verified
+        },
+      });
+      charityId = newCharity.id;
+    }
+
+    if (!charityId) {
+      throw new Error("Either charityId or newCharity must be provided");
+    }
+
     // Verify charity exists
-    await this.getCharity(data.charityId);
+    await this.getCharity(charityId);
 
     return this.prisma.campgroundCharity.upsert({
       where: { campgroundId },
       create: {
         campgroundId,
-        charityId: data.charityId,
+        charityId,
         isEnabled: data.isEnabled ?? true,
         customMessage: data.customMessage,
         roundUpType: data.roundUpType ?? "nearest_dollar",
@@ -177,7 +206,7 @@ export class CharityService {
         defaultOptIn: data.defaultOptIn ?? false,
       },
       update: {
-        charityId: data.charityId,
+        charityId,
         isEnabled: data.isEnabled,
         customMessage: data.customMessage,
         roundUpType: data.roundUpType,
