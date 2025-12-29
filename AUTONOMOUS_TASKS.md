@@ -109,12 +109,12 @@ Josh knows nothing about security and wants peace of mind. This phase verifies a
 Verify complete user journeys work from start to finish.
 
 ### 3.1 Online Booking Flow (Guest Self-Service)
-- [ ] **Search availability** - Date picker, site selection works
-- [ ] **Add to cart** - Reservation created with pending status
-- [ ] **Enter guest info** - Form validation, guest record created
-- [ ] **Payment** - Can complete payment (once Phase 1 fixes are in)
-- [ ] **Confirmation** - Reservation confirmed, email sent
-- [ ] **Guest can view booking** - Portal access works
+- [x] **Search availability** - WORKING: /public/campgrounds/{slug}/availability returns filtered sites
+- [x] **Add to cart** - WORKING: Creates pending reservation, sends early confirmation email
+- [x] **Enter guest info** - WORKING: Validates, finds/creates guest, links to reservation
+- [x] **Payment** - CRITICAL BUG: paidAmount/balanceAmount NOT updated after Stripe success
+- [x] **Confirmation** - BROKEN: No post-payment email, status shows "confirmed" but amounts wrong
+- [x] **Guest can view booking** - WORKING: Magic link auth, portal displays reservations
 
 ### 3.2 Walk-In Reservation (Front Desk)
 - [ ] **Quick book from calendar** - Click date, create reservation

@@ -2,8 +2,7 @@ import { Controller, Get, Post, Put, Delete, Query, Param, Body, Res, UseGuards 
 import { Response } from "express";
 import { PlatformAnalyticsService, AnalyticsQueryParams } from "./platform-analytics.service";
 import { JwtAuthGuard } from "../../auth/guards/jwt-auth.guard";
-import { RolesGuard } from "../../auth/guards/roles.guard";
-import { Roles } from "../../auth/decorators/roles.decorator";
+import { RolesGuard, Roles } from "../../auth/guards/roles.guard";
 import { PlatformRole } from "@prisma/client";
 import { RevenueIntelligenceService } from "./services/revenue-intelligence.service";
 import { GuestJourneyService } from "./services/guest-journey.service";
