@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useMemo, useState, useEffect } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, keepPreviousData } from "@tanstack/react-query";
 import { motion, useReducedMotion } from "framer-motion";
 import {
   AlertCircle,
@@ -302,41 +302,55 @@ export default function Dashboard() {
 
   const { data: campgrounds = [] } = useQuery({
     queryKey: ["campgrounds"],
-    queryFn: () => apiClient.getCampgrounds()
+    queryFn: () => apiClient.getCampgrounds(),
+    staleTime: 60000, // 1 minute - campgrounds don't change often
+    placeholderData: keepPreviousData,
   });
 
-  const [selectedId, setSelectedId] = useState<string>("");
+  // Initialize selectedId from localStorage immediately to prevent flash
+  const [selectedId, setSelectedId] = useState<string>(() => {
+    if (typeof window !== "undefined") {
+      return localStorage.getItem("campreserv:selectedCampground") || "";
+    }
+    return "";
+  });
 
   useEffect(() => {
-    // Sync with sidebar selection
-    const stored = typeof window !== "undefined" ? localStorage.getItem("campreserv:selectedCampground") : null;
-    if (campgrounds.length > 0) {
+    // Only update if we don't have a valid selection yet
+    if (campgrounds.length > 0 && !selectedId) {
+      const stored = typeof window !== "undefined" ? localStorage.getItem("campreserv:selectedCampground") : null;
       if (stored && campgrounds.some((c) => c.id === stored)) {
         setSelectedId(stored);
       } else {
         setSelectedId(campgrounds[0].id);
       }
     }
-  }, [campgrounds]);
+  }, [campgrounds, selectedId]);
 
   const selectedCampground = campgrounds.find((c) => c.id === selectedId) || campgrounds[0];
 
   const reservationsQuery = useQuery({
     queryKey: ["reservations", selectedId],
     queryFn: () => apiClient.getReservations(selectedId ?? ""),
-    enabled: !!selectedId
+    enabled: !!selectedId,
+    staleTime: 30000,
+    placeholderData: keepPreviousData,
   });
 
   const sitesQuery = useQuery({
     queryKey: ["sites", selectedId],
     queryFn: () => apiClient.getSites(selectedId ?? ""),
-    enabled: !!selectedId
+    enabled: !!selectedId,
+    staleTime: 30000,
+    placeholderData: keepPreviousData,
   });
 
   const npsQuery = useQuery({
     queryKey: ["nps-metrics", selectedId],
     queryFn: () => apiClient.getNpsMetrics(selectedId ?? ""),
-    enabled: !!selectedId
+    enabled: !!selectedId,
+    staleTime: 30000,
+    placeholderData: keepPreviousData,
   });
 
   const today = useMemo(() => {
