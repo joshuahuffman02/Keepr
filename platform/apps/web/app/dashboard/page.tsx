@@ -307,25 +307,30 @@ export default function Dashboard() {
     placeholderData: keepPreviousData,
   });
 
-  // Initialize selectedId from localStorage immediately to prevent flash
-  const [selectedId, setSelectedId] = useState<string>(() => {
-    if (typeof window !== "undefined") {
-      return localStorage.getItem("campreserv:selectedCampground") || "";
-    }
-    return "";
-  });
+  // Track when client-side hydration is complete to avoid hydration mismatch
+  const [hasMounted, setHasMounted] = useState(false);
+  const [selectedId, setSelectedId] = useState<string>("");
 
+  // After mount, read from localStorage and set up selection
   useEffect(() => {
-    // Only update if we don't have a valid selection yet
-    if (campgrounds.length > 0 && !selectedId) {
-      const stored = typeof window !== "undefined" ? localStorage.getItem("campreserv:selectedCampground") : null;
+    const stored = localStorage.getItem("campreserv:selectedCampground");
+    if (stored) {
+      setSelectedId(stored);
+    }
+    setHasMounted(true);
+  }, []);
+
+  // Update selection when campgrounds load (if no valid selection yet)
+  useEffect(() => {
+    if (campgrounds.length > 0 && hasMounted && !selectedId) {
+      const stored = localStorage.getItem("campreserv:selectedCampground");
       if (stored && campgrounds.some((c) => c.id === stored)) {
         setSelectedId(stored);
       } else {
         setSelectedId(campgrounds[0].id);
       }
     }
-  }, [campgrounds, selectedId]);
+  }, [campgrounds, hasMounted, selectedId]);
 
   const selectedCampground = campgrounds.find((c) => c.id === selectedId) || campgrounds[0];
 
@@ -648,8 +653,8 @@ export default function Dashboard() {
           />
         )}
 
-        {/* Charity Impact Widget */}
-        {selectedId && (
+        {/* Charity Impact Widget - only render after hydration to prevent flash */}
+        {hasMounted && selectedId && (
           <CharityImpactWidget campgroundId={selectedId} />
         )}
 
@@ -877,7 +882,7 @@ export default function Dashboard() {
                         whileTap={{ scale: 0.95 }}
                       >
                         <Link
-                          href="/billing/repeat-charges"
+                          href={`/campgrounds/${selectedId}/reservations/${r.id}`}
                           aria-label={`Collect payment from ${r.guest?.primaryFirstName ?? 'Guest'}`}
                           className={cn(
                             "inline-flex items-center justify-center rounded-md px-3 py-1.5 text-xs font-semibold text-white",
