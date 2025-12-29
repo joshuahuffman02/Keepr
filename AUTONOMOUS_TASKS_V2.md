@@ -202,7 +202,7 @@ Before any V2 work, V1 must be solid.
 
 ## PHASE 2: REVENUE MANAGEMENT AI
 
-### 2.1 Yield Dashboard - BACKEND DONE
+### 2.1 Yield Dashboard - DONE
 
 **Goal**: Airline-style revenue optimization interface
 
@@ -214,11 +214,13 @@ Before any V2 work, V1 must be solid.
 - [x] **Gap detection** - Count 1-2 night gaps that could be filled
 - [x] **API endpoints** - /yield/dashboard, /yield/metrics, /yield/forecast, /yield/trend
 
-#### 2.1.2 Frontend Dashboard - PENDING
-- [ ] **Revenue command center** - Single view of optimization status (needs UI)
-- [ ] **Occupancy gauges** - Today, this week, next 30 days (needs UI)
-- [ ] **Pricing recommendations** - Integrated via existing AI pricing endpoints
-- [ ] **"Money on table" alerts** - Integrated via AiRevenueInsight
+#### 2.1.2 Frontend Dashboard - DONE
+- [x] **Revenue command center** - Yield Command Center page at /ai/yield
+- [x] **Occupancy gauges** - Today, 7-day, and 30-day projections with progress bars
+- [x] **Pricing recommendations** - Top 4 recommendations with impact display
+- [x] **"Money on table" alerts** - Revenue insights with potential value
+- [x] **Occupancy trend chart** - 30-day bar chart with period summary
+- [x] **Forecast calendar** - 14-day forecast grid with occupancy levels
 
 #### 2.1.3 Enhancements - DEFERRED
 - [ ] **Real-time WebSocket updates** - Existing RealtimeGateway can be extended
@@ -362,7 +364,7 @@ Before any V2 work, V1 must be solid.
 | 2024-12-29 | Dashboard Insights | Mostly existing | Medium | AiInsightsService, AiAnomalyDetectionService, AiDashboardService already comprehensive. Added AiMorningBriefingService for daily email. |
 | 2024-12-29 | AI Reports | Full implementation | High | AiReportQueryService parses NL queries to report params using 135+ template registry. Generates narratives with findings/recommendations. |
 | 2024-12-29 | Campaign AI | Full implementation | High | AiCampaignService with subject line generation, content drafting, send time optimization, content improvement, A/B test generation. |
-| 2024-12-29 | Yield Dashboard | Backend complete | High | AiYieldService with daily snapshots, yield metrics (ADR, RevPAN, YoY), forecasts, gap detection. Leverages existing AiDynamicPricingService and AiRevenueManagerService. |
+| 2024-12-29 | Yield Dashboard | Full implementation | High | AiYieldService + Yield Command Center UI. Daily snapshots, yield metrics (ADR, RevPAN, YoY), forecasts, trend charts, recommendations grid. |
 
 ---
 
@@ -391,7 +393,7 @@ Before any V2 work, V1 must be solid.
 | 2024-12-29 | 1.3 | AI Dashboard Insights | Morning briefing service with cron email, opportunity detection, arrivals preview. Anomaly narratives already existed. |
 | 2024-12-29 | 1.4 | AI-Enhanced Reports | NL query parsing with 135+ report templates, narrative generation with findings/recommendations, suggested queries. |
 | 2024-12-29 | 1.5 | Campaign AI | Subject line generator with A/B testing, send time optimization, content drafting and improvement. Full API endpoints. |
-| 2024-12-29 | 2.1 | Yield Dashboard | Backend complete: AiYieldService with occupancy snapshots, yield metrics (ADR, RevPAN), YoY comparison, forecasts, gap detection. API endpoints ready. Frontend pending. |
+| 2024-12-29 | 2.1 | Yield Dashboard | Full implementation: AiYieldService + Yield Command Center UI. KPIs (occupancy, ADR, RevPAN), forecasts, trend charts, recommendations. |
 
 ---
 

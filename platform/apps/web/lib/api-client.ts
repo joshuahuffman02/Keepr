@@ -10561,6 +10561,121 @@ export const apiClient = {
     }>(`/ai/autopilot/campgrounds/${campgroundId}/revenue/summary`);
   },
 
+  // Yield Management
+  async getYieldDashboard(campgroundId: string) {
+    return fetchJSON<{
+      metrics: {
+        todayOccupancy: number;
+        todayRevenue: number;
+        todayADR: number;
+        todayRevPAN: number;
+        periodOccupancy: number;
+        periodRevenue: number;
+        periodADR: number;
+        periodRevPAN: number;
+        periodNights: number;
+        yoyChange: { occupancy: number; revenue: number; adr: number } | null;
+        next7DaysOccupancy: number;
+        next30DaysOccupancy: number;
+        forecastRevenue30Days: number;
+        gapNights: number;
+        pendingRecommendations: number;
+        potentialRevenue: number;
+      };
+      occupancyTrend: Array<{ date: string; occupancy: number; revenue: number }>;
+      forecasts: Array<{
+        date: string;
+        occupiedSites: number;
+        totalSites: number;
+        occupancyPct: number;
+        projectedRevenue: number;
+      }>;
+      topRecommendations: Array<{
+        id: string;
+        siteClassId: string;
+        dateStart: string;
+        dateEnd: string;
+        currentPrice: number;
+        suggestedPrice: number;
+        adjustmentPercent: number;
+        confidence: number;
+        estimatedRevenueDelta: number;
+        status: string;
+      }>;
+      revenueInsights: Array<{
+        id: string;
+        insightType: string;
+        title: string;
+        description: string;
+        priority: number;
+        estimatedValueCents: number | null;
+        status: string;
+      }>;
+    }>(`/ai/autopilot/campgrounds/${campgroundId}/yield/dashboard`);
+  },
+
+  async getYieldMetrics(
+    campgroundId: string,
+    options?: { startDate?: string; endDate?: string }
+  ) {
+    const params = new URLSearchParams();
+    if (options?.startDate) params.append("startDate", options.startDate);
+    if (options?.endDate) params.append("endDate", options.endDate);
+    const query = params.toString() ? `?${params.toString()}` : "";
+    return fetchJSON<{
+      todayOccupancy: number;
+      todayRevenue: number;
+      todayADR: number;
+      todayRevPAN: number;
+      periodOccupancy: number;
+      periodRevenue: number;
+      periodADR: number;
+      periodRevPAN: number;
+      periodNights: number;
+      yoyChange: { occupancy: number; revenue: number; adr: number } | null;
+      next7DaysOccupancy: number;
+      next30DaysOccupancy: number;
+      forecastRevenue30Days: number;
+      gapNights: number;
+      pendingRecommendations: number;
+      potentialRevenue: number;
+    }>(`/ai/autopilot/campgrounds/${campgroundId}/yield/metrics${query}`);
+  },
+
+  async getOccupancyTrend(campgroundId: string, days?: number) {
+    const query = days ? `?days=${days}` : "";
+    return fetchJSON<Array<{ date: string; occupancy: number; revenue: number }>>(
+      `/ai/autopilot/campgrounds/${campgroundId}/yield/occupancy-trend${query}`
+    );
+  },
+
+  async getYieldForecast(campgroundId: string, days?: number) {
+    const query = days ? `?days=${days}` : "";
+    return fetchJSON<{
+      forecasts: Array<{
+        date: string;
+        occupiedSites: number;
+        totalSites: number;
+        occupancyPct: number;
+        projectedRevenue: number;
+      }>;
+      avgOccupancy: number;
+      totalRevenue: number;
+    }>(`/ai/autopilot/campgrounds/${campgroundId}/yield/forecast${query}`);
+  },
+
+  async backfillYieldSnapshots(campgroundId: string, days?: number) {
+    const res = await fetch(
+      `${API_BASE}/ai/autopilot/campgrounds/${campgroundId}/yield/backfill`,
+      {
+        method: "POST",
+        headers: scopedHeaders(),
+        body: JSON.stringify({ days: days || 90 }),
+      }
+    );
+    return parseResponse<{ success: boolean; recordedDays: number }>(res);
+  },
+
   // Predictive Maintenance
   async getMaintenanceAlerts(campgroundId: string, status?: string) {
     const params = status ? `?status=${status}` : "";
