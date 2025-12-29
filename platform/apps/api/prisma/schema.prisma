@@ -3393,6 +3393,12 @@ model Message {
   readAt        DateTime?
   createdAt     DateTime   @default(now())
 
+  // AI Sentiment Analysis (Phase 1.2) - for guest messages
+  sentiment      String?   // positive | neutral | negative
+  sentimentScore Float?    // -1.0 to 1.0
+  urgencyLevel   String?   // low | normal | high | critical
+  aiAnalyzedAt   DateTime?
+
   campground  Campground  @relation(fields: [campgroundId], references: [id], onDelete: Cascade)
   reservation Reservation @relation(fields: [reservationId], references: [id], onDelete: Cascade)
   guest       Guest       @relation(fields: [guestId], references: [id], onDelete: Cascade)
@@ -3400,6 +3406,7 @@ model Message {
   @@index([campgroundId])
   @@index([reservationId])
   @@index([guestId])
+  @@index([campgroundId, sentiment])
 }
 
 enum WaitlistStatus {
@@ -4027,6 +4034,13 @@ model Communication {
   createdAt         DateTime  @default(now())
   updatedAt         DateTime  @default(now()) @updatedAt
 
+  // AI Sentiment Analysis (Phase 1.2)
+  sentiment         String?   // positive | neutral | negative
+  sentimentScore    Float?    // -1.0 to 1.0 (negative to positive)
+  urgencyLevel      String?   // low | normal | high | critical
+  detectedIntent    String?   // booking | complaint | question | praise | cancellation | other
+  aiAnalyzedAt      DateTime?
+
   guest       Guest?       @relation(fields: [guestId], references: [id], onDelete: SetNull)
   reservation Reservation? @relation(fields: [reservationId], references: [id], onDelete: SetNull)
   campground  Campground   @relation(fields: [campgroundId], references: [id], onDelete: Cascade)
@@ -4036,6 +4050,8 @@ model Communication {
   @@index([reservationId, createdAt])
   @@index([type, direction])
   @@index([campgroundId, conversationId, createdAt])
+  @@index([campgroundId, sentiment])
+  @@index([campgroundId, urgencyLevel])
 }
 
 model CommunicationTemplate {

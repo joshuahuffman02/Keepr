@@ -21,6 +21,7 @@ import { AiWeatherService } from './ai-weather.service';
 import { AiPhoneAgentService } from './ai-phone-agent.service';
 import { AiDashboardService } from './ai-dashboard.service';
 import { AiNaturalSearchService } from './ai-natural-search.service';
+import { AiSentimentService } from './ai-sentiment.service';
 import { AiService } from './ai.service';
 import { AiController } from './ai.controller';
 import { AiAutopilotController } from './ai-autopilot.controller';
@@ -79,6 +80,7 @@ import { AnomaliesModule } from '../anomalies/anomalies.module';
     AiPhoneAgentService,
     AiDashboardService,
     AiNaturalSearchService,
+    AiSentimentService,
     AiService,
   ],
   exports: [
@@ -105,6 +107,7 @@ import { AnomaliesModule } from '../anomalies/anomalies.module';
     AiPhoneAgentService,
     AiDashboardService,
     AiNaturalSearchService,
+    AiSentimentService,
     AiService,
   ],
 })

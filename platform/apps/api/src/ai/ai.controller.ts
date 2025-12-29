@@ -7,6 +7,7 @@ import { AiFeatureGateService } from './ai-feature-gate.service';
 import { AiBookingAssistService } from './ai-booking-assist.service';
 import { AiSupportService } from './ai-support.service';
 import { AiPartnerService } from './ai-partner.service';
+import { AiSentimentService } from './ai-sentiment.service';
 import type { Request } from 'express';
 
 interface UpdateAiSettingsDto {
@@ -63,6 +64,7 @@ export class AiController {
     private readonly bookingAssist: AiBookingAssistService,
     private readonly supportService: AiSupportService,
     private readonly partnerService: AiPartnerService,
+    private readonly sentimentService: AiSentimentService,
   ) { }
 
   // ==================== PUBLIC ENDPOINTS ====================
@@ -333,5 +335,78 @@ export class AiController {
     }
 
     return this.gate.getUsageStats(campgroundId, 30);
+  }
+
+  // ==================== SENTIMENT ANALYSIS ====================
+
+  /**
+   * Get sentiment analysis statistics for dashboard
+   */
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.owner, UserRole.manager, UserRole.front_desk)
+  @Get('campgrounds/:campgroundId/sentiment')
+  async getSentimentStats(
+    @Param('campgroundId') campgroundId: string,
+    @Req() req: Request,
+  ) {
+    const org = (req as any).organizationId || null;
+
+    const campground = await this.prisma.campground.findUnique({
+      where: { id: campgroundId },
+      select: { organizationId: true },
+    });
+
+    if (!campground) {
+      throw new ForbiddenException('Campground not found');
+    }
+
+    if (org && campground.organizationId !== org) {
+      throw new ForbiddenException('Access denied');
+    }
+
+    return this.sentimentService.getSentimentStats(campgroundId);
+  }
+
+  /**
+   * Get sentiment stats for a date range
+   */
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.owner, UserRole.manager, UserRole.front_desk)
+  @Get('campgrounds/:campgroundId/sentiment/range')
+  async getSentimentStatsRange(
+    @Param('campgroundId') campgroundId: string,
+    @Req() req: Request,
+  ) {
+    const org = (req as any).organizationId || null;
+    const query = (req as any).query || {};
+    const startDate = query.startDate ? new Date(query.startDate) : undefined;
+    const endDate = query.endDate ? new Date(query.endDate) : undefined;
+
+    const campground = await this.prisma.campground.findUnique({
+      where: { id: campgroundId },
+      select: { organizationId: true },
+    });
+
+    if (!campground) {
+      throw new ForbiddenException('Campground not found');
+    }
+
+    if (org && campground.organizationId !== org) {
+      throw new ForbiddenException('Access denied');
+    }
+
+    return this.sentimentService.getSentimentStats(campgroundId, { startDate, endDate });
+  }
+
+  /**
+   * Manually trigger sentiment analysis for a communication
+   */
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.owner, UserRole.manager)
+  @Post('communications/:communicationId/analyze-sentiment')
+  async analyzeCommunicationSentiment(
+    @Param('communicationId') communicationId: string,
+  ) {
+    return this.sentimentService.analyzeCommunication(communicationId);
   }
 }

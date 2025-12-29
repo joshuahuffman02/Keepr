@@ -17,6 +17,7 @@ import { NpsService } from "../nps/nps.service";
 import { ObservabilityService } from "../observability/observability.service";
 import { AlertingService } from "../observability/alerting.service";
 import { AiAutoReplyService } from "../ai/ai-auto-reply.service";
+import { AiSentimentService } from "../ai/ai-sentiment.service";
 
 @Controller()
 export class CommunicationsController {
@@ -29,7 +30,8 @@ export class CommunicationsController {
     private readonly npsService: NpsService,
     private readonly observability: ObservabilityService,
     private readonly alerting: AlertingService,
-    private readonly aiAutoReplyService: AiAutoReplyService
+    private readonly aiAutoReplyService: AiAutoReplyService,
+    private readonly aiSentimentService: AiSentimentService
   ) { }
 
   private readonly commsMetricsEnabled =
@@ -586,8 +588,14 @@ export class CommunicationsController {
       }
     });
 
-    // Trigger AI auto-reply processing (fire and forget)
+    // Trigger AI processing (fire and forget)
     if (communication.campgroundId) {
+      // Sentiment analysis
+      this.aiSentimentService.analyzeCommunication(communication.id).catch((err) => {
+        this.logger.warn(`AI sentiment analysis failed for ${communication.id}: ${err.message}`);
+      });
+
+      // Auto-reply processing
       this.aiAutoReplyService.processInboundMessage(communication.id).catch((err) => {
         this.logger.warn(`AI auto-reply processing failed for ${communication.id}: ${err.message}`);
       });
@@ -687,8 +695,14 @@ export class CommunicationsController {
       }
     });
 
-    // Trigger AI auto-reply processing (fire and forget)
+    // Trigger AI processing (fire and forget)
     if (communication.campgroundId) {
+      // Sentiment analysis
+      this.aiSentimentService.analyzeCommunication(communication.id).catch((err) => {
+        this.logger.warn(`AI sentiment analysis failed for ${communication.id}: ${err.message}`);
+      });
+
+      // Auto-reply processing
       this.aiAutoReplyService.processInboundMessage(communication.id).catch((err) => {
         this.logger.warn(`AI auto-reply processing failed for ${communication.id}: ${err.message}`);
       });

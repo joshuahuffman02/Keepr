@@ -8406,6 +8406,50 @@ export const apiClient = {
     };
   },
 
+  // AI Sentiment Analysis
+  async getSentimentStats(campgroundId: string, options?: { startDate?: string; endDate?: string }) {
+    const params = new URLSearchParams();
+    if (options?.startDate) params.set("startDate", options.startDate);
+    if (options?.endDate) params.set("endDate", options.endDate);
+    const query = params.toString() ? `?${params.toString()}` : "";
+    const endpoint = query
+      ? `/ai/campgrounds/${campgroundId}/sentiment/range${query}`
+      : `/ai/campgrounds/${campgroundId}/sentiment`;
+    const data = await fetchJSON<unknown>(endpoint);
+    return data as {
+      total: number;
+      breakdown: { positive: number; neutral: number; negative: number };
+      percentages: { positive: number; neutral: number; negative: number };
+      urgency: { critical: number; high: number };
+      needsAttention: Array<{
+        id: string;
+        type: string;
+        subject: string | null;
+        preview: string | null;
+        sentiment: string | null;
+        urgencyLevel: string | null;
+        detectedIntent: string | null;
+        createdAt: string;
+        guest: { primaryFirstName: string | null; primaryLastName: string | null } | null;
+      }>;
+    };
+  },
+
+  async analyzeCommunicationSentiment(communicationId: string) {
+    const res = await fetch(`${API_BASE}/ai/communications/${communicationId}/analyze-sentiment`, {
+      method: "POST",
+      headers: scopedHeaders()
+    });
+    return parseResponse<{
+      sentiment: "positive" | "neutral" | "negative";
+      sentimentScore: number;
+      urgencyLevel: "low" | "normal" | "high" | "critical";
+      detectedIntent: string;
+      confidence: number;
+      summary?: string;
+    } | null>(res);
+  },
+
   // Charity / Round-Up for Donations
   async getCampgroundCharity(campgroundId: string) {
     const data = await fetchJSON<unknown>(`/campgrounds/${campgroundId}/charity`);
