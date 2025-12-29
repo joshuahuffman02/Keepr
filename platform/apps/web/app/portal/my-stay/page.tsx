@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { apiClient } from "@/lib/api-client";
@@ -8,6 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { PullToRefresh } from "@/components/ui/pull-to-refresh";
 import {
   Calendar,
   MapPin,
@@ -142,6 +143,28 @@ export default function MyStayPage() {
   const [commsHistory, setCommsHistory] = useState<any[]>([]);
   const [commsLoading, setCommsLoading] = useState(false);
 
+  const fetchGuest = useCallback(async (authToken: string) => {
+    try {
+      const data = await apiClient.getGuestMe(authToken);
+      // @ts-ignore - zod schema might need adjustment for dates vs strings
+      setGuest(data);
+      // Auto-select first upcoming reservation
+      const now = new Date();
+      const upcomingReservations = (data.reservations ?? [])
+        .filter((r: any) => new Date(r.departureDate) >= now)
+        .sort((a: any, b: any) => new Date(a.arrivalDate).getTime() - new Date(b.arrivalDate).getTime());
+      if (upcomingReservations.length > 0 && !selectedReservationId) {
+        setSelectedReservationId(upcomingReservations[0].id);
+      }
+    } catch (err) {
+      console.error(err);
+      localStorage.removeItem(GUEST_TOKEN_KEY);
+      router.push("/portal/login");
+    } finally {
+      setLoading(false);
+    }
+  }, [router, selectedReservationId]);
+
   useEffect(() => {
     const storedToken = localStorage.getItem(GUEST_TOKEN_KEY);
     if (!storedToken) {
@@ -149,31 +172,14 @@ export default function MyStayPage() {
       return;
     }
     setToken(storedToken);
+    fetchGuest(storedToken);
+  }, [router, fetchGuest]);
 
-    const fetchGuest = async () => {
-      try {
-        const data = await apiClient.getGuestMe(storedToken);
-        // @ts-ignore - zod schema might need adjustment for dates vs strings
-        setGuest(data);
-        // Auto-select first upcoming reservation
-        const now = new Date();
-        const upcoming = (data.reservations ?? [])
-          .filter((r: any) => new Date(r.departureDate) >= now)
-          .sort((a: any, b: any) => new Date(a.arrivalDate).getTime() - new Date(b.arrivalDate).getTime());
-        if (upcoming.length > 0) {
-          setSelectedReservationId(upcoming[0].id);
-        }
-      } catch (err) {
-        console.error(err);
-        localStorage.removeItem(GUEST_TOKEN_KEY);
-        router.push("/portal/login");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchGuest();
-  }, [router]);
+  // Pull-to-refresh handler
+  const handleRefresh = useCallback(async () => {
+    if (!token) return;
+    await fetchGuest(token);
+  }, [token, fetchGuest]);
 
   const now = new Date();
   const upcoming = useMemo(
@@ -414,19 +420,20 @@ export default function MyStayPage() {
   };
 
   return (
-    <div className="container mx-auto px-4 py-6 space-y-6">
-      {/* Page Header */}
-      <motion.div
-        initial={{ opacity: 0, y: -10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={SPRING_CONFIG}
-        className="flex items-center justify-between"
-      >
-        <div>
-          <h1 className="text-2xl font-bold text-foreground">Welcome back, {guest.primaryFirstName}</h1>
-          <p className="text-muted-foreground">Here's everything about your stay</p>
-        </div>
-      </motion.div>
+    <PullToRefresh onRefresh={handleRefresh} className="min-h-screen">
+      <div className="container mx-auto px-4 py-6 space-y-6">
+        {/* Page Header */}
+        <motion.div
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={SPRING_CONFIG}
+          className="flex items-center justify-between"
+        >
+          <div>
+            <h1 className="text-2xl font-bold text-foreground">Welcome back, {guest.primaryFirstName}</h1>
+            <p className="text-muted-foreground">Here's everything about your stay</p>
+          </div>
+        </motion.div>
 
       {/* Reservation Selector for multi-campground guests */}
       {upcoming.length > 1 && (
@@ -986,5 +993,6 @@ export default function MyStayPage() {
         </div>
       )}
     </div>
+    </PullToRefresh>
   );
 }
