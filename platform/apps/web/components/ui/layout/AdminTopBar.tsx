@@ -219,11 +219,42 @@ export function AdminTopBar({
     const queryClient = useQueryClient();
     const userId = session?.user?.id;
 
-    // Fetch notifications from API
+    // Track when the API token becomes available in localStorage (set by DashboardShell)
+    const [hasApiToken, setHasApiToken] = useState(false);
+    useEffect(() => {
+        // Check immediately and then poll briefly to catch when DashboardShell syncs the token
+        const checkToken = () => {
+            const token = localStorage.getItem("campreserv:authToken");
+            if (token) {
+                setHasApiToken(true);
+                return true;
+            }
+            return false;
+        };
+
+        if (checkToken()) return;
+
+        // Poll briefly in case the token is being synced
+        const interval = setInterval(() => {
+            if (checkToken()) {
+                clearInterval(interval);
+            }
+        }, 100);
+
+        // Clean up after 2 seconds if token never appears
+        const timeout = setTimeout(() => clearInterval(interval), 2000);
+
+        return () => {
+            clearInterval(interval);
+            clearTimeout(timeout);
+        };
+    }, [session]);
+
+    // Fetch notifications from API - wait for both userId and token to be available
     const { data: notificationsData } = useQuery({
         queryKey: ["notifications", userId],
         queryFn: () => apiClient.getNotifications(userId!, { limit: 10 }),
-        enabled: !!userId,
+        enabled: !!userId && hasApiToken,
         refetchInterval: 30000, // Refresh every 30 seconds
     });
 

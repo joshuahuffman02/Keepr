@@ -54,7 +54,7 @@ const nextConfig = {
     const cspDirectives = [
       "default-src 'self'",
       "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://js.stripe.com https://maps.googleapis.com",
-      "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+      "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://unpkg.com",
       "font-src 'self' https://fonts.gstatic.com data:",
       "img-src 'self' data: blob: https: http:",
       "connect-src 'self' https://api.stripe.com wss://*.stripe.com https://maps.googleapis.com https://*.railway.app http://localhost:* ws://localhost:*",
