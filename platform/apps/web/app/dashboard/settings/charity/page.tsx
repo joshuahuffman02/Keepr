@@ -203,7 +203,9 @@ export default function CharitySettingsPage() {
     );
   }
 
-  if (loadingSettings || loadingCharities) {
+  // Only show full loading spinner on initial load when we have no cached data
+  const isInitialLoading = (loadingSettings && !currentSettings) || (loadingCharities && charities.length === 0);
+  if (isInitialLoading) {
     return (
       <div className="flex items-center justify-center p-12">
         <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
