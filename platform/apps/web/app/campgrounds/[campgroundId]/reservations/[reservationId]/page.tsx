@@ -4,34 +4,88 @@ import { useParams, useRouter } from "next/navigation";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { DashboardShell } from "../../../../../components/ui/layout/DashboardShell";
-import { Breadcrumbs } from "../../../../../components/breadcrumbs";
 import { apiClient } from "../../../../../lib/api-client";
-import { computeDepositDue, DepositConfig } from "@campreserv/shared";
 import { Card, CardContent, CardHeader, CardTitle } from "../../../../../components/ui/card";
 import { Badge } from "../../../../../components/ui/badge";
 import { Button } from "../../../../../components/ui/button";
 import { Input } from "../../../../../components/ui/input";
 import { Label } from "../../../../../components/ui/label";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../../../../components/ui/tabs";
 import { format } from "date-fns";
-import { DollarSign, ArrowLeft, MessageSquare, Calculator, ActivitySquare, MapPin, CheckCircle, DoorOpen, Users, AlertTriangle, Clock, ShieldCheck, ClipboardList, Tent, Loader2 } from "lucide-react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "../../../../../components/ui/dialog";
+import {
+  DollarSign,
+  ArrowLeft,
+  MessageSquare,
+  Calculator,
+  MapPin,
+  CheckCircle,
+  DoorOpen,
+  Users,
+  AlertTriangle,
+  Clock,
+  ShieldCheck,
+  ClipboardList,
+  Tent,
+  Loader2,
+  CreditCard,
+  Calendar,
+  User,
+  FileText,
+  History,
+  ChevronDown,
+  ChevronUp,
+  Send,
+  RefreshCw,
+  Check,
+  X,
+  Sparkles,
+  PartyPopper
+} from "lucide-react";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter
+} from "../../../../../components/ui/dialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger
+} from "../../../../../components/ui/alert-dialog";
 import { Switch } from "../../../../../components/ui/switch";
 import { AuditLogTimeline } from "../../../../../components/audit/AuditLogTimeline";
 import { ReservationFormsCard } from "../../../../../components/reservations/ReservationFormsCard";
+import { PaymentCollectionModal } from "../../../../../components/payments/PaymentCollectionModal";
+import { cn } from "../../../../../lib/utils";
+import { motion, AnimatePresence } from "framer-motion";
 
 function formatDate(d?: string | Date | null) {
-  if (!d) return "—";
+  if (!d) return "--";
   const date = typeof d === "string" ? new Date(d) : d;
-  return isNaN(date.getTime()) ? "—" : format(date, "MMM d, yyyy");
+  return isNaN(date.getTime()) ? "--" : format(date, "MMM d, yyyy");
 }
 
 function formatDateTime(d?: string | Date | null) {
-  if (!d) return "—";
+  if (!d) return "--";
   const date = typeof d === "string" ? new Date(d) : d;
-  return isNaN(date.getTime()) ? "—" : format(date, "MMM d, yyyy h:mma");
+  return isNaN(date.getTime()) ? "--" : format(date, "MMM d, yyyy h:mma");
 }
 
-// Extended reservation type with optional fields from API responses
+function formatCurrency(cents: number) {
+  return new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: "USD",
+  }).format(cents / 100);
+}
+
 type ReservationWithExtras = {
   id: string;
   campgroundId: string;
@@ -50,68 +104,85 @@ type ReservationWithExtras = {
   rigType?: string | null;
   rigLength?: number | null;
   guest?: {
+    id?: string;
     primaryFirstName: string;
     primaryLastName: string;
     email?: string;
+    phone?: string;
   } | null;
   site?: {
     name?: string | null;
     siteNumber?: string | null;
     siteClass?: {
       name?: string;
+      maxOccupancy?: number;
     } | null;
   } | null;
   payments?: Array<{
     id: string;
     amountCents: number;
     direction: string;
+    method?: string;
     createdAt?: string;
     date?: string;
   }>;
-  depositRule?: string | null;
-  depositPercentage?: number | null;
-  depositConfig?: {
-    rule?: string;
-    depositPercentage?: number;
-  } | null;
-  seasonalRateId?: string | null;
   balanceAmount?: number;
   createdAt?: string;
   updatedAt?: string;
   checkInAt?: string | null;
   checkOutAt?: string | null;
   seasonalGuestId?: string | null;
+  seasonalRateId?: string | null;
 };
 
 export default function ReservationDetailPage() {
   const params = useParams();
   const router = useRouter();
   const queryClient = useQueryClient();
-  const [commsFilter, setCommsFilter] = useState<"all" | "messages" | "notes" | "failed">("all");
+  const reservationId = params.reservationId as string;
+  const campgroundId = params.campgroundId as string;
+
+  // Payment modal state
+  const [paymentModalOpen, setPaymentModalOpen] = useState(false);
+
+  // Check-in celebration state
+  const [showCheckInSuccess, setShowCheckInSuccess] = useState(false);
+  const [showCheckOutSuccess, setShowCheckOutSuccess] = useState(false);
+
+  // Vehicle form state
   const [vehiclePlate, setVehiclePlate] = useState("");
   const [vehicleState, setVehicleState] = useState("");
   const [vehicleRigType, setVehicleRigType] = useState("");
   const [vehicleRigLength, setVehicleRigLength] = useState("");
+
+  // Access control state
+  const [accessProvider, setAccessProvider] = useState<"kisi" | "brivo" | "cloudkey">("kisi");
+  const [accessCode, setAccessCode] = useState("");
+
+  // Signature state
   const [signatureEmail, setSignatureEmail] = useState("");
   const [signatureType, setSignatureType] = useState("long_term_stay");
   const [deliveryChannel, setDeliveryChannel] = useState<"email" | "email_and_sms" | "sms">("email");
+
+  // COI state
   const [coiUrl, setCoiUrl] = useState("");
   const [coiExpiresAt, setCoiExpiresAt] = useState("");
-  const [accessProvider, setAccessProvider] = useState<"kisi" | "brivo" | "cloudkey">("kisi");
-  const [accessCode, setAccessCode] = useState("");
+
   // Convert to Seasonal state
   const [showConvertModal, setShowConvertModal] = useState(false);
   const [convertIsMetered, setConvertIsMetered] = useState(false);
   const [convertPaysInFull, setConvertPaysInFull] = useState(false);
-  const reservationId = params.reservationId as string;
-  const campgroundId = params.campgroundId as string;
 
+  // Collapsible sections
+  const [showAdvanced, setShowAdvanced] = useState(false);
+
+  // Queries
   const reservationQuery = useQuery({
     queryKey: ["reservation", reservationId],
     queryFn: () => apiClient.getReservation(reservationId),
     enabled: !!reservationId
   });
-  const reservation = reservationQuery.data;
+  const reservation = reservationQuery.data as ReservationWithExtras | undefined;
 
   const checkinStatusQuery = useQuery({
     queryKey: ["checkin-status", reservationId],
@@ -144,26 +215,10 @@ export default function ReservationDetailPage() {
       apiClient.listCommunications({
         campgroundId,
         reservationId,
-        guestId: reservationQuery.data?.guestId,
+        guestId: reservation?.guestId,
         limit: 30
       }),
     enabled: !!reservationId && !!campgroundId
-  });
-
-  const availabilityQuery = useQuery({
-    queryKey: ["reservation-availability", reservationId],
-    queryFn: () =>
-      apiClient.getAvailability(campgroundId, {
-        arrivalDate: reservation?.arrivalDate ?? "",
-        departureDate: reservation?.departureDate ?? ""
-      }),
-    enabled: !!reservationId && !!campgroundId && !!reservation?.arrivalDate && !!reservation?.departureDate
-  });
-
-  const relatedQuery = useQuery({
-    queryKey: ["related-reservations", campgroundId, reservation?.guestId],
-    queryFn: () => apiClient.getReservations(campgroundId),
-    enabled: !!campgroundId && !!reservation?.guestId
   });
 
   const chargesQuery = useQuery({
@@ -172,65 +227,10 @@ export default function ReservationDetailPage() {
     enabled: !!reservationId
   });
 
-  const updateReservation = useMutation({
-    mutationFn: (data: Parameters<typeof apiClient.updateReservation>[1]) => apiClient.updateReservation(reservationId, data),
-    onSuccess: (data, variables) => {
-      queryClient.invalidateQueries({ queryKey: ["reservation", reservationId] });
-      queryClient.invalidateQueries({ queryKey: ["reservations", campgroundId] });
-      if (variables.status === "checked_out" && reservation?.siteId) {
-        apiClient.updateSiteHousekeeping(reservation.siteId, "dirty").catch(err => {
-          console.error("Failed to update site housekeeping status:", err);
-        });
-      }
-    }
-  });
-
-  const vehicleMutation = useMutation({
-    mutationFn: (payload: { plate?: string; state?: string; rigType?: string; rigLength?: number }) => apiClient.upsertVehicle(reservationId, payload),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["access-status", reservationId] });
-      queryClient.invalidateQueries({ queryKey: ["reservation", reservationId] });
-    }
-  });
-
-  const grantAccessMutation = useMutation({
-    mutationFn: (payload: { provider: string; credentialType: string; credentialValue?: string; idempotencyKey: string }) => apiClient.grantAccess(reservationId, payload),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["access-status", reservationId] });
-    }
-  });
-
-  const revokeAccessMutation = useMutation({
-    mutationFn: (payload: { provider: string; providerAccessId?: string }) => apiClient.revokeAccess(reservationId, payload),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["access-status", reservationId] });
-    }
-  });
-
-  // Convert reservation to seasonal guest
-  const convertToSeasonalMutation = useMutation({
-    mutationFn: async () => {
-      const res = await fetch(`/api/seasonals/convert-from-reservation/${reservationId}`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify({
-          isMetered: convertIsMetered,
-          paysInFull: convertPaysInFull,
-        }),
-      });
-      if (!res.ok) {
-        const error = await res.json();
-        throw new Error(error.message || "Failed to convert to seasonal");
-      }
-      return res.json();
-    },
-    onSuccess: (data) => {
-      setShowConvertModal(false);
-      queryClient.invalidateQueries({ queryKey: ["reservation", reservationId] });
-      // Navigate to the seasonal guest detail page
-      router.push(`/campgrounds/${campgroundId}/seasonals`);
-    },
+  const relatedQuery = useQuery({
+    queryKey: ["related-reservations", campgroundId, reservation?.guestId],
+    queryFn: () => apiClient.getReservations(campgroundId),
+    enabled: !!campgroundId && !!reservation?.guestId
   });
 
   const signaturesQuery = useQuery({
@@ -244,6 +244,53 @@ export default function ReservationDetailPage() {
     retry: false
   });
 
+  // Mutations
+  const updateReservation = useMutation({
+    mutationFn: (data: Parameters<typeof apiClient.updateReservation>[1]) =>
+      apiClient.updateReservation(reservationId, data),
+    onSuccess: (data, variables) => {
+      queryClient.invalidateQueries({ queryKey: ["reservation", reservationId] });
+      queryClient.invalidateQueries({ queryKey: ["reservations", campgroundId] });
+
+      if (variables.status === "checked_in") {
+        setShowCheckInSuccess(true);
+        setTimeout(() => setShowCheckInSuccess(false), 4000);
+      }
+      if (variables.status === "checked_out") {
+        setShowCheckOutSuccess(true);
+        if (reservation?.siteId) {
+          apiClient.updateSiteHousekeeping(reservation.siteId, "dirty").catch(console.error);
+        }
+        setTimeout(() => setShowCheckOutSuccess(false), 4000);
+      }
+    }
+  });
+
+  const vehicleMutation = useMutation({
+    mutationFn: (payload: { plate?: string; state?: string; rigType?: string; rigLength?: number }) =>
+      apiClient.upsertVehicle(reservationId, payload),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["access-status", reservationId] });
+      queryClient.invalidateQueries({ queryKey: ["reservation", reservationId] });
+    }
+  });
+
+  const grantAccessMutation = useMutation({
+    mutationFn: (payload: { provider: string; credentialType: string; credentialValue?: string; idempotencyKey: string }) =>
+      apiClient.grantAccess(reservationId, payload),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["access-status", reservationId] });
+    }
+  });
+
+  const revokeAccessMutation = useMutation({
+    mutationFn: (payload: { provider: string; providerAccessId?: string }) =>
+      apiClient.revokeAccess(reservationId, payload),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["access-status", reservationId] });
+    }
+  });
+
   const createSignatureMutation = useMutation({
     mutationFn: async () => {
       const payload = {
@@ -252,8 +299,10 @@ export default function ReservationDetailPage() {
         documentType: signatureType,
         recipientEmail: signatureEmail || reservation?.guest?.email,
         deliveryChannel,
-        message: "Please review and sign the long-stay documents.",
-        recipientName: reservation?.guest ? `${reservation.guest.primaryFirstName} ${reservation.guest.primaryLastName}` : undefined
+        message: "Please review and sign the documents.",
+        recipientName: reservation?.guest
+          ? `${reservation.guest.primaryFirstName} ${reservation.guest.primaryLastName}`
+          : undefined
       };
       const res = await fetch("/api/signatures/requests", {
         method: "POST",
@@ -303,13 +352,38 @@ export default function ReservationDetailPage() {
     }
   });
 
+  const convertToSeasonalMutation = useMutation({
+    mutationFn: async () => {
+      const res = await fetch(`/api/seasonals/convert-from-reservation/${reservationId}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({
+          isMetered: convertIsMetered,
+          paysInFull: convertPaysInFull,
+        }),
+      });
+      if (!res.ok) {
+        const error = await res.json();
+        throw new Error(error.message || "Failed to convert to seasonal");
+      }
+      return res.json();
+    },
+    onSuccess: () => {
+      setShowConvertModal(false);
+      queryClient.invalidateQueries({ queryKey: ["reservation", reservationId] });
+      router.push(`/campgrounds/${campgroundId}/seasonals`);
+    },
+  });
+
+  // Initialize form values from reservation
   useEffect(() => {
     if (reservation) {
       setVehiclePlate(reservation.vehiclePlate || accessStatus?.vehicle?.plate || "");
       setVehicleState(reservation.vehicleState || accessStatus?.vehicle?.state || "");
       setVehicleRigType(reservation.rigType || accessStatus?.vehicle?.rigType || "");
       setVehicleRigLength(
-        reservation.rigLength !== undefined && reservation.rigLength !== null
+        reservation.rigLength != null
           ? String(reservation.rigLength)
           : accessStatus?.vehicle?.rigLength
             ? String(accessStatus.vehicle.rigLength)
@@ -321,748 +395,1086 @@ export default function ReservationDetailPage() {
     }
   }, [reservation?.id, accessStatus?.vehicle?.id]);
 
+  // Loading state
   if (reservationQuery.isLoading) {
     return (
       <DashboardShell>
-        <div className="flex h-80 items-center justify-center text-slate-600">Loading reservation…</div>
+        <div className="flex h-80 items-center justify-center">
+          <Loader2 className="h-8 w-8 animate-spin text-slate-400" />
+        </div>
       </DashboardShell>
     );
   }
 
+  // Not found state
   if (!reservation) {
     return (
       <DashboardShell>
         <div className="flex h-80 flex-col items-center justify-center gap-4 text-slate-600">
           <div>Reservation not found</div>
-          <Button onClick={() => router.push(`/campgrounds/${campgroundId}/reservations`)}>Back to list</Button>
+          <Button onClick={() => router.push(`/campgrounds/${campgroundId}/reservations`)}>
+            Back to list
+          </Button>
         </div>
       </DashboardShell>
     );
   }
 
+  // Computed values
   const guestName = reservation.guest
     ? `${reservation.guest.primaryFirstName} ${reservation.guest.primaryLastName}`
     : "Guest";
   const siteLabel = reservation.site
-    ? `${reservation.site.name || ""} #${reservation.site.siteNumber || ""}`.trim()
+    ? `${reservation.site.name || ""} ${reservation.site.siteNumber ? `#${reservation.site.siteNumber}` : ""}`.trim()
     : "Site";
+  const siteClassName = reservation.site?.siteClass?.name || "";
 
-  const reservationWithExtras = reservation as ReservationWithExtras;
-  const payments = reservationWithExtras.payments || [];
+  const payments = reservation.payments || [];
   const quote = quoteQuery.data;
   const comms = commsQuery.data?.items || [];
+  const signatureRequests = Array.isArray(signaturesQuery.data) ? signaturesQuery.data : [];
 
-  type RelatedReservation = {
-    id: string;
-    guestId: string;
-    arrivalDate: string;
-    departureDate: string;
-    status: string;
-    siteId: string;
-    site?: {
-      name?: string | null;
-      siteNumber?: string | null;
-    } | null;
-  };
-
-  const related = (relatedQuery.data || []).filter((r: RelatedReservation) => r.id !== reservationId && r.guestId === reservation.guestId).slice(0, 3);
   const total = (reservation.totalAmount ?? 0) / 100;
   const paid = (reservation.paidAmount ?? 0) / 100;
   const balance = Math.max(0, total - paid);
-  const depositRule = reservationWithExtras.depositRule ?? reservationWithExtras.depositConfig?.rule ?? null;
-  const depositPercentage =
-    reservationWithExtras.depositPercentage ?? reservationWithExtras.depositConfig?.depositPercentage ?? null;
-  const depositConfig = (reservationWithExtras.depositConfig as DepositConfig | undefined) ?? null;
-  const requiredDeposit =
-    quote?.totalCents && quote?.nights
-      ? computeDepositDue({
-        total: (quote?.totalCents ?? 0) / 100,
-        nights: quote?.nights ?? 1,
-        arrivalDate: reservation.arrivalDate,
-        depositRule,
-        depositPercentage,
-        depositConfig
-      })
-      : 0;
-  const signatureRequests = Array.isArray(signaturesQuery.data)
-    ? signaturesQuery.data
-    : signaturesQuery.isError
-      ? [
-        {
-          id: "stub-signature",
-          documentType: "long_term_stay",
-          status: "sent",
-          recipientEmail: reservation.guest?.email,
-          sentAt: new Date().toISOString()
-        }
-      ]
-      : [];
-  type SignatureRequest = {
-    id: string;
-    documentType: string;
-    status: string;
-    recipientEmail?: string;
-    sentAt?: string;
-    signedAt?: string;
-    token?: string;
-    artifact?: {
-      pdfUrl?: string;
-    };
-    template?: {
-      name?: string;
-      policyConfig?: {
-        enforcement?: string;
-      };
-    };
-    subject?: string;
-    metadata?: string | Record<string, unknown>;
-    children?: unknown[];
-  };
+  const balanceCents = balance * 100;
+  const nights = quote?.nights ?? Math.ceil(
+    (new Date(reservation.departureDate).getTime() - new Date(reservation.arrivalDate).getTime()) / (1000 * 60 * 60 * 24)
+  );
 
-  const getRequestMetadata = (req: SignatureRequest) => {
-    const raw = req?.metadata;
-    if (!raw) return {};
-    if (typeof raw === "string") {
-      try {
-        return JSON.parse(raw);
-      } catch {
-        return {};
-      }
-    }
-    return raw as Record<string, unknown>;
-  };
-  const isPolicyRequest = (req: SignatureRequest) => {
-    const meta = getRequestMetadata(req);
-    return Boolean(meta?.policyId || meta?.policyName || meta?.enforcement || req?.template?.policyConfig);
-  };
-  const policyRequests = signatureRequests.filter(isPolicyRequest);
-  const otherSignatureRequests = signatureRequests.filter((req: SignatureRequest) => !isPolicyRequest(req));
+  const related = (relatedQuery.data || [])
+    .filter((r: any) => r.id !== reservationId && r.guestId === reservation.guestId)
+    .slice(0, 5);
 
-  const statusBadge =
-    reservation.status === "confirmed"
-      ? "bg-emerald-100 text-emerald-700 border-emerald-200"
-      : reservation.status === "checked_in"
-        ? "bg-blue-100 text-blue-700 border-blue-200"
-        : reservation.status === "checked_out"
-          ? "bg-slate-100 text-slate-700 border-slate-200"
-          : reservation.status === "cancelled"
-            ? "bg-rose-100 text-rose-700 border-rose-200"
-            : "bg-amber-100 text-amber-700 border-amber-200";
-
-  type CommunicationItem = {
-    id: string;
-    subject?: string | null;
-    type?: string;
-    status?: string;
-    createdAt?: string;
+  const statusConfig: Record<string, { bg: string; text: string; border: string }> = {
+    confirmed: { bg: "bg-emerald-50", text: "text-emerald-700", border: "border-emerald-200" },
+    checked_in: { bg: "bg-blue-50", text: "text-blue-700", border: "border-blue-200" },
+    checked_out: { bg: "bg-slate-50", text: "text-slate-600", border: "border-slate-200" },
+    cancelled: { bg: "bg-rose-50", text: "text-rose-700", border: "border-rose-200" },
+    pending: { bg: "bg-amber-50", text: "text-amber-700", border: "border-amber-200" }
   };
-
-  const activity = [
-    ...payments.map((p, idx: number) => ({
-      id: `pay-${idx}`,
-      label: `${p.direction === "refund" ? "Refund" : "Payment"} $${((p.amountCents ?? 0) / 100).toFixed(2)}`,
-      at: p.createdAt || p.date || reservationWithExtras.updatedAt
-    })),
-    ...comms.map((c: CommunicationItem, idx: number) => ({
-      id: `comm-${idx}`,
-      label: c.subject || c.type || "Message",
-      at: c.createdAt || reservation.updatedAt
-    }))
-  ]
-    .filter((a): a is { id: string; label: string; at: string } => !!a.at)
-    .sort((a, b) => new Date(b.at).getTime() - new Date(a.at).getTime())
-    .slice(0, 8);
+  const status = statusConfig[reservation.status] || statusConfig.pending;
 
   return (
     <DashboardShell>
-      <div className="space-y-4">
-        <Breadcrumbs
-          items={[
-            { label: "Campgrounds", href: "/campgrounds?all=true" },
-            { label: `Campground ${campgroundId}`, href: `/campgrounds/${campgroundId}` },
-            { label: "Reservations", href: `/campgrounds/${campgroundId}/reservations` },
-            { label: reservationId }
-          ]}
-        />
-
-        <div className="flex flex-wrap items-center justify-between gap-3">
+      {/* ═══════════════════════════════════════════════════════════════════════ */}
+      {/* STICKY HEADER - Always visible with key info and actions */}
+      {/* ═══════════════════════════════════════════════════════════════════════ */}
+      <div className="sticky top-0 z-40 -mx-4 -mt-4 mb-6 bg-white/95 backdrop-blur-sm border-b border-slate-200 px-4 py-4 shadow-sm">
+        <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+          {/* Left: Back button + Guest info */}
           <div className="flex items-center gap-3">
-            <Button variant="ghost" size="icon" onClick={() => router.back()}>
+            <Button variant="ghost" size="icon" onClick={() => router.back()} className="shrink-0">
               <ArrowLeft className="h-4 w-4" />
             </Button>
-            <div>
-              <h1 className="text-2xl font-bold text-slate-900">{guestName}</h1>
-              <div className="text-sm text-slate-500">
-                {formatDate(reservation.arrivalDate)} → {formatDate(reservation.departureDate)} • {siteLabel}
+            <div className="min-w-0">
+              <div className="flex items-center gap-2 flex-wrap">
+                <h1 className="text-xl font-bold text-slate-900 truncate">{guestName}</h1>
+                <Badge className={cn("capitalize", status.bg, status.text, status.border)}>
+                  {reservation.status?.replace("_", " ") || "pending"}
+                </Badge>
+              </div>
+              <div className="text-sm text-slate-500 flex items-center gap-2 flex-wrap">
+                <span>{formatDate(reservation.arrivalDate)} - {formatDate(reservation.departureDate)}</span>
+                <span className="text-slate-300">|</span>
+                <span>{siteLabel}</span>
+                {siteClassName && (
+                  <>
+                    <span className="text-slate-300">|</span>
+                    <span>{siteClassName}</span>
+                  </>
+                )}
               </div>
             </div>
           </div>
-          <div className="flex flex-wrap items-center gap-2">
-            <Badge variant="outline" className={`capitalize border ${statusBadge}`}>{reservation.status?.replace("_", " ") || "pending"}</Badge>
-            <Badge variant="secondary" className="border border-slate-200 bg-slate-50 text-slate-800">
-              Paid ${paid.toFixed(2)} • Bal ${balance.toFixed(2)}
-            </Badge>
+
+          {/* Right: Balance + Actions */}
+          <div className="flex items-center gap-3 flex-wrap">
+            {/* Balance indicator - prominent when balance > 0 */}
+            {balance > 0 ? (
+              <button
+                onClick={() => setPaymentModalOpen(true)}
+                className={cn(
+                  "flex items-center gap-2 px-4 py-2 rounded-lg transition-all",
+                  "bg-gradient-to-r from-amber-50 to-orange-50 border-2 border-amber-300",
+                  "hover:border-amber-400 hover:shadow-md cursor-pointer group"
+                )}
+              >
+                <DollarSign className="h-5 w-5 text-amber-600 group-hover:scale-110 transition-transform" />
+                <div className="text-left">
+                  <div className="text-xs text-amber-700 font-medium">Balance Due</div>
+                  <div className="text-lg font-bold text-amber-900">{formatCurrency(balanceCents)}</div>
+                </div>
+              </button>
+            ) : (
+              <div className="flex items-center gap-2 px-4 py-2 rounded-lg bg-emerald-50 border border-emerald-200">
+                <CheckCircle className="h-5 w-5 text-emerald-600" />
+                <div className="text-left">
+                  <div className="text-xs text-emerald-700 font-medium">Paid in Full</div>
+                  <div className="text-lg font-bold text-emerald-900">{formatCurrency(total * 100)}</div>
+                </div>
+              </div>
+            )}
+
+            {/* Primary action buttons */}
             {reservation.status === "confirmed" && (
-              <Button
-                size="sm"
-                variant="secondary"
-                onClick={() => updateReservation.mutate({ status: "checked_in" })}
-                disabled={updateReservation.isPending}
-              >
-                <CheckCircle className="h-4 w-4 mr-1" />
-                Check in
-              </Button>
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <Button size="lg" className="bg-blue-600 hover:bg-blue-700">
+                    <CheckCircle className="h-4 w-4 mr-2" />
+                    Check In
+                  </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle className="flex items-center gap-3">
+                      <div className="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center">
+                        <CheckCircle className="h-5 w-5 text-blue-600" />
+                      </div>
+                      Ready to check in {guestName}?
+                    </AlertDialogTitle>
+                    <AlertDialogDescription className="sr-only">
+                      Confirm check-in for {guestName}
+                    </AlertDialogDescription>
+                    <div className="space-y-3">
+                      <div className="rounded-lg border border-slate-200 bg-slate-50 p-3">
+                        <div className="flex items-center gap-2 text-sm text-slate-600">
+                          <MapPin className="h-4 w-4" />
+                          <span>{siteLabel}</span>
+                        </div>
+                        <div className="flex items-center gap-2 text-sm text-slate-600 mt-1">
+                          <Calendar className="h-4 w-4" />
+                          <span>{formatDate(reservation.arrivalDate)} - {formatDate(reservation.departureDate)}</span>
+                        </div>
+                      </div>
+                      <div className="text-xs text-slate-500 space-y-1">
+                        <div className="flex items-center gap-2">
+                          <Check className="h-3 w-3 text-emerald-600" />
+                          <span>Access credentials will be activated</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Check className="h-3 w-3 text-emerald-600" />
+                          <span>Welcome message will be sent</span>
+                        </div>
+                        {balance > 0 && (
+                          <div className="flex items-center gap-2 text-amber-600">
+                            <AlertTriangle className="h-3 w-3" />
+                            <span>Outstanding balance: {formatCurrency(balanceCents)}</span>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                    <AlertDialogAction
+                      onClick={() => updateReservation.mutate({ status: "checked_in" })}
+                      className="bg-blue-600 hover:bg-blue-700"
+                      disabled={updateReservation.isPending}
+                    >
+                      {updateReservation.isPending ? (
+                        <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                      ) : (
+                        <CheckCircle className="h-4 w-4 mr-2" />
+                      )}
+                      Yes, Check In
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
             )}
+
             {reservation.status === "checked_in" && (
-              <Button
-                size="sm"
-                variant="secondary"
-                onClick={() => updateReservation.mutate({ status: "checked_out" })}
-                disabled={updateReservation.isPending}
-              >
-                <DoorOpen className="h-4 w-4 mr-1" />
-                Check out
-              </Button>
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <Button size="lg" variant="secondary">
+                    <DoorOpen className="h-4 w-4 mr-2" />
+                    Check Out
+                  </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle className="flex items-center gap-3">
+                      <div className="h-10 w-10 rounded-full bg-slate-100 flex items-center justify-center">
+                        <DoorOpen className="h-5 w-5 text-slate-600" />
+                      </div>
+                      Check out {guestName}?
+                    </AlertDialogTitle>
+                    <AlertDialogDescription className="sr-only">
+                      Confirm check-out for {guestName}
+                    </AlertDialogDescription>
+                    <div className="space-y-3">
+                      {balance > 0 && (
+                        <div className="rounded-lg border-2 border-amber-300 bg-amber-50 p-3">
+                          <div className="flex items-center gap-2 text-amber-800 font-medium">
+                            <AlertTriangle className="h-4 w-4" />
+                            <span>Outstanding balance: {formatCurrency(balanceCents)}</span>
+                          </div>
+                          <p className="text-sm text-amber-700 mt-1">
+                            Consider collecting payment before check-out.
+                          </p>
+                        </div>
+                      )}
+                      <div className="text-xs text-slate-500 space-y-1">
+                        <div className="flex items-center gap-2">
+                          <Check className="h-3 w-3 text-emerald-600" />
+                          <span>Access credentials will be deactivated</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Check className="h-3 w-3 text-emerald-600" />
+                          <span>Site will be marked for housekeeping</span>
+                        </div>
+                      </div>
+                    </div>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                    {balance > 0 && (
+                      <Button variant="outline" onClick={() => setPaymentModalOpen(true)}>
+                        <CreditCard className="h-4 w-4 mr-2" />
+                        Collect Balance First
+                      </Button>
+                    )}
+                    <AlertDialogAction
+                      onClick={() => updateReservation.mutate({ status: "checked_out" })}
+                      disabled={updateReservation.isPending}
+                    >
+                      {updateReservation.isPending ? (
+                        <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                      ) : (
+                        <DoorOpen className="h-4 w-4 mr-2" />
+                      )}
+                      Complete Check Out
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
             )}
-            <Button size="sm" variant="outline" onClick={() => window.scrollTo({ top: 600, behavior: "smooth" })}>
-              <MessageSquare className="h-4 w-4 mr-1" />
+
+            <Button
+              variant="outline"
+              onClick={() => {
+                localStorage.setItem("campreserv:openReservationId", reservation.id);
+                router.push("/messages");
+              }}
+            >
+              <MessageSquare className="h-4 w-4 mr-2" />
               Message
             </Button>
-            {/* Show Convert to Seasonal button for long-term stays (28+ nights) */}
-            {(quote?.nights ?? 0) >= 28 && !reservationWithExtras.seasonalGuestId && (
-              <Button
-                size="sm"
-                variant="outline"
-                onClick={() => setShowConvertModal(true)}
-                className="border-amber-300 text-amber-700 hover:bg-amber-50"
-              >
-                <Tent className="h-4 w-4 mr-1" />
-                Convert to Seasonal
-              </Button>
-            )}
-            {reservationWithExtras.seasonalGuestId && (
-              <Button
-                size="sm"
-                variant="outline"
-                asChild
-                className="border-green-300 text-green-700 hover:bg-green-50"
-              >
-                <a href={`/campgrounds/${campgroundId}/seasonals`}>
-                  <Tent className="h-4 w-4 mr-1" />
-                  View Seasonal
-                </a>
+
+            {balance > 0 && (
+              <Button onClick={() => setPaymentModalOpen(true)} className="bg-emerald-600 hover:bg-emerald-700">
+                <CreditCard className="h-4 w-4 mr-2" />
+                Collect Payment
               </Button>
             )}
           </div>
         </div>
+      </div>
 
-        <div className="grid gap-4 md:grid-cols-3">
-          <Card className="md:col-span-2">
-            <CardHeader>
-              <CardTitle>Stay details</CardTitle>
-            </CardHeader>
-            <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-              <div>
-                <div className="text-xs text-slate-500">Guest</div>
-                <div className="font-medium">{guestName}</div>
-                <div className="text-xs text-slate-500">{reservation.guest?.email}</div>
+      {/* ═══════════════════════════════════════════════════════════════════════ */}
+      {/* CHECK-IN SUCCESS CELEBRATION */}
+      {/* ═══════════════════════════════════════════════════════════════════════ */}
+      <AnimatePresence>
+        {showCheckInSuccess && (
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            className="mb-6 p-6 rounded-xl bg-gradient-to-r from-emerald-50 to-green-50 border-2 border-emerald-300"
+          >
+            <div className="flex items-center gap-4">
+              <div className="h-12 w-12 rounded-full bg-emerald-100 flex items-center justify-center">
+                <PartyPopper className="h-6 w-6 text-emerald-600" />
               </div>
               <div>
-                <div className="text-xs text-slate-500">Site</div>
-                <div className="font-medium">{siteLabel}</div>
-                <div className="text-xs text-slate-500">{(reservation.site as { siteClass?: { name?: string } } | undefined)?.siteClass?.name || "—"}</div>
+                <h3 className="text-lg font-bold text-emerald-900">Welcome!</h3>
+                <p className="text-emerald-700">{guestName} is now checked in to {siteLabel}</p>
               </div>
-              <div>
-                <div className="text-xs text-slate-500">Dates</div>
-                <div className="font-medium">
-                  {formatDate(reservation.arrivalDate)} → {formatDate(reservation.departureDate)}
-                </div>
-              </div>
-              <div>
-                <div className="text-xs text-slate-500">Party</div>
-                <div className="font-medium">
-                  {reservation.adults ?? 0} adults • {reservation.children ?? 0} children
-                </div>
-              </div>
-              <div>
-                <div className="text-xs text-slate-500">Notes</div>
-                <div className="font-medium whitespace-pre-line">
-                  {reservation.notes || "—"}
-                </div>
-              </div>
-              <div>
-                <div className="text-xs text-slate-500">Occupancy</div>
-                <div className="font-medium">
-                  {(reservation.adults ?? 0) + (reservation.children ?? 0)} / {(reservation.site as { siteClass?: { maxOccupancy?: number } } | undefined)?.siteClass?.maxOccupancy || "—"}
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
-          {(reservationWithExtras.seasonalRateId || (chargesQuery.data?.length ?? 0) > 0) && (
-            <Card className="md:col-span-2">
-              <CardHeader className="flex flex-row items-center justify-between pb-2">
-                <CardTitle className="flex items-center gap-2 text-blue-700">
-                  <Calculator className="h-4 w-4" />
-                  Billing Schedule
+      <AnimatePresence>
+        {showCheckOutSuccess && (
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            className="mb-6 p-6 rounded-xl bg-gradient-to-r from-blue-50 to-sky-50 border-2 border-blue-300"
+          >
+            <div className="flex items-center gap-4">
+              <div className="h-12 w-12 rounded-full bg-blue-100 flex items-center justify-center">
+                <CheckCircle className="h-6 w-6 text-blue-600" />
+              </div>
+              <div>
+                <h3 className="text-lg font-bold text-blue-900">Check-out Complete</h3>
+                <p className="text-blue-700">Site {siteLabel} has been marked for housekeeping</p>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* ═══════════════════════════════════════════════════════════════════════ */}
+      {/* TABBED CONTENT */}
+      {/* ═══════════════════════════════════════════════════════════════════════ */}
+      <Tabs defaultValue="overview" className="space-y-6">
+        <TabsList className="grid w-full grid-cols-5 lg:w-auto lg:inline-grid">
+          <TabsTrigger value="overview" className="gap-2">
+            <User className="h-4 w-4 hidden sm:inline" />
+            Overview
+          </TabsTrigger>
+          <TabsTrigger value="payments" className="gap-2">
+            <DollarSign className="h-4 w-4 hidden sm:inline" />
+            Payments
+          </TabsTrigger>
+          <TabsTrigger value="communications" className="gap-2">
+            <MessageSquare className="h-4 w-4 hidden sm:inline" />
+            Comms
+          </TabsTrigger>
+          <TabsTrigger value="checkin" className="gap-2">
+            <ShieldCheck className="h-4 w-4 hidden sm:inline" />
+            Check-in
+          </TabsTrigger>
+          <TabsTrigger value="history" className="gap-2">
+            <History className="h-4 w-4 hidden sm:inline" />
+            History
+          </TabsTrigger>
+        </TabsList>
+
+        {/* ═══════════════════════════════════════════════════════════════════ */}
+        {/* TAB: OVERVIEW */}
+        {/* ═══════════════════════════════════════════════════════════════════ */}
+        <TabsContent value="overview" className="space-y-6">
+          <div className="grid gap-6 lg:grid-cols-3">
+            {/* Stay Details - 2/3 width */}
+            <Card className="lg:col-span-2">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <User className="h-5 w-5 text-slate-500" />
+                  Stay Details
                 </CardTitle>
-                <Button
-                  size="sm"
-                  variant="outline"
-                  onClick={() => {
-                    apiClient.generateRepeatCharges(reservationId)
-                      .then(() => queryClient.invalidateQueries({ queryKey: ["reservation-charges", reservationId] }));
-                  }}
-                >
-                  Regenerate
-                </Button>
               </CardHeader>
               <CardContent>
-                <div className="space-y-4">
-                  {chargesQuery.isLoading ? (
-                    <p className="text-slate-500 text-xs py-4 text-center">Loading schedule...</p>
-                  ) : chargesQuery.data?.length === 0 ? (
-                    <p className="text-slate-500 text-xs italic py-4 text-center border rounded-md">No recurring charges scheduled.</p>
-                  ) : (
-                    <div className="rounded-md border border-slate-200 overflow-hidden shadow-sm">
-                      <table className="w-full text-xs text-left">
-                        <thead className="bg-slate-50 border-b border-slate-200 text-slate-700 uppercase tracking-tight font-semibold">
-                          <tr>
-                            <th className="px-3 py-2.5">Due Date</th>
-                            <th className="px-3 py-2.5">Amount</th>
-                            <th className="px-3 py-2.5">Status</th>
-                            <th className="px-3 py-2.5 text-right">Action</th>
-                          </tr>
-                        </thead>
-                        <tbody className="divide-y divide-slate-200 bg-white">
-                          {chargesQuery.data?.map((charge) => (
-                            <tr key={charge.id} className="hover:bg-slate-50/50">
-                              <td className="px-3 py-2 text-slate-900 font-medium">{formatDate(charge.dueDate)}</td>
-                              <td className="px-3 py-2 text-slate-700 font-semibold">${(charge.amount / 100).toFixed(2)}</td>
-                              <td className="px-3 py-2">
-                                <Badge
-                                  className={`text-[10px] px-2 py-0 border capitalize ${charge.status === "paid" ? "bg-emerald-50 text-emerald-700 border-emerald-200" :
-                                      charge.status === "failed" ? "bg-rose-50 text-rose-700 border-rose-200" :
-                                        "bg-amber-50 text-amber-700 border-amber-200"
-                                    }`}
-                                  variant="outline"
-                                >
-                                  {charge.status}
-                                </Badge>
-                              </td>
-                              <td className="px-3 py-2 text-right">
-                                {charge.status !== "paid" && (
-                                  <Button size="sm" variant="secondary" className="h-7" onClick={() => {
-                                    apiClient.processRepeatCharge(charge.id)
-                                      .then(() => {
-                                        queryClient.invalidateQueries({ queryKey: ["reservation-charges", reservationId] });
-                                        queryClient.invalidateQueries({ queryKey: ["reservation", reservationId] });
-                                      });
-                                  }}>Process</Button>
-                                )}
-                              </td>
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
+                <div className="grid gap-6 sm:grid-cols-2">
+                  <div className="space-y-1">
+                    <div className="text-xs font-medium text-slate-500 uppercase tracking-wide">Guest</div>
+                    <div className="font-semibold text-slate-900">{guestName}</div>
+                    <div className="text-sm text-slate-600">{reservation.guest?.email || "--"}</div>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="h-auto p-0 text-blue-600"
+                      onClick={() => router.push(`/guests/${reservation.guestId}`)}
+                    >
+                      View Profile
+                    </Button>
+                  </div>
+                  <div className="space-y-1">
+                    <div className="text-xs font-medium text-slate-500 uppercase tracking-wide">Site</div>
+                    <div className="font-semibold text-slate-900">{siteLabel}</div>
+                    <div className="text-sm text-slate-600">{siteClassName || "Standard"}</div>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="h-auto p-0 text-blue-600"
+                      onClick={() => router.push(`/campgrounds/${campgroundId}/sites/${reservation.siteId}`)}
+                    >
+                      View Site
+                    </Button>
+                  </div>
+                  <div className="space-y-1">
+                    <div className="text-xs font-medium text-slate-500 uppercase tracking-wide">Dates</div>
+                    <div className="font-semibold text-slate-900">
+                      {formatDate(reservation.arrivalDate)} - {formatDate(reservation.departureDate)}
+                    </div>
+                    <div className="text-sm text-slate-600">{nights} night{nights !== 1 ? "s" : ""}</div>
+                  </div>
+                  <div className="space-y-1">
+                    <div className="text-xs font-medium text-slate-500 uppercase tracking-wide">Party Size</div>
+                    <div className="font-semibold text-slate-900">
+                      {(reservation.adults ?? 0) + (reservation.children ?? 0)} guest{(reservation.adults ?? 0) + (reservation.children ?? 0) !== 1 ? "s" : ""}
+                    </div>
+                    <div className="text-sm text-slate-600">
+                      {reservation.adults ?? 0} adult{(reservation.adults ?? 0) !== 1 ? "s" : ""}, {reservation.children ?? 0} child{(reservation.children ?? 0) !== 1 ? "ren" : ""}
+                    </div>
+                  </div>
+                  {(vehiclePlate || reservation.vehiclePlate) && (
+                    <div className="space-y-1">
+                      <div className="text-xs font-medium text-slate-500 uppercase tracking-wide">Vehicle</div>
+                      <div className="font-semibold text-slate-900">
+                        {vehiclePlate || reservation.vehiclePlate} {vehicleState || reservation.vehicleState}
+                      </div>
+                      <div className="text-sm text-slate-600">
+                        {vehicleRigType || reservation.rigType || ""}
+                        {(vehicleRigLength || reservation.rigLength) ? ` - ${vehicleRigLength || reservation.rigLength}ft` : ""}
+                      </div>
+                    </div>
+                  )}
+                  {reservation.notes && (
+                    <div className="sm:col-span-2 space-y-1">
+                      <div className="text-xs font-medium text-slate-500 uppercase tracking-wide">Notes</div>
+                      <div className="text-sm text-slate-700 whitespace-pre-line bg-slate-50 rounded-lg p-3 border border-slate-200">
+                        {reservation.notes}
+                      </div>
                     </div>
                   )}
                 </div>
               </CardContent>
             </Card>
-          )}
 
+            {/* Financial Summary - 1/3 width */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center justify-between">
+                  <span className="flex items-center gap-2">
+                    <DollarSign className="h-5 w-5 text-emerald-600" />
+                    Financial
+                  </span>
+                  {balance > 0 && (
+                    <Badge className="bg-amber-100 text-amber-800 border border-amber-300">
+                      {formatCurrency(balanceCents)} due
+                    </Badge>
+                  )}
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {/* Primary action area */}
+                <div className={cn(
+                  "p-4 rounded-lg border-2 space-y-3",
+                  balance > 0
+                    ? "bg-gradient-to-br from-amber-50 to-orange-50 border-amber-200"
+                    : "bg-gradient-to-br from-emerald-50 to-green-50 border-emerald-200"
+                )}>
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <div className="text-sm text-slate-600">
+                        {balance > 0 ? "Amount Due" : "Total Paid"}
+                      </div>
+                      <div className={cn(
+                        "text-2xl font-bold",
+                        balance > 0 ? "text-amber-900" : "text-emerald-900"
+                      )}>
+                        {formatCurrency(balance > 0 ? balanceCents : total * 100)}
+                      </div>
+                    </div>
+                    {balance > 0 ? (
+                      <Button
+                        onClick={() => setPaymentModalOpen(true)}
+                        className="bg-emerald-600 hover:bg-emerald-700 shadow-lg hover:shadow-emerald-500/30"
+                      >
+                        <CreditCard className="h-4 w-4 mr-2" />
+                        Collect
+                      </Button>
+                    ) : (
+                      <CheckCircle className="h-8 w-8 text-emerald-600" />
+                    )}
+                  </div>
+                  <div className="flex items-center justify-between text-sm text-slate-600 pt-2 border-t border-slate-200/50">
+                    <span>Total: {formatCurrency(total * 100)}</span>
+                    <span>Paid: {formatCurrency(paid * 100)}</span>
+                  </div>
+                </div>
+
+                {/* Payment count */}
+                <div className="text-sm text-slate-500">
+                  {payments.length} payment{payments.length !== 1 ? "s" : ""} recorded
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Timeline + Related Reservations */}
+          <div className="grid gap-6 lg:grid-cols-2">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Clock className="h-5 w-5 text-slate-500" />
+                  Timeline
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="text-slate-600">Created</span>
+                    <span className="font-medium">{formatDateTime(reservation.createdAt)}</span>
+                  </div>
+                  {payments.slice(0, 3).map((p, i) => (
+                    <div key={p.id} className="flex items-center justify-between text-sm">
+                      <span className="text-slate-600">
+                        {p.direction === "refund" ? "Refund" : "Payment"}
+                      </span>
+                      <span className={cn(
+                        "font-medium",
+                        p.direction === "refund" ? "text-rose-600" : "text-emerald-600"
+                      )}>
+                        {formatCurrency(p.amountCents)} - {formatDateTime(p.createdAt || p.date)}
+                      </span>
+                    </div>
+                  ))}
+                  {reservation.checkInAt && (
+                    <div className="flex items-center justify-between text-sm">
+                      <span className="text-slate-600">Checked in</span>
+                      <span className="font-medium text-blue-600">{formatDateTime(reservation.checkInAt)}</span>
+                    </div>
+                  )}
+                  {reservation.checkOutAt && (
+                    <div className="flex items-center justify-between text-sm">
+                      <span className="text-slate-600">Checked out</span>
+                      <span className="font-medium">{formatDateTime(reservation.checkOutAt)}</span>
+                    </div>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center justify-between">
+                  <span className="flex items-center gap-2">
+                    <Users className="h-5 w-5 text-slate-500" />
+                    Related Stays
+                  </span>
+                  {related.length > 0 && (
+                    <Badge variant="secondary">{related.length}</Badge>
+                  )}
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                {related.length === 0 ? (
+                  <p className="text-sm text-slate-500">First time guest - no previous stays</p>
+                ) : (
+                  <div className="space-y-2">
+                    {related.map((r: any) => (
+                      <button
+                        key={r.id}
+                        onClick={() => router.push(`/campgrounds/${campgroundId}/reservations/${r.id}`)}
+                        className="w-full flex items-center justify-between p-2 rounded-lg border border-slate-200 hover:bg-slate-50 transition-colors text-left"
+                      >
+                        <div>
+                          <div className="text-sm font-medium">
+                            {formatDate(r.arrivalDate)} - {formatDate(r.departureDate)}
+                          </div>
+                          <div className="text-xs text-slate-500">
+                            {r.site?.name || r.site?.siteNumber || r.siteId}
+                          </div>
+                        </div>
+                        <Badge variant="outline" className="capitalize text-xs">
+                          {r.status?.replace("_", " ")}
+                        </Badge>
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Advanced Section (Collapsible) */}
+          {((quote?.nights ?? 0) >= 28 || reservation.seasonalGuestId) && (
+            <Card>
+              <CardHeader>
+                <button
+                  onClick={() => setShowAdvanced(!showAdvanced)}
+                  className="w-full flex items-center justify-between"
+                >
+                  <CardTitle className="flex items-center gap-2">
+                    <Sparkles className="h-5 w-5 text-amber-500" />
+                    Advanced Options
+                  </CardTitle>
+                  {showAdvanced ? (
+                    <ChevronUp className="h-5 w-5 text-slate-400" />
+                  ) : (
+                    <ChevronDown className="h-5 w-5 text-slate-400" />
+                  )}
+                </button>
+              </CardHeader>
+              <AnimatePresence>
+                {showAdvanced && (
+                  <motion.div
+                    initial={{ height: 0, opacity: 0 }}
+                    animate={{ height: "auto", opacity: 1 }}
+                    exit={{ height: 0, opacity: 0 }}
+                  >
+                    <CardContent className="space-y-4">
+                      {(quote?.nights ?? 0) >= 28 && !reservation.seasonalGuestId && (
+                        <div className="flex items-center justify-between p-4 rounded-lg border border-amber-200 bg-amber-50">
+                          <div>
+                            <div className="font-medium text-amber-900">Convert to Seasonal</div>
+                            <div className="text-sm text-amber-700">
+                              This {quote?.nights}-night stay qualifies for seasonal guest management
+                            </div>
+                          </div>
+                          <Button
+                            variant="outline"
+                            onClick={() => setShowConvertModal(true)}
+                            className="border-amber-300 text-amber-700 hover:bg-amber-100"
+                          >
+                            <Tent className="h-4 w-4 mr-2" />
+                            Convert
+                          </Button>
+                        </div>
+                      )}
+                      {reservation.seasonalGuestId && (
+                        <div className="flex items-center justify-between p-4 rounded-lg border border-emerald-200 bg-emerald-50">
+                          <div>
+                            <div className="font-medium text-emerald-900">Seasonal Guest</div>
+                            <div className="text-sm text-emerald-700">
+                              This reservation is linked to a seasonal guest record
+                            </div>
+                          </div>
+                          <Button
+                            variant="outline"
+                            onClick={() => router.push(`/campgrounds/${campgroundId}/seasonals`)}
+                            className="border-emerald-300 text-emerald-700 hover:bg-emerald-100"
+                          >
+                            <Tent className="h-4 w-4 mr-2" />
+                            View Seasonal
+                          </Button>
+                        </div>
+                      )}
+                    </CardContent>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </Card>
+          )}
+        </TabsContent>
+
+        {/* ═══════════════════════════════════════════════════════════════════ */}
+        {/* TAB: PAYMENTS */}
+        {/* ═══════════════════════════════════════════════════════════════════ */}
+        <TabsContent value="payments" className="space-y-6">
+          <div className="flex items-center justify-between">
+            <h2 className="text-lg font-semibold">Payment Management</h2>
+            <div className="flex gap-2">
+              {balance > 0 && (
+                <Button onClick={() => setPaymentModalOpen(true)}>
+                  <CreditCard className="h-4 w-4 mr-2" />
+                  Collect Payment
+                </Button>
+              )}
+            </div>
+          </div>
+
+          <div className="grid gap-6 lg:grid-cols-2">
+            {/* Payment Summary */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Payment Summary</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="space-y-3">
+                  <div className="flex justify-between">
+                    <span className="text-slate-600">Total</span>
+                    <span className="font-semibold">{formatCurrency(total * 100)}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-slate-600">Paid</span>
+                    <span className="font-semibold text-emerald-600">{formatCurrency(paid * 100)}</span>
+                  </div>
+                  <div className="h-2 rounded-full bg-slate-200 overflow-hidden">
+                    <div
+                      className="h-full bg-emerald-500 transition-all"
+                      style={{ width: `${Math.min(100, (paid / total) * 100)}%` }}
+                    />
+                  </div>
+                  <div className="flex justify-between pt-2 border-t">
+                    <span className="font-medium">Balance</span>
+                    <span className={cn(
+                      "font-bold text-lg",
+                      balance > 0 ? "text-amber-600" : "text-emerald-600"
+                    )}>
+                      {formatCurrency(balanceCents)}
+                    </span>
+                  </div>
+                </div>
+
+                {balance > 0 && (
+                  <Button
+                    onClick={() => setPaymentModalOpen(true)}
+                    className="w-full bg-emerald-600 hover:bg-emerald-700"
+                    size="lg"
+                  >
+                    <CreditCard className="h-5 w-5 mr-2" />
+                    Collect {formatCurrency(balanceCents)}
+                  </Button>
+                )}
+              </CardContent>
+            </Card>
+
+            {/* Pricing Breakdown */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center justify-between">
+                  <span>Pricing Breakdown</span>
+                  {quoteQuery.isLoading && <Loader2 className="h-4 w-4 animate-spin" />}
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-2 text-sm">
+                <div className="flex justify-between">
+                  <span>Base ({nights} nights)</span>
+                  <span>{formatCurrency(quote?.baseSubtotalCents ?? 0)}</span>
+                </div>
+                {(quote?.rulesDeltaCents ?? 0) !== 0 && (
+                  <div className="flex justify-between">
+                    <span>Adjustments</span>
+                    <span>{formatCurrency(quote?.rulesDeltaCents ?? 0)}</span>
+                  </div>
+                )}
+                <div className="h-px bg-slate-200 my-2" />
+                <div className="flex justify-between font-medium">
+                  <span>Quoted Total</span>
+                  <span>{formatCurrency(quote?.totalCents ?? reservation.totalAmount)}</span>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Payment History */}
           <Card>
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <DollarSign className="h-4 w-4 text-emerald-600" />
-                Payments
-              </CardTitle>
+              <CardTitle>Payment History</CardTitle>
             </CardHeader>
-            <CardContent className="space-y-2 text-sm">
-              <div className="flex items-center justify-between">
-                <span className="text-slate-500">Deposit</span>
-                <span
-                  className={`px-2 py-0.5 rounded-full text-[11px] font-semibold ${paid >= requiredDeposit
-                    ? "bg-emerald-100 text-emerald-800"
-                    : "bg-amber-100 text-amber-800"
-                    }`}
-                >
-                  {paid >= requiredDeposit ? "Deposit covered" : `Deposit due $${Math.max(0, requiredDeposit - paid).toFixed(2)}`}
-                </span>
-              </div>
-              {requiredDeposit > 0 && paid < requiredDeposit && (
-                <div className="flex">
+            <CardContent>
+              {payments.length === 0 ? (
+                <p className="text-sm text-slate-500 text-center py-8">
+                  No payments recorded yet
+                </p>
+              ) : (
+                <div className="rounded-lg border overflow-hidden">
+                  <table className="w-full text-sm">
+                    <thead className="bg-slate-50 border-b">
+                      <tr>
+                        <th className="text-left px-4 py-3 font-medium text-slate-600">Date</th>
+                        <th className="text-left px-4 py-3 font-medium text-slate-600">Method</th>
+                        <th className="text-right px-4 py-3 font-medium text-slate-600">Amount</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y">
+                      {payments.map((p) => (
+                        <tr key={p.id} className="hover:bg-slate-50">
+                          <td className="px-4 py-3">{formatDateTime(p.createdAt || p.date)}</td>
+                          <td className="px-4 py-3 capitalize">{p.method || p.direction}</td>
+                          <td className={cn(
+                            "px-4 py-3 text-right font-medium",
+                            p.direction === "refund" ? "text-rose-600" : "text-emerald-600"
+                          )}>
+                            {p.direction === "refund" ? "-" : "+"}{formatCurrency(p.amountCents)}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+
+          {/* Billing Schedule (for seasonal/repeat charges) */}
+          {(reservation.seasonalRateId || (chargesQuery.data?.length ?? 0) > 0) && (
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center justify-between">
+                  <span className="flex items-center gap-2">
+                    <Calculator className="h-5 w-5 text-blue-600" />
+                    Billing Schedule
+                  </span>
                   <Button
                     size="sm"
                     variant="outline"
-                    className="w-full"
-                    onClick={() => router.push(`/campgrounds/${campgroundId}/reservations/${reservation.id}`)}
+                    onClick={() => {
+                      apiClient.generateRepeatCharges(reservationId)
+                        .then(() => queryClient.invalidateQueries({ queryKey: ["reservation-charges", reservationId] }));
+                    }}
                   >
-                    Collect deposit
+                    <RefreshCw className="h-4 w-4 mr-2" />
+                    Regenerate
                   </Button>
-                </div>
-              )}
-              <div className="flex items-center justify-between">
-                <span>Total</span>
-                <span className="font-semibold">${(reservation.totalAmount / 100).toFixed(2)}</span>
-              </div>
-              <div className="flex items-center justify-between">
-                <span>Paid</span>
-                <span className="text-emerald-700 font-semibold">
-                  ${((reservation.paidAmount ?? 0) / 100).toFixed(2)}
-                </span>
-              </div>
-              <div className="flex items-center justify-between">
-                <span>Balance</span>
-                <span className="text-slate-900 font-semibold">
-                  ${((reservationWithExtras.balanceAmount ?? Math.max(0, reservation.totalAmount - (reservation.paidAmount ?? 0))) / 100).toFixed(2)}
-                </span>
-              </div>
-              <div className="h-px bg-slate-200 my-2" />
-              <div className="space-y-1 max-h-48 overflow-auto pr-1">
-                {payments.length === 0 && <div className="text-slate-500 text-xs">No payments yet.</div>}
-                {payments.map((p) => (
-                  <div key={p.id} className="flex items-center justify-between text-xs border border-slate-200 rounded px-2 py-1">
-                    <span className="capitalize">{p.direction}</span>
-                    <span className={p.direction === "refund" ? "text-red-600" : "text-emerald-700"}>
-                      ${((p.amountCents ?? 0) / 100).toFixed(2)}
-                    </span>
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                {chargesQuery.isLoading ? (
+                  <div className="text-center py-8">
+                    <Loader2 className="h-6 w-6 animate-spin mx-auto text-slate-400" />
                   </div>
-                ))}
-              </div>
-              <div className="flex gap-2 pt-2">
-                <Button size="sm" variant="outline" onClick={() => router.push(`/campgrounds/${campgroundId}/reservations`)}>
-                  Manage
-                </Button>
-                <Button
-                  size="sm"
-                  variant="secondary"
-                  onClick={() => router.push(`/campgrounds/${campgroundId}/sites/${reservation.siteId}`)}
-                >
-                  Site
-                </Button>
-                <Button
-                  size="sm"
-                  variant="secondary"
-                  onClick={() => router.push(`/guests/${reservation.guestId}`)}
-                >
-                  Guest
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
+                ) : chargesQuery.data?.length === 0 ? (
+                  <p className="text-sm text-slate-500 text-center py-8">
+                    No recurring charges scheduled
+                  </p>
+                ) : (
+                  <div className="rounded-lg border overflow-hidden">
+                    <table className="w-full text-sm">
+                      <thead className="bg-slate-50 border-b">
+                        <tr>
+                          <th className="text-left px-4 py-3 font-medium text-slate-600">Due Date</th>
+                          <th className="text-left px-4 py-3 font-medium text-slate-600">Amount</th>
+                          <th className="text-left px-4 py-3 font-medium text-slate-600">Status</th>
+                          <th className="text-right px-4 py-3 font-medium text-slate-600">Action</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y">
+                        {chargesQuery.data?.map((charge: any) => (
+                          <tr key={charge.id} className="hover:bg-slate-50">
+                            <td className="px-4 py-3">{formatDate(charge.dueDate)}</td>
+                            <td className="px-4 py-3 font-medium">{formatCurrency(charge.amount)}</td>
+                            <td className="px-4 py-3">
+                              <Badge
+                                variant="outline"
+                                className={cn(
+                                  "capitalize",
+                                  charge.status === "paid" && "bg-emerald-50 text-emerald-700 border-emerald-200",
+                                  charge.status === "failed" && "bg-rose-50 text-rose-700 border-rose-200",
+                                  charge.status !== "paid" && charge.status !== "failed" && "bg-amber-50 text-amber-700 border-amber-200"
+                                )}
+                              >
+                                {charge.status}
+                              </Badge>
+                            </td>
+                            <td className="px-4 py-3 text-right">
+                              {charge.status !== "paid" && (
+                                <Button
+                                  size="sm"
+                                  variant="secondary"
+                                  onClick={() => {
+                                    apiClient.processRepeatCharge(charge.id)
+                                      .then(() => {
+                                        queryClient.invalidateQueries({ queryKey: ["reservation-charges", reservationId] });
+                                        queryClient.invalidateQueries({ queryKey: ["reservation", reservationId] });
+                                      });
+                                  }}
+                                >
+                                  Process
+                                </Button>
+                              )}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          )}
+        </TabsContent>
+
+        {/* ═══════════════════════════════════════════════════════════════════ */}
+        {/* TAB: COMMUNICATIONS */}
+        {/* ═══════════════════════════════════════════════════════════════════ */}
+        <TabsContent value="communications" className="space-y-6">
+          <div className="flex items-center justify-between">
+            <h2 className="text-lg font-semibold">Guest Communications</h2>
+            <Button
+              onClick={() => {
+                localStorage.setItem("campreserv:openReservationId", reservation.id);
+                router.push("/messages");
+              }}
+            >
+              <Send className="h-4 w-4 mr-2" />
+              Compose Message
+            </Button>
+          </div>
 
           <Card>
             <CardHeader>
-              <CardTitle className="flex items-center justify-between gap-2">
-                <span>Signatures & COI</span>
-                {signaturesQuery.isFetching && <span className="text-xs text-slate-500">Refreshing…</span>}
-              </CardTitle>
+              <CardTitle>Message History</CardTitle>
             </CardHeader>
-            <CardContent className="space-y-3 text-sm">
-              <div className="space-y-2">
-                <div className="text-xs font-semibold uppercase tracking-wide text-slate-500">Policy agreements</div>
-                {policyRequests.length === 0 && (
-                  <div className="text-xs text-slate-500">No policy signature requests yet.</div>
-                )}
-                {policyRequests.map((req: any) => {
-                  const meta = getRequestMetadata(req);
-                  const policyName = req.template?.name ?? meta?.policyName ?? req.subject ?? "Policy";
-                  const enforcement = meta?.enforcement ?? req.template?.policyConfig?.enforcement ?? "post_booking";
-                  const enforcementLabel =
-                    enforcement === "pre_booking"
-                      ? "Required before booking"
-                      : enforcement === "pre_checkin"
-                        ? "Required before check-in"
-                        : enforcement === "post_booking"
-                          ? "Sent after booking"
-                          : "Information only";
-                  const statusDetail = req.signedAt
-                    ? `Signed ${formatDateTime(req.signedAt)}`
-                    : req.sentAt
-                      ? `Sent ${formatDateTime(req.sentAt)}`
-                      : "Draft";
-                  const canSignNow = req.token && !["signed", "declined", "voided"].includes(req.status);
-                  const hasPdf = Boolean(req.artifact?.pdfUrl);
-                  return (
-                    <div key={req.id} className="flex flex-col gap-2 rounded border border-slate-200 p-2 md:flex-row md:items-center md:justify-between">
-                      <div className="space-y-1">
-                        <div className="flex items-center gap-2">
-                          <span className="font-medium">{policyName}</span>
-                          <Badge variant="outline">{req.status}</Badge>
-                        </div>
-                        <div className="text-xs text-slate-500">
-                          {enforcementLabel} • {statusDetail}
-                        </div>
-                      </div>
-                      <div className="flex flex-wrap gap-2">
-                        {canSignNow && (
-                          <a
-                            href={`/sign/${req.token}`}
-                            target="_blank"
-                            rel="noreferrer"
-                            className="inline-flex items-center justify-center rounded-md border border-slate-200 px-3 py-1 text-xs font-medium text-slate-700 hover:bg-slate-50"
-                          >
-                            Sign now
-                          </a>
-                        )}
-                        {hasPdf ? (
-                          <a
-                            href={req.artifact.pdfUrl}
-                            target="_blank"
-                            rel="noreferrer"
-                            className="inline-flex items-center justify-center rounded-md border border-slate-200 px-3 py-1 text-xs font-medium text-slate-700 hover:bg-slate-50"
-                          >
-                            Download PDF
-                          </a>
-                        ) : (
-                          <Button size="sm" variant="outline" disabled>
-                            {req.status === "signed" ? "Signed" : "Awaiting signature"}
-                          </Button>
-                        )}
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-
-              <div className="space-y-2">
-                <div className="grid grid-cols-1 gap-2 md:grid-cols-4">
-                  <Input
-                    placeholder="Recipient email"
-                    value={signatureEmail || reservation.guest?.email || ""}
-                    onChange={(e) => setSignatureEmail(e.target.value)}
-                  />
-                  <select
-                    className="w-full rounded-md border border-slate-200 px-3 py-2 text-sm"
-                    value={signatureType}
-                    onChange={(e) => setSignatureType(e.target.value)}
-                  >
-                    <option value="long_term_stay">Long-term stay</option>
-                    <option value="park_rules">Park rules</option>
-                    <option value="deposit">Deposit/fees</option>
-                    <option value="waiver">Waiver</option>
-                    <option value="coi">COI acknowledgement</option>
-                    <option value="other">Other</option>
-                  </select>
-                  <select
-                    className="w-full rounded-md border border-slate-200 px-3 py-2 text-sm"
-                    value={deliveryChannel}
-                    onChange={(e) => setDeliveryChannel(e.target.value as "email" | "email_and_sms" | "sms")}
-                  >
-                    <option value="email">Email</option>
-                    <option value="email_and_sms">Email + SMS fallback</option>
-                    <option value="sms">SMS only</option>
-                  </select>
+            <CardContent>
+              {commsQuery.isLoading ? (
+                <div className="text-center py-8">
+                  <Loader2 className="h-6 w-6 animate-spin mx-auto text-slate-400" />
+                </div>
+              ) : comms.length === 0 ? (
+                <div className="text-center py-12">
+                  <MessageSquare className="h-12 w-12 mx-auto text-slate-300 mb-4" />
+                  <p className="text-slate-500">No messages yet</p>
                   <Button
-                    size="sm"
-                    className="w-full md:w-auto"
-                    onClick={() => createSignatureMutation.mutate()}
-                    disabled={createSignatureMutation.status === "pending"}
+                    variant="outline"
+                    className="mt-4"
+                    onClick={() => {
+                      localStorage.setItem("campreserv:openReservationId", reservation.id);
+                      router.push("/messages");
+                    }}
                   >
-                    {createSignatureMutation.status === "pending" ? "Sending…" : "Send signature request"}
+                    Send First Message
                   </Button>
                 </div>
-                <p className="text-xs text-slate-500">
-                  Email-first delivery with optional SMS fallback. Links expire based on the request’s configured expiry.
-                </p>
-              </div>
-
-              <div className="space-y-2">
-                {otherSignatureRequests.length === 0 && <div className="text-xs text-slate-500">No additional signature requests yet.</div>}
-                {otherSignatureRequests.map((req: any) => (
-                  <div key={req.id} className="flex flex-col gap-2 rounded border border-slate-200 p-2 md:flex-row md:items-center md:justify-between">
-                    <div className="space-y-1">
-                      <div className="flex items-center gap-2">
-                        <span className="font-medium capitalize">{(req.documentType || "long_term_stay").replace(/_/g, " ")}</span>
-                        <Badge variant="outline">{req.status}</Badge>
+              ) : (
+                <div className="space-y-3">
+                  {comms.map((c: any) => (
+                    <div
+                      key={c.id}
+                      className="p-4 rounded-lg border border-slate-200 hover:bg-slate-50 transition-colors"
+                    >
+                      <div className="flex items-center justify-between mb-2">
+                        <div className="flex items-center gap-2">
+                          <Badge variant="outline" className="capitalize text-xs">
+                            {c.type}
+                          </Badge>
+                          <span className="text-xs text-slate-500">{c.direction}</span>
+                        </div>
+                        <span className="text-xs text-slate-500">
+                          {formatDateTime(c.createdAt)}
+                        </span>
                       </div>
-                      <div className="text-xs text-slate-500">
-                        Sent to {req.recipientEmail || "n/a"} {req.sentAt ? ` • ${formatDateTime(req.sentAt)}` : ""}
+                      {c.subject && (
+                        <div className="font-medium text-slate-900 mb-1">{c.subject}</div>
+                      )}
+                      {(c.preview || c.body) && (
+                        <div className="text-sm text-slate-600 line-clamp-2">
+                          {c.preview || c.body}
+                        </div>
+                      )}
+                      <div className="mt-2">
+                        <Badge
+                          variant="outline"
+                          className={cn(
+                            "text-xs",
+                            (c.status || "").toLowerCase().includes("fail") || (c.status || "").toLowerCase().includes("bounce")
+                              ? "bg-rose-50 text-rose-700 border-rose-200"
+                              : "bg-emerald-50 text-emerald-700 border-emerald-200"
+                          )}
+                        >
+                          {c.status}
+                        </Badge>
                       </div>
                     </div>
-                    <div className="flex flex-wrap gap-2">
-                      <Button
-                        size="sm"
-                        variant="secondary"
-                        onClick={() => resendSignatureMutation.mutate(req.id)}
-                        disabled={resendSignatureMutation.status === "pending" || ["signed", "declined", "voided"].includes(req.status)}
-                      >
-                        Resend
-                      </Button>
-                      {req.artifact?.pdfUrl ? (
-                        <a
-                          href={req.artifact.pdfUrl}
-                          target="_blank"
-                          rel="noreferrer"
-                          className="inline-flex items-center justify-center rounded-md border border-slate-200 px-3 py-1 text-xs font-medium text-slate-700 hover:bg-slate-50"
+                  ))}
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        {/* ═══════════════════════════════════════════════════════════════════ */}
+        {/* TAB: CHECK-IN */}
+        {/* ═══════════════════════════════════════════════════════════════════ */}
+        <TabsContent value="checkin" className="space-y-6">
+          <div className="grid gap-6 lg:grid-cols-2">
+            {/* Check-in Status */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <ShieldCheck className="h-5 w-5 text-blue-600" />
+                  Check-in Status
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {checkinStatusQuery.isLoading ? (
+                  <Loader2 className="h-6 w-6 animate-spin mx-auto" />
+                ) : checkinStatus ? (
+                  <>
+                    <div className="space-y-3">
+                      <div className="flex items-center justify-between">
+                        <span className="text-slate-600">Check-in</span>
+                        <Badge
+                          variant="outline"
+                          className={cn(
+                            checkinStatus.checkInStatus === "completed" && "bg-emerald-50 text-emerald-700 border-emerald-200",
+                            checkinStatus.checkInStatus === "failed" && "bg-rose-50 text-rose-700 border-rose-200",
+                            checkinStatus.checkInStatus !== "completed" && checkinStatus.checkInStatus !== "failed" && "bg-amber-50 text-amber-700 border-amber-200"
+                          )}
                         >
-                          Download PDF
-                        </a>
-                      ) : (
-                        <Button size="sm" variant="outline" disabled>
-                          Awaiting signature
-                        </Button>
+                          {checkinStatus.checkInStatus?.replace("_", " ") || "not started"}
+                        </Badge>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span className="text-slate-600">Check-out</span>
+                        <Badge
+                          variant="outline"
+                          className={cn(
+                            checkinStatus.checkOutStatus === "completed" && "bg-emerald-50 text-emerald-700 border-emerald-200",
+                            checkinStatus.checkOutStatus !== "completed" && "bg-slate-50 text-slate-600 border-slate-200"
+                          )}
+                        >
+                          {checkinStatus.checkOutStatus?.replace("_", " ") || "not started"}
+                        </Badge>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span className="text-slate-600">Site ready</span>
+                        {checkinStatus.siteReady ? (
+                          <span className="flex items-center gap-1 text-emerald-700 text-sm">
+                            <CheckCircle className="h-4 w-4" /> Ready
+                          </span>
+                        ) : (
+                          <span className="flex items-center gap-1 text-amber-600 text-sm">
+                            <Clock className="h-4 w-4" /> Pending
+                          </span>
+                        )}
+                      </div>
+                      {checkinStatus.idVerificationRequired && (
+                        <div className="flex items-center justify-between">
+                          <span className="text-slate-600">ID verified</span>
+                          <span className="text-amber-600 text-sm">Required</span>
+                        </div>
+                      )}
+                      {checkinStatus.waiverRequired && (
+                        <div className="flex items-center justify-between">
+                          <span className="text-slate-600">Waiver signed</span>
+                          <span className="text-amber-600 text-sm">Required</span>
+                        </div>
                       )}
                     </div>
-                  </div>
-                ))}
-              </div>
-
-              <div className="space-y-2 border-t border-slate-200 pt-3">
-                <div className="grid grid-cols-1 gap-2 md:grid-cols-3">
-                  <Input placeholder="COI file URL" value={coiUrl} onChange={(e) => setCoiUrl(e.target.value)} />
-                  <Input
-                    type="date"
-                    placeholder="Expiry"
-                    value={coiExpiresAt}
-                    onChange={(e) => setCoiExpiresAt(e.target.value)}
-                  />
-                  <Button size="sm" variant="outline" onClick={() => coiUploadMutation.mutate()}>
-                    Save COI
-                  </Button>
-                </div>
-                <p className="text-xs text-slate-500">
-                  Store certificates of insurance with expiry reminders. Reminders are sent before expiry automatically.
-                </p>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Self Check-in Status Card */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <ShieldCheck className="h-4 w-4 text-blue-600" />
-                Check-in Status
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3 text-sm">
-              {checkinStatusQuery.isLoading ? (
-                <div className="text-slate-500 text-xs">Loading...</div>
-              ) : checkinStatus ? (
-                <>
-                  <div className="flex items-center justify-between">
-                    <span className="text-slate-500">Check-in</span>
-                    <Badge
-                      variant="outline"
-                      className={
-                        checkinStatus.checkInStatus === "completed"
-                          ? "bg-emerald-50 text-emerald-700 border-emerald-200"
-                          : checkinStatus.checkInStatus === "failed"
-                            ? "bg-rose-50 text-rose-700 border-rose-200"
-                            : "bg-amber-50 text-amber-700 border-amber-200"
-                      }
-                    >
-                      {checkinStatus.checkInStatus?.replace("_", " ") || "not started"}
-                    </Badge>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-slate-500">Check-out</span>
-                    <Badge
-                      variant="outline"
-                      className={
-                        checkinStatus.checkOutStatus === "completed"
-                          ? "bg-emerald-50 text-emerald-700 border-emerald-200"
-                          : checkinStatus.checkOutStatus === "failed"
-                            ? "bg-rose-50 text-rose-700 border-rose-200"
-                            : "bg-slate-50 text-slate-600 border-slate-200"
-                      }
-                    >
-                      {checkinStatus.checkOutStatus?.replace("_", " ") || "not started"}
-                    </Badge>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-slate-500">Site ready</span>
-                    {checkinStatus.siteReady ? (
-                      <span className="flex items-center gap-1 text-emerald-700 text-xs">
-                        <CheckCircle className="h-3 w-3" /> Ready
-                      </span>
-                    ) : (
-                      <span className="flex items-center gap-1 text-amber-600 text-xs">
-                        <Clock className="h-3 w-3" /> Pending
-                      </span>
+                    {checkinStatus.lateArrivalFlag && (
+                      <div className="flex items-center gap-2 text-amber-600 text-sm p-3 bg-amber-50 rounded-lg">
+                        <AlertTriangle className="h-4 w-4" />
+                        Late arrival flag set
+                      </div>
                     )}
-                  </div>
-                  {checkinStatus.idVerificationRequired && (
-                    <div className="flex items-center justify-between">
-                      <span className="text-slate-500">ID verified</span>
-                      <span className="text-amber-600 text-xs">Required</span>
-                    </div>
-                  )}
-                  {checkinStatus.waiverRequired && (
-                    <div className="flex items-center justify-between">
-                      <span className="text-slate-500">Waiver signed</span>
-                      <span className="text-amber-600 text-xs">Required</span>
-                    </div>
-                  )}
-                  {checkinStatus.lateArrivalFlag && (
-                    <div className="flex items-center gap-1 text-amber-600 text-xs mt-2">
-                      <AlertTriangle className="h-3 w-3" /> Late arrival
-                    </div>
-                  )}
-                  {checkinStatus.selfCheckInAt && (
-                    <div className="text-xs text-slate-500 mt-2">
-                      Checked in: {formatDateTime(checkinStatus.selfCheckInAt)}
-                    </div>
-                  )}
-                  {checkinStatus.selfCheckOutAt && (
-                    <div className="text-xs text-slate-500">
-                      Checked out: {formatDateTime(checkinStatus.selfCheckOutAt)}
-                    </div>
-                  )}
-                </>
-              ) : (
-                <div className="text-slate-500 text-xs">No check-in data available.</div>
-              )}
-            </CardContent>
-          </Card>
+                  </>
+                ) : (
+                  <p className="text-sm text-slate-500">No check-in data available</p>
+                )}
+              </CardContent>
+            </Card>
 
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <DoorOpen className="h-4 w-4 text-emerald-600" />
-                Vehicle & Access Control
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3 text-sm">
-              <div className="grid gap-3 sm:grid-cols-2">
-                <div className="space-y-1">
-                  <Label className="text-xs text-slate-600">License plate</Label>
-                  <Input
-                    value={vehiclePlate}
-                    onChange={(e) => setVehiclePlate(e.target.value.toUpperCase())}
-                    placeholder="ABC123"
-                  />
+            {/* Vehicle & Access */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <DoorOpen className="h-5 w-5 text-emerald-600" />
+                  Vehicle & Access
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="grid gap-3 sm:grid-cols-2">
+                  <div className="space-y-1">
+                    <Label className="text-xs">License Plate</Label>
+                    <Input
+                      value={vehiclePlate}
+                      onChange={(e) => setVehiclePlate(e.target.value.toUpperCase())}
+                      placeholder="ABC123"
+                    />
+                  </div>
+                  <div className="space-y-1">
+                    <Label className="text-xs">State</Label>
+                    <Input
+                      value={vehicleState}
+                      onChange={(e) => setVehicleState(e.target.value.toUpperCase())}
+                      placeholder="CA"
+                    />
+                  </div>
+                  <div className="space-y-1">
+                    <Label className="text-xs">Rig Type</Label>
+                    <Input
+                      value={vehicleRigType}
+                      onChange={(e) => setVehicleRigType(e.target.value)}
+                      placeholder="RV / Trailer"
+                    />
+                  </div>
+                  <div className="space-y-1">
+                    <Label className="text-xs">Length (ft)</Label>
+                    <Input
+                      type="number"
+                      value={vehicleRigLength}
+                      onChange={(e) => setVehicleRigLength(e.target.value)}
+                      placeholder="30"
+                    />
+                  </div>
                 </div>
-                <div className="space-y-1">
-                  <Label className="text-xs text-slate-600">State</Label>
-                  <Input
-                    value={vehicleState}
-                    onChange={(e) => setVehicleState(e.target.value.toUpperCase())}
-                    placeholder="CA"
-                  />
-                </div>
-                <div className="space-y-1">
-                  <Label className="text-xs text-slate-600">Rig type</Label>
-                  <Input
-                    value={vehicleRigType}
-                    onChange={(e) => setVehicleRigType(e.target.value)}
-                    placeholder="RV / trailer / car"
-                  />
-                </div>
-                <div className="space-y-1">
-                  <Label className="text-xs text-slate-600">Rig length (ft)</Label>
-                  <Input
-                    type="number"
-                    value={vehicleRigLength}
-                    onChange={(e) => setVehicleRigLength(e.target.value)}
-                    placeholder="30"
-                  />
-                </div>
-              </div>
-              <div className="flex flex-wrap gap-2">
                 <Button
                   size="sm"
                   onClick={() =>
@@ -1075,56 +1487,50 @@ export default function ReservationDetailPage() {
                   }
                   disabled={vehicleMutation.isPending}
                 >
-                  {vehicleMutation.isPending ? "Saving…" : "Save vehicle"}
+                  {vehicleMutation.isPending ? (
+                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  ) : (
+                    <Check className="h-4 w-4 mr-2" />
+                  )}
+                  Save Vehicle
                 </Button>
-                <Button
-                  size="sm"
-                  variant="outline"
-                  onClick={() => setAccessCode(vehiclePlate || reservation.vehiclePlate || accessCode)}
-                >
-                  Use plate as code
-                </Button>
-              </div>
 
-              <div className="border-t border-slate-200 pt-3 space-y-2">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <div className="font-medium">Gate / lock credential</div>
-                    <div className="text-xs text-slate-500">Send, view status, resend, or revoke</div>
+                <div className="border-t pt-4 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <div className="font-medium">Access Control</div>
+                      <div className="text-xs text-slate-500">Gate/lock credentials</div>
+                    </div>
+                    <select
+                      value={accessProvider}
+                      onChange={(e) => setAccessProvider(e.target.value as any)}
+                      className="text-sm border rounded px-2 py-1"
+                    >
+                      <option value="kisi">Kisi</option>
+                      <option value="brivo">Brivo</option>
+                      <option value="cloudkey">CloudKey</option>
+                    </select>
                   </div>
-                  <select
-                    value={accessProvider}
-                    onChange={(e) => setAccessProvider(e.target.value as "kisi" | "brivo" | "cloudkey")}
-                    className="text-sm border border-slate-200 rounded px-2 py-1"
-                  >
-                    <option value="kisi">Kisi</option>
-                    <option value="brivo">Brivo</option>
-                    <option value="cloudkey">CloudKey</option>
-                  </select>
-                </div>
-                <div className="grid gap-2 sm:grid-cols-2">
-                  <div className="space-y-1">
-                    <Label className="text-xs text-slate-600">Credential (PIN / RFID / QR)</Label>
+                  <div className="flex gap-2">
                     <Input
                       value={accessCode}
                       onChange={(e) => setAccessCode(e.target.value)}
-                      placeholder="Code or token"
+                      placeholder="PIN / Code"
+                      className="flex-1"
                     />
-                  </div>
-                  <div className="flex items-end gap-2">
                     <Button
                       size="sm"
                       onClick={() =>
                         grantAccessMutation.mutate({
                           provider: accessProvider,
                           credentialType: "pin",
-                          credentialValue: accessCode || vehiclePlate || reservation.vehiclePlate || undefined,
+                          credentialValue: accessCode || vehiclePlate || undefined,
                           idempotencyKey: `grant-${accessProvider}-${reservationId}-${accessCode || "default"}`
                         })
                       }
                       disabled={grantAccessMutation.isPending}
                     >
-                      {grantAccessMutation.isPending ? "Sending…" : "Send / resend"}
+                      Grant
                     </Button>
                     <Button
                       size="sm"
@@ -1132,354 +1538,198 @@ export default function ReservationDetailPage() {
                       onClick={() =>
                         revokeAccessMutation.mutate({
                           provider: accessProvider,
-                          providerAccessId: accessStatus?.grants?.find((g: { provider?: string; providerAccessId?: string | null }) => g.provider === accessProvider)?.providerAccessId ?? undefined
+                          providerAccessId: accessStatus?.grants?.find((g: any) => g.provider === accessProvider)?.providerAccessId || undefined
                         })
                       }
                       disabled={revokeAccessMutation.isPending}
                     >
-                      {revokeAccessMutation.isPending ? "Revoking…" : "Revoke"}
+                      Revoke
+                    </Button>
+                  </div>
+                  {(accessStatus?.grants ?? []).length > 0 && (
+                    <div className="space-y-1">
+                      {accessStatus?.grants?.map((g: any) => (
+                        <div key={g.id} className="flex items-center justify-between text-sm p-2 rounded border">
+                          <span className="capitalize">{g.provider}</span>
+                          <Badge
+                            variant="outline"
+                            className={cn(
+                              g.status === "active" && "bg-emerald-50 text-emerald-700",
+                              g.status !== "active" && "bg-slate-50 text-slate-600"
+                            )}
+                          >
+                            {g.status}
+                          </Badge>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Signatures & COI */}
+            <Card className="lg:col-span-2">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <FileText className="h-5 w-5 text-slate-600" />
+                  Signatures & Documents
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                {/* Existing signatures */}
+                {signatureRequests.length > 0 && (
+                  <div className="space-y-2">
+                    <h4 className="text-sm font-medium text-slate-700">Signature Requests</h4>
+                    {signatureRequests.map((req: any) => (
+                      <div key={req.id} className="flex items-center justify-between p-3 rounded-lg border">
+                        <div>
+                          <div className="font-medium capitalize">
+                            {(req.documentType || "document").replace(/_/g, " ")}
+                          </div>
+                          <div className="text-xs text-slate-500">
+                            {req.recipientEmail} - {formatDateTime(req.sentAt)}
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Badge variant="outline">{req.status}</Badge>
+                          {req.status !== "signed" && (
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              onClick={() => resendSignatureMutation.mutate(req.id)}
+                              disabled={resendSignatureMutation.isPending}
+                            >
+                              Resend
+                            </Button>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {/* New signature request */}
+                <div className="space-y-3">
+                  <h4 className="text-sm font-medium text-slate-700">Request New Signature</h4>
+                  <div className="grid gap-3 sm:grid-cols-4">
+                    <Input
+                      placeholder="Email"
+                      value={signatureEmail}
+                      onChange={(e) => setSignatureEmail(e.target.value)}
+                    />
+                    <select
+                      className="rounded-md border px-3 py-2 text-sm"
+                      value={signatureType}
+                      onChange={(e) => setSignatureType(e.target.value)}
+                    >
+                      <option value="long_term_stay">Long-term stay</option>
+                      <option value="park_rules">Park rules</option>
+                      <option value="waiver">Waiver</option>
+                      <option value="other">Other</option>
+                    </select>
+                    <select
+                      className="rounded-md border px-3 py-2 text-sm"
+                      value={deliveryChannel}
+                      onChange={(e) => setDeliveryChannel(e.target.value as any)}
+                    >
+                      <option value="email">Email</option>
+                      <option value="email_and_sms">Email + SMS</option>
+                      <option value="sms">SMS only</option>
+                    </select>
+                    <Button
+                      onClick={() => createSignatureMutation.mutate()}
+                      disabled={createSignatureMutation.isPending}
+                    >
+                      {createSignatureMutation.isPending ? (
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                      ) : (
+                        "Send Request"
+                      )}
                     </Button>
                   </div>
                 </div>
 
-                <div className="space-y-1">
-                  {(accessStatus?.grants ?? []).length === 0 && (
-                    <div className="text-xs text-slate-500">No access grants yet.</div>
-                  )}
-                  {(accessStatus?.grants ?? []).map((g: { id: string; provider: string; providerAccessId?: string | null; status: string }) => (
-                    <div
-                      key={g.id}
-                      className="flex items-center justify-between rounded border border-slate-200 px-2 py-1 text-xs"
+                {/* COI Upload */}
+                <div className="border-t pt-4 space-y-3">
+                  <h4 className="text-sm font-medium text-slate-700">Certificate of Insurance</h4>
+                  <div className="grid gap-3 sm:grid-cols-3">
+                    <Input
+                      placeholder="COI URL"
+                      value={coiUrl}
+                      onChange={(e) => setCoiUrl(e.target.value)}
+                    />
+                    <Input
+                      type="date"
+                      placeholder="Expiry"
+                      value={coiExpiresAt}
+                      onChange={(e) => setCoiExpiresAt(e.target.value)}
+                    />
+                    <Button
+                      variant="outline"
+                      onClick={() => coiUploadMutation.mutate()}
+                      disabled={coiUploadMutation.isPending}
                     >
-                      <div className="flex flex-col">
-                        <span className="font-medium capitalize">{g.provider}</span>
-                        <span className="text-slate-500">{g.providerAccessId || "pending"}</span>
-                      </div>
-                      <Badge
-                        variant="outline"
-                        className={
-                          g.status === "active"
-                            ? "bg-emerald-50 text-emerald-700 border-emerald-200"
-                            : g.status === "blocked" || g.status === "revoked"
-                              ? "bg-rose-50 text-rose-700 border-rose-200"
-                              : "bg-amber-50 text-amber-700 border-amber-200"
-                        }
-                      >
-                        {g.status}
-                      </Badge>
-                    </div>
-                  ))}
+                      Save COI
+                    </Button>
+                  </div>
                 </div>
-              </div>
-            </CardContent>
-          </Card>
+              </CardContent>
+            </Card>
 
-          <Card>
-            <CardHeader className="flex items-center justify-between">
-              <CardTitle className="flex items-center gap-2">
-                <MessageSquare className="h-4 w-4 text-slate-600" />
-                Communications
-              </CardTitle>
-              <div className="flex gap-2 items-center">
-                <div className="flex gap-1">
-                  {(["all", "messages", "notes", "failed"] as const).map((f) => (
-                    <button
-                      key={f}
-                      className={`rounded-full border px-2 py-1 text-[11px] ${commsFilter === f ? "border-emerald-300 bg-emerald-50 text-emerald-800" : "border-slate-200 text-slate-600"}`}
-                      onClick={() => setCommsFilter(f)}
-                    >
-                      {f === "failed" ? "Failed" : f === "messages" ? "Messages" : f[0].toUpperCase() + f.slice(1)}
-                    </button>
-                  ))}
-                </div>
-                <Button
-                  size="sm"
-                  variant="ghost"
-                  className="text-xs"
-                  onClick={() => setCommsFilter("failed")}
-                >
-                  Failed only
-                </Button>
-                <Button
-                  size="sm"
-                  variant="ghost"
-                  className="text-xs"
-                  onClick={() => {
-                    localStorage.setItem("campreserv:openReservationId", reservation.id);
-                    router.push("/messages");
-                  }}
-                >
-                  View all
-                </Button>
-              </div>
-            </CardHeader>
-            <CardContent className="space-y-2 text-sm">
-              {commsQuery.isError && <div className="text-xs text-rose-700">Failed to load messages.</div>}
-              {commsQuery.isLoading && <div className="text-xs text-slate-500">Loading…</div>}
-              {!commsQuery.isLoading && !commsQuery.error && (!comms?.length) && (
-                <div className="text-xs text-slate-500">No messages yet.</div>
-              )}
-              {comms && comms.length > 0 && (
-                <div className="space-y-1">
-                  {comms
-                    .filter((c: CommunicationItem) => {
-                      if (commsFilter === "notes") return (c.type || "").toLowerCase() === "note";
-                      if (commsFilter === "messages") return (c.type || "").toLowerCase() !== "note";
-                      if (commsFilter === "failed") {
-                        const s = (c.status || "").toLowerCase();
-                        return s.includes("fail") || s.includes("bounce") || s.includes("error");
-                      }
-                      return true;
-                    })
-                    .slice(0, 5)
-                    .map((c: CommunicationItem & { status?: string }) => (
-                      <div key={c.id} className="flex items-center justify-between rounded border border-slate-200 px-2 py-1">
-                        <div className="flex flex-col min-w-0">
-                          <span className="font-semibold text-slate-900 truncate">{c.subject || c.type || "Message"}</span>
-                          <span className="text-[11px] text-slate-500 truncate">
-                            {c.createdAt ? new Date(c.createdAt).toLocaleString() : ""}
-                          </span>
-                        </div>
-                        <span
-                          className={`text-[11px] uppercase px-2 py-0.5 rounded-full ${(c.status || "").toLowerCase().includes("fail") || (c.status || "").toLowerCase().includes("bounce")
-                            ? "bg-rose-100 text-rose-700 border border-rose-200"
-                            : "bg-emerald-100 text-emerald-700 border border-emerald-200"
-                            }`}
-                        >
-                          {(c.status || "").toString()}
-                        </span>
-                      </div>
-                    ))}
-                </div>
-              )}
-              <div className="flex gap-2 pt-1">
-                <Button
-                  size="sm"
-                  variant="secondary"
-                  className="flex-1"
-                  onClick={() => {
-                    localStorage.setItem("campreserv:openReservationId", reservation.id);
-                    router.push("/messages");
-                  }}
-                >
-                  Message guest
-                </Button>
-                <Button
-                  size="sm"
-                  variant="ghost"
-                  onClick={() => router.push(`/campgrounds/${campgroundId}/reservations/${reservation.id}`)}
-                >
-                  Open in Reservations
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
+            {/* Forms */}
+            <ReservationFormsCard
+              campgroundId={campgroundId}
+              reservationId={reservationId}
+            />
+          </div>
+        </TabsContent>
+
+        {/* ═══════════════════════════════════════════════════════════════════ */}
+        {/* TAB: HISTORY */}
+        {/* ═══════════════════════════════════════════════════════════════════ */}
+        <TabsContent value="history" className="space-y-6">
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <ActivitySquare className="h-4 w-4 text-blue-600" />
-                Recent activity
+                <ClipboardList className="h-5 w-5 text-slate-600" />
+                Change History
               </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-2 text-sm">
-              {activity.length === 0 && <div className="text-xs text-slate-500">No recent activity.</div>}
-              {activity.length > 0 && (
-                <div className="space-y-1">
-                  {activity.map((a) => (
-                    <div key={a.id} className="flex items-center justify-between rounded border border-slate-200 px-2 py-1">
-                      <span className="truncate">{a.label}</span>
-                      <span className="text-[11px] text-slate-500">{formatDateTime(a.at)}</span>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </CardContent>
-          </Card>
-          <ReservationFormsCard
-            campgroundId={campgroundId}
-            reservationId={reservationId}
-          />
-          <Card className="md:col-span-3">
-            <CardHeader className="flex items-center justify-between">
-              <CardTitle className="flex items-center gap-2">
-                <Users className="h-4 w-4 text-slate-700" />
-                Related reservations
-              </CardTitle>
-              {relatedQuery.isLoading && <span className="text-xs text-slate-500">Loading…</span>}
-            </CardHeader>
-            <CardContent className="space-y-2 text-sm">
-              {relatedQuery.isError && <div className="text-red-600 text-xs">Failed to load related reservations.</div>}
-              {!relatedQuery.isLoading && related.length === 0 && <div className="text-slate-500 text-xs">No other stays for this guest.</div>}
-              <div className="space-y-2">
-                {related.map((r: RelatedReservation) => (
-                  <div key={r.id} className="flex flex-wrap items-center gap-2 rounded border border-slate-200 px-3 py-2">
-                    <span className="rounded-full border px-2 py-0.5 text-[11px]">
-                      {formatDate(r.arrivalDate)} → {formatDate(r.departureDate)}
-                    </span>
-                    <span className="text-slate-800">{r.site?.name || r.site?.siteNumber || r.siteId}</span>
-                    <Badge variant="outline" className={`capitalize border ${r.status === "confirmed"
-                      ? "bg-emerald-100 text-emerald-700 border-emerald-200"
-                      : r.status === "checked_in"
-                        ? "bg-blue-100 text-blue-700 border-blue-200"
-                        : r.status === "checked_out"
-                          ? "bg-slate-100 text-slate-700 border-slate-200"
-                          : r.status === "cancelled"
-                            ? "bg-rose-100 text-rose-700 border-rose-200"
-                            : "bg-amber-100 text-amber-700 border-amber-200"
-                      }`}>
-                      {r.status.replace("_", " ")}
-                    </Badge>
-                    <Button size="sm" variant="ghost" onClick={() => router.push(`/campgrounds/${campgroundId}/reservations/${r.id}`)}>
-                      Open
-                    </Button>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-          <Card>
-            <CardHeader className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <Calculator className="h-4 w-4 text-slate-600" />
-                <CardTitle>Pricing breakdown</CardTitle>
-              </div>
-              {quoteQuery.isLoading && <span className="text-xs text-slate-500">Loading…</span>}
-              {quoteQuery.isError && <span className="text-xs text-red-500">Failed to load</span>}
-            </CardHeader>
-            <CardContent className="space-y-2 text-sm">
-              <div className="flex items-center justify-between">
-                <span>Base subtotal</span>
-                <span className="font-medium">${((quote?.baseSubtotalCents ?? 0) / 100).toFixed(2)}</span>
-              </div>
-              <div className="flex items-center justify-between">
-                <span>Rules delta</span>
-                <span className="font-medium">${((quote?.rulesDeltaCents ?? 0) / 100).toFixed(2)}</span>
-              </div>
-              <div className="flex items-center justify-between">
-                <span>Nights</span>
-                <span className="font-medium">{quote?.nights ?? "—"}</span>
-              </div>
-              <div className="h-px bg-slate-200" />
-              <div className="flex items-center justify-between">
-                <span>Total (quoted)</span>
-                <span className="font-semibold">
-                  ${((quote?.totalCents ?? reservation.totalAmount) / 100).toFixed(2)}
-                </span>
-              </div>
-              <div className="text-xs text-slate-500">
-                Quoted using current rules; amounts on this reservation may include fees/taxes/discounts already applied.
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <MessageSquare className="h-4 w-4 text-slate-600" />
-                <CardTitle>Communications</CardTitle>
-              </div>
-              {commsQuery.isLoading && <span className="text-xs text-slate-500">Loading…</span>}
-              {commsQuery.isError && <span className="text-xs text-red-500">Failed to load</span>}
-            </CardHeader>
-            <CardContent className="space-y-2 max-h-72 overflow-auto pr-1 text-sm">
-              {(!comms || comms.length === 0) && (
-                <div className="text-slate-500 text-xs">No communications yet.</div>
-              )}
-              {comms?.map((c: any) => (
-                <div key={c.id} className="rounded border border-slate-200 px-3 py-2">
-                  <div className="flex items-center justify-between text-xs text-slate-500">
-                    <span className="uppercase">{c.type}</span>
-                    <span>{c.direction}</span>
-                  </div>
-                  {c.subject && <div className="text-sm font-medium text-slate-900">{c.subject}</div>}
-                  {c.preview && <div className="text-sm text-slate-700 line-clamp-2">{c.preview}</div>}
-                  {!c.preview && c.body && <div className="text-sm text-slate-700 line-clamp-2">{c.body}</div>}
-                </div>
-              ))}
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <MapPin className="h-4 w-4 text-slate-600" />
-                <CardTitle>Other available sites</CardTitle>
-              </div>
-              {availabilityQuery.isLoading && <span className="text-xs text-slate-500">Checking…</span>}
-              {availabilityQuery.isError && <span className="text-xs text-red-500">Failed to load</span>}
-            </CardHeader>
-            <CardContent className="space-y-2 text-sm">
-              {!availabilityQuery.data && !availabilityQuery.isLoading && !availabilityQuery.isError && (
-                <div className="text-xs text-slate-500">No availability data.</div>
-              )}
-              {availabilityQuery.data?.filter((s) => s.id !== reservation.siteId).slice(0, 6).map((site) => (
-                <div key={site.id} className="flex items-center justify-between rounded border border-slate-200 px-2 py-1.5">
-                  <div className="flex flex-col">
-                    <span className="font-medium">{site.name || `Site #${site.siteNumber}`}</span>
-                    <span className="text-xs text-slate-500">{site.siteClass?.name ?? "Unassigned class"}</span>
-                  </div>
-                  <div className="text-right">
-                    <div className="text-xs text-slate-500">Nightly</div>
-                    <div className="font-semibold">${((site.siteClass?.defaultRate ?? 0) / 100).toFixed(2)}</div>
-                  </div>
-                </div>
-              ))}
-              {availabilityQuery.data && availabilityQuery.data.filter((s) => s.id !== reservation.siteId).length === 0 && (
-                <div className="text-xs text-slate-500">No alternate sites for these dates.</div>
-              )}
-            </CardContent>
-          </Card>
-        </div>
-
-        <div className="grid gap-4 md:grid-cols-2">
-          <Card>
-            <CardHeader className="flex items-center gap-2">
-              <ActivitySquare className="h-4 w-4 text-slate-600" />
-              <CardTitle>Activity</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-2 text-sm">
-              <div className="flex items-center justify-between">
-                <span>Status</span>
-                <Badge variant="outline" className="capitalize">{reservation.status?.replace("_", " ") || "pending"}</Badge>
-              </div>
-              <div className="flex items-center justify-between">
-                <span>Created</span>
-                <span className="font-medium">{formatDateTime(reservationWithExtras.createdAt)}</span>
-              </div>
-              <div className="flex items-center justify-between">
-                <span>Updated</span>
-                <span className="font-medium">{formatDateTime(reservationWithExtras.updatedAt)}</span>
-              </div>
-              <div className="flex items-center justify-between">
-                <span>Checked in</span>
-                <span className="font-medium">{formatDateTime(reservationWithExtras.checkInAt)}</span>
-              </div>
-              <div className="flex items-center justify-between">
-                <span>Checked out</span>
-                <span className="font-medium">{formatDateTime(reservationWithExtras.checkOutAt)}</span>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader className="flex items-center gap-2">
-              <ClipboardList className="h-4 w-4 text-slate-600" />
-              <CardTitle>Change History</CardTitle>
             </CardHeader>
             <CardContent>
               <AuditLogTimeline
                 campgroundId={campgroundId}
                 entityType="reservation"
                 entityId={reservationId}
-                limit={20}
+                limit={30}
               />
             </CardContent>
           </Card>
-        </div>
-      </div>
+        </TabsContent>
+      </Tabs>
+
+      {/* ═══════════════════════════════════════════════════════════════════════ */}
+      {/* MODALS */}
+      {/* ═══════════════════════════════════════════════════════════════════════ */}
+
+      {/* Payment Collection Modal */}
+      <PaymentCollectionModal
+        isOpen={paymentModalOpen}
+        onClose={() => setPaymentModalOpen(false)}
+        campgroundId={reservation.campgroundId}
+        amountDueCents={balanceCents}
+        subject={{ type: "balance", reservationId: reservation.id }}
+        context="staff_checkin"
+        guestId={reservation.guest?.id}
+        guestEmail={reservation.guest?.email}
+        guestName={guestName}
+        enableSplitTender={true}
+        enableCharityRoundUp={true}
+        onSuccess={() => {
+          setPaymentModalOpen(false);
+          queryClient.invalidateQueries({ queryKey: ["reservation", reservationId] });
+        }}
+      />
 
       {/* Convert to Seasonal Modal */}
       <Dialog open={showConvertModal} onOpenChange={setShowConvertModal}>
@@ -1490,57 +1740,38 @@ export default function ReservationDetailPage() {
               Convert to Seasonal Guest
             </DialogTitle>
             <DialogDescription>
-              This {quote?.nights ?? 0}-night stay qualifies for seasonal guest management.
-              Converting will create a seasonal guest record linked to this reservation.
+              This {nights}-night stay qualifies for seasonal guest management.
             </DialogDescription>
           </DialogHeader>
 
           <div className="space-y-4 py-4">
-            <div className="rounded-lg border border-slate-200 bg-slate-50 p-3">
-              <div className="text-sm font-medium text-slate-900">{guestName}</div>
-              <div className="text-xs text-slate-500">
-                {formatDate(reservation.arrivalDate)} → {formatDate(reservation.departureDate)} • {siteLabel}
+            <div className="rounded-lg border bg-slate-50 p-3">
+              <div className="font-medium">{guestName}</div>
+              <div className="text-sm text-slate-500">
+                {formatDate(reservation.arrivalDate)} - {formatDate(reservation.departureDate)} - {siteLabel}
               </div>
             </div>
 
             <div className="space-y-3">
               <div className="flex items-center justify-between">
                 <div>
-                  <Label htmlFor="metered" className="text-sm font-medium">Metered Utilities</Label>
-                  <p className="text-xs text-slate-500">Guest pays for electric/water usage separately</p>
+                  <Label>Metered Utilities</Label>
+                  <p className="text-xs text-slate-500">Guest pays for usage separately</p>
                 </div>
-                <Switch
-                  id="metered"
-                  checked={convertIsMetered}
-                  onCheckedChange={setConvertIsMetered}
-                />
+                <Switch checked={convertIsMetered} onCheckedChange={setConvertIsMetered} />
               </div>
-
               <div className="flex items-center justify-between">
                 <div>
-                  <Label htmlFor="paysFull" className="text-sm font-medium">Pays in Full</Label>
-                  <p className="text-xs text-slate-500">Full season payment upfront (vs monthly)</p>
+                  <Label>Pays in Full</Label>
+                  <p className="text-xs text-slate-500">Full payment upfront vs monthly</p>
                 </div>
-                <Switch
-                  id="paysFull"
-                  checked={convertPaysInFull}
-                  onCheckedChange={setConvertPaysInFull}
-                />
+                <Switch checked={convertPaysInFull} onCheckedChange={setConvertPaysInFull} />
               </div>
-            </div>
-
-            <div className="rounded-lg border border-amber-200 bg-amber-50 p-3 text-xs text-amber-800">
-              <strong>Note:</strong> You can assign a rate card and configure additional options
-              after conversion from the Seasonals dashboard.
             </div>
           </div>
 
-          <DialogFooter className="gap-2 sm:gap-0">
-            <Button
-              variant="outline"
-              onClick={() => setShowConvertModal(false)}
-              disabled={convertToSeasonalMutation.isPending}
-            >
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowConvertModal(false)}>
               Cancel
             </Button>
             <Button
@@ -1549,16 +1780,11 @@ export default function ReservationDetailPage() {
               className="bg-amber-600 hover:bg-amber-700"
             >
               {convertToSeasonalMutation.isPending ? (
-                <>
-                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                  Converting...
-                </>
+                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
               ) : (
-                <>
-                  <Tent className="h-4 w-4 mr-2" />
-                  Convert to Seasonal
-                </>
+                <Tent className="h-4 w-4 mr-2" />
               )}
+              Convert
             </Button>
           </DialogFooter>
         </DialogContent>
