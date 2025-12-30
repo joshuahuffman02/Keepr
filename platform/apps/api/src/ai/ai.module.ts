@@ -27,6 +27,7 @@ import { AiReportQueryService } from './ai-report-query.service';
 import { AiCampaignService } from './ai-campaign.service';
 import { AiYieldService } from './ai-yield.service';
 import { AiDemandForecastService } from './ai-demand-forecast.service';
+import { AiSmartComposeService } from './ai-smart-compose.service';
 // AI Monitoring & Edge Cases
 import { AiCostTrackingService } from './ai-cost-tracking.service';
 import { AiEdgeCasesService } from './ai-edge-cases.service';
@@ -95,6 +96,7 @@ import { AnomaliesModule } from '../anomalies/anomalies.module';
     AiCampaignService,
     AiYieldService,
     AiDemandForecastService,
+    AiSmartComposeService,
     // AI Monitoring & Edge Cases
     AiCostTrackingService,
     AiEdgeCasesService,
@@ -130,6 +132,7 @@ import { AnomaliesModule } from '../anomalies/anomalies.module';
     AiCampaignService,
     AiYieldService,
     AiDemandForecastService,
+    AiSmartComposeService,
     // AI Monitoring & Edge Cases
     AiCostTrackingService,
     AiEdgeCasesService,

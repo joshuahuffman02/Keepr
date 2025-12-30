@@ -11,6 +11,7 @@ import { AiSentimentService } from './ai-sentiment.service';
 import { AiMorningBriefingService } from './ai-morning-briefing.service';
 import { AiReportQueryService } from './ai-report-query.service';
 import { AiCampaignService } from './ai-campaign.service';
+import { AiSmartComposeService } from './ai-smart-compose.service';
 import type { Request } from 'express';
 
 interface UpdateAiSettingsDto {
@@ -71,6 +72,7 @@ export class AiController {
     private readonly morningBriefingService: AiMorningBriefingService,
     private readonly reportQueryService: AiReportQueryService,
     private readonly campaignService: AiCampaignService,
+    private readonly smartComposeService: AiSmartComposeService,
   ) { }
 
   // ==================== PUBLIC ENDPOINTS ====================
@@ -782,6 +784,136 @@ export class AiController {
       campgroundId,
       { subject: body.subject, body: body.body },
       body.testElement
+    );
+  }
+
+  // ==================== SMART COMPOSE ====================
+
+  /**
+   * Get inline completion suggestion as user types
+   */
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.owner, UserRole.manager, UserRole.front_desk)
+  @Post('campgrounds/:campgroundId/compose/complete')
+  async getInlineCompletion(
+    @Param('campgroundId') campgroundId: string,
+    @Body() body: {
+      text: string;
+      cursorPosition: number;
+      recipientType: 'guest' | 'staff' | 'vendor';
+      messageType: 'email' | 'sms' | 'internal';
+      conversationId?: string;
+      guestName?: string;
+      priorMessages?: Array<{ role: 'guest' | 'staff'; content: string }>;
+    },
+    @Req() req: Request,
+  ) {
+    const org = (req as any).organizationId || null;
+    const userId = (req as any).user?.id;
+
+    const campground = await this.prisma.campground.findUnique({
+      where: { id: campgroundId },
+      select: { organizationId: true },
+    });
+
+    if (!campground) {
+      throw new ForbiddenException('Campground not found');
+    }
+
+    if (org && campground.organizationId !== org) {
+      throw new ForbiddenException('Access denied');
+    }
+
+    return this.smartComposeService.getInlineCompletion(
+      {
+        campgroundId,
+        conversationId: body.conversationId,
+        guestName: body.guestName,
+        recipientType: body.recipientType,
+        messageType: body.messageType,
+        priorMessages: body.priorMessages,
+      },
+      body.text,
+      body.cursorPosition,
+      userId
+    );
+  }
+
+  /**
+   * Check grammar and tone of message
+   */
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.owner, UserRole.manager, UserRole.front_desk)
+  @Post('campgrounds/:campgroundId/compose/check')
+  async checkGrammarAndTone(
+    @Param('campgroundId') campgroundId: string,
+    @Body() body: {
+      text: string;
+      recipientType: 'guest' | 'staff' | 'vendor';
+      messageType: 'email' | 'sms' | 'internal';
+    },
+    @Req() req: Request,
+  ) {
+    const org = (req as any).organizationId || null;
+    const userId = (req as any).user?.id;
+
+    const campground = await this.prisma.campground.findUnique({
+      where: { id: campgroundId },
+      select: { organizationId: true },
+    });
+
+    if (!campground) {
+      throw new ForbiddenException('Campground not found');
+    }
+
+    if (org && campground.organizationId !== org) {
+      throw new ForbiddenException('Access denied');
+    }
+
+    return this.smartComposeService.checkGrammarAndTone(
+      {
+        campgroundId,
+        recipientType: body.recipientType,
+        messageType: body.messageType,
+      },
+      body.text,
+      userId
+    );
+  }
+
+  /**
+   * Get quick reply templates
+   */
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.owner, UserRole.manager, UserRole.front_desk)
+  @Get('campgrounds/:campgroundId/compose/quick-replies')
+  async getQuickReplies(
+    @Param('campgroundId') campgroundId: string,
+    @Req() req: Request,
+  ) {
+    const org = (req as any).organizationId || null;
+    const userId = (req as any).user?.id;
+
+    const campground = await this.prisma.campground.findUnique({
+      where: { id: campgroundId },
+      select: { organizationId: true },
+    });
+
+    if (!campground) {
+      throw new ForbiddenException('Campground not found');
+    }
+
+    if (org && campground.organizationId !== org) {
+      throw new ForbiddenException('Access denied');
+    }
+
+    return this.smartComposeService.getQuickReplies(
+      {
+        campgroundId,
+        recipientType: 'guest',
+        messageType: 'email',
+      },
+      userId
     );
   }
 }

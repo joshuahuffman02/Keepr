@@ -7,9 +7,7 @@ import {
   UseGuards,
   Query,
 } from "@nestjs/common";
-import { JwtAuthGuard } from "../auth/jwt-auth.guard";
-import { RolesGuard } from "../auth/roles.guard";
-import { Roles } from "../auth/roles.decorator";
+import { JwtAuthGuard, RolesGuard, Roles } from "../auth/guards";
 import { UserRole } from "@prisma/client";
 import { BullQueueService, QueueStats } from "./bull-queue.service";
 
