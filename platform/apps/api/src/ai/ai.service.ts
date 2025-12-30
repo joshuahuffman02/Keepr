@@ -33,11 +33,13 @@ export class AiService {
     if (!campgroundId) return true;
     const cg = await this.prisma.campground.findUnique({
       where: { id: campgroundId },
-      select: { aiSuggestionsEnabled: true as any, aiOpenaiApiKey: true as any },
+      select: { aiEnabled: true as any, aiApiKey: true as any },
     });
     if (!cg) return true;
-    if (!(cg as any).aiSuggestionsEnabled) return true;
-    if (!(cg as any).aiOpenaiApiKey) return true;
+    if (!(cg as any).aiEnabled) return true;
+    // Use campground API key or fall back to platform env var
+    const apiKey = (cg as any).aiApiKey || process.env.OPENAI_API_KEY;
+    if (!apiKey) return true;
     return false;
   }
 
@@ -47,20 +49,21 @@ export class AiService {
     await this.prisma.campground.update({
       where: { id: campgroundId },
       data: {
-        aiSuggestionsEnabled: dto.enabled,
-        aiOpenaiApiKey: dto.openaiApiKey ?? (cg as any).aiOpenaiApiKey,
+        aiEnabled: dto.enabled,
+        aiApiKey: dto.openaiApiKey ?? (cg as any).aiApiKey,
       } as any,
     });
-    return { ok: true, enabled: dto.enabled, hasKey: !!(dto.openaiApiKey ?? (cg as any).aiOpenaiApiKey) };
+    return { ok: true, enabled: dto.enabled, hasKey: !!(dto.openaiApiKey ?? (cg as any).aiApiKey) };
   }
 
   async generate(dto: GenerateAiSuggestionsDto) {
     const cg = await this.prisma.campground.findUnique({
       where: { id: dto.campgroundId },
-      select: { id: true, name: true, aiSuggestionsEnabled: true as any, aiOpenaiApiKey: true as any } as any,
+      select: { id: true, name: true, aiEnabled: true as any, aiApiKey: true as any } as any,
     });
     if (!cg) throw new BadRequestException("Campground not found");
-    if (!(cg as any).aiSuggestionsEnabled || !(cg as any).aiOpenaiApiKey) {
+    const apiKey = (cg as any).aiApiKey || process.env.OPENAI_API_KEY;
+    if (!(cg as any).aiEnabled || !apiKey) {
       throw new ForbiddenException("AI suggestions not enabled for this campground");
     }
 
@@ -135,7 +138,7 @@ Guidelines:
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${(cg as any).aiOpenaiApiKey}`,
+        Authorization: `Bearer ${apiKey}`,
       },
       body: JSON.stringify(body),
     });
@@ -164,10 +167,11 @@ Guidelines:
   async ask(dto: AskDto) {
     const cg = await this.prisma.campground.findUnique({
       where: { id: dto.campgroundId },
-      select: { id: true, name: true, aiSuggestionsEnabled: true as any, aiOpenaiApiKey: true as any } as any,
+      select: { id: true, name: true, aiEnabled: true as any, aiApiKey: true as any } as any,
     });
     if (!cg) throw new BadRequestException("Campground not found");
-    if (!(cg as any).aiSuggestionsEnabled || !(cg as any).aiOpenaiApiKey) {
+    const apiKey = (cg as any).aiApiKey || process.env.OPENAI_API_KEY;
+    if (!(cg as any).aiEnabled || !apiKey) {
       throw new ForbiddenException("AI not enabled for this campground");
     }
 
@@ -214,7 +218,7 @@ Return:
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${(cg as any).aiOpenaiApiKey}`,
+        Authorization: `Bearer ${apiKey}`,
       },
       body: JSON.stringify(body),
     });
@@ -351,8 +355,9 @@ Return:
     // Use AI for intelligent pricing recommendation
     const cg = await this.prisma.campground.findUnique({
       where: { id: cgId },
-      select: { name: true, aiOpenaiApiKey: true as any },
+      select: { name: true, aiApiKey: true as any },
     });
+    const apiKey = (cg as any)?.aiApiKey || process.env.OPENAI_API_KEY;
 
     const prompt = `You are a revenue management AI for ${cg?.name || "a campground"}. Analyze the data and suggest optimal pricing.
 
@@ -377,7 +382,7 @@ Respond with JSON only (no markdown):
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${(cg as any).aiOpenaiApiKey}`,
+          Authorization: `Bearer ${apiKey}`,
         },
         body: JSON.stringify({
           model: "gpt-4o-mini",
@@ -545,8 +550,9 @@ Respond with JSON only (no markdown):
     // Use AI for semantic matching
     const cg = await this.prisma.campground.findUnique({
       where: { id: cgId! },
-      select: { name: true, aiOpenaiApiKey: true as any },
+      select: { name: true, aiApiKey: true as any },
     });
+    const apiKey = (cg as any)?.aiApiKey || process.env.OPENAI_API_KEY;
 
     const prompt = `You are a search assistant. Given the user query and items below, return the most relevant matches.
 
@@ -565,7 +571,7 @@ Only include items with score >= 0.5. Return empty array if no good matches.`;
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${(cg as any).aiOpenaiApiKey}`,
+          Authorization: `Bearer ${apiKey}`,
         },
         body: JSON.stringify({
           model: "gpt-4o-mini",
@@ -911,7 +917,7 @@ Only include items with score >= 0.5. Return empty array if no good matches.`;
       const { guestName, lastMessage, reservationContext } = dto.payload || {};
       const cg = campgroundId ? await this.prisma.campground.findUnique({
         where: { id: campgroundId },
-        select: { aiOpenaiApiKey: true as any },
+        select: { aiApiKey: true as any },
       }) : null;
 
       const prompt = `
@@ -939,7 +945,7 @@ Only include items with score >= 0.5. Return empty array if no good matches.`;
       };
 
       try {
-        const apiKey = (cg as any)?.aiOpenaiApiKey;
+        const apiKey = (cg as any)?.aiApiKey;
         if (!apiKey) {
           return {
             action,
