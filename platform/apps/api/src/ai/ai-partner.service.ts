@@ -18,7 +18,7 @@ import { PricingV2Service } from "../pricing-v2/pricing-v2.service";
 import { AiYieldService } from "./ai-yield.service";
 import { AiDynamicPricingService } from "./ai-dynamic-pricing.service";
 import { AiDashboardService } from "./ai-dashboard.service";
-import { AiInsightsService } from "./ai-insights.service";
+import { AiRevenueManagerService } from "./ai-revenue-manager.service";
 type PartnerMode = "staff" | "admin";
 type PersonaKey = "revenue" | "operations" | "marketing" | "accounting" | "hospitality" | "compliance" | "general";
 
@@ -232,7 +232,7 @@ export class AiPartnerService {
     private readonly yieldService: AiYieldService,
     private readonly pricingService: AiDynamicPricingService,
     private readonly dashboardService: AiDashboardService,
-    private readonly insightsService: AiInsightsService
+    private readonly revenueManager: AiRevenueManagerService
   ) {}
 
   async chat(request: PartnerChatRequest): Promise<AiPartnerResponse> {
@@ -1719,7 +1719,10 @@ User request: "${params.anonymizedText}"${historyBlock}`;
     try {
       if (draft.actionType === "get_yield_metrics") {
         const metrics = await this.yieldService.getYieldMetrics(campgroundId);
-        const message = `Current yield metrics: Occupancy ${metrics.occupancy}%, ADR $${(metrics.adr / 100).toFixed(2)}, RevPAN $${(metrics.revPan / 100).toFixed(2)}. ${metrics.occupancy > 80 ? "Strong performance!" : metrics.occupancy < 50 ? "Opportunity to boost bookings." : "Steady occupancy."}`;
+        const occ = metrics.todayOccupancy ?? 0;
+        const adr = metrics.todayADR ?? 0;
+        const revPan = metrics.todayRevPAN ?? 0;
+        const message = `Current yield metrics: Occupancy ${occ.toFixed(1)}%, ADR $${(adr / 100).toFixed(2)}, RevPAN $${(revPan / 100).toFixed(2)}. ${occ > 80 ? "Strong performance!" : occ < 50 ? "Opportunity to boost bookings." : "Steady occupancy."}`;
         return {
           action: { ...draft, status: "executed", result: metrics },
           message
@@ -1728,13 +1731,17 @@ User request: "${params.anonymizedText}"${historyBlock}`;
 
       if (draft.actionType === "get_occupancy_forecast") {
         const days = draft.parameters?.days || 30;
-        const forecast = await this.yieldService.forecastOccupancy(campgroundId, days);
-        const avgOccupancy = forecast.length > 0
-          ? Math.round(forecast.reduce((sum, d) => sum + d.occupancyPercent, 0) / forecast.length)
-          : 0;
-        const message = `${days}-day forecast: Average projected occupancy is ${avgOccupancy}%. ${forecast.length > 0 ? `Peak day: ${forecast.reduce((max, d) => d.occupancyPercent > max.occupancyPercent ? d : max).date} at ${forecast.reduce((max, d) => d.occupancyPercent > max.occupancyPercent ? d : max).occupancyPercent}%.` : ""}`;
+        const forecastResult = await this.yieldService.forecastOccupancy(campgroundId, days);
+        const forecasts = forecastResult.forecasts || [];
+        const avgOccupancy = forecastResult.avgOccupancy ?? 0;
+        let peakInfo = "";
+        if (forecasts.length > 0) {
+          const peak = forecasts.reduce((max, d) => (d.occupancyPct ?? 0) > (max.occupancyPct ?? 0) ? d : max);
+          peakInfo = ` Peak day: ${peak.date} at ${(peak.occupancyPct ?? 0).toFixed(1)}%.`;
+        }
+        const message = `${days}-day forecast: Average projected occupancy is ${avgOccupancy.toFixed(1)}%.${peakInfo}`;
         return {
-          action: { ...draft, status: "executed", result: { forecast, avgOccupancy } },
+          action: { ...draft, status: "executed", result: forecastResult },
           message
         };
       }
@@ -1752,21 +1759,29 @@ User request: "${params.anonymizedText}"${historyBlock}`;
       }
 
       if (draft.actionType === "get_revenue_insights") {
-        const insights = await this.insightsService.getRecentInsights(campgroundId, 5);
+        const summary = await this.revenueManager.getRevenueSummary(campgroundId);
+        const insights = await this.revenueManager.getInsights(campgroundId, { status: "new", limit: 5 });
+        const totalFormatted = summary.totalOpportunityFormatted || "$0.00";
         const message = insights.length > 0
-          ? `${insights.length} revenue insights found. ${insights[0]?.summary || "Check your dashboard for details."}`
+          ? `${insights.length} revenue opportunities found totaling ${totalFormatted}. ${insights[0]?.title || "Check your dashboard for details."}`
           : "No new revenue insights. Performance is tracking as expected.";
         return {
-          action: { ...draft, status: "executed", result: { insights } },
+          action: { ...draft, status: "executed", result: { summary, insights } },
           message
         };
       }
 
       if (draft.actionType === "get_dashboard_summary") {
-        const dashboard = await this.dashboardService.getDashboard(campgroundId);
-        const message = `Dashboard summary: ${dashboard.metrics?.todayArrivals || 0} arrivals today, ${dashboard.metrics?.todayDepartures || 0} departures. ${dashboard.alerts?.length || 0} alerts pending. AI has ${dashboard.activity?.length || 0} recent actions.`;
+        const [quickStats, metrics, activity] = await Promise.all([
+          this.dashboardService.getQuickStats(campgroundId),
+          this.dashboardService.getMetrics(campgroundId, 30),
+          this.dashboardService.getActivityFeed(campgroundId, 10)
+        ]);
+        const arrivals = quickStats?.todayArrivals ?? 0;
+        const departures = quickStats?.todayDepartures ?? 0;
+        const message = `Dashboard summary: ${arrivals} arrivals today, ${departures} departures. AI processed ${activity?.length || 0} recent actions.`;
         return {
-          action: { ...draft, status: "executed", result: dashboard },
+          action: { ...draft, status: "executed", result: { quickStats, metrics, activity } },
           message
         };
       }
