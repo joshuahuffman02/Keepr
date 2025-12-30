@@ -60,21 +60,25 @@
     --status-success-foreground: 0 0% 100%;
     --status-success-bg: 152 57% 96%; /* emerald-50 */
     --status-success-border: 149 61% 86%; /* emerald-200 */
+    --status-success-text: 160 84% 29%; /* emerald-700 - text on light bg */
 
     --status-warning: 38 92% 50%; /* amber-500 - amber for warnings */
     --status-warning-foreground: 21 55% 11%; /* amber-950 */
     --status-warning-bg: 48 100% 96%; /* amber-50 */
     --status-warning-border: 48 96% 76%; /* amber-200 */
+    --status-warning-text: 26 90% 37%; /* amber-700 - text on light bg */
 
     --status-error: 0 84% 60%; /* red-500 - red for errors */
     --status-error-foreground: 0 0% 100%;
     --status-error-bg: 0 86% 97%; /* red-50 */
     --status-error-border: 0 72% 91%; /* red-200 */
+    --status-error-text: 0 72% 43%; /* red-700 - text on light bg */
 
     --status-info: 217 91% 60%; /* blue-500 - blue for informational */
     --status-info-foreground: 0 0% 100%;
     --status-info-bg: 214 100% 97%; /* blue-50 */
     --status-info-border: 213 97% 87%; /* blue-200 */
+    --status-info-text: 221 83% 45%; /* blue-700 - text on light bg */
   }
 
   .dark {
@@ -111,21 +115,25 @@
     --status-success-foreground: 0 0% 100%;
     --status-success-bg: 158 64% 12%; /* emerald-950 */
     --status-success-border: 158 64% 22%; /* emerald-800 */
+    --status-success-text: 152 69% 65%; /* emerald-400 - text on dark bg */
 
     --status-warning: 38 92% 50%; /* amber-500 */
     --status-warning-foreground: 0 0% 100%;
     --status-warning-bg: 36 77% 12%; /* amber-950 */
     --status-warning-border: 36 86% 22%; /* amber-800 */
+    --status-warning-text: 43 96% 60%; /* amber-400 - text on dark bg */
 
     --status-error: 0 62% 50%; /* red-600 */
     --status-error-foreground: 0 0% 100%;
     --status-error-bg: 0 62% 12%; /* red-950 */
     --status-error-border: 0 62% 22%; /* red-800 */
+    --status-error-text: 0 91% 68%; /* red-400 - text on dark bg */
 
     --status-info: 217 91% 60%; /* blue-500 */
     --status-info-foreground: 0 0% 100%;
     --status-info-bg: 222 84% 12%; /* blue-950 */
     --status-info-border: 217 91% 22%; /* blue-800 */
+    --status-info-text: 213 94% 68%; /* blue-400 - text on dark bg */
   }
 }
 

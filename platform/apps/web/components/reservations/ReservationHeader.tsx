@@ -28,11 +28,11 @@ export function ReservationHeader({ reservation, onCheckIn, onCheckOut, onCancel
 
     const getStatusColor = (status: string) => {
         switch (status) {
-            case "confirmed": return "bg-blue-100 text-blue-800";
-            case "checked_in": return "bg-green-100 text-green-800";
-            case "checked_out": return "bg-slate-100 text-slate-800";
-            case "cancelled": return "bg-red-100 text-red-800";
-            default: return "bg-slate-100 text-slate-800";
+            case "confirmed": return "bg-status-info-bg text-status-info-text";
+            case "checked_in": return "bg-status-success-bg text-status-success-text";
+            case "checked_out": return "bg-muted text-muted-foreground";
+            case "cancelled": return "bg-status-error-bg text-status-error-text";
+            default: return "bg-muted text-muted-foreground";
         }
     };
 
@@ -60,7 +60,7 @@ export function ReservationHeader({ reservation, onCheckIn, onCheckOut, onCancel
                     </Link>
                 )}
                 {canCheckIn && (
-                    <Button onClick={onCheckIn} disabled={isProcessing} className="bg-emerald-600 hover:bg-emerald-700">
+                    <Button onClick={onCheckIn} disabled={isProcessing} className="bg-action-primary hover:bg-action-primary-hover">
                         Check In Guest
                     </Button>
                 )}

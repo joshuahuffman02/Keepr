@@ -37,26 +37,26 @@ interface SystemCheckCardProps {
 const severityConfig = {
   error: {
     icon: XCircle,
-    color: "text-red-500",
-    bg: "bg-red-50",
-    border: "border-red-200",
-    badge: "bg-red-100 text-red-800",
+    color: "text-status-error",
+    bg: "bg-status-error-bg",
+    border: "border-status-error-border",
+    badge: "bg-status-error-bg text-status-error-text",
     label: "Error",
   },
   warning: {
     icon: AlertTriangle,
-    color: "text-amber-500",
-    bg: "bg-amber-50",
-    border: "border-amber-200",
-    badge: "bg-amber-100 text-amber-800",
+    color: "text-status-warning",
+    bg: "bg-status-warning-bg",
+    border: "border-status-warning-border",
+    badge: "bg-status-warning-bg text-status-warning-text",
     label: "Warning",
   },
   info: {
     icon: Info,
-    color: "text-blue-500",
-    bg: "bg-blue-50",
-    border: "border-blue-200",
-    badge: "bg-blue-100 text-blue-800",
+    color: "text-status-info",
+    bg: "bg-status-info-bg",
+    border: "border-status-info-border",
+    badge: "bg-status-info-bg text-status-info-text",
     label: "Info",
   },
 };
@@ -94,10 +94,10 @@ export function SystemCheckCard({
   // All issues resolved
   if (visibleIssues.length === 0) {
     return (
-      <Card className={cn("border-emerald-200 bg-emerald-50/50", className)}>
+      <Card className={cn("border-status-success-border bg-status-success-bg/50", className)}>
         <CardContent className="py-8 text-center">
-          <div className="inline-flex items-center justify-center h-12 w-12 rounded-full bg-emerald-100 mb-3">
-            <CheckCircle2 className="h-6 w-6 text-emerald-600" />
+          <div className="inline-flex items-center justify-center h-12 w-12 rounded-full bg-status-success-bg mb-3">
+            <CheckCircle2 className="h-6 w-6 text-status-success" />
           </div>
           <h3 className="font-medium text-slate-900">All systems go!</h3>
           <p className="text-sm text-slate-500 mt-1">
@@ -133,7 +133,7 @@ export function SystemCheckCard({
         </CardTitle>
         <div className="flex items-center gap-2">
           {actionableCount > 0 && (
-            <Badge className="bg-amber-100 text-amber-800 hover:bg-amber-100">
+            <Badge className="bg-status-warning-bg text-status-warning-text hover:bg-status-warning-bg">
               {actionableCount} to review
             </Badge>
           )}

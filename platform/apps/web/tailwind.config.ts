@@ -66,25 +66,29 @@ const config: Config = {
           DEFAULT: "hsl(var(--status-success))",
           foreground: "hsl(var(--status-success-foreground))",
           bg: "hsl(var(--status-success-bg))",
-          border: "hsl(var(--status-success-border))"
+          border: "hsl(var(--status-success-border))",
+          text: "hsl(var(--status-success-text))"
         },
         "status-warning": {
           DEFAULT: "hsl(var(--status-warning))",
           foreground: "hsl(var(--status-warning-foreground))",
           bg: "hsl(var(--status-warning-bg))",
-          border: "hsl(var(--status-warning-border))"
+          border: "hsl(var(--status-warning-border))",
+          text: "hsl(var(--status-warning-text))"
         },
         "status-error": {
           DEFAULT: "hsl(var(--status-error))",
           foreground: "hsl(var(--status-error-foreground))",
           bg: "hsl(var(--status-error-bg))",
-          border: "hsl(var(--status-error-border))"
+          border: "hsl(var(--status-error-border))",
+          text: "hsl(var(--status-error-text))"
         },
         "status-info": {
           DEFAULT: "hsl(var(--status-info))",
           foreground: "hsl(var(--status-info-foreground))",
           bg: "hsl(var(--status-info-bg))",
-          border: "hsl(var(--status-info-border))"
+          border: "hsl(var(--status-info-border))",
+          text: "hsl(var(--status-info-text))"
         }
       },
       borderRadius: {

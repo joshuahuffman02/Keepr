@@ -27,27 +27,27 @@ export const scaleIn = {
   animate: { opacity: 1, scale: 1 },
 };
 
-// Status color mapping using theme tokens
+// Status color mapping using semantic tokens (auto dark mode via CSS variables)
 export const STATUS_VARIANTS = {
   success: {
-    bg: "bg-emerald-50 dark:bg-emerald-900/20",
-    text: "text-emerald-600 dark:text-emerald-400",
-    border: "border-emerald-200 dark:border-emerald-800/30",
+    bg: "bg-status-success-bg",
+    text: "text-status-success-text",
+    border: "border-status-success-border",
   },
   warning: {
-    bg: "bg-amber-50 dark:bg-amber-900/20",
-    text: "text-amber-600 dark:text-amber-400",
-    border: "border-amber-200 dark:border-amber-800/30",
+    bg: "bg-status-warning-bg",
+    text: "text-status-warning-text",
+    border: "border-status-warning-border",
   },
   error: {
-    bg: "bg-red-50 dark:bg-red-900/20",
-    text: "text-red-600 dark:text-red-400",
-    border: "border-red-200 dark:border-red-800/30",
+    bg: "bg-status-error-bg",
+    text: "text-status-error-text",
+    border: "border-status-error-border",
   },
   info: {
-    bg: "bg-blue-50 dark:bg-blue-900/20",
-    text: "text-blue-600 dark:text-blue-400",
-    border: "border-blue-200 dark:border-blue-800/30",
+    bg: "bg-status-info-bg",
+    text: "text-status-info-text",
+    border: "border-status-info-border",
   },
   neutral: {
     bg: "bg-muted",

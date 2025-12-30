@@ -79,20 +79,20 @@ const actionLabels: Record<string, string> = {
 };
 
 const actionColors: Record<string, string> = {
-  "guest.create": "bg-emerald-100 text-emerald-700 border-emerald-200",
-  "guest.update": "bg-blue-100 text-blue-700 border-blue-200",
-  "guest.delete": "bg-red-100 text-red-700 border-red-200",
-  "reservation.create": "bg-emerald-100 text-emerald-700 border-emerald-200",
-  "reservation.update": "bg-blue-100 text-blue-700 border-blue-200",
-  "reservation.delete": "bg-red-100 text-red-700 border-red-200",
-  "reservation.cancel": "bg-red-100 text-red-700 border-red-200",
-  "reservation.checkin": "bg-emerald-100 text-emerald-700 border-emerald-200",
-  "reservation.checkout": "bg-amber-100 text-amber-700 border-amber-200",
-  "reservation.confirm": "bg-emerald-100 text-emerald-700 border-emerald-200",
-  "reservation.payment": "bg-emerald-100 text-emerald-700 border-emerald-200",
-  "reservation.refund": "bg-red-100 text-red-700 border-red-200",
-  "reservation_override": "bg-amber-100 text-amber-700 border-amber-200",
-  "checkin.override": "bg-amber-100 text-amber-700 border-amber-200"
+  "guest.create": "bg-status-success-bg text-status-success-text border-status-success-border",
+  "guest.update": "bg-status-info-bg text-status-info-text border-status-info-border",
+  "guest.delete": "bg-status-error-bg text-status-error-text border-status-error-border",
+  "reservation.create": "bg-status-success-bg text-status-success-text border-status-success-border",
+  "reservation.update": "bg-status-info-bg text-status-info-text border-status-info-border",
+  "reservation.delete": "bg-status-error-bg text-status-error-text border-status-error-border",
+  "reservation.cancel": "bg-status-error-bg text-status-error-text border-status-error-border",
+  "reservation.checkin": "bg-status-success-bg text-status-success-text border-status-success-border",
+  "reservation.checkout": "bg-status-warning-bg text-status-warning-text border-status-warning-border",
+  "reservation.confirm": "bg-status-success-bg text-status-success-text border-status-success-border",
+  "reservation.payment": "bg-status-success-bg text-status-success-text border-status-success-border",
+  "reservation.refund": "bg-status-error-bg text-status-error-text border-status-error-border",
+  "reservation_override": "bg-status-warning-bg text-status-warning-text border-status-warning-border",
+  "checkin.override": "bg-status-warning-bg text-status-warning-text border-status-warning-border"
 };
 
 function formatValue(value: any): string {

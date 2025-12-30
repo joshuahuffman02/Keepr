@@ -22,8 +22,8 @@ export function SyncStatus({ variant = "compact", showDetails = true, className,
         </svg>
       ),
       label: "Synced",
-      color: "text-emerald-600 bg-emerald-50 border-emerald-200",
-      dotColor: "bg-emerald-500",
+      color: "text-status-success-text bg-status-success-bg border-status-success-border",
+      dotColor: "bg-status-success",
     },
     syncing: {
       icon: (
@@ -32,8 +32,8 @@ export function SyncStatus({ variant = "compact", showDetails = true, className,
         </svg>
       ),
       label: "Syncing",
-      color: "text-blue-600 bg-blue-50 border-blue-200",
-      dotColor: "bg-blue-500 animate-pulse",
+      color: "text-status-info-text bg-status-info-bg border-status-info-border",
+      dotColor: "bg-status-info animate-pulse",
     },
     pending: {
       icon: (
@@ -43,8 +43,8 @@ export function SyncStatus({ variant = "compact", showDetails = true, className,
         </svg>
       ),
       label: `Pending (${status.totalPending})`,
-      color: "text-amber-700 bg-amber-50 border-amber-200",
-      dotColor: "bg-amber-500",
+      color: "text-status-warning-text bg-status-warning-bg border-status-warning-border",
+      dotColor: "bg-status-warning",
     },
     offline: {
       icon: (
@@ -55,8 +55,8 @@ export function SyncStatus({ variant = "compact", showDetails = true, className,
         </svg>
       ),
       label: "Offline",
-      color: "text-red-700 bg-red-50 border-red-200",
-      dotColor: "bg-red-500",
+      color: "text-status-error-text bg-status-error-bg border-status-error-border",
+      dotColor: "bg-status-error",
     },
     error: {
       icon: (
@@ -66,8 +66,8 @@ export function SyncStatus({ variant = "compact", showDetails = true, className,
         </svg>
       ),
       label: `Error (${status.totalConflicts} conflicts)`,
-      color: "text-red-700 bg-red-50 border-red-200",
-      dotColor: "bg-red-500",
+      color: "text-status-error-text bg-status-error-bg border-status-error-border",
+      dotColor: "bg-status-error",
     },
   };
 
