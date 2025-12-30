@@ -7346,7 +7346,7 @@ export const apiClient = {
   // Phase 1: Dynamic Pricing V2
   // ---------------------------------------------------------------------------
   async getPricingRulesV2(campgroundId: string) {
-    const data = await fetchJSON<unknown>(`/campgrounds/${campgroundId}/pricing-rules-v2`);
+    const data = await fetchJSON<unknown>(`/campgrounds/${campgroundId}/pricing-rules/v2`);
     return z.array(z.object({
       id: z.string(),
       campgroundId: z.string(),
@@ -7386,7 +7386,7 @@ export const apiClient = {
     maxRateCap?: number | null;
     active?: boolean;
   }) {
-    const res = await fetch(`${API_BASE}/campgrounds/${campgroundId}/pricing-rules-v2`, {
+    const res = await fetch(`${API_BASE}/campgrounds/${campgroundId}/pricing-rules/v2`, {
       method: "POST",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
       body: JSON.stringify(payload),
@@ -7410,7 +7410,7 @@ export const apiClient = {
     maxRateCap: number | null;
     active: boolean;
   }>) {
-    const res = await fetch(`${API_BASE}/pricing-rules-v2/${id}`, {
+    const res = await fetch(`${API_BASE}/pricing-rules/v2/${id}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
       body: JSON.stringify(payload),
@@ -7418,7 +7418,7 @@ export const apiClient = {
     return parseResponse<unknown>(res);
   },
   async deletePricingRuleV2(id: string) {
-    const res = await fetch(`${API_BASE}/pricing-rules-v2/${id}`, {
+    const res = await fetch(`${API_BASE}/pricing-rules/v2/${id}`, {
       method: "DELETE",
       headers: scopedHeaders(),
     });

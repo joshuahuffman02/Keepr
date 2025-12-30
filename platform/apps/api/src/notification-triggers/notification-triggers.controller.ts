@@ -6,14 +6,16 @@ import {
   Delete,
   Body,
   Param,
+  Headers,
   UseGuards,
 } from '@nestjs/common';
 import { NotificationTriggersService, TriggerEvent } from './notification-triggers.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard, Roles } from '../auth/guards/roles.guard';
+import { ScopeGuard } from '../auth/guards/scope.guard';
 import { UserRole } from '@prisma/client';
 
-@UseGuards(JwtAuthGuard, RolesGuard)
+@UseGuards(JwtAuthGuard, RolesGuard, ScopeGuard)
 @Controller('campgrounds/:campgroundId/notification-triggers')
 export class NotificationTriggersController {
   constructor(private readonly service: NotificationTriggersService) {}
@@ -43,6 +45,7 @@ export class NotificationTriggersController {
   @Roles(UserRole.owner, UserRole.manager)
   @Patch(':id')
   update(
+    @Param('campgroundId') campgroundId: string,
     @Param('id') id: string,
     @Body() body: Partial<{
       event: TriggerEvent;
@@ -53,21 +56,24 @@ export class NotificationTriggersController {
       conditions: Record<string, any> | null;
     }>
   ) {
-    return this.service.update(id, body);
+    return this.service.update(id, body, campgroundId);
   }
 
   @Roles(UserRole.owner, UserRole.manager)
   @Delete(':id')
-  delete(@Param('id') id: string) {
-    return this.service.delete(id);
+  delete(
+    @Param('campgroundId') campgroundId: string,
+    @Param('id') id: string
+  ) {
+    return this.service.delete(id, campgroundId);
   }
 }
 
 /**
  * Controller for trigger-by-ID operations (update, delete, test)
- * These routes don't require campgroundId in the path since the trigger ID is unique
+ * Requires x-campground-id header for multi-tenant isolation
  */
-@UseGuards(JwtAuthGuard, RolesGuard)
+@UseGuards(JwtAuthGuard, RolesGuard, ScopeGuard)
 @Controller('notification-triggers')
 export class NotificationTriggersByIdController {
   constructor(private readonly service: NotificationTriggersService) {}
@@ -75,6 +81,7 @@ export class NotificationTriggersByIdController {
   @Roles(UserRole.owner, UserRole.manager)
   @Patch(':id')
   update(
+    @Headers('x-campground-id') campgroundId: string,
     @Param('id') id: string,
     @Body() body: Partial<{
       event: TriggerEvent;
@@ -85,21 +92,25 @@ export class NotificationTriggersByIdController {
       conditions: Record<string, any> | null;
     }>
   ) {
-    return this.service.update(id, body);
+    return this.service.update(id, body, campgroundId);
   }
 
   @Roles(UserRole.owner, UserRole.manager)
   @Delete(':id')
-  delete(@Param('id') id: string) {
-    return this.service.delete(id);
+  delete(
+    @Headers('x-campground-id') campgroundId: string,
+    @Param('id') id: string
+  ) {
+    return this.service.delete(id, campgroundId);
   }
 
   @Roles(UserRole.owner, UserRole.manager)
   @Post(':id/test')
   test(
+    @Headers('x-campground-id') campgroundId: string,
     @Param('id') id: string,
     @Body() body: { email: string }
   ) {
-    return this.service.sendTestNotification(id, body.email);
+    return this.service.sendTestNotification(id, body.email, campgroundId);
   }
 }

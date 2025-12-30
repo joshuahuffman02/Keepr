@@ -1,4 +1,4 @@
-import { Injectable, Logger, NotFoundException } from '@nestjs/common';
+import { Injectable, Logger, NotFoundException, ForbiddenException } from '@nestjs/common';
 import { Cron, CronExpression } from '@nestjs/schedule';
 import { PrismaService } from '../prisma/prisma.service';
 import { EmailService } from '../email/email.service';
@@ -91,7 +91,28 @@ export class NotificationTriggersService {
   }
 
   /**
+   * Validate trigger belongs to campground (multi-tenant isolation)
+   */
+  private async validateTriggerOwnership(id: string, campgroundId: string): Promise<void> {
+    const trigger = await this.prisma.notificationTrigger.findUnique({
+      where: { id },
+      select: { campgroundId: true }
+    });
+
+    if (!trigger) {
+      throw new NotFoundException(`Trigger ${id} not found`);
+    }
+
+    if (trigger.campgroundId !== campgroundId) {
+      throw new ForbiddenException('Access denied to this trigger');
+    }
+  }
+
+  /**
    * Update a trigger
+   * @param id - Trigger ID
+   * @param data - Update data
+   * @param campgroundId - Optional campgroundId for ownership validation (required for cross-tenant protection)
    */
   async update(id: string, data: Partial<{
     event: TriggerEvent;
@@ -100,7 +121,12 @@ export class NotificationTriggersService {
     templateId: string | null;
     delayMinutes: number;
     conditions: Record<string, any> | null;
-  }>) {
+  }>, campgroundId?: string) {
+    // Validate ownership if campgroundId provided
+    if (campgroundId) {
+      await this.validateTriggerOwnership(id, campgroundId);
+    }
+
     return this.prisma.notificationTrigger.update({
       where: { id },
       data: {
@@ -112,8 +138,15 @@ export class NotificationTriggersService {
 
   /**
    * Delete a trigger
+   * @param id - Trigger ID
+   * @param campgroundId - Optional campgroundId for ownership validation (required for cross-tenant protection)
    */
-  async delete(id: string) {
+  async delete(id: string, campgroundId?: string) {
+    // Validate ownership if campgroundId provided
+    if (campgroundId) {
+      await this.validateTriggerOwnership(id, campgroundId);
+    }
+
     return this.prisma.notificationTrigger.delete({
       where: { id }
     });
@@ -389,9 +422,17 @@ export class NotificationTriggersService {
 
   /**
    * Send a test notification to verify the trigger is configured correctly
+   * @param triggerId - Trigger ID
+   * @param testEmail - Email to send test to
+   * @param campgroundId - Optional campgroundId for ownership validation (required for cross-tenant protection)
    */
-  async sendTestNotification(triggerId: string, testEmail: string) {
+  async sendTestNotification(triggerId: string, testEmail: string, campgroundId?: string) {
     this.logger.log(`Sending test notification for trigger ${triggerId} to ${testEmail}`);
+
+    // Validate ownership if campgroundId provided
+    if (campgroundId) {
+      await this.validateTriggerOwnership(triggerId, campgroundId);
+    }
 
     // Get the trigger with its template
     const trigger = await this.prisma.notificationTrigger.findUnique({

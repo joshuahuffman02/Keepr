@@ -2,6 +2,7 @@ import { Controller, Get, Post, Patch, Body, Param, Delete, Query, UseGuards, Re
 import { WaitlistService } from './waitlist.service';
 import { CreateWaitlistEntryDto } from '@campreserv/shared';
 import { JwtAuthGuard } from '../auth/guards';
+import { ScopeGuard } from '../auth/guards/scope.guard';
 
 interface CreateStaffWaitlistDto {
     campgroundId: string;
@@ -38,27 +39,51 @@ interface UpdateWaitlistDto {
     status?: 'waiting' | 'offered' | 'accepted' | 'expired' | 'cancelled';
 }
 
-@UseGuards(JwtAuthGuard)
-@Controller('waitlist')
+@UseGuards(JwtAuthGuard, ScopeGuard)
+@Controller('campgrounds/:campgroundId/waitlist')
 export class WaitlistController {
     constructor(private readonly waitlistService: WaitlistService) { }
 
     @Post()
-    create(@Body() createWaitlistDto: CreateWaitlistEntryDto, @Req() req: any) {
+    create(
+        @Param('campgroundId') campgroundId: string,
+        @Body() createWaitlistDto: CreateWaitlistEntryDto,
+        @Req() req: any
+    ) {
         const idempotencyKey = req.headers["idempotency-key"];
         const sequence = req.headers["x-client-seq"] ?? req.headers["client-seq"];
-        return this.waitlistService.create(createWaitlistDto, idempotencyKey, sequence, req.user);
+        // Ensure campgroundId from path is used
+        return this.waitlistService.create(
+            { ...createWaitlistDto, campgroundId },
+            idempotencyKey,
+            sequence,
+            req.user
+        );
     }
 
     @Post('staff')
-    createStaffEntry(@Body() dto: CreateStaffWaitlistDto, @Req() req: any) {
+    createStaffEntry(
+        @Param('campgroundId') campgroundId: string,
+        @Body() dto: CreateStaffWaitlistDto,
+        @Req() req: any
+    ) {
         const idempotencyKey = req.headers["idempotency-key"];
         const sequence = req.headers["x-client-seq"] ?? req.headers["client-seq"];
-        return this.waitlistService.createStaffEntry(dto, idempotencyKey, sequence, req.user);
+        // Ensure campgroundId from path is used
+        return this.waitlistService.createStaffEntry(
+            { ...dto, campgroundId },
+            idempotencyKey,
+            sequence,
+            req.user
+        );
     }
 
     @Post(':id/accept')
-    accept(@Param('id') id: string, @Req() req: any) {
+    accept(
+        @Param('campgroundId') campgroundId: string,
+        @Param('id') id: string,
+        @Req() req: any
+    ) {
         const idempotencyKey = req.headers["idempotency-key"];
         const sequence = req.headers["x-client-seq"] ?? req.headers["client-seq"];
         return this.waitlistService.accept(id, idempotencyKey, sequence, req.user);
@@ -66,7 +91,7 @@ export class WaitlistController {
 
     @Get()
     findAll(
-        @Query('campgroundId') campgroundId: string,
+        @Param('campgroundId') campgroundId: string,
         @Query('type') type?: string,
         @Query('limit') limit?: string,
         @Query('offset') offset?: string,
@@ -79,14 +104,19 @@ export class WaitlistController {
     }
 
     @Patch(':id')
-    update(@Param('id') id: string, @Body() dto: UpdateWaitlistDto, @Req() req: any) {
-        const idempotencyKey = req.headers["idempotency-key"];
-        const sequence = req.headers["x-client-seq"] ?? req.headers["client-seq"];
-        return this.waitlistService.updateEntry(id, dto);
+    update(
+        @Param('campgroundId') campgroundId: string,
+        @Param('id') id: string,
+        @Body() dto: UpdateWaitlistDto
+    ) {
+        return this.waitlistService.updateEntry(id, campgroundId, dto);
     }
 
     @Delete(':id')
-    remove(@Param('id') id: string) {
-        return this.waitlistService.remove(id);
+    remove(
+        @Param('campgroundId') campgroundId: string,
+        @Param('id') id: string
+    ) {
+        return this.waitlistService.remove(id, campgroundId);
     }
 }
