@@ -7,6 +7,16 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/components/ui/use-toast";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { apiClient } from "@/lib/api-client";
 import { cn } from "@/lib/utils";
 import {
@@ -448,6 +458,32 @@ export function SiteMapEditor({
   const [quickAssignShapeId, setQuickAssignShapeId] = useState<string | null>(null);
   const [quickAssignPosition, setQuickAssignPosition] = useState<{ x: number; y: number } | null>(null);
   const [quickAssignSearch, setQuickAssignSearch] = useState("");
+
+  // Confirmation dialog states
+  const [reassignConfirm, setReassignConfirm] = useState<{
+    shapeId: string;
+    siteId: string;
+    shapeLabel: string;
+    oldSiteLabel: string;
+    newSiteLabel: string;
+  } | null>(null);
+  const [replaceConfirm, setReplaceConfirm] = useState<{
+    shapeId: string;
+    siteId: string;
+    shapeLabel: string;
+    siteLabel: string;
+  } | null>(null);
+  const [quickReplaceConfirm, setQuickReplaceConfirm] = useState<{
+    shapeId: string;
+    siteId: string;
+    shapeLabel: string;
+    siteLabel: string;
+  } | null>(null);
+  const [deleteShapeConfirm, setDeleteShapeConfirm] = useState<{
+    shapeId: string;
+    shapeLabel: string;
+    assignedSiteLabel: string | null;
+  } | null>(null);
 
   // Announce to screen readers
   const announce = useCallback((message: string) => {
@@ -1109,6 +1145,38 @@ export function SiteMapEditor({
     }
   };
 
+  const executeAssignment = async (siteId: string, shapeId: string, needsReassign: boolean, needsReplace: boolean) => {
+    if (!campgroundId) return;
+    const siteLabel = siteLabelById.get(siteId) ?? siteId;
+    const shapeLabel = shapeLabelById.get(shapeId) ?? shapeId;
+    const currentSiteForShape = assignedSiteByShape.get(shapeId);
+    const currentShapeForSite = assignedShapeBySite.get(siteId);
+
+    setAssigning(true);
+    try {
+      if (needsReassign && currentSiteForShape && currentSiteForShape !== siteId) {
+        await apiClient.unassignCampgroundMapSite(campgroundId, currentSiteForShape);
+      }
+      if (needsReplace && currentShapeForSite && currentShapeForSite !== shapeId) {
+        await apiClient.unassignCampgroundMapSite(campgroundId, siteId);
+      }
+
+      const site = sites.find(s => s.id === siteId);
+      const label = site?.mapLabel ?? site?.siteNumber ?? site?.name ?? null;
+      await apiClient.upsertCampgroundMapAssignments(campgroundId, {
+        assignments: [{ siteId, shapeId, label }]
+      });
+      toast({ title: "Assigned!", description: `${shapeLabel} mapped to ${siteLabel}.` });
+      announce(`Shape assigned to ${siteLabel}`);
+      onSaved?.();
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "Assignment failed";
+      toast({ title: "Assignment failed", description: message, variant: "destructive" });
+    } finally {
+      setAssigning(false);
+    }
+  };
+
   const handleAssignShape = async () => {
     if (!campgroundId) return;
     if (!selectedSiteId || !selectedShapeId) {
@@ -1129,39 +1197,65 @@ export function SiteMapEditor({
     const selectedSiteLabel = siteLabelById.get(selectedSiteId) ?? selectedSiteId;
     const selectedShapeLabel = shapeLabelById.get(selectedShapeId) ?? selectedShapeId;
 
-    if (currentSiteForShape && currentSiteForShape !== selectedSiteId) {
-      const assignedLabel = siteLabelById.get(currentSiteForShape) ?? currentSiteForShape;
-      const ok = window.confirm(`"${selectedShapeLabel}" is already assigned to ${assignedLabel}. Reassign it to ${selectedSiteLabel}?`);
-      if (!ok) return;
-    }
+    // Check if we need confirmations
+    const needsReassign = !!(currentSiteForShape && currentSiteForShape !== selectedSiteId);
+    const needsReplace = !!(currentShapeForSite && currentShapeForSite !== selectedShapeId);
 
-    if (currentShapeForSite && currentShapeForSite !== selectedShapeId) {
-      const ok = window.confirm(`"${selectedSiteLabel}" already has a shape. Replace it with "${selectedShapeLabel}"?`);
-      if (!ok) return;
-    }
-
-    setAssigning(true);
-    try {
-      if (currentSiteForShape && currentSiteForShape !== selectedSiteId) {
-        await apiClient.unassignCampgroundMapSite(campgroundId, currentSiteForShape);
-      }
-      if (currentShapeForSite && currentShapeForSite !== selectedShapeId) {
-        await apiClient.unassignCampgroundMapSite(campgroundId, selectedSiteId);
-      }
-
-      const label = selectedSite?.mapLabel ?? selectedSite?.siteNumber ?? selectedSite?.name ?? null;
-      await apiClient.upsertCampgroundMapAssignments(campgroundId, {
-        assignments: [{ siteId: selectedSiteId, shapeId: selectedShapeId, label }]
+    if (needsReassign) {
+      const oldSiteLabel = siteLabelById.get(currentSiteForShape) ?? currentSiteForShape;
+      setReassignConfirm({
+        shapeId: selectedShapeId,
+        siteId: selectedSiteId,
+        shapeLabel: selectedShapeLabel,
+        oldSiteLabel,
+        newSiteLabel: selectedSiteLabel,
       });
-      toast({ title: "Assigned!", description: `${selectedShapeLabel} mapped to ${selectedSiteLabel}.` });
-      announce(`Shape assigned to ${selectedSiteLabel}`);
-      onSaved?.();
-    } catch (err) {
-      const message = err instanceof Error ? err.message : "Assignment failed";
-      toast({ title: "Assignment failed", description: message, variant: "destructive" });
-    } finally {
-      setAssigning(false);
+      return;
     }
+
+    if (needsReplace) {
+      setReplaceConfirm({
+        shapeId: selectedShapeId,
+        siteId: selectedSiteId,
+        shapeLabel: selectedShapeLabel,
+        siteLabel: selectedSiteLabel,
+      });
+      return;
+    }
+
+    // No confirmations needed, proceed directly
+    await executeAssignment(selectedSiteId, selectedShapeId, false, false);
+  };
+
+  const handleReassignConfirmed = async () => {
+    if (!reassignConfirm) return;
+    const { shapeId, siteId, shapeLabel, newSiteLabel } = reassignConfirm;
+    setReassignConfirm(null);
+
+    // Check if we also need replace confirmation
+    const currentShapeForSite = assignedShapeBySite.get(siteId);
+    if (currentShapeForSite && currentShapeForSite !== shapeId) {
+      setReplaceConfirm({
+        shapeId,
+        siteId,
+        shapeLabel,
+        siteLabel: newSiteLabel,
+      });
+      return;
+    }
+
+    // No replace needed, proceed with assignment
+    await executeAssignment(siteId, shapeId, true, false);
+  };
+
+  const handleReplaceConfirmed = async () => {
+    if (!replaceConfirm) return;
+    const { shapeId, siteId } = replaceConfirm;
+    const currentSiteForShape = assignedSiteByShape.get(shapeId);
+    const needsReassign = !!(currentSiteForShape && currentSiteForShape !== siteId);
+    setReplaceConfirm(null);
+
+    await executeAssignment(siteId, shapeId, needsReassign, true);
   };
 
   const handleUnassignSite = async () => {
@@ -1233,17 +1327,28 @@ export function SiteMapEditor({
     const shapeLabel = shapeLabelById.get(shapeId) ?? shapeId;
 
     if (currentShapeForSite && currentShapeForSite !== shapeId) {
-      const ok = window.confirm(`"${siteLabel}" already has a shape. Replace it with "${shapeLabel}"?`);
-      if (!ok) {
-        setQuickAssignShapeId(null);
-        setQuickAssignPosition(null);
-        return;
-      }
+      setQuickReplaceConfirm({
+        shapeId,
+        siteId,
+        shapeLabel,
+        siteLabel,
+      });
+      return;
     }
+
+    // No confirmation needed, proceed directly
+    await executeQuickAssign(siteId, shapeId, false);
+  };
+
+  const executeQuickAssign = async (siteId: string, shapeId: string, needsReplace: boolean) => {
+    if (!campgroundId) return;
+    const siteLabel = siteLabelById.get(siteId) ?? siteId;
+    const shapeLabel = shapeLabelById.get(shapeId) ?? shapeId;
+    const currentShapeForSite = assignedShapeBySite.get(siteId);
 
     setAssigning(true);
     try {
-      if (currentShapeForSite && currentShapeForSite !== shapeId) {
+      if (needsReplace && currentShapeForSite && currentShapeForSite !== shapeId) {
         await apiClient.unassignCampgroundMapSite(campgroundId, siteId);
       }
 
@@ -1264,6 +1369,13 @@ export function SiteMapEditor({
       setQuickAssignShapeId(null);
       setQuickAssignPosition(null);
     }
+  };
+
+  const handleQuickReplaceConfirmed = async () => {
+    if (!quickReplaceConfirm) return;
+    const { shapeId, siteId } = quickReplaceConfirm;
+    setQuickReplaceConfirm(null);
+    await executeQuickAssign(siteId, shapeId, true);
   };
 
   // Filter sites for quick assign popup
@@ -1307,20 +1419,29 @@ export function SiteMapEditor({
     const shapeLabel = shapeLabelById.get(selectedShapeId) ?? selectedShapeId;
     const assignedSiteId = selectedShapeAssignedSiteId;
     const assignedLabel = assignedSiteId ? siteLabelById.get(assignedSiteId) ?? assignedSiteId : null;
-    const confirmMessage = assignedLabel
-      ? `Delete "${shapeLabel}"? It is assigned to ${assignedLabel} and will be unassigned.`
-      : `Delete "${shapeLabel}"?`;
-    if (!window.confirm(confirmMessage)) return;
+
+    setDeleteShapeConfirm({
+      shapeId: selectedShapeId,
+      shapeLabel,
+      assignedSiteLabel: assignedLabel,
+    });
+  };
+
+  const handleDeleteShapeConfirmed = async () => {
+    if (!deleteShapeConfirm || !campgroundId) return;
+    const { shapeId } = deleteShapeConfirm;
+    const assignedSiteId = assignedSiteByShape.get(shapeId);
+    setDeleteShapeConfirm(null);
 
     setAssigning(true);
     try {
       if (assignedSiteId) {
         await apiClient.unassignCampgroundMapSite(campgroundId, assignedSiteId);
       }
-      await apiClient.deleteCampgroundMapShape(campgroundId, selectedShapeId);
+      await apiClient.deleteCampgroundMapShape(campgroundId, shapeId);
       setDraftShapes((prev) => {
         const next = { ...prev };
-        delete next[selectedShapeId];
+        delete next[shapeId];
         return next;
       });
       setSelectedShapeId("");
@@ -2127,6 +2248,92 @@ export function SiteMapEditor({
           </div>
         </div>
       </div>
+
+      {/* Reassign Shape Confirmation Dialog */}
+      <AlertDialog open={!!reassignConfirm} onOpenChange={(open) => !open && setReassignConfirm(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Reassign Shape</AlertDialogTitle>
+            <AlertDialogDescription>
+              "{reassignConfirm?.shapeLabel}" is already assigned to {reassignConfirm?.oldSiteLabel}.
+              Do you want to reassign it to {reassignConfirm?.newSiteLabel}?
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleReassignConfirmed}>
+              Reassign Shape
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Replace Shape Confirmation Dialog */}
+      <AlertDialog open={!!replaceConfirm} onOpenChange={(open) => !open && setReplaceConfirm(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Replace Shape</AlertDialogTitle>
+            <AlertDialogDescription>
+              "{replaceConfirm?.siteLabel}" already has a shape assigned.
+              Do you want to replace it with "{replaceConfirm?.shapeLabel}"?
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleReplaceConfirmed}>
+              Replace Shape
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Quick Replace Shape Confirmation Dialog */}
+      <AlertDialog open={!!quickReplaceConfirm} onOpenChange={(open) => {
+        if (!open) {
+          setQuickReplaceConfirm(null);
+          setQuickAssignShapeId(null);
+          setQuickAssignPosition(null);
+        }
+      }}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Replace Shape</AlertDialogTitle>
+            <AlertDialogDescription>
+              "{quickReplaceConfirm?.siteLabel}" already has a shape.
+              Do you want to replace it with "{quickReplaceConfirm?.shapeLabel}"?
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleQuickReplaceConfirmed}>
+              Replace Shape
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Delete Shape Confirmation Dialog */}
+      <AlertDialog open={!!deleteShapeConfirm} onOpenChange={(open) => !open && setDeleteShapeConfirm(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Shape</AlertDialogTitle>
+            <AlertDialogDescription>
+              {deleteShapeConfirm?.assignedSiteLabel
+                ? `Delete "${deleteShapeConfirm?.shapeLabel}"? It is assigned to ${deleteShapeConfirm?.assignedSiteLabel} and will be unassigned.`
+                : `Are you sure you want to delete "${deleteShapeConfirm?.shapeLabel}"?`}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDeleteShapeConfirmed}
+              className="bg-red-600 hover:bg-red-700"
+            >
+              Delete Shape
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </TooltipProvider>
   );
 }

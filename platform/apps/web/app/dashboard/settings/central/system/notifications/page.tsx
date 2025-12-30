@@ -34,6 +34,16 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { apiClient } from "@/lib/api-client";
 
 interface NotificationTrigger {
@@ -81,6 +91,7 @@ export default function NotificationsPage() {
   const [campgroundId, setCampgroundId] = useState<string | null>(null);
   const [triggers, setTriggers] = useState<NotificationTrigger[]>([]);
   const [updating, setUpdating] = useState<string | null>(null);
+  const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
 
   useEffect(() => {
     const id = localStorage.getItem("campreserv:selectedCampground");
@@ -119,7 +130,6 @@ export default function NotificationsPage() {
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm("Are you sure you want to delete this trigger?")) return;
     try {
       await apiClient.deleteNotificationTrigger(id);
       setTriggers(triggers.filter((t) => t.id !== id));
@@ -361,7 +371,7 @@ export default function NotificationsPage() {
                         <DropdownMenuSeparator />
                         <DropdownMenuItem
                           className="text-red-600"
-                          onClick={() => handleDelete(trigger.id)}
+                          onClick={() => setDeleteConfirmId(trigger.id)}
                         >
                           <Trash2 className="h-4 w-4 mr-2" />
                           Delete
@@ -401,6 +411,32 @@ export default function NotificationsPage() {
           </div>
         </CardContent>
       </Card>
+
+      {/* Delete Trigger Confirmation */}
+      <AlertDialog open={!!deleteConfirmId} onOpenChange={(open) => !open && setDeleteConfirmId(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Trigger</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete this notification trigger? This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => {
+                if (deleteConfirmId) {
+                  handleDelete(deleteConfirmId);
+                  setDeleteConfirmId(null);
+                }
+              }}
+              className="bg-red-600 hover:bg-red-700"
+            >
+              Delete Trigger
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

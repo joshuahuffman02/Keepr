@@ -22,6 +22,16 @@ import {
   Trash2,
   X,
 } from "lucide-react";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "../../../../components/ui/alert-dialog";
 
 function formatDate(d?: string | Date | null) {
   if (!d) return "—";
@@ -48,6 +58,7 @@ export default function GroupsPage() {
     sharedPayment: false,
     sharedComm: true,
   });
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
   const groupsQuery = useQuery({
     queryKey: ["groups", campgroundId],
@@ -213,11 +224,7 @@ export default function GroupsPage() {
                   <Button
                     size="sm"
                     variant="default"
-                    onClick={() => {
-                      if (confirm("Delete this group? Reservations will be unlinked.")) {
-                        deleteGroupMutation.mutate(selectedGroupId);
-                      }
-                    }}
+                    onClick={() => setShowDeleteConfirm(true)}
                     disabled={deleteGroupMutation.isPending}
                   >
                     <Trash2 className="h-4 w-4 mr-1" />
@@ -582,6 +589,32 @@ export default function GroupsPage() {
             </Card>
           </div>
         )}
+
+        {/* Delete Group Confirmation */}
+        <AlertDialog open={showDeleteConfirm} onOpenChange={setShowDeleteConfirm}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Delete Group</AlertDialogTitle>
+              <AlertDialogDescription>
+                Are you sure you want to delete this group? Reservations will be unlinked from the group.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Cancel</AlertDialogCancel>
+              <AlertDialogAction
+                onClick={() => {
+                  if (selectedGroupId) {
+                    deleteGroupMutation.mutate(selectedGroupId);
+                  }
+                  setShowDeleteConfirm(false);
+                }}
+                className="bg-red-600 hover:bg-red-700"
+              >
+                Delete Group
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       </div>
     </DashboardShell>
   );

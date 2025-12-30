@@ -27,6 +27,16 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { apiClient } from "@/lib/api-client";
 
 interface Template {
@@ -67,6 +77,7 @@ export default function TemplatesPage() {
   const [campgroundId, setCampgroundId] = useState<string | null>(null);
   const [templates, setTemplates] = useState<Template[]>([]);
   const [deleting, setDeleting] = useState<string | null>(null);
+  const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
 
   useEffect(() => {
     const id = localStorage.getItem("campreserv:selectedCampground");
@@ -89,7 +100,6 @@ export default function TemplatesPage() {
   }, []);
 
   const handleDelete = async (id: string) => {
-    if (!confirm("Are you sure you want to delete this template?")) return;
     setDeleting(id);
     try {
       await apiClient.deleteCampaignTemplate(id);
@@ -351,7 +361,7 @@ export default function TemplatesPage() {
                             <DropdownMenuSeparator />
                             <DropdownMenuItem
                               className="text-red-600"
-                              onClick={() => handleDelete(template.id)}
+                              onClick={() => setDeleteConfirmId(template.id)}
                               disabled={deleting === template.id}
                             >
                               <Trash2 className="h-4 w-4 mr-2" />
@@ -394,6 +404,32 @@ export default function TemplatesPage() {
           </div>
         </CardContent>
       </Card>
+
+      {/* Delete Template Confirmation */}
+      <AlertDialog open={!!deleteConfirmId} onOpenChange={(open) => !open && setDeleteConfirmId(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Template</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete this template? This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => {
+                if (deleteConfirmId) {
+                  handleDelete(deleteConfirmId);
+                  setDeleteConfirmId(null);
+                }
+              }}
+              className="bg-red-600 hover:bg-red-700"
+            >
+              Delete Template
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

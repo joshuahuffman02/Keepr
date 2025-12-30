@@ -24,6 +24,16 @@ import { Plus, Palette, Calendar, Info, Loader2, Trash2, X } from "lucide-react"
 import { RateGroupRow, type RateGroup } from "@/components/settings/rate-groups";
 import { ColorPicker, PRESET_COLORS } from "@/components/settings/rate-groups";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { apiClient } from "@/lib/api-client";
 
 type SeasonalRate = {
@@ -72,6 +82,7 @@ export default function RateGroupsPage() {
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [isDateDialogOpen, setIsDateDialogOpen] = useState(false);
   const [editingRate, setEditingRate] = useState<SeasonalRate | null>(null);
+  const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
 
   // New group form state
   const [newGroupName, setNewGroupName] = useState("");
@@ -166,7 +177,6 @@ export default function RateGroupsPage() {
 
   const handleDeleteGroup = useCallback(async (id: string) => {
     if (!campgroundId) return;
-    if (!confirm("Are you sure you want to delete this rate group?")) return;
 
     setSaving(true);
     try {
@@ -185,6 +195,10 @@ export default function RateGroupsPage() {
       setSaving(false);
     }
   }, [campgroundId]);
+
+  const confirmDeleteGroup = useCallback((id: string) => {
+    setDeleteConfirmId(id);
+  }, []);
 
   const handleDuplicateGroup = useCallback(async (id: string) => {
     if (!campgroundId) return;
@@ -367,7 +381,7 @@ export default function RateGroupsPage() {
                 key={group.id}
                 group={group}
                 onUpdate={handleUpdateGroup}
-                onDelete={handleDeleteGroup}
+                onDelete={confirmDeleteGroup}
                 onDuplicate={handleDuplicateGroup}
                 onEditDates={handleEditDates}
               />
@@ -402,7 +416,7 @@ export default function RateGroupsPage() {
                 key={group.id}
                 group={group}
                 onUpdate={handleUpdateGroup}
-                onDelete={handleDeleteGroup}
+                onDelete={confirmDeleteGroup}
                 onDuplicate={handleDuplicateGroup}
                 onEditDates={handleEditDates}
               />
@@ -565,6 +579,32 @@ export default function RateGroupsPage() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Delete Rate Group Confirmation */}
+      <AlertDialog open={!!deleteConfirmId} onOpenChange={(open) => !open && setDeleteConfirmId(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Rate Group</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete this rate group? This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => {
+                if (deleteConfirmId) {
+                  handleDeleteGroup(deleteConfirmId);
+                  setDeleteConfirmId(null);
+                }
+              }}
+              className="bg-red-600 hover:bg-red-700"
+            >
+              Delete Rate Group
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

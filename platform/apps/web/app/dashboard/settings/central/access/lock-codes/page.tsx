@@ -49,6 +49,16 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { SettingsTable } from "@/components/settings/tables";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { cn } from "@/lib/utils";
 import { useToast } from "@/components/ui/use-toast";
 import { useCampground } from "@/contexts/CampgroundContext";
@@ -183,6 +193,8 @@ export default function LockCodesPage() {
   const [isEditorOpen, setIsEditorOpen] = useState(false);
   const [editingCode, setEditingCode] = useState<LockCode | null>(null);
   const [copiedId, setCopiedId] = useState<string | null>(null);
+  const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
+  const [rotateConfirmId, setRotateConfirmId] = useState<string | null>(null);
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -314,9 +326,7 @@ export default function LockCodesPage() {
   }, [editingCode, formName, formCode, formType, formRotation, formShowConfirmation, formShowCheckin, createMutation, updateMutation]);
 
   const handleDelete = useCallback((id: string) => {
-    if (confirm("Are you sure you want to delete this lock code?")) {
-      deleteMutation.mutate(id);
-    }
+    deleteMutation.mutate(id);
   }, [deleteMutation]);
 
   const handleToggleActive = useCallback((code: LockCode) => {
@@ -327,9 +337,7 @@ export default function LockCodesPage() {
   }, [updateMutation]);
 
   const handleRotateCode = useCallback((id: string) => {
-    if (confirm("Are you sure you want to rotate this lock code? This will generate a new code.")) {
-      rotateMutation.mutate(id);
-    }
+    rotateMutation.mutate(id);
   }, [rotateMutation]);
 
   const handleCopyCode = useCallback((id: string, code: string) => {
@@ -525,7 +533,7 @@ export default function LockCodesPage() {
                 Copy Code
               </DropdownMenuItem>
               {item.rotationSchedule !== "none" && (
-                <DropdownMenuItem onClick={() => handleRotateCode(item.id)}>
+                <DropdownMenuItem onClick={() => setRotateConfirmId(item.id)}>
                   <RefreshCw className="h-4 w-4 mr-2" />
                   Rotate Now
                 </DropdownMenuItem>
@@ -535,7 +543,7 @@ export default function LockCodesPage() {
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem
-                onClick={() => handleDelete(item.id)}
+                onClick={() => setDeleteConfirmId(item.id)}
                 className="text-red-600"
               >
                 <Trash2 className="h-4 w-4 mr-2" />
@@ -691,6 +699,57 @@ export default function LockCodesPage() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Delete Lock Code Confirmation */}
+      <AlertDialog open={!!deleteConfirmId} onOpenChange={(open) => !open && setDeleteConfirmId(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Lock Code</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete this lock code? This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => {
+                if (deleteConfirmId) {
+                  handleDelete(deleteConfirmId);
+                  setDeleteConfirmId(null);
+                }
+              }}
+              className="bg-red-600 hover:bg-red-700"
+            >
+              Delete Lock Code
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Rotate Lock Code Confirmation */}
+      <AlertDialog open={!!rotateConfirmId} onOpenChange={(open) => !open && setRotateConfirmId(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Rotate Lock Code</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to rotate this lock code? This will generate a new code and the old code will no longer work.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => {
+                if (rotateConfirmId) {
+                  handleRotateCode(rotateConfirmId);
+                  setRotateConfirmId(null);
+                }
+              }}
+            >
+              Rotate Code
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
