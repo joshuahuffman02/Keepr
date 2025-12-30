@@ -123,7 +123,12 @@ export function ReservationBreakdown({ compact = false }: ReservationBreakdownPr
   // Fee calculations from config
   const ccFeePercent = config ? config.feePercentBasisPoints / 100 : 2.9;
   const ccFeeFlatCents = config?.feeFlatCents ?? 30;
-  const ccFeeMode = config?.feeMode ?? "absorb";
+  // If fees are being charged to guest, they're being passed through (not absorbed)
+  const ccFeeMode = feesCents > 0 ? "pass_through" : (config?.feeMode ?? "pass_through");
+
+  // Only show CC fees for card-based payment methods
+  const selectedMethod = state.selectedMethod;
+  const isCardPayment = !selectedMethod || ["card", "saved_card", "terminal", "apple_pay", "google_pay", "link"].includes(selectedMethod);
 
   // Platform fee (Campreserv's per-booking fee)
   // Default based on billing plan: Enterprise=$1, Standard=$2, OTA=$3
@@ -303,31 +308,28 @@ export function ReservationBreakdown({ compact = false }: ReservationBreakdownPr
                 </div>
               )}
 
-              {/* CC Processing Fee (goes to Stripe) */}
-              <div className="flex justify-between pl-2">
-                <span className="flex items-center gap-1.5 text-slate-600">
-                  <CreditCard className="w-3 h-3" />
-                  <TooltipProvider>
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <span className="cursor-help text-xs">CC Processing</span>
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        <p className="text-xs">{ccFeePercent}% + ${(ccFeeFlatCents / 100).toFixed(2)} per transaction</p>
-                        <p className="text-xs text-slate-400">Goes to Stripe</p>
-                      </TooltipContent>
-                    </Tooltip>
-                  </TooltipProvider>
-                </span>
-                <span className="flex items-center gap-1 text-xs">
-                  <span className={ccFeeMode === "absorb" ? "line-through text-slate-400" : "text-slate-900"}>
+              {/* CC Processing Fee (goes to Stripe) - only show for card payments */}
+              {isCardPayment && (
+                <div className="flex justify-between pl-2">
+                  <span className="flex items-center gap-1.5 text-slate-600">
+                    <CreditCard className="w-3 h-3" />
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <span className="cursor-help text-xs">CC Processing</span>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p className="text-xs">{ccFeePercent}% + ${(ccFeeFlatCents / 100).toFixed(2)} per transaction</p>
+                          <p className="text-xs text-slate-400">Goes to Stripe (card payments only)</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+                  </span>
+                  <span className="text-xs text-slate-900">
                     ~{formatCurrency(estimatedCCFeeCents)}
                   </span>
-                  {ccFeeMode === "absorb" && (
-                    <span className="text-emerald-600 text-xs">(absorbed)</span>
-                  )}
-                </span>
-              </div>
+                </div>
+              )}
 
               {/* Total fees if guest pays any */}
               {feesCents > 0 && (
