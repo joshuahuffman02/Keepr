@@ -745,7 +745,7 @@ export default function GiftCardsPage() {
                           <TableCell>
                             <Badge
                               variant={status === "active" ? "secondary" : status === "expired" ? "destructive" : "outline"}
-                              className={status === "active" ? "bg-emerald-50 text-emerald-700 border-emerald-200" : ""}
+                              className={status === "active" ? "bg-status-success-bg text-status-success-text border-status-success-border" : ""}
                             >
                               {status === "active" ? "Active" : status === "expired" ? "Expired" : "Fully used"}
                             </Badge>

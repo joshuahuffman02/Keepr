@@ -928,7 +928,7 @@ export default function CheckInOutPage() {
                   <button
                     key={tag}
                     type="button"
-                    className="inline-flex items-center gap-1 px-2 py-1 text-xs font-medium rounded-md bg-blue-50 text-blue-700 hover:bg-blue-100 border border-blue-200 transition-colors"
+                    className="inline-flex items-center gap-1 px-2 py-1 text-xs font-medium rounded-md bg-status-info-bg text-status-info-text hover:bg-status-info-bg/80 border border-status-info-border transition-colors"
                     onClick={() => setMessageBody(prev => prev + tag)}
                   >
                     {label}

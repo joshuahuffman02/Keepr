@@ -697,7 +697,7 @@ export default function GuestsPage() {
             <div className="text-xs font-semibold uppercase tracking-wide text-slate-500 flex items-center gap-2">
               Filters & exports
               {hasFilters && (
-                <span className="rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 px-2 py-0.5 text-[11px] font-semibold">
+                <span className="rounded-full bg-status-success-bg text-status-success-text border border-status-success-border px-2 py-0.5 text-[11px] font-semibold">
                   filters on
                 </span>
               )}
