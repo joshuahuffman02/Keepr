@@ -15,11 +15,11 @@ type FulfillmentOrder = Awaited<ReturnType<typeof apiClient.getFulfillmentQueue>
 type FulfillmentStatus = NonNullable<FulfillmentOrder["fulfillmentStatus"]>;
 
 const STATUS_COLORS: Record<FulfillmentStatus, string> = {
-    unassigned: "bg-slate-100 text-slate-700 border-slate-200",
-    assigned: "bg-blue-100 text-blue-700 border-blue-200",
-    preparing: "bg-amber-100 text-amber-700 border-amber-200",
-    ready: "bg-emerald-100 text-emerald-700 border-emerald-200",
-    completed: "bg-green-100 text-green-700 border-green-200",
+    unassigned: "bg-muted text-muted-foreground border-border",
+    assigned: "bg-status-info-bg text-status-info-text border-status-info-border",
+    preparing: "bg-status-warning-bg text-status-warning-text border-status-warning-border",
+    ready: "bg-status-success-bg text-status-success-text border-status-success-border",
+    completed: "bg-status-success-bg text-status-success-text border-status-success-border",
 };
 
 const STATUS_LABELS: Record<FulfillmentStatus, string> = {

@@ -221,15 +221,15 @@ export default function GuestDetailPage() {
     const statusTone = (status?: string | null) => {
         const normalized = (status || "").toLowerCase();
         if (normalized.includes("complaint") || normalized.includes("bounce") || normalized.includes("fail")) {
-            return "bg-red-100 text-red-700 border border-red-200";
+            return "bg-status-error-bg text-status-error-text border border-status-error-border";
         }
         if (normalized.startsWith("delivered") || normalized === "sent" || normalized === "received") {
-            return "bg-emerald-100 text-emerald-700 border border-emerald-200";
+            return "bg-status-success-bg text-status-success-text border border-status-success-border";
         }
         if (normalized.includes("pending") || normalized.includes("processing")) {
-            return "bg-amber-100 text-amber-800 border border-amber-200";
+            return "bg-status-warning-bg text-status-warning-text border border-status-warning-border";
         }
-        return "bg-slate-100 text-slate-700 border border-slate-200";
+        return "bg-muted text-muted-foreground border border-border";
     };
 
     const timelineItems = useMemo(() => {

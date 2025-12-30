@@ -56,10 +56,10 @@ import { cn } from "../../../lib/utils";
 type InventoryTransfer = Awaited<ReturnType<typeof apiClient.getInventoryTransfers>>[0];
 
 const STATUS_CONFIG = {
-    pending: { label: "Pending", icon: Clock, color: "bg-amber-100 text-amber-800" },
-    in_transit: { label: "In Transit", icon: Truck, color: "bg-blue-100 text-blue-800" },
-    completed: { label: "Completed", icon: CheckCircle, color: "bg-green-100 text-green-800" },
-    cancelled: { label: "Cancelled", icon: XCircle, color: "bg-slate-100 text-slate-600" },
+    pending: { label: "Pending", icon: Clock, color: "bg-status-warning-bg text-status-warning-text" },
+    in_transit: { label: "In Transit", icon: Truck, color: "bg-status-info-bg text-status-info-text" },
+    completed: { label: "Completed", icon: CheckCircle, color: "bg-status-success-bg text-status-success-text" },
+    cancelled: { label: "Cancelled", icon: XCircle, color: "bg-muted text-muted-foreground" },
 };
 
 export default function TransfersPage() {

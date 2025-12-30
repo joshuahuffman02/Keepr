@@ -59,12 +59,12 @@ interface WaitlistStats {
 }
 
 const STATUS_COLORS: Record<string, string> = {
-  active: "bg-emerald-100 text-emerald-800 border-emerald-200",
-  offered: "bg-amber-100 text-amber-800 border-amber-200",
-  converted: "bg-blue-100 text-blue-800 border-blue-200",
-  fulfilled: "bg-blue-100 text-blue-800 border-blue-200",
-  expired: "bg-slate-100 text-slate-600 border-slate-200",
-  cancelled: "bg-slate-100 text-slate-600 border-slate-200",
+  active: "bg-status-success-bg text-status-success-text border-status-success-border",
+  offered: "bg-status-warning-bg text-status-warning-text border-status-warning-border",
+  converted: "bg-status-info-bg text-status-info-text border-status-info-border",
+  fulfilled: "bg-status-info-bg text-status-info-text border-status-info-border",
+  expired: "bg-muted text-muted-foreground border-border",
+  cancelled: "bg-muted text-muted-foreground border-border",
 };
 
 const PRIORITY_COLORS = [
