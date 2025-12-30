@@ -6,7 +6,8 @@ export class StripeService {
     private readonly logger = new Logger(StripeService.name);
     private stripe: Stripe | null = null;
     private readonly configured: boolean;
-    private readonly apiVersion = "2025-11-17.clover" as any;
+    // Use a stable API version - let SDK handle version negotiation
+    private readonly apiVersion = "2024-12-18.acacia" as Stripe.LatestApiVersion;
 
     constructor() {
         const secretKey = process.env.STRIPE_SECRET_KEY;
@@ -64,26 +65,38 @@ export class StripeService {
         if (idempotencyKey) {
             requestOptions.idempotencyKey = idempotencyKey;
         }
-        return stripe.paymentIntents.create({
+        // Build payment intent params - don't mix automatic_payment_methods with payment_method_types
+        const params: Stripe.PaymentIntentCreateParams = {
             amount: amountCents,
             currency,
             metadata,
             capture_method: captureMethod,
-            automatic_payment_methods: {
-                enabled: true,
-                allow_redirects: "always",
-            },
             payment_method_options: {
                 card: {
                     request_three_d_secure: threeDsPolicy,
                 },
             },
-            payment_method_types: paymentMethodTypes,
-            application_fee_amount: applicationFeeCents,
             transfer_data: {
                 destination: stripeAccountId
             }
-        }, requestOptions);
+        };
+
+        // Only add application_fee_amount if > 0
+        if (applicationFeeCents > 0) {
+            params.application_fee_amount = applicationFeeCents;
+        }
+
+        // Use specific payment methods if provided, otherwise enable automatic
+        if (paymentMethodTypes && paymentMethodTypes.length > 0) {
+            params.payment_method_types = paymentMethodTypes;
+        } else {
+            params.automatic_payment_methods = {
+                enabled: true,
+                allow_redirects: "always",
+            };
+        }
+
+        return stripe.paymentIntents.create(params, requestOptions);
     }
 
     async listBalanceTransactionsForPayout(payoutId: string, stripeAccountId: string) {
