@@ -270,11 +270,10 @@ Response in JSON:
   private async sendRealtimeAlert(campgroundId: string, alert: any) {
     try {
       // Get campground owner/manager emails
-      const staff = await this.prisma.campgroundStaff.findMany({
+      const staff = await this.prisma.campgroundMembership.findMany({
         where: {
           campgroundId,
           role: { in: ["owner", "manager"] },
-          receiveAlertEmails: true,
         },
         include: { user: { select: { email: true, firstName: true } } },
       });
@@ -393,11 +392,10 @@ Response in JSON:
     }
 
     // Get recipients
-    const staff = await this.prisma.campgroundStaff.findMany({
+    const staff = await this.prisma.campgroundMembership.findMany({
       where: {
         campgroundId,
         role: { in: ["owner", "manager"] },
-        receiveAlertEmails: true,
       },
       include: { user: { select: { email: true, firstName: true } } },
     });
