@@ -945,7 +945,7 @@ Only include items with score >= 0.5. Return empty array if no good matches.`;
       };
 
       try {
-        const apiKey = (cg as any)?.aiApiKey;
+        const apiKey = (cg as any)?.aiApiKey || process.env.OPENAI_API_KEY;
         if (!apiKey) {
           return {
             action,
