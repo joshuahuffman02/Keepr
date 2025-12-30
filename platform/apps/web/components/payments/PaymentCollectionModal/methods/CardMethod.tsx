@@ -1,17 +1,14 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { loadStripe } from "@stripe/stripe-js";
 import { Elements, PaymentElement, useStripe, useElements } from "@stripe/react-stripe-js";
 import { Button } from "../../../ui/button";
-import { Input } from "../../../ui/input";
 import { Label } from "../../../ui/label";
 import { Checkbox } from "../../../ui/checkbox";
 import { Loader2, AlertCircle, RefreshCw } from "lucide-react";
 import { usePaymentContext } from "../context/PaymentContext";
 import { usePaymentIntent } from "../hooks/usePaymentIntent";
-import { cn } from "../../../../lib/utils";
-import { apiClient } from "../../../../lib/api-client";
 
 // Initialize Stripe - hardcoded temporarily to bypass env var build issue
 const stripeKey = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY
@@ -48,7 +45,6 @@ function CardPaymentForm({
 
   const [error, setError] = useState<string | null>(null);
   const [processing, setProcessing] = useState(false);
-  const [postalCode, setPostalCode] = useState("");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -68,23 +64,11 @@ function CardPaymentForm({
         throw new Error(submitError.message || "Failed to submit payment details");
       }
 
-      // Confirm the payment
-      const confirmParams: any = {
-        return_url: window.location.href,
-      };
-
-      // Add billing details if postal code provided
-      if (postalCode.trim()) {
-        confirmParams.payment_method_data = {
-          billing_details: {
-            address: { postal_code: postalCode.trim() },
-          },
-        };
-      }
-
       const { error: confirmError, paymentIntent } = await stripe.confirmPayment({
         elements,
-        confirmParams,
+        confirmParams: {
+          return_url: window.location.href,
+        },
         redirect: "if_required",
       });
 
@@ -92,27 +76,10 @@ function CardPaymentForm({
         throw new Error(confirmError.message || "Payment failed");
       }
 
-      // Payment succeeded
+      // Payment succeeded - webhook will record the payment in database
+      // Do NOT record here to avoid double-charging
       if (paymentIntent) {
-        // Record payment in our database (don't rely on webhook alone)
-        // This ensures payment is recorded even if webhook fails/is delayed
-        // The webhook has idempotency check on stripePaymentIntentId to prevent duplicates
-        const reservationId = props.subject?.type === "reservation" || props.subject?.type === "balance"
-          ? props.subject.reservationId
-          : undefined;
-
-        if (reservationId) {
-          try {
-            await apiClient.recordReservationPayment(reservationId, amountCents, [
-              { method: "card", amountCents, note: `Stripe PI: ${paymentIntent.id}` }
-            ]);
-          } catch (recordError) {
-            // Log but don't fail - webhook can still pick it up
-            console.error("Failed to record payment synchronously:", recordError);
-          }
-        }
-
-        // Add tender entry for split tender support
+        // Add tender entry for split tender support (local state only)
         actions.addTenderEntry({
           method: "card",
           amountCents,
@@ -133,21 +100,7 @@ function CardPaymentForm({
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
-      {/* Postal code input */}
-      <div className="space-y-1">
-        <Label htmlFor="postal-code" className="text-sm text-slate-600">
-          Billing ZIP Code
-        </Label>
-        <Input
-          id="postal-code"
-          value={postalCode}
-          onChange={(e) => setPostalCode(e.target.value)}
-          placeholder="12345"
-          className="max-w-[150px]"
-        />
-      </div>
-
-      {/* Stripe PaymentElement */}
+      {/* Stripe PaymentElement - includes its own billing ZIP field */}
       <div className="border border-slate-200 rounded-lg p-4 bg-white">
         <PaymentElement
           options={{
