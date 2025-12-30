@@ -13,9 +13,14 @@ import { usePaymentIntent } from "../hooks/usePaymentIntent";
 import { cn } from "../../../../lib/utils";
 import { apiClient } from "../../../../lib/api-client";
 
-// Initialize Stripe
+// Initialize Stripe - NEXT_PUBLIC vars are inlined at build time
 const stripeKey = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY;
 const stripePromise = stripeKey ? loadStripe(stripeKey) : null;
+
+// Debug: Log if Stripe key is missing (only in browser, dev builds)
+if (typeof window !== "undefined" && !stripeKey) {
+  console.warn("[CardMethod] NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY not found in build. Ensure env var is set before building.");
+}
 
 interface CardMethodProps {
   onSuccess?: (paymentId: string) => void;
