@@ -84,11 +84,12 @@ export default function DynamicPricingPage() {
         const weeklyRule = findRule(MANAGED_RULES.WEEKLY_DISCOUNT);
         const monthlyRule = findRule(MANAGED_RULES.MONTHLY_DISCOUNT);
 
-        // Check if dynamic pricing is enabled (any demand rule is active)
-        const hasActiveDemandRules = data?.some((r: PricingRuleV2) =>
-          r.type === "demand" && r.active
+        // Check if dynamic pricing is enabled (any of our managed rules is active)
+        const managedRuleNames = Object.values(MANAGED_RULES);
+        const hasActiveManagedRules = data?.some((r: PricingRuleV2) =>
+          managedRuleNames.includes(r.name) && r.active
         );
-        setDynamicPricingEnabled(hasActiveDemandRules || false);
+        setDynamicPricingEnabled(hasActiveManagedRules || false);
 
         // Populate form values from existing rules (convert from decimal to percentage)
         if (occMediumRule) setOccupancyMedium(Math.round(occMediumRule.adjustmentValue * 100));
@@ -119,7 +120,7 @@ export default function DynamicPricingPage() {
       const upsertRule = async (
         name: string,
         adjustmentValue: number, // as decimal (e.g., 0.10 for 10%)
-        type: "demand" | "season" = "demand",
+        type: "season" | "weekend" | "holiday" | "event" | "demand" = "event",
         priority: number = 50
       ) => {
         const existing = findExistingRule(name);
@@ -147,13 +148,13 @@ export default function DynamicPricingPage() {
       };
 
       // Save all our managed rules
-      // Occupancy rules (positive = price increase)
-      await upsertRule(MANAGED_RULES.OCCUPANCY_MEDIUM, occupancyMedium / 100, "demand", 40);
-      await upsertRule(MANAGED_RULES.OCCUPANCY_HIGH, occupancyHigh / 100, "demand", 41);
+      // Occupancy rules (positive = price increase) - use "event" type for dynamic adjustments
+      await upsertRule(MANAGED_RULES.OCCUPANCY_MEDIUM, occupancyMedium / 100, "event", 40);
+      await upsertRule(MANAGED_RULES.OCCUPANCY_HIGH, occupancyHigh / 100, "event", 41);
 
       // Lead time rules (early bird is negative = discount, last minute is positive = premium)
-      await upsertRule(MANAGED_RULES.EARLY_BIRD, -earlyBirdDiscount / 100, "demand", 50);
-      await upsertRule(MANAGED_RULES.LAST_MINUTE, lastMinutePremium / 100, "demand", 51);
+      await upsertRule(MANAGED_RULES.EARLY_BIRD, -earlyBirdDiscount / 100, "event", 50);
+      await upsertRule(MANAGED_RULES.LAST_MINUTE, lastMinutePremium / 100, "event", 51);
 
       // Length of stay rules (negative = discount)
       await upsertRule(MANAGED_RULES.WEEKLY_DISCOUNT, -weeklyDiscount / 100, "season", 60);
