@@ -385,6 +385,6 @@ export function formatPrice(cents: number): string {
 /**
  * Get competitor pain points for a specific competitor
  */
-export function getCompetitorPainPoints(competitor: keyof typeof COMPETITOR_PAIN_POINTS): string[] {
+export function getCompetitorPainPoints(competitor: keyof typeof COMPETITOR_PAIN_POINTS): readonly string[] {
   return COMPETITOR_PAIN_POINTS[competitor];
 }
