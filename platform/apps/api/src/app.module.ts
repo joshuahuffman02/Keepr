@@ -122,6 +122,7 @@ import { StripePaymentsModule } from "./stripe-payments/stripe-payments.module";
 import { RealtimeModule } from "./realtime/realtime.module";
 import { CompetitiveModule } from "./competitive/competitive.module";
 import { WebhooksModule } from "./webhooks/webhooks.module";
+import { QueueModule } from "./queues/queue.module";
 
 @Module({
   imports: [
@@ -255,6 +256,8 @@ import { WebhooksModule } from "./webhooks/webhooks.module";
     CompetitiveModule,
     // Webhooks 2.0 - HMAC signatures, retries, dead letter queue
     WebhooksModule,
+    // Job queues with Redis persistence and fallback
+    QueueModule,
   ],
   providers: []
 })

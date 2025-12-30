@@ -2871,10 +2871,11 @@ export const apiClient = {
     const data = await parseResponse<unknown>(res);
     return ReservationSchema.parse(data);
   },
-  async checkOutReservation(id: string) {
+  async checkOutReservation(id: string, options?: { force?: boolean }) {
     const res = await fetch(`${API_BASE}/reservations/${id}/check-out`, {
       method: "POST",
-      headers: { "Content-Type": "application/json", ...scopedHeaders() }
+      headers: { "Content-Type": "application/json", ...scopedHeaders() },
+      body: JSON.stringify({ force: options?.force ?? true }) // Default to force=true since UI handles payment flow
     });
     const data = await parseResponse<unknown>(res);
     return ReservationSchema.parse(data);
@@ -10509,6 +10510,16 @@ export const apiClient = {
       estimatedRevenueDeltaCents: number;
       averageAdjustmentPercent: number;
     }>(`/ai/autopilot/campgrounds/${campgroundId}/pricing/summary`);
+  },
+
+  async getPriceSensitivity(campgroundId: string, siteClassId?: string) {
+    const params = siteClassId ? `?siteClassId=${siteClassId}` : "";
+    return fetchJSON<{
+      elasticity: number;
+      optimalPriceRange: { min: number; max: number };
+      pricePoints: Array<{ price: number; conversionRate: number; bookings: number }>;
+      insight: string;
+    }>(`/ai/autopilot/campgrounds/${campgroundId}/pricing/sensitivity${params}`);
   },
 
   // Revenue Insights

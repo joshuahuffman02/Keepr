@@ -85,6 +85,14 @@ export default function YieldDashboardPage() {
     refetchInterval: 60000, // Refresh every minute (fallback for when WebSocket is disconnected)
   });
 
+  // Price elasticity query
+  const { data: elasticityData } = useQuery({
+    queryKey: ["price-sensitivity"],
+    queryFn: () => apiClient.getPriceSensitivity("current"),
+    enabled: typeof window !== "undefined",
+    staleTime: 5 * 60 * 1000, // 5 minutes
+  });
+
   // Handle real-time yield metrics updates
   const handleMetricsUpdated = useCallback(
     (eventData: YieldMetricsUpdatedData) => {
@@ -646,6 +654,141 @@ export default function YieldDashboardPage() {
             </CardContent>
           </Card>
         </motion.div>
+
+        {/* Price Elasticity Section */}
+        {elasticityData && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ ...SPRING_CONFIG, delay: 0.95 }}
+          >
+            <Card>
+              <CardHeader>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <CardTitle className="flex items-center gap-2">
+                      <TrendingDown className="h-5 w-5 text-violet-500" />
+                      Price Elasticity Analysis
+                    </CardTitle>
+                    <CardDescription>How demand responds to price changes</CardDescription>
+                  </div>
+                  <Badge
+                    variant="outline"
+                    className={cn(
+                      elasticityData.elasticity < -1.5
+                        ? "text-red-600 border-red-200 bg-red-50"
+                        : elasticityData.elasticity < -0.5
+                        ? "text-amber-600 border-amber-200 bg-amber-50"
+                        : "text-emerald-600 border-emerald-200 bg-emerald-50"
+                    )}
+                  >
+                    {elasticityData.elasticity < -1.5
+                      ? "Highly Elastic"
+                      : elasticityData.elasticity < -0.5
+                      ? "Moderately Elastic"
+                      : "Inelastic"}
+                  </Badge>
+                </div>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                  {/* Elasticity Gauge */}
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm text-slate-500">Elasticity Score</span>
+                      <span className="text-2xl font-bold text-slate-900">
+                        {elasticityData.elasticity.toFixed(2)}
+                      </span>
+                    </div>
+                    <div className="relative h-4 bg-slate-100 rounded-full overflow-hidden">
+                      <div
+                        className={cn(
+                          "absolute h-full rounded-full transition-all",
+                          elasticityData.elasticity < -1.5
+                            ? "bg-red-500"
+                            : elasticityData.elasticity < -0.5
+                            ? "bg-amber-500"
+                            : "bg-emerald-500"
+                        )}
+                        style={{
+                          width: `${Math.min(Math.abs(elasticityData.elasticity) * 30, 100)}%`,
+                        }}
+                      />
+                    </div>
+                    <div className="flex justify-between text-xs text-slate-400">
+                      <span>More Price Sensitive</span>
+                      <span>Less Price Sensitive</span>
+                    </div>
+
+                    {/* Optimal Price Range */}
+                    {elasticityData.optimalPriceRange.min > 0 && (
+                      <div className="mt-4 p-4 bg-violet-50 rounded-lg border border-violet-100">
+                        <div className="flex items-center gap-2 mb-2">
+                          <Target className="h-4 w-4 text-violet-600" />
+                          <span className="text-sm font-medium text-violet-900">
+                            Optimal Price Range
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <span className="text-xl font-bold text-violet-700">
+                            {formatCurrency(elasticityData.optimalPriceRange.min)}
+                          </span>
+                          <span className="text-slate-400">-</span>
+                          <span className="text-xl font-bold text-violet-700">
+                            {formatCurrency(elasticityData.optimalPriceRange.max)}
+                          </span>
+                          <span className="text-sm text-slate-500">/night</span>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Price Points Distribution */}
+                  <div className="space-y-4">
+                    <span className="text-sm font-medium text-slate-700">Booking Distribution by Price</span>
+                    {elasticityData.pricePoints.length > 0 ? (
+                      <div className="space-y-2">
+                        {elasticityData.pricePoints.slice(0, 6).map((point, i) => {
+                          const maxBookings = Math.max(...elasticityData.pricePoints.map(p => p.bookings));
+                          const width = (point.bookings / maxBookings) * 100;
+                          return (
+                            <div key={i} className="flex items-center gap-3">
+                              <div className="w-20 text-sm text-slate-600 font-medium">
+                                {formatCurrency(point.price)}
+                              </div>
+                              <div className="flex-1 h-6 bg-slate-100 rounded-full overflow-hidden">
+                                <div
+                                  className="h-full bg-gradient-to-r from-violet-400 to-violet-600 rounded-full transition-all"
+                                  style={{ width: `${width}%` }}
+                                />
+                              </div>
+                              <div className="w-16 text-right text-sm text-slate-600">
+                                {point.bookings} bookings
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    ) : (
+                      <div className="text-center py-8 text-slate-500">
+                        <BarChart3 className="h-8 w-8 mx-auto mb-2 opacity-50" />
+                        <p className="text-sm">Not enough booking data</p>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* Insight */}
+                {elasticityData.insight && (
+                  <div className="mt-6 p-4 bg-slate-50 rounded-lg border flex items-start gap-3">
+                    <Lightbulb className="h-5 w-5 text-amber-500 shrink-0 mt-0.5" />
+                    <p className="text-sm text-slate-700">{elasticityData.insight}</p>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </motion.div>
+        )}
 
         {/* Forecast Table */}
         <motion.div
