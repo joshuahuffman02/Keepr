@@ -251,25 +251,25 @@ Before any V2 work, V1 must be solid.
 
 ---
 
-### 2.3 Dynamic Pricing 2.0
+### 2.3 Dynamic Pricing 2.0 - DONE
 
 **Goal**: Upgrade from rules to ML-driven pricing
 
-#### 2.3.1 ML Pricing Model
-- [ ] **Define objective** - Maximize RevPAR? Occupancy? Revenue?
-- [ ] **Price sensitivity analysis** - How do bookings change with price?
-- [ ] **Demand curve estimation** - What's the optimal price point?
+#### 2.3.1 ML Pricing Model - DONE
+- [x] **Define objective** - RevPAN optimization with elasticity analysis
+- [x] **Price sensitivity analysis** - Historical price elasticity calculation with optimal range
+- [x] **Demand curve estimation** - Price point analysis from booking history
 
-#### 2.3.2 Autopilot Mode
-- [ ] **Automated adjustments** - AI changes prices within bounds
-- [ ] **Guard rails** - Min/max prices, max daily change %
-- [ ] **Human override** - Staff can always take control
-- [ ] **Audit log** - Track all AI pricing decisions
+#### 2.3.2 Autopilot Mode - DONE
+- [x] **Automated adjustments** - Auto-applies recommendations within guardrails
+- [x] **Guard rails** - Max adjustment %, confidence threshold (70%), blocks large decreases
+- [x] **Human override** - All recommendations visible, can be dismissed
+- [x] **Audit log** - All actions logged via AiAutonomousActionService
 
-#### 2.3.3 A/B Testing
-- [ ] **Price experiments** - Test different rates on identical sites
-- [ ] **Statistical significance** - Know when results are real
-- [ ] **Auto-winner selection** - Apply winning price automatically
+#### 2.3.3 A/B Testing - DONE
+- [x] **Price experiments** - AiPriceExperiment model with control/test site groups
+- [x] **Statistical significance** - Z-test with p-value < 0.05 threshold
+- [x] **Auto-winner selection** - Optional auto-apply when significance reached
 
 ---
 
@@ -366,6 +366,7 @@ Before any V2 work, V1 must be solid.
 | 2024-12-29 | Campaign AI | Full implementation | High | AiCampaignService with subject line generation, content drafting, send time optimization, content improvement, A/B test generation. |
 | 2024-12-29 | Yield Dashboard | Full implementation | High | AiYieldService + Yield Command Center UI. Daily snapshots, yield metrics (ADR, RevPAN, YoY), forecasts, trend charts, recommendations grid. |
 | 2024-12-29 | Demand Forecasting | Full implementation | High | AiDemandForecastService with ML-style forecasting. Seasonality, day-of-week, holidays. 90-day forecasts with confidence intervals. Heatmap calendar UI. |
+| 2024-12-29 | Dynamic Pricing 2.0 | Full implementation | High | Price sensitivity analysis, autopilot mode with guardrails, A/B testing with statistical significance. AiPriceExperiment model. |
 
 ---
 
@@ -396,6 +397,7 @@ Before any V2 work, V1 must be solid.
 | 2024-12-29 | 1.5 | Campaign AI | Subject line generator with A/B testing, send time optimization, content drafting and improvement. Full API endpoints. |
 | 2024-12-29 | 2.1 | Yield Dashboard | Full implementation: AiYieldService + Yield Command Center UI. KPIs (occupancy, ADR, RevPAN), forecasts, trend charts, recommendations. |
 | 2024-12-29 | 2.2 | Demand Forecasting | AiDemandForecastService with ML-style forecasting. Seasonality, day-of-week, holiday detection. 90-day forecasts with confidence intervals. Heatmap calendar at /ai/demand. |
+| 2024-12-29 | 2.3 | Dynamic Pricing 2.0 | Price sensitivity analysis with elasticity, autopilot mode with guardrails (max %, confidence, block decreases), A/B testing framework with statistical significance. |
 
 ---
 
