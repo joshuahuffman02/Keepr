@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from "react";
 import { DashboardShell } from "@/components/ui/layout/DashboardShell";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow, TableEmpty } from "@/components/ui/table";
 import { apiClient } from "@/lib/api-client";
 import { Product, ProductCategory } from "@campreserv/shared";
 import { useToast } from "@/components/ui/use-toast";
@@ -161,11 +161,9 @@ export default function InventoryPage() {
                                     </TableRow>
                                 ))}
                                 {products.length === 0 && (
-                                    <TableRow>
-                                        <TableCell colSpan={5} className="text-center py-8 text-muted-foreground">
-                                            No products with inventory tracking enabled.
-                                        </TableCell>
-                                    </TableRow>
+                                    <TableEmpty colSpan={5}>
+                                        No products with inventory tracking enabled.
+                                    </TableEmpty>
                                 )}
                             </TableBody>
                         </Table>

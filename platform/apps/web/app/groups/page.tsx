@@ -14,6 +14,8 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import Link from "next/link";
+import { InlineEmpty } from "@/components/ui/empty-state";
+import { Users } from "lucide-react";
 
 interface GroupSummary {
   id: string;
@@ -166,10 +168,9 @@ export default function GroupsPage() {
                     <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-indigo-600" />
                   </div>
                 ) : groups.length === 0 ? (
-                  <div className="text-center py-8 text-slate-400">
-                    <p>No groups created yet</p>
-                    <p className="text-sm mt-1">Create a group to link reservations together</p>
-                  </div>
+                  <InlineEmpty className="py-8">
+                    No groups created yet. Create a group to link reservations together.
+                  </InlineEmpty>
                 ) : (
                   groups.map(group => (
                     <button
@@ -257,9 +258,9 @@ export default function GroupsPage() {
                 <div className="p-6">
                   <h4 className="font-medium text-slate-800 mb-4">Linked Reservations</h4>
                   {selectedGroup.reservations.length === 0 ? (
-                    <div className="text-center py-8 text-slate-400 bg-slate-50 rounded-lg">
-                      No reservations linked to this group yet
-                    </div>
+                    <InlineEmpty className="py-8 bg-muted rounded-lg">
+                      No reservations linked to this group yet.
+                    </InlineEmpty>
                   ) : (
                     <div className="space-y-3">
                       {selectedGroup.reservations.map(res => (

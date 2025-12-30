@@ -3,6 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { apiClient } from "@/lib/api-client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { CardSkeleton } from "@/components/ui/skeletons";
+import { InlineEmpty } from "@/components/ui/empty-state";
 
 interface DailyReportProps {
     campgroundId: string;
@@ -40,7 +41,7 @@ export function EarlyCheckInsReport({ campgroundId, dateRange }: DailyReportProp
                 </CardHeader>
                 <CardContent>
                     {reportData.length === 0 ? (
-                        <div className="text-center py-8 text-slate-400">No early check-ins scheduled</div>
+                        <InlineEmpty>No early check-ins scheduled</InlineEmpty>
                     ) : (
                         <div className="space-y-2">
                             {reportData.map(r => (
@@ -90,7 +91,7 @@ export function LateCheckOutsReport({ campgroundId, dateRange }: DailyReportProp
                 </CardHeader>
                 <CardContent>
                     {reportData.length === 0 ? (
-                        <div className="text-center py-8 text-slate-400">No late check-outs scheduled</div>
+                        <InlineEmpty>No late check-outs scheduled</InlineEmpty>
                     ) : (
                         <div className="space-y-2">
                             {reportData.map(r => (
@@ -166,7 +167,7 @@ export function NoShowReport({ campgroundId, dateRange }: DailyReportProps) {
                 </CardHeader>
                 <CardContent>
                     {reportData.noShows.length === 0 ? (
-                        <div className="text-center py-8 text-slate-400">No missed arrivals</div>
+                        <InlineEmpty>No missed arrivals</InlineEmpty>
                     ) : (
                         <table className="w-full text-sm">
                             <thead className="bg-slate-50">
@@ -225,7 +226,7 @@ export function DueOutsReport({ campgroundId, dateRange }: DailyReportProps) {
                 </CardHeader>
                 <CardContent>
                     {reportData.length === 0 ? (
-                        <div className="text-center py-8 text-emerald-600 flex items-center justify-center gap-2">
+                        <div className="text-center py-8 text-status-success flex items-center justify-center gap-2">
                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
                             No overstays
                         </div>

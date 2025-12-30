@@ -762,8 +762,8 @@ export default function ApprovalsPage() {
               )}
               {!isLoading && !tableMessage && filteredRequests.length === 0 && (
                 <div className="text-center py-12">
-                  <div className="w-16 h-16 bg-emerald-100 dark:bg-emerald-900/30 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <CheckCircle2 className="h-8 w-8 text-emerald-600 dark:text-emerald-400" />
+                  <div className="w-16 h-16 bg-status-success-bg rounded-full flex items-center justify-center mx-auto mb-4">
+                    <CheckCircle2 className="h-8 w-8 text-status-success" />
                   </div>
                   <p className="font-medium text-foreground">All caught up!</p>
                   <p className="text-sm text-muted-foreground mt-1">No approvals match the current filters.</p>
