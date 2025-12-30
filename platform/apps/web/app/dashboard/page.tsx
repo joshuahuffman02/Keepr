@@ -853,8 +853,7 @@ export default function Dashboard() {
               {attentionList.length > 0 && (
                 <span className={cn(
                   "rounded-full text-xs font-bold px-3 py-1",
-                  "bg-amber-100 text-amber-800 border border-amber-200",
-                  "dark:bg-amber-900/50 dark:text-amber-300 dark:border-amber-700"
+                  "bg-status-warning/15 text-status-warning border border-status-warning/30"
                 )}>
                   {attentionList.length}
                 </span>
@@ -910,8 +909,7 @@ export default function Dashboard() {
                     <div className="flex items-center gap-3">
                       <div className={cn(
                         "h-8 w-8 rounded-full font-semibold flex items-center justify-center text-xs",
-                        "bg-amber-100 text-amber-700 border border-amber-200",
-                        "dark:bg-amber-900/50 dark:text-amber-300 dark:border-amber-700"
+                        "bg-status-warning/15 text-status-warning border border-status-warning/30"
                       )}>
                         {r.guest?.primaryFirstName?.[0] ?? "?"}
                       </div>

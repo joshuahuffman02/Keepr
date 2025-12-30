@@ -3,6 +3,7 @@ import { Cron } from "@nestjs/schedule";
 import { PrismaService } from "../prisma/prisma.service";
 import { AiInsightsService } from "./ai-insights.service";
 import { AiAutopilotConfigService } from "./ai-autopilot-config.service";
+import { AiNoShowPredictionService } from "./ai-no-show-prediction.service";
 import { EmailService } from "../email/email.service";
 
 interface ArrivingGuest {
@@ -14,6 +15,27 @@ interface ArrivingGuest {
   isVip: boolean;
   totalGuests: number;
   vehicleInfo?: string;
+}
+
+interface HighRiskArrival {
+  reservationId: string;
+  confirmationNumber: string;
+  guestName: string;
+  siteName: string;
+  arrivalDate: Date;
+  riskScore: number;
+  riskReason: string;
+  totalAmountCents: number;
+  balanceCents: number;
+  guestEmail?: string;
+  guestPhone?: string;
+  suggestedActions: string[];
+}
+
+interface RevenueAtRisk {
+  highRiskArrivals: HighRiskArrival[];
+  totalRevenueAtRiskCents: number;
+  totalHighRiskCount: number;
 }
 
 interface MorningBriefing {
@@ -59,6 +81,7 @@ interface MorningBriefing {
     siteName?: string;
     dueDate?: Date;
   }[];
+  revenueAtRisk: RevenueAtRisk;
 }
 
 @Injectable()
@@ -69,6 +92,7 @@ export class AiMorningBriefingService {
     private readonly prisma: PrismaService,
     private readonly insightsService: AiInsightsService,
     private readonly configService: AiAutopilotConfigService,
+    private readonly noShowService: AiNoShowPredictionService,
     private readonly emailService: EmailService
   ) {}
 
@@ -99,6 +123,7 @@ export class AiMorningBriefingService {
       maintenanceTickets,
       insights,
       opportunities,
+      revenueAtRisk,
     ] = await Promise.all([
       this.getArrivals(campgroundId, today, tomorrow),
       this.getDepartures(campgroundId, today, tomorrow),
@@ -109,6 +134,7 @@ export class AiMorningBriefingService {
       this.getMaintenanceReminders(campgroundId),
       this.getDailyInsights(campgroundId),
       this.detectOpportunities(campgroundId, nextWeek),
+      this.getRevenueAtRisk(campgroundId, today, tomorrow),
     ]);
 
     return {
@@ -134,6 +160,7 @@ export class AiMorningBriefingService {
       weatherAlerts,
       opportunities,
       maintenanceReminders: maintenanceTickets,
+      revenueAtRisk,
     };
   }
 
@@ -301,6 +328,155 @@ export class AiMorningBriefingService {
     } catch {
       return [];
     }
+  }
+
+  /**
+   * Get high-risk arrivals for today (revenue at risk section)
+   */
+  private async getRevenueAtRisk(
+    campgroundId: string,
+    today: Date,
+    tomorrow: Date
+  ): Promise<RevenueAtRisk> {
+    try {
+      // First, ensure we have up-to-date risk calculations for today's arrivals
+      // Get today's arrivals that are confirmed
+      const todaysArrivals = await this.prisma.reservation.findMany({
+        where: {
+          campgroundId,
+          status: { in: ["confirmed", "pending"] },
+          arrivalDate: { gte: today, lt: tomorrow },
+        },
+        select: { id: true },
+      });
+
+      // Calculate risk for any that don't have a recent calculation
+      for (const reservation of todaysArrivals) {
+        const existingRisk = await this.prisma.aiNoShowRisk.findUnique({
+          where: { reservationId: reservation.id },
+          select: { calculatedAt: true },
+        });
+
+        // Recalculate if no risk record or if it's older than 24 hours
+        const twentyFourHoursAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
+        if (!existingRisk || existingRisk.calculatedAt < twentyFourHoursAgo) {
+          try {
+            await this.noShowService.calculateRisk(reservation.id);
+          } catch {
+            // Skip if calculation fails
+          }
+        }
+      }
+
+      // Now fetch high-risk arrivals for today
+      const highRiskRecords = await this.prisma.aiNoShowRisk.findMany({
+        where: {
+          flagged: true,
+          guestConfirmed: false, // Don't show if guest has already confirmed
+          reservation: {
+            campgroundId,
+            status: { in: ["confirmed", "pending"] },
+            arrivalDate: { gte: today, lt: tomorrow },
+          },
+        },
+        include: {
+          reservation: {
+            select: {
+              id: true,
+              confirmationNumber: true,
+              arrivalDate: true,
+              totalAmountCents: true,
+              balanceCents: true,
+              guest: {
+                select: {
+                  primaryFirstName: true,
+                  primaryLastName: true,
+                  email: true,
+                  phone: true,
+                },
+              },
+              site: {
+                select: { name: true },
+              },
+            },
+          },
+        },
+        orderBy: { riskScore: "desc" },
+        take: 10, // Limit to top 10 for the briefing
+      });
+
+      const highRiskArrivals: HighRiskArrival[] = highRiskRecords.map((risk) => {
+        const reservation = risk.reservation;
+        const suggestedActions = this.getSuggestedActions(risk);
+
+        return {
+          reservationId: reservation.id,
+          confirmationNumber: reservation.confirmationNumber || "N/A",
+          guestName: reservation.guest
+            ? `${reservation.guest.primaryFirstName || ""} ${reservation.guest.primaryLastName || ""}`.trim()
+            : "Unknown Guest",
+          siteName: reservation.site?.name || "Unassigned",
+          arrivalDate: reservation.arrivalDate,
+          riskScore: risk.riskScore,
+          riskReason: risk.riskReason || "Multiple risk factors",
+          totalAmountCents: reservation.totalAmountCents || 0,
+          balanceCents: reservation.balanceCents || 0,
+          guestEmail: reservation.guest?.email || undefined,
+          guestPhone: reservation.guest?.phone || undefined,
+          suggestedActions,
+        };
+      });
+
+      // Calculate total revenue at risk (unpaid balance of high-risk reservations)
+      const totalRevenueAtRiskCents = highRiskArrivals.reduce(
+        (sum, arrival) => sum + arrival.totalAmountCents,
+        0
+      );
+
+      return {
+        highRiskArrivals,
+        totalRevenueAtRiskCents,
+        totalHighRiskCount: highRiskArrivals.length,
+      };
+    } catch (error) {
+      this.logger.warn(`Failed to get revenue at risk: ${error}`);
+      return {
+        highRiskArrivals: [],
+        totalRevenueAtRiskCents: 0,
+        totalHighRiskCount: 0,
+      };
+    }
+  }
+
+  /**
+   * Generate suggested actions based on risk factors
+   */
+  private getSuggestedActions(risk: any): string[] {
+    const actions: string[] = [];
+
+    // Check payment status
+    if (risk.paymentStatusScore < 50) {
+      actions.push("Request payment or deposit");
+    }
+
+    // Check communication
+    if (risk.communicationScore < 50 && !risk.reminderSentAt) {
+      actions.push("Send confirmation reminder");
+    } else if (risk.reminderSentAt && !risk.guestConfirmed) {
+      actions.push("Follow up by phone");
+    }
+
+    // Check guest history
+    if (risk.guestHistoryScore < 40) {
+      actions.push("Verify contact information");
+    }
+
+    // If no specific actions, suggest general confirmation
+    if (actions.length === 0) {
+      actions.push("Confirm arrival with guest");
+    }
+
+    return actions;
   }
 
   private async detectOpportunities(
@@ -477,6 +653,52 @@ export class AiMorningBriefingService {
             ${briefing.anomalies.length > 0 && briefing.weatherAlerts.length > 0 ? ' | ' : ''}
             ${briefing.weatherAlerts.length > 0 ? `${briefing.weatherAlerts.length} weather alert${briefing.weatherAlerts.length > 1 ? 's' : ''}` : ''}
           </p>
+        </div>
+        ` : ''}
+
+        ${briefing.revenueAtRisk.totalHighRiskCount > 0 ? `
+        <!-- Revenue at Risk -->
+        <div style="background: linear-gradient(135deg, #dc2626 0%, #ef4444 100%); border-radius: 16px; padding: 20px; margin-bottom: 24px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+            <h2 style="margin: 0; font-size: 18px; color: white;">Revenue at Risk</h2>
+            <div style="background: rgba(255,255,255,0.2); border-radius: 8px; padding: 8px 12px;">
+              <p style="margin: 0; font-size: 20px; font-weight: bold; color: white;">$${(briefing.revenueAtRisk.totalRevenueAtRiskCents / 100).toLocaleString()}</p>
+              <p style="margin: 2px 0 0 0; font-size: 10px; color: rgba(255,255,255,0.8);">Total at risk</p>
+            </div>
+          </div>
+          <p style="margin: 0 0 16px 0; font-size: 13px; color: rgba(255,255,255,0.9);">
+            ${briefing.revenueAtRisk.totalHighRiskCount} arrival${briefing.revenueAtRisk.totalHighRiskCount > 1 ? 's' : ''} today ${briefing.revenueAtRisk.totalHighRiskCount > 1 ? 'have' : 'has'} a high no-show risk. Take action to secure this revenue.
+          </p>
+          ${briefing.revenueAtRisk.highRiskArrivals.slice(0, 5).map(r => `
+            <div style="background: rgba(255,255,255,0.15); border-radius: 8px; padding: 12px; margin-bottom: 8px;">
+              <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                <div style="flex: 1;">
+                  <p style="margin: 0; font-weight: 600; color: white;">${r.guestName}</p>
+                  <p style="margin: 4px 0 0 0; font-size: 12px; color: rgba(255,255,255,0.8);">
+                    Site ${r.siteName} | Conf #${r.confirmationNumber}
+                  </p>
+                  <p style="margin: 4px 0 0 0; font-size: 11px; color: rgba(255,255,255,0.7);">
+                    Risk: ${r.riskReason}
+                  </p>
+                </div>
+                <div style="text-align: right; margin-left: 12px;">
+                  <p style="margin: 0; font-size: 14px; font-weight: 600; color: #fcd34d;">$${(r.totalAmountCents / 100).toLocaleString()}</p>
+                  <p style="margin: 2px 0 0 0; font-size: 10px; color: rgba(255,255,255,0.7);">${Math.round(r.riskScore * 100)}% risk</p>
+                </div>
+              </div>
+              <div style="margin-top: 8px; padding-top: 8px; border-top: 1px solid rgba(255,255,255,0.2);">
+                <p style="margin: 0; font-size: 11px; color: #fcd34d; font-weight: 500;">
+                  Suggested: ${r.suggestedActions.join(' | ')}
+                </p>
+                ${r.guestPhone ? `<p style="margin: 4px 0 0 0; font-size: 11px; color: rgba(255,255,255,0.8);">Phone: ${r.guestPhone}</p>` : ''}
+              </div>
+            </div>
+          `).join('')}
+          ${briefing.revenueAtRisk.totalHighRiskCount > 5 ? `
+            <p style="margin: 8px 0 0 0; font-size: 12px; color: rgba(255,255,255,0.7); text-align: center;">
+              + ${briefing.revenueAtRisk.totalHighRiskCount - 5} more high-risk arrivals. View all in dashboard.
+            </p>
+          ` : ''}
         </div>
         ` : ''}
 

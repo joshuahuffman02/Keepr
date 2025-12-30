@@ -105,7 +105,7 @@ const statusConfig = {
   connected: {
     label: "Connected",
     icon: CheckCircle2,
-    className: "bg-emerald-100 text-emerald-800",
+    className: "bg-status-success/15 text-status-success",
   },
   disconnected: {
     label: "Not Connected",
@@ -115,7 +115,7 @@ const statusConfig = {
   error: {
     label: "Error",
     icon: XCircle,
-    className: "bg-red-100 text-red-800",
+    className: "bg-status-error/15 text-status-error",
   },
 };
 
@@ -144,8 +144,8 @@ export default function IntegrationsPage() {
         <Card>
           <CardContent className="pt-6">
             <div className="flex items-center gap-3">
-              <div className="p-2 rounded-lg bg-emerald-100">
-                <CheckCircle2 className="h-5 w-5 text-emerald-600" />
+              <div className="p-2 rounded-lg bg-status-success/15">
+                <CheckCircle2 className="h-5 w-5 text-status-success" />
               </div>
               <div>
                 <p className="text-2xl font-bold text-slate-900">
@@ -174,8 +174,8 @@ export default function IntegrationsPage() {
         <Card>
           <CardContent className="pt-6">
             <div className="flex items-center gap-3">
-              <div className="p-2 rounded-lg bg-red-100">
-                <XCircle className="h-5 w-5 text-red-600" />
+              <div className="p-2 rounded-lg bg-status-error/15">
+                <XCircle className="h-5 w-5 text-status-error" />
               </div>
               <div>
                 <p className="text-2xl font-bold text-slate-900">

@@ -1472,8 +1472,8 @@ export function SiteMapEditor({
         animate={{ opacity: 1, y: 0 }}
         className={cn("rounded-xl border-2 border-dashed border-slate-300 bg-gradient-to-br from-slate-50 to-slate-100 p-8 text-center", className)}
       >
-        <div className="mx-auto w-16 h-16 rounded-full bg-emerald-100 flex items-center justify-center mb-4">
-          <Sparkles className="h-8 w-8 text-emerald-600" />
+        <div className="mx-auto w-16 h-16 rounded-full bg-status-success/15 flex items-center justify-center mb-4">
+          <Sparkles className="h-8 w-8 text-status-success" />
         </div>
         <h3 className="font-semibold text-slate-800 mb-2">Ready to map your campground?</h3>
         <p className="text-sm text-slate-600 max-w-md mx-auto">
@@ -1579,8 +1579,8 @@ export function SiteMapEditor({
                   className={cn(
                     "transition-all",
                     selectedPreset === type
-                      ? "bg-emerald-600 hover:bg-emerald-700 text-white shadow-md scale-105"
-                      : "hover:border-emerald-300"
+                      ? "bg-status-success hover:bg-status-success/90 text-white shadow-md scale-105"
+                      : "hover:border-status-success/50"
                   )}
                 >
                   <Icon className="h-4 w-4 mr-1.5" />
@@ -1602,7 +1602,7 @@ export function SiteMapEditor({
                 disabled={isDrawing}
                 className={cn(
                   "transition-all",
-                  isDrawing && "bg-blue-600 hover:bg-blue-700 text-white"
+                  isDrawing && "bg-status-info hover:bg-status-info/90 text-white"
                 )}
               >
                 <Pencil className="h-4 w-4 mr-1.5" />
@@ -1648,7 +1648,7 @@ export function SiteMapEditor({
                 <RotateCcw className="h-4 w-4 mr-1.5" />
                 Undo
               </Button>
-              <Button size="sm" onClick={handleFinish} disabled={draftPoints.length < 3} className="bg-emerald-600 hover:bg-emerald-700 text-white">
+              <Button size="sm" onClick={handleFinish} disabled={draftPoints.length < 3} className="bg-status-success hover:bg-status-success/90 text-white">
                 <CheckCircle2 className="h-4 w-4 mr-1.5" />
                 Finish ({draftPoints.length} pts)
               </Button>
@@ -1745,7 +1745,7 @@ export function SiteMapEditor({
                   size="sm"
                   onClick={handleSaveShapes}
                   disabled={savingShapes || !hasPendingShapes}
-                  className="ml-auto bg-emerald-600 hover:bg-emerald-700 text-white transition-transform active:scale-95"
+                  className="ml-auto bg-status-success hover:bg-status-success/90 text-white transition-transform active:scale-95"
                 >
                   {savingShapes ? <Loader2 className="h-3.5 w-3.5 animate-spin mr-1.5" /> : <Save className="h-3.5 w-3.5 mr-1.5" />}
                   Save {hasPendingShapes && `(${pendingShapeCount})`}
@@ -1790,7 +1790,7 @@ export function SiteMapEditor({
                         "flex w-full items-center justify-between rounded-lg border px-3 py-2 text-left text-sm transition-all",
                         isActive
                           ? "border-emerald-400 bg-emerald-50 dark:bg-emerald-900/30 shadow-sm"
-                          : "border-slate-200 dark:border-slate-700 hover:border-emerald-300 hover:bg-slate-50 dark:hover:bg-slate-800"
+                          : "border-slate-200 dark:border-slate-700 hover:border-status-success/50 hover:bg-slate-50 dark:hover:bg-slate-800"
                       )}
                     >
                       <div className="flex flex-col">
@@ -1803,7 +1803,7 @@ export function SiteMapEditor({
                         variant={isMapped ? "default" : "secondary"}
                         className={cn(
                           "text-[10px]",
-                          isMapped && "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/50 dark:text-emerald-400"
+                          isMapped && "bg-status-success/15 text-status-success dark:bg-emerald-900/50 dark:text-emerald-400"
                         )}
                       >
                         {isMapped ? "Mapped" : "Unmapped"}
@@ -1822,7 +1822,7 @@ export function SiteMapEditor({
                   size="sm"
                   onClick={handleAssignShape}
                   disabled={!selectedSiteId || !selectedShapeId || assigning}
-                  className="bg-emerald-600 hover:bg-emerald-700 text-white transition-transform active:scale-95"
+                  className="bg-status-success hover:bg-status-success/90 text-white transition-transform active:scale-95"
                 >
                   {assigning ? <Loader2 className="h-3.5 w-3.5 animate-spin mr-1.5" /> : <Link2 className="h-3.5 w-3.5 mr-1.5" />}
                   Assign
@@ -2182,7 +2182,7 @@ export function SiteMapEditor({
                 >
                   <div className="flex items-center justify-between mb-2">
                     <span className="text-sm font-semibold text-slate-800 dark:text-white flex items-center gap-2">
-                      <Link2 className="h-4 w-4 text-emerald-600" />
+                      <Link2 className="h-4 w-4 text-status-success" />
                       Assign to Site
                     </span>
                     <button
@@ -2211,7 +2211,7 @@ export function SiteMapEditor({
                           disabled={assigning}
                           className={cn(
                             "w-full flex items-center justify-between px-2 py-1.5 rounded-lg text-sm text-left transition-all",
-                            "hover:bg-emerald-50 dark:hover:bg-emerald-900/30 hover:border-emerald-300",
+                            "hover:bg-emerald-50 dark:hover:bg-emerald-900/30 hover:border-status-success/50",
                             "border border-transparent",
                             isMapped && "opacity-60"
                           )}
@@ -2224,7 +2224,7 @@ export function SiteMapEditor({
                               Mapped
                             </Badge>
                           ) : (
-                            <Badge variant="outline" className="text-[10px] ml-2 shrink-0 text-emerald-600 border-emerald-300">
+                            <Badge variant="outline" className="text-[10px] ml-2 shrink-0 text-status-success border-status-success/50">
                               Available
                             </Badge>
                           )}
@@ -2327,7 +2327,7 @@ export function SiteMapEditor({
             <AlertDialogCancel>Cancel</AlertDialogCancel>
             <AlertDialogAction
               onClick={handleDeleteShapeConfirmed}
-              className="bg-red-600 hover:bg-red-700"
+              className="bg-status-error hover:bg-status-error/90"
             >
               Delete Shape
             </AlertDialogAction>

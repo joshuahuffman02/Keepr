@@ -68,12 +68,12 @@ const reasonConfig = {
   maintenance: {
     label: "Maintenance",
     icon: Wrench,
-    color: "bg-amber-100 text-amber-800",
+    color: "bg-status-warning/15 text-status-warning",
   },
   seasonal: {
     label: "Seasonal",
     icon: Snowflake,
-    color: "bg-blue-100 text-blue-800",
+    color: "bg-status-info/15 text-status-info",
   },
   event: {
     label: "Special Event",
@@ -83,7 +83,7 @@ const reasonConfig = {
   emergency: {
     label: "Emergency",
     icon: AlertTriangle,
-    color: "bg-red-100 text-red-800",
+    color: "bg-status-error/15 text-status-error",
   },
   other: {
     label: "Other",
@@ -411,13 +411,13 @@ export default function SiteClosuresPage() {
         }
         if (isCurrent) {
           return (
-            <Badge className="bg-red-100 text-red-800">
+            <Badge className="bg-status-error/15 text-status-error">
               Active Now
             </Badge>
           );
         }
         return (
-          <Badge className="bg-amber-100 text-amber-800">
+          <Badge className="bg-status-warning/15 text-status-warning">
             Scheduled
           </Badge>
         );
@@ -568,7 +568,7 @@ export default function SiteClosuresPage() {
                     onClick={() => toggleSiteClass(siteClass)}
                     className={cn(
                       formSiteClasses.includes(siteClass) &&
-                        "bg-emerald-100 border-emerald-300 text-emerald-800"
+                        "bg-status-success/15 border-status-success/30 text-status-success"
                     )}
                   >
                     {siteClass}

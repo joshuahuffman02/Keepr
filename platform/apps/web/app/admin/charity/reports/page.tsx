@@ -138,25 +138,25 @@ export default function CharityReportsPage() {
     switch (status) {
       case "collected":
         return (
-          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-emerald-100 text-emerald-700">
+          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-status-success/15 text-status-success">
             <CheckCircle className="h-3 w-3" /> Collected
           </span>
         );
       case "pending_payout":
         return (
-          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-amber-100 text-amber-700">
+          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-status-warning/15 text-status-warning">
             <Clock className="h-3 w-3" /> Pending Payout
           </span>
         );
       case "paid_out":
         return (
-          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-700">
+          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-status-info/15 text-status-info">
             <DollarSign className="h-3 w-3" /> Paid Out
           </span>
         );
       case "refunded":
         return (
-          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-700">
+          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-status-error/15 text-status-error">
             <AlertCircle className="h-3 w-3" /> Refunded
           </span>
         );
@@ -168,7 +168,7 @@ export default function CharityReportsPage() {
         );
       case "completed":
         return (
-          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-emerald-100 text-emerald-700">
+          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-status-success/15 text-status-success">
             <CheckCircle className="h-3 w-3" /> Completed
           </span>
         );
@@ -287,7 +287,7 @@ export default function CharityReportsPage() {
 
                   <div className="bg-white rounded-xl border border-slate-200 p-6">
                     <div className="flex items-center gap-3 mb-2">
-                      <div className="p-2 rounded-lg bg-emerald-100 text-emerald-600">
+                      <div className="p-2 rounded-lg bg-status-success/15 text-status-success">
                         <Heart className="h-5 w-5" />
                       </div>
                       <span className="text-sm text-slate-600">Total Donations</span>
@@ -299,7 +299,7 @@ export default function CharityReportsPage() {
 
                   <div className="bg-white rounded-xl border border-slate-200 p-6">
                     <div className="flex items-center gap-3 mb-2">
-                      <div className="p-2 rounded-lg bg-blue-100 text-blue-600">
+                      <div className="p-2 rounded-lg bg-status-info/15 text-status-info">
                         <Users className="h-5 w-5" />
                       </div>
                       <span className="text-sm text-slate-600">Unique Donors</span>
@@ -311,7 +311,7 @@ export default function CharityReportsPage() {
 
                   <div className="bg-white rounded-xl border border-slate-200 p-6">
                     <div className="flex items-center gap-3 mb-2">
-                      <div className="p-2 rounded-lg bg-amber-100 text-amber-600">
+                      <div className="p-2 rounded-lg bg-status-warning/15 text-status-warning">
                         <TrendingUp className="h-5 w-5" />
                       </div>
                       <span className="text-sm text-slate-600">Opt-in Rate</span>
@@ -500,7 +500,7 @@ export default function CharityReportsPage() {
                           <td className="px-6 py-4 text-sm text-slate-900">
                             {payout.charity.name}
                           </td>
-                          <td className="px-6 py-4 text-sm font-medium text-emerald-600">
+                          <td className="px-6 py-4 text-sm font-medium text-status-success">
                             ${(payout.amountCents / 100).toFixed(2)}
                           </td>
                           <td className="px-6 py-4 text-sm text-slate-600">

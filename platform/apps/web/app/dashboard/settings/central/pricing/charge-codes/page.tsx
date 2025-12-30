@@ -169,9 +169,9 @@ export default function ChargeCodesPage() {
             item.source === "system"
               ? "bg-purple-50 text-purple-700 border-purple-200"
               : item.source === "product"
-              ? "bg-blue-50 text-blue-700 border-blue-200"
+              ? "bg-status-info/15 text-status-info border-blue-200"
               : item.source === "ledger"
-              ? "bg-amber-50 text-amber-700 border-amber-200"
+              ? "bg-status-warning/15 text-status-warning border-amber-200"
               : "bg-slate-50 text-slate-700"
           }
         >
@@ -200,7 +200,7 @@ export default function ChargeCodesPage() {
       render: (item: ChargeCode) => (
         <Badge
           variant={item.isActive ? "default" : "secondary"}
-          className={item.isActive ? "bg-emerald-100 text-emerald-800" : ""}
+          className={item.isActive ? "bg-status-success/15 text-status-success" : ""}
         >
           {item.isActive ? "Active" : "Inactive"}
         </Badge>
@@ -295,8 +295,8 @@ export default function ChargeCodesPage() {
         <Card>
           <CardContent className="pt-6">
             <div className="flex items-center gap-3">
-              <div className="p-2 rounded-lg bg-blue-100">
-                <Receipt className="h-5 w-5 text-blue-600" />
+              <div className="p-2 rounded-lg bg-status-info/15">
+                <Receipt className="h-5 w-5 text-status-info" />
               </div>
               <div>
                 <p className="text-2xl font-bold text-slate-900">
@@ -310,8 +310,8 @@ export default function ChargeCodesPage() {
         <Card>
           <CardContent className="pt-6">
             <div className="flex items-center gap-3">
-              <div className="p-2 rounded-lg bg-amber-100">
-                <Receipt className="h-5 w-5 text-amber-600" />
+              <div className="p-2 rounded-lg bg-status-warning/15">
+                <Receipt className="h-5 w-5 text-status-warning" />
               </div>
               <div>
                 <p className="text-2xl font-bold text-slate-900">
@@ -325,8 +325,8 @@ export default function ChargeCodesPage() {
         <Card>
           <CardContent className="pt-6">
             <div className="flex items-center gap-3">
-              <div className="p-2 rounded-lg bg-emerald-100">
-                <Receipt className="h-5 w-5 text-emerald-600" />
+              <div className="p-2 rounded-lg bg-status-success/15">
+                <Receipt className="h-5 w-5 text-status-success" />
               </div>
               <div>
                 <p className="text-2xl font-bold text-slate-900">

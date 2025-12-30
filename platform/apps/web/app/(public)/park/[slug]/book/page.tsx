@@ -232,10 +232,10 @@ function PriceEstimate({
 
     if (isLoadingSites && !selectedSite) {
         return (
-            <div className="bg-emerald-50 border border-emerald-100 rounded-lg p-3 mb-6">
+            <div className="bg-status-success/15 border border-status-success/30 rounded-lg p-3 mb-6">
                 <div className="flex items-center justify-between">
                     <div className="text-sm text-slate-600">Calculating estimate...</div>
-                    <div className="animate-pulse h-6 w-20 bg-emerald-200 rounded"></div>
+                    <div className="animate-pulse h-6 w-20 bg-status-success/30 rounded"></div>
                 </div>
             </div>
         );
@@ -246,7 +246,7 @@ function PriceEstimate({
     }
 
     return (
-        <div className="bg-emerald-50 border border-emerald-100 rounded-lg p-4 mb-6">
+        <div className="bg-status-success/15 border border-status-success/30 rounded-lg p-4 mb-6">
             <div className="flex items-center justify-between">
                 <div>
                     <div className="text-sm text-slate-600 mb-1">
@@ -259,7 +259,7 @@ function PriceEstimate({
                 <div className="text-right">
                     {priceEstimate.isRange ? (
                         <>
-                            <div className="text-2xl font-bold text-emerald-700">
+                            <div className="text-2xl font-bold text-status-success">
                                 ${priceEstimate.minTotal?.toFixed(0)} - ${priceEstimate.maxTotal?.toFixed(0)}
                             </div>
                             <div className="text-xs text-slate-500">
@@ -268,7 +268,7 @@ function PriceEstimate({
                         </>
                     ) : (
                         <>
-                            <div className="text-2xl font-bold text-emerald-700">
+                            <div className="text-2xl font-bold text-status-success">
                                 {priceEstimate.isExact ? "" : "From "}${priceEstimate.total?.toFixed(0)}
                             </div>
                             <div className="text-xs text-slate-500">
@@ -302,20 +302,20 @@ function BookingProgress({ currentStep }: { currentStep: BookingStep }) {
                 <div key={step.num} className="flex items-center">
                     <div
                         className={`flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 rounded-full text-sm font-semibold transition-all ${step.num < currentStep
-                            ? "bg-emerald-600 text-white"
+                            ? "bg-status-success text-white"
                             : step.num === currentStep
-                                ? "bg-emerald-600 text-white ring-4 ring-emerald-100"
+                                ? "bg-status-success text-white ring-4 ring-status-success/30"
                                 : "bg-slate-200 text-slate-500"
                             }`}
                     >
                         {step.num < currentStep ? <Check className="h-4 w-4" /> : step.num}
                     </div>
-                    <span className={`ml-2 text-xs sm:text-sm font-medium hidden sm:inline ${step.num <= currentStep ? "text-emerald-700" : "text-slate-400"
+                    <span className={`ml-2 text-xs sm:text-sm font-medium hidden sm:inline ${step.num <= currentStep ? "text-status-success" : "text-slate-400"
                         }`}>
                         {step.label}
                     </span>
                     {idx < steps.length - 1 && (
-                        <div className={`w-6 sm:w-12 h-1 mx-2 rounded ${step.num < currentStep ? "bg-emerald-600" : "bg-slate-200"
+                        <div className={`w-6 sm:w-12 h-1 mx-2 rounded ${step.num < currentStep ? "bg-status-success" : "bg-slate-200"
                             }`} />
                     )}
                 </div>
@@ -457,35 +457,35 @@ function DateStep({
                     <button
                         type="button"
                         onClick={handleTonight}
-                        className="px-4 py-2 bg-slate-100 hover:bg-emerald-100 text-slate-700 hover:text-emerald-700 rounded-lg text-sm font-medium transition-colors border border-slate-200 hover:border-emerald-300 inline-flex items-center gap-1"
+                        className="px-4 py-2 bg-slate-100 hover:bg-status-success/20 text-slate-700 hover:text-status-success rounded-lg text-sm font-medium transition-colors border border-slate-200 hover:border-status-success/50 inline-flex items-center gap-1"
                     >
                         <Moon className="h-4 w-4" /> Tonight
                     </button>
                     <button
                         type="button"
                         onClick={handleWeekend}
-                        className="px-4 py-2 bg-slate-100 hover:bg-emerald-100 text-slate-700 hover:text-emerald-700 rounded-lg text-sm font-medium transition-colors border border-slate-200 hover:border-emerald-300 inline-flex items-center gap-1"
+                        className="px-4 py-2 bg-slate-100 hover:bg-status-success/20 text-slate-700 hover:text-status-success rounded-lg text-sm font-medium transition-colors border border-slate-200 hover:border-status-success/50 inline-flex items-center gap-1"
                     >
                         <CalendarDays className="h-4 w-4" /> Weekend
                     </button>
                     <button
                         type="button"
                         onClick={handleThreeNights}
-                        className="px-4 py-2 bg-slate-100 hover:bg-emerald-100 text-slate-700 hover:text-emerald-700 rounded-lg text-sm font-medium transition-colors border border-slate-200 hover:border-emerald-300"
+                        className="px-4 py-2 bg-slate-100 hover:bg-status-success/20 text-slate-700 hover:text-status-success rounded-lg text-sm font-medium transition-colors border border-slate-200 hover:border-status-success/50"
                     >
                         3 Nights
                     </button>
                     <button
                         type="button"
                         onClick={handleOneWeek}
-                        className="px-4 py-2 bg-slate-100 hover:bg-emerald-100 text-slate-700 hover:text-emerald-700 rounded-lg text-sm font-medium transition-colors border border-slate-200 hover:border-emerald-300"
+                        className="px-4 py-2 bg-slate-100 hover:bg-status-success/20 text-slate-700 hover:text-status-success rounded-lg text-sm font-medium transition-colors border border-slate-200 hover:border-status-success/50"
                     >
                         1 Week
                     </button>
                     <button
                         type="button"
                         onClick={handleOneMonth}
-                        className="px-4 py-2 bg-slate-100 hover:bg-emerald-100 text-slate-700 hover:text-emerald-700 rounded-lg text-sm font-medium transition-colors border border-slate-200 hover:border-emerald-300"
+                        className="px-4 py-2 bg-slate-100 hover:bg-status-success/20 text-slate-700 hover:text-status-success rounded-lg text-sm font-medium transition-colors border border-slate-200 hover:border-status-success/50"
                     >
                         1 Month
                     </button>
@@ -526,13 +526,13 @@ function DateStep({
                     />
                 </div>
                 {arrivalDate && departureDate && arrivalDate >= departureDate && (
-                    <p className="text-red-600 text-sm">Check-out must be after check-in</p>
+                    <p className="text-status-error text-sm">Check-out must be after check-in</p>
                 )}
             </div>
             <button
                 onClick={onNext}
                 disabled={!isValid}
-                className="w-full mt-6 py-4 bg-emerald-600 text-white font-semibold rounded-xl hover:bg-emerald-700 disabled:bg-slate-300 disabled:cursor-not-allowed transition-colors"
+                className="w-full mt-6 py-4 bg-status-success text-white font-semibold rounded-xl hover:bg-status-success/90 disabled:bg-slate-300 disabled:cursor-not-allowed transition-colors"
             >
                 Check Availability
             </button>
@@ -598,11 +598,11 @@ function SiteStep({
     const StatusBadge = ({ status }: { status: string }) => {
         switch (status) {
             case 'available':
-                return <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-100 text-emerald-800">Available</span>;
+                return <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-status-success/15 text-status-success">Available</span>;
             case 'booked':
-                return <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">Booked</span>;
+                return <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-status-error/15 text-status-error">Booked</span>;
             case 'maintenance':
-                return <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-amber-100 text-amber-800">Maintenance</span>;
+                return <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-status-warning/15 text-status-warning">Maintenance</span>;
             case 'locked':
             default:
                 return <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-slate-100 text-slate-800">Unavailable</span>;
@@ -705,8 +705,8 @@ function SiteStep({
                 </div>
 
                 {nextAvailability && onApplySuggestedDates && (
-                    <div className="border border-emerald-200 bg-emerald-50 rounded-xl p-4 text-left max-w-lg mx-auto">
-                        <div className="text-sm font-semibold text-emerald-800 flex items-center gap-2">
+                    <div className="border border-status-success/30 bg-status-success/15 rounded-xl p-4 text-left max-w-lg mx-auto">
+                        <div className="text-sm font-semibold text-status-success flex items-center gap-2">
                             <span>Next opening we found</span>
                         </div>
                         <p className="text-slate-700 mt-1">
@@ -717,7 +717,7 @@ function SiteStep({
                         </p>
                         <button
                             onClick={() => onApplySuggestedDates(nextAvailability.arrivalDate, nextAvailability.departureDate)}
-                            className="mt-3 inline-flex items-center justify-center px-4 py-2 rounded-lg bg-emerald-600 text-white text-sm font-medium hover:bg-emerald-700 transition-colors"
+                            className="mt-3 inline-flex items-center justify-center px-4 py-2 rounded-lg bg-status-success text-white text-sm font-medium hover:bg-status-success/90 transition-colors"
                         >
                             Use these dates
                         </button>
@@ -732,7 +732,7 @@ function SiteStep({
                                 <button
                                     key={type}
                                     onClick={() => onChangeSiteType(type)}
-                                    className="px-4 py-2 rounded-lg border border-emerald-200 bg-white shadow-sm hover:border-emerald-400 transition-colors text-sm font-semibold text-emerald-800"
+                                    className="px-4 py-2 rounded-lg border border-status-success/30 bg-white shadow-sm hover:border-emerald-400 transition-colors text-sm font-semibold text-status-success"
                                 >
                                     {siteTypeIcons[type] || <Tent className="h-5 w-5" />} {siteTypeLabel(type)} ({typeSites.length} open)
                                 </button>
@@ -755,7 +755,7 @@ function SiteStep({
                         departureDate={departureDate}
                         siteTypeId={waitlistSiteClassId}
                         trigger={
-                            <button className="px-6 py-3 bg-emerald-600 text-white font-medium rounded-xl hover:bg-emerald-700 transition-colors">
+                            <button className="px-6 py-3 bg-status-success text-white font-medium rounded-xl hover:bg-status-success/90 transition-colors">
                                 {waitlistLabel}
                             </button>
                         }
@@ -780,7 +780,7 @@ function SiteStep({
             onClick={onClick}
             className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium transition-all ${
                 active
-                    ? "bg-emerald-100 text-emerald-800 border border-emerald-300"
+                    ? "bg-status-success/15 text-status-success border border-status-success/30"
                     : "bg-slate-100 text-slate-600 border border-slate-200 hover:bg-slate-200"
             }`}
         >
@@ -801,7 +801,7 @@ function SiteStep({
                         <button
                             type="button"
                             onClick={() => setFilters({ fullHookups: false, petFriendly: false, accessible: false, pullThrough: false })}
-                            className="text-xs text-emerald-600 hover:text-emerald-700 font-medium"
+                            className="text-xs text-status-success hover:text-status-success/90 font-medium"
                         >
                             Clear all
                         </button>
@@ -842,7 +842,7 @@ function SiteStep({
                 )}
             </p>
             {sites.length > 0 && sites.length <= 3 && (
-                <p className="text-center text-amber-600 text-sm font-semibold mb-4">
+                <p className="text-center text-status-warning text-sm font-semibold mb-4">
                     Only {sites.length} left for these dates. Sites are held for a short time during checkout.
                 </p>
             )}
@@ -853,7 +853,7 @@ function SiteStep({
                         <span className="text-slate-600">{siteTypeIcons[classSites[0]?.siteClass?.siteType || "tent"] || <Tent className="h-5 w-5" />}</span>
                         <h3 className="text-lg font-semibold text-slate-900">{className}</h3>
                         {classSites[0]?.siteClass?.defaultRate && (
-                            <span className="text-emerald-700 font-semibold ml-auto">
+                            <span className="text-status-success font-semibold ml-auto">
                                 ${(classSites[0].siteClass.defaultRate / 100).toFixed(0)}/night
                             </span>
                         )}
@@ -878,7 +878,7 @@ function SiteStep({
                                     disabled={!isAvailable}
                                     className={`group overflow-hidden rounded-2xl border transition-all text-left ${selected
                                         ? "border-emerald-500 ring-2 ring-emerald-200"
-                                        : "border-slate-200 hover:border-emerald-300 hover:shadow-md"
+                                        : "border-slate-200 hover:border-status-success/50 hover:shadow-md"
                                         } ${!isAvailable ? "opacity-60 cursor-not-allowed" : ""}`}
                                 >
                                     <div className="relative h-48 w-full overflow-hidden">
@@ -896,7 +896,7 @@ function SiteStep({
                                             <StatusBadge status={site.status || 'available'} />
                                         </div>
                                         {selected && (
-                                            <div className="absolute bottom-3 right-3 rounded-full bg-emerald-600 text-white text-xs px-3 py-1 shadow-lg">
+                                            <div className="absolute bottom-3 right-3 rounded-full bg-status-success text-white text-xs px-3 py-1 shadow-lg">
                                                 Selected
                                             </div>
                                         )}
@@ -909,7 +909,7 @@ function SiteStep({
                                             </div>
                                             {site.siteClass?.defaultRate && (
                                                 <div className="text-right">
-                                                    <div className="text-lg font-bold text-emerald-700">
+                                                    <div className="text-lg font-bold text-status-success">
                                                         ${(site.siteClass.defaultRate / 100).toFixed(0)}
                                                     </div>
                                                     <div className="text-xs text-slate-500">per night</div>
@@ -926,7 +926,7 @@ function SiteStep({
                                                 <Badge variant="outline">Max {site.rigMaxLength}ft rig</Badge>
                                             )}
                                             {(site.accessible || site.siteClass?.accessible) && (
-                                                <Badge variant="outline" className="border-emerald-200 text-emerald-700">
+                                                <Badge variant="outline" className="border-status-success/30 text-status-success">
                                                     ADA Accessible
                                                 </Badge>
                                             )}
@@ -934,7 +934,7 @@ function SiteStep({
                                         {selected && (
                                             <div className="mt-3 flex flex-col gap-2">
                                                 {selectionFeeDisplay ? (
-                                                    <div className="text-sm text-emerald-800 bg-emerald-50 border border-emerald-100 rounded-lg px-3 py-2 flex items-center gap-2">
+                                                    <div className="text-sm text-status-success bg-status-success/15 border border-status-success/30 rounded-lg px-3 py-2 flex items-center gap-2">
                                                         <Lock className="h-4 w-4" />
                                                         <span>
                                                             Selecting this site adds {selectionFeeDisplay} (set by the campground). Fees apply only when you lock a specific site.
@@ -949,7 +949,7 @@ function SiteStep({
                                                     <button
                                                         type="button"
                                                         onClick={(e) => { e.stopPropagation(); onBookSelected?.(); }}
-                                                        className="px-4 py-2 rounded-lg bg-emerald-600 text-white text-sm font-semibold hover:bg-emerald-700 transition-colors"
+                                                        className="px-4 py-2 rounded-lg bg-status-success text-white text-sm font-semibold hover:bg-status-success/90 transition-colors"
                                                     >
                                                         Book now
                                                     </button>
@@ -974,7 +974,7 @@ function SiteStep({
                 <button
                     onClick={onNext}
                     disabled={!selectedSiteId}
-                    className="flex-1 py-4 bg-emerald-600 text-white font-semibold rounded-xl hover:bg-emerald-700 disabled:bg-slate-300 disabled:cursor-not-allowed transition-colors"
+                    className="flex-1 py-4 bg-status-success text-white font-semibold rounded-xl hover:bg-status-success/90 disabled:bg-slate-300 disabled:cursor-not-allowed transition-colors"
                 >
                     Continue →
                 </button>
@@ -983,7 +983,7 @@ function SiteStep({
                 <button
                     type="button"
                     onClick={onProceedWithoutLock}
-                    className="w-full text-sm text-emerald-700 font-semibold underline hover:text-emerald-800"
+                    className="w-full text-sm text-status-success font-semibold underline hover:text-status-success"
                 >
                     Prefer not to lock a specific site? Continue with this site type and we’ll assign the best available.
                 </button>
@@ -1114,7 +1114,7 @@ function GuestStep({
 
                 {/* Note about optional details */}
                 <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 text-center">
-                    <p className="text-sm text-blue-800">
+                    <p className="text-sm text-status-info">
                         That's all we need! You can add more details after booking if needed.
                     </p>
                 </div>
@@ -1177,7 +1177,7 @@ function GuestStep({
                                                     ...guestInfo,
                                                     additionalGuests: [...guestInfo.additionalGuests, { firstName: '', lastName: '', email: '', phone: '' }]
                                                 })}
-                                                className="text-sm text-emerald-600 hover:text-emerald-700 font-medium"
+                                                className="text-sm text-status-success hover:text-status-success/90 font-medium"
                                             >
                                                 + Add Guest
                                             </button>
@@ -1193,7 +1193,7 @@ function GuestStep({
                                                         ...guestInfo,
                                                         additionalGuests: guestInfo.additionalGuests.filter((_, i) => i !== idx)
                                                     })}
-                                                    className="text-xs text-red-500 hover:text-red-600"
+                                                    className="text-xs text-status-error hover:text-status-error/90"
                                                 >
                                                     Remove
                                                 </button>
@@ -1264,7 +1264,7 @@ function GuestStep({
                                                     ...guestInfo,
                                                     childrenDetails: [...guestInfo.childrenDetails, { name: '', gender: '', age: '' }]
                                                 })}
-                                                className="text-sm text-amber-600 hover:text-amber-700 font-medium"
+                                                className="text-sm text-status-warning hover:text-status-warning/90 font-medium"
                                             >
                                                 + Add Child
                                             </button>
@@ -1280,7 +1280,7 @@ function GuestStep({
                                                         ...guestInfo,
                                                         childrenDetails: guestInfo.childrenDetails.filter((_, i) => i !== idx)
                                                     })}
-                                                    className="text-xs text-red-500 hover:text-red-600"
+                                                    className="text-xs text-status-error hover:text-status-error/90"
                                                 >
                                                     Remove
                                                 </button>
@@ -1432,7 +1432,7 @@ function GuestStep({
                                                         petCount: next.length === 0 ? 0 : Math.max(guestInfo.petCount || 0, 1)
                                                     });
                                                 }}
-                                                className="h-4 w-4 text-emerald-600 border-slate-300 rounded focus:ring-emerald-500"
+                                                className="h-4 w-4 text-status-success border-slate-300 rounded focus:ring-emerald-500"
                                             />
                                             {petType.charAt(0).toUpperCase() + petType.slice(1)}
                                         </label>
@@ -1510,15 +1510,15 @@ function GuestStep({
                                 </div>
                             </div>
                             {lengthError && (
-                                <p className="text-red-600 text-sm font-medium">{lengthError}</p>
+                                <p className="text-status-error text-sm font-medium">{lengthError}</p>
                             )}
-                            <div className="flex items-start gap-3 p-3 bg-emerald-50 border border-emerald-100 rounded-xl">
+                            <div className="flex items-start gap-3 p-3 bg-status-success/15 border border-status-success/30 rounded-xl">
                                 <input
                                     id="needs-accessible"
                                     type="checkbox"
                                     checked={guestInfo.needsAccessible}
                                     onChange={(e) => onChange({ ...guestInfo, needsAccessible: e.target.checked })}
-                                    className="mt-1 h-4 w-4 text-emerald-600 border-slate-300 rounded focus:ring-emerald-500"
+                                    className="mt-1 h-4 w-4 text-status-success border-slate-300 rounded focus:ring-emerald-500"
                                 />
                                 <label htmlFor="needs-accessible" className="text-sm text-slate-700 leading-5">
                                     I need an ADA-accessible site (level pad, accessible route, proximity to facilities). We'll filter and flag sites that don't meet this.
@@ -1567,7 +1567,7 @@ function GuestStep({
                 <button
                     onClick={onNext}
                     disabled={!isValid || !!lengthError}
-                    className="flex-1 py-4 bg-emerald-600 text-white font-semibold rounded-xl hover:bg-emerald-700 disabled:bg-slate-300 disabled:cursor-not-allowed transition-colors"
+                    className="flex-1 py-4 bg-status-success text-white font-semibold rounded-xl hover:bg-status-success/90 disabled:bg-slate-300 disabled:cursor-not-allowed transition-colors"
                 >
                     Review →
                 </button>
@@ -1648,7 +1648,7 @@ function PaymentForm({
     return (
         <form onSubmit={handleSubmit} className="space-y-4">
             {capabilitiesStale && (
-                <div className="rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-800">
+                <div className="rounded-md border border-status-warning/30 bg-status-warning/15 px-3 py-2 text-sm text-status-warning">
                     Payment methods are refreshing with Stripe. Card checkout still works; ACH and wallets may appear once capabilities finish updating.
                 </div>
             )}
@@ -1668,23 +1668,23 @@ function PaymentForm({
             {error && (
                 <div className="bg-red-50 border border-red-200 rounded-xl p-4">
                     <div className="flex items-start gap-3">
-                        <AlertCircle className="h-5 w-5 text-red-600 mt-0.5 flex-shrink-0" />
+                        <AlertCircle className="h-5 w-5 text-status-error mt-0.5 flex-shrink-0" />
                         <div className="flex-1">
-                            <h4 className="font-semibold text-red-900 mb-1">Payment Error</h4>
-                            <p className="text-sm text-red-800 mb-3">{error}</p>
-                            <div className="bg-white/80 rounded-lg p-3 border border-red-100">
-                                <p className="text-xs font-medium text-red-900 mb-2">What you can try:</p>
+                            <h4 className="font-semibold text-status-error mb-1">Payment Error</h4>
+                            <p className="text-sm text-status-error mb-3">{error}</p>
+                            <div className="bg-white/80 rounded-lg p-3 border border-status-error/30">
+                                <p className="text-xs font-medium text-status-error mb-2">What you can try:</p>
                                 <ul className="space-y-1">
-                                    <li className="text-xs text-red-800 flex gap-2"><span>•</span>Check your card details are correct</li>
-                                    <li className="text-xs text-red-800 flex gap-2"><span>•</span>Verify you have sufficient funds</li>
-                                    <li className="text-xs text-red-800 flex gap-2"><span>•</span>Try a different card or payment method</li>
-                                    <li className="text-xs text-red-800 flex gap-2"><span>•</span>Contact your bank if the issue persists</li>
+                                    <li className="text-xs text-status-error flex gap-2"><span>•</span>Check your card details are correct</li>
+                                    <li className="text-xs text-status-error flex gap-2"><span>•</span>Verify you have sufficient funds</li>
+                                    <li className="text-xs text-status-error flex gap-2"><span>•</span>Try a different card or payment method</li>
+                                    <li className="text-xs text-status-error flex gap-2"><span>•</span>Contact your bank if the issue persists</li>
                                 </ul>
                             </div>
                             <button
                                 type="button"
                                 onClick={() => setError(null)}
-                                className="mt-3 text-sm text-red-600 hover:text-red-700 font-medium underline"
+                                className="mt-3 text-sm text-status-error hover:text-status-error/90 font-medium underline"
                             >
                                 Dismiss and try again
                             </button>
@@ -2210,13 +2210,13 @@ function ReviewStep({
     if (quoteError) {
         return (
             <div className="flex flex-col items-center justify-center gap-4 py-10 text-center">
-                <p className="text-red-600 font-semibold">We couldn&apos;t calculate your total.</p>
+                <p className="text-status-error font-semibold">We couldn&apos;t calculate your total.</p>
                 <p className="text-sm text-slate-600">
                     {quoteError instanceof Error ? quoteError.message : "Please try again or pick a different site."}
                 </p>
                 <button
                     onClick={onBack}
-                    className="px-4 py-2 rounded-lg border border-slate-200 bg-white text-sm font-medium text-slate-700 hover:border-emerald-300 hover:text-emerald-700 transition-colors"
+                    className="px-4 py-2 rounded-lg border border-slate-200 bg-white text-sm font-medium text-slate-700 hover:border-status-success/50 hover:text-status-success transition-colors"
                 >
                     ← Back
                 </button>
@@ -2243,7 +2243,7 @@ function ReviewStep({
                                 : selectedSite?.siteClass?.name || "Site details"}
                         </div>
                     </div>
-                    <Tent className="h-8 w-8 text-emerald-600" />
+                    <Tent className="h-8 w-8 text-status-success" />
                 </div>
 
                 <div className="py-4 border-b border-slate-200 space-y-2">
@@ -2303,13 +2303,13 @@ function ReviewStep({
                         {quote.rulesDeltaCents !== 0 && (
                             <div className="flex justify-between text-sm">
                                 <span className="text-slate-600">Adjustments</span>
-                                <span className={`font-medium ${quote.rulesDeltaCents < 0 ? "text-green-600" : "text-slate-900"}`}>
+                                <span className={`font-medium ${quote.rulesDeltaCents < 0 ? "text-status-success" : "text-slate-900"}`}>
                                     {quote.rulesDeltaCents < 0 ? "-" : "+"}${(Math.abs(quote.rulesDeltaCents) / 100).toFixed(2)}
                                 </span>
                             </div>
                         )}
                         {appliedDiscountCents > 0 && (
-                            <div className="flex justify-between text-sm text-green-600">
+                            <div className="flex justify-between text-sm text-status-success">
                                 <span className="flex items-center gap-1">
                                     <svg className="w-4 h-4" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2H2v10l9.29 9.29c.94.94 2.48.94 3.42 0l6.58-6.58c.94-.94.94-2.48 0-3.42L12 2Z"/><path d="M7 7h.01"/></svg>
                                     {promoApplied ? `Promo: ${promoCode}` : "Discounts"}
@@ -2347,7 +2347,7 @@ function ReviewStep({
                         )}
                         <div className="flex justify-between text-lg font-bold pt-2 border-t border-slate-300">
                             <span className="text-slate-900">Total due</span>
-                            <span className="text-emerald-600">${(finalTotalWithFees / 100).toFixed(2)}</span>
+                            <span className="text-status-success">${(finalTotalWithFees / 100).toFixed(2)}</span>
                         </div>
                         <div className="rounded-md border border-slate-200 bg-slate-50 p-3 text-xs text-slate-700 space-y-1">
                             <p>{paymentMethodsLabel}</p>
@@ -2365,9 +2365,9 @@ function ReviewStep({
                 {promoApplied ? (
                     <div className="flex items-center justify-between p-3 bg-green-50 border border-green-200 rounded-lg">
                         <div className="flex items-center gap-2">
-                            <svg className="w-4 h-4 text-green-600" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-                            <span className="font-mono font-medium text-green-700">{promoCode}</span>
-                            <span className="text-sm text-green-600">applied!</span>
+                            <svg className="w-4 h-4 text-status-success" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                            <span className="font-mono font-medium text-status-success">{promoCode}</span>
+                            <span className="text-sm text-status-success">applied!</span>
                         </div>
                         <button
                             onClick={handleRemovePromo}
@@ -2396,7 +2396,7 @@ function ReviewStep({
                     </div>
                 )}
                 {promoError && (
-                    <p className="mt-2 text-sm text-red-600">{promoError}</p>
+                    <p className="mt-2 text-sm text-status-error">{promoError}</p>
                 )}
             </div>
 
@@ -2419,9 +2419,9 @@ function ReviewStep({
                                 enforcement === "pre_booking"
                                     ? "bg-rose-100 text-rose-700 border-rose-200"
                                     : enforcement === "pre_checkin"
-                                        ? "bg-amber-100 text-amber-700 border-amber-200"
+                                        ? "bg-status-warning/15 text-status-warning border-status-warning/30"
                                         : enforcement === "post_booking"
-                                            ? "bg-emerald-100 text-emerald-700 border-emerald-200"
+                                            ? "bg-emerald-100 text-status-success border-status-success/30"
                                             : "bg-slate-100 text-slate-700 border-slate-200";
                             const badgeLabel =
                                 enforcement === "pre_booking"
@@ -2454,7 +2454,7 @@ function ReviewStep({
                                         <label className="flex items-start gap-2 text-sm text-slate-700">
                                             <input
                                                 type="checkbox"
-                                                className="mt-0.5 h-4 w-4 rounded border-slate-300 text-emerald-600 focus:ring-emerald-500"
+                                                className="mt-0.5 h-4 w-4 rounded border-slate-300 text-status-success focus:ring-emerald-500"
                                                 checked={policyAcceptances[policy.id] || false}
                                                 onChange={(e) =>
                                                     setPolicyAcceptances((prev) => ({ ...prev, [policy.id]: e.target.checked }))
@@ -2470,7 +2470,7 @@ function ReviewStep({
                         })}
                     </div>
                     {policiesBlocking && (
-                        <div className="mt-3 rounded-md border border-amber-200 bg-amber-50 p-3 text-xs text-amber-800">
+                        <div className="mt-3 rounded-md border border-status-warning/30 bg-status-warning/15 p-3 text-xs text-status-warning">
                             Please accept the required policies to continue.
                         </div>
                     )}
@@ -2495,12 +2495,12 @@ function ReviewStep({
 
             {/* Tax Exemption Waiver Section */}
             {waiverRequired && (
-                <div className="mb-6 p-4 bg-amber-50 border border-amber-200 rounded-xl">
+                <div className="mb-6 p-4 bg-status-warning/15 border border-status-warning/30 rounded-xl">
                     <div className="flex items-start gap-3">
-                        <svg className="w-6 h-6 text-amber-700" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="8" height="4" x="8" y="2" rx="1" ry="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="M12 11h4"/><path d="M12 16h4"/><path d="M8 11h.01"/><path d="M8 16h.01"/></svg>
+                        <svg className="w-6 h-6 text-status-warning" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="8" height="4" x="8" y="2" rx="1" ry="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="M12 11h4"/><path d="M12 16h4"/><path d="M8 11h.01"/><path d="M8 16h.01"/></svg>
                         <div className="flex-1">
-                            <h4 className="font-semibold text-amber-900 mb-2">Tax Exemption Waiver</h4>
-                            <p className="text-sm text-amber-800 mb-4 whitespace-pre-wrap">
+                            <h4 className="font-semibold text-status-warning mb-2">Tax Exemption Waiver</h4>
+                            <p className="text-sm text-status-warning mb-4 whitespace-pre-wrap">
                                 {quote?.taxWaiverText || "By checking this box, I certify that I qualify for the tax exemption as described and agree to provide any required documentation upon check-in."}
                             </p>
                             <label className="flex items-center gap-3 cursor-pointer">
@@ -2508,9 +2508,9 @@ function ReviewStep({
                                     type="checkbox"
                                     checked={taxWaiverSigned}
                                     onChange={(e) => setTaxWaiverSigned(e.target.checked)}
-                                    className="w-5 h-5 rounded border-amber-400 text-amber-600 focus:ring-amber-500"
+                                    className="w-5 h-5 rounded border-status-warning/50 text-status-warning focus:ring-status-warning"
                                 />
-                                <span className="text-sm font-medium text-amber-900">
+                                <span className="text-sm font-medium text-status-warning">
                                     I agree to the tax exemption waiver terms
                                 </span>
                             </label>
@@ -2531,13 +2531,13 @@ function ReviewStep({
             {bookingError && (
                 <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-xl">
                     <div className="flex items-start gap-3">
-                        <AlertCircle className="h-5 w-5 text-red-600 mt-0.5 flex-shrink-0" />
+                        <AlertCircle className="h-5 w-5 text-status-error mt-0.5 flex-shrink-0" />
                         <div>
-                            <p className="font-medium text-red-900 mb-1">Something went wrong</p>
-                            <p className="text-red-700 text-sm mb-3">{bookingError}</p>
-                            <div className="bg-white/50 rounded-lg p-3 border border-red-100">
-                                <p className="text-xs font-medium text-red-900 mb-2">What you can try:</p>
-                                <ul className="space-y-1 text-xs text-red-800">
+                            <p className="font-medium text-status-error mb-1">Something went wrong</p>
+                            <p className="text-status-error text-sm mb-3">{bookingError}</p>
+                            <div className="bg-white/50 rounded-lg p-3 border border-status-error/30">
+                                <p className="text-xs font-medium text-status-error mb-2">What you can try:</p>
+                                <ul className="space-y-1 text-xs text-status-error">
                                     <li className="flex gap-2"><span>•</span>Wait a moment and try again</li>
                                     <li className="flex gap-2"><span>•</span>Go back and verify your information</li>
                                     <li className="flex gap-2"><span>•</span>Try a different payment method</li>
@@ -2549,19 +2549,19 @@ function ReviewStep({
             )}
 
             {/* Trust Badges */}
-            <div className="mb-6 rounded-xl border border-emerald-100 bg-gradient-to-br from-emerald-50 to-cyan-50 p-5">
+            <div className="mb-6 rounded-xl border border-status-success/30 bg-gradient-to-br from-emerald-50 to-cyan-50 p-5">
                 <div className="flex items-center gap-2 mb-4">
-                    <Lock className="h-5 w-5 text-emerald-600" />
+                    <Lock className="h-5 w-5 text-status-success" />
                     <h4 className="font-semibold text-slate-900">Your Payment is Secure</h4>
                 </div>
 
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                     <div className="flex flex-col items-center text-center p-3 bg-white rounded-lg border border-slate-100">
-                        <Shield className="h-6 w-6 text-blue-600 mb-2" />
+                        <Shield className="h-6 w-6 text-status-info mb-2" />
                         <span className="text-xs font-medium text-slate-700">256-bit SSL</span>
                     </div>
                     <div className="flex flex-col items-center text-center p-3 bg-white rounded-lg border border-slate-100">
-                        <CheckCircle className="h-6 w-6 text-emerald-600 mb-2" />
+                        <CheckCircle className="h-6 w-6 text-status-success mb-2" />
                         <span className="text-xs font-medium text-slate-700">PCI Compliant</span>
                     </div>
                     <div className="flex flex-col items-center text-center p-3 bg-white rounded-lg border border-slate-100">
@@ -2581,15 +2581,15 @@ function ReviewStep({
 
             {/* Payment Section */}
             {!stripePromise ? (
-                <div className="rounded-lg border border-red-200 bg-red-50 p-4 text-center">
-                    <AlertCircle className="h-6 w-6 text-red-600 mx-auto mb-2" />
-                    <p className="text-sm font-medium text-red-800">Payment processing is not configured</p>
-                    <p className="text-xs text-red-600 mt-1">Please contact support to complete your booking</p>
+                <div className="rounded-lg border border-status-error/30 bg-status-error/15 p-4 text-center">
+                    <AlertCircle className="h-6 w-6 text-status-error mx-auto mb-2" />
+                    <p className="text-sm font-medium text-status-error">Payment processing is not configured</p>
+                    <p className="text-xs text-status-error mt-1">Please contact support to complete your booking</p>
                 </div>
             ) : clientSecret ? (
                 <Elements stripe={stripePromise} options={{ clientSecret }}>
                     {holdCountdown && (
-                        <div className="mb-3 flex items-center gap-2 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-800">
+                        <div className="mb-3 flex items-center gap-2 rounded-lg border border-status-warning/30 bg-status-warning/15 px-3 py-2 text-sm text-status-warning">
                             <svg className="w-4 h-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M5 22h14"/><path d="M5 2h14"/><path d="M17 22v-4.172a2 2 0 0 0-.586-1.414L12 12l-4.414 4.414A2 2 0 0 0 7 17.828V22"/><path d="M7 2v4.172a2 2 0 0 0 .586 1.414L12 12l4.414-4.414A2 2 0 0 0 17 6.172V2"/></svg>
                             <span>
                                 We’re holding this site for you {holdCountdown === "Expired" ? "(hold expired — try again)" : `for ${holdCountdown} more`} before it releases.
@@ -2621,7 +2621,7 @@ function ReviewStep({
                     <button
                         onClick={handleProceedToPayment}
                         disabled={createReservationMutation.isPending || !quote || waiverBlocking || policiesBlocking || formsBlocking}
-                        className="flex-1 py-4 bg-emerald-600 text-white font-semibold rounded-xl hover:bg-emerald-700 disabled:bg-slate-400 transition-colors"
+                        className="flex-1 py-4 bg-status-success text-white font-semibold rounded-xl hover:bg-status-success/90 disabled:bg-slate-400 transition-colors"
                         title={proceedDisabledReason}
                     >
                         {createReservationMutation.isPending ? "Creating..." : "Proceed to Payment"}
@@ -2659,14 +2659,14 @@ function SuccessScreen({ campgroundName, slug, reservation }: { campgroundName: 
                     transition={{ type: "spring", stiffness: 200, damping: 15, delay: 0.2 }}
                 >
                     <div className="w-20 h-20 bg-emerald-100 rounded-full flex items-center justify-center">
-                        <CheckCircle className="w-12 h-12 text-emerald-600" />
+                        <CheckCircle className="w-12 h-12 text-status-success" />
                     </div>
                     {/* Decorative sparkles */}
                     <Sparkles className="absolute -top-2 -right-2 w-6 h-6 text-amber-400" />
                     <Sparkles className="absolute -bottom-1 -left-2 w-5 h-5 text-emerald-400" />
                 </motion.div>
                 <motion.h2
-                    className="text-4xl font-bold text-emerald-600 mb-2"
+                    className="text-4xl font-bold text-status-success mb-2"
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     transition={{ delay: 0.4 }}
@@ -2682,7 +2682,7 @@ function SuccessScreen({ campgroundName, slug, reservation }: { campgroundName: 
                     Your adventure at {campgroundName} is confirmed
                 </motion.p>
                 <motion.div
-                    className="inline-flex items-center gap-2 bg-emerald-50 border border-emerald-200 rounded-full px-6 py-3 text-sm text-emerald-800"
+                    className="inline-flex items-center gap-2 bg-status-success/15 border border-status-success/30 rounded-full px-6 py-3 text-sm text-status-success"
                     initial={{ opacity: 0, scale: 0.9 }}
                     animate={{ opacity: 1, scale: 1 }}
                     transition={{ delay: 0.6 }}
@@ -2703,7 +2703,7 @@ function SuccessScreen({ campgroundName, slug, reservation }: { campgroundName: 
                     <div>
                         <p className="text-sm text-slate-500 uppercase tracking-wide font-medium mb-1">Confirmation Code</p>
                         <div className="flex items-center gap-2">
-                            <p className="text-3xl font-mono font-bold text-emerald-600">
+                            <p className="text-3xl font-mono font-bold text-status-success">
                                 {reservation.id.slice(-8).toUpperCase()}
                             </p>
                             <button
@@ -2712,7 +2712,7 @@ function SuccessScreen({ campgroundName, slug, reservation }: { campgroundName: 
                                 title="Copy confirmation code"
                             >
                                 {copied ? (
-                                    <Check className="h-4 w-4 text-emerald-600" />
+                                    <Check className="h-4 w-4 text-status-success" />
                                 ) : (
                                     <Copy className="h-4 w-4 text-slate-500" />
                                 )}
@@ -2771,34 +2771,34 @@ function SuccessScreen({ campgroundName, slug, reservation }: { campgroundName: 
                 </h3>
                 <div className="space-y-4">
                     <div className="flex gap-4">
-                        <div className="flex-shrink-0 w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center font-bold text-sm">
+                        <div className="flex-shrink-0 w-8 h-8 bg-status-info text-white rounded-full flex items-center justify-center font-bold text-sm">
                             1
                         </div>
                         <div>
                             <p className="font-medium text-blue-900">Check your email</p>
-                            <p className="text-sm text-blue-800">
+                            <p className="text-sm text-status-info">
                                 We've sent your confirmation and receipt. Add it to your calendar!
                             </p>
                         </div>
                     </div>
                     <div className="flex gap-4">
-                        <div className="flex-shrink-0 w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center font-bold text-sm">
+                        <div className="flex-shrink-0 w-8 h-8 bg-status-info text-white rounded-full flex items-center justify-center font-bold text-sm">
                             2
                         </div>
                         <div>
                             <p className="font-medium text-blue-900">Get check-in details</p>
-                            <p className="text-sm text-blue-800">
+                            <p className="text-sm text-status-info">
                                 48 hours before arrival, we'll email you check-in instructions and directions
                             </p>
                         </div>
                     </div>
                     <div className="flex gap-4">
-                        <div className="flex-shrink-0 w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center font-bold text-sm">
+                        <div className="flex-shrink-0 w-8 h-8 bg-status-info text-white rounded-full flex items-center justify-center font-bold text-sm">
                             3
                         </div>
                         <div>
                             <p className="font-medium text-blue-900">Pack and enjoy!</p>
-                            <p className="text-sm text-blue-800">
+                            <p className="text-sm text-status-info">
                                 Check the weather, pack your gear, and get ready for an unforgettable stay
                             </p>
                         </div>
@@ -2850,7 +2850,7 @@ function SuccessScreen({ campgroundName, slug, reservation }: { campgroundName: 
                                 navigator.clipboard.writeText(`${window.location.origin}/park/${slug}`);
                             });
                         }}
-                        className="px-6 py-2 bg-emerald-600 text-white rounded-lg text-sm font-medium hover:bg-emerald-700 transition-colors flex items-center gap-2"
+                        className="px-6 py-2 bg-status-success text-white rounded-lg text-sm font-medium hover:bg-status-success/90 transition-colors flex items-center gap-2"
                     >
                         <Share2 className="h-4 w-4" />
                         Share with Friends
@@ -3209,7 +3209,7 @@ export default function BookingPage() {
                     {[0, 1, 2].map((i) => (
                         <div
                             key={i}
-                            className="w-2 h-2 rounded-full bg-emerald-500"
+                            className="w-2 h-2 rounded-full bg-status-success/150"
                             style={{ animation: `pulse 1.4s ease-in-out ${i * 0.2}s infinite` }}
                         />
                     ))}
@@ -3225,7 +3225,7 @@ export default function BookingPage() {
                 <h1 className="text-2xl font-bold text-slate-800">Campground Not Found</h1>
                 <Link
                     href="/"
-                    className="px-6 py-3 bg-emerald-600 text-white rounded-lg font-medium hover:bg-emerald-700"
+                    className="px-6 py-3 bg-status-success text-white rounded-lg font-medium hover:bg-status-success/90"
                 >
                     Browse All Campgrounds
                 </Link>
@@ -3238,7 +3238,7 @@ export default function BookingPage() {
             {/* Header */}
             <header className="bg-white shadow-sm">
                 <div className="max-w-4xl mx-auto px-4 py-4 flex items-center justify-between">
-                    <Link href={`/park/${slug}`} className="text-emerald-600 hover:text-emerald-700 font-medium text-sm">
+                    <Link href={`/park/${slug}`} className="text-status-success hover:text-status-success/90 font-medium text-sm">
                         ← Back to {campground.name}
                     </Link>
                     <h1 className="font-bold text-slate-900">Book Your Stay</h1>
@@ -3390,12 +3390,12 @@ export default function BookingPage() {
                             <button
                                 onClick={handleAsk}
                                 disabled={askLoading || !askQuestion.trim()}
-                                className="px-4 py-2 bg-emerald-600 text-white rounded-md text-sm font-medium hover:bg-emerald-700 disabled:opacity-50"
+                                className="px-4 py-2 bg-status-success text-white rounded-md text-sm font-medium hover:bg-status-success/90 disabled:opacity-50"
                             >
                                 {askLoading ? "Asking..." : "Ask"}
                             </button>
                         </div>
-                        {askError && <div className="text-sm text-amber-700 bg-amber-50 border border-amber-200 rounded-md p-2">{askError}</div>}
+                        {askError && <div className="text-sm text-status-warning bg-status-warning/15 border border-status-warning/30 rounded-md p-2">{askError}</div>}
                         {askAnswer && (
                             <div className="text-sm text-slate-800 bg-slate-50 border border-slate-200 rounded-md p-3 whitespace-pre-wrap">
                                 {askAnswer}

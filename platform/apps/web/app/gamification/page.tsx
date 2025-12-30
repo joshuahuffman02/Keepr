@@ -934,7 +934,7 @@ export default function GamificationDashboardPage() {
                           <div>
                             <div className="font-semibold text-slate-900 flex items-center gap-2">
                               {row.name}
-                              {isViewer && <Badge className="bg-emerald-100 text-emerald-700 text-xs">You</Badge>}
+                              {isViewer && <Badge className="bg-status-success/15 text-status-success text-xs">You</Badge>}
                             </div>
                             <div className="text-sm text-slate-500">{row.role || "Staff"}</div>
                           </div>

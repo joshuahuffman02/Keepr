@@ -64,9 +64,9 @@ import { SITE_CLASS_AMENITIES, CABIN_AMENITIES, getCabinAmenitiesByCategory } fr
 
 // Site type configuration with icons
 const siteTypeConfig: Record<string, { icon: React.ReactNode; label: string; color: string }> = {
-  rv: { icon: <Truck className="h-4 w-4" />, label: "RV", color: "bg-blue-100 text-blue-700 dark:bg-blue-900/50 dark:text-blue-400" },
-  tent: { icon: <Tent className="h-4 w-4" />, label: "Tent", color: "bg-green-100 text-green-700 dark:bg-green-900/50 dark:text-green-400" },
-  cabin: { icon: <Home className="h-4 w-4" />, label: "Cabin", color: "bg-amber-100 text-amber-700 dark:bg-amber-900/50 dark:text-amber-400" },
+  rv: { icon: <Truck className="h-4 w-4" />, label: "RV", color: "bg-status-info/15 text-status-info" },
+  tent: { icon: <Tent className="h-4 w-4" />, label: "Tent", color: "bg-status-success/15 text-status-success" },
+  cabin: { icon: <Home className="h-4 w-4" />, label: "Cabin", color: "bg-status-warning/15 text-status-warning" },
   group: { icon: <Users className="h-4 w-4" />, label: "Group", color: "bg-purple-100 text-purple-700 dark:bg-purple-900/50 dark:text-purple-400" },
   glamping: { icon: <Sparkles className="h-4 w-4" />, label: "Glamping", color: "bg-pink-100 text-pink-700 dark:bg-pink-900/50 dark:text-pink-400" },
 };
@@ -485,7 +485,7 @@ export default function SiteClassDetailPage() {
             </div>
           </div>
           <div className="flex items-center gap-2">
-            <Badge variant={siteClass.isActive ? "default" : "outline"} className={siteClass.isActive ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/50 dark:text-emerald-400" : ""}>
+            <Badge variant={siteClass.isActive ? "default" : "outline"} className={siteClass.isActive ? "bg-status-success/15 text-status-success" : ""}>
               {siteClass.isActive ? "Active" : "Inactive"}
             </Badge>
             {!isEditing ? (
@@ -707,7 +707,7 @@ export default function SiteClassDetailPage() {
                             className={cn(
                               "px-4 py-2 rounded-lg border transition-all flex items-center gap-2",
                               editForm.electricAmps?.includes(amp)
-                                ? "border-amber-500 bg-amber-100 text-amber-700 dark:bg-amber-900/50 dark:text-amber-400"
+                                ? "border-amber-500 bg-status-warning/15 text-status-warning"
                                 : "border-border bg-background hover:border-amber-300"
                             )}
                           >
@@ -729,7 +729,7 @@ export default function SiteClassDetailPage() {
                             className={cn(
                               "px-3 py-2 rounded-lg border text-sm transition-all text-left",
                               editForm.equipmentTypes?.includes(opt.value)
-                                ? "border-blue-500 bg-blue-100 text-blue-700 dark:bg-blue-900/50 dark:text-blue-400"
+                                ? "border-blue-500 bg-status-info/15 text-status-info"
                                 : "border-border bg-background hover:border-blue-300"
                             )}
                           >
@@ -956,7 +956,7 @@ export default function SiteClassDetailPage() {
                               className={cn(
                                 "flex items-center gap-2 px-3 py-2 rounded-lg border text-sm transition-all",
                                 editForm.amenityTags?.includes(amenity.id)
-                                  ? "border-emerald-500 bg-emerald-100 text-emerald-700 dark:bg-emerald-900/50 dark:text-emerald-400"
+                                  ? "border-emerald-500 bg-status-success/15 text-status-success"
                                   : "border-border bg-background hover:border-emerald-300"
                               )}
                             >
@@ -998,7 +998,7 @@ export default function SiteClassDetailPage() {
                                     className={cn(
                                       "flex items-center gap-2 px-3 py-2 rounded-lg border text-sm transition-all",
                                       editForm.amenityTags?.includes(amenity.id)
-                                        ? "border-amber-500 bg-amber-100 text-amber-700 dark:bg-amber-900/50 dark:text-amber-400"
+                                        ? "border-amber-500 bg-status-warning/15 text-status-warning"
                                         : "border-border bg-background hover:border-amber-300"
                                     )}
                                   >

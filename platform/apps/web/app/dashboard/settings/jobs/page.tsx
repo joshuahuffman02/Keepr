@@ -67,11 +67,11 @@ export default function JobsPage() {
   const jobs = jobsQuery.data || [];
 
   const statusColor = (status: string) => {
-    if (status === "sent") return "bg-emerald-100 text-emerald-800";
-    if (status === "failed") return "bg-red-100 text-red-800";
-    if (status === "pending") return "bg-amber-100 text-amber-800";
-    if (status === "processing") return "bg-blue-100 text-blue-800";
-    return "bg-slate-100 text-slate-700";
+    if (status === "sent") return "bg-status-success-bg text-status-success-text";
+    if (status === "failed") return "bg-status-error-bg text-status-error-text";
+    if (status === "pending") return "bg-status-warning-bg text-status-warning-text";
+    if (status === "processing") return "bg-status-info-bg text-status-info-text";
+    return "bg-muted text-muted-foreground";
   };
 
   return (

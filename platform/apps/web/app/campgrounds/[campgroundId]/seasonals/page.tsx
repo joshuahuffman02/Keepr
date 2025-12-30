@@ -226,11 +226,11 @@ interface DashboardStats {
 
 function StatusBadge({ status }: { status: SeasonalStatus }) {
   const config: Record<SeasonalStatus, { class: string; label: string }> = {
-    active: { class: "bg-emerald-100 text-emerald-700 border-emerald-200", label: "Active" },
-    pending_renewal: { class: "bg-amber-100 text-amber-700 border-amber-200", label: "Pending Renewal" },
+    active: { class: "bg-status-success/15 text-status-success border-status-success/20", label: "Active" },
+    pending_renewal: { class: "bg-status-warning/15 text-status-warning border-status-warning/20", label: "Pending Renewal" },
     not_renewing: { class: "bg-rose-100 text-rose-700 border-rose-200", label: "Not Renewing" },
     departed: { class: "bg-slate-100 text-slate-700 border-slate-200", label: "Departed" },
-    waitlist: { class: "bg-blue-100 text-blue-700 border-blue-200", label: "Waitlist" },
+    waitlist: { class: "bg-status-info/15 text-status-info border-status-info/20", label: "Waitlist" },
   };
   return (
     <Badge variant="outline" className={config[status].class}>
@@ -242,9 +242,9 @@ function StatusBadge({ status }: { status: SeasonalStatus }) {
 function RenewalIntentBadge({ intent }: { intent?: RenewalIntent }) {
   if (!intent) return <Badge variant="outline" className="bg-slate-50 text-slate-500">Unknown</Badge>;
   const config: Record<RenewalIntent, { class: string; label: string; icon: any }> = {
-    committed: { class: "bg-emerald-100 text-emerald-700 border-emerald-200", label: "Committed", icon: CheckCircle },
-    likely: { class: "bg-green-100 text-green-700 border-green-200", label: "Likely", icon: TrendingUp },
-    undecided: { class: "bg-amber-100 text-amber-700 border-amber-200", label: "Undecided", icon: Clock },
+    committed: { class: "bg-status-success/15 text-status-success border-status-success/20", label: "Committed", icon: CheckCircle },
+    likely: { class: "bg-status-success/15 text-status-success border-status-success/20", label: "Likely", icon: TrendingUp },
+    undecided: { class: "bg-status-warning/15 text-status-warning border-status-warning/20", label: "Undecided", icon: Clock },
     not_renewing: { class: "bg-rose-100 text-rose-700 border-rose-200", label: "Not Returning", icon: X },
   };
   const Icon = config[intent].icon;
@@ -277,7 +277,7 @@ function PaymentStatusBadge({ seasonal }: { seasonal: SeasonalGuest }) {
     );
   }
   return (
-    <Badge variant="outline" className="bg-emerald-100 text-emerald-700 border-emerald-200">
+    <Badge variant="outline" className="bg-status-success/15 text-status-success border-status-success/20">
       <CheckCircle className="h-3 w-3 mr-1" />
       Current
     </Badge>
@@ -390,8 +390,8 @@ function ShimmerStyles() {
 function ContractStatusBadge({ status }: { status?: ContractStatus }) {
   if (!status) return <Badge variant="outline" className="bg-slate-50 text-slate-500">Not Sent</Badge>;
   const config: Record<ContractStatus, { class: string; label: string; icon: any }> = {
-    signed: { class: "bg-emerald-100 text-emerald-700 border-emerald-200", label: "Signed", icon: CheckCircle },
-    sent: { class: "bg-blue-100 text-blue-700 border-blue-200", label: "Sent", icon: Send },
+    signed: { class: "bg-status-success/15 text-status-success border-status-success/20", label: "Signed", icon: CheckCircle },
+    sent: { class: "bg-status-info/15 text-status-info border-status-info/20", label: "Sent", icon: Send },
     not_sent: { class: "bg-slate-100 text-slate-500 border-slate-200", label: "Not Sent", icon: FileText },
     expired: { class: "bg-rose-100 text-rose-700 border-rose-200", label: "Expired", icon: AlertCircle },
   };
@@ -426,10 +426,10 @@ function HeroStatCard({
   highlight?: boolean;
 }) {
   const colorClasses = {
-    emerald: "text-emerald-600 bg-emerald-50",
-    amber: "text-amber-600 bg-amber-50",
+    emerald: "text-status-success bg-status-success/15",
+    amber: "text-status-warning bg-status-warning/15",
     rose: "text-rose-600 bg-rose-50",
-    blue: "text-blue-600 bg-blue-50",
+    blue: "text-status-info bg-status-info/15",
     purple: "text-purple-600 bg-purple-50",
     slate: "text-slate-600 bg-slate-50",
   };
@@ -446,7 +446,7 @@ function HeroStatCard({
             <p className={`text-2xl font-bold mt-1 ${colorClasses[color].split(" ")[0]}`}>{value}</p>
             {subtitle && <p className="text-xs text-slate-400 mt-1">{subtitle}</p>}
             {trend && (
-              <p className={`text-xs flex items-center gap-1 mt-1 ${trend.value >= 0 ? "text-emerald-600" : "text-rose-600"}`}>
+              <p className={`text-xs flex items-center gap-1 mt-1 ${trend.value >= 0 ? "text-status-success" : "text-rose-600"}`}>
                 <TrendingUp className={`h-3 w-3 ${trend.value < 0 ? "rotate-180" : ""}`} />
                 {trend.value > 0 ? "+" : ""}{trend.value}% {trend.label}
               </p>
@@ -480,13 +480,13 @@ function CriticalAlertsBanner({
 
   if (alerts.length === 0) {
     return (
-      <div className="bg-gradient-to-r from-emerald-50 to-teal-50 border border-emerald-200 rounded-xl p-4 flex items-center justify-center gap-3">
-        <div className="p-2 bg-emerald-100 rounded-full">
-          <CheckCircle className="h-5 w-5 text-emerald-600" />
+      <div className="bg-gradient-to-r from-emerald-50 to-teal-50 border border-status-success/20 rounded-xl p-4 flex items-center justify-center gap-3">
+        <div className="p-2 bg-status-success/15 rounded-full">
+          <CheckCircle className="h-5 w-5 text-status-success" />
         </div>
         <div>
           <p className="font-medium text-emerald-800">All caught up!</p>
-          <p className="text-sm text-emerald-600">No urgent items need attention</p>
+          <p className="text-sm text-status-success">No urgent items need attention</p>
         </div>
         <PartyPopper className="h-5 w-5 text-emerald-500 ml-2" />
       </div>
@@ -495,9 +495,9 @@ function CriticalAlertsBanner({
 
   const colorMap: Record<string, string> = {
     rose: "bg-rose-100 text-rose-700 border-rose-200 hover:bg-rose-200",
-    amber: "bg-amber-100 text-amber-700 border-amber-200 hover:bg-amber-200",
-    orange: "bg-orange-100 text-orange-700 border-orange-200 hover:bg-orange-200",
-    blue: "bg-blue-100 text-blue-700 border-blue-200 hover:bg-blue-200",
+    amber: "bg-status-warning/15 text-status-warning border-status-warning/20 hover:bg-status-warning/25",
+    orange: "bg-status-warning/15 text-status-warning border-status-warning/20 hover:bg-status-warning/25",
+    blue: "bg-status-info/15 text-status-info border-status-info/20 hover:bg-status-info/25",
     purple: "bg-purple-100 text-purple-700 border-purple-200 hover:bg-purple-200",
   };
 
@@ -584,10 +584,10 @@ function MilestonesCelebration({ milestones }: { milestones: DashboardStats["mil
       </div>
 
       <CardHeader className="pb-2">
-        <CardTitle className="text-sm flex items-center gap-2 text-amber-800">
+        <CardTitle className="text-sm flex items-center gap-2 text-status-warning">
           <PartyPopper className="h-4 w-4 animate-bounce" style={{ animationDuration: "2s" }} />
           Tenure Milestones This Season
-          <Badge variant="secondary" className="bg-amber-100 text-amber-700 text-xs">
+          <Badge variant="secondary" className="bg-status-warning/15 text-status-warning text-xs">
             {milestones.length} celebration{milestones.length !== 1 ? "s" : ""}!
           </Badge>
         </CardTitle>
@@ -620,7 +620,7 @@ function MilestonesCelebration({ milestones }: { milestones: DashboardStats["mil
           })}
         </div>
         {milestones.length > 5 && (
-          <p className="text-xs text-amber-600 mt-2 flex items-center gap-1">
+          <p className="text-xs text-status-warning mt-2 flex items-center gap-1">
             <Gift className="h-3 w-3" />
             +{milestones.length - 5} more milestone{milestones.length - 5 !== 1 ? "s" : ""} to celebrate!
           </p>
@@ -684,7 +684,7 @@ function ChurnRiskCard({ guests }: { guests: DashboardStats["churnRiskGuests"] }
 
   const riskColors = {
     high: "bg-rose-100 text-rose-700 border-rose-200",
-    medium: "bg-amber-100 text-amber-700 border-amber-200",
+    medium: "bg-status-warning/15 text-status-warning border-status-warning/20",
     low: "bg-slate-100 text-slate-600 border-slate-200",
   };
 
@@ -783,9 +783,9 @@ function PaymentAgingCard({ aging }: { aging: DashboardStats["paymentAging"] }) 
   if (total === 0) return null;
 
   const segments = [
-    { key: "current", value: aging.current, color: "bg-emerald-500", label: "< 30 days", textColor: "text-emerald-700" },
-    { key: "days30", value: aging.days30, color: "bg-amber-500", label: "30-59 days", textColor: "text-amber-700" },
-    { key: "days60", value: aging.days60, color: "bg-orange-500", label: "60-89 days", textColor: "text-orange-700" },
+    { key: "current", value: aging.current, color: "bg-emerald-500", label: "< 30 days", textColor: "text-status-success" },
+    { key: "days30", value: aging.days30, color: "bg-amber-500", label: "30-59 days", textColor: "text-status-warning" },
+    { key: "days60", value: aging.days60, color: "bg-orange-500", label: "60-89 days", textColor: "text-status-warning" },
     { key: "days90Plus", value: aging.days90Plus, color: "bg-rose-600", label: "90+ days", textColor: "text-rose-700" },
   ];
 
@@ -833,15 +833,15 @@ function RenewalDeadlineCountdown({ deadline }: { deadline?: Date }) {
   const isSoon = daysUntil <= 30;
 
   return (
-    <Card className={`${isUrgent ? 'border-rose-300 bg-rose-50' : isSoon ? 'border-amber-300 bg-amber-50' : 'border-blue-200 bg-blue-50'}`}>
+    <Card className={`${isUrgent ? 'border-rose-300 bg-rose-50' : isSoon ? 'border-status-warning/30 bg-status-warning/15' : 'border-status-info/30 bg-status-info/15'}`}>
       <CardContent className="p-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className={`p-2 rounded-full ${isUrgent ? 'bg-rose-100' : isSoon ? 'bg-amber-100' : 'bg-blue-100'}`}>
-              <Timer className={`h-5 w-5 ${isUrgent ? 'text-rose-600' : isSoon ? 'text-amber-600' : 'text-blue-600'}`} />
+            <div className={`p-2 rounded-full ${isUrgent ? 'bg-rose-100' : isSoon ? 'bg-status-warning/15' : 'bg-status-info/15'}`}>
+              <Timer className={`h-5 w-5 ${isUrgent ? 'text-rose-600' : isSoon ? 'text-status-warning' : 'text-status-info'}`} />
             </div>
             <div>
-              <p className={`text-sm font-medium ${isUrgent ? 'text-rose-800' : isSoon ? 'text-amber-800' : 'text-blue-800'}`}>
+              <p className={`text-sm font-medium ${isUrgent ? 'text-rose-800' : isSoon ? 'text-status-warning' : 'text-status-info'}`}>
                 Renewal Deadline
               </p>
               <p className="text-xs text-slate-500">
@@ -850,7 +850,7 @@ function RenewalDeadlineCountdown({ deadline }: { deadline?: Date }) {
             </div>
           </div>
           <div className="text-right">
-            <div className={`text-2xl font-bold ${isUrgent ? 'text-rose-600' : isSoon ? 'text-amber-600' : 'text-blue-600'}`}>
+            <div className={`text-2xl font-bold ${isUrgent ? 'text-rose-600' : isSoon ? 'text-status-warning' : 'text-status-info'}`}>
               {daysUntil}
             </div>
             <div className="text-xs text-slate-500">days left</div>
@@ -886,7 +886,7 @@ function FloatingActionPanel({
     <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 animate-in slide-in-from-bottom-4 duration-300">
       <Card className="shadow-2xl border-slate-300 bg-white/95 backdrop-blur">
         <CardContent className="p-3 flex flex-wrap items-center gap-2 md:gap-3">
-          <Badge className="bg-blue-600 text-white px-3 py-1">
+          <Badge className="bg-status-info text-white px-3 py-1">
             {selectedCount} selected
           </Badge>
           <div className="h-6 w-px bg-slate-200 hidden md:block" />
@@ -908,15 +908,15 @@ function FloatingActionPanel({
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
               <DropdownMenuItem onClick={() => onBulkUpdate("committed")}>
-                <CheckCircle className="h-4 w-4 mr-2 text-emerald-600" />
+                <CheckCircle className="h-4 w-4 mr-2 text-status-success" />
                 Mark Committed
               </DropdownMenuItem>
               <DropdownMenuItem onClick={() => onBulkUpdate("likely")}>
-                <TrendingUp className="h-4 w-4 mr-2 text-green-600" />
+                <TrendingUp className="h-4 w-4 mr-2 text-status-success" />
                 Mark Likely
               </DropdownMenuItem>
               <DropdownMenuItem onClick={() => onBulkUpdate("undecided")}>
-                <Clock className="h-4 w-4 mr-2 text-amber-600" />
+                <Clock className="h-4 w-4 mr-2 text-status-warning" />
                 Mark Undecided
               </DropdownMenuItem>
               <DropdownMenuSeparator />
@@ -1071,7 +1071,7 @@ function SeasonalRow({
                 <Button
                   size="sm"
                   variant="outline"
-                  className="flex-1 text-emerald-600 border-emerald-200 hover:bg-emerald-50"
+                  className="flex-1 text-status-success border-status-success/20 hover:bg-status-success/10"
                   onClick={() => onQuickAction("renewal", "committed")}
                 >
                   <CheckCircle className="h-4 w-4 mr-1" />
@@ -1197,7 +1197,7 @@ function SeasonalRow({
                 <Button
                   size="sm"
                   variant="outline"
-                  className="text-emerald-600 hover:bg-emerald-50"
+                  className="text-status-success hover:bg-status-success/10"
                   onClick={() => onQuickAction("renewal", "committed")}
                 >
                   <CheckCircle className="h-4 w-4 mr-1" />
@@ -1228,7 +1228,7 @@ function WaitlistRow({
   return (
     <Card className="p-4">
       <div className="flex items-center gap-4">
-        <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-700 font-bold text-sm">
+        <div className="w-8 h-8 rounded-full bg-status-info/15 flex items-center justify-center text-status-info font-bold text-sm">
           #{entry.priority}
         </div>
         <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white font-medium">
@@ -1243,7 +1243,7 @@ function WaitlistRow({
         </div>
         <div className="flex items-center gap-2">
           {entry.depositPaid && (
-            <Badge className="bg-emerald-100 text-emerald-700">
+            <Badge className="bg-status-success/15 text-status-success">
               <DollarSign className="h-3 w-3 mr-1" />
               Deposit Paid
             </Badge>
@@ -1282,7 +1282,7 @@ function RateCardDisplay({
           <div className="flex items-center gap-2">
             <CardTitle className="text-base">{rateCard.name}</CardTitle>
             {rateCard.isDefault && (
-              <Badge className="bg-blue-100 text-blue-700">Default</Badge>
+              <Badge className="bg-status-info/15 text-status-info">Default</Badge>
             )}
           </div>
           <div className="flex gap-1">
@@ -1320,9 +1320,9 @@ function RateCardDisplay({
               <div className="space-y-1">
                 {rateCard.discounts?.map((d, i) => (
                   <div key={i} className="text-sm flex items-center gap-2">
-                    <Sparkles className="h-3 w-3 text-emerald-500" />
+                    <Sparkles className="h-3 w-3 text-status-success" />
                     <span>{d.name}</span>
-                    <span className="text-emerald-600 font-medium ml-auto">
+                    <span className="text-status-success font-medium ml-auto">
                       -{d.type === "percentage" ? `${d.value}%` : `$${d.value}`}
                     </span>
                   </div>
@@ -1365,11 +1365,11 @@ function MessageTemplateCard({
   onEdit: () => void;
 }) {
   const categoryColors: Record<string, string> = {
-    renewal: "bg-blue-100 text-blue-700",
-    payment: "bg-emerald-100 text-emerald-700",
+    renewal: "bg-status-info/15 text-status-info",
+    payment: "bg-status-success/15 text-status-success",
     general: "bg-slate-100 text-slate-700",
     welcome: "bg-purple-100 text-purple-700",
-    contract: "bg-amber-100 text-amber-700",
+    contract: "bg-status-warning/15 text-status-warning",
   };
 
   return (
@@ -1908,21 +1908,21 @@ export default function SeasonalsPage() {
           {/* TAB: RENEWALS */}
           <TabsContent value="renewals" className="space-y-4">
             <div className="grid md:grid-cols-4 gap-4">
-              <Card className="p-4 bg-emerald-50 border-emerald-200 cursor-pointer hover:shadow-md transition-all" onClick={() => setRenewalFilter("committed")}>
-                <div className="text-3xl font-bold text-emerald-700">{stats?.renewalsByIntent.committed || 0}</div>
-                <div className="text-sm text-emerald-600 flex items-center gap-1">
+              <Card className="p-4 bg-status-success/15 border-status-success/20 cursor-pointer hover:shadow-md transition-all" onClick={() => setRenewalFilter("committed")}>
+                <div className="text-3xl font-bold text-status-success">{stats?.renewalsByIntent.committed || 0}</div>
+                <div className="text-sm text-status-success flex items-center gap-1">
                   <CheckCircle className="h-4 w-4" /> Committed
                 </div>
               </Card>
-              <Card className="p-4 bg-green-50 border-green-200 cursor-pointer hover:shadow-md transition-all" onClick={() => setRenewalFilter("likely")}>
-                <div className="text-3xl font-bold text-green-700">{stats?.renewalsByIntent.likely || 0}</div>
-                <div className="text-sm text-green-600 flex items-center gap-1">
+              <Card className="p-4 bg-status-success/15 border-status-success/20 cursor-pointer hover:shadow-md transition-all" onClick={() => setRenewalFilter("likely")}>
+                <div className="text-3xl font-bold text-status-success">{stats?.renewalsByIntent.likely || 0}</div>
+                <div className="text-sm text-status-success flex items-center gap-1">
                   <TrendingUp className="h-4 w-4" /> Likely
                 </div>
               </Card>
-              <Card className="p-4 bg-amber-50 border-amber-200 cursor-pointer hover:shadow-md transition-all" onClick={() => setRenewalFilter("undecided")}>
-                <div className="text-3xl font-bold text-amber-700">{stats?.renewalsByIntent.undecided || 0}</div>
-                <div className="text-sm text-amber-600 flex items-center gap-1">
+              <Card className="p-4 bg-status-warning/15 border-status-warning/20 cursor-pointer hover:shadow-md transition-all" onClick={() => setRenewalFilter("undecided")}>
+                <div className="text-3xl font-bold text-status-warning">{stats?.renewalsByIntent.undecided || 0}</div>
+                <div className="text-sm text-status-warning flex items-center gap-1">
                   <Clock className="h-4 w-4" /> Undecided
                 </div>
               </Card>
@@ -1953,7 +1953,7 @@ export default function SeasonalsPage() {
                       className="flex items-center justify-between p-3 bg-slate-50 rounded-lg hover:bg-slate-100 transition-colors"
                     >
                       <div className="flex items-center gap-3">
-                        <div className="w-9 h-9 rounded-full bg-amber-100 flex items-center justify-center text-amber-700 font-medium text-sm">
+                        <div className="w-9 h-9 rounded-full bg-status-warning/15 flex items-center justify-center text-status-warning font-medium text-sm">
                           {seasonal.guest.primaryFirstName[0]}{seasonal.guest.primaryLastName[0]}
                         </div>
                         <div>
@@ -1978,7 +1978,7 @@ export default function SeasonalsPage() {
                         <Button
                           size="sm"
                           variant="outline"
-                          className="text-emerald-600 hover:bg-emerald-50"
+                          className="text-status-success hover:bg-status-success/10"
                           onClick={() => updateRenewalMutation.mutate({ id: seasonal.id, intent: "committed" })}
                         >
                           <CheckCircle className="h-4 w-4 mr-1" />
@@ -2009,9 +2009,9 @@ export default function SeasonalsPage() {
           {/* TAB: PAYMENTS */}
           <TabsContent value="payments" className="space-y-4">
             <div className="grid md:grid-cols-3 gap-4">
-              <Card className="p-4 bg-emerald-50 border-emerald-200">
-                <div className="text-3xl font-bold text-emerald-700">{stats?.paymentsCurrent || 0}</div>
-                <div className="text-sm text-emerald-600 flex items-center gap-1">
+              <Card className="p-4 bg-status-success/15 border-status-success/20">
+                <div className="text-3xl font-bold text-status-success">{stats?.paymentsCurrent || 0}</div>
+                <div className="text-sm text-status-success flex items-center gap-1">
                   <CheckCircle className="h-4 w-4" /> Current
                 </div>
               </Card>

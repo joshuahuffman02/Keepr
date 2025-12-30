@@ -113,7 +113,7 @@ export default function CalendarSettingsPage() {
             <button
               onClick={handleSave}
               disabled={saving}
-              className="px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 disabled:opacity-50"
+              className="px-4 py-2 bg-status-success text-white rounded-lg hover:bg-status-success/90 disabled:opacity-50"
             >
               {saving ? "Saving..." : saved ? <span className="flex items-center gap-1"><Check className="h-4 w-4" /> Saved</span> : "Save Settings"}
             </button>
@@ -215,7 +215,7 @@ export default function CalendarSettingsPage() {
                     setSettings({ ...settings, colorScheme: scheme.value as CalendarSettings["colorScheme"] })
                   }
                   className={`p-4 rounded-xl border text-left transition-all ${settings.colorScheme === scheme.value
-                    ? "border-emerald-500 bg-emerald-50 ring-2 ring-emerald-200"
+                    ? "border-status-success bg-status-success/15 ring-2 ring-status-success/30"
                     : "border-slate-200 hover:border-slate-300"
                     }`}
                 >

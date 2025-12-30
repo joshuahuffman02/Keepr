@@ -329,7 +329,7 @@ export default function WalletPage() {
                                                 initial={{ opacity: 0, y: 10 }}
                                                 animate={{ opacity: 1, y: 0 }}
                                                 className={`flex items-center justify-between p-4 rounded-lg border ${
-                                                    pm.isDefault ? "border-emerald-200 bg-emerald-50/50" : "border-border bg-muted/30"
+                                                    pm.isDefault ? "border-status-success/30 bg-status-success/15" : "border-border bg-muted/30"
                                                 }`}
                                             >
                                                 <div className="flex items-center gap-3">
@@ -346,7 +346,7 @@ export default function WalletPage() {
                                                                 •••• {pm.last4 || "****"}
                                                             </span>
                                                             {pm.isDefault && (
-                                                                <Badge className="bg-emerald-100 text-emerald-800 text-xs">
+                                                                <Badge className="bg-status-success/15 text-status-success border-status-success/30 text-xs">
                                                                     <Star className="w-3 h-3 mr-1" />
                                                                     Default
                                                                 </Badge>
@@ -371,10 +371,10 @@ export default function WalletPage() {
                                     </div>
                                 )}
 
-                                <div className="mt-4 p-3 bg-blue-50 rounded-lg border border-blue-100">
+                                <div className="mt-4 p-3 bg-status-info/15 rounded-lg border border-status-info/30">
                                     <div className="flex items-start gap-2">
-                                        <Shield className="w-4 h-4 text-blue-600 mt-0.5" />
-                                        <div className="text-xs text-blue-800">
+                                        <Shield className="w-4 h-4 text-status-info mt-0.5" />
+                                        <div className="text-xs text-status-info">
                                             <p className="font-medium">Secure Card Storage</p>
                                             <p className="mt-0.5">
                                                 Your cards are securely stored with Stripe. Refunds are automatically
@@ -397,15 +397,15 @@ export default function WalletPage() {
                             <CardContent>
                                 <ul className="space-y-2 text-sm text-muted-foreground">
                                     <li className="flex items-center gap-2">
-                                        <span className="h-2 w-2 rounded-full bg-emerald-500" />
+                                        <span className="h-2 w-2 rounded-full bg-status-success" />
                                         Use your wallet balance to pay for reservations
                                     </li>
                                     <li className="flex items-center gap-2">
-                                        <span className="h-2 w-2 rounded-full bg-emerald-500" />
+                                        <span className="h-2 w-2 rounded-full bg-status-success" />
                                         Pay for items at the camp store
                                     </li>
                                     <li className="flex items-center gap-2">
-                                        <span className="h-2 w-2 rounded-full bg-emerald-500" />
+                                        <span className="h-2 w-2 rounded-full bg-status-success" />
                                         Receive refunds directly to your wallet
                                     </li>
                                     <li className="flex items-center gap-2">

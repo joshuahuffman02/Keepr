@@ -266,7 +266,7 @@ export default function DevelopersSettingsPage() {
                                                 initial={{ scale: 0 }}
                                                 animate={{ scale: 1 }}
                                                 transition={{ type: "spring", stiffness: 300, damping: 20 }}
-                                                className="flex h-8 w-8 items-center justify-center rounded-full bg-emerald-100 text-emerald-600"
+                                                className="flex h-8 w-8 items-center justify-center rounded-full bg-status-success/15 text-status-success"
                                             >
                                                 <CheckCircle2 className="h-5 w-5" />
                                             </motion.div>
@@ -315,7 +315,7 @@ export default function DevelopersSettingsPage() {
                                                     className="shrink-0 transition-colors"
                                                 >
                                                     {copiedField === "clientId" ? (
-                                                        <CheckCircle2 className="h-4 w-4 text-emerald-600" />
+                                                        <CheckCircle2 className="h-4 w-4 text-status-success" />
                                                     ) : (
                                                         <Copy className="h-4 w-4" />
                                                     )}
@@ -327,7 +327,7 @@ export default function DevelopersSettingsPage() {
                                         <div className="space-y-2">
                                             <Label htmlFor="client-secret" className="text-sm font-medium flex items-center gap-2">
                                                 Client Secret
-                                                <span className="inline-flex items-center gap-1 rounded-full bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-800">
+                                                <span className="inline-flex items-center gap-1 rounded-full bg-status-warning/15 text-status-warning px-2 py-0.5 text-xs font-medium">
                                                     <AlertTriangle className="h-3 w-3" />
                                                     Copy now
                                                 </span>
@@ -360,7 +360,7 @@ export default function DevelopersSettingsPage() {
                                                     className="shrink-0"
                                                 >
                                                     {copiedField === "secret" ? (
-                                                        <CheckCircle2 className="h-4 w-4 text-emerald-600" />
+                                                        <CheckCircle2 className="h-4 w-4 text-status-success" />
                                                     ) : (
                                                         <Copy className="h-4 w-4" />
                                                     )}
@@ -512,8 +512,8 @@ export default function DevelopersSettingsPage() {
                                             <div key={endpoint.path} className="flex items-center gap-2 text-sm">
                                                 <span className={`rounded px-1.5 py-0.5 font-mono text-xs font-medium ${
                                                     endpoint.method === "GET"
-                                                        ? "bg-emerald-100 text-emerald-700"
-                                                        : "bg-blue-100 text-blue-700"
+                                                        ? "bg-status-success/15 text-status-success"
+                                                        : "bg-status-info/15 text-status-info"
                                                 }`}>
                                                     {endpoint.method}
                                                 </span>
@@ -637,7 +637,7 @@ export default function DevelopersSettingsPage() {
                                                 aria-label="Copy Client ID"
                                             >
                                                 {copiedField === `id-${client.id}` ? (
-                                                    <CheckCircle2 className="h-3 w-3 text-emerald-600" />
+                                                    <CheckCircle2 className="h-3 w-3 text-status-success" />
                                                 ) : (
                                                     <Copy className="h-3 w-3" />
                                                 )}
@@ -665,7 +665,7 @@ export default function DevelopersSettingsPage() {
                                                 aria-label={`${client.isActive ? "Deactivate" : "Activate"} ${client.name}`}
                                             />
                                             <span className={`text-xs font-medium ${
-                                                client.isActive ? "text-emerald-600" : "text-slate-400"
+                                                client.isActive ? "text-status-success" : "text-slate-400"
                                             }`}>
                                                 {client.isActive ? "Active" : "Inactive"}
                                             </span>
@@ -696,7 +696,7 @@ export default function DevelopersSettingsPage() {
                                                     <Button
                                                         variant="ghost"
                                                         size="icon"
-                                                        className="h-8 w-8 hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-900/20"
+                                                        className="h-8 w-8 hover:bg-status-error/15 hover:text-status-error dark:hover:bg-red-900/20"
                                                         title="Delete"
                                                         aria-label={`Delete ${client.name}`}
                                                     >

@@ -391,14 +391,14 @@ export default function ReservationsPage() {
 
   const statusBadge = (status: ReservationStatus) =>
     status === "confirmed"
-      ? "bg-emerald-100 text-emerald-700 border-emerald-200"
+      ? "bg-status-success/15 text-status-success border-status-success/30"
       : status === "checked_in"
-        ? "bg-blue-100 text-blue-700 border-blue-200"
+        ? "bg-status-info/15 text-status-info border-status-info/30"
         : status === "checked_out"
           ? "bg-slate-100 text-slate-700 border-slate-200"
           : status === "cancelled"
             ? "bg-rose-100 text-rose-700 border-rose-200"
-            : "bg-amber-100 text-amber-700 border-amber-200";
+            : "bg-status-warning/15 text-status-warning border-status-warning/30";
 
   const toggleDetails = useCallback(
     async (res: any, forceOpen?: boolean) => {
@@ -1034,7 +1034,7 @@ export default function ReservationsPage() {
         {flash && (
           <div
             className={`rounded-md border px-3 py-2 text-sm ${flash.type === "success"
-              ? "border-emerald-200 bg-emerald-50 text-emerald-800"
+              ? "border-status-success/30 bg-status-success/15 text-status-success"
               : flash.type === "error"
                 ? "border-rose-200 bg-rose-50 text-rose-700"
                 : "border-slate-200 bg-slate-50 text-slate-700"
@@ -1064,7 +1064,7 @@ export default function ReservationsPage() {
                 <div className="text-2xl font-semibold text-slate-900" data-testid="arrivals-today">
                   {arrivalsToday.length}
                 </div>
-                <div className="text-xs text-emerald-600 font-medium">Click to check in →</div>
+                <div className="text-xs text-status-success font-medium">Click to check in →</div>
               </CardContent>
             </Card>
           </Link>
@@ -1208,8 +1208,8 @@ export default function ReservationsPage() {
                   const statusClass = statusBadge(res.status as ReservationStatus);
                   const balanceClass =
                     balance > 0
-                      ? "border-amber-300 bg-amber-50 text-amber-800"
-                      : "border-emerald-300 bg-emerald-50 text-emerald-800";
+                      ? "border-status-warning/30 bg-status-warning/15 text-status-warning"
+                      : "border-status-success/30 bg-status-success/15 text-status-success";
                   return (
                     <tr key={res.id} className="hover:bg-slate-50">
                       <td className="px-3 py-2">
@@ -1273,7 +1273,7 @@ export default function ReservationsPage() {
                         </div>
                         <div className="flex items-center gap-2 text-xs text-slate-600 mt-1">
                           {activeFilterCount > 0 && (
-                            <span className="rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 px-2 py-0.5 text-[11px] font-semibold">
+                            <span className="rounded-full bg-status-success/15 text-status-success border border-status-success/30 px-2 py-0.5 text-[11px] font-semibold">
                               {activeFilterCount} filters
                             </span>
                           )}
@@ -1346,8 +1346,8 @@ export default function ReservationsPage() {
                   const statusClass = statusBadge(res.status as ReservationStatus);
                   const balanceClass =
                     balance > 0
-                      ? "border-amber-300 bg-amber-50 text-amber-800"
-                      : "border-emerald-300 bg-emerald-50 text-emerald-800";
+                      ? "border-status-warning/30 bg-status-warning/15 text-status-warning"
+                      : "border-status-success/30 bg-status-success/15 text-status-success";
                   return (
                     <tr key={res.id} className="hover:bg-slate-50">
                       <td className="px-3 py-2">
@@ -1411,7 +1411,7 @@ export default function ReservationsPage() {
                         </div>
                         <div className="flex items-center gap-2 text-xs text-slate-600 mt-1">
                           {activeFilterCount > 0 && (
-                            <span className="rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 px-2 py-0.5 text-[11px] font-semibold">
+                            <span className="rounded-full bg-status-success/15 text-status-success border border-status-success/30 px-2 py-0.5 text-[11px] font-semibold">
                               {activeFilterCount} filters
                             </span>
                           )}
@@ -1429,32 +1429,32 @@ export default function ReservationsPage() {
 
         <div className="grid gap-3">
             {overlapsListQuery.data && overlapsListQuery.data.length > 0 && (
-              <details className="rounded-lg border border-amber-200 bg-amber-50 text-sm text-amber-800">
-                <summary className="p-3 cursor-pointer hover:bg-amber-100 rounded-lg flex items-center justify-between">
+              <details className="rounded-lg border border-status-warning/30 bg-status-warning/15 text-sm text-status-warning">
+                <summary className="p-3 cursor-pointer hover:bg-status-warning/25 rounded-lg flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <span className="font-semibold text-amber-900">Overlapping reservations detected</span>
-                    <span className="px-2 py-0.5 rounded-full bg-amber-200 text-amber-800 text-xs font-medium">{overlapsListQuery.data.length}</span>
+                    <span className="font-semibold">Overlapping reservations detected</span>
+                    <span className="px-2 py-0.5 rounded-full bg-status-warning/25 text-xs font-medium">{overlapsListQuery.data.length}</span>
                   </div>
-                  <span className="text-xs text-amber-600">Click to expand</span>
+                  <span className="text-xs">Click to expand</span>
                 </summary>
-                <div className="px-3 pb-3 space-y-2 border-t border-amber-200">
-                  <div className="text-xs text-amber-700 pt-2">These reservations have conflicting dates on the same site. Update arrival/departure dates or move to a different site.</div>
+                <div className="px-3 pb-3 space-y-2 border-t border-status-warning/30">
+                  <div className="text-xs pt-2">These reservations have conflicting dates on the same site. Update arrival/departure dates or move to a different site.</div>
                   <div className="space-y-1">
                     {overlapsListQuery.data.map((row) => (
-                      <div key={`${row.reservationA}-${row.reservationB}`} className="flex flex-wrap items-center gap-2 text-xs p-2 bg-amber-100/50 rounded">
-                        <span className="font-semibold text-amber-900">{row.siteId}</span>
+                      <div key={`${row.reservationA}-${row.reservationB}`} className="flex flex-wrap items-center gap-2 text-xs p-2 bg-status-warning/25 rounded">
+                        <span className="font-semibold">{row.siteId}</span>
                         <span>
                           {row.arrivalA.slice(0, 10)} → {row.departureA.slice(0, 10)}
                         </span>
-                        <span className="text-amber-600">overlaps</span>
+                        <span>overlaps</span>
                         <span>
                           {row.arrivalB.slice(0, 10)} → {row.departureB.slice(0, 10)}
                         </span>
                         <span className="flex gap-2 ml-auto">
-                          <a className="underline text-amber-700 hover:text-amber-900" href={`/campgrounds/${campgroundId}/reservations/${row.reservationA}`}>
+                          <a className="underline hover:opacity-80" href={`/campgrounds/${campgroundId}/reservations/${row.reservationA}`}>
                             Fix A
                           </a>
-                          <a className="underline text-amber-700 hover:text-amber-900" href={`/campgrounds/${campgroundId}/reservations/${row.reservationB}`}>
+                          <a className="underline hover:opacity-80" href={`/campgrounds/${campgroundId}/reservations/${row.reservationB}`}>
                             Fix B
                           </a>
                         </span>
@@ -1469,7 +1469,7 @@ export default function ReservationsPage() {
                 <div className="text-xs font-semibold uppercase tracking-wide text-slate-500 flex items-center gap-2">
                   Filters & exports
                   {activeFilterCount > 0 && (
-                    <span className="rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 px-2 py-0.5 text-[11px] font-semibold">
+                    <span className="rounded-full bg-status-success/15 text-status-success border border-status-success/30 px-2 py-0.5 text-[11px] font-semibold">
                       {activeFilterCount} on
                     </span>
                   )}
@@ -1638,9 +1638,9 @@ export default function ReservationsPage() {
               </div>
             </div>
             {reservationsQuery.isLoading && <p className="text-slate-600">Loading…</p>}
-            {reservationsQuery.error && <p className="text-red-600">Error loading reservations</p>}
+            {reservationsQuery.error && <p className="text-status-error">Error loading reservations</p>}
             {selectedInView.length > 0 && (
-              <div className="rounded-lg border border-blue-200 bg-blue-50 p-3 flex flex-wrap items-center gap-2 text-sm text-slate-800">
+              <div className="rounded-lg border border-status-info/30 bg-status-info/15 p-3 flex flex-wrap items-center gap-2 text-sm text-slate-800">
                 <div className="font-semibold">{selectedInView.length} selected</div>
                 <div className="flex flex-wrap gap-2">
                   <Button
@@ -1687,7 +1687,7 @@ export default function ReservationsPage() {
                       {bulkFeedback.failed ? `, failed ${bulkFeedback.failed}` : ""}
                     </span>
                     <button
-                      className="text-emerald-700 hover:text-emerald-800 font-semibold"
+                      className="text-status-success hover:opacity-80 font-semibold"
                       onClick={() => setBulkFeedback(null)}
                     >
                       clear
@@ -1715,14 +1715,14 @@ export default function ReservationsPage() {
               const resOccupancyOver = resMaxOccupancy ? resOccupancy > resMaxOccupancy : false;
               const statusColor =
                 res.status === "confirmed"
-                  ? "bg-emerald-100 text-emerald-700 border-emerald-200"
+                  ? "bg-status-success/15 text-status-success border-status-success/30"
                   : res.status === "checked_in"
-                    ? "bg-blue-100 text-blue-700 border-blue-200"
+                    ? "bg-status-info/15 text-status-info border-status-info/30"
                     : res.status === "checked_out"
                       ? "bg-slate-100 text-slate-700 border-slate-200"
                       : res.status === "cancelled"
                         ? "bg-rose-100 text-rose-700 border-rose-200"
-                        : "bg-amber-100 text-amber-700 border-amber-200";
+                        : "bg-status-warning/15 text-status-warning border-status-warning/30";
               const suggestedDeposit =
                 campgroundQuery.data && total
                   ? computeDepositDue({
@@ -1788,7 +1788,7 @@ export default function ReservationsPage() {
                         ADR ${nights > 0 ? (total / nights).toFixed(2) : total.toFixed(2)}
                       </span>
                       {balance > 0 && (
-                        <span className="inline-flex items-center gap-2 rounded-full border border-amber-200 bg-amber-50 px-3 py-1 text-xs text-amber-700">
+                        <span className="inline-flex items-center gap-2 rounded-full border border-status-warning/30 bg-status-warning/15 px-3 py-1 text-xs text-status-warning">
                           Balance due ${balance.toFixed(2)}
                         </span>
                       )}
@@ -1800,15 +1800,15 @@ export default function ReservationsPage() {
                         <span
                           className={`rounded-full border px-2 py-0.5 text-[11px] ${
                             paid >= suggestedDeposit
-                              ? "border-emerald-200 bg-emerald-50 text-emerald-700"
-                              : "border-amber-200 bg-amber-50 text-amber-700"
+                              ? "border-status-success/30 bg-status-success/15 text-status-success"
+                              : "border-status-warning/30 bg-status-warning/15 text-status-warning"
                           }`}
                         >
                           {paid >= suggestedDeposit ? "Deposit covered" : `Deposit due $${Math.max(0, suggestedDeposit - paid).toFixed(2)}`}
                       </span>
                       )}
                       {wasSkipped && (
-                        <span className="rounded-full border border-amber-200 bg-amber-50 px-2 py-0.5 text-[11px] text-amber-800">
+                        <span className="rounded-full border border-status-warning/30 bg-status-warning/15 px-2 py-0.5 text-[11px] text-status-warning">
                           Skipped in bulk (status)
                         </span>
                       )}
@@ -2017,7 +2017,7 @@ export default function ReservationsPage() {
                               {topMatches.slice(0, 3).map((m) => (
                                 <button
                                   key={m.site.id}
-                                  className="rounded-md border border-emerald-200 bg-emerald-50 px-2 py-1 text-[11px] text-emerald-800 hover:border-emerald-300"
+                                  className="rounded-md border border-status-success/30 bg-status-success/15 px-2 py-1 text-[11px] text-status-success hover:border-status-success/50"
                                   onClick={() =>
                                     setEditing((prev) => ({
                                       ...prev,
@@ -2089,7 +2089,7 @@ export default function ReservationsPage() {
                           <div className="font-semibold">${total.toFixed(2)}</div>
                           <div className="text-xs text-slate-600">Paid ${paid.toFixed(2)} • Balance ${balance.toFixed(2)}</div>
                           {suggestedDeposit > 0 && (
-                            <div className="text-xs text-amber-700 mt-1">
+                            <div className="text-xs text-status-warning mt-1">
                               Deposit: ${suggestedDeposit.toFixed(2)} {paid >= suggestedDeposit ? "✔" : "← due"}
                             </div>
                           )}
@@ -2210,7 +2210,7 @@ export default function ReservationsPage() {
                             </Button>
                           </div>
                           {depositPaymentTooLow && (
-                            <div className="text-[11px] text-amber-700">
+                            <div className="text-[11px] text-status-warning">
                               Deposit shortfall ${depositShortfall.toFixed(2)} — collect at least this amount.
                             </div>
                           )}
@@ -2421,9 +2421,9 @@ export default function ReservationsPage() {
                         />
                       </div>
                       {manualOverride && (
-                        <div className="rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-xs text-amber-800 space-y-2">
-                          <div className="text-sm font-semibold text-amber-900">Manual pricing override</div>
-                          <div className="text-[11px] text-amber-700">Provide reason and approval to save discount/total changes.</div>
+                        <div className="rounded-md border border-status-warning/30 bg-status-warning/15 px-3 py-2 text-xs text-status-warning space-y-2">
+                          <div className="text-sm font-semibold">Manual pricing override</div>
+                          <div className="text-[11px]">Provide reason and approval to save discount/total changes.</div>
                           <div className="grid md:grid-cols-2 gap-2">
                             <input
                               className="rounded-md border border-amber-300 px-2 py-1 text-xs"
@@ -2515,7 +2515,7 @@ export default function ReservationsPage() {
                         </Button>
                       </div>
                       {(depositShortfall > 0 || overrideMissing || conflict?.conflict) && (
-                        <div className="text-[11px] text-amber-700">
+                        <div className="text-[11px] text-status-warning">
                           {depositShortfall > 0 && `Deposit shortfall $${depositShortfall.toFixed(2)} — collect before saving. `}
                           {overrideMissing && "Override reason + approver are required when editing totals. "}
                           {conflict?.conflict && "Resolve site conflicts before saving."}
@@ -2530,7 +2530,7 @@ export default function ReservationsPage() {
                               {(["all", "messages", "notes", "failed"] as const).map((f) => (
                                 <button
                                   key={f}
-                                  className={`rounded-full border px-2 py-1 text-[11px] ${commsFilter === f ? "border-emerald-300 bg-emerald-50 text-emerald-800" : "border-slate-200 text-slate-600"}`}
+                                  className={`rounded-full border px-2 py-1 text-[11px] ${commsFilter === f ? "border-status-success/30 bg-status-success/15 text-status-success" : "border-slate-200 text-slate-600"}`}
                                   onClick={() => setCommsFilter(f)}
                                 >
                                   {f === "failed" ? "Failed" : f === "messages" ? "Messages" : f[0].toUpperCase() + f.slice(1)}
@@ -2570,7 +2570,7 @@ export default function ReservationsPage() {
                             </Button>
                           </div>
                         </div>
-                        {commsErrors[res.id] && <div className="text-xs text-amber-700">{commsErrors[res.id]}</div>}
+                        {commsErrors[res.id] && <div className="text-xs text-status-warning">{commsErrors[res.id]}</div>}
                         {!commsLoading[res.id] && (commsByRes[res.id] || []).length === 0 && (
                           <div className="overflow-hidden rounded border border-slate-200 bg-white">
                             <table className="w-full text-sm">
@@ -2595,9 +2595,9 @@ export default function ReservationsPage() {
                           const status = c.status || "sent";
                           const statusClass =
                             status.startsWith("delivered") || status === "received"
-                              ? "bg-emerald-100 text-emerald-700 border border-emerald-200"
+                              ? "bg-status-success/15 text-status-success border border-status-success/30"
                               : status.includes("fail") || status.includes("bounce")
-                                ? "bg-red-100 text-red-700 border border-red-200"
+                                ? "bg-status-error/15 text-status-error border border-status-error/30"
                                 : "bg-slate-100 text-slate-700 border border-slate-200";
                           return (
                             <div key={c.id} className="rounded border border-slate-100 bg-slate-50 px-2 py-1 text-xs text-slate-700">
@@ -2606,8 +2606,8 @@ export default function ReservationsPage() {
                                 <span
                                   className={`px-2 py-0.5 rounded-full text-[10px] font-semibold ${
                                     c.direction === "outbound"
-                                      ? "bg-blue-100 text-blue-700 border border-blue-200"
-                                      : "bg-emerald-100 text-emerald-700 border border-emerald-200"
+                                      ? "bg-status-info/15 text-status-info border border-status-info/30"
+                                      : "bg-status-success/15 text-status-success border border-status-success/30"
                                   }`}
                                 >
                                   {c.direction}
@@ -2760,7 +2760,7 @@ export default function ReservationsPage() {
                           </div>
                         )}
                         {resQuoteLoading[res.id] && <div className="text-xs text-slate-500">Loading pricing breakdown…</div>}
-                        {resQuoteErrors[res.id] && <div className="text-xs text-amber-700">{resQuoteErrors[res.id]}</div>}
+                        {resQuoteErrors[res.id] && <div className="text-xs text-status-warning">{resQuoteErrors[res.id]}</div>}
                         {resQuotes[res.id] && (
                           <div className="text-xs text-slate-600">
                             Base ${(resQuotes[res.id].baseSubtotalCents / 100).toFixed(2)} • Rules{" "}
@@ -2775,7 +2775,7 @@ export default function ReservationsPage() {
                           </div>
                         )}
                         {ledgerLoading[res.id] && <div className="text-xs text-slate-600">Loading ledger…</div>}
-                        {ledgerErrors[res.id] && <div className="text-xs text-amber-700">{ledgerErrors[res.id]}</div>}
+                        {ledgerErrors[res.id] && <div className="text-xs text-status-warning">{ledgerErrors[res.id]}</div>}
                         {!ledgerLoading[res.id] && ledgerByRes[res.id] && ledgerByRes[res.id].length === 0 && (
                           <div className="overflow-hidden rounded border border-slate-200 bg-white">
                             <table className="w-full text-sm">

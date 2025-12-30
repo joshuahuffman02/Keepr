@@ -794,7 +794,7 @@ export default function MessagesPage() {
                     <Card className="group hover:shadow-md transition-shadow">
                         <CardHeader className="pb-2">
                             <CardTitle className="text-sm text-muted-foreground flex items-center gap-2">
-                                <MessageSquare className="h-4 w-4 transition-colors group-hover:text-blue-500" />
+                                <MessageSquare className="h-4 w-4 transition-colors group-hover:text-status-info" />
                                 Conversations
                             </CardTitle>
                         </CardHeader>
@@ -815,14 +815,14 @@ export default function MessagesPage() {
                     <Card className={cn(
                         "group transition-all",
                         overdueCount > 0
-                            ? "border-amber-300 dark:border-amber-700 bg-amber-50/50 dark:bg-amber-900/20 hover:shadow-amber-100 dark:hover:shadow-amber-900/50"
+                            ? "border-status-warning/30 bg-status-warning/15 hover:shadow-status-warning/20"
                             : "hover:shadow-md"
                     )}>
                         <CardHeader className="pb-2">
                             <CardTitle className="text-sm text-muted-foreground flex items-center gap-2">
                                 <Clock className={cn(
                                     "h-4 w-4 transition-colors",
-                                    overdueCount > 0 ? "text-amber-600 dark:text-amber-400" : "group-hover:text-emerald-500"
+                                    overdueCount > 0 ? "text-status-warning" : "group-hover:text-status-success"
                                 )} />
                                 Needs reply
                             </CardTitle>
@@ -831,8 +831,8 @@ export default function MessagesPage() {
                             <div className={cn(
                                 "text-2xl font-semibold",
                                 overdueCount > 0
-                                    ? "text-amber-700 dark:text-amber-400"
-                                    : "text-emerald-700 dark:text-emerald-400"
+                                    ? "text-status-warning"
+                                    : "text-status-success"
                             )}>
                                 {overdueCount}
                             </div>
@@ -843,7 +843,7 @@ export default function MessagesPage() {
                                 <Button
                                     size="sm"
                                     variant="outline"
-                                    className="mt-2 w-full border-amber-300 dark:border-amber-700 text-amber-700 dark:text-amber-400 hover:bg-amber-100 dark:hover:bg-amber-900/50 text-xs"
+                                    className="mt-2 w-full border-status-warning/30 text-status-warning hover:bg-status-warning/15 text-xs"
                                     onClick={() => {
                                         setActiveTab("guests");
                                         setGuestFilter("overdue");
@@ -912,7 +912,7 @@ export default function MessagesPage() {
                             <div className="flex items-center gap-2 text-xs text-muted-foreground">
                                 <span className="font-semibold text-foreground">Advanced Filters</span>
                                 {activeFilterCount > 0 && (
-                                    <span className="rounded-full bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800 px-2 py-0.5 text-[11px] font-semibold">
+                                    <span className="rounded-full bg-status-success/15 text-status-success border border-status-success/30 px-2 py-0.5 text-[11px] font-semibold">
                                         {activeFilterCount} active
                                     </span>
                                 )}
@@ -942,7 +942,7 @@ export default function MessagesPage() {
                                             className={cn(
                                                 "rounded-full border px-3 py-1 text-xs transition-colors",
                                                 statusFilter === f
-                                                    ? "border-emerald-300 dark:border-emerald-700 bg-emerald-50 dark:bg-emerald-900/30 text-emerald-800 dark:text-emerald-400 font-medium"
+                                                    ? "border-status-success/30 bg-status-success/15 text-status-success font-medium"
                                                     : "border-border text-muted-foreground hover:border-muted-foreground"
                                             )}
                                             onClick={() => setStatusFilter(f)}
@@ -1106,7 +1106,7 @@ export default function MessagesPage() {
                                             </div>
                                         </div>
                                         {overdueCount > 0 && guestFilter === "all" && (
-                                            <span className="text-amber-700 dark:text-amber-400 font-medium">
+                                            <span className="text-status-warning font-medium">
                                                 • {overdueCount} overdue
                                             </span>
                                         )}
@@ -1142,9 +1142,9 @@ export default function MessagesPage() {
                                                 initial={{ scale: 0 }}
                                                 animate={{ scale: 1 }}
                                                 transition={{ type: "spring", stiffness: 300, damping: 20 }}
-                                                className="flex h-14 w-14 items-center justify-center rounded-full bg-emerald-100 dark:bg-emerald-900/30"
+                                                className="flex h-14 w-14 items-center justify-center rounded-full bg-status-success/15 border border-status-success/30"
                                             >
-                                                <Sparkles className="h-7 w-7 text-emerald-600 dark:text-emerald-400" />
+                                                <Sparkles className="h-7 w-7 text-status-success" />
                                             </motion.div>
                                             <div>
                                                 <p className="font-semibold text-foreground">All caught up!</p>
@@ -1190,7 +1190,7 @@ export default function MessagesPage() {
                                                     selectedReservationId === conv.reservationId
                                                         ? "bg-primary/10 border border-primary/20 shadow-sm"
                                                         : isOverdue
-                                                        ? "bg-amber-50 dark:bg-amber-900/20 hover:bg-amber-100 dark:hover:bg-amber-900/30 border border-amber-200 dark:border-amber-800"
+                                                        ? "bg-status-warning/15 hover:bg-status-warning/20 border border-status-warning/30"
                                                         : "hover:bg-muted border border-transparent hover:border-border"
                                                 )}
                                             >
@@ -1198,14 +1198,14 @@ export default function MessagesPage() {
                                                 {isOverdue && (
                                                     <motion.div
                                                         layoutId={`overdue-${conv.reservationId}`}
-                                                        className="absolute left-0 top-0 bottom-0 w-1 bg-amber-500 dark:bg-amber-400 rounded-l-lg"
+                                                        className="absolute left-0 top-0 bottom-0 w-1 bg-status-warning rounded-l-lg"
                                                     />
                                                 )}
                                                 <div className="flex items-start justify-between gap-2">
                                                     <div className="font-medium truncate flex items-center gap-2 text-foreground">
                                                         {conv.guestName}
                                                         {isOverdue && (
-                                                            <Badge variant="outline" className="bg-amber-100 dark:bg-amber-900/50 text-amber-800 dark:text-amber-300 border-amber-300 dark:border-amber-700 text-[10px] px-1.5 py-0">
+                                                            <Badge variant="outline" className="bg-status-warning/15 text-status-warning border-status-warning/30 text-[10px] px-1.5 py-0">
                                                                 SLA
                                                             </Badge>
                                                         )}
@@ -1278,14 +1278,14 @@ export default function MessagesPage() {
                                                     selectedSmsConversationId === conv.conversationId
                                                         ? "bg-primary/10 border border-primary/20 shadow-sm"
                                                         : conv.unreadCount > 0
-                                                        ? "bg-blue-50 dark:bg-blue-900/20 hover:bg-blue-100 dark:hover:bg-blue-900/30 border border-blue-200 dark:border-blue-800"
+                                                        ? "bg-status-info/15 hover:bg-status-info/20 border border-status-info/30"
                                                         : "hover:bg-muted border border-transparent hover:border-border"
                                                 )}
                                             >
                                                 {conv.unreadCount > 0 && (
                                                     <motion.div
                                                         layoutId={`unread-sms-${conv.conversationId}`}
-                                                        className="absolute left-0 top-0 bottom-0 w-1 bg-blue-500 dark:bg-blue-400 rounded-l-lg"
+                                                        className="absolute left-0 top-0 bottom-0 w-1 bg-status-info rounded-l-lg"
                                                     />
                                                 )}
                                                 <div className="flex items-start justify-between gap-2">
@@ -1535,7 +1535,7 @@ export default function MessagesPage() {
                                                                             "inline-flex items-center gap-1 text-[10px] font-medium px-1.5 py-0.5 rounded mb-1.5",
                                                                             isOutbound
                                                                                 ? "bg-primary-foreground/20 text-primary-foreground hover:bg-primary-foreground/30"
-                                                                                : "bg-blue-100 text-blue-700 hover:bg-blue-200 dark:bg-blue-900/30 dark:text-blue-300"
+                                                                                : "bg-status-info/15 text-status-info hover:bg-status-info/20 border border-status-info/30"
                                                                         )}
                                                                     >
                                                                         <Tent className="h-3 w-3" />
@@ -1549,7 +1549,7 @@ export default function MessagesPage() {
                                                                     <Clock className="h-3 w-3" />
                                                                     {format(new Date(msg.createdAt), "h:mm a")}
                                                                     {isOutbound && msg.status === "sent" && (
-                                                                        <CheckCheck className="h-3 w-3 ml-1 text-emerald-400" />
+                                                                        <CheckCheck className="h-3 w-3 ml-1 text-status-success" />
                                                                     )}
                                                                 </div>
                                                             </div>
@@ -1693,8 +1693,8 @@ export default function MessagesPage() {
                                                 {selectedConversation.messages.map((msg, index) => {
                                                     const isStaff = msg.senderType === "staff";
                                                     const badgeClasses = isStaff
-                                                        ? "bg-blue-100 dark:bg-blue-900/50 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800"
-                                                        : "bg-emerald-100 dark:bg-emerald-900/50 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800";
+                                                        ? "bg-status-info/15 text-status-info border border-status-info/30"
+                                                        : "bg-status-success/15 text-status-success border border-status-success/30";
                                                     return (
                                                     <motion.div
                                                         key={msg.id}
@@ -1728,7 +1728,7 @@ export default function MessagesPage() {
                                                                         animate={{ scale: 1 }}
                                                                         transition={{ delay: 0.3, type: "spring" }}
                                                                     >
-                                                                        <CheckCheck className="h-3 w-3 ml-1 text-emerald-400" />
+                                                                        <CheckCheck className="h-3 w-3 ml-1 text-status-success" />
                                                                     </motion.div>
                                                                 )}
                                                             </div>
@@ -2172,7 +2172,7 @@ export default function MessagesPage() {
                                 <p className="text-xs text-muted-foreground text-right">
                                     {composeBody.length} / 160 characters
                                     {composeBody.length > 160 && (
-                                        <span className="text-amber-600 ml-1">(will be split into multiple messages)</span>
+                                        <span className="text-status-warning ml-1">(will be split into multiple messages)</span>
                                     )}
                                 </p>
                             )}

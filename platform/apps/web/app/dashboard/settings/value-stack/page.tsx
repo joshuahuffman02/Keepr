@@ -500,7 +500,7 @@ export default function ValueStackPage() {
             </div>
             <div className="flex items-center gap-4">
               {totalBonusValue > 0 && (
-                <Badge variant="secondary" className="bg-emerald-100 text-emerald-800">
+                <Badge variant="secondary" className="bg-status-success/15 text-status-success">
                   Total Value: ${(totalBonusValue / 100).toFixed(0)}
                 </Badge>
               )}

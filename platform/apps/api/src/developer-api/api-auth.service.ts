@@ -1,6 +1,6 @@
-import { BadRequestException, Injectable, UnauthorizedException } from "@nestjs/common";
+import { BadRequestException, Injectable, UnauthorizedException, Logger } from "@nestjs/common";
 import { PrismaService } from "../prisma/prisma.service";
-import { ApiScope } from "./types";
+import { ApiScope, ApiClientTier, TIER_LIMITS, DEFAULT_TIER_SCOPES } from "./types";
 import { randomBytes, createHash } from "crypto";
 import * as bcrypt from "bcryptjs";
 
@@ -19,6 +19,7 @@ const DEFAULT_SCOPES: ApiScope[] = [
 
 @Injectable()
 export class ApiAuthService {
+  private readonly logger = new Logger(ApiAuthService.name);
   private accessTtlSeconds = 3600;
 
   constructor(private readonly prisma: PrismaService) { }
@@ -99,11 +100,33 @@ export class ApiAuthService {
     };
   }
 
-  async createClient(input: { campgroundId: string; name: string; scopes?: ApiScope[] }) {
+  async createClient(input: {
+    campgroundId: string;
+    name: string;
+    scopes?: ApiScope[];
+    tier?: ApiClientTier;
+  }) {
     const clientId = `cg_${randomBytes(6).toString("hex")}`;
     const clientSecret = randomBytes(24).toString("hex");
     const hashedSecret = await bcrypt.hash(clientSecret, 12);
-    const scopes = (input.scopes && input.scopes.length ? input.scopes : DEFAULT_SCOPES) as string[];
+
+    // Determine tier and scopes
+    const tier = input.tier || ApiClientTier.FREE;
+    const tierLimits = TIER_LIMITS[tier];
+    const allowedTierScopes = DEFAULT_TIER_SCOPES[tier];
+
+    // Use provided scopes if valid for tier, otherwise use tier defaults
+    let scopes: string[];
+    if (input.scopes && input.scopes.length) {
+      // Filter scopes to only those allowed for the tier
+      const allowedSet = new Set(allowedTierScopes as string[]);
+      scopes = input.scopes.filter(s => allowedSet.has(s));
+      if (scopes.length === 0) {
+        scopes = allowedTierScopes as string[];
+      }
+    } else {
+      scopes = allowedTierScopes as string[];
+    }
 
     const client = await this.prisma.apiClient.create({
       data: {
@@ -111,11 +134,49 @@ export class ApiAuthService {
         name: input.name,
         clientId,
         clientSecretHash: hashedSecret,
-        scopes
+        scopes,
+        tier,
+        rateLimit: tierLimits.requestsPerHour,
       }
     });
 
+    this.logger.log(`Created API client ${clientId} for campground ${input.campgroundId} with tier ${tier}`);
+
     return { client, clientSecret };
+  }
+
+  /**
+   * Update client tier and associated limits
+   */
+  async updateClientTier(clientId: string, tier: ApiClientTier) {
+    const tierLimits = TIER_LIMITS[tier];
+    const allowedScopes = DEFAULT_TIER_SCOPES[tier] as string[];
+
+    const client = await this.prisma.apiClient.update({
+      where: { id: clientId },
+      data: {
+        tier,
+        rateLimit: tierLimits.requestsPerHour,
+        // Optionally update scopes to tier defaults (or leave existing)
+      },
+    });
+
+    this.logger.log(`Updated API client ${client.clientId} to tier ${tier}`);
+    return client;
+  }
+
+  /**
+   * Get client tier limits
+   */
+  getClientTierLimits(tier: ApiClientTier) {
+    return TIER_LIMITS[tier];
+  }
+
+  /**
+   * Get available scopes for a tier
+   */
+  getTierScopes(tier: ApiClientTier): ApiScope[] {
+    return DEFAULT_TIER_SCOPES[tier];
   }
 
   async listClients(campgroundId: string) {

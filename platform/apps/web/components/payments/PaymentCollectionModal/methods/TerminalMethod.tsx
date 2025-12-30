@@ -139,11 +139,11 @@ export function TerminalMethod({ onSuccess, onError, onCancel }: TerminalMethodP
     return (
       <div className="py-12 text-center space-y-4">
         {status === "success" ? (
-          <div className="h-16 w-16 rounded-full bg-green-100 mx-auto flex items-center justify-center">
-            <Check className="h-8 w-8 text-green-600" />
+          <div className="h-16 w-16 rounded-full bg-status-success/15 mx-auto flex items-center justify-center">
+            <Check className="h-8 w-8 text-status-success" />
           </div>
         ) : (
-          <Loader2 className="h-12 w-12 animate-spin mx-auto text-emerald-600" />
+          <Loader2 className="h-12 w-12 animate-spin mx-auto text-status-success" />
         )}
         <p className="text-slate-600 font-medium">{statusMessage}</p>
         {status === "waiting_for_card" && (
@@ -159,7 +159,7 @@ export function TerminalMethod({ onSuccess, onError, onCancel }: TerminalMethodP
     <div className="space-y-6">
       {/* Error display */}
       {error && (
-        <div className="flex items-center gap-2 text-sm text-red-600 bg-red-50 p-3 rounded-lg">
+        <div className="flex items-center gap-2 text-sm text-status-error bg-status-error/15 p-3 rounded-lg">
           <AlertCircle className="h-4 w-4 flex-shrink-0" />
           {error}
         </div>
@@ -167,7 +167,7 @@ export function TerminalMethod({ onSuccess, onError, onCancel }: TerminalMethodP
 
       {/* No online readers warning */}
       {!hasOnlineReaders && (
-        <div className="flex items-center gap-2 text-sm text-amber-600 bg-amber-50 p-3 rounded-lg">
+        <div className="flex items-center gap-2 text-sm text-status-warning bg-status-warning/15 p-3 rounded-lg">
           <WifiOff className="h-4 w-4 flex-shrink-0" />
           All card readers are offline
         </div>
@@ -190,7 +190,7 @@ export function TerminalMethod({ onSuccess, onError, onCancel }: TerminalMethodP
                 "flex items-center gap-3 p-4 border-2 rounded-lg transition-all",
                 isOnline ? "cursor-pointer" : "cursor-not-allowed opacity-60",
                 isSelected && isOnline
-                  ? "border-emerald-500 bg-emerald-50"
+                  ? "border-status-success bg-status-success/15"
                   : "border-slate-200 hover:border-slate-300"
               )}
               onClick={() => isOnline && setSelectedReaderId(reader.id)}
@@ -208,7 +208,7 @@ export function TerminalMethod({ onSuccess, onError, onCancel }: TerminalMethodP
                 <div
                   className={cn(
                     "absolute -bottom-1 -right-1 h-3 w-3 rounded-full border-2 border-white",
-                    isOnline ? "bg-green-500" : "bg-slate-400"
+                    isOnline ? "bg-status-success" : "bg-slate-400"
                   )}
                 />
               </div>
@@ -221,7 +221,7 @@ export function TerminalMethod({ onSuccess, onError, onCancel }: TerminalMethodP
                     className={cn(
                       "text-xs px-2 py-0.5 rounded",
                       isOnline
-                        ? "bg-green-100 text-green-700"
+                        ? "bg-status-success/15 text-status-success"
                         : "bg-slate-100 text-slate-500"
                     )}
                   >
@@ -233,7 +233,7 @@ export function TerminalMethod({ onSuccess, onError, onCancel }: TerminalMethodP
               {/* Selected indicator */}
               {isSelected && isOnline && (
                 <div className="flex-shrink-0">
-                  <div className="h-6 w-6 rounded-full bg-emerald-500 flex items-center justify-center">
+                  <div className="h-6 w-6 rounded-full bg-status-success flex items-center justify-center">
                     <Check className="h-4 w-4 text-white" />
                   </div>
                 </div>

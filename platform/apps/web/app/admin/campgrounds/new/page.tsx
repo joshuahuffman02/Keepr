@@ -172,10 +172,10 @@ Note: The admin will be required to change their password on first login.`;
     if (createdData) {
         return (
             <div className="max-w-2xl space-y-6">
-                <div className="bg-emerald-500/10 border border-emerald-500/30 rounded-lg p-6">
+                <div className="bg-status-success/15 border border-status-success/30 rounded-lg p-6">
                     <div className="flex items-center gap-3 mb-4">
-                        <div className="p-2 bg-emerald-500/20 rounded-full">
-                            <Check className="h-6 w-6 text-emerald-400" />
+                        <div className="p-2 bg-status-success/15 rounded-full">
+                            <Check className="h-6 w-6 text-status-success" />
                         </div>
                         <h2 className="text-xl font-bold text-white">Campground Created!</h2>
                     </div>
@@ -248,7 +248,7 @@ Note: The admin will be required to change their password on first login.`;
             </div>
 
             {error && (
-                <div className="bg-red-500/10 border border-red-500/20 rounded-lg p-4 text-red-400">
+                <div className="bg-status-error/15 border border-status-error/30 rounded-lg p-4 text-status-error">
                     {error}
                 </div>
             )}

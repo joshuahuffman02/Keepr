@@ -37,8 +37,8 @@ import { useWhoami } from "@/hooks/use-whoami";
 import { diffInDays, formatLocalDateInput, parseLocalDateInput } from "../calendar/utils";
 
 const SITE_TYPE_STYLES: Record<string, { label: string; badge: string; border: string }> = {
-  rv: { label: "RV", badge: "bg-emerald-100 text-emerald-700", border: "border-l-emerald-400" },
-  tent: { label: "Tent", badge: "bg-amber-100 text-amber-800", border: "border-l-amber-400" },
+  rv: { label: "RV", badge: "bg-status-success/15 text-status-success", border: "border-l-status-success" },
+  tent: { label: "Tent", badge: "bg-status-warning/15 text-status-warning", border: "border-l-status-warning" },
   cabin: { label: "Cabin", badge: "bg-rose-100 text-rose-700", border: "border-l-rose-400" },
   group: { label: "Group", badge: "bg-indigo-100 text-indigo-700", border: "border-l-indigo-400" },
   glamping: { label: "Glamp", badge: "bg-cyan-100 text-cyan-700", border: "border-l-cyan-400" },
@@ -726,17 +726,17 @@ function BookingLabPageInner() {
 
                   {selectedGuest ? (
                     <div className="space-y-3">
-                      <div className="rounded-xl border border-emerald-100 bg-emerald-50 px-4 py-3 text-xs text-emerald-800">
+                      <div className="rounded-xl border border-status-success/20 bg-status-success/15 px-4 py-3 text-xs text-status-success">
                         <div className="flex items-center gap-2">
                           <BadgeCheck className="h-4 w-4" />
                           <div className="font-semibold">{selectedGuest.primaryFirstName} {selectedGuest.primaryLastName}</div>
                         </div>
-                        <div className="mt-1 text-emerald-700">{selectedGuest.email}</div>
+                        <div className="mt-1">{selectedGuest.email}</div>
                         {selectedGuest.phone && (
-                          <div className="mt-1 text-emerald-700">{selectedGuest.phone}</div>
+                          <div className="mt-1">{selectedGuest.phone}</div>
                         )}
                         {guestStayedSet && !guestStayedSet.has(selectedGuest.id) && (
-                          <div className="mt-1 text-[11px] text-emerald-700/80">No prior stays at this campground</div>
+                          <div className="mt-1 text-[11px] opacity-80">No prior stays at this campground</div>
                         )}
                       </div>
                       <div className="space-y-2">
@@ -985,14 +985,14 @@ function BookingLabPageInner() {
                       <button
                         key={match.site.id}
                         type="button"
-                        className="w-full rounded-lg border border-emerald-100 bg-emerald-50 px-3 py-2 text-left text-sm"
+                        className="w-full rounded-lg border border-status-success/20 bg-status-success/15 px-3 py-2 text-left text-sm"
                         onClick={() => setFormData((prev) => ({ ...prev, siteId: match.site.id }))}
                       >
                         <div className="flex items-center justify-between">
-                          <div className="font-semibold text-emerald-800">{match.site.name}</div>
-                          <Badge className="bg-emerald-600 text-white text-[10px]">{match.score}%</Badge>
+                          <div className="font-semibold text-status-success">{match.site.name}</div>
+                          <Badge className="bg-status-success text-white text-[10px]">{match.score}%</Badge>
                         </div>
-                        <div className="text-xs text-emerald-700">{match.reasons?.[0] || "High match"}</div>
+                        <div className="text-xs text-status-success">{match.reasons?.[0] || "High match"}</div>
                       </button>
                     ))}
                   </div>
@@ -1073,7 +1073,7 @@ function BookingLabPageInner() {
                           type="button"
                           className={cn(
                             "rounded-xl border border-l-4 p-3 text-left transition-all",
-                            isSelected ? "border-emerald-400 bg-emerald-50" : "border-slate-200 hover:border-emerald-300",
+                            isSelected ? "border-status-success bg-status-success/15" : "border-slate-200 hover:border-status-success/50",
                             isDisabled && "opacity-60 cursor-not-allowed",
                             meta.border
                           )}
@@ -1262,7 +1262,7 @@ function BookingLabPageInner() {
                         </div>
                       </div>
                       {cashShortCents > 0 && (
-                        <div className="mt-2 text-xs text-amber-600">
+                        <div className="mt-2 text-xs text-status-warning">
                           Cash received is short by ${(cashShortCents / 100).toFixed(2)}.
                         </div>
                       )}

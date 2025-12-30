@@ -97,9 +97,9 @@ export default function DynamicPricingPage({ params }: { params: { campgroundId:
           </div>
         </div>
 
-        <Alert className="bg-purple-50 border-purple-200">
-          <Info className="h-4 w-4 text-purple-500" />
-          <AlertDescription className="text-purple-800">
+        <Alert className="bg-status-info/15">
+          <Info className="h-4 w-4 text-status-info" />
+          <AlertDescription className="text-status-info">
             Dynamic pricing rules automatically adjust your rates based on occupancy,
             demand, and booking patterns. Use the Quick Settings for common adjustments
             or Advanced Rules for full control.
@@ -154,7 +154,7 @@ export default function DynamicPricingPage({ params }: { params: { campgroundId:
                         </div>
                         <div className="flex items-center gap-4">
                           <span className={`text-lg font-bold ${
-                            rule.adjustmentValue >= 0 ? "text-emerald-600" : "text-rose-600"
+                            rule.adjustmentValue >= 0 ? "text-status-success" : "text-status-error"
                           }`}>
                             {formatAdjustment(rule)}
                           </span>
@@ -197,7 +197,7 @@ export default function DynamicPricingPage({ params }: { params: { campgroundId:
                             {typeLabels[rule.type] || rule.type}
                           </span>
                           {!rule.active && (
-                            <span className="text-xs px-2 py-0.5 rounded-full bg-amber-100 text-amber-700">
+                            <span className="text-xs px-2 py-0.5 rounded-full bg-status-warning/15 text-status-warning">
                               Inactive
                             </span>
                           )}

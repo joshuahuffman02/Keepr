@@ -33,6 +33,11 @@ export enum RealtimeEvent {
 
   // Calendar sync
   CALENDAR_SYNC = "calendar.sync",
+
+  // Yield management events
+  YIELD_METRICS_UPDATED = "yield.metrics_updated",
+  YIELD_RECOMMENDATION_GENERATED = "yield.recommendation_generated",
+  YIELD_FORECAST_UPDATED = "yield.forecast_updated",
 }
 
 export interface ReservationEventData {
@@ -79,6 +84,48 @@ export interface NotificationData {
   message: string;
   priority?: "low" | "medium" | "high";
   actionUrl?: string;
+}
+
+export interface YieldMetricsUpdatedData {
+  todayOccupancy: number;
+  todayRevenue: number;
+  todayADR: number;
+  todayRevPAN: number;
+  periodOccupancy: number;
+  periodRevenue: number;
+  next7DaysOccupancy: number;
+  next30DaysOccupancy: number;
+  gapNights: number;
+  pendingRecommendations: number;
+  potentialRevenue: number;
+  triggeredBy?: "reservation" | "payment" | "scheduled" | "manual";
+}
+
+export interface YieldRecommendationData {
+  recommendationId: string;
+  siteClassId?: string;
+  siteClassName?: string;
+  dateStart: string;
+  dateEnd: string;
+  currentPrice: number;
+  suggestedPrice: number;
+  adjustmentPercent: number;
+  estimatedRevenueDelta: number;
+  confidence: number;
+  reason: string;
+}
+
+export interface YieldForecastUpdatedData {
+  forecasts: Array<{
+    date: string;
+    occupiedSites: number;
+    totalSites: number;
+    occupancyPct: number;
+    projectedRevenue: number;
+  }>;
+  avgOccupancy7Days: number;
+  avgOccupancy30Days: number;
+  totalProjectedRevenue: number;
 }
 
 /**
@@ -220,6 +267,37 @@ export class RealtimeService {
   emitCalendarSync(campgroundId: string, data: { siteIds?: string[]; startDate?: string; endDate?: string }) {
     this.logger.debug(`Emitting calendar.sync for ${campgroundId}`);
     this.gateway.emitToCampground(campgroundId, RealtimeEvent.CALENDAR_SYNC, data);
+  }
+
+  // ============================================
+  // Yield Management Events
+  // ============================================
+
+  emitYieldMetricsUpdated(campgroundId: string, data: YieldMetricsUpdatedData) {
+    this.logger.debug(`Emitting yield.metrics_updated for ${campgroundId}`);
+    this.gateway.emitToDashboard(
+      campgroundId,
+      RealtimeEvent.YIELD_METRICS_UPDATED,
+      data
+    );
+  }
+
+  emitYieldRecommendationGenerated(campgroundId: string, data: YieldRecommendationData) {
+    this.logger.debug(`Emitting yield.recommendation_generated for ${campgroundId}`);
+    this.gateway.emitToDashboard(
+      campgroundId,
+      RealtimeEvent.YIELD_RECOMMENDATION_GENERATED,
+      data
+    );
+  }
+
+  emitYieldForecastUpdated(campgroundId: string, data: YieldForecastUpdatedData) {
+    this.logger.debug(`Emitting yield.forecast_updated for ${campgroundId}`);
+    this.gateway.emitToDashboard(
+      campgroundId,
+      RealtimeEvent.YIELD_FORECAST_UPDATED,
+      data
+    );
   }
 
   // ============================================

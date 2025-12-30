@@ -57,7 +57,7 @@ export default function WelcomePacket() {
                 <div className="absolute inset-0 bg-gradient-to-t from-slate-900/90 to-transparent" />
                 <div className="absolute bottom-0 left-0 right-0 p-6 text-white">
                     <div className="max-w-md mx-auto">
-                        <p className="text-emerald-400 font-medium mb-1 uppercase tracking-wider text-xs">Welcome to {reservation.campground.name}</p>
+                        <p className="text-status-success font-medium mb-1 uppercase tracking-wider text-xs">Welcome to {reservation.campground.name}</p>
                         <h1 className="text-3xl font-bold mb-2">Hi, {reservation.guest.primaryFirstName}!</h1>
                         <p className="text-slate-300">
                             {isToday ? "Your adventure begins today!" :
@@ -77,8 +77,8 @@ export default function WelcomePacket() {
                             <h2 className="text-2xl font-bold text-slate-900">{reservation.site.siteNumber}</h2>
                             <p className="text-sm text-slate-600">{reservation.site.siteClass?.name || "Standard Site"}</p>
                         </div>
-                        <div className="bg-emerald-100 p-2 rounded-lg">
-                            <MapPin className="h-6 w-6 text-emerald-600" />
+                        <div className="bg-status-success/15 p-2 rounded-lg">
+                            <MapPin className="h-6 w-6 text-status-success" />
                         </div>
                     </div>
 
@@ -95,7 +95,7 @@ export default function WelcomePacket() {
                         </div>
                     </div>
 
-                    <Button className="w-full bg-emerald-600 hover:bg-emerald-700 text-white">
+                    <Button className="w-full bg-status-success hover:bg-status-success/90 text-white">
                         <Navigation className="h-4 w-4 mr-2" />
                         Get Directions to Site
                     </Button>
@@ -104,13 +104,13 @@ export default function WelcomePacket() {
                 {/* Quick Actions Grid */}
                 <div className="grid grid-cols-2 gap-4">
                     <div className="bg-white p-4 rounded-xl shadow-sm border border-slate-100 flex flex-col items-center text-center">
-                        <Wifi className="h-6 w-6 text-blue-500 mb-2" />
+                        <Wifi className="h-6 w-6 text-status-info mb-2" />
                         <h3 className="font-semibold text-slate-900 text-sm">WiFi Access</h3>
                         <p className="text-xs text-slate-500 mt-1">Network: CampGuest</p>
                         <p className="text-xs font-mono bg-slate-100 px-2 py-1 rounded mt-2">Pass: happycamper</p>
                     </div>
                     <div className="bg-white p-4 rounded-xl shadow-sm border border-slate-100 flex flex-col items-center text-center">
-                        <CloudSun className="h-6 w-6 text-amber-500 mb-2" />
+                        <CloudSun className="h-6 w-6 text-status-warning mb-2" />
                         <h3 className="font-semibold text-slate-900 text-sm">Weather</h3>
                         <p className="text-xs text-slate-500 mt-1">Sunny, 75°F</p>
                         <p className="text-xs text-slate-400">Perfect for hiking!</p>
@@ -129,7 +129,7 @@ export default function WelcomePacket() {
                         </p>
                         <div className="space-y-3">
                             <div className="flex items-center gap-3 p-2 hover:bg-slate-50 rounded-lg cursor-pointer transition-colors">
-                                <div className="h-10 w-10 bg-green-100 rounded-lg flex items-center justify-center text-green-600">
+                                <div className="h-10 w-10 bg-status-success/15 rounded-lg flex items-center justify-center text-status-success">
                                     <Navigation className="h-5 w-5" />
                                 </div>
                                 <div>
@@ -138,7 +138,7 @@ export default function WelcomePacket() {
                                 </div>
                             </div>
                             <div className="flex items-center gap-3 p-2 hover:bg-slate-50 rounded-lg cursor-pointer transition-colors">
-                                <div className="h-10 w-10 bg-orange-100 rounded-lg flex items-center justify-center text-orange-600">
+                                <div className="h-10 w-10 bg-status-warning/15 rounded-lg flex items-center justify-center text-status-warning">
                                     <ExternalLink className="h-5 w-5" />
                                 </div>
                                 <div>

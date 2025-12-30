@@ -232,9 +232,9 @@ export default function SeasonalRatesSettingsPage() {
     const getRateTypeColor = (type: string) => {
         switch (type) {
             case "nightly": return "bg-indigo-100 text-indigo-600";
-            case "weekly": return "bg-blue-100 text-blue-600";
+            case "weekly": return "bg-status-info/15 text-status-info";
             case "monthly": return "bg-teal-100 text-teal-600";
-            case "seasonal": return "bg-amber-100 text-amber-600";
+            case "seasonal": return "bg-status-warning/15 text-status-warning";
             default: return "bg-slate-100 text-slate-600";
         }
     };

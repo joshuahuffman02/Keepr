@@ -208,7 +208,7 @@ function PageCard({ page, isPinned, onTogglePin }: PageCardProps) {
         className={cn(
           "absolute top-3 right-3 w-8 h-8 rounded-lg flex items-center justify-center transition-all",
           isPinned
-            ? "bg-amber-100 text-amber-600"
+            ? "bg-status-warning/15 text-status-warning"
             : "bg-slate-100 text-slate-400 opacity-0 group-hover:opacity-100"
         )}
         title={isPinned ? "Unpin from menu" : "Pin to menu"}

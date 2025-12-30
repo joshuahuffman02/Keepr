@@ -295,9 +295,9 @@ export default function PromotionsPage() {
       </div>
 
       {/* Info */}
-      <Alert className="bg-orange-50 border-orange-200">
-        <Tag className="h-4 w-4 text-orange-500" />
-        <AlertDescription className="text-orange-800">
+      <Alert className="bg-amber-50 border-amber-200">
+        <Tag className="h-4 w-4 text-amber-600" />
+        <AlertDescription className="text-amber-800">
           Promo codes can be applied during booking to give guests discounts.
           Set expiration dates and usage limits to control availability.
         </AlertDescription>
@@ -308,8 +308,8 @@ export default function PromotionsPage() {
         <Card>
           <CardContent className="pt-6">
             <div className="flex items-center gap-3">
-              <div className="p-2 rounded-lg bg-orange-100">
-                <Tag className="h-5 w-5 text-orange-600" />
+              <div className="p-2 rounded-lg bg-amber-100">
+                <Tag className="h-5 w-5 text-amber-600" />
               </div>
               <div>
                 <p className="text-2xl font-bold text-slate-900">{promotions.length}</p>
@@ -321,8 +321,8 @@ export default function PromotionsPage() {
         <Card>
           <CardContent className="pt-6">
             <div className="flex items-center gap-3">
-              <div className="p-2 rounded-lg bg-emerald-100">
-                <Tag className="h-5 w-5 text-emerald-600" />
+              <div className="p-2 rounded-lg bg-status-success/15">
+                <Tag className="h-5 w-5 text-status-success" />
               </div>
               <div>
                 <p className="text-2xl font-bold text-slate-900">{activeCount}</p>
@@ -334,8 +334,8 @@ export default function PromotionsPage() {
         <Card>
           <CardContent className="pt-6">
             <div className="flex items-center gap-3">
-              <div className="p-2 rounded-lg bg-blue-100">
-                <DollarSign className="h-5 w-5 text-blue-600" />
+              <div className="p-2 rounded-lg bg-status-info/15">
+                <DollarSign className="h-5 w-5 text-status-info" />
               </div>
               <div>
                 <p className="text-2xl font-bold text-slate-900">
@@ -379,8 +379,8 @@ export default function PromotionsPage() {
                     />
                     <div className={`p-3 rounded-lg ${
                       promo.type === "percentage"
-                        ? "bg-blue-100 text-blue-600"
-                        : "bg-green-100 text-green-600"
+                        ? "bg-status-info/15 text-status-info"
+                        : "bg-status-success/15 text-status-success"
                     }`}>
                       {promo.type === "percentage" ? (
                         <Percent className="h-5 w-5" />

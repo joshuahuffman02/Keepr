@@ -50,10 +50,10 @@ const STATUS_OPTIONS = ["all", "scheduled", "in_progress", "submitted", "approve
 
 const STATUS_COLORS: Record<string, { bg: string; text: string; dot: string }> = {
   scheduled: { bg: "bg-slate-100", text: "text-slate-700", dot: "bg-slate-400" },
-  in_progress: { bg: "bg-blue-100", text: "text-blue-700", dot: "bg-blue-500" },
-  submitted: { bg: "bg-amber-100", text: "text-amber-700", dot: "bg-amber-500" },
-  approved: { bg: "bg-emerald-100", text: "text-emerald-700", dot: "bg-emerald-500" },
-  rejected: { bg: "bg-red-100", text: "text-red-700", dot: "bg-red-500" },
+  in_progress: { bg: "bg-status-info/15", text: "text-status-info", dot: "bg-status-info" },
+  submitted: { bg: "bg-status-warning/15", text: "text-status-warning", dot: "bg-status-warning" },
+  approved: { bg: "bg-status-success/15", text: "text-status-success", dot: "bg-status-success" },
+  rejected: { bg: "bg-status-error/15", text: "text-status-error", dot: "bg-status-error" },
 };
 
 const SPRING_CONFIG = {
@@ -630,7 +630,7 @@ export default function StaffSchedulingPage({ params }: { params: { campgroundId
               </div>
               <div className={cn(
                 "w-12 h-12 rounded-xl flex items-center justify-center",
-                pendingApprovalCount > 0 ? "bg-amber-100" : "bg-emerald-100"
+                pendingApprovalCount > 0 ? "bg-status-warning/15" : "bg-status-success/15"
               )}>
                 {pendingApprovalCount > 0 ? (
                   <Clock className="w-6 h-6 text-amber-600" />
@@ -663,7 +663,7 @@ export default function StaffSchedulingPage({ params }: { params: { campgroundId
               </div>
               <div className={cn(
                 "w-12 h-12 rounded-xl flex items-center justify-center",
-                conflicts.size > 0 ? "bg-red-100" : "bg-emerald-100"
+                conflicts.size > 0 ? "bg-status-error/15" : "bg-status-success/15"
               )}>
                 {conflicts.size > 0 ? (
                   <AlertCircle className="w-6 h-6 text-red-600" />
@@ -810,7 +810,7 @@ export default function StaffSchedulingPage({ params }: { params: { campgroundId
 
               {/* Error */}
               {error && (
-                <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 flex items-center gap-2">
+                <div className="rounded-lg border bg-status-error/15 px-4 py-3 text-sm text-status-error flex items-center gap-2">
                   <AlertCircle className="w-4 h-4 flex-shrink-0" />
                   {error}
                 </div>
@@ -965,7 +965,7 @@ export default function StaffSchedulingPage({ params }: { params: { campgroundId
                           transition={{ ...SPRING_CONFIG, delay: index * 0.03 }}
                           className={cn(
                             "rounded-xl border p-4 transition-colors",
-                            conflicts.has(shift.id) ? "border-red-300 bg-red-50" : "border-slate-200 hover:bg-slate-50"
+                            conflicts.has(shift.id) ? "bg-status-error/15" : "border-slate-200 hover:bg-slate-50"
                           )}
                         >
                           <div className="flex items-center justify-between">
@@ -1034,7 +1034,7 @@ export default function StaffSchedulingPage({ params }: { params: { campgroundId
                                   whileTap={{ scale: 0.98 }}
                                   disabled={processing.has(shift.id)}
                                   onClick={() => approveShift(shift.id)}
-                                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-100 text-emerald-700 text-xs font-medium hover:bg-emerald-200 transition-colors"
+                                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-status-success/15 text-status-success text-xs font-medium hover:bg-status-success/25 transition-colors"
                                 >
                                   {processing.has(shift.id) ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <CheckCircle2 className="w-3.5 h-3.5" />}
                                   Approve
@@ -1044,7 +1044,7 @@ export default function StaffSchedulingPage({ params }: { params: { campgroundId
                                   whileTap={{ scale: 0.98 }}
                                   disabled={processing.has(shift.id)}
                                   onClick={() => rejectShift(shift.id)}
-                                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-red-100 text-red-700 text-xs font-medium hover:bg-red-200 transition-colors"
+                                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-status-error/15 text-status-error text-xs font-medium hover:bg-status-error/25 transition-colors"
                                 >
                                   Reject
                                 </motion.button>
@@ -1156,7 +1156,7 @@ export default function StaffSchedulingPage({ params }: { params: { campgroundId
                                   transition={{ delay: index * 0.02 }}
                                   className={cn(
                                     "rounded-lg border p-3 cursor-grab active:cursor-grabbing transition-shadow hover:shadow-md",
-                                    conflicts.has(shift.id) ? "border-red-300 bg-red-50" : "border-slate-200 bg-white"
+                                    conflicts.has(shift.id) ? "bg-status-error/15" : "border-slate-200 bg-white"
                                   )}
                                   draggable
                                   onDragStart={() => handleDragStart(shift.id)}

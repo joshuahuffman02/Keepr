@@ -28,9 +28,9 @@ function getAuthHeaders(): Record<string, string> {
 }
 
 const typeColors = {
-    info: "bg-blue-500/20 text-blue-400 border-blue-500/30",
-    warning: "bg-amber-500/20 text-amber-400 border-amber-500/30",
-    success: "bg-emerald-500/20 text-emerald-400 border-emerald-500/30",
+    info: "bg-status-info/15 text-status-info border-status-info/30",
+    warning: "bg-status-warning/15 text-status-warning border-status-warning/30",
+    success: "bg-status-success/15 text-status-success border-status-success/30",
 };
 
 export default function AnnouncementsPage() {
@@ -146,7 +146,7 @@ export default function AnnouncementsPage() {
             </div>
 
             {error && (
-                <div className="bg-red-500/10 border border-red-500/20 rounded-lg p-4 text-red-400">
+                <div className="bg-status-error/15 border border-status-error/30 rounded-lg p-4 text-status-error">
                     {error}
                 </div>
             )}

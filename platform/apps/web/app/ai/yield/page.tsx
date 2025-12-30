@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useState, useCallback } from "react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { motion } from "framer-motion";
 import { apiClient } from "@/lib/api-client";
 import { DashboardShell } from "@/components/ui/layout/DashboardShell";
@@ -32,6 +32,14 @@ import {
 import { format } from "date-fns";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
+import {
+  useYieldUpdates,
+  useRealtime,
+  YieldMetricsUpdatedData,
+  YieldRecommendationData,
+  YieldForecastUpdatedData,
+} from "@/hooks/use-realtime";
+import { useToast } from "@/hooks/use-toast";
 
 const SPRING_CONFIG = {
   type: "spring" as const,
@@ -66,12 +74,95 @@ function getChangeColor(value: number): string {
 
 export default function YieldDashboardPage() {
   const [selectedPeriod] = useState<"7d" | "30d" | "90d">("30d");
+  const queryClient = useQueryClient();
+  const { toast } = useToast();
+  const { isConnected } = useRealtime();
 
   const { data, isLoading, error } = useQuery({
     queryKey: ["yield-dashboard"],
     queryFn: () => apiClient.getYieldDashboard("current"),
     enabled: typeof window !== "undefined",
-    refetchInterval: 60000, // Refresh every minute
+    refetchInterval: 60000, // Refresh every minute (fallback for when WebSocket is disconnected)
+  });
+
+  // Handle real-time yield metrics updates
+  const handleMetricsUpdated = useCallback(
+    (eventData: YieldMetricsUpdatedData) => {
+      // Optimistically update the cache with new metrics
+      queryClient.setQueryData(["yield-dashboard"], (oldData: typeof data) => {
+        if (!oldData) return oldData;
+        return {
+          ...oldData,
+          metrics: {
+            ...oldData.metrics,
+            todayOccupancy: eventData.todayOccupancy,
+            todayRevenue: eventData.todayRevenue,
+            todayADR: eventData.todayADR,
+            todayRevPAN: eventData.todayRevPAN,
+            periodOccupancy: eventData.periodOccupancy,
+            periodRevenue: eventData.periodRevenue,
+            next7DaysOccupancy: eventData.next7DaysOccupancy,
+            next30DaysOccupancy: eventData.next30DaysOccupancy,
+            gapNights: eventData.gapNights,
+            pendingRecommendations: eventData.pendingRecommendations,
+            potentialRevenue: eventData.potentialRevenue,
+          },
+        };
+      });
+
+      // Show a subtle notification for significant changes
+      if (eventData.triggeredBy === "reservation") {
+        toast({
+          title: "Metrics Updated",
+          description: "Yield metrics refreshed after booking change",
+          duration: 3000,
+        });
+      }
+    },
+    [queryClient, toast]
+  );
+
+  // Handle new pricing recommendations
+  const handleRecommendationGenerated = useCallback(
+    (eventData: YieldRecommendationData) => {
+      // Invalidate to refetch recommendations
+      queryClient.invalidateQueries({ queryKey: ["yield-dashboard"] });
+
+      toast({
+        title: "New Pricing Recommendation",
+        description: `${eventData.reason} - potential +${formatCurrency(eventData.estimatedRevenueDelta)}`,
+        duration: 5000,
+      });
+    },
+    [queryClient, toast]
+  );
+
+  // Handle forecast updates
+  const handleForecastUpdated = useCallback(
+    (eventData: YieldForecastUpdatedData) => {
+      // Update forecast data in cache
+      queryClient.setQueryData(["yield-dashboard"], (oldData: typeof data) => {
+        if (!oldData) return oldData;
+        return {
+          ...oldData,
+          forecasts: eventData.forecasts,
+          metrics: {
+            ...oldData.metrics,
+            next7DaysOccupancy: eventData.avgOccupancy7Days,
+            next30DaysOccupancy: eventData.avgOccupancy30Days,
+            forecastRevenue30Days: eventData.totalProjectedRevenue,
+          },
+        };
+      });
+    },
+    [queryClient]
+  );
+
+  // Subscribe to yield real-time events
+  useYieldUpdates({
+    onMetricsUpdated: handleMetricsUpdated,
+    onRecommendationGenerated: handleRecommendationGenerated,
+    onForecastUpdated: handleForecastUpdated,
   });
 
   if (isLoading) {
@@ -124,9 +215,21 @@ export default function YieldDashboardPage() {
               <p className="text-slate-500">Revenue optimization dashboard</p>
             </div>
           </div>
-          <Badge variant="outline" className="text-emerald-600 border-emerald-200 bg-emerald-50">
-            <Sparkles className="h-3 w-3 mr-1" />
-            Live Data
+          <Badge
+            variant="outline"
+            className={cn(
+              isConnected
+                ? "text-emerald-600 border-emerald-200 bg-emerald-50"
+                : "text-amber-600 border-amber-200 bg-amber-50"
+            )}
+          >
+            <span
+              className={cn(
+                "h-2 w-2 rounded-full mr-2",
+                isConnected ? "bg-emerald-500 animate-pulse" : "bg-amber-500"
+              )}
+            />
+            {isConnected ? "Live" : "Polling"}
           </Badge>
         </div>
 

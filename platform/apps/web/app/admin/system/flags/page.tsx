@@ -130,7 +130,7 @@ export default function FeatureFlagsPage() {
             </div>
 
             {error && (
-                <div className="bg-red-500/10 border border-red-500/20 rounded-lg p-4 text-red-400">
+                <div className="bg-status-error/15 border border-status-error/30 rounded-lg p-4 text-status-error">
                     {error}
                 </div>
             )}
@@ -150,13 +150,13 @@ export default function FeatureFlagsPage() {
                 {filtered.map((flag) => (
                     <div
                         key={flag.id}
-                        className={`bg-slate-800 rounded-lg border p-4 transition-colors ${flag.enabled ? "border-emerald-500/30" : "border-slate-700"
+                        className={`bg-slate-800 rounded-lg border p-4 transition-colors ${flag.enabled ? "border-status-success/30" : "border-slate-700"
                             }`}
                     >
                         <div className="flex items-start justify-between gap-4">
                             <div className="flex items-start gap-3">
-                                <div className={`p-2 rounded-lg ${flag.enabled ? "bg-emerald-500/20" : "bg-slate-700"}`}>
-                                    <Flag className={`h-4 w-4 ${flag.enabled ? "text-emerald-400" : "text-slate-400"}`} />
+                                <div className={`p-2 rounded-lg ${flag.enabled ? "bg-status-success/15" : "bg-slate-700"}`}>
+                                    <Flag className={`h-4 w-4 ${flag.enabled ? "text-status-success" : "text-slate-400"}`} />
                                 </div>
                                 <div>
                                     <div className="flex items-center gap-2">
@@ -187,7 +187,7 @@ export default function FeatureFlagsPage() {
                                 className="flex-shrink-0 p-1 hover:bg-slate-700 rounded transition-colors"
                             >
                                 {flag.enabled ? (
-                                    <ToggleRight className="h-8 w-8 text-emerald-400" />
+                                    <ToggleRight className="h-8 w-8 text-status-success" />
                                 ) : (
                                     <ToggleLeft className="h-8 w-8 text-slate-500" />
                                 )}

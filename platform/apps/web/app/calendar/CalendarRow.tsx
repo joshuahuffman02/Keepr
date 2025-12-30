@@ -81,9 +81,9 @@ export const CalendarRow = memo(function CalendarRow({
                             className={cn(
                                 "border-r border-slate-100 cursor-crosshair transition-colors h-16 touch-none",
                                 zebra,
-                                d.isToday && "bg-blue-50/40",
-                                d.weekend && "bg-slate-50/50",
-                                "hover:bg-blue-50/30"
+                                d.isToday && "bg-status-info/5",
+                                d.weekend && "bg-muted/50",
+                                "hover:bg-status-info/10"
                             )}
                             onPointerDown={(e) => {
                                 // Important: release pointer capture so pointerenter/enter triggers on other cells

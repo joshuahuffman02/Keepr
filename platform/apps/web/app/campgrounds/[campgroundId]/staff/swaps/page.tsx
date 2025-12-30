@@ -66,10 +66,10 @@ const SPRING_CONFIG = {
 };
 
 const STATUS_STYLES: Record<SwapStatus, { bg: string; text: string; icon: React.ReactNode; label: string }> = {
-  pending_recipient: { bg: "bg-amber-100", text: "text-amber-700", icon: <Clock className="w-3.5 h-3.5" />, label: "Awaiting Response" },
-  pending_manager: { bg: "bg-blue-100", text: "text-blue-700", icon: <Shield className="w-3.5 h-3.5" />, label: "Awaiting Manager" },
-  approved: { bg: "bg-emerald-100", text: "text-emerald-700", icon: <CheckCircle2 className="w-3.5 h-3.5" />, label: "Approved" },
-  rejected: { bg: "bg-red-100", text: "text-red-700", icon: <XCircle className="w-3.5 h-3.5" />, label: "Rejected" },
+  pending_recipient: { bg: "bg-status-warning/15", text: "text-status-warning", icon: <Clock className="w-3.5 h-3.5" />, label: "Awaiting Response" },
+  pending_manager: { bg: "bg-status-info/15", text: "text-status-info", icon: <Shield className="w-3.5 h-3.5" />, label: "Awaiting Manager" },
+  approved: { bg: "bg-status-success/15", text: "text-status-success", icon: <CheckCircle2 className="w-3.5 h-3.5" />, label: "Approved" },
+  rejected: { bg: "bg-status-error/15", text: "text-status-error", icon: <XCircle className="w-3.5 h-3.5" />, label: "Rejected" },
   declined: { bg: "bg-slate-100", text: "text-slate-500", icon: <XCircle className="w-3.5 h-3.5" />, label: "Declined" },
   cancelled: { bg: "bg-slate-100", text: "text-slate-500", icon: <X className="w-3.5 h-3.5" />, label: "Cancelled" },
 };
@@ -255,10 +255,10 @@ export default function ShiftSwapsPage({ params }: { params: { campgroundId: str
               initial={{ opacity: 0, y: -20, scale: 0.95 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: -10, scale: 0.95 }}
-              className="mb-6 p-4 bg-emerald-50 border border-emerald-200 rounded-xl flex items-center gap-3"
+              className="mb-6 p-4 bg-status-success/15 border border-status-success/30 rounded-xl flex items-center gap-3"
             >
-              <Sparkles className="w-5 h-5 text-emerald-600" />
-              <span className="text-emerald-800">{successMessage}</span>
+              <Sparkles className="w-5 h-5 text-status-success" />
+              <span className="text-status-success">{successMessage}</span>
             </motion.div>
           )}
         </AnimatePresence>
@@ -427,7 +427,7 @@ export default function ShiftSwapsPage({ params }: { params: { campgroundId: str
                               disabled={isProcessing}
                               className={cn(
                                 "flex-1 px-4 py-2 rounded-lg text-sm font-medium transition-all flex items-center justify-center gap-2",
-                                "bg-emerald-600 text-white hover:bg-emerald-700",
+                                "bg-status-success text-white hover:bg-status-success/90",
                                 isProcessing && "opacity-50 cursor-not-allowed"
                               )}
                             >
@@ -459,7 +459,7 @@ export default function ShiftSwapsPage({ params }: { params: { campgroundId: str
                               disabled={isProcessing}
                               className={cn(
                                 "flex-1 px-4 py-2 rounded-lg text-sm font-medium transition-all flex items-center justify-center gap-2",
-                                "bg-emerald-600 text-white hover:bg-emerald-700",
+                                "bg-status-success text-white hover:bg-status-success/90",
                                 isProcessing && "opacity-50 cursor-not-allowed"
                               )}
                             >
@@ -475,7 +475,7 @@ export default function ShiftSwapsPage({ params }: { params: { campgroundId: str
                               disabled={isProcessing}
                               className={cn(
                                 "flex-1 px-4 py-2 rounded-lg text-sm font-medium transition-all flex items-center justify-center gap-2",
-                                "bg-red-100 text-red-700 hover:bg-red-200",
+                                "bg-status-error/15 text-status-error hover:bg-status-error/25",
                                 isProcessing && "opacity-50 cursor-not-allowed"
                               )}
                             >

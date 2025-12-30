@@ -258,10 +258,10 @@ export default function CustomFieldsPage() {
 
       {/* Suggested Fields */}
       {fields.length < 3 && (
-        <Card className="border-dashed border-emerald-300 bg-emerald-50/50">
+        <Card className="border-dashed border-green-300 bg-green-50/50">
           <CardHeader className="pb-3">
             <CardTitle className="text-base flex items-center gap-2">
-              <Sparkles className="h-4 w-4 text-emerald-600" />
+              <Sparkles className="h-4 w-4 text-green-600" />
               Quick Add Suggestions
             </CardTitle>
             <CardDescription>
@@ -415,7 +415,7 @@ export default function CustomFieldsPage() {
                     className={cn(
                       "px-3 py-1.5 rounded-full text-sm font-medium border transition-colors",
                       formDisplayAt.includes(option.value)
-                        ? "bg-emerald-100 border-emerald-300 text-emerald-800"
+                        ? "bg-status-success/15 border-status-success/30 text-status-success"
                         : "bg-white border-slate-200 text-slate-600 hover:border-slate-300"
                     )}
                   >

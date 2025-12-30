@@ -174,8 +174,8 @@ export default function LedgerPage() {
                     onClick={() => applyPreset(preset)}
                     className={`px-3 py-1.5 text-sm rounded-full transition-all duration-150 ${
                       start === preset.start && end === preset.end
-                        ? "bg-emerald-100 text-emerald-700 border-2 border-emerald-300 font-medium"
-                        : "bg-slate-100 text-slate-600 border border-slate-200 hover:bg-slate-200"
+                        ? "bg-status-success/15 text-status-success border-2 border-status-success font-medium"
+                        : "bg-muted text-muted-foreground border border-slate-200 hover:bg-slate-200"
                     }`}
                   >
                     {preset.label}
@@ -390,8 +390,8 @@ export default function LedgerPage() {
                         Balance Verification
                       </h3>
                       <span className={`text-xs px-3 py-1.5 rounded-full font-medium flex items-center gap-1.5 ${needsReview
-                          ? 'bg-amber-100 text-amber-700 border border-amber-200'
-                          : 'bg-emerald-100 text-emerald-700 border border-emerald-200'
+                          ? 'bg-status-warning/15 text-status-warning border border-status-warning'
+                          : 'bg-status-success/15 text-status-success border border-status-success'
                         }`}>
                         {isBalanced && <CheckCircle className="h-3.5 w-3.5" />}
                         {needsReview ? 'Needs Review' : entries.length > 0 ? 'Books Balanced!' : 'No Entries'}
@@ -529,8 +529,8 @@ export default function LedgerPage() {
                           <td className="px-3 py-3">
                             <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium ${
                               row.direction === "credit"
-                                ? "bg-emerald-100 text-emerald-700"
-                                : "bg-rose-100 text-rose-700"
+                                ? "bg-status-success/15 text-status-success"
+                                : "bg-status-error/15 text-status-error"
                             }`}>
                               {row.direction === "credit" ? (
                                 <TrendingUp className="h-3 w-3" />

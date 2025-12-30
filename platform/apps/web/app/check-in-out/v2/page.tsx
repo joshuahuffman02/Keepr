@@ -50,7 +50,11 @@ type Reservation = {
 export default function CheckInOutV2() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  const [date, setDate] = useState(new Date().toISOString().split("T")[0]);
+  // Use local date, not UTC (toISOString gives UTC which can be a different day)
+  const [date, setDate] = useState(() => {
+    const d = new Date();
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+  });
   const [campgroundId, setCampgroundId] = useState<string>("");
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState<"all" | "balance" | "unassigned">("all");
@@ -238,7 +242,10 @@ export default function CheckInOutV2() {
                 className="pl-9 pr-4 py-2 border border-slate-200 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
               />
             </div>
-            <Button variant="outline" onClick={() => setDate(new Date().toISOString().split("T")[0])}>
+            <Button variant="outline" onClick={() => {
+              const d = new Date();
+              setDate(`${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`);
+            }}>
               Today
             </Button>
           </div>
@@ -378,11 +385,11 @@ export default function CheckInOutV2() {
                       className={`p-3 rounded-full ${
                         tab === "arrivals"
                           ? res.status === "checked_in"
-                            ? "bg-emerald-100 text-emerald-700"
-                            : "bg-blue-100 text-blue-700"
+                            ? "bg-status-success/15 text-status-success"
+                            : "bg-status-info/15 text-status-info"
                           : res.status === "checked_out"
                           ? "bg-slate-100 text-slate-600"
-                          : "bg-orange-100 text-orange-700"
+                          : "bg-status-warning/15 text-status-warning"
                       }`}
                     >
                       {tab === "arrivals" ? (
@@ -402,7 +409,7 @@ export default function CheckInOutV2() {
                           </Badge>
                         )}
                         {!res.siteId && (
-                          <Badge variant="outline" className="h-5 px-1.5 text-[10px] uppercase tracking-wider text-amber-700 border-amber-200">
+                          <Badge variant="outline" className="h-5 px-1.5 text-[10px] uppercase tracking-wider text-status-warning border-status-warning">
                             Assign site
                           </Badge>
                         )}
@@ -427,7 +434,7 @@ export default function CheckInOutV2() {
                         ) : null}
                       </div>
                       {res.notes ? (
-                        <p className="text-sm text-amber-700 mt-2 bg-amber-50 p-2 rounded border border-amber-100 inline-block">
+                        <p className="text-sm text-status-warning mt-2 bg-status-warning/15 p-2 rounded border border-status-warning inline-block">
                           Note: {res.notes}
                         </p>
                       ) : null}
@@ -437,21 +444,21 @@ export default function CheckInOutV2() {
                   <div className="flex flex-col items-end gap-3 min-w-[200px]">
                     <div className="text-right">
                       <div className="text-xs text-slate-500">Balance</div>
-                      <div className={`font-bold ${res.balanceAmount > 0 ? "text-amber-700" : "text-emerald-700"}`}>
+                      <div className={`font-bold ${res.balanceAmount > 0 ? "text-status-warning" : "text-status-success"}`}>
                         {formatMoney(res.balanceAmount)}
                       </div>
                     </div>
 
                     {tab === "arrivals" ? (
                       res.status === "checked_in" ? (
-                        <Button disabled variant="outline" className="text-emerald-600 border-emerald-200 bg-emerald-50">
+                        <Button disabled variant="outline" className="text-status-success border-status-success bg-status-success/15">
                           <CheckCircle className="h-4 w-4 mr-2" />
                           Checked In
                         </Button>
                       ) : (
                         <div className="flex flex-wrap gap-2 justify-end">
                           {!res.siteId && (
-                            <Button variant="outline" className="text-amber-700 border-amber-200 hover:bg-amber-50">
+                            <Button variant="outline" className="text-status-warning border-status-warning hover:bg-status-warning/15">
                               Assign Site
                             </Button>
                           )}
@@ -471,7 +478,7 @@ export default function CheckInOutV2() {
                     ) : (
                       <div className="flex flex-wrap gap-2 justify-end">
                         {res.balanceAmount > 0 && (
-                          <Button variant="outline" className="text-amber-700 border-amber-200 hover:bg-amber-50" onClick={() => openPayment(res)}>
+                          <Button variant="outline" className="text-status-warning border-status-warning hover:bg-status-warning/15" onClick={() => openPayment(res)}>
                             Settle Balance
                           </Button>
                         )}

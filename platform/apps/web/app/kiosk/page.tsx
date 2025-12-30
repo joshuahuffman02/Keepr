@@ -848,9 +848,9 @@ export default function KioskPage() {
                                     initial={{ scale: 0 }}
                                     animate={{ scale: 1 }}
                                     transition={{ ...springConfig, delay: 0.2 }}
-                                    className="mx-auto w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mb-4"
+                                    className="mx-auto w-20 h-20 bg-status-success/15 rounded-full flex items-center justify-center mb-4"
                                 >
-                                    <Tablet className="w-10 h-10 text-green-600" />
+                                    <Tablet className="w-10 h-10 text-status-success" />
                                 </motion.div>
                                 <CardTitle className="text-3xl font-bold text-gray-900">Kiosk Setup</CardTitle>
                                 <CardDescription className="text-lg">
@@ -860,7 +860,7 @@ export default function KioskPage() {
                             <CardContent className="space-y-6 px-10 pb-10">
                                 {loading ? (
                                     <div className="flex flex-col items-center gap-4 py-8">
-                                        <Loader2 className="w-12 h-12 animate-spin text-green-600" />
+                                        <Loader2 className="w-12 h-12 animate-spin text-status-success" />
                                         <p className="text-gray-600">{getLoadingMessage()}</p>
                                     </div>
                                 ) : (
@@ -901,7 +901,7 @@ export default function KioskPage() {
                                                 initial={{ opacity: 0, y: -10 }}
                                                 animate={{ opacity: 1, y: 0 }}
                                                 role="alert"
-                                                className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg flex items-center gap-2"
+                                                className="bg-status-error/15 border border-status-error/30 text-status-error px-4 py-3 rounded-lg flex items-center gap-2"
                                             >
                                                 <AlertCircle className="w-5 h-5 flex-shrink-0" aria-hidden="true" />
                                                 {error}
@@ -911,7 +911,7 @@ export default function KioskPage() {
                                         <Button
                                             onClick={handlePairing}
                                             disabled={loading || pairingCode.length !== 6}
-                                            className="w-full h-14 text-xl bg-green-600 hover:bg-green-700 active:scale-[0.98] transition-transform"
+                                            className="w-full h-14 text-xl bg-status-success hover:bg-status-success/90 active:scale-[0.98] transition-transform"
                                         >
                                             {loading ? (
                                                 <Loader2 className="w-6 h-6 animate-spin mr-2" />
@@ -949,10 +949,10 @@ export default function KioskPage() {
                                     animate={{ opacity: 1, y: 0 }}
                                     transition={{ ...springConfig, delay: 0.2 }}
                                 >
-                                    <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-green-900 mb-4">
+                                    <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-status-success mb-4">
                                         {getGreeting()}
                                     </h1>
-                                    <p className="text-xl sm:text-2xl text-green-700">
+                                    <p className="text-xl sm:text-2xl text-status-success">
                                         Welcome to {campground?.name || "Check-In"}
                                     </p>
                                 </motion.div>
@@ -964,7 +964,7 @@ export default function KioskPage() {
                                         transition={{ ...springConfig, delay: 0.3 }}
                                     >
                                         <Button
-                                            className="w-full h-56 md:h-64 text-xl md:text-2xl flex flex-col gap-4 md:gap-6 bg-green-600 hover:bg-green-700 active:scale-[0.98] shadow-xl transition-all"
+                                            className="w-full h-56 md:h-64 text-xl md:text-2xl flex flex-col gap-4 md:gap-6 bg-status-success hover:bg-status-success/90 active:scale-[0.98] shadow-xl transition-all"
                                             onClick={() => setState("lookup")}
                                         >
                                             <div className="w-20 h-20 md:w-24 md:h-24 bg-white/20 rounded-full flex items-center justify-center">
@@ -980,7 +980,7 @@ export default function KioskPage() {
                                         transition={{ ...springConfig, delay: 0.4 }}
                                     >
                                         <Button
-                                            className="w-full h-56 md:h-64 text-xl md:text-2xl flex flex-col gap-4 md:gap-6 bg-blue-600 hover:bg-blue-700 active:scale-[0.98] shadow-xl transition-all"
+                                            className="w-full h-56 md:h-64 text-xl md:text-2xl flex flex-col gap-4 md:gap-6 bg-status-info hover:bg-status-info/90 active:scale-[0.98] shadow-xl transition-all"
                                             onClick={() => setState("walkin-nights")}
                                         >
                                             <div className="w-20 h-20 md:w-24 md:h-24 bg-white/20 rounded-full flex items-center justify-center">
@@ -1034,7 +1034,7 @@ export default function KioskPage() {
                                             exit={{ opacity: 0, y: -10 }}
                                             id="lookup-error"
                                             role="alert"
-                                            className="bg-red-50 border border-red-200 text-red-700 px-6 py-4 rounded-lg flex items-start gap-3"
+                                            className="bg-status-error/15 border border-status-error/30 text-status-error px-6 py-4 rounded-lg flex items-start gap-3"
                                         >
                                             <AlertCircle className="w-5 h-5 flex-shrink-0 mt-0.5" aria-hidden="true" />
                                             <span>{error}</span>
@@ -1053,7 +1053,7 @@ export default function KioskPage() {
                                     <Button
                                         onClick={handleLookup}
                                         disabled={loading || !confirmationCode}
-                                        className="flex-1 h-14 md:h-16 text-lg md:text-xl bg-green-600 hover:bg-green-700 active:scale-[0.98] transition-transform"
+                                        className="flex-1 h-14 md:h-16 text-lg md:text-xl bg-status-success hover:bg-status-success/90 active:scale-[0.98] transition-transform"
                                     >
                                         {loading ? (
                                             <>
@@ -1103,18 +1103,18 @@ export default function KioskPage() {
                                             <motion.div key={n} variants={fadeInUp}>
                                                 <Button
                                                     variant="outline"
-                                                    className="w-full h-32 md:h-40 flex flex-col gap-2 md:gap-4 text-xl active:scale-[0.98] active:border-green-500 active:bg-green-50 transition-all disabled:opacity-50"
+                                                    className="w-full h-32 md:h-40 flex flex-col gap-2 md:gap-4 text-xl active:scale-[0.98] active:border-green-500 active:bg-status-success/15 transition-all disabled:opacity-50"
                                                     onClick={() => handleSearchSites(n)}
                                                     disabled={loading}
                                                 >
                                                     {searchingNights === n ? (
                                                         <>
-                                                            <Loader2 className="w-10 h-10 md:w-12 md:h-12 animate-spin text-green-600" />
+                                                            <Loader2 className="w-10 h-10 md:w-12 md:h-12 animate-spin text-status-success" />
                                                             <span className="text-base">Searching...</span>
                                                         </>
                                                     ) : (
                                                         <>
-                                                            <span className="text-5xl md:text-6xl font-bold text-green-600">{n}</span>
+                                                            <span className="text-5xl md:text-6xl font-bold text-status-success">{n}</span>
                                                             Night{n > 1 ? "s" : ""}
                                                         </>
                                                     )}
@@ -1128,7 +1128,7 @@ export default function KioskPage() {
                                                 onClick={() => { setShowCustomNights(true); setNights(4); }}
                                                 disabled={loading}
                                             >
-                                                <Grid3X3 className="w-10 h-10 md:w-12 md:h-12 text-blue-600" />
+                                                <Grid3X3 className="w-10 h-10 md:w-12 md:h-12 text-status-info" />
                                                 More nights
                                             </Button>
                                         </motion.div>
@@ -1154,7 +1154,7 @@ export default function KioskPage() {
                                                     key={nights}
                                                     initial={{ scale: 1.2, opacity: 0.5 }}
                                                     animate={{ scale: 1, opacity: 1 }}
-                                                    className="text-6xl md:text-8xl font-bold text-green-600"
+                                                    className="text-6xl md:text-8xl font-bold text-status-success"
                                                 >
                                                     {nights}
                                                 </motion.span>
@@ -1301,7 +1301,7 @@ export default function KioskPage() {
 
                                     {loading ? (
                                         <div className="flex flex-col justify-center items-center h-64 gap-4">
-                                            <Loader2 className="w-12 h-12 animate-spin text-green-600" />
+                                            <Loader2 className="w-12 h-12 animate-spin text-status-success" />
                                             <p className="text-gray-600">{getLoadingMessage()}</p>
                                         </div>
                                     ) : filteredSites.length === 0 ? (
@@ -1335,7 +1335,7 @@ export default function KioskPage() {
                                                     key={site.id}
                                                     variants={fadeInUp}
                                                     onClick={() => { setSelectedSite(site); setState("walkin-guest"); }}
-                                                    className="border-2 border-gray-200 rounded-xl p-5 md:p-6 cursor-pointer active:scale-[0.98] active:border-green-500 active:bg-green-50 transition-all"
+                                                    className="border-2 border-gray-200 rounded-xl p-5 md:p-6 cursor-pointer active:scale-[0.98] active:border-green-500 active:bg-status-success/15 transition-all"
                                                     role="button"
                                                     tabIndex={0}
                                                     onKeyDown={(e) => {
@@ -1373,7 +1373,7 @@ export default function KioskPage() {
                                                                 </Badge>
                                                             )}
                                                         </div>
-                                                        <p className="text-lg md:text-xl font-bold text-green-700 pt-1">
+                                                        <p className="text-lg md:text-xl font-bold text-status-success pt-1">
                                                             ${((site.siteClass?.defaultRate || 0) / 100).toFixed(2)} <span className="text-sm font-normal text-gray-500">/ night</span>
                                                         </p>
                                                     </div>
@@ -1433,7 +1433,7 @@ export default function KioskPage() {
                                             aria-describedby={fieldErrors.firstName ? "firstName-error" : undefined}
                                         />
                                         {fieldErrors.firstName && (
-                                            <p id="firstName-error" className="text-sm text-red-600 flex items-center gap-1">
+                                            <p id="firstName-error" className="text-sm text-status-error flex items-center gap-1">
                                                 <AlertCircle className="w-4 h-4" />
                                                 {fieldErrors.firstName}
                                             </p>
@@ -1455,7 +1455,7 @@ export default function KioskPage() {
                                             aria-describedby={fieldErrors.lastName ? "lastName-error" : undefined}
                                         />
                                         {fieldErrors.lastName && (
-                                            <p id="lastName-error" className="text-sm text-red-600 flex items-center gap-1">
+                                            <p id="lastName-error" className="text-sm text-status-error flex items-center gap-1">
                                                 <AlertCircle className="w-4 h-4" />
                                                 {fieldErrors.lastName}
                                             </p>
@@ -1485,7 +1485,7 @@ export default function KioskPage() {
                                         aria-describedby={fieldErrors.email ? "email-error" : undefined}
                                     />
                                     {fieldErrors.email && (
-                                        <p id="email-error" className="text-sm text-red-600 flex items-center gap-1">
+                                        <p id="email-error" className="text-sm text-status-error flex items-center gap-1">
                                             <AlertCircle className="w-4 h-4" />
                                             {fieldErrors.email}
                                         </p>
@@ -1508,7 +1508,7 @@ export default function KioskPage() {
                                             placeholder="(555) 555-5555"
                                         />
                                         {fieldErrors.phone && (
-                                            <p className="text-sm text-red-600 flex items-center gap-1">
+                                            <p className="text-sm text-status-error flex items-center gap-1">
                                                 <AlertCircle className="w-4 h-4" />
                                                 {fieldErrors.phone}
                                             </p>
@@ -1543,7 +1543,7 @@ export default function KioskPage() {
                                         placeholder="12345"
                                     />
                                     {fieldErrors.zipCode && (
-                                        <p className="text-sm text-red-600 flex items-center gap-1">
+                                        <p className="text-sm text-status-error flex items-center gap-1">
                                             <AlertCircle className="w-4 h-4" />
                                             {fieldErrors.zipCode}
                                         </p>
@@ -1642,7 +1642,7 @@ export default function KioskPage() {
                                             animate={{ opacity: 1, y: 0 }}
                                             exit={{ opacity: 0, y: -10 }}
                                             role="alert"
-                                            className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg flex items-start gap-2"
+                                            className="bg-status-error/15 border border-status-error/30 text-status-error px-4 py-3 rounded-lg flex items-start gap-2"
                                         >
                                             <AlertCircle className="w-5 h-5 flex-shrink-0 mt-0.5" />
                                             {error}
@@ -1704,12 +1704,12 @@ export default function KioskPage() {
                                 >
                                     <div className="flex items-center gap-4 mb-4">
                                         <motion.div
-                                            className="w-12 h-12 md:w-14 md:h-14 bg-green-100 rounded-full flex items-center justify-center"
+                                            className="w-12 h-12 md:w-14 md:h-14 bg-status-success/15 rounded-full flex items-center justify-center"
                                             initial={{ scale: 0 }}
                                             animate={{ scale: 1 }}
                                             transition={{ ...springConfig, delay: 0.2 }}
                                         >
-                                            <User className="w-6 h-6 md:w-7 md:h-7 text-green-600" />
+                                            <User className="w-6 h-6 md:w-7 md:h-7 text-status-success" />
                                         </motion.div>
                                         <div>
                                             <p className="text-xl md:text-2xl font-bold text-gray-900">
@@ -1729,7 +1729,7 @@ export default function KioskPage() {
                                         transition={{ delay: 0.2 }}
                                     >
                                         <div className="flex items-center gap-2 md:gap-3 mb-2">
-                                            <Calendar className="w-5 h-5 md:w-6 md:h-6 text-blue-600" />
+                                            <Calendar className="w-5 h-5 md:w-6 md:h-6 text-status-info" />
                                             <span className="text-base md:text-lg font-medium text-gray-700">Check-In</span>
                                         </div>
                                         <p className="text-xl md:text-2xl font-bold text-gray-900">
@@ -1743,7 +1743,7 @@ export default function KioskPage() {
                                         transition={{ delay: 0.3 }}
                                     >
                                         <div className="flex items-center gap-2 md:gap-3 mb-2">
-                                            <Calendar className="w-5 h-5 md:w-6 md:h-6 text-blue-600" />
+                                            <Calendar className="w-5 h-5 md:w-6 md:h-6 text-status-info" />
                                             <span className="text-base md:text-lg font-medium text-gray-700">Check-Out</span>
                                         </div>
                                         <p className="text-xl md:text-2xl font-bold text-gray-900">
@@ -1754,16 +1754,16 @@ export default function KioskPage() {
 
                                 {/* Site Assignment */}
                                 <motion.div
-                                    className="bg-green-50 rounded-xl p-5 md:p-6"
+                                    className="bg-status-success/15 rounded-xl p-5 md:p-6"
                                     initial={{ opacity: 0, y: 10 }}
                                     animate={{ opacity: 1, y: 0 }}
                                     transition={{ delay: 0.4 }}
                                 >
                                     <div className="flex items-center gap-2 md:gap-3 mb-2">
-                                        <MapPin className="w-5 h-5 md:w-6 md:h-6 text-green-600" />
+                                        <MapPin className="w-5 h-5 md:w-6 md:h-6 text-status-success" />
                                         <span className="text-base md:text-lg font-medium text-gray-700">Your Site</span>
                                     </div>
-                                    <p className="text-2xl md:text-3xl font-bold text-green-700">
+                                    <p className="text-2xl md:text-3xl font-bold text-status-success">
                                         {reservation.site?.name || reservation.site?.siteNumber || "Site TBD"}
                                     </p>
                                 </motion.div>
@@ -1818,8 +1818,8 @@ export default function KioskPage() {
                                         animate={{ opacity: 1, y: 0 }}
                                         transition={{ delay: 0.1 }}
                                     >
-                                        <div className="w-16 h-16 md:w-20 md:h-20 bg-orange-100 rounded-full flex items-center justify-center mb-3 md:mb-4">
-                                            <Flame className="w-8 h-8 md:w-10 md:h-10 text-orange-600" />
+                                        <div className="w-16 h-16 md:w-20 md:h-20 bg-status-warning/15 rounded-full flex items-center justify-center mb-3 md:mb-4">
+                                            <Flame className="w-8 h-8 md:w-10 md:h-10 text-status-warning" />
                                         </div>
                                         <h3 className="text-xl md:text-2xl font-bold text-gray-900">Firewood</h3>
                                         <p className="text-base md:text-lg text-gray-600 mb-3 md:mb-4">$10.00 / bundle</p>
@@ -1935,8 +1935,8 @@ export default function KioskPage() {
                     >
                         <Card className="w-full max-w-3xl shadow-2xl">
                             <CardHeader className="text-center pb-4 md:pb-6 pt-8 md:pt-10">
-                                <div className="mx-auto w-16 h-16 md:w-20 md:h-20 bg-blue-100 rounded-full flex items-center justify-center mb-4">
-                                    <FileText className="w-8 h-8 md:w-10 md:h-10 text-blue-600" />
+                                <div className="mx-auto w-16 h-16 md:w-20 md:h-20 bg-status-info/15 rounded-full flex items-center justify-center mb-4">
+                                    <FileText className="w-8 h-8 md:w-10 md:h-10 text-status-info" />
                                 </div>
                                 <CardTitle className="text-2xl md:text-3xl font-bold text-gray-900">
                                     Required Forms
@@ -1957,7 +1957,7 @@ export default function KioskPage() {
                                     return (
                                         <motion.div
                                             key={form.id}
-                                            className={`rounded-xl border-2 transition-all ${isComplete ? "bg-green-50 border-green-200" : "bg-white border-gray-200"}`}
+                                            className={`rounded-xl border-2 transition-all ${isComplete ? "bg-status-success/15 border-status-success/30" : "bg-white border-gray-200"}`}
                                             initial={{ opacity: 0, y: 10 }}
                                             animate={{ opacity: 1, y: 0 }}
                                         >
@@ -1967,7 +1967,7 @@ export default function KioskPage() {
                                             >
                                                 <div className="flex items-center gap-3">
                                                     {isComplete ? (
-                                                        <CheckCircle className="h-6 w-6 text-green-600" />
+                                                        <CheckCircle className="h-6 w-6 text-status-success" />
                                                     ) : form.isRequired !== false ? (
                                                         <AlertCircle className="h-6 w-6 text-amber-500" />
                                                     ) : (
@@ -2174,14 +2174,14 @@ export default function KioskPage() {
 
                             <div className="px-6 md:px-10 pb-8 md:pb-10 pt-0">
                                 {error && (
-                                    <div className="mb-4 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg flex items-start gap-3">
+                                    <div className="mb-4 bg-status-error/15 border border-status-error/30 text-status-error px-4 py-3 rounded-lg flex items-start gap-3">
                                         <AlertCircle className="w-5 h-5 flex-shrink-0 mt-0.5" />
                                         {error}
                                     </div>
                                 )}
 
                                 {!allFormsComplete && (
-                                    <div className="mb-4 bg-amber-50 border border-amber-200 text-amber-700 px-4 py-3 rounded-lg flex items-center gap-3">
+                                    <div className="mb-4 bg-status-warning/15 border border-status-warning/30 text-status-warning px-4 py-3 rounded-lg flex items-center gap-3">
                                         <AlertCircle className="w-5 h-5 flex-shrink-0" />
                                         <span>Please complete all required forms before proceeding.</span>
                                     </div>
@@ -2259,18 +2259,18 @@ export default function KioskPage() {
                                     <div className="space-y-4">
                                         {!guestInfo.firstName ? (
                                             <motion.div
-                                                className="bg-blue-50 border border-blue-200 rounded-xl p-5 md:p-6 flex items-center gap-4"
+                                                className="bg-blue-50 border border-status-info/30 rounded-xl p-5 md:p-6 flex items-center gap-4"
                                                 initial={{ opacity: 0, y: 10 }}
                                                 animate={{ opacity: 1, y: 0 }}
                                                 transition={{ delay: 0.1 }}
                                             >
-                                                <CreditCard className="w-7 h-7 md:w-8 md:h-8 text-blue-600" />
+                                                <CreditCard className="w-7 h-7 md:w-8 md:h-8 text-status-info" />
                                                 <div>
                                                     <p className="font-bold text-gray-900">Card on File</p>
                                                     <p className="text-gray-600">Visa ending in 4242</p>
                                                 </div>
                                                 <div className="ml-auto">
-                                                    <Badge className="bg-blue-100 text-blue-700 hover:bg-blue-100">Default</Badge>
+                                                    <Badge className="bg-status-info/15 text-status-info hover:bg-status-info/15">Default</Badge>
                                                 </div>
                                             </motion.div>
                                         ) : (
@@ -2346,12 +2346,12 @@ export default function KioskPage() {
                                     </div>
                                 ) : (
                                     <motion.div
-                                        className="bg-green-50 border border-green-200 rounded-xl p-5 md:p-6 text-center text-green-700 font-medium"
+                                        className="bg-status-success/15 border border-status-success/30 rounded-xl p-5 md:p-6 text-center text-status-success font-medium"
                                         initial={{ opacity: 0, y: 10 }}
                                         animate={{ opacity: 1, y: 0 }}
                                         transition={{ delay: 0.1 }}
                                     >
-                                        <CheckCircle className="w-8 h-8 mx-auto mb-2 text-green-600" />
+                                        <CheckCircle className="w-8 h-8 mx-auto mb-2 text-status-success" />
                                         No payment required - you're all set!
                                     </motion.div>
                                 )}
@@ -2363,7 +2363,7 @@ export default function KioskPage() {
                                             animate={{ opacity: 1, y: 0 }}
                                             exit={{ opacity: 0, y: -10 }}
                                             role="alert"
-                                            className="bg-red-50 border border-red-200 text-red-700 px-5 md:px-6 py-4 rounded-lg flex items-start gap-3"
+                                            className="bg-status-error/15 border border-status-error/30 text-status-error px-5 md:px-6 py-4 rounded-lg flex items-start gap-3"
                                         >
                                             <AlertCircle className="w-5 h-5 flex-shrink-0 mt-0.5" />
                                             {error}
@@ -2415,12 +2415,12 @@ export default function KioskPage() {
                         <Card className="w-full max-w-2xl shadow-2xl">
                             <CardContent className="text-center py-12 md:py-16 px-6 md:px-10">
                                 <motion.div
-                                    className="mx-auto w-20 h-20 md:w-24 md:h-24 bg-green-100 rounded-full flex items-center justify-center mb-6 md:mb-8"
+                                    className="mx-auto w-20 h-20 md:w-24 md:h-24 bg-status-success/15 rounded-full flex items-center justify-center mb-6 md:mb-8"
                                     initial={{ scale: 0, rotate: -180 }}
                                     animate={{ scale: 1, rotate: 0 }}
                                     transition={{ ...springConfig, delay: 0.2 }}
                                 >
-                                    <CheckCircle className="w-12 h-12 md:w-14 md:h-14 text-green-600" />
+                                    <CheckCircle className="w-12 h-12 md:w-14 md:h-14 text-status-success" />
                                 </motion.div>
                                 <motion.h1
                                     className="text-3xl md:text-4xl font-bold text-gray-900 mb-3 md:mb-4"
@@ -2440,14 +2440,14 @@ export default function KioskPage() {
                                 </motion.p>
 
                                 <motion.div
-                                    className="bg-green-50 rounded-xl p-6 md:p-8 mb-6 md:mb-8"
+                                    className="bg-status-success/15 rounded-xl p-6 md:p-8 mb-6 md:mb-8"
                                     initial={{ opacity: 0, scale: 0.9 }}
                                     animate={{ opacity: 1, scale: 1 }}
                                     transition={{ delay: 0.5, ...springConfig }}
                                 >
                                     <p className="text-base md:text-lg text-gray-600 mb-2">Your site is</p>
                                     <motion.p
-                                        className="text-4xl md:text-5xl font-bold text-green-700"
+                                        className="text-4xl md:text-5xl font-bold text-status-success"
                                         initial={{ scale: 1.2, opacity: 0 }}
                                         animate={{ scale: 1, opacity: 1 }}
                                         transition={{ delay: 0.7, ...springConfig }}
@@ -2482,7 +2482,7 @@ export default function KioskPage() {
                                         animate={{ opacity: 1, y: 0 }}
                                         transition={{ delay: 0.7 }}
                                     >
-                                        <ShoppingBag className="w-7 h-7 md:w-8 md:h-8 text-orange-600 flex-shrink-0" />
+                                        <ShoppingBag className="w-7 h-7 md:w-8 md:h-8 text-status-warning flex-shrink-0" />
                                         <div>
                                             <p className="font-bold text-gray-900">Add-ons Ordered</p>
                                             <p className="text-gray-600">
@@ -2494,13 +2494,13 @@ export default function KioskPage() {
 
                                 {queuedCheckinPending && (
                                     <motion.div
-                                        className="bg-amber-50 rounded-xl p-5 md:p-6 mb-6 md:mb-8 text-left flex items-center gap-4 border border-amber-100"
+                                        className="bg-status-warning/15 rounded-xl p-5 md:p-6 mb-6 md:mb-8 text-left flex items-center gap-4 border border-amber-100"
                                         initial={{ opacity: 0, y: 10 }}
                                         animate={{ opacity: 1, y: 0 }}
                                         transition={{ delay: 0.7 }}
                                     >
-                                        <div className="w-10 h-10 md:w-12 md:h-12 bg-amber-100 rounded-full flex items-center justify-center flex-shrink-0">
-                                            <RefreshCw className="w-5 h-5 md:w-6 md:h-6 text-amber-600" />
+                                        <div className="w-10 h-10 md:w-12 md:h-12 bg-status-warning/15 rounded-full flex items-center justify-center flex-shrink-0">
+                                            <RefreshCw className="w-5 h-5 md:w-6 md:h-6 text-status-warning" />
                                         </div>
                                         <div>
                                             <p className="font-bold text-gray-900">Saved Offline</p>
@@ -2518,7 +2518,7 @@ export default function KioskPage() {
                                     transition={{ delay: 0.8 }}
                                 >
                                     <div className="flex items-start gap-3">
-                                        <MapPin className="w-6 h-6 text-blue-600 mt-1 flex-shrink-0" />
+                                        <MapPin className="w-6 h-6 text-status-info mt-1 flex-shrink-0" />
                                         <div>
                                             <p className="font-medium text-gray-900">Directions</p>
                                             <p className="text-gray-600">
@@ -2574,7 +2574,7 @@ export default function KioskPage() {
                         initial={{ y: -100, opacity: 0 }}
                         animate={{ y: 0, opacity: 1 }}
                         exit={{ y: -100, opacity: 0 }}
-                        className="fixed top-0 left-0 right-0 bg-amber-500 text-white py-3 md:py-4 px-6 shadow-lg z-50"
+                        className="fixed top-0 left-0 right-0 bg-status-warning/150 text-white py-3 md:py-4 px-6 shadow-lg z-50"
                     >
                         <div className="max-w-4xl mx-auto flex items-center gap-3 md:gap-4">
                             <motion.div
@@ -2604,7 +2604,7 @@ export default function KioskPage() {
                         <div
                             className={`flex items-center gap-2 md:gap-3 rounded-full px-4 md:px-5 py-2.5 md:py-3 shadow-lg transition-colors ${
                                 showTimeWarning
-                                    ? "bg-red-500 text-white"
+                                    ? "bg-status-error/150 text-white"
                                     : "bg-white/90 backdrop-blur border border-gray-200 text-gray-600"
                             }`}
                         >
@@ -2617,7 +2617,7 @@ export default function KioskPage() {
                                     size="sm"
                                     variant="secondary"
                                     onClick={handleActivity}
-                                    className="ml-2 h-7 md:h-8 px-3 bg-white text-red-600 hover:bg-gray-100 active:scale-[0.95]"
+                                    className="ml-2 h-7 md:h-8 px-3 bg-white text-status-error hover:bg-gray-100 active:scale-[0.95]"
                                 >
                                     I'm here
                                 </Button>
@@ -2632,7 +2632,7 @@ export default function KioskPage() {
                 <motion.div
                     initial={{ opacity: 0, x: 20 }}
                     animate={{ opacity: 1, x: 0 }}
-                    className="fixed bottom-4 md:bottom-8 left-4 md:left-8 bg-blue-100 border border-blue-200 text-blue-800 px-4 py-3 rounded-lg shadow-lg"
+                    className="fixed bottom-4 md:bottom-8 left-4 md:left-8 bg-status-info/15 border border-status-info/30 text-status-info px-4 py-3 rounded-lg shadow-lg"
                 >
                     <p className="font-medium text-sm md:text-base">
                         Processing {queuedCheckins} check-in{queuedCheckins > 1 ? "s" : ""}...
@@ -2645,7 +2645,7 @@ export default function KioskPage() {
                 <motion.div
                     initial={{ opacity: 0, y: -10 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className="fixed top-4 md:top-6 right-4 md:right-6 w-64 md:w-72 rounded-lg border border-amber-200 bg-amber-50 text-amber-900 p-3 text-sm space-y-2 shadow-lg z-40"
+                    className="fixed top-4 md:top-6 right-4 md:right-6 w-64 md:w-72 rounded-lg border border-status-warning/30 bg-status-warning/15 text-amber-900 p-3 text-sm space-y-2 shadow-lg z-40"
                 >
                     <div className="font-semibold">Needs attention</div>
                     {conflicts.slice(0, 2).map((c) => (

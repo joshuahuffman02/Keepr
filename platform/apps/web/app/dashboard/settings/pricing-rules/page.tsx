@@ -373,7 +373,7 @@ export default function PricingRulesV2Page() {
                 >
                   <div className="flex items-start justify-between">
                     <div className="flex items-start gap-3">
-                      <div className={`p-2 rounded-lg ${rule.active ? "bg-emerald-100 text-emerald-700" : "bg-slate-200 text-slate-500"}`}>
+                      <div className={`p-2 rounded-lg ${rule.active ? "bg-status-success/15 text-status-success" : "bg-slate-200 text-slate-500"}`}>
                         <TypeIcon className="h-5 w-5" />
                       </div>
                       <div>
@@ -383,7 +383,7 @@ export default function PricingRulesV2Page() {
                             Priority {rule.priority}
                           </span>
                           {!rule.active && (
-                            <span className="text-xs px-2 py-0.5 rounded-full bg-amber-100 text-amber-700">
+                            <span className="text-xs px-2 py-0.5 rounded-full bg-status-warning/15 text-status-warning">
                               Inactive
                             </span>
                           )}

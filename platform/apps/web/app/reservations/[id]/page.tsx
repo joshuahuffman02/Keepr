@@ -131,13 +131,13 @@ export default function ReservationDetailPage() {
     const statusTone = (status?: string | null) => {
         const normalized = (status || "").toLowerCase();
         if (normalized.includes("complaint") || normalized.includes("bounce") || normalized.includes("fail")) {
-            return "bg-red-100 text-red-700 border border-red-200";
+            return "bg-status-error/15 text-status-error border border-status-error/30";
         }
         if (normalized.startsWith("delivered") || normalized === "sent" || normalized === "received") {
-            return "bg-emerald-100 text-emerald-700 border border-emerald-200";
+            return "bg-status-success/15 text-status-success border border-status-success/30";
         }
         if (normalized.includes("pending") || normalized.includes("processing")) {
-            return "bg-amber-100 text-amber-800 border border-amber-200";
+            return "bg-status-warning/15 text-status-warning border border-status-warning/30";
         }
         return "bg-slate-100 text-slate-700 border border-slate-200";
     };
@@ -431,7 +431,7 @@ export default function ReservationDetailPage() {
                                     <div className="flex items-center gap-2">
                                         <h2 className="text-lg font-semibold text-slate-900">Communications</h2>
                                         {overdueCount > 0 && (
-                                            <span className="px-2 py-0.5 rounded-full text-[11px] font-semibold bg-amber-100 text-amber-800 border border-amber-200">
+                                            <span className="px-2 py-0.5 rounded-full text-[11px] font-semibold bg-status-warning/15 text-status-warning border border-status-warning/30">
                                                 {overdueCount} need reply
                                             </span>
                                         )}
@@ -602,8 +602,8 @@ export default function ReservationDetailPage() {
                                                             {item.kind === "communication" && (
                                                                 <span
                                                                     className={`px-2 py-0.5 rounded-full text-[10px] font-semibold ${item.direction === "outbound"
-                                                                        ? "bg-blue-100 text-blue-700 border border-blue-200"
-                                                                        : "bg-emerald-100 text-emerald-700 border border-emerald-200"
+                                                                        ? "bg-status-info/15 text-status-info border border-status-info/30"
+                                                                        : "bg-status-success/15 text-status-success border border-status-success/30"
                                                                         }`}
                                                                 >
                                                                     {item.direction}

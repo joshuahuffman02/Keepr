@@ -139,19 +139,19 @@ interface Badge {
 
 // Visual configuration
 const STATE_CONFIG: Record<OpTaskState, { label: string; color: string; bgColor: string }> = {
-  pending: { label: "Pending", color: "text-amber-800", bgColor: "bg-amber-100 border-amber-200" },
+  pending: { label: "Pending", color: "text-status-warning", bgColor: "bg-status-warning/15 border-status-warning/30" },
   assigned: { label: "Assigned", color: "text-purple-800", bgColor: "bg-purple-100 border-purple-200" },
-  in_progress: { label: "In Progress", color: "text-blue-800", bgColor: "bg-blue-100 border-blue-200" },
-  blocked: { label: "Blocked", color: "text-red-800", bgColor: "bg-red-100 border-red-200" },
-  completed: { label: "Completed", color: "text-emerald-800", bgColor: "bg-emerald-100 border-emerald-200" },
+  in_progress: { label: "In Progress", color: "text-status-info", bgColor: "bg-status-info/15 border-status-info/30" },
+  blocked: { label: "Blocked", color: "text-status-error", bgColor: "bg-status-error/15 border-status-error/30" },
+  completed: { label: "Completed", color: "text-status-success", bgColor: "bg-status-success/15 border-status-success/30" },
   verified: { label: "Verified", color: "text-teal-800", bgColor: "bg-teal-100 border-teal-200" },
   cancelled: { label: "Cancelled", color: "text-slate-600", bgColor: "bg-slate-100 border-slate-200" },
 };
 
 const SLA_CONFIG: Record<OpSlaStatus, { label: string; color: string; icon: string }> = {
-  on_track: { label: "On Track", color: "bg-emerald-500", icon: "check" },
-  at_risk: { label: "At Risk", color: "bg-amber-500", icon: "alert-triangle" },
-  breached: { label: "Breached", color: "bg-red-500", icon: "x" },
+  on_track: { label: "On Track", color: "bg-status-success", icon: "check" },
+  at_risk: { label: "At Risk", color: "bg-status-warning", icon: "alert-triangle" },
+  breached: { label: "Breached", color: "bg-status-error", icon: "x" },
 };
 
 const CATEGORY_CONFIG: Record<OpTaskCategory, { label: string; icon: string; color: string }> = {
@@ -688,7 +688,7 @@ function TaskBoardTab({
                 onClick={() => setMobileStateFilter(tab.id)}
                 className={`px-3 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-colors min-h-[44px] ${
                   mobileStateFilter === tab.id
-                    ? 'bg-emerald-100 text-emerald-700'
+                    ? 'bg-status-success/15 text-status-success'
                     : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
                 }`}
               >
@@ -845,8 +845,8 @@ function TaskCard({
         {/* Due time */}
         {task.slaDueAt && (
           <div className={`flex items-center gap-2 ${
-            task.slaStatus === "breached" ? "text-red-600 font-medium" :
-            task.slaStatus === "at_risk" ? "text-amber-600" : "text-slate-600"
+            task.slaStatus === "breached" ? "text-status-error font-medium" :
+            task.slaStatus === "at_risk" ? "text-status-warning" : "text-slate-600"
           }`}>
             <span>Due:</span>
             <span>{timeRemaining}</span>
@@ -870,7 +870,7 @@ function TaskCard({
           <div className="flex items-center gap-2">
             <div className="flex-1 h-1.5 bg-slate-100 rounded-full overflow-hidden">
               <div
-                className="h-full bg-emerald-500 transition-all duration-300"
+                className="h-full bg-status-success transition-all duration-300"
                 style={{ width: `${task.checklistProgress || 0}%` }}
               />
             </div>
@@ -886,7 +886,7 @@ function TaskCard({
         {task.state === "pending" && (
           <button
             onClick={() => updateTaskState(task.id, "in_progress")}
-            className="flex-1 px-3 py-1.5 bg-blue-50 text-blue-700 rounded-lg text-xs font-medium hover:bg-blue-100 transition-colors"
+            className="flex-1 px-3 py-1.5 bg-status-info/15 text-status-info rounded-lg text-xs font-medium hover:bg-status-info/25 transition-colors"
           >
             Start
           </button>
@@ -894,7 +894,7 @@ function TaskCard({
         {task.state === "assigned" && (
           <button
             onClick={() => updateTaskState(task.id, "in_progress")}
-            className="flex-1 px-3 py-1.5 bg-blue-50 text-blue-700 rounded-lg text-xs font-medium hover:bg-blue-100 transition-colors"
+            className="flex-1 px-3 py-1.5 bg-status-info/15 text-status-info rounded-lg text-xs font-medium hover:bg-status-info/25 transition-colors"
           >
             Start Work
           </button>
@@ -903,13 +903,13 @@ function TaskCard({
           <>
             <button
               onClick={() => updateTaskState(task.id, "completed")}
-              className="flex-1 px-3 py-1.5 bg-emerald-50 text-emerald-700 rounded-lg text-xs font-medium hover:bg-emerald-100 transition-colors"
+              className="flex-1 px-3 py-1.5 bg-status-success/15 text-status-success rounded-lg text-xs font-medium hover:bg-status-success/25 transition-colors"
             >
               Complete
             </button>
             <button
               onClick={() => updateTaskState(task.id, "blocked")}
-              className="px-3 py-1.5 bg-red-50 text-red-700 rounded-lg text-xs font-medium hover:bg-red-100 transition-colors"
+              className="px-3 py-1.5 bg-status-error/15 text-status-error rounded-lg text-xs font-medium hover:bg-status-error/25 transition-colors"
             >
               Block
             </button>
@@ -918,7 +918,7 @@ function TaskCard({
         {task.state === "blocked" && (
           <button
             onClick={() => updateTaskState(task.id, "in_progress")}
-            className="flex-1 px-3 py-1.5 bg-blue-50 text-blue-700 rounded-lg text-xs font-medium hover:bg-blue-100 transition-colors"
+            className="flex-1 px-3 py-1.5 bg-status-info/15 text-status-info rounded-lg text-xs font-medium hover:bg-status-info/25 transition-colors"
           >
             Unblock
           </button>
@@ -980,7 +980,7 @@ function MobileTaskRow({
             </span>
             {task.site?.name && <span>Site: {task.site.name}</span>}
             {timeRemaining && (
-              <span className={task.slaStatus === 'breached' ? 'text-red-600 font-medium' : task.slaStatus === 'at_risk' ? 'text-amber-600' : ''}>
+              <span className={task.slaStatus === 'breached' ? 'text-status-error font-medium' : task.slaStatus === 'at_risk' ? 'text-status-warning' : ''}>
                 Due: {timeRemaining}
               </span>
             )}
@@ -1023,7 +1023,7 @@ function MobileTaskRow({
             <div className="flex items-center gap-2">
               <div className="flex-1 h-2 bg-slate-100 rounded-full overflow-hidden">
                 <div
-                  className="h-full bg-emerald-500 transition-all duration-300"
+                  className="h-full bg-status-success transition-all duration-300"
                   style={{ width: `${task.checklistProgress || 0}%` }}
                 />
               </div>
@@ -1038,7 +1038,7 @@ function MobileTaskRow({
             {task.state === "pending" && (
               <button
                 onClick={(e) => { e.stopPropagation(); updateTaskState(task.id, "in_progress"); }}
-                className="flex-1 px-4 py-3 bg-blue-600 text-white rounded-lg text-sm font-medium active:bg-blue-700 transition-colors min-h-[48px]"
+                className="flex-1 px-4 py-3 bg-status-info text-white rounded-lg text-sm font-medium active:bg-status-info/90 transition-colors min-h-[48px]"
               >
                 Start Task
               </button>
@@ -1046,7 +1046,7 @@ function MobileTaskRow({
             {task.state === "assigned" && (
               <button
                 onClick={(e) => { e.stopPropagation(); updateTaskState(task.id, "in_progress"); }}
-                className="flex-1 px-4 py-3 bg-blue-600 text-white rounded-lg text-sm font-medium active:bg-blue-700 transition-colors min-h-[48px]"
+                className="flex-1 px-4 py-3 bg-status-info text-white rounded-lg text-sm font-medium active:bg-status-info/90 transition-colors min-h-[48px]"
               >
                 Start Work
               </button>
@@ -1055,13 +1055,13 @@ function MobileTaskRow({
               <>
                 <button
                   onClick={(e) => { e.stopPropagation(); updateTaskState(task.id, "completed"); }}
-                  className="flex-1 px-4 py-3 bg-emerald-600 text-white rounded-lg text-sm font-medium active:bg-emerald-700 transition-colors min-h-[48px]"
+                  className="flex-1 px-4 py-3 bg-status-success text-white rounded-lg text-sm font-medium active:bg-status-success/90 transition-colors min-h-[48px]"
                 >
                   Complete
                 </button>
                 <button
                   onClick={(e) => { e.stopPropagation(); updateTaskState(task.id, "blocked"); }}
-                  className="px-4 py-3 bg-red-100 text-red-700 rounded-lg text-sm font-medium active:bg-red-200 transition-colors min-h-[48px]"
+                  className="px-4 py-3 bg-status-error/15 text-status-error rounded-lg text-sm font-medium active:bg-status-error/25 transition-colors min-h-[48px]"
                 >
                   Block
                 </button>
@@ -1070,7 +1070,7 @@ function MobileTaskRow({
             {task.state === "blocked" && (
               <button
                 onClick={(e) => { e.stopPropagation(); updateTaskState(task.id, "in_progress"); }}
-                className="flex-1 px-4 py-3 bg-blue-600 text-white rounded-lg text-sm font-medium active:bg-blue-700 transition-colors min-h-[48px]"
+                className="flex-1 px-4 py-3 bg-status-info text-white rounded-lg text-sm font-medium active:bg-status-info/90 transition-colors min-h-[48px]"
               >
                 Resume
               </button>
@@ -1129,19 +1129,19 @@ function SlaDashboardTab({
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <div className="bg-white rounded-xl border border-slate-200 p-6">
           <div className="text-sm text-slate-500 mb-2">Current On Track</div>
-          <div className="text-3xl font-bold text-emerald-600">{slaMetrics?.current.onTrack || 0}</div>
+          <div className="text-3xl font-bold text-status-success">{slaMetrics?.current.onTrack || 0}</div>
         </div>
         <div className="bg-white rounded-xl border border-slate-200 p-6">
           <div className="text-sm text-slate-500 mb-2">At Risk</div>
-          <div className="text-3xl font-bold text-amber-600">{slaMetrics?.current.atRisk || 0}</div>
+          <div className="text-3xl font-bold text-status-warning">{slaMetrics?.current.atRisk || 0}</div>
         </div>
         <div className="bg-white rounded-xl border border-slate-200 p-6">
           <div className="text-sm text-slate-500 mb-2">Breached</div>
-          <div className="text-3xl font-bold text-red-600">{slaMetrics?.current.breached || 0}</div>
+          <div className="text-3xl font-bold text-status-error">{slaMetrics?.current.breached || 0}</div>
         </div>
         <div className="bg-white rounded-xl border border-slate-200 p-6">
           <div className="text-sm text-slate-500 mb-2">Today's Compliance</div>
-          <div className="text-3xl font-bold text-blue-600">{slaMetrics?.today.complianceRate || 100}%</div>
+          <div className="text-3xl font-bold text-status-info">{slaMetrics?.today.complianceRate || 100}%</div>
         </div>
       </div>
 
@@ -1154,11 +1154,11 @@ function SlaDashboardTab({
             <div className="text-sm text-slate-500">Tasks Completed</div>
           </div>
           <div>
-            <div className="text-2xl font-bold text-emerald-600">{slaMetrics?.today.onTime || 0}</div>
+            <div className="text-2xl font-bold text-status-success">{slaMetrics?.today.onTime || 0}</div>
             <div className="text-sm text-slate-500">On Time</div>
           </div>
           <div>
-            <div className="text-2xl font-bold text-red-600">{slaMetrics?.today.late || 0}</div>
+            <div className="text-2xl font-bold text-status-error">{slaMetrics?.today.late || 0}</div>
             <div className="text-sm text-slate-500">Late</div>
           </div>
         </div>
@@ -1166,8 +1166,8 @@ function SlaDashboardTab({
 
       {/* Breached Tasks */}
       {breachedTasks.length > 0 && (
-        <div className="bg-white rounded-xl border border-red-200 p-6">
-          <h3 className="text-lg font-semibold text-red-700 mb-4 flex items-center gap-2">
+        <div className="bg-white rounded-xl border border-status-error/30 p-6">
+          <h3 className="text-lg font-semibold text-status-error mb-4 flex items-center gap-2">
             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>
             SLA Breached ({breachedTasks.length})
           </h3>
@@ -1181,8 +1181,8 @@ function SlaDashboardTab({
 
       {/* At Risk Tasks */}
       {atRiskTasks.length > 0 && (
-        <div className="bg-white rounded-xl border border-amber-200 p-6">
-          <h3 className="text-lg font-semibold text-amber-700 mb-4 flex items-center gap-2">
+        <div className="bg-white rounded-xl border border-status-warning/30 p-6">
+          <h3 className="text-lg font-semibold text-status-warning mb-4 flex items-center gap-2">
             At Risk ({atRiskTasks.length})
           </h3>
           <div className="space-y-3">
@@ -1194,9 +1194,9 @@ function SlaDashboardTab({
       )}
 
       {breachedTasks.length === 0 && atRiskTasks.length === 0 && (
-        <div className="bg-emerald-50 rounded-xl border border-emerald-200 p-8 text-center">
-          <h3 className="text-lg font-semibold text-emerald-800">All Clear!</h3>
-          <p className="text-emerald-600 mt-1">No SLA issues at the moment. Great work!</p>
+        <div className="bg-status-success/15 rounded-xl border border-status-success/30 p-8 text-center">
+          <h3 className="text-lg font-semibold text-status-success">All Clear!</h3>
+          <p className="text-status-success mt-1">No SLA issues at the moment. Great work!</p>
         </div>
       )}
     </div>
@@ -1227,7 +1227,7 @@ function SlaTaskRow({
         </div>
       </div>
       <div className={`text-sm font-medium ${
-        task.slaStatus === "breached" ? "text-red-600" : "text-amber-600"
+        task.slaStatus === "breached" ? "text-status-error" : "text-status-warning"
       }`}>
         {timeRemaining}
       </div>
@@ -1929,7 +1929,7 @@ function CreateTeamModal({
 // ============================================================
 
 const TIER_CONFIG: Record<string, { color: string; bg: string }> = {
-  bronze: { color: "text-amber-700", bg: "bg-amber-100" },
+  bronze: { color: "text-status-warning", bg: "bg-status-warning/15" },
   silver: { color: "text-slate-500", bg: "bg-slate-100" },
   gold: { color: "text-yellow-600", bg: "bg-yellow-100" },
   platinum: { color: "text-purple-600", bg: "bg-purple-100" },
@@ -2117,7 +2117,7 @@ function LeaderboardTab({
                       Lvl {entry.level}
                     </span>
                     {entry.streak >= 3 && (
-                      <span className="text-xs px-2 py-0.5 bg-orange-100 text-orange-600 rounded-full">
+                      <span className="text-xs px-2 py-0.5 bg-status-warning/15 text-status-warning rounded-full">
                         {entry.streak} day streak
                       </span>
                     )}
@@ -2129,7 +2129,7 @@ function LeaderboardTab({
 
                 {/* Points */}
                 <div className="text-right">
-                  <div className="text-xl font-bold text-emerald-600">{entry.periodPoints}</div>
+                  <div className="text-xl font-bold text-status-success">{entry.periodPoints}</div>
                   <div className="text-xs text-slate-500">pts</div>
                 </div>
               </div>
@@ -2149,7 +2149,7 @@ function LeaderboardTab({
           {badges.map(badge => (
             <div
               key={badge.id}
-              className={`p-4 rounded-xl border-2 ${badge.earnedCount > 0 ? 'border-emerald-200 bg-emerald-50' : 'border-slate-100 bg-slate-50'} text-center`}
+              className={`p-4 rounded-xl border-2 ${badge.earnedCount > 0 ? 'border-status-success/30 bg-status-success/15' : 'border-slate-100 bg-slate-50'} text-center`}
             >
               <div className="text-3xl mb-2">{badge.icon}</div>
               <div className="font-medium text-slate-900 text-sm">{badge.name}</div>
@@ -2157,9 +2157,9 @@ function LeaderboardTab({
                 {badge.tier}
               </div>
               <div className="text-xs text-slate-500 mb-2">{badge.description}</div>
-              <div className="text-xs text-emerald-600 font-medium">+{badge.points} pts</div>
+              <div className="text-xs text-status-success font-medium">+{badge.points} pts</div>
               {badge.earnedCount > 0 && (
-                <div className="mt-2 text-xs text-emerald-700 bg-emerald-100 rounded-full px-2 py-0.5">
+                <div className="mt-2 text-xs text-status-success bg-status-success/15 rounded-full px-2 py-0.5">
                   Earned by {badge.earnedCount} staff
                 </div>
               )}

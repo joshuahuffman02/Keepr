@@ -179,7 +179,7 @@ export default function BlackoutDatesPage() {
             case "active":
                 return <Badge className="bg-rose-100 text-rose-800 border-rose-200">Active</Badge>;
             case "upcoming":
-                return <Badge className="bg-amber-100 text-amber-800 border-amber-200">Upcoming</Badge>;
+                return <Badge className="bg-status-warning/15 text-status-warning border-status-warning/30">Upcoming</Badge>;
             case "past":
                 return <Badge variant="secondary">Past</Badge>;
             default:

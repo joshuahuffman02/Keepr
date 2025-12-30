@@ -399,7 +399,7 @@ Type \`help\` to see all available commands, or just ask me anything!`,
                     whileTap={prefersReducedMotion ? undefined : { scale: 0.98 }}
                   >
                     <div className="flex items-center gap-2">
-                      <div className="flex h-8 w-8 items-center justify-center rounded-full bg-emerald-100 dark:bg-emerald-900/50 text-emerald-600 dark:text-emerald-400">
+                      <div className="flex h-8 w-8 items-center justify-center rounded-full bg-status-success/15 text-status-success">
                         {action.icon}
                       </div>
                       <span className="font-semibold text-foreground">{action.label}</span>

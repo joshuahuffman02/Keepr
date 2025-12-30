@@ -136,10 +136,10 @@ export default function AiAutopilotPage() {
   }
 
   const severityColors: Record<string, string> = {
-    critical: "bg-red-100 text-red-800 border-red-200",
-    high: "bg-orange-100 text-orange-800 border-orange-200",
-    medium: "bg-yellow-100 text-yellow-800 border-yellow-200",
-    low: "bg-blue-100 text-blue-800 border-blue-200",
+    critical: "bg-status-error/15 text-status-error",
+    high: "bg-status-warning/15 text-status-warning",
+    medium: "bg-status-warning/15 text-status-warning",
+    low: "bg-status-info/15 text-status-info",
   };
 
   return (
@@ -484,7 +484,7 @@ export default function AiAutopilotPage() {
             <div className="space-y-3">
               {replyDrafts?.map((draft: any) => (
                 <Card key={draft.id} className={cn(
-                  draft.status === "pending" && "border-blue-200 bg-blue-50/30"
+                  draft.status === "pending" && "bg-status-info/15"
                 )}>
                   <CardContent className="p-4">
                     <div className="flex items-start justify-between">
@@ -632,7 +632,7 @@ export default function AiAutopilotPage() {
             <div className="space-y-3">
               {noShowRisks?.map((risk: any) => (
                 <Card key={risk.id} className={cn(
-                  risk.flagged && !risk.guestConfirmed && "border-orange-200 bg-orange-50/30"
+                  risk.flagged && !risk.guestConfirmed && "bg-status-warning/15"
                 )}>
                   <CardContent className="p-4">
                     <div className="flex items-start justify-between">

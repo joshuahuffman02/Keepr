@@ -27,9 +27,13 @@ import { AiReportQueryService } from './ai-report-query.service';
 import { AiCampaignService } from './ai-campaign.service';
 import { AiYieldService } from './ai-yield.service';
 import { AiDemandForecastService } from './ai-demand-forecast.service';
+// AI Monitoring & Edge Cases
+import { AiCostTrackingService } from './ai-cost-tracking.service';
+import { AiEdgeCasesService } from './ai-edge-cases.service';
 import { AiService } from './ai.service';
 import { AiController } from './ai.controller';
 import { AiAutopilotController } from './ai-autopilot.controller';
+import { AiMonitoringController } from './ai-monitoring.controller';
 import { PrismaModule } from '../prisma/prisma.module';
 import { PublicReservationsModule } from '../public-reservations/public-reservations.module';
 import { PermissionsModule } from '../permissions/permissions.module';
@@ -60,7 +64,7 @@ import { AnomaliesModule } from '../anomalies/anomalies.module';
     EmailModule,
     AnomaliesModule,
   ],
-  controllers: [AiController, AiAutopilotController],
+  controllers: [AiController, AiAutopilotController, AiMonitoringController],
   providers: [
     AiPrivacyService,
     AiProviderService,
@@ -91,6 +95,9 @@ import { AnomaliesModule } from '../anomalies/anomalies.module';
     AiCampaignService,
     AiYieldService,
     AiDemandForecastService,
+    // AI Monitoring & Edge Cases
+    AiCostTrackingService,
+    AiEdgeCasesService,
     AiService,
   ],
   exports: [
@@ -123,6 +130,9 @@ import { AnomaliesModule } from '../anomalies/anomalies.module';
     AiCampaignService,
     AiYieldService,
     AiDemandForecastService,
+    // AI Monitoring & Edge Cases
+    AiCostTrackingService,
+    AiEdgeCasesService,
     AiService,
   ],
 })

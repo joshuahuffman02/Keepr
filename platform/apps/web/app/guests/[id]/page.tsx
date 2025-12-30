@@ -885,7 +885,7 @@ export default function GuestDetailPage() {
                                 <div className="flex items-center gap-2">
                                     <CardTitle>Communications</CardTitle>
                                     {overdueCount > 0 && (
-                                        <span className="px-2 py-0.5 rounded-full text-[11px] font-semibold bg-amber-100 text-amber-800 border border-amber-200">
+                                        <span className="px-2 py-0.5 rounded-full text-[11px] font-semibold bg-status-warning/15 text-status-warning border border-status-warning">
                                             {overdueCount} need reply
                                         </span>
                                     )}
@@ -1100,8 +1100,8 @@ export default function GuestDetailPage() {
                                                                 <span
                                                                     className={`px-2 py-0.5 rounded-full text-[10px] font-semibold ${
                                                                         item.direction === "outbound"
-                                                                            ? "bg-blue-100 text-blue-700 border border-blue-200"
-                                                                            : "bg-emerald-100 text-emerald-700 border border-emerald-200"
+                                                                            ? "bg-status-info/15 text-status-info border border-status-info"
+                                                                            : "bg-status-success/15 text-status-success border border-status-success"
                                                                     }`}
                                                                 >
                                                                     {item.direction}

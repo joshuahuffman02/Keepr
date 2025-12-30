@@ -431,10 +431,10 @@ export default function AvailabilityPage({ params }: { params: { campgroundId: s
                                 "w-full px-2 py-2 rounded-lg text-xs font-medium transition-all",
                                 status.available
                                   ? status.isOverride
-                                    ? "bg-emerald-100 text-emerald-700 ring-2 ring-emerald-300"
-                                    : "bg-emerald-50 text-emerald-700"
+                                    ? "bg-status-success/15 text-status-success ring-2 ring-status-success/30"
+                                    : "bg-status-success/10 text-status-success"
                                   : status.isOverride
-                                  ? "bg-red-100 text-red-700 ring-2 ring-red-300"
+                                  ? "bg-status-error/15 text-status-error ring-2 ring-status-error/30"
                                   : "bg-slate-100 text-slate-500"
                               )}
                             >
@@ -506,7 +506,7 @@ export default function AvailabilityPage({ params }: { params: { campgroundId: s
                       className={cn(
                         "flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-lg border-2 font-medium transition-all",
                         overrideAvailable
-                          ? "border-emerald-500 bg-emerald-50 text-emerald-700"
+                          ? "border-status-success bg-status-success/15 text-status-success"
                           : "border-slate-200 text-slate-600 hover:border-slate-300"
                       )}
                     >
@@ -518,7 +518,7 @@ export default function AvailabilityPage({ params }: { params: { campgroundId: s
                       className={cn(
                         "flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-lg border-2 font-medium transition-all",
                         !overrideAvailable
-                          ? "border-red-500 bg-red-50 text-red-700"
+                          ? "border-status-error bg-status-error/15 text-status-error"
                           : "border-slate-200 text-slate-600 hover:border-slate-300"
                       )}
                     >
@@ -601,11 +601,11 @@ export default function AvailabilityPage({ params }: { params: { campgroundId: s
           className="flex flex-wrap items-center gap-4 text-xs text-slate-600"
         >
           <div className="flex items-center gap-2">
-            <div className="w-4 h-4 rounded bg-emerald-50 border border-emerald-200" />
+            <div className="w-4 h-4 rounded bg-status-success/10 border border-status-success/20" />
             <span>Available (regular)</span>
           </div>
           <div className="flex items-center gap-2">
-            <div className="w-4 h-4 rounded bg-emerald-100 ring-2 ring-emerald-300" />
+            <div className="w-4 h-4 rounded bg-status-success/15 ring-2 ring-status-success/30" />
             <span>Available (override)</span>
           </div>
           <div className="flex items-center gap-2">
@@ -613,7 +613,7 @@ export default function AvailabilityPage({ params }: { params: { campgroundId: s
             <span>Unavailable (regular)</span>
           </div>
           <div className="flex items-center gap-2">
-            <div className="w-4 h-4 rounded bg-red-100 ring-2 ring-red-300" />
+            <div className="w-4 h-4 rounded bg-status-error/15 ring-2 ring-status-error/30" />
             <span>Unavailable (override)</span>
           </div>
         </motion.div>

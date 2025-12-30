@@ -106,7 +106,7 @@ export default function PlatformUsersPage() {
       <div>
         <div className="space-y-3">
           <div className="text-xl font-semibold text-white">Platform users</div>
-          <div className="rounded-lg border border-amber-200/20 bg-amber-500/10 text-amber-400 p-4">
+          <div className="rounded-lg border border-status-warning/30 bg-status-warning/15 text-status-warning p-4">
             You do not have access to platform staff administration.
           </div>
         </div>

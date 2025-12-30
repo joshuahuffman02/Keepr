@@ -602,7 +602,7 @@ function QuestionBuilder({
                           <button
                             type="button"
                             onClick={() => removeOption(q.id, optIdx)}
-                            className="p-1 rounded hover:bg-red-50 text-slate-400 hover:text-red-500 transition-colors"
+                            className="p-1 rounded hover:bg-status-error/15 text-slate-400 hover:text-status-error transition-colors"
                             aria-label="Remove option"
                           >
                             <X className="h-3.5 w-3.5" />
@@ -612,7 +612,7 @@ function QuestionBuilder({
                       <button
                         type="button"
                         onClick={() => addOption(q.id)}
-                        className="text-xs text-emerald-600 hover:text-emerald-700 font-medium flex items-center gap-1"
+                        className="text-xs text-status-success hover:text-status-success/90 font-medium flex items-center gap-1"
                       >
                         <Plus className="h-3 w-3" />
                         Add option
@@ -637,7 +637,7 @@ function QuestionBuilder({
                 <button
                   type="button"
                   onClick={() => removeQuestion(q.id)}
-                  className="p-1.5 rounded hover:bg-red-50 text-slate-400 hover:text-red-500 transition-colors"
+                  className="p-1.5 rounded hover:bg-status-error/15 text-slate-400 hover:text-status-error transition-colors"
                   aria-label="Delete question"
                 >
                   <Trash2 className="h-4 w-4" />
@@ -729,7 +729,7 @@ function FormSettings({
             {siteClassesLoading ? (
               <div className="text-xs text-slate-500">Loading site classes...</div>
             ) : siteClassesError ? (
-              <div className="text-xs text-red-500">Error loading site classes: {String(siteClassesError)}</div>
+              <div className="text-xs text-status-error">Error loading site classes: {String(siteClassesError)}</div>
             ) : siteClasses.length === 0 ? (
               <div className="text-xs text-slate-500">No site types found. Create site classes first.</div>
             ) : (
@@ -1064,7 +1064,7 @@ function FormSettings({
                         type="button"
                         variant="ghost"
                         size="sm"
-                        className="h-8 w-8 p-0 text-slate-400 hover:text-red-500"
+                        className="h-8 w-8 p-0 text-slate-400 hover:text-status-error"
                         onClick={() => {
                           onChange({
                             displayConditions: form.displayConditions.filter((_, i) => i !== index)
@@ -1293,7 +1293,7 @@ function ManualAttach({
                   onClick={() => setSelectedId(item.id)}
                   className={cn(
                     "w-full p-3 text-left hover:bg-slate-50 transition-colors",
-                    selectedId === item.id && "bg-emerald-50"
+                    selectedId === item.id && "bg-status-success/15"
                   )}
                 >
                   {searchType === "reservation" ? (
@@ -1376,7 +1376,7 @@ function FirstFormCelebration({ open, onClose, formName }: { open: boolean; onCl
         </div>
         <h3 className="text-xl font-bold text-slate-900 mb-2">Your First Form is Ready!</h3>
         <p className="text-slate-600 mb-6">
-          <span className="font-medium text-emerald-600">{formName}</span> is now available.
+          <span className="font-medium text-status-success">{formName}</span> is now available.
         </p>
         <Button onClick={onClose} className="bg-gradient-to-r from-emerald-500 to-teal-500">Got it!</Button>
       </div>
@@ -1409,7 +1409,7 @@ function FormPreview({ open, onClose, form }: { open: boolean; onClose: () => vo
               <div key={idx} className="space-y-1.5">
                 <label className="text-sm font-medium">
                   {q.label}
-                  {q.required && <span className="text-red-500 ml-1">*</span>}
+                  {q.required && <span className="text-status-error ml-1">*</span>}
                 </label>
                 {q.type === "checkbox" ? (
                   <div className="flex items-center gap-2">
@@ -1444,7 +1444,7 @@ function EmptyFormsState({ onCreateClick, onTemplateClick }: { onCreateClick: ()
     <div className="relative overflow-hidden rounded-xl border-2 border-dashed border-slate-200 bg-gradient-to-br from-slate-50 to-white p-8">
       <div className="absolute top-0 right-0 w-48 h-48 bg-gradient-to-br from-emerald-100/40 to-teal-100/40 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
       <div className="relative text-center mb-8">
-        <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-br from-emerald-100 to-teal-100 text-emerald-600 mb-4">
+        <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-br from-status-success/15 to-teal-100 text-status-success mb-4">
           <FileText className="h-8 w-8" />
         </div>
         <h3 className="text-xl font-bold text-slate-900 mb-2">Create Your First Form</h3>
@@ -1459,7 +1459,7 @@ function EmptyFormsState({ onCreateClick, onTemplateClick }: { onCreateClick: ()
             onClick={() => onTemplateClick(t)}
             className="group p-4 rounded-lg border-2 border-slate-200 bg-white text-left transition-all duration-200 hover:border-emerald-300 hover:shadow-md hover:-translate-y-0.5"
           >
-            <div className="inline-flex items-center justify-center w-10 h-10 rounded-lg mb-3 bg-slate-100 text-slate-600 group-hover:bg-emerald-100 group-hover:text-emerald-600 transition-colors">
+            <div className="inline-flex items-center justify-center w-10 h-10 rounded-lg mb-3 bg-slate-100 text-slate-600 group-hover:bg-status-success/15 group-hover:text-status-success transition-colors">
               {t.icon}
             </div>
             <div className="font-medium text-slate-900 mb-1">{t.name}</div>
@@ -1763,10 +1763,10 @@ export default function FormsPage() {
   // Helper to get auto-attach badge
   const getAutoAttachBadge = (t: any) => {
     if (t.autoAttachMode === "all_bookings") {
-      return <Badge className="bg-amber-100 text-amber-700 hover:bg-amber-100">All bookings</Badge>;
+      return <Badge className="bg-status-warning/15 text-status-warning border-status-warning/30 hover:bg-status-warning/15">All bookings</Badge>;
     }
     if (t.autoAttachMode === "site_classes" && t.siteClassIds?.length > 0) {
-      return <Badge className="bg-blue-100 text-blue-700 hover:bg-blue-100">{t.siteClassIds.length} site types</Badge>;
+      return <Badge className="bg-status-info/15 text-status-info border-status-info/30 hover:bg-status-info/15">{t.siteClassIds.length} site types</Badge>;
     }
     return <Badge variant="secondary">Manual</Badge>;
   };
@@ -1791,7 +1791,7 @@ export default function FormsPage() {
             <AlertDialogCancel>Cancel</AlertDialogCancel>
             <AlertDialogAction
               onClick={() => deleteConfirmId && deleteMutation.mutate(deleteConfirmId)}
-              className="bg-red-600 hover:bg-red-700"
+              className="bg-status-error text-white hover:bg-status-error/90"
             >
               {deleteMutation.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : "Delete"}
             </AlertDialogAction>
@@ -1839,7 +1839,7 @@ export default function FormsPage() {
           </CardHeader>
           <CardContent className="space-y-4">
             {!campgroundId && (
-              <div className="rounded-lg border border-amber-200 bg-amber-50 p-4 text-sm text-amber-800 flex items-center gap-3">
+              <div className="rounded-lg border border-status-warning/30 bg-status-warning/15 p-4 text-sm text-status-warning flex items-center gap-3">
                 <AlertTriangle className="h-5 w-5" />
                 <span>Select a campground from the sidebar to manage forms.</span>
               </div>
@@ -1876,10 +1876,10 @@ export default function FormsPage() {
                           </Badge>
                           {/* Show category badge for legal documents */}
                           {isLegalDocumentType(t.type) && (
-                            <Badge className="bg-blue-100 text-blue-700 hover:bg-blue-100">Legal</Badge>
+                            <Badge className="bg-status-info/15 text-status-info border-status-info/30 hover:bg-status-info/15">Legal</Badge>
                           )}
                           {getAutoAttachBadge(t)}
-                          <Badge variant={t.isActive ? "default" : "secondary"} className={t.isActive ? "bg-emerald-100 text-emerald-700" : ""}>
+                          <Badge variant={t.isActive ? "default" : "secondary"} className={t.isActive ? "bg-status-success/15 text-status-success border-status-success/30" : ""}>
                             {t.isActive ? "Active" : "Inactive"}
                           </Badge>
                         </div>
@@ -1904,7 +1904,7 @@ export default function FormsPage() {
                           <Edit3 className="h-4 w-4 mr-1" />
                           Edit
                         </Button>
-                        <Button size="sm" variant="ghost" onClick={() => setDeleteConfirmId(t.id)} className="text-slate-500 hover:text-red-600 hover:bg-red-50">
+                        <Button size="sm" variant="ghost" onClick={() => setDeleteConfirmId(t.id)} className="text-slate-500 hover:text-status-error hover:bg-status-error/15">
                           <Trash2 className="h-4 w-4" />
                         </Button>
                       </div>
@@ -1989,7 +1989,7 @@ export default function FormsPage() {
                             }))}
                             className={cn(
                               "inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium border",
-                              form.title === t.name ? "border-emerald-400 bg-emerald-50 text-emerald-700" : "border-slate-200 bg-slate-50 text-slate-600 hover:border-emerald-300"
+                              form.title === t.name ? "border-status-success/30 bg-status-success/15 text-status-success" : "border-slate-200 bg-slate-50 text-slate-600 hover:border-status-success/30"
                             )}
                           >
                             {t.icon}
@@ -2095,14 +2095,14 @@ export default function FormsPage() {
 
                 {/* Enforcement setting for legal documents */}
                 {isLegalDocumentType(form.type) && (
-                  <div className="p-3 rounded-lg border border-blue-200 bg-blue-50 space-y-3">
-                    <div className="flex items-center gap-2 text-sm font-medium text-blue-900">
+                  <div className="p-3 rounded-lg border border-status-info/30 bg-status-info/15 space-y-3">
+                    <div className="flex items-center gap-2 text-sm font-medium text-status-info">
                       <Scale className="h-4 w-4" />
                       Signature Requirements
                     </div>
                     <div className="grid md:grid-cols-2 gap-3">
                       <div className="space-y-2">
-                        <label className="text-xs font-medium text-blue-800">When is signature required?</label>
+                        <label className="text-xs font-medium text-status-info">When is signature required?</label>
                         <Select
                           value={form.enforcement || "post_booking"}
                           onValueChange={(v: EnforcementType) => setForm(f => ({ ...f, enforcement: v }))}
@@ -2124,7 +2124,7 @@ export default function FormsPage() {
                           onCheckedChange={(checked) => setForm(f => ({ ...f, requireSignature: checked }))}
                           id="require-signature"
                         />
-                        <label htmlFor="require-signature" className="text-xs text-blue-800">
+                        <label htmlFor="require-signature" className="text-xs text-status-info">
                           Require signature (vs. acknowledgement only)
                         </label>
                       </div>
@@ -2160,7 +2160,7 @@ export default function FormsPage() {
               <Button
                 onClick={() => upsertMutation.mutate()}
                 disabled={upsertMutation.isPending || !form.title}
-                className="bg-emerald-600 hover:bg-emerald-700"
+                className="bg-status-success text-white hover:bg-status-success/90"
               >
                 {upsertMutation.isPending ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <CheckCircle2 className="h-4 w-4 mr-2" />}
                 {editingId ? "Save changes" : "Create form"}

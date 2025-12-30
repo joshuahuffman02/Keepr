@@ -78,7 +78,7 @@ export default function PayoutDetailPage() {
             <CardTitle className="flex items-center gap-2">
               <span>{data?.stripePayoutId ?? payoutId}</span>
               {data?.status && (
-                <Badge className="bg-blue-100 text-blue-800">{data.status.replace("_", " ")}</Badge>
+                <Badge className="bg-status-info/15 text-status-info">{data.status.replace("_", " ")}</Badge>
               )}
             </CardTitle>
           </CardHeader>
@@ -97,7 +97,7 @@ export default function PayoutDetailPage() {
                   Recon — Net: {formatMoney(recon.payoutNetCents)} | Lines: {formatMoney(recon.lineSumCents)} | Ledger: {formatMoney(recon.ledgerNetCents)} | Drift vs Ledger: {formatMoney(recon.driftVsLedgerCents)}
                 </div>
                 {Math.abs(recon.driftVsLedgerCents) > DRIFT_THRESHOLD_CENTS && (
-                  <Badge className="bg-amber-100 text-amber-800 w-fit">
+                  <Badge className="bg-status-warning/15 text-status-warning w-fit">
                     Drift exceeds threshold ({formatMoney(recon.driftVsLedgerCents)})
                   </Badge>
                 )}

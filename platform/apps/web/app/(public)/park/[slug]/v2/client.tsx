@@ -326,8 +326,8 @@ export function CampgroundV2Client({ slug, initialData, previewToken }: { slug: 
                   Tap pins to view site details and availability for your selected dates.
                 </p>
                 {selectedSiteId && (
-                  <div className="mt-3 p-3 bg-emerald-50 rounded-xl border border-emerald-100 animate-in fade-in slide-in-from-top-2">
-                    <div className="text-xs font-bold text-emerald-800 uppercase tracking-wider">Currently Selection</div>
+                  <div className="mt-3 p-3 bg-status-success/15 rounded-xl border border-status-success/30 animate-in fade-in slide-in-from-top-2">
+                    <div className="text-xs font-bold text-status-success uppercase tracking-wider">Currently Selection</div>
                     <div className="font-semibold text-slate-900 mt-0.5">
                       {sitesStatus?.find(s => s.id === selectedSiteId)?.siteNumber} ({sitesStatus?.find(s => s.id === selectedSiteId)?.siteClassName})
                     </div>
@@ -390,8 +390,8 @@ export function CampgroundV2Client({ slug, initialData, previewToken }: { slug: 
               </div>
             ) : (
               <div className="text-center py-4">
-                <div className="w-10 h-10 bg-amber-50 rounded-full flex items-center justify-center mx-auto mb-2">
-                  <Sparkles className="h-5 w-5 text-amber-500" />
+                <div className="w-10 h-10 bg-status-warning/15 rounded-full flex items-center justify-center mx-auto mb-2">
+                  <Sparkles className="h-5 w-5 text-status-warning" />
                 </div>
                 <p className="text-sm text-slate-600">Be the first to share your experience!</p>
                 <p className="text-xs text-slate-400 mt-1">Reviews appear after your stay</p>
@@ -540,15 +540,15 @@ export function CampgroundV2Client({ slug, initialData, previewToken }: { slug: 
               {promotions.length > 0 && (
                 <div className="space-y-3">
                   {promotions.map((promo) => (
-                    <Card key={promo.id} className="p-4 border-rose-100 bg-rose-50/60 hover:shadow-md transition">
+                    <Card key={promo.id} className="p-4 border-status-error/30 bg-status-error/10 hover:shadow-md transition">
                       <div className="flex items-center justify-between">
-                        <div className="text-sm font-semibold text-rose-700">Deal</div>
-                        {promo.validTo && <Badge variant="secondary" className="bg-rose-600 text-white border-rose-500">Ends {promo.validTo.split("T")[0]}</Badge>}
+                        <div className="text-sm font-semibold text-status-error">Deal</div>
+                        {promo.validTo && <Badge variant="secondary" className="bg-status-error text-white border-status-error">Ends {promo.validTo.split("T")[0]}</Badge>}
                       </div>
                       <h3 className="text-lg font-bold text-slate-900 mt-1">{promo.code}</h3>
                       <p className="text-sm text-slate-600">{promo.description || "Special offer for your stay."}</p>
                       <Button
-                        className="w-full mt-3 bg-white text-rose-700 border border-rose-200 hover:bg-rose-100"
+                        className="w-full mt-3 bg-white text-status-error border border-status-error/30 hover:bg-status-error/10"
                         onClick={() => {
                           const q = new URLSearchParams({
                             arrivalDate,
@@ -570,10 +570,10 @@ export function CampgroundV2Client({ slug, initialData, previewToken }: { slug: 
         ) : (
           <section className="space-y-3">
             <h2 className="text-xl font-semibold text-slate-900">Events & offers</h2>
-            <Card className="p-6 border-dashed border-slate-200 bg-gradient-to-br from-emerald-50 to-teal-50">
+            <Card className="p-6 border-dashed border-slate-200 bg-gradient-to-br from-status-success/10 to-teal-50">
               <div className="text-center space-y-4">
-                <div className="w-12 h-12 bg-emerald-100 rounded-full flex items-center justify-center mx-auto">
-                  <Sparkles className="h-6 w-6 text-emerald-600" />
+                <div className="w-12 h-12 bg-status-success/15 rounded-full flex items-center justify-center mx-auto">
+                  <Sparkles className="h-6 w-6 text-status-success" />
                 </div>
                 <div>
                   <h3 className="font-semibold text-slate-900">
@@ -606,8 +606,8 @@ export function CampgroundV2Client({ slug, initialData, previewToken }: { slug: 
                     </Button>
                   </div>
                 ) : (
-                  <div className="flex items-center justify-center gap-2 text-emerald-600 animate-in fade-in zoom-in duration-300">
-                    <div className="w-6 h-6 bg-emerald-100 rounded-full flex items-center justify-center">
+                  <div className="flex items-center justify-center gap-2 text-status-success animate-in fade-in zoom-in duration-300">
+                    <div className="w-6 h-6 bg-status-success/15 rounded-full flex items-center justify-center">
                       <Check className="h-4 w-4" />
                     </div>
                     <span className="font-medium">You're on the list!</span>
@@ -648,7 +648,7 @@ export function CampgroundV2Client({ slug, initialData, previewToken }: { slug: 
                       <Badge variant="secondary" className="bg-black/60 text-white border-white/10">
                         {sc.siteType?.toUpperCase() || "STAY"}
                       </Badge>
-                      {sc.petFriendly && <Badge variant="secondary" className="bg-emerald-600 text-white border-emerald-500">Pet friendly</Badge>}
+                      {sc.petFriendly && <Badge variant="secondary" className="bg-status-success text-white border-status-success">Pet friendly</Badge>}
                     </div>
                     {/* Scarcity badge for limited availability */}
                     {stubbedAvailability <= 5 && (
@@ -664,7 +664,7 @@ export function CampgroundV2Client({ slug, initialData, previewToken }: { slug: 
                         <p className="text-sm text-slate-600 line-clamp-2">{sc.description}</p>
                       </div>
                       <div className="text-right">
-                        <div className="text-2xl font-bold text-emerald-600" aria-label={`${pricePerNight} dollars per night`}>
+                        <div className="text-2xl font-bold text-status-success" aria-label={`${pricePerNight} dollars per night`}>
                           ${pricePerNight}
                         </div>
                         <div className="text-xs text-slate-500">per night</div>
@@ -780,7 +780,7 @@ export function CampgroundV2Client({ slug, initialData, previewToken }: { slug: 
             {valueStack.guarantees?.length > 0 && (
               <div className="space-y-4">
                 <div className="flex items-center gap-2">
-                  <Shield className="h-5 w-5 text-emerald-600" />
+                  <Shield className="h-5 w-5 text-status-success" />
                   <h2 className="text-lg font-semibold text-slate-900">Our Guarantees</h2>
                 </div>
                 <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
@@ -796,10 +796,10 @@ export function CampgroundV2Client({ slug, initialData, previewToken }: { slug: 
                     };
                     const IconComponent = iconMap[g.iconName as string] || Shield;
                     return (
-                      <Card key={g.id} className="p-4 border-emerald-100 bg-white/80 backdrop-blur-sm">
+                      <Card key={g.id} className="p-4 border-status-success/30 bg-white/80 backdrop-blur-sm">
                         <div className="flex gap-3">
-                          <div className="w-10 h-10 bg-emerald-100 rounded-full flex items-center justify-center flex-shrink-0">
-                            <IconComponent className="h-5 w-5 text-emerald-600" />
+                          <div className="w-10 h-10 bg-status-success/15 rounded-full flex items-center justify-center flex-shrink-0">
+                            <IconComponent className="h-5 w-5 text-status-success" />
                           </div>
                           <div>
                             <h3 className="font-semibold text-slate-900">{g.title}</h3>
@@ -818,11 +818,11 @@ export function CampgroundV2Client({ slug, initialData, previewToken }: { slug: 
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <Gift className="h-5 w-5 text-emerald-600" />
+                    <Gift className="h-5 w-5 text-status-success" />
                     <h2 className="text-lg font-semibold text-slate-900">Included With Your Stay</h2>
                   </div>
                   {valueStack.totalBonusValue > 0 && (
-                    <Badge variant="secondary" className="bg-emerald-100 text-emerald-800 border-emerald-200">
+                    <Badge variant="secondary" className="bg-status-success/15 text-status-success border-status-success/30">
                       ${(valueStack.totalBonusValue / 100).toFixed(0)} value included
                     </Badge>
                   )}
@@ -840,13 +840,13 @@ export function CampgroundV2Client({ slug, initialData, previewToken }: { slug: 
                     const IconComponent = bonusIconMap[b.iconName as string] || Gift;
                     return (
                       <div key={b.id} className="flex items-center gap-3 p-3 bg-white/60 rounded-lg">
-                        <div className="w-8 h-8 bg-amber-100 rounded-full flex items-center justify-center flex-shrink-0">
-                          <IconComponent className="h-4 w-4 text-amber-600" />
+                        <div className="w-8 h-8 bg-status-warning/15 rounded-full flex items-center justify-center flex-shrink-0">
+                          <IconComponent className="h-4 w-4 text-status-warning" />
                         </div>
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center justify-between">
                             <span className="font-medium text-slate-900">{b.name}</span>
-                            <span className="text-sm text-emerald-600 font-semibold">${(b.valueCents / 100).toFixed(0)} value</span>
+                            <span className="text-sm text-status-success font-semibold">${(b.valueCents / 100).toFixed(0)} value</span>
                           </div>
                           {b.description && (
                             <p className="text-xs text-slate-500 truncate">{b.description}</p>

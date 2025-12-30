@@ -296,7 +296,7 @@ export default function FinancePage() {
                     <DollarSign className="h-5 w-5 text-emerald-700 dark:text-emerald-400" />
                   </div>
                   {metrics.nextPayout && (
-                    <Badge className="bg-emerald-100 dark:bg-emerald-900/50 text-emerald-700 dark:text-emerald-300 border-emerald-200 dark:border-emerald-700">
+                    <Badge className="bg-status-success/15 text-status-success border-status-success">
                       On schedule
                     </Badge>
                   )}
@@ -340,8 +340,8 @@ export default function FinancePage() {
                   {metrics.revenueChange !== 0 && (
                     <Badge className={`${
                       metrics.revenueChange > 0
-                        ? "bg-emerald-100 dark:bg-emerald-900/50 text-emerald-700 dark:text-emerald-300 border-emerald-200 dark:border-emerald-700"
-                        : "bg-rose-100 dark:bg-rose-900/50 text-rose-700 dark:text-rose-300 border-rose-200 dark:border-rose-700"
+                        ? "bg-status-success/15 text-status-success border-status-success"
+                        : "bg-status-error/15 text-status-error border-status-error"
                     }`}>
                       {metrics.revenueChange > 0 ? "+" : ""}{metrics.revenueChange.toFixed(0)}% vs last month
                     </Badge>
@@ -380,11 +380,11 @@ export default function FinancePage() {
                     }`} />
                   </div>
                   {metrics.disputeSummary.open > 0 ? (
-                    <Badge className="bg-amber-100 dark:bg-amber-900/50 text-amber-700 dark:text-amber-300 border-amber-200 dark:border-amber-700">
+                    <Badge className="bg-status-warning/15 text-status-warning border-status-warning">
                       {metrics.disputeSummary.open} need attention
                     </Badge>
                   ) : metrics.disputeSummary.total > 0 ? (
-                    <Badge className="bg-emerald-100 dark:bg-emerald-900/50 text-emerald-700 dark:text-emerald-300 border-emerald-200 dark:border-emerald-700">
+                    <Badge className="bg-status-success/15 text-status-success border-status-success">
                       All resolved
                     </Badge>
                   ) : null}
@@ -502,7 +502,7 @@ export default function FinancePage() {
                       Payment Disputes
                     </h3>
                     {metrics.disputeSummary.open > 0 && (
-                      <Badge className="bg-amber-100 dark:bg-amber-900/50 text-amber-700 dark:text-amber-300 border-amber-200 dark:border-amber-700">
+                      <Badge className="bg-status-warning/15 text-status-warning border-status-warning">
                         {metrics.disputeSummary.open}
                       </Badge>
                     )}

@@ -247,8 +247,8 @@ export default function PromotionsSettingsPage() {
                                     <div className="flex items-center justify-between">
                                         <div className="flex items-center gap-4">
                                             <div className={`p-3 rounded-lg ${promo.type === "percentage"
-                                                ? "bg-blue-100 text-blue-600"
-                                                : "bg-green-100 text-green-600"
+                                                ? "bg-status-info/15 text-status-info"
+                                                : "bg-status-success/15 text-status-success"
                                                 }`}>
                                                 {promo.type === "percentage" ? (
                                                     <Percent className="h-5 w-5" />

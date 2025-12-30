@@ -130,7 +130,7 @@ export default function AdminUsersPage() {
                                         </td>
                                         <td className="px-4 py-3">
                                             {user.platformRole ? (
-                                                <Badge className="bg-blue-500/10 text-blue-400 hover:bg-blue-500/20 border-blue-500/20">
+                                                <Badge className="bg-status-info/15 text-status-info hover:bg-status-info/20 border-status-info/30">
                                                     {user.platformRole.replace('_', ' ')}
                                                 </Badge>
                                             ) : (

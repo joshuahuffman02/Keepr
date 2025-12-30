@@ -108,11 +108,11 @@ export default function CampaignsPage() {
   const statusBadge = (status: string) => {
     switch (status) {
       case "sent":
-        return <Badge className="bg-emerald-100 text-emerald-800 border border-emerald-200">Sent</Badge>;
+        return <Badge className="bg-status-success/15 text-status-success border border-status-success/30">Sent</Badge>;
       case "sending":
-        return <Badge className="bg-blue-100 text-blue-800 border border-blue-200">Sending</Badge>;
+        return <Badge className="bg-status-info/15 text-status-info border border-status-info/30">Sending</Badge>;
       case "scheduled":
-        return <Badge className="bg-amber-100 text-amber-800 border border-amber-200">Scheduled</Badge>;
+        return <Badge className="bg-status-warning/15 text-status-warning border border-status-warning/30">Scheduled</Badge>;
       case "cancelled":
         return <Badge className="bg-slate-100 text-slate-700 border border-slate-200">Cancelled</Badge>;
       default:

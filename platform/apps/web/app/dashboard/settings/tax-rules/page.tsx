@@ -239,9 +239,9 @@ export default function TaxRulesSettingsPage() {
 
     const getTypeColor = (type: string) => {
         switch (type) {
-            case "percentage": return "bg-blue-100 text-blue-600";
-            case "flat": return "bg-green-100 text-green-600";
-            case "exemption": return "bg-amber-100 text-amber-600";
+            case "percentage": return "bg-status-info/15 text-status-info";
+            case "flat": return "bg-status-success/15 text-status-success";
+            case "exemption": return "bg-status-warning/15 text-status-warning";
             default: return "bg-slate-100 text-slate-600";
         }
     };

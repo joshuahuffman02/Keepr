@@ -196,7 +196,7 @@ export function AvatarImage({
     return (
       <div
         className={cn(
-          "rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center font-semibold",
+          "rounded-full bg-status-success/15 text-status-success flex items-center justify-center font-semibold",
           sizeClasses[size],
           className
         )}
@@ -214,7 +214,7 @@ export function AvatarImage({
         fill
         showSkeleton
         fallback={
-          <div className="h-full w-full bg-emerald-100 text-emerald-700 flex items-center justify-center font-semibold">
+          <div className="h-full w-full bg-status-success/15 text-status-success flex items-center justify-center font-semibold">
             {initials || "?"}
           </div>
         }

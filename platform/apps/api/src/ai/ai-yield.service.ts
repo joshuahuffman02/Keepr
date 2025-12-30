@@ -1,6 +1,7 @@
 import { Injectable, Logger } from "@nestjs/common";
 import { Cron } from "@nestjs/schedule";
 import { PrismaService } from "../prisma/prisma.service";
+import { RealtimeService } from "../realtime/realtime.service";
 
 interface YieldMetrics {
   // Today's metrics
@@ -46,7 +47,10 @@ interface OccupancyForecast {
 export class AiYieldService {
   private readonly logger = new Logger(AiYieldService.name);
 
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly realtime: RealtimeService
+  ) {}
 
   // ==================== SNAPSHOT POPULATION ====================
 
@@ -595,5 +599,144 @@ export class AiYieldService {
       topRecommendations: recommendations,
       revenueInsights: insights,
     };
+  }
+
+  // ==================== REAL-TIME BROADCASTS ====================
+
+  /**
+   * Broadcast updated yield metrics to all connected clients
+   * Call this after a reservation change, payment, or manual trigger
+   */
+  async broadcastYieldMetricsUpdate(
+    campgroundId: string,
+    triggeredBy: "reservation" | "payment" | "scheduled" | "manual" = "manual"
+  ): Promise<void> {
+    try {
+      const metrics = await this.getYieldMetrics(campgroundId);
+
+      this.realtime.emitYieldMetricsUpdated(campgroundId, {
+        todayOccupancy: metrics.todayOccupancy,
+        todayRevenue: metrics.todayRevenue,
+        todayADR: metrics.todayADR,
+        todayRevPAN: metrics.todayRevPAN,
+        periodOccupancy: metrics.periodOccupancy,
+        periodRevenue: metrics.periodRevenue,
+        next7DaysOccupancy: metrics.next7DaysOccupancy,
+        next30DaysOccupancy: metrics.next30DaysOccupancy,
+        gapNights: metrics.gapNights,
+        pendingRecommendations: metrics.pendingRecommendations,
+        potentialRevenue: metrics.potentialRevenue,
+        triggeredBy,
+      });
+
+      this.logger.debug(
+        `Broadcast yield metrics update for campground ${campgroundId}, triggered by ${triggeredBy}`
+      );
+    } catch (error) {
+      this.logger.error(
+        `Failed to broadcast yield metrics for ${campgroundId}: ${error}`
+      );
+    }
+  }
+
+  /**
+   * Broadcast a new pricing recommendation to clients
+   */
+  async broadcastRecommendation(
+    campgroundId: string,
+    recommendation: {
+      id: string;
+      siteClassId?: string;
+      dateStart: Date;
+      dateEnd: Date;
+      currentPrice: number;
+      suggestedPrice: number;
+      adjustmentPercent: number;
+      estimatedRevenueDelta: number;
+      confidence: number;
+      reason: string;
+    }
+  ): Promise<void> {
+    // Get site class name if available
+    let siteClassName: string | undefined;
+    if (recommendation.siteClassId) {
+      const siteClass = await this.prisma.siteClass.findUnique({
+        where: { id: recommendation.siteClassId },
+        select: { name: true },
+      });
+      siteClassName = siteClass?.name;
+    }
+
+    this.realtime.emitYieldRecommendationGenerated(campgroundId, {
+      recommendationId: recommendation.id,
+      siteClassId: recommendation.siteClassId,
+      siteClassName,
+      dateStart: recommendation.dateStart.toISOString().split("T")[0],
+      dateEnd: recommendation.dateEnd.toISOString().split("T")[0],
+      currentPrice: recommendation.currentPrice,
+      suggestedPrice: recommendation.suggestedPrice,
+      adjustmentPercent: recommendation.adjustmentPercent,
+      estimatedRevenueDelta: recommendation.estimatedRevenueDelta,
+      confidence: recommendation.confidence,
+      reason: recommendation.reason,
+    });
+
+    this.logger.debug(
+      `Broadcast new pricing recommendation for campground ${campgroundId}`
+    );
+  }
+
+  /**
+   * Broadcast updated forecast data to clients
+   */
+  async broadcastForecastUpdate(campgroundId: string): Promise<void> {
+    try {
+      const forecast7 = await this.forecastOccupancy(campgroundId, 7);
+      const forecast30 = await this.forecastOccupancy(campgroundId, 30);
+
+      this.realtime.emitYieldForecastUpdated(campgroundId, {
+        forecasts: forecast30.forecasts,
+        avgOccupancy7Days: forecast7.avgOccupancy,
+        avgOccupancy30Days: forecast30.avgOccupancy,
+        totalProjectedRevenue: forecast30.totalRevenue,
+      });
+
+      this.logger.debug(`Broadcast forecast update for campground ${campgroundId}`);
+    } catch (error) {
+      this.logger.error(
+        `Failed to broadcast forecast for ${campgroundId}: ${error}`
+      );
+    }
+  }
+
+  /**
+   * Called when a reservation is created/updated/cancelled
+   * Triggers yield metrics recalculation and broadcast
+   */
+  async onReservationChange(
+    campgroundId: string,
+    changeType: "created" | "updated" | "cancelled"
+  ): Promise<void> {
+    this.logger.log(
+      `Reservation ${changeType} detected for campground ${campgroundId}, updating yield metrics`
+    );
+
+    // Broadcast updated metrics
+    await this.broadcastYieldMetricsUpdate(campgroundId, "reservation");
+
+    // Also update the forecast since reservation changes affect occupancy projections
+    await this.broadcastForecastUpdate(campgroundId);
+  }
+
+  /**
+   * Called when a payment is received
+   * Updates revenue-related metrics
+   */
+  async onPaymentReceived(campgroundId: string): Promise<void> {
+    this.logger.log(
+      `Payment received for campground ${campgroundId}, updating yield metrics`
+    );
+
+    await this.broadcastYieldMetricsUpdate(campgroundId, "payment");
   }
 }

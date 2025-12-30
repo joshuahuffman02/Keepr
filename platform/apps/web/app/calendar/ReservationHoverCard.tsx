@@ -34,27 +34,27 @@ interface ReservationHoverCardProps {
 const statusConfig = {
   confirmed: {
     label: "Confirmed",
-    color: "text-emerald-700 bg-emerald-50 border-emerald-200",
+    color: "text-status-success bg-status-success/15 border-status-success/30",
     icon: CheckCircle,
-    iconColor: "text-emerald-600",
+    iconColor: "text-status-success",
   },
   checked_in: {
     label: "Checked In",
-    color: "text-blue-700 bg-blue-50 border-blue-200",
+    color: "text-status-info bg-status-info/15 border-status-info/30",
     icon: Clock,
-    iconColor: "text-blue-600",
+    iconColor: "text-status-info",
   },
   cancelled: {
     label: "Cancelled",
-    color: "text-rose-700 bg-rose-50 border-rose-200",
+    color: "text-status-error bg-status-error/15 border-status-error/30",
     icon: XCircle,
-    iconColor: "text-rose-600",
+    iconColor: "text-status-error",
   },
   pending: {
     label: "Pending",
-    color: "text-amber-700 bg-amber-50 border-amber-200",
+    color: "text-status-warning bg-status-warning/15 border-status-warning/30",
     icon: HelpCircle,
-    iconColor: "text-amber-600",
+    iconColor: "text-status-warning",
   },
 };
 
@@ -93,8 +93,8 @@ export function ReservationHoverCard({
         </div>
         <div className="flex items-center gap-2">
           {reservation.siteLocked && (
-            <div className="flex items-center gap-1.5 px-2 py-1 rounded-full border border-amber-200 bg-amber-50 text-xs font-medium text-amber-700">
-              <Lock className="h-3 w-3 text-amber-600" />
+            <div className="flex items-center gap-1.5 px-2 py-1 rounded-full border border-status-warning/30 bg-status-warning/15 text-xs font-medium text-status-warning">
+              <Lock className="h-3 w-3 text-status-warning" />
               Site Locked
             </div>
           )}
@@ -145,20 +145,20 @@ export function ReservationHoverCard({
                 {formatCurrency(total)}
               </span>
               {balance > 0 && (
-                <span className="text-xs text-amber-600 font-medium">
+                <span className="text-xs text-status-warning font-medium">
                   {formatCurrency(balance)} due
                 </span>
               )}
               {balance <= 0 && paid > 0 && (
-                <span className="text-xs text-emerald-600 font-medium">
+                <span className="text-xs text-status-success font-medium">
                   Paid in full
                 </span>
               )}
             </div>
             {paid > 0 && paid < total && (
-              <div className="mt-1.5 h-1.5 bg-slate-100 rounded-full overflow-hidden">
+              <div className="mt-1.5 h-1.5 bg-muted rounded-full overflow-hidden">
                 <div
-                  className="h-full bg-emerald-500 rounded-full transition-all"
+                  className="h-full bg-status-success rounded-full transition-all"
                   style={{ width: `${Math.min(100, (paid / total) * 100)}%` }}
                 />
               </div>
@@ -176,7 +176,7 @@ export function ReservationHoverCard({
               e.preventDefault();
               onQuickCheckIn?.();
             }}
-            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-emerald-700 bg-emerald-100 hover:bg-emerald-200 rounded-md transition-colors"
+            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-status-success bg-status-success/15 hover:bg-status-success/25 rounded-md transition-colors"
           >
             <LogIn className="h-3 w-3" />
             Quick Check-in

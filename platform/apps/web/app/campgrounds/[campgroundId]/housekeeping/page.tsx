@@ -82,9 +82,9 @@ function formatTime(d?: string | Date | null) {
 
 function SlaStatusBadge({ status }: { status: SlaStatus }) {
   const styles = {
-    on_track: "bg-emerald-100 text-emerald-700 border-emerald-200",
-    at_risk: "bg-amber-100 text-amber-700 border-amber-200",
-    breached: "bg-rose-100 text-rose-700 border-rose-200",
+    on_track: "bg-status-success/15 text-status-success",
+    at_risk: "bg-status-warning/15 text-status-warning",
+    breached: "bg-status-error/15 text-status-error",
   };
   const icons = {
     on_track: <CheckCircle className="h-3 w-3" />,
@@ -101,15 +101,15 @@ function SlaStatusBadge({ status }: { status: SlaStatus }) {
 
 function HousekeepingStatusBadge({ status }: { status: string }) {
   const styles: Record<string, string> = {
-    vacant_dirty: "bg-rose-100 text-rose-700 border-rose-200",
-    cleaning_in_progress: "bg-blue-100 text-blue-700 border-blue-200",
-    pending_inspection: "bg-amber-100 text-amber-700 border-amber-200",
-    inspection_failed: "bg-red-100 text-red-700 border-red-200",
-    vacant_clean: "bg-emerald-100 text-emerald-700 border-emerald-200",
-    vacant_inspected: "bg-green-100 text-green-700 border-green-200",
+    vacant_dirty: "bg-status-error/15 text-status-error",
+    cleaning_in_progress: "bg-status-info/15 text-status-info",
+    pending_inspection: "bg-status-warning/15 text-status-warning",
+    inspection_failed: "bg-status-error/15 text-status-error",
+    vacant_clean: "bg-status-success/15 text-status-success",
+    vacant_inspected: "bg-status-success/15 text-status-success",
     occupied: "bg-slate-100 text-slate-700 border-slate-200",
     occupied_service: "bg-purple-100 text-purple-700 border-purple-200",
-    occupied_dnd: "bg-orange-100 text-orange-700 border-orange-200",
+    occupied_dnd: "bg-status-warning/15 text-status-warning",
     out_of_order: "bg-gray-100 text-gray-700 border-gray-200",
   };
   const labels: Record<string, string> = {

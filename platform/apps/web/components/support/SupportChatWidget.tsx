@@ -566,7 +566,7 @@ export function SupportChatWidget() {
           type="button"
           onClick={() => setMode("support")}
           className={`rounded-full px-3 py-1 transition-colors ${
-            isSupportMode ? "bg-status-info-bg text-status-info-text" : "bg-muted text-muted-foreground hover:bg-muted/80"
+            isSupportMode ? "bg-status-info/15 text-status-info" : "bg-muted text-muted-foreground hover:bg-muted/80"
           }`}
         >
           Support
@@ -575,32 +575,32 @@ export function SupportChatWidget() {
           type="button"
           onClick={() => setMode("partner")}
           className={`rounded-full px-3 py-1 transition-colors ${
-            isSupportMode ? "bg-muted text-muted-foreground hover:bg-muted/80" : "bg-status-success-bg text-status-success-text"
+            isSupportMode ? "bg-muted text-muted-foreground hover:bg-muted/80" : "bg-status-success/15 text-status-success"
           }`}
         >
           Staff
         </button>
         {!isSupportMode && !campgroundId && (
-          <span className="ml-auto rounded-full bg-amber-100 px-2 py-1 text-[11px] text-amber-700">
+          <span className="ml-auto rounded-full bg-status-warning/15 px-2 py-1 text-[11px] text-status-warning">
             Select a campground
           </span>
         )}
       </div>
 
       {!isSupportMode && (
-        <div className="border-b border-emerald-100 bg-emerald-50 px-4 py-2 text-[11px] text-emerald-800">
+        <div className="border-b border-status-success/30 bg-status-success/15 px-4 py-2 text-[11px] text-status-success">
           <div className="flex flex-wrap items-center justify-between gap-2">
             <div className="flex items-center gap-2">
               <span className="font-semibold">Staff actions</span>
-              <span className="rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-amber-700">
+              <span className="rounded-full bg-status-warning/15 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-status-warning">
                 Beta
               </span>
             </div>
-            <span className="rounded-full border border-emerald-200 bg-white px-2 py-0.5 text-emerald-700">
+            <span className="rounded-full border border-status-success/30 bg-white px-2 py-0.5 text-status-success">
               {campgroundId ? `Campground ${formatId(campgroundId)}` : "Select a campground"}
             </span>
           </div>
-          <div className="mt-1 text-emerald-700">
+          <div className="mt-1 text-status-success">
             {campgroundId
               ? "Actions run with your permissions. Review before confirming; I can still guide anything I can't run."
               : "Select a campground in the top bar to run actions."}
@@ -617,14 +617,14 @@ export function SupportChatWidget() {
               className={`flex gap-3 ${msg.role === "user" ? "justify-end" : "justify-start"}`}
             >
               {msg.role === "assistant" && (
-                <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
-                  <Bot className="w-4 h-4 text-blue-600" />
+                <div className="w-8 h-8 bg-status-info/15 rounded-full flex items-center justify-center flex-shrink-0">
+                  <Bot className="w-4 h-4 text-status-info" />
                 </div>
               )}
               <div
                 className={`max-w-[75%] p-3 rounded-2xl ${
                   msg.role === "user"
-                    ? "bg-blue-500 text-white rounded-br-md"
+                    ? "bg-status-info text-white rounded-br-md"
                     : "bg-slate-100 text-slate-900 rounded-bl-md"
                 }`}
               >
@@ -637,7 +637,7 @@ export function SupportChatWidget() {
                       <Link
                         key={idx}
                         href={article.url}
-                        className="flex items-center gap-2 bg-white rounded-lg p-2 border border-slate-200 text-sm text-blue-600 hover:bg-blue-50 transition-colors"
+                        className="flex items-center gap-2 bg-white rounded-lg p-2 border border-slate-200 text-sm text-status-info hover:bg-status-info/15 transition-colors"
                       >
                         <ExternalLink className="w-3 h-3" />
                         {article.title}
@@ -651,7 +651,7 @@ export function SupportChatWidget() {
                     <p className="text-xs text-slate-500 mb-2">Need more help?</p>
                     <Link
                       href="/help/contact"
-                      className="inline-flex items-center gap-2 bg-blue-500 text-white px-3 py-2 rounded-lg text-sm font-medium hover:bg-blue-600 transition-colors"
+                      className="inline-flex items-center gap-2 bg-status-info text-white px-3 py-2 rounded-lg text-sm font-medium hover:bg-status-info/80 transition-colors"
                     >
                       <Ticket className="w-4 h-4" />
                       Submit a Ticket
@@ -672,7 +672,7 @@ export function SupportChatWidget() {
             const bubbleWidth = msg.role === "user" ? "max-w-[75%]" : hasActionDrafts ? "max-w-[90%]" : "max-w-[75%]";
             const bubbleStyle =
               msg.role === "user"
-                ? "bg-emerald-500 text-white rounded-br-md"
+                ? "bg-status-success text-white rounded-br-md"
                 : hasActionDrafts
                   ? "bg-slate-50 text-slate-900 rounded-bl-md border border-slate-200"
                   : "bg-slate-100 text-slate-900 rounded-bl-md";
@@ -684,15 +684,15 @@ export function SupportChatWidget() {
                 className={`flex gap-3 ${msg.role === "user" ? "justify-end" : "justify-start"}`}
               >
                 {msg.role === "assistant" && (
-                  <div className="w-8 h-8 bg-emerald-100 rounded-full flex items-center justify-center flex-shrink-0">
-                    <Bot className="w-4 h-4 text-emerald-600" />
+                  <div className="w-8 h-8 bg-status-success/15 rounded-full flex items-center justify-center flex-shrink-0">
+                    <Bot className="w-4 h-4 text-status-success" />
                   </div>
                 )}
                 <div className={`${bubbleWidth} ${bubblePadding} rounded-2xl ${bubbleStyle}`}>
                   <p className="text-sm whitespace-pre-wrap">{msg.content}</p>
 
                 {msg.denials?.length ? (
-                  <div className="mt-3 rounded-lg border border-rose-200 bg-rose-50 px-3 py-2 text-xs text-rose-700">
+                  <div className="mt-3 rounded-lg border border-status-error/30 bg-status-error/15 px-3 py-2 text-xs text-status-error">
                     {msg.denials.map((denial, idx) => (
                       <div key={`${denial.reason}-${idx}`}>
                         {denial.reason}
@@ -711,7 +711,7 @@ export function SupportChatWidget() {
                           key={`${question}-${idx}`}
                           type="button"
                           onClick={() => handlePartnerQuickReply(question)}
-                          className="rounded-full border border-slate-200 bg-white px-3 py-1 text-xs text-slate-600 hover:border-emerald-400 hover:text-emerald-600"
+                          className="rounded-full border border-slate-200 bg-white px-3 py-1 text-xs text-slate-600 hover:border-status-success hover:text-status-success"
                         >
                           {question}
                         </button>
@@ -725,16 +725,16 @@ export function SupportChatWidget() {
                     {msg.actionDrafts.map((draft) => {
                       const statusClass =
                         draft.status === "executed"
-                          ? "bg-status-success-bg text-status-success-text"
+                          ? "bg-status-success/15 text-status-success"
                           : draft.status === "denied"
-                            ? "bg-status-error-bg text-status-error-text"
-                            : "bg-status-warning-bg text-status-warning-text";
+                            ? "bg-status-error/15 text-status-error"
+                            : "bg-status-warning/15 text-status-warning";
                       const impactClass =
                         draft.impact?.level === "high"
-                          ? "bg-status-error-bg text-status-error-text"
+                          ? "bg-status-error/15 text-status-error"
                           : draft.impact?.level === "medium"
-                            ? "bg-status-warning-bg text-status-warning-text"
-                            : "bg-status-success-bg text-status-success-text";
+                            ? "bg-status-warning/15 text-status-warning"
+                            : "bg-status-success/15 text-status-success";
                       const summary = buildActionSummary(draft);
                       const { items: highlights, usedKeys } = buildActionHighlights(draft);
                       const detailParams = Object.entries(draft.parameters ?? {}).filter(([key]) => !usedKeys.has(key));
@@ -750,7 +750,7 @@ export function SupportChatWidget() {
                             </div>
                             <div className="flex flex-wrap items-center gap-2">
                               {draft.requiresConfirmation && (
-                                <span className="rounded-full bg-amber-100 px-2 py-0.5 text-[11px] text-amber-700">
+                                <span className="rounded-full bg-status-warning/15 px-2 py-0.5 text-[11px] text-status-warning">
                                   Confirm to run
                                 </span>
                               )}
@@ -786,14 +786,14 @@ export function SupportChatWidget() {
                               </div>
                               <p className="mt-1 text-slate-600">{draft.impact.summary}</p>
                               {draft.impact.warnings?.length ? (
-                                <div className="mt-2 space-y-1 text-amber-700">
+                                <div className="mt-2 space-y-1 text-status-warning">
                                   {draft.impact.warnings.map((warning) => (
                                     <div key={warning}>- {warning}</div>
                                   ))}
                                 </div>
                               ) : null}
                               {draft.impact.saferAlternative ? (
-                                <div className="mt-2 text-emerald-700">
+                                <div className="mt-2 text-status-success">
                                   Safer alternative: {draft.impact.saferAlternative}
                                 </div>
                               ) : null}
@@ -801,9 +801,9 @@ export function SupportChatWidget() {
                           )}
 
                           {draft.result && (
-                            <div className="mt-2 rounded-lg border border-emerald-100 bg-emerald-50 px-3 py-2 text-[11px] text-emerald-800">
+                            <div className="mt-2 rounded-lg border border-status-success/30 bg-status-success/15 px-3 py-2 text-[11px] text-status-success">
                               <div className="font-semibold">Result</div>
-                              <div className="mt-1 text-emerald-700">{formatValue(draft.result)}</div>
+                              <div className="mt-1 text-status-success">{formatValue(draft.result)}</div>
                             </div>
                           )}
 
@@ -817,7 +817,7 @@ export function SupportChatWidget() {
                                   <Link
                                     key={`${link.label}-${link.url}`}
                                     href={link.url}
-                                    className="rounded-full border border-slate-200 bg-white px-3 py-1 text-slate-600 hover:border-emerald-400 hover:text-emerald-600"
+                                    className="rounded-full border border-slate-200 bg-white px-3 py-1 text-slate-600 hover:border-status-success hover:text-status-success"
                                   >
                                     {link.label}
                                   </Link>
@@ -833,7 +833,7 @@ export function SupportChatWidget() {
                                   type="button"
                                   onClick={() => handleConfirmDraft(draft)}
                                   disabled={confirmPartnerMutation.isPending && confirmingDraftId === draft.id}
-                                  className="rounded-full bg-emerald-600 px-3 py-1 text-[11px] font-semibold text-white shadow-sm transition hover:bg-emerald-700 disabled:opacity-60"
+                                  className="rounded-full bg-status-success px-3 py-1 text-[11px] font-semibold text-white shadow-sm transition hover:bg-status-success/80 disabled:opacity-60"
                                 >
                                   {confirmingDraftId === draft.id ? "Confirming..." : "Confirm & run"}
                                 </button>
@@ -884,7 +884,7 @@ export function SupportChatWidget() {
                 ) : null}
 
                 {msg.confirmations?.length ? (
-                  <div className="mt-3 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-xs text-amber-800">
+                  <div className="mt-3 rounded-lg border border-status-warning/30 bg-status-warning/15 px-3 py-2 text-xs text-status-warning">
                     {msg.confirmations.map((confirmation) => (
                       <div key={confirmation.id}>{confirmation.prompt}</div>
                     ))}
@@ -897,7 +897,7 @@ export function SupportChatWidget() {
                       <Link
                         key={`${link.label}-${link.url}`}
                         href={link.url}
-                        className="rounded-full border border-slate-200 bg-white px-3 py-1 text-slate-600 hover:border-emerald-400 hover:text-emerald-600"
+                        className="rounded-full border border-slate-200 bg-white px-3 py-1 text-slate-600 hover:border-status-success hover:text-status-success"
                       >
                         {link.label}
                       </Link>
@@ -918,9 +918,9 @@ export function SupportChatWidget() {
         {isPending && (
           <div className="flex gap-3 justify-start">
             <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
-              isSupportMode ? "bg-blue-100" : "bg-emerald-100"
+              isSupportMode ? "bg-status-info/15" : "bg-status-success/15"
             }`}>
-              <Bot className={`w-4 h-4 ${isSupportMode ? "text-blue-600" : "text-emerald-600"}`} />
+              <Bot className={`w-4 h-4 ${isSupportMode ? "text-status-info" : "text-status-success"}`} />
             </div>
             <div className="bg-slate-100 rounded-2xl rounded-bl-md p-3">
               <div className="flex gap-1">
@@ -988,7 +988,7 @@ export function SupportChatWidget() {
             onKeyDown={handleKeyDown}
             placeholder={isSupportMode ? "Ask a question..." : "Ask for actions, maintenance, billing, messaging, or drafts..."}
             className={`flex-1 px-4 py-2 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 text-sm ${
-              isSupportMode ? "focus:ring-blue-500/20 focus:border-blue-500" : "focus:ring-emerald-500/20 focus:border-emerald-500"
+              isSupportMode ? "focus:ring-status-info/20 focus:border-status-info" : "focus:ring-status-success/20 focus:border-status-success"
             }`}
             disabled={isPending}
           />
@@ -997,7 +997,7 @@ export function SupportChatWidget() {
             onClick={handleSend}
             disabled={!activeInput.trim() || isPending}
             className={`p-2 text-white rounded-xl transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${
-              isSupportMode ? "bg-blue-500 hover:bg-blue-600" : "bg-emerald-500 hover:bg-emerald-600"
+              isSupportMode ? "bg-status-info hover:bg-status-info/80" : "bg-status-success hover:bg-status-success/80"
             }`}
           >
             <Send className="w-5 h-5" />

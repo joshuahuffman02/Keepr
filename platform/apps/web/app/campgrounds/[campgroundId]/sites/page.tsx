@@ -70,11 +70,11 @@ import {
 
 // Site type configuration with icons
 const siteTypeConfig: Record<string, { icon: React.ReactNode; label: string; color: string }> = {
-  rv: { icon: <Home className="h-4 w-4" />, label: "RV", color: "bg-blue-100 text-blue-700 dark:bg-blue-900/50 dark:text-blue-400" },
-  tent: { icon: <Tent className="h-4 w-4" />, label: "Tent", color: "bg-green-100 text-green-700 dark:bg-green-900/50 dark:text-green-400" },
-  cabin: { icon: <Home className="h-4 w-4" />, label: "Cabin", color: "bg-amber-100 text-amber-700 dark:bg-amber-900/50 dark:text-amber-400" },
-  group: { icon: <Users className="h-4 w-4" />, label: "Group", color: "bg-purple-100 text-purple-700 dark:bg-purple-900/50 dark:text-purple-400" },
-  glamping: { icon: <Sparkles className="h-4 w-4" />, label: "Glamping", color: "bg-pink-100 text-pink-700 dark:bg-pink-900/50 dark:text-pink-400" },
+  rv: { icon: <Home className="h-4 w-4" />, label: "RV", color: "bg-status-info/15 text-status-info" },
+  tent: { icon: <Tent className="h-4 w-4" />, label: "Tent", color: "bg-status-success/15 text-status-success" },
+  cabin: { icon: <Home className="h-4 w-4" />, label: "Cabin", color: "bg-status-warning/15 text-status-warning" },
+  group: { icon: <Users className="h-4 w-4" />, label: "Group", color: "bg-status-info/15 text-status-info" },
+  glamping: { icon: <Sparkles className="h-4 w-4" />, label: "Glamping", color: "bg-status-warning/15 text-status-warning" },
 };
 
 // Standard power amp options for RV sites
@@ -578,8 +578,8 @@ export default function SitesPage() {
                   <div className="text-3xl font-bold text-foreground">{activeSites}</div>
                   <div className="text-sm text-muted-foreground">Active Sites</div>
                 </div>
-                <div className="h-12 w-12 rounded-full bg-emerald-100 dark:bg-emerald-900/50 flex items-center justify-center">
-                  <CheckCircle2 className="h-6 w-6 text-emerald-600 dark:text-emerald-400" />
+                <div className="h-12 w-12 rounded-full bg-status-success/15 flex items-center justify-center">
+                  <CheckCircle2 className="h-6 w-6 text-status-success" />
                 </div>
               </div>
             </CardContent>
@@ -592,8 +592,8 @@ export default function SitesPage() {
                   <div className="text-3xl font-bold text-foreground">{sitesWithHookups}</div>
                   <div className="text-sm text-muted-foreground">With Hookups</div>
                 </div>
-                <div className="h-12 w-12 rounded-full bg-amber-100 dark:bg-amber-900/50 flex items-center justify-center">
-                  <Zap className="h-6 w-6 text-amber-600 dark:text-amber-400" />
+                <div className="h-12 w-12 rounded-full bg-status-warning/15 flex items-center justify-center">
+                  <Zap className="h-6 w-6 text-status-warning" />
                 </div>
               </div>
             </CardContent>
@@ -977,7 +977,7 @@ export default function SitesPage() {
                               className={cn(
                                 "px-2 py-1 text-xs rounded-md border transition-all",
                                 formState.powerAmps.includes(amp)
-                                  ? "border-amber-500 bg-amber-100 dark:bg-amber-900/50 text-amber-700 dark:text-amber-300"
+                                  ? "border-amber-500 bg-status-warning/15 text-status-warning"
                                   : "border-border bg-background text-muted-foreground hover:border-amber-300"
                               )}
                             >
@@ -1276,15 +1276,15 @@ export default function SitesPage() {
                           className={cn(
                             "group flex items-center gap-2 px-2.5 py-1.5 text-xs font-medium rounded-full transition-all",
                             site.isActive !== false
-                              ? "bg-emerald-100 text-emerald-700 hover:bg-emerald-200 dark:bg-emerald-900/50 dark:text-emerald-400 dark:hover:bg-emerald-900/70"
-                              : "bg-red-100 text-red-700 hover:bg-red-200 dark:bg-red-900/50 dark:text-red-400 dark:hover:bg-red-900/70"
+                              ? "bg-status-success/15 text-status-success hover:bg-status-success/25"
+                              : "bg-status-error/15 text-status-error hover:bg-status-error/25"
                           )}
                           disabled={quickUpdateSite.isPending}
                           title={site.isActive !== false ? "Click to deactivate" : "Click to activate"}
                         >
                           <span className={cn(
                             "w-2 h-2 rounded-full transition-colors",
-                            site.isActive !== false ? "bg-emerald-500" : "bg-red-500"
+                            site.isActive !== false ? "bg-status-success" : "bg-status-error"
                           )} />
                           {site.isActive !== false ? "Active" : "Inactive"}
                         </button>
@@ -1464,7 +1464,7 @@ export default function SitesPage() {
                                     className={cn(
                                       "px-2 py-1 text-xs rounded-md border transition-all",
                                       editForm.powerAmps.includes(amp)
-                                        ? "border-amber-500 bg-amber-100 dark:bg-amber-900/50 text-amber-700 dark:text-amber-300"
+                                        ? "border-amber-500 bg-status-warning/15 text-status-warning"
                                         : "border-border bg-background text-muted-foreground hover:border-amber-300"
                                     )}
                                   >

@@ -105,17 +105,17 @@ export default function SavedReportsPage() {
                       {r.filters && (r.filters.status !== "all" || r.filters.siteType !== "all" || r.filters.groupBy !== "none") && (
                         <div className="flex items-center gap-1 flex-wrap mt-1">
                           {r.filters.status !== "all" && (
-                            <span className="text-xs px-2 py-0.5 rounded bg-indigo-100 text-indigo-700">
+                            <span className="text-xs px-2 py-0.5 rounded bg-status-info/15 text-status-info">
                               {r.filters.status}
                             </span>
                           )}
                           {r.filters.siteType !== "all" && (
-                            <span className="text-xs px-2 py-0.5 rounded bg-emerald-100 text-emerald-700">
+                            <span className="text-xs px-2 py-0.5 rounded bg-status-success/15 text-status-success">
                               {r.filters.siteType}
                             </span>
                           )}
                           {r.filters.groupBy !== "none" && (
-                            <span className="text-xs px-2 py-0.5 rounded bg-amber-100 text-amber-700">
+                            <span className="text-xs px-2 py-0.5 rounded bg-status-warning/15 text-status-warning">
                               Grouped by {r.filters.groupBy}
                             </span>
                           )}

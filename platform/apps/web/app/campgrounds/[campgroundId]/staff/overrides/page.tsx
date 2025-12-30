@@ -71,17 +71,17 @@ const statusConfig: Record<string, { icon: typeof CheckCircle2; label: string; c
   pending: {
     icon: Clock,
     label: "Pending",
-    className: "bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400 border-amber-200 dark:border-amber-800"
+    className: "bg-status-warning/15 text-status-warning border-status-warning/30"
   },
   approved: {
     icon: CheckCircle2,
     label: "Approved",
-    className: "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800"
+    className: "bg-status-success/15 text-status-success border-status-success/30"
   },
   rejected: {
     icon: XCircle,
     label: "Rejected",
-    className: "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400 border-red-200 dark:border-red-800"
+    className: "bg-status-error/15 text-status-error border-status-error/30"
   },
 };
 
@@ -481,14 +481,14 @@ export default function OverridesPage({ params }: { params: { campgroundId: stri
                     className={cn(
                       "flex items-center gap-2 rounded-lg px-4 py-3",
                       submitStatus === "success"
-                        ? "bg-emerald-50 dark:bg-emerald-900/20 text-emerald-800 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800"
-                        : "bg-red-50 dark:bg-red-900/20 text-red-800 dark:text-red-300 border border-red-200 dark:border-red-800"
+                        ? "bg-status-success/15 text-status-success border border-status-success/30"
+                        : "bg-status-error/15 text-status-error border border-status-error/30"
                     )}
                   >
                     {submitStatus === "success" ? (
-                      <Sparkles className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
+                      <Sparkles className="h-5 w-5 text-status-success" />
                     ) : (
-                      <AlertCircle className="h-5 w-5 text-red-600 dark:text-red-400" />
+                      <AlertCircle className="h-5 w-5 text-status-error" />
                     )}
                     <span className="text-sm font-medium">{statusMessage}</span>
                   </motion.div>

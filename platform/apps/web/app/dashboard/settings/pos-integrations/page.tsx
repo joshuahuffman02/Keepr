@@ -185,7 +185,7 @@ export default function PosIntegrationsPage() {
   const getStatusBadge = (status: string) => {
     switch (status) {
       case "active":
-        return <Badge className="bg-emerald-100 text-emerald-800">Connected</Badge>;
+        return <Badge className="bg-status-success/15 text-status-success">Connected</Badge>;
       case "error":
         return <Badge variant="destructive">Error</Badge>;
       case "pending":
@@ -746,11 +746,11 @@ function SyncLogsTab({ integrations }: { integrations: Integration[] }) {
   const getStatusBadge = (status: string) => {
     switch (status) {
       case "completed":
-        return <Badge className="bg-emerald-100 text-emerald-800">Completed</Badge>;
+        return <Badge className="bg-status-success/15 text-status-success">Completed</Badge>;
       case "failed":
         return <Badge variant="destructive">Failed</Badge>;
       case "running":
-        return <Badge className="bg-blue-100 text-blue-800">Running</Badge>;
+        return <Badge className="bg-status-info/15 text-status-info">Running</Badge>;
       default:
         return <Badge variant="outline">{status}</Badge>;
     }

@@ -238,8 +238,8 @@ export default function GamificationSettingsPage() {
     return (
       <div className="max-w-5xl space-y-6">
         <div className="flex flex-col items-center justify-center py-24 text-center">
-          <div className="w-24 h-24 rounded-full bg-red-100 flex items-center justify-center mb-6">
-            <Trophy className="w-12 h-12 text-red-400" />
+          <div className="w-24 h-24 rounded-full bg-status-error/15 flex items-center justify-center mb-6">
+            <Trophy className="w-12 h-12 text-status-error/60" />
           </div>
           <h1 className="text-2xl font-bold text-slate-900 mb-2">Unable to Load Settings</h1>
           <p className="text-slate-500 max-w-md mb-4">
@@ -264,7 +264,7 @@ export default function GamificationSettingsPage() {
         </div>
         <Badge
           variant={enabled ? "default" : "outline"}
-          className={enabled ? "bg-emerald-100 text-emerald-800 border-emerald-200" : ""}
+          className={enabled ? "bg-status-success/15 text-status-success border-status-success/30" : ""}
         >
           {enabled ? "Enabled" : "Disabled"}
         </Badge>
@@ -523,11 +523,11 @@ export default function GamificationSettingsPage() {
                     variant="outline"
                     className={`w-8 justify-center ${
                       row.rank === 1
-                        ? "bg-amber-100 text-amber-700 border-amber-200"
+                        ? "bg-status-warning/15 text-status-warning border-status-warning/30"
                         : row.rank === 2
                         ? "bg-slate-100 text-slate-600 border-slate-200"
                         : row.rank === 3
-                        ? "bg-amber-50 text-amber-600 border-amber-100"
+                        ? "bg-status-warning/10 text-status-warning border-status-warning/20"
                         : ""
                     }`}
                   >

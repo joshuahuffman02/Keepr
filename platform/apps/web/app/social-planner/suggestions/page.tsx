@@ -147,8 +147,8 @@ export default function SocialPlannerSuggestions() {
                     <div className="text-xs text-slate-500 mt-1">Generated: {new Date(s.createdAt || Date.now()).toLocaleString()}</div>
                 <div className="text-xs text-slate-500 flex gap-2 mt-2">
                   {s.category && <span className="badge">{s.category}</span>}
-                  {s.platform && <span className="badge bg-emerald-50 text-emerald-700">{s.platform}</span>}
-                  {s.proposedDate && <span className="badge bg-blue-50 text-blue-700">Target {new Date(s.proposedDate).toLocaleDateString()}</span>}
+                  {s.platform && <span className="badge bg-status-success/15 text-status-success">{s.platform}</span>}
+                  {s.proposedDate && <span className="badge bg-status-info/15 text-status-info">Target {new Date(s.proposedDate).toLocaleDateString()}</span>}
                 </div>
               </div>
                   <div className="flex items-center gap-2">

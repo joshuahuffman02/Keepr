@@ -183,13 +183,13 @@ function getActivityIcon(type: string) {
 function getStatusColor(status?: string) {
   switch (status) {
     case "success":
-      return "bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800";
+      return "bg-status-success/15 text-status-success border-status-success";
     case "pending":
-      return "bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 border-amber-200 dark:border-amber-800";
+      return "bg-status-warning/15 text-status-warning border-status-warning";
     case "warning":
-      return "bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-400 border-orange-200 dark:border-orange-800";
+      return "bg-status-warning/15 text-status-warning border-status-warning";
     case "error":
-      return "bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 border-red-200 dark:border-red-800";
+      return "bg-status-error/15 text-status-error border-status-error";
     default:
       return "bg-slate-100 dark:bg-slate-900/30 text-slate-700 dark:text-slate-400 border-slate-200 dark:border-slate-800";
   }
@@ -363,7 +363,7 @@ export default function AICommandCenterPage() {
                       <h3 className="font-semibold text-lg text-foreground">AI Assistant Active</h3>
                       <Badge
                         variant="outline"
-                        className="bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 border-emerald-300 dark:border-emerald-700"
+                        className="bg-status-success/15 text-status-success border-status-success/30"
                       >
                         <span className="relative flex h-2 w-2 mr-1.5">
                           <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
@@ -700,18 +700,18 @@ export default function AICommandCenterPage() {
                           >
                             <div className={cn(
                               "flex h-8 w-8 items-center justify-center rounded-full",
-                              item.status === "success" || item.color === "emerald" ? "bg-emerald-100 dark:bg-emerald-900/30" :
-                              item.status === "pending" || item.color === "amber" ? "bg-amber-100 dark:bg-amber-900/30" :
-                              item.status === "warning" || item.color === "orange" ? "bg-orange-100 dark:bg-orange-900/30" :
-                              item.status === "error" || item.color === "red" ? "bg-red-100 dark:bg-red-900/30" :
+                              item.status === "success" || item.color === "emerald" ? "bg-status-success/15" :
+                              item.status === "pending" || item.color === "amber" ? "bg-status-warning/15" :
+                              item.status === "warning" || item.color === "orange" ? "bg-status-warning/15" :
+                              item.status === "error" || item.color === "red" ? "bg-status-error/15" :
                               "bg-slate-100 dark:bg-slate-900/30"
                             )}>
                               <Icon className={cn(
                                 "h-4 w-4",
-                                item.status === "success" || item.color === "emerald" ? "text-emerald-600 dark:text-emerald-400" :
-                                item.status === "pending" || item.color === "amber" ? "text-amber-600 dark:text-amber-400" :
-                                item.status === "warning" || item.color === "orange" ? "text-orange-600 dark:text-orange-400" :
-                                item.status === "error" || item.color === "red" ? "text-red-600 dark:text-red-400" :
+                                item.status === "success" || item.color === "emerald" ? "text-status-success" :
+                                item.status === "pending" || item.color === "amber" ? "text-status-warning" :
+                                item.status === "warning" || item.color === "orange" ? "text-status-warning" :
+                                item.status === "error" || item.color === "red" ? "text-status-error" :
                                 "text-slate-600 dark:text-slate-400"
                               )} />
                             </div>

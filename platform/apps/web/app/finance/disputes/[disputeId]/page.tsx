@@ -12,13 +12,13 @@ import { format } from "date-fns";
 import Link from "next/link";
 
 const statusColors: Record<string, string> = {
-  needs_response: "bg-amber-100 text-amber-800",
-  warning_needs_response: "bg-amber-100 text-amber-800",
-  warning_under_review: "bg-blue-100 text-blue-800",
-  under_review: "bg-blue-100 text-blue-800",
-  charge_refunded: "bg-rose-100 text-rose-800",
-  won: "bg-emerald-100 text-emerald-800",
-  lost: "bg-rose-100 text-rose-800"
+  needs_response: "bg-status-warning/15 text-status-warning",
+  warning_needs_response: "bg-status-warning/15 text-status-warning",
+  warning_under_review: "bg-status-info/15 text-status-info",
+  under_review: "bg-status-info/15 text-status-info",
+  charge_refunded: "bg-status-error/15 text-status-error",
+  won: "bg-status-success/15 text-status-success",
+  lost: "bg-status-error/15 text-status-error"
 };
 
 function formatMoney(cents: number | null | undefined, currency = "USD") {
@@ -90,7 +90,7 @@ export default function DisputeDetailPage() {
                 </Badge>
               )}
               {dueSoon && (
-                <Badge className="bg-amber-100 text-amber-800">Due within 48h</Badge>
+                <Badge className="bg-status-warning/15 text-status-warning">Due within 48h</Badge>
               )}
             </CardTitle>
           </CardHeader>

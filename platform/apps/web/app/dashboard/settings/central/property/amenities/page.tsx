@@ -12,7 +12,7 @@ const amenityCategories = [
     name: "Pool & Recreation",
     description: "Swimming pools, hot tubs, playgrounds, sports courts",
     count: 4,
-    color: "bg-blue-100 text-blue-600",
+    color: "bg-status-info/15 text-status-info",
   },
   {
     icon: ShowerHead,
@@ -26,21 +26,21 @@ const amenityCategories = [
     name: "Connectivity",
     description: "WiFi, cable TV, cell signal",
     count: 2,
-    color: "bg-emerald-100 text-emerald-600",
+    color: "bg-status-success/15 text-status-success",
   },
   {
     icon: Utensils,
     name: "Dining & Shopping",
     description: "Camp store, restaurant, snack bar, ice",
     count: 3,
-    color: "bg-amber-100 text-amber-600",
+    color: "bg-status-warning/15 text-status-warning",
   },
   {
     icon: Trees,
     name: "Nature & Activities",
     description: "Hiking trails, fishing, boat launch, fire pits",
     count: 5,
-    color: "bg-green-100 text-green-600",
+    color: "bg-status-success/15 text-status-success",
   },
 ];
 

@@ -188,7 +188,7 @@ export default function TutorialsPage() {
             <button
               onClick={() => setSelectedCategory("all")}
               className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${selectedCategory === "all"
-                  ? "bg-emerald-100 text-emerald-700"
+                  ? "bg-status-success/15 text-status-success"
                   : "bg-slate-100 text-slate-600 hover:bg-slate-200"
                 }`}
             >
@@ -201,7 +201,7 @@ export default function TutorialsPage() {
                   key={cat}
                   onClick={() => setSelectedCategory(cat)}
                   className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${selectedCategory === cat
-                      ? "bg-emerald-100 text-emerald-700"
+                      ? "bg-status-success/15 text-status-success"
                       : "bg-slate-100 text-slate-600 hover:bg-slate-200"
                     }`}
                 >
@@ -216,7 +216,7 @@ export default function TutorialsPage() {
             <button
               onClick={() => setSelectedDifficulty("all")}
               className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors ${selectedDifficulty === "all"
-                  ? "bg-blue-100 text-blue-700"
+                  ? "bg-status-info/15 text-status-info"
                   : "bg-slate-100 text-slate-600 hover:bg-slate-200"
                 }`}
             >
@@ -227,7 +227,7 @@ export default function TutorialsPage() {
                 key={level}
                 onClick={() => setSelectedDifficulty(level)}
                 className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors ${selectedDifficulty === level
-                    ? "bg-blue-100 text-blue-700"
+                    ? "bg-status-info/15 text-status-info"
                     : "bg-slate-100 text-slate-600 hover:bg-slate-200"
                   }`}
               >
@@ -255,9 +255,9 @@ export default function TutorialsPage() {
               <div className="p-5 space-y-3">
                 <div className="flex items-center gap-2 text-xs text-slate-500">
                   <span className="px-2 py-0.5 rounded bg-emerald-50 text-emerald-700 font-semibold">{featuredTutorial.category}</span>
-                  <span className={`px-2 py-0.5 rounded ${featuredTutorial.difficulty === "Beginner" ? "bg-blue-100 text-blue-700" :
-                      featuredTutorial.difficulty === "Intermediate" ? "bg-amber-100 text-amber-700" :
-                        "bg-rose-100 text-rose-700"
+                  <span className={`px-2 py-0.5 rounded ${featuredTutorial.difficulty === "Beginner" ? "bg-status-info/15 text-status-info" :
+                      featuredTutorial.difficulty === "Intermediate" ? "bg-status-warning/15 text-status-warning" :
+                        "bg-status-error/15 text-status-error"
                     }`}>
                     {featuredTutorial.difficulty}
                   </span>
@@ -320,9 +320,9 @@ export default function TutorialsPage() {
               <div className="p-4">
                 <div className="flex items-center gap-2 mb-2">
                   <span className="text-xs font-medium text-emerald-600">{video.category}</span>
-                  <span className={`text-xs px-2 py-0.5 rounded ${video.difficulty === "Beginner" ? "bg-blue-100 text-blue-700" :
-                      video.difficulty === "Intermediate" ? "bg-amber-100 text-amber-700" :
-                        "bg-rose-100 text-rose-700"
+                  <span className={`text-xs px-2 py-0.5 rounded ${video.difficulty === "Beginner" ? "bg-status-info/15 text-status-info" :
+                      video.difficulty === "Intermediate" ? "bg-status-warning/15 text-status-warning" :
+                        "bg-status-error/15 text-status-error"
                     }`}>
                     {video.difficulty}
                   </span>

@@ -9,6 +9,7 @@ import { JwtStrategy } from './strategies/jwt.strategy';
 import { PrismaModule } from '../prisma/prisma.module';
 import { ScopeGuard } from './guards/scope.guard';
 import { RolesGuard } from './guards/roles.guard';
+import { OAuth2Module } from './oauth2/oauth2.module';
 
 @Module({
     imports: [
@@ -21,10 +22,11 @@ import { RolesGuard } from './guards/roles.guard';
                 signOptions: { expiresIn: '7d' }
             }),
             inject: [ConfigService]
-        })
+        }),
+        OAuth2Module,
     ],
     controllers: [AuthController, TwoFactorController],
     providers: [AuthService, JwtStrategy, ScopeGuard, RolesGuard],
-    exports: [AuthService, JwtModule, ScopeGuard, RolesGuard]
+    exports: [AuthService, JwtModule, ScopeGuard, RolesGuard, OAuth2Module]
 })
 export class AuthModule { }

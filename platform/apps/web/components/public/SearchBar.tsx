@@ -84,7 +84,7 @@ export function SearchBar({ onSearch }: SearchBarProps) {
                                 <input
                                     type="text"
                                     placeholder="City, state, or region"
-                                    className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 outline-none transition-all"
+                                    className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-status-success focus:ring-2 focus:ring-status-success/20 outline-none transition-all"
                                     value={location}
                                     onChange={(e) => setLocation(e.target.value)}
                                 />
@@ -95,7 +95,7 @@ export function SearchBar({ onSearch }: SearchBarProps) {
                                 <label className="block text-sm font-medium text-slate-700">Check-in</label>
                                 <input
                                     type="date"
-                                    className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 outline-none transition-all"
+                                    className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-status-success focus:ring-2 focus:ring-status-success/20 outline-none transition-all"
                                     value={checkIn}
                                     onChange={(e) => setCheckIn(e.target.value)}
                                 />
@@ -106,7 +106,7 @@ export function SearchBar({ onSearch }: SearchBarProps) {
                                 <label className="block text-sm font-medium text-slate-700">Check-out</label>
                                 <input
                                     type="date"
-                                    className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 outline-none transition-all"
+                                    className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-status-success focus:ring-2 focus:ring-status-success/20 outline-none transition-all"
                                     value={checkOut}
                                     onChange={(e) => setCheckOut(e.target.value)}
                                 />
@@ -116,7 +116,7 @@ export function SearchBar({ onSearch }: SearchBarProps) {
                             <div className="space-y-2">
                                 <label className="block text-sm font-medium text-slate-700">Guests</label>
                                 <select
-                                    className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 outline-none transition-all"
+                                    className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-status-success focus:ring-2 focus:ring-status-success/20 outline-none transition-all"
                                     value={guests}
                                     onChange={(e) => setGuests(Number(e.target.value))}
                                 >
@@ -135,7 +135,7 @@ export function SearchBar({ onSearch }: SearchBarProps) {
                                 {["RV Sites", "Tent Camping", "Cabins", "Waterfront", "Pet Friendly", "Full Hookups"].map((tag) => (
                                     <button
                                         key={tag}
-                                        className="px-4 py-2 text-sm font-medium text-slate-600 bg-slate-100 rounded-full hover:bg-emerald-100 hover:text-emerald-700 transition-colors"
+                                        className="px-4 py-2 text-sm font-medium text-slate-600 bg-slate-100 rounded-full hover:bg-status-success/15 hover:text-status-success transition-colors"
                                     >
                                         {tag}
                                     </button>

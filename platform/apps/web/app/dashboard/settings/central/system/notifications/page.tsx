@@ -222,8 +222,8 @@ export default function NotificationsPage() {
         <Card>
           <CardContent className="pt-6">
             <div className="flex items-center gap-3">
-              <div className="p-2 rounded-lg bg-emerald-100">
-                <Zap className="h-5 w-5 text-emerald-600" />
+              <div className="p-2 rounded-lg bg-status-success/15">
+                <Zap className="h-5 w-5 text-status-success" />
               </div>
               <div>
                 <p className="text-2xl font-bold text-slate-900">{enabledCount}</p>
@@ -250,8 +250,8 @@ export default function NotificationsPage() {
         <Card>
           <CardContent className="pt-6">
             <div className="flex items-center gap-3">
-              <div className="p-2 rounded-lg bg-green-100">
-                <Smartphone className="h-5 w-5 text-green-600" />
+              <div className="p-2 rounded-lg bg-status-success/15">
+                <Smartphone className="h-5 w-5 text-status-success" />
               </div>
               <div>
                 <p className="text-2xl font-bold text-slate-900">
@@ -306,7 +306,7 @@ export default function NotificationsPage() {
                       disabled={updating === trigger.id}
                     />
                     <div className={`p-2 rounded-lg ${
-                      trigger.enabled ? "bg-emerald-100 text-emerald-600" : "bg-slate-100 text-slate-400"
+                      trigger.enabled ? "bg-status-success/15 text-status-success" : "bg-slate-100 text-slate-400"
                     }`}>
                       <Icon className="h-4 w-4" />
                     </div>

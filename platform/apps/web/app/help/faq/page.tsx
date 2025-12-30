@@ -118,7 +118,7 @@ export default function FAQPage() {
               <h1 className="text-2xl font-bold text-slate-900 mb-1">Frequently Asked Questions</h1>
               <p className="text-slate-600">Quick answers to the questions we hear most often.</p>
             </div>
-            <div className="px-3 py-1.5 bg-emerald-50 border border-emerald-200 rounded-lg text-sm text-emerald-700 font-semibold">
+            <div className="px-3 py-1.5 bg-status-success/15 border border-status-success rounded-lg text-sm text-status-success font-semibold">
               {filteredFaqs.length} item{filteredFaqs.length === 1 ? "" : "s"}
             </div>
           </div>
@@ -138,7 +138,7 @@ export default function FAQPage() {
             <button
               onClick={() => setCategory("all")}
               className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors ${
-                category === "all" ? "bg-emerald-100 text-emerald-700" : "bg-slate-100 text-slate-600 hover:bg-slate-200"
+                category === "all" ? "bg-status-success/15 text-status-success" : "bg-slate-100 text-slate-600 hover:bg-slate-200"
               }`}
             >
               All
@@ -148,7 +148,7 @@ export default function FAQPage() {
                 key={cat}
                 onClick={() => setCategory(cat)}
                 className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors ${
-                  category === cat ? "bg-emerald-100 text-emerald-700" : "bg-slate-100 text-slate-600 hover:bg-slate-200"
+                  category === cat ? "bg-status-success/15 text-status-success" : "bg-slate-100 text-slate-600 hover:bg-slate-200"
                 }`}
               >
                 {cat}

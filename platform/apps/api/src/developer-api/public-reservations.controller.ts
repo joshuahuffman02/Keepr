@@ -4,7 +4,7 @@ import { ApiScopeGuard } from "./guards/api-scope.guard";
 import { ApiScopes } from "./decorators/api-scopes.decorator";
 import { PublicApiService, ApiReservationInput } from "./public-api.service";
 import { IsBoolean, IsDateString, IsNotEmpty, IsNumber, IsOptional, IsString } from "class-validator";
-import { ApiTags, ApiOperation, ApiResponse, ApiProperty } from "@nestjs/swagger";
+import { ApiTags, ApiOperation, ApiResponse, ApiProperty, ApiBearerAuth } from "@nestjs/swagger";
 
 class CreateReservationBody implements ApiReservationInput {
   @ApiProperty({ description: "ID of the site to reserve" })
@@ -73,6 +73,7 @@ class PaymentBody {
 }
 
 @ApiTags("Reservations")
+@ApiBearerAuth("bearer")
 @Controller("public/reservations")
 @UseGuards(ApiTokenGuard, ApiScopeGuard)
 export class PublicReservationsController {

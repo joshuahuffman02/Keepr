@@ -77,9 +77,9 @@ import {
 
 // Site type configuration with icons
 const siteTypeConfig: Record<string, { icon: React.ReactNode; label: string; color: string }> = {
-  rv: { icon: <Home className="h-4 w-4" />, label: "RV", color: "bg-blue-100 text-blue-700 dark:bg-blue-900/50 dark:text-blue-400" },
-  tent: { icon: <Tent className="h-4 w-4" />, label: "Tent", color: "bg-green-100 text-green-700 dark:bg-green-900/50 dark:text-green-400" },
-  cabin: { icon: <Home className="h-4 w-4" />, label: "Cabin", color: "bg-amber-100 text-amber-700 dark:bg-amber-900/50 dark:text-amber-400" },
+  rv: { icon: <Home className="h-4 w-4" />, label: "RV", color: "bg-status-info/15 text-status-info" },
+  tent: { icon: <Tent className="h-4 w-4" />, label: "Tent", color: "bg-status-success/15 text-status-success" },
+  cabin: { icon: <Home className="h-4 w-4" />, label: "Cabin", color: "bg-status-warning/15 text-status-warning" },
   group: { icon: <Users className="h-4 w-4" />, label: "Group", color: "bg-purple-100 text-purple-700 dark:bg-purple-900/50 dark:text-purple-400" },
   glamping: { icon: <Sparkles className="h-4 w-4" />, label: "Glamping", color: "bg-pink-100 text-pink-700 dark:bg-pink-900/50 dark:text-pink-400" },
 };
@@ -408,8 +408,8 @@ export default function SiteClassesPage() {
                   <div className="text-3xl font-bold text-foreground">{activeClasses}</div>
                   <div className="text-sm text-muted-foreground">Active Classes</div>
                 </div>
-                <div className="h-12 w-12 rounded-full bg-emerald-100 dark:bg-emerald-900/50 flex items-center justify-center">
-                  <CheckCircle2 className="h-6 w-6 text-emerald-600 dark:text-emerald-400" />
+                <div className="h-12 w-12 rounded-full bg-status-success/15 flex items-center justify-center">
+                  <CheckCircle2 className="h-6 w-6 text-status-success" />
                 </div>
               </div>
             </CardContent>
@@ -422,8 +422,8 @@ export default function SiteClassesPage() {
                   <div className="text-3xl font-bold text-foreground">{totalSitesWithClass}</div>
                   <div className="text-sm text-muted-foreground">Sites Assigned</div>
                 </div>
-                <div className="h-12 w-12 rounded-full bg-blue-100 dark:bg-blue-900/50 flex items-center justify-center">
-                  <Trees className="h-6 w-6 text-blue-600 dark:text-blue-400" />
+                <div className="h-12 w-12 rounded-full bg-status-info/15 flex items-center justify-center">
+                  <Trees className="h-6 w-6 text-status-info" />
                 </div>
               </div>
             </CardContent>
@@ -803,7 +803,7 @@ export default function SiteClassesPage() {
                                 {typeConfig.label}
                               </Badge>
                               {rentalType !== "transient" && (
-                                <Badge variant="outline" className="text-xs bg-purple-50 dark:bg-purple-900/30 text-purple-700 dark:text-purple-400 border-purple-200 dark:border-purple-800">
+                                <Badge variant="outline" className="text-xs bg-purple-100 text-purple-700 dark:bg-purple-900/50 dark:text-purple-400">
                                   {rentalTypeLabels[rentalType] || rentalType}
                                 </Badge>
                               )}
@@ -881,21 +881,21 @@ export default function SiteClassesPage() {
 
                           {/* RV Configuration (only for RV sites) */}
                           {cls.siteType === "rv" && (rvOrientation || (electricAmps && electricAmps.length > 0)) && (
-                            <div className="flex flex-wrap gap-2 mb-3 p-2 rounded-lg bg-blue-50 dark:bg-blue-900/20 border border-blue-100 dark:border-blue-800/30">
+                            <div className="flex flex-wrap gap-2 mb-3 p-2 rounded-lg bg-status-info/15">
                               {rvOrientation && orientationLabels[rvOrientation] && (
-                                <div className="flex items-center gap-1 text-xs text-blue-700 dark:text-blue-400">
+                                <div className="flex items-center gap-1 text-xs text-status-info">
                                   {orientationLabels[rvOrientation].icon}
                                   <span>{orientationLabels[rvOrientation].label}</span>
                                 </div>
                               )}
                               {electricAmps && electricAmps.length > 0 && (
-                                <div className="flex items-center gap-1 text-xs text-blue-700 dark:text-blue-400">
+                                <div className="flex items-center gap-1 text-xs text-status-info">
                                   <Gauge className="h-3 w-3" />
                                   <span>{electricAmps.join("/")}A</span>
                                 </div>
                               )}
                               {slideOutsAccepted && slideOutsAccepted !== "none" && (
-                                <div className="flex items-center gap-1 text-xs text-blue-700 dark:text-blue-400">
+                                <div className="flex items-center gap-1 text-xs text-status-info">
                                   <Truck className="h-3 w-3" />
                                   <span>Slide-outs: {slideOutsAccepted}</span>
                                 </div>

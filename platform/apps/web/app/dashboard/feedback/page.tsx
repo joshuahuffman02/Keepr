@@ -214,9 +214,9 @@ export default function FeedbackDashboard() {
 
   // NPS score color and sentiment
   const getNpsStyle = (score: number) => {
-    if (score >= 50) return { color: "text-emerald-600", bg: "bg-emerald-50", border: "border-emerald-200", label: "Excellent", icon: Sparkles };
-    if (score >= 0) return { color: "text-amber-600", bg: "bg-amber-50", border: "border-amber-200", label: "Good", icon: TrendingUp };
-    return { color: "text-red-600", bg: "bg-red-50", border: "border-red-200", label: "Needs Work", icon: TrendingDown };
+    if (score >= 50) return { color: "text-status-success", bg: "bg-status-success/15", border: "border-emerald-200", label: "Excellent", icon: Sparkles };
+    if (score >= 0) return { color: "text-status-warning", bg: "bg-status-warning/15", border: "border-amber-200", label: "Good", icon: TrendingUp };
+    return { color: "text-status-error", bg: "bg-status-error/15", border: "border-red-200", label: "Needs Work", icon: TrendingDown };
   };
 
   const npsStyle = getNpsStyle(npsScore);
@@ -338,16 +338,16 @@ export default function FeedbackDashboard() {
             label="Promoters"
             value={metrics?.promoters ?? 0}
             icon={ThumbsUp}
-            iconBg="bg-emerald-100"
-            iconColor="text-emerald-600"
+            iconBg="bg-status-success/15"
+            iconColor="text-status-success"
             subtitle="Score 9-10"
           />
           <MetricCard
             label="Detractors"
             value={metrics?.detractors ?? 0}
             icon={ThumbsDown}
-            iconBg="bg-red-100"
-            iconColor="text-red-600"
+            iconBg="bg-status-error/15"
+            iconColor="text-status-error"
             subtitle="Score 0-6"
           />
         </motion.div>
@@ -714,7 +714,7 @@ export default function FeedbackDashboard() {
                   <div className="flex items-center gap-2">
                     <h2 className="text-lg font-semibold text-slate-900">Guest Reviews</h2>
                     {pendingReviews.length > 0 && (
-                      <span className="bg-amber-100 text-amber-800 text-xs font-semibold px-2 py-1 rounded-full">
+                      <span className="bg-status-warning/15 text-status-warning text-xs font-semibold px-2 py-1 rounded-full">
                         {pendingReviews.length} pending
                       </span>
                     )}
@@ -1009,10 +1009,10 @@ function MetricCard({
 // Status Badge Component
 function StatusBadge({ status }: { status: string }) {
   const styles: Record<string, { bg: string; text: string; icon: React.ElementType }> = {
-    pending: { bg: "bg-amber-100", text: "text-amber-800", icon: Clock },
-    approved: { bg: "bg-emerald-100", text: "text-emerald-800", icon: CheckCircle2 },
+    pending: { bg: "bg-status-warning/15", text: "text-status-warning", icon: Clock },
+    approved: { bg: "bg-status-success/15", text: "text-status-success", icon: CheckCircle2 },
     rejected: { bg: "bg-slate-100", text: "text-slate-600", icon: XCircle },
-    removed: { bg: "bg-red-100", text: "text-red-800", icon: Trash2 },
+    removed: { bg: "bg-status-error/15", text: "text-status-error", icon: Trash2 },
   };
 
   const style = styles[status] || styles.pending;

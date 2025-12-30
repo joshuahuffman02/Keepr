@@ -277,7 +277,7 @@ export default function SocialPlannerCalendar() {
               </div>
               <div className="col-span-2 text-slate-600">{post.platform}</div>
               <div className="col-span-2">
-                <span className="badge bg-blue-100 text-blue-700">{post.status}</span>
+                <span className="badge bg-status-info/15 text-status-info">{post.status}</span>
               </div>
               <div className="col-span-2 text-slate-600">
                 {post.scheduledFor ? new Date(post.scheduledFor).toLocaleDateString() : "Parking lot"}
@@ -304,7 +304,7 @@ export default function SocialPlannerCalendar() {
             <div className="text-xs text-slate-500 mt-2 flex flex-wrap gap-2">
               {post.category && <span className="badge">{post.category}</span>}
               <span className="badge bg-slate-100 text-slate-700">{post.platform}</span>
-                {post.scheduledFor && <span className="badge bg-emerald-100 text-emerald-700">Due {new Date(post.scheduledFor).toLocaleDateString()}</span>}
+                {post.scheduledFor && <span className="badge bg-status-success/15 text-status-success">Due {new Date(post.scheduledFor).toLocaleDateString()}</span>}
               </div>
             </div>
           ))}
@@ -332,7 +332,7 @@ export default function SocialPlannerCalendar() {
                     </div>
                     <div className="text-xs text-slate-500 mt-1 flex flex-wrap gap-2">
                       {post.category && <span className="badge">{post.category}</span>}
-              {post.ideaParkingLot && <span className="badge bg-amber-100 text-amber-700">Parking lot</span>}
+              {post.ideaParkingLot && <span className="badge bg-status-warning/15 text-status-warning">Parking lot</span>}
                     </div>
                   </div>
                 ))}

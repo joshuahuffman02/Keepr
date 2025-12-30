@@ -220,8 +220,8 @@ export default function ReferralsPage() {
                             exit={{ opacity: 0, y: -10 }}
                             className={cn(
                                 "flex items-center gap-3 rounded-lg border px-4 py-3",
-                                message.type === "success" && "bg-emerald-50 dark:bg-emerald-900/20 border-emerald-200 dark:border-emerald-800 text-emerald-800 dark:text-emerald-300",
-                                message.type === "error" && "bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800 text-red-800 dark:text-red-300"
+                                message.type === "success" && "bg-status-success/15 text-status-success",
+                                message.type === "error" && "bg-status-error/15 text-status-error"
                             )}
                         >
                             {message.type === "success" ? <Sparkles className="h-5 w-5" /> : <AlertCircle className="h-5 w-5" />}
@@ -243,8 +243,8 @@ export default function ReferralsPage() {
                     <Card className="border-border bg-card">
                         <CardContent className="pt-6">
                             <div className="flex items-center gap-3">
-                                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-blue-100 dark:bg-blue-900/30">
-                                    <Users className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+                                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-status-info/15">
+                                    <Users className="h-5 w-5 text-status-info" />
                                 </div>
                                 <div>
                                     <p className="text-2xl font-bold text-foreground">
@@ -486,7 +486,7 @@ export default function ReferralsPage() {
                                             <div className="flex items-start gap-3 min-w-0">
                                                 <div className={cn(
                                                     "flex h-10 w-10 items-center justify-center rounded-lg shrink-0",
-                                                    program.isActive ? "bg-emerald-100 dark:bg-emerald-900/30" : "bg-muted"
+                                                    program.isActive ? "bg-status-success/15" : "bg-muted"
                                                 )}>
                                                     <Gift className={cn(
                                                         "h-5 w-5",
@@ -499,7 +499,7 @@ export default function ReferralsPage() {
                                                         <Badge variant="outline" className={cn(
                                                             "text-xs",
                                                             program.isActive
-                                                                ? "bg-emerald-100 text-emerald-800 border-emerald-200 dark:bg-emerald-900/30 dark:text-emerald-400 dark:border-emerald-800"
+                                                                ? "bg-status-success/15 text-status-success"
                                                                 : "bg-muted text-muted-foreground"
                                                         )}>
                                                             {program.isActive ? "Active" : "Paused"}
@@ -645,7 +645,7 @@ export default function ReferralsPage() {
                                                             initial={{ width: 0 }}
                                                             animate={{ width: `${Math.min(100, (r.count / Math.max(...(stayReasons?.breakdown ?? []).map((b: { count?: number }) => b.count ?? 0), 1)) * 100)}%` }}
                                                             transition={{ ...SPRING_CONFIG, delay: i * 0.05 }}
-                                                            className="h-full bg-emerald-500 rounded-full"
+                                                            className="h-full bg-status-success rounded-full"
                                                         />
                                                     </div>
                                                 </div>

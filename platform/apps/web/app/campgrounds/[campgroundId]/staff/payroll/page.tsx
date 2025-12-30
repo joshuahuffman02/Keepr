@@ -391,7 +391,7 @@ export default function PayrollExportPage({ params }: { params: { campgroundId: 
                         <div
                           className={cn(
                             "w-8 h-8 rounded-lg flex items-center justify-center",
-                            provider === p.id ? "bg-emerald-100 text-emerald-600" : "bg-slate-100 text-slate-500"
+                            provider === p.id ? "bg-status-success/15 text-status-success" : "bg-muted text-muted-foreground"
                           )}
                         >
                           {p.icon}
@@ -583,7 +583,7 @@ export default function PayrollExportPage({ params }: { params: { campgroundId: 
                                   className={cn(
                                     "inline-flex px-2 py-1 rounded-md text-xs font-medium",
                                     row.earningCode === "OT" || row.earningCode === "overtime"
-                                      ? "bg-amber-100 text-amber-700"
+                                      ? "bg-status-warning/15 text-status-warning"
                                       : "bg-slate-100 text-slate-700"
                                   )}
                                 >
@@ -682,13 +682,13 @@ export default function PayrollExportPage({ params }: { params: { campgroundId: 
                         <div
                           className={cn(
                             "w-10 h-10 rounded-lg flex items-center justify-center",
-                            exp.status === "generated" ? "bg-emerald-100" : "bg-amber-100"
+                            exp.status === "generated" ? "bg-status-success/15" : "bg-status-warning/15"
                           )}
                         >
                           {exp.status === "generated" ? (
-                            <CheckCircle2 className="w-5 h-5 text-emerald-600" />
+                            <CheckCircle2 className="w-5 h-5 text-status-success" />
                           ) : (
-                            <Clock className="w-5 h-5 text-amber-600" />
+                            <Clock className="w-5 h-5 text-status-warning" />
                           )}
                         </div>
                         <div>

@@ -895,7 +895,7 @@ function ReportsPageInner() {
               {promotionsQuery.isLoading ? (
                 <div className="text-sm text-slate-500">Loading promotions…</div>
               ) : promotionsQuery.isError ? (
-                <div className="text-sm text-red-600">Failed to load promotions.</div>
+                <div className="text-sm text-status-error">Failed to load promotions.</div>
               ) : filteredPromos.length === 0 ? (
                 <div className="rounded-lg border border-slate-200 bg-white px-3 py-3 text-sm text-slate-700">
                   No promotions yet. Create promo codes in Settings → Promotions.
@@ -945,7 +945,7 @@ function ReportsPageInner() {
                               {p.validTo ? ` → ${new Date(p.validTo).toLocaleDateString()}` : ""}
                             </td>
                             <td className="px-3 py-2">
-                              <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${p.isActive ? "bg-emerald-100 text-emerald-700" : "bg-slate-100 text-slate-500"}`}>
+                              <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${p.isActive ? "bg-status-success-bg text-status-success-text" : "bg-muted text-muted-foreground"}`}>
                                 {p.isActive ? "Active" : "Inactive"}
                               </span>
                             </td>
@@ -3992,15 +3992,15 @@ function ReportsPageInner() {
                 <HelpAnchor topicId="reports-overview" label="Reports help" />
               </div>
               <p className="text-slate-600 text-sm">Financials, occupancy, marketing, audits—live and exportable.</p>
-              <div className="mt-2 text-xs bg-blue-50 border border-blue-200 rounded-lg px-3 py-2 text-blue-800 space-y-1">
+              <div className="mt-2 text-xs bg-status-info/15 border border-status-info/30 rounded-lg px-3 py-2 text-status-info space-y-1">
                 <div className="flex items-start gap-2">
-                  <Info className="h-4 w-4 text-blue-500 mt-0.5 shrink-0" />
+                  <Info className="h-4 w-4 text-status-info mt-0.5 shrink-0" />
                   <div>
                     <strong>Reports are read-only views</strong> of your live data. To edit reservations or billing,
                     use <a href="/reservations" className="underline font-medium">Reservations</a> or <a href="/billing" className="underline font-medium">Billing</a>.
                   </div>
                 </div>
-                <div className="pl-6 text-blue-700">
+                <div className="pl-6 text-status-info">
                   <strong>Tip:</strong> Click <em>Save report</em> to bookmark your current view for quick access later.
                 </div>
               </div>
@@ -4138,7 +4138,7 @@ function ReportsPageInner() {
                   key={sub.id}
                   onClick={() => setActiveSubTab(sub.id)}
                   className={`px-3 py-2 rounded-lg border text-sm font-medium transition-colors whitespace-nowrap ${activeSubTab === sub.id || (!activeSubTab && idx === 0)
-                    ? 'border-emerald-200 bg-emerald-50 text-emerald-700'
+                    ? 'border-status-success/30 bg-status-success/15 text-status-success'
                     : 'border-slate-200 bg-white text-slate-600 hover:bg-slate-50'
                     }`}
                 >
@@ -4274,10 +4274,10 @@ function ReportsPageInner() {
                       <span className="text-xs px-2 py-0.5 rounded bg-indigo-100 text-indigo-700">{reportFilters.status}</span>
                     )}
                     {reportFilters.siteType !== 'all' && (
-                      <span className="text-xs px-2 py-0.5 rounded bg-emerald-100 text-emerald-700">{reportFilters.siteType}</span>
+                      <span className="text-xs px-2 py-0.5 rounded bg-status-success-bg text-status-success-text">{reportFilters.siteType}</span>
                     )}
                     {reportFilters.groupBy !== 'none' && (
-                      <span className="text-xs px-2 py-0.5 rounded bg-amber-100 text-amber-700">Grouped by {reportFilters.groupBy}</span>
+                      <span className="text-xs px-2 py-0.5 rounded bg-status-warning-bg text-status-warning-text">Grouped by {reportFilters.groupBy}</span>
                     )}
                     <button
                       onClick={() => setReportFilters({ status: 'all', siteType: 'all', groupBy: 'none' })}
@@ -4370,13 +4370,13 @@ function ReportsPageInner() {
                 </Button>
               </div>
             ) : (
-              <span className="text-sm text-amber-700">Select a campground to view reports.</span>
+              <span className="text-sm text-status-warning">Select a campground to view reports.</span>
             )}
           </div>
 
 
           {!campgroundId && (
-            <div className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+            <div className="rounded-lg border border-status-warning/30 bg-status-warning/15 px-4 py-3 text-sm text-status-warning">
               Choose a campground from the sidebar to load reports.
             </div>
           )}
@@ -4465,7 +4465,7 @@ function ReportsPageInner() {
                 <div className="text-sm text-slate-500">Loading metrics…</div>
               )}
               {(summaryQuery.error || agingQuery.error || ledgerSummaryQuery.error) && (
-                <div className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+                <div className="rounded-lg border border-status-warning/30 bg-status-warning/15 px-4 py-3 text-sm text-status-warning">
                   Some report data failed to load. Try again or refresh.
                 </div>
               )}
@@ -4515,9 +4515,9 @@ function ReportsPageInner() {
                                 <td className="py-2 font-medium">{site.name}</td>
                                 <td className="py-2">{site.className}</td>
                                 <td className="py-2 text-center">
-                                  <span className={`inline-block px-2 py-0.5 rounded text-xs font-medium ${site.status === 'Available' ? 'bg-emerald-100 text-emerald-800' :
-                                    site.status === 'Occupied' ? 'bg-blue-100 text-blue-800' :
-                                      'bg-slate-300 text-slate-700'
+                                  <span className={`inline-block px-2 py-0.5 rounded text-xs font-medium ${site.status === 'Available' ? 'bg-status-success-bg text-status-success-text' :
+                                    site.status === 'Occupied' ? 'bg-status-info-bg text-status-info-text' :
+                                      'bg-muted text-muted-foreground'
                                     }`}>
                                     {site.status}
                                   </span>
@@ -4689,7 +4689,7 @@ function ReportsPageInner() {
                               <tr key={d.date} className={idx % 2 === 0 ? 'bg-slate-50' : ''}>
                                 <td className="py-2 font-medium">{d.date}</td>
                                 <td className="py-2 text-center">
-                                  <span className={`inline-block px-2 py-0.5 rounded text-xs ${d.bookings > 0 ? 'bg-blue-100 text-blue-800' : 'bg-slate-100 text-slate-600'
+                                  <span className={`inline-block px-2 py-0.5 rounded text-xs ${d.bookings > 0 ? 'bg-status-info-bg text-status-info-text' : 'bg-muted text-muted-foreground'
                                     }`}>
                                     {d.bookings}
                                   </span>
@@ -4818,9 +4818,9 @@ function ReportsPageInner() {
                               {noShowReport.noShows.map((r, idx) => (
                                 <tr key={r.id} className={idx % 2 === 0 ? 'bg-orange-50' : 'bg-white'}>
                                   <td className="py-2">
-                                    <span className={`inline-block px-2 py-0.5 rounded text-xs font-medium ${r.daysLate > 7 ? 'bg-red-100 text-red-800' :
-                                      r.daysLate > 3 ? 'bg-orange-100 text-orange-800' :
-                                        'bg-amber-100 text-amber-800'
+                                    <span className={`inline-block px-2 py-0.5 rounded text-xs font-medium ${r.daysLate > 7 ? 'bg-status-error-bg text-status-error-text' :
+                                      r.daysLate > 3 ? 'bg-status-warning/15 text-status-warning' :
+                                        'bg-status-warning-bg text-status-warning-text'
                                       }`}>
                                       {r.daysLate} days
                                     </span>
@@ -5255,10 +5255,10 @@ function ReportsPageInner() {
                                 <td className="py-2 font-medium">{site.siteName}</td>
                                 <td className="py-2 text-slate-600">{site.siteClass}</td>
                                 <td className="py-2 text-center">
-                                  <span className={`inline-block px-2 py-0.5 rounded text-xs font-medium ${site.occupancyRate >= 80 ? 'bg-emerald-100 text-emerald-800' :
-                                    site.occupancyRate >= 60 ? 'bg-blue-100 text-blue-800' :
-                                      site.occupancyRate >= 40 ? 'bg-amber-100 text-amber-800' :
-                                        'bg-red-100 text-red-800'
+                                  <span className={`inline-block px-2 py-0.5 rounded text-xs font-medium ${site.occupancyRate >= 80 ? 'bg-status-success-bg text-status-success-text' :
+                                    site.occupancyRate >= 60 ? 'bg-status-info-bg text-status-info-text' :
+                                      site.occupancyRate >= 40 ? 'bg-status-warning-bg text-status-warning-text' :
+                                        'bg-status-error-bg text-status-error-text'
                                     }`}>
                                     {site.occupancyRate.toFixed(1)}%
                                   </span>
@@ -5370,7 +5370,7 @@ function ReportsPageInner() {
                                     <span className="font-medium text-slate-900">{stay.nights} {stay.nights === 1 ? 'night' : 'nights'}</span>
                                   </td>
                                   <td className="py-2 text-center">
-                                    <span className="inline-block px-2 py-0.5 rounded text-xs bg-blue-100 text-blue-800 font-medium">
+                                    <span className="inline-block px-2 py-0.5 rounded text-xs bg-status-info-bg text-status-info-text font-medium">
                                       {stay.count}
                                     </span>
                                   </td>
@@ -5702,9 +5702,9 @@ function ReportsPageInner() {
                                   <td className="py-2 font-medium">{guest.name}</td>
                                   <td className="py-2 text-center">
                                     <span className={`inline-block px-2 py-0.5 rounded text-xs font-medium ${guest.visits >= 10 ? 'bg-purple-100 text-purple-800' :
-                                      guest.visits >= 5 ? 'bg-emerald-100 text-emerald-800' :
-                                        guest.visits >= 3 ? 'bg-blue-100 text-blue-800' :
-                                          'bg-slate-100 text-slate-800'
+                                      guest.visits >= 5 ? 'bg-status-success-bg text-status-success-text' :
+                                        guest.visits >= 3 ? 'bg-status-info-bg text-status-info-text' :
+                                          'bg-muted text-muted-foreground'
                                       }`}>
                                       {guest.visits}x
                                     </span>
@@ -5998,7 +5998,7 @@ function ReportsPageInner() {
                           </div>
                         ))}
                       </div>
-                      <div className="rounded-md bg-blue-50 border border-blue-200 px-3 py-2 text-xs text-blue-800">
+                      <div className="rounded-md bg-status-info/15 border border-status-info/30 px-3 py-2 text-xs text-status-info">
                         <span className="font-semibold">Note:</span> Forecasts are based on current confirmed and pending reservations. Actual results may vary based on new bookings and cancellations.
                       </div>
                     </div>
@@ -6160,9 +6160,9 @@ function ReportsPageInner() {
                               <div className="flex items-start justify-between gap-3">
                                 <div className="flex-1">
                                   <div className="flex items-center gap-2 mb-1">
-                                    <span className={`inline-block px-2 py-0.5 rounded text-xs font-semibold ${opp.severity === 'high' ? 'bg-red-100 text-red-800' :
-                                      opp.severity === 'medium' ? 'bg-amber-100 text-amber-800' :
-                                        'bg-blue-100 text-blue-800'
+                                    <span className={`inline-block px-2 py-0.5 rounded text-xs font-semibold ${opp.severity === 'high' ? 'bg-status-error-bg text-status-error-text' :
+                                      opp.severity === 'medium' ? 'bg-status-warning-bg text-status-warning-text' :
+                                        'bg-status-info-bg text-status-info-text'
                                       }`}>
                                       {opp.severity.toUpperCase()}
                                     </span>
@@ -6301,7 +6301,7 @@ function ReportsPageInner() {
                                     <td className="py-2">
                                       <span className={`inline-block px-2 py-0.5 rounded text-xs ${stay.type === 'Monthly (30+)' ? 'bg-purple-100 text-purple-800' :
                                         stay.type === 'Bi-Weekly (14-29)' ? 'bg-indigo-100 text-indigo-800' :
-                                          'bg-blue-100 text-blue-800'
+                                          'bg-status-info-bg text-status-info-text'
                                         }`}>
                                         {stay.type}
                                       </span>
@@ -6375,7 +6375,7 @@ function ReportsPageInner() {
                                     <td className="py-2 text-right">
                                       <span className={`inline-block px-2 py-0.5 rounded text-xs font-bold ${group.partySize >= 10 ? 'bg-purple-100 text-purple-800' :
                                         group.partySize >= 8 ? 'bg-indigo-100 text-indigo-800' :
-                                          'bg-blue-100 text-blue-800'
+                                          'bg-status-info-bg text-status-info-text'
                                         }`}>
                                         {group.partySize}
                                       </span>
@@ -6488,30 +6488,30 @@ function ReportsPageInner() {
                       </div>
                       <div className="space-y-2">
                         {pricingStrategyReport.map((rec, idx) => (
-                          <div key={idx} className={`rounded-lg border-2 p-3 ${rec.priority === 'high' ? 'border-rose-300 bg-rose-50' :
-                            rec.priority === 'medium' ? 'border-amber-300 bg-amber-50' :
-                              'border-blue-300 bg-blue-50'
+                          <div key={idx} className={`rounded-lg border-2 p-3 ${rec.priority === 'high' ? 'border-status-error/40 bg-status-error/10' :
+                            rec.priority === 'medium' ? 'border-status-warning/40 bg-status-warning/10' :
+                              'border-status-info/40 bg-status-info/10'
                             }`}>
                             <div className="flex items-start justify-between mb-2">
                               <div className="flex items-center gap-2">
-                                <span className={`inline-block px-2 py-0.5 rounded text-xs font-bold ${rec.priority === 'high' ? 'bg-rose-200 text-rose-900' :
-                                  rec.priority === 'medium' ? 'bg-amber-200 text-amber-900' :
-                                    'bg-blue-200 text-blue-900'
+                                <span className={`inline-block px-2 py-0.5 rounded text-xs font-bold ${rec.priority === 'high' ? 'bg-status-error/30 text-status-error' :
+                                  rec.priority === 'medium' ? 'bg-status-warning/30 text-status-warning' :
+                                    'bg-status-info/30 text-status-info'
                                   }`}>
                                   {rec.priority.toUpperCase()}
                                 </span>
-                                <span className={`text-sm font-semibold ${rec.priority === 'high' ? 'text-rose-900' :
-                                  rec.priority === 'medium' ? 'text-amber-900' :
-                                    'text-blue-900'
+                                <span className={`text-sm font-semibold ${rec.priority === 'high' ? 'text-status-error' :
+                                  rec.priority === 'medium' ? 'text-status-warning' :
+                                    'text-status-info'
                                   }`}>
                                   {rec.type}
                                 </span>
                               </div>
                               <div className="text-xs font-semibold text-slate-700">{rec.site}</div>
                             </div>
-                            <div className={`text-xs mb-2 ${rec.priority === 'high' ? 'text-rose-700' :
-                              rec.priority === 'medium' ? 'text-amber-700' :
-                                'text-blue-700'
+                            <div className={`text-xs mb-2 ${rec.priority === 'high' ? 'text-status-error' :
+                              rec.priority === 'medium' ? 'text-status-warning' :
+                                'text-status-info'
                               }`}>
                               {rec.reason}
                             </div>
@@ -6806,11 +6806,11 @@ function ReportsPageInner() {
                       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                         {Object.entries(agingQuery.data).map(([bucket, cents]) => {
                           const colorMap: Record<string, string> = {
-                            'current': 'bg-green-50 border-green-200 text-green-900',
-                            '1_30': 'bg-blue-50 border-blue-200 text-blue-900',
-                            '31_60': 'bg-amber-50 border-amber-200 text-amber-900',
-                            '61_90': 'bg-orange-50 border-orange-200 text-orange-900',
-                            'over_90': 'bg-rose-50 border-rose-200 text-rose-900'
+                            'current': 'bg-status-success/15 border-status-success/30 text-status-success',
+                            '1_30': 'bg-status-info/15 border-status-info/30 text-status-info',
+                            '31_60': 'bg-status-warning/15 border-status-warning/30 text-status-warning',
+                            '61_90': 'bg-status-warning/20 border-status-warning/40 text-status-warning',
+                            'over_90': 'bg-status-error/15 border-status-error/30 text-status-error'
                           };
                           return (
                             <div key={bucket} className={`rounded-lg border p-3 ${colorMap[bucket] || 'bg-slate-50 border-slate-200'}`}>
@@ -6929,7 +6929,7 @@ function ReportsPageInner() {
                         </div>
                       )}
                       {rateConsistencyStats.inconsistentSites === 0 && (
-                        <div className="rounded-md bg-green-50 border border-green-200 px-3 py-2 text-sm text-green-800">
+                        <div className="rounded-md bg-status-success/15 border border-status-success/30 px-3 py-2 text-sm text-status-success">
                           <span className="font-semibold">All Clear!</span> No significant rate inconsistencies detected across your sites.
                         </div>
                       )}

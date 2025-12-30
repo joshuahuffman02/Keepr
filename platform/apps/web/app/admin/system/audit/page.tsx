@@ -22,13 +22,13 @@ function getAuthHeaders(): Record<string, string> {
 }
 
 const actionColors: Record<string, string> = {
-    CREATE: "bg-emerald-500/20 text-emerald-400",
-    UPDATE: "bg-blue-500/20 text-blue-400",
-    DELETE: "bg-red-500/20 text-red-400",
+    CREATE: "bg-status-success/15 text-status-success",
+    UPDATE: "bg-status-info/15 text-status-info",
+    DELETE: "bg-status-error/15 text-status-error",
     LOGIN: "bg-purple-500/20 text-purple-400",
     LOGOUT: "bg-slate-500/20 text-slate-400",
     SYNC: "bg-cyan-500/20 text-cyan-400",
-    EXPORT: "bg-amber-500/20 text-amber-400",
+    EXPORT: "bg-status-warning/15 text-status-warning",
     IMPORT: "bg-teal-500/20 text-teal-400",
 };
 
@@ -148,7 +148,7 @@ export default function AuditLogPage() {
             </div>
 
             {error && (
-                <div className="bg-red-500/10 border border-red-500/20 rounded-lg p-4 text-red-400">
+                <div className="bg-status-error/15 border border-status-error/30 rounded-lg p-4 text-status-error">
                     {error}
                 </div>
             )}

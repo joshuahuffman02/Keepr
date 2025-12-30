@@ -20,6 +20,10 @@ export enum RealtimeEvent {
   GUEST_CREATED = "guest.created",
   GUEST_UPDATED = "guest.updated",
   CALENDAR_SYNC = "calendar.sync",
+  // Yield management events
+  YIELD_METRICS_UPDATED = "yield.metrics_updated",
+  YIELD_RECOMMENDATION_GENERATED = "yield.recommendation_generated",
+  YIELD_FORECAST_UPDATED = "yield.forecast_updated",
 }
 
 export interface ReservationEventData {
@@ -73,12 +77,60 @@ export interface NotificationData {
   timestamp: string;
 }
 
+export interface YieldMetricsUpdatedData {
+  todayOccupancy: number;
+  todayRevenue: number;
+  todayADR: number;
+  todayRevPAN: number;
+  periodOccupancy: number;
+  periodRevenue: number;
+  next7DaysOccupancy: number;
+  next30DaysOccupancy: number;
+  gapNights: number;
+  pendingRecommendations: number;
+  potentialRevenue: number;
+  triggeredBy?: "reservation" | "payment" | "scheduled" | "manual";
+  timestamp: string;
+}
+
+export interface YieldRecommendationData {
+  recommendationId: string;
+  siteClassId?: string;
+  siteClassName?: string;
+  dateStart: string;
+  dateEnd: string;
+  currentPrice: number;
+  suggestedPrice: number;
+  adjustmentPercent: number;
+  estimatedRevenueDelta: number;
+  confidence: number;
+  reason: string;
+  timestamp: string;
+}
+
+export interface YieldForecastUpdatedData {
+  forecasts: Array<{
+    date: string;
+    occupiedSites: number;
+    totalSites: number;
+    occupancyPct: number;
+    projectedRevenue: number;
+  }>;
+  avgOccupancy7Days: number;
+  avgOccupancy30Days: number;
+  totalProjectedRevenue: number;
+  timestamp: string;
+}
+
 export type RealtimeEventData =
   | ReservationEventData
   | SiteAvailabilityEventData
   | PaymentEventData
   | DashboardMetricsData
-  | NotificationData;
+  | NotificationData
+  | YieldMetricsUpdatedData
+  | YieldRecommendationData
+  | YieldForecastUpdatedData;
 
 type EventCallback<T = RealtimeEventData> = (data: T) => void;
 
@@ -368,4 +420,49 @@ export function useNotifications(callback: EventCallback<NotificationData>) {
   useEffect(() => {
     return on(RealtimeEvent.NOTIFICATION_NEW, callback);
   }, [on, callback]);
+}
+
+/**
+ * Hook for yield dashboard real-time updates
+ *
+ * Usage:
+ * ```tsx
+ * useYieldUpdates({
+ *   onMetricsUpdated: (data) => {
+ *     // Update local state or invalidate queries
+ *     queryClient.invalidateQueries({ queryKey: ["yield-dashboard"] });
+ *   },
+ *   onRecommendationGenerated: (data) => {
+ *     toast({ title: "New pricing recommendation", description: data.reason });
+ *   },
+ *   onForecastUpdated: (data) => {
+ *     // Handle forecast changes
+ *   },
+ * });
+ * ```
+ */
+export function useYieldUpdates(handlers: {
+  onMetricsUpdated?: EventCallback<YieldMetricsUpdatedData>;
+  onRecommendationGenerated?: EventCallback<YieldRecommendationData>;
+  onForecastUpdated?: EventCallback<YieldForecastUpdatedData>;
+}) {
+  const { on } = useRealtime();
+
+  useEffect(() => {
+    const unsubscribers: (() => void)[] = [];
+
+    if (handlers.onMetricsUpdated) {
+      unsubscribers.push(on(RealtimeEvent.YIELD_METRICS_UPDATED, handlers.onMetricsUpdated));
+    }
+    if (handlers.onRecommendationGenerated) {
+      unsubscribers.push(on(RealtimeEvent.YIELD_RECOMMENDATION_GENERATED, handlers.onRecommendationGenerated));
+    }
+    if (handlers.onForecastUpdated) {
+      unsubscribers.push(on(RealtimeEvent.YIELD_FORECAST_UPDATED, handlers.onForecastUpdated));
+    }
+
+    return () => {
+      unsubscribers.forEach((unsub) => unsub());
+    };
+  }, [on, handlers]);
 }

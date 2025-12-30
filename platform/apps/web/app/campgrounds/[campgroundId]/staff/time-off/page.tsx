@@ -74,9 +74,9 @@ const TIME_OFF_TYPES: { value: TimeOffType; label: string; icon: string }[] = [
 ];
 
 const STATUS_STYLES: Record<TimeOffStatus, { bg: string; text: string; icon: React.ReactNode }> = {
-  pending: { bg: "bg-amber-100", text: "text-amber-700", icon: <Clock className="w-3.5 h-3.5" /> },
-  approved: { bg: "bg-emerald-100", text: "text-emerald-700", icon: <CheckCircle2 className="w-3.5 h-3.5" /> },
-  rejected: { bg: "bg-red-100", text: "text-red-700", icon: <XCircle className="w-3.5 h-3.5" /> },
+  pending: { bg: "bg-status-warning/15", text: "text-status-warning", icon: <Clock className="w-3.5 h-3.5" /> },
+  approved: { bg: "bg-status-success/15", text: "text-status-success", icon: <CheckCircle2 className="w-3.5 h-3.5" /> },
+  rejected: { bg: "bg-status-error/15", text: "text-status-error", icon: <XCircle className="w-3.5 h-3.5" /> },
   cancelled: { bg: "bg-slate-100", text: "text-slate-500", icon: <XCircle className="w-3.5 h-3.5" /> },
 };
 
@@ -297,7 +297,7 @@ export default function TimeOffPage({ params }: { params: { campgroundId: string
                         className={cn(
                           "flex items-center gap-2 px-3 py-2 rounded-lg border-2 text-sm font-medium transition-all",
                           formType === type.value
-                            ? "border-purple-500 bg-purple-50 text-purple-700"
+                            ? "border-purple-500 bg-status-info/10 text-purple-700"
                             : "border-slate-200 hover:border-slate-300 text-slate-700"
                         )}
                       >
@@ -405,7 +405,7 @@ export default function TimeOffPage({ params }: { params: { campgroundId: string
             {pendingRequests.length > 0 && (
               <span className={cn(
                 "ml-1 px-1.5 py-0.5 rounded-full text-xs",
-                activeTab === "pending" ? "bg-white/20" : "bg-amber-100 text-amber-700"
+                activeTab === "pending" ? "bg-white/20" : "bg-status-warning/15 text-status-warning"
               )}>
                 {pendingRequests.length}
               </span>
@@ -513,7 +513,7 @@ export default function TimeOffPage({ params }: { params: { campgroundId: string
                             whileTap={{ scale: 0.98 }}
                             disabled={processing.has(request.id)}
                             onClick={() => reviewRequest(request.id, "approved")}
-                            className="flex items-center gap-2 px-4 py-2 rounded-lg bg-emerald-600 text-white text-sm font-medium disabled:opacity-50 hover:bg-emerald-700 transition-colors"
+                            className="flex items-center gap-2 px-4 py-2 rounded-lg bg-status-success text-white text-sm font-medium disabled:opacity-50 hover:bg-status-success/90 transition-colors"
                           >
                             {processing.has(request.id) ? (
                               <Loader2 className="w-4 h-4 animate-spin" />
@@ -527,7 +527,7 @@ export default function TimeOffPage({ params }: { params: { campgroundId: string
                             whileTap={{ scale: 0.98 }}
                             disabled={processing.has(request.id)}
                             onClick={() => reviewRequest(request.id, "rejected")}
-                            className="flex items-center gap-2 px-4 py-2 rounded-lg border border-red-200 text-red-700 bg-red-50 text-sm font-medium disabled:opacity-50 hover:bg-red-100 transition-colors"
+                            className="flex items-center gap-2 px-4 py-2 rounded-lg border border-status-error/30 text-status-error bg-status-error/15 text-sm font-medium disabled:opacity-50 hover:bg-status-error/25 transition-colors"
                           >
                             <XCircle className="w-4 h-4" />
                             Reject

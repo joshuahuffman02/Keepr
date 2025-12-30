@@ -78,7 +78,7 @@ export function IntegrationCard({
                 {/* Popular badge */}
                 {integration.popular && !isConnected && (
                     <div className="absolute -top-2 -right-2 z-10">
-                        <span className="inline-flex items-center gap-1 rounded-full bg-amber-100 dark:bg-amber-900/50 px-2 py-0.5 text-xs font-medium text-amber-700 dark:text-amber-300">
+                        <span className="inline-flex items-center gap-1 rounded-full bg-status-warning/15 px-2 py-0.5 text-xs font-medium text-status-warning">
                             <Sparkles className="h-3 w-3" />
                             Popular
                         </span>
@@ -101,10 +101,10 @@ export function IntegrationCard({
                             className={cn(
                                 "flex h-12 w-12 shrink-0 items-center justify-center rounded-lg transition-colors",
                                 isConnected
-                                    ? "bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400"
+                                    ? "bg-status-success/15 text-status-success"
                                     : hasError
-                                    ? "bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400"
-                                    : "bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 group-hover:bg-blue-100 dark:group-hover:bg-blue-900/30 group-hover:text-blue-600 dark:group-hover:text-blue-400"
+                                    ? "bg-status-error/15 text-status-error"
+                                    : "bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 group-hover:bg-status-info/15 group-hover:text-status-info"
                             )}
                         >
                             <Icon className="h-6 w-6" />
@@ -117,18 +117,18 @@ export function IntegrationCard({
                                     {integration.name}
                                 </h3>
                                 {isConnected && (
-                                    <span className="inline-flex items-center gap-1 rounded-full bg-emerald-100 dark:bg-emerald-900/50 px-2 py-0.5 text-xs font-medium text-emerald-700 dark:text-emerald-300">
+                                    <span className="inline-flex items-center gap-1 rounded-full bg-status-success/15 px-2 py-0.5 text-xs font-medium text-status-success">
                                         <Check className="h-3 w-3" />
                                         Connected
                                     </span>
                                 )}
                                 {hasError && (
-                                    <span className="inline-flex items-center rounded-full bg-red-100 dark:bg-red-900/50 px-2 py-0.5 text-xs font-medium text-red-700 dark:text-red-300">
+                                    <span className="inline-flex items-center rounded-full bg-status-error/15 px-2 py-0.5 text-xs font-medium text-status-error">
                                         Error
                                     </span>
                                 )}
                                 {isPending && (
-                                    <span className="inline-flex items-center rounded-full bg-amber-100 dark:bg-amber-900/50 px-2 py-0.5 text-xs font-medium text-amber-700 dark:text-amber-300">
+                                    <span className="inline-flex items-center rounded-full bg-status-warning/15 px-2 py-0.5 text-xs font-medium text-status-warning">
                                         Pending
                                     </span>
                                 )}
@@ -148,7 +148,7 @@ export function IntegrationCard({
                                 key={feature}
                                 className="flex items-center gap-2 text-sm text-muted-foreground"
                             >
-                                <Check className="h-4 w-4 text-emerald-500 shrink-0" />
+                                <Check className="h-4 w-4 text-status-success shrink-0" />
                                 <span>{feature}</span>
                             </li>
                         ))}

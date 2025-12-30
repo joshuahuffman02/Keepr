@@ -181,7 +181,7 @@ export default function EquipmentTypesPage() {
           variant={item.isActive ? "default" : "secondary"}
           className={cn(
             item.isActive
-              ? "bg-emerald-100 text-emerald-800"
+              ? "bg-status-success/15 text-status-success"
               : "bg-slate-100 text-slate-600"
           )}
         >

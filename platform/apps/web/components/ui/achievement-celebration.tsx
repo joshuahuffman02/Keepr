@@ -281,7 +281,7 @@ export function AchievementCelebration({
                       {title}
                     </h4>
                     {badge && (
-                      <span className="px-2 py-0.5 text-xs font-medium bg-amber-100 text-amber-800 rounded-full">
+                      <span className="px-2 py-0.5 text-xs font-medium bg-status-warning/15 text-status-warning rounded-full">
                         {badge}
                       </span>
                     )}
@@ -304,7 +304,7 @@ export function AchievementCelebration({
               </div>
               {/* Progress bar */}
               <motion.div
-                className="h-1 bg-emerald-500"
+                className="h-1 bg-status-success"
                 initial={{ width: "100%" }}
                 animate={{ width: "0%" }}
                 transition={{ duration: duration / 1000, ease: "linear" }}
@@ -360,7 +360,7 @@ export function AchievementCelebration({
                 transition={{ delay: 0.1 }}
                 className="mb-4"
               >
-                <span className="px-3 py-1 text-sm font-semibold bg-amber-500/20 text-amber-300 rounded-full">
+                <span className="px-3 py-1 text-sm font-semibold bg-status-warning/20 text-status-warning rounded-full">
                   {badge}
                 </span>
               </motion.div>

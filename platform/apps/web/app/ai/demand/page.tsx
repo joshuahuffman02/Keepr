@@ -56,11 +56,11 @@ interface DemandForecast {
 // ==================== HELPER FUNCTIONS ====================
 
 const demandLevelColors: Record<DemandLevel, { bg: string; text: string; border: string }> = {
-  very_low: { bg: "bg-blue-100", text: "text-blue-700", border: "border-blue-300" },
-  low: { bg: "bg-sky-100", text: "text-sky-700", border: "border-sky-300" },
-  moderate: { bg: "bg-amber-100", text: "text-amber-700", border: "border-amber-300" },
-  high: { bg: "bg-orange-100", text: "text-orange-700", border: "border-orange-300" },
-  very_high: { bg: "bg-red-100", text: "text-red-700", border: "border-red-300" },
+  very_low: { bg: "bg-status-info/15", text: "text-status-info", border: "border-status-info" },
+  low: { bg: "bg-status-info/15", text: "text-status-info", border: "border-status-info" },
+  moderate: { bg: "bg-status-warning/15", text: "text-status-warning", border: "border-status-warning" },
+  high: { bg: "bg-status-warning/15", text: "text-status-warning", border: "border-status-warning" },
+  very_high: { bg: "bg-status-error/15", text: "text-status-error", border: "border-status-error" },
 };
 
 const demandLevelLabels: Record<DemandLevel, string> = {
@@ -380,12 +380,12 @@ function DayDetailPanel({
 
         {/* Booking Gap */}
         {forecast.predictedOccupancy > forecast.existingBookings && (
-          <div className="bg-amber-50 border border-amber-200 rounded-lg p-3">
+          <div className="bg-status-warning/15 border border-status-warning rounded-lg p-3">
             <div className="flex items-start gap-2">
-              <AlertTriangle className="h-4 w-4 text-amber-600 mt-0.5 shrink-0" />
+              <AlertTriangle className="h-4 w-4 text-status-warning mt-0.5 shrink-0" />
               <div>
-                <p className="text-sm font-medium text-amber-800">Booking Gap</p>
-                <p className="text-xs text-amber-600">
+                <p className="text-sm font-medium text-status-warning">Booking Gap</p>
+                <p className="text-xs text-status-warning">
                   {Math.round(forecast.predictedOccupancy - forecast.existingBookings)}% gap between
                   predicted demand and current bookings
                 </p>
@@ -469,16 +469,16 @@ function InsightsPanel({
           </CardHeader>
           <CardContent className="space-y-2">
             {insights.peakDemandPeriods.slice(0, 3).map((period, idx) => (
-              <div key={idx} className="bg-orange-50 rounded-lg p-3">
+              <div key={idx} className="bg-status-warning/15 rounded-lg p-3 border border-status-warning/20">
                 <div className="flex items-center justify-between">
-                  <span className="text-sm font-medium text-orange-800">
+                  <span className="text-sm font-medium text-status-warning">
                     {formatDateRange(period.startDate, period.endDate)}
                   </span>
-                  <span className="text-xs bg-orange-100 text-orange-700 px-2 py-0.5 rounded-full">
+                  <span className="text-xs bg-status-warning/15 text-status-warning px-2 py-0.5 rounded-full">
                     {Math.round(period.avgDemand)}% demand
                   </span>
                 </div>
-                <p className="text-xs text-orange-600 mt-1">{period.reason}</p>
+                <p className="text-xs text-status-warning mt-1">{period.reason}</p>
               </div>
             ))}
           </CardContent>
@@ -496,16 +496,16 @@ function InsightsPanel({
           </CardHeader>
           <CardContent className="space-y-2">
             {insights.lowDemandPeriods.slice(0, 3).map((period, idx) => (
-              <div key={idx} className="bg-blue-50 rounded-lg p-3">
+              <div key={idx} className="bg-status-info/15 rounded-lg p-3 border border-status-info/20">
                 <div className="flex items-center justify-between">
-                  <span className="text-sm font-medium text-blue-800">
+                  <span className="text-sm font-medium text-status-info">
                     {formatDateRange(period.startDate, period.endDate)}
                   </span>
-                  <span className="text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full">
+                  <span className="text-xs bg-status-info/15 text-status-info px-2 py-0.5 rounded-full">
                     {Math.round(period.avgDemand)}% demand
                   </span>
                 </div>
-                <p className="text-xs text-blue-600 mt-1">{period.suggestion}</p>
+                <p className="text-xs text-status-info mt-1">{period.suggestion}</p>
               </div>
             ))}
           </CardContent>
@@ -528,7 +528,7 @@ function InsightsPanel({
                   className={cn(
                     "shrink-0 w-6 h-6 rounded-full flex items-center justify-center",
                     opp.type === "pricing"
-                      ? "bg-emerald-100 text-emerald-600"
+                      ? "bg-status-success/15 text-status-success"
                       : "bg-purple-100 text-purple-600"
                   )}
                 >

@@ -87,7 +87,7 @@ export function ReservationPill({
     const showQuickCheckIn = onQuickCheckIn && reservation.status === "confirmed" && isArrivalToday;
     const showSignals = hasMaintenance || needsCleaning || hasConflict || reservation.siteLocked;
     const lockedAccent = reservation.siteLocked
-        ? "border-amber-200/70 shadow-[0_0_0_1px_rgba(251,191,36,0.45)]"
+        ? "border-status-warning/30"
         : "";
 
     const statusConfig = {
@@ -133,7 +133,7 @@ export function ReservationPill({
                 lockedAccent,
                 isHighlighted ? "ring-2 ring-white/60 ring-offset-2 ring-offset-slate-100 z-20 shadow-lg" : "z-10",
                 isDragging && !isBeingDragged && "pointer-events-none opacity-40 grayscale-[0.5]",
-                isBeingDragged && "ring-2 ring-blue-400 ring-offset-1 opacity-90 scale-[1.02] shadow-2xl z-50"
+                isBeingDragged && "ring-2 ring-status-info ring-offset-1 opacity-90 scale-[1.02] shadow-2xl z-50"
             )}
             style={style}
             title={`${guestName} • ${reservation.status}`}
@@ -142,7 +142,7 @@ export function ReservationPill({
             onPointerUp={handlePointerUp}
         >
             {reservation.siteLocked && (
-                <span className="absolute left-0 top-0 bottom-0 w-2 bg-amber-300/95 rounded-l-lg" aria-hidden="true" />
+                <span className="absolute left-0 top-0 bottom-0 w-2 bg-status-warning rounded-l-lg" aria-hidden="true" />
             )}
             <div className="flex items-center min-w-0 w-full">
                 <Icon className="w-3 h-3 mr-2 flex-shrink-0 opacity-80 group-hover:opacity-100 transition-opacity" />
@@ -155,7 +155,7 @@ export function ReservationPill({
                 {showSignals && (
                     <div className="ml-2 flex gap-1 items-center flex-shrink-0">
                         {reservation.siteLocked && (
-                            <span className="flex h-5 w-5 items-center justify-center rounded-full bg-amber-300/40 ring-1 ring-amber-200/70">
+                            <span className="flex h-5 w-5 items-center justify-center rounded-full bg-status-warning/40 ring-1 ring-status-warning/30">
                                 <Lock className="h-3 w-3 text-white" aria-label="Site locked" />
                             </span>
                         )}
@@ -206,7 +206,7 @@ export function ReservationPill({
                 <button
                     type="button"
                     onClick={handleQuickCheckIn}
-                    className="absolute right-1.5 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-all duration-200 bg-white shadow-md text-emerald-600 rounded-full p-1.5 hover:scale-110 active:scale-90"
+                    className="absolute right-1.5 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-all duration-200 bg-white shadow-md text-status-success rounded-full p-1.5 hover:scale-110 active:scale-90"
                     title="Quick Check-in"
                 >
                     <LogIn className="h-3 w-3" />

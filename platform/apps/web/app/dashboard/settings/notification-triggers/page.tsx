@@ -421,7 +421,7 @@ function TriggerRow({
               {channelOption?.icon} {channelOption?.label}
             </span>
             {trigger.delayMinutes > 0 && (
-              <span className="text-xs bg-amber-100 text-amber-700 px-2 py-0.5 rounded">
+              <span className="text-xs bg-status-warning/15 text-status-warning px-2 py-0.5 rounded">
                 {formatDelay(trigger.delayMinutes)}
               </span>
             )}
@@ -511,8 +511,8 @@ function DeleteConfirmModal({
     >
       <div className="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-6 motion-safe:animate-in motion-safe:zoom-in-95 motion-safe:duration-200">
         <div className="flex justify-center mb-4">
-          <div className="p-3 bg-red-100 rounded-full">
-            <Trash2 className="h-6 w-6 text-red-600" />
+          <div className="p-3 bg-status-error/15 rounded-full">
+            <Trash2 className="h-6 w-6 text-status-error" />
           </div>
         </div>
         <h2 id="delete-title" className="text-xl font-bold text-slate-900 text-center mb-2">

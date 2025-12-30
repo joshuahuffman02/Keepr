@@ -17,6 +17,8 @@ interface AiCompletionRequest {
 interface AiCompletionResponse {
     content: string;
     tokensUsed: number;
+    inputTokens: number;
+    outputTokens: number;
     latencyMs: number;
     provider: string;
     model: string;
@@ -28,6 +30,18 @@ interface AiToolCompletionRequest extends AiCompletionRequest {
 }
 
 interface AiToolCompletionResponse extends AiCompletionResponse {
+    toolCalls?: { id?: string; name: string; arguments: string }[];
+}
+
+interface ProviderResponse {
+    content: string;
+    tokensUsed: number;
+    inputTokens: number;
+    outputTokens: number;
+    model: string;
+}
+
+interface ProviderToolResponse extends ProviderResponse {
     toolCalls?: { id?: string; name: string; arguments: string }[];
 }
 
@@ -81,13 +95,15 @@ export class AiProviderService {
                 promptHash: this.privacy.hashForAudit(request.userPrompt),
                 responseHash: this.privacy.hashForAudit(response.content),
                 tokensUsed: response.tokensUsed,
+                inputTokens: response.inputTokens,
+                outputTokens: response.outputTokens,
                 latencyMs,
                 userId: request.userId,
                 sessionId: request.sessionId,
                 success: true,
                 provider,
                 modelUsed: response.model,
-                costCents: this.estimateCost(response.tokensUsed, provider, response.model),
+                costCents: this.estimateCost(response.inputTokens, response.outputTokens, provider, response.model),
             });
 
             // Update campground usage stats
@@ -101,6 +117,8 @@ export class AiProviderService {
             return {
                 content: response.content,
                 tokensUsed: response.tokensUsed,
+                inputTokens: response.inputTokens,
+                outputTokens: response.outputTokens,
                 latencyMs,
                 provider,
                 model: response.model,
@@ -115,6 +133,8 @@ export class AiProviderService {
                 promptHash: this.privacy.hashForAudit(request.userPrompt),
                 responseHash: '',
                 tokensUsed: 0,
+                inputTokens: 0,
+                outputTokens: 0,
                 latencyMs,
                 userId: request.userId,
                 sessionId: request.sessionId,
@@ -171,13 +191,15 @@ export class AiProviderService {
                 promptHash: this.privacy.hashForAudit(request.userPrompt),
                 responseHash,
                 tokensUsed: response.tokensUsed,
+                inputTokens: response.inputTokens,
+                outputTokens: response.outputTokens,
                 latencyMs,
                 userId: request.userId,
                 sessionId: request.sessionId,
                 success: true,
                 provider,
                 modelUsed: response.model,
-                costCents: this.estimateCost(response.tokensUsed, provider, response.model),
+                costCents: this.estimateCost(response.inputTokens, response.outputTokens, provider, response.model),
             });
 
             await this.prisma.campground.update({
@@ -191,6 +213,8 @@ export class AiProviderService {
                 content: response.content,
                 toolCalls: response.toolCalls,
                 tokensUsed: response.tokensUsed,
+                inputTokens: response.inputTokens,
+                outputTokens: response.outputTokens,
                 latencyMs,
                 provider,
                 model: response.model,
@@ -204,6 +228,8 @@ export class AiProviderService {
                 promptHash: this.privacy.hashForAudit(request.userPrompt),
                 responseHash: '',
                 tokensUsed: 0,
+                inputTokens: 0,
+                outputTokens: 0,
                 latencyMs,
                 userId: request.userId,
                 sessionId: request.sessionId,
@@ -225,7 +251,7 @@ export class AiProviderService {
             maxTokens: number;
             temperature: number;
         },
-    ): Promise<{ content: string; tokensUsed: number; model: string }> {
+    ): Promise<ProviderResponse> {
         switch (provider) {
             case 'openai':
                 return this.callOpenAI(options);
@@ -249,7 +275,7 @@ export class AiProviderService {
             tools: any[];
             toolChoice?: any;
         },
-    ): Promise<{ content: string; tokensUsed: number; model: string; toolCalls?: { id?: string; name: string; arguments: string }[] }> {
+    ): Promise<ProviderToolResponse> {
         if (provider === 'openai') {
             return this.callOpenAITools(options);
         }
@@ -274,7 +300,7 @@ export class AiProviderService {
         apiKey?: string | null;
         maxTokens: number;
         temperature: number;
-    }): Promise<{ content: string; tokensUsed: number; model: string }> {
+    }): Promise<ProviderResponse> {
         const apiKey = options.apiKey || process.env.OPENAI_API_KEY;
         if (!apiKey) {
             throw new BadRequestException('OpenAI API key not configured');
@@ -305,13 +331,18 @@ export class AiProviderService {
 
         const data = await response.json() as {
             choices: { message: { content: string } }[];
-            usage: { total_tokens: number };
+            usage: { total_tokens: number; prompt_tokens: number; completion_tokens: number };
             model: string;
         };
+
+        const inputTokens = data.usage?.prompt_tokens || 0;
+        const outputTokens = data.usage?.completion_tokens || 0;
 
         return {
             content: data.choices[0]?.message?.content || '',
             tokensUsed: data.usage?.total_tokens || 0,
+            inputTokens,
+            outputTokens,
             model: data.model || 'gpt-4o-mini',
         };
     }
@@ -324,7 +355,7 @@ export class AiProviderService {
         temperature: number;
         tools: any[];
         toolChoice?: any;
-    }): Promise<{ content: string; tokensUsed: number; model: string; toolCalls?: { id?: string; name: string; arguments: string }[] }> {
+    }): Promise<ProviderToolResponse> {
         const apiKey = options.apiKey || process.env.OPENAI_API_KEY;
         if (!apiKey) {
             throw new BadRequestException('OpenAI API key not configured');
@@ -357,7 +388,7 @@ export class AiProviderService {
 
         const data = await response.json() as {
             choices: { message: { content: string; tool_calls?: { id?: string; type: string; function: { name: string; arguments: string } }[] } }[];
-            usage: { total_tokens: number };
+            usage: { total_tokens: number; prompt_tokens: number; completion_tokens: number };
             model: string;
         };
 
@@ -368,10 +399,15 @@ export class AiProviderService {
             arguments: call.function?.arguments,
         })).filter((call) => call.name && call.arguments);
 
+        const inputTokens = data.usage?.prompt_tokens || 0;
+        const outputTokens = data.usage?.completion_tokens || 0;
+
         return {
             content: message?.content || '',
             toolCalls: toolCalls?.length ? toolCalls as { id?: string; name: string; arguments: string }[] : undefined,
             tokensUsed: data.usage?.total_tokens || 0,
+            inputTokens,
+            outputTokens,
             model: data.model || 'gpt-4o-mini',
         };
     }
@@ -382,7 +418,7 @@ export class AiProviderService {
         apiKey?: string | null;
         maxTokens: number;
         temperature: number;
-    }): Promise<{ content: string; tokensUsed: number; model: string }> {
+    }): Promise<ProviderResponse> {
         const apiKey = options.apiKey || process.env.ANTHROPIC_API_KEY;
         if (!apiKey) {
             throw new BadRequestException('Anthropic API key not configured');
@@ -417,9 +453,14 @@ export class AiProviderService {
             model: string;
         };
 
+        const inputTokens = data.usage?.input_tokens || 0;
+        const outputTokens = data.usage?.output_tokens || 0;
+
         return {
             content: data.content[0]?.text || '',
-            tokensUsed: (data.usage?.input_tokens || 0) + (data.usage?.output_tokens || 0),
+            tokensUsed: inputTokens + outputTokens,
+            inputTokens,
+            outputTokens,
             model: data.model || 'claude-3-haiku',
         };
     }
@@ -429,7 +470,7 @@ export class AiProviderService {
         userPrompt: string;
         maxTokens: number;
         temperature: number;
-    }): Promise<{ content: string; tokensUsed: number; model: string }> {
+    }): Promise<ProviderResponse> {
         // Placeholder for local/self-hosted models (Ollama, vLLM, etc.)
         const localEndpoint = process.env.LOCAL_AI_ENDPOINT || 'http://localhost:11434/api/generate';
 
@@ -452,23 +493,56 @@ export class AiProviderService {
         return {
             content: data.response || '',
             tokensUsed: 0, // Local models don't typically report token usage
+            inputTokens: 0,
+            outputTokens: 0,
             model: process.env.LOCAL_AI_MODEL || 'local',
         };
     }
 
-    private estimateCost(tokens: number, provider: string, model: string): number {
-        // Rough cost estimates in cents per 1000 tokens
-        const costs: Record<string, number> = {
-            'gpt-4o-mini': 0.015, // $0.00015 per 1K tokens
-            'gpt-4o': 0.5, // $0.005 per 1K tokens
-            'gpt-4': 3, // $0.03 per 1K tokens
-            'claude-3-haiku': 0.025, // $0.00025 per 1K tokens
-            'claude-3-sonnet': 0.3, // $0.003 per 1K tokens
-            'local': 0, // Free
+    private estimateCost(inputTokens: number, outputTokens: number, provider: string, model: string): number {
+        // Cost estimates in cents per 1000 tokens (updated Jan 2025)
+        const costs: Record<string, { input: number; output: number }> = {
+            'gpt-4o-mini': { input: 0.015, output: 0.06 },
+            'gpt-4o': { input: 0.25, output: 1.0 },
+            'gpt-4-turbo': { input: 1.0, output: 3.0 },
+            'gpt-4': { input: 3.0, output: 6.0 },
+            'gpt-3.5-turbo': { input: 0.05, output: 0.15 },
+            'claude-3-opus': { input: 1.5, output: 7.5 },
+            'claude-3-sonnet': { input: 0.3, output: 1.5 },
+            'claude-3-haiku': { input: 0.025, output: 0.125 },
+            'claude-3-haiku-20240307': { input: 0.025, output: 0.125 },
+            'claude-3-5-sonnet': { input: 0.3, output: 1.5 },
+            'claude-3-5-haiku': { input: 0.1, output: 0.5 },
+            'local': { input: 0, output: 0 },
         };
 
-        const costPer1K = costs[model] || costs['gpt-4o-mini'];
-        return Math.ceil((tokens / 1000) * costPer1K * 100) / 100; // Round to 2 decimal cents
+        const normalizedModel = this.normalizeModelName(model);
+        const modelCosts = costs[normalizedModel] || costs['gpt-4o-mini'];
+
+        const inputCost = (inputTokens / 1000) * modelCosts.input;
+        const outputCost = (outputTokens / 1000) * modelCosts.output;
+
+        return Math.round((inputCost + outputCost) * 100) / 100; // Round to 2 decimal cents
+    }
+
+    private normalizeModelName(model: string): string {
+        const normalized = model.toLowerCase();
+
+        if (normalized.includes('gpt-4o-mini')) return 'gpt-4o-mini';
+        if (normalized.includes('gpt-4o')) return 'gpt-4o';
+        if (normalized.includes('gpt-4-turbo')) return 'gpt-4-turbo';
+        if (normalized.includes('gpt-4')) return 'gpt-4';
+        if (normalized.includes('gpt-3.5')) return 'gpt-3.5-turbo';
+
+        if (normalized.includes('claude-3-opus')) return 'claude-3-opus';
+        if (normalized.includes('claude-3-5-sonnet')) return 'claude-3-5-sonnet';
+        if (normalized.includes('claude-3-sonnet')) return 'claude-3-sonnet';
+        if (normalized.includes('claude-3-5-haiku')) return 'claude-3-5-haiku';
+        if (normalized.includes('claude-3-haiku')) return 'claude-3-haiku';
+
+        if (normalized.includes('local') || normalized.includes('ollama')) return 'local';
+
+        return model;
     }
 
     private async logInteraction(data: {
@@ -477,6 +551,8 @@ export class AiProviderService {
         promptHash: string;
         responseHash: string;
         tokensUsed: number;
+        inputTokens?: number;
+        outputTokens?: number;
         latencyMs: number;
         userId?: string;
         sessionId?: string;

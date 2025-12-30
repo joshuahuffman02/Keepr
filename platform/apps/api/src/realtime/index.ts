@@ -6,4 +6,7 @@ export type {
   PaymentEventData,
   DashboardMetricsData,
   NotificationData,
+  YieldMetricsUpdatedData,
+  YieldRecommendationData,
+  YieldForecastUpdatedData,
 } from "./realtime.service";

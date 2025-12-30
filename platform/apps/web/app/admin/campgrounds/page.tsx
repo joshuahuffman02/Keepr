@@ -103,7 +103,7 @@ export default function AdminCampgroundsListPage() {
             </div>
 
             {error && (
-                <div className="bg-red-500/10 border border-red-500/20 rounded-lg p-4 text-red-400">
+                <div className="bg-status-error/15 border border-status-error/30 rounded-lg p-4 text-status-error">
                     {error}
                 </div>
             )}
@@ -135,7 +135,7 @@ export default function AdminCampgroundsListPage() {
                                     <div className="flex items-center gap-2">
                                         <h3 className="font-semibold text-white">{campground.name}</h3>
                                         {campground.isActive === false && (
-                                            <span className="px-2 py-0.5 text-xs bg-red-500/20 text-red-400 rounded">
+                                            <span className="px-2 py-0.5 text-xs bg-status-error/15 text-status-error rounded">
                                                 Inactive
                                             </span>
                                         )}

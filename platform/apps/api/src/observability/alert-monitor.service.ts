@@ -2,6 +2,8 @@ import { Injectable, Logger } from "@nestjs/common";
 import { Cron } from "@nestjs/schedule";
 import { ObservabilityService } from "./observability.service";
 import { AlertingService } from "./alerting.service";
+import { AlertSinksService } from "./alert-sinks.service";
+import { PrometheusService } from "./prometheus.service";
 import { PrismaService } from "../prisma/prisma.service";
 import { OtaService } from "../ota/ota.service";
 
@@ -14,10 +16,14 @@ export class AlertMonitorService {
     (process.env.ENABLE_READY_PROBE ?? process.env.ready_checks_enabled ?? "true").toString().toLowerCase() === "true";
   private readonly otaAlertsEnabled =
     (process.env.ENABLE_OTA_MONITORING ?? process.env.ota_alerts_enabled ?? "true").toString().toLowerCase() === "true";
+  private readonly useNewAlertSinks =
+    (process.env.USE_NEW_ALERT_SINKS ?? "true").toString().toLowerCase() === "true";
 
   constructor(
     private readonly observability: ObservabilityService,
     private readonly alerting: AlertingService,
+    private readonly alertSinks: AlertSinksService,
+    private readonly prometheus: PrometheusService,
     private readonly prisma: PrismaService,
     private readonly otaService: OtaService
   ) { }
@@ -87,13 +93,34 @@ export class AlertMonitorService {
         `Queues lag=${alerts.queues.lagBreaches.length}, depth=${alerts.queues.depthBreaches.length}\n` +
         `Comms delivery=${(alerts.comms.deliveryRate * 100).toFixed(1)}% bounce=${(alerts.comms.bounceRate * 100).toFixed(2)}% smsFail=${((alerts.comms.providers.twilio?.failureRate ?? 0) * 100).toFixed(2)}%`;
 
-      await this.alerting.dispatch("Observability alerts firing", message, "error", "observability-breach", {
+      const alertDetails = {
         breaches,
         api: alerts.api,
         comms: alerts.comms,
         queues: alerts.queues,
         reportRuns: reportSignal,
-      });
+      };
+
+      // Use new alert sinks service if enabled (provides rate limiting and extensibility)
+      if (this.useNewAlertSinks) {
+        await this.alertSinks.dispatch({
+          title: "Observability alerts firing",
+          message,
+          severity: "error",
+          dedupKey: "observability-breach",
+          source: "alert-monitor",
+          details: alertDetails,
+        });
+      } else {
+        // Fall back to legacy alerting service
+        await this.alerting.dispatch("Observability alerts firing", message, "error", "observability-breach", alertDetails);
+      }
+
+      // Update Prometheus metrics for alerting
+      this.prometheus.incCounter("alerts_fired_total", { severity: "error", type: "observability-breach" });
+      for (const breach of breaches) {
+        this.prometheus.incCounter("alert_breaches_total", { breach });
+      }
     } catch (err) {
       this.logger.error(`Alert evaluation failed: ${(err as any)?.message ?? err}`);
     }

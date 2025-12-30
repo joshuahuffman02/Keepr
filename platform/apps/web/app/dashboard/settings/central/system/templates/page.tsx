@@ -63,10 +63,10 @@ const CATEGORIES = [
 ];
 
 const categoryColors: Record<string, string> = {
-  booking: "bg-blue-100 text-blue-800",
-  payment: "bg-green-100 text-green-800",
-  reminder: "bg-amber-100 text-amber-800",
-  confirmation: "bg-emerald-100 text-emerald-800",
+  booking: "bg-status-info/15 text-status-info",
+  payment: "bg-status-success/15 text-status-success",
+  reminder: "bg-status-warning/15 text-status-warning",
+  confirmation: "bg-status-success/15 text-status-success",
   marketing: "bg-purple-100 text-purple-800",
   operational: "bg-slate-100 text-slate-800",
   general: "bg-gray-100 text-gray-800",
@@ -210,8 +210,8 @@ export default function TemplatesPage() {
         <Card>
           <CardContent className="pt-6">
             <div className="flex items-center gap-3">
-              <div className="p-2 rounded-lg bg-blue-100">
-                <Mail className="h-5 w-5 text-blue-600" />
+              <div className="p-2 rounded-lg bg-status-info/15">
+                <Mail className="h-5 w-5 text-status-info" />
               </div>
               <div>
                 <p className="text-2xl font-bold text-slate-900">
@@ -225,8 +225,8 @@ export default function TemplatesPage() {
         <Card>
           <CardContent className="pt-6">
             <div className="flex items-center gap-3">
-              <div className="p-2 rounded-lg bg-green-100">
-                <Smartphone className="h-5 w-5 text-green-600" />
+              <div className="p-2 rounded-lg bg-status-success/15">
+                <Smartphone className="h-5 w-5 text-status-success" />
               </div>
               <div>
                 <p className="text-2xl font-bold text-slate-900">
@@ -296,9 +296,9 @@ export default function TemplatesPage() {
                       <div className="flex items-center gap-3 min-w-0">
                         <div className={`p-2 rounded-lg ${
                           template.channel === "email"
-                            ? "bg-blue-100 text-blue-600"
+                            ? "bg-status-info/15 text-status-info"
                             : template.channel === "sms"
-                            ? "bg-green-100 text-green-600"
+                            ? "bg-status-success/15 text-status-success"
                             : "bg-purple-100 text-purple-600"
                         }`}>
                           {template.channel === "email" ? (

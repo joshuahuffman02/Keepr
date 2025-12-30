@@ -3,12 +3,13 @@ import { IntegrationsController } from "./integrations.controller";
 import { IntegrationsService } from "./integrations.service";
 import { PrismaService } from "../prisma/prisma.service";
 import { QuickBooksModule } from "./quickbooks/quickbooks.module";
+import { MarketplaceModule } from "./marketplace.module";
 
 @Module({
-  imports: [QuickBooksModule],
+  imports: [QuickBooksModule, MarketplaceModule],
   controllers: [IntegrationsController],
   providers: [IntegrationsService],
-  exports: [QuickBooksModule],
+  exports: [QuickBooksModule, MarketplaceModule],
 })
 export class IntegrationsModule { }
 

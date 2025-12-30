@@ -127,7 +127,7 @@ export default function DiscountsPage() {
       key: "value",
       label: "Value",
       render: (item: Discount) => (
-        <span className="font-medium text-emerald-600">
+        <span className="font-medium text-status-success">
           {item.type === "percent" ? `${item.value}%` : `$${item.value}`} off
         </span>
       ),
@@ -170,7 +170,7 @@ export default function DiscountsPage() {
           variant={item.isActive ? "default" : "secondary"}
           className={cn(
             item.isActive
-              ? "bg-emerald-100 text-emerald-800"
+              ? "bg-status-success/15 text-status-success"
               : "bg-slate-100 text-slate-600"
           )}
         >

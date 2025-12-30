@@ -55,28 +55,28 @@ const categoryConfig = {
 const severityConfig = {
   error: {
     icon: XCircle,
-    color: "text-red-500",
-    bg: "bg-red-50",
-    border: "border-red-200",
-    badge: "bg-red-100 text-red-800 border-red-200",
+    color: "text-status-error",
+    bg: "bg-status-error/15",
+    border: "border-status-error/30",
+    badge: "bg-status-error/15 text-status-error border-status-error/30",
     label: "Error",
     priority: 1,
   },
   warning: {
     icon: AlertTriangle,
-    color: "text-amber-500",
-    bg: "bg-amber-50",
-    border: "border-amber-200",
-    badge: "bg-amber-100 text-amber-800 border-amber-200",
+    color: "text-status-warning",
+    bg: "bg-status-warning/15",
+    border: "border-status-warning/30",
+    badge: "bg-status-warning/15 text-status-warning border-status-warning/30",
     label: "Warning",
     priority: 2,
   },
   info: {
     icon: Info,
-    color: "text-blue-500",
-    bg: "bg-blue-50",
-    border: "border-blue-200",
-    badge: "bg-blue-100 text-blue-800 border-blue-200",
+    color: "text-status-info",
+    bg: "bg-status-info/15",
+    border: "border-status-info/30",
+    badge: "bg-status-info/15 text-status-info border-status-info/30",
     label: "Suggestion",
     priority: 3,
   },
@@ -148,16 +148,16 @@ export default function SystemCheckPage() {
       {/* Summary Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {/* Errors */}
-        <Card className={cn(errorCount > 0 ? "border-red-200 bg-red-50/50" : "")}>
+        <Card className={cn(errorCount > 0 ? "border-status-error/30 bg-status-error/15" : "")}>
           <CardContent className="pt-6">
             <div className="flex items-center gap-3">
               <div className={cn(
                 "h-10 w-10 rounded-lg flex items-center justify-center",
-                errorCount > 0 ? "bg-red-100" : "bg-slate-100"
+                errorCount > 0 ? "bg-status-error/15" : "bg-slate-100"
               )}>
                 <XCircle className={cn(
                   "h-5 w-5",
-                  errorCount > 0 ? "text-red-500" : "text-slate-400"
+                  errorCount > 0 ? "text-status-error" : "text-slate-400"
                 )} />
               </div>
               <div>
@@ -169,16 +169,16 @@ export default function SystemCheckPage() {
         </Card>
 
         {/* Warnings */}
-        <Card className={cn(warningCount > 0 ? "border-amber-200 bg-amber-50/50" : "")}>
+        <Card className={cn(warningCount > 0 ? "border-status-warning/30 bg-status-warning/15" : "")}>
           <CardContent className="pt-6">
             <div className="flex items-center gap-3">
               <div className={cn(
                 "h-10 w-10 rounded-lg flex items-center justify-center",
-                warningCount > 0 ? "bg-amber-100" : "bg-slate-100"
+                warningCount > 0 ? "bg-status-warning/15" : "bg-slate-100"
               )}>
                 <AlertTriangle className={cn(
                   "h-5 w-5",
-                  warningCount > 0 ? "text-amber-500" : "text-slate-400"
+                  warningCount > 0 ? "text-status-warning" : "text-slate-400"
                 )} />
               </div>
               <div>
@@ -193,8 +193,8 @@ export default function SystemCheckPage() {
         <Card>
           <CardContent className="pt-6">
             <div className="flex items-center gap-3">
-              <div className="h-10 w-10 rounded-lg flex items-center justify-center bg-blue-100">
-                <Info className="h-5 w-5 text-blue-500" />
+              <div className="h-10 w-10 rounded-lg flex items-center justify-center bg-status-info/15">
+                <Info className="h-5 w-5 text-status-info" />
               </div>
               <div>
                 <p className="text-2xl font-bold text-slate-900">{infoCount}</p>
@@ -245,10 +245,10 @@ export default function SystemCheckPage() {
 
       {/* Issues List */}
       {filteredIssues.length === 0 ? (
-        <Card className="border-emerald-200 bg-emerald-50/50">
+        <Card className="border-green-200 bg-green-50/50">
           <CardContent className="py-12 text-center">
-            <div className="inline-flex items-center justify-center h-16 w-16 rounded-full bg-emerald-100 mb-4">
-              <CheckCircle2 className="h-8 w-8 text-emerald-600" />
+            <div className="inline-flex items-center justify-center h-16 w-16 rounded-full bg-status-success/15 mb-4">
+              <CheckCircle2 className="h-8 w-8 text-status-success" />
             </div>
             <h3 className="text-lg font-medium text-slate-900">All clear!</h3>
             <p className="text-slate-500 mt-1 max-w-sm mx-auto">

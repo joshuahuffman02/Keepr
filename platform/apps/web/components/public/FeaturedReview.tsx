@@ -59,9 +59,9 @@ export function FeaturedReview({
           <span
             className={cn(
               "inline-flex items-center gap-1 text-xs font-medium",
-              variant === "light" && "text-emerald-600",
-              variant === "dark" && "text-emerald-400",
-              variant === "glass" && "text-emerald-300"
+              variant === "light" && "text-status-success",
+              variant === "dark" && "text-status-success",
+              variant === "glass" && "text-status-success"
             )}
           >
             <CheckCircle2 className="h-3 w-3" />
@@ -88,8 +88,8 @@ export function FeaturedReview({
         <div
           className={cn(
             "w-8 h-8 rounded-full flex items-center justify-center text-xs font-semibold",
-            variant === "light" && "bg-emerald-100 text-emerald-700",
-            variant === "dark" && "bg-emerald-900 text-emerald-200",
+            variant === "light" && "bg-status-success/15 text-status-success",
+            variant === "dark" && "bg-status-success/15 text-status-success",
             variant === "glass" && "bg-white/20 text-white"
           )}
         >

@@ -219,8 +219,8 @@ export default function AdminDashboardPage() {
                 <CardContent>
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                         <div className="flex items-center gap-3">
-                            <div className="h-10 w-10 rounded-lg bg-green-500/10 flex items-center justify-center">
-                                <CheckCircle2 className="h-5 w-5 text-green-400" />
+                            <div className="h-10 w-10 rounded-lg bg-status-success/15 flex items-center justify-center">
+                                <CheckCircle2 className="h-5 w-5 text-status-success" />
                             </div>
                             <div>
                                 <p className="text-sm font-medium text-white">API Status</p>
@@ -229,8 +229,8 @@ export default function AdminDashboardPage() {
                         </div>
 
                         <div className="flex items-center gap-3">
-                            <div className="h-10 w-10 rounded-lg bg-green-500/10 flex items-center justify-center">
-                                <Database className="h-5 w-5 text-green-400" />
+                            <div className="h-10 w-10 rounded-lg bg-status-success/15 flex items-center justify-center">
+                                <Database className="h-5 w-5 text-status-success" />
                             </div>
                             <div>
                                 <p className="text-sm font-medium text-white">Database</p>
@@ -239,8 +239,8 @@ export default function AdminDashboardPage() {
                         </div>
 
                         <div className="flex items-center gap-3">
-                            <div className="h-10 w-10 rounded-lg bg-blue-500/10 flex items-center justify-center">
-                                <Clock className="h-5 w-5 text-blue-400" />
+                            <div className="h-10 w-10 rounded-lg bg-status-info/15 flex items-center justify-center">
+                                <Clock className="h-5 w-5 text-status-info" />
                             </div>
                             <div>
                                 <p className="text-sm font-medium text-white">Last Sync</p>
@@ -250,12 +250,12 @@ export default function AdminDashboardPage() {
 
                         <div className="flex items-center gap-3">
                             <div className={`h-10 w-10 rounded-lg flex items-center justify-center ${
-                                systemHealth.activeAlerts > 0 ? 'bg-red-500/10' : 'bg-green-500/10'
+                                systemHealth.activeAlerts > 0 ? 'bg-status-error/15' : 'bg-status-success/15'
                             }`}>
                                 {systemHealth.activeAlerts > 0 ? (
-                                    <AlertTriangle className="h-5 w-5 text-red-400" />
+                                    <AlertTriangle className="h-5 w-5 text-status-error" />
                                 ) : (
-                                    <CheckCircle2 className="h-5 w-5 text-green-400" />
+                                    <CheckCircle2 className="h-5 w-5 text-status-success" />
                                 )}
                             </div>
                             <div>

@@ -42,9 +42,9 @@ interface User {
 
 const roleColors: Record<string, string> = {
   owner: "bg-purple-100 text-purple-800",
-  manager: "bg-blue-100 text-blue-800",
-  front_desk: "bg-emerald-100 text-emerald-800",
-  maintenance: "bg-amber-100 text-amber-800",
+  manager: "bg-status-info/15 text-status-info",
+  front_desk: "bg-status-success/15 text-status-success",
+  maintenance: "bg-status-warning/15 text-status-warning",
   finance: "bg-cyan-100 text-cyan-800",
   marketing: "bg-pink-100 text-pink-800",
   readonly: "bg-slate-100 text-slate-800",
@@ -163,9 +163,9 @@ export default function UsersPage() {
           variant={item.isActive ? "default" : "secondary"}
           className={cn(
             item.isPending
-              ? "bg-amber-100 text-amber-800"
+              ? "bg-status-warning/15 text-status-warning"
               : item.isActive
-              ? "bg-emerald-100 text-emerald-800"
+              ? "bg-status-success/15 text-status-success"
               : "bg-slate-100 text-slate-600"
           )}
         >

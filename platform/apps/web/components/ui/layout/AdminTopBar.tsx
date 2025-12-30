@@ -340,7 +340,7 @@ export function AdminTopBar({
                     <div className="hidden md:flex items-center gap-1 mr-2">
                         <Link
                             href="/check-in-out"
-                            className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-slate-600 hover:text-emerald-700 hover:bg-emerald-50 rounded-lg transition-colors"
+                            className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-slate-600 hover:text-status-success hover:bg-status-success/15 rounded-lg transition-colors"
                             title="Check In/Out"
                         >
                             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">
@@ -351,7 +351,7 @@ export function AdminTopBar({
                         </Link>
                         <Link
                             href="/booking"
-                            className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-slate-600 hover:text-emerald-700 hover:bg-emerald-50 rounded-lg transition-colors"
+                            className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-slate-600 hover:text-status-success hover:bg-status-success/15 rounded-lg transition-colors"
                             title="New Booking"
                         >
                             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">
@@ -361,7 +361,7 @@ export function AdminTopBar({
                         </Link>
                         <Link
                             href="/pos"
-                            className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-slate-600 hover:text-emerald-700 hover:bg-emerald-50 rounded-lg transition-colors"
+                            className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-slate-600 hover:text-status-success hover:bg-status-success/15 rounded-lg transition-colors"
                             title="Point of Sale"
                         >
                             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">
@@ -399,7 +399,7 @@ export function AdminTopBar({
                                     <div className="font-semibold text-foreground text-sm">Notifications</div>
                                     {unreadCount > 0 && (
                                         <button
-                                            className="text-xs text-emerald-600 hover:text-emerald-700 font-medium disabled:opacity-50"
+                                            className="text-xs text-status-success hover:text-status-success/80 font-medium disabled:opacity-50"
                                             onClick={markAllRead}
                                             disabled={markAllReadMutation.isPending}
                                         >
@@ -424,7 +424,7 @@ export function AdminTopBar({
                                                     key={notif.id}
                                                     onClick={() => handleNotificationClick(notif)}
                                                     className={`w-full flex items-start gap-3 px-4 py-3 text-left transition-colors ${
-                                                        isUnread ? "bg-emerald-50/50 dark:bg-emerald-950/20" : "hover:bg-muted"
+                                                        isUnread ? "bg-status-success/15" : "hover:bg-muted"
                                                     }`}
                                                 >
                                                     <div className="text-lg flex-shrink-0">{config.icon}</div>
@@ -432,7 +432,7 @@ export function AdminTopBar({
                                                         <div className="text-sm font-medium text-foreground flex items-center gap-2">
                                                             {notif.title}
                                                             {isUnread && (
-                                                                <span className="w-2 h-2 rounded-full bg-emerald-500 flex-shrink-0" />
+                                                                <span className="w-2 h-2 rounded-full bg-status-success flex-shrink-0" />
                                                             )}
                                                         </div>
                                                         {notif.body && (
@@ -450,7 +450,7 @@ export function AdminTopBar({
                                 <div className="border-t border-border px-4 py-2">
                                     <Link
                                         href="/notifications"
-                                        className="text-sm text-emerald-600 hover:text-emerald-700 font-medium"
+                                        className="text-sm text-status-success hover:text-status-success/80 font-medium"
                                         onClick={() => setIsNotificationsOpen(false)}
                                     >
                                         View all notifications →
@@ -565,7 +565,7 @@ export function AdminTopBar({
                                         <path d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
                                     </svg>
                                     What's New
-                                    <span className="ml-auto px-1.5 py-0.5 bg-amber-100 rounded text-[10px] text-amber-700 font-medium">NEW</span>
+                                    <span className="ml-auto px-1.5 py-0.5 bg-status-warning/15 rounded text-[10px] text-status-warning font-medium">NEW</span>
                                 </Link>
 
                                 {/* Divider */}

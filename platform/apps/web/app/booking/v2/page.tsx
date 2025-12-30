@@ -303,7 +303,7 @@ function BookingV2Content() {
                 <button
                   type="button"
                   onClick={() => setForm(p => ({ ...p, pricingType: "transient", seasonalRateId: undefined }))}
-                  className={`flex-1 p-3 rounded-lg border text-center transition-all ${form.pricingType === "transient" ? "border-emerald-500 bg-emerald-50 text-emerald-700 ring-2 ring-emerald-500/20" : "border-slate-200 hover:border-slate-300"}`}
+                  className={`flex-1 p-3 rounded-lg border text-center transition-all ${form.pricingType === "transient" ? "border-status-success bg-status-success/15 text-status-success ring-2 ring-status-success/20" : "border-slate-200 hover:border-slate-300"}`}
                 >
                   <div className="font-semibold">Transient</div>
                   <div className="text-xs opacity-70">Short-term/Nightly</div>
@@ -311,7 +311,7 @@ function BookingV2Content() {
                 <button
                   type="button"
                   onClick={() => setForm(p => ({ ...p, pricingType: "seasonal" }))}
-                  className={`flex-1 p-3 rounded-lg border text-center transition-all ${form.pricingType === "seasonal" ? "border-emerald-500 bg-emerald-50 text-emerald-700 ring-2 ring-emerald-500/20" : "border-slate-200 hover:border-slate-300"}`}
+                  className={`flex-1 p-3 rounded-lg border text-center transition-all ${form.pricingType === "seasonal" ? "border-status-success bg-status-success/15 text-status-success ring-2 ring-status-success/20" : "border-slate-200 hover:border-slate-300"}`}
                 >
                   <div className="font-semibold">Seasonal</div>
                   <div className="text-xs opacity-70">Long-term (Monthly/Weekly)</div>
@@ -410,7 +410,7 @@ function BookingV2Content() {
                           <Link
                             href="/guests"
                             onClick={() => setShowGuestDropdown(false)}
-                            className="w-full px-4 py-3 text-left bg-emerald-50 hover:bg-emerald-100 transition-colors flex items-center gap-2 text-emerald-700 font-medium border-t-2 border-emerald-200"
+                            className="w-full px-4 py-3 text-left bg-status-success/15 hover:bg-status-success/25 transition-colors flex items-center gap-2 text-status-success font-medium border-t-2 border-status-success/30"
                           >
                             <UserPlus className="h-4 w-4" />
                             Create or manage guests
@@ -420,7 +420,7 @@ function BookingV2Content() {
                         <Link
                           href="/guests"
                           onClick={() => setShowGuestDropdown(false)}
-                          className="w-full px-4 py-3 text-left hover:bg-emerald-50 transition-colors flex items-center gap-2 text-emerald-700 font-medium"
+                          className="w-full px-4 py-3 text-left hover:bg-status-success/15 transition-colors flex items-center gap-2 text-status-success font-medium"
                         >
                           <UserPlus className="h-4 w-4" />
                           No guests found — add new
@@ -532,14 +532,14 @@ function BookingV2Content() {
                       key={s.id}
                       type="button"
                       onClick={() => setForm((p) => ({ ...p, siteId: s.id }))}
-                      className={`flex items-center justify-between rounded-lg border px-3 py-2 text-sm transition hover:border-emerald-300 ${form.siteId === s.id ? "border-emerald-400 bg-emerald-50 text-emerald-800" : "border-slate-200 bg-white text-slate-700"
+                      className={`flex items-center justify-between rounded-lg border px-3 py-2 text-sm transition hover:border-status-success/30 ${form.siteId === s.id ? "border-status-success/30 bg-status-success/15 text-status-success" : "border-slate-200 bg-white text-slate-700"
                         }`}
                     >
                       <span className="flex items-center gap-2">
                         <MapPin className="h-4 w-4 text-slate-400" />
                         {s.name}
                       </span>
-                      {form.siteId === s.id ? <CheckCircle className="h-4 w-4 text-emerald-600" /> : null}
+                      {form.siteId === s.id ? <CheckCircle className="h-4 w-4 text-status-success" /> : null}
                     </button>
                   ))}
                 {availableSites.length === 0 && (
@@ -557,7 +557,7 @@ function BookingV2Content() {
                   <div className="text-xs uppercase font-semibold text-slate-500">Step 5</div>
                   <h3 className="text-lg font-semibold text-slate-900">Notes & requests</h3>
                 </div>
-                <Badge variant="outline" className="text-emerald-700 border-emerald-200">
+                <Badge variant="outline" className="text-status-success border-status-success/30">
                   Optional
                 </Badge>
               </div>
@@ -603,7 +603,7 @@ function BookingV2Content() {
                 {form.pricingType === "seasonal" && selectedSeasonalRate && (
                   <div className="mt-2 pt-2 border-t border-slate-100">
                     <div className="text-xs uppercase font-semibold text-slate-500 mb-1">Seasonal Plan</div>
-                    <div className="flex items-center gap-2 text-emerald-700 font-medium">
+                    <div className="flex items-center gap-2 text-status-success font-medium">
                       <CreditCard className="h-4 w-4" />
                       <span>{selectedSeasonalRate.name}</span>
                     </div>
@@ -622,8 +622,8 @@ function BookingV2Content() {
             </Card>
 
             {confirmation ? (
-              <Card className="p-4 space-y-2 border-emerald-200 bg-emerald-50">
-                <div className="flex items-center gap-2 text-emerald-700">
+              <Card className="p-4 space-y-2 border-status-success/30 bg-status-success/15">
+                <div className="flex items-center gap-2 text-status-success">
                   <CheckCircle className="h-4 w-4" />
                   <span className="font-semibold">Reservation created</span>
                 </div>
@@ -633,7 +633,7 @@ function BookingV2Content() {
                   Guest: {selectedGuest ? `${selectedGuest.primaryFirstName} ${selectedGuest.primaryLastName}` : ""}
                 </div>
                 <div className="flex items-center gap-2 text-sm">
-                  <Link href="/reservations" className="text-emerald-700 font-semibold flex items-center gap-1">
+                  <Link href="/reservations" className="text-status-success font-semibold flex items-center gap-1">
                     Go to reservations <ArrowRight className="h-4 w-4" />
                   </Link>
                 </div>
@@ -648,7 +648,7 @@ function BookingV2Content() {
                   <div className="text-xs text-slate-500">Take payment on the reservation after creation or in POS.</div>
                 </div>
               </div>
-              <Link href="/pos" className="text-sm font-semibold text-emerald-700 flex items-center gap-1">
+              <Link href="/pos" className="text-sm font-semibold text-status-success flex items-center gap-1">
                 Open POS <ArrowRight className="h-4 w-4" />
               </Link>
             </Card>

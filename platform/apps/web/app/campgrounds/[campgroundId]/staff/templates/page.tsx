@@ -372,10 +372,10 @@ export default function ScheduleTemplatesPage({ params }: { params: { campground
               initial={{ opacity: 0, y: -20, scale: 0.95 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: -10, scale: 0.95 }}
-              className="mb-6 p-4 bg-emerald-50 border border-emerald-200 rounded-xl flex items-center gap-3"
+              className="mb-6 p-4 bg-status-success/15 border border-status-success/30 rounded-xl flex items-center gap-3"
             >
-              <Sparkles className="w-5 h-5 text-emerald-600" />
-              <span className="text-emerald-800">{successMessage}</span>
+              <Sparkles className="w-5 h-5 text-status-success" />
+              <span className="text-status-success">{successMessage}</span>
             </motion.div>
           )}
         </AnimatePresence>
@@ -760,7 +760,7 @@ export default function ScheduleTemplatesPage({ params }: { params: { campground
                               setApplyingTemplate(isApplying ? null : template.id);
                               if (!applyWeekStart) setApplyWeekStart(getNextSunday());
                             }}
-                            className="px-3 py-1.5 bg-emerald-100 text-emerald-700 rounded-lg text-sm font-medium hover:bg-emerald-200 flex items-center gap-1"
+                            className="px-3 py-1.5 bg-status-success/15 text-status-success rounded-lg text-sm font-medium hover:bg-status-success/25 flex items-center gap-1"
                           >
                             <Play className="w-4 h-4" />
                             Apply
@@ -819,7 +819,7 @@ export default function ScheduleTemplatesPage({ params }: { params: { campground
                           initial={{ height: 0, opacity: 0 }}
                           animate={{ height: "auto", opacity: 1 }}
                           exit={{ height: 0, opacity: 0 }}
-                          className="border-t border-slate-100 bg-emerald-50/50 overflow-hidden"
+                          className="border-t border-slate-100 bg-status-success/10 overflow-hidden"
                         >
                           <div className="p-4 flex items-center gap-4">
                             <div className="flex-1">
@@ -837,8 +837,8 @@ export default function ScheduleTemplatesPage({ params }: { params: { campground
                               onClick={() => handleApply(template.id)}
                               disabled={processing || !applyWeekStart}
                               className={cn(
-                                "px-4 py-2 bg-emerald-600 text-white rounded-lg font-medium flex items-center gap-2",
-                                "hover:bg-emerald-700",
+                                "px-4 py-2 bg-status-success text-white rounded-lg font-medium flex items-center gap-2",
+                                "hover:bg-status-success/90",
                                 (processing || !applyWeekStart) && "opacity-50 cursor-not-allowed"
                               )}
                             >

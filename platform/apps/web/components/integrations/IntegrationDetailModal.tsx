@@ -121,10 +121,10 @@ export function IntegrationDetailModal({
                             className={cn(
                                 "flex h-14 w-14 shrink-0 items-center justify-center rounded-xl",
                                 isConnected
-                                    ? "bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400"
+                                    ? "bg-status-success/15 text-status-success"
                                     : hasError
-                                    ? "bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400"
-                                    : "bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400"
+                                    ? "bg-status-error/15 text-status-error"
+                                    : "bg-status-info/15 text-status-info"
                             )}
                         >
                             <Icon className="h-7 w-7" />
@@ -133,7 +133,7 @@ export function IntegrationDetailModal({
                             <DialogTitle className="text-xl flex items-center gap-2">
                                 {integration.name}
                                 {isConnected && (
-                                    <span className="inline-flex items-center gap-1 rounded-full bg-emerald-100 dark:bg-emerald-900/50 px-2 py-0.5 text-xs font-medium text-emerald-700 dark:text-emerald-300">
+                                    <span className="inline-flex items-center gap-1 rounded-full bg-status-success/15 px-2 py-0.5 text-xs font-medium text-status-success">
                                         <Check className="h-3 w-3" />
                                         Connected
                                     </span>
@@ -159,9 +159,9 @@ export function IntegrationDetailModal({
                                 initial={{ scale: 0 }}
                                 animate={{ scale: 1 }}
                                 transition={{ type: "spring", stiffness: 300, damping: 20 }}
-                                className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-emerald-100 dark:bg-emerald-900/30"
+                                className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-status-success/15"
                             >
-                                <CheckCircle2 className="h-8 w-8 text-emerald-600 dark:text-emerald-400" />
+                                <CheckCircle2 className="h-8 w-8 text-status-success" />
                             </motion.div>
                             <h3 className="text-lg font-semibold text-foreground">
                                 You're all set!
@@ -223,7 +223,7 @@ export function IntegrationDetailModal({
                                                     key={feature}
                                                     className="flex items-center gap-2 text-sm"
                                                 >
-                                                    <Check className="h-4 w-4 text-emerald-500" />
+                                                    <Check className="h-4 w-4 text-status-success" />
                                                     <span className="text-foreground">{feature}</span>
                                                 </li>
                                             ))}
@@ -256,10 +256,10 @@ export function IntegrationDetailModal({
                                                     className={cn(
                                                         "mt-0.5 h-2 w-2 rounded-full shrink-0",
                                                         log.status === "success"
-                                                            ? "bg-emerald-500"
+                                                            ? "bg-status-success"
                                                             : log.status === "error"
-                                                            ? "bg-red-500"
-                                                            : "bg-amber-500"
+                                                            ? "bg-status-error"
+                                                            : "bg-status-warning"
                                                     )}
                                                 />
                                                 <div className="flex-1 min-w-0">
@@ -334,7 +334,7 @@ export function IntegrationDetailModal({
                                             key={feature}
                                             className="flex items-center gap-2 text-sm"
                                         >
-                                            <Check className="h-4 w-4 text-emerald-500" />
+                                            <Check className="h-4 w-4 text-status-success" />
                                             <span className="text-foreground">{feature}</span>
                                         </li>
                                     ))}

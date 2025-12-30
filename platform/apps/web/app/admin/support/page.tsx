@@ -68,9 +68,9 @@ type Report = {
 };
 
 const statusColor: Record<string, string> = {
-  new: "bg-emerald-50 text-emerald-700 border-emerald-200",
-  triage: "bg-amber-50 text-amber-700 border-amber-200",
-  in_progress: "bg-blue-50 text-blue-700 border-blue-200",
+  new: "bg-status-success/15 text-status-success border-status-success/30",
+  triage: "bg-status-warning/15 text-status-warning border-status-warning/30",
+  in_progress: "bg-status-info/15 text-status-info border-status-info/30",
   resolved: "bg-slate-50 text-slate-600 border-slate-200",
   closed: "bg-slate-100 text-slate-600 border-slate-200"
 };
@@ -234,7 +234,7 @@ export default function SupportAdminPage() {
   if (!whoamiLoading && !allowSupport) {
     return (
       <div className="p-8">
-        <div className="rounded-lg border border-amber-200/20 bg-amber-500/10 text-amber-900 p-4">
+        <div className="rounded-lg border border-status-warning/30 bg-status-warning/15 text-status-warning p-4">
           <h2 className="font-semibold">Access Denied</h2>
           <p className="text-sm">You do not have permission to view or assign support reports.</p>
         </div>
@@ -367,33 +367,33 @@ export default function SupportAdminPage() {
 
         {/* Summary Cards */}
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
-          <div className="rounded-xl border border-rose-100 bg-rose-50 px-4 py-3 shadow-sm">
-            <div className="flex items-center gap-2 text-xs font-semibold text-rose-700">
-              <div className="h-2 w-2 rounded-full bg-rose-500" /> New
+          <div className="rounded-xl border border-status-error/30 bg-status-error/15 px-4 py-3 shadow-sm">
+            <div className="flex items-center gap-2 text-xs font-semibold text-status-error">
+              <div className="h-2 w-2 rounded-full bg-status-error" /> New
             </div>
-            <div className="text-2xl font-bold text-rose-900">{newCount}</div>
-            <div className="text-xs text-rose-700/80">Needs attention</div>
+            <div className="text-2xl font-bold text-status-error">{newCount}</div>
+            <div className="text-xs text-status-error/80">Needs attention</div>
           </div>
-          <div className="rounded-xl border border-amber-100 bg-amber-50 px-4 py-3 shadow-sm">
-            <div className="flex items-center gap-2 text-xs font-semibold text-amber-700">
-              <div className="h-2 w-2 rounded-full bg-amber-500" /> Triage
+          <div className="rounded-xl border border-status-warning/30 bg-status-warning/15 px-4 py-3 shadow-sm">
+            <div className="flex items-center gap-2 text-xs font-semibold text-status-warning">
+              <div className="h-2 w-2 rounded-full bg-status-warning" /> Triage
             </div>
-            <div className="text-2xl font-bold text-amber-900">{triageCount}</div>
-            <div className="text-xs text-amber-700/80">Investigating</div>
+            <div className="text-2xl font-bold text-status-warning">{triageCount}</div>
+            <div className="text-xs text-status-warning/80">Investigating</div>
           </div>
-          <div className="rounded-xl border border-blue-100 bg-blue-50 px-4 py-3 shadow-sm">
-            <div className="flex items-center gap-2 text-xs font-semibold text-blue-700">
-              <div className="h-2 w-2 rounded-full bg-blue-500" /> In Progress
+          <div className="rounded-xl border border-status-info/30 bg-status-info/15 px-4 py-3 shadow-sm">
+            <div className="flex items-center gap-2 text-xs font-semibold text-status-info">
+              <div className="h-2 w-2 rounded-full bg-status-info" /> In Progress
             </div>
-            <div className="text-2xl font-bold text-blue-900">{inProgressCount}</div>
-            <div className="text-xs text-blue-700/80">Being fixed</div>
+            <div className="text-2xl font-bold text-status-info">{inProgressCount}</div>
+            <div className="text-xs text-status-info/80">Being fixed</div>
           </div>
-          <div className="rounded-xl border border-emerald-100 bg-emerald-50 px-4 py-3 shadow-sm">
-            <div className="flex items-center gap-2 text-xs font-semibold text-emerald-700">
-              <div className="h-2 w-2 rounded-full bg-emerald-500" /> Resolved
+          <div className="rounded-xl border border-status-success/30 bg-status-success/15 px-4 py-3 shadow-sm">
+            <div className="flex items-center gap-2 text-xs font-semibold text-status-success">
+              <div className="h-2 w-2 rounded-full bg-status-success" /> Resolved
             </div>
-            <div className="text-2xl font-bold text-emerald-900">{resolvedCount}</div>
-            <div className="text-xs text-emerald-700/80">Completed</div>
+            <div className="text-2xl font-bold text-status-success">{resolvedCount}</div>
+            <div className="text-xs text-status-success/80">Completed</div>
           </div>
         </div>
 

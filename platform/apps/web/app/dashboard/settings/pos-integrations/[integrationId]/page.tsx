@@ -374,9 +374,9 @@ export default function PosIntegrationDetailPage() {
               variant={integration.status === "CONNECTED" ? "default" : "secondary"}
               className={
                 integration.status === "CONNECTED"
-                  ? "bg-green-100 text-green-800"
+                  ? "bg-status-success/15 text-status-success"
                   : integration.status === "ERROR"
-                  ? "bg-red-100 text-red-800"
+                  ? "bg-status-error/15 text-status-error"
                   : ""
               }
             >

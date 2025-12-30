@@ -248,9 +248,9 @@ const settingsCategories: SettingCategory[] = [
 ];
 
 const iconColorMap: Record<string, string> = {
-  emerald: "bg-emerald-100 text-emerald-700",
-  blue: "bg-blue-100 text-blue-700",
-  red: "bg-red-100 text-red-700",
+  emerald: "bg-status-success/15 text-status-success",
+  blue: "bg-status-info/15 text-status-info",
+  red: "bg-status-error/15 text-status-error",
   violet: "bg-violet-100 text-violet-700",
 };
 
@@ -328,7 +328,7 @@ export default function SettingsLandingPage() {
         <Card className="mb-8 border-2 border-emerald-200 dark:border-emerald-800 bg-gradient-to-br from-emerald-50/50 to-teal-50/50 dark:from-emerald-950/20 dark:to-teal-950/20">
           <CardHeader>
             <div className="flex items-center gap-3">
-              <div className="p-2.5 rounded-lg bg-emerald-100 text-emerald-700 dark:bg-emerald-900 dark:text-emerald-300">
+              <div className="p-2.5 rounded-lg bg-status-success/15 text-status-success">
                 <Palette className="h-5 w-5" />
               </div>
               <div>

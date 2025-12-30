@@ -251,8 +251,8 @@ export default function CharityAdminPage() {
         <Card className="bg-slate-800 border-slate-700">
           <CardContent className="pt-6">
             <div className="flex items-center gap-3">
-              <div className="p-2 bg-green-500/20 rounded-lg">
-                <DollarSign className="h-5 w-5 text-green-400" />
+              <div className="p-2 bg-status-success/15 rounded-lg">
+                <DollarSign className="h-5 w-5 text-status-success" />
               </div>
               <div>
                 <p className="text-sm text-slate-400">Total Raised</p>
@@ -267,8 +267,8 @@ export default function CharityAdminPage() {
         <Card className="bg-slate-800 border-slate-700">
           <CardContent className="pt-6">
             <div className="flex items-center gap-3">
-              <div className="p-2 bg-blue-500/20 rounded-lg">
-                <Users className="h-5 w-5 text-blue-400" />
+              <div className="p-2 bg-status-info/15 rounded-lg">
+                <Users className="h-5 w-5 text-status-info" />
               </div>
               <div>
                 <p className="text-sm text-slate-400">Total Donors</p>
@@ -299,8 +299,8 @@ export default function CharityAdminPage() {
         <Card className="bg-slate-800 border-slate-700">
           <CardContent className="pt-6">
             <div className="flex items-center gap-3">
-              <div className="p-2 bg-amber-500/20 rounded-lg">
-                <Building2 className="h-5 w-5 text-amber-400" />
+              <div className="p-2 bg-status-warning/15 rounded-lg">
+                <Building2 className="h-5 w-5 text-status-warning" />
               </div>
               <div>
                 <p className="text-sm text-slate-400">Active Charities</p>

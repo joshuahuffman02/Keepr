@@ -157,17 +157,17 @@ export default function OptimizationPage() {
       {/* Stats Cards (only show when enabled) */}
       {settings.enabled && (
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <Card className="bg-gradient-to-br from-emerald-50 to-white border-emerald-200">
+          <Card className="bg-gradient-to-br from-green-50 to-white border-green-200">
             <CardContent className="pt-6">
               <div className="flex items-center gap-3">
-                <div className="p-2 rounded-lg bg-emerald-100">
-                  <TrendingUp className="h-5 w-5 text-emerald-600" />
+                <div className="p-2 rounded-lg bg-status-success/15">
+                  <TrendingUp className="h-5 w-5 text-status-success" />
                 </div>
                 <div>
-                  <p className="text-2xl font-bold text-emerald-900">
+                  <p className="text-2xl font-bold text-green-900">
                     ${totalRevenueGain}
                   </p>
-                  <p className="text-sm text-emerald-700">Revenue gained (30 days)</p>
+                  <p className="text-sm text-green-700">Revenue gained (30 days)</p>
                 </div>
               </div>
             </CardContent>
@@ -334,7 +334,7 @@ export default function OptimizationPage() {
                           {entry.gapsFilled} gaps filled
                         </p>
                       </div>
-                      <Badge className="bg-emerald-100 text-emerald-800">
+                      <Badge className="bg-status-success/15 text-status-success">
                         +${entry.revenueGain}
                       </Badge>
                     </div>

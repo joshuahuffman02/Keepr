@@ -90,14 +90,14 @@ interface Contract {
 const statusConfig: Record<string, { label: string; color: string; icon: React.ReactNode }> = {
   preview: { label: "Preview", color: "bg-purple-100 text-purple-700", icon: <Eye className="h-3 w-3" /> },
   draft: { label: "Draft", color: "bg-slate-100 text-slate-600", icon: <FileText className="h-3 w-3" /> },
-  sent: { label: "Sent", color: "bg-blue-100 text-blue-700", icon: <Send className="h-3 w-3" /> },
-  viewed: { label: "Viewed", color: "bg-amber-100 text-amber-700", icon: <Eye className="h-3 w-3" /> },
-  signed: { label: "Signed", color: "bg-emerald-100 text-emerald-700", icon: <CheckCircle2 className="h-3 w-3" /> },
-  signed_paper: { label: "Paper Signed", color: "bg-emerald-100 text-emerald-700", icon: <PenLine className="h-3 w-3" /> },
+  sent: { label: "Sent", color: "bg-status-info/15 text-status-info border-status-info/30", icon: <Send className="h-3 w-3" /> },
+  viewed: { label: "Viewed", color: "bg-status-warning/15 text-status-warning border-status-warning/30", icon: <Eye className="h-3 w-3" /> },
+  signed: { label: "Signed", color: "bg-status-success/15 text-status-success border-status-success/30", icon: <CheckCircle2 className="h-3 w-3" /> },
+  signed_paper: { label: "Paper Signed", color: "bg-status-success/15 text-status-success border-status-success/30", icon: <PenLine className="h-3 w-3" /> },
   waived: { label: "Waived", color: "bg-teal-100 text-teal-700", icon: <UserCheck className="h-3 w-3" /> },
-  declined: { label: "Declined", color: "bg-red-100 text-red-700", icon: <X className="h-3 w-3" /> },
+  declined: { label: "Declined", color: "bg-status-error/15 text-status-error border-status-error/30", icon: <X className="h-3 w-3" /> },
   voided: { label: "Voided", color: "bg-slate-200 text-slate-600", icon: <Ban className="h-3 w-3" /> },
-  expired: { label: "Expired", color: "bg-orange-100 text-orange-700", icon: <Clock className="h-3 w-3" /> },
+  expired: { label: "Expired", color: "bg-status-warning/15 text-status-warning border-status-warning/30", icon: <Clock className="h-3 w-3" /> },
 };
 
 const waiverReasonLabels: Record<string, string> = {
@@ -171,11 +171,11 @@ function ContractStatsDashboard({ stats, isLoading }: { stats: ContractStats | n
 
 function StatCard({ label, value, icon, color }: { label: string; value: number; icon: React.ReactNode; color: string }) {
   const colorClasses: Record<string, string> = {
-    emerald: "bg-emerald-50 text-emerald-600 border-emerald-200",
+    emerald: "bg-status-success/15 text-status-success border-status-success/30",
     teal: "bg-teal-50 text-teal-600 border-teal-200",
-    amber: "bg-amber-50 text-amber-600 border-amber-200",
-    red: "bg-red-50 text-red-600 border-red-200",
-    blue: "bg-blue-50 text-blue-600 border-blue-200",
+    amber: "bg-status-warning/15 text-status-warning border-status-warning/30",
+    red: "bg-status-error/15 text-status-error border-status-error/30",
+    blue: "bg-status-info/15 text-status-info border-status-info/30",
   };
 
   return (
@@ -536,7 +536,7 @@ function RenewalCampaignModal({
               rows={3}
             />
           </div>
-          <div className="rounded-lg border border-amber-200 bg-amber-50 p-3 text-sm text-amber-800">
+          <div className="rounded-lg border border-status-warning/30 bg-status-warning/15 p-3 text-sm text-status-warning">
             <div className="flex items-start gap-2">
               <AlertTriangle className="h-4 w-4 mt-0.5 flex-shrink-0" />
               <div>
@@ -705,7 +705,7 @@ export function ContractsTab({ campgroundId }: { campgroundId: string | null }) 
 
   if (!campgroundId) {
     return (
-      <div className="rounded-lg border border-amber-200 bg-amber-50 p-4 text-sm text-amber-800 flex items-center gap-3">
+      <div className="rounded-lg border border-status-warning/30 bg-status-warning/15 p-4 text-sm text-status-warning flex items-center gap-3">
         <AlertTriangle className="h-5 w-5" />
         <span>Select a campground from the sidebar to manage contracts.</span>
       </div>

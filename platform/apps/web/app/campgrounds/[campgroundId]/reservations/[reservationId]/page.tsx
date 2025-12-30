@@ -450,11 +450,11 @@ export default function ReservationDetailPage() {
     .slice(0, 5);
 
   const statusConfig: Record<string, { bg: string; text: string; border: string }> = {
-    confirmed: { bg: "bg-emerald-50", text: "text-emerald-700", border: "border-emerald-200" },
-    checked_in: { bg: "bg-blue-50", text: "text-blue-700", border: "border-blue-200" },
+    confirmed: { bg: "bg-status-success/15", text: "text-status-success", border: "border-status-success/20" },
+    checked_in: { bg: "bg-status-info/15", text: "text-status-info", border: "border-status-info/20" },
     checked_out: { bg: "bg-slate-50", text: "text-slate-600", border: "border-slate-200" },
     cancelled: { bg: "bg-rose-50", text: "text-rose-700", border: "border-rose-200" },
-    pending: { bg: "bg-amber-50", text: "text-amber-700", border: "border-amber-200" }
+    pending: { bg: "bg-status-warning/15", text: "text-status-warning", border: "border-status-warning/20" }
   };
   const status = statusConfig[reservation.status] || statusConfig.pending;
 
@@ -505,15 +505,15 @@ export default function ReservationDetailPage() {
               >
                 <DollarSign className="h-5 w-5 text-amber-600 group-hover:scale-110 transition-transform" />
                 <div className="text-left">
-                  <div className="text-xs text-amber-700 font-medium">Balance Due</div>
+                  <div className="text-xs text-status-warning font-medium">Balance Due</div>
                   <div className="text-lg font-bold text-amber-900">{formatCurrency(balanceCents)}</div>
                 </div>
               </button>
             ) : (
-              <div className="flex items-center gap-2 px-4 py-2 rounded-lg bg-emerald-50 border border-emerald-200">
+              <div className="flex items-center gap-2 px-4 py-2 rounded-lg bg-status-success/15 border border-status-success/20">
                 <CheckCircle className="h-5 w-5 text-emerald-600" />
                 <div className="text-left">
-                  <div className="text-xs text-emerald-700 font-medium">Paid in Full</div>
+                  <div className="text-xs text-status-success font-medium">Paid in Full</div>
                   <div className="text-lg font-bold text-emerald-900">{formatCurrency(total * 100)}</div>
                 </div>
               </div>
@@ -531,8 +531,8 @@ export default function ReservationDetailPage() {
                 <AlertDialogContent>
                   <AlertDialogHeader>
                     <AlertDialogTitle className="flex items-center gap-3">
-                      <div className="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center">
-                        <CheckCircle className="h-5 w-5 text-blue-600" />
+                      <div className="h-10 w-10 rounded-full bg-status-info/15 flex items-center justify-center">
+                        <CheckCircle className="h-5 w-5 text-status-info" />
                       </div>
                       Ready to check in {guestName}?
                     </AlertDialogTitle>
@@ -608,12 +608,12 @@ export default function ReservationDetailPage() {
                     </AlertDialogDescription>
                     <div className="space-y-3">
                       {balance > 0 && (
-                        <div className="rounded-lg border-2 border-amber-300 bg-amber-50 p-3">
-                          <div className="flex items-center gap-2 text-amber-800 font-medium">
+                        <div className="rounded-lg border-2 border-status-warning/30 bg-status-warning/15 p-3">
+                          <div className="flex items-center gap-2 text-status-warning font-medium">
                             <AlertTriangle className="h-4 w-4" />
                             <span>Outstanding balance: {formatCurrency(balanceCents)}</span>
                           </div>
-                          <p className="text-sm text-amber-700 mt-1">
+                          <p className="text-sm text-status-warning mt-1">
                             Consider collecting payment before check-out.
                           </p>
                         </div>
@@ -687,12 +687,12 @@ export default function ReservationDetailPage() {
             className="mb-6 p-6 rounded-xl bg-gradient-to-r from-emerald-50 to-green-50 border-2 border-emerald-300"
           >
             <div className="flex items-center gap-4">
-              <div className="h-12 w-12 rounded-full bg-emerald-100 flex items-center justify-center">
-                <PartyPopper className="h-6 w-6 text-emerald-600" />
+              <div className="h-12 w-12 rounded-full bg-status-success/15 flex items-center justify-center">
+                <PartyPopper className="h-6 w-6 text-status-success" />
               </div>
               <div>
                 <h3 className="text-lg font-bold text-emerald-900">Welcome!</h3>
-                <p className="text-emerald-700">{guestName} is now checked in to {siteLabel}</p>
+                <p className="text-status-success">{guestName} is now checked in to {siteLabel}</p>
               </div>
             </div>
           </motion.div>
@@ -708,12 +708,12 @@ export default function ReservationDetailPage() {
             className="mb-6 p-6 rounded-xl bg-gradient-to-r from-blue-50 to-sky-50 border-2 border-blue-300"
           >
             <div className="flex items-center gap-4">
-              <div className="h-12 w-12 rounded-full bg-blue-100 flex items-center justify-center">
-                <CheckCircle className="h-6 w-6 text-blue-600" />
+              <div className="h-12 w-12 rounded-full bg-status-info/15 flex items-center justify-center">
+                <CheckCircle className="h-6 w-6 text-status-info" />
               </div>
               <div>
                 <h3 className="text-lg font-bold text-blue-900">Check-out Complete</h3>
-                <p className="text-blue-700">Site {siteLabel} has been marked for housekeeping</p>
+                <p className="text-status-info">Site {siteLabel} has been marked for housekeeping</p>
               </div>
             </div>
           </motion.div>
@@ -837,7 +837,7 @@ export default function ReservationDetailPage() {
                     Financial
                   </span>
                   {balance > 0 && (
-                    <Badge className="bg-amber-100 text-amber-800 border border-amber-300">
+                    <Badge className="bg-status-warning/15 text-status-warning border border-status-warning/30">
                       {formatCurrency(balanceCents)} due
                     </Badge>
                   )}
@@ -1003,17 +1003,17 @@ export default function ReservationDetailPage() {
                   >
                     <CardContent className="space-y-4">
                       {(quote?.nights ?? 0) >= 28 && !reservation.seasonalGuestId && (
-                        <div className="flex items-center justify-between p-4 rounded-lg border border-amber-200 bg-amber-50">
+                        <div className="flex items-center justify-between p-4 rounded-lg border border-status-warning/20 bg-status-warning/15">
                           <div>
                             <div className="font-medium text-amber-900">Convert to Seasonal</div>
-                            <div className="text-sm text-amber-700">
+                            <div className="text-sm text-status-warning">
                               This {quote?.nights}-night stay qualifies for seasonal guest management
                             </div>
                           </div>
                           <Button
                             variant="outline"
                             onClick={() => setShowConvertModal(true)}
-                            className="border-amber-300 text-amber-700 hover:bg-amber-100"
+                            className="border-status-warning/30 text-status-warning hover:bg-status-warning/10"
                           >
                             <Tent className="h-4 w-4 mr-2" />
                             Convert
@@ -1021,17 +1021,17 @@ export default function ReservationDetailPage() {
                         </div>
                       )}
                       {reservation.seasonalGuestId && (
-                        <div className="flex items-center justify-between p-4 rounded-lg border border-emerald-200 bg-emerald-50">
+                        <div className="flex items-center justify-between p-4 rounded-lg border border-status-success/20 bg-status-success/15">
                           <div>
                             <div className="font-medium text-emerald-900">Seasonal Guest</div>
-                            <div className="text-sm text-emerald-700">
+                            <div className="text-sm text-status-success">
                               This reservation is linked to a seasonal guest record
                             </div>
                           </div>
                           <Button
                             variant="outline"
                             onClick={() => router.push(`/campgrounds/${campgroundId}/seasonals`)}
-                            className="border-emerald-300 text-emerald-700 hover:bg-emerald-100"
+                            className="border-status-success/30 text-status-success hover:bg-status-success/10"
                           >
                             <Tent className="h-4 w-4 mr-2" />
                             View Seasonal
@@ -1228,9 +1228,9 @@ export default function ReservationDetailPage() {
                                 variant="outline"
                                 className={cn(
                                   "capitalize",
-                                  charge.status === "paid" && "bg-emerald-50 text-emerald-700 border-emerald-200",
+                                  charge.status === "paid" && "bg-status-success/15 text-status-success border-status-success/20",
                                   charge.status === "failed" && "bg-rose-50 text-rose-700 border-rose-200",
-                                  charge.status !== "paid" && charge.status !== "failed" && "bg-amber-50 text-amber-700 border-amber-200"
+                                  charge.status !== "paid" && charge.status !== "failed" && "bg-status-warning/15 text-status-warning border-status-warning/20"
                                 )}
                               >
                                 {charge.status}
@@ -1338,7 +1338,7 @@ export default function ReservationDetailPage() {
                             "text-xs",
                             (c.status || "").toLowerCase().includes("fail") || (c.status || "").toLowerCase().includes("bounce")
                               ? "bg-rose-50 text-rose-700 border-rose-200"
-                              : "bg-emerald-50 text-emerald-700 border-emerald-200"
+                              : "bg-status-success/15 text-status-success border-status-success/20"
                           )}
                         >
                           {c.status}
@@ -1376,9 +1376,9 @@ export default function ReservationDetailPage() {
                         <Badge
                           variant="outline"
                           className={cn(
-                            checkinStatus.checkInStatus === "completed" && "bg-emerald-50 text-emerald-700 border-emerald-200",
+                            checkinStatus.checkInStatus === "completed" && "bg-status-success/15 text-status-success border-status-success/20",
                             checkinStatus.checkInStatus === "failed" && "bg-rose-50 text-rose-700 border-rose-200",
-                            checkinStatus.checkInStatus !== "completed" && checkinStatus.checkInStatus !== "failed" && "bg-amber-50 text-amber-700 border-amber-200"
+                            checkinStatus.checkInStatus !== "completed" && checkinStatus.checkInStatus !== "failed" && "bg-status-warning/15 text-status-warning border-status-warning/20"
                           )}
                         >
                           {checkinStatus.checkInStatus?.replace("_", " ") || "not started"}
@@ -1389,7 +1389,7 @@ export default function ReservationDetailPage() {
                         <Badge
                           variant="outline"
                           className={cn(
-                            checkinStatus.checkOutStatus === "completed" && "bg-emerald-50 text-emerald-700 border-emerald-200",
+                            checkinStatus.checkOutStatus === "completed" && "bg-status-success/15 text-status-success border-status-success/20",
                             checkinStatus.checkOutStatus !== "completed" && "bg-slate-50 text-slate-600 border-slate-200"
                           )}
                         >
@@ -1399,7 +1399,7 @@ export default function ReservationDetailPage() {
                       <div className="flex items-center justify-between">
                         <span className="text-slate-600">Site ready</span>
                         {checkinStatus.siteReady ? (
-                          <span className="flex items-center gap-1 text-emerald-700 text-sm">
+                          <span className="flex items-center gap-1 text-status-success text-sm">
                             <CheckCircle className="h-4 w-4" /> Ready
                           </span>
                         ) : (
@@ -1557,7 +1557,7 @@ export default function ReservationDetailPage() {
                           <Badge
                             variant="outline"
                             className={cn(
-                              g.status === "active" && "bg-emerald-50 text-emerald-700",
+                              g.status === "active" && "bg-status-success/15 text-status-success",
                               g.status !== "active" && "bg-slate-50 text-slate-600"
                             )}
                           >

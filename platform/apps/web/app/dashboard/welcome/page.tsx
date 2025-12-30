@@ -215,7 +215,7 @@ export default function WelcomePage() {
                   <div
                     className={`flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center ${
                       task.isComplete
-                        ? "bg-emerald-100 text-emerald-600"
+                        ? "bg-status-success/15 text-status-success"
                         : "bg-slate-100 text-slate-400 group-hover:bg-emerald-50 group-hover:text-emerald-500"
                     }`}
                   >
@@ -236,7 +236,7 @@ export default function WelcomePage() {
                         {task.title}
                       </h3>
                       {task.isComplete && (
-                        <span className="text-xs font-medium text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full">
+                        <span className="text-xs font-medium text-status-success bg-status-success/15 px-2 py-0.5 rounded-full">
                           Done
                         </span>
                       )}

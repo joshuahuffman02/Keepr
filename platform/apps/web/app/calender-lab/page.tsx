@@ -50,8 +50,8 @@ const SITE_COL_WIDTH = 240;
 const DAY_MIN_WIDTH = 104;
 
 const SITE_TYPE_STYLES: Record<string, { label: string; badge: string; border: string }> = {
-  rv: { label: "RV", badge: "bg-emerald-100 text-emerald-700", border: "border-l-emerald-400" },
-  tent: { label: "Tent", badge: "bg-amber-100 text-amber-800", border: "border-l-amber-400" },
+  rv: { label: "RV", badge: "bg-status-success/15 text-status-success", border: "border-l-status-success" },
+  tent: { label: "Tent", badge: "bg-status-warning/15 text-status-warning", border: "border-l-status-warning" },
   cabin: { label: "Cabin", badge: "bg-rose-100 text-rose-700", border: "border-l-rose-400" },
   group: { label: "Group", badge: "bg-indigo-100 text-indigo-700", border: "border-l-indigo-400" },
   glamping: { label: "Glamp", badge: "bg-cyan-100 text-cyan-700", border: "border-l-cyan-400" },
@@ -536,11 +536,11 @@ export default function CalendarLabPage() {
             const paid = res.paidAmount ?? 0;
             const balance = total - paid;
             const statusColors: Record<string, string> = {
-              confirmed: "bg-emerald-100 text-emerald-700 border-emerald-200",
-              checked_in: "bg-blue-100 text-blue-700 border-blue-200",
-              checked_out: "bg-slate-100 text-slate-700 border-slate-200",
-              cancelled: "bg-rose-100 text-rose-700 border-rose-200",
-              pending: "bg-amber-100 text-amber-700 border-amber-200"
+              confirmed: "bg-status-success/15 text-status-success border-status-success/30",
+              checked_in: "bg-status-info/15 text-status-info border-status-info/30",
+              checked_out: "bg-muted text-muted-foreground border-border",
+              cancelled: "bg-status-error/15 text-status-error border-status-error/30",
+              pending: "bg-status-warning/15 text-status-warning border-status-warning/30"
             };
             const statusIcons: Record<string, React.ReactNode> = {
               confirmed: <CheckCircle className="h-3.5 w-3.5" />,
@@ -1085,10 +1085,10 @@ function CalendarLabRow({
 
 function ReservationChip({ reservation, onClick }: { reservation: CalendarReservation; onClick: () => void }) {
   const statusStyles: Record<string, string> = {
-    confirmed: "bg-gradient-to-br from-emerald-500/90 to-emerald-600/95 border-emerald-400/40",
-    checked_in: "bg-gradient-to-br from-blue-500/90 to-blue-600/95 border-blue-400/40",
-    pending: "bg-gradient-to-br from-amber-400/90 to-amber-500/95 border-amber-400/40",
-    cancelled: "bg-gradient-to-br from-rose-400/90 to-rose-500/95 border-rose-400/40"
+    confirmed: "bg-gradient-to-br from-status-success/90 to-status-success/95 border-status-success/40",
+    checked_in: "bg-gradient-to-br from-status-info/90 to-status-info/95 border-status-info/40",
+    pending: "bg-gradient-to-br from-status-warning/90 to-status-warning/95 border-status-warning/40",
+    cancelled: "bg-gradient-to-br from-status-error/90 to-status-error/95 border-status-error/40"
   };
 
   const guestName = `${reservation.guest?.primaryFirstName || ""} ${reservation.guest?.primaryLastName || ""}`.trim() || "Guest";

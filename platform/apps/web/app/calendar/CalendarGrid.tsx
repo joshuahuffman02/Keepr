@@ -271,10 +271,10 @@ export function CalendarGrid({ data, onSelectionComplete, onReservationMove }: C
                     {days.map((d, idx) => (
                         <div
                             key={idx}
-                            className={`px-2 py-3 text-center border-r border-slate-100 last:border-r-0 relative ${d.isToday ? "bg-blue-50 text-blue-700" : ""}`}
+                            className={`px-2 py-3 text-center border-r border-slate-100 last:border-r-0 relative ${d.isToday ? "bg-status-info/10 text-status-info" : ""}`}
                         >
                             {d.label}
-                            {d.isToday && <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-blue-600 rounded-full mx-2" />}
+                            {d.isToday && <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-status-info rounded-full mx-2" />}
                         </div>
                     ))}
                 </div>

@@ -108,9 +108,9 @@ function ReviewBadge({ score, count }: { score?: number | null; count?: number |
     const numeric = Number(score);
     if (!Number.isFinite(numeric)) return null;
     return (
-        <div className="inline-flex items-center gap-2 bg-amber-50 text-amber-800 px-3 py-1 rounded-full border border-amber-200 text-sm font-semibold">
-            <span className="flex items-center gap-1"><Star className="h-4 w-4 text-amber-500" /> {numeric.toFixed(1)}</span>
-            <span className="text-amber-700 text-xs">{count ?? 0} reviews</span>
+        <div className="inline-flex items-center gap-2 bg-status-warning/15 text-status-warning px-3 py-1 rounded-full border border-status-warning/30 text-sm font-semibold">
+            <span className="flex items-center gap-1"><Star className="h-4 w-4 text-status-warning" /> {numeric.toFixed(1)}</span>
+            <span className="text-status-warning text-xs">{count ?? 0} reviews</span>
         </div>
     );
 }
@@ -335,23 +335,23 @@ function SiteClassCard({
                         </span>
                     )}
                     {siteClass.hookupsPower && (
-                        <span className="text-xs bg-amber-100 text-amber-700 px-2 py-1 rounded inline-flex items-center gap-1">
+                        <span className="text-xs bg-status-warning/15 text-status-warning px-2 py-1 rounded inline-flex items-center gap-1">
                             <Zap className="h-3 w-3" />
                             {electricAmps && electricAmps.length > 0 ? `${electricAmps.join("/")}A` : "Power"}
                         </span>
                     )}
                     {siteClass.hookupsWater && (
-                        <span className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded inline-flex items-center gap-1"><Droplet className="h-3 w-3" /> Water</span>
+                        <span className="text-xs bg-status-info/15 text-status-info px-2 py-1 rounded inline-flex items-center gap-1"><Droplet className="h-3 w-3" /> Water</span>
                     )}
                     {siteClass.hookupsSewer && (
-                        <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded inline-flex items-center gap-1"><Plug className="h-3 w-3" /> Sewer</span>
+                        <span className="text-xs bg-status-success/15 text-status-success px-2 py-1 rounded inline-flex items-center gap-1"><Plug className="h-3 w-3" /> Sewer</span>
                     )}
                     {siteClass.petFriendly && (
-                        <span className="text-xs bg-orange-100 text-orange-700 px-2 py-1 rounded inline-flex items-center gap-1"><Dog className="h-3 w-3" /> Pets OK</span>
+                        <span className="text-xs bg-status-warning/15 text-status-warning px-2 py-1 rounded inline-flex items-center gap-1"><Dog className="h-3 w-3" /> Pets OK</span>
                     )}
                     {/* Display additional amenities from amenityTags */}
                     {displayAmenities.map((amenity) => (
-                        <span key={amenity.id} className="text-xs bg-emerald-50 text-emerald-700 px-2 py-1 rounded inline-flex items-center gap-1">
+                        <span key={amenity.id} className="text-xs bg-status-success/15 text-status-success px-2 py-1 rounded inline-flex items-center gap-1">
                             <amenity.icon className="h-3 w-3" /> {amenity.label}
                         </span>
                     ))}
@@ -408,12 +408,12 @@ function getRecurrenceDescription(recurrenceDays?: number[]): string {
 // Event Card
 function EventCard({ event, slug }: { event: PublicCampgroundDetail["events"][0]; slug: string }) {
     const typeColors: Record<string, string> = {
-        activity: "bg-blue-100 text-blue-700",
+        activity: "bg-status-info/15 text-status-info",
         workshop: "bg-purple-100 text-purple-700",
         entertainment: "bg-pink-100 text-pink-700",
-        holiday: "bg-red-100 text-red-700 ring-2 ring-red-200",
-        recurring: "bg-green-100 text-green-700",
-        ongoing: "bg-amber-100 text-amber-700",
+        holiday: "bg-status-error/15 text-status-error ring-2 ring-status-error/30",
+        recurring: "bg-status-success/15 text-status-success",
+        ongoing: "bg-status-warning/15 text-status-warning",
         themed: "bg-indigo-100 text-indigo-700 ring-2 ring-indigo-200",
     };
 
@@ -502,15 +502,15 @@ function EventCard({ event, slug }: { event: PublicCampgroundDetail["events"][0]
     // Ongoing events get banner style
     if (isOngoing) {
         return (
-            <div className="bg-gradient-to-r from-amber-50 to-orange-50 rounded-xl border-2 border-amber-200 p-5 hover:shadow-md transition-all">
+            <div className="bg-gradient-to-r from-status-warning/10 to-orange-50 rounded-xl border-2 border-status-warning/30 p-5 hover:shadow-md transition-all">
                 {event.imageUrl && (
                     <div className="relative mb-3 h-36 w-full overflow-hidden rounded-lg">
                         <Image src={event.imageUrl} alt={event.title} fill className="object-cover" />
                     </div>
                 )}
                 <div className="flex items-center gap-2 mb-2">
-                    <Palette className="h-5 w-5 text-amber-600" />
-                    <span className="text-xs px-2 py-1 bg-amber-500 text-white rounded-full font-bold uppercase">
+                    <Palette className="h-5 w-5 text-status-warning" />
+                    <span className="text-xs px-2 py-1 bg-status-warning text-white rounded-full font-bold uppercase">
                         All Weekend
                     </span>
                 </div>
@@ -553,7 +553,7 @@ function EventCard({ event, slug }: { event: PublicCampgroundDetail["events"][0]
                             {event.eventType.charAt(0).toUpperCase() + event.eventType.slice(1)}
                         </span>
                         {recurrenceLabel && (
-                            <span className="text-xs px-2 py-1 bg-green-500 text-white rounded-full font-medium inline-flex items-center gap-1">
+                            <span className="text-xs px-2 py-1 bg-status-success text-white rounded-full font-medium inline-flex items-center gap-1">
                                 <RefreshCw className="h-3 w-3" /> {recurrenceLabel}
                             </span>
                         )}
@@ -959,11 +959,11 @@ export function CampgroundDetailClient({
                     </div>
 
                     {viewOnly && (
-                        <div className="mb-8 flex items-start gap-3 p-4 bg-amber-50 border border-amber-200 rounded-xl">
-                            <Link2 className="h-5 w-5 text-amber-600 flex-shrink-0" aria-hidden />
+                        <div className="mb-8 flex items-start gap-3 p-4 bg-status-warning/15 border border-status-warning/30 rounded-xl">
+                            <Link2 className="h-5 w-5 text-status-warning flex-shrink-0" aria-hidden />
                             <div>
-                                <p className="font-semibold text-amber-900">Discovery listing — booking handled off-platform</p>
-                                <p className="text-sm text-amber-800">
+                                <p className="font-semibold text-status-warning">Discovery listing — booking handled off-platform</p>
+                                <p className="text-sm text-status-warning">
                                     Booking is disabled here. {externalHref ? "Use the website link to reserve directly." : "Please contact the campground to book."}
                                 </p>
                             </div>
@@ -1030,9 +1030,9 @@ export function CampgroundDetailClient({
                                 <p className="text-sm text-slate-600">What recent guests are saying</p>
                             </div>
                             {campground.reviewScore ? (
-                                <div className="flex items-center gap-2 bg-amber-50 text-amber-800 px-3 py-2 rounded-full border border-amber-200 text-sm font-semibold">
-                                    <span className="flex items-center gap-1"><Star className="h-4 w-4 text-amber-500" /> {Number(campground.reviewScore).toFixed(1)}</span>
-                                    <span className="text-amber-700 text-xs">{campground.reviewCount ?? 0} reviews</span>
+                                <div className="flex items-center gap-2 bg-status-warning/15 text-status-warning px-3 py-2 rounded-full border border-status-warning/30 text-sm font-semibold">
+                                    <span className="flex items-center gap-1"><Star className="h-4 w-4 text-status-warning" /> {Number(campground.reviewScore).toFixed(1)}</span>
+                                    <span className="text-status-warning text-xs">{campground.reviewCount ?? 0} reviews</span>
                                 </div>
                             ) : null}
                         </div>
@@ -1101,8 +1101,8 @@ export function CampgroundDetailClient({
                                             key={tag}
                                             onClick={() => setTagFilter(tagFilter === tag ? null : tag)}
                                             className={`px-3 py-1 rounded-full text-sm border transition-colors ${tagFilter === tag
-                                                ? "border-emerald-300 bg-emerald-50 text-emerald-700"
-                                                : "border-slate-200 bg-white text-slate-700 hover:border-emerald-200"
+                                                ? "border-status-success/50 bg-status-success/15 text-status-success"
+                                                : "border-slate-200 bg-white text-slate-700 hover:border-status-success/30"
                                                 }`}
                                         >
                                             {tag}
@@ -1111,7 +1111,7 @@ export function CampgroundDetailClient({
                                 {tagFilter && (
                                     <button
                                         onClick={() => setTagFilter(null)}
-                                        className="text-xs text-emerald-600 hover:underline"
+                                        className="text-xs text-status-success hover:underline"
                                     >
                                         Clear tags
                                     </button>
@@ -1130,7 +1130,7 @@ export function CampgroundDetailClient({
                                                 <span>{pct}%</span>
                                             </div>
                                             <div className="h-2 w-full bg-slate-100 rounded">
-                                                <div className="h-2 bg-emerald-500 rounded" style={{ width: `${pct}%` }} />
+                                                <div className="h-2 bg-status-success rounded" style={{ width: `${pct}%` }} />
                                             </div>
                                         </div>
                                     );
@@ -1159,7 +1159,7 @@ export function CampgroundDetailClient({
                                 {filteredReviews.slice(0, visibleCount).map((review) => (
                                     <div key={review.id} className="rounded-xl border border-slate-200 bg-white p-4 space-y-2 shadow-sm">
                                         <div className="flex items-center gap-2">
-                                            <span className="inline-flex items-center justify-center h-8 w-8 rounded-full bg-amber-100 text-amber-800 font-semibold">
+                                            <span className="inline-flex items-center justify-center h-8 w-8 rounded-full bg-status-warning/15 text-status-warning font-semibold">
                                                 {review.rating.toFixed(1)}
                                             </span>
                                             {review.photos && review.photos.length > 0 && (
@@ -1187,14 +1187,14 @@ export function CampgroundDetailClient({
                                 {visibleCount < filteredReviews.length && (
                                     <button
                                         onClick={() => setVisibleCount((c) => c + 6)}
-                                        className="col-span-full text-sm font-semibold text-emerald-600 hover:underline justify-self-center"
+                                        className="col-span-full text-sm font-semibold text-status-success hover:underline justify-self-center"
                                     >
                                         Show more reviews
                                     </button>
                                 )}
                             </div>
                         )}
-                        {reviewsQuery.error && <div className="text-sm text-rose-600">Failed to load reviews.</div>}
+                        {reviewsQuery.error && <div className="text-sm text-status-error">Failed to load reviews.</div>}
                     </section>
 
                     {/* Amenities */}

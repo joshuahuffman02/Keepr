@@ -193,10 +193,10 @@ const managementCategories: ManagementCategory[] = [
 ];
 
 const iconColorMap: Record<string, string> = {
-  emerald: "bg-emerald-100 text-emerald-700",
-  blue: "bg-blue-100 text-blue-700",
-  green: "bg-green-100 text-green-700",
-  orange: "bg-orange-100 text-orange-700",
+  emerald: "bg-status-success/15 text-status-success",
+  blue: "bg-status-info/15 text-status-info",
+  green: "bg-status-success/15 text-status-success",
+  orange: "bg-status-warning/15 text-status-warning",
   violet: "bg-violet-100 text-violet-700",
   indigo: "bg-indigo-100 text-indigo-700",
 };

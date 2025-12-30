@@ -71,10 +71,10 @@ Before any V2 work, V1 must be solid.
   - [x] Real-time reservation status changes
   - [x] Dashboard live metrics support
   - [x] Staff notifications support
-- [ ] **Observability Wiring**
-  - [ ] PagerDuty/Slack alert sinks
-  - [ ] Grafana/Prometheus dashboards
-  - [ ] Synthetic checks for critical paths
+- [x] **Observability Wiring** - DONE: Full implementation
+  - [x] PagerDuty/Slack alert sinks - AlertSinksService with rate limiting
+  - [x] Grafana/Prometheus dashboards - PrometheusService with /metrics endpoint
+  - [x] Synthetic checks for critical paths - SyntheticChecksService with 5-min cron
 
 ### 0.4 Seasonal Auto-Scheduler
 - [x] **Cron job for past_due status** - DONE: Daily at 1:00 AM, also sends overdue notification emails
@@ -110,9 +110,9 @@ Before any V2 work, V1 must be solid.
 - [x] **"Apply & View Sites"** - One-click to apply intent and proceed to site selection
 
 #### 1.1.4 Testing & Polish
-- [ ] **Test edge cases** - Vague queries, impossible requests, typos
-- [ ] **Measure latency** - AI response time acceptable?
-- [ ] **Cost monitoring** - Track Claude API usage
+- [x] **Test edge cases** - DONE: AiEdgeCasesService handles vague queries, impossible requests, typos with fuzzy matching
+- [x] **Measure latency** - DONE: AiCostTrackingService tracks latency with p50/p90/p95/p99 percentiles
+- [x] **Cost monitoring** - DONE: Full cost tracking by feature, model, campground with budget alerts
 
 ---
 
@@ -157,7 +157,7 @@ Before any V2 work, V1 must be solid.
 - [x] **Opportunity alerts** - Detects high demand periods, gap nights, last-minute availability
 - [x] **Maintenance reminders** - High-priority overdue tickets
 - [x] **Revenue potential** - Shows estimated revenue for each opportunity
-- [ ] **Revenue at risk** - AiNoShowPredictionService exists but not yet in briefing
+- [x] **Revenue at risk** - DONE: Integrated into morning briefing with high-risk arrivals and suggested actions
 
 ---
 
@@ -222,10 +222,10 @@ Before any V2 work, V1 must be solid.
 - [x] **Occupancy trend chart** - 30-day bar chart with period summary
 - [x] **Forecast calendar** - 14-day forecast grid with occupancy levels
 
-#### 2.1.3 Enhancements - DEFERRED
-- [ ] **Real-time WebSocket updates** - Existing RealtimeGateway can be extended
-- [ ] **Price elasticity display** - Needs historical price/booking correlation
-- [ ] **Competitor comparison** - Needs external data source
+#### 2.1.3 Enhancements
+- [x] **Real-time WebSocket updates** - DONE: Yield events integrated with RealtimeGateway
+- [ ] **Price elasticity display** - Needs historical price/booking correlation (deferred)
+- [x] **Competitor comparison** - DONE: Full Competitive Intelligence system implemented
 
 ---
 

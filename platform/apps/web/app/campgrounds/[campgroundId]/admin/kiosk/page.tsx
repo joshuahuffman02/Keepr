@@ -187,7 +187,7 @@ export default function KioskDevicesPage() {
                             </p>
                         </div>
                         {devices.length > 0 && (
-                            <Badge variant="secondary" className="bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-400">
+                            <Badge variant="secondary" className="bg-status-success/15 text-status-success">
                                 {devices.filter(d => d.status === "active").length} active
                             </Badge>
                         )}
@@ -203,9 +203,9 @@ export default function KioskDevicesPage() {
                             exit={{ opacity: 0, y: -10 }}
                             className={cn(
                                 "flex items-center gap-3 rounded-lg border px-4 py-3",
-                                message.type === "success" && "bg-emerald-50 dark:bg-emerald-900/20 border-emerald-200 dark:border-emerald-800 text-emerald-800 dark:text-emerald-300",
-                                message.type === "error" && "bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800 text-red-800 dark:text-red-300",
-                                message.type === "info" && "bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800 text-blue-800 dark:text-blue-300"
+                                message.type === "success" && "bg-status-success/15 text-status-success",
+                                message.type === "error" && "bg-status-error/15 text-status-error",
+                                message.type === "info" && "bg-status-info/15 text-status-info"
                             )}
                         >
                             {message.type === "success" && <Sparkles className="h-5 w-5" />}
@@ -368,7 +368,7 @@ export default function KioskDevicesPage() {
                                                     <div className={cn(
                                                         "flex h-10 w-10 items-center justify-center rounded-lg",
                                                         device.status === "active"
-                                                            ? "bg-emerald-100 dark:bg-emerald-900/30"
+                                                            ? "bg-status-success/15"
                                                             : "bg-muted"
                                                     )}>
                                                         <Tablet className={cn(
@@ -387,8 +387,8 @@ export default function KioskDevicesPage() {
                                                                 variant="outline"
                                                                 className={cn(
                                                                     device.status === "active"
-                                                                        ? "bg-emerald-100 text-emerald-800 border-emerald-200 dark:bg-emerald-900/30 dark:text-emerald-400 dark:border-emerald-800"
-                                                                        : "bg-red-100 text-red-800 border-red-200 dark:bg-red-900/30 dark:text-red-400 dark:border-red-800"
+                                                                        ? "bg-status-success/15 text-status-success"
+                                                                        : "bg-status-error/15 text-status-error"
                                                                 )}
                                                             >
                                                                 {device.status === "active" ? (

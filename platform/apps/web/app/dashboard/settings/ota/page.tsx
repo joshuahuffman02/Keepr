@@ -195,7 +195,7 @@ function ChannelCard({
         <div className="flex items-center gap-3">
           <div className={cn(
             "w-12 h-12 rounded-xl flex items-center justify-center text-2xl",
-            isSelected ? "bg-blue-100" : needsSetup ? "bg-amber-100" : "bg-slate-100"
+            isSelected ? "bg-status-info/15" : needsSetup ? "bg-status-warning/15" : "bg-slate-100"
           )}>
             {provider?.icon || "🔗"}
           </div>
@@ -206,7 +206,7 @@ function ChannelCard({
         </div>
         <div className="flex flex-col items-end gap-1">
           {needsSetup ? (
-            <Badge variant="outline" className="text-amber-700 border-amber-300 bg-amber-100">
+            <Badge variant="outline" className="text-status-warning border-status-warning/30 bg-status-warning/15">
               <AlertCircle className="h-3 w-3 mr-1" />
               Needs setup
             </Badge>
@@ -246,7 +246,7 @@ function ChannelCard({
 function StatusBadge({ status }: { status?: string }) {
   if (status === "two_way") {
     return (
-      <Badge className="bg-emerald-100 text-emerald-800 border-emerald-200">
+      <Badge className="bg-status-success/15 text-status-success border-status-success/30">
         <ArrowRightLeft className="h-3 w-3 mr-1" />
         Two-way
       </Badge>
@@ -254,7 +254,7 @@ function StatusBadge({ status }: { status?: string }) {
   }
   if (status === "pull") {
     return (
-      <Badge className="bg-blue-100 text-blue-800 border-blue-200">
+      <Badge className="bg-status-info/15 text-status-info border-status-info/30">
         <Download className="h-3 w-3 mr-1" />
         Pull only
       </Badge>
@@ -799,8 +799,8 @@ export default function OtaSettingsPage() {
                   {channelsQuery.data?.length ?? 0}
                 </p>
               </div>
-              <div className="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center">
-                <Link2 className="h-6 w-6 text-blue-600" />
+              <div className="w-12 h-12 rounded-full bg-status-info/15 flex items-center justify-center">
+                <Link2 className="h-6 w-6 text-status-info" />
               </div>
             </div>
           </CardContent>
@@ -815,8 +815,8 @@ export default function OtaSettingsPage() {
                   <SyncBadge status={syncStatus?.lastSyncStatus} />
                 </div>
               </div>
-              <div className="w-12 h-12 rounded-full bg-emerald-100 flex items-center justify-center">
-                <Wifi className="h-6 w-6 text-emerald-600" />
+              <div className="w-12 h-12 rounded-full bg-status-success/15 flex items-center justify-center">
+                <Wifi className="h-6 w-6 text-status-success" />
               </div>
             </div>
           </CardContent>
@@ -831,8 +831,8 @@ export default function OtaSettingsPage() {
                   {syncStatus?.pendingSyncs ?? 0}
                 </p>
               </div>
-              <div className="w-12 h-12 rounded-full bg-amber-100 flex items-center justify-center">
-                <RefreshCw className="h-6 w-6 text-amber-600" />
+              <div className="w-12 h-12 rounded-full bg-status-warning/15 flex items-center justify-center">
+                <RefreshCw className="h-6 w-6 text-status-warning" />
               </div>
             </div>
           </CardContent>

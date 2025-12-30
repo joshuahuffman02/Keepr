@@ -191,10 +191,10 @@ export default function GroupsPage() {
                         </div>
                         <div className="flex items-center gap-2">
                           {group.sharedPayment && (
-                            <span className="px-2 py-0.5 bg-emerald-100 text-emerald-700 rounded text-xs">Shared Pay</span>
+                            <span className="px-2 py-0.5 bg-status-success/15 text-status-success border border-status-success/30 rounded text-xs">Shared Pay</span>
                           )}
                           {group.sharedComm && (
-                            <span className="px-2 py-0.5 bg-blue-100 text-blue-700 rounded text-xs">Shared Comm</span>
+                            <span className="px-2 py-0.5 bg-status-info/15 text-status-info border border-status-info/30 rounded text-xs">Shared Comm</span>
                           )}
                         </div>
                       </div>
@@ -268,7 +268,7 @@ export default function GroupsPage() {
                           key={res.id}
                           className={`p-4 rounded-lg border ${
                             res.groupRole === "primary"
-                              ? "bg-indigo-50 border-indigo-200"
+                              ? "bg-status-info/15 border-status-info/30"
                               : "bg-white border-slate-200"
                           }`}
                         >
@@ -279,7 +279,7 @@ export default function GroupsPage() {
                                   {res.guest?.primaryFirstName} {res.guest?.primaryLastName || "Guest"}
                                 </span>
                                 {res.groupRole === "primary" && (
-                                  <span className="px-2 py-0.5 bg-indigo-100 text-indigo-700 rounded text-xs font-medium">
+                                  <span className="px-2 py-0.5 bg-status-info/15 text-status-info border border-status-info/30 rounded text-xs font-medium">
                                     Primary
                                   </span>
                                 )}
@@ -292,10 +292,10 @@ export default function GroupsPage() {
                               )}
                             </div>
                             <div className="flex items-center gap-2">
-                              <span className={`px-2 py-0.5 rounded text-xs ${
-                                res.status === "confirmed" ? "bg-emerald-100 text-emerald-700" :
-                                res.status === "checked_in" ? "bg-blue-100 text-blue-700" :
-                                "bg-slate-100 text-slate-600"
+                              <span className={`px-2 py-0.5 rounded text-xs border ${
+                                res.status === "confirmed" ? "bg-status-success/15 text-status-success border-status-success/30" :
+                                res.status === "checked_in" ? "bg-status-info/15 text-status-info border-status-info/30" :
+                                "bg-slate-100 text-slate-600 border-slate-200"
                               }`}>
                                 {res.status}
                               </span>

@@ -20,8 +20,8 @@ export default function OtaError({
     <div className="flex items-center justify-center min-h-[400px] px-4">
       <div className="max-w-md w-full text-center space-y-6">
         <div className="flex justify-center">
-          <div className="rounded-full bg-red-100 p-4">
-            <AlertTriangle className="h-12 w-12 text-red-600" />
+          <div className="rounded-full bg-status-error/15 p-4">
+            <AlertTriangle className="h-12 w-12 text-status-error" />
           </div>
         </div>
 

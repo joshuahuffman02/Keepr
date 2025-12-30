@@ -2,6 +2,7 @@ import { Module } from "@nestjs/common";
 import { ConfigModule } from "@nestjs/config";
 import { PrismaModule } from "./prisma/prisma.module";
 import { ScheduleModule } from "@nestjs/schedule";
+import { CommonModule } from "./common/common.module";
 import { AuthModule } from "./auth/auth.module";
 import { OrganizationsModule } from "./organizations/organizations.module";
 import { CampgroundsModule } from "./campgrounds/campgrounds.module";
@@ -119,11 +120,14 @@ import { StayRulesModule } from "./stay-rules/stay-rules.module";
 import { SystemCheckModule } from "./system-check/system-check.module";
 import { StripePaymentsModule } from "./stripe-payments/stripe-payments.module";
 import { RealtimeModule } from "./realtime/realtime.module";
+import { CompetitiveModule } from "./competitive/competitive.module";
+import { WebhooksModule } from "./webhooks/webhooks.module";
 
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
     ScheduleModule.forRoot(),
+    CommonModule, // API versioning and rate limiting
     SecurityModule, // Must be before AuthModule
     PrismaModule,
     AuthModule,
@@ -247,6 +251,10 @@ import { RealtimeModule } from "./realtime/realtime.module";
     StayRulesModule,
     // System Check
     SystemCheckModule,
+    // Competitive Intelligence
+    CompetitiveModule,
+    // Webhooks 2.0 - HMAC signatures, retries, dead letter queue
+    WebhooksModule,
   ],
   providers: []
 })

@@ -80,8 +80,8 @@ type SiteClass = {
 };
 
 const meterTypeConfig = {
-    power: { icon: Zap, label: "Power", color: "text-amber-600 dark:text-amber-400", bg: "bg-amber-100 dark:bg-amber-900/30", unit: "kWh" },
-    water: { icon: Droplets, label: "Water", color: "text-blue-600 dark:text-blue-400", bg: "bg-blue-100 dark:bg-blue-900/30", unit: "gal" },
+    power: { icon: Zap, label: "Power", color: "text-amber-600 dark:text-amber-400", bg: "bg-status-warning/15", unit: "kWh" },
+    water: { icon: Droplets, label: "Water", color: "text-blue-600 dark:text-blue-400", bg: "bg-status-info/15", unit: "gal" },
     sewer: { icon: Waves, label: "Sewer", color: "text-slate-600 dark:text-slate-400", bg: "bg-slate-100 dark:bg-slate-800/50", unit: "gal" },
 };
 
@@ -328,8 +328,8 @@ export default function BillingSettingsPage() {
             aria-live="polite"
             className={cn(
                 "flex items-center gap-3 rounded-lg border px-4 py-3",
-                message.type === "success" && "bg-emerald-50 dark:bg-emerald-900/20 border-emerald-200 dark:border-emerald-800 text-emerald-800 dark:text-emerald-300",
-                message.type === "error" && "bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800 text-red-800 dark:text-red-300"
+                message.type === "success" && "bg-status-success/15 border-status-success/20 text-status-success",
+                message.type === "error" && "bg-status-error/15 border-status-error/20 text-status-error"
             )}
         >
             {message.type === "success" ? <CheckCircle2 className="h-5 w-5 shrink-0" aria-hidden="true" /> : <AlertCircle className="h-5 w-5 shrink-0" aria-hidden="true" />}
@@ -405,14 +405,14 @@ export default function BillingSettingsPage() {
 
                                 {/* No metered sites warning */}
                                 {meteredSites.length === 0 && !sitesQuery.isLoading && !siteClassesQuery.isLoading && (
-                                    <div className="rounded-lg border border-amber-200 dark:border-amber-800 bg-amber-50 dark:bg-amber-900/20 p-4">
+                                    <div className="rounded-lg border border-status-warning/20 bg-status-warning/15 p-4">
                                         <div className="flex gap-3">
-                                            <Info className="h-5 w-5 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" />
+                                            <Info className="h-5 w-5 text-status-warning shrink-0 mt-0.5" />
                                             <div className="space-y-1">
-                                                <p className="text-sm font-medium text-amber-800 dark:text-amber-300">
+                                                <p className="text-sm font-medium text-status-warning">
                                                     No sites with metered billing
                                                 </p>
-                                                <p className="text-sm text-amber-700 dark:text-amber-400">
+                                                <p className="text-sm text-status-warning">
                                                     To add meters, first enable metered billing on a site class. Go to{" "}
                                                     <a
                                                         href={`/campgrounds/${campgroundId}/classes`}
@@ -552,8 +552,8 @@ export default function BillingSettingsPage() {
                                                 animate={{ scale: 1, opacity: 1 }}
                                                 transition={{ type: "spring", stiffness: 200 }}
                                             >
-                                                <div className="mx-auto w-14 h-14 rounded-full bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center mb-4">
-                                                    <Gauge className="h-7 w-7 text-emerald-600 dark:text-emerald-400" />
+                                                <div className="mx-auto w-14 h-14 rounded-full bg-status-success/15 flex items-center justify-center mb-4">
+                                                    <Gauge className="h-7 w-7 text-status-success" />
                                                 </div>
                                                 <h4 className="font-medium text-foreground mb-1">No meters yet</h4>
                                                 <p className="text-sm text-muted-foreground max-w-sm mx-auto">
@@ -918,9 +918,9 @@ export default function BillingSettingsPage() {
                                                         <td className="py-3 px-3 font-medium text-foreground">{inv.number}</td>
                                                         <td className="py-3 px-3">
                                                             <Badge variant="outline" className={cn(
-                                                                inv.status === "paid" && "bg-emerald-100 text-emerald-800 border-emerald-200 dark:bg-emerald-900/30 dark:text-emerald-400 dark:border-emerald-800",
-                                                                inv.status === "overdue" && "bg-red-100 text-red-800 border-red-200 dark:bg-red-900/30 dark:text-red-400 dark:border-red-800",
-                                                                inv.status === "pending" && "bg-amber-100 text-amber-800 border-amber-200 dark:bg-amber-900/30 dark:text-amber-400 dark:border-amber-800"
+                                                                inv.status === "paid" && "bg-status-success/15 text-status-success border-status-success/20",
+                                                                inv.status === "overdue" && "bg-status-error/15 text-status-error border-status-error/20",
+                                                                inv.status === "pending" && "bg-status-warning/15 text-status-warning border-status-warning/20"
                                                             )}>
                                                                 {inv.status}
                                                             </Badge>

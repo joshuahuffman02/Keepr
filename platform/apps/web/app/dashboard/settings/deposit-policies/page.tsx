@@ -275,14 +275,14 @@ export default function DepositPoliciesPage() {
                 >
                   <div className="flex items-start justify-between">
                     <div className="flex items-start gap-3">
-                      <div className={`p-2 rounded-lg ${policy.active ? "bg-blue-100 text-blue-700" : "bg-slate-200 text-slate-500"}`}>
+                      <div className={`p-2 rounded-lg ${policy.active ? "bg-status-info/15 text-status-info" : "bg-slate-200 text-slate-500"}`}>
                         <StrategyIcon className="h-5 w-5" />
                       </div>
                       <div>
                         <div className="flex items-center gap-2">
                           <h3 className="font-semibold text-slate-900">{policy.name}</h3>
                           {!policy.active && (
-                            <span className="text-xs px-2 py-0.5 rounded-full bg-amber-100 text-amber-700">
+                            <span className="text-xs px-2 py-0.5 rounded-full bg-status-warning/15 text-status-warning">
                               Inactive
                             </span>
                           )}

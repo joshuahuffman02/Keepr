@@ -548,6 +548,9 @@ model User {
   // Customizable menu configuration
   menuConfig      UserMenuConfig?
   featureProgress FeatureProgress[]
+
+  // OAuth2 tokens issued to this user
+  oAuthTokens     OAuthToken[]
 }
 
 // User's customizable sidebar menu configuration
@@ -1290,6 +1293,7 @@ model Campground {
   permissionRules           PermissionRule[]
   integrationConnections    IntegrationConnection[]
   integrationExportJobs     IntegrationExportJob[]
+  marketplaceConnections    MarketplaceConnection[]
   apiClients                ApiClient[]
   webhookEndpoints          WebhookEndpoint[]
   communicationTemplates    CommunicationTemplate[]         @relation("CampgroundCommunicationTemplates")
@@ -1420,6 +1424,13 @@ model Campground {
   stripeCustomers           StripeCustomer[]
   stripeTerminalLocations   StripeTerminalLocation[]
   stripeTerminalReaders     StripeTerminalReader[]
+
+  // Competitive Intelligence
+  competitors               Competitor[]
+  rateParityAlerts          RateParityAlert[]
+
+  // OAuth2 Clients
+  oAuthClients              OAuthClient[]
 
   // Soft delete
   deletedAt DateTime?
@@ -4622,17 +4633,25 @@ model IntegrationExportJob {
 // Developer Ecosystem: Public API + Webhooks
 // =============================================================================
 
+// API Client tiers for rate limiting
+enum ApiClientTier {
+  free
+  standard
+  enterprise
+}
+
 model ApiClient {
-  id               String   @id @default(cuid())
+  id               String        @id @default(cuid())
   campgroundId     String
   name             String
-  clientId         String   @unique
+  clientId         String        @unique
   clientSecretHash String
   scopes           String[]
-  isActive         Boolean  @default(true)
-  rateLimit        Int      @default(1000) // requests per hour
-  createdAt        DateTime @default(now())
-  updatedAt        DateTime @updatedAt
+  isActive         Boolean       @default(true)
+  rateLimit        Int           @default(1000) // requests per hour
+  tier             ApiClientTier @default(free)
+  createdAt        DateTime      @default(now())
+  updatedAt        DateTime      @updatedAt
 
   campground       Campground        @relation(fields: [campgroundId], references: [id], onDelete: Cascade)
   tokens           ApiToken[]
@@ -4641,6 +4660,7 @@ model ApiClient {
   externalPosSales ExternalPosSale[]
 
   @@index([campgroundId])
+  @@index([tier])
 }
 
 model ApiToken {
@@ -4684,7 +4704,7 @@ model WebhookDelivery {
   id                String    @id @default(cuid())
   webhookEndpointId String
   eventType         String
-  status            String // pending | delivered | failed | retrying
+  status            String // pending | delivered | failed | retrying | dead_letter
   payload           Json
   responseStatus    Int?
   responseBody      String?
@@ -4723,6 +4743,73 @@ model ApiUsage {
   @@index([apiClientId, createdAt])
   @@index([createdAt])
   @@index([endpoint])
+}
+
+// =============================================================================
+// OAuth2 Models for Developer Platform
+// =============================================================================
+
+// OAuth2 Client (separate from legacy ApiClient for cleaner OAuth2 implementation)
+model OAuthClient {
+  id               String   @id @default(cuid())
+  campgroundId     String
+  name             String
+  description      String?
+  clientId         String   @unique // Public identifier (cs_xxx)
+  clientSecretHash String?  // Null for public clients
+  redirectUris     String[] // Allowed redirect URIs
+  scopes           String[] // Allowed scopes
+  grantTypes       String[] // Allowed grant types (client_credentials, authorization_code, refresh_token)
+  isConfidential   Boolean  @default(true) // False for public clients (mobile, SPA)
+  isActive         Boolean  @default(true)
+  logoUrl          String?
+  homepageUrl      String?
+  privacyPolicyUrl String?
+  termsOfServiceUrl String?
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  campground Campground   @relation(fields: [campgroundId], references: [id], onDelete: Cascade)
+  tokens     OAuthToken[]
+
+  @@index([campgroundId])
+  @@index([isActive])
+}
+
+// OAuth2 Token (access + refresh tokens)
+model OAuthToken {
+  id               String    @id @default(cuid())
+  oAuthClientId    String
+  accessTokenHash  String    @unique
+  refreshTokenHash String?   @unique
+  scopes           String[]
+  userId           String?   // User context for authorization_code grant
+  expiresAt        DateTime  // Access token expiry
+  refreshExpiresAt DateTime? // Refresh token expiry
+  revokedAt        DateTime?
+  createdAt        DateTime  @default(now())
+
+  oAuthClient OAuthClient @relation(fields: [oAuthClientId], references: [id], onDelete: Cascade)
+  user        User?       @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([oAuthClientId])
+  @@index([userId])
+  @@index([expiresAt])
+  @@index([revokedAt])
+}
+
+// OAuth2 Scope definition (for documentation and validation)
+model OAuthScope {
+  id          String  @id @default(cuid())
+  name        String  @unique // e.g., "reservations:read"
+  description String  // Human-readable description
+  category    String? // Grouping category
+  isDefault   Boolean @default(false) // Included by default
+  isRestricted Boolean @default(false) // Requires approval
+  createdAt   DateTime @default(now())
+
+  @@index([category])
+  @@index([isDefault])
 }
 
 // =============================================================================
@@ -6854,6 +6941,8 @@ model AiInteractionLog {
   promptHash   String // SHA-256 of anonymized prompt (for audit, not content)
   responseHash String // SHA-256 of response
   tokensUsed   Int
+  inputTokens  Int?  // Separate input token count for cost calculation
+  outputTokens Int?  // Separate output token count for cost calculation
   latencyMs    Int
   userId       String? // Staff user ID if applicable
   sessionId    String? // Anonymous session for consumer interactions
@@ -10000,4 +10089,153 @@ model PaymentAuditLog {
   @@index([campgroundId, createdAt])
   @@index([entityType, entityId])
   @@index([actorId])
+}
+
+// =============================================================================
+// COMPETITIVE INTELLIGENCE
+// =============================================================================
+
+enum RateParityAlertStatus {
+  active
+  acknowledged
+  resolved
+}
+
+model Competitor {
+  id           String           @id @default(cuid())
+  campgroundId String
+  name         String
+  url          String?
+  notes        String?          @db.Text
+  isActive     Boolean          @default(true)
+  createdAt    DateTime         @default(now())
+  updatedAt    DateTime         @updatedAt
+
+  campground Campground       @relation(fields: [campgroundId], references: [id], onDelete: Cascade)
+  rates      CompetitorRate[]
+
+  @@index([campgroundId])
+  @@index([campgroundId, isActive])
+}
+
+model CompetitorRate {
+  id           String    @id @default(cuid())
+  competitorId String
+  siteType     String    // rv, tent, cabin, etc.
+  rateNightly  Int       // cents
+  source       String    // manual, scraped, ota
+  capturedAt   DateTime  @default(now())
+  validFrom    DateTime?
+  validTo      DateTime?
+  notes        String?   @db.Text
+
+  competitor Competitor @relation(fields: [competitorId], references: [id], onDelete: Cascade)
+
+  @@index([competitorId])
+  @@index([competitorId, siteType])
+  @@index([capturedAt])
+}
+
+model RateParityAlert {
+  id              String                 @id @default(cuid())
+  campgroundId    String
+  siteType        String
+  directRateCents Int                    // Your direct rate
+  otaRateCents    Int                    // OTA rate (lower)
+  otaSource       String                 // Which OTA had the lower rate
+  difference      Int                    // Difference in cents
+  status          RateParityAlertStatus  @default(active)
+  acknowledgedBy  String?
+  acknowledgedAt  DateTime?
+  resolvedAt      DateTime?
+  createdAt       DateTime               @default(now())
+
+  campground Campground @relation(fields: [campgroundId], references: [id], onDelete: Cascade)
+
+  @@index([campgroundId])
+  @@index([campgroundId, status])
+  @@index([createdAt])
+}
+
+// =============================================================================
+// INTEGRATION MARKETPLACE
+// =============================================================================
+
+// Available integrations in the marketplace - platform-managed catalog
+model IntegrationDefinition {
+  id           String   @id @default(cuid())
+  slug         String   @unique // quickbooks, mailchimp, remotelock, etc.
+  name         String
+  description  String   @db.Text
+  category     String   // accounting, marketing, locks, insurance, crm, pms
+  logoUrl      String?
+  docsUrl      String?
+  authType     String   // oauth2, api_key, webhook, none
+  configSchema Json?    // JSON Schema for required configuration fields
+  syncTypes    String[] @default([]) // What data syncs: guests, reservations, payments, etc.
+  webhookTypes String[] @default([]) // What webhooks are supported
+  features     Json?    // Feature flags and capabilities
+  isActive     Boolean  @default(true)
+  isBeta       Boolean  @default(false)
+  isPremium    Boolean  @default(false) // Requires higher subscription tier
+  sortOrder    Int      @default(100)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  marketplaceConnections MarketplaceConnection[]
+
+  @@index([category])
+  @@index([isActive])
+}
+
+// Campground's connection to a marketplace integration
+model MarketplaceConnection {
+  id             String    @id @default(cuid())
+  campgroundId   String
+  definitionId   String
+  status         String    @default("pending") // pending, connected, error, disconnected, suspended
+  credentials    Json?     // Encrypted OAuth tokens, API keys (uses AES-256-GCM)
+  config         Json?     // User-configured settings per configSchema
+  webhookSecret  String?   // Secret for validating inbound webhooks
+  lastSyncAt     DateTime?
+  lastSyncStatus String?   // success, partial, failed
+  errorMessage   String?
+  errorCode      String?   // Standardized error codes
+  syncEnabled    Boolean   @default(true) // Master switch for auto-sync
+  syncSchedule   String?   // cron expression for scheduled syncs
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  campground Campground            @relation(fields: [campgroundId], references: [id], onDelete: Cascade)
+  definition IntegrationDefinition @relation(fields: [definitionId], references: [id])
+  syncLogs   MarketplaceSyncLog[]
+
+  @@unique([campgroundId, definitionId])
+  @@index([campgroundId])
+  @@index([definitionId])
+  @@index([status])
+}
+
+// Sync history for marketplace connections
+model MarketplaceSyncLog {
+  id               String    @id @default(cuid())
+  connectionId     String
+  syncType         String    // full, incremental, webhook, manual
+  direction        String    // inbound, outbound, bidirectional
+  recordsProcessed Int       @default(0)
+  recordsFailed    Int       @default(0)
+  recordsSkipped   Int       @default(0)
+  startedAt        DateTime  @default(now())
+  completedAt      DateTime?
+  status           String    @default("running") // running, success, partial, failed, cancelled
+  errorDetails     Json?     // Array of error objects with entity info
+  summary          Json?     // { created: 5, updated: 10, deleted: 2 }
+  triggeredBy      String?   // user_id, system, webhook
+  metadata         Json?     // Additional context
+
+  connection MarketplaceConnection @relation(fields: [connectionId], references: [id], onDelete: Cascade)
+
+  @@index([connectionId])
+  @@index([connectionId, startedAt])
+  @@index([status])
 }

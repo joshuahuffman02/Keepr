@@ -240,7 +240,7 @@ export default function WaitlistPage() {
                           <div className="text-slate-900">{formatDate(entry.arrivalDate)}</div>
                           <div className="text-xs text-slate-500">→ {formatDate(entry.departureDate)}</div>
                           {entry.flexibleDates && (
-                            <span className="text-xs text-amber-600">±{entry.flexibleDays} days</span>
+                            <span className="text-xs text-status-warning">±{entry.flexibleDays} days</span>
                           )}
                         </td>
                         <td className="px-4 py-3">
@@ -266,7 +266,7 @@ export default function WaitlistPage() {
                         </td>
                         <td className="px-4 py-3">
                           {entry.autoOffer ? (
-                            <span className="text-emerald-600 font-medium">Yes</span>
+                            <span className="text-status-success font-medium">Yes</span>
                           ) : (
                             <span className="text-slate-400">No</span>
                           )}
@@ -291,7 +291,7 @@ export default function WaitlistPage() {
                             {entry.status === "active" && (
                               <button
                                 onClick={() => setDeleteConfirmId(entry.id)}
-                                className="px-2 py-1 text-red-600 hover:text-red-700 hover:bg-red-50 rounded text-xs"
+                                className="px-2 py-1 text-status-error hover:text-status-error hover:bg-status-error/15 rounded text-xs"
                               >
                                 Remove
                               </button>
@@ -342,7 +342,7 @@ export default function WaitlistPage() {
                     setDeleteConfirmId(null);
                   }
                 }}
-                className="bg-red-600 hover:bg-red-700"
+                className="bg-status-error hover:bg-status-error/90 text-white"
               >
                 Remove
               </AlertDialogAction>
@@ -519,7 +519,7 @@ function WaitlistModal({
                 type="button"
                 onClick={() => setType("regular")}
                 className={`flex-1 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${type === "regular"
-                  ? "bg-emerald-100 text-emerald-700 border-2 border-emerald-300"
+                  ? "bg-status-success/15 text-status-success border-2 border-status-success/30"
                   : "bg-slate-50 text-slate-600 border border-slate-200"
                   }`}
               >
@@ -529,7 +529,7 @@ function WaitlistModal({
                 type="button"
                 onClick={() => setType("seasonal")}
                 className={`flex-1 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${type === "seasonal"
-                  ? "bg-amber-100 text-amber-700 border-2 border-amber-300"
+                  ? "bg-status-warning/15 text-status-warning border-2 border-status-warning/30"
                   : "bg-slate-50 text-slate-600 border border-slate-200"
                   }`}
               >

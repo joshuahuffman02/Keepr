@@ -234,21 +234,11 @@ export async function initializePrismaShutdownHooks(app: INestApplication): Prom
 }
 
 export function configureSwagger(app: INestApplication): void {
-    const { DocumentBuilder, SwaggerModule } = require("@nestjs/swagger");
+    const { configureSwagger: setupSwagger } = require("./common/swagger.config");
+    const { AuthModule } = require("./auth/auth.module");
 
-    const config = new DocumentBuilder()
-        .setTitle("CampReserv Public API")
-        .setDescription("API for external integrations and developers")
-        .setVersion("1.0")
-        .addBearerAuth()
-        .build();
-
-    const document = SwaggerModule.createDocument(app, config, {
-        include: [
-            DeveloperApiModule
-        ],
-        deepScanRoutes: true
+    setupSwagger(app, {
+        title: "Campreserv API",
+        includeModules: [DeveloperApiModule, AuthModule],
     });
-
-    SwaggerModule.setup("api/docs", app, document);
 }

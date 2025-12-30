@@ -22,10 +22,10 @@ export function HeroSection() {
           {/* Left Column - Content */}
           <div className="space-y-8">
             {/* Badge */}
-            <div className="inline-flex items-center rounded-full px-4 py-1.5 text-sm font-medium bg-emerald-100 text-emerald-800 border border-emerald-200">
+            <div className="inline-flex items-center rounded-full px-4 py-1.5 text-sm font-medium bg-status-success/15 text-status-success border border-status-success/30">
               <span className="relative flex h-2 w-2 mr-2">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-status-success opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-status-success"></span>
               </span>
               Tired of clunky software? There's a better way.
             </div>
@@ -46,16 +46,16 @@ export function HeroSection() {
 
             {/* Pain Points */}
             <div className="flex flex-wrap gap-3 text-sm">
-              <span className="inline-flex items-center px-3 py-1 rounded-full bg-red-50 text-red-700 border border-red-100">
+              <span className="inline-flex items-center px-3 py-1 rounded-full bg-status-error/15 text-status-error border border-status-error/30">
                 <svg className="mr-1.5 w-3 h-3" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg> No contracts
               </span>
-              <span className="inline-flex items-center px-3 py-1 rounded-full bg-red-50 text-red-700 border border-red-100">
+              <span className="inline-flex items-center px-3 py-1 rounded-full bg-status-error/15 text-status-error border border-status-error/30">
                 <svg className="mr-1.5 w-3 h-3" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg> No setup fees
               </span>
-              <span className="inline-flex items-center px-3 py-1 rounded-full bg-red-50 text-red-700 border border-red-100">
+              <span className="inline-flex items-center px-3 py-1 rounded-full bg-status-error/15 text-status-error border border-status-error/30">
                 <svg className="mr-1.5 w-3 h-3" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg> No hidden costs
               </span>
-              <span className="inline-flex items-center px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-100">
+              <span className="inline-flex items-center px-3 py-1 rounded-full bg-status-success/15 text-status-success border border-status-success/30">
                 <svg className="mr-1.5 w-3 h-3" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Go live in 48 hours
               </span>
             </div>
@@ -116,8 +116,8 @@ export function HeroSection() {
             {/* Floating Feature Cards */}
             <div className="absolute -bottom-4 -left-4 bg-white rounded-xl shadow-lg p-4 border border-slate-100">
               <div className="flex items-center gap-3">
-                <div className="h-12 w-12 rounded-lg bg-emerald-100 flex items-center justify-center">
-                  <svg className="h-6 w-6 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <div className="h-12 w-12 rounded-lg bg-status-success/15 flex items-center justify-center">
+                  <svg className="h-6 w-6 text-status-success" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
                   </svg>
                 </div>

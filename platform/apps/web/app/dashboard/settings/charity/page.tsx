@@ -452,11 +452,11 @@ export default function CharitySettingsPage() {
                       <div className="flex-1">
                         <div className="flex items-center gap-2 flex-wrap">
                           <span className="font-medium text-slate-900 dark:text-white">{SYBILS_KIDS.name}</span>
-                          <Badge variant="secondary" className="text-xs bg-amber-100 text-amber-700 dark:bg-amber-900/50 dark:text-amber-300">
+                          <Badge variant="secondary" className="text-xs bg-status-warning/15 text-status-warning dark:bg-amber-900/50 dark:text-amber-300">
                             <Sparkles className="h-3 w-3 mr-1" />
                             Recommended
                           </Badge>
-                          <Badge variant="secondary" className="text-xs bg-emerald-100 text-emerald-700 dark:bg-emerald-900/50 dark:text-emerald-300">
+                          <Badge variant="secondary" className="text-xs bg-status-success/15 text-status-success dark:bg-emerald-900/50 dark:text-emerald-300">
                             <CheckCircle className="h-3 w-3 mr-1" />
                             Verified
                           </Badge>
@@ -486,7 +486,7 @@ export default function CharitySettingsPage() {
                           <div className="flex items-center gap-2">
                             <span className="font-medium text-slate-900 dark:text-white">{charity.name}</span>
                             {charity.isVerified && (
-                              <Badge variant="secondary" className="text-xs bg-emerald-100 text-emerald-700 dark:bg-emerald-900/50 dark:text-emerald-300">
+                              <Badge variant="secondary" className="text-xs bg-status-success/15 text-status-success dark:bg-emerald-900/50 dark:text-emerald-300">
                                 <CheckCircle className="h-3 w-3 mr-1" />
                                 Verified
                               </Badge>

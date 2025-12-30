@@ -82,13 +82,13 @@ const typeConfig = {
   gate: {
     label: "Gate Code",
     icon: DoorOpen,
-    color: "bg-blue-100 text-blue-800",
+    color: "bg-status-info/15 text-status-info",
     description: "Entry gate access",
   },
   cabin: {
     label: "Cabin Lock",
     icon: Lock,
-    color: "bg-amber-100 text-amber-800",
+    color: "bg-status-warning/15 text-status-warning",
     description: "Cabin door codes",
   },
   amenity: {
@@ -100,13 +100,13 @@ const typeConfig = {
   wifi: {
     label: "WiFi Password",
     icon: Wifi,
-    color: "bg-emerald-100 text-emerald-800",
+    color: "bg-status-success/15 text-status-success",
     description: "Network access",
   },
   master: {
     label: "Master Code",
     icon: Shield,
-    color: "bg-red-100 text-red-800",
+    color: "bg-status-error/15 text-status-error",
     description: "Staff only",
   },
 };
@@ -439,7 +439,7 @@ export default function LockCodesPage() {
           variant={item.isActive ? "default" : "secondary"}
           className={cn(
             item.isActive
-              ? "bg-emerald-100 text-emerald-800"
+              ? "bg-status-success/15 text-status-success"
               : "bg-slate-100 text-slate-600"
           )}
         >

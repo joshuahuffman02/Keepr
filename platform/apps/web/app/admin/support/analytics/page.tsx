@@ -173,7 +173,7 @@ export default function SupportAnalyticsPage() {
         <div className="space-y-3">
           <div className="text-xs uppercase font-semibold text-slate-500">Support</div>
           <h1 className="text-2xl font-bold text-white">Support analytics</h1>
-          <div className="rounded-lg border border-amber-200/20 bg-amber-500/10 text-amber-400 p-4">
+          <div className="rounded-lg border border-status-warning/30 bg-status-warning/15 text-status-warning p-4">
             You do not have permission to view support analytics.
           </div>
         </div>
@@ -223,7 +223,7 @@ export default function SupportAnalyticsPage() {
         </div>
 
         {!regionAllowed || !campgroundAllowed ? (
-          <div className="rounded-lg border border-amber-200 bg-amber-50 text-amber-800 p-4">
+          <div className="rounded-lg border border-status-warning/30 bg-status-warning/15 text-status-warning p-4">
             You are out of scope for this region/campground selection. Adjust filters to view analytics.
           </div>
         ) : null}
@@ -246,12 +246,12 @@ export default function SupportAnalyticsPage() {
                 </div>
                 <div className="rounded border border-slate-200 p-3">
                   <div className="text-xs uppercase text-slate-500">On-time</div>
-                  <div className="text-2xl font-bold text-emerald-700">{totals.onTime}</div>
+                  <div className="text-2xl font-bold text-status-success">{totals.onTime}</div>
                   <div className="text-xs text-slate-500">Resolved within SLA</div>
                 </div>
                 <div className="rounded border border-slate-200 p-3">
                   <div className="text-xs uppercase text-slate-500">Overdue</div>
-                  <div className="text-2xl font-bold text-rose-700">{totals.overdue}</div>
+                  <div className="text-2xl font-bold text-status-error">{totals.overdue}</div>
                   <div className="text-xs text-slate-500">Past SLA target</div>
                 </div>
               </CardContent>
@@ -280,8 +280,8 @@ export default function SupportAnalyticsPage() {
                         <TableRow key={`${row.region}-${row.campgroundId || "all"}`}>
                           <TableCell className="font-medium capitalize">{row.region}</TableCell>
                           <TableCell>{row.campgroundName || row.campgroundId || "—"}</TableCell>
-                          <TableCell className="text-right text-emerald-700">{row.onTime}</TableCell>
-                          <TableCell className="text-right text-rose-700">{row.overdue}</TableCell>
+                          <TableCell className="text-right text-status-success">{row.onTime}</TableCell>
+                          <TableCell className="text-right text-status-error">{row.overdue}</TableCell>
                           <TableCell className="text-right w-48">
                             <div className="flex items-center gap-2 justify-end">
                               <Progress value={compliance * 100} className="w-28" />

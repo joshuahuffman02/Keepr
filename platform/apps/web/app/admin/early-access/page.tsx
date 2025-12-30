@@ -238,8 +238,8 @@ export default function EarlyAccessAdminPage() {
             <CardContent>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div className="flex items-center gap-4">
-                  <div className="h-12 w-12 rounded-lg bg-amber-500/10 flex items-center justify-center">
-                    <Timer className="h-6 w-6 text-amber-400" />
+                  <div className="h-12 w-12 rounded-lg bg-status-warning/15 flex items-center justify-center">
+                    <Timer className="h-6 w-6 text-status-warning" />
                   </div>
                   <div>
                     <p className="text-2xl font-bold text-white">{stats?.onboarding.pending || 0}</p>
@@ -248,8 +248,8 @@ export default function EarlyAccessAdminPage() {
                 </div>
 
                 <div className="flex items-center gap-4">
-                  <div className="h-12 w-12 rounded-lg bg-green-500/10 flex items-center justify-center">
-                    <UserCheck className="h-6 w-6 text-green-400" />
+                  <div className="h-12 w-12 rounded-lg bg-status-success/15 flex items-center justify-center">
+                    <UserCheck className="h-6 w-6 text-status-success" />
                   </div>
                   <div>
                     <p className="text-2xl font-bold text-white">{stats?.onboarding.completed || 0}</p>
@@ -258,8 +258,8 @@ export default function EarlyAccessAdminPage() {
                 </div>
 
                 <div className="flex items-center gap-4">
-                  <div className="h-12 w-12 rounded-lg bg-blue-500/10 flex items-center justify-center">
-                    <TrendingUp className="h-6 w-6 text-blue-400" />
+                  <div className="h-12 w-12 rounded-lg bg-status-info/15 flex items-center justify-center">
+                    <TrendingUp className="h-6 w-6 text-status-info" />
                   </div>
                   <div>
                     <p className="text-2xl font-bold text-white">{stats?.onboarding.conversionRate || 0}%</p>

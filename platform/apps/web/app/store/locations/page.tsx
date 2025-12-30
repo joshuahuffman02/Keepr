@@ -210,7 +210,7 @@ export default function StoreLocationsPage() {
                                                         </Badge>
                                                     )}
                                                     {location.isDefault && (
-                                                        <Badge className="bg-amber-100 text-amber-800 hover:bg-amber-100">
+                                                        <Badge className="bg-status-warning/15 text-status-warning hover:bg-status-warning/15">
                                                             <Star className="w-3 h-3 mr-1" />
                                                             Default
                                                         </Badge>

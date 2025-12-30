@@ -202,10 +202,10 @@ function ActivityCard({
                         <div className={cn(
                             "px-2.5 py-1 rounded-full text-xs font-medium backdrop-blur-sm",
                             snapshot.remaining > 5
-                                ? "bg-emerald-500/90 text-white"
+                                ? "bg-status-success/90 text-white"
                                 : snapshot.remaining > 0
-                                    ? "bg-amber-500/90 text-white"
-                                    : "bg-red-500/90 text-white"
+                                    ? "bg-status-warning/90 text-white"
+                                    : "bg-status-error/90 text-white"
                         )}>
                             {isOpenAvailability
                                 ? (snapshot.remaining > 0 ? `${snapshot.remaining} available` : "All rented")
@@ -780,7 +780,7 @@ export default function ActivitiesPage() {
                                         </div>
                                         <Badge
                                             variant={session.status === "open" ? "default" : "secondary"}
-                                            className={session.status === "open" ? "bg-emerald-100 text-emerald-700" : ""}
+                                            className={session.status === "open" ? "bg-status-success/15 text-status-success" : ""}
                                         >
                                             {session.status}
                                         </Badge>

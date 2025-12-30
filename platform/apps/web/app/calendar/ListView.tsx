@@ -102,13 +102,13 @@ export function ListView({
   const getStatusColor = (status: string) => {
     switch (status) {
       case "checked_in":
-        return "bg-blue-600";
+        return "bg-status-info";
       case "confirmed":
-        return "bg-emerald-600";
+        return "bg-status-success";
       case "pending":
-        return "bg-amber-500";
+        return "bg-status-warning";
       default:
-        return "bg-slate-500";
+        return "bg-muted-foreground";
     }
   };
 
@@ -267,7 +267,7 @@ export function ListView({
                                 <span className="font-semibold">
                                   {formatCurrency(res.totalAmount)}
                                   {hasBalance && (
-                                    <span className="text-red-600 text-xs ml-2">
+                                    <span className="text-status-error text-xs ml-2">
                                       (Owe: {formatCurrency(res.balanceAmount)})
                                     </span>
                                   )}

@@ -329,9 +329,9 @@ export default function WebhooksSettingsPage() {
                                                     </div>
                                                 </TableCell>
                                                 <TableCell>
-                                                    <div className={`inline-flex items-center rounded-md border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 border-transparent ${delivery.status === 'delivered' ? 'bg-green-100 text-green-800' :
-                                                            delivery.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
-                                                                'bg-red-100 text-red-800'
+                                                    <div className={`inline-flex items-center rounded-md border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 border-transparent ${delivery.status === 'delivered' ? 'bg-status-success/15 text-status-success' :
+                                                            delivery.status === 'pending' ? 'bg-status-warning/15 text-status-warning' :
+                                                                'bg-status-error/15 text-status-error'
                                                         }`}>
                                                         {delivery.status}
                                                         {delivery.responseStatus && ` (${delivery.responseStatus})`}

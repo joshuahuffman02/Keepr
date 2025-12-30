@@ -11381,6 +11381,242 @@ export const apiClient = {
     });
     return parseResponse<unknown>(res);
   },
+
+  // ==================== COMPETITIVE INTELLIGENCE ====================
+
+  async getCompetitors(campgroundId: string, includeInactive = false) {
+    const params = includeInactive ? "?includeInactive=true" : "";
+    const data = await fetchJSON<unknown>(`/campgrounds/${campgroundId}/competitive/competitors${params}`);
+    return data as Array<{
+      id: string;
+      campgroundId: string;
+      name: string;
+      url?: string;
+      notes?: string;
+      isActive: boolean;
+      createdAt: string;
+      updatedAt: string;
+      rates?: Array<{
+        id: string;
+        competitorId: string;
+        siteType: string;
+        rateNightly: number;
+        source: string;
+        capturedAt: string;
+        validFrom?: string;
+        validTo?: string;
+        notes?: string;
+      }>;
+    }>;
+  },
+
+  async getCompetitor(campgroundId: string, competitorId: string) {
+    const data = await fetchJSON<unknown>(`/campgrounds/${campgroundId}/competitive/competitors/${competitorId}`);
+    return data as {
+      id: string;
+      campgroundId: string;
+      name: string;
+      url?: string;
+      notes?: string;
+      isActive: boolean;
+      createdAt: string;
+      updatedAt: string;
+      rates?: Array<{
+        id: string;
+        competitorId: string;
+        siteType: string;
+        rateNightly: number;
+        source: string;
+        capturedAt: string;
+      }>;
+    };
+  },
+
+  async createCompetitor(campgroundId: string, payload: { name: string; url?: string; notes?: string }) {
+    const res = await fetch(`${API_BASE}/campgrounds/${campgroundId}/competitive/competitors`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", ...scopedHeaders() },
+      body: JSON.stringify(payload)
+    });
+    return parseResponse<unknown>(res);
+  },
+
+  async updateCompetitor(campgroundId: string, competitorId: string, payload: { name?: string; url?: string; notes?: string; isActive?: boolean }) {
+    const res = await fetch(`${API_BASE}/campgrounds/${campgroundId}/competitive/competitors/${competitorId}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json", ...scopedHeaders() },
+      body: JSON.stringify(payload)
+    });
+    return parseResponse<unknown>(res);
+  },
+
+  async deleteCompetitor(campgroundId: string, competitorId: string) {
+    const res = await fetch(`${API_BASE}/campgrounds/${campgroundId}/competitive/competitors/${competitorId}`, {
+      method: "DELETE",
+      headers: scopedHeaders()
+    });
+    if (!res.ok) {
+      const error = await res.json().catch(() => ({}));
+      throw new Error(error.message || "Failed to delete competitor");
+    }
+    return true;
+  },
+
+  async getCompetitorRates(campgroundId: string, siteType?: string) {
+    const params = siteType ? `?siteType=${siteType}` : "";
+    const data = await fetchJSON<unknown>(`/campgrounds/${campgroundId}/competitive/rates${params}`);
+    return data as Array<{
+      id: string;
+      competitorId: string;
+      siteType: string;
+      rateNightly: number;
+      source: string;
+      capturedAt: string;
+      validFrom?: string;
+      validTo?: string;
+      notes?: string;
+      competitor: {
+        id: string;
+        name: string;
+      };
+    }>;
+  },
+
+  async createCompetitorRate(campgroundId: string, payload: {
+    competitorId: string;
+    siteType: string;
+    rateNightly: number;
+    source?: string;
+    notes?: string;
+  }) {
+    const res = await fetch(`${API_BASE}/campgrounds/${campgroundId}/competitive/rates`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", ...scopedHeaders() },
+      body: JSON.stringify(payload)
+    });
+    return parseResponse<unknown>(res);
+  },
+
+  async deleteCompetitorRate(campgroundId: string, rateId: string) {
+    const res = await fetch(`${API_BASE}/campgrounds/${campgroundId}/competitive/rates/${rateId}`, {
+      method: "DELETE",
+      headers: scopedHeaders()
+    });
+    if (!res.ok) {
+      const error = await res.json().catch(() => ({}));
+      throw new Error(error.message || "Failed to delete rate");
+    }
+    return true;
+  },
+
+  async getMarketPosition(campgroundId: string) {
+    const data = await fetchJSON<unknown>(`/campgrounds/${campgroundId}/competitive/market-position`);
+    return data as Array<{
+      siteType: string;
+      yourRate: number;
+      position: number;
+      totalCompetitors: number;
+      positionLabel: string;
+      averageMarketRate: number;
+      lowestRate: number;
+      highestRate: number;
+      competitorRates: Array<{
+        competitorId: string;
+        competitorName: string;
+        rate: number;
+        difference: number;
+        percentDifference: number;
+      }>;
+    }>;
+  },
+
+  async getCompetitorComparison(campgroundId: string, siteType: string, date?: string) {
+    const params = date ? `?date=${date}` : "";
+    const data = await fetchJSON<unknown>(`/campgrounds/${campgroundId}/competitive/comparison/${siteType}${params}`);
+    return data as {
+      siteType: string;
+      yourRate: number;
+      position: number;
+      totalCompetitors: number;
+      positionLabel: string;
+      averageMarketRate: number;
+      lowestRate: number;
+      highestRate: number;
+      competitorRates: Array<{
+        competitorId: string;
+        competitorName: string;
+        rate: number;
+        difference: number;
+        percentDifference: number;
+      }>;
+    };
+  },
+
+  async checkRateParity(campgroundId: string) {
+    const data = await fetchJSON<unknown>(`/campgrounds/${campgroundId}/competitive/rate-parity`);
+    return data as {
+      hasParityIssues: boolean;
+      alerts: Array<{
+        siteType: string;
+        directRate: number;
+        otaRate: number;
+        otaSource: string;
+        difference: number;
+      }>;
+    };
+  },
+
+  async getRateParityAlerts(campgroundId: string, status?: string) {
+    const params = status ? `?status=${status}` : "";
+    const data = await fetchJSON<unknown>(`/campgrounds/${campgroundId}/competitive/alerts${params}`);
+    return data as Array<{
+      id: string;
+      campgroundId: string;
+      siteType: string;
+      directRateCents: number;
+      otaRateCents: number;
+      otaSource: string;
+      difference: number;
+      status: "active" | "acknowledged" | "resolved";
+      acknowledgedBy?: string;
+      acknowledgedAt?: string;
+      resolvedAt?: string;
+      createdAt: string;
+    }>;
+  },
+
+  async acknowledgeRateParityAlert(campgroundId: string, alertId: string) {
+    const res = await fetch(`${API_BASE}/campgrounds/${campgroundId}/competitive/alerts/${alertId}/acknowledge`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", ...scopedHeaders() },
+      body: JSON.stringify({ userId: "current" }) // The backend will get actual user from JWT
+    });
+    return parseResponse<unknown>(res);
+  },
+
+  async resolveRateParityAlert(campgroundId: string, alertId: string) {
+    const res = await fetch(`${API_BASE}/campgrounds/${campgroundId}/competitive/alerts/${alertId}/resolve`, {
+      method: "POST",
+      headers: scopedHeaders()
+    });
+    return parseResponse<unknown>(res);
+  },
+
+  async getRateTrends(campgroundId: string, siteType: string, startDate?: string, endDate?: string) {
+    const params = new URLSearchParams();
+    if (startDate) params.set("startDate", startDate);
+    if (endDate) params.set("endDate", endDate);
+    const query = params.toString() ? `?${params.toString()}` : "";
+    const data = await fetchJSON<unknown>(`/campgrounds/${campgroundId}/competitive/trends/${siteType}${query}`);
+    return data as {
+      siteType: string;
+      trends: Array<{
+        competitorId: string;
+        competitorName: string;
+        dataPoints: Array<{ date: string; rate: number }>;
+      }>;
+    };
+  },
 };
 
 export type PublicCampgroundList = z.infer<typeof PublicCampgroundListSchema>;

@@ -10,7 +10,7 @@ interface ReceiptViewProps {
 export function ReceiptView({ order, onNewOrder }: ReceiptViewProps) {
     return (
         <div className="h-full flex flex-col items-center justify-center p-6 max-w-md mx-auto w-full">
-            <div className="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mb-6">
+            <div className="w-16 h-16 bg-status-success/15 text-status-success rounded-full flex items-center justify-center mb-6">
                 <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
                     <polyline points="20 6 9 17 4 12" />
                 </svg>
@@ -22,7 +22,7 @@ export function ReceiptView({ order, onNewOrder }: ReceiptViewProps) {
             <div className="w-full bg-white border border-slate-200 rounded-xl p-6 shadow-sm mb-8 space-y-4">
                 <div className="flex justify-between text-sm">
                     <span className="text-slate-500">Status</span>
-                    <span className="font-medium text-emerald-600 uppercase">{order.status}</span>
+                    <span className="font-medium text-status-success uppercase">{order.status}</span>
                 </div>
                 <div className="flex justify-between text-sm">
                     <span className="text-slate-500">Payment Method</span>

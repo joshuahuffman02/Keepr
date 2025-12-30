@@ -61,7 +61,11 @@ type Reservation = {
 export default function CheckInOutPage() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  const [date, setDate] = useState(new Date().toISOString().split("T")[0]);
+  // Use local date, not UTC (toISOString gives UTC which can be a different day)
+  const [date, setDate] = useState(() => {
+    const d = new Date();
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+  });
   const [campgroundId, setCampgroundId] = useState<string>("");
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState<"all" | "balance" | "unassigned">("all");
@@ -363,7 +367,10 @@ export default function CheckInOutPage() {
                 className="pl-9 pr-4 py-2 border border-slate-200 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
               />
             </div>
-            <Button variant="outline" onClick={() => setDate(new Date().toISOString().split("T")[0])}>
+            <Button variant="outline" onClick={() => {
+              const d = new Date();
+              setDate(`${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`);
+            }}>
               Today
             </Button>
           </div>
@@ -456,7 +463,7 @@ export default function CheckInOutPage() {
               <TabsList>
                 <TabsTrigger value="onsite" className="gap-1">
                   On Site
-                  <Badge variant="secondary" className="ml-1 bg-emerald-100 text-emerald-700">
+                  <Badge variant="secondary" className="ml-1 bg-status-success/15 text-status-success">
                     {onsite.length}
                   </Badge>
                 </TabsTrigger>
@@ -490,7 +497,7 @@ export default function CheckInOutPage() {
                 Select all ({filteredList.length})
               </Label>
               {selectedCount > 0 && (
-                <Badge variant="secondary" className="bg-blue-100 text-blue-700">
+                <Badge variant="secondary" className="bg-status-info/15 text-status-info">
                   {selectedCount} selected
                 </Badge>
               )}
@@ -573,14 +580,14 @@ export default function CheckInOutPage() {
                     <div
                       className={`p-3 rounded-full ${
                         tab === "onsite"
-                          ? "bg-emerald-100 text-emerald-700"
+                          ? "bg-status-success/15 text-status-success"
                           : tab === "arrivals"
                           ? res.status === "checked_in"
-                            ? "bg-emerald-100 text-emerald-700"
-                            : "bg-blue-100 text-blue-700"
+                            ? "bg-status-success/15 text-status-success"
+                            : "bg-status-info/15 text-status-info"
                           : res.status === "checked_out"
                           ? "bg-slate-100 text-slate-600"
-                          : "bg-orange-100 text-orange-700"
+                          : "bg-status-warning/15 text-status-warning"
                       }`}
                     >
                       {tab === "onsite" ? <Home className="h-5 w-5" /> : tab === "arrivals" ? (res.status === "checked_in" ? <CheckCircle className="h-5 w-5" /> : <Clock className="h-5 w-5" />) : <LogOut className="h-5 w-5" />}
@@ -928,11 +935,11 @@ export default function CheckInOutPage() {
                   <button
                     key={tag}
                     type="button"
-                    className="inline-flex items-center gap-1 px-2 py-1 text-xs font-medium rounded-md bg-status-info-bg text-status-info-text hover:bg-status-info-bg/80 border border-status-info-border transition-colors"
+                    className="inline-flex items-center gap-1 px-2 py-1 text-xs font-medium rounded-md bg-status-info/15 text-status-info hover:bg-status-info/10 border border-status-info/30 transition-colors"
                     onClick={() => setMessageBody(prev => prev + tag)}
                   >
                     {label}
-                    <span className="text-blue-400 font-mono text-[10px]">{tag}</span>
+                    <span className="opacity-60 font-mono text-[10px]">{tag}</span>
                   </button>
                 ))}
               </div>
@@ -1066,17 +1073,17 @@ function SummaryCard({ label, value, icon, href, onClick, highlight }: { label: 
   const content = (
     <div className={`card border p-4 shadow-sm flex items-center justify-between ${
       highlight
-        ? "border-emerald-300 bg-emerald-50"
+        ? "border-status-success/40 bg-status-success/10"
         : "border-slate-200 bg-white"
     }`}>
       <div className="flex items-center gap-3">
-        <span className={`rounded-md p-2 ${highlight ? "bg-emerald-100 text-emerald-600" : "bg-slate-50 text-slate-500"}`}>{icon}</span>
+        <span className={`rounded-md p-2 ${highlight ? "bg-status-success/15 text-status-success" : "bg-slate-50 text-slate-500"}`}>{icon}</span>
         <div>
-          <div className={`text-xs font-semibold uppercase tracking-wide ${highlight ? "text-emerald-600" : "text-slate-500"}`}>{label}</div>
-          <div className={`text-xl font-bold ${highlight ? "text-emerald-700" : "text-slate-900"}`}>{value}</div>
+          <div className={`text-xs font-semibold uppercase tracking-wide ${highlight ? "text-status-success" : "text-slate-500"}`}>{label}</div>
+          <div className={`text-xl font-bold ${highlight ? "text-status-success" : "text-slate-900"}`}>{value}</div>
         </div>
       </div>
-      <ArrowRight className={`h-4 w-4 ${highlight ? "text-emerald-400" : "text-slate-300"}`} />
+      <ArrowRight className={`h-4 w-4 ${highlight ? "text-status-success/60" : "text-slate-300"}`} />
     </div>
   );
   if (href) {
@@ -1098,8 +1105,8 @@ function SummaryCard({ label, value, icon, href, onClick, highlight }: { label: 
 
 function HintCard({ title, description, icon, href }: { title: string; description: string; icon: React.ReactNode; href: string }) {
   return (
-    <Link href={href} className="flex items-start gap-3 rounded-lg border border-slate-200 bg-white p-4 shadow-sm hover:border-emerald-200 hover:shadow-md transition">
-      <span className="rounded-md bg-emerald-50 p-2 text-emerald-600">{icon}</span>
+    <Link href={href} className="flex items-start gap-3 rounded-lg border border-slate-200 bg-white p-4 shadow-sm hover:border-status-success/40 hover:shadow-md transition">
+      <span className="rounded-md bg-status-success/10 p-2 text-status-success">{icon}</span>
       <div>
         <div className="text-sm font-semibold text-slate-900">{title}</div>
         <div className="text-xs text-slate-600">{description}</div>
