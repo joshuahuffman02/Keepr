@@ -51,6 +51,11 @@ const STEP_VALIDATORS: Partial<Record<OnboardingStepKey, any>> = {
   team_setup: null,
   communication_setup: null,
   integrations: null,
+  menu_setup: null,
+  feature_discovery: null,
+  smart_quiz: null,
+  feature_triage: null,
+  guided_setup: null,
   review_launch: null,
 };
 
@@ -520,6 +525,79 @@ I have read and understand this waiver and agree to its terms.`;
           },
         });
         this.logger.log(`Updated communication settings for campground ${campgroundId}`);
+      }
+
+      // Save quiz response when smart_quiz step is saved
+      if (step === OnboardingStep.smart_quiz) {
+        const quizData = sanitized as any;
+        // Create or update quiz response
+        await this.prisma.onboardingQuizResponse.upsert({
+          where: { onboardingSessionId: sessionId },
+          create: {
+            onboardingSessionId: sessionId,
+            parkType: quizData.answers?.parkType,
+            operations: quizData.answers?.operations || [],
+            teamSize: quizData.answers?.teamSize,
+            amenities: quizData.answers?.amenities || [],
+            techLevel: quizData.answers?.techLevel,
+            recommendedNow: quizData.recommendations?.setupNow || [],
+            recommendedLater: quizData.recommendations?.setupLater || [],
+          },
+          update: {
+            parkType: quizData.answers?.parkType,
+            operations: quizData.answers?.operations || [],
+            teamSize: quizData.answers?.teamSize,
+            amenities: quizData.answers?.amenities || [],
+            techLevel: quizData.answers?.techLevel,
+            recommendedNow: quizData.recommendations?.setupNow || [],
+            recommendedLater: quizData.recommendations?.setupLater || [],
+          },
+        });
+        this.logger.log(`Saved quiz response for session ${sessionId}`);
+      }
+
+      // Create feature setup queue when feature_triage step is saved
+      if (step === OnboardingStep.feature_triage && campgroundId) {
+        const triageData = sanitized as any;
+        const selections = triageData.selections || {};
+
+        // Delete existing queue items for this campground (idempotent re-save)
+        await this.prisma.featureSetupQueue.deleteMany({ where: { campgroundId } });
+
+        // Create queue items for each feature based on triage selection
+        const queueItems: Array<{
+          campgroundId: string;
+          featureKey: string;
+          status: 'setup_now' | 'setup_later' | 'skipped' | 'completed';
+          priority: number;
+        }> = [];
+
+        let priority = 0;
+        for (const [featureKey, status] of Object.entries(selections)) {
+          if (status === 'setup_now' || status === 'setup_later') {
+            queueItems.push({
+              campgroundId,
+              featureKey,
+              status: status as 'setup_now' | 'setup_later',
+              priority: status === 'setup_now' ? priority++ : priority + 1000, // setup_now items come first
+            });
+          } else if (status === 'skip') {
+            queueItems.push({
+              campgroundId,
+              featureKey,
+              status: 'skipped',
+              priority: 9999,
+            });
+          }
+        }
+
+        if (queueItems.length > 0) {
+          await this.prisma.featureSetupQueue.createMany({
+            data: queueItems,
+            skipDuplicates: true,
+          });
+          this.logger.log(`Created ${queueItems.length} feature queue items for campground ${campgroundId}`);
+        }
       }
 
       const progress = this.buildProgress({

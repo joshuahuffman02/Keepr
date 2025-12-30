@@ -1,7 +1,9 @@
 "use client";
 
 import { useState, useMemo } from "react";
+import { useSearchParams } from "next/navigation";
 import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   Sparkles,
   Check,
@@ -12,6 +14,12 @@ import {
   ExternalLink,
   Trophy,
   Target,
+  ListTodo,
+  Clock,
+  SkipForward,
+  CheckCircle,
+  Play,
+  Undo2,
 } from "lucide-react";
 import { DashboardShell } from "@/components/ui/layout/DashboardShell";
 import { Button } from "@/components/ui/button";
@@ -19,6 +27,7 @@ import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import { PAGE_REGISTRY, type PageDefinition, type PageCategory } from "@/lib/page-registry";
 import { useFeatureProgress } from "@/hooks/use-feature-progress";
+import { useCampground } from "@/contexts/CampgroundContext";
 import Link from "next/link";
 
 const SPRING_CONFIG = {
@@ -26,6 +35,16 @@ const SPRING_CONFIG = {
   stiffness: 300,
   damping: 25,
 };
+
+function getAuthHeaders(): HeadersInit {
+  const token = typeof window !== "undefined"
+    ? localStorage.getItem("campreserv:authToken")
+    : null;
+  return {
+    "Content-Type": "application/json",
+    ...(token ? { Authorization: `Bearer ${token}` } : {}),
+  };
+}
 
 const CATEGORY_INFO: Record<PageCategory, { label: string; description: string; color: string }> = {
   operations: {
@@ -261,13 +280,127 @@ function CategorySection({
   );
 }
 
+// Feature labels for queue items
+const FEATURE_LABELS: Record<string, { label: string; path: string }> = {
+  seasonal_rates: { label: "Seasonal Rates", path: "/dashboard/settings/seasonal-rates" },
+  tax_rules: { label: "Tax Rules", path: "/dashboard/settings/tax-rules" },
+  cancellation_policy: { label: "Cancellation Policy", path: "/dashboard/settings/policies" },
+  deposit_policy: { label: "Deposit Policy", path: "/dashboard/settings/deposit-policies" },
+  team_members: { label: "Team Members", path: "/dashboard/settings/users" },
+  staff_scheduling: { label: "Staff Scheduling", path: "/staff-scheduling" },
+  time_clock: { label: "Time Clock", path: "/staff/timeclock" },
+  store_products: { label: "Store Products", path: "/store/inventory" },
+  pos_setup: { label: "POS Setup", path: "/dashboard/settings/pos-integrations" },
+  store_categories: { label: "Product Categories", path: "/store/categories" },
+  housekeeping: { label: "Housekeeping", path: "/housekeeping" },
+  activities: { label: "Activities", path: "/activities" },
+  events: { label: "Events", path: "/events" },
+  group_bookings: { label: "Group Bookings", path: "/groups" },
+  promotions: { label: "Promotions", path: "/dashboard/settings/promotions" },
+  email_templates: { label: "Email Templates", path: "/dashboard/settings/communications" },
+  email_campaigns: { label: "Email Campaigns", path: "/dashboard/settings/campaigns" },
+  branding: { label: "Branding", path: "/dashboard/settings/branding" },
+  photos: { label: "Park Photos", path: "/dashboard/settings/photos" },
+  upsells: { label: "Upsells & Add-ons", path: "/dashboard/settings/upsells" },
+  integrations: { label: "Integrations", path: "/dashboard/settings/integrations" },
+};
+
+function getFeatureInfo(key: string): { label: string; path: string } {
+  return FEATURE_LABELS[key] || { label: key, path: "/features" };
+}
+
+type TabType = "all" | "queue" | "completed";
+
+interface QueueItem {
+  id: string;
+  featureKey: string;
+  status: "setup_now" | "setup_later" | "completed" | "skipped";
+  priority: number;
+  completedAt: string | null;
+  skippedAt: string | null;
+}
+
 export default function FeaturesPage() {
+  const searchParams = useSearchParams();
+  const initialTab = (searchParams.get("tab") as TabType) || "all";
   const prefersReducedMotion = useReducedMotion();
   const { progress, stats, isLoading, toggleFeature, reset, isCompleted } = useFeatureProgress();
+  const { selectedCampground } = useCampground();
+  const campgroundId = selectedCampground?.id;
+  const queryClient = useQueryClient();
+  const [activeTab, setActiveTab] = useState<TabType>(initialTab);
   const [searchQuery, setSearchQuery] = useState("");
   const [expandedCategories, setExpandedCategories] = useState<Set<PageCategory>>(
     new Set(["operations"])
   );
+
+  // Fetch queue data
+  const { data: queueData, isLoading: queueLoading } = useQuery({
+    queryKey: ["setup-queue-full", campgroundId],
+    queryFn: async () => {
+      if (!campgroundId) return null;
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_BASE}/campgrounds/${campgroundId}/setup-queue`,
+        { headers: getAuthHeaders() }
+      );
+      if (!response.ok) throw new Error("Failed to fetch queue");
+      return response.json() as Promise<{
+        items: QueueItem[];
+        setupNowCount: number;
+        setupLaterCount: number;
+        completedCount: number;
+        skippedCount: number;
+      }>;
+    },
+    enabled: !!campgroundId && activeTab !== "all",
+    staleTime: 30 * 1000,
+  });
+
+  // Queue mutations
+  const completeMutation = useMutation({
+    mutationFn: async (featureKey: string) => {
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_BASE}/campgrounds/${campgroundId}/setup-queue/${featureKey}/complete`,
+        { method: "POST", headers: getAuthHeaders() }
+      );
+      if (!response.ok) throw new Error("Failed to complete feature");
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["setup-queue-full", campgroundId] });
+      queryClient.invalidateQueries({ queryKey: ["setup-queue", campgroundId] });
+    },
+  });
+
+  const skipMutation = useMutation({
+    mutationFn: async (featureKey: string) => {
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_BASE}/campgrounds/${campgroundId}/setup-queue/${featureKey}/skip`,
+        { method: "POST", headers: getAuthHeaders() }
+      );
+      if (!response.ok) throw new Error("Failed to skip feature");
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["setup-queue-full", campgroundId] });
+      queryClient.invalidateQueries({ queryKey: ["setup-queue", campgroundId] });
+    },
+  });
+
+  const requeueMutation = useMutation({
+    mutationFn: async (featureKey: string) => {
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_BASE}/campgrounds/${campgroundId}/setup-queue/${featureKey}/requeue`,
+        { method: "POST", headers: getAuthHeaders() }
+      );
+      if (!response.ok) throw new Error("Failed to requeue feature");
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["setup-queue-full", campgroundId] });
+      queryClient.invalidateQueries({ queryKey: ["setup-queue", campgroundId] });
+    },
+  });
 
   // Build completed features list from API data
   const completedFeatures = useMemo(
@@ -333,6 +466,28 @@ export default function FeaturesPage() {
   const completedCount = completedFeatures.length;
   const progressPercent = totalFeatures > 0 ? Math.round((completedCount / totalFeatures) * 100) : 0;
 
+  // Queue counts for tab badges
+  const pendingQueueCount = queueData
+    ? queueData.setupNowCount + queueData.setupLaterCount
+    : 0;
+  const completedQueueCount = queueData?.completedCount || 0;
+
+  // Filter queue items by tab
+  const filteredQueueItems = useMemo(() => {
+    if (!queueData) return [];
+    if (activeTab === "queue") {
+      return queueData.items.filter(
+        (i) => i.status === "setup_now" || i.status === "setup_later"
+      );
+    }
+    if (activeTab === "completed") {
+      return queueData.items.filter(
+        (i) => i.status === "completed" || i.status === "skipped"
+      );
+    }
+    return [];
+  }, [queueData, activeTab]);
+
   return (
     <DashboardShell>
       <div className="max-w-5xl mx-auto space-y-6">
@@ -351,93 +506,315 @@ export default function FeaturesPage() {
               </p>
             </div>
           </div>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => reset()}
-            className="flex items-center gap-2"
+          {activeTab === "all" && (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => reset()}
+              className="flex items-center gap-2"
+            >
+              <RotateCcw className="w-4 h-4" />
+              Reset Progress
+            </Button>
+          )}
+        </div>
+
+        {/* Tabs */}
+        <div className="flex gap-1 p-1 bg-slate-100 dark:bg-slate-800 rounded-xl">
+          <button
+            onClick={() => setActiveTab("all")}
+            className={cn(
+              "flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium transition-colors",
+              activeTab === "all"
+                ? "bg-white dark:bg-slate-900 text-slate-900 dark:text-white shadow-sm"
+                : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
+            )}
           >
-            <RotateCcw className="w-4 h-4" />
-            Reset Progress
-          </Button>
+            <Sparkles className="w-4 h-4" />
+            All Features
+          </button>
+          <button
+            onClick={() => setActiveTab("queue")}
+            className={cn(
+              "flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium transition-colors",
+              activeTab === "queue"
+                ? "bg-white dark:bg-slate-900 text-slate-900 dark:text-white shadow-sm"
+                : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
+            )}
+          >
+            <ListTodo className="w-4 h-4" />
+            My Queue
+            {pendingQueueCount > 0 && (
+              <span className="px-1.5 py-0.5 text-xs bg-emerald-100 dark:bg-emerald-900/50 text-emerald-700 dark:text-emerald-400 rounded-full">
+                {pendingQueueCount}
+              </span>
+            )}
+          </button>
+          <button
+            onClick={() => setActiveTab("completed")}
+            className={cn(
+              "flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium transition-colors",
+              activeTab === "completed"
+                ? "bg-white dark:bg-slate-900 text-slate-900 dark:text-white shadow-sm"
+                : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
+            )}
+          >
+            <CheckCircle className="w-4 h-4" />
+            Completed
+            {completedQueueCount > 0 && (
+              <span className="px-1.5 py-0.5 text-xs bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-400 rounded-full">
+                {completedQueueCount}
+              </span>
+            )}
+          </button>
         </div>
 
-        {/* Overall progress */}
-        <div className="bg-gradient-to-r from-emerald-500 to-teal-500 rounded-2xl p-6 text-white">
-          <div className="flex items-center justify-between mb-4">
-            <div>
-              <p className="text-emerald-100 text-sm">Your exploration progress</p>
-              <p className="text-3xl font-bold">
-                {completedCount} of {totalFeatures} features
-              </p>
-            </div>
-            <div className="text-right">
-              <p className="text-5xl font-bold">{progressPercent}%</p>
-              <p className="text-emerald-100 text-sm">complete</p>
-            </div>
-          </div>
-          <div className="h-3 bg-white/20 rounded-full overflow-hidden">
-            <motion.div
-              initial={{ width: 0 }}
-              animate={{ width: `${progressPercent}%` }}
-              transition={{ duration: 0.5, ease: "easeOut" }}
-              className="h-full bg-white rounded-full"
-            />
-          </div>
-        </div>
-
-        {/* Search */}
-        <div className="relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-          <Input
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Search features..."
-            className="pl-9"
-          />
-        </div>
-
-        {/* Categories */}
-        <div className="space-y-3">
-          {filteredCategories.map((category, index) => {
-            const features = searchQuery
-              ? pagesByCategory[category].filter((page) => {
-                  const query = searchQuery.toLowerCase();
-                  return (
-                    page.label.toLowerCase().includes(query) ||
-                    page.description.toLowerCase().includes(query) ||
-                    page.keywords.some((k) => k.toLowerCase().includes(query))
-                  );
-                })
-              : pagesByCategory[category];
-
-            if (features.length === 0) return null;
-
-            return (
-              <motion.div
-                key={category}
-                initial={prefersReducedMotion ? {} : { opacity: 0, y: 10 }}
-                animate={prefersReducedMotion ? {} : { opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.05 }}
-              >
-                <CategorySection
-                  category={category}
-                  features={features}
-                  completedFeatures={completedFeatures}
-                  onToggle={handleToggle}
-                  isExpanded={expandedCategories.has(category) || !!searchQuery}
-                  onToggleExpand={() => toggleCategory(category)}
+        {/* All Features Tab */}
+        {activeTab === "all" && (
+          <>
+            {/* Overall progress */}
+            <div className="bg-gradient-to-r from-emerald-500 to-teal-500 rounded-2xl p-6 text-white">
+              <div className="flex items-center justify-between mb-4">
+                <div>
+                  <p className="text-emerald-100 text-sm">Your exploration progress</p>
+                  <p className="text-3xl font-bold">
+                    {completedCount} of {totalFeatures} features
+                  </p>
+                </div>
+                <div className="text-right">
+                  <p className="text-5xl font-bold">{progressPercent}%</p>
+                  <p className="text-emerald-100 text-sm">complete</p>
+                </div>
+              </div>
+              <div className="h-3 bg-white/20 rounded-full overflow-hidden">
+                <motion.div
+                  initial={{ width: 0 }}
+                  animate={{ width: `${progressPercent}%` }}
+                  transition={{ duration: 0.5, ease: "easeOut" }}
+                  className="h-full bg-white rounded-full"
                 />
-              </motion.div>
-            );
-          })}
-        </div>
+              </div>
+            </div>
 
-        {/* Empty state */}
-        {filteredCategories.length === 0 && (
-          <div className="text-center py-12">
-            <Search className="w-12 h-12 text-slate-300 dark:text-slate-600 mx-auto mb-4" />
-            <p className="text-slate-500 dark:text-slate-400">No features match your search</p>
+            {/* Search */}
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+              <Input
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Search features..."
+                className="pl-9"
+              />
+            </div>
+
+            {/* Categories */}
+            <div className="space-y-3">
+              {filteredCategories.map((category, index) => {
+                const features = searchQuery
+                  ? pagesByCategory[category].filter((page) => {
+                      const query = searchQuery.toLowerCase();
+                      return (
+                        page.label.toLowerCase().includes(query) ||
+                        page.description.toLowerCase().includes(query) ||
+                        page.keywords.some((k) => k.toLowerCase().includes(query))
+                      );
+                    })
+                  : pagesByCategory[category];
+
+                if (features.length === 0) return null;
+
+                return (
+                  <motion.div
+                    key={category}
+                    initial={prefersReducedMotion ? {} : { opacity: 0, y: 10 }}
+                    animate={prefersReducedMotion ? {} : { opacity: 1, y: 0 }}
+                    transition={{ delay: index * 0.05 }}
+                  >
+                    <CategorySection
+                      category={category}
+                      features={features}
+                      completedFeatures={completedFeatures}
+                      onToggle={handleToggle}
+                      isExpanded={expandedCategories.has(category) || !!searchQuery}
+                      onToggleExpand={() => toggleCategory(category)}
+                    />
+                  </motion.div>
+                );
+              })}
+            </div>
+
+            {/* Empty state */}
+            {filteredCategories.length === 0 && (
+              <div className="text-center py-12">
+                <Search className="w-12 h-12 text-slate-300 dark:text-slate-600 mx-auto mb-4" />
+                <p className="text-slate-500 dark:text-slate-400">No features match your search</p>
+              </div>
+            )}
+          </>
+        )}
+
+        {/* Queue Tab */}
+        {activeTab === "queue" && (
+          <div className="space-y-4">
+            {queueLoading ? (
+              <div className="text-center py-12">
+                <div className="w-8 h-8 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+                <p className="text-slate-500">Loading queue...</p>
+              </div>
+            ) : filteredQueueItems.length === 0 ? (
+              <div className="text-center py-12 bg-slate-50 dark:bg-slate-800/50 rounded-2xl">
+                <CheckCircle className="w-12 h-12 text-emerald-500 mx-auto mb-4" />
+                <h3 className="text-lg font-semibold text-slate-900 dark:text-white mb-2">
+                  All caught up!
+                </h3>
+                <p className="text-slate-500 dark:text-slate-400">
+                  No features pending in your queue.
+                </p>
+              </div>
+            ) : (
+              <div className="space-y-2">
+                {filteredQueueItems.map((item, index) => {
+                  const info = getFeatureInfo(item.featureKey);
+                  return (
+                    <motion.div
+                      key={item.id}
+                      initial={prefersReducedMotion ? {} : { opacity: 0, x: -10 }}
+                      animate={prefersReducedMotion ? {} : { opacity: 1, x: 0 }}
+                      transition={{ delay: index * 0.03 }}
+                      className={cn(
+                        "flex items-center gap-4 p-4 rounded-xl border transition-colors",
+                        "bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700"
+                      )}
+                    >
+                      <div className={cn(
+                        "w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0",
+                        item.status === "setup_now"
+                          ? "bg-emerald-100 dark:bg-emerald-900/30"
+                          : "bg-amber-100 dark:bg-amber-900/30"
+                      )}>
+                        {item.status === "setup_now" ? (
+                          <Play className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
+                        ) : (
+                          <Clock className="w-5 h-5 text-amber-600 dark:text-amber-400" />
+                        )}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="font-medium text-slate-900 dark:text-white">
+                          {info.label}
+                        </p>
+                        <p className="text-sm text-slate-500 dark:text-slate-400">
+                          {item.status === "setup_now" ? "Set up now" : "Set up later"}
+                        </p>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Link
+                          href={info.path}
+                          className="p-2 rounded-lg text-slate-600 hover:text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-900/30 transition-colors"
+                          title="Open settings"
+                        >
+                          <ExternalLink className="w-4 h-4" />
+                        </Link>
+                        <button
+                          onClick={() => completeMutation.mutate(item.featureKey)}
+                          disabled={completeMutation.isPending}
+                          className="p-2 rounded-lg text-slate-600 hover:text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-900/30 transition-colors"
+                          title="Mark complete"
+                        >
+                          <Check className="w-4 h-4" />
+                        </button>
+                        <button
+                          onClick={() => skipMutation.mutate(item.featureKey)}
+                          disabled={skipMutation.isPending}
+                          className="p-2 rounded-lg text-slate-600 hover:text-slate-900 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+                          title="Skip"
+                        >
+                          <SkipForward className="w-4 h-4" />
+                        </button>
+                      </div>
+                    </motion.div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Completed Tab */}
+        {activeTab === "completed" && (
+          <div className="space-y-4">
+            {queueLoading ? (
+              <div className="text-center py-12">
+                <div className="w-8 h-8 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+                <p className="text-slate-500">Loading...</p>
+              </div>
+            ) : filteredQueueItems.length === 0 ? (
+              <div className="text-center py-12 bg-slate-50 dark:bg-slate-800/50 rounded-2xl">
+                <ListTodo className="w-12 h-12 text-slate-400 mx-auto mb-4" />
+                <h3 className="text-lg font-semibold text-slate-900 dark:text-white mb-2">
+                  No completed features yet
+                </h3>
+                <p className="text-slate-500 dark:text-slate-400">
+                  Features you complete or skip will appear here.
+                </p>
+              </div>
+            ) : (
+              <div className="space-y-2">
+                {filteredQueueItems.map((item, index) => {
+                  const info = getFeatureInfo(item.featureKey);
+                  const isSkipped = item.status === "skipped";
+                  return (
+                    <motion.div
+                      key={item.id}
+                      initial={prefersReducedMotion ? {} : { opacity: 0, x: -10 }}
+                      animate={prefersReducedMotion ? {} : { opacity: 1, x: 0 }}
+                      transition={{ delay: index * 0.03 }}
+                      className={cn(
+                        "flex items-center gap-4 p-4 rounded-xl border transition-colors",
+                        "bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700",
+                        isSkipped && "opacity-60"
+                      )}
+                    >
+                      <div className={cn(
+                        "w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0",
+                        isSkipped
+                          ? "bg-slate-100 dark:bg-slate-800"
+                          : "bg-emerald-100 dark:bg-emerald-900/30"
+                      )}>
+                        {isSkipped ? (
+                          <SkipForward className="w-5 h-5 text-slate-400" />
+                        ) : (
+                          <CheckCircle className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
+                        )}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className={cn(
+                          "font-medium",
+                          isSkipped
+                            ? "text-slate-500 line-through"
+                            : "text-slate-900 dark:text-white"
+                        )}>
+                          {info.label}
+                        </p>
+                        <p className="text-sm text-slate-500 dark:text-slate-400">
+                          {isSkipped ? "Skipped" : "Completed"}
+                        </p>
+                      </div>
+                      {isSkipped && (
+                        <button
+                          onClick={() => requeueMutation.mutate(item.featureKey)}
+                          disabled={requeueMutation.isPending}
+                          className="flex items-center gap-1 px-3 py-1.5 rounded-lg text-sm text-slate-600 hover:text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-900/30 transition-colors"
+                          title="Re-add to queue"
+                        >
+                          <Undo2 className="w-4 h-4" />
+                          Re-queue
+                        </button>
+                      )}
+                    </motion.div>
+                  );
+                })}
+              </div>
+            )}
           </div>
         )}
       </div>

@@ -30,8 +30,12 @@ import { CommunicationSetup, CommunicationSetupData } from "./steps/Communicatio
 import { Integrations, IntegrationsData } from "./steps/Integrations";
 import { MenuSetup } from "./steps/MenuSetup";
 import { FeatureDiscovery } from "./steps/FeatureDiscovery";
+import { SmartQuiz, SmartQuizData } from "./steps/SmartQuiz";
+import { FeatureTriage, FeatureTriageData } from "./steps/FeatureTriage";
+import { GuidedSetup, GuidedSetupData } from "./steps/GuidedSetup";
 import { ReviewLaunch } from "./steps/ReviewLaunch";
 import { Loader2 } from "lucide-react";
+import { getRecommendedFeatures, type FeatureRecommendations } from "@/lib/feature-recommendations";
 
 interface WizardState {
   currentStep: OnboardingStepKey;
@@ -117,6 +121,11 @@ interface WizardState {
   // Menu and feature discovery
   pinnedPages?: string[];
   completedFeatures?: string[];
+  // Smart quiz and feature triage (NEW)
+  smartQuiz?: SmartQuizData;
+  featureTriage?: FeatureTriageData;
+  featureRecommendations?: FeatureRecommendations;
+  guidedSetup?: GuidedSetupData;
 }
 
 export default function OnboardingPage() {
@@ -208,6 +217,13 @@ export default function OnboardingPage() {
     const bookingRulesData = data.booking_rules || data.bookingRules;
     const waiversDocumentsData = data.waivers_documents || data.waiversDocuments;
     const communicationSetupData = data.communication_setup || data.communicationSetup;
+    const smartQuizData = data.smart_quiz;
+    const featureTriageData = data.feature_triage?.featureTriage;
+    const guidedSetupData = data.guided_setup;
+    // Reconstruct recommendations from smart_quiz if available
+    const featureRecommendationsData = smartQuizData
+      ? { setupNow: smartQuizData.recommendedNow || [], setupLater: smartQuizData.recommendedLater || [], skipped: [] }
+      : undefined;
 
     setState((prev) => ({
       ...prev,
@@ -238,6 +254,10 @@ export default function OnboardingPage() {
       bookingRules: bookingRulesData,
       waiversDocuments: waiversDocumentsData,
       communicationSetup: communicationSetupData,
+      smartQuiz: smartQuizData,
+      featureTriage: featureTriageData,
+      featureRecommendations: featureRecommendationsData,
+      guidedSetup: guidedSetupData,
       completedSteps: mappedCompletedSteps,
       currentStep: currentStepKey,
       inventoryPath: inventoryPathData,
@@ -767,11 +787,132 @@ export default function OnboardingPage() {
       completedFeatures,
     }));
     completeStep("feature_discovery");
-    goToStep("review_launch");
+    goToStep("smart_quiz");
   };
 
   const handleFeatureDiscoverySkip = () => {
     completeStep("feature_discovery");
+    goToStep("smart_quiz");
+  };
+
+  const handleSmartQuizChange = (quizData: SmartQuizData) => {
+    setState((prev) => ({
+      ...prev,
+      smartQuiz: quizData,
+      featureRecommendations: quizData.recommendations,
+    }));
+  };
+
+  const handleSmartQuizNext = async () => {
+    const quizData = state.smartQuiz;
+    if (!quizData) {
+      // No quiz data, skip to feature triage with no recommendations
+      setState((prev) => ({
+        ...prev,
+        featureRecommendations: { setupNow: [], setupLater: [], skipped: [] },
+      }));
+      completeStep("smart_quiz");
+      goToStep("feature_triage");
+      return;
+    }
+
+    await saveMutation.mutateAsync({
+      step: "smart_quiz",
+      data: {
+        parkType: quizData.answers.parkType,
+        operations: quizData.answers.operations,
+        teamSize: quizData.answers.teamSize,
+        amenities: quizData.answers.amenities,
+        techLevel: quizData.answers.techLevel,
+        recommendedNow: quizData.recommendations.setupNow,
+        recommendedLater: quizData.recommendations.setupLater,
+      },
+    });
+
+    completeStep("smart_quiz");
+    goToStep("feature_triage");
+  };
+
+  const handleSmartQuizSkip = () => {
+    // Skip quiz - provide empty recommendations, user will manually select
+    setState((prev) => ({
+      ...prev,
+      featureRecommendations: { setupNow: [], setupLater: [], skipped: [] },
+    }));
+    completeStep("smart_quiz");
+    goToStep("feature_triage");
+  };
+
+  const handleFeatureTriageChange = (triageData: FeatureTriageData) => {
+    setState((prev) => ({
+      ...prev,
+      featureTriage: triageData,
+    }));
+  };
+
+  const handleFeatureTriageNext = async () => {
+    const triageData = state.featureTriage;
+    if (!triageData) {
+      completeStep("feature_triage");
+      goToStep("review_launch");
+      return;
+    }
+
+    // Extract setup_now features from selections
+    const setupNowKeys = Object.entries(triageData.selections)
+      .filter(([, status]) => status === "setup_now")
+      .map(([key]) => key);
+    const setupLaterKeys = Object.entries(triageData.selections)
+      .filter(([, status]) => status === "setup_later")
+      .map(([key]) => key);
+
+    await saveMutation.mutateAsync({
+      step: "feature_triage",
+      data: {
+        featureTriage: triageData,
+        setupNow: setupNowKeys,
+        setupLater: setupLaterKeys,
+      },
+    });
+
+    completeStep("feature_triage");
+    showCelebration("Features Selected!", "Your personalized setup is ready", "default");
+    setTimeout(() => {
+      hideCelebration();
+      // If there are setup_now features, go to guided setup, otherwise go to launch
+      if (setupNowKeys.length > 0) {
+        goToStep("guided_setup");
+      } else {
+        goToStep("review_launch");
+      }
+    }, 2000);
+  };
+
+  const handleFeatureTriageSkip = () => {
+    // Skip triage - go directly to launch
+    completeStep("feature_triage");
+    goToStep("review_launch");
+  };
+
+  const handleGuidedSetupChange = (setupData: GuidedSetupData) => {
+    setState((prev) => ({
+      ...prev,
+      guidedSetup: setupData,
+    }));
+  };
+
+  const handleGuidedSetupComplete = async () => {
+    const setupData = state.guidedSetup;
+
+    await saveMutation.mutateAsync({
+      step: "guided_setup",
+      data: {
+        completedFeatures: setupData?.completedFeatures || [],
+        skippedFeatures: setupData?.skippedFeatures || [],
+        completed: true,
+      },
+    });
+    completeStep("guided_setup");
     goToStep("review_launch");
   };
 
@@ -1133,6 +1274,57 @@ export default function OnboardingPage() {
             onNext={() => handleFeatureDiscoverySave(state.completedFeatures || [])}
             onBack={() => goToStep("menu_setup", "backward")}
             onSkip={handleFeatureDiscoverySkip}
+          />
+        );
+
+      case "smart_quiz":
+        return (
+          <SmartQuiz
+            data={state.smartQuiz || {}}
+            onChange={handleSmartQuizChange}
+            onNext={handleSmartQuizNext}
+            onSkip={handleSmartQuizSkip}
+            onBack={() => goToStep("feature_discovery", "backward")}
+          />
+        );
+
+      case "feature_triage":
+        return (
+          <FeatureTriage
+            recommendations={state.featureRecommendations || { setupNow: [], setupLater: [], skipped: [] }}
+            data={state.featureTriage || {}}
+            onChange={handleFeatureTriageChange}
+            onNext={handleFeatureTriageNext}
+            onSkip={handleFeatureTriageSkip}
+            onBack={() => goToStep("smart_quiz", "backward")}
+          />
+        );
+
+      case "guided_setup":
+        // Ensure we have feature triage data
+        if (!state.featureTriage) {
+          return (
+            <div className="flex-1 flex items-center justify-center">
+              <div className="max-w-md text-center">
+                <p className="text-slate-400">No features selected for setup.</p>
+                <button
+                  onClick={handleGuidedSetupComplete}
+                  className="mt-4 px-6 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg transition-colors"
+                >
+                  Continue to Launch
+                </button>
+              </div>
+            </div>
+          );
+        }
+        return (
+          <GuidedSetup
+            featureTriage={state.featureTriage}
+            campgroundId={state.campground?.id || sessionQuery.data?.session.campgroundId || ""}
+            data={state.guidedSetup || {}}
+            onChange={handleGuidedSetupChange}
+            onComplete={handleGuidedSetupComplete}
+            onBack={() => goToStep("feature_triage", "backward")}
           />
         );
 

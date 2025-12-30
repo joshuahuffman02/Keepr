@@ -90,6 +90,7 @@ import { UploadsModule } from "./uploads/uploads.module";
 import { WaiversModule } from "./waivers/waivers.module";
 import { HealthModule } from "./health/health.module";
 import { OnboardingModule } from "./onboarding/onboarding.module";
+import { FeatureSetupQueueModule } from "./feature-setup-queue/feature-setup-queue.module";
 import { AccessControlModule } from "./access-control/access-control.module";
 import { BillingModule } from "./billing/billing.module";
 import { AccountingModule } from "./accounting/accounting.module";
@@ -225,6 +226,7 @@ import { QueueModule } from "./queues/queue.module";
     WaiversModule,
     SignaturesModule,
     OnboardingModule,
+    FeatureSetupQueueModule,
     ReferralsModule,
     TicketsModule,
     AdminModule,

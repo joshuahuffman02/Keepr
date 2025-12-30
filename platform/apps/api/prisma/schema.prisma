@@ -426,6 +426,12 @@ enum OnboardingStep {
   team_setup
   communication_setup
   integrations
+  // Feature selection steps
+  menu_setup
+  feature_discovery
+  smart_quiz
+  feature_triage
+  guided_setup
   review_launch
   // Legacy step names (for backwards compatibility)
   account_profile
@@ -550,7 +556,7 @@ model User {
   featureProgress FeatureProgress[]
 
   // OAuth2 tokens issued to this user
-  oAuthTokens     OAuthToken[]
+  oAuthTokens OAuthToken[]
 }
 
 // User's customizable sidebar menu configuration
@@ -1105,11 +1111,11 @@ model Campground {
   routingAssigneeId     String?
 
   // SMS / Twilio settings (per-campground)
-  smsEnabled            Boolean  @default(false)
-  twilioAccountSid      String?
-  twilioAuthToken       String? // Encrypted in practice
-  twilioFromNumber      String? // The Twilio phone number
-  smsWelcomeMessage     String?  @db.Text // Optional custom welcome message
+  smsEnabled        Boolean @default(false)
+  twilioAccountSid  String?
+  twilioAuthToken   String? // Encrypted in practice
+  twilioFromNumber  String? // The Twilio phone number
+  smsWelcomeMessage String? @db.Text // Optional custom welcome message
 
   // Long-term settings
   longTermEnabled   Boolean @default(false)
@@ -1132,52 +1138,52 @@ model Campground {
   receiptFooter  String?
 
   // Financial
-  taxState                    Decimal?       @db.Decimal(10, 4)
-  taxLocal                    Decimal?       @db.Decimal(10, 4)
-  depositRule                 String? // e.g., none, full, half, first_night, first_night_fees, percentage
-  depositPercentage           Int? // For percentage rule (0-100)
-  depositConfig               Json?
-  defaultDepositPolicyId      String?        @unique
-  cancellationPolicyType      String? // flexible, moderate, strict, custom
-  cancellationWindowHours     Int? // hours before arrival to allow refund
-  cancellationFeeType         String? // flat, percent, first_night
-  cancellationFeeFlatCents    Int?
-  cancellationFeePercent      Int?
-  cancellationNotes           String?        @db.Text
-  storeOpenHour               Int? // 0-23
-  storeCloseHour              Int? // 0-23
-  orderWebhookUrl             String?
-  stripeAccountId             String?        @unique
-  applicationFeeFlatCents     Int?           @default(300) // Legacy per-booking fee in cents
-  billingPlan                 BillingPlan    @default(ota_only)
-  perBookingFeeCents          Int?           @default(300) // If null, fall back to plan default
-  monthlyFeeCents             Int? // For enterprise plans (e.g., 50000 = $500)
-  feeMode                     PaymentFeeMode @default(absorb)
+  taxState                 Decimal?       @db.Decimal(10, 4)
+  taxLocal                 Decimal?       @db.Decimal(10, 4)
+  depositRule              String? // e.g., none, full, half, first_night, first_night_fees, percentage
+  depositPercentage        Int? // For percentage rule (0-100)
+  depositConfig            Json?
+  defaultDepositPolicyId   String?        @unique
+  cancellationPolicyType   String? // flexible, moderate, strict, custom
+  cancellationWindowHours  Int? // hours before arrival to allow refund
+  cancellationFeeType      String? // flat, percent, first_night
+  cancellationFeeFlatCents Int?
+  cancellationFeePercent   Int?
+  cancellationNotes        String?        @db.Text
+  storeOpenHour            Int? // 0-23
+  storeCloseHour           Int? // 0-23
+  orderWebhookUrl          String?
+  stripeAccountId          String?        @unique
+  applicationFeeFlatCents  Int?           @default(300) // Legacy per-booking fee in cents
+  billingPlan              BillingPlan    @default(ota_only)
+  perBookingFeeCents       Int?           @default(300) // If null, fall back to plan default
+  monthlyFeeCents          Int? // For enterprise plans (e.g., 50000 = $500)
+  feeMode                  PaymentFeeMode @default(absorb)
 
   // Pricing controls
-  maxDiscountFraction         Decimal?       @db.Decimal(4, 3) @default(0.4) // Max discount cap (0.4 = 40%)
-  managerApprovalThreshold    Decimal?       @db.Decimal(4, 3) @default(0.25) // Discounts above this need manager approval
-  minOverrideRateCents        Int? // Minimum allowed rate when manually overriding
-  maxOverrideRateCents        Int? // Maximum allowed rate when manually overriding
+  maxDiscountFraction      Decimal? @default(0.4) @db.Decimal(4, 3) // Max discount cap (0.4 = 40%)
+  managerApprovalThreshold Decimal? @default(0.25) @db.Decimal(4, 3) // Discounts above this need manager approval
+  minOverrideRateCents     Int? // Minimum allowed rate when manually overriding
+  maxOverrideRateCents     Int? // Maximum allowed rate when manually overriding
 
   stripeCapabilities          Json?
   stripeCapabilitiesFetchedAt DateTime?
 
   // Payment method configuration
-  enableCardPayments  Boolean  @default(true)
-  enableApplePay      Boolean  @default(true)
-  enableGooglePay     Boolean  @default(true)
-  enableACH           Boolean  @default(true)
-  enableCash          Boolean  @default(true)
-  enableCheck         Boolean  @default(true)
-  enableFolio         Boolean  @default(true)
-  allowedCardBrands   String[] @default(["visa", "mastercard", "amex", "discover"])
-  showFeeBreakdown    Boolean  @default(false) // Show processing fee to guest in pass-through mode
+  enableCardPayments Boolean  @default(true)
+  enableApplePay     Boolean  @default(true)
+  enableGooglePay    Boolean  @default(true)
+  enableACH          Boolean  @default(true)
+  enableCash         Boolean  @default(true)
+  enableCheck        Boolean  @default(true)
+  enableFolio        Boolean  @default(true)
+  allowedCardBrands  String[] @default(["visa", "mastercard", "amex", "discover"])
+  showFeeBreakdown   Boolean  @default(false) // Show processing fee to guest in pass-through mode
 
-  reviewScore                 Decimal?       @db.Decimal(4, 2)
-  reviewCount                 Int            @default(0)
-  reviewSources               Json?
-  reviewsUpdatedAt            DateTime?
+  reviewScore      Decimal?  @db.Decimal(4, 2)
+  reviewCount      Int       @default(0)
+  reviewSources    Json?
+  reviewsUpdatedAt DateTime?
 
   // Public booking page settings
   showPublicMap Boolean @default(false)
@@ -1350,10 +1356,10 @@ model Campground {
   charityDonations       CharityDonation[]
 
   // AI Autopilot relations
-  aiAutopilotConfig      AiAutopilotConfig?
-  aiContextItems         AiCampgroundContext[]
-  aiReplyDrafts          AiReplyDraft[]
-  aiAnomalyAlerts        AiAnomalyAlert[]
+  aiAutopilotConfig        AiAutopilotConfig?
+  aiContextItems           AiCampgroundContext[]
+  aiReplyDrafts            AiReplyDraft[]
+  aiAnomalyAlerts          AiAnomalyAlert[]
   // AI Autonomous features
   aiPricingRecommendations AiPricingRecommendation[]
   aiPriceExperiments       AiPriceExperiment[]
@@ -1417,22 +1423,25 @@ model Campground {
   bookingPageConfig BookingPageConfig?
 
   // Seasonals Management
-  seasonalRateCards         SeasonalRateCard[]        @relation("CampgroundSeasonalRateCards")
-  seasonalGuests            SeasonalGuest[]           @relation("CampgroundSeasonalGuests")
-  seasonalPayments          SeasonalPayment[]         @relation("CampgroundSeasonalPayments")
-  seasonalCommunications    SeasonalCommunication[]   @relation("CampgroundSeasonalCommunications")
+  seasonalRateCards      SeasonalRateCard[]      @relation("CampgroundSeasonalRateCards")
+  seasonalGuests         SeasonalGuest[]         @relation("CampgroundSeasonalGuests")
+  seasonalPayments       SeasonalPayment[]       @relation("CampgroundSeasonalPayments")
+  seasonalCommunications SeasonalCommunication[] @relation("CampgroundSeasonalCommunications")
 
   // Stripe Payment Infrastructure (per-campground)
-  stripeCustomers           StripeCustomer[]
-  stripeTerminalLocations   StripeTerminalLocation[]
-  stripeTerminalReaders     StripeTerminalReader[]
+  stripeCustomers         StripeCustomer[]
+  stripeTerminalLocations StripeTerminalLocation[]
+  stripeTerminalReaders   StripeTerminalReader[]
 
   // Competitive Intelligence
-  competitors               Competitor[]
-  rateParityAlerts          RateParityAlert[]
+  competitors      Competitor[]
+  rateParityAlerts RateParityAlert[]
 
   // OAuth2 Clients
-  oAuthClients              OAuthClient[]
+  oAuthClients OAuthClient[]
+
+  // Feature setup queue (onboarding feature triage)
+  featureSetupQueue FeatureSetupQueue[]
 
   // Soft delete
   deletedAt DateTime?
@@ -2811,7 +2820,7 @@ model ArLedgerEntry {
 }
 
 model LedgerEntry {
-  id            String   @id @default(cuid())
+  id            String    @id @default(cuid())
   campgroundId  String
   reservationId String?
   periodId      String?
@@ -2819,16 +2828,16 @@ model LedgerEntry {
   account       String?
   description   String?
   amountCents   Int
-  direction     String   @default("debit")
-  occurredAt    DateTime @default(now())
-  createdAt     DateTime @default(now())
+  direction     String    @default("debit")
+  occurredAt    DateTime  @default(now())
+  createdAt     DateTime  @default(now())
   externalRef   String?
   dedupeKey     String?
   sourceType    String?
   sourceTxId    String?
   sourceTs      DateTime?
   hash          String?
-  adjustment    Boolean  @default(false)
+  adjustment    Boolean   @default(false)
 
   reservation   Reservation?   @relation(fields: [reservationId], references: [id], onDelete: SetNull)
   campground    Campground     @relation(fields: [campgroundId], references: [id], onDelete: Cascade)
@@ -3009,17 +3018,17 @@ model PayoutRecon {
 }
 
 model PayoutReconLine {
-  id            String   @id @default(cuid())
+  id            String    @id @default(cuid())
   payoutReconId String
   type          String // payout, fee, chargeback, reserve, adjustment, other
-  status        String   @default("matched")
+  status        String    @default("matched")
   sourceTxId    String?
   sourceTs      DateTime?
   amountCents   Int
-  currency      String   @default("usd")
+  currency      String    @default("usd")
   glEntryId     String?
   notes         String?
-  createdAt     DateTime @default(now())
+  createdAt     DateTime  @default(now())
 
   payoutRecon PayoutRecon @relation(fields: [payoutReconId], references: [id], onDelete: Cascade)
 
@@ -3363,12 +3372,12 @@ model StoreOrder {
   createdAt             DateTime                    @default(now())
   updatedAt             DateTime                    @default(now()) @updatedAt
 
-  campground          Campground              @relation(fields: [campgroundId], references: [id], onDelete: Cascade)
-  reservation         Reservation?            @relation(fields: [reservationId], references: [id], onDelete: SetNull)
-  guest               Guest?                  @relation(fields: [guestId], references: [id], onDelete: SetNull)
-  completedBy         User?                   @relation("OrderCompletedBy", fields: [completedById], references: [id], onDelete: SetNull)
-  fulfillmentLocation StoreLocation?          @relation("FulfillmentLocation", fields: [fulfillmentLocationId], references: [id], onDelete: SetNull)
-  assignedBy          User?                   @relation("OrderAssignedBy", fields: [assignedById], references: [id], onDelete: SetNull)
+  campground          Campground             @relation(fields: [campgroundId], references: [id], onDelete: Cascade)
+  reservation         Reservation?           @relation(fields: [reservationId], references: [id], onDelete: SetNull)
+  guest               Guest?                 @relation(fields: [guestId], references: [id], onDelete: SetNull)
+  completedBy         User?                  @relation("OrderCompletedBy", fields: [completedById], references: [id], onDelete: SetNull)
+  fulfillmentLocation StoreLocation?         @relation("FulfillmentLocation", fields: [fulfillmentLocationId], references: [id], onDelete: SetNull)
+  assignedBy          User?                  @relation("OrderAssignedBy", fields: [assignedById], references: [id], onDelete: SetNull)
   items               StoreOrderItem[]
   adjustments         StoreOrderAdjustment[]
 
@@ -3408,22 +3417,22 @@ enum StoreAdjustmentType {
 }
 
 model StoreOrderAdjustment {
-  id                 String              @id @default(cuid())
-  orderId            String
-  type               StoreAdjustmentType @default(refund)
-  amountCents        Int
-  note               String?
-  items              Json? // Array of affected items: [{itemId, name, qty, amountCents}]
-  createdById        String?
+  id                String              @id @default(cuid())
+  orderId           String
+  type              StoreAdjustmentType @default(refund)
+  amountCents       Int
+  note              String?
+  items             Json? // Array of affected items: [{itemId, name, qty, amountCents}]
+  createdById       String?
   // Payment processor refund tracking
-  stripeRefundId     String? // Stripe refund ID if processed via Stripe
-  refundStatus       String? // pending, succeeded, failed
-  refundError        String? // Error message if refund failed
+  stripeRefundId    String? // Stripe refund ID if processed via Stripe
+  refundStatus      String? // pending, succeeded, failed
+  refundError       String? // Error message if refund failed
   // Inventory restoration
-  inventoryRestored  Boolean @default(false) // Whether inventory was restocked
+  inventoryRestored Boolean             @default(false) // Whether inventory was restocked
   // Guest notification
-  notificationSent   Boolean @default(false) // Whether guest was notified
-  createdAt          DateTime            @default(now())
+  notificationSent  Boolean             @default(false) // Whether guest was notified
+  createdAt         DateTime            @default(now())
 
   order     StoreOrder @relation(fields: [orderId], references: [id], onDelete: Cascade)
   createdBy User?      @relation("StoreAdjustmentCreatedBy", fields: [createdById], references: [id], onDelete: SetNull)
@@ -3513,9 +3522,9 @@ model Message {
   createdAt     DateTime   @default(now())
 
   // AI Sentiment Analysis (Phase 1.2) - for guest messages
-  sentiment      String?   // positive | neutral | negative
-  sentimentScore Float?    // -1.0 to 1.0
-  urgencyLevel   String?   // low | normal | high | critical
+  sentiment      String? // positive | neutral | negative
+  sentimentScore Float? // -1.0 to 1.0
+  urgencyLevel   String? // low | normal | high | critical
   aiAnalyzedAt   DateTime?
 
   campground  Campground  @relation(fields: [campgroundId], references: [id], onDelete: Cascade)
@@ -3939,9 +3948,61 @@ model OnboardingSession {
   organization Organization?    @relation(fields: [organizationId], references: [id], onDelete: SetNull)
   campground   Campground?      @relation(fields: [campgroundId], references: [id], onDelete: SetNull)
 
+  // Quiz response for feature recommendations
+  quizResponse OnboardingQuizResponse?
+
   @@index([inviteId])
   @@index([organizationId])
   @@index([campgroundId])
+}
+
+// Onboarding quiz response - stores park characteristics and feature recommendations
+model OnboardingQuizResponse {
+  id                  String @id @default(cuid())
+  onboardingSessionId String @unique
+
+  // Quiz answers
+  parkType   String? // small_rv, medium_rv, large_rv, tent, mixed, cabin_glamping, seasonal, mobile
+  operations String[] @default([]) // reservations, seasonals, store, utilities, activities, housekeeping, groups, marketing
+  teamSize   String? // solo, small_team, medium_team, large_team
+  amenities  String[] @default([]) // recreation, camp_store, laundry, event_space, food_service, wifi, dump_station, water_access
+  techLevel  String? // tech_savvy, basic, mixed
+
+  // Generated recommendations
+  recommendedNow   String[] @default([]) // Feature keys to setup immediately
+  recommendedLater String[] @default([]) // Feature keys to setup later
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  session OnboardingSession @relation(fields: [onboardingSessionId], references: [id], onDelete: Cascade)
+}
+
+// Feature setup queue status
+enum FeatureSetupStatus {
+  setup_now // User chose to setup now during triage
+  setup_later // User chose to setup later - goes to queue
+  skipped // User chose to skip
+  completed // Setup completed
+}
+
+// Feature setup queue - tracks which features a campground needs to configure
+model FeatureSetupQueue {
+  id           String             @id @default(cuid())
+  campgroundId String
+  featureKey   String // Matches page-registry key or setupable feature key
+  status       FeatureSetupStatus @default(setup_later)
+  priority     Int                @default(0) // For ordering (lower = higher priority)
+  completedAt  DateTime?
+  skippedAt    DateTime?
+  createdAt    DateTime           @default(now())
+  updatedAt    DateTime           @updatedAt
+
+  campground Campground @relation(fields: [campgroundId], references: [id], onDelete: Cascade)
+
+  @@unique([campgroundId, featureKey])
+  @@index([campgroundId])
+  @@index([campgroundId, status])
 }
 
 // Activity scheduling mode
@@ -4136,7 +4197,7 @@ model Communication {
   organizationId    String?
   guestId           String?
   reservationId     String?
-  conversationId    String?   // For SMS threading: hash of normalized phone pairs
+  conversationId    String? // For SMS threading: hash of normalized phone pairs
   type              String // email | sms | note | call
   direction         String // inbound | outbound
   subject           String?
@@ -4154,11 +4215,11 @@ model Communication {
   updatedAt         DateTime  @default(now()) @updatedAt
 
   // AI Sentiment Analysis (Phase 1.2)
-  sentiment         String?   // positive | neutral | negative
-  sentimentScore    Float?    // -1.0 to 1.0 (negative to positive)
-  urgencyLevel      String?   // low | normal | high | critical
-  detectedIntent    String?   // booking | complaint | question | praise | cancellation | other
-  aiAnalyzedAt      DateTime?
+  sentiment      String? // positive | neutral | negative
+  sentimentScore Float? // -1.0 to 1.0 (negative to positive)
+  urgencyLevel   String? // low | normal | high | critical
+  detectedIntent String? // booking | complaint | question | praise | cancellation | other
+  aiAnalyzedAt   DateTime?
 
   guest       Guest?       @relation(fields: [guestId], references: [id], onDelete: SetNull)
   reservation Reservation? @relation(fields: [reservationId], references: [id], onDelete: SetNull)
@@ -4414,13 +4475,13 @@ model NpsResponse {
   followedUp   Boolean   @default(false)
   followUpAt   DateTime?
   followUpNote String?   @db.Text
-  followUpBy   String?   // User ID who did the follow-up
+  followUpBy   String? // User ID who did the follow-up
 
   // Resolution tracking
-  resolved      Boolean   @default(false)
-  resolvedAt    DateTime?
-  resolvedBy    String?   // User ID who resolved
-  resolvedNote  String?   @db.Text
+  resolved     Boolean   @default(false)
+  resolvedAt   DateTime?
+  resolvedBy   String? // User ID who resolved
+  resolvedNote String?   @db.Text
 
   survey      NpsSurvey    @relation(fields: [surveyId], references: [id], onDelete: Cascade)
   invite      NpsInvite?   @relation(fields: [inviteId], references: [id], onDelete: SetNull)
@@ -4858,23 +4919,23 @@ model ApiUsage {
 
 // OAuth2 Client (separate from legacy ApiClient for cleaner OAuth2 implementation)
 model OAuthClient {
-  id               String   @id @default(cuid())
-  campgroundId     String
-  name             String
-  description      String?
-  clientId         String   @unique // Public identifier (cs_xxx)
-  clientSecretHash String?  // Null for public clients
-  redirectUris     String[] // Allowed redirect URIs
-  scopes           String[] // Allowed scopes
-  grantTypes       String[] // Allowed grant types (client_credentials, authorization_code, refresh_token)
-  isConfidential   Boolean  @default(true) // False for public clients (mobile, SPA)
-  isActive         Boolean  @default(true)
-  logoUrl          String?
-  homepageUrl      String?
-  privacyPolicyUrl String?
+  id                String   @id @default(cuid())
+  campgroundId      String
+  name              String
+  description       String?
+  clientId          String   @unique // Public identifier (cs_xxx)
+  clientSecretHash  String? // Null for public clients
+  redirectUris      String[] // Allowed redirect URIs
+  scopes            String[] // Allowed scopes
+  grantTypes        String[] // Allowed grant types (client_credentials, authorization_code, refresh_token)
+  isConfidential    Boolean  @default(true) // False for public clients (mobile, SPA)
+  isActive          Boolean  @default(true)
+  logoUrl           String?
+  homepageUrl       String?
+  privacyPolicyUrl  String?
   termsOfServiceUrl String?
-  createdAt        DateTime @default(now())
-  updatedAt        DateTime @updatedAt
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
 
   campground Campground   @relation(fields: [campgroundId], references: [id], onDelete: Cascade)
   tokens     OAuthToken[]
@@ -4890,8 +4951,8 @@ model OAuthToken {
   accessTokenHash  String    @unique
   refreshTokenHash String?   @unique
   scopes           String[]
-  userId           String?   // User context for authorization_code grant
-  expiresAt        DateTime  // Access token expiry
+  userId           String? // User context for authorization_code grant
+  expiresAt        DateTime // Access token expiry
   refreshExpiresAt DateTime? // Refresh token expiry
   revokedAt        DateTime?
   createdAt        DateTime  @default(now())
@@ -4907,13 +4968,13 @@ model OAuthToken {
 
 // OAuth2 Scope definition (for documentation and validation)
 model OAuthScope {
-  id          String  @id @default(cuid())
-  name        String  @unique // e.g., "reservations:read"
-  description String  // Human-readable description
-  category    String? // Grouping category
-  isDefault   Boolean @default(false) // Included by default
-  isRestricted Boolean @default(false) // Requires approval
-  createdAt   DateTime @default(now())
+  id           String   @id @default(cuid())
+  name         String   @unique // e.g., "reservations:read"
+  description  String // Human-readable description
+  category     String? // Grouping category
+  isDefault    Boolean  @default(false) // Included by default
+  isRestricted Boolean  @default(false) // Requires approval
+  createdAt    DateTime @default(now())
 
   @@index([category])
   @@index([isDefault])
@@ -7048,8 +7109,8 @@ model AiInteractionLog {
   promptHash   String // SHA-256 of anonymized prompt (for audit, not content)
   responseHash String // SHA-256 of response
   tokensUsed   Int
-  inputTokens  Int?  // Separate input token count for cost calculation
-  outputTokens Int?  // Separate output token count for cost calculation
+  inputTokens  Int? // Separate input token count for cost calculation
+  outputTokens Int? // Separate output token count for cost calculation
   latencyMs    Int
   userId       String? // Staff user ID if applicable
   sessionId    String? // Anonymous session for consumer interactions
@@ -9076,14 +9137,14 @@ model OpTaskComment {
 
 enum SeasonalBillingFrequency {
   monthly
-  biweekly              // Every 2 weeks
-  semi_monthly          // 1st and 15th of month
+  biweekly // Every 2 weeks
+  semi_monthly // 1st and 15th of month
   quarterly
   semi_annual
-  seasonal              // One payment for whole season
-  deposit_plus_monthly  // Deposit upfront + monthly payments
+  seasonal // One payment for whole season
+  deposit_plus_monthly // Deposit upfront + monthly payments
   offseason_installments // Pay during off-season months
-  custom                // Manually defined schedule
+  custom // Manually defined schedule
 }
 
 enum SeasonalStatus {
@@ -9250,7 +9311,7 @@ model SeasonalGuest {
 
   // Tenure
   firstSeasonYear Int
-  totalSeasons    Int @default(1)
+  totalSeasons    Int  @default(1)
   seniorityRank   Int? // 1 = most senior
 
   // Current Assignment
@@ -9278,8 +9339,8 @@ model SeasonalGuest {
   // Compliance
   coiExpiresAt     DateTime? // Certificate of Insurance expiry
   coiDocumentUrl   String?
-  vehiclePlates    String[] @default([]) // Multiple vehicles
-  petCount         Int      @default(0)
+  vehiclePlates    String[]  @default([]) // Multiple vehicles
+  petCount         Int       @default(0)
   petNotes         String?
   emergencyContact String?
   emergencyPhone   String?
@@ -9304,7 +9365,7 @@ model SeasonalGuest {
   pricing        SeasonalGuestPricing[]
   payments       SeasonalPayment[]
   communications SeasonalCommunication[]
-  reservations   Reservation[] @relation("SeasonalGuestReservations") // All linked reservations
+  reservations   Reservation[]           @relation("SeasonalGuestReservations") // All linked reservations
 
   @@unique([guestId, campgroundId])
   @@index([campgroundId, status])
@@ -9314,9 +9375,9 @@ model SeasonalGuest {
 
 // Track what a specific seasonal guest is getting for a season
 model SeasonalGuestPricing {
-  id              String        @id @default(cuid())
+  id              String           @id @default(cuid())
   seasonalGuestId String
-  seasonalGuest   SeasonalGuest @relation(fields: [seasonalGuestId], references: [id], onDelete: Cascade)
+  seasonalGuest   SeasonalGuest    @relation(fields: [seasonalGuestId], references: [id], onDelete: Cascade)
   rateCardId      String
   rateCard        SeasonalRateCard @relation(fields: [rateCardId], references: [id], onDelete: Restrict)
 
@@ -9367,12 +9428,12 @@ model SeasonalPayment {
   description String? // "May 2025", "Season 2025 - Full Payment"
 
   // Amount
-  amount     Decimal               @db.Decimal(10, 2)
-  dueDate    DateTime
-  status     SeasonalPaymentStatus @default(scheduled)
+  amount  Decimal               @db.Decimal(10, 2)
+  dueDate DateTime
+  status  SeasonalPaymentStatus @default(scheduled)
 
   // Payment details
-  paidAmount    Decimal?              @db.Decimal(10, 2)
+  paidAmount    Decimal?               @db.Decimal(10, 2)
   paidAt        DateTime?
   paymentMethod SeasonalPaymentMethod?
   transactionId String? // Stripe/processor reference
@@ -9380,14 +9441,14 @@ model SeasonalPayment {
   receiptUrl    String?
 
   // Late fees
-  lateFee       Decimal? @db.Decimal(10, 2)
-  lateFeeWaived Boolean  @default(false)
+  lateFee         Decimal?  @db.Decimal(10, 2)
+  lateFeeWaived   Boolean   @default(false)
   lateFeeWaivedBy String?
   lateFeeWaivedAt DateTime?
 
-  notes     String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  notes      String?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
   recordedBy String? // Staff user who recorded manual payment
 
   @@index([seasonalGuestId, seasonYear])
@@ -9451,9 +9512,9 @@ enum LockCodeRotationSchedule {
 }
 
 model LockCode {
-  id           String                   @id @default(cuid())
+  id           String     @id @default(cuid())
   campgroundId String
-  campground   Campground               @relation(fields: [campgroundId], references: [id], onDelete: Cascade)
+  campground   Campground @relation(fields: [campgroundId], references: [id], onDelete: Cascade)
 
   name               String
   code               String // Encrypted in production
@@ -9480,13 +9541,13 @@ model StayRule {
   campgroundId String
   campground   Campground @relation(fields: [campgroundId], references: [id], onDelete: Cascade)
 
-  name            String
-  minNights       Int       @default(1)
-  maxNights       Int       @default(28)
-  siteClasses     String[]  @default([]) // Empty = applies to all
-  dateRanges      Json      @default("[]") // Array of {start, end} date strings
+  name             String
+  minNights        Int      @default(1)
+  maxNights        Int      @default(28)
+  siteClasses      String[] @default([]) // Empty = applies to all
+  dateRanges       Json     @default("[]") // Array of {start, end} date strings
   ignoreDaysBefore Int      @default(0) // Allow last-minute bookings to bypass min
-  isActive        Boolean   @default(true)
+  isActive         Boolean  @default(true)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -9504,18 +9565,18 @@ model AiAutopilotConfig {
   campground   Campground @relation(fields: [campgroundId], references: [id], onDelete: Cascade)
 
   // Auto-Reply Settings
-  autoReplyEnabled            Boolean @default(false)
-  autoReplyMode               String  @default("draft") // "draft" | "auto"
-  autoReplyConfidenceThreshold Float  @default(0.8)
-  autoReplyDelayMinutes       Int     @default(5)
-  autoReplyExcludeCategories  String[] @default([]) // Categories to skip
+  autoReplyEnabled             Boolean  @default(false)
+  autoReplyMode                String   @default("draft") // "draft" | "auto"
+  autoReplyConfidenceThreshold Float    @default(0.8)
+  autoReplyDelayMinutes        Int      @default(5)
+  autoReplyExcludeCategories   String[] @default([]) // Categories to skip
 
   // Smart Waitlist Settings
-  smartWaitlistEnabled    Boolean @default(false)
-  smartWaitlistMode       String  @default("suggest") // "suggest" | "auto"
-  waitlistGuestValueWeight Float  @default(0.3)
-  waitlistLikelihoodWeight Float  @default(0.3)
-  waitlistSeasonalWeight   Float  @default(0.2)
+  smartWaitlistEnabled     Boolean @default(false)
+  smartWaitlistMode        String  @default("suggest") // "suggest" | "auto"
+  waitlistGuestValueWeight Float   @default(0.3)
+  waitlistLikelihoodWeight Float   @default(0.3)
+  waitlistSeasonalWeight   Float   @default(0.2)
 
   // Anomaly Detection Settings
   anomalyDetectionEnabled Boolean @default(false)
@@ -9525,56 +9586,56 @@ model AiAutopilotConfig {
   anomalySensitivity      String  @default("medium") // "low" | "medium" | "high"
 
   // No-Show Prediction Settings
-  noShowPredictionEnabled Boolean @default(false)
-  noShowThreshold         Float   @default(0.7)
-  noShowAutoReminder      Boolean @default(false)
-  noShowReminderDaysBefore Int    @default(2)
+  noShowPredictionEnabled  Boolean @default(false)
+  noShowThreshold          Float   @default(0.7)
+  noShowAutoReminder       Boolean @default(false)
+  noShowReminderDaysBefore Int     @default(2)
 
   // ===== AUTONOMOUS CONTROL =====
 
   // Auto-Reply Autonomous Mode
-  autoReplyAutoSendEnabled    Boolean @default(false) // Send without human review
-  autoReplyMaxDailyAutoSends  Int     @default(50)    // Daily limit for auto-sends
+  autoReplyAutoSendEnabled   Boolean @default(false) // Send without human review
+  autoReplyMaxDailyAutoSends Int     @default(50) // Daily limit for auto-sends
 
   // Waitlist Autonomous Mode
-  waitlistAutoOfferEnabled    Boolean @default(false) // Auto-offer spots
-  waitlistAutoOfferMinScore   Float   @default(75)    // Min score to auto-offer
-  waitlistAutoOfferHoldMinutes Int    @default(30)    // Hold time for offer
+  waitlistAutoOfferEnabled     Boolean @default(false) // Auto-offer spots
+  waitlistAutoOfferMinScore    Float   @default(75) // Min score to auto-offer
+  waitlistAutoOfferHoldMinutes Int     @default(30) // Hold time for offer
 
   // Anomaly Auto-Fix
-  anomalyAutoFixEnabled       Boolean @default(false) // One-click fixes
-  anomalyAutoFixCategories    String[] @default([])   // Categories to auto-fix
+  anomalyAutoFixEnabled    Boolean  @default(false) // One-click fixes
+  anomalyAutoFixCategories String[] @default([]) // Categories to auto-fix
 
   // No-Show Auto-Release
-  noShowAutoReleaseEnabled    Boolean @default(false)
-  noShowAutoConfirmHours      Int     @default(24)    // Hours before to confirm
-  noShowAutoReleaseHours      Int     @default(4)     // Hours after check-in to release
+  noShowAutoReleaseEnabled Boolean @default(false)
+  noShowAutoConfirmHours   Int     @default(24) // Hours before to confirm
+  noShowAutoReleaseHours   Int     @default(4) // Hours after check-in to release
 
   // ===== DYNAMIC PRICING =====
-  dynamicPricingAiEnabled     Boolean @default(false)
-  dynamicPricingMode          String  @default("suggest") // "suggest" | "auto"
-  dynamicPricingMaxAdjust     Float   @default(50)        // Max % adjustment
+  dynamicPricingAiEnabled Boolean @default(false)
+  dynamicPricingMode      String  @default("suggest") // "suggest" | "auto"
+  dynamicPricingMaxAdjust Float   @default(50) // Max % adjustment
 
   // ===== PREDICTIVE MAINTENANCE =====
   predictiveMaintenanceEnabled Boolean @default(false)
-  maintenanceAlertThreshold    Int     @default(3)   // Incidents before alert
+  maintenanceAlertThreshold    Int     @default(3) // Incidents before alert
 
   // ===== WEATHER ALERTS =====
-  weatherAlertsEnabled        Boolean @default(false)
-  weatherApiKey               String?               // OpenWeatherMap API key
-  weatherTriggers             Json?                 // Storm thresholds, etc.
+  weatherAlertsEnabled Boolean @default(false)
+  weatherApiKey        String? // OpenWeatherMap API key
+  weatherTriggers      Json? // Storm thresholds, etc.
 
   // ===== AI PHONE AGENT =====
-  phoneAgentEnabled           Boolean @default(false)
-  phoneAgentNumber            String?               // Twilio phone number
-  phoneAgentTransferNumber    String?               // Staff transfer number
-  phoneAgentHoursStart        String?               // "09:00"
-  phoneAgentHoursEnd          String?               // "21:00"
-  phoneAgentVoice             String  @default("alloy") // OpenAI voice
+  phoneAgentEnabled        Boolean @default(false)
+  phoneAgentNumber         String? // Twilio phone number
+  phoneAgentTransferNumber String? // Staff transfer number
+  phoneAgentHoursStart     String? // "09:00"
+  phoneAgentHoursEnd       String? // "21:00"
+  phoneAgentVoice          String  @default("alloy") // OpenAI voice
 
   // ===== MORNING BRIEFING =====
-  morningBriefingEnabled      Boolean @default(false)
-  morningBriefingTime         String  @default("07:00")
+  morningBriefingEnabled Boolean @default(false)
+  morningBriefingTime    String  @default("07:00")
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -9586,13 +9647,13 @@ model AiCampgroundContext {
   campgroundId String
   campground   Campground @relation(fields: [campgroundId], references: [id], onDelete: Cascade)
 
-  type      String  // "faq" | "policy" | "training_example" | "common_question"
-  question  String? @db.Text // For FAQs and training examples
-  answer    String  @db.Text // The content/response
-  category  String? // "check_in" | "amenities" | "pets" | "cancellation" | etc.
-  priority  Int     @default(0)
-  isActive  Boolean @default(true)
-  source    String? // "auto_import" | "manual" - track where it came from
+  type     String // "faq" | "policy" | "training_example" | "common_question"
+  question String? @db.Text // For FAQs and training examples
+  answer   String  @db.Text // The content/response
+  category String? // "check_in" | "amenities" | "pets" | "cancellation" | etc.
+  priority Int     @default(0)
+  isActive Boolean @default(true)
+  source   String? // "auto_import" | "manual" - track where it came from
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -9612,21 +9673,21 @@ model AiReplyDraft {
   guestId         String?
   reservationId   String?
 
-  inboundSubject  String? // Original message subject
-  inboundPreview  String? @db.Text // Preview of inbound message
-  draftContent    String  @db.Text
-  confidence      Float // 0-1 confidence score
-  detectedIntent  String? // "question" | "complaint" | "change_request" | "cancellation" | etc.
-  detectedTone    String? // "friendly" | "neutral" | "upset"
-  usedContextIds  String[] @default([]) // IDs of AiCampgroundContext used
-  usedContextSummary String? @db.Text // Human-readable summary of what was used
+  inboundSubject     String? // Original message subject
+  inboundPreview     String?  @db.Text // Preview of inbound message
+  draftContent       String   @db.Text
+  confidence         Float // 0-1 confidence score
+  detectedIntent     String? // "question" | "complaint" | "change_request" | "cancellation" | etc.
+  detectedTone       String? // "friendly" | "neutral" | "upset"
+  usedContextIds     String[] @default([]) // IDs of AiCampgroundContext used
+  usedContextSummary String?  @db.Text // Human-readable summary of what was used
 
-  status          String   @default("pending") // "pending" | "approved" | "edited" | "rejected" | "sent" | "auto_sent"
-  reviewedById    String?
-  reviewedAt      DateTime?
-  editedContent   String?  @db.Text
-  rejectionReason String?
-  sentAt          DateTime?
+  status              String    @default("pending") // "pending" | "approved" | "edited" | "rejected" | "sent" | "auto_sent"
+  reviewedById        String?
+  reviewedAt          DateTime?
+  editedContent       String?   @db.Text
+  rejectionReason     String?
+  sentAt              DateTime?
   autoSendScheduledAt DateTime? // When auto-send is scheduled for
 
   createdAt DateTime @default(now())
@@ -9653,8 +9714,8 @@ model AiWaitlistScore {
   communicationScore Int @default(50) // Guest responsiveness
 
   // Final weighted score and explanation
-  aiScore   Float
-  aiReason  String? @db.Text // Explanation of scoring
+  aiScore  Float
+  aiReason String? @db.Text // Explanation of scoring
 
   calculatedAt DateTime @default(now())
 
@@ -9669,17 +9730,17 @@ model AiAnomalyAlert {
   campgroundId String
   campground   Campground @relation(fields: [campgroundId], references: [id], onDelete: Cascade)
 
-  type          String // "revenue_drop" | "revenue_spike" | "occupancy_drop" | "booking_velocity_change" | etc.
-  severity      String // "low" | "medium" | "high" | "critical"
-  title         String
-  summary       String  @db.Text
-  aiAnalysis    String? @db.Text // AI-generated explanation
+  type            String // "revenue_drop" | "revenue_spike" | "occupancy_drop" | "booking_velocity_change" | etc.
+  severity        String // "low" | "medium" | "high" | "critical"
+  title           String
+  summary         String  @db.Text
+  aiAnalysis      String? @db.Text // AI-generated explanation
   suggestedAction String? @db.Text
 
-  metric        String
-  currentValue  Float
-  expectedValue Float
-  deviation     Float // Percentage deviation
+  metric           String
+  currentValue     Float
+  expectedValue    Float
+  deviation        Float // Percentage deviation
   comparisonPeriod String? // "last_week" | "last_month" | "last_year"
 
   status           String    @default("new") // "new" | "acknowledged" | "resolved" | "dismissed"
@@ -9688,9 +9749,9 @@ model AiAnomalyAlert {
   resolvedAt       DateTime?
   dismissedReason  String?
 
-  detectedAt      DateTime
-  digestIncluded  Boolean  @default(false)
-  digestSentAt    DateTime?
+  detectedAt     DateTime
+  digestIncluded Boolean   @default(false)
+  digestSentAt   DateTime?
 
   metadata Json? // Additional context data
 
@@ -9712,11 +9773,11 @@ model AiNoShowRisk {
   riskScore Float // 0-1 probability of no-show
 
   // Factor scores (0-100 each, higher = more risk)
-  paymentStatusScore   Int // Unpaid = higher risk
-  leadTimeScore        Int // Very early or last-minute = pattern dependent
-  guestHistoryScore    Int // Past no-shows = higher risk
-  communicationScore   Int // No communication = higher risk
-  bookingPatternScore  Int // Unusual patterns = higher risk
+  paymentStatusScore  Int // Unpaid = higher risk
+  leadTimeScore       Int // Very early or last-minute = pattern dependent
+  guestHistoryScore   Int // Past no-shows = higher risk
+  communicationScore  Int // No communication = higher risk
+  bookingPatternScore Int // Unusual patterns = higher risk
 
   factors Json? // Detailed breakdown for UI display
 
@@ -9724,7 +9785,7 @@ model AiNoShowRisk {
   staffNotifiedAt  DateTime?
   reminderSentAt   DateTime?
   guestConfirmedAt DateTime?
-  outcome          String?   // "showed" | "no_show" | "cancelled" | null (pending)
+  outcome          String? // "showed" | "no_show" | "cancelled" | null (pending)
 
   calculatedAt DateTime @default(now())
   updatedAt    DateTime @updatedAt
@@ -9741,32 +9802,32 @@ model AiNoShowRisk {
 
 // Dynamic pricing recommendations from AI
 model AiPricingRecommendation {
-  id                  String     @id @default(cuid())
-  campgroundId        String
-  campground          Campground @relation(fields: [campgroundId], references: [id], onDelete: Cascade)
-  siteClassId         String?
+  id           String     @id @default(cuid())
+  campgroundId String
+  campground   Campground @relation(fields: [campgroundId], references: [id], onDelete: Cascade)
+  siteClassId  String?
 
   dateStart           DateTime
   dateEnd             DateTime
-  recommendationType  String   // "underpriced" | "overpriced" | "event_opportunity" | "demand_surge"
+  recommendationType  String // "underpriced" | "overpriced" | "event_opportunity" | "demand_surge"
   currentPriceCents   Int
   suggestedPriceCents Int
   adjustmentPercent   Float
-  confidence          Float    // 0-1
+  confidence          Float // 0-1
   reasoning           String   @db.Text
-  factors             Json     // Detailed breakdown (occupancy, competitors, events, etc.)
+  factors             Json // Detailed breakdown (occupancy, competitors, events, etc.)
 
-  status              String   @default("pending") // "pending" | "applied" | "dismissed" | "expired"
-  appliedAt           DateTime?
-  appliedById         String?
-  dismissedAt         DateTime?
-  dismissedById       String?
-  dismissedReason     String?
+  status          String    @default("pending") // "pending" | "applied" | "dismissed" | "expired"
+  appliedAt       DateTime?
+  appliedById     String?
+  dismissedAt     DateTime?
+  dismissedById   String?
+  dismissedReason String?
 
-  estimatedRevenueDelta Int?   // Cents - estimated revenue impact
+  estimatedRevenueDelta Int? // Cents - estimated revenue impact
 
-  createdAt           DateTime @default(now())
-  expiresAt           DateTime
+  createdAt DateTime @default(now())
+  expiresAt DateTime
 
   @@index([campgroundId])
   @@index([campgroundId, status])
@@ -9776,51 +9837,51 @@ model AiPricingRecommendation {
 
 // AI price experiments for A/B testing
 model AiPriceExperiment {
-  id              String     @id @default(cuid())
-  campgroundId    String
-  campground      Campground @relation(fields: [campgroundId], references: [id], onDelete: Cascade)
-  siteClassId     String
+  id           String     @id @default(cuid())
+  campgroundId String
+  campground   Campground @relation(fields: [campgroundId], references: [id], onDelete: Cascade)
+  siteClassId  String
 
-  name            String
-  description     String?    @db.Text
-  hypothesis      String     @db.Text
+  name        String
+  description String? @db.Text
+  hypothesis  String  @db.Text
 
   // Experiment config
-  controlPrice    Int        // cents - base price
-  testPrice       Int        // cents - experimental price
-  adjustmentPct   Float      // percentage difference
+  controlPrice  Int // cents - base price
+  testPrice     Int // cents - experimental price
+  adjustmentPct Float // percentage difference
 
   // Duration
-  startDate       DateTime
-  endDate         DateTime
+  startDate DateTime
+  endDate   DateTime
 
   // Assignment - which sites get which price
-  controlSiteIds  String[]   // sites with control price
-  testSiteIds     String[]   // sites with test price
+  controlSiteIds String[] // sites with control price
+  testSiteIds    String[] // sites with test price
 
   // Results
-  controlBookings Int        @default(0)
-  testBookings    Int        @default(0)
-  controlRevenue  Int        @default(0) // cents
-  testRevenue     Int        @default(0) // cents
-  controlViews    Int        @default(0) // availability checks
-  testViews       Int        @default(0)
+  controlBookings Int @default(0)
+  testBookings    Int @default(0)
+  controlRevenue  Int @default(0) // cents
+  testRevenue     Int @default(0) // cents
+  controlViews    Int @default(0) // availability checks
+  testViews       Int @default(0)
 
   // Statistical analysis
-  pValue          Float?     // statistical significance
-  confidenceLevel Float?     // 0-1
-  winner          String?    // "control" | "test" | null (not enough data)
-  liftPercent     Float?     // revenue lift percentage
+  pValue          Float? // statistical significance
+  confidenceLevel Float? // 0-1
+  winner          String? // "control" | "test" | null (not enough data)
+  liftPercent     Float? // revenue lift percentage
 
   // Status
-  status          String     @default("draft") // "draft" | "running" | "paused" | "completed" | "cancelled"
-  autoApplyWinner Boolean    @default(false)
-  winnerApplied   Boolean    @default(false)
+  status          String    @default("draft") // "draft" | "running" | "paused" | "completed" | "cancelled"
+  autoApplyWinner Boolean   @default(false)
+  winnerApplied   Boolean   @default(false)
   winnerAppliedAt DateTime?
 
-  createdAt       DateTime   @default(now())
-  createdById     String?
-  updatedAt       DateTime   @updatedAt
+  createdAt   DateTime @default(now())
+  createdById String?
+  updatedAt   DateTime @updatedAt
 
   @@index([campgroundId])
   @@index([campgroundId, status])
@@ -9829,27 +9890,27 @@ model AiPriceExperiment {
 
 // AI-identified revenue opportunities and gaps
 model AiRevenueInsight {
-  id              String     @id @default(cuid())
-  campgroundId    String
-  campground      Campground @relation(fields: [campgroundId], references: [id], onDelete: Cascade)
+  id           String     @id @default(cuid())
+  campgroundId String
+  campground   Campground @relation(fields: [campgroundId], references: [id], onDelete: Cascade)
 
-  insightType     String   // "revenue_gap" | "underutilized_site" | "missed_upsell" | "pricing_opportunity" | "occupancy_gap"
+  insightType     String // "revenue_gap" | "underutilized_site" | "missed_upsell" | "pricing_opportunity" | "occupancy_gap"
   title           String
-  summary         String   @db.Text
-  impactCents     Int      // Estimated monthly revenue impact
-  difficulty      String   // "easy" | "medium" | "hard"
-  priority        Int      @default(50) // 0-100
-  recommendations Json     // Actionable steps
+  summary         String @db.Text
+  impactCents     Int // Estimated monthly revenue impact
+  difficulty      String // "easy" | "medium" | "hard"
+  priority        Int    @default(50) // 0-100
+  recommendations Json // Actionable steps
 
-  status          String   @default("new") // "new" | "in_progress" | "completed" | "dismissed"
+  status          String    @default("new") // "new" | "in_progress" | "completed" | "dismissed"
   completedAt     DateTime?
   dismissedAt     DateTime?
   dismissedReason String?
 
-  metadata        Json?    // Additional context
+  metadata Json? // Additional context
 
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@index([campgroundId])
   @@index([campgroundId, status])
@@ -9858,33 +9919,33 @@ model AiRevenueInsight {
 
 // Predictive maintenance alerts based on incident patterns
 model AiMaintenanceAlert {
-  id              String     @id @default(cuid())
-  campgroundId    String
-  campground      Campground @relation(fields: [campgroundId], references: [id], onDelete: Cascade)
-  siteId          String?
+  id           String     @id @default(cuid())
+  campgroundId String
+  campground   Campground @relation(fields: [campgroundId], references: [id], onDelete: Cascade)
+  siteId       String?
 
-  alertType       String   // "pattern_detected" | "failure_predicted" | "scheduled_due"
-  severity        String   // "low" | "medium" | "high" | "critical"
-  category        String   // "electrical" | "plumbing" | "hvac" | "structural" | "grounds"
-  title           String
-  summary         String   @db.Text
+  alertType String // "pattern_detected" | "failure_predicted" | "scheduled_due"
+  severity  String // "low" | "medium" | "high" | "critical"
+  category  String // "electrical" | "plumbing" | "hvac" | "structural" | "grounds"
+  title     String
+  summary   String @db.Text
 
-  incidentCount   Int      // Number of related incidents
-  incidentIds     String[] // References to maintenance incidents
+  incidentCount    Int // Number of related incidents
+  incidentIds      String[] // References to maintenance incidents
   predictedFailure DateTime? // When failure is predicted
-  confidence      Float    // 0-1
+  confidence       Float // 0-1
 
-  suggestedAction String   @db.Text
-  estimatedCostCents Int?  // Repair cost estimate
+  suggestedAction    String @db.Text
+  estimatedCostCents Int? // Repair cost estimate
 
-  status          String   @default("new") // "new" | "acknowledged" | "scheduled" | "resolved" | "dismissed"
-  acknowledgedAt  DateTime?
-  acknowledgedById String?
+  status              String    @default("new") // "new" | "acknowledged" | "scheduled" | "resolved" | "dismissed"
+  acknowledgedAt      DateTime?
+  acknowledgedById    String?
   maintenanceTicketId String? // Link to created ticket
-  resolvedAt      DateTime?
+  resolvedAt          DateTime?
 
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@index([campgroundId])
   @@index([campgroundId, status])
@@ -9894,29 +9955,29 @@ model AiMaintenanceAlert {
 
 // Weather alerts and automated guest notifications
 model AiWeatherAlert {
-  id              String     @id @default(cuid())
-  campgroundId    String
-  campground      Campground @relation(fields: [campgroundId], references: [id], onDelete: Cascade)
+  id           String     @id @default(cuid())
+  campgroundId String
+  campground   Campground @relation(fields: [campgroundId], references: [id], onDelete: Cascade)
 
-  alertType       String   // "storm" | "extreme_heat" | "extreme_cold" | "flood" | "fire_risk" | "snow"
-  severity        String   // "advisory" | "watch" | "warning" | "emergency"
-  weatherData     Json     // Raw weather API data
+  alertType   String // "storm" | "extreme_heat" | "extreme_cold" | "flood" | "fire_risk" | "snow"
+  severity    String // "advisory" | "watch" | "warning" | "emergency"
+  weatherData Json // Raw weather API data
 
-  title           String
-  message         String   @db.Text // Generated message for guests
-  startTime       DateTime
-  endTime         DateTime?
-  affectedDates   DateTime[] // Reservation dates affected
+  title         String
+  message       String     @db.Text // Generated message for guests
+  startTime     DateTime
+  endTime       DateTime?
+  affectedDates DateTime[] // Reservation dates affected
 
-  guestsAffected  Int      @default(0)
-  guestsNotified  Int      @default(0)
-  notificationsSent Json?  // Log of sent notifications
+  guestsAffected    Int   @default(0)
+  guestsNotified    Int   @default(0)
+  notificationsSent Json? // Log of sent notifications
 
-  status          String   @default("active") // "active" | "expired" | "cancelled"
+  status            String  @default("active") // "active" | "expired" | "cancelled"
   autoNotifyEnabled Boolean @default(false)
 
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@index([campgroundId])
   @@index([campgroundId, status])
@@ -9925,41 +9986,41 @@ model AiWeatherAlert {
 
 // AI Phone Agent call sessions
 model AiPhoneSession {
-  id              String     @id @default(cuid())
-  campgroundId    String
-  campground      Campground @relation(fields: [campgroundId], references: [id], onDelete: Cascade)
+  id           String     @id @default(cuid())
+  campgroundId String
+  campground   Campground @relation(fields: [campgroundId], references: [id], onDelete: Cascade)
 
-  twilioCallSid   String   @unique
-  callerPhone     String
-  guestId         String?  // Linked if caller identified
-  reservationId   String?  // Linked if about specific reservation
+  twilioCallSid String  @unique
+  callerPhone   String
+  guestId       String? // Linked if caller identified
+  reservationId String? // Linked if about specific reservation
 
-  status          String   // "ringing" | "in_progress" | "completed" | "transferred" | "voicemail" | "failed"
+  status String // "ringing" | "in_progress" | "completed" | "transferred" | "voicemail" | "failed"
 
-  startedAt       DateTime @default(now())
+  startedAt       DateTime  @default(now())
   connectedAt     DateTime?
   endedAt         DateTime?
   durationSeconds Int?
 
-  transcript      String?  @db.Text
-  summary         String?  @db.Text // AI-generated summary
-  intents         String[] // Detected intents: ["check_availability", "make_reservation", etc.]
-  actionsPerformed Json?   // What the AI did: [{action: "checked_availability", result: {...}}]
+  transcript       String?  @db.Text
+  summary          String?  @db.Text // AI-generated summary
+  intents          String[] // Detected intents: ["check_availability", "make_reservation", etc.]
+  actionsPerformed Json? // What the AI did: [{action: "checked_availability", result: {...}}]
 
-  transferredAt   DateTime?
-  transferReason  String?
-  transferredTo   String?  // Phone number transferred to
+  transferredAt  DateTime?
+  transferReason String?
+  transferredTo  String? // Phone number transferred to
 
-  voicemailUrl    String?  // If voicemail recorded
+  voicemailUrl        String? // If voicemail recorded
   voicemailTranscript String? @db.Text
 
-  sentiment       String?  // "positive" | "neutral" | "negative"
+  sentiment        String? // "positive" | "neutral" | "negative"
   resolutionStatus String? // "resolved" | "transferred" | "callback_needed" | "voicemail"
 
-  tokensUsed      Int      @default(0)
-  costCents       Int      @default(0)
+  tokensUsed Int @default(0)
+  costCents  Int @default(0)
 
-  metadata        Json?
+  metadata Json?
 
   @@index([campgroundId])
   @@index([campgroundId, status])
@@ -9970,52 +10031,52 @@ model AiPhoneSession {
 
 // Aggregated AI dashboard metrics
 model AiDashboardMetrics {
-  id                    String     @id @default(cuid())
-  campgroundId          String
-  campground            Campground @relation(fields: [campgroundId], references: [id], onDelete: Cascade)
+  id           String     @id @default(cuid())
+  campgroundId String
+  campground   Campground @relation(fields: [campgroundId], references: [id], onDelete: Cascade)
 
-  periodStart           DateTime
-  periodEnd             DateTime
+  periodStart DateTime
+  periodEnd   DateTime
 
   // Message handling
-  messagesReceived      Int      @default(0)
-  messagesHandled       Int      @default(0) // AI drafted
-  messagesAutoSent      Int      @default(0) // Autonomous
+  messagesReceived       Int    @default(0)
+  messagesHandled        Int    @default(0) // AI drafted
+  messagesAutoSent       Int    @default(0) // Autonomous
   avgResponseTimeMinutes Float?
 
   // Risk management
-  risksIdentified       Int      @default(0)
-  noShowsPrevented      Int      @default(0)
-  anomaliesDetected     Int      @default(0)
-  anomaliesResolved     Int      @default(0)
+  risksIdentified   Int @default(0)
+  noShowsPrevented  Int @default(0)
+  anomaliesDetected Int @default(0)
+  anomaliesResolved Int @default(0)
 
   // Pricing
-  pricingSuggestions    Int      @default(0)
-  pricingSuggestionsApplied Int  @default(0)
-  pricingRevenueDelta   Int      @default(0) // Cents
+  pricingSuggestions        Int @default(0)
+  pricingSuggestionsApplied Int @default(0)
+  pricingRevenueDelta       Int @default(0) // Cents
 
   // Phone
-  phoneCallsReceived    Int      @default(0)
-  phoneCallsHandled     Int      @default(0) // Completed by AI
-  phoneCallsTransferred Int      @default(0)
+  phoneCallsReceived     Int  @default(0)
+  phoneCallsHandled      Int  @default(0) // Completed by AI
+  phoneCallsTransferred  Int  @default(0)
   avgCallDurationSeconds Int?
 
   // Waitlist
-  waitlistOffersGenerated Int    @default(0)
-  waitlistOffersAccepted  Int    @default(0)
+  waitlistOffersGenerated Int @default(0)
+  waitlistOffersAccepted  Int @default(0)
 
   // Revenue impact
-  estimatedRevenueSavedCents Int @default(0)
+  estimatedRevenueSavedCents     Int @default(0)
   estimatedRevenueGeneratedCents Int @default(0)
 
   // Costs
-  aiTokensUsed          Int      @default(0)
-  aiCostCents           Int      @default(0)
+  aiTokensUsed Int @default(0)
+  aiCostCents  Int @default(0)
 
   // ROI
-  roiPercent            Float?   // (revenue - cost) / cost * 100
+  roiPercent Float? // (revenue - cost) / cost * 100
 
-  calculatedAt          DateTime @default(now())
+  calculatedAt DateTime @default(now())
 
   @@unique([campgroundId, periodStart, periodEnd])
   @@index([campgroundId])
@@ -10024,29 +10085,29 @@ model AiDashboardMetrics {
 
 // Audit log for all autonomous AI actions
 model AiAutonomousAction {
-  id              String     @id @default(cuid())
-  campgroundId    String
-  campground      Campground @relation(fields: [campgroundId], references: [id], onDelete: Cascade)
+  id           String     @id @default(cuid())
+  campgroundId String
+  campground   Campground @relation(fields: [campgroundId], references: [id], onDelete: Cascade)
 
-  actionType      String   // "auto_reply_sent" | "waitlist_auto_offered" | "site_released" | "price_adjusted" | "guest_notified"
-  entityType      String   // "communication" | "waitlist" | "reservation" | "pricing" | etc.
-  entityId        String
+  actionType String // "auto_reply_sent" | "waitlist_auto_offered" | "site_released" | "price_adjusted" | "guest_notified"
+  entityType String // "communication" | "waitlist" | "reservation" | "pricing" | etc.
+  entityId   String
 
-  description     String
-  details         Json     // Full action details
+  description String
+  details     Json // Full action details
 
-  confidence      Float?   // AI confidence for this action
-  reasoning       String?  @db.Text // Why AI took this action
+  confidence Float? // AI confidence for this action
+  reasoning  String? @db.Text // Why AI took this action
 
-  reversible      Boolean  @default(false)
-  reversedAt      DateTime?
-  reversedById    String?
-  reversedReason  String?
+  reversible     Boolean   @default(false)
+  reversedAt     DateTime?
+  reversedById   String?
+  reversedReason String?
 
-  outcome         String?  // "success" | "partial" | "failed"
-  outcomeDetails  String?  @db.Text
+  outcome        String? // "success" | "partial" | "failed"
+  outcomeDetails String? @db.Text
 
-  createdAt       DateTime @default(now())
+  createdAt DateTime @default(now())
 
   @@index([campgroundId])
   @@index([campgroundId, actionType])
@@ -10054,22 +10115,21 @@ model AiAutonomousAction {
   @@index([entityType, entityId])
 }
 
-
 // Demo/sales lead requests from marketing website
 model DemoRequest {
-  id        String   @id @default(cuid())
-  name      String
-  email     String
-  phone     String?
+  id             String  @id @default(cuid())
+  name           String
+  email          String
+  phone          String?
   campgroundName String
-  siteCount String
-  message   String? @db.Text
+  siteCount      String
+  message        String? @db.Text
 
-  status    String   @default("new") // "new" | "contacted" | "scheduled" | "completed" | "closed"
-  notes     String?  @db.Text
+  status     String  @default("new") // "new" | "contacted" | "scheduled" | "completed" | "closed"
+  notes      String? @db.Text
   assignedTo String?
 
-  source    String   @default("website") // "website" | "referral" | etc.
+  source String @default("website") // "website" | "referral" | etc.
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -10088,9 +10148,9 @@ model StripeCustomer {
   id                     String   @id @default(cuid())
   campgroundId           String
   guestId                String
-  stripeCustomerId       String   // Stripe customer ID on the connected account (cus_xxx)
+  stripeCustomerId       String // Stripe customer ID on the connected account (cus_xxx)
   email                  String?
-  defaultPaymentMethodId String?  // Default pm_xxx ID
+  defaultPaymentMethodId String? // Default pm_xxx ID
   metadata               Json?
   createdAt              DateTime @default(now())
   updatedAt              DateTime @updatedAt
@@ -10108,18 +10168,18 @@ model StripeCustomer {
 // Guest Payment Method - Saved cards/bank accounts for a guest
 model GuestPaymentMethod {
   id                    String   @id @default(cuid())
-  stripeCustomerId      String   // FK to StripeCustomer
-  stripePaymentMethodId String   // Stripe payment method ID (pm_xxx)
-  type                  String   // "card", "us_bank_account", "card_present"
+  stripeCustomerId      String // FK to StripeCustomer
+  stripePaymentMethodId String // Stripe payment method ID (pm_xxx)
+  type                  String // "card", "us_bank_account", "card_present"
   last4                 String?
-  brand                 String?  // "visa", "mastercard", "amex", "discover"
+  brand                 String? // "visa", "mastercard", "amex", "discover"
   expMonth              Int?
   expYear               Int?
-  bankName              String?  // For ACH
+  bankName              String? // For ACH
   isDefault             Boolean  @default(false)
-  nickname              String?  // User-friendly label: "Business Card", "Personal Visa"
-  addedBy               String   // "guest" | "staff" | "auto" (auto-saved after payment)
-  addedByUserId         String?  // Staff user ID if added by staff
+  nickname              String? // User-friendly label: "Business Card", "Personal Visa"
+  addedBy               String // "guest" | "staff" | "auto" (auto-saved after payment)
+  addedByUserId         String? // Staff user ID if added by staff
   metadata              Json?
   createdAt             DateTime @default(now())
   updatedAt             DateTime @updatedAt
@@ -10134,9 +10194,9 @@ model GuestPaymentMethod {
 model StripeTerminalLocation {
   id               String   @id @default(cuid())
   campgroundId     String
-  stripeLocationId String   // Stripe terminal location ID (tml_xxx)
-  displayName      String   // "Front Office", "Camp Store", "Pool House"
-  address          Json?    // { line1, line2, city, state, postal_code, country }
+  stripeLocationId String // Stripe terminal location ID (tml_xxx)
+  displayName      String // "Front Office", "Camp Store", "Pool House"
+  address          Json? // { line1, line2, city, state, postal_code, country }
   metadata         Json?
   createdAt        DateTime @default(now())
   updatedAt        DateTime @updatedAt
@@ -10152,11 +10212,11 @@ model StripeTerminalLocation {
 model StripeTerminalReader {
   id               String    @id @default(cuid())
   campgroundId     String
-  locationId       String?   // FK to StripeTerminalLocation
-  stripeReaderId   String    // Stripe reader ID (tmr_xxx)
-  label            String    // User-friendly name: "Front Desk Reader 1"
-  registrationCode String?   // Used during initial registration
-  deviceType       String    // "bbpos_wisepos_e", "verifone_P400", "stripe_m2", etc.
+  locationId       String? // FK to StripeTerminalLocation
+  stripeReaderId   String // Stripe reader ID (tmr_xxx)
+  label            String // User-friendly name: "Front Desk Reader 1"
+  registrationCode String? // Used during initial registration
+  deviceType       String // "bbpos_wisepos_e", "verifone_P400", "stripe_m2", etc.
   serialNumber     String?
   status           String    @default("offline") // "online" | "offline" | "busy"
   lastSeenAt       DateTime?
@@ -10178,15 +10238,15 @@ model StripeTerminalReader {
 model PaymentAuditLog {
   id           String   @id @default(cuid())
   campgroundId String
-  actorId      String?  // User ID or "system" for automated operations
+  actorId      String? // User ID or "system" for automated operations
   actorEmail   String?
   actorRole    String?
-  action       String   // payment_method.saved, payment_method.deleted, payment.refunded, etc.
-  entityType   String   // payment, payment_method, refund, terminal
+  action       String // payment_method.saved, payment_method.deleted, payment.refunded, etc.
+  entityType   String // payment, payment_method, refund, terminal
   entityId     String
-  before       Json?    // State before the action
-  after        Json?    // State after the action
-  metadata     Json?    // Additional context
+  before       Json? // State before the action
+  after        Json? // State after the action
+  metadata     Json? // Additional context
   ip           String?
   userAgent    String?
   createdAt    DateTime @default(now())
@@ -10209,14 +10269,14 @@ enum RateParityAlertStatus {
 }
 
 model Competitor {
-  id           String           @id @default(cuid())
+  id           String   @id @default(cuid())
   campgroundId String
   name         String
   url          String?
-  notes        String?          @db.Text
-  isActive     Boolean          @default(true)
-  createdAt    DateTime         @default(now())
-  updatedAt    DateTime         @updatedAt
+  notes        String?  @db.Text
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 
   campground Campground       @relation(fields: [campgroundId], references: [id], onDelete: Cascade)
   rates      CompetitorRate[]
@@ -10228,9 +10288,9 @@ model Competitor {
 model CompetitorRate {
   id           String    @id @default(cuid())
   competitorId String
-  siteType     String    // rv, tent, cabin, etc.
-  rateNightly  Int       // cents
-  source       String    // manual, scraped, ota
+  siteType     String // rv, tent, cabin, etc.
+  rateNightly  Int // cents
+  source       String // manual, scraped, ota
   capturedAt   DateTime  @default(now())
   validFrom    DateTime?
   validTo      DateTime?
@@ -10244,18 +10304,18 @@ model CompetitorRate {
 }
 
 model RateParityAlert {
-  id              String                 @id @default(cuid())
+  id              String                @id @default(cuid())
   campgroundId    String
   siteType        String
-  directRateCents Int                    // Your direct rate
-  otaRateCents    Int                    // OTA rate (lower)
-  otaSource       String                 // Which OTA had the lower rate
-  difference      Int                    // Difference in cents
-  status          RateParityAlertStatus  @default(active)
+  directRateCents Int // Your direct rate
+  otaRateCents    Int // OTA rate (lower)
+  otaSource       String // Which OTA had the lower rate
+  difference      Int // Difference in cents
+  status          RateParityAlertStatus @default(active)
   acknowledgedBy  String?
   acknowledgedAt  DateTime?
   resolvedAt      DateTime?
-  createdAt       DateTime               @default(now())
+  createdAt       DateTime              @default(now())
 
   campground Campground @relation(fields: [campgroundId], references: [id], onDelete: Cascade)
 
@@ -10274,14 +10334,14 @@ model IntegrationDefinition {
   slug         String   @unique // quickbooks, mailchimp, remotelock, etc.
   name         String
   description  String   @db.Text
-  category     String   // accounting, marketing, locks, insurance, crm, pms
+  category     String // accounting, marketing, locks, insurance, crm, pms
   logoUrl      String?
   docsUrl      String?
-  authType     String   // oauth2, api_key, webhook, none
-  configSchema Json?    // JSON Schema for required configuration fields
+  authType     String // oauth2, api_key, webhook, none
+  configSchema Json? // JSON Schema for required configuration fields
   syncTypes    String[] @default([]) // What data syncs: guests, reservations, payments, etc.
   webhookTypes String[] @default([]) // What webhooks are supported
-  features     Json?    // Feature flags and capabilities
+  features     Json? // Feature flags and capabilities
   isActive     Boolean  @default(true)
   isBeta       Boolean  @default(false)
   isPremium    Boolean  @default(false) // Requires higher subscription tier
@@ -10301,15 +10361,15 @@ model MarketplaceConnection {
   campgroundId   String
   definitionId   String
   status         String    @default("pending") // pending, connected, error, disconnected, suspended
-  credentials    Json?     // Encrypted OAuth tokens, API keys (uses AES-256-GCM)
-  config         Json?     // User-configured settings per configSchema
-  webhookSecret  String?   // Secret for validating inbound webhooks
+  credentials    Json? // Encrypted OAuth tokens, API keys (uses AES-256-GCM)
+  config         Json? // User-configured settings per configSchema
+  webhookSecret  String? // Secret for validating inbound webhooks
   lastSyncAt     DateTime?
-  lastSyncStatus String?   // success, partial, failed
+  lastSyncStatus String? // success, partial, failed
   errorMessage   String?
-  errorCode      String?   // Standardized error codes
+  errorCode      String? // Standardized error codes
   syncEnabled    Boolean   @default(true) // Master switch for auto-sync
-  syncSchedule   String?   // cron expression for scheduled syncs
+  syncSchedule   String? // cron expression for scheduled syncs
   createdAt      DateTime  @default(now())
   updatedAt      DateTime  @updatedAt
 
@@ -10327,18 +10387,18 @@ model MarketplaceConnection {
 model MarketplaceSyncLog {
   id               String    @id @default(cuid())
   connectionId     String
-  syncType         String    // full, incremental, webhook, manual
-  direction        String    // inbound, outbound, bidirectional
+  syncType         String // full, incremental, webhook, manual
+  direction        String // inbound, outbound, bidirectional
   recordsProcessed Int       @default(0)
   recordsFailed    Int       @default(0)
   recordsSkipped   Int       @default(0)
   startedAt        DateTime  @default(now())
   completedAt      DateTime?
   status           String    @default("running") // running, success, partial, failed, cancelled
-  errorDetails     Json?     // Array of error objects with entity info
-  summary          Json?     // { created: 5, updated: 10, deleted: 2 }
-  triggeredBy      String?   // user_id, system, webhook
-  metadata         Json?     // Additional context
+  errorDetails     Json? // Array of error objects with entity info
+  summary          Json? // { created: 5, updated: 10, deleted: 2 }
+  triggeredBy      String? // user_id, system, webhook
+  metadata         Json? // Additional context
 
   connection MarketplaceConnection @relation(fields: [connectionId], references: [id], onDelete: Cascade)
 

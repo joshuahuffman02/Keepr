@@ -20,9 +20,12 @@ export type OnboardingStepKey =
   | "integrations"
   | "menu_setup"
   | "feature_discovery"
+  | "smart_quiz"
+  | "feature_triage"
+  | "guided_setup"
   | "review_launch";
 
-export type OnboardingPhase = "foundation" | "inventory" | "pricing" | "rules" | "launch";
+export type OnboardingPhase = "foundation" | "inventory" | "pricing" | "rules" | "features" | "launch";
 
 export interface OnboardingStep {
   key: OnboardingStepKey;
@@ -205,6 +208,33 @@ export const onboardingSteps: OnboardingStep[] = [
     phase: "launch",
     required: false,
   },
+  // Phase 6: Feature Selection (NEW)
+  {
+    key: "smart_quiz",
+    title: "Tell Us About Your Park",
+    description: "A few questions to personalize your setup",
+    phase: "features",
+    required: false,
+  },
+  {
+    key: "feature_triage",
+    title: "Choose Features",
+    description: "Select which features to set up",
+    phase: "features",
+    required: false,
+    celebration: {
+      title: "Features Selected!",
+      subtitle: "Your personalized setup is ready",
+    },
+  },
+  {
+    key: "guided_setup",
+    title: "Feature Setup",
+    description: "Configure your selected features",
+    phase: "features",
+    required: false,
+  },
+  // Phase 7: Launch
   {
     key: "review_launch",
     title: "Go Live",
@@ -225,6 +255,7 @@ export const phaseLabels: Record<OnboardingPhase, string> = {
   inventory: "Your Sites",
   pricing: "Pricing",
   rules: "Rules & Policies",
+  features: "Features",
   launch: "Go Live",
 };
 

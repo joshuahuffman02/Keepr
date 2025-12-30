@@ -18,9 +18,14 @@ export type OnboardingStepKey =
   | "team_setup"
   | "communication_setup"
   | "integrations"
+  | "menu_setup"
+  | "feature_discovery"
+  | "smart_quiz"
+  | "feature_triage"
+  | "guided_setup"
   | "review_launch";
 
-export type OnboardingPhase = "foundation" | "inventory" | "pricing" | "rules" | "launch";
+export type OnboardingPhase = "foundation" | "inventory" | "pricing" | "rules" | "features" | "launch";
 
 export interface OnboardingStep {
   key: OnboardingStepKey;
@@ -51,10 +56,17 @@ export const ONBOARDING_STEPS: OnboardingStep[] = [
   { key: "cancellation_rules", title: "Cancellation", description: "Cancellation policies", phase: "rules", required: false },
   { key: "waivers_documents", title: "Waivers", description: "Liability and guest agreements", phase: "rules", required: false },
   { key: "park_rules", title: "Park Rules", description: "Guest policies", phase: "rules", required: false },
-  // Phase 5: Team & Launch
-  { key: "team_setup", title: "Team Setup", description: "Invite staff members", phase: "launch", required: false },
-  { key: "communication_setup", title: "Communications", description: "Email templates and automation", phase: "launch", required: false },
-  { key: "integrations", title: "Integrations", description: "Connect business tools", phase: "launch", required: false },
+  // Phase 5: Team
+  { key: "team_setup", title: "Team Setup", description: "Invite staff members", phase: "rules", required: false },
+  { key: "communication_setup", title: "Communications", description: "Email templates and automation", phase: "rules", required: false },
+  { key: "integrations", title: "Integrations", description: "Connect business tools", phase: "rules", required: false },
+  // Phase 6: Feature Selection
+  { key: "menu_setup", title: "Sidebar Menu", description: "Customize your navigation", phase: "features", required: false },
+  { key: "feature_discovery", title: "Feature Discovery", description: "Explore available features", phase: "features", required: false },
+  { key: "smart_quiz", title: "Tell Us About Your Park", description: "Personalize your setup", phase: "features", required: false },
+  { key: "feature_triage", title: "Choose Features", description: "Select what to set up", phase: "features", required: false },
+  { key: "guided_setup", title: "Feature Setup", description: "Configure selected features", phase: "features", required: false },
+  // Phase 7: Launch
   { key: "review_launch", title: "Go Live", description: "Review and launch", phase: "launch", required: true },
 ];
 

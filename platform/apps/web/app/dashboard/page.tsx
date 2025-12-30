@@ -50,6 +50,7 @@ import {
 } from "@/lib/animations";
 import { cn } from "@/lib/utils";
 import { CharityImpactWidget } from "@/components/charity/CharityImpactWidget";
+import { SetupQueueWidget } from "@/components/onboarding/SetupQueueWidget";
 
 type Reservation = {
   id: string;
@@ -704,6 +705,11 @@ export default function Dashboard() {
         {/* Charity Impact Widget - only render after hydration to prevent flash */}
         {hasMounted && selectedId && (
           <CharityImpactWidget campgroundId={selectedId} />
+        )}
+
+        {/* Setup Queue Widget - shows pending feature configurations */}
+        {hasMounted && selectedId && (
+          <SetupQueueWidget campgroundId={selectedId} />
         )}
 
         {/* Error State */}
