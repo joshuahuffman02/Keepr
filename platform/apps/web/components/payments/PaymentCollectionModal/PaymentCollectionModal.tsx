@@ -29,6 +29,7 @@ import { CharityRoundUp } from "./components/CharityRoundUp";
 import { FeeEstimate } from "./components/FeeBreakdown";
 import { SplitTenderManager } from "./components/SplitTenderManager";
 import { SuccessView } from "./components/SuccessView";
+import { ReservationBreakdown } from "./components/ReservationBreakdown";
 
 // ============================================================================
 // INNER MODAL CONTENT (uses context)
@@ -111,6 +112,9 @@ function PaymentModalContent() {
           {/* Method Selection Step */}
           {!configLoading && step === "method_select" && (
             <div className="space-y-6">
+              {/* Reservation pricing breakdown */}
+              <ReservationBreakdown />
+
               {/* Split tender manager (shows applied payments) */}
               {props.enableSplitTender !== false && (
                 <SplitTenderManager
