@@ -831,6 +831,7 @@ const GamificationCategoryEnum = z.enum([
   "assist",
   "manual",
   "other",
+  "payment_collection",
 ]);
 
 const GamificationSettingSchema = z.object({
