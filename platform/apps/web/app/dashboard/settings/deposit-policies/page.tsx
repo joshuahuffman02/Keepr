@@ -5,6 +5,16 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Button } from "../../../../components/ui/button";
 import { apiClient } from "../../../../lib/api-client";
 import { Plus, Pencil, Trash2, Banknote, Clock, Percent, DollarSign } from "lucide-react";
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+} from "../../../../components/ui/alert-dialog";
 
 type DepositPolicy = {
   id: string;
@@ -73,6 +83,7 @@ export default function DepositPoliciesPage() {
   const [formData, setFormData] = useState<FormData>(defaultFormData);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
   const qc = useQueryClient();
 
   useEffect(() => {
@@ -190,9 +201,13 @@ export default function DepositPoliciesPage() {
     }
   };
 
-  const handleDelete = async (id: string) => {
-    if (!confirm("Delete this deposit policy?")) return;
-    await deleteMutation.mutateAsync(id);
+  const confirmDeletePolicy = async () => {
+    if (!deleteConfirmId) return;
+    try {
+      await deleteMutation.mutateAsync(deleteConfirmId);
+    } finally {
+      setDeleteConfirmId(null);
+    }
   };
 
   const formatValue = (policy: DepositPolicy) => {
@@ -296,7 +311,7 @@ export default function DepositPoliciesPage() {
                       <Button
                         variant="ghost"
                         size="sm"
-                        onClick={() => handleDelete(policy.id)}
+                        onClick={() => setDeleteConfirmId(policy.id)}
                         className="text-red-600 hover:text-red-700"
                       >
                         <Trash2 className="h-4 w-4" />
@@ -480,6 +495,26 @@ export default function DepositPoliciesPage() {
           </div>
         </div>
       )}
+
+      <AlertDialog open={!!deleteConfirmId} onOpenChange={(open) => !open && setDeleteConfirmId(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Deposit Policy</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete this deposit policy? This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={confirmDeletePolicy}
+              className="bg-red-600 hover:bg-red-700"
+            >
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

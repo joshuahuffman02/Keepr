@@ -373,8 +373,8 @@ Verify reporting works for daily operations and accounting.
 | Wallet payments for reservations | GuestWalletMethod.tsx shows "Coming Soon" but backend API is fully implemented. Do you want this wired up for launch, or is it OK to defer? | Open |
 | Seasonal past_due scheduler | No cron job to auto-mark SeasonalPayment as past_due when dueDate passes. Payments are only marked past_due when staff views/updates. Need a daily scheduler? | Open |
 | **7 Unprotected Controllers** | Auth guards added to all 7 controllers. Verified protection in place. | FIXED |
-| **CRITICAL: Multi-Tenant Isolation** | 14 controllers missing ScopeGuard. Services allow cross-tenant access by ID. Lock codes can be accessed across campgrounds (physical security risk). Full audit report: `SECURITY_AUDIT_MULTI_TENANT_2024-12-28.md` | **BLOCKING** |
-| **CRITICAL: Online Booking Payment Bug** | `/public/payments/intents/:id/confirm` creates Payment record but does NOT update reservation `paidAmount`/`balanceAmount`. Webhook skips due to idempotency. Every online booking shows $0 paid! Fix: Add paidAmount update to confirm endpoint. | **BLOCKING** |
+| **CRITICAL: Multi-Tenant Isolation** | **FIXED 2024-12-29**: Added ScopeGuard to WaitlistController. Added campgroundId validation to BatchInventoryService, MarkdownRulesService, ValueStackService. Made campgroundId required in NotificationTriggersService. Added campgroundId filter to GuestSegmentService. LockCodesService was already fixed. | **FIXED** |
+| **CRITICAL: Online Booking Payment Bug** | **FIXED**: confirmPublicPaymentIntent now updates paidAmount/balanceAmount atomically (lines 682-700). Creates Payment record AND updates reservation amounts in transaction. | **FIXED** |
 
 ---
 

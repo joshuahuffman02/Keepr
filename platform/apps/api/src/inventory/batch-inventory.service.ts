@@ -3,6 +3,7 @@ import {
     NotFoundException,
     BadRequestException,
     ConflictException,
+    ForbiddenException,
 } from "@nestjs/common";
 import { Prisma, ExpirationTier } from "@prisma/client";
 import { PrismaService } from "../prisma/prisma.service";
@@ -132,7 +133,7 @@ export class BatchInventoryService {
         return batch;
     }
 
-    async getBatch(id: string) {
+    async getBatch(id: string, campgroundId: string) {
         const batch = await this.prisma.inventoryBatch.findUnique({
             where: { id },
             include: {
@@ -148,6 +149,9 @@ export class BatchInventoryService {
             },
         });
         if (!batch) throw new NotFoundException("Batch not found");
+        if (batch.campgroundId !== campgroundId) {
+            throw new ForbiddenException("Access denied to this batch");
+        }
         return batch;
     }
 
@@ -184,9 +188,12 @@ export class BatchInventoryService {
         });
     }
 
-    async updateBatch(id: string, dto: UpdateBatchDto) {
+    async updateBatch(id: string, campgroundId: string, dto: UpdateBatchDto) {
         const batch = await this.prisma.inventoryBatch.findUnique({ where: { id } });
         if (!batch) throw new NotFoundException("Batch not found");
+        if (batch.campgroundId !== campgroundId) {
+            throw new ForbiddenException("Access denied to this batch");
+        }
 
         return this.prisma.inventoryBatch.update({
             where: { id },
@@ -201,11 +208,15 @@ export class BatchInventoryService {
 
     async adjustBatch(
         id: string,
+        campgroundId: string,
         dto: AdjustBatchDto,
         actorUserId: string
     ) {
         const batch = await this.prisma.inventoryBatch.findUnique({ where: { id } });
         if (!batch) throw new NotFoundException("Batch not found");
+        if (batch.campgroundId !== campgroundId) {
+            throw new ForbiddenException("Access denied to this batch");
+        }
 
         const newQty = batch.qtyRemaining + dto.adjustment;
         if (newQty < 0) {
@@ -244,6 +255,7 @@ export class BatchInventoryService {
 
     async disposeBatch(
         id: string,
+        campgroundId: string,
         dto: DisposeBatchDto,
         actorUserId: string
     ) {
@@ -254,6 +266,9 @@ export class BatchInventoryService {
             },
         });
         if (!batch) throw new NotFoundException("Batch not found");
+        if (batch.campgroundId !== campgroundId) {
+            throw new ForbiddenException("Access denied to this batch");
+        }
 
         if (batch.qtyRemaining === 0) {
             throw new ConflictException("Batch is already depleted");

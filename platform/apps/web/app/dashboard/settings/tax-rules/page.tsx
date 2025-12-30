@@ -13,6 +13,16 @@ import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/components/ui/use-toast";
 import { apiClient } from "@/lib/api-client";
 import { Plus, Pencil, Trash2, Loader2, Percent, DollarSign, FileX, ArrowRightLeft, Settings } from "lucide-react";
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 type TaxRule = {
     id: string;
@@ -67,6 +77,7 @@ export default function TaxRulesSettingsPage() {
     const [formData, setFormData] = useState<TaxRuleFormData>(defaultFormData);
     const [saving, setSaving] = useState(false);
     const [error, setError] = useState<string | null>(null);
+    const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
 
     // Currency state
     const configQuery = useQuery({
@@ -190,13 +201,15 @@ export default function TaxRulesSettingsPage() {
         }
     };
 
-    const handleDelete = async (id: string) => {
-        if (!confirm("Are you sure you want to delete this tax rule?")) return;
+    const confirmDeleteRule = async () => {
+        if (!deleteConfirmId) return;
         try {
-            await apiClient.deleteTaxRule(id);
+            await apiClient.deleteTaxRule(deleteConfirmId);
             if (campgroundId) loadTaxRules(campgroundId);
         } catch (err) {
             console.error(err);
+        } finally {
+            setDeleteConfirmId(null);
         }
     };
 
@@ -339,7 +352,7 @@ export default function TaxRulesSettingsPage() {
                                                     <Button variant="ghost" size="icon" onClick={() => openEditModal(rule)}>
                                                         <Pencil className="h-4 w-4" />
                                                     </Button>
-                                                    <Button variant="ghost" size="icon" onClick={() => handleDelete(rule.id)}>
+                                                    <Button variant="ghost" size="icon" onClick={() => setDeleteConfirmId(rule.id)}>
                                                         <Trash2 className="h-4 w-4 text-destructive" />
                                                     </Button>
                                                 </div>
@@ -574,6 +587,26 @@ export default function TaxRulesSettingsPage() {
                     </div>
                 </DialogContent>
             </Dialog>
+
+            <AlertDialog open={!!deleteConfirmId} onOpenChange={(open) => !open && setDeleteConfirmId(null)}>
+                <AlertDialogContent>
+                    <AlertDialogHeader>
+                        <AlertDialogTitle>Delete Tax Rule</AlertDialogTitle>
+                        <AlertDialogDescription>
+                            Are you sure you want to delete this tax rule? This action cannot be undone.
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogAction
+                            onClick={confirmDeleteRule}
+                            className="bg-red-600 hover:bg-red-700"
+                        >
+                            Delete
+                        </AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
         </div>
     );
 }

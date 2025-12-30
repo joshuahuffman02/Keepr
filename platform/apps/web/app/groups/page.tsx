@@ -3,6 +3,16 @@
 import { useEffect, useState, useCallback } from "react";
 import { apiClient } from "@/lib/api-client";
 import { DashboardShell } from "@/components/ui/layout/DashboardShell";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import Link from "next/link";
 
 interface GroupSummary {
@@ -52,6 +62,7 @@ export default function GroupsPage() {
   const [loading, setLoading] = useState(true);
   const [selectedGroup, setSelectedGroup] = useState<GroupDetail | null>(null);
   const [showCreateModal, setShowCreateModal] = useState(false);
+  const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
 
   // Fallback: hydrate selected campground from localStorage (DashboardShell writes campreserv:selectedCampground)
   useEffect(() => {
@@ -94,14 +105,16 @@ export default function GroupsPage() {
     }
   };
 
-  const deleteGroup = async (id: string) => {
-    if (!confirm("Delete this group? Reservations will be unlinked but not deleted.")) return;
+  const confirmDeleteGroup = async () => {
+    if (!deleteConfirmId) return;
     try {
-      await apiClient.deleteGroup(id);
+      await apiClient.deleteGroup(deleteConfirmId);
       setSelectedGroup(null);
+      setDeleteConfirmId(null);
       loadGroups();
     } catch (err) {
       console.error("Failed to delete group:", err);
+      setDeleteConfirmId(null);
     }
   };
 
@@ -202,7 +215,7 @@ export default function GroupsPage() {
                   </div>
                   <div className="flex items-center gap-2">
                     <button
-                      onClick={() => deleteGroup(selectedGroup.id)}
+                      onClick={() => setDeleteConfirmId(selectedGroup.id)}
                       className="px-3 py-1.5 text-red-600 hover:bg-red-50 rounded-lg text-sm"
                     >
                       Delete Group
@@ -321,6 +334,26 @@ export default function GroupsPage() {
             }}
           />
         )}
+
+        <AlertDialog open={!!deleteConfirmId} onOpenChange={(open) => !open && setDeleteConfirmId(null)}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Delete Group</AlertDialogTitle>
+              <AlertDialogDescription>
+                Are you sure you want to delete this group? Reservations will be unlinked but not deleted.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Cancel</AlertDialogCancel>
+              <AlertDialogAction
+                onClick={confirmDeleteGroup}
+                className="bg-red-600 hover:bg-red-700"
+              >
+                Delete Group
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       </div>
     </DashboardShell>
   );

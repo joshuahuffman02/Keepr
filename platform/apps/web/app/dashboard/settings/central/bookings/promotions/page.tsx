@@ -42,6 +42,16 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { apiClient } from "@/lib/api-client";
 import { format } from "date-fns";
 
@@ -92,6 +102,7 @@ export default function PromotionsPage() {
   const [formData, setFormData] = useState<PromotionFormData>(defaultFormData);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
 
   useEffect(() => {
     const id = localStorage.getItem("campreserv:selectedCampground");
@@ -182,13 +193,15 @@ export default function PromotionsPage() {
     }
   };
 
-  const handleDelete = async (id: string) => {
-    if (!confirm("Are you sure you want to delete this promotion?")) return;
+  const confirmDeletePromotion = async () => {
+    if (!deleteConfirmId) return;
     try {
-      await apiClient.deletePromotion(id);
+      await apiClient.deletePromotion(deleteConfirmId);
       if (campgroundId) loadPromotions(campgroundId);
     } catch (err) {
       console.error("Failed to delete promotion:", err);
+    } finally {
+      setDeleteConfirmId(null);
     }
   };
 
@@ -423,7 +436,7 @@ export default function PromotionsPage() {
                         <DropdownMenuSeparator />
                         <DropdownMenuItem
                           className="text-red-600"
-                          onClick={() => handleDelete(promo.id)}
+                          onClick={() => setDeleteConfirmId(promo.id)}
                         >
                           <Trash2 className="h-4 w-4 mr-2" />
                           Delete
@@ -565,6 +578,26 @@ export default function PromotionsPage() {
           </div>
         </DialogContent>
       </Dialog>
+
+      <AlertDialog open={!!deleteConfirmId} onOpenChange={(open) => !open && setDeleteConfirmId(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Promotion</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete this promotion? This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={confirmDeletePromotion}
+              className="bg-red-600 hover:bg-red-700"
+            >
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

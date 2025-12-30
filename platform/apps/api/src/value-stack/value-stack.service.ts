@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, ForbiddenException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { GuaranteeType } from '@prisma/client';
 
@@ -28,6 +28,7 @@ export class ValueStackService {
 
   async updateGuarantee(
     id: string,
+    campgroundId: string,
     data: Partial<{
       type: GuaranteeType;
       title: string;
@@ -37,13 +38,23 @@ export class ValueStackService {
       isActive: boolean;
     }>,
   ) {
+    const guarantee = await this.prisma.campgroundGuarantee.findUnique({ where: { id } });
+    if (!guarantee) throw new NotFoundException('Guarantee not found');
+    if (guarantee.campgroundId !== campgroundId) {
+      throw new ForbiddenException('Access denied to this guarantee');
+    }
     return this.prisma.campgroundGuarantee.update({
       where: { id },
       data,
     });
   }
 
-  async deleteGuarantee(id: string) {
+  async deleteGuarantee(id: string, campgroundId: string) {
+    const guarantee = await this.prisma.campgroundGuarantee.findUnique({ where: { id } });
+    if (!guarantee) throw new NotFoundException('Guarantee not found');
+    if (guarantee.campgroundId !== campgroundId) {
+      throw new ForbiddenException('Access denied to this guarantee');
+    }
     return this.prisma.campgroundGuarantee.delete({ where: { id } });
   }
 
@@ -71,6 +82,7 @@ export class ValueStackService {
 
   async updateBonus(
     id: string,
+    campgroundId: string,
     data: Partial<{
       name: string;
       description: string;
@@ -82,13 +94,23 @@ export class ValueStackService {
       isActive: boolean;
     }>,
   ) {
+    const bonus = await this.prisma.campgroundBonus.findUnique({ where: { id } });
+    if (!bonus) throw new NotFoundException('Bonus not found');
+    if (bonus.campgroundId !== campgroundId) {
+      throw new ForbiddenException('Access denied to this bonus');
+    }
     return this.prisma.campgroundBonus.update({
       where: { id },
       data,
     });
   }
 
-  async deleteBonus(id: string) {
+  async deleteBonus(id: string, campgroundId: string) {
+    const bonus = await this.prisma.campgroundBonus.findUnique({ where: { id } });
+    if (!bonus) throw new NotFoundException('Bonus not found');
+    if (bonus.campgroundId !== campgroundId) {
+      throw new ForbiddenException('Access denied to this bonus');
+    }
     return this.prisma.campgroundBonus.delete({ where: { id } });
   }
 

@@ -9,6 +9,16 @@ import { useToast } from "@/components/ui/use-toast";
 import { ToastAction } from "@/components/ui/toast";
 import { useWhoami } from "@/hooks/use-whoami";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 type TicketForm = {
   title: string;
@@ -59,6 +69,7 @@ export function FloatingTicketWidget() {
   const { data: whoami } = useWhoami();
   const [open, setOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showDiscardConfirm, setShowDiscardConfirm] = useState(false);
   const [form, setForm] = useState<TicketForm>({
     title: "",
     notes: "",
@@ -113,8 +124,8 @@ export function FloatingTicketWidget() {
 
   const handleOpenChange = (nextOpen: boolean) => {
     if (!nextOpen && isDirty && !isSubmitting) {
-      const confirmClose = window.confirm("Close and discard this ticket draft?");
-      if (!confirmClose) return;
+      setShowDiscardConfirm(true);
+      return;
     }
     setOpen(nextOpen);
     if (typeof window !== "undefined") {
@@ -123,6 +134,16 @@ export function FloatingTicketWidget() {
     if (!nextOpen && !isSubmitting) {
       setForm({ title: "", notes: "", category: "issue" });
     }
+  };
+
+  const confirmDiscard = () => {
+    setOpen(false);
+    setShowDiscardConfirm(false);
+    if (typeof window !== "undefined") {
+      localStorage.setItem(LS_TICKET_OPEN, "false");
+      localStorage.removeItem(LS_TICKET_DRAFT);
+    }
+    setForm({ title: "", notes: "", category: "issue" });
   };
 
   const handleSubmit = async () => {
@@ -217,8 +238,8 @@ export function FloatingTicketWidget() {
           className="max-w-lg"
           onRequestClose={() => {
             if (isDirty) {
-              const ok = window.confirm("Close and discard this ticket draft?");
-              return ok;
+              setShowDiscardConfirm(true);
+              return false;
             }
             return true;
           }}
@@ -340,6 +361,26 @@ export function FloatingTicketWidget() {
       >
         View tickets
       </a>
+
+      <AlertDialog open={showDiscardConfirm} onOpenChange={setShowDiscardConfirm}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Discard Draft</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to close and discard this ticket draft? Your changes will be lost.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Keep Editing</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={confirmDiscard}
+              className="bg-red-600 hover:bg-red-700"
+            >
+              Discard
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

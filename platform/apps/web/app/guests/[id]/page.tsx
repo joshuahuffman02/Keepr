@@ -16,6 +16,16 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from ".
 import { Badge } from "../../../components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../../components/ui/select";
 import { Trophy, Star, History, ArrowLeft, Trash2, Plus, Car, Truck, Mail, MessageSquare, GitBranch, RotateCcw, PlusCircle, Send, Wallet, DollarSign, ClipboardList, CreditCard, Calendar, ExternalLink, Phone, StickyNote, PhoneCall } from "lucide-react";
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+} from "../../../components/ui/alert-dialog";
 import { GuestPaymentMethods } from "../../../components/guests/GuestPaymentMethods";
 import { AuditLogTimeline } from "../../../components/audit/AuditLogTimeline";
 import { cn } from "../../../lib/utils";
@@ -1200,6 +1210,7 @@ function GuestEquipmentTab({ guestId }: { guestId: string }) {
     const { toast } = useToast();
     const queryClient = useQueryClient();
     const [addOpen, setAddOpen] = useState(false);
+    const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
     const [newEquipment, setNewEquipment] = useState({
         type: "trailer",
         make: "",
@@ -1363,11 +1374,7 @@ function GuestEquipmentTab({ guestId }: { guestId: string }) {
                                     <Button
                                         variant="ghost"
                                         size="icon"
-                                        onClick={() => {
-                                            if (confirm("Are you sure you want to remove this item?")) {
-                                                deleteMutation.mutate(item.id);
-                                            }
-                                        }}
+                                        onClick={() => setDeleteConfirmId(item.id)}
                                         className="text-red-500 hover:text-red-600 hover:bg-red-50"
                                     >
                                         <Trash2 className="w-4 h-4" />
@@ -1385,6 +1392,31 @@ function GuestEquipmentTab({ guestId }: { guestId: string }) {
                     </TableBody>
                 </Table>
             </CardContent>
+
+            <AlertDialog open={!!deleteConfirmId} onOpenChange={(open) => !open && setDeleteConfirmId(null)}>
+                <AlertDialogContent>
+                    <AlertDialogHeader>
+                        <AlertDialogTitle>Remove Equipment</AlertDialogTitle>
+                        <AlertDialogDescription>
+                            Are you sure you want to remove this item? This action cannot be undone.
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogAction
+                            onClick={() => {
+                                if (deleteConfirmId) {
+                                    deleteMutation.mutate(deleteConfirmId);
+                                    setDeleteConfirmId(null);
+                                }
+                            }}
+                            className="bg-red-600 hover:bg-red-700"
+                        >
+                            Remove
+                        </AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
         </Card>
     );
 }

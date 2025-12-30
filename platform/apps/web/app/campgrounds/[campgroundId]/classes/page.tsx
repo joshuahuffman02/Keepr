@@ -58,6 +58,16 @@ import {
 import { SITE_CLASS_AMENITIES } from "../../../../lib/amenities";
 import { cn } from "../../../../lib/utils";
 import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "../../../../components/ui/alert-dialog";
+import {
   SPRING_CONFIG,
   fadeInUp,
   staggerContainer,
@@ -188,6 +198,7 @@ export default function SiteClassesPage() {
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [inlineEditingRate, setInlineEditingRate] = useState<string | null>(null);
   const [inlineRateValue, setInlineRateValue] = useState<string>("");
+  const [deleteConfirm, setDeleteConfirm] = useState<{ id: string; name: string; siteCount: number } | null>(null);
   const inlineRateInputRef = useRef<HTMLInputElement>(null);
 
   // Focus inline rate input when it becomes visible
@@ -293,11 +304,13 @@ export default function SiteClassesPage() {
 
   const handleDeleteClass = (id: string, name: string) => {
     const siteCount = sitesPerClass[id] || 0;
-    const impactMessage = siteCount > 0
-      ? `\n\n${siteCount} site${siteCount === 1 ? '' : 's'} will lose ${siteCount === 1 ? 'its' : 'their'} class assignment.`
-      : '';
-    if (window.confirm(`Are you sure you want to delete "${name}"?${impactMessage}\n\nThis action cannot be undone.`)) {
-      deleteClass.mutate(id);
+    setDeleteConfirm({ id, name, siteCount });
+  };
+
+  const confirmDeleteClass = () => {
+    if (deleteConfirm) {
+      deleteClass.mutate(deleteConfirm.id);
+      setDeleteConfirm(null);
     }
   };
 
@@ -964,6 +977,32 @@ export default function SiteClassesPage() {
           </AnimatePresence>
         </motion.div>
       </motion.div>
+
+      <AlertDialog open={!!deleteConfirm} onOpenChange={(open) => !open && setDeleteConfirm(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Site Class</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete "{deleteConfirm?.name}"?
+              {deleteConfirm?.siteCount && deleteConfirm.siteCount > 0 && (
+                <span className="block mt-2 text-amber-600">
+                  {deleteConfirm.siteCount} site{deleteConfirm.siteCount === 1 ? '' : 's'} will lose {deleteConfirm.siteCount === 1 ? 'its' : 'their'} class assignment.
+                </span>
+              )}
+              <span className="block mt-2">This action cannot be undone.</span>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={confirmDeleteClass}
+              className="bg-red-600 hover:bg-red-700"
+            >
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </DashboardShell>
   );
 }

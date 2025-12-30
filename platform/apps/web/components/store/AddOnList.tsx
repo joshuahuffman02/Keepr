@@ -2,6 +2,16 @@ import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { apiClient } from "../../lib/api-client";
 import { Button } from "../ui/button";
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+} from "../ui/alert-dialog";
 import { AddOnModal } from "./AddOnModal";
 import { AddOn } from "@campreserv/shared";
 
@@ -13,6 +23,7 @@ export function AddOnList({ campgroundId }: AddOnListProps) {
     const qc = useQueryClient();
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingAddOn, setEditingAddOn] = useState<AddOn | null>(null);
+    const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
 
     const addOnsQuery = useQuery({
         queryKey: ["store-addons", campgroundId],
@@ -95,11 +106,7 @@ export function AddOnList({ campgroundId }: AddOnListProps) {
                                 variant="ghost"
                                 size="sm"
                                 className="text-red-600 hover:text-red-700 hover:bg-red-50"
-                                onClick={() => {
-                                    if (confirm("Are you sure you want to delete this add-on?")) {
-                                        deleteMutation.mutate(addOn.id);
-                                    }
-                                }}
+                                onClick={() => setDeleteConfirmId(addOn.id)}
                             >
                                 Delete
                             </Button>
@@ -119,6 +126,31 @@ export function AddOnList({ campgroundId }: AddOnListProps) {
                 addOn={editingAddOn}
                 onSave={handleSave}
             />
+
+            <AlertDialog open={!!deleteConfirmId} onOpenChange={(open) => !open && setDeleteConfirmId(null)}>
+                <AlertDialogContent>
+                    <AlertDialogHeader>
+                        <AlertDialogTitle>Delete Add-on</AlertDialogTitle>
+                        <AlertDialogDescription>
+                            Are you sure you want to delete this add-on? This action cannot be undone.
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogAction
+                            onClick={() => {
+                                if (deleteConfirmId) {
+                                    deleteMutation.mutate(deleteConfirmId);
+                                    setDeleteConfirmId(null);
+                                }
+                            }}
+                            className="bg-red-600 hover:bg-red-700"
+                        >
+                            Delete
+                        </AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
         </div>
     );
 }

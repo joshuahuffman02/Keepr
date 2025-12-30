@@ -1,4 +1,4 @@
-import { ConflictException, Injectable, Logger, NotFoundException } from '@nestjs/common';
+import { ConflictException, ForbiddenException, Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { EmailService } from '../email/email.service';
 import { CreateWaitlistEntryDto } from '@campreserv/shared';
@@ -181,7 +181,17 @@ export class WaitlistService {
         return result;
     }
 
-    async updateEntry(id: string, updates: Partial<CreateStaffWaitlistDto>) {
+    async updateEntry(id: string, campgroundId: string, updates: Partial<CreateStaffWaitlistDto>) {
+        // Validate entry belongs to this campground
+        const existing = await this.prisma.waitlistEntry.findUnique({
+            where: { id },
+            select: { campgroundId: true }
+        });
+        if (!existing) throw new NotFoundException('Waitlist entry not found');
+        if (existing.campgroundId !== campgroundId) {
+            throw new ForbiddenException('Access denied to this waitlist entry');
+        }
+
         return this.prisma.waitlistEntry.update({
             where: { id },
             data: {
@@ -257,7 +267,17 @@ export class WaitlistService {
         });
     }
 
-    async remove(id: string) {
+    async remove(id: string, campgroundId: string) {
+        // Validate entry belongs to this campground
+        const existing = await this.prisma.waitlistEntry.findUnique({
+            where: { id },
+            select: { campgroundId: true }
+        });
+        if (!existing) throw new NotFoundException('Waitlist entry not found');
+        if (existing.campgroundId !== campgroundId) {
+            throw new ForbiddenException('Access denied to this waitlist entry');
+        }
+
         return this.prisma.waitlistEntry.delete({
             where: { id },
         });

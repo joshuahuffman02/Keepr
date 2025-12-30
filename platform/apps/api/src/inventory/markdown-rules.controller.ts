@@ -61,20 +61,27 @@ export class MarkdownRulesController {
     }
 
     @Get(":id")
-    async getRule(@Param("id") id: string) {
-        return this.markdownService.getRule(id);
+    async getRule(
+        @Param("campgroundId") campgroundId: string,
+        @Param("id") id: string
+    ) {
+        return this.markdownService.getRule(id, campgroundId);
     }
 
     @Put(":id")
     async updateRule(
+        @Param("campgroundId") campgroundId: string,
         @Param("id") id: string,
         @Body() dto: UpdateMarkdownRuleDto
     ) {
-        return this.markdownService.updateRule(id, dto);
+        return this.markdownService.updateRule(id, campgroundId, dto);
     }
 
     @Delete(":id")
-    async deleteRule(@Param("id") id: string) {
-        return this.markdownService.deleteRule(id);
+    async deleteRule(
+        @Param("campgroundId") campgroundId: string,
+        @Param("id") id: string
+    ) {
+        return this.markdownService.deleteRule(id, campgroundId);
     }
 }

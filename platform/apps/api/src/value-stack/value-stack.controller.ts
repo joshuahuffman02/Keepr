@@ -45,6 +45,7 @@ export class ValueStackController {
 
   @Put('guarantees/:id')
   async updateGuarantee(
+    @Param('campgroundId') campgroundId: string,
     @Param('id') id: string,
     @Body()
     body: Partial<{
@@ -56,12 +57,15 @@ export class ValueStackController {
       isActive: boolean;
     }>,
   ) {
-    return this.valueStackService.updateGuarantee(id, body);
+    return this.valueStackService.updateGuarantee(id, campgroundId, body);
   }
 
   @Delete('guarantees/:id')
-  async deleteGuarantee(@Param('id') id: string) {
-    return this.valueStackService.deleteGuarantee(id);
+  async deleteGuarantee(
+    @Param('campgroundId') campgroundId: string,
+    @Param('id') id: string
+  ) {
+    return this.valueStackService.deleteGuarantee(id, campgroundId);
   }
 
   // ==================== BONUSES ====================
@@ -90,6 +94,7 @@ export class ValueStackController {
 
   @Put('bonuses/:id')
   async updateBonus(
+    @Param('campgroundId') campgroundId: string,
     @Param('id') id: string,
     @Body()
     body: Partial<{
@@ -103,12 +108,15 @@ export class ValueStackController {
       isActive: boolean;
     }>,
   ) {
-    return this.valueStackService.updateBonus(id, body);
+    return this.valueStackService.updateBonus(id, campgroundId, body);
   }
 
   @Delete('bonuses/:id')
-  async deleteBonus(@Param('id') id: string) {
-    return this.valueStackService.deleteBonus(id);
+  async deleteBonus(
+    @Param('campgroundId') campgroundId: string,
+    @Param('id') id: string
+  ) {
+    return this.valueStackService.deleteBonus(id, campgroundId);
   }
 
   // ==================== LEAD CAPTURE CONFIG ====================

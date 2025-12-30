@@ -7,6 +7,16 @@ import { Button } from "../../../../components/ui/button";
 import { FormField } from "../../../../components/ui/form-field";
 import { apiClient } from "../../../../lib/api-client";
 import { Plus, Pencil, Trash2, Calendar, TrendingUp, Sun, Gift, BarChart3 } from "lucide-react";
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+} from "../../../../components/ui/alert-dialog";
 import { HelpTooltip, HelpTooltipContent, HelpTooltipSection, HelpTooltipList } from "../../../../components/help/HelpTooltip";
 import { PageOnboardingHint } from "../../../../components/help/OnboardingHint";
 
@@ -139,6 +149,7 @@ export default function PricingRulesV2Page() {
   const [campgroundId, setCampgroundId] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingRule, setEditingRule] = useState<PricingRuleV2 | null>(null);
+  const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
   const qc = useQueryClient();
 
   const {
@@ -264,9 +275,13 @@ export default function PricingRulesV2Page() {
     }
   };
 
-  const handleDelete = async (id: string) => {
-    if (!confirm("Delete this pricing rule?")) return;
-    await deleteMutation.mutateAsync(id);
+  const confirmDeleteRule = async () => {
+    if (!deleteConfirmId) return;
+    try {
+      await deleteMutation.mutateAsync(deleteConfirmId);
+    } finally {
+      setDeleteConfirmId(null);
+    }
   };
 
   const toggleDow = (day: number) => {
@@ -398,7 +413,7 @@ export default function PricingRulesV2Page() {
                       <Button
                         variant="ghost"
                         size="sm"
-                        onClick={() => handleDelete(rule.id)}
+                        onClick={() => setDeleteConfirmId(rule.id)}
                         className="text-red-600 hover:text-red-700"
                       >
                         <Trash2 className="h-4 w-4" />
@@ -665,6 +680,26 @@ export default function PricingRulesV2Page() {
           </div>
         </div>
       )}
+
+      <AlertDialog open={!!deleteConfirmId} onOpenChange={(open) => !open && setDeleteConfirmId(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Pricing Rule</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete this pricing rule? This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={confirmDeleteRule}
+              className="bg-red-600 hover:bg-red-700"
+            >
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

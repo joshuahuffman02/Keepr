@@ -2,6 +2,16 @@ import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { apiClient } from "../../lib/api-client";
 import { Button } from "../ui/button";
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+} from "../ui/alert-dialog";
 import { CategoryModal } from "./CategoryModal";
 import { ProductCategory } from "@campreserv/shared";
 
@@ -13,6 +23,7 @@ export function CategoryList({ campgroundId }: CategoryListProps) {
     const qc = useQueryClient();
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingCategory, setEditingCategory] = useState<ProductCategory | null>(null);
+    const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
 
     const categoriesQuery = useQuery({
         queryKey: ["store-categories", campgroundId],
@@ -85,11 +96,7 @@ export function CategoryList({ campgroundId }: CategoryListProps) {
                                 variant="ghost"
                                 size="sm"
                                 className="text-red-600 hover:text-red-700 hover:bg-red-50"
-                                onClick={() => {
-                                    if (confirm("Are you sure you want to delete this category?")) {
-                                        deleteMutation.mutate(category.id);
-                                    }
-                                }}
+                                onClick={() => setDeleteConfirmId(category.id)}
                             >
                                 Delete
                             </Button>
@@ -109,6 +116,31 @@ export function CategoryList({ campgroundId }: CategoryListProps) {
                 category={editingCategory}
                 onSave={handleSave}
             />
+
+            <AlertDialog open={!!deleteConfirmId} onOpenChange={(open) => !open && setDeleteConfirmId(null)}>
+                <AlertDialogContent>
+                    <AlertDialogHeader>
+                        <AlertDialogTitle>Delete Category</AlertDialogTitle>
+                        <AlertDialogDescription>
+                            Are you sure you want to delete this category? This action cannot be undone.
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogAction
+                            onClick={() => {
+                                if (deleteConfirmId) {
+                                    deleteMutation.mutate(deleteConfirmId);
+                                    setDeleteConfirmId(null);
+                                }
+                            }}
+                            className="bg-red-600 hover:bg-red-700"
+                        >
+                            Delete
+                        </AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
         </div>
     );
 }

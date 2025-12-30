@@ -15,6 +15,8 @@ import { ReservationSchema, computeDepositDue, CreateCommunicationSchema, Deposi
 import type { z } from "zod";
 import { useGanttStore } from "../../../../lib/gantt-store";
 import { BulkMessageModal } from "../../../../components/reservations/BulkMessageModal";
+import { AnimatePresence } from "framer-motion";
+import { CelebrationOverlay } from "../../../../components/signup/CelebrationOverlay";
 
 type ReservationStatus = z.infer<typeof ReservationSchema>["status"];
 type ReservationUpdate = Partial<z.infer<typeof ReservationSchema>> & {
@@ -180,6 +182,7 @@ export default function ReservationsPage() {
   const [resQuoteLoading, setResQuoteLoading] = useState<Record<string, boolean>>({});
   const [resQuoteErrors, setResQuoteErrors] = useState<Record<string, string>>({});
   const [flash, setFlash] = useState<{ type: "success" | "error" | "info"; message: string } | null>(null);
+  const [showBookingSuccess, setShowBookingSuccess] = useState(false);
   const [bulkMessageOpen, setBulkMessageOpen] = useState(false);
   const { selection, setSelection, drag, setDrag, startDrag, resetDrag } = useGanttStore();
   const focusId = selection.openDetailsId;
@@ -320,7 +323,9 @@ export default function ReservationsPage() {
         taxesAmount: "",
         discountsAmount: ""
       });
-      setFlash({ type: "success", message: "Reservation saved." });
+      // Show celebration overlay
+      setShowBookingSuccess(true);
+      setTimeout(() => setShowBookingSuccess(false), 2500);
       queryClient.invalidateQueries({ queryKey: ["reservations", campgroundId] });
     },
     onError: (err) => {
@@ -2832,6 +2837,13 @@ export default function ReservationsPage() {
           }
         }}
       />
+      <AnimatePresence>
+        <CelebrationOverlay
+          show={showBookingSuccess}
+          title="Reservation Created!"
+          subtitle="Your booking has been saved successfully"
+        />
+      </AnimatePresence>
     </DashboardShell>
   );
 }

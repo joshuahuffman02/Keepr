@@ -2,6 +2,7 @@ import {
     Injectable,
     NotFoundException,
     BadRequestException,
+    ForbiddenException,
 } from "@nestjs/common";
 import { Prisma, MarkdownScope, MarkdownDiscountType } from "@prisma/client";
 import { PrismaService } from "../prisma/prisma.service";
@@ -56,7 +57,7 @@ export class MarkdownRulesService {
         });
     }
 
-    async getRule(id: string) {
+    async getRule(id: string, campgroundId: string) {
         const rule = await this.prisma.markdownRule.findUnique({
             where: { id },
             include: {
@@ -65,6 +66,9 @@ export class MarkdownRulesService {
             },
         });
         if (!rule) throw new NotFoundException("Markdown rule not found");
+        if (rule.campgroundId !== campgroundId) {
+            throw new ForbiddenException("Access denied to this markdown rule");
+        }
         return rule;
     }
 
@@ -85,9 +89,12 @@ export class MarkdownRulesService {
         });
     }
 
-    async updateRule(id: string, dto: UpdateMarkdownRuleDto) {
+    async updateRule(id: string, campgroundId: string, dto: UpdateMarkdownRuleDto) {
         const rule = await this.prisma.markdownRule.findUnique({ where: { id } });
         if (!rule) throw new NotFoundException("Markdown rule not found");
+        if (rule.campgroundId !== campgroundId) {
+            throw new ForbiddenException("Access denied to this markdown rule");
+        }
 
         // Validate discount value for percentage type
         const discountType = dto.discountType ?? rule.discountType;
@@ -102,9 +109,12 @@ export class MarkdownRulesService {
         });
     }
 
-    async deleteRule(id: string) {
+    async deleteRule(id: string, campgroundId: string) {
         const rule = await this.prisma.markdownRule.findUnique({ where: { id } });
         if (!rule) throw new NotFoundException("Markdown rule not found");
+        if (rule.campgroundId !== campgroundId) {
+            throw new ForbiddenException("Access denied to this markdown rule");
+        }
 
         return this.prisma.markdownRule.delete({ where: { id } });
     }

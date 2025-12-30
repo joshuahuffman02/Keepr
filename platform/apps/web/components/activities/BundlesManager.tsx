@@ -19,6 +19,16 @@ import {
     Package, Plus, Trash2, Percent, DollarSign, Tag, Sparkles,
     Check, Gift, Loader2, Edit2
 } from "lucide-react";
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+} from "../ui/alert-dialog";
 
 type Activity = {
     id: string;
@@ -60,6 +70,7 @@ export function BundlesManager({ campgroundId, activities }: BundlesManagerProps
     const queryClient = useQueryClient();
     const [isCreateOpen, setIsCreateOpen] = useState(false);
     const [editingBundle, setEditingBundle] = useState<Bundle | null>(null);
+    const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
 
     const [newBundle, setNewBundle] = useState({
         name: "",
@@ -282,11 +293,7 @@ export function BundlesManager({ campgroundId, activities }: BundlesManagerProps
                                             variant="ghost"
                                             size="icon"
                                             className="text-slate-400 hover:text-red-500"
-                                            onClick={() => {
-                                                if (confirm("Delete this bundle?")) {
-                                                    deleteMutation.mutate(bundle.id);
-                                                }
-                                            }}
+                                            onClick={() => setDeleteConfirmId(bundle.id)}
                                         >
                                             <Trash2 className="h-4 w-4" />
                                         </Button>
@@ -465,6 +472,31 @@ export function BundlesManager({ campgroundId, activities }: BundlesManagerProps
                     </DialogFooter>
                 </DialogContent>
             </Dialog>
+
+            <AlertDialog open={!!deleteConfirmId} onOpenChange={(open) => !open && setDeleteConfirmId(null)}>
+                <AlertDialogContent>
+                    <AlertDialogHeader>
+                        <AlertDialogTitle>Delete Bundle</AlertDialogTitle>
+                        <AlertDialogDescription>
+                            Are you sure you want to delete this bundle? This action cannot be undone.
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogAction
+                            onClick={() => {
+                                if (deleteConfirmId) {
+                                    deleteMutation.mutate(deleteConfirmId);
+                                    setDeleteConfirmId(null);
+                                }
+                            }}
+                            className="bg-red-600 hover:bg-red-700"
+                        >
+                            Delete
+                        </AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
         </>
     );
 }

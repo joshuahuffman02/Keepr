@@ -5,6 +5,16 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { DashboardShell } from "@/components/ui/layout/DashboardShell";
 import { apiClient } from "@/lib/api-client";
 import { PageSettingsLink } from "@/components/ui/PageSettingsLink";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 interface WaitlistEntry {
   id: string;
@@ -69,6 +79,7 @@ export default function WaitlistPage() {
   const [typeFilter, setTypeFilter] = useState<string>("all");
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [editingEntry, setEditingEntry] = useState<WaitlistEntry | null>(null);
+  const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
   const queryClient = useQueryClient();
 
   useEffect(() => {
@@ -278,11 +289,7 @@ export default function WaitlistPage() {
                             </button>
                             {entry.status === "active" && (
                               <button
-                                onClick={() => {
-                                  if (confirm("Remove from waitlist?")) {
-                                    deleteMutation.mutate(entry.id);
-                                  }
-                                }}
+                                onClick={() => setDeleteConfirmId(entry.id)}
                                 className="px-2 py-1 text-red-600 hover:text-red-700 hover:bg-red-50 rounded text-xs"
                               >
                                 Remove
@@ -316,6 +323,31 @@ export default function WaitlistPage() {
             }}
           />
         )}
+
+        <AlertDialog open={!!deleteConfirmId} onOpenChange={(open) => !open && setDeleteConfirmId(null)}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Remove from Waitlist</AlertDialogTitle>
+              <AlertDialogDescription>
+                Are you sure you want to remove this entry from the waitlist?
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Cancel</AlertDialogCancel>
+              <AlertDialogAction
+                onClick={() => {
+                  if (deleteConfirmId) {
+                    deleteMutation.mutate(deleteConfirmId);
+                    setDeleteConfirmId(null);
+                  }
+                }}
+                className="bg-red-600 hover:bg-red-700"
+              >
+                Remove
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       </div>
     </DashboardShell>
   );

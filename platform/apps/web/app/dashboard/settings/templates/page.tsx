@@ -21,6 +21,16 @@ import {
   Link as LinkIcon,
   ExternalLink,
 } from "lucide-react";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 interface Template {
   id: string;
@@ -415,6 +425,7 @@ export default function TemplatesPage() {
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [previewMode, setPreviewMode] = useState(false);
   const [successToast, setSuccessToast] = useState<SuccessToast | null>(null);
+  const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
   const queryClient = useQueryClient();
   const templateListRef = useRef<HTMLDivElement>(null);
 
@@ -637,11 +648,7 @@ export default function TemplatesPage() {
                 onSave={() => {
                   queryClient.invalidateQueries({ queryKey: ["campaign-templates"] });
                 }}
-                onDelete={() => {
-                  if (confirm("Delete this template?")) {
-                    deleteMutation.mutate(selectedTemplate.id);
-                  }
-                }}
+                onDelete={() => setDeleteConfirmOpen(true)}
                 previewMode={previewMode}
                 onTogglePreview={() => setPreviewMode(!previewMode)}
               />
@@ -694,6 +701,31 @@ export default function TemplatesPage() {
             }}
           />
         )}
+
+        <AlertDialog open={deleteConfirmOpen} onOpenChange={setDeleteConfirmOpen}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Delete Template</AlertDialogTitle>
+              <AlertDialogDescription>
+                Are you sure you want to delete this template? This action cannot be undone.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Cancel</AlertDialogCancel>
+              <AlertDialogAction
+                onClick={() => {
+                  if (selectedTemplate) {
+                    deleteMutation.mutate(selectedTemplate.id);
+                  }
+                  setDeleteConfirmOpen(false);
+                }}
+                className="bg-red-600 hover:bg-red-700"
+              >
+                Delete
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       </div>
     </div>
   );

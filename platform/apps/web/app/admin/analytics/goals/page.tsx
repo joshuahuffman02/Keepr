@@ -19,6 +19,16 @@ import {
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 interface Goal {
   id: string;
@@ -363,6 +373,7 @@ export default function GoalsPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isUsingMockData, setIsUsingMockData] = useState(false);
+  const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
 
   const fetchGoals = async () => {
     try {
@@ -438,11 +449,11 @@ export default function GoalsPage() {
     }
   };
 
-  const handleDeleteGoal = async (id: string) => {
-    if (!confirm("Are you sure you want to delete this goal?")) return;
+  const confirmDeleteGoal = async () => {
+    if (!deleteConfirmId) return;
 
     try {
-      const res = await fetch(`/api/admin/platform-analytics/goals/${id}`, {
+      const res = await fetch(`/api/admin/platform-analytics/goals/${deleteConfirmId}`, {
         method: "DELETE",
       });
 
@@ -454,6 +465,8 @@ export default function GoalsPage() {
     } catch (err) {
       console.error("Error deleting goal:", err);
       alert("Failed to delete goal. Please try again.");
+    } finally {
+      setDeleteConfirmId(null);
     }
   };
 
@@ -612,7 +625,7 @@ export default function GoalsPage() {
                         <Edit2 className="h-4 w-4 text-slate-400" />
                       </button>
                       <button
-                        onClick={() => handleDeleteGoal(goal.id)}
+                        onClick={() => setDeleteConfirmId(goal.id)}
                         className="p-2 hover:bg-slate-700 rounded-lg transition-colors"
                       >
                         <Trash2 className="h-4 w-4 text-slate-400" />
@@ -697,6 +710,26 @@ export default function GoalsPage() {
         onSubmit={handleCreateGoal}
         isSubmitting={isSubmitting}
       />
+
+      <AlertDialog open={!!deleteConfirmId} onOpenChange={(open) => !open && setDeleteConfirmId(null)}>
+        <AlertDialogContent className="bg-slate-800 border-slate-700">
+          <AlertDialogHeader>
+            <AlertDialogTitle className="text-white">Delete Goal</AlertDialogTitle>
+            <AlertDialogDescription className="text-slate-400">
+              Are you sure you want to delete this goal? This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel className="border-slate-600 text-slate-300 hover:bg-slate-700">Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={confirmDeleteGoal}
+              className="bg-red-600 hover:bg-red-700"
+            >
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

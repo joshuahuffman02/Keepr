@@ -112,7 +112,7 @@ export class NotificationTriggersService {
    * Update a trigger
    * @param id - Trigger ID
    * @param data - Update data
-   * @param campgroundId - Optional campgroundId for ownership validation (required for cross-tenant protection)
+   * @param campgroundId - Required campgroundId for ownership validation (multi-tenant isolation)
    */
   async update(id: string, data: Partial<{
     event: TriggerEvent;
@@ -121,11 +121,9 @@ export class NotificationTriggersService {
     templateId: string | null;
     delayMinutes: number;
     conditions: Record<string, any> | null;
-  }>, campgroundId?: string) {
-    // Validate ownership if campgroundId provided
-    if (campgroundId) {
-      await this.validateTriggerOwnership(id, campgroundId);
-    }
+  }>, campgroundId: string) {
+    // Always validate ownership for multi-tenant isolation
+    await this.validateTriggerOwnership(id, campgroundId);
 
     return this.prisma.notificationTrigger.update({
       where: { id },
@@ -139,13 +137,11 @@ export class NotificationTriggersService {
   /**
    * Delete a trigger
    * @param id - Trigger ID
-   * @param campgroundId - Optional campgroundId for ownership validation (required for cross-tenant protection)
+   * @param campgroundId - Required campgroundId for ownership validation (multi-tenant isolation)
    */
-  async delete(id: string, campgroundId?: string) {
-    // Validate ownership if campgroundId provided
-    if (campgroundId) {
-      await this.validateTriggerOwnership(id, campgroundId);
-    }
+  async delete(id: string, campgroundId: string) {
+    // Always validate ownership for multi-tenant isolation
+    await this.validateTriggerOwnership(id, campgroundId);
 
     return this.prisma.notificationTrigger.delete({
       where: { id }
@@ -424,15 +420,13 @@ export class NotificationTriggersService {
    * Send a test notification to verify the trigger is configured correctly
    * @param triggerId - Trigger ID
    * @param testEmail - Email to send test to
-   * @param campgroundId - Optional campgroundId for ownership validation (required for cross-tenant protection)
+   * @param campgroundId - Required campgroundId for ownership validation (multi-tenant isolation)
    */
-  async sendTestNotification(triggerId: string, testEmail: string, campgroundId?: string) {
+  async sendTestNotification(triggerId: string, testEmail: string, campgroundId: string) {
     this.logger.log(`Sending test notification for trigger ${triggerId} to ${testEmail}`);
 
-    // Validate ownership if campgroundId provided
-    if (campgroundId) {
-      await this.validateTriggerOwnership(triggerId, campgroundId);
-    }
+    // Always validate ownership for multi-tenant isolation
+    await this.validateTriggerOwnership(triggerId, campgroundId);
 
     // Get the trigger with its template
     const trigger = await this.prisma.notificationTrigger.findUnique({

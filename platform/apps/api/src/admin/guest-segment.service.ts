@@ -176,9 +176,15 @@ export class GuestSegmentService {
         const criteria = segment.criteria as SegmentCriteria[];
         const whereConditions = this.buildGuestWhereFromCriteria(criteria);
 
+        // CRITICAL: Always filter by campgroundId for multi-tenant isolation
+        const finalWhere = {
+            ...whereConditions,
+            campgroundId: segment.campgroundId,
+        };
+
         const [guests, total] = await Promise.all([
             this.prisma.guest.findMany({
-                where: whereConditions,
+                where: finalWhere,
                 skip: options?.skip || 0,
                 take: options?.take || 50,
                 orderBy: { createdAt: "desc" },
@@ -194,7 +200,7 @@ export class GuestSegmentService {
                     createdAt: true,
                 },
             }),
-            this.prisma.guest.count({ where: whereConditions }),
+            this.prisma.guest.count({ where: finalWhere }),
         ]);
 
         return { guests, total };

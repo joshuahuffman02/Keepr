@@ -15,6 +15,16 @@ import {
   DialogFooter,
 } from "../ui/dialog";
 import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "../ui/alert-dialog";
+import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -58,6 +68,7 @@ export function ReservationFormsCard({
   const [attachModalOpen, setAttachModalOpen] = useState(false);
   const [viewModalOpen, setViewModalOpen] = useState(false);
   const [skipModalOpen, setSkipModalOpen] = useState(false);
+  const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
   const [selectedSubmission, setSelectedSubmission] = useState<any>(null);
   const [skipNote, setSkipNote] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
@@ -157,9 +168,10 @@ export function ReservationFormsCard({
     setSelectedSubmission(null);
   };
 
-  const handleDelete = (id: string) => {
-    if (confirm("Remove this form from the reservation?")) {
-      deleteMutation.mutate(id);
+  const handleDeleteConfirm = () => {
+    if (deleteConfirmId) {
+      deleteMutation.mutate(deleteConfirmId);
+      setDeleteConfirmId(null);
     }
   };
 
@@ -390,7 +402,7 @@ export function ReservationFormsCard({
                         </DropdownMenuItem>
                       )}
                       <DropdownMenuItem
-                        onClick={() => handleDelete(submission.id)}
+                        onClick={() => setDeleteConfirmId(submission.id)}
                         className="text-red-600"
                       >
                         <X className="h-4 w-4 mr-2" />
@@ -597,6 +609,27 @@ export function ReservationFormsCard({
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog open={!!deleteConfirmId} onOpenChange={(open) => !open && setDeleteConfirmId(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Remove Form</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to remove this form from the reservation? This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDeleteConfirm}
+              className="bg-red-600 hover:bg-red-700"
+            >
+              Remove
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </>
   );
 }

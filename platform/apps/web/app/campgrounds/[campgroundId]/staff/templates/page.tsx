@@ -23,6 +23,16 @@ import {
   RefreshCw,
   Settings2,
 } from "lucide-react";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { cn } from "@/lib/utils";
 
 type TemplateShift = {
@@ -96,6 +106,7 @@ export default function ScheduleTemplatesPage({ params }: { params: { campground
   const [recurringTemplate, setRecurringTemplate] = useState<string | null>(null);
   const [recurringDay, setRecurringDay] = useState(0);
   const [recurringWeeksAhead, setRecurringWeeksAhead] = useState(1);
+  const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
 
   const loadTemplates = async () => {
     setLoading(true);
@@ -202,10 +213,12 @@ export default function ScheduleTemplatesPage({ params }: { params: { campground
     }
   };
 
-  const handleDelete = async (templateId: string) => {
-    if (!confirm("Are you sure you want to delete this template?")) return;
+  const confirmDeleteTemplate = async () => {
+    if (!deleteConfirmId) return;
 
     setProcessing(true);
+    const templateId = deleteConfirmId;
+    setDeleteConfirmId(null);
     try {
       const res = await fetch(`/api/staff/templates/${templateId}`, { method: "DELETE" });
       if (!res.ok) throw new Error("Failed to delete");
@@ -780,7 +793,7 @@ export default function ScheduleTemplatesPage({ params }: { params: { campground
                           <button
                             onClick={(e) => {
                               e.stopPropagation();
-                              handleDelete(template.id);
+                              setDeleteConfirmId(template.id);
                             }}
                             className="p-2 text-red-500 hover:bg-red-50 rounded-lg"
                           >
@@ -898,6 +911,26 @@ export default function ScheduleTemplatesPage({ params }: { params: { campground
           </motion.div>
         )}
       </div>
+
+      <AlertDialog open={!!deleteConfirmId} onOpenChange={(open) => !open && setDeleteConfirmId(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Template</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete this template? This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={confirmDeleteTemplate}
+              className="bg-red-600 hover:bg-red-700"
+            >
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </DashboardShell>
   );
 }

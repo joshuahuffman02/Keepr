@@ -37,6 +37,16 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 interface Charity {
   id: string;
@@ -101,6 +111,7 @@ export default function CharityAdminPage() {
     website: "",
     category: "",
   });
+  const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
 
   const fetchCharities = async () => {
     try {
@@ -177,16 +188,18 @@ export default function CharityAdminPage() {
     }
   };
 
-  const handleDelete = async (id: string) => {
-    if (!confirm("Are you sure you want to deactivate this charity?")) return;
+  const confirmDeleteCharity = async () => {
+    if (!deleteConfirmId) return;
 
     try {
-      const res = await fetch(`/api/charity/${id}`, { method: "DELETE" });
+      const res = await fetch(`/api/charity/${deleteConfirmId}`, { method: "DELETE" });
       if (res.ok) {
         fetchCharities();
       }
     } catch (error) {
       console.error("Failed to delete charity:", error);
+    } finally {
+      setDeleteConfirmId(null);
     }
   };
 
@@ -448,7 +461,7 @@ export default function CharityAdminPage() {
                         <Button
                           variant="ghost"
                           size="sm"
-                          onClick={() => handleDelete(charity.id)}
+                          onClick={() => setDeleteConfirmId(charity.id)}
                           className="text-slate-400 hover:text-red-400"
                         >
                           <Trash2 className="h-4 w-4" />
@@ -566,6 +579,26 @@ export default function CharityAdminPage() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      <AlertDialog open={!!deleteConfirmId} onOpenChange={(open) => !open && setDeleteConfirmId(null)}>
+        <AlertDialogContent className="bg-slate-800 border-slate-700">
+          <AlertDialogHeader>
+            <AlertDialogTitle className="text-white">Deactivate Charity</AlertDialogTitle>
+            <AlertDialogDescription className="text-slate-400">
+              Are you sure you want to deactivate this charity? This action can be reversed.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel className="border-slate-600 text-slate-300 hover:bg-slate-700">Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={confirmDeleteCharity}
+              className="bg-red-600 hover:bg-red-700"
+            >
+              Deactivate
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

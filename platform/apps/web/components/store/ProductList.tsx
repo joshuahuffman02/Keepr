@@ -2,6 +2,16 @@ import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { apiClient } from "../../lib/api-client";
 import { Button } from "../ui/button";
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+} from "../ui/alert-dialog";
 import { ProductModal } from "./ProductModal";
 import { ProductImportExport } from "./ProductImportExport";
 import { Product, ProductCategory } from "@campreserv/shared";
@@ -14,6 +24,7 @@ export function ProductList({ campgroundId }: ProductListProps) {
     const qc = useQueryClient();
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingProduct, setEditingProduct] = useState<Product | null>(null);
+    const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
 
     const productsQuery = useQuery({
         queryKey: ["store-products", campgroundId],
@@ -112,11 +123,7 @@ export function ProductList({ campgroundId }: ProductListProps) {
                                     variant="ghost"
                                     size="sm"
                                     className="text-red-600 hover:text-red-700 hover:bg-red-50"
-                                    onClick={() => {
-                                        if (confirm("Are you sure you want to delete this product?")) {
-                                            deleteMutation.mutate(product.id);
-                                        }
-                                    }}
+                                    onClick={() => setDeleteConfirmId(product.id)}
                                 >
                                     Delete
                                 </Button>
@@ -138,6 +145,31 @@ export function ProductList({ campgroundId }: ProductListProps) {
                 categories={categories}
                 onSave={handleSave}
             />
+
+            <AlertDialog open={!!deleteConfirmId} onOpenChange={(open) => !open && setDeleteConfirmId(null)}>
+                <AlertDialogContent>
+                    <AlertDialogHeader>
+                        <AlertDialogTitle>Delete Product</AlertDialogTitle>
+                        <AlertDialogDescription>
+                            Are you sure you want to delete this product? This action cannot be undone.
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogAction
+                            onClick={() => {
+                                if (deleteConfirmId) {
+                                    deleteMutation.mutate(deleteConfirmId);
+                                    setDeleteConfirmId(null);
+                                }
+                            }}
+                            className="bg-red-600 hover:bg-red-700"
+                        >
+                            Delete
+                        </AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
         </div>
     );
 }

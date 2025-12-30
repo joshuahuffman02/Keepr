@@ -31,6 +31,16 @@ import {
     AlertCircle,
     PartyPopper
 } from "lucide-react";
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 const SPRING_CONFIG = {
     type: "spring" as const,
@@ -57,6 +67,7 @@ export default function KioskDevicesPage() {
     const [message, setMessage] = useState<{ type: "success" | "error" | "info"; text: string } | null>(null);
     const [showCelebration, setShowCelebration] = useState(false);
     const [copiedCode, setCopiedCode] = useState(false);
+    const [deleteConfirm, setDeleteConfirm] = useState<{ id: string; name: string } | null>(null);
 
     // Fetch campground for breadcrumb
     const campgroundQuery = useQuery({
@@ -436,11 +447,7 @@ export default function KioskDevicesPage() {
                                                     <Button
                                                         size="sm"
                                                         variant="ghost"
-                                                        onClick={() => {
-                                                            if (confirm(`Remove "${device.name}" permanently? This cannot be undone.`)) {
-                                                                deleteMutation.mutate(device.id);
-                                                            }
-                                                        }}
+                                                        onClick={() => setDeleteConfirm({ id: device.id, name: device.name })}
                                                         disabled={deleteMutation.isPending}
                                                         className="text-red-600 hover:text-red-700 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-900/20"
                                                     >
@@ -496,6 +503,31 @@ export default function KioskDevicesPage() {
                     </Card>
                 </motion.div>
             </div>
+
+            <AlertDialog open={!!deleteConfirm} onOpenChange={(open) => !open && setDeleteConfirm(null)}>
+                <AlertDialogContent>
+                    <AlertDialogHeader>
+                        <AlertDialogTitle>Remove Device</AlertDialogTitle>
+                        <AlertDialogDescription>
+                            Are you sure you want to remove "{deleteConfirm?.name}" permanently? This action cannot be undone.
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogAction
+                            onClick={() => {
+                                if (deleteConfirm) {
+                                    deleteMutation.mutate(deleteConfirm.id);
+                                    setDeleteConfirm(null);
+                                }
+                            }}
+                            className="bg-red-600 hover:bg-red-700"
+                        >
+                            Remove
+                        </AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
         </DashboardShell>
     );
 }

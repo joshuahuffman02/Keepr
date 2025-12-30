@@ -32,6 +32,16 @@ import { cn } from "../../lib/utils";
 import { Skeleton } from "../../components/ui/skeleton";
 import { SessionScheduleWizard } from "../../components/activities/SessionScheduleWizard";
 import { BundlesManager } from "../../components/activities/BundlesManager";
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+} from "../../components/ui/alert-dialog";
 
 const locales = {
     "en-US": enUS,
@@ -122,6 +132,7 @@ function ActivityCard({
 }) {
     const { toast } = useToast();
     const [isHovered, setIsHovered] = useState(false);
+    const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
 
     const capacityQuery = useQuery<CapacitySnapshot>({
         queryKey: ["activityCapacity", activity.id],
@@ -301,17 +312,36 @@ function ActivityCard({
                         variant="ghost"
                         size="icon"
                         className="text-slate-400 hover:text-red-500 hover:bg-red-50 transition-colors"
-                        onClick={() => {
-                            if (confirm("Delete this activity? This cannot be undone.")) {
-                                onDelete(activity.id);
-                            }
-                        }}
+                        onClick={() => setDeleteConfirmOpen(true)}
                         aria-label={`Delete ${activity.name}`}
                     >
                         <Trash2 className="h-4 w-4" />
                     </Button>
                 </div>
             </CardContent>
+
+            <AlertDialog open={deleteConfirmOpen} onOpenChange={setDeleteConfirmOpen}>
+                <AlertDialogContent>
+                    <AlertDialogHeader>
+                        <AlertDialogTitle>Delete Activity</AlertDialogTitle>
+                        <AlertDialogDescription>
+                            Are you sure you want to delete "{activity.name}"? This action cannot be undone.
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogAction
+                            onClick={() => {
+                                onDelete(activity.id);
+                                setDeleteConfirmOpen(false);
+                            }}
+                            className="bg-red-600 hover:bg-red-700"
+                        >
+                            Delete
+                        </AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
         </Card>
     );
 }

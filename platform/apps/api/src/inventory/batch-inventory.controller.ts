@@ -68,31 +68,40 @@ export class BatchInventoryController {
     }
 
     @Get("batches/:id")
-    async getBatch(@Param("id") id: string) {
-        return this.batchService.getBatch(id);
+    async getBatch(
+        @Param("campgroundId") campgroundId: string,
+        @Param("id") id: string
+    ) {
+        return this.batchService.getBatch(id, campgroundId);
     }
 
     @Put("batches/:id")
-    async updateBatch(@Param("id") id: string, @Body() dto: UpdateBatchDto) {
-        return this.batchService.updateBatch(id, dto);
+    async updateBatch(
+        @Param("campgroundId") campgroundId: string,
+        @Param("id") id: string,
+        @Body() dto: UpdateBatchDto
+    ) {
+        return this.batchService.updateBatch(id, campgroundId, dto);
     }
 
     @Post("batches/:id/adjust")
     async adjustBatch(
+        @Param("campgroundId") campgroundId: string,
         @Param("id") id: string,
         @Body() dto: AdjustBatchDto,
         @Request() req: any
     ) {
-        return this.batchService.adjustBatch(id, dto, req.user.id);
+        return this.batchService.adjustBatch(id, campgroundId, dto, req.user.id);
     }
 
     @Post("batches/:id/dispose")
     async disposeBatch(
+        @Param("campgroundId") campgroundId: string,
         @Param("id") id: string,
         @Body() dto: DisposeBatchDto,
         @Request() req: any
     ) {
-        return this.batchService.disposeBatch(id, dto, req.user.id);
+        return this.batchService.disposeBatch(id, campgroundId, dto, req.user.id);
     }
 
     // ==================== EXPIRATION ALERTS ====================
