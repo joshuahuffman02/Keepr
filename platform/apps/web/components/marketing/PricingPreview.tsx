@@ -83,10 +83,10 @@ const competitors = [
     monthlyBase: "$100",
     perBooking: "$2.30",
     marketplaceCommission: "0%",
-    setupFee: "$0",
+    setupFee: "DIY Free",
     paymentProcessing: "2.9% + $0.30",
-    freeTrialDays: "30",
-    support: "Priority",
+    freeTrialDays: "30-day guarantee",
+    support: "Email",
     aiIncluded: "$5/mo",
     features: {
       onlineBooking: true,
@@ -218,8 +218,8 @@ export function PricingPreview() {
           </h2>
 
           <p className="text-xl text-slate-300 mb-8">
-            Stop overpaying for outdated software. Join 45 founding campgrounds who locked in
-            pricing that will never increase — while competitors raise rates every year.
+            Stop overpaying for outdated software. Lock in early access pricing
+            that will never increase — while competitors raise rates every year.
           </p>
 
           <div className="flex flex-wrap items-center justify-center gap-6 text-slate-400">
@@ -229,7 +229,7 @@ export function PricingPreview() {
             </div>
             <div className="flex items-center gap-2">
               <Gift className="h-5 w-5 text-emerald-400" />
-              <span>Free migration</span>
+              <span>Free migration for early access</span>
             </div>
             <div className="flex items-center gap-2">
               <Zap className="h-5 w-5 text-emerald-400" />

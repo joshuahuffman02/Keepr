@@ -87,21 +87,21 @@ export function DemoCTA() {
           {/* Left Column - Content */}
           <div className="text-white">
             <h2 className="text-4xl sm:text-5xl font-bold mb-6">
-              Ready to transform your campground?
+              Ready to modernize your campground?
             </h2>
             <p className="text-xl text-emerald-50 mb-8">
-              Join hundreds of successful campground owners who have streamlined their operations
-              and increased revenue with Camp Everyday Host.
+              See how Camp Everyday can streamline your operations with AI-powered tools,
+              guest loyalty programs, and integrated staff scheduling.
             </p>
 
             {/* Benefits */}
             <div className="space-y-4">
               {[
-                'Free 30-day trial with full access',
-                'No credit card required',
-                'Personal onboarding & training',
+                '30-day money-back guarantee',
+                'Early access pricing locked forever',
+                'DIY setup guides included',
+                'Optional setup assistance available',
                 'Data import services available',
-                '24/7 customer support',
               ].map((benefit) => (
                 <div key={benefit} className="flex items-start gap-3">
                   <CheckCircle2 className="h-6 w-6 text-emerald-300 flex-shrink-0 mt-0.5" />
@@ -112,20 +112,9 @@ export function DemoCTA() {
 
             {/* Trust Badge */}
             <div className="mt-8 pt-8 border-t border-emerald-400/30">
-              <p className="text-emerald-100 text-sm mb-2">Built for campground owners</p>
+              <p className="text-emerald-100 text-sm mb-2">Built by campground enthusiasts</p>
               <div className="flex items-center gap-2">
-                <div className="flex -space-x-2">
-                  {[1, 2, 3, 4, 5].map((i) => (
-                    <div
-                      key={i}
-                      className="h-10 w-10 rounded-full bg-white border-2 border-emerald-600"
-                    />
-                  ))}
-                </div>
-                <div className="flex items-center gap-1 ml-2">
-                  <span className="text-emerald-300">✦</span>
-                  <span className="ml-2 text-white font-semibold">Join early access</span>
-                </div>
+                <span className="text-white font-semibold">Limited early access spots available</span>
               </div>
             </div>
           </div>

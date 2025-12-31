@@ -35,11 +35,11 @@ const coreFeatures = [
 // What you get with Camp Everyday
 const benefits = [
   "0% marketplace commission - keep 100% of your booking revenue",
-  "$0 setup fee - start using the platform immediately",
+  "DIY setup is free - optional assistance available",
   "Built-in loyalty program with XP, levels, and rewards",
   "AI-powered demand forecasting and pricing insights",
   "Staff scheduling synced with your occupancy",
-  "Go live in 48 hours with optional setup assistance",
+  "Go live in 48 hours with our setup guides",
 ];
 
 const colorClasses = {
