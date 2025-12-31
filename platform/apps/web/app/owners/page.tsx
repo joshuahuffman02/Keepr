@@ -13,12 +13,38 @@ import { Footer } from '@/components/marketing/Footer';
 
 
 export const metadata: Metadata = {
-  title: 'Camp Everyday - Modern Alternative to Campspot & Newbook',
-  description: 'Tired of clunky legacy software? Camp Everyday is the modern reservation system for campgrounds and RV parks. No contracts, no hidden fees, go live in 48 hours.',
+  title: 'Campground Management Software | Camp Everyday - Campspot Alternative',
+  description: 'The modern campground reservation software with AI, loyalty programs, and staff scheduling. Everything Campspot has, plus features they don\'t. $100/mo flat + $2.30/booking. No contracts.',
+  keywords: [
+    'campground management software',
+    'rv park reservation system',
+    'campground booking software',
+    'campspot alternative',
+    'newbook alternative',
+    'campground software with loyalty program',
+    'rv park software with staff scheduling',
+    'campground software with ai pricing',
+  ],
   openGraph: {
-    title: 'Camp Everyday - Modern Alternative to Campspot & Newbook',
-    description: 'Tired of clunky legacy software? The modern reservation system for campgrounds.',
+    title: 'Camp Everyday - Everything Campspot Has, Plus Loyalty, AI & Staff Scheduling',
+    description: 'The modern campground management software. AI demand forecasting, loyalty programs, and staff scheduling that no competitor offers. $100/mo + $2.30/booking.',
     type: 'website',
+    images: [
+      {
+        url: '/images/og/owners-preview.png',
+        width: 1200,
+        height: 630,
+        alt: 'Camp Everyday - Modern Campground Management Software',
+      },
+    ],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Camp Everyday - Modern Campground Software',
+    description: 'AI, loyalty programs, staff scheduling. Features Campspot doesn\'t have.',
+  },
+  alternates: {
+    canonical: 'https://campeveryday.com/owners',
   },
 };
 

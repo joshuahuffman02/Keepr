@@ -1,8 +1,9 @@
 'use client';
 
 import { Button } from '@/components/ui/button';
+import Link from 'next/link';
 import Image from 'next/image';
-import { ArrowRight, Play } from 'lucide-react';
+import { ArrowRight, Play, Sparkles, Users, Calendar, Brain } from 'lucide-react';
 
 export function HeroSection() {
   return (
@@ -22,41 +23,64 @@ export function HeroSection() {
           {/* Left Column - Content */}
           <div className="space-y-8">
             {/* Badge */}
-            <div className="inline-flex items-center rounded-full px-4 py-1.5 text-sm font-medium bg-status-success/15 text-status-success border border-status-success/30">
-              <span className="relative flex h-2 w-2 mr-2">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-status-success opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-status-success"></span>
-              </span>
-              Tired of clunky software? There's a better way.
+            <div className="inline-flex items-center rounded-full px-4 py-1.5 text-sm font-medium bg-amber-100 text-amber-800 border border-amber-200">
+              <Sparkles className="h-4 w-4 mr-2" />
+              Built for parks that outgrew Campspot
             </div>
 
-            {/* Headline */}
+            {/* Headline - Strategy Aligned */}
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight text-slate-900">
-              The Modern Alternative to{' '}
+              Everything Campspot has.{' '}
               <span className="bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent">
-                Legacy Reservation Systems
+                Plus loyalty, AI, and staff scheduling.
               </span>
             </h1>
 
-            {/* Subheadline */}
+            {/* Subheadline - Pricing Transparency */}
             <p className="text-xl text-slate-600 leading-relaxed">
-              Ditch the outdated software, confusing contracts, and nickel-and-dime fees.
-              Camp Everyday is built for 2025 — fast, simple, and priced fairly.
+              The modern reservation system for campgrounds and RV parks.
+              <span className="font-semibold text-slate-900"> $100/month flat</span> + $2.30/booking.
+              No contracts. No hidden fees. Go live in 48 hours.
             </p>
 
-            {/* Pain Points */}
+            {/* Exclusive Features - No Competitor Has These */}
+            <div className="grid grid-cols-3 gap-4">
+              <div className="flex flex-col items-center text-center p-3 rounded-xl bg-white border border-slate-200 shadow-sm">
+                <div className="h-10 w-10 rounded-lg bg-purple-100 flex items-center justify-center mb-2">
+                  <Sparkles className="h-5 w-5 text-purple-600" />
+                </div>
+                <span className="text-xs font-semibold text-slate-900">Loyalty & XP</span>
+                <span className="text-xs text-slate-500">No competitor has this</span>
+              </div>
+              <div className="flex flex-col items-center text-center p-3 rounded-xl bg-white border border-slate-200 shadow-sm">
+                <div className="h-10 w-10 rounded-lg bg-blue-100 flex items-center justify-center mb-2">
+                  <Brain className="h-5 w-5 text-blue-600" />
+                </div>
+                <span className="text-xs font-semibold text-slate-900">AI Forecasting</span>
+                <span className="text-xs text-slate-500">No competitor has this</span>
+              </div>
+              <div className="flex flex-col items-center text-center p-3 rounded-xl bg-white border border-slate-200 shadow-sm">
+                <div className="h-10 w-10 rounded-lg bg-emerald-100 flex items-center justify-center mb-2">
+                  <Calendar className="h-5 w-5 text-emerald-600" />
+                </div>
+                <span className="text-xs font-semibold text-slate-900">Staff Scheduling</span>
+                <span className="text-xs text-slate-500">No competitor has this</span>
+              </div>
+            </div>
+
+            {/* Trust Indicators */}
             <div className="flex flex-wrap gap-3 text-sm">
-              <span className="inline-flex items-center px-3 py-1 rounded-full bg-status-error/15 text-status-error border border-status-error/30">
-                <svg className="mr-1.5 w-3 h-3" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg> No contracts
+              <span className="inline-flex items-center px-3 py-1.5 rounded-full bg-emerald-100 text-emerald-700 font-medium">
+                <svg className="mr-1.5 w-4 h-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                30-day money-back guarantee
               </span>
-              <span className="inline-flex items-center px-3 py-1 rounded-full bg-status-error/15 text-status-error border border-status-error/30">
-                <svg className="mr-1.5 w-3 h-3" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg> No setup fees
+              <span className="inline-flex items-center px-3 py-1.5 rounded-full bg-emerald-100 text-emerald-700 font-medium">
+                <svg className="mr-1.5 w-4 h-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                Free data migration
               </span>
-              <span className="inline-flex items-center px-3 py-1 rounded-full bg-status-error/15 text-status-error border border-status-error/30">
-                <svg className="mr-1.5 w-3 h-3" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg> No hidden costs
-              </span>
-              <span className="inline-flex items-center px-3 py-1 rounded-full bg-status-success/15 text-status-success border border-status-success/30">
-                <svg className="mr-1.5 w-3 h-3" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Go live in 48 hours
+              <span className="inline-flex items-center px-3 py-1.5 rounded-full bg-emerald-100 text-emerald-700 font-medium">
+                <svg className="mr-1.5 w-4 h-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                Go live in 48 hours
               </span>
             </div>
 
@@ -65,36 +89,37 @@ export function HeroSection() {
               <Button
                 size="lg"
                 className="bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white text-lg px-8 py-6 group"
+                asChild
               >
-                Get a Free Demo
-                <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
+                <Link href="/demo">
+                  Try Live Demo
+                  <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
+                </Link>
               </Button>
               <Button
                 size="lg"
                 variant="outline"
                 className="text-lg px-8 py-6 border-2 border-slate-300 hover:border-emerald-600 hover:text-emerald-600 group"
+                asChild
               >
-                <Play className="mr-2 h-5 w-5" />
-                Watch Video
+                <Link href="/roi-calculator">
+                  <svg className="mr-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="4" y="2" width="16" height="20" rx="2"/><line x1="8" y1="6" x2="16" y2="6"/><line x1="8" y1="10" x2="16" y2="10"/><line x1="8" y1="14" x2="12" y2="14"/><line x1="8" y1="18" x2="12" y2="18"/></svg>
+                  Calculate Your Savings
+                </Link>
               </Button>
             </div>
 
-            {/* Trust Indicators */}
-            <div className="flex items-center gap-8 pt-4">
-              <div className="flex -space-x-2">
-                {[1, 2, 3, 4].map((i) => (
-                  <div
-                    key={i}
-                    className="h-10 w-10 rounded-full bg-gradient-to-br from-emerald-400 to-teal-500 border-2 border-white"
-                  />
-                ))}
-              </div>
-              <div className="text-sm text-slate-600">
-                <div className="font-semibold text-slate-900">Switching from Campspot or Newbook?</div>
-                <div className="flex items-center gap-1">
-                  <svg className="w-3 h-3 text-emerald-600" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-                  <span className="text-slate-600">We migrate your data for free</span>
-                </div>
+            {/* Switching CTA */}
+            <div className="flex items-center gap-4 pt-2">
+              <div className="text-sm">
+                <span className="text-slate-600">Switching from </span>
+                <Link href="/compare/campspot" className="font-semibold text-emerald-600 hover:text-emerald-700">Campspot</Link>
+                <span className="text-slate-600">, </span>
+                <Link href="/compare/newbook" className="font-semibold text-emerald-600 hover:text-emerald-700">Newbook</Link>
+                <span className="text-slate-600">, or </span>
+                <Link href="/compare/camplife" className="font-semibold text-emerald-600 hover:text-emerald-700">CampLife</Link>
+                <span className="text-slate-600">? </span>
+                <Link href="/switch-from-campspot" className="font-semibold text-emerald-600 hover:text-emerald-700 underline">We migrate free.</Link>
               </div>
             </div>
           </div>

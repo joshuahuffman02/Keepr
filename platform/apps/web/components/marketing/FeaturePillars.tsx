@@ -7,44 +7,63 @@ import {
   Users,
   Zap,
   BarChart3,
-  ArrowRight
+  ArrowRight,
+  Brain,
+  Sparkles,
+  Calendar
 } from 'lucide-react';
 
 const features = [
   {
-    name: 'Growth & Revenue',
-    description: 'Maximize bookings and optimize pricing with intelligent revenue management tools.',
-    icon: TrendingUp,
-    color: 'emerald',
-    features: [
-      'Dynamic pricing optimization',
-      'Channel management',
-      'Revenue analytics',
-      'Seasonal rate automation',
-    ],
-  },
-  {
-    name: 'Management & Operations',
-    description: 'Streamline daily operations with powerful automation and workflows.',
-    icon: Settings,
+    name: 'AI-Powered Intelligence',
+    description: 'The only campground software with real AI. Predict demand, optimize pricing, and reduce no-shows.',
+    icon: Brain,
     color: 'blue',
+    exclusive: true,
     features: [
-      'Reservation management',
-      'Site assignment & grid',
-      'Maintenance tracking',
-      'Staff management',
+      'AI demand forecasting',
+      'AI pricing recommendations',
+      'AI no-show detection',
+      'Anomaly detection alerts',
     ],
   },
   {
-    name: 'Marketing & Distribution',
-    description: 'Expand your reach with integrated marketing tools and OTA connections.',
-    icon: Megaphone,
+    name: 'Loyalty & Gamification',
+    description: 'Turn one-time guests into lifetime campers with XP, levels, and rewards.',
+    icon: Sparkles,
     color: 'purple',
+    exclusive: true,
     features: [
-      'Email campaigns',
-      'OTA marketplace',
-      'SEO optimization',
-      'Social media integration',
+      'XP system & leveling',
+      'Rewards marketplace',
+      'Achievement badges',
+      'Referral programs',
+    ],
+  },
+  {
+    name: 'Staff Scheduling & Payroll',
+    description: 'Finally, staff scheduling that syncs with your occupancy. Includes time tracking.',
+    icon: Calendar,
+    color: 'emerald',
+    exclusive: true,
+    features: [
+      'Shift scheduling',
+      'Time clock & tracking',
+      'Payroll integration',
+      'Occupancy-based staffing',
+    ],
+  },
+  {
+    name: 'Reservations & Revenue',
+    description: 'Maximize bookings with dynamic pricing and intelligent revenue management.',
+    icon: TrendingUp,
+    color: 'teal',
+    exclusive: false,
+    features: [
+      'Drag-and-drop calendar',
+      'Dynamic pricing rules',
+      'Group bookings',
+      'Waitlist management',
     ],
   },
   {
@@ -52,35 +71,25 @@ const features = [
     description: 'Delight guests with seamless booking, check-in, and communication.',
     icon: Users,
     color: 'pink',
+    exclusive: false,
     features: [
       'Online booking engine',
-      'Mobile check-in',
-      'Guest portal',
-      'Automated messaging',
+      'Self-service portal',
+      '2-way SMS messaging',
+      'Push notifications',
     ],
   },
   {
-    name: 'Integrations & Apps',
-    description: 'Connect with your favorite tools and extend functionality.',
-    icon: Zap,
+    name: 'Operations & Integrations',
+    description: 'Run your entire park from one place. Connect to your favorite tools.',
+    icon: Settings,
     color: 'amber',
+    exclusive: false,
     features: [
-      'Payment processors',
-      'Accounting software',
-      'POS systems',
-      'Third-party apps',
-    ],
-  },
-  {
-    name: 'Data & Reporting',
-    description: 'Make informed decisions with comprehensive analytics and insights.',
-    icon: BarChart3,
-    color: 'teal',
-    features: [
-      'Custom dashboards',
-      'Financial reports',
-      'Occupancy analytics',
-      'Performance metrics',
+      'Housekeeping management',
+      'Maintenance tickets',
+      'POS & camp store',
+      'Accounting integrations',
     ],
   },
 ];
@@ -125,13 +134,14 @@ export function FeaturePillars() {
         {/* Section Header */}
         <div className="text-center max-w-3xl mx-auto mb-16">
           <h2 className="text-base font-semibold text-emerald-600 tracking-wide uppercase mb-3">
-            Complete Solution
+            Complete Platform
           </h2>
           <p className="text-4xl font-bold text-slate-900 mb-4">
-            Everything you need to run your campground
+            Everything competitors have. Plus features they don't.
           </p>
           <p className="text-xl text-slate-600">
-            From bookings to check-out, we've got every aspect of your operation covered.
+            The first 3 features below? No other campground software offers them.
+            That's our edge.
           </p>
         </div>
 
@@ -144,10 +154,18 @@ export function FeaturePillars() {
             return (
               <div
                 key={feature.name}
-                className={`group relative bg-white rounded-2xl border-2 border-slate-200 p-8 transition-all duration-300 hover:shadow-xl ${colors.hover}`}
+                className={`group relative bg-white rounded-2xl border-2 ${feature.exclusive ? 'border-emerald-300 ring-2 ring-emerald-100' : 'border-slate-200'} p-8 transition-all duration-300 hover:shadow-xl ${colors.hover}`}
               >
+                {/* Exclusive Badge */}
+                {feature.exclusive && (
+                  <div className="absolute -top-3 left-6 inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-emerald-600 text-white">
+                    <Sparkles className="h-3 w-3 mr-1" />
+                    EXCLUSIVE
+                  </div>
+                )}
+
                 {/* Icon */}
-                <div className={`inline-flex h-14 w-14 items-center justify-center rounded-xl ${colors.bg} mb-6`}>
+                <div className={`inline-flex h-14 w-14 items-center justify-center rounded-xl ${colors.bg} mb-6 ${feature.exclusive ? 'mt-2' : ''}`}>
                   <Icon className={`h-7 w-7 ${colors.icon}`} />
                 </div>
 
@@ -179,14 +197,12 @@ export function FeaturePillars() {
                   ))}
                 </ul>
 
-                {/* Learn More Link */}
-                <a
-                  href={`#${feature.name.toLowerCase().replace(/\s+/g, '-')}`}
-                  className="inline-flex items-center text-sm font-semibold text-emerald-600 hover:text-emerald-700 group-hover:translate-x-1 transition-transform"
-                >
-                  Learn more
-                  <ArrowRight className="ml-2 h-4 w-4" />
-                </a>
+                {/* Competitor Note for Exclusive Features */}
+                {feature.exclusive && (
+                  <div className="text-xs text-red-600 font-medium mb-4">
+                    Campspot, Newbook, CampLife don't offer this
+                  </div>
+                )}
 
                 {/* Hover Effect */}
                 <div className="absolute inset-0 -z-10 rounded-2xl bg-gradient-to-br from-emerald-50 to-teal-50 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
