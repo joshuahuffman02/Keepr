@@ -127,6 +127,7 @@ import { QueueModule } from "./queues/queue.module";
 import { SeoSeedingModule } from "./seo-seeding/seo-seeding.module";
 import { ClaimsModule } from "./claims/claims.module";
 import { PublicCampgroundsModule } from "./public-campgrounds/public-campgrounds.module";
+import { PublicEventsModule } from "./public-events/public-events.module";
 import { PublicLocationsModule } from "./public-locations/public-locations.module";
 import { SoftwarePagesModule } from "./software-pages/software-pages.module";
 import { SeoModule } from "./seo/seo.module";
@@ -272,6 +273,8 @@ import { SeoModule } from "./seo/seo.module";
     ClaimsModule,
     // Public Campgrounds - Unauthenticated campground pages
     PublicCampgroundsModule,
+    // Public Events - Unauthenticated events discovery
+    PublicEventsModule,
     // Public Locations - SEO location pages (states, cities, attractions)
     PublicLocationsModule,
     // Software Pages - B2B SEO (competitor comparisons, feature pages)

@@ -391,15 +391,14 @@ export function CampgroundCard({
                             </Link>
                         ) : (
                             <div className="flex flex-col items-end gap-1">
-                            <span className="px-3 py-1.5 text-xs font-medium text-slate-500 bg-slate-100 rounded-full">
-                                External
-                            </span>
-                                <a
-                                    href={`mailto:hello@campeveryday.com?subject=Invite%20${encodeURIComponent(name)}%20to%20Camp%20Everyday&body=Please reach out to ${encodeURIComponent(name)} to join the platform.`}
-                                    className="text-[11px] text-emerald-700 font-semibold hover:text-emerald-800"
+                                <Link
+                                    href={campgroundPath}
+                                    onClick={onExplore}
+                                    className="px-4 py-2 text-sm font-semibold text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 rounded-lg transition-colors flex items-center gap-1 group"
                                 >
-                                    Suggest this park →
-                                </a>
+                                    <span>View</span>
+                                    <span className="group-hover:translate-x-0.5 transition-transform">→</span>
+                                </Link>
                             </div>
                         )}
                     </div>
