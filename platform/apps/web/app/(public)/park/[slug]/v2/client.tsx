@@ -330,8 +330,10 @@ export function CampgroundV2Client({ slug, initialData, previewToken }: { slug: 
               </div>
             )}
 
-            {/* Trust badges */}
-            <TrustBadges variant="compact" className="mt-4 justify-center text-white/90" />
+            {/* Trust badges - only show for internal (non-RIDB) campgrounds */}
+            {!isExternal && (
+              <TrustBadges variant="compact" className="mt-4 justify-center text-white/90" />
+            )}
           </div>
         </div>
       </section>
@@ -903,8 +905,8 @@ export function CampgroundV2Client({ slug, initialData, previewToken }: { slug: 
           </section>
         )}
 
-        {/* Gallery with keyboard navigation */}
-        {photos.length > 0 && (
+        {/* Gallery with keyboard navigation - only show for internal campgrounds with photos */}
+        {!isExternal && photos.length > 0 && (
           <section className="space-y-3" aria-label="Photo gallery">
             <div className="flex items-center justify-between">
               <h2 className="text-xl font-semibold text-slate-900">Gallery</h2>
