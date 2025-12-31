@@ -23,48 +23,49 @@ export function HeroSection() {
           {/* Left Column - Content */}
           <div className="space-y-8">
             {/* Badge */}
-            <div className="inline-flex items-center rounded-full px-4 py-1.5 text-sm font-medium bg-amber-100 text-amber-800 border border-amber-200">
+            <div className="inline-flex items-center rounded-full px-4 py-1.5 text-sm font-medium bg-emerald-100 text-emerald-800 border border-emerald-200">
               <Sparkles className="h-4 w-4 mr-2" />
-              Built for parks that outgrew Campspot
+              The all-in-one platform for modern campgrounds
             </div>
 
-            {/* Headline - Strategy Aligned */}
+            {/* Headline */}
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight text-slate-900">
-              Everything Campspot has.{' '}
+              Run your campground{' '}
               <span className="bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent">
-                Plus loyalty, AI, and staff scheduling.
+                smarter, not harder
               </span>
             </h1>
 
-            {/* Subheadline - Pricing Transparency */}
+            {/* Subheadline - Value Proposition */}
             <p className="text-xl text-slate-600 leading-relaxed">
-              The modern reservation system for campgrounds and RV parks.
+              The modern reservation system with AI-powered insights, guest loyalty programs,
+              and integrated staff scheduling.
               <span className="font-semibold text-slate-900"> $100/month flat</span> + $2.30/booking.
-              No contracts. No hidden fees. Go live in 48 hours.
+              No contracts. Go live in 48 hours.
             </p>
 
-            {/* Exclusive Features - No Competitor Has These */}
+            {/* Key Features */}
             <div className="grid grid-cols-3 gap-4">
               <div className="flex flex-col items-center text-center p-3 rounded-xl bg-white border border-slate-200 shadow-sm">
                 <div className="h-10 w-10 rounded-lg bg-purple-100 flex items-center justify-center mb-2">
                   <Sparkles className="h-5 w-5 text-purple-600" />
                 </div>
                 <span className="text-xs font-semibold text-slate-900">Loyalty & XP</span>
-                <span className="text-xs text-slate-500">No competitor has this</span>
+                <span className="text-xs text-slate-500">Keep guests coming back</span>
               </div>
               <div className="flex flex-col items-center text-center p-3 rounded-xl bg-white border border-slate-200 shadow-sm">
                 <div className="h-10 w-10 rounded-lg bg-blue-100 flex items-center justify-center mb-2">
                   <Brain className="h-5 w-5 text-blue-600" />
                 </div>
                 <span className="text-xs font-semibold text-slate-900">AI Forecasting</span>
-                <span className="text-xs text-slate-500">No competitor has this</span>
+                <span className="text-xs text-slate-500">Predict demand & pricing</span>
               </div>
               <div className="flex flex-col items-center text-center p-3 rounded-xl bg-white border border-slate-200 shadow-sm">
                 <div className="h-10 w-10 rounded-lg bg-emerald-100 flex items-center justify-center mb-2">
                   <Calendar className="h-5 w-5 text-emerald-600" />
                 </div>
                 <span className="text-xs font-semibold text-slate-900">Staff Scheduling</span>
-                <span className="text-xs text-slate-500">No competitor has this</span>
+                <span className="text-xs text-slate-500">Synced with occupancy</span>
               </div>
             </div>
 
@@ -109,17 +110,10 @@ export function HeroSection() {
               </Button>
             </div>
 
-            {/* Switching CTA */}
+            {/* Migration CTA */}
             <div className="flex items-center gap-4 pt-2">
-              <div className="text-sm">
-                <span className="text-slate-600">Switching from </span>
-                <Link href="/compare/campspot" className="font-semibold text-emerald-600 hover:text-emerald-700">Campspot</Link>
-                <span className="text-slate-600">, </span>
-                <Link href="/compare/newbook" className="font-semibold text-emerald-600 hover:text-emerald-700">Newbook</Link>
-                <span className="text-slate-600">, or </span>
-                <Link href="/compare/camplife" className="font-semibold text-emerald-600 hover:text-emerald-700">CampLife</Link>
-                <span className="text-slate-600">? </span>
-                <Link href="/switch-from-campspot" className="font-semibold text-emerald-600 hover:text-emerald-700 underline">We migrate free.</Link>
+              <div className="text-sm text-slate-600">
+                Switching from another system? <span className="font-semibold text-emerald-600">We migrate your data for free.</span>
               </div>
             </div>
           </div>
@@ -147,8 +141,8 @@ export function HeroSection() {
                   </svg>
                 </div>
                 <div>
-                  <div className="text-2xl font-bold text-slate-900">10x faster</div>
-                  <div className="text-xs text-slate-600">vs legacy systems</div>
+                  <div className="text-2xl font-bold text-slate-900">48 hours</div>
+                  <div className="text-xs text-slate-600">to go live</div>
                 </div>
               </div>
             </div>
@@ -161,8 +155,8 @@ export function HeroSection() {
                   </svg>
                 </div>
                 <div>
-                  <div className="text-2xl font-bold text-slate-900">50% less</div>
-                  <div className="text-xs text-slate-600">than competitors</div>
+                  <div className="text-2xl font-bold text-slate-900">$100/mo</div>
+                  <div className="text-xs text-slate-600">transparent pricing</div>
                 </div>
               </div>
             </div>

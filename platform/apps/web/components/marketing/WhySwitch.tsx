@@ -1,63 +1,45 @@
 'use client';
 
-import { XCircle, CheckCircle, ArrowRight, Sparkles, Brain, Calendar, Users, Star, Zap } from 'lucide-react';
+import { CheckCircle, ArrowRight, Sparkles, Brain, Calendar, Clock, Shield, Zap } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 
-// Features NO competitor offers
-const exclusiveFeatures = [
+// Core platform features
+const coreFeatures = [
   {
     name: "Loyalty & Gamification",
-    description: "XP system, leveling up, rewards - drive repeat bookings like never before",
+    description: "XP system, leveling up, rewards - keep guests coming back year after year",
     icon: Sparkles,
     color: "purple",
   },
   {
-    name: "AI Demand Forecasting",
-    description: "Predict busy periods and optimize pricing automatically",
+    name: "AI-Powered Insights",
+    description: "Demand forecasting and no-show prediction to optimize your operations",
     icon: Brain,
     color: "blue",
   },
   {
-    name: "AI No-Show Detection",
-    description: "Identify high-risk reservations before they cancel",
-    icon: Zap,
-    color: "amber",
-  },
-  {
-    name: "Staff Scheduling + Payroll",
-    description: "Integrated with reservations and time tracking",
+    name: "Staff Scheduling",
+    description: "Schedule staff based on occupancy with integrated time tracking",
     icon: Calendar,
     color: "emerald",
   },
+  {
+    name: "Lightning Fast",
+    description: "Modern interface built for speed - no more waiting on slow software",
+    icon: Zap,
+    color: "amber",
+  },
 ];
 
-// Pain points comparison
-const painPoints = [
-  {
-    legacy: "10% marketplace commission eats into profits",
-    modern: "0% marketplace commission - keep your revenue",
-  },
-  {
-    legacy: "$1,000-$3,000 setup fees",
-    modern: "$0 setup fee - start for free",
-  },
-  {
-    legacy: "No loyalty programs or gamification",
-    modern: "Built-in loyalty with XP, levels, and rewards",
-  },
-  {
-    legacy: "No AI or demand forecasting",
-    modern: "AI-powered pricing and no-show prediction",
-  },
-  {
-    legacy: "No staff scheduling integration",
-    modern: "Staff scheduling synced with occupancy",
-  },
-  {
-    legacy: "Weeks of setup and training",
-    modern: "Go live in 48 hours",
-  },
+// What you get with Camp Everyday
+const benefits = [
+  "0% marketplace commission - keep 100% of your booking revenue",
+  "$0 setup fee - start using the platform immediately",
+  "Built-in loyalty program with XP, levels, and rewards",
+  "AI-powered demand forecasting and pricing insights",
+  "Staff scheduling synced with your occupancy",
+  "Go live in 48 hours with free data migration",
 ];
 
 const colorClasses = {
@@ -73,22 +55,18 @@ export function WhySwitch() {
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="text-center mb-12">
-          <div className="inline-flex items-center rounded-full px-4 py-1.5 text-sm font-medium bg-emerald-100 text-emerald-700 border border-emerald-200 mb-4">
-            <Star className="h-4 w-4 mr-2" />
-            Features no competitor has
-          </div>
           <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-4">
-            Why Parks Are Switching to Camp Everyday
+            Why Campgrounds Choose Camp Everyday
           </h2>
           <p className="text-xl text-slate-600 max-w-2xl mx-auto">
-            We built the features campgrounds actually need - ones legacy systems
-            like Campspot and Newbook don't offer.
+            We built the platform we wished existed - modern, powerful, and designed
+            specifically for campground operations.
           </p>
         </div>
 
-        {/* Exclusive Features Grid */}
+        {/* Features Grid */}
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-16">
-          {exclusiveFeatures.map((feature) => {
+          {coreFeatures.map((feature) => {
             const Icon = feature.icon;
             const colors = colorClasses[feature.color as keyof typeof colorClasses];
             return (
@@ -101,54 +79,28 @@ export function WhySwitch() {
                 </div>
                 <h3 className="font-bold text-slate-900 mb-2">{feature.name}</h3>
                 <p className="text-sm text-slate-600">{feature.description}</p>
-                <div className="mt-3 inline-flex items-center text-xs font-semibold text-red-600 bg-red-50 px-2 py-1 rounded-full">
-                  <XCircle className="h-3 w-3 mr-1" />
-                  Competitors don't have this
-                </div>
               </div>
             );
           })}
         </div>
 
-        {/* Comparison Grid */}
-        <div className="grid md:grid-cols-2 gap-8 mb-12">
-          {/* Legacy Column */}
-          <div className="bg-white rounded-2xl p-8 border border-slate-200">
-            <div className="flex items-center gap-3 mb-6">
-              <div className="h-10 w-10 rounded-full bg-red-100 flex items-center justify-center">
-                <XCircle className="h-5 w-5 text-red-600" />
-              </div>
-              <div>
-                <h3 className="font-bold text-slate-900">Legacy Systems</h3>
-                <p className="text-sm text-slate-500">Campspot, Newbook, ResNexus...</p>
-              </div>
-            </div>
-            <ul className="space-y-4">
-              {painPoints.map((point, i) => (
-                <li key={i} className="flex items-start gap-3">
-                  <XCircle className="h-5 w-5 text-red-400 mt-0.5 flex-shrink-0" />
-                  <span className="text-slate-600">{point.legacy}</span>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          {/* Modern Column */}
+        {/* Benefits List */}
+        <div className="max-w-3xl mx-auto mb-12">
           <div className="bg-gradient-to-br from-emerald-50 to-teal-50 rounded-2xl p-8 border border-emerald-200">
             <div className="flex items-center gap-3 mb-6">
               <div className="h-10 w-10 rounded-full bg-emerald-100 flex items-center justify-center">
                 <CheckCircle className="h-5 w-5 text-emerald-600" />
               </div>
               <div>
-                <h3 className="font-bold text-slate-900">Camp Everyday</h3>
-                <p className="text-sm text-emerald-600">Built for modern campgrounds</p>
+                <h3 className="font-bold text-slate-900">What You Get</h3>
+                <p className="text-sm text-emerald-600">Everything you need to run your park</p>
               </div>
             </div>
-            <ul className="space-y-4">
-              {painPoints.map((point, i) => (
+            <ul className="grid md:grid-cols-2 gap-4">
+              {benefits.map((benefit, i) => (
                 <li key={i} className="flex items-start gap-3">
                   <CheckCircle className="h-5 w-5 text-emerald-500 mt-0.5 flex-shrink-0" />
-                  <span className="text-slate-700 font-medium">{point.modern}</span>
+                  <span className="text-slate-700">{benefit}</span>
                 </li>
               ))}
             </ul>
@@ -159,8 +111,8 @@ export function WhySwitch() {
         <div className="text-center">
           <div className="inline-flex flex-col sm:flex-row items-center gap-6 p-6 bg-white rounded-2xl shadow-lg border border-slate-100">
             <div className="text-left">
-              <p className="font-semibold text-slate-900">Ready to make the switch?</p>
-              <p className="text-sm text-slate-500">We'll migrate your data for free. Go live in 48 hours.</p>
+              <p className="font-semibold text-slate-900">Ready to get started?</p>
+              <p className="text-sm text-slate-500">Try the live demo or calculate your potential savings.</p>
             </div>
             <div className="flex gap-3">
               <Button
@@ -179,8 +131,8 @@ export function WhySwitch() {
                 className="whitespace-nowrap"
                 asChild
               >
-                <Link href="/switch-from-campspot">
-                  Migration Guide
+                <Link href="/roi-calculator">
+                  ROI Calculator
                 </Link>
               </Button>
             </div>

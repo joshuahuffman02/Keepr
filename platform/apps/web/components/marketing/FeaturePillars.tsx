@@ -16,10 +16,9 @@ import {
 const features = [
   {
     name: 'AI-Powered Intelligence',
-    description: 'The only campground software with real AI. Predict demand, optimize pricing, and reduce no-shows.',
+    description: 'Predict demand, optimize pricing, and reduce no-shows with built-in AI.',
     icon: Brain,
     color: 'blue',
-    exclusive: true,
     features: [
       'AI demand forecasting',
       'AI pricing recommendations',
@@ -32,7 +31,6 @@ const features = [
     description: 'Turn one-time guests into lifetime campers with XP, levels, and rewards.',
     icon: Sparkles,
     color: 'purple',
-    exclusive: true,
     features: [
       'XP system & leveling',
       'Rewards marketplace',
@@ -42,10 +40,9 @@ const features = [
   },
   {
     name: 'Staff Scheduling & Payroll',
-    description: 'Finally, staff scheduling that syncs with your occupancy. Includes time tracking.',
+    description: 'Schedule staff based on occupancy with integrated time tracking and payroll.',
     icon: Calendar,
     color: 'emerald',
-    exclusive: true,
     features: [
       'Shift scheduling',
       'Time clock & tracking',
@@ -58,7 +55,6 @@ const features = [
     description: 'Maximize bookings with dynamic pricing and intelligent revenue management.',
     icon: TrendingUp,
     color: 'teal',
-    exclusive: false,
     features: [
       'Drag-and-drop calendar',
       'Dynamic pricing rules',
@@ -71,7 +67,6 @@ const features = [
     description: 'Delight guests with seamless booking, check-in, and communication.',
     icon: Users,
     color: 'pink',
-    exclusive: false,
     features: [
       'Online booking engine',
       'Self-service portal',
@@ -84,7 +79,6 @@ const features = [
     description: 'Run your entire park from one place. Connect to your favorite tools.',
     icon: Settings,
     color: 'amber',
-    exclusive: false,
     features: [
       'Housekeeping management',
       'Maintenance tickets',
@@ -137,11 +131,11 @@ export function FeaturePillars() {
             Complete Platform
           </h2>
           <p className="text-4xl font-bold text-slate-900 mb-4">
-            Everything competitors have. Plus features they don't.
+            Everything you need to run your campground
           </p>
           <p className="text-xl text-slate-600">
-            The first 3 features below? No other campground software offers them.
-            That's our edge.
+            From AI-powered insights to guest loyalty programs, we've built the
+            all-in-one platform for modern campground operations.
           </p>
         </div>
 
@@ -154,18 +148,10 @@ export function FeaturePillars() {
             return (
               <div
                 key={feature.name}
-                className={`group relative bg-white rounded-2xl border-2 ${feature.exclusive ? 'border-emerald-300 ring-2 ring-emerald-100' : 'border-slate-200'} p-8 transition-all duration-300 hover:shadow-xl ${colors.hover}`}
+                className={`group relative bg-white rounded-2xl border-2 border-slate-200 p-8 transition-all duration-300 hover:shadow-xl ${colors.hover}`}
               >
-                {/* Exclusive Badge */}
-                {feature.exclusive && (
-                  <div className="absolute -top-3 left-6 inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-emerald-600 text-white">
-                    <Sparkles className="h-3 w-3 mr-1" />
-                    EXCLUSIVE
-                  </div>
-                )}
-
                 {/* Icon */}
-                <div className={`inline-flex h-14 w-14 items-center justify-center rounded-xl ${colors.bg} mb-6 ${feature.exclusive ? 'mt-2' : ''}`}>
+                <div className={`inline-flex h-14 w-14 items-center justify-center rounded-xl ${colors.bg} mb-6`}>
                   <Icon className={`h-7 w-7 ${colors.icon}`} />
                 </div>
 
@@ -178,7 +164,7 @@ export function FeaturePillars() {
                 </p>
 
                 {/* Feature List */}
-                <ul className="space-y-2 mb-6">
+                <ul className="space-y-2">
                   {feature.features.map((item) => (
                     <li key={item} className="flex items-center text-sm text-slate-600">
                       <svg
@@ -196,13 +182,6 @@ export function FeaturePillars() {
                     </li>
                   ))}
                 </ul>
-
-                {/* Competitor Note for Exclusive Features */}
-                {feature.exclusive && (
-                  <div className="text-xs text-red-600 font-medium mb-4">
-                    Campspot, Newbook, CampLife don't offer this
-                  </div>
-                )}
 
                 {/* Hover Effect */}
                 <div className="absolute inset-0 -z-10 rounded-2xl bg-gradient-to-br from-emerald-50 to-teal-50 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />

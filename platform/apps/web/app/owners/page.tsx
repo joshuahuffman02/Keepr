@@ -13,21 +13,21 @@ import { Footer } from '@/components/marketing/Footer';
 
 
 export const metadata: Metadata = {
-  title: 'Campground Management Software | Camp Everyday - Campspot Alternative',
-  description: 'The modern campground reservation software with AI, loyalty programs, and staff scheduling. Everything Campspot has, plus features they don\'t. $100/mo flat + $2.30/booking. No contracts.',
+  title: 'Campground Management Software | Camp Everyday',
+  description: 'The modern campground reservation software with AI-powered insights, guest loyalty programs, and integrated staff scheduling. $100/mo flat + $2.30/booking. No contracts. Go live in 48 hours.',
   keywords: [
     'campground management software',
     'rv park reservation system',
     'campground booking software',
-    'campspot alternative',
-    'newbook alternative',
+    'campground reservation software',
+    'rv park management system',
     'campground software with loyalty program',
     'rv park software with staff scheduling',
-    'campground software with ai pricing',
+    'campground software with ai',
   ],
   openGraph: {
-    title: 'Camp Everyday - Everything Campspot Has, Plus Loyalty, AI & Staff Scheduling',
-    description: 'The modern campground management software. AI demand forecasting, loyalty programs, and staff scheduling that no competitor offers. $100/mo + $2.30/booking.',
+    title: 'Camp Everyday - Modern Campground Management Software',
+    description: 'The all-in-one platform for campgrounds and RV parks. AI-powered insights, guest loyalty programs, and integrated staff scheduling. $100/mo + $2.30/booking.',
     type: 'website',
     images: [
       {
@@ -41,7 +41,7 @@ export const metadata: Metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'Camp Everyday - Modern Campground Software',
-    description: 'AI, loyalty programs, staff scheduling. Features Campspot doesn\'t have.',
+    description: 'AI-powered insights, loyalty programs, and staff scheduling in one platform.',
   },
   alternates: {
     canonical: 'https://campeveryday.com/owners',
