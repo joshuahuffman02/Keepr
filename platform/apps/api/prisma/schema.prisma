@@ -557,6 +557,12 @@ model User {
 
   // OAuth2 tokens issued to this user
   oAuthTokens OAuthToken[]
+
+  // Mobile app sessions with refresh tokens
+  mobileSessions MobileSession[]
+
+  // Mobile device tokens for push notifications
+  mobileDeviceTokens MobileDeviceToken[]
 }
 
 // User's customizable sidebar menu configuration
@@ -1294,6 +1300,7 @@ model Campground {
   xpBalances                XpBalance[]
   xpEvents                  XpEvent[]
   pushSubscriptions         PushSubscription[]
+  mobileDeviceTokens        MobileDeviceToken[]
   privacySetting            PrivacySetting?
   consentLogs               ConsentLog[]
   approvalRequests          ApprovalRequest[]
@@ -1469,6 +1476,31 @@ model PushSubscription {
 
   @@index([userId])
   @@index([campgroundId])
+}
+
+// Mobile device tokens for APNs (iOS) and FCM (Android)
+model MobileDeviceToken {
+  id           String    @id @default(cuid())
+  userId       String
+  campgroundId String?
+  deviceToken  String    @unique // APNs or FCM token
+  platform     String // "ios" or "android"
+  deviceId     String? // Device identifier for dedup
+  appBundle    String? // App bundle ID (e.g., "com.campreserv.guest")
+  appVersion   String?
+  environment  String    @default("production") // "sandbox" or "production"
+  isActive     Boolean   @default(true)
+  lastUsedAt   DateTime  @default(now())
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  user       User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  campground Campground? @relation(fields: [campgroundId], references: [id], onDelete: SetNull)
+
+  @@index([userId])
+  @@index([campgroundId])
+  @@index([platform])
+  @@index([deviceId])
 }
 
 model FormTemplate {
@@ -4979,6 +5011,27 @@ model OAuthScope {
 
   @@index([category])
   @@index([isDefault])
+}
+
+// Mobile Session for native app authentication with refresh tokens
+model MobileSession {
+  id               String    @id @default(cuid())
+  userId           String
+  refreshTokenHash String    @unique
+  deviceId         String? // Optional device identifier
+  deviceName       String? // e.g., "iPhone 15 Pro"
+  platform         String? // "ios" or "android"
+  appVersion       String? // e.g., "1.0.0"
+  lastUsedAt       DateTime  @default(now())
+  expiresAt        DateTime // Refresh token expiry
+  revokedAt        DateTime?
+  createdAt        DateTime  @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([expiresAt])
+  @@index([deviceId])
 }
 
 // =============================================================================

@@ -1,0 +1,68 @@
+{
+  "": {
+    "swift-dependencies": "/Users/josh/Documents/GitHub/Campreserv (broken) copy/mobile/ios/Packages/CampreservUI/.build/arm64-apple-macosx/debug/CampreservUI.build/master.swiftdeps"
+  },
+  "/Users/josh/Documents/GitHub/Campreserv (broken) copy/mobile/ios/Packages/CampreservUI/Sources/CampreservUI/CampreservUI.swift": {
+    "dependencies": "/Users/josh/Documents/GitHub/Campreserv (broken) copy/mobile/ios/Packages/CampreservUI/.build/arm64-apple-macosx/debug/CampreservUI.build/CampreservUI.d",
+    "object": "/Users/josh/Documents/GitHub/Campreserv (broken) copy/mobile/ios/Packages/CampreservUI/.build/arm64-apple-macosx/debug/CampreservUI.build/CampreservUI.swift.o",
+    "swiftmodule": "/Users/josh/Documents/GitHub/Campreserv (broken) copy/mobile/ios/Packages/CampreservUI/.build/arm64-apple-macosx/debug/CampreservUI.build/CampreservUI~partial.swiftmodule",
+    "swift-dependencies": "/Users/josh/Documents/GitHub/Campreserv (broken) copy/mobile/ios/Packages/CampreservUI/.build/arm64-apple-macosx/debug/CampreservUI.build/CampreservUI.swiftdeps",
+    "diagnostics": "/Users/josh/Documents/GitHub/Campreserv (broken) copy/mobile/ios/Packages/CampreservUI/.build/arm64-apple-macosx/debug/CampreservUI.build/CampreservUI.dia"
+  },
+  "/Users/josh/Documents/GitHub/Campreserv (broken) copy/mobile/ios/Packages/CampreservUI/Sources/CampreservUI/Components/Card.swift": {
+    "dependencies": "/Users/josh/Documents/GitHub/Campreserv (broken) copy/mobile/ios/Packages/CampreservUI/.build/arm64-apple-macosx/debug/CampreservUI.build/Card.d",
+    "object": "/Users/josh/Documents/GitHub/Campreserv (broken) copy/mobile/ios/Packages/CampreservUI/.build/arm64-apple-macosx/debug/CampreservUI.build/Card.swift.o",
+    "swiftmodule": "/Users/josh/Documents/GitHub/Campreserv (broken) copy/mobile/ios/Packages/CampreservUI/.build/arm64-apple-macosx/debug/CampreservUI.build/Card~partial.swiftmodule",
+    "swift-dependencies": "/Users/josh/Documents/GitHub/Campreserv (broken) copy/mobile/ios/Packages/CampreservUI/.build/arm64-apple-macosx/debug/CampreservUI.build/Card.swiftdeps",
+    "diagnostics": "/Users/josh/Documents/GitHub/Campreserv (broken) copy/mobile/ios/Packages/CampreservUI/.build/arm64-apple-macosx/debug/CampreservUI.build/Card.dia"
+  },
+  "/Users/josh/Documents/GitHub/Campreserv (broken) copy/mobile/ios/Packages/CampreservUI/Sources/CampreservUI/Components/ErrorView.swift": {
+    "dependencies": "/Users/josh/Documents/GitHub/Campreserv (broken) copy/mobile/ios/Packages/CampreservUI/.build/arm64-apple-macosx/debug/CampreservUI.build/ErrorView.d",
+    "object": "/Users/josh/Documents/GitHub/Campreserv (broken) copy/mobile/ios/Packages/CampreservUI/.build/arm64-apple-macosx/debug/CampreservUI.build/ErrorView.swift.o",
+    "swiftmodule": "/Users/josh/Documents/GitHub/Campreserv (broken) copy/mobile/ios/Packages/CampreservUI/.build/arm64-apple-macosx/debug/CampreservUI.build/ErrorView~partial.swiftmodule",
+    "swift-dependencies": "/Users/josh/Documents/GitHub/Campreserv (broken) copy/mobile/ios/Packages/CampreservUI/.build/arm64-apple-macosx/debug/CampreservUI.build/ErrorView.swiftdeps",
+    "diagnostics": "/Users/josh/Documents/GitHub/Campreserv (broken) copy/mobile/ios/Packages/CampreservUI/.build/arm64-apple-macosx/debug/CampreservUI.build/ErrorView.dia"
+  },
+  "/Users/josh/Documents/GitHub/Campreserv (broken) copy/mobile/ios/Packages/CampreservUI/Sources/CampreservUI/Components/FormField.swift": {
+    "dependencies": "/Users/josh/Documents/GitHub/Campreserv (broken) copy/mobile/ios/Packages/CampreservUI/.build/arm64-apple-macosx/debug/CampreservUI.build/FormField.d",
+    "object": "/Users/josh/Documents/GitHub/Campreserv (broken) copy/mobile/ios/Packages/CampreservUI/.build/arm64-apple-macosx/debug/CampreservUI.build/FormField.swift.o",
+    "swiftmodule": "/Users/josh/Documents/GitHub/Campreserv (broken) copy/mobile/ios/Packages/CampreservUI/.build/arm64-apple-macosx/debug/CampreservUI.build/FormField~partial.swiftmodule",
+    "swift-dependencies": "/Users/josh/Documents/GitHub/Campreserv (broken) copy/mobile/ios/Packages/CampreservUI/.build/arm64-apple-macosx/debug/CampreservUI.build/FormField.swiftdeps",
+    "diagnostics": "/Users/josh/Documents/GitHub/Campreserv (broken) copy/mobile/ios/Packages/CampreservUI/.build/arm64-apple-macosx/debug/CampreservUI.build/FormField.dia"
+  },
+  "/Users/josh/Documents/GitHub/Campreserv (broken) copy/mobile/ios/Packages/CampreservUI/Sources/CampreservUI/Components/LoadingView.swift": {
+    "dependencies": "/Users/josh/Documents/GitHub/Campreserv (broken) copy/mobile/ios/Packages/CampreservUI/.build/arm64-apple-macosx/debug/CampreservUI.build/LoadingView.d",
+    "object": "/Users/josh/Documents/GitHub/Campreserv (broken) copy/mobile/ios/Packages/CampreservUI/.build/arm64-apple-macosx/debug/CampreservUI.build/LoadingView.swift.o",
+    "swiftmodule": "/Users/josh/Documents/GitHub/Campreserv (broken) copy/mobile/ios/Packages/CampreservUI/.build/arm64-apple-macosx/debug/CampreservUI.build/LoadingView~partial.swiftmodule",
+    "swift-dependencies": "/Users/josh/Documents/GitHub/Campreserv (broken) copy/mobile/ios/Packages/CampreservUI/.build/arm64-apple-macosx/debug/CampreservUI.build/LoadingView.swiftdeps",
+    "diagnostics": "/Users/josh/Documents/GitHub/Campreserv (broken) copy/mobile/ios/Packages/CampreservUI/.build/arm64-apple-macosx/debug/CampreservUI.build/LoadingView.dia"
+  },
+  "/Users/josh/Documents/GitHub/Campreserv (broken) copy/mobile/ios/Packages/CampreservUI/Sources/CampreservUI/Components/PrimaryButton.swift": {
+    "dependencies": "/Users/josh/Documents/GitHub/Campreserv (broken) copy/mobile/ios/Packages/CampreservUI/.build/arm64-apple-macosx/debug/CampreservUI.build/PrimaryButton.d",
+    "object": "/Users/josh/Documents/GitHub/Campreserv (broken) copy/mobile/ios/Packages/CampreservUI/.build/arm64-apple-macosx/debug/CampreservUI.build/PrimaryButton.swift.o",
+    "swiftmodule": "/Users/josh/Documents/GitHub/Campreserv (broken) copy/mobile/ios/Packages/CampreservUI/.build/arm64-apple-macosx/debug/CampreservUI.build/PrimaryButton~partial.swiftmodule",
+    "swift-dependencies": "/Users/josh/Documents/GitHub/Campreserv (broken) copy/mobile/ios/Packages/CampreservUI/.build/arm64-apple-macosx/debug/CampreservUI.build/PrimaryButton.swiftdeps",
+    "diagnostics": "/Users/josh/Documents/GitHub/Campreserv (broken) copy/mobile/ios/Packages/CampreservUI/.build/arm64-apple-macosx/debug/CampreservUI.build/PrimaryButton.dia"
+  },
+  "/Users/josh/Documents/GitHub/Campreserv (broken) copy/mobile/ios/Packages/CampreservUI/Sources/CampreservUI/Components/StatusBadge.swift": {
+    "dependencies": "/Users/josh/Documents/GitHub/Campreserv (broken) copy/mobile/ios/Packages/CampreservUI/.build/arm64-apple-macosx/debug/CampreservUI.build/StatusBadge.d",
+    "object": "/Users/josh/Documents/GitHub/Campreserv (broken) copy/mobile/ios/Packages/CampreservUI/.build/arm64-apple-macosx/debug/CampreservUI.build/StatusBadge.swift.o",
+    "swiftmodule": "/Users/josh/Documents/GitHub/Campreserv (broken) copy/mobile/ios/Packages/CampreservUI/.build/arm64-apple-macosx/debug/CampreservUI.build/StatusBadge~partial.swiftmodule",
+    "swift-dependencies": "/Users/josh/Documents/GitHub/Campreserv (broken) copy/mobile/ios/Packages/CampreservUI/.build/arm64-apple-macosx/debug/CampreservUI.build/StatusBadge.swiftdeps",
+    "diagnostics": "/Users/josh/Documents/GitHub/Campreserv (broken) copy/mobile/ios/Packages/CampreservUI/.build/arm64-apple-macosx/debug/CampreservUI.build/StatusBadge.dia"
+  },
+  "/Users/josh/Documents/GitHub/Campreserv (broken) copy/mobile/ios/Packages/CampreservUI/Sources/CampreservUI/Styles/Colors.swift": {
+    "dependencies": "/Users/josh/Documents/GitHub/Campreserv (broken) copy/mobile/ios/Packages/CampreservUI/.build/arm64-apple-macosx/debug/CampreservUI.build/Colors.d",
+    "object": "/Users/josh/Documents/GitHub/Campreserv (broken) copy/mobile/ios/Packages/CampreservUI/.build/arm64-apple-macosx/debug/CampreservUI.build/Colors.swift.o",
+    "swiftmodule": "/Users/josh/Documents/GitHub/Campreserv (broken) copy/mobile/ios/Packages/CampreservUI/.build/arm64-apple-macosx/debug/CampreservUI.build/Colors~partial.swiftmodule",
+    "swift-dependencies": "/Users/josh/Documents/GitHub/Campreserv (broken) copy/mobile/ios/Packages/CampreservUI/.build/arm64-apple-macosx/debug/CampreservUI.build/Colors.swiftdeps",
+    "diagnostics": "/Users/josh/Documents/GitHub/Campreserv (broken) copy/mobile/ios/Packages/CampreservUI/.build/arm64-apple-macosx/debug/CampreservUI.build/Colors.dia"
+  },
+  "/Users/josh/Documents/GitHub/Campreserv (broken) copy/mobile/ios/Packages/CampreservUI/Sources/CampreservUI/Styles/Typography.swift": {
+    "dependencies": "/Users/josh/Documents/GitHub/Campreserv (broken) copy/mobile/ios/Packages/CampreservUI/.build/arm64-apple-macosx/debug/CampreservUI.build/Typography.d",
+    "object": "/Users/josh/Documents/GitHub/Campreserv (broken) copy/mobile/ios/Packages/CampreservUI/.build/arm64-apple-macosx/debug/CampreservUI.build/Typography.swift.o",
+    "swiftmodule": "/Users/josh/Documents/GitHub/Campreserv (broken) copy/mobile/ios/Packages/CampreservUI/.build/arm64-apple-macosx/debug/CampreservUI.build/Typography~partial.swiftmodule",
+    "swift-dependencies": "/Users/josh/Documents/GitHub/Campreserv (broken) copy/mobile/ios/Packages/CampreservUI/.build/arm64-apple-macosx/debug/CampreservUI.build/Typography.swiftdeps",
+    "diagnostics": "/Users/josh/Documents/GitHub/Campreserv (broken) copy/mobile/ios/Packages/CampreservUI/.build/arm64-apple-macosx/debug/CampreservUI.build/Typography.dia"
+  }
+}

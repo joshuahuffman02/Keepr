@@ -1,0 +1,439 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		0D01A67C3007EA4BD6043A8E /* StaffReservationsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EB765169F9F1D9207D21226A /* StaffReservationsView.swift */; };
+		2C251CBC1B37EDDDD011C532 /* CampreservStaffApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53FAA9F74C627BBE781B022A /* CampreservStaffApp.swift */; };
+		35D71E204F04CC686B841456 /* StaffAuthView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C74A3B40FF26EC5745540C7 /* StaffAuthView.swift */; };
+		38DF173FB4976190C98DB00E /* CampreservCore in Frameworks */ = {isa = PBXBuildFile; productRef = BE256E3F6EE6EE50D8445D80 /* CampreservCore */; };
+		5D536E57239149BE69B8DD60 /* CampreservUI in Frameworks */ = {isa = PBXBuildFile; productRef = 21C1A0A05E5DFF6C01A8B1DE /* CampreservUI */; };
+		7E5A0A23455C3EAF233B62D1 /* MaintenanceListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 671F173245C814CD070BC8A3 /* MaintenanceListView.swift */; };
+		8BB418BB38FCA0F35DAE5A00 /* StaffAppState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19A00D1BF6E85C87C0A26E16 /* StaffAppState.swift */; };
+		A0F831163C0D9DD95692E75E /* StaffPOSView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 32A3E9DE010322182E01756F /* StaffPOSView.swift */; };
+		E449D532C663BD6418FE3054 /* StaffDashboardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1109EA0BD8FF0D0057E00A2E /* StaffDashboardView.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		1109EA0BD8FF0D0057E00A2E /* StaffDashboardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StaffDashboardView.swift; sourceTree = "<group>"; };
+		19A00D1BF6E85C87C0A26E16 /* StaffAppState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StaffAppState.swift; sourceTree = "<group>"; };
+		2C74A3B40FF26EC5745540C7 /* StaffAuthView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StaffAuthView.swift; sourceTree = "<group>"; };
+		32A3E9DE010322182E01756F /* StaffPOSView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StaffPOSView.swift; sourceTree = "<group>"; };
+		3B5F420AB1D4956C1BE110C2 /* CampreservStaff.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = CampreservStaff.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		53FAA9F74C627BBE781B022A /* CampreservStaffApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CampreservStaffApp.swift; sourceTree = "<group>"; };
+		623EF36417F5A6579E026B30 /* CampreservCore */ = {isa = PBXFileReference; lastKnownFileType = folder; name = CampreservCore; path = ../Packages/CampreservCore; sourceTree = SOURCE_ROOT; };
+		671F173245C814CD070BC8A3 /* MaintenanceListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MaintenanceListView.swift; sourceTree = "<group>"; };
+		D2E5E6C431173BBCEED44E52 /* CampreservUI */ = {isa = PBXFileReference; lastKnownFileType = folder; name = CampreservUI; path = ../Packages/CampreservUI; sourceTree = SOURCE_ROOT; };
+		EB765169F9F1D9207D21226A /* StaffReservationsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StaffReservationsView.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		4B87CB697C35BB28F42FE54F /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				38DF173FB4976190C98DB00E /* CampreservCore in Frameworks */,
+				5D536E57239149BE69B8DD60 /* CampreservUI in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		22330A23129BCD036100AF37 /* POS */ = {
+			isa = PBXGroup;
+			children = (
+				32A3E9DE010322182E01756F /* StaffPOSView.swift */,
+			);
+			path = POS;
+			sourceTree = "<group>";
+		};
+		36A65D8B6E8ED027F9D08954 /* App */ = {
+			isa = PBXGroup;
+			children = (
+				53FAA9F74C627BBE781B022A /* CampreservStaffApp.swift */,
+				19A00D1BF6E85C87C0A26E16 /* StaffAppState.swift */,
+			);
+			path = App;
+			sourceTree = "<group>";
+		};
+		41EE735429E7ECEF39B85BC6 /* Features */ = {
+			isa = PBXGroup;
+			children = (
+				734BDFD8183A235317C6C571 /* Auth */,
+				FF75365BB45403F999B0C5DF /* Dashboard */,
+				CCC0F2A03A1D0E5BB7C673A2 /* Maintenance */,
+				22330A23129BCD036100AF37 /* POS */,
+				64759AAAF3127EDDE3A71F86 /* Reservations */,
+			);
+			path = Features;
+			sourceTree = "<group>";
+		};
+		44D606B6421CA1603658B4EB /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				3B5F420AB1D4956C1BE110C2 /* CampreservStaff.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		64759AAAF3127EDDE3A71F86 /* Reservations */ = {
+			isa = PBXGroup;
+			children = (
+				EB765169F9F1D9207D21226A /* StaffReservationsView.swift */,
+			);
+			path = Reservations;
+			sourceTree = "<group>";
+		};
+		734BDFD8183A235317C6C571 /* Auth */ = {
+			isa = PBXGroup;
+			children = (
+				2C74A3B40FF26EC5745540C7 /* StaffAuthView.swift */,
+			);
+			path = Auth;
+			sourceTree = "<group>";
+		};
+		9A9C562724CBA8A77A1278C6 /* CampreservStaff */ = {
+			isa = PBXGroup;
+			children = (
+				36A65D8B6E8ED027F9D08954 /* App */,
+				41EE735429E7ECEF39B85BC6 /* Features */,
+			);
+			path = CampreservStaff;
+			sourceTree = "<group>";
+		};
+		A259B1A662562135C4AAB388 /* Packages */ = {
+			isa = PBXGroup;
+			children = (
+				623EF36417F5A6579E026B30 /* CampreservCore */,
+				D2E5E6C431173BBCEED44E52 /* CampreservUI */,
+			);
+			name = Packages;
+			sourceTree = "<group>";
+		};
+		CCC0F2A03A1D0E5BB7C673A2 /* Maintenance */ = {
+			isa = PBXGroup;
+			children = (
+				671F173245C814CD070BC8A3 /* MaintenanceListView.swift */,
+			);
+			path = Maintenance;
+			sourceTree = "<group>";
+		};
+		DB4A9CDA111A82A23F4C2808 = {
+			isa = PBXGroup;
+			children = (
+				9A9C562724CBA8A77A1278C6 /* CampreservStaff */,
+				A259B1A662562135C4AAB388 /* Packages */,
+				44D606B6421CA1603658B4EB /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		FF75365BB45403F999B0C5DF /* Dashboard */ = {
+			isa = PBXGroup;
+			children = (
+				1109EA0BD8FF0D0057E00A2E /* StaffDashboardView.swift */,
+			);
+			path = Dashboard;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		CBE559E553CC6C9DCA78E4E6 /* CampreservStaff */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 97DEA83E075BE244EA709048 /* Build configuration list for PBXNativeTarget "CampreservStaff" */;
+			buildPhases = (
+				0FCDA5857A0E121D9EFF9119 /* Sources */,
+				4B87CB697C35BB28F42FE54F /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = CampreservStaff;
+			packageProductDependencies = (
+				BE256E3F6EE6EE50D8445D80 /* CampreservCore */,
+				21C1A0A05E5DFF6C01A8B1DE /* CampreservUI */,
+			);
+			productName = CampreservStaff;
+			productReference = 3B5F420AB1D4956C1BE110C2 /* CampreservStaff.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		0A9C63CC5B80AA8388399A44 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = YES;
+				LastUpgradeCheck = 1500;
+				TargetAttributes = {
+					CBE559E553CC6C9DCA78E4E6 = {
+						DevelopmentTeam = "";
+						ProvisioningStyle = Automatic;
+					};
+				};
+			};
+			buildConfigurationList = 4BE85DEFE38E560151F44812 /* Build configuration list for PBXProject "CampreservStaff" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				Base,
+				en,
+			);
+			mainGroup = DB4A9CDA111A82A23F4C2808;
+			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				9C3CEAF863B22C4393F8942E /* XCLocalSwiftPackageReference "../Packages/CampreservCore" */,
+				17F24EB56C6C9F51BCD11735 /* XCLocalSwiftPackageReference "../Packages/CampreservUI" */,
+			);
+			preferredProjectObjectVersion = 77;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				CBE559E553CC6C9DCA78E4E6 /* CampreservStaff */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXSourcesBuildPhase section */
+		0FCDA5857A0E121D9EFF9119 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				2C251CBC1B37EDDDD011C532 /* CampreservStaffApp.swift in Sources */,
+				7E5A0A23455C3EAF233B62D1 /* MaintenanceListView.swift in Sources */,
+				8BB418BB38FCA0F35DAE5A00 /* StaffAppState.swift in Sources */,
+				35D71E204F04CC686B841456 /* StaffAuthView.swift in Sources */,
+				E449D532C663BD6418FE3054 /* StaffDashboardView.swift in Sources */,
+				A0F831163C0D9DD95692E75E /* StaffPOSView.swift in Sources */,
+				0D01A67C3007EA4BD6043A8E /* StaffReservationsView.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		0A4F8014F1F891036265C666 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.campreserv.staff;
+				SDKROOT = iphoneos;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		18598970A224CC0479E82798 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_STYLE = Automatic;
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = "";
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					"DEBUG=1",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				MARKETING_VERSION = 1.0.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		72C12B6851424A0A55806E58 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.campreserv.staff;
+				SDKROOT = iphoneos;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		C1761441E0DADBE48178C670 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_STYLE = Automatic;
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = "";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				MARKETING_VERSION = 1.0.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		4BE85DEFE38E560151F44812 /* Build configuration list for PBXProject "CampreservStaff" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				18598970A224CC0479E82798 /* Debug */,
+				C1761441E0DADBE48178C670 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		97DEA83E075BE244EA709048 /* Build configuration list for PBXNativeTarget "CampreservStaff" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				72C12B6851424A0A55806E58 /* Debug */,
+				0A4F8014F1F891036265C666 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+/* End XCConfigurationList section */
+
+/* Begin XCLocalSwiftPackageReference section */
+		17F24EB56C6C9F51BCD11735 /* XCLocalSwiftPackageReference "../Packages/CampreservUI" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = ../Packages/CampreservUI;
+		};
+		9C3CEAF863B22C4393F8942E /* XCLocalSwiftPackageReference "../Packages/CampreservCore" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = ../Packages/CampreservCore;
+		};
+/* End XCLocalSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		21C1A0A05E5DFF6C01A8B1DE /* CampreservUI */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = CampreservUI;
+		};
+		BE256E3F6EE6EE50D8445D80 /* CampreservCore */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = CampreservCore;
+		};
+/* End XCSwiftPackageProductDependency section */
+	};
+	rootObject = 0A9C63CC5B80AA8388399A44 /* Project object */;
+}

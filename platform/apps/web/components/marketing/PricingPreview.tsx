@@ -207,19 +207,16 @@ export function PricingPreview() {
         <div className="text-center max-w-4xl mx-auto mb-16">
           <div className="inline-flex items-center gap-2 px-4 py-2 bg-amber-500/20 border border-amber-500/30 rounded-full text-amber-400 text-sm font-semibold mb-6">
             <Clock className="h-4 w-4" />
-            Early Access Program - Limited Spots
+            Only 45 Founding Spots Available
           </div>
 
           <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
-            Pay Less Than Legacy Systems.{' '}
-            <span className="bg-gradient-to-r from-amber-400 to-orange-400 bg-clip-text text-transparent">
-              Forever.
-            </span>
+            Be One of Our First 45 Founding Campgrounds
           </h2>
 
           <p className="text-xl text-slate-300 mb-8">
-            Stop overpaying for outdated software. Lock in early access pricing
-            that will never increase — while competitors raise rates every year.
+            Lock in early access pricing that will never increase. Once these 45 spots are gone,
+            standard pricing kicks in — and you'll have helped shape the future of campground software.
           </p>
 
           <div className="flex flex-wrap items-center justify-center gap-6 text-slate-400">
@@ -568,7 +565,7 @@ export function PricingPreview() {
         {/* Bottom CTA */}
         <div className="mt-16 text-center">
           <p className="text-slate-400 mb-6">
-            Not sure which tier is right for you? Start with any tier - you can always upgrade.
+            Join the first 45 campgrounds building the future of reservation software.
           </p>
           <Button
             asChild
@@ -576,7 +573,7 @@ export function PricingPreview() {
             className="border-slate-600 text-white hover:bg-slate-700 px-8 py-6 text-lg"
           >
             <Link href="/signup">
-              Get Started Now
+              Claim Your Founding Spot
               <ArrowRight className="ml-2 h-5 w-5" />
             </Link>
           </Button>
@@ -584,7 +581,11 @@ export function PricingPreview() {
 
         {/* Trust Elements */}
         <div className="mt-16 pt-16 border-t border-slate-700">
-          <div className="grid md:grid-cols-3 gap-8 text-center">
+          <div className="grid md:grid-cols-4 gap-8 text-center">
+            <div>
+              <div className="text-4xl font-bold text-amber-400 mb-2">45</div>
+              <p className="text-slate-400">Founding spots available</p>
+            </div>
             <div>
               <div className="text-4xl font-bold text-white mb-2">30-Day</div>
               <p className="text-slate-400">Money-back guarantee</p>

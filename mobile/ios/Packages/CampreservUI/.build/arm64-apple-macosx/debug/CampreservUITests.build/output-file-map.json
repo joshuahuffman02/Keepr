@@ -1,0 +1,12 @@
+{
+  "": {
+    "swift-dependencies": "/Users/josh/Documents/GitHub/Campreserv (broken) copy/mobile/ios/Packages/CampreservUI/.build/arm64-apple-macosx/debug/CampreservUITests.build/master.swiftdeps"
+  },
+  "/Users/josh/Documents/GitHub/Campreserv (broken) copy/mobile/ios/Packages/CampreservUI/Tests/CampreservUITests/CampreservUITests.swift": {
+    "dependencies": "/Users/josh/Documents/GitHub/Campreserv (broken) copy/mobile/ios/Packages/CampreservUI/.build/arm64-apple-macosx/debug/CampreservUITests.build/CampreservUITests.d",
+    "object": "/Users/josh/Documents/GitHub/Campreserv (broken) copy/mobile/ios/Packages/CampreservUI/.build/arm64-apple-macosx/debug/CampreservUITests.build/CampreservUITests.swift.o",
+    "swiftmodule": "/Users/josh/Documents/GitHub/Campreserv (broken) copy/mobile/ios/Packages/CampreservUI/.build/arm64-apple-macosx/debug/CampreservUITests.build/CampreservUITests~partial.swiftmodule",
+    "swift-dependencies": "/Users/josh/Documents/GitHub/Campreserv (broken) copy/mobile/ios/Packages/CampreservUI/.build/arm64-apple-macosx/debug/CampreservUITests.build/CampreservUITests.swiftdeps",
+    "diagnostics": "/Users/josh/Documents/GitHub/Campreserv (broken) copy/mobile/ios/Packages/CampreservUI/.build/arm64-apple-macosx/debug/CampreservUITests.build/CampreservUITests.dia"
+  }
+}

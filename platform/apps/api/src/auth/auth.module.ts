@@ -14,6 +14,7 @@ import { OAuth2Module } from './oauth2/oauth2.module';
 @Module({
     imports: [
         PrismaModule,
+        ConfigModule,
         PassportModule.register({ defaultStrategy: 'jwt' }),
         JwtModule.registerAsync({
             imports: [ConfigModule],
