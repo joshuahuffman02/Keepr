@@ -570,7 +570,7 @@ export function PricingPreview() {
           <Button
             asChild
             variant="outline"
-            className="border-slate-600 text-white hover:bg-slate-700 px-8 py-6 text-lg"
+            className="border-slate-600 bg-slate-800 text-white hover:bg-slate-700 px-8 py-6 text-lg"
           >
             <Link href="/signup">
               Claim Your Founding Spot

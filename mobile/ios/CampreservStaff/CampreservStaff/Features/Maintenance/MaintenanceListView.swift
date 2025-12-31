@@ -2,12 +2,12 @@ import SwiftUI
 import CampreservCore
 import CampreservUI
 
-/// Maintenance tasks list
+/// Maintenance tasks list - full screen layout
 struct MaintenanceListView: View {
 
     @EnvironmentObject private var appState: StaffAppState
     @State private var tasks: [MaintenanceTask] = []
-    @State private var isLoading = true
+    @State private var isLoading = false
     @State private var selectedFilter: TaskFilter = .open
     @State private var showNewTask = false
 
@@ -19,8 +19,11 @@ struct MaintenanceListView: View {
 
                 // Content
                 if isLoading {
+                    Spacer()
                     LoadingView(message: "Loading tasks...")
+                    Spacer()
                 } else if filteredTasks.isEmpty {
+                    Spacer()
                     EmptyStateView(
                         icon: "checkmark.circle",
                         title: "All Clear",
@@ -29,10 +32,12 @@ struct MaintenanceListView: View {
                     ) {
                         showNewTask = true
                     }
+                    Spacer()
                 } else {
                     tasksList
                 }
             }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
             .background(Color.campBackground)
             .navigationTitle("Maintenance")
             .toolbar {
@@ -60,27 +65,42 @@ struct MaintenanceListView: View {
         ScrollView(.horizontal, showsIndicators: false) {
             HStack(spacing: 8) {
                 ForEach(TaskFilter.allCases, id: \.self) { filter in
-                    FilterChip(
+                    TaskFilterChip(
                         title: filter.title,
+                        count: countFor(filter),
                         isSelected: selectedFilter == filter
                     ) {
                         selectedFilter = filter
                     }
                 }
             }
-            .padding()
+            .padding(.horizontal, 16)
+            .padding(.vertical, 12)
+        }
+        .background(Color.campSurface)
+    }
+
+    private func countFor(_ filter: TaskFilter) -> Int {
+        switch filter {
+        case .open: return tasks.filter { $0.state == "open" || $0.state == "in_progress" }.count
+        case .inProgress: return tasks.filter { $0.state == "in_progress" }.count
+        case .completed: return tasks.filter { $0.state == "completed" }.count
+        case .all: return tasks.count
         }
     }
 
     private var tasksList: some View {
-        List {
-            ForEach(filteredTasks, id: \.id) { task in
-                NavigationLink(destination: TaskDetailView(task: task)) {
-                    TaskRow(task: task)
+        ScrollView {
+            LazyVStack(spacing: 12) {
+                ForEach(filteredTasks, id: \.id) { task in
+                    NavigationLink(destination: TaskDetailView(task: task)) {
+                        TaskCard(task: task)
+                    }
+                    .buttonStyle(.plain)
                 }
             }
+            .padding(16)
         }
-        .listStyle(.plain)
     }
 
     private var filteredTasks: [MaintenanceTask] {
@@ -100,10 +120,77 @@ struct MaintenanceListView: View {
         isLoading = true
         defer { isLoading = false }
 
-        // Call API
-        try? await Task.sleep(for: .seconds(1))
-        tasks = []
+        // Simulate loading demo tasks
+        try? await Task.sleep(for: .seconds(0.5))
+        tasks = MaintenanceTask.demoTasks
     }
+}
+
+// MARK: - Demo Data
+
+extension MaintenanceTask {
+    static let demoTasks: [MaintenanceTask] = [
+        MaintenanceTask(
+            id: "task-1",
+            title: "Fix water hookup at Site 12",
+            description: "Guest reported low water pressure. May need to replace valve.",
+            siteName: "Site 12",
+            type: "repair",
+            priority: "high",
+            state: "open",
+            assigneeName: nil,
+            createdAt: Date().addingTimeInterval(-3600),
+            dueDate: Date().addingTimeInterval(86400)
+        ),
+        MaintenanceTask(
+            id: "task-2",
+            title: "Replace light bulb at restroom B",
+            description: "Third stall light is out",
+            siteName: "Restroom B",
+            type: "maintenance",
+            priority: "normal",
+            state: "in_progress",
+            assigneeName: "Mike",
+            createdAt: Date().addingTimeInterval(-7200),
+            dueDate: nil
+        ),
+        MaintenanceTask(
+            id: "task-3",
+            title: "Mow grass around playground",
+            description: nil,
+            siteName: "Playground",
+            type: "maintenance",
+            priority: "low",
+            state: "open",
+            assigneeName: nil,
+            createdAt: Date().addingTimeInterval(-86400),
+            dueDate: Date().addingTimeInterval(172800)
+        ),
+        MaintenanceTask(
+            id: "task-4",
+            title: "Clean fire pit at Site 5",
+            description: "Ash buildup needs removal",
+            siteName: "Site 5",
+            type: "cleaning",
+            priority: "normal",
+            state: "completed",
+            assigneeName: "Sarah",
+            createdAt: Date().addingTimeInterval(-172800),
+            dueDate: nil
+        ),
+        MaintenanceTask(
+            id: "task-5",
+            title: "Inspect electrical at Site 22",
+            description: "Guest reported sparks when plugging in. URGENT - safety issue.",
+            siteName: "Site 22",
+            type: "inspection",
+            priority: "urgent",
+            state: "open",
+            assigneeName: nil,
+            createdAt: Date().addingTimeInterval(-1800),
+            dueDate: Date()
+        )
+    ]
 }
 
 // MARK: - Models
@@ -147,44 +234,97 @@ enum TaskFilter: CaseIterable {
 
 // MARK: - Components
 
-struct TaskRow: View {
+struct TaskFilterChip: View {
+    let title: String
+    let count: Int
+    let isSelected: Bool
+    let action: () -> Void
+
+    var body: some View {
+        Button(action: action) {
+            HStack(spacing: 6) {
+                Text(title)
+                if count > 0 {
+                    Text("\(count)")
+                        .font(.system(size: 11, weight: .semibold))
+                        .foregroundColor(isSelected ? .campPrimary : .white)
+                        .padding(.horizontal, 6)
+                        .padding(.vertical, 2)
+                        .background(isSelected ? Color.white : Color.campPrimary)
+                        .cornerRadius(10)
+                }
+            }
+            .font(.campLabel)
+            .foregroundColor(isSelected ? .white : .campTextPrimary)
+            .padding(.horizontal, 16)
+            .padding(.vertical, 10)
+            .background(isSelected ? Color.campPrimary : Color.campBackground)
+            .cornerRadius(20)
+        }
+    }
+}
+
+struct TaskCard: View {
     let task: MaintenanceTask
 
     var body: some View {
-        HStack(spacing: 12) {
-            // Priority indicator
-            Circle()
-                .fill(priorityColor)
-                .frame(width: 12, height: 12)
+        VStack(alignment: .leading, spacing: 12) {
+            // Header
+            HStack {
+                // Priority indicator
+                Circle()
+                    .fill(priorityColor)
+                    .frame(width: 10, height: 10)
 
-            VStack(alignment: .leading, spacing: 4) {
                 Text(task.title)
                     .font(.campLabel)
                     .foregroundColor(.campTextPrimary)
+                    .lineLimit(2)
 
-                HStack(spacing: 8) {
-                    if let site = task.siteName {
-                        Label(site, systemImage: "location")
-                    }
-                    Text(task.type.capitalized)
-                }
-                .font(.campCaption)
-                .foregroundColor(.campTextSecondary)
+                Spacer()
+
+                TaskStateBadge(state: task.state)
             }
 
-            Spacer()
+            // Description
+            if let description = task.description {
+                Text(description)
+                    .font(.campBodySmall)
+                    .foregroundColor(.campTextSecondary)
+                    .lineLimit(2)
+            }
 
-            VStack(alignment: .trailing, spacing: 4) {
-                TaskStateBadge(state: task.state)
+            // Footer
+            HStack(spacing: 16) {
+                if let site = task.siteName {
+                    Label(site, systemImage: "location")
+                }
+
+                Label(task.type.capitalized, systemImage: typeIcon)
+
+                Spacer()
 
                 if let assignee = task.assigneeName {
-                    Text(assignee)
-                        .font(.campCaption)
-                        .foregroundColor(.campTextHint)
+                    Label(assignee, systemImage: "person")
+                }
+
+                if let due = task.dueDate {
+                    Label(formatDue(due), systemImage: "clock")
+                        .foregroundColor(isDueUrgent(due) ? .campError : .campTextHint)
                 }
             }
+            .font(.campCaption)
+            .foregroundColor(.campTextHint)
         }
-        .padding(.vertical, 8)
+        .padding(16)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(Color.campSurface)
+        .cornerRadius(12)
+        .shadow(color: .black.opacity(0.05), radius: 4, y: 2)
+        .overlay(
+            RoundedRectangle(cornerRadius: 12)
+                .stroke(task.priority == "urgent" ? Color.campError.opacity(0.5) : Color.clear, lineWidth: 2)
+        )
     }
 
     private var priorityColor: Color {
@@ -195,6 +335,31 @@ struct TaskRow: View {
         default: return .campTextHint
         }
     }
+
+    private var typeIcon: String {
+        switch task.type {
+        case "repair": return "wrench.fill"
+        case "cleaning": return "sparkles"
+        case "inspection": return "eye.fill"
+        default: return "wrench.and.screwdriver"
+        }
+    }
+
+    private func formatDue(_ date: Date) -> String {
+        if Calendar.current.isDateInToday(date) {
+            return "Today"
+        } else if Calendar.current.isDateInTomorrow(date) {
+            return "Tomorrow"
+        } else {
+            let formatter = DateFormatter()
+            formatter.dateFormat = "MMM d"
+            return formatter.string(from: date)
+        }
+    }
+
+    private func isDueUrgent(_ date: Date) -> Bool {
+        date < Date() || Calendar.current.isDateInToday(date)
+    }
 }
 
 struct TaskStateBadge: View {
@@ -202,12 +367,12 @@ struct TaskStateBadge: View {
 
     var body: some View {
         Text(displayText)
-            .font(.campLabelSmall)
+            .font(.system(size: 11, weight: .semibold))
             .foregroundColor(color)
             .padding(.horizontal, 8)
             .padding(.vertical, 4)
             .background(color.opacity(0.15))
-            .cornerRadius(4)
+            .cornerRadius(6)
     }
 
     private var displayText: String {
@@ -233,83 +398,122 @@ struct TaskStateBadge: View {
 struct TaskDetailView: View {
     let task: MaintenanceTask
     @State private var isLoading = false
+    @Environment(\.dismiss) private var dismiss
 
     var body: some View {
         ScrollView {
-            VStack(spacing: 24) {
-                // Header
-                Card {
-                    VStack(alignment: .leading, spacing: 12) {
-                        HStack {
-                            Text(task.title)
-                                .font(.campHeading2)
-                            Spacer()
-                            TaskStateBadge(state: task.state)
-                        }
-
-                        if let description = task.description {
-                            Text(description)
-                                .font(.campBody)
-                                .foregroundColor(.campTextSecondary)
-                        }
-
-                        Divider()
-
-                        // Details
-                        VStack(spacing: 8) {
-                            if let site = task.siteName {
-                                DetailRow(label: "Location", value: site)
-                            }
-                            DetailRow(label: "Type", value: task.type.capitalized)
-                            DetailRow(label: "Priority", value: task.priority.capitalized)
-                            if let assignee = task.assigneeName {
-                                DetailRow(label: "Assigned To", value: assignee)
-                            }
-                            if let due = task.dueDate {
-                                DetailRow(label: "Due Date", value: formatDate(due))
-                            }
-                        }
+            VStack(spacing: 20) {
+                // Header card
+                VStack(alignment: .leading, spacing: 16) {
+                    HStack {
+                        Circle()
+                            .fill(priorityColor)
+                            .frame(width: 12, height: 12)
+                        Text(task.priority.capitalized)
+                            .font(.campCaption)
+                            .foregroundColor(priorityColor)
+                        Spacer()
+                        TaskStateBadge(state: task.state)
                     }
+
+                    Text(task.title)
+                        .font(.campHeading2)
+                        .foregroundColor(.campTextPrimary)
+
+                    if let description = task.description {
+                        Text(description)
+                            .font(.campBody)
+                            .foregroundColor(.campTextSecondary)
+                    }
+                }
+                .padding(20)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .background(Color.campSurface)
+                .cornerRadius(16)
+
+                // Details grid
+                LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 12) {
+                    if let site = task.siteName {
+                        DetailCard(icon: "location.fill", label: "Location", value: site)
+                    }
+                    DetailCard(icon: "tag.fill", label: "Type", value: task.type.capitalized)
+                    if let assignee = task.assigneeName {
+                        DetailCard(icon: "person.fill", label: "Assigned To", value: assignee)
+                    }
+                    if let due = task.dueDate {
+                        DetailCard(icon: "calendar", label: "Due Date", value: formatDate(due))
+                    }
+                    DetailCard(icon: "clock.fill", label: "Created", value: formatDate(task.createdAt))
                 }
 
                 // Action buttons
-                actionButtons
+                VStack(spacing: 12) {
+                    switch task.state {
+                    case "open":
+                        PrimaryButton("Start Task", icon: "play.fill") {
+                            // Update state
+                        }
+                        SecondaryButton("Assign to Me") {
+                            // Assign
+                        }
+                    case "in_progress":
+                        PrimaryButton("Mark Complete", icon: "checkmark.circle.fill") {
+                            // Complete
+                        }
+                    default:
+                        EmptyView()
+                    }
+                }
+                .padding(.top, 8)
             }
             .padding(16)
         }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(Color.campBackground)
         .navigationTitle("Task Details")
         .navigationBarTitleDisplayMode(.inline)
     }
 
-    private var actionButtons: some View {
-        VStack(spacing: 12) {
-            switch task.state {
-            case "open":
-                PrimaryButton("Start Task", icon: "play.fill") {
-                    Task { await updateState("in_progress") }
-                }
-            case "in_progress":
-                PrimaryButton("Mark Complete", icon: "checkmark") {
-                    Task { await updateState("completed") }
-                }
-            default:
-                EmptyView()
-            }
+    private var priorityColor: Color {
+        switch task.priority {
+        case "urgent": return .campError
+        case "high": return .campWarning
+        case "normal": return .campInfo
+        default: return .campTextHint
         }
-    }
-
-    private func updateState(_ newState: String) async {
-        isLoading = true
-        // Call API
-        try? await Task.sleep(for: .seconds(1))
-        isLoading = false
     }
 
     private func formatDate(_ date: Date) -> String {
         let formatter = DateFormatter()
         formatter.dateStyle = .medium
+        formatter.timeStyle = .short
         return formatter.string(from: date)
+    }
+}
+
+struct DetailCard: View {
+    let icon: String
+    let label: String
+    let value: String
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            HStack(spacing: 6) {
+                Image(systemName: icon)
+                    .foregroundColor(.campPrimary)
+                Text(label)
+                    .foregroundColor(.campTextHint)
+            }
+            .font(.campCaption)
+
+            Text(value)
+                .font(.campLabel)
+                .foregroundColor(.campTextPrimary)
+        }
+        .padding(12)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(Color.campSurface)
+        .cornerRadius(10)
     }
 }
 
@@ -369,7 +573,6 @@ struct NewTaskView: View {
 
     private func createTask() async {
         isLoading = true
-        // Call API
         try? await Task.sleep(for: .seconds(1))
         isLoading = false
         dismiss()
