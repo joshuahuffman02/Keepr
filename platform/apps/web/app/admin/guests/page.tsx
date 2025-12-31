@@ -159,7 +159,7 @@ function TrendIndicator({ current, previous }: { current: number; previous: numb
 
   if (isNeutral) {
     return (
-      <span className="flex items-center text-slate-400 text-xs">
+      <span className="flex items-center text-slate-600 dark:text-slate-400 text-xs">
         <Minus className="h-3 w-3 mr-1" />
         No change
       </span>
@@ -167,7 +167,7 @@ function TrendIndicator({ current, previous }: { current: number; previous: numb
   }
 
   return (
-    <span className={`flex items-center text-xs ${isPositive ? "text-emerald-400" : "text-rose-400"}`}>
+    <span className={`flex items-center text-xs ${isPositive ? "text-emerald-600 dark:text-emerald-400" : "text-rose-600 dark:text-rose-400"}`}>
       {isPositive ? <ArrowUp className="h-3 w-3 mr-1" /> : <ArrowDown className="h-3 w-3 mr-1" />}
       {Math.abs(change).toFixed(1)}% vs last month
     </span>
@@ -186,14 +186,14 @@ function BarChart({ data, labelKey, valueKey, maxValue }: {
     <div className="space-y-2">
       {data.map((item, i) => (
         <div key={i} className="flex items-center gap-3">
-          <div className="w-24 text-xs text-slate-400 truncate">{item[labelKey]}</div>
-          <div className="flex-1 h-6 bg-slate-800 rounded overflow-hidden">
+          <div className="w-24 text-xs text-slate-600 dark:text-slate-400 truncate">{item[labelKey]}</div>
+          <div className="flex-1 h-6 bg-slate-200 dark:bg-slate-800 rounded overflow-hidden">
             <div
               className="h-full bg-emerald-600 rounded transition-all"
               style={{ width: `${(item[valueKey] / max) * 100}%` }}
             />
           </div>
-          <div className="w-16 text-xs text-slate-300 text-right">
+          <div className="w-16 text-xs text-slate-700 dark:text-slate-300 text-right">
             {item.percentage ? `${item.percentage}%` : item[valueKey].toLocaleString()}
           </div>
         </div>
@@ -218,7 +218,7 @@ function SimpleLineChart({ data }: { data: { month: string; reservations: number
               style={{ height: `${Math.max(height, 5)}%` }}
               title={`${item.month}: ${item.reservations.toLocaleString()} reservations`}
             />
-            <span className="text-[10px] text-slate-500">{item.month}</span>
+            <span className="text-[10px] text-slate-500 dark:text-slate-500">{item.month}</span>
           </div>
         );
       })}
@@ -477,15 +477,15 @@ export default function GuestAnalyticsPage() {
     return (
       <div className="p-8">
         <div className="animate-pulse space-y-6">
-          <div className="h-8 bg-slate-800 rounded w-64" />
+          <div className="h-8 bg-slate-200 dark:bg-slate-800 rounded w-64" />
           <div className="grid grid-cols-4 gap-4">
             {[1, 2, 3, 4].map(i => (
-              <div key={i} className="h-32 bg-slate-800 rounded-lg" />
+              <div key={i} className="h-32 bg-slate-200 dark:bg-slate-800 rounded-lg" />
             ))}
           </div>
           <div className="grid grid-cols-2 gap-6">
-            <div className="h-64 bg-slate-800 rounded-lg" />
-            <div className="h-64 bg-slate-800 rounded-lg" />
+            <div className="h-64 bg-slate-200 dark:bg-slate-800 rounded-lg" />
+            <div className="h-64 bg-slate-200 dark:bg-slate-800 rounded-lg" />
           </div>
         </div>
       </div>
@@ -495,7 +495,7 @@ export default function GuestAnalyticsPage() {
   if (!canViewAnalytics) {
     return (
       <div className="p-8">
-        <Card className="bg-amber-900/20 border-amber-700">
+        <Card className="bg-amber-50 dark:bg-amber-900/20 border-amber-700">
           <CardContent className="p-6">
             <div className="flex items-center gap-3">
               <AlertTriangle className="h-6 w-6 text-amber-500" />
@@ -515,7 +515,7 @@ export default function GuestAnalyticsPage() {
   if (error) {
     return (
       <div className="p-8">
-        <Card className="bg-rose-900/20 border-rose-700">
+        <Card className="bg-rose-50 dark:bg-rose-900/20 border-rose-700">
           <CardContent className="p-6">
             <div className="flex items-center gap-3">
               <AlertTriangle className="h-6 w-6 text-rose-500" />
@@ -543,14 +543,14 @@ export default function GuestAnalyticsPage() {
       <div className="flex items-center justify-between">
         <div>
           <div className="flex items-center gap-3">
-            <h1 className="text-2xl font-bold text-white">Guest Analytics</h1>
+            <h1 className="text-2xl font-bold text-slate-900 dark:text-white">Guest Analytics</h1>
             {!hasData && (
-              <Badge className="bg-slate-600/20 text-slate-400 border border-slate-600/50">
+              <Badge className="bg-slate-600/20 text-slate-600 dark:text-slate-400 border border-slate-300 dark:border-slate-600/50">
                 No Data
               </Badge>
             )}
           </div>
-          <p className="text-slate-400 mt-1">
+          <p className="text-slate-600 dark:text-slate-400 mt-1">
             {hasData
               ? "Platform-wide guest insights across all campgrounds"
               : "Guest analytics will appear once you have reservations"}
@@ -558,7 +558,7 @@ export default function GuestAnalyticsPage() {
         </div>
         <div className="flex items-center gap-3">
           <Select value={dateRange} onValueChange={setDateRange}>
-            <SelectTrigger className="w-44 bg-slate-800 border-slate-700">
+            <SelectTrigger className="w-44 bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -574,7 +574,7 @@ export default function GuestAnalyticsPage() {
             size="sm"
             onClick={handleRefresh}
             disabled={refreshing}
-            className="border-slate-700"
+            className="border-slate-200 dark:border-slate-700"
           >
             <RefreshCw className={`h-4 w-4 mr-2 ${refreshing ? "animate-spin" : ""}`} />
             Refresh
@@ -582,7 +582,7 @@ export default function GuestAnalyticsPage() {
           <Button
             variant="outline"
             size="sm"
-            className="border-slate-700"
+            className="border-slate-200 dark:border-slate-700"
             onClick={() => setExportDialogOpen(true)}
           >
             <Download className="h-4 w-4 mr-2" />
@@ -591,7 +591,7 @@ export default function GuestAnalyticsPage() {
           <Button
             variant="outline"
             size="sm"
-            className="border-emerald-700 text-emerald-400 hover:bg-emerald-900/20"
+            className="border-emerald-700 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 dark:bg-emerald-900/20"
             onClick={() => {
               setShareLink(null);
               setShareName("");
@@ -606,11 +606,11 @@ export default function GuestAnalyticsPage() {
 
       {/* Empty State */}
       {!hasData && (
-        <Card className="bg-slate-800/30 border-slate-700">
+        <Card className="bg-slate-50 dark:bg-slate-800/30 border-slate-200 dark:border-slate-700">
           <CardContent className="p-12 text-center">
             <Users className="h-16 w-16 text-slate-600 mx-auto mb-4" />
-            <h3 className="text-xl font-semibold text-slate-300 mb-2">No Guest Data Yet</h3>
-            <p className="text-slate-400 mb-6 max-w-md mx-auto">
+            <h3 className="text-xl font-semibold text-slate-700 dark:text-slate-300 mb-2">No Guest Data Yet</h3>
+            <p className="text-slate-600 dark:text-slate-400 mb-6 max-w-md mx-auto">
               Guest analytics will be available once you have reservations in your campgrounds.
               Create your first reservation to start seeing insights about your guests.
             </p>
@@ -622,24 +622,24 @@ export default function GuestAnalyticsPage() {
       {hasData && (
       <>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <Card className="bg-slate-800/50 border-slate-700">
+        <Card className="bg-white dark:bg-slate-800/50 border-slate-200 dark:border-slate-700">
           <CardContent className="p-4">
             <div className="flex items-center justify-between">
               <Users className="h-8 w-8 text-emerald-500" />
-              <Badge variant="outline" className="text-emerald-400 border-emerald-400/50">
+              <Badge variant="outline" className="text-emerald-600 dark:text-emerald-400 border-emerald-400 dark:border-emerald-400/50">
                 Total
               </Badge>
             </div>
             <div className="mt-3">
-              <div className="text-2xl font-bold text-white">
+              <div className="text-2xl font-bold text-slate-900 dark:text-white">
                 {analytics.overview.totalGuests.toLocaleString()}
               </div>
-              <div className="text-sm text-slate-400">Total Guests</div>
+              <div className="text-sm text-slate-600 dark:text-slate-400">Total Guests</div>
             </div>
           </CardContent>
         </Card>
 
-        <Card className="bg-slate-800/50 border-slate-700">
+        <Card className="bg-white dark:bg-slate-800/50 border-slate-200 dark:border-slate-700">
           <CardContent className="p-4">
             <div className="flex items-center justify-between">
               <TrendingUp className="h-8 w-8 text-blue-500" />
@@ -649,44 +649,44 @@ export default function GuestAnalyticsPage() {
               />
             </div>
             <div className="mt-3">
-              <div className="text-2xl font-bold text-white">
+              <div className="text-2xl font-bold text-slate-900 dark:text-white">
                 {analytics.overview.newGuestsThisMonth.toLocaleString()}
               </div>
-              <div className="text-sm text-slate-400">New Guests This Month</div>
+              <div className="text-sm text-slate-600 dark:text-slate-400">New Guests This Month</div>
             </div>
           </CardContent>
         </Card>
 
-        <Card className="bg-slate-800/50 border-slate-700">
+        <Card className="bg-white dark:bg-slate-800/50 border-slate-200 dark:border-slate-700">
           <CardContent className="p-4">
             <div className="flex items-center justify-between">
               <RefreshCw className="h-8 w-8 text-amber-500" />
-              <Badge variant="outline" className="text-amber-400 border-amber-400/50">
+              <Badge variant="outline" className="text-amber-600 dark:text-amber-400 border-amber-400 dark:border-amber-400/50">
                 {analytics.overview.repeatRate}%
               </Badge>
             </div>
             <div className="mt-3">
-              <div className="text-2xl font-bold text-white">
+              <div className="text-2xl font-bold text-slate-900 dark:text-white">
                 {analytics.overview.repeatGuests.toLocaleString()}
               </div>
-              <div className="text-sm text-slate-400">Repeat Guests</div>
+              <div className="text-sm text-slate-600 dark:text-slate-400">Repeat Guests</div>
             </div>
           </CardContent>
         </Card>
 
-        <Card className="bg-slate-800/50 border-slate-700">
+        <Card className="bg-white dark:bg-slate-800/50 border-slate-200 dark:border-slate-700">
           <CardContent className="p-4">
             <div className="flex items-center justify-between">
               <Calendar className="h-8 w-8 text-violet-500" />
-              <Badge variant="outline" className="text-violet-400 border-violet-400/50">
+              <Badge variant="outline" className="text-violet-600 dark:text-violet-400 border-violet-400 dark:border-violet-400/50">
                 Avg
               </Badge>
             </div>
             <div className="mt-3">
-              <div className="text-2xl font-bold text-white">
+              <div className="text-2xl font-bold text-slate-900 dark:text-white">
                 {analytics.overview.avgStayLength} nights
               </div>
-              <div className="text-sm text-slate-400">Avg Stay Length</div>
+              <div className="text-sm text-slate-600 dark:text-slate-400">Avg Stay Length</div>
             </div>
           </CardContent>
         </Card>
@@ -694,7 +694,7 @@ export default function GuestAnalyticsPage() {
 
       {/* Insights Banner */}
       {analytics.insights.length > 0 && (
-        <Card className="bg-gradient-to-r from-slate-800/80 to-slate-800/40 border-slate-700">
+        <Card className="bg-gradient-to-r from-slate-100 to-slate-50 dark:from-slate-800/80 dark:to-slate-800/40 border-slate-200 dark:border-slate-700">
           <CardHeader className="pb-2">
             <CardTitle className="text-lg flex items-center gap-2">
               <TrendingUp className="h-5 w-5 text-emerald-500" />
@@ -708,21 +708,21 @@ export default function GuestAnalyticsPage() {
                   key={i}
                   className={`p-3 rounded-lg border ${
                     insight.type === "warning"
-                      ? "bg-amber-900/20 border-amber-700/50"
+                      ? "bg-amber-50 dark:bg-amber-900/20 border-amber-700/50"
                       : insight.type === "success"
-                      ? "bg-emerald-900/20 border-emerald-700/50"
-                      : "bg-slate-700/30 border-slate-600/50"
+                      ? "bg-emerald-50 dark:bg-emerald-900/20 border-emerald-700/50"
+                      : "bg-slate-100 dark:bg-slate-700/30 border-slate-300 dark:border-slate-600/50"
                   }`}
                 >
                   <div className="flex items-center justify-between mb-1">
-                    <span className="font-medium text-sm text-white">{insight.title}</span>
+                    <span className="font-medium text-sm text-slate-900 dark:text-white">{insight.title}</span>
                     {insight.metric && (
                       <Badge variant="outline" className="text-xs">
                         {insight.metric}
                       </Badge>
                     )}
                   </div>
-                  <p className="text-xs text-slate-400">{insight.description}</p>
+                  <p className="text-xs text-slate-600 dark:text-slate-400">{insight.description}</p>
                 </div>
               ))}
             </div>
@@ -733,7 +733,7 @@ export default function GuestAnalyticsPage() {
       {/* Main Content Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Geographic Origin */}
-        <Card className="bg-slate-800/50 border-slate-700">
+        <Card className="bg-white dark:bg-slate-800/50 border-slate-200 dark:border-slate-700">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <MapPin className="h-5 w-5 text-emerald-500" />
@@ -743,7 +743,7 @@ export default function GuestAnalyticsPage() {
           </CardHeader>
           <CardContent className="space-y-6">
             <div>
-              <h4 className="text-sm font-medium text-slate-300 mb-3">By Country</h4>
+              <h4 className="text-sm font-medium text-slate-700 dark:text-slate-300 mb-3">By Country</h4>
               <BarChart
                 data={analytics.geographic.byCountry}
                 labelKey="country"
@@ -751,7 +751,7 @@ export default function GuestAnalyticsPage() {
               />
             </div>
             <div>
-              <h4 className="text-sm font-medium text-slate-300 mb-3">Top States/Provinces</h4>
+              <h4 className="text-sm font-medium text-slate-700 dark:text-slate-300 mb-3">Top States/Provinces</h4>
               <BarChart
                 data={analytics.geographic.byState.slice(0, 6)}
                 labelKey="state"
@@ -762,7 +762,7 @@ export default function GuestAnalyticsPage() {
         </Card>
 
         {/* Seasonal Trends */}
-        <Card className="bg-slate-800/50 border-slate-700">
+        <Card className="bg-white dark:bg-slate-800/50 border-slate-200 dark:border-slate-700">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Calendar className="h-5 w-5 text-blue-500" />
@@ -772,25 +772,25 @@ export default function GuestAnalyticsPage() {
           </CardHeader>
           <CardContent className="space-y-4">
             <SimpleLineChart data={analytics.seasonalTrends.byMonth} />
-            <div className="grid grid-cols-3 gap-3 pt-4 border-t border-slate-700">
+            <div className="grid grid-cols-3 gap-3 pt-4 border-t border-slate-200 dark:border-slate-700">
               <div className="text-center">
                 <Badge className="bg-emerald-600 mb-1">Peak</Badge>
-                <div className="text-xs text-slate-400">{analytics.seasonalTrends.peakSeason}</div>
+                <div className="text-xs text-slate-600 dark:text-slate-400">{analytics.seasonalTrends.peakSeason}</div>
               </div>
               <div className="text-center">
                 <Badge className="bg-amber-600 mb-1">Shoulder</Badge>
-                <div className="text-xs text-slate-400">{analytics.seasonalTrends.shoulderSeason}</div>
+                <div className="text-xs text-slate-600 dark:text-slate-400">{analytics.seasonalTrends.shoulderSeason}</div>
               </div>
               <div className="text-center">
                 <Badge className="bg-slate-600 mb-1">Off</Badge>
-                <div className="text-xs text-slate-400">{analytics.seasonalTrends.offSeason}</div>
+                <div className="text-xs text-slate-600 dark:text-slate-400">{analytics.seasonalTrends.offSeason}</div>
               </div>
             </div>
           </CardContent>
         </Card>
 
         {/* Demographics */}
-        <Card className="bg-slate-800/50 border-slate-700">
+        <Card className="bg-white dark:bg-slate-800/50 border-slate-200 dark:border-slate-700">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Truck className="h-5 w-5 text-amber-500" />
@@ -800,38 +800,38 @@ export default function GuestAnalyticsPage() {
           </CardHeader>
           <CardContent className="space-y-6">
             <div>
-              <h4 className="text-sm font-medium text-slate-300 mb-3">RV/Equipment Types</h4>
+              <h4 className="text-sm font-medium text-slate-700 dark:text-slate-300 mb-3">RV/Equipment Types</h4>
               <BarChart
                 data={analytics.demographics.rigTypes}
                 labelKey="type"
                 valueKey="count"
               />
             </div>
-            <div className="grid grid-cols-3 gap-4 pt-4 border-t border-slate-700">
+            <div className="grid grid-cols-3 gap-4 pt-4 border-t border-slate-200 dark:border-slate-700">
               <div className="text-center">
-                <div className="text-xl font-bold text-white">{analytics.demographics.avgRigLength}ft</div>
-                <div className="text-xs text-slate-400">Avg RV Length</div>
+                <div className="text-xl font-bold text-slate-900 dark:text-white">{analytics.demographics.avgRigLength}ft</div>
+                <div className="text-xs text-slate-600 dark:text-slate-400">Avg RV Length</div>
               </div>
               <div className="text-center">
-                <div className="text-xl font-bold text-white flex items-center justify-center gap-1">
-                  <Baby className="h-4 w-4 text-blue-400" />
+                <div className="text-xl font-bold text-slate-900 dark:text-white flex items-center justify-center gap-1">
+                  <Baby className="h-4 w-4 text-blue-600 dark:text-blue-400" />
                   {((analytics.demographics.partyComposition.withChildren / analytics.overview.totalGuests) * 100).toFixed(0)}%
                 </div>
-                <div className="text-xs text-slate-400">With Children</div>
+                <div className="text-xs text-slate-600 dark:text-slate-400">With Children</div>
               </div>
               <div className="text-center">
-                <div className="text-xl font-bold text-white flex items-center justify-center gap-1">
-                  <Dog className="h-4 w-4 text-amber-400" />
+                <div className="text-xl font-bold text-slate-900 dark:text-white flex items-center justify-center gap-1">
+                  <Dog className="h-4 w-4 text-amber-600 dark:text-amber-400" />
                   {analytics.demographics.petPercentage}%
                 </div>
-                <div className="text-xs text-slate-400">With Pets</div>
+                <div className="text-xs text-slate-600 dark:text-slate-400">With Pets</div>
               </div>
             </div>
           </CardContent>
         </Card>
 
         {/* Travel Behavior */}
-        <Card className="bg-slate-800/50 border-slate-700">
+        <Card className="bg-white dark:bg-slate-800/50 border-slate-200 dark:border-slate-700">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <TrendingUp className="h-5 w-5 text-violet-500" />
@@ -841,7 +841,7 @@ export default function GuestAnalyticsPage() {
           </CardHeader>
           <CardContent className="space-y-6">
             <div>
-              <h4 className="text-sm font-medium text-slate-300 mb-3">Stay Reasons</h4>
+              <h4 className="text-sm font-medium text-slate-700 dark:text-slate-300 mb-3">Stay Reasons</h4>
               <BarChart
                 data={analytics.travelBehavior.stayReasons.slice(0, 5)}
                 labelKey="reason"
@@ -849,23 +849,23 @@ export default function GuestAnalyticsPage() {
               />
             </div>
             <div>
-              <h4 className="text-sm font-medium text-slate-300 mb-3">Booking Sources</h4>
+              <h4 className="text-sm font-medium text-slate-700 dark:text-slate-300 mb-3">Booking Sources</h4>
               <BarChart
                 data={analytics.travelBehavior.bookingSources.slice(0, 5)}
                 labelKey="source"
                 valueKey="count"
               />
             </div>
-            <div className="grid grid-cols-2 gap-4 pt-4 border-t border-slate-700">
+            <div className="grid grid-cols-2 gap-4 pt-4 border-t border-slate-200 dark:border-slate-700">
               <div className="text-center">
-                <div className="text-xl font-bold text-white">{analytics.travelBehavior.avgBookingWindow} days</div>
-                <div className="text-xs text-slate-400">Avg Booking Window</div>
+                <div className="text-xl font-bold text-slate-900 dark:text-white">{analytics.travelBehavior.avgBookingWindow} days</div>
+                <div className="text-xs text-slate-600 dark:text-slate-400">Avg Booking Window</div>
               </div>
               <div className="text-center">
-                <div className="text-xl font-bold text-white">
+                <div className="text-xl font-bold text-slate-900 dark:text-white">
                   {analytics.travelBehavior.weekdayVsWeekend.weekend}%
                 </div>
-                <div className="text-xs text-slate-400">Weekend Arrivals</div>
+                <div className="text-xs text-slate-600 dark:text-slate-400">Weekend Arrivals</div>
               </div>
             </div>
           </CardContent>
@@ -873,10 +873,10 @@ export default function GuestAnalyticsPage() {
       </div>
 
       {/* Snowbird Insights */}
-      <Card className="bg-gradient-to-r from-blue-900/30 to-slate-800/50 border-slate-700">
+      <Card className="bg-gradient-to-r from-blue-50 to-slate-50 dark:from-blue-900/30 dark:to-slate-800/50 border-slate-200 dark:border-slate-700">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <MapPin className="h-5 w-5 text-blue-400" />
+            <MapPin className="h-5 w-5 text-blue-600 dark:text-blue-400" />
             Snowbird Migration Patterns
           </CardTitle>
           <CardDescription>
@@ -885,36 +885,36 @@ export default function GuestAnalyticsPage() {
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="text-center p-4 bg-slate-800/50 rounded-lg">
-              <div className="text-3xl font-bold text-white">
+            <div className="text-center p-4 bg-white dark:bg-slate-800/50 rounded-lg">
+              <div className="text-3xl font-bold text-slate-900 dark:text-white">
                 {analytics.geographic.snowbirdPatterns.northernStates.toLocaleString()}
               </div>
-              <div className="text-sm text-slate-400 mt-1">
+              <div className="text-sm text-slate-600 dark:text-slate-400 mt-1">
                 Guests from Northern States/Canada
               </div>
-              <div className="text-xs text-blue-400 mt-2">
+              <div className="text-xs text-blue-600 dark:text-blue-400 mt-2">
                 MI, OH, MN, WI, Ontario, Alberta
               </div>
             </div>
-            <div className="text-center p-4 bg-slate-800/50 rounded-lg">
-              <div className="text-3xl font-bold text-white">
+            <div className="text-center p-4 bg-white dark:bg-slate-800/50 rounded-lg">
+              <div className="text-3xl font-bold text-slate-900 dark:text-white">
                 {analytics.geographic.snowbirdPatterns.southernDestinations.toLocaleString()}
               </div>
-              <div className="text-sm text-slate-400 mt-1">
+              <div className="text-sm text-slate-600 dark:text-slate-400 mt-1">
                 Booked Southern Destinations
               </div>
-              <div className="text-xs text-emerald-400 mt-2">
+              <div className="text-xs text-emerald-600 dark:text-emerald-400 mt-2">
                 TX, AZ, FL properties
               </div>
             </div>
-            <div className="text-center p-4 bg-slate-800/50 rounded-lg">
-              <div className="text-3xl font-bold text-white">
+            <div className="text-center p-4 bg-white dark:bg-slate-800/50 rounded-lg">
+              <div className="text-3xl font-bold text-slate-900 dark:text-white">
                 October
               </div>
-              <div className="text-sm text-slate-400 mt-1">
+              <div className="text-sm text-slate-600 dark:text-slate-400 mt-1">
                 Peak Migration Month
               </div>
-              <div className="text-xs text-amber-400 mt-2">
+              <div className="text-xs text-amber-600 dark:text-amber-400 mt-2">
                 15% earlier than last year
               </div>
             </div>
@@ -926,9 +926,9 @@ export default function GuestAnalyticsPage() {
 
       {/* Export Dialog */}
       <Dialog open={exportDialogOpen} onOpenChange={setExportDialogOpen}>
-        <DialogContent className="bg-slate-900 border-slate-700">
+        <DialogContent className="bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700">
           <DialogHeader>
-            <DialogTitle className="text-white">Export Analytics</DialogTitle>
+            <DialogTitle className="text-slate-900 dark:text-white">Export Analytics</DialogTitle>
             <DialogDescription>
               Download guest analytics data for the selected time period.
             </DialogDescription>
@@ -937,7 +937,7 @@ export default function GuestAnalyticsPage() {
             <div className="space-y-2">
               <Label>Export Format</Label>
               <Select value={exportFormat} onValueChange={(v) => setExportFormat(v as "csv" | "json")}>
-                <SelectTrigger className="bg-slate-800 border-slate-700">
+                <SelectTrigger className="bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -948,7 +948,7 @@ export default function GuestAnalyticsPage() {
             </div>
             <div className="space-y-2">
               <Label>Date Range</Label>
-              <div className="text-sm text-slate-400 bg-slate-800 p-2 rounded border border-slate-700">
+              <div className="text-sm text-slate-600 dark:text-slate-400 bg-slate-800 p-2 rounded border border-slate-200 dark:border-slate-700">
                 {dateRange === "last_30_days" && "Last 30 Days"}
                 {dateRange === "last_90_days" && "Last 90 Days"}
                 {dateRange === "last_12_months" && "Last 12 Months"}
@@ -956,7 +956,7 @@ export default function GuestAnalyticsPage() {
                 {dateRange === "all_time" && "All Time"}
               </div>
             </div>
-            <div className="text-xs text-slate-500">
+            <div className="text-xs text-slate-500 dark:text-slate-500">
               The export will include overview metrics, geographic data, demographics, seasonal trends, and travel behavior.
             </div>
           </div>
@@ -964,7 +964,7 @@ export default function GuestAnalyticsPage() {
             <Button
               variant="outline"
               onClick={() => setExportDialogOpen(false)}
-              className="border-slate-700"
+              className="border-slate-200 dark:border-slate-700"
             >
               Cancel
             </Button>
@@ -991,9 +991,9 @@ export default function GuestAnalyticsPage() {
 
       {/* Share Dialog */}
       <Dialog open={shareDialogOpen} onOpenChange={setShareDialogOpen}>
-        <DialogContent className="bg-slate-900 border-slate-700">
+        <DialogContent className="bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700">
           <DialogHeader>
-            <DialogTitle className="text-white">Share Analytics</DialogTitle>
+            <DialogTitle className="text-slate-900 dark:text-white">Share Analytics</DialogTitle>
             <DialogDescription>
               Create a shareable link for campground partners to view these insights.
             </DialogDescription>
@@ -1007,13 +1007,13 @@ export default function GuestAnalyticsPage() {
                     value={shareName}
                     onChange={(e) => setShareName(e.target.value)}
                     placeholder="e.g., Q4 2024 Guest Insights"
-                    className="bg-slate-800 border-slate-700"
+                    className="bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700"
                   />
                 </div>
                 <div className="space-y-2">
                   <Label>Link Expiration</Label>
                   <Select value={shareExpiry} onValueChange={setShareExpiry}>
-                    <SelectTrigger className="bg-slate-800 border-slate-700">
+                    <SelectTrigger className="bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
@@ -1024,13 +1024,13 @@ export default function GuestAnalyticsPage() {
                     </SelectContent>
                   </Select>
                 </div>
-                <div className="text-xs text-slate-500">
+                <div className="text-xs text-slate-500 dark:text-slate-500">
                   Shared reports are view-only. Partners cannot download or modify the data.
                 </div>
               </>
             ) : (
               <div className="space-y-4">
-                <div className="flex items-center gap-2 p-3 bg-emerald-900/20 border border-emerald-700/50 rounded-lg">
+                <div className="flex items-center gap-2 p-3 bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-700/50 rounded-lg">
                   <Check className="h-5 w-5 text-emerald-500" />
                   <span className="text-sm text-emerald-300">Share link created successfully!</span>
                 </div>
@@ -1040,13 +1040,13 @@ export default function GuestAnalyticsPage() {
                     <Input
                       value={shareLink}
                       readOnly
-                      className="bg-slate-800 border-slate-700 text-slate-300"
+                      className="bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300"
                     />
                     <Button
                       variant="outline"
                       size="icon"
                       onClick={copyShareLink}
-                      className="border-slate-700 shrink-0"
+                      className="border-slate-200 dark:border-slate-700 shrink-0"
                     >
                       {shareLinkCopied ? (
                         <Check className="h-4 w-4 text-emerald-500" />
@@ -1056,7 +1056,7 @@ export default function GuestAnalyticsPage() {
                     </Button>
                   </div>
                 </div>
-                <div className="text-xs text-slate-500">
+                <div className="text-xs text-slate-500 dark:text-slate-500">
                   This link will expire in {shareExpiry === "24" ? "24 hours" : shareExpiry === "168" ? "7 days" : shareExpiry === "720" ? "30 days" : "90 days"}.
                 </div>
               </div>
@@ -1068,7 +1068,7 @@ export default function GuestAnalyticsPage() {
                 <Button
                   variant="outline"
                   onClick={() => setShareDialogOpen(false)}
-                  className="border-slate-700"
+                  className="border-slate-200 dark:border-slate-700"
                 >
                   Cancel
                 </Button>

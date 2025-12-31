@@ -91,7 +91,7 @@ function TrendIndicator({ change, size = "default" }: { change: number; size?: "
 
   if (isNeutral) {
     return (
-      <span className={`flex items-center text-slate-400 ${sizeClasses}`}>
+      <span className={`flex items-center text-slate-600 dark:text-slate-400 ${sizeClasses}`}>
         <Minus className={size === "large" ? "h-5 w-5 mr-1" : "h-4 w-4 mr-1"} />
         No change
       </span>
@@ -99,7 +99,7 @@ function TrendIndicator({ change, size = "default" }: { change: number; size?: "
   }
 
   return (
-    <span className={`flex items-center ${isPositive ? "text-emerald-400" : "text-rose-400"} ${sizeClasses}`}>
+    <span className={`flex items-center ${isPositive ? "text-emerald-600 dark:text-emerald-400" : "text-rose-600 dark:text-rose-400"} ${sizeClasses}`}>
       {isPositive ? (
         <TrendingUp className={size === "large" ? "h-5 w-5 mr-1" : "h-4 w-4 mr-1"} />
       ) : (
@@ -125,16 +125,16 @@ function formatValue(value: number, format: string): string {
 
 function MetricCard({ metric }: { metric: TrendMetric }) {
   return (
-    <Card className="bg-slate-800/50 border-slate-700">
+    <Card className="bg-white dark:bg-slate-800/50 border-slate-200 dark:border-slate-700">
       <CardContent className="p-4">
         <div className="flex items-center justify-between mb-2">
-          <span className="text-sm text-slate-400">{metric.label}</span>
+          <span className="text-sm text-slate-600 dark:text-slate-400">{metric.label}</span>
           <TrendIndicator change={metric.change} />
         </div>
-        <div className="text-2xl font-bold text-white">
+        <div className="text-2xl font-bold text-slate-900 dark:text-white">
           {formatValue(metric.currentValue, metric.format)}
         </div>
-        <div className="text-xs text-slate-500 mt-1">
+        <div className="text-xs text-slate-500 dark:text-slate-500 mt-1">
           vs {formatValue(metric.previousValue, metric.format)} prev period
         </div>
       </CardContent>
@@ -258,10 +258,10 @@ export default function GuestTrendsPage() {
     return (
       <div className="p-8">
         <div className="animate-pulse space-y-6">
-          <div className="h-8 bg-slate-800 rounded w-64" />
+          <div className="h-8 bg-slate-200 dark:bg-slate-800 rounded w-64" />
           <div className="grid grid-cols-3 gap-4">
             {[1, 2, 3, 4, 5, 6].map(i => (
-              <div key={i} className="h-32 bg-slate-800 rounded-lg" />
+              <div key={i} className="h-32 bg-slate-200 dark:bg-slate-800 rounded-lg" />
             ))}
           </div>
         </div>
@@ -272,7 +272,7 @@ export default function GuestTrendsPage() {
   if (!canViewTrends) {
     return (
       <div className="p-8">
-        <Card className="bg-amber-900/20 border-amber-700">
+        <Card className="bg-amber-50 dark:bg-amber-900/20 border-amber-700">
           <CardContent className="p-6">
             <div className="flex items-center gap-3">
               <AlertTriangle className="h-6 w-6 text-amber-500" />
@@ -292,7 +292,7 @@ export default function GuestTrendsPage() {
   if (error) {
     return (
       <div className="p-8">
-        <Card className="bg-rose-900/20 border-rose-700">
+        <Card className="bg-rose-50 dark:bg-rose-900/20 border-rose-700">
           <CardContent className="p-6">
             <div className="flex items-center gap-3">
               <AlertTriangle className="h-6 w-6 text-rose-500" />
@@ -319,14 +319,14 @@ export default function GuestTrendsPage() {
       <div className="flex items-center justify-between">
         <div>
           <div className="flex items-center gap-3">
-            <h1 className="text-2xl font-bold text-white">Guest Trends</h1>
+            <h1 className="text-2xl font-bold text-slate-900 dark:text-white">Guest Trends</h1>
             {!hasData && (
-              <Badge className="bg-slate-600/20 text-slate-400 border border-slate-600/50">
+              <Badge className="bg-slate-600/20 text-slate-600 dark:text-slate-400 border border-slate-300 dark:border-slate-600/50">
                 No Data
               </Badge>
             )}
           </div>
-          <p className="text-slate-400 mt-1">
+          <p className="text-slate-600 dark:text-slate-400 mt-1">
             {hasData
               ? "Year-over-year guest trends and insights"
               : "Trend data will appear once you have reservations"}
@@ -334,7 +334,7 @@ export default function GuestTrendsPage() {
         </div>
         <div className="flex items-center gap-3">
           <Select value={dateRange} onValueChange={setDateRange}>
-            <SelectTrigger className="w-44 bg-slate-800 border-slate-700">
+            <SelectTrigger className="w-44 bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -345,7 +345,7 @@ export default function GuestTrendsPage() {
             </SelectContent>
           </Select>
           <Select value={comparisonPeriod} onValueChange={setComparisonPeriod}>
-            <SelectTrigger className="w-44 bg-slate-800 border-slate-700">
+            <SelectTrigger className="w-44 bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -353,7 +353,7 @@ export default function GuestTrendsPage() {
               <SelectItem value="previous_year">Previous Year</SelectItem>
             </SelectContent>
           </Select>
-          <Button variant="outline" size="sm" className="border-slate-700">
+          <Button variant="outline" size="sm" className="border-slate-200 dark:border-slate-700">
             <Download className="h-4 w-4 mr-2" />
             Export
           </Button>
@@ -362,11 +362,11 @@ export default function GuestTrendsPage() {
 
       {/* Empty State */}
       {!hasData && (
-        <Card className="bg-slate-800/30 border-slate-700">
+        <Card className="bg-slate-50 dark:bg-slate-800/30 border-slate-200 dark:border-slate-700">
           <CardContent className="p-12 text-center">
             <TrendingUp className="h-16 w-16 text-slate-600 mx-auto mb-4" />
-            <h3 className="text-xl font-semibold text-slate-300 mb-2">No Trend Data Yet</h3>
-            <p className="text-slate-400 mb-6 max-w-md mx-auto">
+            <h3 className="text-xl font-semibold text-slate-700 dark:text-slate-300 mb-2">No Trend Data Yet</h3>
+            <p className="text-slate-600 dark:text-slate-400 mb-6 max-w-md mx-auto">
               Guest trend analytics will be available once you have multiple reservations over time.
               Trends help you understand how your guest demographics and behavior change.
             </p>
@@ -387,7 +387,7 @@ export default function GuestTrendsPage() {
       {hasData && trendsData.monthlyTrends.length > 0 && (
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Bookings Trend */}
-        <Card className="bg-slate-800/50 border-slate-700">
+        <Card className="bg-white dark:bg-slate-800/50 border-slate-200 dark:border-slate-700">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Calendar className="h-5 w-5 text-emerald-500" />
@@ -397,7 +397,7 @@ export default function GuestTrendsPage() {
           </CardHeader>
           <CardContent>
             <SimpleAreaChart data={trendsData.monthlyTrends} dataKey="reservations" color="bg-emerald-600" />
-            <div className="flex justify-between text-xs text-slate-500 mt-2">
+            <div className="flex justify-between text-xs text-slate-500 dark:text-slate-500 mt-2">
               <span>{trendsData.monthlyTrends[0]?.month}</span>
               <span>{trendsData.monthlyTrends[trendsData.monthlyTrends.length - 1]?.month}</span>
             </div>
@@ -405,7 +405,7 @@ export default function GuestTrendsPage() {
         </Card>
 
         {/* Revenue Trend */}
-        <Card className="bg-slate-800/50 border-slate-700">
+        <Card className="bg-white dark:bg-slate-800/50 border-slate-200 dark:border-slate-700">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <DollarSign className="h-5 w-5 text-blue-500" />
@@ -415,7 +415,7 @@ export default function GuestTrendsPage() {
           </CardHeader>
           <CardContent>
             <SimpleAreaChart data={trendsData.monthlyTrends} dataKey="revenue" color="bg-blue-600" />
-            <div className="flex justify-between text-xs text-slate-500 mt-2">
+            <div className="flex justify-between text-xs text-slate-500 dark:text-slate-500 mt-2">
               <span>{trendsData.monthlyTrends[0]?.month}</span>
               <span>{trendsData.monthlyTrends[trendsData.monthlyTrends.length - 1]?.month}</span>
             </div>
@@ -426,7 +426,7 @@ export default function GuestTrendsPage() {
 
       {/* Regional Performance */}
       {hasData && trendsData.regionalTrends.length > 0 && (
-      <Card className="bg-slate-800/50 border-slate-700">
+      <Card className="bg-white dark:bg-slate-800/50 border-slate-200 dark:border-slate-700">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <MapPin className="h-5 w-5 text-amber-500" />
@@ -438,29 +438,29 @@ export default function GuestTrendsPage() {
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
-                <tr className="border-b border-slate-700">
-                  <th className="text-left text-sm font-medium text-slate-400 pb-3">Region</th>
-                  <th className="text-right text-sm font-medium text-slate-400 pb-3">Current Period</th>
-                  <th className="text-right text-sm font-medium text-slate-400 pb-3">Previous Period</th>
-                  <th className="text-right text-sm font-medium text-slate-400 pb-3">Change</th>
-                  <th className="text-right text-sm font-medium text-slate-400 pb-3">Top Origin</th>
+                <tr className="border-b border-slate-200 dark:border-slate-700">
+                  <th className="text-left text-sm font-medium text-slate-600 dark:text-slate-400 pb-3">Region</th>
+                  <th className="text-right text-sm font-medium text-slate-600 dark:text-slate-400 pb-3">Current Period</th>
+                  <th className="text-right text-sm font-medium text-slate-600 dark:text-slate-400 pb-3">Previous Period</th>
+                  <th className="text-right text-sm font-medium text-slate-600 dark:text-slate-400 pb-3">Change</th>
+                  <th className="text-right text-sm font-medium text-slate-600 dark:text-slate-400 pb-3">Top Origin</th>
                 </tr>
               </thead>
               <tbody>
                 {trendsData.regionalTrends.map((region, i) => (
-                  <tr key={i} className="border-b border-slate-800 last:border-0">
-                    <td className="py-3 text-white font-medium">{region.region}</td>
-                    <td className="py-3 text-right text-white">
+                  <tr key={i} className="border-b border-slate-200 dark:border-slate-800 last:border-0">
+                    <td className="py-3 text-slate-900 dark:text-white font-medium">{region.region}</td>
+                    <td className="py-3 text-right text-slate-900 dark:text-white">
                       {region.currentBookings.toLocaleString()}
                     </td>
-                    <td className="py-3 text-right text-slate-400">
+                    <td className="py-3 text-right text-slate-600 dark:text-slate-400">
                       {region.previousBookings.toLocaleString()}
                     </td>
                     <td className="py-3 text-right">
                       <TrendIndicator change={region.change} />
                     </td>
                     <td className="py-3 text-right">
-                      <Badge variant="outline" className="text-slate-300">
+                      <Badge variant="outline" className="text-slate-700 dark:text-slate-300">
                         {region.topOriginState}
                       </Badge>
                     </td>
@@ -475,10 +475,10 @@ export default function GuestTrendsPage() {
 
       {/* Snowbird Migration Trends */}
       {hasData && trendsData.snowbirdTrends.length > 0 && (
-      <Card className="bg-gradient-to-r from-blue-900/30 to-slate-800/50 border-slate-700">
+      <Card className="bg-gradient-to-r from-blue-50 to-slate-50 dark:from-blue-900/30 dark:to-slate-800/50 border-slate-200 dark:border-slate-700">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <MapPin className="h-5 w-5 text-blue-400" />
+            <MapPin className="h-5 w-5 text-blue-600 dark:text-blue-400" />
             Snowbird Migration Trends
           </CardTitle>
           <CardDescription>
@@ -488,9 +488,9 @@ export default function GuestTrendsPage() {
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {trendsData.snowbirdTrends.map((trend, i) => (
-              <div key={i} className="bg-slate-800/50 rounded-lg p-4 space-y-3">
+              <div key={i} className="bg-white dark:bg-slate-800/50 rounded-lg p-4 space-y-3">
                 <div className="flex items-center justify-between">
-                  <span className="text-lg font-bold text-white">{trend.year}</span>
+                  <span className="text-lg font-bold text-slate-900 dark:text-white">{trend.year}</span>
                   {i < trendsData.snowbirdTrends.length - 1 && (
                     <TrendIndicator
                       change={
@@ -503,33 +503,33 @@ export default function GuestTrendsPage() {
                 </div>
                 <div className="space-y-2">
                   <div className="flex justify-between text-sm">
-                    <span className="text-slate-400">Total Migrants</span>
-                    <span className="text-white font-medium">
+                    <span className="text-slate-600 dark:text-slate-400">Total Migrants</span>
+                    <span className="text-slate-900 dark:text-white font-medium">
                       {trend.totalMigrants.toLocaleString()}
                     </span>
                   </div>
                   <div className="flex justify-between text-sm">
-                    <span className="text-slate-400">Avg Departure</span>
-                    <span className="text-white font-medium">
+                    <span className="text-slate-600 dark:text-slate-400">Avg Departure</span>
+                    <span className="text-slate-900 dark:text-white font-medium">
                       {["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"][
                         Math.floor(trend.avgDepartureMonth) - 1
                       ]}
                     </span>
                   </div>
                   <div className="flex justify-between text-sm">
-                    <span className="text-slate-400">Avg Stay</span>
-                    <span className="text-white font-medium">{trend.avgStayLength} nights</span>
+                    <span className="text-slate-600 dark:text-slate-400">Avg Stay</span>
+                    <span className="text-slate-900 dark:text-white font-medium">{trend.avgStayLength} nights</span>
                   </div>
                   <div className="flex justify-between text-sm">
-                    <span className="text-slate-400">Canadian %</span>
-                    <span className="text-white font-medium">{trend.canadianPercentage}%</span>
+                    <span className="text-slate-600 dark:text-slate-400">Canadian %</span>
+                    <span className="text-slate-900 dark:text-white font-medium">{trend.canadianPercentage}%</span>
                   </div>
                 </div>
-                <div className="pt-2 border-t border-slate-700">
-                  <span className="text-xs text-slate-500">Top Destinations:</span>
+                <div className="pt-2 border-t border-slate-200 dark:border-slate-700">
+                  <span className="text-xs text-slate-500 dark:text-slate-500">Top Destinations:</span>
                   <div className="flex flex-wrap gap-1 mt-1">
                     {trend.topDestinations.map((dest, j) => (
-                      <Badge key={j} variant="secondary" className="text-xs bg-slate-700/50">
+                      <Badge key={j} variant="secondary" className="text-xs bg-slate-100 dark:bg-slate-700/50">
                         {dest}
                       </Badge>
                     ))}
@@ -547,7 +547,7 @@ export default function GuestTrendsPage() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* New vs Repeat */}
         {trendsData.monthlyTrends.some(m => m.newGuests && m.repeatGuests) && (
-        <Card className="bg-slate-800/50 border-slate-700">
+        <Card className="bg-white dark:bg-slate-800/50 border-slate-200 dark:border-slate-700">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Users className="h-5 w-5 text-violet-500" />
@@ -564,8 +564,8 @@ export default function GuestTrendsPage() {
                 return (
                   <div key={i} className="space-y-1">
                     <div className="flex justify-between text-sm">
-                      <span className="text-slate-400">{month.month}</span>
-                      <span className="text-slate-400">{total} guests</span>
+                      <span className="text-slate-600 dark:text-slate-400">{month.month}</span>
+                      <span className="text-slate-600 dark:text-slate-400">{total} guests</span>
                     </div>
                     <div className="flex h-4 rounded overflow-hidden">
                       <div
@@ -585,11 +585,11 @@ export default function GuestTrendsPage() {
               <div className="flex items-center gap-4 pt-2 text-xs">
                 <div className="flex items-center gap-1">
                   <div className="w-3 h-3 bg-violet-600 rounded" />
-                  <span className="text-slate-400">New Guests</span>
+                  <span className="text-slate-600 dark:text-slate-400">New Guests</span>
                 </div>
                 <div className="flex items-center gap-1">
                   <div className="w-3 h-3 bg-emerald-600 rounded" />
-                  <span className="text-slate-400">Repeat Guests</span>
+                  <span className="text-slate-600 dark:text-slate-400">Repeat Guests</span>
                 </div>
               </div>
             </div>
@@ -599,7 +599,7 @@ export default function GuestTrendsPage() {
 
         {/* Stay Length Trends */}
         {trendsData.monthlyTrends.some(m => m.avgStay) && (
-        <Card className="bg-slate-800/50 border-slate-700">
+        <Card className="bg-white dark:bg-slate-800/50 border-slate-200 dark:border-slate-700">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Clock className="h-5 w-5 text-amber-500" />
@@ -609,28 +609,28 @@ export default function GuestTrendsPage() {
           </CardHeader>
           <CardContent>
             <SimpleAreaChart data={trendsData.monthlyTrends} dataKey="avgStay" color="bg-amber-600" />
-            <div className="flex justify-between text-xs text-slate-500 mt-2">
+            <div className="flex justify-between text-xs text-slate-500 dark:text-slate-500 mt-2">
               <span>{trendsData.monthlyTrends[0]?.month}</span>
               <span>{trendsData.monthlyTrends[trendsData.monthlyTrends.length - 1]?.month}</span>
             </div>
-            <div className="grid grid-cols-3 gap-4 mt-4 pt-4 border-t border-slate-700">
+            <div className="grid grid-cols-3 gap-4 mt-4 pt-4 border-t border-slate-200 dark:border-slate-700">
               <div className="text-center">
-                <div className="text-lg font-bold text-white">
+                <div className="text-lg font-bold text-slate-900 dark:text-white">
                   {Math.min(...trendsData.monthlyTrends.map(m => m.avgStay || 0)).toFixed(1)}
                 </div>
-                <div className="text-xs text-slate-400">Min (nights)</div>
+                <div className="text-xs text-slate-600 dark:text-slate-400">Min (nights)</div>
               </div>
               <div className="text-center">
-                <div className="text-lg font-bold text-white">
+                <div className="text-lg font-bold text-slate-900 dark:text-white">
                   {(trendsData.monthlyTrends.reduce((sum, m) => sum + (m.avgStay || 0), 0) / trendsData.monthlyTrends.length).toFixed(1)}
                 </div>
-                <div className="text-xs text-slate-400">Average (nights)</div>
+                <div className="text-xs text-slate-600 dark:text-slate-400">Average (nights)</div>
               </div>
               <div className="text-center">
-                <div className="text-lg font-bold text-white">
+                <div className="text-lg font-bold text-slate-900 dark:text-white">
                   {Math.max(...trendsData.monthlyTrends.map(m => m.avgStay || 0)).toFixed(1)}
                 </div>
-                <div className="text-xs text-slate-400">Max (nights)</div>
+                <div className="text-xs text-slate-600 dark:text-slate-400">Max (nights)</div>
               </div>
             </div>
           </CardContent>

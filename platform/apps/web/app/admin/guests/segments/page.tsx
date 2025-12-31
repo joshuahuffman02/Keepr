@@ -104,14 +104,14 @@ function SegmentCard({ segment, onEdit, onCopy, onArchive }: {
   };
 
   return (
-    <Card className="bg-slate-800/50 border-slate-700 hover:border-slate-600 transition-colors">
+    <Card className="bg-white dark:bg-slate-800/50 border-slate-200 dark:border-slate-700 hover:border-slate-600 transition-colors">
       <CardHeader className="pb-2">
         <div className="flex items-start justify-between">
           <div className="space-y-1">
             <div className="flex items-center gap-2">
               <CardTitle className="text-lg">{segment.name}</CardTitle>
               {segment.isTemplate && (
-                <Badge variant="outline" className="text-xs text-blue-400 border-blue-400/50">
+                <Badge variant="outline" className="text-xs text-blue-600 dark:text-blue-400 border-blue-400 dark:border-blue-400/50">
                   Template
                 </Badge>
               )}
@@ -140,7 +140,7 @@ function SegmentCard({ segment, onEdit, onCopy, onArchive }: {
             <Button
               variant="ghost"
               size="sm"
-              className="h-8 w-8 p-0 text-rose-400 hover:text-rose-300"
+              className="h-8 w-8 p-0 text-rose-600 dark:text-rose-400 hover:text-rose-300"
               onClick={() => onArchive(segment)}
               title="Archive"
             >
@@ -160,7 +160,7 @@ function SegmentCard({ segment, onEdit, onCopy, onArchive }: {
                 <Badge
                   key={i}
                   variant="secondary"
-                  className="bg-slate-700/50 text-slate-300 flex items-center gap-1"
+                  className="bg-slate-100 dark:bg-slate-700/50 text-slate-700 dark:text-slate-300 flex items-center gap-1"
                 >
                   <Icon className="h-3 w-3" />
                   {criteriaType?.label || criterion.type}: {
@@ -174,20 +174,20 @@ function SegmentCard({ segment, onEdit, onCopy, onArchive }: {
           </div>
 
           {/* Stats row */}
-          <div className="flex items-center justify-between pt-2 border-t border-slate-700">
+          <div className="flex items-center justify-between pt-2 border-t border-slate-200 dark:border-slate-700">
             <div className="flex items-center gap-4">
               <div className="flex items-center gap-1.5">
                 <Users className="h-4 w-4 text-emerald-500" />
-                <span className="text-sm font-medium text-white">
+                <span className="text-sm font-medium text-slate-900 dark:text-white">
                   {segment.guestCount.toLocaleString()}
                 </span>
-                <span className="text-xs text-slate-400">guests</span>
+                <span className="text-xs text-slate-600 dark:text-slate-400">guests</span>
               </div>
               <Badge className={`${scopeColors[segment.scope]} text-xs`}>
                 {scopeLabels[segment.scope]}
               </Badge>
             </div>
-            <span className="text-xs text-slate-500">
+            <span className="text-xs text-slate-500 dark:text-slate-500">
               Updated {new Date(segment.updatedAt).toLocaleDateString()}
             </span>
           </div>
@@ -396,10 +396,10 @@ export default function GuestSegmentsPage() {
     return (
       <div className="p-8">
         <div className="animate-pulse space-y-6">
-          <div className="h-8 bg-slate-800 rounded w-64" />
+          <div className="h-8 bg-slate-200 dark:bg-slate-800 rounded w-64" />
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {[1, 2, 3, 4, 5, 6].map(i => (
-              <div key={i} className="h-48 bg-slate-800 rounded-lg" />
+              <div key={i} className="h-48 bg-slate-200 dark:bg-slate-800 rounded-lg" />
             ))}
           </div>
         </div>
@@ -410,7 +410,7 @@ export default function GuestSegmentsPage() {
   if (!canManageSegments) {
     return (
       <div className="p-8">
-        <Card className="bg-amber-900/20 border-amber-700">
+        <Card className="bg-amber-50 dark:bg-amber-900/20 border-amber-700">
           <CardContent className="p-6">
             <div className="flex items-center gap-3">
               <AlertTriangle className="h-6 w-6 text-amber-500" />
@@ -430,7 +430,7 @@ export default function GuestSegmentsPage() {
   if (error) {
     return (
       <div className="p-8">
-        <Card className="bg-rose-900/20 border-rose-700">
+        <Card className="bg-rose-50 dark:bg-rose-900/20 border-rose-700">
           <CardContent className="p-6">
             <div className="flex items-center gap-3">
               <AlertTriangle className="h-6 w-6 text-rose-500" />
@@ -451,9 +451,9 @@ export default function GuestSegmentsPage() {
       <div className="flex items-center justify-between">
         <div>
           <div className="flex items-center gap-3">
-            <h1 className="text-2xl font-bold text-white">Guest Segments</h1>
+            <h1 className="text-2xl font-bold text-slate-900 dark:text-white">Guest Segments</h1>
           </div>
-          <p className="text-slate-400 mt-1">
+          <p className="text-slate-600 dark:text-slate-400 mt-1">
             Create and manage guest segments for targeted messaging and insights
           </p>
         </div>
@@ -464,7 +464,7 @@ export default function GuestSegmentsPage() {
               Create Segment
             </Button>
           </DialogTrigger>
-          <DialogContent className="bg-slate-900 border-slate-700 max-w-lg">
+          <DialogContent className="bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700 max-w-lg">
             <DialogHeader>
               <DialogTitle>Create New Segment</DialogTitle>
               <DialogDescription>
@@ -479,7 +479,7 @@ export default function GuestSegmentsPage() {
                   value={newSegment.name}
                   onChange={(e) => setNewSegment({ ...newSegment, name: e.target.value })}
                   placeholder="e.g., Texas Family Campers"
-                  className="bg-slate-800 border-slate-700"
+                  className="bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700"
                 />
               </div>
               <div className="space-y-2">
@@ -489,7 +489,7 @@ export default function GuestSegmentsPage() {
                   value={newSegment.description}
                   onChange={(e) => setNewSegment({ ...newSegment, description: e.target.value })}
                   placeholder="Brief description of this segment"
-                  className="bg-slate-800 border-slate-700"
+                  className="bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700"
                 />
               </div>
               <div className="space-y-2">
@@ -500,7 +500,7 @@ export default function GuestSegmentsPage() {
                     setNewSegment({ ...newSegment, scope: value })
                   }
                 >
-                  <SelectTrigger className="bg-slate-800 border-slate-700">
+                  <SelectTrigger className="bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -516,7 +516,7 @@ export default function GuestSegmentsPage() {
                   {criteriaTypeOptions.slice(0, 6).map(option => (
                     <label
                       key={option.value}
-                      className="flex items-center gap-2 p-2 rounded border border-slate-700 hover:border-slate-600 cursor-pointer"
+                      className="flex items-center gap-2 p-2 rounded border border-slate-200 dark:border-slate-700 hover:border-slate-600 cursor-pointer"
                     >
                       <Checkbox
                         checked={newSegment.criteria.some(c => c.type === option.value)}
@@ -537,7 +537,7 @@ export default function GuestSegmentsPage() {
                           }
                         }}
                       />
-                      <option.icon className="h-4 w-4 text-slate-400" />
+                      <option.icon className="h-4 w-4 text-slate-600 dark:text-slate-400" />
                       <span className="text-sm">{option.label}</span>
                     </label>
                   ))}
@@ -562,70 +562,70 @@ export default function GuestSegmentsPage() {
 
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <Card className="bg-slate-800/50 border-slate-700">
+        <Card className="bg-white dark:bg-slate-800/50 border-slate-200 dark:border-slate-700">
           <CardContent className="p-4">
             <div className="flex items-center justify-between">
               <Users className="h-8 w-8 text-emerald-500" />
-              <Badge variant="outline" className="text-emerald-400 border-emerald-400/50">
+              <Badge variant="outline" className="text-emerald-600 dark:text-emerald-400 border-emerald-400 dark:border-emerald-400/50">
                 Active
               </Badge>
             </div>
             <div className="mt-3">
-              <div className="text-2xl font-bold text-white">
+              <div className="text-2xl font-bold text-slate-900 dark:text-white">
                 {segments.filter(s => s.status === "active").length}
               </div>
-              <div className="text-sm text-slate-400">Active Segments</div>
+              <div className="text-sm text-slate-600 dark:text-slate-400">Active Segments</div>
             </div>
           </CardContent>
         </Card>
 
-        <Card className="bg-slate-800/50 border-slate-700">
+        <Card className="bg-white dark:bg-slate-800/50 border-slate-200 dark:border-slate-700">
           <CardContent className="p-4">
             <div className="flex items-center justify-between">
               <Globe className="h-8 w-8 text-blue-500" />
-              <Badge variant="outline" className="text-blue-400 border-blue-400/50">
+              <Badge variant="outline" className="text-blue-600 dark:text-blue-400 border-blue-400 dark:border-blue-400/50">
                 Global
               </Badge>
             </div>
             <div className="mt-3">
-              <div className="text-2xl font-bold text-white">
+              <div className="text-2xl font-bold text-slate-900 dark:text-white">
                 {segments.filter(s => s.scope === "global" && s.isTemplate).length}
               </div>
-              <div className="text-sm text-slate-400">Global Templates</div>
+              <div className="text-sm text-slate-600 dark:text-slate-400">Global Templates</div>
             </div>
           </CardContent>
         </Card>
 
-        <Card className="bg-slate-800/50 border-slate-700">
+        <Card className="bg-white dark:bg-slate-800/50 border-slate-200 dark:border-slate-700">
           <CardContent className="p-4">
             <div className="flex items-center justify-between">
               <Building2 className="h-8 w-8 text-purple-500" />
-              <Badge variant="outline" className="text-purple-400 border-purple-400/50">
+              <Badge variant="outline" className="text-purple-400 border-purple-400 dark:border-purple-400/50">
                 Custom
               </Badge>
             </div>
             <div className="mt-3">
-              <div className="text-2xl font-bold text-white">
+              <div className="text-2xl font-bold text-slate-900 dark:text-white">
                 {segments.filter(s => !s.isTemplate).length}
               </div>
-              <div className="text-sm text-slate-400">Custom Segments</div>
+              <div className="text-sm text-slate-600 dark:text-slate-400">Custom Segments</div>
             </div>
           </CardContent>
         </Card>
 
-        <Card className="bg-slate-800/50 border-slate-700">
+        <Card className="bg-white dark:bg-slate-800/50 border-slate-200 dark:border-slate-700">
           <CardContent className="p-4">
             <div className="flex items-center justify-between">
               <TrendingUp className="h-8 w-8 text-amber-500" />
-              <Badge variant="outline" className="text-amber-400 border-amber-400/50">
+              <Badge variant="outline" className="text-amber-600 dark:text-amber-400 border-amber-400 dark:border-amber-400/50">
                 Total
               </Badge>
             </div>
             <div className="mt-3">
-              <div className="text-2xl font-bold text-white">
+              <div className="text-2xl font-bold text-slate-900 dark:text-white">
                 {segments.reduce((sum, s) => sum + s.guestCount, 0).toLocaleString()}
               </div>
-              <div className="text-sm text-slate-400">Segmented Guests</div>
+              <div className="text-sm text-slate-600 dark:text-slate-400">Segmented Guests</div>
             </div>
           </CardContent>
         </Card>
@@ -634,16 +634,16 @@ export default function GuestSegmentsPage() {
       {/* Filters */}
       <div className="flex items-center gap-4">
         <div className="relative flex-1 max-w-md">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-600 dark:text-slate-400" />
           <Input
             placeholder="Search segments..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-10 bg-slate-800 border-slate-700"
+            className="pl-10 bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700"
           />
         </div>
         <Select value={scopeFilter} onValueChange={setScopeFilter}>
-          <SelectTrigger className="w-44 bg-slate-800 border-slate-700">
+          <SelectTrigger className="w-44 bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700">
             <Filter className="h-4 w-4 mr-2" />
             <SelectValue placeholder="Filter by scope" />
           </SelectTrigger>
@@ -670,11 +670,11 @@ export default function GuestSegmentsPage() {
       </div>
 
       {filteredSegments.length === 0 && (
-        <Card className="bg-slate-800/30 border-slate-700">
+        <Card className="bg-slate-50 dark:bg-slate-800/30 border-slate-200 dark:border-slate-700">
           <CardContent className="p-12 text-center">
             <Users className="h-12 w-12 text-slate-600 mx-auto mb-4" />
-            <h3 className="text-lg font-medium text-slate-300 mb-2">No segments found</h3>
-            <p className="text-slate-400 mb-4">
+            <h3 className="text-lg font-medium text-slate-700 dark:text-slate-300 mb-2">No segments found</h3>
+            <p className="text-slate-600 dark:text-slate-400 mb-4">
               {searchQuery || scopeFilter !== "all"
                 ? "Try adjusting your search or filters"
                 : "Create your first segment to start grouping guests"}
