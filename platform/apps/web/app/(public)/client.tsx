@@ -1,13 +1,15 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import { useState, useMemo, useEffect, useRef } from "react";
+import { useState, useMemo, useEffect, useRef, useCallback } from "react";
+import { useSearchParams, useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
 import { motion, useInView, useReducedMotion } from "framer-motion";
-import { Search } from "lucide-react";
+import { Search, Calendar } from "lucide-react";
 import { CampgroundCard } from "../../components/public/CampgroundCard";
 import { CategoryTabs, categories, type CategoryType } from "../../components/public/CategoryTabs";
 import { LocationSections } from "../../components/public/LocationSections";
+import { EventCard } from "../../components/public/EventCard";
 import { apiClient } from "../../lib/api-client";
 import type { AdaCertificationLevel } from "../../lib/ada-accessibility";
 import { trackEvent } from "@/lib/analytics";
@@ -157,11 +159,38 @@ const COMMON_AMENITIES = [
     "Pool", "Playground", "Pet Friendly", "Fishing", "Hiking"
 ];
 
+// Event types for filter
+const EVENT_TYPES = [
+    { value: "activity", label: "Activities" },
+    { value: "workshop", label: "Workshops" },
+    { value: "entertainment", label: "Entertainment" },
+    { value: "holiday", label: "Holiday Events" },
+    { value: "recurring", label: "Recurring" },
+    { value: "ongoing", label: "Ongoing" }
+];
+
+// Date range options for events
+const DATE_RANGES = [
+    { value: "this-weekend", label: "This Weekend" },
+    { value: "this-week", label: "This Week" },
+    { value: "this-month", label: "This Month" },
+    { value: "next-month", label: "Next Month" }
+];
+
 export function HomeClient() {
+    const searchParams = useSearchParams();
+    const router = useRouter();
+    const pathname = usePathname();
+
+    // Initialize state from URL params
     const [searchQuery, setSearchQuery] = useState("");
-    const [stateFilter, setStateFilter] = useState<string>("");
+    const [stateFilter, setStateFilter] = useState<string>(searchParams.get("state") || "");
     const [amenityFilters, setAmenityFilters] = useState<string[]>([]);
-    const [activeCategory, setActiveCategory] = useState<CategoryType>("all");
+    const [activeCategory, setActiveCategory] = useState<CategoryType>(
+        (searchParams.get("category") as CategoryType) || "all"
+    );
+    const [eventTypeFilter, setEventTypeFilter] = useState<string>(searchParams.get("eventType") || "");
+    const [dateRangeFilter, setDateRangeFilter] = useState<string>(searchParams.get("dateRange") || "");
     const [sortBy, setSortBy] = useState<"recommended" | "name" | "rating" | "reviews">("recommended");
     const [displayCount, setDisplayCount] = useState(24);
     const [searchFilters, setSearchFilters] = useState<{
@@ -170,10 +199,72 @@ export function HomeClient() {
         guests: number;
     } | null>(null);
 
+    // Update URL when filters change
+    const updateUrlParams = useCallback((updates: Record<string, string | undefined>) => {
+        const params = new URLSearchParams(searchParams.toString());
+        Object.entries(updates).forEach(([key, value]) => {
+            if (value && value !== "all" && value !== "") {
+                params.set(key, value);
+            } else {
+                params.delete(key);
+            }
+        });
+        const newUrl = params.toString() ? `${pathname}?${params.toString()}` : pathname;
+        router.replace(newUrl, { scroll: false });
+    }, [searchParams, pathname, router]);
+
+    // Calculate date range for events API
+    const getDateRange = useCallback((range: string) => {
+        const today = new Date();
+        const startDate = new Date(today);
+        let endDate = new Date(today);
+
+        switch (range) {
+            case "this-weekend":
+                // Get Friday of this week
+                const dayOfWeek = today.getDay();
+                const daysUntilFriday = (5 - dayOfWeek + 7) % 7;
+                startDate.setDate(today.getDate() + daysUntilFriday);
+                endDate.setDate(startDate.getDate() + 2); // Sunday
+                break;
+            case "this-week":
+                endDate.setDate(today.getDate() + (7 - today.getDay()));
+                break;
+            case "this-month":
+                endDate = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+                break;
+            case "next-month":
+                startDate.setMonth(today.getMonth() + 1, 1);
+                endDate = new Date(today.getFullYear(), today.getMonth() + 2, 0);
+                break;
+            default:
+                return { startDate: undefined, endDate: undefined };
+        }
+
+        return {
+            startDate: startDate.toISOString().split("T")[0],
+            endDate: endDate.toISOString().split("T")[0]
+        };
+    }, []);
+
     // Fetch public campgrounds from our system
     const { data: internalCampgrounds = [], isLoading } = useQuery({
         queryKey: ["public-campgrounds"],
         queryFn: () => apiClient.getPublicCampgrounds()
+    });
+
+    // Fetch public events when events category is active
+    const { startDate, endDate } = getDateRange(dateRangeFilter);
+    const { data: eventsData, isLoading: eventsLoading } = useQuery({
+        queryKey: ["public-events", stateFilter, eventTypeFilter, startDate, endDate],
+        queryFn: () => apiClient.searchPublicEvents({
+            state: stateFilter || undefined,
+            eventType: eventTypeFilter || undefined,
+            startDate: startDate,
+            endDate: endDate,
+            limit: 100
+        }),
+        enabled: activeCategory === "events"
     });
 
     // Filter campgrounds from our database
@@ -358,6 +449,12 @@ export function HomeClient() {
                         onCategoryChange={(category) => {
                             setActiveCategory(category);
                             setDisplayCount(24);
+                            // Clear event-specific filters when switching away from events
+                            if (category !== "events") {
+                                setEventTypeFilter("");
+                                setDateRangeFilter("");
+                            }
+                            updateUrlParams({ category, eventType: undefined, dateRange: undefined });
                         }}
                     />
                 </div>
@@ -400,16 +497,29 @@ export function HomeClient() {
                     <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                         <div>
                             <h2 className="text-2xl md:text-3xl font-bold text-slate-900">
-                                {activeCategory !== "all"
+                                {activeCategory === "events"
+                                    ? "Upcoming Events"
+                                    : activeCategory !== "all"
                                     ? categories.find((c) => c.id === activeCategory)?.label || "Campgrounds"
                                     : searchQuery || stateFilter || amenityFilters.length > 0
                                     ? "Search Results"
                                     : "Featured Campgrounds"}
                             </h2>
                             <p className="text-slate-600 mt-1">
-                                {allCampgrounds.length.toLocaleString()} campgrounds
-                                {stateFilter && ` in ${stateFilter}`}
-                                {amenityFilters.length > 0 && ` with ${amenityFilters.join(", ")}`}
+                                {activeCategory === "events" ? (
+                                    <>
+                                        {eventsData?.total ?? 0} events
+                                        {stateFilter && ` in ${stateFilter}`}
+                                        {eventTypeFilter && ` - ${EVENT_TYPES.find(t => t.value === eventTypeFilter)?.label}`}
+                                        {dateRangeFilter && ` (${DATE_RANGES.find(r => r.value === dateRangeFilter)?.label})`}
+                                    </>
+                                ) : (
+                                    <>
+                                        {allCampgrounds.length.toLocaleString()} campgrounds
+                                        {stateFilter && ` in ${stateFilter}`}
+                                        {amenityFilters.length > 0 && ` with ${amenityFilters.join(", ")}`}
+                                    </>
+                                )}
                             </p>
                         </div>
                     </div>
@@ -441,7 +551,11 @@ export function HomeClient() {
                         {/* State Filter */}
                         <select
                             value={stateFilter}
-                            onChange={(e) => { setStateFilter(e.target.value); setDisplayCount(24); }}
+                            onChange={(e) => {
+                                setStateFilter(e.target.value);
+                                setDisplayCount(24);
+                                updateUrlParams({ state: e.target.value || undefined });
+                            }}
                             className="px-3 py-2.5 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500/20 bg-white min-w-[140px]"
                         >
                             <option value="">All States</option>
@@ -449,6 +563,41 @@ export function HomeClient() {
                                 <option key={state} value={state}>{state}</option>
                             ))}
                         </select>
+
+                        {/* Events-specific filters */}
+                        {activeCategory === "events" && (
+                            <>
+                                {/* Event Type Filter */}
+                                <select
+                                    value={eventTypeFilter}
+                                    onChange={(e) => {
+                                        setEventTypeFilter(e.target.value);
+                                        updateUrlParams({ eventType: e.target.value || undefined });
+                                    }}
+                                    className="px-3 py-2.5 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500/20 bg-white min-w-[140px]"
+                                >
+                                    <option value="">All Event Types</option>
+                                    {EVENT_TYPES.map((type) => (
+                                        <option key={type.value} value={type.value}>{type.label}</option>
+                                    ))}
+                                </select>
+
+                                {/* Date Range Filter */}
+                                <select
+                                    value={dateRangeFilter}
+                                    onChange={(e) => {
+                                        setDateRangeFilter(e.target.value);
+                                        updateUrlParams({ dateRange: e.target.value || undefined });
+                                    }}
+                                    className="px-3 py-2.5 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500/20 bg-white min-w-[140px]"
+                                >
+                                    <option value="">Any Time</option>
+                                    {DATE_RANGES.map((range) => (
+                                        <option key={range.value} value={range.value}>{range.label}</option>
+                                    ))}
+                                </select>
+                            </>
+                        )}
 
                         {/* Sort */}
                         <select
@@ -463,9 +612,9 @@ export function HomeClient() {
                         </select>
                     </div>
 
-                    {/* Amenity Filter Chips */}
+                    {/* Amenity Filter Chips - hide for events */}
                     <div className="flex flex-wrap gap-2">
-                        {COMMON_AMENITIES.slice(0, 8).map((amenity) => {
+                        {activeCategory !== "events" && COMMON_AMENITIES.slice(0, 8).map((amenity) => {
                             const isSelected = amenityFilters.includes(amenity);
                             return (
                                 <button
@@ -489,14 +638,18 @@ export function HomeClient() {
                                 </button>
                             );
                         })}
-                        {(searchQuery || stateFilter || amenityFilters.length > 0 || activeCategory !== "all") && (
+                        {(searchQuery || stateFilter || amenityFilters.length > 0 || activeCategory !== "all" || eventTypeFilter || dateRangeFilter) && (
                             <button
                                 onClick={() => {
                                     setSearchQuery("");
                                     setStateFilter("");
                                     setAmenityFilters([]);
                                     setActiveCategory("all");
+                                    setEventTypeFilter("");
+                                    setDateRangeFilter("");
                                     setDisplayCount(24);
+                                    // Clear all URL params
+                                    router.replace(pathname, { scroll: false });
                                 }}
                                 className="px-3 py-1.5 text-sm rounded-full border border-red-200 bg-red-50 text-red-600 hover:bg-red-100 transition-colors"
                             >
@@ -506,7 +659,93 @@ export function HomeClient() {
                     </div>
                 </motion.div>
 
-                {isLoading ? (
+                {/* Events Grid - when events category is active */}
+                {activeCategory === "events" ? (
+                    eventsLoading ? (
+                        <div className="space-y-8">
+                            <motion.div
+                                className="text-center py-4"
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                                transition={{ delay: 0.5 }}
+                            >
+                                <p className="text-slate-500 text-sm flex items-center justify-center gap-2">
+                                    <Calendar className="w-5 h-5 text-orange-500 animate-bounce" />
+                                    Discovering upcoming events...
+                                </p>
+                            </motion.div>
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                                {[1, 2, 3, 4, 5, 6].map((i) => (
+                                    <motion.div
+                                        key={i}
+                                        className="bg-white rounded-2xl overflow-hidden shadow-lg"
+                                        initial={{ opacity: 0, y: 20 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        transition={{ delay: i * 0.1 }}
+                                    >
+                                        <div className="aspect-[4/3] bg-gradient-to-br from-orange-100 to-orange-200 relative overflow-hidden">
+                                            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent -translate-x-full animate-[shimmer_1.5s_infinite]" />
+                                        </div>
+                                        <div className="p-5 space-y-3">
+                                            <div className="h-4 bg-orange-100 rounded w-1/4 animate-pulse" />
+                                            <div className="h-5 bg-slate-200 rounded w-2/3 animate-pulse" />
+                                            <div className="h-4 bg-slate-200 rounded w-1/2 animate-pulse" />
+                                        </div>
+                                    </motion.div>
+                                ))}
+                            </div>
+                        </div>
+                    ) : eventsData?.results && eventsData.results.length > 0 ? (
+                        <>
+                            <motion.div
+                                className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+                                variants={prefersReducedMotion ? undefined : staggerContainer}
+                                initial="hidden"
+                                animate={featuredInView ? "visible" : "hidden"}
+                            >
+                                {eventsData.results.slice(0, displayCount).map((event, index) => (
+                                    <motion.div
+                                        key={event.id}
+                                        variants={prefersReducedMotion ? undefined : scaleIn}
+                                        custom={index}
+                                    >
+                                        <EventCard {...event} />
+                                    </motion.div>
+                                ))}
+                            </motion.div>
+
+                            {/* Load More for Events */}
+                            {eventsData.results.length > displayCount && (
+                                <div className="flex justify-center mt-8">
+                                    <button
+                                        onClick={() => setDisplayCount((prev) => prev + 24)}
+                                        className="px-6 py-3 bg-orange-500 hover:bg-orange-600 text-white font-medium rounded-lg transition-colors flex items-center gap-2"
+                                    >
+                                        Load More Events
+                                        <span className="text-orange-200">
+                                            ({Math.min(displayCount + 24, eventsData.results.length) - displayCount} more)
+                                        </span>
+                                    </button>
+                                </div>
+                            )}
+                        </>
+                    ) : (
+                        <motion.div
+                            className="text-center py-16"
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            transition={{ delay: 0.2 }}
+                        >
+                            <Calendar className="w-16 h-16 text-orange-200 mx-auto mb-4" />
+                            <h3 className="text-xl font-semibold text-slate-900 mb-2">No events found</h3>
+                            <p className="text-slate-600">
+                                {stateFilter || eventTypeFilter || dateRangeFilter
+                                    ? "Try adjusting your filters to find more events"
+                                    : "Check back soon for upcoming campground events"}
+                            </p>
+                        </motion.div>
+                    )
+                ) : isLoading ? (
                     <div className="space-y-8">
                         {/* Friendly loading message */}
                         <motion.div

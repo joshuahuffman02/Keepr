@@ -4265,6 +4265,53 @@ export const apiClient = {
     const results = Array.isArray(data) ? data : (data as { results: unknown[] }).results;
     return PublicCampgroundListSchema.parse(results);
   },
+  async searchPublicEvents(params?: {
+    state?: string;
+    eventType?: string;
+    startDate?: string;
+    endDate?: string;
+    limit?: number;
+    offset?: number;
+  }) {
+    const searchParams = new URLSearchParams();
+    if (params?.state) searchParams.set("state", params.state);
+    if (params?.eventType) searchParams.set("eventType", params.eventType);
+    if (params?.startDate) searchParams.set("startDate", params.startDate);
+    if (params?.endDate) searchParams.set("endDate", params.endDate);
+    if (params?.limit) searchParams.set("limit", String(params.limit));
+    if (params?.offset) searchParams.set("offset", String(params.offset));
+    const query = searchParams.toString();
+    const data = await fetchJSON<unknown>(`/public/events${query ? `?${query}` : ""}`);
+    // Response is { results, total }
+    const response = data as { results: unknown[]; total: number };
+    return {
+      results: z.array(z.object({
+        id: z.string(),
+        title: z.string(),
+        description: z.string().nullable(),
+        eventType: z.string(),
+        startDate: z.string(),
+        endDate: z.string().nullable(),
+        startTime: z.string().nullable(),
+        endTime: z.string().nullable(),
+        isAllDay: z.boolean(),
+        imageUrl: z.string().nullable(),
+        priceCents: z.number(),
+        capacity: z.number().nullable(),
+        currentSignups: z.number(),
+        location: z.string().nullable(),
+        campground: z.object({
+          id: z.string(),
+          slug: z.string().nullable(),
+          name: z.string(),
+          city: z.string().nullable(),
+          state: z.string().nullable(),
+          heroImageUrl: z.string().nullable()
+        })
+      })).parse(response.results),
+      total: response.total
+    };
+  },
   async getPublicCampground(slug: string, previewToken?: string) {
     const url = previewToken
       ? `/public/campgrounds/${slug}/preview?token=${encodeURIComponent(previewToken)}`
