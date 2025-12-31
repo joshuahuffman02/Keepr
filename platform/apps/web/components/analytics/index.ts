@@ -5,3 +5,16 @@ export { DataTable } from "./DataTable";
 export { DateRangePicker } from "./DateRangePicker";
 export { AiInsightCard, AiInsightCardSkeleton } from "./AiInsightCard";
 export { WebVitals, usePerformanceMark, useLongTaskMonitor } from "./WebVitals";
+
+// Analytics tracking components
+export {
+  TrackedPage,
+  TrackedButton,
+  TrackedLink,
+  TrackedForm,
+  TrackedSearch,
+  TrackedTabs,
+  TrackedModal,
+  useRenderTracking,
+  useTrackedClick,
+} from "./tracked-components";

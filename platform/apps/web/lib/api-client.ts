@@ -11650,6 +11650,33 @@ export const apiClient = {
       }>;
     };
   },
+
+  // -------------------------------------------------------------------------
+  // Generic HTTP Methods (for dynamic endpoints)
+  // -------------------------------------------------------------------------
+  async get<T = unknown>(url: string, options?: { params?: Record<string, string | number | boolean | undefined | null> }): Promise<{ data: T }> {
+    const searchParams = new URLSearchParams();
+    if (options?.params) {
+      Object.entries(options.params).forEach(([key, value]) => {
+        if (value !== undefined && value !== null) {
+          searchParams.set(key, String(value));
+        }
+      });
+    }
+    const query = searchParams.toString() ? `?${searchParams.toString()}` : "";
+    const data = await fetchJSON<T>(`${url}${query}`);
+    return { data };
+  },
+
+  async post<T = unknown>(url: string, body?: unknown): Promise<{ data: T }> {
+    const res = await fetch(`${API_BASE}${url}`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", ...scopedHeaders() },
+      body: body ? JSON.stringify(body) : undefined,
+    });
+    const data = await parseResponse<T>(res);
+    return { data };
+  },
 };
 
 export type PublicCampgroundList = z.infer<typeof PublicCampgroundListSchema>;
