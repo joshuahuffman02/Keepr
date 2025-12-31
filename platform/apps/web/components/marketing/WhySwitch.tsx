@@ -39,7 +39,7 @@ const benefits = [
   "Built-in loyalty program with XP, levels, and rewards",
   "AI-powered demand forecasting and pricing insights",
   "Staff scheduling synced with your occupancy",
-  "Go live in 48 hours with free data migration",
+  "Go live in 48 hours with optional setup assistance",
 ];
 
 const colorClasses = {

@@ -100,7 +100,7 @@ export function DemoCTA() {
                 'Free 30-day trial with full access',
                 'No credit card required',
                 'Personal onboarding & training',
-                'Migrate your existing data for free',
+                'Data import services available',
                 '24/7 customer support',
               ].map((benefit) => (
                 <div key={benefit} className="flex items-start gap-3">

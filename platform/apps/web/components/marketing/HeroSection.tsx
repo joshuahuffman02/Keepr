@@ -77,7 +77,7 @@ export function HeroSection() {
               </span>
               <span className="inline-flex items-center px-3 py-1.5 rounded-full bg-emerald-100 text-emerald-700 font-medium">
                 <svg className="mr-1.5 w-4 h-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-                Free data migration
+                No contracts, cancel anytime
               </span>
               <span className="inline-flex items-center px-3 py-1.5 rounded-full bg-emerald-100 text-emerald-700 font-medium">
                 <svg className="mr-1.5 w-4 h-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
@@ -113,7 +113,7 @@ export function HeroSection() {
             {/* Migration CTA */}
             <div className="flex items-center gap-4 pt-2">
               <div className="text-sm text-slate-600">
-                Switching from another system? <span className="font-semibold text-emerald-600">We migrate your data for free.</span>
+                Switching from another system? <Link href="/pricing#add-ons" className="font-semibold text-emerald-600 hover:text-emerald-700">Data import services available.</Link>
               </div>
             </div>
           </div>
