@@ -445,6 +445,66 @@ enum OnboardingStep {
   imports
 }
 
+// ---------------------------------------------------------------------------
+// SEO & Campground Claims enums
+// ---------------------------------------------------------------------------
+
+enum CampgroundClaimStatus {
+  unclaimed // No owner has claimed this campground
+  claim_pending // Claim submitted, awaiting verification
+  claimed // Verified and owned by a user
+}
+
+enum ClaimVerificationMethod {
+  phone // Verified via phone call to listed number
+  email // Verified via email to listed address
+  document // Verified via business documentation
+  domain // Verified via domain ownership
+  manual // Manually verified by support staff
+}
+
+enum CampgroundDataSource {
+  recreation_gov // Recreation.gov federal campgrounds
+  reserve_california // California State Parks
+  reserve_america // ReserveAmerica system
+  nps // National Park Service
+  usfs // US Forest Service
+  blm // Bureau of Land Management
+  state_parks // Generic state parks system
+  osm // OpenStreetMap
+  manual // Manually entered
+  user_submitted // User-submitted campground
+  claimed // Created when owner claimed
+}
+
+enum SeoLocationType {
+  country // e.g., USA
+  state // e.g., California
+  region // e.g., Pacific Northwest
+  county // e.g., San Diego County
+  city // e.g., San Diego
+  neighborhood // e.g., Mission Beach
+  attraction // e.g., Near Yosemite
+}
+
+enum AttractionType {
+  national_park
+  state_park
+  national_forest
+  national_monument
+  lake
+  beach
+  river
+  mountain
+  ski_resort
+  theme_park
+  historic_site
+  scenic_byway
+  wildlife_area
+  recreation_area
+  other
+}
+
 model User {
   id                 String        @id @default(cuid())
   email              String        @unique
@@ -563,6 +623,14 @@ model User {
 
   // Mobile device tokens for push notifications
   mobileDeviceTokens MobileDeviceToken[]
+
+  // Enhanced Analytics System
+  analyticsSessions     AnalyticsSession[]
+  analyticsStaffMetrics AnalyticsStaffMetrics[]
+
+  // SEO & Claims
+  claimedCampgrounds Campground[]      @relation("ClaimedCampgrounds")
+  campgroundClaims   CampgroundClaim[] @relation("ClaimSubmittedBy")
 }
 
 // User's customizable sidebar menu configuration
@@ -819,6 +887,7 @@ enum ReviewModerationStatus {
 // =============================================================================
 
 enum AnalyticsEventName {
+  // Guest/Public events
   page_view
   site_card_view
   image_viewed
@@ -834,8 +903,24 @@ enum AnalyticsEventName {
   deal_applied
   email_signup
   review_viewed
+  // Staff/Admin events
+  admin_page_view
+  admin_action
+  admin_search
+  admin_error
+  admin_feature_use
+  admin_session_start
+  admin_session_end
   admin_pricing_change
   admin_image_reorder
+  // Funnel events
+  funnel_step
+  funnel_abandon
+  funnel_complete
+  // Portal events
+  portal_login
+  portal_view
+  portal_action
 }
 
 enum AbTestStatus {
@@ -1027,6 +1112,13 @@ model Organization {
   usageEvents    UsageEvent[]
   setupServices  SetupService[]
 
+  // Enhanced Analytics System
+  analyticsSessions     AnalyticsSession[]
+  analyticsPageStats    AnalyticsPageStats[]
+  analyticsFeatureUsage AnalyticsFeatureUsage[]
+  analyticsFunnels      AnalyticsFunnel[]
+  analyticsAnomalies    AnalyticsAnomaly[]
+
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now()) @updatedAt
 }
@@ -1040,6 +1132,21 @@ model Campground {
   isBookable        Boolean @default(true)
   externalUrl       String?
   nonBookableReason String?
+
+  // Claim & SEO Status
+  claimStatus            CampgroundClaimStatus    @default(unclaimed)
+  claimedAt              DateTime?
+  claimedByUserId        String?
+  verificationMethod     ClaimVerificationMethod?
+  verificationCode       String? // 6-digit code for phone/email verification
+  verificationCodeExpiry DateTime?
+  verificationAttempts   Int                      @default(0)
+  seededDataSource       CampgroundDataSource?
+  seededDataSourceId     String? // External ID from source (e.g., Recreation.gov facility ID)
+  seededAt               DateTime?
+  lastEnrichedAt         DateTime? // When data was last enriched from external sources
+  seoScore               Int? // 0-100 SEO completeness score
+  seoMissingFields       String[]                 @default([]) // List of fields needed for better SEO
 
   // Location
   city       String?
@@ -1451,12 +1558,30 @@ model Campground {
   // Feature setup queue (onboarding feature triage)
   featureSetupQueue FeatureSetupQueue[]
 
+  // Enhanced Analytics System
+  analyticsSessions     AnalyticsSession[]
+  analyticsPageStats    AnalyticsPageStats[]
+  analyticsFeatureUsage AnalyticsFeatureUsage[]
+  analyticsFunnels      AnalyticsFunnel[]
+  analyticsAnomalies    AnalyticsAnomaly[]
+  analyticsStaffMetrics AnalyticsStaffMetrics[]
+
   // Soft delete
   deletedAt DateTime?
   deletedBy String?
 
+  // SEO Relations
+  claimedByUser      User?                  @relation("ClaimedCampgrounds", fields: [claimedByUserId], references: [id], onDelete: SetNull)
+  claims             CampgroundClaim[]
+  locationMappings   CampgroundLocation[]
+  attractionMappings CampgroundAttraction[]
+
   @@index([dataSource, dataSourceId])
   @@index([deletedAt])
+  @@index([claimStatus])
+  @@index([seededDataSource, seededDataSourceId])
+  @@index([state, city])
+  @@index([latitude, longitude])
 }
 
 model PushSubscription {
@@ -1480,19 +1605,19 @@ model PushSubscription {
 
 // Mobile device tokens for APNs (iOS) and FCM (Android)
 model MobileDeviceToken {
-  id           String    @id @default(cuid())
+  id           String   @id @default(cuid())
   userId       String
   campgroundId String?
-  deviceToken  String    @unique // APNs or FCM token
+  deviceToken  String   @unique // APNs or FCM token
   platform     String // "ios" or "android"
   deviceId     String? // Device identifier for dedup
   appBundle    String? // App bundle ID (e.g., "com.campreserv.guest")
   appVersion   String?
-  environment  String    @default("production") // "sandbox" or "production"
-  isActive     Boolean   @default(true)
-  lastUsedAt   DateTime  @default(now())
-  createdAt    DateTime  @default(now())
-  updatedAt    DateTime  @updatedAt
+  environment  String   @default("production") // "sandbox" or "production"
+  isActive     Boolean  @default(true)
+  lastUsedAt   DateTime @default(now())
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 
   user       User        @relation(fields: [userId], references: [id], onDelete: Cascade)
   campground Campground? @relation(fields: [campgroundId], references: [id], onDelete: SetNull)
@@ -2131,6 +2256,9 @@ model Guest {
 
   // Stripe Payment Methods (per campground)
   stripeCustomers StripeCustomer[]
+
+  // Enhanced Analytics System
+  analyticsSessions AnalyticsSession[]
 
   // Soft delete
   deletedAt DateTime?
@@ -10529,4 +10657,531 @@ model IssueAttempt {
   issue Issue @relation(fields: [issueId], references: [id], onDelete: Cascade)
 
   @@index([issueId])
+}
+
+// =============================================================================
+// ENHANCED ANALYTICS SYSTEM
+// =============================================================================
+
+// Actor type for analytics sessions
+enum AnalyticsActorType {
+  staff
+  guest
+  anonymous
+  system
+}
+
+// Session-level analytics tracking
+model AnalyticsSession {
+  id             String             @id @default(cuid())
+  sessionId      String             @unique
+  actorType      AnalyticsActorType @default(anonymous)
+  userId         String? // Staff user ID if logged in
+  guestId        String? // Guest ID if logged in to portal
+  campgroundId   String?
+  organizationId String?
+
+  // Timing
+  startedAt    DateTime
+  endedAt      DateTime?
+  durationSecs Int?
+
+  // Engagement metrics
+  pageViews Int @default(0)
+  actions   Int @default(0)
+  errors    Int @default(0)
+
+  // Navigation
+  entryPage String?
+  exitPage  String?
+  pages     String[] @default([]) // Ordered list of pages visited
+
+  // Device info
+  deviceType String? // mobile, tablet, desktop
+  browser    String?
+  os         String?
+  userAgent  String? @db.Text
+  screenSize String? // e.g., "1920x1080"
+  locale     String?
+
+  // Location
+  country String?
+  region  String?
+  city    String?
+
+  // Attribution
+  referrer    String?
+  utmSource   String?
+  utmMedium   String?
+  utmCampaign String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  campground   Campground?   @relation(fields: [campgroundId], references: [id], onDelete: SetNull)
+  organization Organization? @relation(fields: [organizationId], references: [id], onDelete: SetNull)
+  user         User?         @relation(fields: [userId], references: [id], onDelete: SetNull)
+  guest        Guest?        @relation(fields: [guestId], references: [id], onDelete: SetNull)
+
+  @@index([campgroundId, startedAt])
+  @@index([organizationId, startedAt])
+  @@index([userId, startedAt])
+  @@index([actorType, startedAt])
+  @@index([startedAt])
+}
+
+// Daily page-level aggregates for admin/staff usage
+model AnalyticsPageStats {
+  id             String   @id @default(cuid())
+  campgroundId   String?
+  organizationId String?
+  date           DateTime @db.Date
+  path           String // URL path
+  pageTitle      String? // Human-readable page name
+  featureArea    String? // Categorization: reservations, pos, housekeeping, etc.
+
+  // Engagement
+  views          Int    @default(0)
+  uniqueUsers    Int    @default(0)
+  uniqueSessions Int    @default(0)
+  avgTimeOnPage  Float? // seconds
+  avgScrollDepth Float? // 0-100 percentage
+  bounceRate     Float? // 0-1
+
+  // Actions on page
+  actions     Int @default(0)
+  searches    Int @default(0)
+  errors      Int @default(0)
+  formSubmits Int @default(0)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  campground   Campground?   @relation(fields: [campgroundId], references: [id], onDelete: Cascade)
+  organization Organization? @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@unique([campgroundId, date, path])
+  @@index([organizationId, date, path])
+  @@index([featureArea, date])
+  @@index([date])
+}
+
+// Feature usage tracking across campgrounds
+model AnalyticsFeatureUsage {
+  id             String   @id @default(cuid())
+  campgroundId   String
+  organizationId String?
+  date           DateTime @db.Date
+  feature        String // pos, housekeeping, reports, ai_pricing, reservations, etc.
+  subFeature     String? // More granular: pos.checkout, reservations.create
+
+  // Usage metrics
+  usageCount      Int    @default(0)
+  uniqueUsers     Int    @default(0)
+  avgDurationSecs Float?
+  successRate     Float? // 0-1, for actions that can succeed/fail
+  errorCount      Int    @default(0)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  campground   Campground    @relation(fields: [campgroundId], references: [id], onDelete: Cascade)
+  organization Organization? @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@unique([campgroundId, date, feature, subFeature])
+  @@index([feature, date])
+  @@index([organizationId, date])
+}
+
+// Multi-step funnel tracking
+model AnalyticsFunnel {
+  id             String  @id @default(cuid())
+  campgroundId   String
+  organizationId String?
+  sessionId      String
+  funnelName     String // booking, checkin, payment, onboarding, portal_modification
+
+  // Step timestamps (null = not reached)
+  step1At DateTime?
+  step2At DateTime?
+  step3At DateTime?
+  step4At DateTime?
+  step5At DateTime?
+  step6At DateTime?
+
+  // Step names for this funnel instance
+  stepNames String[] @default([])
+
+  // Completion
+  completedAt   DateTime?
+  abandonedAt   DateTime?
+  abandonedStep Int?
+  abandonReason String?
+
+  // Context
+  metadata Json?
+
+  // Timing
+  totalDurationSecs Int? // Time from step1 to completion/abandonment
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  campground   Campground    @relation(fields: [campgroundId], references: [id], onDelete: Cascade)
+  organization Organization? @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@index([campgroundId, funnelName, createdAt])
+  @@index([organizationId, funnelName, createdAt])
+  @@index([funnelName, abandonedStep])
+  @@index([sessionId])
+  @@index([funnelName, completedAt])
+}
+
+// Real-time analytics for live dashboard
+model AnalyticsLiveEvent {
+  id             String   @id @default(cuid())
+  campgroundId   String?
+  organizationId String?
+  sessionId      String
+  eventType      String // page_view, action, error, booking, checkin
+  eventData      Json
+  actorType      String // staff, guest, anonymous
+  actorId        String?
+  occurredAt     DateTime @default(now())
+
+  // TTL - these get cleaned up after 24 hours
+  expiresAt DateTime
+
+  @@index([campgroundId, occurredAt])
+  @@index([organizationId, occurredAt])
+  @@index([expiresAt])
+}
+
+// Anomaly detection alerts
+model AnalyticsAnomaly {
+  id             String    @id @default(cuid())
+  campgroundId   String?
+  organizationId String?
+  anomalyType    String // booking_drop, error_spike, abandonment_increase, traffic_spike
+  severity       String // info, warning, critical
+  metric         String // The metric that triggered the anomaly
+  expectedValue  Float
+  actualValue    Float
+  deviation      Float // Percentage deviation from expected
+  detectedAt     DateTime  @default(now())
+  acknowledgedAt DateTime?
+  acknowledgedBy String?
+  notes          String?   @db.Text
+  metadata       Json?
+
+  campground   Campground?   @relation(fields: [campgroundId], references: [id], onDelete: Cascade)
+  organization Organization? @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@index([campgroundId, detectedAt])
+  @@index([organizationId, detectedAt])
+  @@index([anomalyType, detectedAt])
+  @@index([severity, acknowledgedAt])
+}
+
+// Staff efficiency metrics (daily aggregates)
+model AnalyticsStaffMetrics {
+  id           String   @id @default(cuid())
+  campgroundId String
+  userId       String
+  date         DateTime @db.Date
+
+  // Session metrics
+  sessionsCount    Int    @default(0)
+  totalSessionSecs Int    @default(0)
+  avgSessionSecs   Float?
+
+  // Activity metrics
+  pageViews     Int @default(0)
+  actionsCount  Int @default(0)
+  searchesCount Int @default(0)
+  errorsCount   Int @default(0)
+
+  // Task completion
+  reservationsCreated  Int @default(0)
+  reservationsModified Int @default(0)
+  checkInsCompleted    Int @default(0)
+  paymentsProcessed    Int @default(0)
+  guestsCreated        Int @default(0)
+
+  // Time metrics (seconds)
+  avgCheckInTime     Float?
+  avgReservationTime Float?
+  avgPaymentTime     Float?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  campground Campground @relation(fields: [campgroundId], references: [id], onDelete: Cascade)
+  user       User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([campgroundId, userId, date])
+  @@index([userId, date])
+  @@index([date])
+}
+
+// ---------------------------------------------------------------------------
+// SEO & Campground Claims Models
+// ---------------------------------------------------------------------------
+
+// Tracks claim requests for unclaimed campgrounds
+model CampgroundClaim {
+  id           String @id @default(cuid())
+  campgroundId String
+  userId       String // User who submitted the claim
+  status       String @default("pending") // pending, approved, rejected, expired
+
+  // Contact info provided during claim
+  claimantName    String
+  claimantEmail   String
+  claimantPhone   String?
+  claimantRole    String? // owner, manager, authorized_representative
+  businessName    String?
+  businessAddress String?
+
+  // Verification
+  verificationMethod   ClaimVerificationMethod?
+  verificationCode     String? // 6-digit code
+  verificationExpiry   DateTime?
+  verificationAttempts Int                      @default(0)
+  verifiedAt           DateTime?
+
+  // Supporting documents
+  documents       Json? // Array of { filename, url, type }
+  notes           String? @db.Text
+  rejectionReason String?
+
+  // Audit
+  reviewedByUserId String?
+  reviewedAt       DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  campground Campground @relation(fields: [campgroundId], references: [id], onDelete: Cascade)
+  user       User       @relation("ClaimSubmittedBy", fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([campgroundId])
+  @@index([userId])
+  @@index([status])
+  @@index([createdAt])
+}
+
+// Geographic locations for SEO pages
+model SeoLocation {
+  id   String          @id @default(cuid())
+  type SeoLocationType
+  name String // Display name: "California", "San Diego", "Pacific Northwest"
+  slug String          @unique // URL slug: "california", "san-diego", "pacific-northwest"
+
+  // Geographic data
+  state       String? // For cities: their parent state
+  country     String   @default("USA")
+  latitude    Decimal? @db.Decimal(12, 8)
+  longitude   Decimal? @db.Decimal(12, 8)
+  boundingBox Json? // { north, south, east, west } for geographic bounds
+
+  // Parent location (for hierarchy: city -> county -> state -> region -> country)
+  parentId String?
+
+  // SEO content
+  metaTitle       String?
+  metaDescription String?  @db.Text
+  heroImageUrl    String?
+  description     String?  @db.Text
+  highlights      String[] @default([]) // Key attractions/features
+  bestTimeToVisit String?
+
+  // Stats (cached, updated periodically)
+  campgroundCount  Int       @default(0)
+  avgRating        Decimal?  @db.Decimal(3, 2)
+  popularAmenities String[]  @default([])
+  priceRangeLow    Int? // In cents
+  priceRangeHigh   Int? // In cents
+  statsUpdatedAt   DateTime?
+
+  // Publishing
+  isPublished Boolean   @default(false)
+  publishedAt DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  parent   SeoLocation?  @relation("LocationHierarchy", fields: [parentId], references: [id], onDelete: SetNull)
+  children SeoLocation[] @relation("LocationHierarchy")
+
+  campgroundMappings CampgroundLocation[]
+
+  @@index([type])
+  @@index([state])
+  @@index([parentId])
+  @@index([isPublished])
+}
+
+// Many-to-many: Campground <-> SeoLocation
+model CampgroundLocation {
+  id           String @id @default(cuid())
+  campgroundId String
+  locationId   String
+
+  // Distance from campground to location center (for sorting)
+  distanceMiles Float?
+
+  // Is this the primary location for this campground?
+  isPrimary Boolean @default(false)
+
+  createdAt DateTime @default(now())
+
+  campground Campground  @relation(fields: [campgroundId], references: [id], onDelete: Cascade)
+  location   SeoLocation @relation(fields: [locationId], references: [id], onDelete: Cascade)
+
+  @@unique([campgroundId, locationId])
+  @@index([locationId])
+  @@index([isPrimary])
+}
+
+// Attractions (National Parks, Lakes, Ski Resorts, etc.)
+model Attraction {
+  id   String         @id @default(cuid())
+  type AttractionType
+  name String // "Yosemite National Park", "Lake Tahoe"
+  slug String         @unique
+
+  // Location
+  state     String?
+  city      String?
+  country   String  @default("USA")
+  latitude  Decimal @db.Decimal(12, 8)
+  longitude Decimal @db.Decimal(12, 8)
+
+  // External references
+  npsCode       String? // National Park Service code (e.g., "YOSE")
+  googlePlaceId String?
+  wikipediaUrl  String?
+
+  // SEO content
+  metaTitle       String?
+  metaDescription String?  @db.Text
+  heroImageUrl    String?
+  description     String?  @db.Text
+  activities      String[] @default([]) // hiking, fishing, skiing, etc.
+  bestSeason      String? // "spring", "summer", "fall", "winter", "year-round"
+
+  // Stats (cached)
+  nearbyCampgroundCount Int       @default(0)
+  avgCampgroundRating   Decimal?  @db.Decimal(3, 2)
+  statsUpdatedAt        DateTime?
+
+  // Publishing
+  isPublished Boolean   @default(false)
+  publishedAt DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  campgroundMappings CampgroundAttraction[]
+
+  @@index([type])
+  @@index([state])
+  @@index([isPublished])
+}
+
+// Many-to-many: Campground <-> Attraction
+model CampgroundAttraction {
+  id           String @id @default(cuid())
+  campgroundId String
+  attractionId String
+
+  // Distance from campground to attraction
+  distanceMiles Float
+
+  // Drive time in minutes (if known)
+  driveTimeMinutes Int?
+
+  // Is this attraction one of the closest to this campground?
+  isNearby Boolean @default(true) // Within ~50 miles
+
+  createdAt DateTime @default(now())
+
+  campground Campground @relation(fields: [campgroundId], references: [id], onDelete: Cascade)
+  attraction Attraction @relation(fields: [attractionId], references: [id], onDelete: Cascade)
+
+  @@unique([campgroundId, attractionId])
+  @@index([attractionId])
+  @@index([distanceMiles])
+  @@index([isNearby])
+}
+
+// B2B Software comparison pages for SEO
+model SoftwarePage {
+  id   String @id @default(cuid())
+  slug String @unique // "campspot-alternative", "newbook-vs-campreserv"
+  type String // "alternative", "comparison", "feature", "industry"
+
+  // Page content
+  title           String
+  metaTitle       String?
+  metaDescription String? @db.Text
+  heroImageUrl    String?
+
+  // Structured content (stored as JSON for flexibility)
+  content Json? // { sections: [{ type, heading, body, features, etc. }] }
+
+  // Target competitor (for alternative/comparison pages)
+  competitorName String?
+  competitorSlug String? // For matching to Competitor model
+
+  // Target keyword and related keywords
+  primaryKeyword    String?
+  secondaryKeywords String[] @default([])
+
+  // Publishing
+  isPublished Boolean   @default(false)
+  publishedAt DateTime?
+
+  // Stats
+  pageViews    Int       @default(0)
+  conversions  Int       @default(0) // Demo requests from this page
+  lastViewedAt DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([type])
+  @@index([isPublished])
+  @@index([competitorSlug])
+}
+
+// Seeding job tracking for bulk campground imports
+model CampgroundSeedJob {
+  id          String               @id @default(cuid())
+  source      CampgroundDataSource
+  status      String               @default("pending") // pending, running, completed, failed
+  startedAt   DateTime?
+  completedAt DateTime?
+
+  // Stats
+  totalRecords     Int @default(0)
+  processedRecords Int @default(0)
+  createdRecords   Int @default(0)
+  updatedRecords   Int @default(0)
+  skippedRecords   Int @default(0)
+  errorRecords     Int @default(0)
+
+  // Error details
+  errors Json? // Array of { record, error }
+
+  // Config
+  config Json? // Source-specific configuration
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([source])
+  @@index([status])
+  @@index([createdAt])
 }

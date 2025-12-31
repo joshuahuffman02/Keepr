@@ -124,6 +124,12 @@ import { RealtimeModule } from "./realtime/realtime.module";
 import { CompetitiveModule } from "./competitive/competitive.module";
 import { WebhooksModule } from "./webhooks/webhooks.module";
 import { QueueModule } from "./queues/queue.module";
+import { SeoSeedingModule } from "./seo-seeding/seo-seeding.module";
+import { ClaimsModule } from "./claims/claims.module";
+import { PublicCampgroundsModule } from "./public-campgrounds/public-campgrounds.module";
+import { PublicLocationsModule } from "./public-locations/public-locations.module";
+import { SoftwarePagesModule } from "./software-pages/software-pages.module";
+import { SeoModule } from "./seo/seo.module";
 
 @Module({
   imports: [
@@ -260,6 +266,18 @@ import { QueueModule } from "./queues/queue.module";
     WebhooksModule,
     // Job queues with Redis persistence and fallback
     QueueModule,
+    // SEO Seeding - Campground data import and SEO infrastructure
+    SeoSeedingModule,
+    // Claims - Campground ownership claiming
+    ClaimsModule,
+    // Public Campgrounds - Unauthenticated campground pages
+    PublicCampgroundsModule,
+    // Public Locations - SEO location pages (states, cities, attractions)
+    PublicLocationsModule,
+    // Software Pages - B2B SEO (competitor comparisons, feature pages)
+    SoftwarePagesModule,
+    // SEO - Sitemaps, robots.txt
+    SeoModule,
   ],
   providers: []
 })
