@@ -671,7 +671,10 @@ export function CampgroundV2Client({ slug, initialData, previewToken }: { slug: 
             <Card className="p-6 border-slate-200">
               <h2 className="text-xl font-semibold text-slate-900 mb-4">About {campground?.name}</h2>
               {campground?.description && (
-                <p className="text-slate-600 mb-4">{campground.description}</p>
+                <div
+                  className="text-slate-600 mb-4 prose prose-sm prose-slate max-w-none [&>h2]:text-lg [&>h2]:font-semibold [&>h2]:mt-4 [&>h2]:mb-2 [&>p]:mb-2"
+                  dangerouslySetInnerHTML={{ __html: campground.description }}
+                />
               )}
               <div className="grid gap-4 md:grid-cols-2">
                 <div className="space-y-3">

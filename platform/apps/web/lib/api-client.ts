@@ -4260,9 +4260,10 @@ export const apiClient = {
 
   // Public API methods (no auth required)
   async getPublicCampgrounds() {
-    const data = await fetchJSON<{ results: unknown[]; total: number }>("/public/campgrounds");
-    // API returns { results, total } - extract results array
-    return PublicCampgroundListSchema.parse(data.results);
+    const data = await fetchJSON<unknown>("/public/campgrounds");
+    // Handle both array response and {results, total} response for backwards compatibility
+    const results = Array.isArray(data) ? data : (data as { results: unknown[] }).results;
+    return PublicCampgroundListSchema.parse(results);
   },
   async getPublicCampground(slug: string, previewToken?: string) {
     const url = previewToken

@@ -21,6 +21,10 @@ const nextConfig = {
         protocol: "https",
         hostname: "cdn.campeveryday.com",
       },
+      {
+        protocol: "https",
+        hostname: "cdn.recreation.gov",
+      },
     ],
     // Optimize image formats
     formats: ["image/avif", "image/webp"],
