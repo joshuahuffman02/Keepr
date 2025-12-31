@@ -8,27 +8,37 @@
 
 /* Begin PBXBuildFile section */
 		0D01A67C3007EA4BD6043A8E /* StaffReservationsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EB765169F9F1D9207D21226A /* StaffReservationsView.swift */; };
+		29F3C2D39BF1E3E007ECEBBF /* ShiftClockView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A86610A520CE596102BB4BDA /* ShiftClockView.swift */; };
 		2C251CBC1B37EDDDD011C532 /* CampreservStaffApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53FAA9F74C627BBE781B022A /* CampreservStaffApp.swift */; };
 		35D71E204F04CC686B841456 /* StaffAuthView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C74A3B40FF26EC5745540C7 /* StaffAuthView.swift */; };
 		38DF173FB4976190C98DB00E /* CampreservCore in Frameworks */ = {isa = PBXBuildFile; productRef = BE256E3F6EE6EE50D8445D80 /* CampreservCore */; };
+		574F64AB0C6ABC65C128C665 /* MessagesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A5203D395665930BC904180 /* MessagesView.swift */; };
 		5D536E57239149BE69B8DD60 /* CampreservUI in Frameworks */ = {isa = PBXBuildFile; productRef = 21C1A0A05E5DFF6C01A8B1DE /* CampreservUI */; };
 		7E5A0A23455C3EAF233B62D1 /* MaintenanceListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 671F173245C814CD070BC8A3 /* MaintenanceListView.swift */; };
+		88BA5450B42AD92F72551544 /* GuestChatView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E1AC6F7A29D352A5C5CCA75 /* GuestChatView.swift */; };
+		8B5288F9EE1335C97660BADB /* IncidentsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE539522F6A2BA8FD41BB0D5 /* IncidentsView.swift */; };
 		8BB418BB38FCA0F35DAE5A00 /* StaffAppState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19A00D1BF6E85C87C0A26E16 /* StaffAppState.swift */; };
 		A0F831163C0D9DD95692E75E /* StaffPOSView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 32A3E9DE010322182E01756F /* StaffPOSView.swift */; };
+		C3135B4637ED5B8BC99ED246 /* TeamChatView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F24F88530632A37ED0D52BE /* TeamChatView.swift */; };
 		E449D532C663BD6418FE3054 /* StaffDashboardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1109EA0BD8FF0D0057E00A2E /* StaffDashboardView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		0A5203D395665930BC904180 /* MessagesView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = MessagesView.swift; path = CampreservStaff/Features/Messaging/MessagesView.swift; sourceTree = "<group>"; };
+		0E1AC6F7A29D352A5C5CCA75 /* GuestChatView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = GuestChatView.swift; path = CampreservStaff/Features/Messaging/GuestChatView.swift; sourceTree = "<group>"; };
 		1109EA0BD8FF0D0057E00A2E /* StaffDashboardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StaffDashboardView.swift; sourceTree = "<group>"; };
 		19A00D1BF6E85C87C0A26E16 /* StaffAppState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StaffAppState.swift; sourceTree = "<group>"; };
+		1F24F88530632A37ED0D52BE /* TeamChatView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = TeamChatView.swift; path = CampreservStaff/Features/Messaging/TeamChatView.swift; sourceTree = "<group>"; };
 		2C74A3B40FF26EC5745540C7 /* StaffAuthView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StaffAuthView.swift; sourceTree = "<group>"; };
 		32A3E9DE010322182E01756F /* StaffPOSView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StaffPOSView.swift; sourceTree = "<group>"; };
 		3B5F420AB1D4956C1BE110C2 /* CampreservStaff.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = CampreservStaff.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		53FAA9F74C627BBE781B022A /* CampreservStaffApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CampreservStaffApp.swift; sourceTree = "<group>"; };
 		623EF36417F5A6579E026B30 /* CampreservCore */ = {isa = PBXFileReference; lastKnownFileType = folder; name = CampreservCore; path = ../Packages/CampreservCore; sourceTree = SOURCE_ROOT; };
 		671F173245C814CD070BC8A3 /* MaintenanceListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MaintenanceListView.swift; sourceTree = "<group>"; };
+		A86610A520CE596102BB4BDA /* ShiftClockView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ShiftClockView.swift; path = CampreservStaff/Features/TimeTracking/ShiftClockView.swift; sourceTree = "<group>"; };
 		D2E5E6C431173BBCEED44E52 /* CampreservUI */ = {isa = PBXFileReference; lastKnownFileType = folder; name = CampreservUI; path = ../Packages/CampreservUI; sourceTree = SOURCE_ROOT; };
 		EB765169F9F1D9207D21226A /* StaffReservationsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StaffReservationsView.swift; sourceTree = "<group>"; };
+		EE539522F6A2BA8FD41BB0D5 /* IncidentsView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = IncidentsView.swift; path = CampreservStaff/Features/Incidents/IncidentsView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -69,6 +79,9 @@
 				CCC0F2A03A1D0E5BB7C673A2 /* Maintenance */,
 				22330A23129BCD036100AF37 /* POS */,
 				64759AAAF3127EDDE3A71F86 /* Reservations */,
+				8FC59B71C6818DA641AC58A3 /* Messaging */,
+				C13ADD8A0BFA119AB3E28D16 /* TimeTracking */,
+				ABED46FAB3D7D963DD4E5EF3 /* Incidents */,
 			);
 			path = Features;
 			sourceTree = "<group>";
@@ -97,6 +110,17 @@
 			path = Auth;
 			sourceTree = "<group>";
 		};
+		8FC59B71C6818DA641AC58A3 /* Messaging */ = {
+			isa = PBXGroup;
+			children = (
+				0A5203D395665930BC904180 /* MessagesView.swift */,
+				0E1AC6F7A29D352A5C5CCA75 /* GuestChatView.swift */,
+				1F24F88530632A37ED0D52BE /* TeamChatView.swift */,
+			);
+			name = Messaging;
+			path = Messaging;
+			sourceTree = "<group>";
+		};
 		9A9C562724CBA8A77A1278C6 /* CampreservStaff */ = {
 			isa = PBXGroup;
 			children = (
@@ -115,6 +139,24 @@
 			name = Packages;
 			sourceTree = "<group>";
 		};
+		ABED46FAB3D7D963DD4E5EF3 /* Incidents */ = {
+			isa = PBXGroup;
+			children = (
+				EE539522F6A2BA8FD41BB0D5 /* IncidentsView.swift */,
+			);
+			name = Incidents;
+			path = Incidents;
+			sourceTree = "<group>";
+		};
+		C13ADD8A0BFA119AB3E28D16 /* TimeTracking */ = {
+			isa = PBXGroup;
+			children = (
+				A86610A520CE596102BB4BDA /* ShiftClockView.swift */,
+			);
+			name = TimeTracking;
+			path = TimeTracking;
+			sourceTree = "<group>";
+		};
 		CCC0F2A03A1D0E5BB7C673A2 /* Maintenance */ = {
 			isa = PBXGroup;
 			children = (
@@ -129,6 +171,11 @@
 				9A9C562724CBA8A77A1278C6 /* CampreservStaff */,
 				A259B1A662562135C4AAB388 /* Packages */,
 				44D606B6421CA1603658B4EB /* Products */,
+				0A5203D395665930BC904180 /* MessagesView.swift */,
+				0E1AC6F7A29D352A5C5CCA75 /* GuestChatView.swift */,
+				1F24F88530632A37ED0D52BE /* TeamChatView.swift */,
+				A86610A520CE596102BB4BDA /* ShiftClockView.swift */,
+				EE539522F6A2BA8FD41BB0D5 /* IncidentsView.swift */,
 			);
 			sourceTree = "<group>";
 		};
@@ -189,10 +236,11 @@
 			mainGroup = DB4A9CDA111A82A23F4C2808;
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
-				9C3CEAF863B22C4393F8942E /* XCLocalSwiftPackageReference "../Packages/CampreservCore" */,
-				17F24EB56C6C9F51BCD11735 /* XCLocalSwiftPackageReference "../Packages/CampreservUI" */,
+				9C3CEAF863B22C4393F8942E /* XCLocalSwiftPackageReference "CampreservCore" */,
+				17F24EB56C6C9F51BCD11735 /* XCLocalSwiftPackageReference "CampreservUI" */,
 			);
 			preferredProjectObjectVersion = 77;
+			productRefGroup = 44D606B6421CA1603658B4EB /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
@@ -213,6 +261,11 @@
 				E449D532C663BD6418FE3054 /* StaffDashboardView.swift in Sources */,
 				A0F831163C0D9DD95692E75E /* StaffPOSView.swift in Sources */,
 				0D01A67C3007EA4BD6043A8E /* StaffReservationsView.swift in Sources */,
+				574F64AB0C6ABC65C128C665 /* MessagesView.swift in Sources */,
+				88BA5450B42AD92F72551544 /* GuestChatView.swift in Sources */,
+				C3135B4637ED5B8BC99ED246 /* TeamChatView.swift in Sources */,
+				29F3C2D39BF1E3E007ECEBBF /* ShiftClockView.swift in Sources */,
+				8B5288F9EE1335C97660BADB /* IncidentsView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -414,11 +467,11 @@
 /* End XCConfigurationList section */
 
 /* Begin XCLocalSwiftPackageReference section */
-		17F24EB56C6C9F51BCD11735 /* XCLocalSwiftPackageReference "../Packages/CampreservUI" */ = {
+		17F24EB56C6C9F51BCD11735 /* XCLocalSwiftPackageReference "CampreservUI" */ = {
 			isa = XCLocalSwiftPackageReference;
 			relativePath = ../Packages/CampreservUI;
 		};
-		9C3CEAF863B22C4393F8942E /* XCLocalSwiftPackageReference "../Packages/CampreservCore" */ = {
+		9C3CEAF863B22C4393F8942E /* XCLocalSwiftPackageReference "CampreservCore" */ = {
 			isa = XCLocalSwiftPackageReference;
 			relativePath = ../Packages/CampreservCore;
 		};

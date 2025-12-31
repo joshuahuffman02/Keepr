@@ -59,18 +59,83 @@ struct StaffMainTabView: View {
                 }
                 .tag(1)
 
+            MessagesView()
+                .tabItem {
+                    Label("Messages", systemImage: "message")
+                }
+                .tag(2)
+
             StaffPOSView()
                 .tabItem {
                     Label("POS", systemImage: "creditcard")
                 }
-                .tag(2)
-
-            MaintenanceListView()
-                .tabItem {
-                    Label("Tasks", systemImage: "wrench.and.screwdriver")
-                }
                 .tag(3)
+
+            MoreView()
+                .tabItem {
+                    Label("More", systemImage: "ellipsis")
+                }
+                .tag(4)
         }
         .tint(.campPrimary)
+    }
+}
+
+/// More menu with additional features
+struct MoreView: View {
+
+    @EnvironmentObject private var appState: StaffAppState
+
+    var body: some View {
+        NavigationStack {
+            List {
+                Section {
+                    NavigationLink(destination: MaintenanceListView()) {
+                        Label("Maintenance Tasks", systemImage: "wrench.and.screwdriver")
+                    }
+
+                    NavigationLink(destination: ShiftClockView()) {
+                        Label("Time Clock", systemImage: "clock")
+                    }
+
+                    NavigationLink(destination: IncidentsView()) {
+                        Label("Incidents", systemImage: "exclamationmark.triangle")
+                    }
+                }
+
+                Section {
+                    NavigationLink(destination: SettingsView()) {
+                        Label("Settings", systemImage: "gear")
+                    }
+
+                    Button {
+                        Task { await appState.logout() }
+                    } label: {
+                        Label("Sign Out", systemImage: "rectangle.portrait.and.arrow.right")
+                            .foregroundColor(.campError)
+                    }
+                }
+            }
+            .navigationTitle("More")
+        }
+    }
+}
+
+/// Placeholder settings view
+struct SettingsView: View {
+    var body: some View {
+        List {
+            Section("Account") {
+                Text("Profile")
+                Text("Notifications")
+            }
+
+            Section("App") {
+                Text("Appearance")
+                Text("About")
+            }
+        }
+        .navigationTitle("Settings")
+        .navigationBarTitleDisplayMode(.inline)
     }
 }

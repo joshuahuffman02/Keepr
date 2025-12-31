@@ -8,13 +8,16 @@ import { usePaymentContext } from "../context/PaymentContext";
 import { cn } from "../../../../lib/utils";
 import { apiClient } from "../../../../lib/api-client";
 
+// Payment methods that incur CC processing fees
+const CARD_PAYMENT_METHODS = ["card", "saved_card", "apple_pay", "google_pay", "terminal"];
+
 interface CharityRoundUpProps {
   disabled?: boolean;
 }
 
 export function CharityRoundUp({ disabled = false }: CharityRoundUpProps) {
   const { state, actions, props } = usePaymentContext();
-  const { charityDonation, discountCents, donationCents } = state;
+  const { charityDonation, discountCents, donationCents, selectedMethod, config } = state;
   const [reservationTotal, setReservationTotal] = useState<number | null>(null);
 
   // Get reservationId from subject
@@ -38,12 +41,19 @@ export function CharityRoundUp({ disabled = false }: CharityRoundUpProps) {
       });
   }, [reservationId]);
 
-  // Calculate round-up amount based on actual reservation total
+  // Calculate round-up amount based on actual payment total (including CC fees when applicable)
   const roundUpAmount = useMemo(() => {
     // Use the fetched reservation total, or fall back to state calculation
-    const baseTotal = reservationTotal !== null
+    let baseTotal = reservationTotal !== null
       ? reservationTotal - discountCents  // Reservation total minus any promo discounts applied in modal
       : state.originalAmountCents - discountCents;
+
+    // If a card payment method is selected (or likely to be selected), include CC processing fees
+    // This ensures the round-up creates a nice round number after fees are added
+    if (selectedMethod && CARD_PAYMENT_METHODS.includes(selectedMethod) && config?.feeMode === "pass_through") {
+      const ccFeeCents = actions.calculateFees(selectedMethod, baseTotal);
+      baseTotal += ccFeeCents;
+    }
 
     const dollars = baseTotal / 100;
     const roundedUp = Math.ceil(dollars);
@@ -51,7 +61,7 @@ export function CharityRoundUp({ disabled = false }: CharityRoundUpProps) {
 
     // If already a round number, round up to next dollar
     return roundUpCents === 0 ? 100 : roundUpCents;
-  }, [reservationTotal, state.originalAmountCents, discountCents]);
+  }, [reservationTotal, state.originalAmountCents, discountCents, selectedMethod, config, actions]);
 
   const handleToggle = (checked: boolean) => {
     actions.setCharityDonation({
@@ -107,7 +117,7 @@ export function CharityRoundUp({ disabled = false }: CharityRoundUpProps) {
  */
 export function CharityRoundUpInline({ disabled = false }: CharityRoundUpProps) {
   const { state, actions, props } = usePaymentContext();
-  const { charityDonation, discountCents } = state;
+  const { charityDonation, discountCents, selectedMethod, config } = state;
   const [reservationTotal, setReservationTotal] = useState<number | null>(null);
 
   // Get reservationId from subject
@@ -129,14 +139,21 @@ export function CharityRoundUpInline({ disabled = false }: CharityRoundUpProps) 
   }, [reservationId]);
 
   const roundUpAmount = useMemo(() => {
-    const baseTotal = reservationTotal !== null
+    let baseTotal = reservationTotal !== null
       ? reservationTotal - discountCents
       : state.originalAmountCents - discountCents;
+
+    // Include CC fees when card payment method is selected
+    if (selectedMethod && CARD_PAYMENT_METHODS.includes(selectedMethod) && config?.feeMode === "pass_through") {
+      const ccFeeCents = actions.calculateFees(selectedMethod, baseTotal);
+      baseTotal += ccFeeCents;
+    }
+
     const dollars = baseTotal / 100;
     const roundedUp = Math.ceil(dollars);
     const roundUpCents = Math.round((roundedUp - dollars) * 100);
     return roundUpCents === 0 ? 100 : roundUpCents;
-  }, [reservationTotal, state.originalAmountCents, discountCents]);
+  }, [reservationTotal, state.originalAmountCents, discountCents, selectedMethod, config, actions]);
 
   const handleToggle = () => {
     actions.setCharityDonation({
