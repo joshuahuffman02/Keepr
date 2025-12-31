@@ -22,6 +22,7 @@ export interface PublicCampgroundView {
   state: string | null;
   description: string | null;
   claimStatus: CampgroundClaimStatus;
+  seededDataSource: string | null;
 
   // SEO metadata
   metaTitle: string;
@@ -127,6 +128,7 @@ export class PublicCampgroundsService {
         reviewScore: true,
         reviewCount: true,
         claimStatus: true,
+        seededDataSource: true,
         deletedAt: true,
         organization: {
           select: {
@@ -174,6 +176,7 @@ export class PublicCampgroundsService {
       state: campground.state,
       description: campground.description,
       claimStatus: campground.claimStatus,
+      seededDataSource: campground.seededDataSource,
       metaTitle,
       metaDescription,
       latitude: campground.latitude?.toNumber() ?? null,

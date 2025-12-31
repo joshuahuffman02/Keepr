@@ -50,6 +50,7 @@ interface CampgroundPageData {
   priceRange?: { min: number; max: number };
   rating?: number;
   reviewCount?: number;
+  seededDataSource?: string;
   nearbyAttractions: Array<{
     id: string;
     name: string;
@@ -512,6 +513,26 @@ export default async function CampgroundPage({
                 </Link>
               )}
             </div>
+          </div>
+        </section>
+      )}
+
+      {/* Data Source Attribution - Required by RIDB API Agreement */}
+      {campground.seededDataSource === "recreation_gov" && (
+        <section className="py-6 bg-slate-100 border-t border-slate-200">
+          <div className="max-w-6xl mx-auto px-6">
+            <p className="text-sm text-slate-500 text-center">
+              Campground data sourced from{" "}
+              <a
+                href="https://www.recreation.gov"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-emerald-600 hover:underline"
+              >
+                Recreation.gov
+              </a>
+              . Camp Everyday is not affiliated with or endorsed by the U.S. Government.
+            </p>
           </div>
         </section>
       )}
