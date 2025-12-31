@@ -2,11 +2,51 @@
 
 import { useRef, useMemo } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { motion, useInView, useReducedMotion } from "framer-motion";
-import { MapPin, Star, TrendingUp, ChevronRight, Sparkles } from "lucide-react";
+import { ChevronRight } from "lucide-react";
 import { CampgroundCard } from "./CampgroundCard";
 import { useGeolocation, getStateName } from "../../hooks/use-geolocation";
 import type { AdaCertificationLevel } from "../../lib/ada-accessibility";
+
+// Region-based icons for state detection
+const regionIcons: Record<string, string> = {
+  // Mountain states
+  CO: "/images/icons/regions/mountain.png",
+  MT: "/images/icons/regions/mountain.png",
+  WY: "/images/icons/regions/mountain.png",
+  UT: "/images/icons/regions/mountain.png",
+  ID: "/images/icons/regions/mountain.png",
+  NV: "/images/icons/regions/mountain.png",
+  // Coastal states
+  CA: "/images/icons/regions/beach.png",
+  FL: "/images/icons/regions/beach.png",
+  HI: "/images/icons/regions/beach.png",
+  SC: "/images/icons/regions/beach.png",
+  NC: "/images/icons/regions/beach.png",
+  GA: "/images/icons/regions/beach.png",
+  TX: "/images/icons/regions/beach.png",
+  AL: "/images/icons/regions/beach.png",
+  MS: "/images/icons/regions/beach.png",
+  LA: "/images/icons/regions/beach.png",
+  // Pacific Northwest / Forest
+  OR: "/images/icons/regions/forest.png",
+  WA: "/images/icons/regions/forest.png",
+  AK: "/images/icons/regions/forest.png",
+  ME: "/images/icons/regions/forest.png",
+  VT: "/images/icons/regions/forest.png",
+  NH: "/images/icons/regions/forest.png",
+  // Desert Southwest
+  AZ: "/images/icons/regions/desert.png",
+  NM: "/images/icons/regions/desert.png",
+  // Lake states
+  MI: "/images/icons/regions/lake.png",
+  MN: "/images/icons/regions/lake.png",
+  WI: "/images/icons/regions/lake.png",
+  NY: "/images/icons/regions/lake.png",
+  PA: "/images/icons/regions/lake.png",
+  OH: "/images/icons/regions/lake.png",
+};
 
 // Animation variants
 const fadeInUp = {
@@ -57,7 +97,8 @@ interface LocationSectionsProps {
 interface SectionProps {
   title: string;
   subtitle?: string;
-  icon: React.ReactNode;
+  icon?: React.ReactNode;
+  iconImage?: string;
   campgrounds: CampgroundData[];
   viewAllHref?: string;
   viewAllLabel?: string;
@@ -68,6 +109,7 @@ function HorizontalScrollSection({
   title,
   subtitle,
   icon,
+  iconImage,
   campgrounds,
   viewAllHref,
   viewAllLabel = "See all",
@@ -87,9 +129,15 @@ function HorizontalScrollSection({
         animate={inView ? "visible" : "hidden"}
       >
         <div className="flex items-center gap-3">
-          <div className="p-2 bg-emerald-100 rounded-lg text-emerald-600">
-            {icon}
-          </div>
+          {iconImage ? (
+            <div className="relative w-12 h-12">
+              <Image src={iconImage} alt="" fill className="object-contain" sizes="48px" />
+            </div>
+          ) : (
+            <div className="p-2 bg-emerald-100 rounded-lg text-emerald-600">
+              {icon}
+            </div>
+          )}
           <div>
             <h3 className="text-xl font-bold text-slate-900">{title}</h3>
             {subtitle && <p className="text-sm text-slate-500">{subtitle}</p>}
@@ -229,7 +277,7 @@ export function LocationSections({ campgrounds, className = "" }: LocationSectio
         <HorizontalScrollSection
           title={nearbySection.title}
           subtitle={nearbySection.subtitle}
-          icon={<MapPin className="w-5 h-5" />}
+          iconImage={userState ? (regionIcons[userState] || "/images/icons/regions/forest.png") : "/images/icons/regions/forest.png"}
           campgrounds={nearbySection.campgrounds}
           viewAllHref={userState ? `/?state=${userState}` : undefined}
           prefersReducedMotion={prefersReducedMotion}
@@ -241,7 +289,7 @@ export function LocationSections({ campgrounds, className = "" }: LocationSectio
         <HorizontalScrollSection
           title="Featured Picks"
           subtitle="Award-winning campgrounds"
-          icon={<Sparkles className="w-5 h-5" />}
+          iconImage="/images/icons/verified-reviews.png"
           campgrounds={featuredPicks}
           prefersReducedMotion={prefersReducedMotion}
         />
@@ -252,7 +300,7 @@ export function LocationSections({ campgrounds, className = "" }: LocationSectio
         <HorizontalScrollSection
           title="Highly Rated"
           subtitle="4.5+ stars from guests"
-          icon={<Star className="w-5 h-5" />}
+          iconImage="/images/icons/giving-heart.png"
           campgrounds={highlyRated}
           viewAllHref="/?sort=rating"
           prefersReducedMotion={prefersReducedMotion}
@@ -264,7 +312,7 @@ export function LocationSections({ campgrounds, className = "" }: LocationSectio
         <HorizontalScrollSection
           title="Rising Stars"
           subtitle="Newer campgrounds worth discovering"
-          icon={<TrendingUp className="w-5 h-5" />}
+          iconImage="/images/icons/hot-trending.png"
           campgrounds={newListings}
           prefersReducedMotion={prefersReducedMotion}
         />

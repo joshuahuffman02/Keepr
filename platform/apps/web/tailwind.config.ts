@@ -126,6 +126,18 @@ const config: Config = {
         "fade-in-up": {
           "0%": { opacity: "0", transform: "translateY(10px)" },
           "100%": { opacity: "1", transform: "translateY(0)" }
+        },
+        "float-slow": {
+          "0%, 100%": { transform: "translateY(0) rotate(0deg)" },
+          "50%": { transform: "translateY(-12px) rotate(3deg)" }
+        },
+        "float-medium": {
+          "0%, 100%": { transform: "translateY(0) rotate(0deg)" },
+          "50%": { transform: "translateY(-8px) rotate(-2deg)" }
+        },
+        "float-fast": {
+          "0%, 100%": { transform: "translateY(0) rotate(0deg)" },
+          "50%": { transform: "translateY(-6px) rotate(2deg)" }
         }
       },
       animation: {
@@ -133,7 +145,10 @@ const config: Config = {
         "accordion-up": "accordion-up 0.2s ease-out",
         blob: "blob 7s infinite",
         shimmer: "shimmer 1.5s infinite",
-        "fade-in-up": "fade-in-up 0.5s ease-out"
+        "fade-in-up": "fade-in-up 0.5s ease-out",
+        "float-slow": "float-slow 6s ease-in-out infinite",
+        "float-medium": "float-medium 4s ease-in-out infinite",
+        "float-fast": "float-fast 3s ease-in-out infinite"
       }
     }
   },

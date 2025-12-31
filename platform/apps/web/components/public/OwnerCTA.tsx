@@ -1,13 +1,14 @@
 "use client";
 
-import { Building2, ArrowRight, CheckCircle2, Sparkles } from "lucide-react";
+import Image from "next/image";
+import { ArrowRight, CheckCircle2, Sparkles } from "lucide-react";
 import { cn } from "../../lib/utils";
 
 const benefits = [
-  "Free data migration from any system",
-  "Go live in 48 hours, not weeks",
-  "No contracts, cancel anytime",
-  "50% less than legacy systems",
+  { text: "Free data migration from any system", icon: "/images/icons/owner-cta/handshake.png" },
+  { text: "Go live in 48 hours, not weeks", icon: "/images/icons/owner-cta/property-keys.png" },
+  { text: "No contracts, cancel anytime", icon: "/images/icons/owner-cta/house-plus.png" },
+  { text: "50% less than legacy systems", icon: "/images/icons/owner-cta/growing-money.png" },
 ];
 
 interface OwnerCTAProps {
@@ -24,9 +25,15 @@ export function OwnerCTA({ className }: OwnerCTAProps) {
           Founder pricing ends soon — Only 45 spots
         </div>
 
-        {/* Icon */}
-        <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-emerald-500/10 mb-6">
-          <Building2 className="w-8 h-8 text-emerald-400" />
+        {/* Icon - Property Keys */}
+        <div className="relative w-20 h-20 mx-auto mb-6">
+          <Image
+            src="/images/icons/owner-cta/property-keys.png"
+            alt=""
+            fill
+            className="object-contain"
+            sizes="80px"
+          />
         </div>
 
         {/* Headline */}
@@ -40,12 +47,20 @@ export function OwnerCTA({ className }: OwnerCTAProps) {
           system built for how you actually run your campground — fast, simple, affordable.
         </p>
 
-        {/* Benefits */}
-        <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-3 mb-10">
+        {/* Benefits with clay icons */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-10 max-w-2xl mx-auto">
           {benefits.map((benefit, i) => (
-            <div key={i} className="flex items-center gap-2 text-slate-300">
-              <CheckCircle2 className="h-4 w-4 text-emerald-400" />
-              <span className="text-sm">{benefit}</span>
+            <div key={i} className="flex items-center gap-3 bg-slate-800/50 rounded-xl p-3 text-left">
+              <div className="relative w-10 h-10 flex-shrink-0">
+                <Image
+                  src={benefit.icon}
+                  alt=""
+                  fill
+                  className="object-contain"
+                  sizes="40px"
+                />
+              </div>
+              <span className="text-sm text-slate-300">{benefit.text}</span>
             </div>
           ))}
         </div>

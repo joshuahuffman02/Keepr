@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { SearchBar } from "./SearchBar";
 import { TrustBadgesDark } from "./TrustBadges";
 import { SocialProofInline } from "./SocialProofStrip";
@@ -23,6 +24,31 @@ export function HeroBanner({ onSearch }: HeroBannerProps) {
         <div className="absolute -top-40 -right-40 w-80 h-80 bg-white/10 rounded-full blur-3xl" />
         <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-white/10 rounded-full blur-3xl" />
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-white/5 rounded-full blur-3xl" />
+
+        {/* Floating clay decorations - hidden on mobile for performance */}
+        <div className="hidden md:block">
+          {/* Left side decorations */}
+          <div className="absolute top-20 left-[5%] w-16 h-16 opacity-60 animate-float-slow">
+            <Image src="/images/icons/hero/pine-tree.png" alt="" fill className="object-contain" sizes="64px" />
+          </div>
+          <div className="absolute top-40 left-[12%] w-12 h-12 opacity-50 animate-float-medium">
+            <Image src="/images/icons/hero/tent.png" alt="" fill className="object-contain" sizes="48px" />
+          </div>
+          <div className="absolute bottom-32 left-[8%] w-14 h-14 opacity-55 animate-float-fast">
+            <Image src="/images/icons/hero/campfire.png" alt="" fill className="object-contain" sizes="56px" />
+          </div>
+
+          {/* Right side decorations */}
+          <div className="absolute top-16 right-[8%] w-14 h-14 opacity-70 animate-float-medium">
+            <Image src="/images/icons/hero/sun.png" alt="" fill className="object-contain" sizes="56px" />
+          </div>
+          <div className="absolute top-48 right-[5%] w-16 h-16 opacity-50 animate-float-slow">
+            <Image src="/images/icons/hero/mountain.png" alt="" fill className="object-contain" sizes="64px" />
+          </div>
+          <div className="absolute bottom-40 right-[10%] w-10 h-10 opacity-45 animate-float-fast">
+            <Image src="/images/icons/hero/moon.png" alt="" fill className="object-contain" sizes="40px" />
+          </div>
+        </div>
 
         {/* Mountain silhouette */}
         <svg
