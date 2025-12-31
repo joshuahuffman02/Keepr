@@ -34,6 +34,8 @@ interface CampgroundCardProps {
     pastAwards?: number[];
     // ADA Accessibility Certification
     adaCertificationLevel?: AdaCertificationLevel;
+    // Compact mode for horizontal scroll sections
+    compact?: boolean;
 }
 
 export function CampgroundCard({
@@ -56,7 +58,8 @@ export function CampgroundCard({
     ratingBadge,
     npsBadge,
     pastAwards = [],
-    adaCertificationLevel
+    adaCertificationLevel,
+    compact = false
 }: CampgroundCardProps) {
     const adaBadge = adaCertificationLevel ? getAdaBadgeInfo(adaCertificationLevel) : null;
     const [isHovered, setIsHovered] = useState(false);
@@ -286,9 +289,9 @@ export function CampgroundCard({
             </div>
 
             {/* Content */}
-            <div className="p-5">
+            <div className={compact ? "p-3" : "p-5"}>
                 {/* Rating */}
-                <div className="flex items-center gap-2 mb-2 text-sm flex-wrap">
+                <div className={`flex items-center gap-2 ${compact ? "mb-1" : "mb-2"} text-sm flex-wrap`}>
                     <div className="flex items-center gap-1">
                         <svg className={`w-4 h-4 ${hasRating ? "text-amber-400" : "text-slate-300"}`} fill="currentColor" viewBox="0 0 20 20">
                         <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
@@ -296,20 +299,20 @@ export function CampgroundCard({
                         {hasRating ? (
                             <>
                                 <span className="font-semibold text-slate-900">{rating?.toFixed(1)}</span>
-                                {typeof reviewCount === "number" && reviewCount > 0 && (
+                                {typeof reviewCount === "number" && reviewCount > 0 && !compact && (
                                     <span className="text-slate-500">({reviewCount} reviews)</span>
                                 )}
                             </>
                         ) : (
-                            <span className="text-slate-500">Reviews coming soon</span>
+                            <span className="text-slate-500">{compact ? "New" : "Reviews coming soon"}</span>
                         )}
                     </div>
-                    {ratingBadge && (
+                    {ratingBadge && !compact && (
                         <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 text-[11px] font-semibold">
                             {ratingBadge}
                         </span>
                     )}
-                    {!isInternal && (
+                    {!isInternal && !compact && (
                         <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-slate-100 text-slate-600 text-[11px]">
                             External listing
                         </span>
@@ -317,19 +320,19 @@ export function CampgroundCard({
                 </div>
 
                 {/* Name */}
-                <h3 className="text-lg font-bold text-slate-900 mb-1 line-clamp-1">{name}</h3>
+                <h3 className={`${compact ? "text-base" : "text-lg"} font-bold text-slate-900 mb-1 line-clamp-1`}>{name}</h3>
 
                 {/* Location */}
-                <p className="text-sm text-slate-500 mb-3 flex items-center gap-1">
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <p className={`text-sm text-slate-500 ${compact ? "mb-2" : "mb-3"} flex items-center gap-1`}>
+                    <svg className="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                     </svg>
-                    {location}
+                    <span className="line-clamp-1">{location}</span>
                 </p>
 
-                {/* Amenities */}
-                {amenities.length > 0 && (
+                {/* Amenities - hide in compact mode */}
+                {amenities.length > 0 && !compact && (
                     <div className="flex flex-wrap gap-1.5 mb-3">
                         {amenities.slice(0, 3).map((amenity) => (
                             <span
@@ -347,40 +350,60 @@ export function CampgroundCard({
                     </div>
                 )}
 
-                {/* Price and CTA */}
-                <div className="flex items-center justify-between pt-3 border-t border-slate-100">
-                    {pricePerNight ? (
-                        <div>
-                            <span className="text-lg font-bold text-slate-900">${pricePerNight}</span>
-                            <span className="text-sm text-slate-500"> / night</span>
-                        </div>
-                    ) : (
-                        <span className="text-sm text-slate-500">Contact for pricing</span>
-                    )}
-
-                    {isInternal ? (
+                {/* Price and CTA - simplified in compact mode */}
+                {compact ? (
+                    <div className="flex items-center justify-between">
+                        {pricePerNight ? (
+                            <div>
+                                <span className="text-base font-bold text-slate-900">${pricePerNight}</span>
+                                <span className="text-xs text-slate-500"> / night</span>
+                            </div>
+                        ) : (
+                            <span className="text-xs text-slate-500">Contact for pricing</span>
+                        )}
                         <Link
                             href={campgroundPath}
                             onClick={onExplore}
-                            className="px-4 py-2 text-sm font-semibold text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 rounded-lg transition-colors flex items-center gap-1 group"
+                            className="text-sm font-semibold text-emerald-600 hover:text-emerald-700"
                         >
-                            <span>Discover</span>
-                            <span className="group-hover:translate-x-0.5 transition-transform">→</span>
+                            View →
                         </Link>
-                    ) : (
-                        <div className="flex flex-col items-end gap-1">
-                        <span className="px-3 py-1.5 text-xs font-medium text-slate-500 bg-slate-100 rounded-full">
-                            External
-                        </span>
-                            <a
-                                href={`mailto:hello@campeveryday.com?subject=Invite%20${encodeURIComponent(name)}%20to%20Camp%20Everyday&body=Please reach out to ${encodeURIComponent(name)} to join the platform.`}
-                                className="text-[11px] text-emerald-700 font-semibold hover:text-emerald-800"
+                    </div>
+                ) : (
+                    <div className="flex items-center justify-between pt-3 border-t border-slate-100">
+                        {pricePerNight ? (
+                            <div>
+                                <span className="text-lg font-bold text-slate-900">${pricePerNight}</span>
+                                <span className="text-sm text-slate-500"> / night</span>
+                            </div>
+                        ) : (
+                            <span className="text-sm text-slate-500">Contact for pricing</span>
+                        )}
+
+                        {isInternal ? (
+                            <Link
+                                href={campgroundPath}
+                                onClick={onExplore}
+                                className="px-4 py-2 text-sm font-semibold text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 rounded-lg transition-colors flex items-center gap-1 group"
                             >
-                                Suggest this park →
-                            </a>
-                        </div>
-                    )}
-                </div>
+                                <span>Discover</span>
+                                <span className="group-hover:translate-x-0.5 transition-transform">→</span>
+                            </Link>
+                        ) : (
+                            <div className="flex flex-col items-end gap-1">
+                            <span className="px-3 py-1.5 text-xs font-medium text-slate-500 bg-slate-100 rounded-full">
+                                External
+                            </span>
+                                <a
+                                    href={`mailto:hello@campeveryday.com?subject=Invite%20${encodeURIComponent(name)}%20to%20Camp%20Everyday&body=Please reach out to ${encodeURIComponent(name)} to join the platform.`}
+                                    className="text-[11px] text-emerald-700 font-semibold hover:text-emerald-800"
+                                >
+                                    Suggest this park →
+                                </a>
+                            </div>
+                        )}
+                    </div>
+                )}
             </div>
         </div>
     );

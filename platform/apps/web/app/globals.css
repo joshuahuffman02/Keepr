@@ -290,6 +290,23 @@
   .gradient-overlay:hover::before {
     @apply from-emerald-500/5 to-teal-500/5;
   }
+
+  /* Hide scrollbar while maintaining scroll functionality */
+  .scrollbar-hide {
+    -ms-overflow-style: none; /* IE and Edge */
+    scrollbar-width: none; /* Firefox */
+  }
+
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none; /* Chrome, Safari, Opera */
+  }
+
+  /* Shimmer animation for loading skeletons */
+  @keyframes shimmer {
+    100% {
+      transform: translateX(100%);
+    }
+  }
 }
 
 /* Ensure proper focus styles are never removed */

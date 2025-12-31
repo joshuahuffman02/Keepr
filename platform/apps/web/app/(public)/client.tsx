@@ -7,6 +7,7 @@ import { motion, useInView, useReducedMotion } from "framer-motion";
 import { Search } from "lucide-react";
 import { CampgroundCard } from "../../components/public/CampgroundCard";
 import { CategoryTabs, categories, type CategoryType } from "../../components/public/CategoryTabs";
+import { LocationSections } from "../../components/public/LocationSections";
 import { apiClient } from "../../lib/api-client";
 import type { AdaCertificationLevel } from "../../lib/ada-accessibility";
 import { trackEvent } from "@/lib/analytics";
@@ -361,6 +362,31 @@ export function HomeClient() {
                     />
                 </div>
             </div>
+
+            {/* Location-based curated sections - only show when no filters active */}
+            {!isLoading && activeCategory === "all" && !searchQuery && !stateFilter && amenityFilters.length === 0 && (
+                <LocationSections
+                    campgrounds={allCampgrounds.map((cg) => ({
+                        id: cg.id,
+                        name: cg.name,
+                        slug: "slug" in cg ? cg.slug : undefined,
+                        city: cg.city || undefined,
+                        state: cg.state || undefined,
+                        country: "country" in cg ? (cg.country || undefined) : undefined,
+                        heroImageUrl: "heroImageUrl" in cg ? (cg.heroImageUrl || undefined) : undefined,
+                        isInternal: cg.isInternal,
+                        isExternal: cg.isExternal,
+                        rating: cg.rating,
+                        reviewCount: cg.reviewCount,
+                        pricePerNight: "pricePerNight" in cg ? cg.pricePerNight : undefined,
+                        amenities: "amenities" in cg ? cg.amenities : [],
+                        npsBadge: cg.npsBadge,
+                        pastAwards: "pastAwards" in cg ? cg.pastAwards : [],
+                        adaCertificationLevel: "adaCertificationLevel" in cg ? cg.adaCertificationLevel as AdaCertificationLevel : undefined
+                    }))}
+                    className="py-8 border-b border-slate-100"
+                />
+            )}
 
             {/* Featured Campgrounds */}
             <section id="featured" className="max-w-7xl mx-auto px-6 py-16" ref={featuredRef}>
