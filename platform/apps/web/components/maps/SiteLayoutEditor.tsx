@@ -99,6 +99,8 @@ export interface SiteLayoutEditorProps {
   siteClasses?: { id: string; name: string; color: string }[];
   onSave?: (data: LayoutData) => void;
   onSiteClick?: (site: LayoutSite) => void;
+  onBackgroundImageChange?: (imageUrl: string) => void;
+  backgroundImageUrl?: string | null;
   readOnly?: boolean;
   height?: string | number;
   className?: string;
@@ -142,12 +144,15 @@ export function SiteLayoutEditor({
   siteClasses = [],
   onSave,
   onSiteClick,
+  onBackgroundImageChange,
+  backgroundImageUrl,
   readOnly = false,
   height = "700px",
   className,
 }: SiteLayoutEditorProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
+  const backgroundImageRef = useRef<HTMLImageElement | null>(null);
 
   // State
   const [sites, setSites] = useState<LayoutSite[]>(initialData?.sites || []);
@@ -166,6 +171,8 @@ export function SiteLayoutEditor({
   const [historyIndex, setHistoryIndex] = useState(-1);
   const [showLayers, setShowLayers] = useState(true);
   const [nextSiteNumber, setNextSiteNumber] = useState(1);
+  const [showBackgroundImage, setShowBackgroundImage] = useState(true);
+  const [backgroundOpacity, setBackgroundOpacity] = useState(0.5);
 
   const canvasWidth = initialData?.canvasWidth || 1200;
   const canvasHeight = initialData?.canvasHeight || 800;
@@ -424,6 +431,30 @@ export function SiteLayoutEditor({
     []
   );
 
+  // Load background image
+  useEffect(() => {
+    if (!backgroundImageUrl) {
+      backgroundImageRef.current = null;
+      return;
+    }
+
+    const img = new Image();
+    img.crossOrigin = "anonymous";
+    img.onload = () => {
+      backgroundImageRef.current = img;
+      // Trigger re-render to draw the image
+      const canvas = canvasRef.current;
+      if (canvas) {
+        canvas.dispatchEvent(new Event("redraw"));
+      }
+    };
+    img.onerror = () => {
+      console.error("Failed to load background image:", backgroundImageUrl);
+      backgroundImageRef.current = null;
+    };
+    img.src = backgroundImageUrl;
+  }, [backgroundImageUrl]);
+
   // Keyboard shortcuts
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -473,6 +504,32 @@ export function SiteLayoutEditor({
     // Draw background
     ctx.fillStyle = "#f8fafc";
     ctx.fillRect(0, 0, canvasWidth, canvasHeight);
+
+    // Draw background image if available
+    if (showBackgroundImage && backgroundImageRef.current) {
+      ctx.globalAlpha = backgroundOpacity;
+      // Scale image to fit canvas while maintaining aspect ratio
+      const img = backgroundImageRef.current;
+      const imgAspect = img.width / img.height;
+      const canvasAspect = canvasWidth / canvasHeight;
+      let drawWidth = canvasWidth;
+      let drawHeight = canvasHeight;
+      let drawX = 0;
+      let drawY = 0;
+
+      if (imgAspect > canvasAspect) {
+        // Image is wider - fit to width
+        drawHeight = canvasWidth / imgAspect;
+        drawY = (canvasHeight - drawHeight) / 2;
+      } else {
+        // Image is taller - fit to height
+        drawWidth = canvasHeight * imgAspect;
+        drawX = (canvasWidth - drawWidth) / 2;
+      }
+
+      ctx.drawImage(img, drawX, drawY, drawWidth, drawHeight);
+      ctx.globalAlpha = 1;
+    }
 
     // Draw grid
     if (showGrid) {
@@ -551,7 +608,7 @@ export function SiteLayoutEditor({
     });
 
     ctx.restore();
-  }, [sites, elements, selectedIds, zoom, pan, showGrid, gridSize, canvasWidth, canvasHeight]);
+  }, [sites, elements, selectedIds, zoom, pan, showGrid, gridSize, canvasWidth, canvasHeight, showBackgroundImage, backgroundOpacity, backgroundImageUrl]);
 
   // Handle save
   const handleSave = () => {
@@ -581,6 +638,25 @@ export function SiteLayoutEditor({
     a.download = "campground-layout.json";
     a.click();
     URL.revokeObjectURL(url);
+  };
+
+  // Handle background image import
+  const handleImportBackgroundImage = () => {
+    const input = document.createElement("input");
+    input.type = "file";
+    input.accept = "image/*";
+    input.onchange = (e) => {
+      const file = (e.target as HTMLInputElement).files?.[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = () => {
+        const dataUrl = reader.result as string;
+        onBackgroundImageChange?.(dataUrl);
+      };
+      reader.readAsDataURL(file);
+    };
+    input.click();
   };
 
   const selectedSite = sites.find((s) => selectedIds.includes(s.id));
@@ -744,6 +820,50 @@ export function SiteLayoutEditor({
                 </TooltipTrigger>
                 <TooltipContent>Toggle Grid</TooltipContent>
               </Tooltip>
+            </div>
+
+            {/* Background Image Controls */}
+            <div className="flex items-center gap-1 border-r pr-2">
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button variant="outline" size="sm" onClick={handleImportBackgroundImage}>
+                    <Upload className="h-4 w-4 mr-1" />
+                    Map Image
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>Import background map image</TooltipContent>
+              </Tooltip>
+
+              {backgroundImageUrl && (
+                <>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button
+                        variant={showBackgroundImage ? "default" : "ghost"}
+                        size="icon"
+                        onClick={() => setShowBackgroundImage(!showBackgroundImage)}
+                      >
+                        {showBackgroundImage ? <Eye className="h-4 w-4" /> : <EyeOff className="h-4 w-4" />}
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>{showBackgroundImage ? "Hide" : "Show"} Background</TooltipContent>
+                  </Tooltip>
+
+                  <div className="flex items-center gap-1 ml-1">
+                    <span className="text-xs text-slate-500">Opacity:</span>
+                    <input
+                      type="range"
+                      min="0.1"
+                      max="1"
+                      step="0.1"
+                      value={backgroundOpacity}
+                      onChange={(e) => setBackgroundOpacity(parseFloat(e.target.value))}
+                      className="w-16 h-1 accent-emerald-600"
+                    />
+                    <span className="text-xs text-slate-500 w-8">{Math.round(backgroundOpacity * 100)}%</span>
+                  </div>
+                </>
+              )}
             </div>
 
             {/* Spacer */}

@@ -24,14 +24,22 @@ import { Badge } from "@/components/ui/badge";
 
 // Dynamic import for maplibre-gl
 let maplibregl: any = null;
+let MapLibreMap: any = null;
+let NavigationControl: any = null;
+let Marker: any = null;
+let Popup: any = null;
 
 const loadMapLibre = async () => {
   if (!maplibregl) {
     const mapLibreModule = await import("maplibre-gl");
     await import("maplibre-gl/dist/maplibre-gl.css");
     maplibregl = mapLibreModule.default;
+    MapLibreMap = mapLibreModule.Map;
+    NavigationControl = mapLibreModule.NavigationControl;
+    Marker = mapLibreModule.Marker;
+    Popup = mapLibreModule.Popup;
   }
-  return maplibregl;
+  return { maplibregl, MapLibreMap, NavigationControl, Marker, Popup };
 };
 
 // Free tile style - OpenFreeMap (no API key needed)
@@ -163,10 +171,10 @@ export function CampgroundSearchMap({
 
     let isMounted = true;
 
-    loadMapLibre().then((ml) => {
+    loadMapLibre().then(({ MapLibreMap: MapClass, NavigationControl: NavControl }) => {
       if (!isMounted || !containerRef.current) return;
 
-      const map = new ml.Map({
+      const map = new MapClass({
         container: containerRef.current,
         style: FREE_MAP_STYLE,
         center: initialCenter,
@@ -174,7 +182,7 @@ export function CampgroundSearchMap({
         attributionControl: true,
       });
 
-      map.addControl(new ml.NavigationControl(), "top-right");
+      map.addControl(new NavControl(), "top-right");
 
       map.on("load", () => {
         if (isMounted) {
@@ -272,7 +280,7 @@ export function CampgroundSearchMap({
           });
         });
 
-        const marker = new maplibregl.Marker({ element: el })
+        const marker = new Marker({ element: el })
           .setLngLat([avgLng, avgLat])
           .addTo(mapRef.current);
 
@@ -323,7 +331,7 @@ export function CampgroundSearchMap({
             .addTo(mapRef.current);
         });
 
-        const marker = new maplibregl.Marker({ element: el })
+        const marker = new Marker({ element: el })
           .setLngLat([campground.longitude, campground.latitude])
           .addTo(mapRef.current);
 
@@ -361,7 +369,7 @@ export function CampgroundSearchMap({
           const el = document.createElement("div");
           el.className = "w-4 h-4 bg-blue-500 rounded-full border-2 border-white shadow-lg animate-pulse";
 
-          new maplibregl.Marker({ element: el })
+          new Marker({ element: el })
             .setLngLat([longitude, latitude])
             .addTo(mapRef.current);
 
