@@ -303,9 +303,9 @@ export function CampgroundCard({
                                     <span className="text-slate-500">({reviewCount} reviews)</span>
                                 )}
                             </>
-                        ) : (
+                        ) : !isExternal ? (
                             <span className="text-slate-500">{compact ? "New" : "Reviews coming soon"}</span>
-                        )}
+                        ) : null}
                     </div>
                     {ratingBadge && !compact && (
                         <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 text-[11px] font-semibold">
