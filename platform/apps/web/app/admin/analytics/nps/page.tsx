@@ -32,6 +32,8 @@ import {
   BreakdownPie,
   DataTable,
   DateRangePicker,
+  NpsGauge,
+  DivergingBar,
 } from "@/components/analytics";
 
 // Mock data
@@ -212,14 +214,14 @@ export default function NpsAnalyticsPage() {
       <div className="flex items-center justify-between">
         <div>
           <div className="flex items-center gap-3">
-            <h1 className="text-2xl font-bold text-white">NPS Analytics</h1>
+            <h1 className="text-2xl font-bold text-slate-900 dark:text-white">NPS Analytics</h1>
             {isUsingMockData && (
-              <Badge className="bg-amber-600/20 text-amber-400 border border-amber-600/50">
+              <Badge className="bg-amber-100 dark:bg-amber-600/20 text-amber-700 dark:text-amber-400 border border-amber-300 dark:border-amber-600/50">
                 Demo Data
               </Badge>
             )}
           </div>
-          <p className="text-slate-400 mt-1">
+          <p className="text-slate-600 dark:text-slate-400 mt-1">
             Net Promoter Score tracking and guest sentiment analysis
           </p>
         </div>
@@ -228,97 +230,55 @@ export default function NpsAnalyticsPage() {
 
       {/* Main NPS Score Card */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <Card className={`border ${getNpsBgColor(data.overview.score)}`}>
-          <CardContent className="p-6">
-            <div className="text-center">
-              <p className="text-sm text-slate-400 mb-2">Platform NPS Score</p>
-              <p className={`text-6xl font-bold ${getNpsColor(data.overview.score)}`}>
-                {data.overview.score}
-              </p>
-              <p className={`text-lg font-medium ${getNpsColor(data.overview.score)} mt-1`}>
-                {getNpsLabel(data.overview.score)}
-              </p>
-              {data.overview.scoreTrend !== null && (
-                <div className="flex items-center justify-center gap-1 mt-3">
-                  {data.overview.scoreTrend > 0 ? (
-                    <TrendingUp className="h-4 w-4 text-green-400" />
-                  ) : data.overview.scoreTrend < 0 ? (
-                    <TrendingDown className="h-4 w-4 text-red-400" />
-                  ) : (
-                    <Minus className="h-4 w-4 text-slate-400" />
-                  )}
-                  <span className={data.overview.scoreTrend >= 0 ? "text-green-400" : "text-red-400"}>
-                    {data.overview.scoreTrend > 0 ? "+" : ""}{data.overview.scoreTrend} pts
-                  </span>
-                  <span className="text-slate-500 text-sm">vs previous period</span>
-                </div>
-              )}
-              {/* YoY Comparison */}
-              {data.overview.yoyScore !== null && data.overview.yoyScore !== undefined && (
-                <div className="mt-4 pt-4 border-t border-slate-600/50">
-                  <p className="text-xs text-slate-500 mb-1">Year-over-Year</p>
-                  <div className="flex items-center justify-center gap-2">
-                    {data.overview.yoyChange !== null && data.overview.yoyChange > 0 ? (
-                      <TrendingUp className="h-4 w-4 text-green-400" />
-                    ) : data.overview.yoyChange !== null && data.overview.yoyChange < 0 ? (
-                      <TrendingDown className="h-4 w-4 text-red-400" />
-                    ) : (
-                      <Minus className="h-4 w-4 text-slate-400" />
-                    )}
-                    <span className={data.overview.yoyChange !== null && data.overview.yoyChange >= 0 ? "text-green-400 font-semibold" : "text-red-400 font-semibold"}>
-                      {data.overview.yoyChange !== null && data.overview.yoyChange > 0 ? "+" : ""}{data.overview.yoyChange} pts
-                    </span>
-                    <span className="text-slate-500 text-sm">
-                      (was {data.overview.yoyScore})
-                    </span>
-                  </div>
-                </div>
-              )}
-            </div>
-          </CardContent>
-        </Card>
+        <NpsGauge
+          score={data.overview.score}
+          scoreTrend={data.overview.scoreTrend}
+          yoyScore={data.overview.yoyScore}
+          yoyChange={data.overview.yoyChange}
+          loading={loading}
+        />
 
-        <Card className="bg-slate-800/50 border-slate-700">
+        <Card className="border-slate-200 dark:border-slate-700">
           <CardContent className="p-6">
             <div className="grid grid-cols-3 gap-4 text-center">
               <div>
                 <div className="flex items-center justify-center gap-2 mb-2">
-                  <ThumbsUp className="h-5 w-5 text-green-400" />
+                  <ThumbsUp className="h-5 w-5 text-green-500 dark:text-green-400" />
                 </div>
-                <p className="text-2xl font-bold text-green-400">{data.overview.promoters}</p>
-                <p className="text-xs text-slate-400">Promoters</p>
-                <p className="text-sm text-green-400">{data.overview.promoterPercentage.toFixed(0)}%</p>
+                <p className="text-2xl font-bold text-green-600 dark:text-green-400">{data.overview.promoters}</p>
+                <p className="text-xs text-slate-500 dark:text-slate-400">Promoters</p>
+                <p className="text-sm text-green-600 dark:text-green-400">{data.overview.promoterPercentage.toFixed(0)}%</p>
               </div>
               <div>
                 <div className="flex items-center justify-center gap-2 mb-2">
-                  <Minus className="h-5 w-5 text-amber-400" />
+                  <Minus className="h-5 w-5 text-amber-500 dark:text-amber-400" />
                 </div>
-                <p className="text-2xl font-bold text-amber-400">{data.overview.passives}</p>
-                <p className="text-xs text-slate-400">Passives</p>
-                <p className="text-sm text-amber-400">{data.overview.passivePercentage.toFixed(0)}%</p>
+                <p className="text-2xl font-bold text-amber-600 dark:text-amber-400">{data.overview.passives}</p>
+                <p className="text-xs text-slate-500 dark:text-slate-400">Passives</p>
+                <p className="text-sm text-amber-600 dark:text-amber-400">{data.overview.passivePercentage.toFixed(0)}%</p>
               </div>
               <div>
                 <div className="flex items-center justify-center gap-2 mb-2">
-                  <ThumbsDown className="h-5 w-5 text-red-400" />
+                  <ThumbsDown className="h-5 w-5 text-red-500 dark:text-red-400" />
                 </div>
-                <p className="text-2xl font-bold text-red-400">{data.overview.detractors}</p>
-                <p className="text-xs text-slate-400">Detractors</p>
-                <p className="text-sm text-red-400">{data.overview.detractorPercentage.toFixed(0)}%</p>
+                <p className="text-2xl font-bold text-red-600 dark:text-red-400">{data.overview.detractors}</p>
+                <p className="text-xs text-slate-500 dark:text-slate-400">Detractors</p>
+                <p className="text-sm text-red-600 dark:text-red-400">{data.overview.detractorPercentage.toFixed(0)}%</p>
               </div>
             </div>
-            <div className="mt-4 pt-4 border-t border-slate-700">
+            <div className="mt-4 pt-4 border-t border-slate-200 dark:border-slate-700">
               <div className="flex justify-between text-sm">
-                <span className="text-slate-400">Total Responses</span>
-                <span className="text-white font-medium">{data.overview.totalResponses.toLocaleString()}</span>
+                <span className="text-slate-500 dark:text-slate-400">Total Responses</span>
+                <span className="text-slate-900 dark:text-white font-medium">{data.overview.totalResponses.toLocaleString()}</span>
               </div>
               <div className="flex justify-between text-sm mt-2">
-                <span className="text-slate-400">Response Rate</span>
-                <span className="text-white font-medium">{data.overview.responseRate.toFixed(1)}%</span>
+                <span className="text-slate-500 dark:text-slate-400">Response Rate</span>
+                <span className="text-slate-900 dark:text-white font-medium">{data.overview.responseRate.toFixed(1)}%</span>
               </div>
               {data.overview.yoyResponses !== null && data.overview.yoyResponses !== undefined && (
                 <div className="flex justify-between text-sm mt-2">
-                  <span className="text-slate-400">YoY Response Growth</span>
-                  <span className={data.overview.yoyResponsesChange !== null && data.overview.yoyResponsesChange >= 0 ? "text-green-400 font-medium" : "text-red-400 font-medium"}>
+                  <span className="text-slate-500 dark:text-slate-400">YoY Response Growth</span>
+                  <span className={data.overview.yoyResponsesChange !== null && data.overview.yoyResponsesChange >= 0 ? "text-green-600 dark:text-green-400 font-medium" : "text-red-600 dark:text-red-400 font-medium"}>
                     {data.overview.yoyResponsesChange !== null && data.overview.yoyResponsesChange > 0 ? "+" : ""}{data.overview.yoyResponsesChange?.toFixed(1)}%
                   </span>
                 </div>
@@ -412,15 +372,30 @@ export default function NpsAnalyticsPage() {
         />
       </div>
 
+      {/* NPS by Accommodation Type - Diverging Bar */}
+      <DivergingBar
+        title="NPS Breakdown by Accommodation Type"
+        description="Compare promoter vs detractor percentages across site types"
+        data={data.byAccommodationType.map(item => ({
+          label: item.segment.charAt(0).toUpperCase() + item.segment.slice(1),
+          positive: Math.round((item.promoters / item.responses) * 100),
+          negative: Math.round((item.detractors / item.responses) * 100),
+          neutral: Math.round(((item.responses - item.promoters - item.detractors) / item.responses) * 100),
+          score: item.score,
+        }))}
+        loading={loading}
+        maxValue={100}
+      />
+
       {/* Needs Attention - Worst Performing */}
       {data.worstCampgrounds && data.worstCampgrounds.length > 0 && (
-        <Card className="bg-red-500/5 border-red-500/20">
+        <Card className="bg-red-50 dark:bg-red-500/5 border-red-200 dark:border-red-500/20">
           <CardHeader>
             <div className="flex items-center gap-2">
-              <Frown className="h-5 w-5 text-red-400" />
-              <CardTitle className="text-lg text-white">Needs Attention</CardTitle>
+              <Frown className="h-5 w-5 text-red-500 dark:text-red-400" />
+              <CardTitle className="text-lg text-slate-900 dark:text-white">Needs Attention</CardTitle>
             </div>
-            <p className="text-sm text-slate-400">
+            <p className="text-sm text-slate-600 dark:text-slate-400">
               Campgrounds with lowest NPS scores - prioritize for improvement
             </p>
           </CardHeader>
@@ -428,25 +403,25 @@ export default function NpsAnalyticsPage() {
             <div className="overflow-x-auto">
               <table className="w-full">
                 <thead>
-                  <tr className="border-b border-slate-700">
-                    <th className="text-left py-3 px-4 text-sm font-medium text-slate-400">Campground</th>
-                    <th className="text-right py-3 px-4 text-sm font-medium text-slate-400">NPS</th>
-                    <th className="text-right py-3 px-4 text-sm font-medium text-slate-400">Responses</th>
-                    <th className="text-right py-3 px-4 text-sm font-medium text-slate-400">Detractors</th>
-                    <th className="text-left py-3 px-4 text-sm font-medium text-slate-400">Top Issues</th>
+                  <tr className="border-b border-red-200 dark:border-slate-700">
+                    <th className="text-left py-3 px-4 text-sm font-medium text-slate-600 dark:text-slate-400">Campground</th>
+                    <th className="text-right py-3 px-4 text-sm font-medium text-slate-600 dark:text-slate-400">NPS</th>
+                    <th className="text-right py-3 px-4 text-sm font-medium text-slate-600 dark:text-slate-400">Responses</th>
+                    <th className="text-right py-3 px-4 text-sm font-medium text-slate-600 dark:text-slate-400">Detractors</th>
+                    <th className="text-left py-3 px-4 text-sm font-medium text-slate-600 dark:text-slate-400">Top Issues</th>
                   </tr>
                 </thead>
                 <tbody>
                   {data.worstCampgrounds.map((cg, idx) => (
-                    <tr key={cg.campgroundId} className={idx % 2 === 0 ? "bg-slate-800/30" : ""}>
-                      <td className="py-3 px-4 text-sm text-white">{cg.campgroundName}</td>
+                    <tr key={cg.campgroundId} className={idx % 2 === 0 ? "bg-red-100/50 dark:bg-slate-800/30" : ""}>
+                      <td className="py-3 px-4 text-sm text-slate-900 dark:text-white">{cg.campgroundName}</td>
                       <td className={`py-3 px-4 text-sm text-right font-semibold ${getNpsColor(cg.score)}`}>
                         {cg.score}
                       </td>
-                      <td className="py-3 px-4 text-sm text-right text-slate-300">
+                      <td className="py-3 px-4 text-sm text-right text-slate-700 dark:text-slate-300">
                         {cg.responses.toLocaleString()}
                       </td>
-                      <td className="py-3 px-4 text-sm text-right text-red-400 font-medium">
+                      <td className="py-3 px-4 text-sm text-right text-red-600 dark:text-red-400 font-medium">
                         {cg.detractorPercentage}%
                       </td>
                       <td className="py-3 px-4">
@@ -454,7 +429,7 @@ export default function NpsAnalyticsPage() {
                           {cg.topIssues?.map((issue, i) => (
                             <Badge
                               key={i}
-                              className="bg-red-500/20 text-red-300 border-red-500/30 text-xs"
+                              className="bg-red-100 dark:bg-red-500/20 text-red-700 dark:text-red-300 border-red-300 dark:border-red-500/30 text-xs"
                             >
                               {issue}
                             </Badge>

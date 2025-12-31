@@ -6,6 +6,13 @@ export { DateRangePicker } from "./DateRangePicker";
 export { AiInsightCard, AiInsightCardSkeleton } from "./AiInsightCard";
 export { WebVitals, usePerformanceMark, useLongTaskMonitor } from "./WebVitals";
 export { CohortHeatmap } from "./CohortHeatmap";
+export { NpsGauge } from "./NpsGauge";
+export { DivergingBar } from "./DivergingBar";
+export { RadarChart } from "./RadarChart";
+export { WaterfallChart } from "./WaterfallChart";
+export { USStateHeatmap } from "./USStateHeatmap";
+export { SankeyDiagram } from "./SankeyDiagram";
+export { SlopeGraph } from "./SlopeGraph";
 
 // Analytics tracking components
 export {

@@ -10,6 +10,7 @@ import {
   DataTable,
   DateRangePicker,
   formatCurrency,
+  WaterfallChart,
 } from "@/components/analytics";
 
 export default function RevenueIntelligencePage() {
@@ -42,22 +43,33 @@ export default function RevenueIntelligencePage() {
 
   const hasData = data && data.overview && data.overview.totalRevenue > 0;
 
+  // Mock waterfall data for revenue bridge
+  const waterfallData = [
+    { label: "Prior Period", value: 425000, type: "start" as const },
+    { label: "New Bookings", value: 85000, type: "increase" as const },
+    { label: "Price Increases", value: 12500, type: "increase" as const },
+    { label: "Upsells & Add-ons", value: 8200, type: "increase" as const },
+    { label: "Cancellations", value: -15800, type: "decrease" as const },
+    { label: "Refunds", value: -6400, type: "decrease" as const },
+    { label: "Current Period", value: 508500, type: "total" as const },
+  ];
+
   if (!loading && !hasData) {
     return (
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold text-white">Revenue Intelligence</h1>
-            <p className="text-slate-400 mt-1">
+            <h1 className="text-2xl font-bold text-slate-900 dark:text-white">Revenue Intelligence</h1>
+            <p className="text-slate-600 dark:text-slate-400 mt-1">
               Deep dive into platform revenue metrics and trends
             </p>
           </div>
           <DateRangePicker value={dateRange} onChange={setDateRange} />
         </div>
         <div className="flex flex-col items-center justify-center py-12 text-center">
-          <DollarSign className="h-16 w-16 text-slate-600 mb-4" />
-          <h3 className="text-lg font-medium text-white mb-2">No Revenue Data Available</h3>
-          <p className="text-slate-400 max-w-md">
+          <DollarSign className="h-16 w-16 text-slate-400 dark:text-slate-600 mb-4" />
+          <h3 className="text-lg font-medium text-slate-900 dark:text-white mb-2">No Revenue Data Available</h3>
+          <p className="text-slate-600 dark:text-slate-400 max-w-md">
             There is no revenue data for the selected time period. Data will appear here once reservations are made.
           </p>
         </div>
@@ -70,8 +82,8 @@ export default function RevenueIntelligencePage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-white">Revenue Intelligence</h1>
-          <p className="text-slate-400 mt-1">
+          <h1 className="text-2xl font-bold text-slate-900 dark:text-white">Revenue Intelligence</h1>
+          <p className="text-slate-600 dark:text-slate-400 mt-1">
             Deep dive into platform revenue metrics and trends
           </p>
         </div>
@@ -159,6 +171,16 @@ export default function RevenueIntelligencePage() {
         height={250}
         formatYAxis={(v) => `$${v.toFixed(0)}`}
         formatTooltip={(v) => `$${v.toFixed(2)}`}
+        loading={loading}
+      />
+
+      {/* Revenue Bridge Waterfall */}
+      <WaterfallChart
+        title="Revenue Bridge"
+        description="How revenue changed from prior period to current period"
+        data={waterfallData}
+        height={350}
+        formatValue={(v) => `$${(v / 1000).toFixed(1)}K`}
         loading={loading}
       />
 

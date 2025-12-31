@@ -11,6 +11,7 @@ import {
   DataTable,
   DateRangePicker,
   formatCurrency,
+  SankeyDiagram,
 } from "@/components/analytics";
 
 export default function GuestJourneyPage() {
@@ -48,17 +49,17 @@ export default function GuestJourneyPage() {
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold text-white">Guest Journey Analytics</h1>
-            <p className="text-slate-400 mt-1">
+            <h1 className="text-2xl font-bold text-slate-900 dark:text-white">Guest Journey Analytics</h1>
+            <p className="text-slate-600 dark:text-slate-400 mt-1">
               Understand guest behavior, progression, and lifetime value
             </p>
           </div>
           <DateRangePicker value={dateRange} onChange={setDateRange} />
         </div>
         <div className="flex flex-col items-center justify-center py-12 text-center">
-          <Users className="h-16 w-16 text-slate-600 mb-4" />
-          <h3 className="text-lg font-medium text-white mb-2">No Guest Data Available</h3>
-          <p className="text-slate-400 max-w-md">
+          <Users className="h-16 w-16 text-slate-400 dark:text-slate-600 mb-4" />
+          <h3 className="text-lg font-medium text-slate-900 dark:text-white mb-2">No Guest Data Available</h3>
+          <p className="text-slate-600 dark:text-slate-400 max-w-md">
             There is no guest data for the selected time period. Data will appear here once guests make reservations.
           </p>
         </div>
@@ -71,8 +72,8 @@ export default function GuestJourneyPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-white">Guest Journey Analytics</h1>
-          <p className="text-slate-400 mt-1">
+          <h1 className="text-2xl font-bold text-slate-900 dark:text-white">Guest Journey Analytics</h1>
+          <p className="text-slate-600 dark:text-slate-400 mt-1">
             Understand guest behavior, progression, and lifetime value
           </p>
         </div>
@@ -117,63 +118,81 @@ export default function GuestJourneyPage() {
         />
       </div>
 
-      {/* Accommodation Progression */}
-      <Card className="bg-slate-800/50 border-slate-700">
-        <CardHeader>
-          <CardTitle className="text-lg text-white flex items-center gap-2">
-            <TrendingUp className="h-5 w-5 text-green-400" />
-            Accommodation Progression
-          </CardTitle>
-          <p className="text-sm text-slate-400">
-            How guests move between accommodation types over their journey
-          </p>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {/* Upgrade/Downgrade Rates */}
-            <div className="space-y-4">
-              <div className="p-4 bg-green-500/10 border border-green-500/30 rounded-lg">
-                <p className="text-sm text-green-400 font-medium">Upgrade Rate</p>
-                <p className="text-3xl font-bold text-white">
+      {/* Accommodation Progression Sankey */}
+      <SankeyDiagram
+        title="Accommodation Progression"
+        description="How guests flow between accommodation types over their journey"
+        nodes={[
+          { id: "tent", label: "Tent" },
+          { id: "rv", label: "RV" },
+          { id: "cabin", label: "Cabin" },
+          { id: "glamping", label: "Glamping" },
+          { id: "tent-return", label: "Tent" },
+          { id: "rv-return", label: "RV" },
+          { id: "cabin-return", label: "Cabin" },
+          { id: "glamping-return", label: "Glamping" },
+        ]}
+        links={
+          data?.accommodationProgression?.progressions?.map((prog: any) => ({
+            source: prog.fromType,
+            target: `${prog.toType}-return`,
+            value: prog.count,
+          })) || [
+            { source: "tent", target: "tent-return", value: 450 },
+            { source: "tent", target: "rv-return", value: 180 },
+            { source: "tent", target: "cabin-return", value: 120 },
+            { source: "rv", target: "rv-return", value: 680 },
+            { source: "rv", target: "cabin-return", value: 95 },
+            { source: "rv", target: "glamping-return", value: 45 },
+            { source: "cabin", target: "cabin-return", value: 320 },
+            { source: "cabin", target: "glamping-return", value: 85 },
+            { source: "glamping", target: "glamping-return", value: 150 },
+            { source: "glamping", target: "cabin-return", value: 35 },
+          ]
+        }
+        loading={loading}
+        formatValue={(v) => `${v.toLocaleString()} guests`}
+      />
+
+      {/* Upgrade/Downgrade Rates */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <Card className="bg-green-500/10 dark:bg-green-500/10 border-green-500/30">
+          <CardContent className="p-6">
+            <div className="flex items-center gap-4">
+              <div className="p-3 bg-green-500/20 rounded-lg">
+                <TrendingUp className="h-6 w-6 text-green-500" />
+              </div>
+              <div>
+                <p className="text-sm text-green-600 dark:text-green-400 font-medium">Upgrade Rate</p>
+                <p className="text-3xl font-bold text-slate-900 dark:text-white">
                   {data?.accommodationProgression?.upgradeRate?.toFixed(1) || 0}%
                 </p>
-                <p className="text-xs text-slate-400 mt-1">
+                <p className="text-xs text-slate-600 dark:text-slate-400 mt-1">
                   Guests moving to higher-tier accommodations
                 </p>
               </div>
-              <div className="p-4 bg-red-500/10 border border-red-500/30 rounded-lg">
-                <p className="text-sm text-red-400 font-medium">Downgrade Rate</p>
-                <p className="text-3xl font-bold text-white">
+            </div>
+          </CardContent>
+        </Card>
+        <Card className="bg-red-500/10 dark:bg-red-500/10 border-red-500/30">
+          <CardContent className="p-6">
+            <div className="flex items-center gap-4">
+              <div className="p-3 bg-red-500/20 rounded-lg">
+                <ArrowRight className="h-6 w-6 text-red-500 rotate-90" />
+              </div>
+              <div>
+                <p className="text-sm text-red-600 dark:text-red-400 font-medium">Downgrade Rate</p>
+                <p className="text-3xl font-bold text-slate-900 dark:text-white">
                   {data?.accommodationProgression?.downgradeRate?.toFixed(1) || 0}%
                 </p>
-                <p className="text-xs text-slate-400 mt-1">
+                <p className="text-xs text-slate-600 dark:text-slate-400 mt-1">
                   Guests moving to lower-tier accommodations
                 </p>
               </div>
             </div>
-
-            {/* Top Progressions */}
-            <div className="md:col-span-2">
-              <p className="text-sm font-medium text-slate-400 mb-3">Top Progression Paths</p>
-              <div className="space-y-2">
-                {(data?.accommodationProgression?.progressions || []).slice(0, 5).map((prog: any, idx: number) => (
-                  <div key={idx} className="flex items-center justify-between p-3 bg-slate-700/50 rounded-lg">
-                    <div className="flex items-center gap-3">
-                      <span className="text-white font-medium capitalize">{prog.fromType}</span>
-                      <ArrowRight className="h-4 w-4 text-slate-500" />
-                      <span className="text-white font-medium capitalize">{prog.toType}</span>
-                    </div>
-                    <div className="text-right">
-                      <span className="text-white font-medium">{prog.count}</span>
-                      <span className="text-slate-400 text-sm ml-2">({prog.percentage.toFixed(1)}%)</span>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
+      </div>
 
       {/* LTV Analysis */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
