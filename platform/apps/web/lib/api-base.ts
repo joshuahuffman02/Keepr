@@ -3,11 +3,6 @@
  *
  * For SSR (server-side rendering), we need to use the full backend URL
  * since Next.js rewrites only work for client-side requests.
- *
- * Priority:
- * 1. NEXT_PUBLIC_API_BASE environment variable (if set and non-empty)
- * 2. RAILWAY_ENVIRONMENT or NODE_ENV === "production": Railway API backend
- * 3. Development: localhost:4000
  */
 export function getServerApiBase(): string {
   // If explicitly set via env var (and not empty), use that
@@ -16,16 +11,18 @@ export function getServerApiBase(): string {
     return envApiBase;
   }
 
-  // Check for Railway environment or production mode
-  const isProduction =
-    process.env.RAILWAY_ENVIRONMENT === "production" ||
-    process.env.NODE_ENV === "production" ||
-    process.env.VERCEL_ENV === "production";
+  // Check if running locally (localhost detection)
+  // In Railway and other cloud environments, these won't be set
+  const isLocalDev =
+    process.env.NODE_ENV === "development" ||
+    process.env.HOSTNAME === "localhost" ||
+    process.env.npm_lifecycle_event === "dev";
 
-  if (isProduction) {
-    return "https://camp-everydayapi-production.up.railway.app";
+  if (isLocalDev) {
+    return "http://localhost:4000";
   }
 
-  // In development, use localhost
-  return "http://localhost:4000";
+  // Default to production Railway API URL for all other cases
+  // This handles Railway, Vercel, and any other cloud deployment
+  return "https://camp-everydayapi-production.up.railway.app";
 }
