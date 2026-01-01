@@ -1455,27 +1455,9 @@ export default function SeasonalsPage() {
         { credentials: "include", headers: getAuthHeaders() }
       );
       if (!response.ok) {
-        // Return mock data for now if API not ready
-        return {
-          totalSeasonals: 0,
-          activeSeasonals: 0,
-          renewalRate: 0,
-          contractsSigned: 0,
-          contractsTotal: 0,
-          paymentsCurrent: 0,
-          paymentsPastDue: 0,
-          paymentsPaidAhead: 0,
-          totalMonthlyRevenue: 0,
-          averageTenure: 0,
-          longestTenure: 0,
-          waitlistCount: 0,
-          combinedTenureYears: 0,
-          renewalsByIntent: { committed: 0, likely: 0, undecided: 0, not_renewing: 0 },
-          churnRiskGuests: [],
-          paymentAging: { current: 0, days30: 0, days60: 0, days90Plus: 0 },
-          needsAttention: { pastDuePayments: 0, expiringContracts: 0, expiredInsurance: 0, pendingRenewals: 0, unsignedContracts: 0 },
-          milestones: [],
-        } as DashboardStats;
+        const errorData = await response.json().catch(() => ({}));
+        console.error("[Seasonals Stats] API error:", response.status, errorData);
+        throw new Error(errorData.message || `Stats API failed: ${response.status}`);
       }
       return response.json() as Promise<DashboardStats>;
     },
