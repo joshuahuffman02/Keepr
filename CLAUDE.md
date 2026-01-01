@@ -56,6 +56,54 @@ pnpm lint:web               # Lint web app
 
 ---
 
+## Database & API Generation
+
+This project uses SchemaForge for schema-driven development.
+
+### Workflow
+1. Define/modify data models in `schema.forge`
+2. Run `npx schemaforge generate` to regenerate all code
+3. Run `npx schemaforge migrate push` to update the database (dev)
+4. Run `npx schemaforge seed` to populate test data
+
+### Schema Location
+- Schema file: `schema.forge`
+- Generated code: `./generated/`
+
+### Key Commands
+```bash
+npx schemaforge generate          # Regenerate all code from schema
+npx schemaforge diff              # Preview changes before regenerating
+npx schemaforge migrate push      # Push schema to database (dev)
+npx schemaforge migrate create    # Create migration file (prod)
+npx schemaforge seed              # Generate and run test data
+```
+
+### Schema Syntax
+```
+model Post @softDelete {
+  id        String   @id @default(uuid)
+  title     String   @min(1) @max(200)
+  content   String?  @ui(inputType: "textarea")
+  published Boolean  @default(false)
+  author    User     @relation(fields: [authorId], references: [id])
+  authorId  String
+  createdAt DateTime @default(now)
+}
+```
+
+### Available Attributes
+- `@id` - Primary key
+- `@default(uuid|now|value)` - Default values
+- `@unique` - Unique constraint
+- `@softDelete` - Model-level soft delete
+- `@ui(inputType, label, placeholder)` - Form hints
+- `@min(n)` / `@max(n)` - Validation
+
+**DO NOT manually edit files in `./generated/` - they will be overwritten.**
+
+---
+
 ## CRITICAL GUARDRAILS
 
 **DO NOT modify these without explicit approval:**
