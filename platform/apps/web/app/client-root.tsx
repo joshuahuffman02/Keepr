@@ -9,6 +9,7 @@ import { SkipToContent } from "@/components/ui/skip-to-content";
 import { SyncStatusProvider } from "@/contexts/SyncStatusContext";
 import { FeatureTourProvider } from "@/components/tours/FeatureTourProvider";
 import { WebVitals } from "@/components/analytics/WebVitals";
+import { EasterEggsProvider } from "@/contexts/EasterEggsContext";
 
 interface WindowWithSW extends Window {
   __forceSWUpdate?: () => void;
@@ -60,11 +61,13 @@ export default function ClientRoot({ children }: { children: ReactNode }) {
   return (
     <SyncStatusProvider>
       <FeatureTourProvider>
-        <SkipToContent />
-        {children}
-        <FloatingTicketWidget />
-        <Toaster />
-        <WebVitals />
+        <EasterEggsProvider>
+          <SkipToContent />
+          {children}
+          <FloatingTicketWidget />
+          <Toaster />
+          <WebVitals />
+        </EasterEggsProvider>
       </FeatureTourProvider>
     </SyncStatusProvider>
   );

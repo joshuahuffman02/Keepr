@@ -1,5 +1,7 @@
 import { ReactNode } from "react";
 import { PublicHeader } from "../../components/public/PublicHeader";
+import { ActivityFeed } from "../../components/public/ActivityFeed";
+import { ScrollProgressIndicator } from "../../components/ui/scroll-progress-indicator";
 
 export default function PublicLayout({ children }: { children: ReactNode }) {
     return (
@@ -8,6 +10,10 @@ export default function PublicLayout({ children }: { children: ReactNode }) {
             <main className="pt-20">
                 {children}
             </main>
+
+            {/* Personality features */}
+            <ActivityFeed />
+            <ScrollProgressIndicator />
 
             {/* Footer */}
             <footer className="bg-slate-900 text-white mt-20">

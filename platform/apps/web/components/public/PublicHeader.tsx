@@ -16,6 +16,7 @@ import {
     Building2,
     ChevronDown
 } from "lucide-react";
+import { useEasterEggs } from "@/contexts/EasterEggsContext";
 
 // Extend session type to include campgrounds
 interface ExtendedSession {
@@ -41,6 +42,7 @@ export function PublicHeader() {
     const [profileOpen, setProfileOpen] = useState(false);
     const profileRef = useRef<HTMLDivElement>(null);
     const isLoading = status === "loading";
+    const { handleLogoClick } = useEasterEggs();
 
     // Check if user has campground access (owner/manager)
     const hasCampgroundAccess = session?.campgrounds && session.campgrounds.length > 0;
@@ -209,7 +211,7 @@ export function PublicHeader() {
         <header className="fixed top-0 left-0 right-0 z-50 bg-white/85 backdrop-blur-xl border-b border-slate-200/60">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3 sm:py-4 flex items-center justify-between gap-3">
                 {/* Logo */}
-                <Link href="/" className="flex items-center gap-3 group min-w-0">
+                <Link href="/" className="flex items-center gap-3 group min-w-0" onClick={handleLogoClick}>
                     <div className="relative w-10 h-10 sm:w-12 sm:h-12 transition-transform group-hover:scale-105">
                         <Image
                             src="/logo.png"
