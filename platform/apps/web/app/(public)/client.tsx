@@ -3,10 +3,9 @@
 import { useQuery } from "@tanstack/react-query";
 import { useState, useMemo, useEffect, useRef, useCallback } from "react";
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
-import Link from "next/link";
 import Image from "next/image";
 import { motion, useInView, useReducedMotion } from "framer-motion";
-import { Search, Calendar } from "lucide-react";
+import { Search, Calendar, Sparkles } from "lucide-react";
 import { CampgroundCard } from "../../components/public/CampgroundCard";
 import { CategoryTabs, categories, type CategoryType } from "../../components/public/CategoryTabs";
 import { LocationSections } from "../../components/public/LocationSections";
@@ -16,9 +15,8 @@ import type { AdaCertificationLevel } from "../../lib/ada-accessibility";
 import { trackEvent } from "@/lib/analytics";
 import { HeroBanner } from "../../components/public/HeroBanner";
 import { ValueStack } from "../../components/public/ValueStack";
-import { UrgencySection } from "../../components/public/UrgencySection";
-import { OwnerCTA } from "../../components/public/OwnerCTA";
 import { CharityImpactSection } from "../../components/charity/CharityImpactSection";
+import { InlineActivityFeed } from "../../components/public/InlineActivityFeed";
 
 // Animation variants for scroll reveal
 const fadeInUp = {
@@ -38,111 +36,6 @@ const scaleIn = {
     hidden: { opacity: 0, scale: 0.95 },
     visible: { opacity: 1, scale: 1, transition: { duration: 0.5, ease: "easeOut" as const } }
 } as const;
-
-// Blog posts data
-const blogPosts = [
-    {
-        href: "/blog/camper-tips/01-first-time-camping-checklist",
-        category: "Camper Tips",
-        categoryColor: "emerald",
-        title: "First-Time Camping Checklist: Everything You Need",
-        description: "Planning your first camping trip? The key to a great experience is preparation. This comprehensive checklist covers everything you need."
-    },
-    {
-        href: "/blog/industry/01-camping-industry-trends-2024",
-        category: "Industry Trends",
-        categoryColor: "violet",
-        title: "State of the Camping Industry: 2024 Trends",
-        description: "Explore the latest camping industry trends for 2024. Data, insights, and what campground owners need to know about the future."
-    },
-    {
-        href: "/blog/growth/01-increase-off-season-bookings",
-        category: "Growth",
-        categoryColor: "amber",
-        title: "10 Ways to Increase Off-Season Bookings",
-        description: "Boost off-season campground revenue with proven strategies. Learn events, pricing, marketing, and partnerships that fill sites."
-    }
-];
-
-// Blog Section with scroll animations
-function BlogSection({ prefersReducedMotion }: { prefersReducedMotion: boolean | null }) {
-    const blogRef = useRef(null);
-    const blogInView = useInView(blogRef, { once: true, margin: "-100px" });
-
-    const categoryColors: Record<string, string> = {
-        emerald: "text-emerald-600 group-hover:text-emerald-600",
-        violet: "text-violet-600 group-hover:text-violet-600",
-        amber: "text-amber-600 group-hover:text-amber-600"
-    };
-
-    return (
-        <section className="py-20 bg-slate-50" ref={blogRef}>
-            <div className="max-w-7xl mx-auto px-6">
-                <motion.div
-                    className="flex flex-col md:flex-row items-center justify-between gap-8 mb-12"
-                    variants={prefersReducedMotion ? undefined : fadeInUp}
-                    initial="hidden"
-                    animate={blogInView ? "visible" : "hidden"}
-                >
-                    <div>
-                        <h2 className="text-2xl md:text-3xl font-bold text-slate-900 mb-4">
-                            Latest from the Blog
-                        </h2>
-                        <p className="text-slate-600 max-w-xl">
-                            Tips, guides, and industry insights to help you get the most out of your camping experience.
-                        </p>
-                    </div>
-                    <Link
-                        href="/blog"
-                        className="inline-flex items-center gap-2 px-6 py-3 bg-white text-slate-900 border border-slate-200 font-semibold rounded-lg hover:border-emerald-500 hover:text-emerald-600 transition-colors group"
-                    >
-                        View All Posts
-                        <svg className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
-                        </svg>
-                    </Link>
-                </motion.div>
-
-                <motion.div
-                    className="grid md:grid-cols-3 gap-6"
-                    variants={prefersReducedMotion ? undefined : staggerContainer}
-                    initial="hidden"
-                    animate={blogInView ? "visible" : "hidden"}
-                >
-                    {blogPosts.map((post, index) => (
-                        <motion.div
-                            key={post.href}
-                            variants={prefersReducedMotion ? undefined : scaleIn}
-                            custom={index}
-                        >
-                            <Link
-                                href={post.href}
-                                className="bg-white rounded-2xl overflow-hidden shadow-sm border border-slate-100 group cursor-pointer hover:shadow-md transition-shadow block h-full"
-                            >
-                                <div className="p-6">
-                                    <span className={`text-xs font-semibold uppercase tracking-wider mb-2 block ${categoryColors[post.categoryColor]}`}>
-                                        {post.category}
-                                    </span>
-                                    <h3 className={`text-lg font-bold text-slate-900 mb-2 transition-colors ${categoryColors[post.categoryColor]}`}>
-                                        {post.title}
-                                    </h3>
-                                    <p className="text-slate-600 text-sm mb-4 line-clamp-3">
-                                        {post.description}
-                                    </p>
-                                    <span className="text-sm font-semibold text-slate-900 flex items-center gap-1 group-hover:gap-2 transition-all">
-                                        Read Article <span aria-hidden="true">→</span>
-                                    </span>
-                                </div>
-                            </Link>
-                        </motion.div>
-                    ))}
-                </motion.div>
-            </div>
-        </section>
-    );
-}
-
-// Note: External campgrounds removed - only showing campgrounds from our database
 
 // US States for filter
 const US_STATES = [
@@ -407,27 +300,28 @@ export function HomeClient() {
             });
         }
 
-        // Apply sorting
-        switch (sortBy) {
-            case "name":
-                filtered.sort((a, b) => a.name.localeCompare(b.name));
-                break;
-            case "rating":
-                filtered.sort((a, b) => (b.rating ?? 0) - (a.rating ?? 0));
-                break;
-            case "reviews":
-                filtered.sort((a, b) => (b.reviewCount ?? 0) - (a.reviewCount ?? 0));
-                break;
-            case "recommended":
-            default:
-                // Sort by a combination of rating and review count
-                filtered.sort((a, b) => {
+        // Apply sorting - always prioritize internal (bookable) campgrounds first
+        filtered.sort((a, b) => {
+            // Internal campgrounds always come first
+            if (a.isInternal && !b.isInternal) return -1;
+            if (!a.isInternal && b.isInternal) return 1;
+
+            // Then apply the selected sort within each group
+            switch (sortBy) {
+                case "name":
+                    return a.name.localeCompare(b.name);
+                case "rating":
+                    return (b.rating ?? 0) - (a.rating ?? 0);
+                case "reviews":
+                    return (b.reviewCount ?? 0) - (a.reviewCount ?? 0);
+                case "recommended":
+                default:
+                    // Sort by a combination of rating and review count
                     const scoreA = ((a.rating ?? 0) * 20) + Math.min(a.reviewCount ?? 0, 100);
                     const scoreB = ((b.rating ?? 0) * 20) + Math.min(b.reviewCount ?? 0, 100);
                     return scoreB - scoreA;
-                });
-                break;
-        }
+            }
+        });
 
         return filtered;
     }, [internalCampgrounds, searchQuery, searchFilters, stateFilter, activeCategory, amenityFilters, sortBy]);
@@ -450,6 +344,9 @@ export function HomeClient() {
         <div className="min-h-screen max-w-[480px] mx-auto sm:max-w-none sm:mx-0">
             {/* Hero Section with Hormozi-style messaging */}
             <HeroBanner onSearch={handleSearch} />
+
+            {/* Live Activity Feed - Social proof inline after hero */}
+            <InlineActivityFeed className="border-b border-slate-100" />
 
             {/* Category Navigation - Airbnb-style tabs */}
             <div className="sticky top-0 z-40 bg-white/95 backdrop-blur-sm border-b border-slate-100 shadow-sm">
@@ -667,9 +564,10 @@ export function HomeClient() {
                                     // Clear all URL params
                                     router.replace(pathname, { scroll: false });
                                 }}
-                                className="px-3 py-1.5 text-sm rounded-full border border-red-200 bg-red-50 text-red-600 hover:bg-red-100 transition-colors"
+                                className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm rounded-full border border-emerald-200 bg-emerald-50 text-emerald-700 hover:bg-emerald-100 transition-colors"
                             >
-                                Clear All
+                                <Sparkles className="w-3.5 h-3.5" />
+                                Start Fresh
                             </button>
                         )}
                     </div>
@@ -853,11 +751,12 @@ export function HomeClient() {
                             <div className="flex justify-center mt-8">
                                 <button
                                     onClick={() => setDisplayCount((prev) => prev + 24)}
-                                    className="px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-medium rounded-lg transition-colors flex items-center gap-2"
+                                    className="px-6 py-3 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-medium rounded-lg transition-all shadow-lg shadow-emerald-500/20 hover:shadow-emerald-500/30 flex items-center gap-2"
                                 >
-                                    Load More
-                                    <span className="text-emerald-200">
-                                        ({Math.min(displayCount + 24, allCampgrounds.length) - displayCount} more of {allCampgrounds.length - displayCount} remaining)
+                                    <Sparkles className="w-4 h-4" />
+                                    Discover More Treasures
+                                    <span className="text-emerald-100 text-sm">
+                                        ({allCampgrounds.length - displayCount} adventures await)
                                     </span>
                                 </button>
                             </div>
@@ -881,44 +780,34 @@ export function HomeClient() {
                                 sizes="128px"
                             />
                         </div>
-                        <h3 className="text-xl font-semibold text-slate-900 mb-2">No campgrounds found</h3>
-                        <p className="text-slate-600">Try adjusting your search or filters</p>
+                        <h3 className="text-xl font-semibold text-slate-900 mb-2">
+                            Even our best scouts came up empty...
+                        </h3>
+                        <p className="text-slate-600 mb-4">
+                            But new adventures await! Try adjusting your search or explore different destinations.
+                        </p>
+                        <button
+                            onClick={() => {
+                                setSearchQuery("");
+                                setStateFilter("");
+                                setAmenityFilters([]);
+                                setActiveCategory("all");
+                                router.replace(pathname, { scroll: false });
+                            }}
+                            className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-emerald-700 bg-emerald-50 rounded-lg hover:bg-emerald-100 transition-colors"
+                        >
+                            <Sparkles className="w-4 h-4" />
+                            Start Fresh
+                        </button>
                     </motion.div>
                 )}
             </section>
 
-            {/* Value Stack - Why Book With Camp Everyday */}
-            <ValueStack />
-
-            {/* Urgency Section - Popular This Weekend */}
-            <UrgencySection
-                campgrounds={allCampgrounds.map((cg) => ({
-                    id: cg.id,
-                    name: cg.name,
-                    slug: "slug" in cg ? cg.slug : undefined,
-                    city: cg.city || undefined,
-                    state: cg.state || undefined,
-                    country: "country" in cg ? (cg.country || undefined) : undefined,
-                    heroImageUrl: "heroImageUrl" in cg ? (cg.heroImageUrl || undefined) : undefined,
-                    isInternal: cg.isInternal,
-                    rating: cg.rating,
-                    reviewCount: cg.reviewCount,
-                    pricePerNight: "pricePerNight" in cg ? cg.pricePerNight : undefined,
-                    amenities: "amenities" in cg ? cg.amenities : [],
-                    npsBadge: cg.npsBadge,
-                    pastAwards: "pastAwards" in cg ? cg.pastAwards : [],
-                    availableSites: Math.floor(Math.random() * 8) + 1, // Stubbed for now
-                }))}
-            />
-
-            {/* Blog CTA Section */}
-            <BlogSection prefersReducedMotion={prefersReducedMotion} />
-
-            {/* Charity Impact Section */}
+            {/* Charity Impact Section - The heart of Camp Everyday */}
             <CharityImpactSection />
 
-            {/* Owner CTA Section */}
-            <OwnerCTA />
+            {/* Value Stack - Why Book With Camp Everyday (condensed) */}
+            <ValueStack />
         </div>
     );
 }

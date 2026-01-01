@@ -19,7 +19,7 @@ interface HeroBannerProps {
 
 // Time-appropriate icon component
 function TimeIcon({ timeOfDay }: { timeOfDay: string }) {
-  const iconClass = "w-6 h-6 md:w-8 md:h-8 text-white/80";
+  const iconClass = "w-7 h-7 md:w-9 md:h-9 text-white/80";
 
   switch (timeOfDay) {
     case "morning":
@@ -47,37 +47,31 @@ export function HeroBanner({ onSearch }: HeroBannerProps) {
       {/* Background gradient - changes with time of day */}
       <div className={`absolute inset-0 bg-gradient-to-br ${gradientClass} transition-colors duration-1000`} />
 
-      {/* Decorative elements */}
+      {/* Decorative elements - simplified */}
       <div className="absolute inset-0 overflow-hidden">
         {/* Seasonal particles - leaves, snow, petals, or fireflies */}
         {!isReducedMotion && <SeasonalParticles />}
 
+        {/* Ambient glow spots */}
         <div className="absolute -top-40 -right-40 w-80 h-80 bg-white/10 rounded-full blur-3xl" />
         <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-white/10 rounded-full blur-3xl" />
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-white/5 rounded-full blur-3xl" />
 
-        {/* Floating clay decorations - hidden on mobile for performance */}
+        {/* Floating clay decorations - reduced to 4 key elements */}
         <div className="hidden md:block">
-          {/* Left side decorations */}
+          {/* Left side - tree and tent */}
           <div className="absolute top-20 left-[5%] w-16 h-16 opacity-60 animate-float-slow">
             <Image src="/images/icons/hero/pine-tree.png" alt="" fill className="object-contain" sizes="64px" />
           </div>
-          <div className="absolute top-40 left-[12%] w-12 h-12 opacity-50 animate-float-medium">
-            <Image src="/images/icons/hero/tent.png" alt="" fill className="object-contain" sizes="48px" />
-          </div>
-          <div className="absolute bottom-32 left-[8%] w-14 h-14 opacity-55 animate-float-fast">
-            <Image src="/images/icons/hero/campfire.png" alt="" fill className="object-contain" sizes="56px" />
+          <div className="absolute bottom-32 left-[10%] w-14 h-14 opacity-55 animate-float-medium">
+            <Image src="/images/icons/hero/tent.png" alt="" fill className="object-contain" sizes="56px" />
           </div>
 
-          {/* Right side decorations */}
+          {/* Right side - sun and campfire */}
           <div className="absolute top-16 right-[8%] w-14 h-14 opacity-70 animate-float-medium">
             <Image src="/images/icons/hero/sun.png" alt="" fill className="object-contain" sizes="56px" />
           </div>
-          <div className="absolute top-48 right-[5%] w-16 h-16 opacity-50 animate-float-slow">
-            <Image src="/images/icons/hero/mountain.png" alt="" fill className="object-contain" sizes="64px" />
-          </div>
-          <div className="absolute bottom-40 right-[10%] w-10 h-10 opacity-45 animate-float-fast">
-            <Image src="/images/icons/hero/moon.png" alt="" fill className="object-contain" sizes="40px" />
+          <div className="absolute bottom-36 right-[6%] w-14 h-14 opacity-55 animate-float-fast">
+            <Image src="/images/icons/hero/campfire.png" alt="" fill className="object-contain" sizes="56px" />
           </div>
         </div>
 
@@ -96,46 +90,75 @@ export function HeroBanner({ onSearch }: HeroBannerProps) {
 
       {/* Content */}
       <div className="relative max-w-7xl mx-auto px-6 py-20 md:py-28">
-        {/* Trust badges - subtle at top */}
-        <div className="mb-8 md:mb-12">
-          <TrustBadgesDark className="justify-center" />
-        </div>
-
-        {/* Main headline - changes with time of day */}
+        {/* Main headline - BIGGER with shimmer effect */}
         <div className="text-center mb-10 md:mb-12">
           {/* Time indicator */}
-          <div className="flex items-center justify-center gap-2 mb-4">
+          <div className="flex items-center justify-center gap-2 mb-5">
             <TimeIcon timeOfDay={timeOfDay} />
           </div>
 
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-4 md:mb-6 leading-tight">
+          <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-white mb-4 md:mb-6 leading-tight">
             {greeting.headline.split(",")[0]}
             {greeting.headline.includes(",") && (
-              <span className={`block bg-gradient-to-r ${greeting.accentFrom} ${greeting.accentTo} bg-clip-text text-transparent`}>
+              <span className={`block relative bg-gradient-to-r ${greeting.accentFrom} ${greeting.accentTo} bg-clip-text text-transparent`}>
                 {greeting.headline.split(",")[1]?.trim() || "Top-Rated Campgrounds"}
+                {/* Shimmer effect overlay */}
+                {!isReducedMotion && (
+                  <span
+                    className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent bg-[length:200%_100%] animate-shimmer"
+                    style={{ mixBlendMode: "overlay" }}
+                  />
+                )}
               </span>
             )}
             {!greeting.headline.includes(",") && (
-              <span className={`block bg-gradient-to-r ${greeting.accentFrom} ${greeting.accentTo} bg-clip-text text-transparent`}>
+              <span className={`block relative bg-gradient-to-r ${greeting.accentFrom} ${greeting.accentTo} bg-clip-text text-transparent`}>
                 Find Your Perfect Campsite
+                {/* Shimmer effect overlay */}
+                {!isReducedMotion && (
+                  <span
+                    className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent bg-[length:200%_100%] animate-shimmer"
+                    style={{ mixBlendMode: "overlay" }}
+                  />
+                )}
               </span>
             )}
           </h1>
-          <p className="text-lg md:text-xl text-white/80 max-w-2xl mx-auto">
+          <p className="text-lg md:text-xl lg:text-2xl text-white/85 max-w-2xl mx-auto font-light">
             {greeting.subheadline}
           </p>
         </div>
 
-        {/* Search bar */}
+        {/* Search bar - the star of the show */}
         <div className="max-w-4xl mx-auto">
           <SearchBar onSearch={onSearch} />
         </div>
 
+        {/* Trust badges - now below search bar for cleaner focus */}
+        <div className="mt-8 md:mt-10">
+          <TrustBadgesDark className="justify-center" />
+        </div>
+
         {/* Social proof stats */}
-        <div className="mt-12 md:mt-16">
+        <div className="mt-8 md:mt-12">
           <SocialProofInline />
         </div>
       </div>
+
+      {/* CSS for shimmer animation */}
+      <style jsx>{`
+        @keyframes shimmer {
+          0% {
+            background-position: 200% 0;
+          }
+          100% {
+            background-position: -200% 0;
+          }
+        }
+        .animate-shimmer {
+          animation: shimmer 3s ease-in-out infinite;
+        }
+      `}</style>
     </section>
   );
 }

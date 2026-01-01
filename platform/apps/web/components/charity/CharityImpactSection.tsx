@@ -2,12 +2,12 @@
 
 import { useEffect, useState, useRef } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { motion, useInView, useReducedMotion } from "framer-motion";
-import { TrendingUp } from "lucide-react";
+import { motion, useInView, useReducedMotion, useScroll, useTransform } from "framer-motion";
+import { Heart, Sparkles, TreePine, HandHeart, Users } from "lucide-react";
 import Image from "next/image";
 import { apiClient } from "@/lib/api-client";
 
-// Animated counter hook
+// Animated counter hook with "growing" feel
 function useAnimatedCounter(end: number, duration: number = 2000, start: boolean = true) {
   const [count, setCount] = useState(0);
   const prefersReducedMotion = useReducedMotion();
@@ -30,7 +30,7 @@ function useAnimatedCounter(end: number, duration: number = 2000, start: boolean
       if (!startTime) startTime = timestamp;
       const progress = Math.min((timestamp - startTime) / duration, 1);
 
-      // Ease out cubic for satisfying deceleration
+      // Ease out cubic for satisfying "growth" deceleration
       const easeOut = 1 - Math.pow(1 - progress, 3);
       setCount(Math.floor(easeOut * end));
 
@@ -58,14 +58,9 @@ function formatDollars(cents: number): string {
   return `$${dollars.toFixed(0)}`;
 }
 
-// Fun impact equivalents
-function getImpactMessage(totalCents: number): string {
-  const dollars = totalCents / 100;
-  if (dollars >= 10000) return `That's enough to plant ${Math.floor(dollars / 5)} trees!`;
-  if (dollars >= 5000) return `That's ${Math.floor(dollars / 25)} nights of shelter for families!`;
-  if (dollars >= 1000) return `That's ${Math.floor(dollars / 10)} meals for those in need!`;
-  if (dollars >= 100) return `Every dollar makes a difference!`;
-  return "Growing every day!";
+// Calculate equivalent trees (one tree = ~$5 donation)
+function calculateTrees(cents: number): number {
+  return Math.floor(cents / 500);
 }
 
 // Demo data shown when no real donations exist yet
@@ -90,6 +85,13 @@ export function CharityImpactSection({ variant = "full", showCTA = true }: Chari
   const isInView = useInView(ref, { once: true, margin: "-100px" });
   const prefersReducedMotion = useReducedMotion();
 
+  // Parallax effect for background
+  const { scrollYProgress } = useScroll({
+    target: ref,
+    offset: ["start end", "end start"]
+  });
+  const backgroundY = useTransform(scrollYProgress, [0, 1], ["0%", "30%"]);
+
   const { data: stats, isLoading } = useQuery({
     queryKey: ["platform-charity-stats"],
     queryFn: () => apiClient.getPlatformCharityStats(),
@@ -111,228 +113,244 @@ export function CharityImpactSection({ variant = "full", showCTA = true }: Chari
     isInView && !isLoading
   );
 
-  const animatedDonations = useAnimatedCounter(
-    displayStats.totalDonations,
+  const animatedTrees = useAnimatedCounter(
+    calculateTrees(displayStats.totalAmountCents),
     2000,
     isInView && !isLoading
   );
 
-  const animatedCampgrounds = useAnimatedCounter(
+  const animatedDonors = useAnimatedCounter(
     displayStats.donorCount,
     1800,
     isInView && !isLoading
   );
 
-  // Get top 3 charities (use demo if no real data)
-  const topCharities = useDemo
-    ? DEMO_STATS.topCharities
-    : (stats?.byCharity ?? [])
-        .filter(c => c.charity)
-        .sort((a, b) => b.amountCents - a.amountCents)
-        .slice(0, 3);
-
-  // Always show - use demo data if no real donations
-
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: prefersReducedMotion ? 0 : 0.1,
-      },
-    },
-  };
-
-  const itemVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      transition: { duration: 0.5, ease: "easeOut" as const },
-    },
-  };
-
   if (variant === "compact") {
     return (
       <motion.div
         ref={ref}
-        initial="hidden"
-        animate={isInView ? "visible" : "hidden"}
-        variants={containerVariants}
-        className="bg-gradient-to-r from-rose-50 to-amber-50 dark:from-rose-950/30 dark:to-amber-950/30 rounded-2xl p-6 border border-rose-100 dark:border-rose-900/50"
+        initial={{ opacity: 0, y: 20 }}
+        animate={isInView ? { opacity: 1, y: 0 } : {}}
+        className="bg-gradient-to-r from-rose-50 to-amber-50 rounded-2xl p-6 border border-rose-100"
       >
-        <motion.div variants={itemVariants} className="flex items-center gap-3 mb-4">
-          <div className="relative w-10 h-10">
-            <Image src="/images/icons/giving-heart.png" alt="Heart" fill className="object-contain" sizes="40px" />
-          </div>
+        <div className="flex items-center gap-3 mb-4">
+          <motion.div
+            className="relative w-10 h-10"
+            animate={!prefersReducedMotion ? { scale: [1, 1.1, 1] } : {}}
+            transition={{ duration: 1.5, repeat: Infinity }}
+          >
+            <Heart className="w-10 h-10 text-rose-500 fill-rose-500" />
+          </motion.div>
           <div>
-            <h3 className="font-semibold text-slate-900 dark:text-white">Community Giving</h3>
-            <p className="text-sm text-slate-600 dark:text-slate-400">Together we make a difference</p>
+            <h3 className="font-semibold text-slate-900">Community Giving</h3>
+            <p className="text-sm text-slate-600">Together we make a difference</p>
           </div>
-        </motion.div>
-
-        <motion.div variants={itemVariants} className="text-center">
-          <div className="text-4xl font-bold text-rose-600 dark:text-rose-400">
-            {isLoading ? (
-              <span className="inline-block w-24 h-10 bg-rose-200 dark:bg-rose-800 rounded animate-pulse" />
-            ) : (
-              formatDollars(animatedTotal)
-            )}
+        </div>
+        <div className="text-center">
+          <div className="text-4xl font-bold text-rose-600">
+            {isLoading ? "..." : formatDollars(animatedTotal)}
           </div>
-          <p className="text-sm text-slate-600 dark:text-slate-400 mt-1">
-            raised for charity
-          </p>
-        </motion.div>
+          <p className="text-sm text-slate-600 mt-1">raised for charity</p>
+        </div>
       </motion.div>
     );
   }
 
   return (
-    <section ref={ref} className="py-16 bg-gradient-to-b from-rose-50/50 via-white to-amber-50/30 dark:from-rose-950/20 dark:via-slate-900 dark:to-amber-950/10">
-      <div className="max-w-6xl mx-auto px-4">
+    <section ref={ref} className="relative py-20 overflow-hidden">
+      {/* Parallax background with forest silhouette */}
+      <motion.div
+        className="absolute inset-0 bg-gradient-to-b from-emerald-900 via-emerald-800 to-teal-900"
+        style={{ y: prefersReducedMotion ? 0 : backgroundY }}
+      >
+        {/* Forest silhouette */}
+        <svg
+          className="absolute bottom-0 left-0 right-0 text-emerald-950/50"
+          viewBox="0 0 1440 200"
+          preserveAspectRatio="none"
+        >
+          <path
+            fill="currentColor"
+            d="M0,150 L60,120 L120,150 L180,100 L240,140 L300,80 L360,130 L420,90 L480,150 L540,70 L600,120 L660,150 L720,100 L780,140 L840,60 L900,130 L960,90 L1020,150 L1080,80 L1140,120 L1200,150 L1260,100 L1320,140 L1380,90 L1440,150 L1440,200 L0,200 Z"
+          />
+        </svg>
+        {/* Stars/sparkles background */}
+        <div className="absolute inset-0 opacity-20">
+          {[...Array(20)].map((_, i) => (
+            <motion.div
+              key={i}
+              className="absolute w-1 h-1 bg-white rounded-full"
+              style={{
+                left: `${Math.random() * 100}%`,
+                top: `${Math.random() * 60}%`,
+              }}
+              animate={!prefersReducedMotion ? {
+                opacity: [0.3, 1, 0.3],
+                scale: [1, 1.5, 1],
+              } : {}}
+              transition={{
+                duration: 2 + Math.random() * 2,
+                repeat: Infinity,
+                delay: Math.random() * 2,
+              }}
+            />
+          ))}
+        </div>
+      </motion.div>
+
+      <div className="relative max-w-6xl mx-auto px-6">
         <motion.div
-          initial="hidden"
-          animate={isInView ? "visible" : "hidden"}
-          variants={containerVariants}
+          initial={{ opacity: 0 }}
+          animate={isInView ? { opacity: 1 } : {}}
+          transition={{ duration: 0.8 }}
           className="text-center"
         >
-          {/* Header */}
-          <motion.div variants={itemVariants} className="mb-12">
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-rose-100 dark:bg-rose-900/50 text-rose-700 dark:text-rose-300 text-sm font-medium mb-4">
-              <Image src="/images/icons/giving-heart.png" alt="Heart" width={20} height={20} className="object-contain" />
-              <span>Community Impact</span>
-              <Image src="/images/icons/tree-planting.png" alt="Impact" width={20} height={20} className="object-contain" />
-            </div>
-            <h2 className="text-3xl md:text-4xl font-bold text-slate-900 dark:text-white mb-4">
-              Camping with Heart
+          {/* Emotional Header */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={isInView ? { opacity: 1, y: 0 } : {}}
+            transition={{ delay: 0.2 }}
+            className="mb-12"
+          >
+            {/* Pulsing heart icon */}
+            <motion.div
+              className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-rose-500/20 mb-6"
+              animate={!prefersReducedMotion ? { scale: [1, 1.1, 1] } : {}}
+              transition={{ duration: 1.5, repeat: Infinity }}
+            >
+              <Heart className="w-8 h-8 text-rose-400 fill-rose-400" />
+            </motion.div>
+
+            <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-4">
+              Together, We're Making Magic
+              <span className="block text-2xl md:text-3xl lg:text-4xl mt-2 bg-gradient-to-r from-amber-300 to-rose-300 bg-clip-text text-transparent">
+                Beyond the Campfire
+              </span>
             </h2>
-            <p className="text-lg text-slate-600 dark:text-slate-400 max-w-2xl mx-auto">
-              When you book through Camp Everyday, you're part of a community that gives back.
-              Campgrounds across the country are making a difference, one reservation at a time.
+            <p className="text-lg md:text-xl text-emerald-100/80 max-w-2xl mx-auto">
+              Every booking at Camp Everyday helps protect the wild places we love.
+              Your adventures are planting seeds of change.
             </p>
           </motion.div>
 
-          {/* Main Stats */}
-          <motion.div variants={itemVariants} className="mb-12">
-            <div className="inline-block p-8 rounded-3xl bg-white dark:bg-slate-800 shadow-xl shadow-rose-500/10">
-              <div className="flex items-center justify-center gap-3 mb-3">
-                <motion.div
-                  animate={isInView && !prefersReducedMotion ? { scale: [1, 1.2, 1] } : {}}
-                  transition={{ duration: 0.5, delay: 1.5 }}
-                  className="relative w-12 h-12"
-                >
-                  <Image src="/images/icons/giving-heart.png" alt="Heart" fill className="object-contain" sizes="48px" />
-                </motion.div>
-                <span className="text-5xl md:text-6xl font-bold bg-gradient-to-r from-rose-600 to-amber-600 bg-clip-text text-transparent">
-                  {isLoading ? (
-                    <span className="inline-block w-32 h-14 bg-slate-200 dark:bg-slate-700 rounded animate-pulse" />
-                  ) : (
-                    formatDollars(animatedTotal)
-                  )}
-                </span>
-              </div>
-              <p className="text-slate-600 dark:text-slate-400 font-medium">
-                donated to charity
-              </p>
-              {!isLoading && (
-                <motion.p
-                  variants={itemVariants}
-                  className="text-sm text-amber-600 dark:text-amber-400 mt-2 flex items-center justify-center gap-1"
-                >
-                  <TrendingUp className="h-4 w-4" />
-                  {getImpactMessage(displayStats.totalAmountCents)}
-                </motion.p>
-              )}
-            </div>
-          </motion.div>
-
-          {/* Secondary Stats */}
+          {/* Impact Stats Cards */}
           <motion.div
-            variants={itemVariants}
-            className="grid grid-cols-2 md:grid-cols-3 gap-6 mb-12 max-w-3xl mx-auto"
+            initial={{ opacity: 0, y: 30 }}
+            animate={isInView ? { opacity: 1, y: 0 } : {}}
+            transition={{ delay: 0.4 }}
+            className="grid md:grid-cols-3 gap-6 mb-12"
           >
-            <div className="p-6 rounded-2xl bg-white/80 dark:bg-slate-800/80 backdrop-blur">
-              <div className="flex items-center justify-center mb-2">
-                <Image src="/images/icons/donation-box.png" alt="Donations" width={32} height={32} className="object-contain" />
+            {/* Trees Planted */}
+            <motion.div
+              className="bg-white/10 backdrop-blur-sm rounded-2xl p-8 border border-white/20"
+              whileHover={!prefersReducedMotion ? { scale: 1.02, y: -5 } : {}}
+              transition={{ type: "spring", stiffness: 300 }}
+            >
+              <motion.div
+                className="w-16 h-16 mx-auto mb-4 rounded-full bg-emerald-500/20 flex items-center justify-center"
+                animate={isInView && !prefersReducedMotion ? { rotate: [0, 5, -5, 0] } : {}}
+                transition={{ duration: 3, repeat: Infinity, delay: 0.5 }}
+              >
+                <TreePine className="w-8 h-8 text-emerald-400" />
+              </motion.div>
+              <div className="text-4xl md:text-5xl font-bold text-white mb-2">
+                {isLoading ? "..." : animatedTrees.toLocaleString()}
               </div>
-              <div className="text-3xl font-bold text-slate-900 dark:text-white">
-                {isLoading ? "..." : animatedDonations.toLocaleString()}
-              </div>
-              <p className="text-sm text-slate-600 dark:text-slate-400">donations made</p>
-            </div>
+              <div className="text-emerald-200 font-medium mb-1">Trees Planted</div>
+              <p className="text-sm text-emerald-100/60">
+                Every booking helps a forest grow
+              </p>
+            </motion.div>
 
-            <div className="p-6 rounded-2xl bg-white/80 dark:bg-slate-800/80 backdrop-blur">
-              <div className="flex items-center justify-center mb-2">
-                <Image src="/images/icons/community-circle.png" alt="Guests" width={32} height={32} className="object-contain" />
+            {/* Total Donated */}
+            <motion.div
+              className="bg-white/10 backdrop-blur-sm rounded-2xl p-8 border border-white/20"
+              whileHover={!prefersReducedMotion ? { scale: 1.02, y: -5 } : {}}
+              transition={{ type: "spring", stiffness: 300 }}
+            >
+              <motion.div
+                className="w-16 h-16 mx-auto mb-4 rounded-full bg-amber-500/20 flex items-center justify-center"
+                animate={isInView && !prefersReducedMotion ? { scale: [1, 1.1, 1] } : {}}
+                transition={{ duration: 2, repeat: Infinity }}
+              >
+                <HandHeart className="w-8 h-8 text-amber-400" />
+              </motion.div>
+              <div className="text-4xl md:text-5xl font-bold text-white mb-2">
+                {isLoading ? "..." : formatDollars(animatedTotal)}
               </div>
-              <div className="text-3xl font-bold text-slate-900 dark:text-white">
-                {isLoading ? "..." : animatedCampgrounds.toLocaleString()}
-              </div>
-              <p className="text-sm text-slate-600 dark:text-slate-400">generous guests</p>
-            </div>
+              <div className="text-amber-200 font-medium mb-1">Donated to Conservation</div>
+              <p className="text-sm text-amber-100/60">
+                Your adventures fund wild places
+              </p>
+            </motion.div>
 
-            <div className="col-span-2 md:col-span-1 p-6 rounded-2xl bg-white/80 dark:bg-slate-800/80 backdrop-blur">
-              <div className="flex items-center justify-center mb-2">
-                <Image src="/images/icons/tree-planting.png" alt="Charities" width={32} height={32} className="object-contain" />
+            {/* Adventurers Giving Back */}
+            <motion.div
+              className="bg-white/10 backdrop-blur-sm rounded-2xl p-8 border border-white/20"
+              whileHover={!prefersReducedMotion ? { scale: 1.02, y: -5 } : {}}
+              transition={{ type: "spring", stiffness: 300 }}
+            >
+              <motion.div
+                className="w-16 h-16 mx-auto mb-4 rounded-full bg-rose-500/20 flex items-center justify-center"
+                animate={isInView && !prefersReducedMotion ? { y: [0, -3, 0] } : {}}
+                transition={{ duration: 2.5, repeat: Infinity, delay: 1 }}
+              >
+                <Users className="w-8 h-8 text-rose-400" />
+              </motion.div>
+              <div className="text-4xl md:text-5xl font-bold text-white mb-2">
+                {isLoading ? "..." : animatedDonors.toLocaleString()}
               </div>
-              <div className="text-3xl font-bold text-slate-900 dark:text-white">
-                {isLoading ? "..." : topCharities.length}
-              </div>
-              <p className="text-sm text-slate-600 dark:text-slate-400">charities supported</p>
-            </div>
+              <div className="text-rose-200 font-medium mb-1">Generous Adventurers</div>
+              <p className="text-sm text-rose-100/60">
+                A community that cares
+              </p>
+            </motion.div>
           </motion.div>
 
-          {/* Top Charities */}
-          {topCharities.length > 0 && (
-            <motion.div variants={itemVariants} className="mb-12">
-              <h3 className="text-lg font-semibold text-slate-900 dark:text-white mb-6">
-                Top Supported Charities
-              </h3>
-              <div className="flex flex-wrap justify-center gap-4">
-                {topCharities.map((item, index) => (
-                  <motion.div
-                    key={item.charity?.id}
-                    initial={{ opacity: 0, scale: 0.9 }}
-                    animate={isInView ? { opacity: 1, scale: 1 } : {}}
-                    transition={{ delay: 0.5 + index * 0.1 }}
-                    className="flex items-center gap-3 px-5 py-3 rounded-full bg-white dark:bg-slate-800 shadow-md"
-                  >
-                    <div className="w-8 h-8 rounded-full bg-gradient-to-br from-rose-400 to-amber-400 flex items-center justify-center text-white font-bold text-sm">
-                      {index + 1}
-                    </div>
-                    <div className="text-left">
-                      <p className="font-medium text-slate-900 dark:text-white text-sm">
-                        {item.charity?.name}
-                      </p>
-                      <p className="text-xs text-slate-500 dark:text-slate-400">
-                        {formatDollars(item.amountCents)} raised
-                      </p>
-                    </div>
-                  </motion.div>
-                ))}
-              </div>
-            </motion.div>
-          )}
+          {/* Emotional Story Block */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={isInView ? { opacity: 1, y: 0 } : {}}
+            transition={{ delay: 0.6 }}
+            className="bg-white/5 backdrop-blur-sm rounded-2xl p-8 md:p-12 border border-white/10 mb-12"
+          >
+            <div className="flex items-center justify-center gap-2 mb-4">
+              <Sparkles className="w-5 h-5 text-amber-400" />
+              <span className="text-amber-300 font-medium">The Magic of Giving</span>
+              <Sparkles className="w-5 h-5 text-amber-400" />
+            </div>
+            <blockquote className="text-xl md:text-2xl text-white/90 italic max-w-3xl mx-auto leading-relaxed">
+              "When you round up your reservation for charity, you're not just adding a few cents.
+              You're joining thousands of fellow adventurers in protecting the trails,
+              forests, and wild spaces that make camping magical."
+            </blockquote>
+            <p className="text-emerald-200/80 mt-4">
+              - The Camp Everyday Team
+            </p>
+          </motion.div>
 
-          {/* CTA for Campground Owners */}
+          {/* CTA */}
           {showCTA && (
-            <motion.div variants={itemVariants}>
-              <div className="inline-flex flex-col sm:flex-row items-center gap-4 p-6 rounded-2xl bg-gradient-to-r from-emerald-50 to-teal-50 dark:from-emerald-950/30 dark:to-teal-950/30 border border-emerald-200 dark:border-emerald-800">
-                <div className="text-left">
-                  <p className="font-semibold text-slate-900 dark:text-white">
-                    Own a campground?
-                  </p>
-                  <p className="text-sm text-slate-600 dark:text-slate-400">
-                    Join the movement and let your guests give back too.
-                  </p>
-                </div>
-                <a
-                  href="/signup"
-                  className="px-6 py-2.5 rounded-full bg-emerald-600 hover:bg-emerald-700 text-white font-medium text-sm transition-colors whitespace-nowrap"
-                >
-                  Get Started Free
-                </a>
-              </div>
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={isInView ? { opacity: 1, y: 0 } : {}}
+              transition={{ delay: 0.8 }}
+              className="flex flex-col sm:flex-row items-center justify-center gap-4"
+            >
+              <a
+                href="/about/charity"
+                className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-white text-emerald-800 font-semibold hover:bg-emerald-50 transition-colors shadow-lg"
+              >
+                <Heart className="w-5 h-5 text-rose-500" />
+                See Where Your Impact Goes
+              </a>
+              <a
+                href="/campgrounds"
+                className="inline-flex items-center gap-2 px-6 py-3 rounded-full border-2 border-white/30 text-white font-semibold hover:bg-white/10 transition-colors"
+              >
+                <Sparkles className="w-5 h-5" />
+                Book Your Next Adventure
+              </a>
             </motion.div>
           )}
         </motion.div>

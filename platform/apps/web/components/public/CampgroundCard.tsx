@@ -208,13 +208,20 @@ export function CampgroundCard({
                                 : `${pastAwards.length}x Campground of the Year`}
                         </div>
                     )}
-                    {/* Verified badge for internal campgrounds (not external/RIDB) */}
+                    {/* Book Instantly badge for internal campgrounds */}
                     {isInternal && !npsBadge && !isExternal && (
                         <div className="px-3 py-1.5 bg-gradient-to-r from-emerald-500 to-teal-500 text-white text-xs font-bold rounded-full shadow-lg flex items-center gap-1.5">
-                            <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20">
-                                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                            <Sparkles className="w-3.5 h-3.5" />
+                            Book Instantly
+                        </div>
+                    )}
+                    {/* External campground badge - links to recreation.gov */}
+                    {isExternal && (
+                        <div className="px-3 py-1.5 bg-gradient-to-r from-slate-600 to-slate-500 text-white text-xs font-medium rounded-full shadow-lg flex items-center gap-1.5">
+                            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
                             </svg>
-                            Verified
+                            Recreation.gov
                         </div>
                     )}
                     {/* ADA Accessibility Badge */}
@@ -275,17 +282,26 @@ export function CampgroundCard({
                     </AnimatePresence>
                 </button>
 
-                {/* Quick book button on hover */}
-                {isInternal && (
-                    <Link
-                        href={campgroundPath}
-                        className={`absolute bottom-4 left-4 right-4 py-3 bg-white/95 backdrop-blur-sm text-center text-sm font-semibold text-slate-900 rounded-xl shadow-lg transition-all duration-300 flex items-center justify-center gap-2 ${isHovered ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
-                            }`}
-                    >
-                        <Sparkles className="h-4 w-4 text-emerald-600" />
-                        {isExternal ? "See More Details" : "See Available Sites"}
-                    </Link>
-                )}
+                {/* Quick action button on hover */}
+                <Link
+                    href={campgroundPath}
+                    className={`absolute bottom-4 left-4 right-4 py-3 bg-white/95 backdrop-blur-sm text-center text-sm font-semibold rounded-xl shadow-lg transition-all duration-300 flex items-center justify-center gap-2 ${isHovered ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
+                        } ${isExternal ? "text-slate-700" : "text-slate-900"}`}
+                >
+                    {isExternal ? (
+                        <>
+                            <svg className="h-4 w-4 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                            </svg>
+                            View on Recreation.gov
+                        </>
+                    ) : (
+                        <>
+                            <Sparkles className="h-4 w-4 text-emerald-600" />
+                            Begin Your Adventure
+                        </>
+                    )}
+                </Link>
             </div>
 
             {/* Content */}
@@ -310,11 +326,6 @@ export function CampgroundCard({
                     {ratingBadge && !compact && (
                         <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 text-[11px] font-semibold">
                             {ratingBadge}
-                        </span>
-                    )}
-                    {!isInternal && !compact && (
-                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-slate-100 text-slate-600 text-[11px]">
-                            External listing
                         </span>
                     )}
                 </div>
@@ -386,20 +397,21 @@ export function CampgroundCard({
                                 onClick={onExplore}
                                 className="px-4 py-2 text-sm font-semibold text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 rounded-lg transition-colors flex items-center gap-1 group"
                             >
-                                <span>Discover</span>
+                                <Sparkles className="w-4 h-4" />
+                                <span>Explore</span>
                                 <span className="group-hover:translate-x-0.5 transition-transform">→</span>
                             </Link>
                         ) : (
-                            <div className="flex flex-col items-end gap-1">
-                                <Link
-                                    href={campgroundPath}
-                                    onClick={onExplore}
-                                    className="px-4 py-2 text-sm font-semibold text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 rounded-lg transition-colors flex items-center gap-1 group"
-                                >
-                                    <span>View</span>
-                                    <span className="group-hover:translate-x-0.5 transition-transform">→</span>
-                                </Link>
-                            </div>
+                            <Link
+                                href={campgroundPath}
+                                onClick={onExplore}
+                                className="px-4 py-2 text-sm font-semibold text-slate-600 hover:text-slate-700 hover:bg-slate-50 rounded-lg transition-colors flex items-center gap-1 group"
+                            >
+                                <span>Learn More</span>
+                                <svg className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                                </svg>
+                            </Link>
                         )}
                     </div>
                 )}

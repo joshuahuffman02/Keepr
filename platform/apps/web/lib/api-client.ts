@@ -4259,8 +4259,14 @@ export const apiClient = {
 
 
   // Public API methods (no auth required)
-  async getPublicCampgrounds() {
-    const data = await fetchJSON<unknown>("/public/campgrounds");
+  async getPublicCampgrounds(options?: { limit?: number }) {
+    const params = new URLSearchParams();
+    // Default to a high limit to fetch all campgrounds including external/RIDB ones
+    if (options?.limit) params.set("limit", String(options.limit));
+    else params.set("limit", "1000"); // Fetch up to 1000 campgrounds by default
+
+    const query = params.toString();
+    const data = await fetchJSON<unknown>(`/public/campgrounds${query ? `?${query}` : ""}`);
     // Handle both array response and {results, total} response for backwards compatibility
     const results = Array.isArray(data) ? data : (data as { results: unknown[] }).results;
     return PublicCampgroundListSchema.parse(results);

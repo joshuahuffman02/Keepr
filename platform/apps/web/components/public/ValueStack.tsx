@@ -7,39 +7,21 @@ import { cn } from "../../lib/utils";
 const pillars = [
   {
     image: "/images/icons/trust-security.png",
-    title: "Secure Booking",
-    description: "Your payment and personal info protected with bank-level security.",
-    guarantee: "100% secure",
-  },
-  {
-    image: "/images/icons/easy-booking.png",
-    title: "Easy Booking",
-    description: "Book your perfect campsite in just a few clicks. Simple, fast, done.",
-    guarantee: "Book in minutes",
-  },
-  {
-    image: "/images/icons/support.png",
-    title: "24/7 Support",
-    description: "Real humans ready to help whenever you need us. Day or night.",
-    guarantee: "Always here for you",
+    title: "Your Adventure, Protected",
+    description: "Bank-level security keeps your payment and personal info safe. Book with complete peace of mind.",
+    guarantee: "100% Secure",
   },
   {
     image: "/images/icons/best-price.png",
-    title: "Best Price",
-    description: "Book direct with campgrounds. No middleman markup, no hidden fees.",
-    guarantee: "Price match guarantee",
+    title: "No Middleman Magic",
+    description: "Book directly with campgrounds. No hidden fees, no markup - just honest pricing for honest adventures.",
+    guarantee: "Best Price Promise",
   },
   {
-    image: "/images/icons/verified-reviews.png",
-    title: "Verified Reviews",
-    description: "Real reviews from real campers. Know what to expect before you arrive.",
-    guarantee: "Trusted feedback",
-  },
-  {
-    image: "/images/icons/instant-confirm.png",
-    title: "Instant Confirmation",
-    description: "Know you're booked in seconds. Real-time availability, no waiting.",
-    guarantee: "Confirmed immediately",
+    image: "/images/icons/support.png",
+    title: "Real Humans, Real Help",
+    description: "Our team of camping enthusiasts is here whenever you need us. Day or night, rain or shine.",
+    guarantee: "24/7 Support",
   },
 ];
 
@@ -54,11 +36,11 @@ export function ValueStack({ className }: ValueStackProps) {
         {/* Section header */}
         <div className="text-center mb-12 md:mb-16">
           <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold text-slate-900 mb-4">
-            Why Book With Camp Everyday?
+            Your Trust is Our Treasure
           </h2>
           <p className="text-slate-600 max-w-2xl mx-auto">
-            We partner directly with campgrounds to bring you the best experience.
-            No middleman markup, no hidden fees, just great camping.
+            Every great adventure begins with peace of mind. Here's how we make
+            your journey magical from the very first click.
           </p>
         </div>
 
