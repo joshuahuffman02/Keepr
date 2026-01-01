@@ -63,8 +63,7 @@ This project uses SchemaForge for schema-driven development.
 ### Workflow
 1. Define/modify data models in `schema.forge`
 2. Run `npx schemaforge generate` to regenerate all code
-3. Run `npx schemaforge migrate push` to update the database (dev)
-4. Run `npx schemaforge seed` to populate test data
+3. Run `npx schemaforge migrate run` to apply pending migrations
 
 ### Schema Location
 - Schema file: `schema.forge`
@@ -72,11 +71,10 @@ This project uses SchemaForge for schema-driven development.
 
 ### Key Commands
 ```bash
+npx schemaforge init              # Initialize a new schema.forge file
 npx schemaforge generate          # Regenerate all code from schema
-npx schemaforge diff              # Preview changes before regenerating
-npx schemaforge migrate push      # Push schema to database (dev)
-npx schemaforge migrate create    # Create migration file (prod)
-npx schemaforge seed              # Generate and run test data
+npx schemaforge migrate create    # Create a new migration
+npx schemaforge migrate run       # Apply pending migrations
 ```
 
 ### Schema Syntax
