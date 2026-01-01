@@ -1430,13 +1430,17 @@ export default function SeasonalsPage() {
   const [selectedSeasonal, setSelectedSeasonal] = useState<SeasonalGuest | null>(null);
   const [seasonYear, setSeasonYear] = useState(currentYear);
 
-  // Helper to get auth headers for API calls
+  // Helper to get auth headers for API calls (includes campground scope)
   const getAuthHeaders = useCallback((): Record<string, string> => {
-    const token = typeof window !== "undefined"
-      ? localStorage.getItem("campreserv:authToken")
-      : null;
-    return token ? { Authorization: `Bearer ${token}` } : {};
-  }, []);
+    const headers: Record<string, string> = {};
+    if (typeof window !== "undefined") {
+      const token = localStorage.getItem("campreserv:authToken");
+      if (token) headers.Authorization = `Bearer ${token}`;
+    }
+    // Include campground ID for ScopeGuard
+    if (campgroundId) headers["x-campground-id"] = campgroundId;
+    return headers;
+  }, [campgroundId]);
 
   // Debounced search - waits 300ms after typing stops before querying
   useEffect(() => {
