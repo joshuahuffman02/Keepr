@@ -61,7 +61,7 @@ interface AttractionPageData {
 
 async function getAttraction(slug: string): Promise<AttractionPageData | null> {
   try {
-    const res = await fetch(`${API_BASE}/public/locations/attraction/${slug}`, {
+    const res = await fetch(`${API_BASE}/public/attractions/${slug}`, {
       next: { revalidate: 3600 }, // Cache for 1 hour
     });
     if (!res.ok) return null;

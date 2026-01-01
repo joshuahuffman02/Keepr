@@ -1,16 +1,14 @@
 import { Metadata } from "next";
 import Link from "next/link";
+import Image from "next/image";
 import {
   MapPin,
   Mountain,
-  Tent,
-  Trees,
-  Waves,
-  Star,
   ArrowRight,
   Search,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { CampingSearchForm } from "./CampingSearchForm";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "http://localhost:4000";
 
@@ -44,7 +42,7 @@ interface PopularDestination {
 
 async function getStates(): Promise<StateData[]> {
   try {
-    const res = await fetch(`${API_BASE}/public/locations/states`, {
+    const res = await fetch(`${API_BASE}/public/locations`, {
       next: { revalidate: 86400 }, // Cache for 24 hours
     });
     if (!res.ok) return [];
@@ -56,7 +54,7 @@ async function getStates(): Promise<StateData[]> {
 
 async function getPopularDestinations(): Promise<PopularDestination[]> {
   try {
-    const res = await fetch(`${API_BASE}/public/locations/popular`, {
+    const res = await fetch(`${API_BASE}/public/locations/featured/destinations`, {
       next: { revalidate: 3600 }, // Cache for 1 hour
     });
     if (!res.ok) return [];
@@ -118,16 +116,7 @@ export default async function CampingIndexPage() {
           </p>
 
           {/* Search Bar */}
-          <div className="max-w-xl mx-auto">
-            <div className="relative">
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400" />
-              <input
-                type="text"
-                placeholder="Search by location, park name, or attraction..."
-                className="w-full pl-12 pr-4 py-4 rounded-xl text-lg border-2 border-transparent focus:border-emerald-500 focus:outline-none"
-              />
-            </div>
-          </div>
+          <CampingSearchForm />
         </div>
       </section>
 
@@ -291,34 +280,47 @@ export default async function CampingIndexPage() {
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
             {[
               {
-                icon: <Tent className="h-8 w-8" />,
+                icon: "/images/icons/bouncing-tent.png",
                 title: "Tent Camping",
                 description: "Traditional camping with tent sites and basic amenities.",
+                href: "/?category=tent",
               },
               {
-                icon: <Trees className="h-8 w-8" />,
+                icon: "/images/icons/electric-hookup.png",
                 title: "RV Parks",
                 description: "Full-hookup sites with electric, water, and sewer connections.",
+                href: "/?category=rv",
               },
               {
-                icon: <Waves className="h-8 w-8" />,
+                icon: "/images/icons/regions/lake.png",
                 title: "Lakefront Camping",
                 description: "Waterfront sites with beach access and water activities.",
+                href: "/?amenity=lakefront",
               },
               {
-                icon: <Mountain className="h-8 w-8" />,
+                icon: "/images/icons/regions/mountain.png",
                 title: "Backcountry",
                 description: "Remote wilderness camping for the adventurous spirit.",
+                href: "/?category=backcountry",
               },
             ].map((type) => (
-              <div
+              <Link
                 key={type.title}
-                className="p-6 bg-slate-50 rounded-xl border border-slate-200"
+                href={type.href}
+                className="group p-6 bg-slate-50 rounded-xl border border-slate-200 hover:border-emerald-300 hover:shadow-lg transition-all"
               >
-                <div className="text-emerald-600 mb-4">{type.icon}</div>
-                <h3 className="text-lg font-bold text-slate-900 mb-2">{type.title}</h3>
+                <div className="relative w-16 h-16 mb-4">
+                  <Image
+                    src={type.icon}
+                    alt=""
+                    fill
+                    className="object-contain group-hover:scale-110 transition-transform"
+                    sizes="64px"
+                  />
+                </div>
+                <h3 className="text-lg font-bold text-slate-900 mb-2 group-hover:text-emerald-600 transition-colors">{type.title}</h3>
                 <p className="text-slate-600 text-sm">{type.description}</p>
-              </div>
+              </Link>
             ))}
           </div>
         </div>
