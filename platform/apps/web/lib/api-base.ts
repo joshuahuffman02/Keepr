@@ -26,3 +26,18 @@ export function getServerApiBase(): string {
   // This handles Railway, Vercel, and any other cloud deployment
   return "https://camp-everydayapi-production.up.railway.app";
 }
+
+/**
+ * Builds the full API URL for a given endpoint path.
+ *
+ * Handles the case where NEXT_PUBLIC_API_BASE may or may not end with /api.
+ * The endpoint should NOT include /api prefix (e.g., "/public/locations/minnesota").
+ */
+export function getServerApiUrl(endpoint: string): string {
+  const base = getServerApiBase();
+  // If base already ends with /api, don't add another /api prefix
+  const apiPrefix = base.endsWith("/api") ? "" : "/api";
+  // Ensure endpoint starts with /
+  const normalizedEndpoint = endpoint.startsWith("/") ? endpoint : `/${endpoint}`;
+  return `${base}${apiPrefix}${normalizedEndpoint}`;
+}

@@ -9,7 +9,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { CampingSearchForm } from "./CampingSearchForm";
-import { getServerApiBase } from "@/lib/api-base";
+import { getServerApiUrl } from "@/lib/api-base";
 
 export const metadata: Metadata = {
   title: "Find Campgrounds & RV Parks | Camp Everyday",
@@ -41,8 +41,8 @@ interface PopularDestination {
 
 async function getStates(): Promise<StateData[]> {
   try {
-    const apiBase = getServerApiBase();
-    const res = await fetch(`${apiBase}/api/public/locations`, {
+    const url = getServerApiUrl("/public/locations");
+    const res = await fetch(url, {
       next: { revalidate: 86400 }, // Cache for 24 hours
     });
     if (!res.ok) return [];
@@ -54,8 +54,8 @@ async function getStates(): Promise<StateData[]> {
 
 async function getPopularDestinations(): Promise<PopularDestination[]> {
   try {
-    const apiBase = getServerApiBase();
-    const res = await fetch(`${apiBase}/api/public/locations/featured/destinations`, {
+    const url = getServerApiUrl("/public/locations/featured/destinations");
+    const res = await fetch(url, {
       next: { revalidate: 3600 }, // Cache for 1 hour
     });
     if (!res.ok) return [];

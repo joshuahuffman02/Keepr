@@ -21,7 +21,7 @@ import {
   Droplets,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { getServerApiBase } from "@/lib/api-base";
+import { getServerApiUrl } from "@/lib/api-base";
 
 interface CampgroundPageData {
   id: string;
@@ -63,8 +63,8 @@ interface CampgroundPageData {
 
 async function getCampground(slug: string): Promise<CampgroundPageData | null> {
   try {
-    const apiBase = getServerApiBase();
-    const res = await fetch(`${apiBase}/api/public/campgrounds/${slug}`, {
+    const url = getServerApiUrl(`/public/campgrounds/${slug}`);
+    const res = await fetch(url, {
       next: { revalidate: 3600 }, // Cache for 1 hour
     });
     if (!res.ok) return null;

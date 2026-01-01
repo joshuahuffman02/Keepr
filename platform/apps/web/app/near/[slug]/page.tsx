@@ -15,7 +15,7 @@ import {
   Sun,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { getServerApiBase } from "@/lib/api-base";
+import { getServerApiUrl } from "@/lib/api-base";
 
 interface AttractionPageData {
   id: string;
@@ -58,8 +58,8 @@ interface AttractionPageData {
 
 async function getAttraction(slug: string): Promise<AttractionPageData | null> {
   try {
-    const apiBase = getServerApiBase();
-    const res = await fetch(`${apiBase}/api/public/attractions/${slug}`, {
+    const url = getServerApiUrl(`/public/attractions/${slug}`);
+    const res = await fetch(url, {
       next: { revalidate: 3600 }, // Cache for 1 hour
     });
     if (!res.ok) return null;

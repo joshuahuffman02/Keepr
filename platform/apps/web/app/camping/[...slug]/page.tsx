@@ -11,7 +11,7 @@ import {
   ChevronRight,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { getServerApiBase } from "@/lib/api-base";
+import { getServerApiUrl } from "@/lib/api-base";
 
 interface LocationPageData {
   type: "state" | "city" | "region" | "county";
@@ -68,22 +68,13 @@ interface LocationPageData {
 async function getLocation(slugParts: string[]): Promise<LocationPageData | null> {
   const slug = slugParts.join("/");
   try {
-    const apiBase = getServerApiBase();
-    const url = `${apiBase}/api/public/locations/${slug}`;
-    console.log("[SSR] Fetching location:", url);
+    const url = getServerApiUrl(`/public/locations/${slug}`);
     const res = await fetch(url, {
       next: { revalidate: 3600 }, // Cache for 1 hour
     });
-    console.log("[SSR] Response status:", res.status);
-    if (!res.ok) {
-      console.log("[SSR] Response not OK:", res.status, res.statusText);
-      return null;
-    }
-    const data = await res.json();
-    console.log("[SSR] Got location data:", data?.name);
-    return data;
-  } catch (error) {
-    console.error("[SSR] Fetch error:", error);
+    if (!res.ok) return null;
+    return res.json();
+  } catch {
     return null;
   }
 }
