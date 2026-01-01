@@ -131,6 +131,7 @@ import { PublicEventsModule } from "./public-events/public-events.module";
 import { PublicLocationsModule } from "./public-locations/public-locations.module";
 import { SoftwarePagesModule } from "./software-pages/software-pages.module";
 import { SeoModule } from "./seo/seo.module";
+import { PlatformStatsModule } from "./platform-stats/platform-stats.module";
 
 @Module({
   imports: [
@@ -281,6 +282,8 @@ import { SeoModule } from "./seo/seo.module";
     SoftwarePagesModule,
     // SEO - Sitemaps, robots.txt
     SeoModule,
+    // Public Platform Stats - Homepage activity feed
+    PlatformStatsModule,
   ],
   providers: []
 })

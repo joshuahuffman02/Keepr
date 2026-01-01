@@ -8677,6 +8677,36 @@ export const apiClient = {
     };
   },
 
+  // Platform Stats (public - no auth required)
+  async getPlatformStats() {
+    const data = await fetchJSON<unknown>("/public/platform-stats");
+    return data as {
+      campgrounds: {
+        total: number;
+        claimed: number;
+        byState: Array<{ state: string; count: number }>;
+      };
+      activity: {
+        pageViewsToday: number;
+        pageViewsThisWeek: number;
+        searchesToday: number;
+        searchesThisWeek: number;
+        uniqueVisitorsToday: number;
+      };
+      recentActivity: Array<{
+        type: "page_view" | "search" | "booking";
+        campgroundName: string | null;
+        campgroundSlug: string | null;
+        state: string | null;
+        minutesAgo: number;
+      }>;
+      topRegions: Array<{
+        state: string;
+        activityCount: number;
+      }>;
+    };
+  },
+
   // Data Import
   async getImportSchema(campgroundId: string, entityType: string) {
     const data = await fetchJSON<unknown>(`/campgrounds/${campgroundId}/import/schema/${entityType}`);
