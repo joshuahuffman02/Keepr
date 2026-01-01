@@ -1597,7 +1597,28 @@ export default function SeasonalsPage() {
     },
   });
 
-  const stats = statsQuery.data;
+  // Provide fallback stats to prevent crashes when API fails
+  const emptyStats: DashboardStats = {
+    totalSeasonals: 0,
+    activeSeasonals: 0,
+    renewalRate: 0,
+    contractsSigned: 0,
+    contractsTotal: 0,
+    paymentsCurrent: 0,
+    paymentsPastDue: 0,
+    paymentsPaidAhead: 0,
+    totalMonthlyRevenue: 0,
+    averageTenure: 0,
+    longestTenure: 0,
+    waitlistCount: 0,
+    combinedTenureYears: 0,
+    renewalsByIntent: { committed: 0, likely: 0, undecided: 0, not_renewing: 0 },
+    churnRiskGuests: [],
+    paymentAging: { current: 0, days30: 0, days60: 0, days90Plus: 0 },
+    needsAttention: { pastDuePayments: 0, expiringContracts: 0, expiredInsurance: 0, pendingRenewals: 0, unsignedContracts: 0 },
+    milestones: [],
+  };
+  const stats = statsQuery.data || emptyStats;
   const seasonals = seasonalsQuery.data?.data || [];
   const waitlist = waitlistQuery.data || [];
   const rateCards = rateCardsQuery.data || [];
@@ -1691,6 +1712,17 @@ export default function SeasonalsPage() {
             </Button>
           </div>
         </div>
+
+        {/* Stats API Error Banner */}
+        {statsQuery.isError && (
+          <div className="bg-amber-50 border border-amber-200 rounded-lg p-3 flex items-center gap-2 text-amber-800">
+            <AlertTriangle className="h-4 w-4 flex-shrink-0" />
+            <span className="text-sm">
+              Unable to load stats. Check browser console for details.
+              {statsQuery.error instanceof Error && `: ${statsQuery.error.message}`}
+            </span>
+          </div>
+        )}
 
         {/* Critical Alerts */}
         {stats && (
