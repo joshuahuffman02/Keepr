@@ -68,7 +68,7 @@ interface LocationPageData {
 async function getLocation(slugParts: string[]): Promise<LocationPageData | null> {
   const slug = slugParts.join("/");
   try {
-    const res = await fetch(`${API_BASE}/public/locations/${slug}`, {
+    const res = await fetch(`${API_BASE}/api/public/locations/${slug}`, {
       next: { revalidate: 3600 }, // Cache for 1 hour
     });
     if (!res.ok) return null;

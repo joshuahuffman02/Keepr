@@ -42,7 +42,7 @@ interface PopularDestination {
 
 async function getStates(): Promise<StateData[]> {
   try {
-    const res = await fetch(`${API_BASE}/public/locations`, {
+    const res = await fetch(`${API_BASE}/api/public/locations`, {
       next: { revalidate: 86400 }, // Cache for 24 hours
     });
     if (!res.ok) return [];
@@ -54,7 +54,7 @@ async function getStates(): Promise<StateData[]> {
 
 async function getPopularDestinations(): Promise<PopularDestination[]> {
   try {
-    const res = await fetch(`${API_BASE}/public/locations/featured/destinations`, {
+    const res = await fetch(`${API_BASE}/api/public/locations/featured/destinations`, {
       next: { revalidate: 3600 }, // Cache for 1 hour
     });
     if (!res.ok) return [];

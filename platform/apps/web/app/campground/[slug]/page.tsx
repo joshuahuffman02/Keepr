@@ -66,7 +66,7 @@ interface CampgroundPageData {
 
 async function getCampground(slug: string): Promise<CampgroundPageData | null> {
   try {
-    const res = await fetch(`${API_BASE}/public/campgrounds/${slug}`, {
+    const res = await fetch(`${API_BASE}/api/public/campgrounds/${slug}`, {
       next: { revalidate: 3600 }, // Cache for 1 hour
     });
     if (!res.ok) return null;
