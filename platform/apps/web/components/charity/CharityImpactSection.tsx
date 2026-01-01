@@ -157,27 +157,27 @@ export function CharityImpactSection({ variant = "full", showCTA = true }: Chari
         initial="hidden"
         animate={isInView ? "visible" : "hidden"}
         variants={containerVariants}
-        className="bg-gradient-to-r from-rose-50 to-amber-50 dark:from-rose-950/30 dark:to-amber-950/30 rounded-2xl p-6 border border-rose-100 dark:border-rose-900/50"
+        className="bg-gradient-to-r from-rose-50 to-amber-50 rounded-2xl p-6 border border-rose-100"
       >
         <motion.div variants={itemVariants} className="flex items-center gap-3 mb-4">
           <div className="relative w-10 h-10">
             <Image src="/images/icons/giving-heart.png" alt="Heart" fill className="object-contain" sizes="40px" />
           </div>
           <div>
-            <h3 className="font-semibold text-slate-900 dark:text-white">Community Giving</h3>
-            <p className="text-sm text-slate-600 dark:text-slate-400">Together we make a difference</p>
+            <h3 className="font-semibold text-slate-900">Community Giving</h3>
+            <p className="text-sm text-slate-600">Together we make a difference</p>
           </div>
         </motion.div>
 
         <motion.div variants={itemVariants} className="text-center">
-          <div className="text-4xl font-bold text-rose-600 dark:text-rose-400">
+          <div className="text-4xl font-bold text-rose-600">
             {isLoading ? (
-              <span className="inline-block w-24 h-10 bg-rose-200 dark:bg-rose-800 rounded animate-pulse" />
+              <span className="inline-block w-24 h-10 bg-rose-200 rounded animate-pulse" />
             ) : (
               formatDollars(animatedTotal)
             )}
           </div>
-          <p className="text-sm text-slate-600 dark:text-slate-400 mt-1">
+          <p className="text-sm text-slate-600 mt-1">
             raised for charity
           </p>
         </motion.div>
@@ -186,7 +186,7 @@ export function CharityImpactSection({ variant = "full", showCTA = true }: Chari
   }
 
   return (
-    <section ref={ref} className="py-16 bg-gradient-to-b from-rose-50/50 via-white to-amber-50/30 dark:from-rose-950/20 dark:via-slate-900 dark:to-amber-950/10">
+    <section ref={ref} className="py-16 bg-gradient-to-b from-rose-50/50 via-white to-amber-50/30">
       <div className="max-w-6xl mx-auto px-4">
         <motion.div
           initial="hidden"
@@ -196,15 +196,15 @@ export function CharityImpactSection({ variant = "full", showCTA = true }: Chari
         >
           {/* Header */}
           <motion.div variants={itemVariants} className="mb-12">
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-rose-100 dark:bg-rose-900/50 text-rose-700 dark:text-rose-300 text-sm font-medium mb-4">
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-rose-100 text-rose-700 text-sm font-medium mb-4">
               <Image src="/images/icons/giving-heart.png" alt="Heart" width={20} height={20} className="object-contain" />
               <span>Community Impact</span>
               <Image src="/images/icons/community-circle.png" alt="Community" width={20} height={20} className="object-contain" />
             </div>
-            <h2 className="text-3xl md:text-4xl font-bold text-slate-900 dark:text-white mb-4">
+            <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-4">
               Camping with Heart
             </h2>
-            <p className="text-lg text-slate-600 dark:text-slate-400 max-w-2xl mx-auto">
+            <p className="text-lg text-slate-600 max-w-2xl mx-auto">
               When you book through Camp Everyday, you're part of a community that gives back.
               Campgrounds across the country are making a difference, one reservation at a time.
             </p>
@@ -212,7 +212,7 @@ export function CharityImpactSection({ variant = "full", showCTA = true }: Chari
 
           {/* Main Stats */}
           <motion.div variants={itemVariants} className="mb-12">
-            <div className="inline-block p-8 rounded-3xl bg-white dark:bg-slate-800 shadow-xl shadow-rose-500/10">
+            <div className="inline-block p-8 rounded-3xl bg-white shadow-xl shadow-rose-500/10">
               <div className="flex items-center justify-center gap-3 mb-3">
                 <motion.div
                   animate={isInView && !prefersReducedMotion ? { scale: [1, 1.2, 1] } : {}}
@@ -223,19 +223,19 @@ export function CharityImpactSection({ variant = "full", showCTA = true }: Chari
                 </motion.div>
                 <span className="text-5xl md:text-6xl font-bold bg-gradient-to-r from-rose-600 to-amber-600 bg-clip-text text-transparent">
                   {isLoading ? (
-                    <span className="inline-block w-32 h-14 bg-slate-200 dark:bg-slate-700 rounded animate-pulse" />
+                    <span className="inline-block w-32 h-14 bg-slate-200 rounded animate-pulse" />
                   ) : (
                     formatDollars(animatedTotal)
                   )}
                 </span>
               </div>
-              <p className="text-slate-600 dark:text-slate-400 font-medium">
+              <p className="text-slate-600 font-medium">
                 donated to charity
               </p>
               {!isLoading && (
                 <motion.p
                   variants={itemVariants}
-                  className="text-sm text-amber-600 dark:text-amber-400 mt-2 flex items-center justify-center gap-1"
+                  className="text-sm text-amber-600 mt-2 flex items-center justify-center gap-1"
                 >
                   <TrendingUp className="h-4 w-4" />
                   {getImpactMessage(displayStats.totalAmountCents)}
@@ -249,41 +249,41 @@ export function CharityImpactSection({ variant = "full", showCTA = true }: Chari
             variants={itemVariants}
             className="grid grid-cols-2 md:grid-cols-3 gap-6 mb-12 max-w-3xl mx-auto"
           >
-            <div className="p-6 rounded-2xl bg-white/80 dark:bg-slate-800/80 backdrop-blur">
+            <div className="p-6 rounded-2xl bg-white/80 backdrop-blur">
               <div className="flex items-center justify-center mb-2">
                 <Image src="/images/icons/donation-box.png" alt="Donations" width={32} height={32} className="object-contain" />
               </div>
-              <div className="text-3xl font-bold text-slate-900 dark:text-white">
+              <div className="text-3xl font-bold text-slate-900">
                 {isLoading ? "..." : animatedDonations.toLocaleString()}
               </div>
-              <p className="text-sm text-slate-600 dark:text-slate-400">donations made</p>
+              <p className="text-sm text-slate-600">donations made</p>
             </div>
 
-            <div className="p-6 rounded-2xl bg-white/80 dark:bg-slate-800/80 backdrop-blur">
+            <div className="p-6 rounded-2xl bg-white/80 backdrop-blur">
               <div className="flex items-center justify-center mb-2">
                 <Image src="/images/icons/community-circle.png" alt="Guests" width={32} height={32} className="object-contain" />
               </div>
-              <div className="text-3xl font-bold text-slate-900 dark:text-white">
+              <div className="text-3xl font-bold text-slate-900">
                 {isLoading ? "..." : animatedCampgrounds.toLocaleString()}
               </div>
-              <p className="text-sm text-slate-600 dark:text-slate-400">generous guests</p>
+              <p className="text-sm text-slate-600">generous guests</p>
             </div>
 
-            <div className="col-span-2 md:col-span-1 p-6 rounded-2xl bg-white/80 dark:bg-slate-800/80 backdrop-blur">
+            <div className="col-span-2 md:col-span-1 p-6 rounded-2xl bg-white/80 backdrop-blur">
               <div className="flex items-center justify-center mb-2">
                 <Image src="/images/icons/charity-hands.png" alt="Charities" width={32} height={32} className="object-contain" />
               </div>
-              <div className="text-3xl font-bold text-slate-900 dark:text-white">
+              <div className="text-3xl font-bold text-slate-900">
                 {isLoading ? "..." : topCharities.length}
               </div>
-              <p className="text-sm text-slate-600 dark:text-slate-400">charities supported</p>
+              <p className="text-sm text-slate-600">charities supported</p>
             </div>
           </motion.div>
 
           {/* Top Charities */}
           {topCharities.length > 0 && (
             <motion.div variants={itemVariants} className="mb-12">
-              <h3 className="text-lg font-semibold text-slate-900 dark:text-white mb-6">
+              <h3 className="text-lg font-semibold text-slate-900 mb-6">
                 Top Supported Charities
               </h3>
               <div className="flex flex-wrap justify-center gap-4">
@@ -293,16 +293,16 @@ export function CharityImpactSection({ variant = "full", showCTA = true }: Chari
                     initial={{ opacity: 0, scale: 0.9 }}
                     animate={isInView ? { opacity: 1, scale: 1 } : {}}
                     transition={{ delay: 0.5 + index * 0.1 }}
-                    className="flex items-center gap-3 px-5 py-3 rounded-full bg-white dark:bg-slate-800 shadow-md"
+                    className="flex items-center gap-3 px-5 py-3 rounded-full bg-white shadow-md"
                   >
                     <div className="w-8 h-8 rounded-full bg-gradient-to-br from-rose-400 to-amber-400 flex items-center justify-center text-white font-bold text-sm">
                       {index + 1}
                     </div>
                     <div className="text-left">
-                      <p className="font-medium text-slate-900 dark:text-white text-sm">
+                      <p className="font-medium text-slate-900 text-sm">
                         {item.charity?.name}
                       </p>
-                      <p className="text-xs text-slate-500 dark:text-slate-400">
+                      <p className="text-xs text-slate-500">
                         {formatDollars(item.amountCents)} raised
                       </p>
                     </div>
@@ -315,12 +315,12 @@ export function CharityImpactSection({ variant = "full", showCTA = true }: Chari
           {/* CTA for Campground Owners */}
           {showCTA && (
             <motion.div variants={itemVariants}>
-              <div className="inline-flex flex-col sm:flex-row items-center gap-4 p-6 rounded-2xl bg-gradient-to-r from-emerald-50 to-teal-50 dark:from-emerald-950/30 dark:to-teal-950/30 border border-emerald-200 dark:border-emerald-800">
+              <div className="inline-flex flex-col sm:flex-row items-center gap-4 p-6 rounded-2xl bg-gradient-to-r from-emerald-50 to-teal-50 border border-emerald-200">
                 <div className="text-left">
-                  <p className="font-semibold text-slate-900 dark:text-white">
+                  <p className="font-semibold text-slate-900">
                     Own a campground?
                   </p>
-                  <p className="text-sm text-slate-600 dark:text-slate-400">
+                  <p className="text-sm text-slate-600">
                     Join the movement and let your guests give back too.
                   </p>
                 </div>

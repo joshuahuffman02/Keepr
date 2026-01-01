@@ -402,16 +402,27 @@ export function HomeClient() {
                 >
                     {/* Header */}
                     <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-                        <div>
-                            <h2 className="text-2xl md:text-3xl font-bold text-slate-900">
-                                {activeCategory === "events"
-                                    ? "Upcoming Events"
-                                    : activeCategory !== "all"
-                                    ? categories.find((c) => c.id === activeCategory)?.label || "Campgrounds"
-                                    : searchQuery || stateFilter || amenityFilters.length > 0
-                                    ? "Search Results"
-                                    : "Featured Campgrounds"}
-                            </h2>
+                        <div className="flex items-start gap-3">
+                            {/* Clay icon */}
+                            <div className="relative w-10 h-10 md:w-12 md:h-12 flex-shrink-0">
+                                <Image
+                                    src="/images/icons/bouncing-tent.png"
+                                    alt=""
+                                    fill
+                                    className="object-contain"
+                                    sizes="48px"
+                                />
+                            </div>
+                            <div>
+                                <h2 className="text-2xl md:text-3xl font-bold text-slate-900">
+                                    {activeCategory === "events"
+                                        ? "Upcoming Events"
+                                        : activeCategory !== "all"
+                                        ? categories.find((c) => c.id === activeCategory)?.label || "Campgrounds"
+                                        : searchQuery || stateFilter || amenityFilters.length > 0
+                                        ? "Search Results"
+                                        : "Featured Campgrounds"}
+                                </h2>
                             <p className="text-slate-600 mt-1">
                                 {activeCategory === "events" ? (
                                     <>
@@ -428,6 +439,7 @@ export function HomeClient() {
                                     </>
                                 )}
                             </p>
+                            </div>
                         </div>
                     </div>
 

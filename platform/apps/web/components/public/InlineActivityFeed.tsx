@@ -2,16 +2,14 @@
 
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
-import Image from "next/image";
 
-// Simple, authentic activity messages
-const ACTIVITIES = [
-  { location: "Yellowstone", count: 23, type: "viewing" },
-  { location: "Colorado", count: 18, type: "viewing" },
-  { location: "Lake Tahoe", count: 31, type: "viewing" },
-  { location: "Yosemite", count: 27, type: "viewing" },
-  { location: "Grand Canyon", count: 15, type: "viewing" },
-  { location: "Zion", count: 12, type: "viewing" },
+// Honest, accurate messages - no fake numbers
+const MESSAGES = [
+  { highlight: "Thousands of happy campers", rest: "have found their perfect spot" },
+  { highlight: "From coast to coast", rest: "families are making memories" },
+  { highlight: "New campgrounds", rest: "added every week" },
+  { highlight: "Book instantly", rest: "at hundreds of campgrounds nationwide" },
+  { highlight: "Plan your next adventure", rest: "with real-time availability" },
 ];
 
 interface InlineActivityFeedProps {
@@ -35,9 +33,9 @@ export function InlineActivityFeed({ className }: InlineActivityFeedProps) {
   useEffect(() => {
     if (!isVisible) return;
 
-    // Rotate through activities
+    // Rotate through messages
     const interval = setInterval(() => {
-      setCurrentIndex((prev) => (prev + 1) % ACTIVITIES.length);
+      setCurrentIndex((prev) => (prev + 1) % MESSAGES.length);
     }, 5000);
 
     return () => clearInterval(interval);
@@ -47,7 +45,7 @@ export function InlineActivityFeed({ className }: InlineActivityFeedProps) {
     return null;
   }
 
-  const activity = ACTIVITIES[currentIndex];
+  const message = MESSAGES[currentIndex];
 
   return (
     <motion.div
@@ -65,7 +63,7 @@ export function InlineActivityFeed({ className }: InlineActivityFeedProps) {
             transition={{ duration: 2, repeat: Infinity }}
           />
 
-          {/* Activity text */}
+          {/* Message text */}
           <AnimatePresence mode="wait">
             <motion.p
               key={currentIndex}
@@ -75,8 +73,8 @@ export function InlineActivityFeed({ className }: InlineActivityFeedProps) {
               transition={{ duration: 0.3 }}
               className="text-sm text-slate-600"
             >
-              <span className="font-semibold text-slate-800">{activity.count} adventurers</span>
-              {" "}exploring {activity.location} right now
+              <span className="font-semibold text-slate-800">{message.highlight}</span>
+              {" "}{message.rest}
             </motion.p>
           </AnimatePresence>
         </div>
