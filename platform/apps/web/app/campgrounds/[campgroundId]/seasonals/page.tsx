@@ -1664,6 +1664,7 @@ export default function SeasonalsPage() {
               Seasonal Guests
               <Badge variant="secondary" className="text-lg">{stats?.totalSeasonals || 0}</Badge>
             </h1>
+            <p className="text-xs text-slate-400 mt-0.5">Long-term campers with seasonal agreements (not individual reservations)</p>
             <p className="text-sm text-slate-500 flex items-center gap-2 mt-1">
               <Calendar className="h-4 w-4" />
               <select
@@ -1860,7 +1861,7 @@ export default function SeasonalsPage() {
                 className="rounded border-slate-300"
               />
               <span className="text-slate-500">
-                {selectedIds.length > 0 ? `${selectedIds.length} selected` : `${seasonals.length} guests`}
+                {selectedIds.length > 0 ? `${selectedIds.length} selected` : `${seasonals.length} seasonal guests`}
               </span>
             </div>
 
@@ -2189,7 +2190,7 @@ export default function SeasonalsPage() {
               <div>
                 <h3 className="text-lg font-medium">Waitlist Queue</h3>
                 <p className="text-sm text-slate-500">
-                  {waitlist.length} guests waiting • Est. {3} spots available next season
+                  {waitlist.length} on waitlist • Est. {3} spots available next season
                 </p>
               </div>
               <Button>
@@ -2499,7 +2500,7 @@ export default function SeasonalsPage() {
 
             toast({
               title: "Export complete",
-              description: `Exported ${result.count} guest${result.count !== 1 ? "s" : ""} to CSV`,
+              description: `Exported ${result.count} seasonal guest${result.count !== 1 ? "s" : ""} to CSV`,
             });
           } catch (err: any) {
             toast({ title: "Error", description: err.message, variant: "destructive" });
