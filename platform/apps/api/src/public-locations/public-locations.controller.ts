@@ -24,7 +24,34 @@ export class PublicLocationsController {
   constructor(private readonly locationsService: PublicLocationsService) {}
 
   /**
+   * List all states
+   */
+  @Get()
+  async listStates() {
+    return this.locationsService.listStates();
+  }
+
+  /**
+   * Get popular destinations for homepage
+   * NOTE: Must be defined BEFORE :slug route to prevent "featured" being caught as a slug
+   */
+  @Get("featured/destinations")
+  async getPopularDestinations() {
+    return this.locationsService.getPopularDestinations();
+  }
+
+  /**
+   * Get cities in a state
+   * NOTE: Must be defined BEFORE :slug route to prevent ":stateSlug/cities" conflicts
+   */
+  @Get(":stateSlug/cities")
+  async getCitiesInState(@Param("stateSlug") stateSlug: string) {
+    return this.locationsService.listCitiesInState(stateSlug);
+  }
+
+  /**
    * Get a location page by slug (state, city, or region)
+   * NOTE: Param routes must be LAST to avoid catching literal paths
    */
   @Get(":slug")
   async getLocation(
@@ -45,30 +72,6 @@ export class PublicLocationsController {
 
     return location;
   }
-
-  /**
-   * Get cities in a state
-   */
-  @Get(":stateSlug/cities")
-  async getCitiesInState(@Param("stateSlug") stateSlug: string) {
-    return this.locationsService.listCitiesInState(stateSlug);
-  }
-
-  /**
-   * List all states
-   */
-  @Get()
-  async listStates() {
-    return this.locationsService.listStates();
-  }
-
-  /**
-   * Get popular destinations for homepage
-   */
-  @Get("featured/destinations")
-  async getPopularDestinations() {
-    return this.locationsService.getPopularDestinations();
-  }
 }
 
 @Controller("public/attractions")
@@ -76,7 +79,26 @@ export class PublicAttractionsController {
   constructor(private readonly locationsService: PublicLocationsService) {}
 
   /**
+   * List all national parks
+   * NOTE: Literal routes must be defined BEFORE param routes
+   */
+  @Get("type/national-parks")
+  async listNationalParks() {
+    return this.locationsService.listNationalParks();
+  }
+
+  /**
+   * List attractions by type
+   * NOTE: Must be before :slug but after type/national-parks
+   */
+  @Get("type/:type")
+  async listByType(@Param("type") type: AttractionType) {
+    return this.locationsService.listAttractionsByType(type);
+  }
+
+  /**
    * Get an attraction page by slug
+   * NOTE: Param routes must be LAST to avoid catching literal paths
    */
   @Get(":slug")
   async getAttraction(
@@ -96,21 +118,5 @@ export class PublicAttractionsController {
     }
 
     return attraction;
-  }
-
-  /**
-   * List all national parks
-   */
-  @Get("type/national-parks")
-  async listNationalParks() {
-    return this.locationsService.listNationalParks();
-  }
-
-  /**
-   * List attractions by type
-   */
-  @Get("type/:type")
-  async listByType(@Param("type") type: AttractionType) {
-    return this.locationsService.listAttractionsByType(type);
   }
 }
