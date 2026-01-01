@@ -48,15 +48,13 @@ export function TrustBadges({ variant = "inline", className, showIcons = true }:
 
   if (variant === "stacked") {
     return (
-      <div className={cn("space-y-3", className)}>
+      <div className={cn("grid grid-cols-2 md:grid-cols-4 gap-4", className)}>
         {badges.map((badge, i) => (
-          <div key={i} className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-emerald-100">
-              <badge.icon className="h-5 w-5 text-emerald-600" />
+          <div key={i} className="flex items-center gap-2">
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-100 flex-shrink-0">
+              <badge.icon className="h-4 w-4 text-emerald-600" />
             </div>
-            <div>
-              <p className="font-medium text-slate-900">{badge.text}</p>
-            </div>
+            <p className="text-sm font-medium text-slate-700">{badge.shortText}</p>
           </div>
         ))}
       </div>
