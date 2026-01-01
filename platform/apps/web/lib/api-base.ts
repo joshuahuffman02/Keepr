@@ -5,18 +5,24 @@
  * since Next.js rewrites only work for client-side requests.
  *
  * Priority:
- * 1. NEXT_PUBLIC_API_BASE environment variable (if set)
- * 2. Production: Railway API backend URL
+ * 1. NEXT_PUBLIC_API_BASE environment variable (if set and non-empty)
+ * 2. RAILWAY_ENVIRONMENT or NODE_ENV === "production": Railway API backend
  * 3. Development: localhost:4000
  */
 export function getServerApiBase(): string {
-  // If explicitly set via env var, use that
-  if (process.env.NEXT_PUBLIC_API_BASE) {
-    return process.env.NEXT_PUBLIC_API_BASE;
+  // If explicitly set via env var (and not empty), use that
+  const envApiBase = process.env.NEXT_PUBLIC_API_BASE;
+  if (envApiBase && envApiBase.trim() !== "") {
+    return envApiBase;
   }
 
-  // In production, use the Railway API backend
-  if (process.env.NODE_ENV === "production") {
+  // Check for Railway environment or production mode
+  const isProduction =
+    process.env.RAILWAY_ENVIRONMENT === "production" ||
+    process.env.NODE_ENV === "production" ||
+    process.env.VERCEL_ENV === "production";
+
+  if (isProduction) {
     return "https://camp-everydayapi-production.up.railway.app";
   }
 

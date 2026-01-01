@@ -24,8 +24,8 @@ interface LocationPageData {
   avgRating?: number;
   priceRangeLow?: number;
   priceRangeHigh?: number;
-  popularAmenities: string[];
-  highlights: string[];
+  popularAmenities?: string[];
+  highlights?: string[];
   bestTimeToVisit?: string;
   campgrounds: Array<{
     id: string;
@@ -35,26 +35,29 @@ interface LocationPageData {
     state?: string;
     rating?: number;
     reviewCount?: number;
+    reviewScore?: number;
     priceRange?: { min: number; max: number };
-    amenities: string[];
+    amenities?: string[];
     heroImageUrl?: string;
-    isBookable: boolean;
+    isBookable?: boolean;
+    claimStatus?: string;
   }>;
-  nearbyAttractions: Array<{
+  nearbyAttractions?: Array<{
     id: string;
     name: string;
     slug: string;
     type: string;
-    nearbyCampgroundCount: number;
+    nearbyCampgroundCount?: number;
+    campgroundCount?: number;
   }>;
-  childLocations: Array<{
+  childLocations?: Array<{
     id: string;
     name: string;
     slug: string;
     type: string;
     campgroundCount: number;
   }>;
-  breadcrumbs: Array<{
+  breadcrumbs?: Array<{
     name: string;
     slug: string;
   }>;
@@ -132,7 +135,7 @@ export default async function LocationPage({
         name: "Camping",
         item: "https://campeveryday.com/camping",
       },
-      ...location.breadcrumbs.map((bc, index) => ({
+      ...(location.breadcrumbs || []).map((bc, index) => ({
         "@type": "ListItem",
         position: index + 2,
         name: bc.name,
@@ -169,10 +172,10 @@ export default async function LocationPage({
             <Link href="/camping" className="hover:text-white">
               Camping
             </Link>
-            {location.breadcrumbs.map((bc, index) => (
+            {(location.breadcrumbs || []).map((bc, index) => (
               <span key={bc.slug} className="flex items-center gap-2">
                 <ChevronRight className="h-4 w-4" />
-                {index === location.breadcrumbs.length - 1 ? (
+                {index === (location.breadcrumbs || []).length - 1 ? (
                   <span className="text-white">{bc.name}</span>
                 ) : (
                   <Link href={`/camping/${bc.slug}`} className="hover:text-white">
@@ -226,13 +229,13 @@ export default async function LocationPage({
             {/* Sidebar - Filters & Info */}
             <div className="lg:col-span-1 space-y-8">
               {/* Child Locations */}
-              {location.childLocations.length > 0 && (
+              {(location.childLocations || []).length > 0 && (
                 <div>
                   <h3 className="text-lg font-bold text-slate-900 mb-4">
                     {location.type === "state" ? "Cities" : "Areas"}
                   </h3>
                   <div className="space-y-2">
-                    {location.childLocations.slice(0, 10).map((child) => (
+                    {(location.childLocations || []).slice(0, 10).map((child) => (
                       <Link
                         key={child.id}
                         href={`/camping/${child.slug}`}
@@ -245,22 +248,22 @@ export default async function LocationPage({
                       </Link>
                     ))}
                   </div>
-                  {location.childLocations.length > 10 && (
+                  {(location.childLocations || []).length > 10 && (
                     <button className="mt-3 text-emerald-600 text-sm hover:underline">
-                      Show all {location.childLocations.length} locations
+                      Show all {(location.childLocations || []).length} locations
                     </button>
                   )}
                 </div>
               )}
 
               {/* Nearby Attractions */}
-              {location.nearbyAttractions.length > 0 && (
+              {(location.nearbyAttractions || []).length > 0 && (
                 <div>
                   <h3 className="text-lg font-bold text-slate-900 mb-4">
                     Nearby Attractions
                   </h3>
                   <div className="space-y-2">
-                    {location.nearbyAttractions.slice(0, 5).map((attraction) => (
+                    {(location.nearbyAttractions || []).slice(0, 5).map((attraction) => (
                       <Link
                         key={attraction.id}
                         href={`/near/${attraction.slug}`}
@@ -282,13 +285,13 @@ export default async function LocationPage({
               )}
 
               {/* Popular Amenities */}
-              {location.popularAmenities.length > 0 && (
+              {(location.popularAmenities || []).length > 0 && (
                 <div>
                   <h3 className="text-lg font-bold text-slate-900 mb-4">
                     Popular Amenities
                   </h3>
                   <div className="flex flex-wrap gap-2">
-                    {location.popularAmenities.map((amenity) => (
+                    {(location.popularAmenities || []).map((amenity) => (
                       <span
                         key={amenity}
                         className="px-3 py-1 bg-emerald-50 text-emerald-700 rounded-full text-sm"
@@ -389,9 +392,9 @@ export default async function LocationPage({
                       </div>
 
                       {/* Amenities Preview */}
-                      {campground.amenities.length > 0 && (
+                      {(campground.amenities || []).length > 0 && (
                         <div className="mt-3 flex flex-wrap gap-1">
-                          {campground.amenities.slice(0, 3).map((amenity) => (
+                          {(campground.amenities || []).slice(0, 3).map((amenity) => (
                             <span
                               key={amenity}
                               className="px-2 py-0.5 bg-slate-100 text-slate-600 rounded text-xs"
@@ -399,9 +402,9 @@ export default async function LocationPage({
                               {amenity}
                             </span>
                           ))}
-                          {campground.amenities.length > 3 && (
+                          {(campground.amenities || []).length > 3 && (
                             <span className="px-2 py-0.5 text-slate-500 text-xs">
-                              +{campground.amenities.length - 3} more
+                              +{(campground.amenities || []).length - 3} more
                             </span>
                           )}
                         </div>
@@ -435,14 +438,14 @@ export default async function LocationPage({
       </section>
 
       {/* Highlights Section */}
-      {location.highlights.length > 0 && (
+      {(location.highlights || []).length > 0 && (
         <section className="py-16 bg-slate-50">
           <div className="max-w-6xl mx-auto px-6">
             <h2 className="text-2xl font-bold text-slate-900 mb-6">
               Why Camp in {location.name}?
             </h2>
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {location.highlights.map((highlight, index) => (
+              {(location.highlights || []).map((highlight, index) => (
                 <div
                   key={index}
                   className="bg-white rounded-xl p-6 border border-slate-200"
@@ -470,24 +473,24 @@ export default async function LocationPage({
               every camping style.
             </p>
 
-            {location.popularAmenities.length > 0 && (
+            {(location.popularAmenities || []).length > 0 && (
               <>
                 <h3>Popular Amenities</h3>
                 <p>
                   Campgrounds in {location.name} commonly offer{" "}
-                  {location.popularAmenities.slice(0, 5).join(", ")}. Many facilities
+                  {(location.popularAmenities || []).slice(0, 5).join(", ")}. Many facilities
                   cater to both tent campers and RV travelers with various hookup
                   options.
                 </p>
               </>
             )}
 
-            {location.nearbyAttractions.length > 0 && (
+            {(location.nearbyAttractions || []).length > 0 && (
               <>
                 <h3>Things to Do</h3>
                 <p>
                   Visitors to {location.name} can explore nearby attractions including{" "}
-                  {location.nearbyAttractions
+                  {(location.nearbyAttractions || [])
                     .slice(0, 3)
                     .map((a) => a.name)
                     .join(", ")}
