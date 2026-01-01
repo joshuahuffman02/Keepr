@@ -105,7 +105,7 @@ export default async function CampingIndexPage() {
       />
 
       {/* Hero Section */}
-      <section className="relative pt-20 pb-32 bg-gradient-to-br from-emerald-900 via-emerald-800 to-slate-900 overflow-hidden">
+      <section className="relative pb-32 bg-gradient-to-br from-emerald-900 via-emerald-800 to-slate-900 overflow-hidden">
         <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-10" />
         <div className="relative max-w-6xl mx-auto px-6 text-center">
           <h1 className="text-4xl md:text-6xl font-bold text-white mb-6">

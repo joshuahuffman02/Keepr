@@ -170,7 +170,7 @@ export default async function CampgroundPage({
 
       {/* Hero Section */}
       <section
-        className="relative pt-20 pb-32 bg-cover bg-center"
+        className="relative pb-32 bg-cover bg-center"
         style={{
           backgroundImage: campground.heroImageUrl
             ? `url(${campground.heroImageUrl})`

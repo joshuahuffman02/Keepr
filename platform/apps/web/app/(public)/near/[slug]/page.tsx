@@ -157,7 +157,7 @@ export default async function AttractionPage({
 
       {/* Hero Section */}
       <section
-        className="relative pt-20 pb-32 bg-cover bg-center"
+        className="relative pb-32 bg-cover bg-center"
         style={{
           backgroundImage: attraction.heroImageUrl
             ? `url(${attraction.heroImageUrl})`
@@ -392,13 +392,10 @@ export default async function AttractionPage({
                 ))}
               </div>
 
-              {/* Load More */}
+              {/* Pagination Info */}
               {attraction.campgrounds.length < attraction.nearbyCampgroundCount && (
-                <div className="mt-8 text-center">
-                  <Button variant="outline" size="lg">
-                    Load More Campgrounds
-                    <ArrowRight className="ml-2 h-4 w-4" />
-                  </Button>
+                <div className="mt-8 text-center text-slate-500">
+                  Showing {attraction.campgrounds.length} of {attraction.nearbyCampgroundCount} campgrounds
                 </div>
               )}
             </div>

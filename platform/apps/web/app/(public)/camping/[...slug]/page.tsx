@@ -6,7 +6,6 @@ import {
   Star,
   Tent,
   Mountain,
-  ArrowRight,
   Filter,
   ChevronRight,
 } from "lucide-react";
@@ -158,7 +157,7 @@ export default async function LocationPage({
 
       {/* Hero Section */}
       <section
-        className="relative pt-20 pb-32 bg-cover bg-center"
+        className="relative pb-32 bg-cover bg-center"
         style={{
           backgroundImage: location.heroImageUrl
             ? `url(${location.heroImageUrl})`
@@ -423,13 +422,10 @@ export default async function LocationPage({
                 ))}
               </div>
 
-              {/* Load More */}
+              {/* Pagination Info */}
               {location.campgrounds.length < location.campgroundCount && (
-                <div className="mt-8 text-center">
-                  <Button variant="outline" size="lg">
-                    Load More Campgrounds
-                    <ArrowRight className="ml-2 h-4 w-4" />
-                  </Button>
+                <div className="mt-8 text-center text-slate-500">
+                  Showing {location.campgrounds.length} of {location.campgroundCount} campgrounds
                 </div>
               )}
             </div>
