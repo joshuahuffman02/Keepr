@@ -22,6 +22,13 @@ interface CampgroundCardProps {
     rating?: number | null;
     reviewCount?: number | null;
     pricePerNight?: number;
+    // All-in pricing (total with fees for typical stay)
+    totalPriceEstimate?: {
+        nights: number;
+        subtotal: number;
+        fees: number;
+        total: number;
+    };
     amenities?: string[];
     onExplore?: () => void;
     ratingBadge?: string;
@@ -36,6 +43,8 @@ interface CampgroundCardProps {
     adaCertificationLevel?: AdaCertificationLevel;
     // Compact mode for horizontal scroll sections
     compact?: boolean;
+    // Show "no hidden fees" badge
+    showNoHiddenFeesBadge?: boolean;
 }
 
 export function CampgroundCard({
@@ -53,13 +62,15 @@ export function CampgroundCard({
     rating,
     reviewCount,
     pricePerNight,
+    totalPriceEstimate,
     amenities = [],
     onExplore,
     ratingBadge,
     npsBadge,
     pastAwards = [],
     adaCertificationLevel,
-    compact = false
+    compact = false,
+    showNoHiddenFeesBadge = false
 }: CampgroundCardProps) {
     const adaBadge = adaCertificationLevel ? getAdaBadgeInfo(adaCertificationLevel) : null;
     const [isHovered, setIsHovered] = useState(false);
@@ -383,9 +394,59 @@ export function CampgroundCard({
                 ) : (
                     <div className="flex items-center justify-between pt-3 border-t border-slate-100">
                         {pricePerNight ? (
-                            <div>
-                                <span className="text-lg font-bold text-slate-900">${pricePerNight}</span>
-                                <span className="text-sm text-slate-500"> / night</span>
+                            <div className="group/price relative">
+                                <div className="flex items-baseline gap-1">
+                                    <span className="text-lg font-bold text-slate-900">${pricePerNight}</span>
+                                    <span className="text-sm text-slate-500">/ night</span>
+                                </div>
+
+                                {/* All-in price with tooltip */}
+                                {totalPriceEstimate && (
+                                    <div className="text-xs text-slate-500 mt-0.5 cursor-help">
+                                        <span className="font-medium text-emerald-600">
+                                            ${totalPriceEstimate.total} total
+                                        </span>
+                                        <span className="text-slate-400"> for {totalPriceEstimate.nights} nights</span>
+
+                                        {/* Tooltip on hover */}
+                                        <div className="absolute left-0 bottom-full mb-2 w-48 p-3 bg-slate-900 text-white text-xs rounded-lg shadow-xl opacity-0 invisible group-hover/price:opacity-100 group-hover/price:visible transition-all z-20">
+                                            <div className="flex justify-between mb-1">
+                                                <span>${pricePerNight} x {totalPriceEstimate.nights} nights</span>
+                                                <span>${totalPriceEstimate.subtotal}</span>
+                                            </div>
+                                            {totalPriceEstimate.fees > 0 && (
+                                                <div className="flex justify-between text-slate-300">
+                                                    <span>Fees & taxes</span>
+                                                    <span>${totalPriceEstimate.fees}</span>
+                                                </div>
+                                            )}
+                                            <div className="flex justify-between mt-1 pt-1 border-t border-slate-700 font-semibold">
+                                                <span>Total</span>
+                                                <span>${totalPriceEstimate.total}</span>
+                                            </div>
+                                            {showNoHiddenFeesBadge && (
+                                                <div className="mt-2 pt-2 border-t border-slate-700 flex items-center gap-1 text-emerald-400">
+                                                    <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                                                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                                                    </svg>
+                                                    No hidden fees
+                                                </div>
+                                            )}
+                                            {/* Arrow */}
+                                            <div className="absolute left-4 -bottom-1 w-2 h-2 bg-slate-900 rotate-45" />
+                                        </div>
+                                    </div>
+                                )}
+
+                                {/* No hidden fees badge - inline version */}
+                                {showNoHiddenFeesBadge && !totalPriceEstimate && (
+                                    <div className="flex items-center gap-1 text-xs text-emerald-600 mt-0.5">
+                                        <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                                        </svg>
+                                        No hidden fees
+                                    </div>
+                                )}
                             </div>
                         ) : (
                             <span className="text-sm text-slate-500">Contact for pricing</span>
