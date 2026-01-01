@@ -10,7 +10,7 @@ import { Maintenance } from "@campreserv/shared";
 import { format } from "date-fns";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { CreateTicketDialog } from "@/components/maintenance/CreateTicketDialog";
+import { CreateTicketDialog, MaintenanceTicket } from "@/components/maintenance/CreateTicketDialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { HelpAnchor } from "@/components/help/HelpAnchor";
 import { MobileQuickActionsBar } from "@/components/staff/MobileQuickActionsBar";
@@ -23,6 +23,7 @@ export default function MaintenancePage() {
   const [loading, setLoading] = useState(true);
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<string>("open");
+  const [selectedTicket, setSelectedTicket] = useState<MaintenanceTicket | null>(null);
 
   useEffect(() => {
     loadTickets();
@@ -113,7 +114,11 @@ export default function MaintenancePage() {
             </div>
           ) : (
             tickets.map((ticket) => (
-              <Card key={ticket.id} className="relative overflow-hidden">
+              <Card
+                key={ticket.id}
+                className="relative overflow-hidden cursor-pointer hover:border-slate-400 transition-colors"
+                onClick={() => setSelectedTicket(ticket as unknown as MaintenanceTicket)}
+              >
                 <div className="p-4 flex flex-col gap-3 sm:flex-row sm:items-start sm:gap-4">
                   <div className={`hidden sm:block w-2 h-full absolute left-0 top-0 ${ticket.priority === 'critical' ? 'bg-red-500' :
                     ticket.priority === 'high' ? 'bg-orange-500' : 'bg-transparent'
@@ -163,12 +168,21 @@ export default function MaintenancePage() {
       </Tabs>
 
       <CreateTicketDialog
-        open={isCreateOpen}
-        onOpenChange={setIsCreateOpen}
+        open={isCreateOpen || !!selectedTicket}
+        onOpenChange={(open) => {
+          if (!open) {
+            setIsCreateOpen(false);
+            setSelectedTicket(null);
+          } else {
+            setIsCreateOpen(true);
+          }
+        }}
         onSuccess={() => {
           setIsCreateOpen(false);
+          setSelectedTicket(null);
           loadTickets();
         }}
+        ticket={selectedTicket}
       />
       <MobileQuickActionsBar
         active="tasks"

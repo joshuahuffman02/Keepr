@@ -13,27 +13,46 @@ import { useToast } from "@/components/ui/use-toast";
 import type { Site } from "@campreserv/shared";
 
 type MaintenancePriority = "low" | "medium" | "high" | "critical";
+type MaintenanceStatus = "open" | "in_progress" | "closed";
+
+export interface MaintenanceTicket {
+    id: string;
+    title: string;
+    description?: string;
+    priority: MaintenancePriority;
+    status: MaintenanceStatus;
+    siteId?: string;
+    isBlocking?: boolean;
+    outOfOrder?: boolean;
+    outOfOrderReason?: string;
+    dueDate?: string;
+    campgroundId: string;
+}
 
 interface CreateTicketDialogProps {
     open: boolean;
     onOpenChange: (open: boolean) => void;
     onSuccess: () => void;
     campgroundId?: string | null;
+    ticket?: MaintenanceTicket | null; // If provided, edit mode
 }
 
 type SiteOption = Pick<Site, "id" | "name" | "siteNumber">;
 
-export function CreateTicketDialog({ open, onOpenChange, onSuccess, campgroundId }: CreateTicketDialogProps) {
+export function CreateTicketDialog({ open, onOpenChange, onSuccess, campgroundId, ticket }: CreateTicketDialogProps) {
     const { toast } = useToast();
     const [loading, setLoading] = useState(false);
     const [sites, setSites] = useState<SiteOption[]>([]);
     const [sitesLoading, setSitesLoading] = useState(false);
     const [selectedCampgroundId, setSelectedCampgroundId] = useState<string | null>(campgroundId ?? null);
 
+    const isEditMode = !!ticket;
+
     const [formData, setFormData] = useState({
         title: "",
         description: "",
         priority: "medium" as MaintenancePriority,
+        status: "open" as MaintenanceStatus,
         siteId: "none",
         isBlocking: false,
         outOfOrder: false,
@@ -44,11 +63,39 @@ export function CreateTicketDialog({ open, onOpenChange, onSuccess, campgroundId
     useEffect(() => {
         if (open) {
             const stored = localStorage.getItem("campreserv:selectedCampground");
-            const nextCampgroundId = campgroundId ?? stored ?? null;
+            const nextCampgroundId = ticket?.campgroundId ?? campgroundId ?? stored ?? null;
             setSelectedCampgroundId(nextCampgroundId);
             void loadSites(nextCampgroundId);
+
+            // Populate form if editing
+            if (ticket) {
+                setFormData({
+                    title: ticket.title,
+                    description: ticket.description || "",
+                    priority: ticket.priority,
+                    status: ticket.status,
+                    siteId: ticket.siteId || "none",
+                    isBlocking: ticket.isBlocking || false,
+                    outOfOrder: ticket.outOfOrder || false,
+                    outOfOrderReason: ticket.outOfOrderReason || "",
+                    dueDate: ticket.dueDate ? ticket.dueDate.split("T")[0] : ""
+                });
+            } else {
+                // Reset form for create mode
+                setFormData({
+                    title: "",
+                    description: "",
+                    priority: "medium",
+                    status: "open",
+                    siteId: "none",
+                    isBlocking: false,
+                    outOfOrder: false,
+                    outOfOrderReason: "",
+                    dueDate: ""
+                });
+            }
         }
-    }, [open, campgroundId]);
+    }, [open, campgroundId, ticket]);
 
     async function loadSites(nextCampgroundId: string | null) {
         if (!nextCampgroundId) {
@@ -80,45 +127,45 @@ export function CreateTicketDialog({ open, onOpenChange, onSuccess, campgroundId
             if (!selectedCampgroundId) {
                 toast({
                     title: "Select a campground",
-                    description: "Pick a campground before creating a maintenance ticket.",
+                    description: "Pick a campground before saving the ticket.",
                     variant: "destructive"
                 });
                 setLoading(false);
                 return;
             }
-            interface CreateMaintenanceTicketPayload {
-                title: string;
-                description: string;
-                priority: MaintenancePriority;
-                campgroundId: string;
-                siteId?: string;
-                status: "open";
-                isBlocking: boolean;
-                outOfOrder: boolean;
-                outOfOrderReason?: string;
-                dueDate?: string;
-            }
 
-            const payload: CreateMaintenanceTicketPayload = {
-                ...formData,
+            const payload = {
+                title: formData.title,
+                description: formData.description,
+                priority: formData.priority,
+                status: formData.status as "open" | "in_progress" | "closed",
                 siteId: formData.siteId === "none" ? undefined : formData.siteId,
                 campgroundId: selectedCampgroundId,
-                status: "open",
+                isBlocking: formData.isBlocking,
                 outOfOrder: formData.outOfOrder,
                 outOfOrderReason: formData.outOfOrder ? formData.outOfOrderReason : undefined,
+                dueDate: formData.dueDate || undefined,
             };
 
-            await apiClient.createMaintenanceTicket(payload);
-
-            toast({
-                title: "Ticket created",
-                description: "Maintenance ticket has been created successfully."
-            });
+            if (isEditMode && ticket) {
+                await apiClient.updateMaintenance(ticket.id, payload);
+                toast({
+                    title: "Ticket updated",
+                    description: "Maintenance ticket has been updated successfully."
+                });
+            } else {
+                await apiClient.createMaintenanceTicket(payload);
+                toast({
+                    title: "Ticket created",
+                    description: "Maintenance ticket has been created successfully."
+                });
+            }
 
             setFormData({
                 title: "",
                 description: "",
                 priority: "medium",
+                status: "open",
                 siteId: "none",
                 isBlocking: false,
                 outOfOrder: false,
@@ -130,7 +177,7 @@ export function CreateTicketDialog({ open, onOpenChange, onSuccess, campgroundId
         } catch (error) {
             toast({
                 title: "Error",
-                description: "Failed to create ticket. Please try again.",
+                description: isEditMode ? "Failed to update ticket. Please try again." : "Failed to create ticket. Please try again.",
                 variant: "destructive"
             });
         } finally {
@@ -142,9 +189,9 @@ export function CreateTicketDialog({ open, onOpenChange, onSuccess, campgroundId
         <Dialog open={open} onOpenChange={onOpenChange}>
             <DialogContent className="sm:max-w-[500px]">
                 <DialogHeader>
-                    <DialogTitle>Create Maintenance Ticket</DialogTitle>
+                    <DialogTitle>{isEditMode ? "Edit Maintenance Ticket" : "Create Maintenance Ticket"}</DialogTitle>
                     <DialogDescription>
-                        Report an issue or schedule maintenance.
+                        {isEditMode ? "Update ticket details and status." : "Report an issue or schedule maintenance."}
                     </DialogDescription>
                 </DialogHeader>
 
@@ -216,6 +263,25 @@ export function CreateTicketDialog({ open, onOpenChange, onSuccess, campgroundId
                         </div>
                     </div>
 
+                    {isEditMode && (
+                        <div className="space-y-2">
+                            <Label htmlFor="status">Status</Label>
+                            <Select
+                                value={formData.status}
+                                onValueChange={(v) => setFormData({ ...formData, status: v as MaintenanceStatus })}
+                            >
+                                <SelectTrigger>
+                                    <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="open">Open</SelectItem>
+                                    <SelectItem value="in_progress">In Progress</SelectItem>
+                                    <SelectItem value="closed">Closed</SelectItem>
+                                </SelectContent>
+                            </Select>
+                        </div>
+                    )}
+
                     <div className="flex items-center justify-between space-x-2 border p-3 rounded-md">
                         <div className="space-y-0.5">
                             <Label className="text-base">Block Availability</Label>
@@ -259,7 +325,7 @@ export function CreateTicketDialog({ open, onOpenChange, onSuccess, campgroundId
                             Cancel
                         </Button>
                         <Button type="submit" disabled={loading}>
-                            {loading ? "Creating..." : "Create Ticket"}
+                            {loading ? "Saving..." : isEditMode ? "Save Changes" : "Create Ticket"}
                         </Button>
                     </div>
                 </form>
