@@ -79,26 +79,31 @@ alias sf='npx tsx src/cli/index.ts'
 sf import --from prisma -i "/Users/josh/Documents/GitHub/Campreserv (broken) copy/platform/apps/api/prisma/schema.prisma" -o ./campreserv.forge
 ```
 
-### Step 3: Configure for Prisma + NestJS
+### Step 3: Generate AI Context (Most Useful)
 
-Edit `campreserv.forge` config block:
+```bash
+sf context --schema ./campreserv.forge --output ./campreserv-context.md
+```
+
+This generates 11,000+ lines of AI-readable documentation covering all 335 models, relationships, and 1,675 API endpoints.
+
+### Step 4: Configure for Code Generation (Optional)
+
+Edit `campreserv.forge` config block (note: uses `:` not `=`):
 
 ```
 config {
-  output = "./generated"
-  stack {
-    database {
-      engine = "postgresql"
-      orm = "prisma"
-    }
-    api {
-      framework = "nestjs"
-    }
-  }
+  database: "postgresql"
+  output: "./generated"
+  apiStyle: "hono"
 }
 ```
 
-### Step 4: Add @ai Annotations (Optional)
+**Note:** The importer automatically renames reserved keywords:
+- `action` -> `actionType`
+- `model` -> `modelRef`
+
+### Step 5: Add @ai Annotations (Optional)
 
 ```
 model Reservation @softDelete {
@@ -112,12 +117,11 @@ model Reservation @softDelete {
 }
 ```
 
-### Step 5: Generate, Context, Verify
+### Step 6: Generate Code
 
 ```bash
-sf generate --schema ./campreserv.forge
-sf context --schema ./campreserv.forge
-sf verify --schema ./campreserv.forge
+sf generate --schema ./campreserv.forge   # Generates validators, types, API, forms, tables
+sf verify --schema ./campreserv.forge     # Check schema/code consistency
 ```
 
 ### Key Commands
