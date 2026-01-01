@@ -56,47 +56,80 @@ pnpm lint:web               # Lint web app
 
 ---
 
-## Database & API Generation
+## SchemaForge Setup
 
-This project uses SchemaForge for schema-driven development.
+SchemaForge is located at `/Users/josh/Documents/GitHub/Programming Lanuauge` (note: folder has typo).
 
-### Workflow
-1. Define/modify data models in `schema.forge`
-2. Run `npx schemaforge generate` to regenerate all code
-3. Run `npx schemaforge migrate run` to apply pending migrations
+**Important:** The npm-published `schemaforge` package only has basic commands. The full feature set (import, context, verify, multi-stack) is in the local dev version.
 
-### Schema Location
-- Schema file: `schema.forge`
-- Generated code: `./generated/`
+### Step 1: Use Local Dev Version
 
-### Key Commands
 ```bash
-npx schemaforge init              # Initialize a new schema.forge file
-npx schemaforge generate          # Regenerate all code from schema
-npx schemaforge migrate create    # Create a new migration
-npx schemaforge migrate run       # Apply pending migrations
+cd "/Users/josh/Documents/GitHub/Programming Lanuauge"
+pnpm install
+pnpm build
+
+# Add this alias to save typing
+alias sf='npx tsx src/cli/index.ts'
 ```
 
-### Schema Syntax
+### Step 2: Import Existing Prisma Schema
+
+```bash
+sf import --from prisma -i "/Users/josh/Documents/GitHub/Campreserv (broken) copy/platform/apps/api/prisma/schema.prisma" -o ./campreserv.forge
 ```
-model Post @softDelete {
-  id        String   @id @default(uuid)
-  title     String   @min(1) @max(200)
-  content   String?  @ui(inputType: "textarea")
-  published Boolean  @default(false)
-  author    User     @relation(fields: [authorId], references: [id])
-  authorId  String
-  createdAt DateTime @default(now)
+
+### Step 3: Configure for Prisma + NestJS
+
+Edit `campreserv.forge` config block:
+
+```
+config {
+  output = "./generated"
+  stack {
+    database {
+      engine = "postgresql"
+      orm = "prisma"
+    }
+    api {
+      framework = "nestjs"
+    }
+  }
 }
 ```
 
-### Available Attributes
-- `@id` - Primary key
-- `@default(uuid|now|value)` - Default values
-- `@unique` - Unique constraint
-- `@softDelete` - Model-level soft delete
-- `@ui(inputType, label, placeholder)` - Form hints
-- `@min(n)` / `@max(n)` - Validation
+### Step 4: Add @ai Annotations (Optional)
+
+```
+model Reservation @softDelete {
+  @ai.description("A booking for a campsite over a date range")
+  @ai.rules(["Status only moves forward", "checked_in requires payment"])
+  @ai.transitions({ pending: ["confirmed", "cancelled"], confirmed: ["checked_in", "cancelled"] })
+  status String @default("pending")
+
+  @ai.computed("Derived from nights * nightly rate")
+  totalCents Int
+}
+```
+
+### Step 5: Generate, Context, Verify
+
+```bash
+sf generate --schema ./campreserv.forge
+sf context --schema ./campreserv.forge
+sf verify --schema ./campreserv.forge
+```
+
+### Key Commands
+
+| Command                 | Purpose                            |
+|-------------------------|------------------------------------|
+| `sf import --from prisma` | Import existing Prisma schema      |
+| `sf generate`             | Generate code for configured stack |
+| `sf context`              | Generate AI-readable documentation |
+| `sf verify`               | Check schema/code consistency      |
+| `sf migrate create`       | Create database migration          |
+| `sf migrate run`          | Apply pending migrations           |
 
 **DO NOT manually edit files in `./generated/` - they will be overwritten.**
 
