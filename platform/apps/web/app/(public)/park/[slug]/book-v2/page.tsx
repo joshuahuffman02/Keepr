@@ -73,6 +73,13 @@ interface GuestFormData {
   lastName: string;
   email: string;
   phone: string;
+  address?: {
+    street: string;
+    city: string;
+    state: string;
+    zipCode: string;
+    country: string;
+  };
   vehicle?: {
     type: string;
     length: string;
@@ -545,6 +552,9 @@ function PaymentStep({
   selectedSiteClassId,
   selectedSiteId,
   guestInfo,
+  quote,
+  isLoadingQuote,
+  priceBreakdown,
   onBack,
   onComplete,
 }: {
@@ -555,6 +565,9 @@ function PaymentStep({
   selectedSiteClassId: string | null;
   selectedSiteId: string | null;
   guestInfo: GuestFormData;
+  quote: Quote | undefined;
+  isLoadingQuote: boolean;
+  priceBreakdown: { label: string; amount: number; isDiscount?: boolean; isTax?: boolean }[];
   onBack: () => void;
   onComplete: (reservation: any) => void;
 }) {
@@ -565,28 +578,6 @@ function PaymentStep({
     amountCents: number;
     charityId: string | null;
   }>({ optedIn: false, amountCents: 0, charityId: null });
-
-  // Get quote - requires siteId, so only fetch when we have one
-  const {
-    data: quote,
-    isLoading: isLoadingQuote,
-    error: quoteError,
-  } = useQuery({
-    queryKey: [
-      "public-quote",
-      slug,
-      arrivalDate,
-      departureDate,
-      selectedSiteId,
-    ],
-    queryFn: () =>
-      apiClient.getPublicQuote(slug, {
-        arrivalDate,
-        departureDate,
-        siteId: selectedSiteId!,
-      }),
-    enabled: !!slug && !!arrivalDate && !!departureDate && !!selectedSiteId,
-  });
 
   // Create reservation mutation
   const createReservation = useMutation({
@@ -603,7 +594,7 @@ function PaymentStep({
           lastName: guestInfo.lastName,
           email: guestInfo.email.toLowerCase().trim(),
           phone: guestInfo.phone,
-          zipCode: "", // Required field - will be filled if we add zip code to form
+          zipCode: guestInfo.address?.zipCode || "",
         },
         adults: guestInfo.adults,
         children: guestInfo.children,
@@ -661,24 +652,18 @@ function PaymentStep({
             <div className="h-4 bg-slate-200 rounded w-3/4" />
             <div className="h-4 bg-slate-200 rounded w-1/2" />
           </div>
-        ) : quote ? (
+        ) : priceBreakdown.length > 0 ? (
           <div className="space-y-3 p-4 bg-slate-50 rounded-lg">
-            <div className="flex justify-between text-sm">
-              <span className="text-slate-600">
-                {quote.nights} night{quote.nights !== 1 ? "s" : ""} x ${(quote.perNightCents / 100).toFixed(2)}
-              </span>
-              <span className="text-slate-900">
-                ${(quote.baseSubtotalCents / 100).toFixed(2)}
-              </span>
-            </div>
-            {quote.taxesCents > 0 && (
-              <div className="flex justify-between text-sm">
-                <span className="text-slate-600">Taxes & fees</span>
-                <span className="text-slate-900">
-                  ${(quote.taxesCents / 100).toFixed(2)}
+            {priceBreakdown.map((item, idx) => (
+              <div key={idx} className="flex justify-between text-sm">
+                <span className={item.isDiscount ? "text-emerald-600" : "text-slate-600"}>
+                  {item.label}
+                </span>
+                <span className={item.isDiscount ? "text-emerald-600" : "text-slate-900"}>
+                  {item.isDiscount ? "-" : ""}${(item.amount / 100).toFixed(2)}
                 </span>
               </div>
-            )}
+            ))}
             <div className="border-t border-slate-200 pt-3 flex justify-between font-semibold">
               <span>Total</span>
               <span className="text-emerald-600">
@@ -926,12 +911,105 @@ export default function BookingPageV2() {
     (sc: any) => sc.id === selectedSiteClassId
   );
   const pricePerNight = selectedClass?.defaultRate || 0;
-  const subtotal = pricePerNight * nights;
 
-  // Build price breakdown
+  // Get a representative site for quoting (use selected site or first available from class)
+  const quoteSiteId = useMemo(() => {
+    if (selectedSiteId) return selectedSiteId;
+    if (!selectedSiteClassId || !availableSites) return null;
+    const classAvailable = availableSites.find(
+      (site) => site.siteClass?.id === selectedSiteClassId && site.status === "available"
+    );
+    return classAvailable?.id || null;
+  }, [selectedSiteId, selectedSiteClassId, availableSites]);
+
+  // Fetch quote for accurate pricing including dynamic pricing, taxes, booking fee, etc.
+  const {
+    data: quote,
+    isLoading: isLoadingQuote,
+  } = useQuery({
+    queryKey: [
+      "public-quote",
+      slug,
+      arrivalDate,
+      departureDate,
+      quoteSiteId,
+      guestInfo.adults,
+      guestInfo.children,
+      guestInfo.petCount,
+    ],
+    queryFn: () =>
+      apiClient.getPublicQuote(slug, {
+        siteId: quoteSiteId!,
+        arrivalDate,
+        departureDate,
+        adults: guestInfo.adults,
+        children: guestInfo.children,
+        petCount: guestInfo.petCount,
+        petTypes: guestInfo.petTypes,
+      }),
+    enabled: !!slug && !!arrivalDate && !!departureDate && !!quoteSiteId,
+    staleTime: 30 * 1000, // 30 seconds
+  });
+
+  // Build price breakdown from actual quote data
   const priceBreakdown = useMemo(() => {
-    const items: { label: string; amount: number; isDiscount?: boolean }[] = [];
-    if (selectedClass && nights > 0) {
+    const items: { label: string; amount: number; isDiscount?: boolean; isTax?: boolean }[] = [];
+
+    if (quote && nights > 0) {
+      // Base rate
+      items.push({
+        label: `${selectedClass?.name || "Accommodation"} x ${nights} night${nights !== 1 ? "s" : ""}`,
+        amount: quote.baseSubtotalCents,
+      });
+
+      // Pricing rules delta (dynamic pricing adjustments)
+      if (quote.rulesDeltaCents && quote.rulesDeltaCents !== 0) {
+        items.push({
+          label: quote.rulesDeltaCents > 0 ? "Peak season adjustment" : "Off-season discount",
+          amount: Math.abs(quote.rulesDeltaCents),
+          isDiscount: quote.rulesDeltaCents < 0,
+        });
+      }
+
+      // Applied discounts (promo codes, loyalty, etc.)
+      if (quote.appliedDiscounts && quote.appliedDiscounts.length > 0) {
+        for (const discount of quote.appliedDiscounts) {
+          items.push({
+            label: discount.type === "promo" ? "Promo code" : "Discount",
+            amount: discount.amountCents,
+            isDiscount: true,
+          });
+        }
+      }
+
+      // Referral discount
+      if (quote.referralDiscountCents && quote.referralDiscountCents > 0) {
+        items.push({
+          label: "Referral discount",
+          amount: quote.referralDiscountCents,
+          isDiscount: true,
+        });
+      }
+
+      // Site selection fee (paid upgrade)
+      if (selectedSiteId && siteSelectionFeeCents) {
+        items.push({
+          label: "Site selection fee",
+          amount: siteSelectionFeeCents,
+        });
+      }
+
+      // Taxes
+      if (quote.taxesCents && quote.taxesCents > 0) {
+        items.push({
+          label: "Taxes & fees",
+          amount: quote.taxesCents,
+          isTax: true,
+        });
+      }
+    } else if (selectedClass && nights > 0) {
+      // Fallback estimate when quote isn't available yet
+      const subtotal = pricePerNight * nights;
       items.push({
         label: `${selectedClass.name} x ${nights} night${nights !== 1 ? "s" : ""}`,
         amount: subtotal,
@@ -942,14 +1020,23 @@ export default function BookingPageV2() {
           amount: siteSelectionFeeCents,
         });
       }
-      // Estimate fees (10%)
-      const fees = Math.round(subtotal * 0.1);
-      items.push({ label: "Service fee", amount: fees });
+      // Estimate taxes (placeholder until quote loads)
+      const estimatedTaxes = Math.round(subtotal * 0.1);
+      items.push({
+        label: "Est. taxes & fees",
+        amount: estimatedTaxes,
+        isTax: true,
+      });
     }
     return items;
-  }, [selectedClass, nights, subtotal, selectedSiteId, siteSelectionFeeCents]);
+  }, [quote, selectedClass, nights, pricePerNight, selectedSiteId, siteSelectionFeeCents]);
 
-  const totalAmount = priceBreakdown.reduce((sum, item) => sum + item.amount, 0);
+  // Total from quote (includes all fees, taxes, dynamic pricing, booking fee, etc.)
+  const totalAmount = quote?.totalWithTaxesCents || quote?.totalCents ||
+    priceBreakdown.reduce((sum, item) => {
+      if (item.isDiscount) return sum - item.amount;
+      return sum + item.amount;
+    }, 0);
 
   // Handle site type change
   const handleSiteTypeChange = (type: string) => {
@@ -1152,6 +1239,9 @@ export default function BookingPageV2() {
               selectedSiteClassId={selectedSiteClassId}
               selectedSiteId={selectedSiteId}
               guestInfo={guestInfo}
+              quote={quote}
+              isLoadingQuote={isLoadingQuote}
+              priceBreakdown={priceBreakdown}
               onBack={() => setStep(2)}
               onComplete={(reservation) => {
                 setConfirmedReservation(reservation);

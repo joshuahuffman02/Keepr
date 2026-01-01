@@ -8,6 +8,7 @@ import {
   Car,
   Users,
   Dog,
+  MapPin,
   Plus,
   X,
   AlertCircle,
@@ -30,6 +31,13 @@ interface GuestFormData {
   email: string;
   phone: string;
   // Expandable sections
+  address?: {
+    street: string;
+    city: string;
+    state: string;
+    zipCode: string;
+    country: string;
+  };
   vehicle?: {
     type: string;
     length: string;
@@ -48,6 +56,8 @@ interface CompactGuestFormProps {
   errors?: Record<string, string>;
   /** Site type determines which expandable sections to show */
   siteType?: string;
+  /** Whether to show address section */
+  showAddress?: boolean;
   /** Whether to show vehicle section */
   showVehicle?: boolean;
   /** Whether to show pet section */
@@ -73,11 +83,13 @@ export function CompactGuestForm({
   onChange,
   errors = {},
   siteType,
+  showAddress = true,
   showVehicle = true,
   showPets = true,
   className,
 }: CompactGuestFormProps) {
   const prefersReducedMotion = useReducedMotion();
+  const [showAddressSection, setShowAddressSection] = useState(false);
   const [showVehicleSection, setShowVehicleSection] = useState(false);
   const [showGuestSection, setShowGuestSection] = useState(false);
   const [showPetSection, setShowPetSection] = useState(false);
@@ -91,6 +103,23 @@ export function CompactGuestForm({
 
   const updateField = (field: keyof GuestFormData, value: any) => {
     onChange({ ...data, [field]: value });
+  };
+
+  const updateAddress = (
+    field: keyof NonNullable<GuestFormData["address"]>,
+    value: string
+  ) => {
+    onChange({
+      ...data,
+      address: {
+        street: data.address?.street || "",
+        city: data.address?.city || "",
+        state: data.address?.state || "",
+        zipCode: data.address?.zipCode || "",
+        country: data.address?.country || "US",
+        [field]: value,
+      },
+    });
   };
 
   const updateVehicle = (
@@ -202,6 +231,90 @@ export function CompactGuestForm({
 
       {/* Expandable Sections */}
       <div className="space-y-3">
+        {/* Address Section */}
+        {showAddress && (
+          <ExpandableSection
+            title="Home Address"
+            description={
+              data.address?.city && data.address?.state
+                ? `${data.address.city}, ${data.address.state}`
+                : "Where are you traveling from?"
+            }
+            icon={MapPin}
+            isOpen={showAddressSection}
+            onToggle={() => setShowAddressSection(!showAddressSection)}
+            hasContent={!!data.address?.city || !!data.address?.zipCode}
+          >
+            <div className="space-y-4 pt-4">
+              <div className="space-y-2">
+                <Label htmlFor={`${formId}-street`}>Street Address</Label>
+                <Input
+                  id={`${formId}-street`}
+                  value={data.address?.street || ""}
+                  onChange={(e) => updateAddress("street", e.target.value)}
+                  placeholder="123 Main St"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor={`${formId}-city`}>City</Label>
+                  <Input
+                    id={`${formId}-city`}
+                    value={data.address?.city || ""}
+                    onChange={(e) => updateAddress("city", e.target.value)}
+                    placeholder="Sacramento"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor={`${formId}-state`}>State</Label>
+                  <Input
+                    id={`${formId}-state`}
+                    value={data.address?.state || ""}
+                    onChange={(e) =>
+                      updateAddress("state", e.target.value.toUpperCase())
+                    }
+                    placeholder="CA"
+                    maxLength={2}
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor={`${formId}-zipCode`}>ZIP Code</Label>
+                  <Input
+                    id={`${formId}-zipCode`}
+                    value={data.address?.zipCode || ""}
+                    onChange={(e) => updateAddress("zipCode", e.target.value)}
+                    placeholder="95814"
+                    maxLength={10}
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor={`${formId}-country`}>Country</Label>
+                  <Select
+                    value={data.address?.country || "US"}
+                    onValueChange={(v) => updateAddress("country", v)}
+                  >
+                    <SelectTrigger id={`${formId}-country`}>
+                      <SelectValue placeholder="Select country" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="US">United States</SelectItem>
+                      <SelectItem value="CA">Canada</SelectItem>
+                      <SelectItem value="MX">Mexico</SelectItem>
+                      <SelectItem value="OTHER">Other</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+            </div>
+          </ExpandableSection>
+        )}
+
         {/* Vehicle Section */}
         {showVehicle && (
           <ExpandableSection
