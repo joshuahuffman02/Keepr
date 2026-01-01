@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { motion, useReducedMotion } from "framer-motion";
 import {
   Calendar,
@@ -13,6 +14,8 @@ import {
   Star,
   Zap,
   Heart,
+  Loader2,
+  Tent,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -25,6 +28,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
+import { apiClient } from "@/lib/api-client";
 
 interface SiteClass {
   id: string;
@@ -71,7 +75,7 @@ export function BookingSidebar({
 }: BookingSidebarProps) {
   const prefersReducedMotion = useReducedMotion();
   const [showPriceBreakdown, setShowPriceBreakdown] = useState(false);
-  const [selectedSiteType, setSelectedSiteType] = useState("all");
+  const [selectedSiteClassId, setSelectedSiteClassId] = useState<string | null>(null);
 
   // Calculate nights
   const nights = useMemo(() => {
@@ -81,7 +85,7 @@ export function BookingSidebar({
     return Math.max(1, Math.ceil((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24)));
   }, [arrivalDate, departureDate]);
 
-  // Get lowest price
+  // Get lowest price for "from" display when no site class selected
   const lowestPrice = useMemo(() => {
     const prices = siteClasses
       .filter((sc) => sc.defaultRate && sc.defaultRate > 0)
@@ -89,23 +93,103 @@ export function BookingSidebar({
     return prices.length > 0 ? Math.min(...prices) / 100 : null;
   }, [siteClasses]);
 
-  // Estimate total
-  const estimatedTotal = useMemo(() => {
-    if (!lowestPrice || !nights) return null;
-    return lowestPrice * nights;
-  }, [lowestPrice, nights]);
+  // Get selected site class
+  const selectedClass = useMemo(() => {
+    return siteClasses.find((sc) => sc.id === selectedSiteClassId) || null;
+  }, [siteClasses, selectedSiteClassId]);
 
-  // Get unique site types
-  const siteTypes = useMemo(() => {
-    const types = new Set<string>();
-    siteClasses.forEach((sc) => {
-      if (sc.siteType) types.add(sc.siteType.toLowerCase());
-    });
-    return Array.from(types);
-  }, [siteClasses]);
+  // Fetch availability to get a siteId for quoting
+  const { data: availableSites } = useQuery({
+    queryKey: ["public-availability", campgroundSlug, arrivalDate, departureDate, previewToken],
+    queryFn: () =>
+      apiClient.getPublicAvailability(
+        campgroundSlug,
+        { arrivalDate, departureDate },
+        previewToken
+      ),
+    enabled: !!campgroundSlug && !!arrivalDate && !!departureDate && nights > 0,
+    staleTime: 60 * 1000,
+  });
+
+  // Get a site ID from the selected class for quoting
+  const quoteSiteId = useMemo(() => {
+    if (!selectedSiteClassId || !availableSites) return null;
+    const available = availableSites.find(
+      (site) => site.siteClass?.id === selectedSiteClassId && site.status === "available"
+    );
+    return available?.id || null;
+  }, [selectedSiteClassId, availableSites]);
+
+  // Fetch real quote when we have dates + site
+  const {
+    data: quote,
+    isLoading: isLoadingQuote,
+  } = useQuery({
+    queryKey: [
+      "public-quote",
+      campgroundSlug,
+      arrivalDate,
+      departureDate,
+      quoteSiteId,
+      parseInt(guests || "1"),
+    ],
+    queryFn: () =>
+      apiClient.getPublicQuote(campgroundSlug, {
+        siteId: quoteSiteId!,
+        arrivalDate,
+        departureDate,
+        adults: parseInt(guests || "1"),
+      }),
+    enabled: !!campgroundSlug && !!arrivalDate && !!departureDate && !!quoteSiteId,
+    staleTime: 30 * 1000,
+  });
 
   // Check if high demand (stubbed - would come from API)
   const isHighDemand = nights > 0 && (reviewCount || 0) > 10;
+
+  // Build price breakdown from quote
+  const priceBreakdown = useMemo(() => {
+    if (!quote) return null;
+
+    const items: { label: string; amount: number; isDiscount?: boolean }[] = [];
+
+    // Base rate
+    items.push({
+      label: `$${(quote.perNightCents / 100).toFixed(0)} x ${quote.nights} night${quote.nights !== 1 ? "s" : ""}`,
+      amount: quote.baseSubtotalCents,
+    });
+
+    // Pricing rules (dynamic pricing)
+    if (quote.rulesDeltaCents && quote.rulesDeltaCents !== 0) {
+      items.push({
+        label: quote.rulesDeltaCents > 0 ? "Peak season" : "Off-season discount",
+        amount: Math.abs(quote.rulesDeltaCents),
+        isDiscount: quote.rulesDeltaCents < 0,
+      });
+    }
+
+    // Discounts
+    if (quote.discountCents && quote.discountCents > 0) {
+      items.push({
+        label: "Discount",
+        amount: quote.discountCents,
+        isDiscount: true,
+      });
+    }
+
+    // Taxes & fees
+    if (quote.taxesCents && quote.taxesCents > 0) {
+      items.push({
+        label: "Taxes & fees",
+        amount: quote.taxesCents,
+      });
+    }
+
+    return items;
+  }, [quote]);
+
+  const totalAmount = quote?.totalWithTaxesCents || quote?.totalCents || 0;
+  const perNightDisplay = quote ? quote.perNightCents / 100 : (selectedClass?.defaultRate || 0) / 100;
 
   return (
     <motion.div
@@ -120,8 +204,21 @@ export function BookingSidebar({
       {/* Header with price */}
       <div className="p-6 pb-4">
         <div className="flex items-baseline justify-between mb-1">
-          {lowestPrice ? (
+          {selectedClass && quote ? (
             <div className="flex items-baseline gap-1">
+              <span className="text-2xl font-bold text-slate-900">
+                ${(quote.perNightCents / 100).toFixed(0)}
+              </span>
+              <span className="text-slate-500">/ night</span>
+            </div>
+          ) : selectedClass && isLoadingQuote ? (
+            <div className="flex items-center gap-2">
+              <Loader2 className="h-5 w-5 animate-spin text-emerald-600" />
+              <span className="text-slate-500">Calculating...</span>
+            </div>
+          ) : lowestPrice ? (
+            <div className="flex items-baseline gap-1">
+              <span className="text-sm text-slate-500">from</span>
               <span className="text-2xl font-bold text-slate-900">
                 ${lowestPrice.toFixed(0)}
               </span>
@@ -212,23 +309,32 @@ export function BookingSidebar({
           </div>
         </div>
 
-        {/* Site type filter */}
-        {siteTypes.length > 1 && (
+        {/* Site class selector */}
+        {siteClasses.length > 0 && (
           <div className="space-y-1">
             <label className="text-xs font-medium text-slate-600 uppercase tracking-wider">
-              Accommodation type
+              Accommodation
             </label>
             <div className="relative">
-              <Sparkles className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400 z-10 pointer-events-none" />
-              <Select value={selectedSiteType} onValueChange={setSelectedSiteType}>
+              <Tent className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400 z-10 pointer-events-none" />
+              <Select
+                value={selectedSiteClassId || ""}
+                onValueChange={(value) => setSelectedSiteClassId(value || null)}
+              >
                 <SelectTrigger className="pl-10 border-slate-300 focus:border-emerald-500 focus:ring-emerald-500">
-                  <SelectValue placeholder="All types" />
+                  <SelectValue placeholder="Select accommodation" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">All types</SelectItem>
-                  {siteTypes.map((type) => (
-                    <SelectItem key={type} value={type}>
-                      {type.charAt(0).toUpperCase() + type.slice(1)}
+                  {siteClasses.map((sc) => (
+                    <SelectItem key={sc.id} value={sc.id}>
+                      <span className="flex items-center justify-between gap-2 w-full">
+                        <span>{sc.name}</span>
+                        {sc.defaultRate && (
+                          <span className="text-slate-500 text-xs">
+                            ${(sc.defaultRate / 100).toFixed(0)}/nt
+                          </span>
+                        )}
+                      </span>
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -238,8 +344,8 @@ export function BookingSidebar({
         )}
       </div>
 
-      {/* Price breakdown (expandable) */}
-      {estimatedTotal && nights > 0 && (
+      {/* Price breakdown (expandable) - only show when we have a real quote */}
+      {quote && priceBreakdown && nights > 0 && (
         <div className="px-6 pb-4">
           <button
             onClick={() => setShowPriceBreakdown(!showPriceBreakdown)}
@@ -247,7 +353,7 @@ export function BookingSidebar({
             aria-expanded={showPriceBreakdown}
           >
             <span className="underline decoration-dashed underline-offset-4">
-              ${lowestPrice?.toFixed(0)} x {nights} night{nights === 1 ? "" : "s"}
+              ${(quote.perNightCents / 100).toFixed(0)} x {quote.nights} night{quote.nights === 1 ? "" : "s"}
             </span>
             {showPriceBreakdown ? (
               <ChevronUp className="h-4 w-4" />
@@ -262,29 +368,34 @@ export function BookingSidebar({
               initial={prefersReducedMotion ? {} : { opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: "auto" }}
             >
-              <div className="flex justify-between text-slate-600">
-                <span>
-                  ${lowestPrice?.toFixed(0)} x {nights} nights
-                </span>
-                <span>${estimatedTotal.toFixed(0)}</span>
-              </div>
-              <div className="flex justify-between text-slate-600">
-                <span>Cleaning fee</span>
-                <span>TBD</span>
-              </div>
-              <div className="flex justify-between text-slate-600">
-                <span>Service fee</span>
-                <span>TBD</span>
-              </div>
+              {priceBreakdown.map((item, idx) => (
+                <div key={idx} className="flex justify-between text-slate-600">
+                  <span className={item.isDiscount ? "text-emerald-600" : ""}>
+                    {item.label}
+                  </span>
+                  <span className={item.isDiscount ? "text-emerald-600" : ""}>
+                    {item.isDiscount ? "-" : ""}${(item.amount / 100).toFixed(2)}
+                  </span>
+                </div>
+              ))}
               <div className="pt-2 border-t border-slate-200 flex justify-between font-semibold text-slate-900">
-                <span>Estimated total</span>
-                <span>${estimatedTotal.toFixed(0)}+</span>
+                <span>Total</span>
+                <span>${(totalAmount / 100).toFixed(2)}</span>
               </div>
               <p className="text-xs text-slate-500">
-                Final price shown on next step
+                Includes taxes, fees, and all charges
               </p>
             </motion.div>
           )}
+        </div>
+      )}
+
+      {/* Prompt to select accommodation if not selected */}
+      {!selectedSiteClassId && nights > 0 && (
+        <div className="px-6 pb-4">
+          <p className="text-sm text-slate-500 text-center">
+            Select accommodation to see price
+          </p>
         </div>
       )}
 
