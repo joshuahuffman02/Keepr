@@ -348,7 +348,7 @@ export function PricingPreview() {
         </div>
 
         {/* Setup Assistance Add-Ons */}
-        <div className="max-w-5xl mx-auto mb-20">
+        <div id="add-ons" className="max-w-5xl mx-auto mb-20 scroll-mt-24">
           <div className="text-center mb-12">
             <div className="inline-flex items-center gap-2 px-4 py-2 bg-blue-500/20 border border-blue-500/30 rounded-full text-blue-400 text-sm font-semibold mb-6">
               <Wrench className="h-4 w-4" />

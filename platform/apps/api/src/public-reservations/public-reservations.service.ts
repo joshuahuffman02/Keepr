@@ -7,6 +7,7 @@ import { PromotionsService } from "../promotions/promotions.service";
 import { EmailService } from '../email/email.service';
 import { AbandonedCartService } from "../abandoned-cart/abandoned-cart.service";
 import { differenceInMinutes } from "date-fns";
+import { createHmac, timingSafeEqual } from "crypto";
 import { resolveDiscounts } from "../pricing-v2/discount-engine";
 import { PricingV2Service } from "../pricing-v2/pricing-v2.service";
 import { TaxRuleType } from "@prisma/client";
@@ -39,6 +40,30 @@ export class PublicReservationsService {
         private readonly depositPoliciesService: DepositPoliciesService,
         private readonly stripeService: StripeService
     ) { }
+
+    private getPublicReservationTokenSecret(): string {
+        const secret = process.env.PUBLIC_RESERVATION_TOKEN_SECRET || process.env.JWT_SECRET;
+        if (!secret) {
+            throw new BadRequestException("Public reservation token secret not configured");
+        }
+        return secret;
+    }
+
+    private buildPublicReservationToken(reservationId: string): string {
+        const secret = this.getPublicReservationTokenSecret();
+        return createHmac("sha256", secret).update(reservationId).digest("base64url");
+    }
+
+    private validatePublicReservationToken(reservationId: string, token?: string): boolean {
+        if (!token) return false;
+        const expected = this.buildPublicReservationToken(reservationId);
+        if (token.length !== expected.length) return false;
+        try {
+            return timingSafeEqual(Buffer.from(token), Buffer.from(expected));
+        } catch {
+            return false;
+        }
+    }
 
     private async hasSignedWaiver(reservationId: string, guestId: string) {
         const [signedSignature, signedArtifact, digitalWaiver] = await Promise.all([
@@ -1206,6 +1231,7 @@ export class PublicReservationsService {
                 const departureFormatted = reservation.departureDate.toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric", year: "numeric" });
                 const nights = Math.ceil((reservation.departureDate.getTime() - reservation.arrivalDate.getTime()) / (1000 * 60 * 60 * 24));
                 const baseUrl = (process.env.FRONTEND_URL || process.env.APP_BASE_URL || process.env.NEXT_PUBLIC_APP_BASE || "http://localhost:3000").replace(/\/+$/, "");
+                const publicAccessToken = this.buildPublicReservationToken(reservation.id);
 
                 // Check for forms that need to be completed after booking
                 const afterBookingForms = await this.prisma.formTemplate.findMany({
@@ -1230,7 +1256,7 @@ export class PublicReservationsService {
                             ${formsToComplete.map(f => `<li style="margin: 4px 0;">${f.title}${f.isRequired !== false ? ' <span style="color: #dc2626;">(Required)</span>' : ''}</li>`).join('')}
                         </ul>
                         <div style="text-align: center;">
-                            <a href="${baseUrl}/forms/guest/${reservation.id}" style="display: inline-block; padding: 10px 20px; background: #3b82f6; color: #fff; text-decoration: none; border-radius: 6px; font-weight: 500; font-size: 14px;">Complete Forms Now</a>
+                            <a href="${baseUrl}/forms/guest/${reservation.id}?token=${publicAccessToken}" style="display: inline-block; padding: 10px 20px; background: #3b82f6; color: #fff; text-decoration: none; border-radius: 6px; font-weight: 500; font-size: 14px;">Complete Forms Now</a>
                         </div>
                     </div>`
                     : "";

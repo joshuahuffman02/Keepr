@@ -45,34 +45,52 @@ INCONSISTENCIES PREVENT COMPLETION - requires standardization:
 ## 5) Trust and credibility
 - [ ] Visible claims are quantified (saves time, reduces no-shows, increases direct bookings).
 - [ ] Security/compliance posture stated plainly (PCI, SOC, GDPR if applicable).
+  - NOTE: /security page exists with good content, needs trust badges on marketing pages
 - [ ] Partner and integration logos are real and current.
-- [ ] Case studies show measurable results, not just quotes.
+  - NOTE: Using Lucide icons, not real partner logos (Stripe, QuickBooks, etc.)
+- [x] Case studies show measurable results, not just quotes.
+  - DONE: Case studies include +18% revenue, -27% no-shows, 2x upsells
 
 ## 6) Conversion UX polish
-- [ ] All CTAs have a single, predictable flow (no dead ends).
+- [x] All CTAs have a single, predictable flow (no dead ends).
+  - DONE: Fixed #add-ons anchor, /signup route works correctly
 - [ ] Forms are short, progressive, and include validation feedback.
+  - NOTE: Checkout forms excellent (ValidatedFormField), marketing forms need inline validation
 - [ ] Live scheduling or demo request feels premium (no generic forms).
+  - NOTE: Demo page is visually polished but lacks live calendar (Calendly/HubSpot)
 - [ ] Lead capture is tracked end-to-end (GA4, GTM, CRM).
+  - NOTE: GA4/Meta config UI exists but scripts not loaded; CRM stubbed
 
 ## 7) Product UX intuitiveness
-- [ ] Default views are useful without configuration.
+- [x] Default views are useful without configuration.
+  - DONE: Dashboard shows arrivals/departures/occupancy/balances immediately
 - [ ] Empty states include suggested actions (first booking, import, setup).
-- [ ] Tasks are guided by wizards when they are multi-step.
+  - NOTE: Some boards have suggestions, welcome page separate from dashboard
+- [x] Tasks are guided by wizards when they are multi-step.
+  - DONE: SessionScheduleWizard, BookingProgressIndicator/Bar are excellent
+  - NOTE: Data Import flow could use step indicator
 - [ ] Filters are visible, persistent, and show active filter pills.
-- [ ] Export is flexible (column pickers, saved presets, CSV/XLSX).
-- [ ] Inline help exists for complex forms (tooltips or "Learn more").
+  - NOTE: FilterChip component exists; pages show counts but not individual removable pills
+- [x] Export is flexible (column pickers, saved presets, CSV/XLSX).
+- [x] Inline help exists for complex forms (tooltips or "Learn more").
 
 ## 8) Data clarity and reporting
 - [ ] Dashboards answer the top 3 operator questions without drilling.
+  - NOTE: Arrivals/departures/balances visible (2.5/3); Revenue metric missing from dashboard
 - [ ] Charts have clear labels, units, and date ranges.
-- [ ] Reports can be exported without manual copy/paste.
-- [ ] Audit trails exist for sensitive actions (rates, refunds, policies).
+  - NOTE: Good formatters for units, but Y-axis labels missing (e.g., "Revenue ($)")
+- [x] Reports can be exported without manual copy/paste.
+- [x] Audit trails exist for sensitive actions (rates, refunds, policies).
+  - DONE: 20 services use audit logging; PaymentAuditLog tracks refunds
+  - NOTE: Gaps in permission changes and seasonal rates
 
 ## 9) Performance and accessibility
 - [ ] Core Web Vitals are in the green for public pages.
+  - NOTE: web-vitals.ts monitoring exists but analytics endpoint incomplete (TODO)
 - [x] Inputs and tables are keyboard friendly.
 - [x] Contrast and focus states are consistent and visible.
-- [ ] Motion is purposeful and minimal (avoid gratuitous animation).
+- [x] Motion is purposeful and minimal (avoid gratuitous animation).
+  - DONE: 53+ motion-safe: instances, proper reduced motion support throughout
 
 ## 10) Release notes and product cadence
 - [x] Release notes have "New", "Update", "Enhancement" tags with dates.
@@ -85,6 +103,7 @@ INCONSISTENCIES PREVENT COMPLETION - requires standardization:
 - [ ] Mobile layout reviewed for every major page.
 - [ ] All primary flows tested with real data.
 - [ ] No placeholder lorem text or missing images.
+  - NOTE: No lorem ipsum found; 5 "coming soon" placeholders remain (Link payment, photos, reviews)
 
 ---
 
