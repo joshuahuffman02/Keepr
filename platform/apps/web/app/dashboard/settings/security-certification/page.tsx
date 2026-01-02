@@ -54,6 +54,14 @@ import { cn } from "@/lib/utils";
 import Confetti from "react-confetti";
 import { useWindowSize } from "@/hooks/use-window-size";
 
+const SECURITY_TONES: Record<SecurityCertificationLevel, { bg: string; text: string; border: string }> = {
+  none: { bg: "bg-muted", text: "text-muted-foreground", border: "border-border" },
+  basic: { bg: "bg-status-warning/15", text: "text-status-warning", border: "border-status-warning/30" },
+  standard: { bg: "bg-muted", text: "text-foreground", border: "border-border" },
+  advanced: { bg: "bg-status-success/15", text: "text-status-success", border: "border-status-success/30" },
+  excellence: { bg: "bg-status-info/15", text: "text-status-info", border: "border-status-info/30" },
+};
+
 // SVG Shield Badge Component
 function ShieldBadge({ level, size = "md" }: { level: SecurityCertificationLevel; size?: "sm" | "md" | "lg" }) {
   const sizeClasses = {
@@ -65,15 +73,15 @@ function ShieldBadge({ level, size = "md" }: { level: SecurityCertificationLevel
   const badgeInfo = getSecurityBadgeInfo(level);
   if (!badgeInfo) {
     return (
-      <div className={cn("rounded-full flex items-center justify-center bg-slate-100 dark:bg-slate-700", sizeClasses[size])}>
-        <Shield className={cn("text-slate-400", size === "lg" ? "w-12 h-12" : size === "md" ? "w-8 h-8" : "w-4 h-4")} />
+      <div className={cn("rounded-full flex items-center justify-center bg-muted dark:bg-slate-700", sizeClasses[size])}>
+        <Shield className={cn("text-muted-foreground", size === "lg" ? "w-12 h-12" : size === "md" ? "w-8 h-8" : "w-4 h-4")} />
       </div>
     );
   }
 
   return (
-    <div className={cn("rounded-full flex items-center justify-center", `bg-gradient-to-br ${badgeInfo.gradient}`, sizeClasses[size])}>
-      <ShieldCheck className={cn("text-white", size === "lg" ? "w-12 h-12" : size === "md" ? "w-8 h-8" : "w-4 h-4")} />
+    <div className={cn("rounded-full flex items-center justify-center", SECURITY_TONES[level].bg, sizeClasses[size])}>
+      <ShieldCheck className={cn(SECURITY_TONES[level].text, size === "lg" ? "w-12 h-12" : size === "md" ? "w-8 h-8" : "w-4 h-4")} />
     </div>
   );
 }
@@ -178,6 +186,7 @@ export default function SecurityCertificationPage() {
   const certificationLevel = calculateSecurityCertificationLevel(assessmentData);
   const stats = getSecurityAssessmentStats(assessmentData);
   const badgeInfo = getSecurityBadgeInfo(certificationLevel);
+  const badgeTone = SECURITY_TONES[certificationLevel];
   const quickWins = getQuickWins(assessmentData, 5);
 
   // Track unsaved changes
@@ -309,7 +318,7 @@ export default function SecurityCertificationPage() {
   if (!campgroundId) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
-        <p className="text-slate-500 dark:text-slate-400">Select a campground to configure security certification.</p>
+        <p className="text-muted-foreground dark:text-muted-foreground">Select a campground to configure security certification.</p>
       </div>
     );
   }
@@ -363,7 +372,7 @@ export default function SecurityCertificationPage() {
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.5, opacity: 0 }}
               transition={{ type: "spring", stiffness: 200, damping: 20 }}
-              className="bg-white dark:bg-slate-900 rounded-2xl p-4 sm:p-8 max-w-md mx-4 text-center shadow-2xl relative"
+              className="bg-card dark:bg-slate-900 rounded-2xl p-4 sm:p-8 max-w-md mx-4 text-center shadow-2xl relative"
               onClick={(e) => e.stopPropagation()}
             >
               {/* Close button */}
@@ -371,7 +380,7 @@ export default function SecurityCertificationPage() {
                 variant="ghost"
                 size="icon"
                 onClick={() => setShowTierUnlock(null)}
-                className="absolute top-2 right-2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                className="absolute top-2 right-2 text-muted-foreground hover:text-muted-foreground dark:hover:text-slate-300 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
                 aria-label="Close dialog"
               >
                 <X className="w-5 h-5" />
@@ -391,7 +400,7 @@ export default function SecurityCertificationPage() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.3 }}
-                className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white mb-2 mt-4"
+                className="text-xl sm:text-2xl font-bold text-foreground dark:text-white mb-2 mt-4"
               >
                 Certification Unlocked!
               </motion.h2>
@@ -401,8 +410,8 @@ export default function SecurityCertificationPage() {
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.4 }}
                 className={cn(
-                  "text-lg font-semibold mb-4 bg-gradient-to-r bg-clip-text text-transparent",
-                  badgeInfo?.gradient
+                  "text-lg font-semibold mb-4",
+                  badgeTone.text
                 )}
               >
                 {badgeInfo?.label} - {badgeInfo?.tier} Shield
@@ -412,7 +421,7 @@ export default function SecurityCertificationPage() {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.5 }}
-                className="text-slate-600 dark:text-slate-400 mb-6"
+                className="text-muted-foreground dark:text-muted-foreground mb-6"
               >
                 {badgeInfo?.description}
               </motion.p>
@@ -433,11 +442,11 @@ export default function SecurityCertificationPage() {
         {/* Header - Fixed mobile responsive */}
         <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
           <div className="flex-1">
-            <h1 className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
+            <h1 className="text-xl sm:text-2xl font-bold text-foreground dark:text-white flex items-center gap-2">
               <Shield className="w-6 sm:w-7 h-6 sm:h-7 text-blue-600 dark:text-blue-400" />
               Security & Privacy Certification
             </h1>
-            <p className="text-sm sm:text-base text-slate-600 dark:text-slate-400 mt-1">
+            <p className="text-sm sm:text-base text-muted-foreground dark:text-muted-foreground mt-1">
               Protect your customers and earn trust with industry-leading security practices
             </p>
           </div>
@@ -478,20 +487,20 @@ export default function SecurityCertificationPage() {
           <motion.div
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
-            className="p-6 rounded-xl bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-950/50 dark:to-indigo-950/50 border-2 border-blue-200 dark:border-blue-800"
+            className="p-6 rounded-xl bg-status-info/10 border-2 border-status-info/20"
           >
             <div className="flex flex-col sm:flex-row items-start gap-4">
-              <div className="w-12 h-12 rounded-full bg-blue-100 dark:bg-blue-900 flex items-center justify-center flex-shrink-0">
-                <Shield className="w-6 h-6 text-blue-600 dark:text-blue-400" />
+              <div className="w-12 h-12 rounded-full bg-status-info/15 flex items-center justify-center flex-shrink-0">
+                <Shield className="w-6 h-6 text-status-info" />
               </div>
               <div>
-                <h3 className="text-lg font-semibold text-slate-900 dark:text-white mb-2">
+                <h3 className="text-lg font-semibold text-foreground dark:text-white mb-2">
                   Welcome to Security Certification
                 </h3>
-                <p className="text-sm text-slate-700 dark:text-slate-300 mb-3">
+                <p className="text-sm text-foreground dark:text-slate-300 mb-3">
                   Don&apos;t worry—you&apos;re not expected to complete everything at once. This checklist helps you build security practices over time. Many items take just minutes to complete, and we provide templates for the rest.
                 </p>
-                <div className="flex items-center gap-2 text-sm text-blue-700 dark:text-blue-300">
+                <div className="flex items-center gap-2 text-sm text-status-info">
                   <Target className="w-4 h-4" />
                   <span className="font-medium">Start with &quot;Quick Wins&quot; below to earn your first badge in under 30 minutes</span>
                 </div>
@@ -505,18 +514,18 @@ export default function SecurityCertificationPage() {
           <motion.div
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
-            className="p-3 rounded-lg bg-gradient-to-r from-amber-50 to-yellow-50 dark:from-amber-950 dark:to-yellow-950 border border-amber-200 dark:border-amber-800"
+            className="p-3 rounded-lg bg-status-warning/10 border border-status-warning/20"
           >
             <div className="flex items-center gap-2">
               <motion.div
                 animate={prefersReducedMotion ? {} : { scale: [1, 1.2, 1] }}
                 transition={{ repeat: Infinity, duration: 2 }}
               >
-                <Sparkles className="w-5 h-5 text-amber-600 dark:text-amber-400" />
+                <Sparkles className="w-5 h-5 text-status-warning" />
               </motion.div>
-              <p className="text-sm font-medium text-amber-800 dark:text-amber-200">
+              <p className="text-sm font-medium text-status-warning">
                 You&apos;re only {nextTierInfo.pointsNeeded} points away from {getSecurityBadgeInfo(nextTierInfo.tier)?.label}!
-                <span className="block text-xs text-amber-700 dark:text-amber-300 mt-0.5">
+                <span className="block text-xs text-muted-foreground mt-0.5">
                   Complete {Math.ceil(nextTierInfo.pointsNeeded / 10)} more items to level up
                 </span>
               </p>
@@ -526,13 +535,13 @@ export default function SecurityCertificationPage() {
 
         {/* Quick Wins - Moved higher for better hierarchy */}
         {certificationLevel !== "excellence" && quickWins.length > 0 && (
-          <Card className="border-2 border-amber-200 dark:border-amber-800 bg-gradient-to-br from-amber-50 to-yellow-50 dark:from-amber-950/50 dark:to-yellow-950/50 shadow-lg">
+          <Card className="border-2 border-status-warning/30 bg-status-warning/10 shadow-lg">
             <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-slate-900 dark:text-white">
+              <CardTitle className="flex items-center gap-2 text-foreground dark:text-white">
                 <Lightbulb className="w-5 h-5 text-amber-500" />
                 Quick Wins
               </CardTitle>
-              <CardDescription className="dark:text-slate-400">
+              <CardDescription className="dark:text-muted-foreground">
                 High-impact items you can complete quickly
               </CardDescription>
             </CardHeader>
@@ -550,7 +559,7 @@ export default function SecurityCertificationPage() {
                     aria-label={`Toggle completion for ${item.label}`}
                     className={cn(
                       "flex items-center justify-between p-3 rounded-lg border transition-all cursor-pointer",
-                      "bg-white dark:bg-slate-800 border-amber-200 dark:border-amber-700",
+                      "bg-card dark:bg-slate-800 border-amber-200 dark:border-amber-700",
                       "hover:bg-amber-50 dark:hover:bg-slate-700 hover:shadow-md",
                       "focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2 dark:focus:ring-offset-slate-900"
                     )}
@@ -574,7 +583,7 @@ export default function SecurityCertificationPage() {
                         tabIndex={-1}
                       />
                       <div>
-                        <span className="text-sm font-medium text-slate-700 dark:text-slate-300">{item.label}</span>
+                        <span className="text-sm font-medium text-foreground dark:text-slate-300">{item.label}</span>
                         {item.required && (
                           <Badge variant="outline" className="ml-2 text-xs bg-blue-50 dark:bg-blue-950 text-blue-700 dark:text-blue-300 border-blue-200 dark:border-blue-800">
                             Core Practice
@@ -591,17 +600,17 @@ export default function SecurityCertificationPage() {
         )}
 
         {/* Current Status Card */}
-        <Card className="border-2 border-blue-200 dark:border-blue-800 bg-gradient-to-br from-slate-50 to-white dark:from-slate-800 dark:to-slate-900 shadow-lg">
+        <Card className="border-2 border-border bg-card shadow-lg">
           <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-slate-900 dark:text-white">
-              <ShieldCheck className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+            <CardTitle className="flex items-center gap-2 text-foreground dark:text-white">
+              <ShieldCheck className="w-5 h-5 text-status-info" />
               Current Certification Status
             </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6">
               {/* Certification Badge */}
-              <div className="flex flex-col items-center text-center p-4 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700">
+              <div className="flex flex-col items-center text-center p-4 rounded-xl bg-card dark:bg-slate-800 border border-border dark:border-slate-700">
                 {badgeInfo ? (
                   <>
                     <motion.div
@@ -609,27 +618,24 @@ export default function SecurityCertificationPage() {
                     >
                       <ShieldBadge level={certificationLevel} size="md" />
                     </motion.div>
-                    <Badge className={cn(
-                      "text-white mb-2 mt-3",
-                      `bg-gradient-to-r ${badgeInfo.gradient}`
-                    )}>
+                    <Badge className={cn("mb-2 mt-3", badgeTone.bg, badgeTone.text)}>
                       {badgeInfo.tier} Shield
                     </Badge>
-                    <p className="font-medium text-slate-900 dark:text-white">{badgeInfo.label}</p>
-                    <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">{badgeInfo.description}</p>
+                    <p className="font-medium text-foreground dark:text-white">{badgeInfo.label}</p>
+                    <p className="text-xs text-muted-foreground dark:text-muted-foreground mt-1">{badgeInfo.description}</p>
                   </>
                 ) : (
                   <div className="flex flex-col items-center text-center">
-                    <div className="w-16 h-16 rounded-full bg-gradient-to-br from-blue-100 to-indigo-100 dark:from-blue-900 dark:to-indigo-900 flex items-center justify-center mb-3">
-                      <Shield className="w-8 h-8 text-blue-600 dark:text-blue-400" />
+                    <div className="w-16 h-16 rounded-full bg-status-info/15 flex items-center justify-center mb-3">
+                      <Shield className="w-8 h-8 text-status-info" />
                     </div>
-                    <h4 className="font-semibold text-slate-900 dark:text-white mb-1">
+                    <h4 className="font-semibold text-foreground dark:text-white mb-1">
                       Ready to Get Started?
                     </h4>
-                    <p className="text-xs text-slate-500 dark:text-slate-400 mb-2">
+                    <p className="text-xs text-muted-foreground dark:text-muted-foreground mb-2">
                       Complete your first security practice to earn Bronze Shield
                     </p>
-                    <Badge variant="secondary" className="bg-blue-50 dark:bg-blue-950 text-blue-700 dark:text-blue-300">
+                    <Badge variant="secondary" className="bg-status-info/10 text-status-info border-status-info/20">
                       Just getting started
                     </Badge>
                   </div>
@@ -640,11 +646,11 @@ export default function SecurityCertificationPage() {
               <div className="space-y-4">
                 <div>
                   <div className="flex justify-between text-sm mb-1">
-                    <span className="text-slate-600 dark:text-slate-400 font-medium">Points Earned</span>
-                    <span className="font-medium text-slate-900 dark:text-white">{stats.totalPoints} / {stats.maxPoints}</span>
+                    <span className="text-muted-foreground dark:text-muted-foreground font-medium">Points Earned</span>
+                    <span className="font-medium text-foreground dark:text-white">{stats.totalPoints} / {stats.maxPoints}</span>
                   </div>
                   <div
-                    className="h-2 bg-slate-100 dark:bg-slate-700 rounded-full overflow-hidden"
+                    className="h-2 bg-muted dark:bg-slate-700 rounded-full overflow-hidden"
                     role="progressbar"
                     aria-valuenow={stats.totalPoints}
                     aria-valuemax={stats.maxPoints}
@@ -652,7 +658,7 @@ export default function SecurityCertificationPage() {
                   >
                     <motion.div
                       className={cn(
-                        "h-full bg-gradient-to-r from-blue-500 to-cyan-500 relative origin-left",
+                        "h-full bg-status-info relative origin-left",
                         (stats.totalPoints / stats.maxPoints) > 0.9 && "motion-safe:animate-pulse"
                       )}
                       initial={{ scaleX: 0 }}
@@ -663,18 +669,18 @@ export default function SecurityCertificationPage() {
                 </div>
                 <div>
                   <div className="flex justify-between text-sm mb-1">
-                    <span className="text-slate-600 dark:text-slate-400">Core Practices</span>
-                    <span className="font-medium text-slate-900 dark:text-white">{stats.requiredCompleted} / {stats.requiredTotal}</span>
+                    <span className="text-muted-foreground dark:text-muted-foreground">Core Practices</span>
+                    <span className="font-medium text-foreground dark:text-white">{stats.requiredCompleted} / {stats.requiredTotal}</span>
                   </div>
                   <div
-                    className="h-2 bg-slate-100 dark:bg-slate-700 rounded-full overflow-hidden"
+                    className="h-2 bg-muted dark:bg-slate-700 rounded-full overflow-hidden"
                     role="progressbar"
                     aria-valuenow={stats.requiredCompleted}
                     aria-valuemax={stats.requiredTotal}
                     aria-label="Core practices progress"
                   >
                     <motion.div
-                      className="h-full bg-gradient-to-r from-emerald-500 to-teal-500 origin-left"
+                      className="h-full bg-status-success origin-left"
                       initial={{ scaleX: 0 }}
                       animate={{ scaleX: stats.requiredRatio }}
                       transition={{ duration: 0.8, delay: 0.1, ease: "easeOut" }}
@@ -684,8 +690,8 @@ export default function SecurityCertificationPage() {
               </div>
 
               {/* Verification Status */}
-              <div className="p-4 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700">
-                <h4 className="font-medium text-slate-900 dark:text-white mb-2">Verification Status</h4>
+              <div className="p-4 rounded-xl bg-card dark:bg-slate-800 border border-border dark:border-slate-700">
+                <h4 className="font-medium text-foreground dark:text-white mb-2">Verification Status</h4>
                 <div className="flex items-center gap-2 mb-2">
                   {isVerified ? (
                     <CheckCircle2 className="w-5 h-5 text-emerald-500 dark:text-emerald-400" />
@@ -697,7 +703,7 @@ export default function SecurityCertificationPage() {
                   </span>
                 </div>
                 {isVerified && auditorOrg && (
-                  <p className="text-xs text-slate-500 dark:text-slate-400">
+                  <p className="text-xs text-muted-foreground dark:text-muted-foreground">
                     Verified by {auditorOrg}
                   </p>
                 )}
@@ -709,11 +715,11 @@ export default function SecurityCertificationPage() {
         {/* Certification Tiers - Fixed mobile grid */}
         <Card className="dark:bg-slate-900 dark:border-slate-700">
           <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-slate-900 dark:text-white">
+            <CardTitle className="flex items-center gap-2 text-foreground dark:text-white">
               <Award className="w-5 h-5 text-amber-500" />
               Certification Tiers
             </CardTitle>
-            <CardDescription className="dark:text-slate-400">
+            <CardDescription className="dark:text-muted-foreground">
               Complete checklist items to achieve higher certification levels
             </CardDescription>
           </CardHeader>
@@ -728,6 +734,7 @@ export default function SecurityCertificationPage() {
                 const isAchieved = levelIndex <= currentIndex && certificationLevel !== "none";
                 const isCurrent = level === certificationLevel;
                 const pointsNeeded = threshold.minPoints - stats.totalPoints;
+                const tone = SECURITY_TONES[level];
 
                 return (
                   <div
@@ -735,25 +742,25 @@ export default function SecurityCertificationPage() {
                     className={cn(
                       "p-3 sm:p-4 rounded-xl border-2 transition-all",
                       isCurrent
-                        ? "border-blue-500 bg-blue-50 dark:bg-blue-950"
+                        ? `${tone.border} ${tone.bg}`
                         : isAchieved
-                        ? "border-emerald-500 bg-emerald-50 dark:bg-emerald-950"
-                        : "border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800"
+                        ? `${tone.border} ${tone.bg}`
+                        : "border-border dark:border-slate-700 bg-card dark:bg-slate-800"
                     )}
                   >
                     <div className="flex flex-col items-center text-center">
                       <ShieldBadge level={level} size="sm" />
-                      <h4 className="font-semibold text-slate-900 dark:text-white mt-2 text-sm sm:text-base">{info?.tier}</h4>
-                      <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">{threshold.minPoints}+ pts</p>
-                      <p className="text-xs text-slate-500 dark:text-slate-400">{Math.round(threshold.requiredItemsRatio * 100)}% core</p>
+                      <h4 className="font-semibold text-foreground dark:text-white mt-2 text-sm sm:text-base">{info?.tier}</h4>
+                      <p className="text-xs text-muted-foreground dark:text-muted-foreground mt-1">{threshold.minPoints}+ pts</p>
+                      <p className="text-xs text-muted-foreground dark:text-muted-foreground">{Math.round(threshold.requiredItemsRatio * 100)}% core</p>
                       {isCurrent && (
-                        <Badge className="mt-2 bg-blue-500 dark:bg-blue-600">Current</Badge>
+                        <Badge className={cn("mt-2", tone.bg, tone.text)}>Current</Badge>
                       )}
                       {isAchieved && !isCurrent && (
-                        <CheckCircle2 className="w-5 h-5 text-emerald-500 mt-2" />
+                        <CheckCircle2 className={cn("w-5 h-5 mt-2", tone.text)} />
                       )}
                       {!isAchieved && pointsNeeded > 0 && (
-                        <p className="text-xs text-slate-400 mt-2">{pointsNeeded} pts to go</p>
+                        <p className="text-xs text-muted-foreground mt-2">{pointsNeeded} pts to go</p>
                       )}
                     </div>
                   </div>
@@ -764,13 +771,13 @@ export default function SecurityCertificationPage() {
         </Card>
 
         {/* Platform Protections - Handled by Campreserv */}
-        <Card className="border-2 border-emerald-200 dark:border-emerald-800 bg-gradient-to-br from-emerald-50 to-white dark:from-emerald-950/50 dark:to-slate-900">
+        <Card className="border-2 border-status-success/30 bg-status-success/10">
           <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-slate-900 dark:text-white">
-              <ShieldCheck className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
+            <CardTitle className="flex items-center gap-2 text-foreground dark:text-white">
+              <ShieldCheck className="w-5 h-5 text-status-success" />
               Protected by Campreserv
             </CardTitle>
-            <CardDescription className="dark:text-slate-400">
+            <CardDescription className="dark:text-muted-foreground">
               These security measures are automatically handled by the Campreserv platform - no action required
             </CardDescription>
           </CardHeader>
@@ -789,17 +796,17 @@ export default function SecurityCertificationPage() {
                 return (
                   <div
                     key={protection.id}
-                    className="flex items-start gap-3 p-3 rounded-lg bg-white dark:bg-slate-800 border border-emerald-200 dark:border-emerald-800"
+                    className="flex items-start gap-3 p-3 rounded-lg bg-card dark:bg-slate-800 border border-status-success/20"
                   >
-                    <div className="w-8 h-8 rounded-lg bg-emerald-100 dark:bg-emerald-900 flex items-center justify-center flex-shrink-0">
-                      <IconComponent className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                    <div className="w-8 h-8 rounded-lg bg-status-success/15 flex items-center justify-center flex-shrink-0">
+                      <IconComponent className="w-4 h-4 text-status-success" />
                     </div>
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center gap-2">
-                        <span className="text-sm font-medium text-slate-900 dark:text-white">{protection.label}</span>
-                        <CheckCircle2 className="w-4 h-4 text-emerald-500 dark:text-emerald-400 flex-shrink-0" />
+                        <span className="text-sm font-medium text-foreground dark:text-white">{protection.label}</span>
+                        <CheckCircle2 className="w-4 h-4 text-status-success flex-shrink-0" />
                       </div>
-                      <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">{protection.description}</p>
+                      <p className="text-xs text-muted-foreground dark:text-muted-foreground mt-0.5">{protection.description}</p>
                     </div>
                   </div>
                 );
@@ -811,11 +818,11 @@ export default function SecurityCertificationPage() {
         {/* Compliance Checklist */}
         <Card className="dark:bg-slate-900 dark:border-slate-700">
           <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-slate-900 dark:text-white">
+            <CardTitle className="flex items-center gap-2 text-foreground dark:text-white">
               <FileText className="w-5 h-5 text-blue-500 dark:text-blue-400" />
               Build Your Security Program
             </CardTitle>
-            <CardDescription className="dark:text-slate-400">
+            <CardDescription className="dark:text-muted-foreground">
               Step-by-step guidance to protect your business and build guest trust
             </CardDescription>
           </CardHeader>
@@ -829,10 +836,10 @@ export default function SecurityCertificationPage() {
 
               return (
                 <Collapsible key={category} open={isExpanded} onOpenChange={() => toggleCategory(category)}>
-                  <div className="border border-slate-200 dark:border-slate-700 rounded-lg overflow-hidden">
+                  <div className="border border-border dark:border-slate-700 rounded-lg overflow-hidden">
                     <CollapsibleTrigger asChild>
                       <button
-                        className="w-full p-4 flex items-center justify-between hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-inset"
+                        className="w-full p-4 flex items-center justify-between hover:bg-muted/60 dark:hover:bg-slate-800 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-inset"
                         aria-expanded={isExpanded}
                       >
                         <div className="flex items-center gap-3">
@@ -849,28 +856,28 @@ export default function SecurityCertificationPage() {
                             )}
                           </div>
                           <div className="text-left">
-                            <h4 className="font-semibold text-slate-900 dark:text-white">{categoryInfo.label}</h4>
-                            <p className="text-xs text-slate-500 dark:text-slate-400">{categoryInfo.description}</p>
+                            <h4 className="font-semibold text-foreground dark:text-white">{categoryInfo.label}</h4>
+                            <p className="text-xs text-muted-foreground dark:text-muted-foreground">{categoryInfo.description}</p>
                           </div>
                         </div>
                         <div className="flex items-center gap-4">
                           <div className="text-right">
-                            <p className="text-sm font-medium text-slate-900 dark:text-white">
+                            <p className="text-sm font-medium text-foreground dark:text-white">
                               {categoryStats?.completed || 0}/{categoryStats?.total || 0}
                             </p>
-                            <p className="text-xs text-slate-500 dark:text-slate-400">
+                            <p className="text-xs text-muted-foreground dark:text-muted-foreground">
                               {categoryStats?.points || 0}/{categoryStats?.maxPoints || 0} pts
                             </p>
                           </div>
                           <ChevronDown className={cn(
-                            "w-5 h-5 text-slate-400 transition-transform",
+                            "w-5 h-5 text-muted-foreground transition-transform",
                             isExpanded && "rotate-180"
                           )} />
                         </div>
                       </button>
                     </CollapsibleTrigger>
                     <CollapsibleContent>
-                      <div className="border-t border-slate-200 dark:border-slate-700 p-4 space-y-3">
+                      <div className="border-t border-border dark:border-slate-700 p-4 space-y-3">
                         {/* Category completion message */}
                         {isCategoryComplete && (
                           <div className="mb-3 p-3 rounded-lg bg-emerald-50 dark:bg-emerald-950 border border-emerald-200 dark:border-emerald-800">
@@ -894,7 +901,7 @@ export default function SecurityCertificationPage() {
                               "focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-inset",
                               completedItems.has(item.id)
                                 ? "bg-emerald-50 dark:bg-emerald-950 border border-emerald-200 dark:border-emerald-800"
-                                : "bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-700"
+                                : "bg-muted/60 dark:bg-slate-800 border border-border dark:border-slate-700 hover:bg-muted dark:hover:bg-slate-700"
                             )}
                             onClick={() => toggleItem(item.id)}
                             onKeyDown={(e) => {
@@ -917,7 +924,7 @@ export default function SecurityCertificationPage() {
                                   "text-sm font-medium",
                                   completedItems.has(item.id)
                                     ? "text-emerald-900 dark:text-emerald-100"
-                                    : "text-slate-900 dark:text-white"
+                                    : "text-foreground dark:text-white"
                                 )}>
                                   {item.label}
                                 </span>
@@ -926,13 +933,13 @@ export default function SecurityCertificationPage() {
                                     Core Practice
                                   </Badge>
                                 ) : (
-                                  <Badge variant="outline" className="text-xs bg-slate-50 dark:bg-slate-800 text-slate-500 dark:text-slate-400">
+                                  <Badge variant="outline" className="text-xs bg-muted/60 dark:bg-slate-800 text-muted-foreground dark:text-muted-foreground">
                                     Enhanced
                                   </Badge>
                                 )}
                                 <Badge variant="secondary" className="text-xs">{item.points} pts</Badge>
                               </div>
-                              <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+                              <p className="text-xs text-muted-foreground dark:text-muted-foreground mt-1">
                                 {item.description}
                               </p>
                               {(item.templateId || item.resourceUrl) && (
@@ -982,23 +989,23 @@ export default function SecurityCertificationPage() {
         {/* Third-Party Verification */}
         <Card className="dark:bg-slate-900 dark:border-slate-700">
           <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-slate-900 dark:text-white">
+            <CardTitle className="flex items-center gap-2 text-foreground dark:text-white">
               <UserCheck className="w-5 h-5 text-emerald-500 dark:text-emerald-400" />
               Get Your Security Verified
             </CardTitle>
-            <CardDescription className="dark:text-slate-400">
+            <CardDescription className="dark:text-muted-foreground">
               Optionally have your security assessment verified by an expert for added credibility
             </CardDescription>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              <div className="flex items-center gap-3 p-4 rounded-lg bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700">
+              <div className="flex items-center gap-3 p-4 rounded-lg bg-muted/60 dark:bg-slate-800 border border-border dark:border-slate-700">
                 <Checkbox
                   id="verified"
                   checked={isVerified}
                   onCheckedChange={(checked) => setIsVerified(checked === true)}
                 />
-                <label htmlFor="verified" className="text-sm font-medium text-slate-900 dark:text-white cursor-pointer flex items-center gap-2">
+                <label htmlFor="verified" className="text-sm font-medium text-foreground dark:text-white cursor-pointer flex items-center gap-2">
                   <ShieldCheck className="w-4 h-4 text-emerald-500" />
                   This assessment has been verified by a third-party auditor
                 </label>
@@ -1013,7 +1020,7 @@ export default function SecurityCertificationPage() {
                     className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4"
                   >
                     <div className="space-y-2">
-                      <Label htmlFor="auditorName" className="flex items-center gap-2 text-slate-700 dark:text-slate-300">
+                      <Label htmlFor="auditorName" className="flex items-center gap-2 text-foreground dark:text-slate-300">
                         <UserCheck className="w-4 h-4" />
                         Auditor Name
                       </Label>
@@ -1026,7 +1033,7 @@ export default function SecurityCertificationPage() {
                       />
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="auditorOrg" className="flex items-center gap-2 text-slate-700 dark:text-slate-300">
+                      <Label htmlFor="auditorOrg" className="flex items-center gap-2 text-foreground dark:text-slate-300">
                         <Building2 className="w-4 h-4" />
                         Organization
                       </Label>
@@ -1039,7 +1046,7 @@ export default function SecurityCertificationPage() {
                       />
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="auditorEmail" className="flex items-center gap-2 text-slate-700 dark:text-slate-300">
+                      <Label htmlFor="auditorEmail" className="flex items-center gap-2 text-foreground dark:text-slate-300">
                         <Mail className="w-4 h-4" />
                         Contact Email
                       </Label>
@@ -1062,11 +1069,11 @@ export default function SecurityCertificationPage() {
         {/* Resources */}
         <Card className="dark:bg-slate-900 dark:border-slate-700">
           <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-slate-900 dark:text-white">
+            <CardTitle className="flex items-center gap-2 text-foreground dark:text-white">
               <ExternalLink className="w-5 h-5 text-blue-500 dark:text-blue-400" />
               Security Resources
             </CardTitle>
-            <CardDescription className="dark:text-slate-400">
+            <CardDescription className="dark:text-muted-foreground">
               External guides and frameworks to help improve your security
             </CardDescription>
           </CardHeader>
@@ -1078,14 +1085,14 @@ export default function SecurityCertificationPage() {
                   href={resource.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-start gap-3 p-4 rounded-lg bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-slate-900"
+                  className="flex items-start gap-3 p-4 rounded-lg bg-muted/60 dark:bg-slate-800 border border-border dark:border-slate-700 hover:bg-muted dark:hover:bg-slate-700 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-slate-900"
                 >
                   <div className="w-10 h-10 rounded-lg bg-blue-100 dark:bg-blue-900 flex items-center justify-center flex-shrink-0">
                     <ExternalLink className="w-5 h-5 text-blue-600 dark:text-blue-400" />
                   </div>
                   <div>
-                    <h4 className="font-medium text-slate-900 dark:text-white">{resource.title}</h4>
-                    <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">{resource.description}</p>
+                    <h4 className="font-medium text-foreground dark:text-white">{resource.title}</h4>
+                    <p className="text-xs text-muted-foreground dark:text-muted-foreground mt-1">{resource.description}</p>
                   </div>
                 </a>
               ))}
@@ -1096,11 +1103,11 @@ export default function SecurityCertificationPage() {
         {/* Downloadable Templates */}
         <Card className="dark:bg-slate-900 dark:border-slate-700">
           <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-slate-900 dark:text-white">
+            <CardTitle className="flex items-center gap-2 text-foreground dark:text-white">
               <Download className="w-5 h-5 text-emerald-500 dark:text-emerald-400" />
               Policy & Document Templates
             </CardTitle>
-            <CardDescription className="dark:text-slate-400">
+            <CardDescription className="dark:text-muted-foreground">
               Download and customize these templates for your campground
             </CardDescription>
           </CardHeader>
@@ -1112,14 +1119,14 @@ export default function SecurityCertificationPage() {
                   href={`/security-templates/${template.filename}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-start gap-3 p-4 rounded-lg bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 dark:focus:ring-offset-slate-900"
+                  className="flex items-start gap-3 p-4 rounded-lg bg-muted/60 dark:bg-slate-800 border border-border dark:border-slate-700 hover:bg-muted dark:hover:bg-slate-700 transition-colors focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 dark:focus:ring-offset-slate-900"
                 >
                   <div className="w-10 h-10 rounded-lg bg-emerald-100 dark:bg-emerald-900 flex items-center justify-center flex-shrink-0">
                     <FileText className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
                   </div>
                   <div>
-                    <h4 className="font-medium text-slate-900 dark:text-white">{template.title}</h4>
-                    <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">{template.description}</p>
+                    <h4 className="font-medium text-foreground dark:text-white">{template.title}</h4>
+                    <p className="text-xs text-muted-foreground dark:text-muted-foreground mt-1">{template.description}</p>
                   </div>
                 </a>
               ))}

@@ -241,7 +241,7 @@ export default function CharitySettingsPage() {
       <motion.div
         initial={prefersReducedMotion ? {} : { opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
-        className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-rose-50 via-amber-50 to-orange-50 dark:from-rose-950/40 dark:via-amber-950/30 dark:to-orange-950/20 border border-rose-100 dark:border-rose-900/50 p-8"
+        className="relative overflow-hidden rounded-2xl bg-status-warning/10 border border-status-warning/20 p-8"
       >
         {/* Decorative elements */}
         <div className="absolute top-4 right-4 opacity-20">
@@ -250,20 +250,20 @@ export default function CharitySettingsPage() {
 
         <div className="relative">
           <div className="flex items-center gap-3 mb-3">
-            <div className="p-2.5 rounded-xl bg-gradient-to-br from-rose-500 to-amber-500 shadow-lg shadow-rose-500/25">
-              <Heart className="h-6 w-6 text-white" />
+            <div className="p-2.5 rounded-xl bg-status-warning/15">
+              <Heart className="h-6 w-6 text-status-warning" />
             </div>
             <div>
-              <h1 className="text-2xl font-bold text-slate-900 dark:text-white">
+              <h1 className="text-2xl font-bold text-foreground dark:text-white">
                 Charity Round-Up
               </h1>
-              <p className="text-sm text-slate-600 dark:text-slate-400">
+              <p className="text-sm text-muted-foreground dark:text-muted-foreground">
                 Turn spare change into real change
               </p>
             </div>
           </div>
 
-          <p className="text-slate-600 dark:text-slate-400 max-w-xl mt-4">
+          <p className="text-muted-foreground dark:text-muted-foreground max-w-xl mt-4">
             When guests check out, they can round up their total to support a cause you care about.
             It's a small gesture that adds up to something meaningful.
           </p>
@@ -273,13 +273,13 @@ export default function CharitySettingsPage() {
             <motion.div
               initial={prefersReducedMotion ? {} : { opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
-              className="mt-6 p-4 rounded-xl bg-white/70 dark:bg-slate-800/70 backdrop-blur border border-amber-200 dark:border-amber-800"
+              className="mt-6 p-4 rounded-xl bg-card/70 dark:bg-slate-800/70 backdrop-blur border border-amber-200 dark:border-amber-800"
             >
               <div className="flex items-center gap-3">
                 <PartyPopper className="h-5 w-5 text-amber-500" />
                 <div className="flex-1">
-                  <p className="font-medium text-slate-900 dark:text-white">{milestone.milestone}</p>
-                  <p className="text-sm text-slate-600 dark:text-slate-400">{milestone.next}</p>
+                  <p className="font-medium text-foreground dark:text-white">{milestone.milestone}</p>
+                  <p className="text-sm text-muted-foreground dark:text-muted-foreground">{milestone.next}</p>
                 </div>
               </div>
             </motion.div>
@@ -295,14 +295,14 @@ export default function CharitySettingsPage() {
         className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4"
       >
         <Card className="relative overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/5 to-transparent" />
+          <div className="absolute inset-0 bg-status-success/10" />
           <CardContent className="pt-6 relative">
             <div className="flex items-center gap-3">
               <div className="p-2 rounded-full bg-emerald-100 dark:bg-emerald-900/50">
                 <DollarSign className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
               </div>
               <div>
-                <p className="text-2xl font-bold text-slate-900 dark:text-white">
+                <p className="text-2xl font-bold text-foreground dark:text-white">
                   ${((stats?.totalAmountCents || 0) / 100).toFixed(2)}
                 </p>
                 <p className="text-xs text-muted-foreground">Total Raised</p>
@@ -317,14 +317,14 @@ export default function CharitySettingsPage() {
         </Card>
 
         <Card className="relative overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 to-transparent" />
+          <div className="absolute inset-0 bg-status-info/10" />
           <CardContent className="pt-6 relative">
             <div className="flex items-center gap-3">
               <div className="p-2 rounded-full bg-blue-100 dark:bg-blue-900/50">
                 <Heart className="h-5 w-5 text-blue-600 dark:text-blue-400" />
               </div>
               <div>
-                <p className="text-2xl font-bold text-slate-900 dark:text-white">
+                <p className="text-2xl font-bold text-foreground dark:text-white">
                   {stats?.totalDonations || 0}
                 </p>
                 <p className="text-xs text-muted-foreground">Donations</p>
@@ -334,14 +334,14 @@ export default function CharitySettingsPage() {
         </Card>
 
         <Card className="relative overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-br from-purple-500/5 to-transparent" />
+          <div className="absolute inset-0 bg-status-warning/10" />
           <CardContent className="pt-6 relative">
             <div className="flex items-center gap-3">
               <div className="p-2 rounded-full bg-purple-100 dark:bg-purple-900/50">
                 <Users className="h-5 w-5 text-purple-600 dark:text-purple-400" />
               </div>
               <div>
-                <p className="text-2xl font-bold text-slate-900 dark:text-white">
+                <p className="text-2xl font-bold text-foreground dark:text-white">
                   {stats?.donorCount || 0}
                 </p>
                 <p className="text-xs text-muted-foreground">Generous Guests</p>
@@ -351,14 +351,14 @@ export default function CharitySettingsPage() {
         </Card>
 
         <Card className="relative overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-br from-amber-500/5 to-transparent" />
+          <div className="absolute inset-0 bg-status-warning/10" />
           <CardContent className="pt-6 relative">
             <div className="flex items-center gap-3">
               <div className="p-2 rounded-full bg-amber-100 dark:bg-amber-900/50">
                 <TrendingUp className="h-5 w-5 text-amber-600 dark:text-amber-400" />
               </div>
               <div>
-                <p className="text-2xl font-bold text-slate-900 dark:text-white">
+                <p className="text-2xl font-bold text-foreground dark:text-white">
                   {(stats?.optInRate || 0).toFixed(0)}%
                 </p>
                 <p className="text-xs text-muted-foreground">Opt-in Rate</p>
@@ -378,15 +378,15 @@ export default function CharitySettingsPage() {
           <CardContent className="py-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <div className={`p-2 rounded-full transition-colors ${isEnabled ? 'bg-emerald-100 dark:bg-emerald-900/50' : 'bg-slate-100 dark:bg-slate-800'}`}>
+                <div className={`p-2 rounded-full transition-colors ${isEnabled ? 'bg-emerald-100 dark:bg-emerald-900/50' : 'bg-muted dark:bg-slate-800'}`}>
                   {isEnabled ? (
                     <CheckCircle className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
                   ) : (
-                    <Heart className="h-5 w-5 text-slate-400" />
+                    <Heart className="h-5 w-5 text-muted-foreground" />
                   )}
                 </div>
                 <div>
-                  <p className="font-medium text-slate-900 dark:text-white">
+                  <p className="font-medium text-foreground dark:text-white">
                     {isEnabled ? 'Round-Up is Active' : 'Round-Up is Paused'}
                   </p>
                   <p className="text-sm text-muted-foreground">
@@ -445,13 +445,13 @@ export default function CharitySettingsPage() {
                     className={`p-4 rounded-xl border-2 cursor-pointer transition-all text-left w-full ${
                       selectedCharityId === SYBILS_KIDS.id
                         ? "border-rose-500 bg-rose-50 dark:bg-rose-950/30 shadow-md"
-                        : "border-rose-200 dark:border-rose-800 hover:border-rose-400 dark:hover:border-rose-600 bg-gradient-to-r from-rose-50/50 to-amber-50/50 dark:from-rose-950/20 dark:to-amber-950/20"
+                        : "border-status-warning/30 hover:border-status-warning/40 bg-status-warning/10"
                     }`}
                   >
                     <div className="flex items-start justify-between gap-3">
                       <div className="flex-1">
                         <div className="flex items-center gap-2 flex-wrap">
-                          <span className="font-medium text-slate-900 dark:text-white">{SYBILS_KIDS.name}</span>
+                          <span className="font-medium text-foreground dark:text-white">{SYBILS_KIDS.name}</span>
                           <Badge variant="secondary" className="text-xs bg-status-warning/15 text-status-warning dark:bg-amber-900/50 dark:text-amber-300">
                             <Sparkles className="h-3 w-3 mr-1" />
                             Recommended
@@ -478,13 +478,13 @@ export default function CharitySettingsPage() {
                       className={`p-4 rounded-xl border-2 cursor-pointer transition-all text-left w-full ${
                         selectedCharityId === charity.id
                           ? "border-rose-500 bg-rose-50 dark:bg-rose-950/30 shadow-md"
-                          : "border-slate-200 dark:border-slate-700 hover:border-rose-300 dark:hover:border-rose-700"
+                          : "border-border dark:border-slate-700 hover:border-rose-300 dark:hover:border-rose-700"
                       }`}
                     >
                       <div className="flex items-start justify-between gap-3">
                         <div className="flex-1">
                           <div className="flex items-center gap-2">
-                            <span className="font-medium text-slate-900 dark:text-white">{charity.name}</span>
+                            <span className="font-medium text-foreground dark:text-white">{charity.name}</span>
                             {charity.isVerified && (
                               <Badge variant="secondary" className="text-xs bg-status-success/15 text-status-success dark:bg-emerald-900/50 dark:text-emerald-300">
                                 <CheckCircle className="h-3 w-3 mr-1" />
@@ -512,7 +512,7 @@ export default function CharitySettingsPage() {
                       <Heart className="h-4 w-4 text-rose-600 dark:text-rose-400" />
                     </div>
                     <div className="flex-1">
-                      <p className="font-medium text-slate-900 dark:text-white">Create Your Charity</p>
+                      <p className="font-medium text-foreground dark:text-white">Create Your Charity</p>
                       <p className="text-sm text-muted-foreground">
                         Add any 501(c)(3) organization. You'll manage the donations.
                       </p>
@@ -531,7 +531,7 @@ export default function CharitySettingsPage() {
                         placeholder="e.g., Local Veterans Foundation"
                         value={customCharity.name}
                         onChange={(e) => setCustomCharity({ ...customCharity, name: e.target.value })}
-                        className="bg-white dark:bg-slate-900"
+                        className="bg-card dark:bg-slate-900"
                       />
                     </div>
                     <div className="space-y-2">
@@ -542,7 +542,7 @@ export default function CharitySettingsPage() {
                         value={customCharity.description}
                         onChange={(e) => setCustomCharity({ ...customCharity, description: e.target.value })}
                         rows={2}
-                        className="bg-white dark:bg-slate-900"
+                        className="bg-card dark:bg-slate-900"
                       />
                     </div>
                     <div className="grid gap-4 md:grid-cols-2">
@@ -553,7 +553,7 @@ export default function CharitySettingsPage() {
                           placeholder="XX-XXXXXXX"
                           value={customCharity.taxId}
                           onChange={(e) => setCustomCharity({ ...customCharity, taxId: e.target.value })}
-                          className="bg-white dark:bg-slate-900"
+                          className="bg-card dark:bg-slate-900"
                         />
                       </div>
                       <div className="space-y-2">
@@ -563,7 +563,7 @@ export default function CharitySettingsPage() {
                           placeholder="https://..."
                           value={customCharity.website}
                           onChange={(e) => setCustomCharity({ ...customCharity, website: e.target.value })}
-                          className="bg-white dark:bg-slate-900"
+                          className="bg-card dark:bg-slate-900"
                         />
                       </div>
                     </div>
@@ -623,7 +623,7 @@ export default function CharitySettingsPage() {
             </div>
 
             {/* Default Opt-In */}
-            <div className="flex items-center justify-between p-4 rounded-xl border bg-slate-50 dark:bg-slate-800/50">
+            <div className="flex items-center justify-between p-4 rounded-xl border bg-muted/60 dark:bg-slate-800/50">
               <div>
                 <Label htmlFor="default-optin" className="font-medium">Pre-check the donation box</Label>
                 <p className="text-xs text-muted-foreground mt-1">
@@ -638,7 +638,7 @@ export default function CharitySettingsPage() {
             </div>
 
             {/* GL Code */}
-            <div className="p-4 rounded-xl border bg-slate-50 dark:bg-slate-800/50">
+            <div className="p-4 rounded-xl border bg-muted/60 dark:bg-slate-800/50">
               <div className="flex items-start gap-3">
                 <div className="p-2 rounded-lg bg-blue-100 dark:bg-blue-900/50">
                   <BookOpen className="h-4 w-4 text-blue-600 dark:text-blue-400" />
@@ -655,7 +655,7 @@ export default function CharitySettingsPage() {
                     value={glCode}
                     onChange={(e) => setGlCode(e.target.value)}
                     placeholder="2400"
-                    className="max-w-[200px] bg-white dark:bg-slate-900"
+                    className="max-w-[200px] bg-card dark:bg-slate-900"
                   />
                   <p className="text-xs text-muted-foreground">
                     Default: 2400 (Charity Donations Payable)
@@ -673,7 +673,7 @@ export default function CharitySettingsPage() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.3 }}
       >
-        <Card className="bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-800/50 dark:to-slate-900/50">
+        <Card className="bg-muted/60">
           <CardHeader>
             <CardTitle className="text-lg flex items-center gap-2">
               <ArrowRight className="h-5 w-5 text-blue-500" />
@@ -687,7 +687,7 @@ export default function CharitySettingsPage() {
                   1
                 </div>
                 <div>
-                  <p className="font-medium text-slate-900 dark:text-white">Guest Checks Out</p>
+                  <p className="font-medium text-foreground dark:text-white">Guest Checks Out</p>
                   <p className="text-sm text-muted-foreground mt-1">
                     During payment, they see the option to round up for {charityName}
                   </p>
@@ -698,7 +698,7 @@ export default function CharitySettingsPage() {
                   2
                 </div>
                 <div>
-                  <p className="font-medium text-slate-900 dark:text-white">Donation Recorded</p>
+                  <p className="font-medium text-foreground dark:text-white">Donation Recorded</p>
                   <p className="text-sm text-muted-foreground mt-1">
                     Amount is added to their total and logged under GL {glCode}
                   </p>
@@ -709,7 +709,7 @@ export default function CharitySettingsPage() {
                   3
                 </div>
                 <div>
-                  <p className="font-medium text-slate-900 dark:text-white">You Send the Funds</p>
+                  <p className="font-medium text-foreground dark:text-white">You Send the Funds</p>
                   <p className="text-sm text-muted-foreground mt-1">
                     Export from QuickBooks and write a check to the charity
                   </p>
@@ -732,7 +732,7 @@ export default function CharitySettingsPage() {
             variant="outline"
             onClick={() => disableMutation.mutate()}
             disabled={disableMutation.isPending}
-            className="text-slate-600"
+            className="text-muted-foreground"
           >
             {disableMutation.isPending && <Loader2 className="h-4 w-4 animate-spin mr-2" />}
             Pause Round-Up
@@ -742,7 +742,7 @@ export default function CharitySettingsPage() {
         <Button
           onClick={() => saveMutation.mutate()}
           disabled={saveMutation.isPending}
-          className="bg-gradient-to-r from-rose-500 to-amber-500 hover:from-rose-600 hover:to-amber-600 text-white shadow-lg shadow-rose-500/25"
+          className="bg-status-warning text-white shadow-lg shadow-status-warning/20 hover:bg-status-warning/90"
         >
           {saveMutation.isPending && <Loader2 className="h-4 w-4 animate-spin mr-2" />}
           Save Settings
