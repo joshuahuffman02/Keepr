@@ -172,12 +172,12 @@ export class RefundService {
             },
         });
 
-        // Create refund record (as a negative payment)
+        // Create refund record (positive amount with refund direction)
         const refundPayment = await this.prisma.payment.create({
             data: {
                 campgroundId,
                 reservationId: payment.reservationId,
-                amountCents: -refundAmountCents, // Negative for refund
+                amountCents: refundAmountCents,
                 method: payment.method,
                 direction: "refund",
                 note: note || `Refund for payment ${paymentId}`,

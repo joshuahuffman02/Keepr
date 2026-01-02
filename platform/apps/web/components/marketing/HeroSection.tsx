@@ -92,20 +92,20 @@ export function HeroSection() {
                 className="bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white text-lg px-8 py-6 group"
                 asChild
               >
-                <Link href="/demo">
-                  Try Live Demo
+                <Link href="/signup">
+                  Start Free Trial
                   <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
                 </Link>
               </Button>
               <Button
                 size="lg"
-                variant="outline"
-                className="text-lg px-8 py-6 border-2 border-slate-300 hover:border-emerald-600 hover:text-emerald-600 group"
+                variant="ghost"
+                className="text-base px-6 py-5 text-slate-600 hover:text-emerald-600 hover:bg-emerald-50 group"
                 asChild
               >
-                <Link href="/roi-calculator">
-                  <svg className="mr-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="4" y="2" width="16" height="20" rx="2"/><line x1="8" y1="6" x2="16" y2="6"/><line x1="8" y1="10" x2="16" y2="10"/><line x1="8" y1="14" x2="12" y2="14"/><line x1="8" y1="18" x2="12" y2="18"/></svg>
-                  Calculate Your Savings
+                <Link href="/demo">
+                  <Play className="mr-2 h-4 w-4" />
+                  Watch Demo
                 </Link>
               </Button>
             </div>

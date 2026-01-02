@@ -53,6 +53,7 @@ interface TrendChartProps {
   formatYAxis?: (value: number) => string;
   formatTooltip?: (value: number) => string;
   loading?: boolean;
+  yAxisLabel?: string;
 }
 
 const formatCurrency = (value: number) =>
@@ -79,6 +80,7 @@ export function TrendChart({
   formatYAxis = formatNumber,
   formatTooltip = formatNumber,
   loading = false,
+  yAxisLabel,
 }: TrendChartProps) {
   const [isRechartsLoaded, setIsRechartsLoaded] = useState(false);
 
@@ -129,7 +131,12 @@ export function TrendChart({
           <AreaChart {...commonProps}>
             {showGrid && <CartesianGrid strokeDasharray="3 3" stroke="#334155" />}
             <XAxis dataKey={xAxisKey} tick={{ fill: "#94a3b8", fontSize: 12 }} stroke="#475569" />
-            <YAxis tick={{ fill: "#94a3b8", fontSize: 12 }} stroke="#475569" tickFormatter={formatYAxis} />
+            <YAxis
+              tick={{ fill: "#94a3b8", fontSize: 12 }}
+              stroke="#475569"
+              tickFormatter={formatYAxis}
+              label={yAxisLabel ? { value: yAxisLabel, angle: -90, position: "insideLeft", style: { textAnchor: "middle", fill: "#94a3b8", fontSize: 12 } } : undefined}
+            />
             <Tooltip content={<CustomTooltip />} />
             {showLegend && <Legend wrapperStyle={{ paddingTop: 10 }} />}
             {dataKeys.map((dk) => (
@@ -152,7 +159,12 @@ export function TrendChart({
           <BarChart {...commonProps}>
             {showGrid && <CartesianGrid strokeDasharray="3 3" stroke="#334155" />}
             <XAxis dataKey={xAxisKey} tick={{ fill: "#94a3b8", fontSize: 12 }} stroke="#475569" />
-            <YAxis tick={{ fill: "#94a3b8", fontSize: 12 }} stroke="#475569" tickFormatter={formatYAxis} />
+            <YAxis
+              tick={{ fill: "#94a3b8", fontSize: 12 }}
+              stroke="#475569"
+              tickFormatter={formatYAxis}
+              label={yAxisLabel ? { value: yAxisLabel, angle: -90, position: "insideLeft", style: { textAnchor: "middle", fill: "#94a3b8", fontSize: 12 } } : undefined}
+            />
             <Tooltip content={<CustomTooltip />} />
             {showLegend && <Legend wrapperStyle={{ paddingTop: 10 }} />}
             {dataKeys.map((dk) => (
@@ -166,7 +178,12 @@ export function TrendChart({
           <LineChart {...commonProps}>
             {showGrid && <CartesianGrid strokeDasharray="3 3" stroke="#334155" />}
             <XAxis dataKey={xAxisKey} tick={{ fill: "#94a3b8", fontSize: 12 }} stroke="#475569" />
-            <YAxis tick={{ fill: "#94a3b8", fontSize: 12 }} stroke="#475569" tickFormatter={formatYAxis} />
+            <YAxis
+              tick={{ fill: "#94a3b8", fontSize: 12 }}
+              stroke="#475569"
+              tickFormatter={formatYAxis}
+              label={yAxisLabel ? { value: yAxisLabel, angle: -90, position: "insideLeft", style: { textAnchor: "middle", fill: "#94a3b8", fontSize: 12 } } : undefined}
+            />
             <Tooltip content={<CustomTooltip />} />
             {showLegend && <Legend wrapperStyle={{ paddingTop: 10 }} />}
             {dataKeys.map((dk) => (

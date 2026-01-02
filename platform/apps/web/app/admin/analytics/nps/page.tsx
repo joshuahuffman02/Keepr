@@ -310,6 +310,7 @@ export default function NpsAnalyticsPage() {
         formatYAxis={(v) => `${v}`}
         formatTooltip={(v) => `${v}`}
         loading={loading}
+        yAxisLabel="NPS Score"
       />
 
       {/* By Segment */}

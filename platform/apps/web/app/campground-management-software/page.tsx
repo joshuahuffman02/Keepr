@@ -20,10 +20,47 @@ import {
   TrendingUp,
   Wrench,
   ShoppingCart,
+  ChevronDown,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { PublicHeader } from "@/components/public/PublicHeader";
 import { PRICING, PROOF_POINTS, CTA_COPY, DIFFERENTIATORS } from "@/lib/positioning";
+import { FAQJsonLd } from "@/components/seo";
+
+const softwareFaqs = [
+  {
+    question: "What types of campgrounds can use Camp Everyday?",
+    answer: "Camp Everyday works for all types of outdoor hospitality: RV parks, tent campgrounds, cabin rentals, glamping sites, yurts, treehouses, and mixed-use properties. Our flexible site class system lets you manage any combination of accommodations.",
+  },
+  {
+    question: "How is Camp Everyday different from Campspot or Newbook?",
+    answer: "Unlike Campspot, we charge zero commission on bookings (just a flat $2.30 per reservation). Unlike Newbook, there are no setup fees or long implementation times. We offer features most competitors lack: AI demand forecasting, built-in loyalty programs, and integrated staff scheduling.",
+  },
+  {
+    question: "Can I manage multiple campground properties?",
+    answer: "Yes. Our platform supports multi-property management with centralized reporting, shared guest databases, and portfolio-wide analytics. Each property can have its own branding, rates, and policies.",
+  },
+  {
+    question: "Does it work offline for remote campgrounds?",
+    answer: "Yes. Our POS system includes offline mode that syncs when connectivity returns. Staff can process check-ins, take payments, and create reservations even without internet access.",
+  },
+  {
+    question: "What integrations are available?",
+    answer: "Camp Everyday integrates with Stripe for payments, QuickBooks and Xero for accounting, major OTA channels (Hipcamp, Airbnb, Booking.com), and offers a full REST API for custom integrations.",
+  },
+  {
+    question: "How does the AI demand forecasting work?",
+    answer: "Our AI analyzes your historical booking patterns, local events, weather data, and competitor pricing to predict future demand. It suggests optimal pricing and can automatically adjust rates based on your rules.",
+  },
+  {
+    question: "What guest communication features are included?",
+    answer: "All plans include automated confirmation emails, pre-arrival reminders, and check-out instructions. Higher tiers add SMS messaging, guest surveys, and a self-service portal where guests can manage their reservations.",
+  },
+  {
+    question: "Is training provided for my staff?",
+    answer: "Yes. We provide DIY video tutorials, role-specific training guides, and live onboarding sessions for Pro and Enterprise plans. Most staff become comfortable with the system within a few hours.",
+  },
+];
 
 export const metadata: Metadata = {
   title: "Campground Management Software | Camp Everyday - Modern Reservation System",
@@ -144,6 +181,7 @@ export default function CampgroundManagementSoftwarePage() {
   return (
     <div className="min-h-screen bg-white">
       <PublicHeader />
+      <FAQJsonLd faqs={softwareFaqs} />
 
       <script
         type="application/ld+json"
@@ -183,14 +221,13 @@ export default function CampgroundManagementSoftwarePage() {
                   <ArrowRight className="ml-2 h-5 w-5" />
                 </Link>
               </Button>
-              <Button
-                asChild
-                size="lg"
-                variant="outline"
-                className="px-8 py-6 text-lg border-slate-600 text-white hover:bg-slate-800"
+              <Link
+                href="/demo"
+                className="text-sm font-medium text-slate-400 hover:text-white transition-colors flex items-center gap-2"
               >
-                <Link href="/demo">Try Live Demo</Link>
-              </Button>
+                <Clock className="h-4 w-4" />
+                Watch 3-min Demo
+              </Link>
             </div>
 
             {/* Trust Badges */}
@@ -444,6 +481,39 @@ export default function CampgroundManagementSoftwarePage() {
         </div>
       </section>
 
+      {/* FAQ Section */}
+      <section className="py-20">
+        <div className="max-w-4xl mx-auto px-6">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-4">
+              Frequently Asked Questions
+            </h2>
+            <p className="text-lg text-slate-600 max-w-2xl mx-auto">
+              Everything you need to know about Camp Everyday campground management software.
+            </p>
+          </div>
+
+          <div className="space-y-4">
+            {softwareFaqs.map((faq, index) => (
+              <details
+                key={index}
+                className="group border border-slate-200 rounded-xl bg-white overflow-hidden"
+              >
+                <summary className="flex items-center justify-between cursor-pointer list-none px-6 py-5 hover:bg-slate-50 transition-colors">
+                  <span className="font-semibold text-slate-900 text-left pr-4">
+                    {faq.question}
+                  </span>
+                  <ChevronDown className="h-5 w-5 text-slate-500 flex-shrink-0 transition-transform group-open:rotate-180" />
+                </summary>
+                <div className="px-6 pb-5 pt-0 text-slate-600 leading-relaxed border-t border-slate-100">
+                  <div className="pt-4">{faq.answer}</div>
+                </div>
+              </details>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* Final CTA */}
       <section className="py-20 bg-gradient-to-br from-emerald-600 to-teal-600">
         <div className="max-w-4xl mx-auto px-6 text-center">
@@ -465,14 +535,12 @@ export default function CampgroundManagementSoftwarePage() {
                 <ArrowRight className="ml-2 h-5 w-5" />
               </Link>
             </Button>
-            <Button
-              asChild
-              size="lg"
-              variant="outline"
-              className="px-8 py-6 text-lg border-white/30 text-white hover:bg-white/10"
+            <Link
+              href="/demo"
+              className="text-sm font-medium text-emerald-100 hover:text-white transition-colors"
             >
-              <Link href="/demo">Try Live Demo</Link>
-            </Button>
+              or watch a quick demo
+            </Link>
           </div>
 
           <p className="text-emerald-200 text-sm">

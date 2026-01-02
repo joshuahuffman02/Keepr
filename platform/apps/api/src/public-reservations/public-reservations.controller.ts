@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post, Query, BadRequestException, Logger } from "@nestjs/common";
+import { Body, Controller, Get, Param, Post, Query, BadRequestException, Logger, Headers } from "@nestjs/common";
 import { PublicReservationsService } from "./public-reservations.service";
 import { CreatePublicReservationDto, PublicQuoteDto, CreatePublicWaitlistDto, CreateDemoRequestDto } from "./dto/create-public-reservation.dto";
 import { FormsService } from "../forms/forms.service";
@@ -94,30 +94,25 @@ export class PublicReservationsController {
     kioskCheckIn(
         @Param("id") id: string,
         @Body() body: { upsellTotalCents: number },
-        @Query("campgroundId") campgroundId: string
+        @Headers("x-kiosk-token") kioskToken: string
     ) {
-        // SECURITY: Always require campgroundId for kiosk check-in
-        // This prevents IDOR by ensuring reservation belongs to expected campground
-        // For proper kiosk device flows, use /kiosk/... endpoints with X-Kiosk-Token header
-        if (!campgroundId) {
-            throw new BadRequestException("campgroundId required for kiosk check-in");
+        if (!kioskToken) {
+            throw new BadRequestException("kiosk token required");
         }
-        return this.service.kioskCheckIn(id, body.upsellTotalCents || 0, campgroundId);
+        return this.service.kioskCheckIn(id, body.upsellTotalCents || 0, kioskToken);
     }
 
     @Get("reservations/:id")
     @Throttle({ default: { limit: 20, ttl: 60000 } }) // Moderate rate limit: 20 per minute
     getReservation(
         @Param("id") id: string,
-        @Query("campgroundId") campgroundId?: string,
         @Query("token") token?: string
     ) {
-        // SECURITY: Require either campgroundId for validation OR a signed token
-        // This prevents IDOR by ensuring caller has legitimate access
-        if (!campgroundId && !token) {
-            throw new BadRequestException("campgroundId or access token required");
+        // SECURITY: Require signed token for public reservation access
+        if (!token) {
+            throw new BadRequestException("access token required");
         }
-        return this.service.getReservation(id, campgroundId, token);
+        return this.service.getReservation(id, token);
     }
 
     /**
@@ -127,14 +122,13 @@ export class PublicReservationsController {
     @Get("reservations/:id/form-submissions")
     async getReservationFormSubmissions(
         @Param("id") id: string,
-        @Query("campgroundId") campgroundId?: string,
         @Query("token") token?: string
     ) {
-        // SECURITY: Require either campgroundId for validation OR a signed token
-        if (!campgroundId && !token) {
-            throw new BadRequestException("campgroundId or access token required");
+        // SECURITY: Require signed token for public reservation access
+        if (!token) {
+            throw new BadRequestException("access token required");
         }
-        return this.formsService.getReservationFormSubmissions(id, campgroundId);
+        return this.formsService.getReservationFormSubmissions(id, token);
     }
 
     /**

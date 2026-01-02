@@ -146,6 +146,7 @@ export default function RevenueIntelligencePage() {
             formatYAxis={(v) => `$${(v / 1000).toFixed(0)}K`}
             formatTooltip={(v) => formatCurrency(v)}
             loading={loading}
+            yAxisLabel="Revenue ($)"
           />
         </div>
         <BreakdownPie
@@ -172,6 +173,7 @@ export default function RevenueIntelligencePage() {
         formatYAxis={(v) => `$${v.toFixed(0)}`}
         formatTooltip={(v) => `$${v.toFixed(2)}`}
         loading={loading}
+        yAxisLabel="ADR ($)"
       />
 
       {/* Revenue Bridge Waterfall */}
@@ -182,6 +184,7 @@ export default function RevenueIntelligencePage() {
         height={350}
         formatValue={(v) => `$${(v / 1000).toFixed(1)}K`}
         loading={loading}
+        yAxisLabel="Revenue ($)"
       />
 
       {/* Revenue by Type Table */}

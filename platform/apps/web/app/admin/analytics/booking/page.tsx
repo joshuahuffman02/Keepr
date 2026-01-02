@@ -183,6 +183,7 @@ export default function BookingBehaviorPage() {
           height={300}
           formatTooltip={(v) => v.toLocaleString()}
           loading={loading}
+          yAxisLabel="Bookings"
         />
         <TrendChart
           title="Lead Time Seasonality"
@@ -197,6 +198,7 @@ export default function BookingBehaviorPage() {
           formatYAxis={(v) => `${v}d`}
           formatTooltip={(v) => `${v.toFixed(1)} days`}
           loading={loading}
+          yAxisLabel="Lead Time (days)"
         />
       </div>
 
@@ -288,6 +290,7 @@ export default function BookingBehaviorPage() {
         height={250}
         formatTooltip={(v) => v.toLocaleString()}
         loading={loading}
+        yAxisLabel="Bookings"
       />
     </div>
   );

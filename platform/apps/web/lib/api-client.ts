@@ -3160,8 +3160,11 @@ export const apiClient = {
     }).parse(data);
   },
 
-  async getPublicReservation(id: string) {
-    const data = await fetchJSON<unknown>(`/public/reservations/${id}`);
+  async getPublicReservation(id: string, token?: string) {
+    const url = token
+      ? `/public/reservations/${id}?token=${encodeURIComponent(token)}`
+      : `/public/reservations/${id}`;
+    const data = await fetchJSON<unknown>(url);
     return ReservationSchema.extend({
       guest: GuestSchema.pick({ primaryFirstName: true, primaryLastName: true }),
       campground: CampgroundSchema.pick({ name: true, slug: true, city: true, state: true, timezone: true }),
@@ -3171,10 +3174,13 @@ export const apiClient = {
     }).parse(data);
   },
 
-  async kioskCheckIn(id: string, upsellTotalCents: number) {
+  async kioskCheckIn(id: string, upsellTotalCents: number, kioskToken?: string) {
     const res = await fetch(`${API_BASE}/public/reservations/${id}/kiosk-checkin`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        ...(kioskToken ? { "x-kiosk-token": kioskToken } : {})
+      },
       body: JSON.stringify({ upsellTotalCents })
     });
     return parseResponse<unknown>(res);

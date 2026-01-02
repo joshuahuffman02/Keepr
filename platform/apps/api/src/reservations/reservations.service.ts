@@ -2366,6 +2366,65 @@ export class ReservationsService {
     return updated;
   }
 
+  private async allocateRefundToPayments(
+    tx: any,
+    reservationId: string,
+    amountCents: number,
+    hints?: { stripePaymentIntentId?: string; stripeChargeId?: string }
+  ): Promise<Array<{ id: string; appliedAmountCents: number }>> {
+    if (amountCents <= 0) return [];
+    const now = new Date();
+
+    if (hints?.stripePaymentIntentId || hints?.stripeChargeId) {
+      const payment = await tx.payment.findFirst({
+        where: {
+          reservationId,
+          direction: "charge",
+          OR: [
+            ...(hints.stripePaymentIntentId ? [{ stripePaymentIntentId: hints.stripePaymentIntentId }] : []),
+            ...(hints.stripeChargeId ? [{ stripeChargeId: hints.stripeChargeId }] : [])
+          ]
+        },
+        orderBy: { createdAt: "desc" }
+      });
+      if (payment) {
+        const refunded = payment.refundedAmountCents ?? 0;
+        const available = Math.max(0, payment.amountCents - refunded);
+        const apply = Math.min(amountCents, available);
+        if (apply > 0) {
+          await tx.payment.update({
+            where: { id: payment.id },
+            data: { refundedAmountCents: refunded + apply, refundedAt: now }
+          });
+          return [{ id: payment.id, appliedAmountCents: apply }];
+        }
+      }
+    }
+
+    let remaining = amountCents;
+    const payments = await tx.payment.findMany({
+      where: { reservationId, direction: "charge" },
+      orderBy: { createdAt: "desc" }
+    });
+
+    const applied: Array<{ id: string; appliedAmountCents: number }> = [];
+    for (const payment of payments) {
+      if (remaining <= 0) break;
+      const refunded = payment.refundedAmountCents ?? 0;
+      const available = Math.max(0, payment.amountCents - refunded);
+      if (available <= 0) continue;
+      const apply = Math.min(remaining, available);
+      await tx.payment.update({
+        where: { id: payment.id },
+        data: { refundedAmountCents: refunded + apply, refundedAt: now }
+      });
+      applied.push({ id: payment.id, appliedAmountCents: apply });
+      remaining -= apply;
+    }
+
+    return applied;
+  }
+
   async refundPayment(
     id: string,
     amountCents: number,
@@ -2430,6 +2489,9 @@ export class ReservationsService {
 
       const fullReservation = { ...lockedReservation, site, guest, campground };
 
+      const appliedRefunds = await this.allocateRefundToPayments(tx, id, amountCents);
+      const originalPaymentId = appliedRefunds[0]?.id ?? null;
+
       // Handle wallet refund
       if (destination === "wallet" && fullReservation.guestId) {
         await this.guestWalletService.creditFromRefund(
@@ -2447,7 +2509,8 @@ export class ReservationsService {
             amountCents,
             method: "wallet_credit",
             direction: "refund",
-            note: options?.reason ?? "Reservation refund - credited to wallet"
+            note: options?.reason ?? "Reservation refund - credited to wallet",
+            originalPaymentId
           }
         });
       } else {
@@ -2459,7 +2522,8 @@ export class ReservationsService {
             amountCents,
             method: "card",
             direction: "refund",
-            note: options?.reason ?? "Reservation refund"
+            note: options?.reason ?? "Reservation refund",
+            originalPaymentId
           }
         });
       }
@@ -2554,72 +2618,92 @@ export class ReservationsService {
       source?: string;
       tenders?: { method: string; amountCents: number; note?: string }[];
       receiptKind?: "refund" | "payment" | "pos";
+      stripePaymentIntentId?: string;
+      stripeChargeId?: string;
     }
   ) {
     if (amountCents <= 0) return; // Skip zero or negative refunds
 
-    const reservation = await this.prisma.reservation.findUnique({
-      where: { id },
-      include: {
-        site: { include: { siteClass: true } },
-        guest: true,
-        campground: { select: { name: true } }
+    const result = await this.prisma.$transaction(async (tx) => {
+      const reservation = await tx.reservation.findUnique({
+        where: { id },
+        include: {
+          site: { include: { siteClass: true } },
+          guest: true,
+          campground: { select: { name: true } }
+        }
+      });
+      if (!reservation) {
+        this.logger.error(`Stripe Refund - Reservation ${id} not found for refund recording`);
+        return null;
       }
+
+      const newPaid = Math.max(0, (reservation.paidAmount ?? 0) - amountCents);
+      const paymentFields = this.buildPaymentFields(reservation.totalAmount, newPaid);
+
+      const updated = await tx.reservation.update({
+        where: { id },
+        data: {
+          paidAmount: newPaid,
+          ...paymentFields
+        }
+      });
+
+      const appliedRefunds = await this.allocateRefundToPayments(tx, reservation.id, amountCents, {
+        stripePaymentIntentId: options?.stripePaymentIntentId,
+        stripeChargeId: options?.stripeChargeId
+      });
+      const originalPaymentId = appliedRefunds[0]?.id ?? null;
+
+      await tx.payment.create({
+        data: {
+          campgroundId: reservation.campgroundId,
+          reservationId: reservation.id,
+          amountCents,
+          method: "card",
+          direction: "refund",
+          note: stripeRefundId ? `Stripe refund: ${stripeRefundId}` : "Stripe refund",
+          originalPaymentId,
+          stripePaymentIntentId: stripeRefundId ? `refund_${stripeRefundId}` : undefined,
+          stripeChargeId: options?.stripeChargeId ?? undefined
+        }
+      });
+
+      const revenueGl = reservation.site?.siteClass?.glCode ?? "REVENUE_UNMAPPED";
+      const revenueAccount = reservation.site?.siteClass?.clientAccount ?? "Revenue";
+      const dedupeKeyBase = stripeRefundId ? `res:${reservation.id}:refund:${stripeRefundId}` : `res:${reservation.id}:refund:${amountCents}`;
+      await postBalancedLedgerEntries(tx, [
+        {
+          campgroundId: reservation.campgroundId,
+          reservationId: reservation.id,
+          glCode: "CASH",
+          account: "Cash",
+          description: stripeRefundId ? `Stripe refund: ${stripeRefundId}` : "Stripe refund",
+          amountCents: amountCents,
+          direction: "credit",
+          externalRef: stripeRefundId ?? null,
+          dedupeKey: `${dedupeKeyBase}:credit`
+        },
+        {
+          campgroundId: reservation.campgroundId,
+          reservationId: reservation.id,
+          glCode: revenueGl,
+          account: revenueAccount,
+          description: stripeRefundId ? `Stripe refund: ${stripeRefundId}` : "Stripe refund",
+          amountCents: amountCents,
+          direction: "debit",
+          externalRef: stripeRefundId ?? null,
+          dedupeKey: `${dedupeKeyBase}:debit`
+        }
+      ]);
+
+      return { reservation, updated };
     });
-    if (!reservation) {
-      this.logger.error(`Stripe Refund - Reservation ${id} not found for refund recording`);
+
+    if (!result) {
       return;
     }
-
-    const newPaid = Math.max(0, (reservation.paidAmount ?? 0) - amountCents);
-    const paymentFields = this.buildPaymentFields(reservation.totalAmount, newPaid);
-
-    const updated = await this.prisma.reservation.update({
-      where: { id },
-      data: {
-        paidAmount: newPaid,
-        ...paymentFields
-      }
-    });
-
-    await this.prisma.payment.create({
-      data: {
-        campgroundId: reservation.campgroundId,
-        reservationId: reservation.id,
-        amountCents,
-        method: "card",
-        direction: "refund",
-        note: stripeRefundId ? `Stripe refund: ${stripeRefundId}` : "Stripe refund"
-      }
-    });
-
-    const revenueGl = reservation.site?.siteClass?.glCode ?? "REVENUE_UNMAPPED";
-    const revenueAccount = reservation.site?.siteClass?.clientAccount ?? "Revenue";
-    const dedupeKeyBase = stripeRefundId ? `res:${reservation.id}:refund:${stripeRefundId}` : `res:${reservation.id}:refund:${amountCents}`;
-    await postBalancedLedgerEntries(this.prisma, [
-      {
-        campgroundId: reservation.campgroundId,
-        reservationId: reservation.id,
-        glCode: "CASH",
-        account: "Cash",
-        description: stripeRefundId ? `Stripe refund: ${stripeRefundId}` : "Stripe refund",
-        amountCents: amountCents,
-        direction: "credit",
-        externalRef: stripeRefundId ?? null,
-        dedupeKey: `${dedupeKeyBase}:credit`
-      },
-      {
-        campgroundId: reservation.campgroundId,
-        reservationId: reservation.id,
-        glCode: revenueGl,
-        account: revenueAccount,
-        description: stripeRefundId ? `Stripe refund: ${stripeRefundId}` : "Stripe refund",
-        amountCents: amountCents,
-        direction: "debit",
-        externalRef: stripeRefundId ?? null,
-        dedupeKey: `${dedupeKeyBase}:debit`
-      }
-    ]);
+    const { reservation, updated } = result;
 
     // Send refund receipt
     try {

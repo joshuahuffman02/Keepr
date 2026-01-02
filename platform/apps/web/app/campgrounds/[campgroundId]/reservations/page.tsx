@@ -18,6 +18,7 @@ import { useGanttStore } from "../../../../lib/gantt-store";
 import { BulkMessageModal } from "../../../../components/reservations/BulkMessageModal";
 import { AnimatePresence } from "framer-motion";
 import { CelebrationOverlay } from "../../../../components/signup/CelebrationOverlay";
+import { FilterChip } from "../../../../components/ui/filter-chip";
 
 type ReservationStatus = z.infer<typeof ReservationSchema>["status"];
 type ReservationUpdate = Partial<z.infer<typeof ReservationSchema>> & {
@@ -1648,6 +1649,88 @@ export default function ReservationsPage() {
                   </Button>
                 </div>
               </div>
+              {/* Active filter pills */}
+              {activeFilterCount > 0 && (
+                <div className="flex flex-wrap items-center gap-2 pt-2 border-t border-slate-100">
+                  <span className="text-xs text-slate-500 font-medium">Active:</span>
+                  {search.trim() && (
+                    <FilterChip
+                      label={`Search: "${search.trim().length > 20 ? search.trim().slice(0, 20) + '...' : search.trim()}"`}
+                      selected
+                      removable
+                      onRemove={() => setSearch("")}
+                      variant="subtle"
+                    />
+                  )}
+                  {statusFilter !== "all" && (
+                    <FilterChip
+                      label={`Status: ${statusFilter.replace("_", " ").replace(/\b\w/g, (c) => c.toUpperCase())}`}
+                      selected
+                      removable
+                      onRemove={() => setStatusFilter("all")}
+                      variant="subtle"
+                    />
+                  )}
+                  {startFilter && endFilter && startFilter === endFilter ? (
+                    <FilterChip
+                      label={`Date: ${new Date(startFilter + "T00:00:00").toLocaleDateString()}`}
+                      selected
+                      removable
+                      onRemove={() => {
+                        setStartFilter("");
+                        setEndFilter("");
+                      }}
+                      variant="subtle"
+                    />
+                  ) : (
+                    <>
+                      {startFilter && (
+                        <FilterChip
+                          label={`From: ${new Date(startFilter + "T00:00:00").toLocaleDateString()}`}
+                          selected
+                          removable
+                          onRemove={() => setStartFilter("")}
+                          variant="subtle"
+                        />
+                      )}
+                      {endFilter && (
+                        <FilterChip
+                          label={`To: ${new Date(endFilter + "T00:00:00").toLocaleDateString()}`}
+                          selected
+                          removable
+                          onRemove={() => setEndFilter("")}
+                          variant="subtle"
+                        />
+                      )}
+                    </>
+                  )}
+                  {filterDepositsDue && (
+                    <FilterChip
+                      label="Deposits due"
+                      selected
+                      removable
+                      onRemove={() => setFilterDepositsDue(false)}
+                      variant="subtle"
+                    />
+                  )}
+                  {activeFilterCount > 1 && (
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      className="text-xs h-7 px-2"
+                      onClick={() => {
+                        setSearch("");
+                        setStatusFilter("all");
+                        setStartFilter("");
+                        setEndFilter("");
+                        setFilterDepositsDue(false);
+                      }}
+                    >
+                      Clear all
+                    </Button>
+                  )}
+                </div>
+              )}
             </div>
             {reservationsQuery.isLoading && <p className="text-slate-600">Loading…</p>}
             {reservationsQuery.error && <p className="text-status-error">Error loading reservations</p>}

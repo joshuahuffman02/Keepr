@@ -578,6 +578,9 @@ export function getAvailablePaymentMethods(
     if (method === "guest_wallet" && !options.hasWalletBalance) continue;
     if (method === "terminal" && !options.hasTerminalReaders) continue;
 
+    // Link payment is not yet implemented - hide from method selector
+    if (method === "link") continue;
+
     available.push(method);
   }
 

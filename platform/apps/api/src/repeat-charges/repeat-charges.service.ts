@@ -243,77 +243,81 @@ export class RepeatChargesService {
                 throw new BadRequestException(failureReason);
             }
 
-            // Update charge status
-            const updated = await this.prisma.repeatCharge.update({
-                where: { id: chargeId },
-                data: {
-                    status: ChargeStatus.paid,
-                    paidAt: new Date()
-                }
+            const updated = await this.prisma.$transaction(async (tx) => {
+                // Update charge status
+                const updatedCharge = await tx.repeatCharge.update({
+                    where: { id: chargeId },
+                    data: {
+                        status: ChargeStatus.paid,
+                        paidAt: new Date()
+                    }
+                });
+
+                // Record the payment
+                const payment = await tx.payment.create({
+                    data: {
+                        campgroundId: charge.reservation.campgroundId,
+                        reservationId: charge.reservationId,
+                        amountCents: charge.amount,
+                        method: 'card',
+                        direction: 'charge',
+                        note: `Repeat charge for ${charge.dueDate.toISOString().split('T')[0]}`,
+                        stripePaymentIntentId: paymentIntent.id,
+                        stripeChargeId: paymentIntent.latest_charge as string | undefined,
+                        applicationFeeCents,
+                        capturedAt: new Date()
+                    }
+                });
+
+                // Get current reservation to calculate new balance
+                const currentRes = await tx.reservation.findUnique({
+                    where: { id: charge.reservationId },
+                    select: { totalAmount: true, paidAmount: true }
+                });
+
+                const newPaidAmount = (currentRes?.paidAmount || 0) + charge.amount;
+                const newBalanceAmount = (currentRes?.totalAmount || 0) - newPaidAmount;
+                const paymentStatus = newBalanceAmount <= 0 ? 'paid' : 'partial';
+
+                // Update reservation paid amount, balance, and payment status
+                await tx.reservation.update({
+                    where: { id: charge.reservationId },
+                    data: {
+                        paidAmount: newPaidAmount,
+                        balanceAmount: newBalanceAmount,
+                        paymentStatus
+                    }
+                });
+
+                // Post balanced ledger entries
+                const revenueGl = charge.reservation.site?.siteClass?.glCode || 'SITE_REVENUE';
+                const dedupeKey = `repeat_charge_${chargeId}_${payment.id}`;
+
+                await postBalancedLedgerEntries(tx, [
+                    {
+                        campgroundId: charge.reservation.campgroundId,
+                        reservationId: charge.reservationId,
+                        glCode: 'CASH',
+                        account: 'Cash',
+                        direction: 'debit' as const,
+                        amountCents: charge.amount,
+                        description: `Repeat charge payment for ${charge.dueDate.toISOString().split('T')[0]}`,
+                        dedupeKey: `${dedupeKey}:debit`
+                    },
+                    {
+                        campgroundId: charge.reservation.campgroundId,
+                        reservationId: charge.reservationId,
+                        glCode: revenueGl,
+                        account: 'Site Revenue',
+                        direction: 'credit' as const,
+                        amountCents: charge.amount,
+                        description: `Repeat charge payment for ${charge.dueDate.toISOString().split('T')[0]}`,
+                        dedupeKey: `${dedupeKey}:credit`
+                    }
+                ]);
+
+                return updatedCharge;
             });
-
-            // Record the payment
-            const payment = await this.prisma.payment.create({
-                data: {
-                    campgroundId: charge.reservation.campgroundId,
-                    reservationId: charge.reservationId,
-                    amountCents: charge.amount,
-                    method: 'card',
-                    direction: 'charge',
-                    note: `Repeat charge for ${charge.dueDate.toISOString().split('T')[0]}`,
-                    stripePaymentIntentId: paymentIntent.id,
-                    stripeChargeId: paymentIntent.latest_charge as string | undefined,
-                    applicationFeeCents,
-                    capturedAt: new Date()
-                }
-            });
-
-            // Get current reservation to calculate new balance
-            const currentRes = await this.prisma.reservation.findUnique({
-                where: { id: charge.reservationId },
-                select: { totalAmount: true, paidAmount: true }
-            });
-
-            const newPaidAmount = (currentRes?.paidAmount || 0) + charge.amount;
-            const newBalanceAmount = (currentRes?.totalAmount || 0) - newPaidAmount;
-            const paymentStatus = newBalanceAmount <= 0 ? 'paid' : 'partial';
-
-            // Update reservation paid amount, balance, and payment status
-            await this.prisma.reservation.update({
-                where: { id: charge.reservationId },
-                data: {
-                    paidAmount: newPaidAmount,
-                    balanceAmount: newBalanceAmount,
-                    paymentStatus
-                }
-            });
-
-            // Post balanced ledger entries
-            const revenueGl = charge.reservation.site?.siteClass?.glCode || 'SITE_REVENUE';
-            const dedupeKey = `repeat_charge_${chargeId}_${payment.id}`;
-
-            await postBalancedLedgerEntries(this.prisma, [
-                {
-                    campgroundId: charge.reservation.campgroundId,
-                    reservationId: charge.reservationId,
-                    glCode: 'CASH',
-                    account: 'Cash',
-                    direction: 'debit' as const,
-                    amountCents: charge.amount,
-                    description: `Repeat charge payment for ${charge.dueDate.toISOString().split('T')[0]}`,
-                    dedupeKey: `${dedupeKey}:debit`
-                },
-                {
-                    campgroundId: charge.reservation.campgroundId,
-                    reservationId: charge.reservationId,
-                    glCode: revenueGl,
-                    account: 'Site Revenue',
-                    direction: 'credit' as const,
-                    amountCents: charge.amount,
-                    description: `Repeat charge payment for ${charge.dueDate.toISOString().split('T')[0]}`,
-                    dedupeKey: `${dedupeKey}:credit`
-                }
-            ]);
 
             return updated;
         } catch (error: any) {

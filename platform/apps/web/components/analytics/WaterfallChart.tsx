@@ -52,6 +52,7 @@ interface WaterfallChartProps {
   height?: number;
   loading?: boolean;
   formatValue?: (value: number) => string;
+  yAxisLabel?: string;
 }
 
 function processWaterfallData(data: WaterfallDataPoint[]) {
@@ -94,6 +95,7 @@ export function WaterfallChart({
   height = 350,
   loading = false,
   formatValue = (v) => `$${(v / 1000).toFixed(1)}K`,
+  yAxisLabel,
 }: WaterfallChartProps) {
   const processedData = processWaterfallData(data);
 
@@ -159,6 +161,7 @@ export function WaterfallChart({
                 tickLine={false}
                 axisLine={{ stroke: "#64748b", strokeOpacity: 0.3 }}
                 tickFormatter={(v: number) => formatValue(v)}
+                label={yAxisLabel ? { value: yAxisLabel, angle: -90, position: "insideLeft", style: { textAnchor: "middle", fill: "#64748b", fontSize: 11 } } : undefined}
               />
               <Tooltip
                 contentStyle={{

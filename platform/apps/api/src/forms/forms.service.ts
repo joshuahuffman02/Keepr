@@ -2,10 +2,35 @@ import { Injectable, NotFoundException, BadRequestException } from "@nestjs/comm
 import { Prisma } from "@prisma/client";
 import { PrismaService } from "../prisma/prisma.service";
 import { CreateFormSubmissionDto, CreateFormTemplateDto, UpdateFormSubmissionDto, UpdateFormTemplateDto } from "./dto/form-template.dto";
+import { createHmac, timingSafeEqual } from "crypto";
 
 @Injectable()
 export class FormsService {
   constructor(private readonly prisma: PrismaService) {}
+
+  private getPublicReservationTokenSecret(): string {
+    const secret = process.env.PUBLIC_RESERVATION_TOKEN_SECRET || process.env.JWT_SECRET;
+    if (!secret) {
+      throw new BadRequestException("Public reservation token secret not configured");
+    }
+    return secret;
+  }
+
+  private buildPublicReservationToken(reservationId: string): string {
+    const secret = this.getPublicReservationTokenSecret();
+    return createHmac("sha256", secret).update(reservationId).digest("base64url");
+  }
+
+  private validatePublicReservationToken(reservationId: string, token?: string): boolean {
+    if (!token) return false;
+    const expected = this.buildPublicReservationToken(reservationId);
+    if (token.length !== expected.length) return false;
+    try {
+      return timingSafeEqual(Buffer.from(token), Buffer.from(expected));
+    } catch {
+      return false;
+    }
+  }
 
   listByCampground(campgroundId: string) {
     return this.prisma.formTemplate.findMany({
@@ -247,19 +272,11 @@ export class FormsService {
   }
 
   /**
-   * Get form submissions for a reservation
-   * SECURITY: When campgroundId is provided, validates reservation belongs to that campground
+   * Get form submissions for a reservation (public access via token)
    */
-  async getReservationFormSubmissions(reservationId: string, campgroundId?: string) {
-    // If campgroundId provided, verify the reservation belongs to it
-    if (campgroundId) {
-      const reservation = await this.prisma.reservation.findFirst({
-        where: { id: reservationId, campgroundId },
-        select: { id: true }
-      });
-      if (!reservation) {
-        throw new NotFoundException("Reservation not found in this campground");
-      }
+  async getReservationFormSubmissions(reservationId: string, token?: string) {
+    if (!this.validatePublicReservationToken(reservationId, token)) {
+      throw new NotFoundException("Reservation not found");
     }
 
     return this.prisma.formSubmission.findMany({
@@ -281,4 +298,3 @@ export class FormsService {
     });
   }
 }
-

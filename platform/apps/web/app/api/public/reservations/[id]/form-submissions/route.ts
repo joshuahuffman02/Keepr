@@ -11,9 +11,14 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> }
 ) {
   const { id } = await params;
+  const token = req.nextUrl.searchParams.get("token");
 
   try {
-    const res = await fetch(`${API_BASE}/public/reservations/${id}/form-submissions`, {
+    const url = new URL(`${API_BASE}/public/reservations/${id}/form-submissions`);
+    if (token) {
+      url.searchParams.set("token", token);
+    }
+    const res = await fetch(url.toString(), {
       headers: { "Content-Type": "application/json" },
       cache: "no-store",
     });

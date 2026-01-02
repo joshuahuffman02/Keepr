@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useParams } from "next/navigation";
+import { useParams, useSearchParams } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 import { apiClient } from "../../../../lib/api-client";
 import { format, differenceInDays } from "date-fns";
@@ -11,12 +11,25 @@ import { Button } from "../../../../components/ui/button";
 export default function WelcomePacket() {
     const params = useParams();
     const id = params.id as string;
+    const searchParams = useSearchParams();
+    const token = searchParams.get("token") || "";
 
     const { data: reservation, isLoading, error } = useQuery({
-        queryKey: ["public-reservation", id],
-        queryFn: () => apiClient.getPublicReservation(id),
-        enabled: !!id
+        queryKey: ["public-reservation", id, token],
+        queryFn: () => apiClient.getPublicReservation(id, token),
+        enabled: !!id && !!token
     });
+
+    if (!token) {
+        return (
+            <div className="min-h-screen flex items-center justify-center bg-slate-50 p-4">
+                <div className="text-center">
+                    <h1 className="text-2xl font-bold text-slate-900 mb-2">Access Token Required</h1>
+                    <p className="text-slate-600">Please use the link provided in your email to view your welcome packet.</p>
+                </div>
+            </div>
+        );
+    }
 
     if (isLoading) {
         return (

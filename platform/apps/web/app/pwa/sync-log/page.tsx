@@ -163,7 +163,8 @@ export default function SyncLogPage() {
         const remaining: any[] = [];
         for (const item of items) {
           try {
-            await apiClient.kioskCheckIn(item.reservationId, item.upsellTotal);
+            const deviceToken = localStorage.getItem("campreserv:kioskDeviceToken") || undefined;
+            await apiClient.kioskCheckIn(item.reservationId, item.upsellTotal, deviceToken);
             recordTelemetry({ source: "kiosk", type: "sync", status: "success", message: "Manual flush check-in", meta: { reservationId: item.reservationId } });
           } catch (err: any) {
             remaining.push(item);
@@ -357,4 +358,3 @@ export default function SyncLogPage() {
     </div>
   );
 }
-

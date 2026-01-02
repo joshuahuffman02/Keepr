@@ -20,7 +20,6 @@ import { IsInt, IsOptional, Min } from "class-validator";
 import { Type } from "class-transformer";
 import { IdempotencyService } from "./idempotency.service";
 import { GatewayConfigService } from "./gateway-config.service";
-import { postBalancedLedgerEntries } from "../ledger/ledger-posting.util";
 
 import { IsNotEmpty, IsString } from "class-validator";
 
@@ -162,7 +161,8 @@ export class PaymentsController {
         campgroundId: true,
         balanceAmount: true,
         totalAmount: true,
-        paidAmount: true
+        paidAmount: true,
+        status: true
       }
     });
     if (!reservation) {
@@ -190,6 +190,7 @@ export class PaymentsController {
         monthlyFeeCents: true as any,
         feeMode: true,
         name: true,
+        currency: true,
         stripeCapabilities: true as any,
         stripeCapabilitiesFetchedAt: true as any
       } as any
@@ -226,6 +227,7 @@ export class PaymentsController {
       gatewayFeeFlatCents,
       reservation,
       capabilities: refreshed.capabilities ?? ((campground as any)?.stripeCapabilities as Record<string, string> | undefined),
+      currency: (campground as any)?.currency as string | undefined,
       capabilitiesFetchedAt: refreshed.fetchedAt ?? ((campground as any)?.stripeCapabilitiesFetchedAt as Date | undefined)
     };
   }
@@ -506,6 +508,7 @@ export class PaymentsController {
       reservationId: body.reservationId,
       campgroundId,
       source: 'public_checkout',
+      currency,
       feeMode,
       applicationFeeCents: String(applicationFeeCents),
       platformPassThroughFeeCents: String(platformPassThroughFeeCents),
@@ -600,29 +603,18 @@ export class PaymentsController {
     }
 
     try {
-      // Get reservation to find the connected account
-      const reservation = await this.prisma.reservation.findUnique({
-        where: { id: body.reservationId },
-        select: {
-          id: true,
-          status: true,
-          totalAmount: true,
-          campground: {
-            select: { id: true, stripeAccountId: true as any }
-          }
-        }
-      });
-
-      if (!reservation) {
-        throw new BadRequestException("Reservation not found");
-      }
-
-      const stripeAccountId = (reservation.campground as any)?.stripeAccountId;
-
-      // SECURITY: Validate Stripe account is configured before proceeding
-      if (!stripeAccountId) {
-        throw new BadRequestException("Campground is not connected to Stripe. Cannot process payment.");
-      }
+      const ctx = await this.getPaymentContext(body.reservationId);
+      const {
+        stripeAccountId,
+        applicationFeeCents,
+        feeMode,
+        reservation,
+        campgroundId,
+        gatewayConfig,
+        gatewayFeePercentBasisPoints,
+        gatewayFeeFlatCents,
+        currency: campgroundCurrency
+      } = ctx;
 
       // Retrieve payment intent from Stripe to verify status
       const intent = await this.stripeService.retrievePaymentIntent(paymentIntentId, stripeAccountId);
@@ -632,12 +624,29 @@ export class PaymentsController {
       const intentReservationId = intent.metadata?.reservationId;
       const intentCampgroundId = intent.metadata?.campgroundId;
 
-      if (intentReservationId && intentReservationId !== body.reservationId) {
+      if (!intentReservationId || intentReservationId !== body.reservationId) {
         throw new BadRequestException("Payment intent does not match this reservation");
       }
 
-      if (intentCampgroundId && intentCampgroundId !== reservation.campground.id) {
+      if (!intentCampgroundId || intentCampgroundId !== campgroundId) {
         throw new BadRequestException("Payment intent does not match this campground");
+      }
+
+      const expectedCurrency = (intent.metadata?.currency || campgroundCurrency || "usd").toLowerCase();
+      if ((intent.currency || "").toLowerCase() !== expectedCurrency) {
+        throw new BadRequestException("Payment intent currency does not match expected currency");
+      }
+
+      const { amountCents } = this.computeChargeAmounts({
+        reservation,
+        platformFeeMode: feeMode,
+        applicationFeeCents,
+        gatewayFeeMode: gatewayConfig?.feeMode ?? feeMode,
+        gatewayFeePercentBasisPoints,
+        gatewayFeeFlatCents
+      });
+      if (intent.amount !== amountCents) {
+        throw new BadRequestException("Payment intent amount does not match expected total");
       }
 
       // SECURITY FIX (PAY-HIGH-001): Only treat "succeeded" as completed payment
@@ -657,29 +666,9 @@ export class PaymentsController {
       // For requires_capture (authorization-only), return early without updating reservation
       // The reservation will be updated when the payment is captured
       if (intent.status === "requires_capture") {
-        // Create payment record as "authorized" but do NOT update reservation financials
-        const authPayment = await this.prisma.payment.create({
-          data: {
-            reservationId: body.reservationId,
-            campgroundId: reservation.campground.id,
-            amountCents: intent.amount,
-            currency: intent.currency?.toUpperCase() || "USD",
-            status: "authorized",
-            method: "card",
-            stripePaymentIntentId: paymentIntentId,
-            paidAt: null,
-            metadata: {
-              source: "public_checkout_authorized",
-              paymentIntentStatus: intent.status,
-              requiresCapture: true
-            }
-          }
-        });
-
         const response = {
           success: true,
           status: "authorized",
-          paymentId: authPayment.id,
           reservationId: body.reservationId,
           amountCents: intent.amount,
           message: "Payment authorized. Capture required to complete payment.",
@@ -709,102 +698,45 @@ export class PaymentsController {
         return response;
       }
 
-      // Record the payment AND update reservation atomically
+      // Record the payment and update reservation via standard accounting pipeline
       // At this point, intent.status === "succeeded" (requires_capture handled above)
-      const amountCents = intent.amount;
-
-      const { payment, updatedReservation } = await this.prisma.$transaction(async (tx) => {
-        // Create payment record
-        const payment = await tx.payment.create({
-          data: {
-            reservationId: body.reservationId,
-            campgroundId: reservation.campground.id,
-            amountCents,
-            currency: intent.currency?.toUpperCase() || "USD",
-            status: "completed",
-            method: "card",
-            stripePaymentIntentId: paymentIntentId,
-            paidAt: new Date(),
-            metadata: {
-              source: "public_checkout_confirm",
-              paymentIntentStatus: intent.status
-            }
-          }
-        });
-
-        // Get current reservation state
-        const currentReservation = await tx.reservation.findUnique({
-          where: { id: body.reservationId },
-          select: { paidAmount: true, balanceAmount: true, totalAmount: true }
-        });
-
-        // Payment succeeded - update financial fields and confirm reservation
-        const newPaidAmount = (currentReservation?.paidAmount ?? 0) + amountCents;
-        const newBalanceAmount = Math.max(0, (currentReservation?.balanceAmount ?? currentReservation?.totalAmount ?? 0) - amountCents);
-        const paymentStatus = newBalanceAmount === 0 ? "paid" : newPaidAmount > 0 ? "partial" : "unpaid";
-
-        const updatedReservation = await tx.reservation.update({
-          where: { id: body.reservationId },
-          data: {
-            status: "confirmed",
-            confirmedAt: new Date(),
-            paidAmount: newPaidAmount,
-            balanceAmount: newBalanceAmount,
-            paymentStatus
-          }
-        });
-
-        return { payment, updatedReservation };
+      const amountCents = intent.amount_received ?? intent.amount;
+      const receiptLines = this.buildReceiptLinesFromIntent(intent);
+      await this.reservations.recordPayment(body.reservationId, amountCents, {
+        transactionId: intent.id,
+        paymentMethod: intent.payment_method_types?.[0] || "card",
+        source: intent.metadata?.source || "public_checkout",
+        stripePaymentIntentId: intent.id,
+        stripeChargeId: (intent as any)?.latest_charge as any,
+        capturedAt: new Date(),
+        lineItems: receiptLines.lineItems,
+        taxCents: receiptLines.taxCents,
+        feeCents: receiptLines.feeCents,
+        totalCents: receiptLines.totalCents,
+        receiptKind: "payment",
+        tenders: [
+          { method: intent.payment_method_types?.[0] || "card", amountCents, note: "public_checkout" }
+        ]
       });
 
-      // Post ledger entries for completed payment
-      // This ensures proper accounting trail for public checkout payments
-      {
-        try {
-          // Get site info for GL codes
-          const siteInfo = await this.prisma.site.findUnique({
-            where: { id: reservation.siteId },
-            include: { siteClass: { select: { glCode: true, clientAccount: true } } }
-          });
-          const revenueGl = siteInfo?.siteClass?.glCode ?? "REVENUE_UNMAPPED";
-          const revenueAccount = siteInfo?.siteClass?.clientAccount ?? "Revenue";
-          const dedupeKey = `public-confirm:${paymentIntentId}`;
+      const recordedPayment = await this.prisma.payment.findFirst({
+        where: { stripePaymentIntentId: paymentIntentId, reservationId: body.reservationId },
+        select: { id: true }
+      });
 
-          await postBalancedLedgerEntries(this.prisma, [
-            {
-              campgroundId: reservation.campground.id,
-              reservationId: body.reservationId,
-              glCode: "CASH",
-              account: "Cash",
-              description: `Online payment (card)`,
-              amountCents,
-              direction: "debit" as const,
-              externalRef: paymentIntentId,
-              dedupeKey: `${dedupeKey}:debit`
-            },
-            {
-              campgroundId: reservation.campground.id,
-              reservationId: body.reservationId,
-              glCode: revenueGl,
-              account: revenueAccount,
-              description: `Online payment (card)`,
-              amountCents,
-              direction: "credit" as const,
-              externalRef: paymentIntentId,
-              dedupeKey: `${dedupeKey}:credit`
-            }
-          ]);
-        } catch (ledgerErr) {
-          // Log but don't fail the payment - ledger can be reconciled later
-          this.logger.error(`Failed to post ledger entries for ${paymentIntentId}:`, ledgerErr);
-        }
+      // Confirm reservation if still pending
+      if (reservation.status === "pending") {
+        await this.prisma.reservation.update({
+          where: { id: body.reservationId },
+          data: { status: "confirmed", confirmedAt: new Date() }
+        });
       }
 
       const response = {
         success: true,
         status: intent.status,
-        paymentId: payment.id,
         reservationId: body.reservationId,
+        paymentId: recordedPayment?.id,
         amountCents,
         message: "Payment confirmed and reservation updated"
       };
@@ -1134,6 +1066,8 @@ export class PaymentsController {
           totalCents: refund.amount || receiptLines.totalCents,
           paymentMethod: intent.payment_method_types?.[0] || "card",
           source: intent.metadata?.source || "online",
+          stripePaymentIntentId: intent.id,
+          stripeChargeId: refund.charge as string | undefined,
           tenders: [
             {
               method: intent.payment_method_types?.[0] || "card",
@@ -1293,7 +1227,7 @@ export class PaymentsController {
             const existingPayment = await this.prisma.payment.findFirst({
               where: {
                 reservationId,
-                externalRef: refundId,
+                stripePaymentIntentId: `refund_${refundId}`,
                 direction: "refund"
               }
             });
@@ -1311,6 +1245,8 @@ export class PaymentsController {
               totalCents: refundAmount,
               paymentMethod: intent.payment_method_types?.[0] || "card",
               source: intent.metadata?.source || "online",
+              stripePaymentIntentId: paymentIntentId,
+              stripeChargeId: charge.id,
               tenders: [
                 { method: intent.payment_method_types?.[0] || "card", amountCents: refundAmount, note: "webhook_refund" }
               ]
@@ -1633,7 +1569,8 @@ export class PaymentsController {
       await this.reservations.recordRefund(
         reservationId,
         amount,
-        `ACH return ${paymentIntent.last_payment_error?.code ?? ""}`.trim()
+        `ACH return ${paymentIntent.last_payment_error?.code ?? ""}`.trim(),
+        { stripePaymentIntentId: paymentIntentId }
       );
 
       // Create balanced ledger entries for the ACH return

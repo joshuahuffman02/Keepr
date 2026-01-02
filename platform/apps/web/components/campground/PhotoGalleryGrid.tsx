@@ -30,7 +30,7 @@ export function PhotoGalleryGrid({
     setLightboxOpen(true);
   }, []);
 
-  // If no photos, show placeholder gradient
+  // If no photos, show placeholder gradient with helpful message
   if (!photos || photos.length === 0) {
     return (
       <div
@@ -41,9 +41,10 @@ export function PhotoGalleryGrid({
         aria-label="No photos available"
       >
         <div className="absolute inset-0 flex items-center justify-center">
-          <div className="text-center text-white/80">
-            <Images className="h-16 w-16 mx-auto mb-4 opacity-50" />
-            <p className="text-lg font-medium">Photos coming soon</p>
+          <div className="text-center text-white/90">
+            <Images className="h-16 w-16 mx-auto mb-4 opacity-60" />
+            <p className="text-xl font-semibold mb-2">{campgroundName}</p>
+            <p className="text-sm text-white/70">No photos available yet</p>
           </div>
         </div>
       </div>

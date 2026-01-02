@@ -1,5 +1,7 @@
 import { Metadata } from "next";
 import { PricingPreview } from "@/components/marketing/PricingPreview";
+import { FAQSection } from "@/components/marketing/FAQSection";
+import { FAQJsonLd } from "@/components/seo";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 
@@ -8,9 +10,46 @@ export const metadata: Metadata = {
   description: "Transparent plans with fee pass-through controls for campgrounds.",
 };
 
+const pricingFaqs = [
+  {
+    question: "What's included in the base price?",
+    answer: "All plans include unlimited users, online reservations, guest portal, POS system, staff scheduling, maintenance tracking, and standard support. Higher tiers add AI features, advanced analytics, and priority support.",
+  },
+  {
+    question: "How does the per-booking fee work?",
+    answer: "We charge $2.30 for each confirmed reservation (not per night). This applies to online bookings and staff-created reservations alike. You can pass this fee to guests or absorb it yourself.",
+  },
+  {
+    question: "Can I switch plans later?",
+    answer: "Yes, you can upgrade or downgrade at any time. Changes take effect on your next billing cycle. Your early access pricing is locked in forever on your current plan.",
+  },
+  {
+    question: "What payment methods do you accept?",
+    answer: "We accept all major credit cards (Visa, Mastercard, American Express) and ACH bank transfers for annual plans. All payments are processed securely through Stripe.",
+  },
+  {
+    question: "Is there a free trial?",
+    answer: "Yes. All plans include a 30-day free trial with full access to all features. No credit card required to start. If you're not satisfied, we also offer a 30-day money-back guarantee after the trial.",
+  },
+  {
+    question: "What are AI credits and how do they work?",
+    answer: "AI credits power features like demand forecasting, no-show prediction, and smart pricing suggestions. Each plan includes a monthly allocation ($5-$25 worth). Unused credits roll over up to 2x your monthly allocation.",
+  },
+  {
+    question: "Do you offer discounts for multiple properties?",
+    answer: "Yes. Organizations with 3+ campgrounds receive 15% off the base price for each additional property. Contact our sales team for custom enterprise pricing.",
+  },
+  {
+    question: "Are there any hidden fees?",
+    answer: "No. What you see is what you pay. The monthly base price plus $2.30 per booking covers everything. Optional add-ons like SMS messaging are clearly priced separately.",
+  },
+];
+
 export default function PricingPage() {
   return (
     <main className="bg-white min-h-screen">
+      <FAQJsonLd faqs={pricingFaqs} />
+
       <section className="border-b border-slate-100 bg-gradient-to-br from-emerald-50 via-white to-teal-50">
         <div className="max-w-5xl mx-auto px-6 py-16 md:py-24 space-y-6 text-center">
           <p className="text-sm font-semibold uppercase tracking-[0.12em] text-emerald-700">Pricing</p>
@@ -21,13 +60,16 @@ export default function PricingPage() {
             Choose the plan that fits today, with flexible service fees you can pass to guests or absorb.
             Taxes and fees are always itemized for clarity.
           </p>
-          <div className="flex flex-col sm:flex-row justify-center gap-3 sm:gap-4">
-            <Button asChild size="lg" className="px-8">
-              <Link href="/signup">Get Started Free</Link>
+          <div className="flex flex-col sm:flex-row justify-center items-center gap-3 sm:gap-4">
+            <Button asChild size="lg" className="px-8 bg-emerald-600 hover:bg-emerald-700">
+              <Link href="/signup">Start Free Trial</Link>
             </Button>
-            <Button asChild size="lg" variant="outline" className="px-8 border-2">
-              <Link href="#pricing">View Early Access Tiers</Link>
-            </Button>
+            <Link
+              href="#pricing"
+              className="text-sm font-medium text-slate-600 hover:text-emerald-600 transition-colors"
+            >
+              Compare plans below
+            </Link>
           </div>
           <div className="text-sm text-slate-500">
             Fee pass-through toggle available on all plans. Messaging add-on optional for Essential and Pro.
@@ -44,6 +86,13 @@ export default function PricingPage() {
           itemized on every receipt to keep accounting and guest expectations clear.
         </p>
       </section>
+
+      <FAQSection
+        faqs={pricingFaqs}
+        title="Pricing Questions"
+        subtitle="Common questions about our plans and billing."
+        className="bg-slate-50"
+      />
     </main>
   );
 }

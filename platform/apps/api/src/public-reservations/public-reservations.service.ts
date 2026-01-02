@@ -1336,6 +1336,7 @@ export class PublicReservationsService {
 
                 return {
                     ...reservation,
+                    publicAccessToken,
                     appliedDiscounts: quote.appliedDiscounts ?? [],
                     rejectedDiscounts: quote.rejectedDiscounts ?? [],
                     discountCapped: quote.discountCapped ?? false
@@ -1460,12 +1461,29 @@ export class PublicReservationsService {
         return null;
     }
 
-    async kioskCheckIn(id: string, upsellTotalCents: number, campgroundId: string) {
-        // SECURITY FIX (PUB-CRIT-001): campgroundId is now required, not optional
-        // This prevents IDOR attacks where reservation ID alone could trigger check-in
-        if (!campgroundId) {
-            throw new BadRequestException("campgroundId is required for kiosk check-in");
+    async kioskCheckIn(id: string, upsellTotalCents: number, kioskToken: string) {
+        if (!kioskToken) {
+            throw new BadRequestException("kiosk token required");
         }
+
+        const kioskDevice = await this.prisma.kioskDevice.findUnique({
+            where: { deviceToken: kioskToken },
+            select: { id: true, campgroundId: true, status: true, allowCheckIn: true, allowPayments: true }
+        });
+
+        if (!kioskDevice || kioskDevice.status !== "active") {
+            throw new BadRequestException("Invalid kiosk token");
+        }
+        if (!kioskDevice.allowCheckIn) {
+            throw new BadRequestException("Kiosk device is not allowed to check in");
+        }
+
+        await this.prisma.kioskDevice.update({
+            where: { id: kioskDevice.id },
+            data: { lastSeenAt: new Date() }
+        });
+
+        const campgroundId = kioskDevice.campgroundId;
 
         const reservation = await this.prisma.reservation.findUnique({
             where: { id },
@@ -1525,6 +1543,9 @@ export class PublicReservationsService {
         // Process payment if there's a balance due
         let paymentIntentId: string | undefined;
         if (balanceDue > 0) {
+            if (!kioskDevice.allowPayments) {
+                throw new BadRequestException("Kiosk device is not allowed to process payments");
+            }
             try {
                 // Get the most recent successful payment to extract payment method details
                 const lastPayment = await this.prisma.payment.findFirst({
@@ -1648,6 +1669,8 @@ export class PublicReservationsService {
                     feesAmount: { increment: upsellTotalCents },
                     totalAmount: newTotal,
                     paidAmount: newTotal,
+                    balanceAmount: 0,
+                    paymentStatus: "paid",
                     // Add a note about the upsell/kiosk check-in
                     notes: reservation.notes
                         ? `${reservation.notes} \n[Kiosk] Checked in. Upsell: $${(upsellTotalCents / 100).toFixed(2)}. ${balanceDue > 0 ? `Charged card on file (${paymentIntentId}).` : 'No balance due.'}`
@@ -1688,7 +1711,11 @@ export class PublicReservationsService {
             throw e;
         }
     }
-    async getReservation(id: string, campgroundId?: string) {
+    async getReservation(id: string, token?: string) {
+        if (!this.validatePublicReservationToken(id, token)) {
+            throw new NotFoundException("Reservation not found");
+        }
+
         const reservation = await this.prisma.reservation.findUnique({
             where: { id },
             include: {
@@ -1709,11 +1736,6 @@ export class PublicReservationsService {
         });
 
         if (!reservation) {
-            throw new NotFoundException("Reservation not found");
-        }
-
-        // SECURITY: Verify reservation belongs to the expected campground (prevents IDOR)
-        if (campgroundId && reservation.campgroundId !== campgroundId) {
             throw new NotFoundException("Reservation not found");
         }
 
@@ -1739,6 +1761,6 @@ export class PublicReservationsService {
             this.logger.warn("Failed to recompute reservation discounts", error);
         }
 
-        return { ...reservation, ...discountsInfo };
+        return { ...reservation, publicAccessToken: this.buildPublicReservationToken(id), ...discountsInfo };
     }
 }

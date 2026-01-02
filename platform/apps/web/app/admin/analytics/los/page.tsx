@@ -170,6 +170,7 @@ export default function LengthOfStayPage() {
             height={300}
             formatTooltip={(v) => v.toLocaleString()}
             loading={loading}
+            yAxisLabel="Reservations"
           />
         </div>
         <BreakdownPie
@@ -195,6 +196,7 @@ export default function LengthOfStayPage() {
         formatYAxis={(v) => `${v}`}
         formatTooltip={(v) => `${v.toFixed(1)} nights`}
         loading={loading}
+        yAxisLabel="Nights"
       />
 
       {/* LOS by Type */}
@@ -249,6 +251,7 @@ export default function LengthOfStayPage() {
         formatYAxis={(v) => `${v}`}
         formatTooltip={(v) => `${v.toFixed(1)} nights`}
         loading={loading}
+        yAxisLabel="Nights"
       />
     </div>
   );

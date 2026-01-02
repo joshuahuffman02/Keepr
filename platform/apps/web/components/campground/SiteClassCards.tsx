@@ -81,18 +81,9 @@ export function SiteClassCards({
     });
   };
 
+  // Hide section entirely when there are no site classes
   if (siteClasses.length === 0) {
-    return (
-      <section className={cn("space-y-4", className)}>
-        <h2 className="text-xl font-semibold text-slate-900">Accommodations</h2>
-        <div className="text-center py-12 bg-slate-50 rounded-xl border border-slate-200 border-dashed">
-          <Tent className="h-10 w-10 text-slate-300 mx-auto mb-3" />
-          <p className="text-slate-500">
-            Accommodation details coming soon
-          </p>
-        </div>
-      </section>
-    );
+    return null;
   }
 
   return (

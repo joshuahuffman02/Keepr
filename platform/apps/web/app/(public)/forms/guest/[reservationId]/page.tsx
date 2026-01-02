@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useMemo, useEffect } from "react";
-import { useParams } from "next/navigation";
+import { useParams, useSearchParams } from "next/navigation";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -33,6 +33,8 @@ interface FormTemplate {
 export default function GuestFormsPage() {
   const params = useParams();
   const reservationId = params.reservationId as string;
+  const searchParams = useSearchParams();
+  const token = searchParams.get("token") || "";
 
   const [formResponses, setFormResponses] = useState<Record<string, Record<string, any>>>({});
   const [completedForms, setCompletedForms] = useState<Set<string>>(new Set());
@@ -42,13 +44,13 @@ export default function GuestFormsPage() {
 
   // Fetch reservation details
   const { data: reservation, isLoading: loadingRes } = useQuery({
-    queryKey: ["guest-reservation", reservationId],
+    queryKey: ["guest-reservation", reservationId, token],
     queryFn: async () => {
-      const res = await fetch(`/api/public/reservations/${reservationId}`);
+      const res = await fetch(`/api/public/reservations/${reservationId}?token=${encodeURIComponent(token)}`);
       if (!res.ok) throw new Error("Reservation not found");
       return res.json();
     },
-    enabled: !!reservationId
+    enabled: !!reservationId && !!token
   });
 
   // Fetch forms for this reservation's campground
@@ -64,13 +66,13 @@ export default function GuestFormsPage() {
 
   // Fetch already submitted forms for this reservation
   const { data: submissions = [] } = useQuery({
-    queryKey: ["guest-form-submissions", reservationId],
+    queryKey: ["guest-form-submissions", reservationId, token],
     queryFn: async () => {
-      const res = await fetch(`/api/public/reservations/${reservationId}/form-submissions`);
+      const res = await fetch(`/api/public/reservations/${reservationId}/form-submissions?token=${encodeURIComponent(token)}`);
       if (!res.ok) return [];
       return res.json();
     },
-    enabled: !!reservationId
+    enabled: !!reservationId && !!token
   });
 
   // Mark already-submitted forms as complete
@@ -106,6 +108,18 @@ export default function GuestFormsPage() {
       setError("Failed to submit form. Please try again.");
     }
   });
+
+  // Early return for missing token (after all hooks)
+  if (!token) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-slate-50 p-4">
+        <div className="text-center">
+          <h1 className="text-2xl font-bold text-slate-900 mb-2">Access Token Required</h1>
+          <p className="text-slate-600">Please use the link provided in your email to access your forms.</p>
+        </div>
+      </div>
+    );
+  }
 
   const handleInputChange = (formId: string, questionId: string, value: any) => {
     setFormResponses(prev => ({

@@ -247,7 +247,8 @@ export default function KioskPage() {
                     continue;
                 }
                 try {
-                    await apiClient.kioskCheckIn(item.reservationId, item.upsellTotal);
+                    const deviceToken = localStorage.getItem(KIOSK_TOKEN_KEY) || undefined;
+                    await apiClient.kioskCheckIn(item.reservationId, item.upsellTotal, deviceToken);
                     recordTelemetry({ source: "kiosk", type: "sync", status: "success", message: "Queued check-in flushed", meta: { reservationId: item.reservationId } });
                     setQueuedCheckinPending(false);
                 } catch (err: any) {
@@ -770,7 +771,8 @@ export default function KioskPage() {
                 }
             }
 
-            await apiClient.kioskCheckIn(reservation.id, upsellTotal);
+            const deviceToken = localStorage.getItem(KIOSK_TOKEN_KEY) || undefined;
+            await apiClient.kioskCheckIn(reservation.id, upsellTotal, deviceToken);
             recordTelemetry({ source: "kiosk", type: "sync", status: "success", message: "Check-in completed", meta: { reservationId: reservation.id } });
             setState("success");
             triggerCelebration();

@@ -8,6 +8,7 @@ import {
   AlertCircle,
   ArrowRight,
   BarChart3,
+  Banknote,
   Calendar,
   CheckCircle,
   ClipboardList,
@@ -426,6 +427,14 @@ export default function Dashboard() {
     placeholderData: keepPreviousData,
   });
 
+  const yieldMetricsQuery = useQuery({
+    queryKey: ["yield-metrics", selectedId],
+    queryFn: () => apiClient.getYieldMetrics(selectedId ?? ""),
+    enabled: !!selectedId,
+    staleTime: 30000,
+    placeholderData: keepPreviousData,
+  });
+
   const today = useMemo(() => {
     const d = new Date();
     d.setHours(0, 0, 0, 0);
@@ -436,6 +445,7 @@ export default function Dashboard() {
   const isLoading = reservationsQuery.isLoading || sitesQuery.isLoading;
   const isError = reservationsQuery.isError || sitesQuery.isError;
   const totalSites = sitesQuery.data?.length ?? 0;
+  const yieldMetrics = yieldMetricsQuery.data;
 
   // Single-pass computation of all dashboard metrics
   const dashboardMetrics = useMemo(() => {
@@ -814,6 +824,9 @@ export default function Dashboard() {
                     Total unpaid balances across all active reservations. The breakdown shows:
                     Overdue (past arrival date), Due Today (arriving today), and Future (not yet due).
                   </HelpTooltipSection>
+                  <HelpTooltipSection title="Revenue">
+                    Total revenue collected today. Click to view detailed revenue analytics and trends.
+                  </HelpTooltipSection>
                 </HelpTooltipContent>
               }
               side="bottom"
@@ -822,13 +835,13 @@ export default function Dashboard() {
           </div>
 
           {isLoading ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
-              {[1, 2, 3, 4, 5].map((i) => (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-3">
+              {[1, 2, 3, 4, 5, 6].map((i) => (
                 <SkeletonCard key={i} />
               ))}
             </div>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-3">
               <OpsCard label="Arrivals" value={todayArrivals.length} href="/check-in-out" icon={<UserCheck className="h-4 w-4" />} tone="emerald" index={0} prefersReducedMotion={prefersReducedMotion} celebrate={todayArrivals.length >= 5} />
               <OpsCard label="Departures" value={todayDepartures.length} href="/check-in-out" icon={<LogOut className="h-4 w-4" />} tone="amber" index={1} prefersReducedMotion={prefersReducedMotion} />
               <OpsCard label="In-house" value={inHouse.length} href="/reservations" icon={<Users className="h-4 w-4" />} tone="blue" index={2} prefersReducedMotion={prefersReducedMotion} />
@@ -846,6 +859,23 @@ export default function Dashboard() {
                   ...(balanceOverdue > 0 ? [{ label: "overdue", value: formatMoney(balanceOverdue), tone: "danger" as const }] : []),
                   ...(balanceDueToday > 0 ? [{ label: "due today", value: formatMoney(balanceDueToday), tone: "warning" as const }] : []),
                   ...(balanceFuture > 0 ? [{ label: "future", value: formatMoney(balanceFuture), tone: "success" as const }] : []),
+                ] : undefined}
+              />
+              <OpsCard
+                label="Revenue"
+                value={formatMoney(yieldMetrics?.todayRevenue ?? 0)}
+                href="/ai/yield"
+                icon={<Banknote className="h-4 w-4" />}
+                tone="emerald"
+                index={5}
+                prefersReducedMotion={prefersReducedMotion}
+                celebrate={(yieldMetrics?.todayRevenue ?? 0) >= 100000}
+                breakdown={yieldMetrics?.yoyChange ? [
+                  {
+                    label: "vs last year",
+                    value: `${yieldMetrics.yoyChange.revenue >= 0 ? "+" : ""}${yieldMetrics.yoyChange.revenue.toFixed(0)}%`,
+                    tone: yieldMetrics.yoyChange.revenue >= 0 ? "success" as const : "danger" as const
+                  }
                 ] : undefined}
               />
             </div>
