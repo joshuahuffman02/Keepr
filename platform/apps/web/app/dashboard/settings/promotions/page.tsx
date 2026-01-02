@@ -150,6 +150,7 @@ export default function PromotionsSettingsPage() {
     };
 
     const handleDelete = async (id: string) => {
+        if (!campgroundId) return;
         try {
             await apiClient.deletePromotion(id, campgroundId);
             if (campgroundId) loadPromotions(campgroundId);
@@ -159,6 +160,7 @@ export default function PromotionsSettingsPage() {
     };
 
     const toggleActive = async (promo: Promotion) => {
+        if (!campgroundId) return;
         try {
             await apiClient.updatePromotion(promo.id, { isActive: !promo.isActive }, campgroundId);
             if (campgroundId) loadPromotions(campgroundId);
