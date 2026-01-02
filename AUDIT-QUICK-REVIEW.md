@@ -712,6 +712,13 @@ Scope: Targeted review of public payment confirmation, public reservation access
 - Fix: Require `validateOrgAccess` for all org billing endpoints and scope by organizationId.
 - Tests: Users without org membership should be blocked from subscription/period actions.
 
+#### ACCT-HIGH-024: POS Stripe fallback records card payments as succeeded before confirmation
+- Files: `platform/apps/api/src/pos/pos.service.ts:450`, `platform/apps/api/src/pos/pos.service.ts:465`
+- Problem: When provider integrations are unavailable, POS creates a Stripe PaymentIntent and immediately records the payment as `succeeded` without confirming or verifying `intent.status`.
+- Impact: Card payments can fail or require action while the cart is closed and receipts are sent, causing revenue leakage and reconciliation drift.
+- Fix: Confirm the intent (or collect via terminal), and only mark `posPayment` as succeeded after `intent.status === "succeeded"`; otherwise keep the cart/payment pending until webhook confirmation.
+- Tests: A PaymentIntent that returns `requires_payment_method` or `requires_action` should not close the cart or mark payment succeeded.
+
 ### Medium
 
 #### ACCT-MED-001: Ledger dedupe can mask partial postings outside transactions

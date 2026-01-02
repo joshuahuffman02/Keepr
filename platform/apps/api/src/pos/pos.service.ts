@@ -14,6 +14,7 @@ import { AuditService } from "../audit/audit.service";
 import { EmailService } from "../email/email.service";
 import { BatchInventoryService, ExpiredBatchException } from "../inventory/batch-inventory.service";
 import { MarkdownRulesService } from "../inventory/markdown-rules.service";
+import { postBalancedLedgerEntries } from "../ledger/ledger-posting.util";
 
 @Injectable()
 export class PosService {
@@ -352,19 +353,30 @@ export class PosService {
               throw new BadRequestException(`Cannot charge to site - reservation status is ${reservation.status}`);
             }
 
-            // Create ledger entry for the charge
-            await tx.ledgerEntry.create({
-              data: {
+            // Create balanced ledger entries for the charge
+            // SECURITY FIX: Use balanced entries (debit A/R, credit POS Revenue)
+            await postBalancedLedgerEntries(tx, [
+              {
                 campgroundId: cart.campgroundId,
                 reservationId,
-                glCode: "POS",
-                account: "POS Charges",
+                glCode: "AR",
+                account: "Accounts Receivable",
                 description: `POS charge from cart #${cartId.slice(-6)}`,
                 amountCents: p.amountCents,
-                direction: "debit", // Debit increases guest balance owed
-                dedupeKey: `pos_cart_${cartId}_${p.idempotencyKey}`
+                direction: "debit" as const, // Debit increases guest balance owed
+                dedupeKey: `pos_cart_${cartId}_${p.idempotencyKey}:debit`
+              },
+              {
+                campgroundId: cart.campgroundId,
+                reservationId,
+                glCode: "POS_REVENUE",
+                account: "POS Revenue",
+                description: `POS charge from cart #${cartId.slice(-6)}`,
+                amountCents: p.amountCents,
+                direction: "credit" as const, // Credit recognizes revenue
+                dedupeKey: `pos_cart_${cartId}_${p.idempotencyKey}:credit`
               }
-            });
+            ]);
 
             // Update reservation balance
             await tx.reservation.update({
