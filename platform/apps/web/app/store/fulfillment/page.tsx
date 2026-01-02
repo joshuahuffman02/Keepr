@@ -87,7 +87,7 @@ export default function FulfillmentQueuePage() {
         if (!selectedOrder) return;
         setAssigning(true);
         try {
-            await apiClient.assignOrderToLocation(selectedOrder.id, locationId);
+            await apiClient.assignOrderToLocation(selectedOrder.id, locationId, campgroundId ?? undefined);
             setAssignDialogOpen(false);
             setSelectedOrder(null);
             await loadData();
@@ -101,7 +101,7 @@ export default function FulfillmentQueuePage() {
     const handleUpdateStatus = async (orderId: string, newStatus: FulfillmentStatus) => {
         setUpdating(orderId);
         try {
-            await apiClient.updateFulfillmentStatus(orderId, newStatus);
+            await apiClient.updateFulfillmentStatus(orderId, newStatus, campgroundId ?? undefined);
             await loadData();
         } catch (err) {
             console.error("Failed to update status:", err);

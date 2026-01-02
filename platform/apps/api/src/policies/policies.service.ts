@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from "@nestjs/common";
+import { BadRequestException, Injectable, NotFoundException } from "@nestjs/common";
 import { PrismaService } from "../prisma/prisma.service";
 import { SignaturesService } from "../signatures/signatures.service";
 import { CreatePolicyTemplateDto } from "./dto/create-policy-template.dto";
@@ -344,7 +344,13 @@ export class PoliciesService {
     });
   }
 
-  async updateTemplate(id: string, dto: UpdatePolicyTemplateDto) {
+  async updateTemplate(campgroundId: string, id: string, dto: UpdatePolicyTemplateDto) {
+    const existing = await this.prisma.documentTemplate.findFirst({
+      where: { id, campgroundId }
+    });
+    if (!existing) {
+      throw new NotFoundException("Policy template not found");
+    }
     const type = dto.type && ALLOWED_SIGNATURE_TYPES.has(dto.type) ? dto.type : undefined;
     return this.prisma.documentTemplate.update({
       where: { id },
@@ -363,7 +369,13 @@ export class PoliciesService {
     });
   }
 
-  async removeTemplate(id: string) {
+  async removeTemplate(campgroundId: string, id: string) {
+    const existing = await this.prisma.documentTemplate.findFirst({
+      where: { id, campgroundId }
+    });
+    if (!existing) {
+      throw new NotFoundException("Policy template not found");
+    }
     return this.prisma.documentTemplate.delete({ where: { id } });
   }
 

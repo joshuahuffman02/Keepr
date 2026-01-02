@@ -44,6 +44,7 @@ export default function LocationInventoryPage() {
     const params = useParams();
     const locationId = params.id as string;
     const queryClient = useQueryClient();
+    const [campgroundId, setCampgroundId] = useState<string | null>(null);
 
     const [searchQuery, setSearchQuery] = useState("");
     const [adjustingItem, setAdjustingItem] = useState<LocationInventory | null>(null);
@@ -52,16 +53,21 @@ export default function LocationInventoryPage() {
     const [adjustmentNotes, setAdjustmentNotes] = useState("");
     const [lowStockAlert, setLowStockAlert] = useState<number | undefined>();
 
+    useEffect(() => {
+        if (typeof window === "undefined") return;
+        setCampgroundId(localStorage.getItem("campreserv:selectedCampground"));
+    }, []);
+
     const { data: location, isLoading: locationLoading } = useQuery({
-        queryKey: ["store-location", locationId],
-        queryFn: () => apiClient.getStoreLocation(locationId),
-        enabled: !!locationId,
+        queryKey: ["store-location", locationId, campgroundId],
+        queryFn: () => apiClient.getStoreLocation(locationId, campgroundId ?? undefined),
+        enabled: !!locationId && !!campgroundId,
     });
 
     const { data: inventory = [], isLoading: inventoryLoading } = useQuery({
-        queryKey: ["location-inventory", locationId],
-        queryFn: () => apiClient.getLocationInventory(locationId),
-        enabled: !!locationId,
+        queryKey: ["location-inventory", locationId, campgroundId],
+        queryFn: () => apiClient.getLocationInventory(locationId, undefined, campgroundId ?? undefined),
+        enabled: !!locationId && !!campgroundId,
     });
 
     const { data: products = [] } = useQuery({
@@ -72,7 +78,7 @@ export default function LocationInventoryPage() {
 
     const updateMutation = useMutation({
         mutationFn: (data: { stockQty?: number; adjustment?: number; lowStockAlert?: number; notes?: string }) =>
-            apiClient.updateLocationInventory(locationId, adjustingItem!.productId, data),
+            apiClient.updateLocationInventory(locationId, adjustingItem!.productId, data, campgroundId ?? undefined),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["location-inventory", locationId] });
             closeAdjustDialog();

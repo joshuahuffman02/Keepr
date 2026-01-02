@@ -6,6 +6,17 @@ interface DateRange {
     end: string;
 }
 
+type StayRuleUpdate = Partial<{
+    campgroundId: string;
+    name: string;
+    minNights: number;
+    maxNights: number;
+    siteClasses: string[];
+    dateRanges: DateRange[];
+    ignoreDaysBefore: number;
+    isActive: boolean;
+}>;
+
 @Injectable()
 export class StayRulesService {
     constructor(private readonly prisma: PrismaService) { }
@@ -39,33 +50,30 @@ export class StayRulesService {
         });
     }
 
-    async findOne(id: string) {
-        const rule = await this.prisma.stayRule.findUnique({ where: { id } });
+    async findOne(campgroundId: string, id: string) {
+        const rule = await this.prisma.stayRule.findFirst({
+            where: { id, campgroundId },
+        });
         if (!rule) throw new NotFoundException('Stay rule not found');
         return rule;
     }
 
-    async update(id: string, data: Partial<{
-        name: string;
-        minNights: number;
-        maxNights: number;
-        siteClasses: string[];
-        dateRanges: DateRange[];
-        ignoreDaysBefore: number;
-        isActive: boolean;
-    }>) {
+    async update(campgroundId: string, id: string, data: StayRuleUpdate) {
+        await this.findOne(campgroundId, id);
+        const { campgroundId: _campgroundId, ...rest } = data;
         return this.prisma.stayRule.update({
             where: { id },
-            data,
+            data: rest,
         });
     }
 
-    async remove(id: string) {
+    async remove(campgroundId: string, id: string) {
+        await this.findOne(campgroundId, id);
         return this.prisma.stayRule.delete({ where: { id } });
     }
 
-    async duplicate(id: string) {
-        const existing = await this.findOne(id);
+    async duplicate(campgroundId: string, id: string) {
+        const existing = await this.findOne(campgroundId, id);
         return this.prisma.stayRule.create({
             data: {
                 campgroundId: existing.campgroundId,

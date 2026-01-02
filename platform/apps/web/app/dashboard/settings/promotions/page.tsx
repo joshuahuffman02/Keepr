@@ -136,7 +136,7 @@ export default function PromotionsSettingsPage() {
             };
 
             if (editingPromotion) {
-                await apiClient.updatePromotion(editingPromotion.id, payload);
+                await apiClient.updatePromotion(editingPromotion.id, payload, campgroundId);
             } else {
                 await apiClient.createPromotion({ campgroundId, ...payload });
             }
@@ -151,7 +151,7 @@ export default function PromotionsSettingsPage() {
 
     const handleDelete = async (id: string) => {
         try {
-            await apiClient.deletePromotion(id);
+            await apiClient.deletePromotion(id, campgroundId);
             if (campgroundId) loadPromotions(campgroundId);
         } catch (err) {
             console.error(err);
@@ -160,7 +160,7 @@ export default function PromotionsSettingsPage() {
 
     const toggleActive = async (promo: Promotion) => {
         try {
-            await apiClient.updatePromotion(promo.id, { isActive: !promo.isActive });
+            await apiClient.updatePromotion(promo.id, { isActive: !promo.isActive }, campgroundId);
             if (campgroundId) loadPromotions(campgroundId);
         } catch (err) {
             console.error(err);

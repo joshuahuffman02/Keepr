@@ -96,7 +96,7 @@ export default function BlackoutDatesPage() {
 
     const updateMutation = useMutation({
         mutationFn: (data: { id: string; payload: { startDate: string; endDate: string; reason: string; siteId?: string } }) =>
-            apiClient.updateBlackout(data.id, data.payload),
+            apiClient.updateBlackout(data.id, data.payload, campgroundId),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["blackouts", campgroundId] });
             toast({ title: "Success", description: "Blackout date updated." });
@@ -109,7 +109,7 @@ export default function BlackoutDatesPage() {
 
     // Delete mutation
     const deleteMutation = useMutation({
-        mutationFn: (id: string) => apiClient.deleteBlackout(id),
+        mutationFn: (id: string) => apiClient.deleteBlackout(id, campgroundId),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["blackouts", campgroundId] });
             toast({ title: "Success", description: "Blackout date deleted." });

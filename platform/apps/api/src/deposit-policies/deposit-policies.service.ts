@@ -54,15 +54,17 @@ export class DepositPoliciesService {
     return policy;
   }
 
-  async update(id: string, dto: UpdateDepositPolicyDto, actorId?: string | null) {
-    const existing = await this.prisma.depositPolicy.findUnique({ where: { id } });
+  async update(campgroundId: string, id: string, dto: UpdateDepositPolicyDto, actorId?: string | null) {
+    const existing = await this.prisma.depositPolicy.findFirst({ where: { id, campgroundId } });
     if (!existing) throw new NotFoundException("Deposit policy not found");
+    const { campgroundId: _campgroundId, siteClassId, retryPlanId, ...rest } =
+      dto as UpdateDepositPolicyDto & { campgroundId?: string };
     const updated = await this.prisma.depositPolicy.update({
       where: { id },
       data: {
-        ...dto,
-        siteClassId: dto.siteClassId === undefined ? undefined : dto.siteClassId ?? null,
-        retryPlanId: dto.retryPlanId === undefined ? undefined : dto.retryPlanId ?? null
+        ...rest,
+        siteClassId: siteClassId === undefined ? undefined : siteClassId ?? null,
+        retryPlanId: retryPlanId === undefined ? undefined : retryPlanId ?? null
       }
     });
 
@@ -79,8 +81,8 @@ export class DepositPoliciesService {
     return updated;
   }
 
-  async remove(id: string, actorId?: string | null) {
-    const existing = await this.prisma.depositPolicy.findUnique({ where: { id } });
+  async remove(campgroundId: string, id: string, actorId?: string | null) {
+    const existing = await this.prisma.depositPolicy.findFirst({ where: { id, campgroundId } });
     if (!existing) throw new NotFoundException("Deposit policy not found");
     await this.prisma.depositPolicy.delete({ where: { id } });
 

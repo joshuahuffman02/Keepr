@@ -32,16 +32,16 @@ export class PromotionsService {
         });
     }
 
-    async findOne(id: string) {
-        const promotion = await this.prisma.promotion.findUnique({
-            where: { id }
+    async findOne(campgroundId: string, id: string) {
+        const promotion = await this.prisma.promotion.findFirst({
+            where: { id, campgroundId }
         });
         if (!promotion) throw new NotFoundException("Promotion not found");
         return promotion;
     }
 
-    async update(id: string, data: UpdatePromotionDto) {
-        await this.findOne(id);
+    async update(campgroundId: string, id: string, data: UpdatePromotionDto) {
+        await this.findOne(campgroundId, id);
 
         return this.prisma.promotion.update({
             where: { id },
@@ -62,8 +62,8 @@ export class PromotionsService {
         });
     }
 
-    async remove(id: string) {
-        await this.findOne(id);
+    async remove(campgroundId: string, id: string) {
+        await this.findOne(campgroundId, id);
         return this.prisma.promotion.delete({ where: { id } });
     }
 

@@ -1,4 +1,4 @@
-import { Injectable } from "@nestjs/common";
+import { Injectable, NotFoundException } from "@nestjs/common";
 import { PrismaService } from "../prisma/prisma.service";
 import { CreateSiteClassDto } from "./dto/create-site-class.dto";
 import { SiteType } from "@prisma/client";
@@ -7,13 +7,15 @@ import { SiteType } from "@prisma/client";
 export class SiteClassesService {
   constructor(private readonly prisma: PrismaService) {}
 
-  findOne(id: string) {
-    return this.prisma.siteClass.findUnique({
-      where: { id },
-      include: {
-        campground: true
-      }
+  async findOne(campgroundId: string, id: string) {
+    const siteClass = await this.prisma.siteClass.findFirst({
+      where: { id, campgroundId },
+      include: { campground: true }
     });
+    if (!siteClass) {
+      throw new NotFoundException("Site class not found");
+    }
+    return siteClass;
   }
 
   listByCampground(campgroundId: string) {
@@ -24,8 +26,9 @@ export class SiteClassesService {
     return this.prisma.siteClass.create({ data: { ...data, siteType: data.siteType as SiteType } });
   }
 
-  update(id: string, data: Partial<CreateSiteClassDto>) {
-    const { campgroundId, siteType, extraAdultFee, extraChildFee, ...rest } = data;
+  async update(campgroundId: string, id: string, data: Partial<CreateSiteClassDto>) {
+    await this.findOne(campgroundId, id);
+    const { campgroundId: _campgroundId, siteType, extraAdultFee, extraChildFee, ...rest } = data;
     return this.prisma.siteClass.update({
       where: { id },
       data: {
@@ -38,7 +41,8 @@ export class SiteClassesService {
     });
   }
 
-  remove(id: string) {
+  async remove(campgroundId: string, id: string) {
+    await this.findOne(campgroundId, id);
     return this.prisma.siteClass.delete({ where: { id } });
   }
 }

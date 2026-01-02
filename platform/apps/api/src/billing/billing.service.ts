@@ -27,6 +27,20 @@ export class BillingService {
     ratePlanId?: string,
     config?: { billingMode?: string; billTo?: string; multiplier?: number; autoEmail?: boolean }
   ) {
+    const site = await this.prisma.site.findFirst({
+      where: { id: siteId, campgroundId },
+      select: { id: true }
+    });
+    if (!site) throw new NotFoundException("Site not found");
+
+    if (ratePlanId) {
+      const plan = await this.prisma.utilityRatePlan.findFirst({
+        where: { id: ratePlanId, campgroundId },
+        select: { id: true }
+      });
+      if (!plan) throw new NotFoundException("Rate plan not found");
+    }
+
     return this.prisma.utilityMeter.create({
       data: {
         campgroundId,
@@ -56,7 +70,21 @@ export class BillingService {
     });
   }
 
-  async addMeterRead(meterId: string, readingValue: number, readAt: Date, readBy?: string, note?: string, source: string = "manual") {
+  async addMeterRead(
+    campgroundId: string,
+    meterId: string,
+    readingValue: number,
+    readAt: Date,
+    readBy?: string,
+    note?: string,
+    source: string = "manual"
+  ) {
+    const meter = await this.prisma.utilityMeter.findFirst({
+      where: { id: meterId, campgroundId },
+      select: { id: true }
+    });
+    if (!meter) throw new NotFoundException("Meter not found");
+
     return this.prisma.utilityMeterRead.create({
       data: {
         meterId,
@@ -94,7 +122,13 @@ export class BillingService {
     return { imported: validReads.length, skipped: reads.length - validReads.length };
   }
 
-  async listReads(meterId: string, start?: Date, end?: Date) {
+  async listReads(campgroundId: string, meterId: string, start?: Date, end?: Date) {
+    const meter = await this.prisma.utilityMeter.findFirst({
+      where: { id: meterId, campgroundId },
+      select: { id: true }
+    });
+    if (!meter) throw new NotFoundException("Meter not found");
+
     return this.prisma.utilityMeterRead.findMany({
       where: {
         meterId,
@@ -112,6 +146,7 @@ export class BillingService {
   }
 
   async updateMeter(
+    campgroundId: string,
     meterId: string,
     data: {
       ratePlanId?: string | null;
@@ -123,6 +158,20 @@ export class BillingService {
       serialNumber?: string | null;
     }
   ) {
+    const meter = await this.prisma.utilityMeter.findFirst({
+      where: { id: meterId, campgroundId },
+      select: { id: true }
+    });
+    if (!meter) throw new NotFoundException("Meter not found");
+
+    if (data.ratePlanId !== undefined && data.ratePlanId !== null) {
+      const plan = await this.prisma.utilityRatePlan.findFirst({
+        where: { id: data.ratePlanId, campgroundId },
+        select: { id: true }
+      });
+      if (!plan) throw new NotFoundException("Rate plan not found");
+    }
+
     return this.prisma.utilityMeter.update({
       where: { id: meterId },
       data: {
@@ -137,9 +186,9 @@ export class BillingService {
     });
   }
 
-  async billMeterNow(meterId: string) {
-    const meter = await this.prisma.utilityMeter.findUnique({
-      where: { id: meterId },
+  async billMeterNow(campgroundId: string, meterId: string) {
+    const meter = await this.prisma.utilityMeter.findFirst({
+      where: { id: meterId, campgroundId },
       include: {
         reads: { orderBy: { readAt: "asc" } },
         ratePlan: true
@@ -236,12 +285,12 @@ export class BillingService {
       data: { lastBilledReadAt: endRead.readAt }
     });
 
-    return this.getInvoice(invoice.id);
+    return this.getInvoice(campgroundId, invoice.id);
   }
 
-  async seedMetersForSiteClass(siteClassId: string) {
-    const siteClass = await this.prisma.siteClass.findUnique({
-      where: { id: siteClassId },
+  async seedMetersForSiteClass(campgroundId: string, siteClassId: string) {
+    const siteClass = await this.prisma.siteClass.findFirst({
+      where: { id: siteClassId, campgroundId },
       include: { sites: true }
     });
     if (!siteClass) throw new NotFoundException("Site class not found");
@@ -277,8 +326,16 @@ export class BillingService {
     return { created, totalSites: sites.length };
   }
 
-  async createBillingCycle(reservationId: string, cadence: string, periodStart: Date, periodEnd: Date) {
-    const reservation = await this.prisma.reservation.findUnique({ where: { id: reservationId } });
+  async createBillingCycle(
+    campgroundId: string,
+    reservationId: string,
+    cadence: string,
+    periodStart: Date,
+    periodEnd: Date
+  ) {
+    const reservation = await this.prisma.reservation.findFirst({
+      where: { id: reservationId, campgroundId }
+    });
     if (!reservation) throw new NotFoundException("Reservation not found");
     return this.prisma.billingCycle.create({
       data: {
@@ -311,7 +368,7 @@ export class BillingService {
     });
     if (existing) return existing;
 
-    return this.createBillingCycle(reservationId, cadence, periodStart, periodEnd);
+    return this.createBillingCycle(reservation.campgroundId, reservationId, cadence, periodStart, periodEnd);
   }
 
   private buildInvoiceNumber(campgroundId: string) {
@@ -435,9 +492,9 @@ export class BillingService {
     }
   }
 
-  async generateInvoiceForCycle(cycleId: string) {
-    const cycle = await this.prisma.billingCycle.findUnique({
-      where: { id: cycleId },
+  async generateInvoiceForCycle(campgroundId: string, cycleId: string) {
+    const cycle = await this.prisma.billingCycle.findFirst({
+      where: { id: cycleId, campgroundId },
       include: { reservation: true }
     });
     if (!cycle) throw new NotFoundException("Cycle not found");
@@ -538,13 +595,14 @@ export class BillingService {
     });
   }
 
-  async applyLateFeesForOverdue() {
+  async applyLateFeesForOverdue(campgroundId?: string) {
     const now = new Date();
     const invoices = await this.prisma.invoice.findMany({
       where: {
         status: "open",
         dueDate: { lt: now },
-        balanceCents: { gt: 0 }
+        balanceCents: { gt: 0 },
+        ...(campgroundId ? { campgroundId } : {})
       },
       include: {
         billingCycle: true,
@@ -598,8 +656,10 @@ export class BillingService {
     }
   }
 
-  async writeOffInvoice(invoiceId: string, reason: string, actorId?: string) {
-    const invoice = await this.prisma.invoice.findUnique({ where: { id: invoiceId } });
+  async writeOffInvoice(campgroundId: string, invoiceId: string, reason: string, actorId?: string) {
+    const invoice = await this.prisma.invoice.findFirst({
+      where: { id: invoiceId, campgroundId }
+    });
     if (!invoice) throw new NotFoundException("Invoice not found");
     if (invoice.status === "written_off") return invoice;
 
@@ -679,11 +739,20 @@ export class BillingService {
       }
     });
 
-    return this.prisma.invoice.findUnique({ where: { id: invoiceId }, include: { lines: true } });
+    return this.getInvoice(campgroundId, invoiceId);
   }
 
-  async overrideInvoiceLine(invoiceId: string, lineId: string, amountCents: number, note: string, actorId?: string) {
-    const invoice = await this.prisma.invoice.findUnique({ where: { id: invoiceId } });
+  async overrideInvoiceLine(
+    campgroundId: string,
+    invoiceId: string,
+    lineId: string,
+    amountCents: number,
+    note: string,
+    actorId?: string
+  ) {
+    const invoice = await this.prisma.invoice.findFirst({
+      where: { id: invoiceId, campgroundId }
+    });
     if (!invoice) throw new NotFoundException("Invoice not found");
     const line = await this.prisma.invoiceLine.findUnique({ where: { id: lineId } });
     if (!line || line.invoiceId !== invoiceId) throw new NotFoundException("Line not found");
@@ -716,21 +785,23 @@ export class BillingService {
       }
     });
 
-    return this.getInvoice(invoiceId);
+    return this.getInvoice(campgroundId, invoiceId);
   }
 
-  async listInvoicesByReservation(reservationId: string) {
+  async listInvoicesByReservation(campgroundId: string, reservationId: string) {
     return this.prisma.invoice.findMany({
-      where: { reservationId },
+      where: { reservationId, campgroundId },
       include: { lines: true, billingCycle: true }
     });
   }
 
-  async getInvoice(id: string) {
-    return this.prisma.invoice.findUnique({
-      where: { id },
+  async getInvoice(campgroundId: string, id: string) {
+    const invoice = await this.prisma.invoice.findFirst({
+      where: { id, campgroundId },
       include: { lines: true, billingCycle: true }
     });
+    if (!invoice) throw new NotFoundException("Invoice not found");
+    return invoice;
   }
 
   async generateCyclesAndInvoices() {
@@ -746,7 +817,7 @@ export class BillingService {
       const cycle = await this.upsertCurrentCycle(reservation.id, cadence);
       const now = new Date();
       if (cycle.periodEnd <= now) {
-        await this.generateInvoiceForCycle(cycle.id).catch((err) => {
+        await this.generateInvoiceForCycle(reservation.campgroundId, cycle.id).catch((err) => {
           this.logger.warn(`Failed to generate invoice for cycle ${cycle.id}: ${err instanceof Error ? err.message : err}`);
         });
       }

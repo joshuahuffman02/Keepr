@@ -57,9 +57,9 @@ export class TransferService {
     /**
      * Get a single transfer by ID
      */
-    async getTransfer(id: string) {
-        const transfer = await this.prisma.inventoryTransfer.findUnique({
-            where: { id },
+    async getTransfer(campgroundId: string, id: string) {
+        const transfer = await this.prisma.inventoryTransfer.findFirst({
+            where: { id, campgroundId },
             include: {
                 fromLocation: true,
                 toLocation: true,
@@ -88,15 +88,16 @@ export class TransferService {
         }
 
         const [fromLocation, toLocation] = await Promise.all([
-            this.prisma.storeLocation.findUnique({ where: { id: data.fromLocationId } }),
-            this.prisma.storeLocation.findUnique({ where: { id: data.toLocationId } }),
+            this.prisma.storeLocation.findFirst({
+                where: { id: data.fromLocationId, campgroundId: data.campgroundId },
+            }),
+            this.prisma.storeLocation.findFirst({
+                where: { id: data.toLocationId, campgroundId: data.campgroundId },
+            }),
         ]);
 
         if (!fromLocation) throw new NotFoundException("Source location not found");
         if (!toLocation) throw new NotFoundException("Destination location not found");
-        if (fromLocation.campgroundId !== data.campgroundId || toLocation.campgroundId !== data.campgroundId) {
-            throw new BadRequestException("Locations must belong to the same campground");
-        }
 
         // Validate items
         if (!data.items || data.items.length === 0) {
@@ -109,7 +110,9 @@ export class TransferService {
                 throw new BadRequestException("Quantity must be positive");
             }
 
-            const product = await this.prisma.product.findUnique({ where: { id: item.productId } });
+            const product = await this.prisma.product.findFirst({
+                where: { id: item.productId, campgroundId: data.campgroundId },
+            });
             if (!product) throw new NotFoundException(`Product ${item.productId} not found`);
 
             // Check stock at source location
@@ -155,9 +158,9 @@ export class TransferService {
     /**
      * Approve a pending transfer (marks it as in_transit)
      */
-    async approveTransfer(id: string, approvedById: string) {
-        const transfer = await this.prisma.inventoryTransfer.findUnique({
-            where: { id },
+    async approveTransfer(campgroundId: string, id: string, approvedById: string) {
+        const transfer = await this.prisma.inventoryTransfer.findFirst({
+            where: { id, campgroundId },
             include: { items: true },
         });
 
@@ -196,9 +199,9 @@ export class TransferService {
     /**
      * Complete a transfer (actually moves the inventory)
      */
-    async completeTransfer(id: string, completedById: string) {
-        const transfer = await this.prisma.inventoryTransfer.findUnique({
-            where: { id },
+    async completeTransfer(campgroundId: string, id: string, completedById: string) {
+        const transfer = await this.prisma.inventoryTransfer.findFirst({
+            where: { id, campgroundId },
             include: {
                 items: { include: { product: true } },
                 fromLocation: true,
@@ -321,8 +324,10 @@ export class TransferService {
     /**
      * Cancel a pending or in_transit transfer
      */
-    async cancelTransfer(id: string, cancelledById: string) {
-        const transfer = await this.prisma.inventoryTransfer.findUnique({ where: { id } });
+    async cancelTransfer(campgroundId: string, id: string, cancelledById: string) {
+        const transfer = await this.prisma.inventoryTransfer.findFirst({
+            where: { id, campgroundId },
+        });
 
         if (!transfer) throw new NotFoundException("Transfer not found");
         if (transfer.status === "completed") {

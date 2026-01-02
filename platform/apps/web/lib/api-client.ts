@@ -2811,17 +2811,20 @@ export const apiClient = {
       siteClassId?: string | null;
       siteId?: string | null;
       policyConfig?: Record<string, any> | null;
-    }
+    },
+    campgroundId?: string
   ) {
-    const res = await fetch(`${API_BASE}/policy-templates/${id}`, {
+    const path = withCampgroundId(`/policy-templates/${id}`, campgroundId);
+    const res = await fetch(`${API_BASE}${path}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
       body: JSON.stringify(payload)
     });
     return parseResponse<unknown>(res);
   },
-  async deletePolicyTemplate(id: string) {
-    const res = await fetch(`${API_BASE}/policy-templates/${id}`, {
+  async deletePolicyTemplate(id: string, campgroundId?: string) {
+    const path = withCampgroundId(`/policy-templates/${id}`, campgroundId);
+    const res = await fetch(`${API_BASE}${path}`, {
       method: "DELETE",
       headers: { "Content-Type": "application/json", ...scopedHeaders() }
     });
@@ -3007,8 +3010,9 @@ export const apiClient = {
   },
 
 
-  async getSiteClass(id: string) {
-    const data = await fetchJSON<unknown>(`/site-classes/${id}`);
+  async getSiteClass(id: string, campgroundId?: string) {
+    const path = withCampgroundId(`/site-classes/${id}`, campgroundId);
+    const data = await fetchJSON<unknown>(path);
     return SiteClassSchema.parse(data);
   },
   async createSiteClass(campgroundId: string, payload: Omit<z.input<typeof SiteClassSchema>, "id" | "campgroundId">) {
@@ -3020,8 +3024,9 @@ export const apiClient = {
     const data = await parseResponse<unknown>(res);
     return SiteClassSchema.parse(data);
   },
-  async updateSiteClass(id: string, payload: Partial<z.input<typeof SiteClassSchema>>) {
-    const res = await fetch(`${API_BASE}/site-classes/${id}`, {
+  async updateSiteClass(id: string, payload: Partial<z.input<typeof SiteClassSchema>>, campgroundId?: string) {
+    const path = withCampgroundId(`/site-classes/${id}`, campgroundId);
+    const res = await fetch(`${API_BASE}${path}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
       body: JSON.stringify(payload)
@@ -3029,8 +3034,9 @@ export const apiClient = {
     const data = await parseResponse<unknown>(res);
     return SiteClassSchema.parse(data);
   },
-  async deleteSiteClass(id: string) {
-    const res = await fetch(`${API_BASE}/site-classes/${id}`, { method: "DELETE", headers: scopedHeaders() });
+  async deleteSiteClass(id: string, campgroundId?: string) {
+    const path = withCampgroundId(`/site-classes/${id}`, campgroundId);
+    const res = await fetch(`${API_BASE}${path}`, { method: "DELETE", headers: scopedHeaders() });
     if (!res.ok) throw new Error("Failed to delete site class");
     return true;
   },
@@ -4945,8 +4951,9 @@ export const apiClient = {
     const data = await fetchJSON<unknown>(`/campgrounds/${campgroundId}/store/locations${params}`);
     return z.array(StoreLocationSchema).parse(data);
   },
-  async getStoreLocation(id: string) {
-    const data = await fetchJSON<unknown>(`/store/locations/${id}`);
+  async getStoreLocation(id: string, campgroundId?: string) {
+    const path = withCampgroundId(`/store/locations/${id}`, campgroundId);
+    const data = await fetchJSON<unknown>(path);
     return StoreLocationSchema.parse(data);
   },
   async getDefaultStoreLocation(campgroundId: string) {
@@ -4962,8 +4969,9 @@ export const apiClient = {
     const data = await parseResponse<unknown>(res);
     return StoreLocationSchema.parse(data);
   },
-  async updateStoreLocation(id: string, payload: Partial<z.input<typeof CreateStoreLocationSchema>>) {
-    const res = await fetch(`${API_BASE}/store/locations/${id}`, {
+  async updateStoreLocation(id: string, payload: Partial<z.input<typeof CreateStoreLocationSchema>>, campgroundId?: string) {
+    const path = withCampgroundId(`/store/locations/${id}`, campgroundId);
+    const res = await fetch(`${API_BASE}${path}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
       body: JSON.stringify(payload)
@@ -4971,8 +4979,9 @@ export const apiClient = {
     const data = await parseResponse<unknown>(res);
     return StoreLocationSchema.parse(data);
   },
-  async deleteStoreLocation(id: string) {
-    const res = await fetch(`${API_BASE}/store/locations/${id}`, { method: "DELETE", headers: scopedHeaders() });
+  async deleteStoreLocation(id: string, campgroundId?: string) {
+    const path = withCampgroundId(`/store/locations/${id}`, campgroundId);
+    const res = await fetch(`${API_BASE}${path}`, { method: "DELETE", headers: scopedHeaders() });
     if (!res.ok) {
       const error = await res.json().catch(() => ({}));
       throw new Error(error.message || "Failed to delete location");
@@ -4989,13 +4998,17 @@ export const apiClient = {
   },
 
   // Location Inventory
-  async getLocationInventory(locationId: string, productId?: string) {
-    const params = productId ? `?productId=${productId}` : "";
-    const data = await fetchJSON<unknown>(`/store/locations/${locationId}/inventory${params}`);
+  async getLocationInventory(locationId: string, productId?: string, campgroundId?: string) {
+    const searchParams = new URLSearchParams();
+    if (productId) searchParams.set("productId", productId);
+    const qs = searchParams.toString();
+    const path = withCampgroundId(`/store/locations/${locationId}/inventory${qs ? `?${qs}` : ""}`, campgroundId);
+    const data = await fetchJSON<unknown>(path);
     return z.array(LocationInventorySchema).parse(data);
   },
-  async updateLocationInventory(locationId: string, productId: string, payload: { stockQty?: number; adjustment?: number; lowStockAlert?: number; notes?: string }) {
-    const res = await fetch(`${API_BASE}/store/locations/${locationId}/inventory/${productId}`, {
+  async updateLocationInventory(locationId: string, productId: string, payload: { stockQty?: number; adjustment?: number; lowStockAlert?: number; notes?: string }, campgroundId?: string) {
+    const path = withCampgroundId(`/store/locations/${locationId}/inventory/${productId}`, campgroundId);
+    const res = await fetch(`${API_BASE}${path}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
       body: JSON.stringify(payload)
@@ -5005,12 +5018,14 @@ export const apiClient = {
   },
 
   // Location Price Overrides
-  async getLocationPriceOverrides(locationId: string) {
-    const data = await fetchJSON<unknown>(`/store/locations/${locationId}/prices`);
+  async getLocationPriceOverrides(locationId: string, campgroundId?: string) {
+    const path = withCampgroundId(`/store/locations/${locationId}/prices`, campgroundId);
+    const data = await fetchJSON<unknown>(path);
     return z.array(LocationPriceOverrideSchema).parse(data);
   },
-  async createLocationPriceOverride(locationId: string, payload: { productId: string; priceCents: number; reason?: string }) {
-    const res = await fetch(`${API_BASE}/store/locations/${locationId}/prices`, {
+  async createLocationPriceOverride(locationId: string, payload: { productId: string; priceCents: number; reason?: string }, campgroundId?: string) {
+    const path = withCampgroundId(`/store/locations/${locationId}/prices`, campgroundId);
+    const res = await fetch(`${API_BASE}${path}`, {
       method: "POST",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
       body: JSON.stringify(payload)
@@ -5018,8 +5033,9 @@ export const apiClient = {
     const data = await parseResponse<unknown>(res);
     return LocationPriceOverrideSchema.parse(data);
   },
-  async deleteLocationPriceOverride(locationId: string, productId: string) {
-    const res = await fetch(`${API_BASE}/store/locations/${locationId}/prices/${productId}`, {
+  async deleteLocationPriceOverride(locationId: string, productId: string, campgroundId?: string) {
+    const path = withCampgroundId(`/store/locations/${locationId}/prices/${productId}`, campgroundId);
+    const res = await fetch(`${API_BASE}${path}`, {
       method: "DELETE",
       headers: scopedHeaders()
     });
@@ -5062,8 +5078,9 @@ export const apiClient = {
     const data = await fetchJSON<unknown>(`/campgrounds/${campgroundId}/store/transfers${qs ? `?${qs}` : ""}`);
     return z.array(InventoryTransferSchema).parse(data);
   },
-  async getInventoryTransfer(id: string) {
-    const data = await fetchJSON<unknown>(`/store/transfers/${id}`);
+  async getInventoryTransfer(id: string, campgroundId?: string) {
+    const path = withCampgroundId(`/store/transfers/${id}`, campgroundId);
+    const data = await fetchJSON<unknown>(path);
     return InventoryTransferSchema.parse(data);
   },
   async createInventoryTransfer(campgroundId: string, payload: z.input<typeof CreateInventoryTransferSchema>) {
@@ -5075,24 +5092,27 @@ export const apiClient = {
     const data = await parseResponse<unknown>(res);
     return InventoryTransferSchema.parse(data);
   },
-  async approveInventoryTransfer(id: string) {
-    const res = await fetch(`${API_BASE}/store/transfers/${id}/approve`, {
+  async approveInventoryTransfer(id: string, campgroundId?: string) {
+    const path = withCampgroundId(`/store/transfers/${id}/approve`, campgroundId);
+    const res = await fetch(`${API_BASE}${path}`, {
       method: "PATCH",
       headers: scopedHeaders()
     });
     const data = await parseResponse<unknown>(res);
     return InventoryTransferSchema.parse(data);
   },
-  async completeInventoryTransfer(id: string) {
-    const res = await fetch(`${API_BASE}/store/transfers/${id}/complete`, {
+  async completeInventoryTransfer(id: string, campgroundId?: string) {
+    const path = withCampgroundId(`/store/transfers/${id}/complete`, campgroundId);
+    const res = await fetch(`${API_BASE}${path}`, {
       method: "PATCH",
       headers: scopedHeaders()
     });
     const data = await parseResponse<unknown>(res);
     return InventoryTransferSchema.parse(data);
   },
-  async cancelInventoryTransfer(id: string) {
-    const res = await fetch(`${API_BASE}/store/transfers/${id}/cancel`, {
+  async cancelInventoryTransfer(id: string, campgroundId?: string) {
+    const path = withCampgroundId(`/store/transfers/${id}/cancel`, campgroundId);
+    const res = await fetch(`${API_BASE}${path}`, {
       method: "PATCH",
       headers: scopedHeaders()
     });
@@ -5137,8 +5157,9 @@ export const apiClient = {
     const data = await fetchJSON<unknown>(`/campgrounds/${campgroundId}/store/orders/fulfillment-counts`);
     return z.record(z.string(), z.number()).parse(data);
   },
-  async assignOrderToLocation(orderId: string, locationId: string) {
-    const res = await fetch(`${API_BASE}/store/orders/${orderId}/assign-location`, {
+  async assignOrderToLocation(orderId: string, locationId: string, campgroundId?: string) {
+    const path = withCampgroundId(`/store/orders/${orderId}/assign-location`, campgroundId);
+    const res = await fetch(`${API_BASE}${path}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
       body: JSON.stringify({ locationId })
@@ -5146,8 +5167,9 @@ export const apiClient = {
     const data = await parseResponse<unknown>(res);
     return StoreOrderSchema.parse(data);
   },
-  async updateFulfillmentStatus(orderId: string, status: string) {
-    const res = await fetch(`${API_BASE}/store/orders/${orderId}/fulfillment-status`, {
+  async updateFulfillmentStatus(orderId: string, status: string, campgroundId?: string) {
+    const path = withCampgroundId(`/store/orders/${orderId}/fulfillment-status`, campgroundId);
+    const res = await fetch(`${API_BASE}${path}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
       body: JSON.stringify({ status })
@@ -5155,9 +5177,10 @@ export const apiClient = {
     const data = await parseResponse<unknown>(res);
     return StoreOrderSchema.parse(data);
   },
-  async getLocationFulfillmentOrders(locationId: string, includeCompleted = false) {
+  async getLocationFulfillmentOrders(locationId: string, includeCompleted = false, campgroundId?: string) {
     const params = includeCompleted ? "?includeCompleted=true" : "";
-    const data = await fetchJSON<unknown>(`/store/locations/${locationId}/fulfillment-orders${params}`);
+    const path = withCampgroundId(`/store/locations/${locationId}/fulfillment-orders${params}`, campgroundId);
+    const data = await fetchJSON<unknown>(path);
     return z.array(StoreOrderSchema).parse(data);
   },
   async bulkAssignOrders(campgroundId: string, orderIds: string[], locationId: string) {
@@ -5184,8 +5207,9 @@ export const apiClient = {
     const data = await parseResponse<unknown>(res);
     return BlackoutDateSchema.parse(data);
   },
-  async updateBlackout(id: string, payload: Partial<z.input<typeof CreateBlackoutDateSchema>>) {
-    const res = await fetch(`${API_BASE}/blackouts/${id}`, {
+  async updateBlackout(id: string, payload: Partial<z.input<typeof CreateBlackoutDateSchema>>, campgroundId?: string) {
+    const path = withCampgroundId(`/blackouts/${id}`, campgroundId);
+    const res = await fetch(`${API_BASE}${path}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
       body: JSON.stringify(payload)
@@ -5193,8 +5217,9 @@ export const apiClient = {
     const data = await parseResponse<unknown>(res);
     return BlackoutDateSchema.parse(data);
   },
-  async deleteBlackout(id: string) {
-    const res = await fetch(`${API_BASE}/blackouts/${id}`, { method: "DELETE", headers: scopedHeaders() });
+  async deleteBlackout(id: string, campgroundId?: string) {
+    const path = withCampgroundId(`/blackouts/${id}`, campgroundId);
+    const res = await fetch(`${API_BASE}${path}`, { method: "DELETE", headers: scopedHeaders() });
     if (!res.ok) throw new Error("Failed to delete blackout date");
     return true;
   },
@@ -5245,16 +5270,18 @@ export const apiClient = {
     usageLimit?: number | null;
     isActive?: boolean;
     description?: string | null;
-  }) {
-    const res = await fetch(`${API_BASE}/promotions/${id}`, {
+  }, campgroundId?: string) {
+    const path = withCampgroundId(`/promotions/${id}`, campgroundId);
+    const res = await fetch(`${API_BASE}${path}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
       body: JSON.stringify(payload)
     });
     return parseResponse<{ id: string }>(res);
   },
-  async deletePromotion(id: string) {
-    const res = await fetch(`${API_BASE}/promotions/${id}`, { method: "DELETE", headers: scopedHeaders() });
+  async deletePromotion(id: string, campgroundId?: string) {
+    const path = withCampgroundId(`/promotions/${id}`, campgroundId);
+    const res = await fetch(`${API_BASE}${path}`, { method: "DELETE", headers: scopedHeaders() });
     if (!res.ok) throw new Error("Failed to delete promotion");
     return true;
   },
@@ -5780,16 +5807,18 @@ export const apiClient = {
     requiresWaiver: boolean;
     waiverText: string;
     isActive: boolean;
-  }>) {
-    const res = await fetch(`${API_BASE}/tax-rules/${id}`, {
+  }>, campgroundId?: string) {
+    const path = withCampgroundId(`/tax-rules/${id}`, campgroundId);
+    const res = await fetch(`${API_BASE}${path}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
       body: JSON.stringify(payload)
     });
     return parseResponse<{ id: string }>(res);
   },
-  async deleteTaxRule(id: string) {
-    const res = await fetch(`${API_BASE}/tax-rules/${id}`, {
+  async deleteTaxRule(id: string, campgroundId?: string) {
+    const path = withCampgroundId(`/tax-rules/${id}`, campgroundId);
+    const res = await fetch(`${API_BASE}${path}`, {
       method: "DELETE",
       headers: scopedHeaders()
     });
@@ -7624,16 +7653,18 @@ export const apiClient = {
     siteClassId: string | null;
     retryPlanId: string | null;
     active: boolean;
-  }>) {
-    const res = await fetch(`${API_BASE}/deposit-policies/${id}`, {
+  }>, campgroundId?: string) {
+    const path = withCampgroundId(`/deposit-policies/${id}`, campgroundId);
+    const res = await fetch(`${API_BASE}${path}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
       body: JSON.stringify(payload),
     });
     return parseResponse<unknown>(res);
   },
-  async deleteDepositPolicy(id: string) {
-    const res = await fetch(`${API_BASE}/deposit-policies/${id}`, {
+  async deleteDepositPolicy(id: string, campgroundId?: string) {
+    const path = withCampgroundId(`/deposit-policies/${id}`, campgroundId);
+    const res = await fetch(`${API_BASE}${path}`, {
       method: "DELETE",
       headers: scopedHeaders(),
     });
@@ -7689,16 +7720,18 @@ export const apiClient = {
     inventoryTracking: boolean;
     inventoryQty: number | null;
     active: boolean;
-  }>) {
-    const res = await fetch(`${API_BASE}/upsells/${id}`, {
+  }>, campgroundId?: string) {
+    const path = withCampgroundId(`/upsells/${id}`, campgroundId);
+    const res = await fetch(`${API_BASE}${path}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
       body: JSON.stringify(payload),
     });
     return parseResponse<unknown>(res);
   },
-  async deleteUpsellItem(id: string) {
-    const res = await fetch(`${API_BASE}/upsells/${id}`, {
+  async deleteUpsellItem(id: string, campgroundId?: string) {
+    const path = withCampgroundId(`/upsells/${id}`, campgroundId);
+    const res = await fetch(`${API_BASE}${path}`, {
       method: "DELETE",
       headers: scopedHeaders(),
     });
@@ -8315,8 +8348,9 @@ export const apiClient = {
     const data = await parseResponse<unknown>(res);
     return UtilityMeterSchema.parse(data);
   },
-  async addUtilityMeterRead(meterId: string, payload: { readingValue: number; readAt: string; readBy?: string; note?: string; source?: string }) {
-    const res = await fetch(`${API_BASE}/meters/${meterId}/reads`, {
+  async addUtilityMeterRead(meterId: string, payload: { readingValue: number; readAt: string; readBy?: string; note?: string; source?: string }, campgroundId?: string) {
+    const path = withCampgroundId(`/meters/${meterId}/reads`, campgroundId);
+    const res = await fetch(`${API_BASE}${path}`, {
       method: "POST",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
       body: JSON.stringify(payload),
@@ -8336,8 +8370,9 @@ export const apiClient = {
     const data = await fetchJSON<unknown>(`/campgrounds/${campgroundId}/utility-rate-plans`);
     return z.array(UtilityRatePlanSchema).parse(data);
   },
-  async updateUtilityMeter(meterId: string, payload: { ratePlanId?: string | null; billingMode?: string; billTo?: string; multiplier?: number; autoEmail?: boolean; active?: boolean; serialNumber?: string | null }) {
-    const res = await fetch(`${API_BASE}/meters/${meterId}`, {
+  async updateUtilityMeter(meterId: string, payload: { ratePlanId?: string | null; billingMode?: string; billTo?: string; multiplier?: number; autoEmail?: boolean; active?: boolean; serialNumber?: string | null }, campgroundId?: string) {
+    const path = withCampgroundId(`/meters/${meterId}`, campgroundId);
+    const res = await fetch(`${API_BASE}${path}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
       body: JSON.stringify(payload),
@@ -8345,45 +8380,52 @@ export const apiClient = {
     const data = await parseResponse<unknown>(res);
     return UtilityMeterSchema.parse(data);
   },
-  async billUtilityMeter(meterId: string) {
-    const res = await fetch(`${API_BASE}/meters/${meterId}/bill`, {
+  async billUtilityMeter(meterId: string, campgroundId?: string) {
+    const path = withCampgroundId(`/meters/${meterId}/bill`, campgroundId);
+    const res = await fetch(`${API_BASE}${path}`, {
       method: "POST",
       headers: { ...scopedHeaders() },
     });
     return parseResponse<unknown>(res);
   },
-  async seedMetersForSiteClass(siteClassId: string) {
-    const res = await fetch(`${API_BASE}/site-classes/${siteClassId}/meters/seed`, {
+  async seedMetersForSiteClass(siteClassId: string, campgroundId?: string) {
+    const path = withCampgroundId(`/site-classes/${siteClassId}/meters/seed`, campgroundId);
+    const res = await fetch(`${API_BASE}${path}`, {
       method: "POST",
       headers: { ...scopedHeaders() },
     });
     return parseResponse<{ created: number; totalSites: number }>(res);
   },
-  async listUtilityMeterReads(meterId: string, params?: { start?: string; end?: string }) {
+  async listUtilityMeterReads(meterId: string, params?: { start?: string; end?: string }, campgroundId?: string) {
     const qs = new URLSearchParams();
     if (params?.start) qs.set("start", params.start);
     if (params?.end) qs.set("end", params.end);
-    const data = await fetchJSON<unknown>(`/meters/${meterId}/reads${qs.toString() ? `?${qs.toString()}` : ""}`);
+    const path = withCampgroundId(`/meters/${meterId}/reads${qs.toString() ? `?${qs.toString()}` : ""}`, campgroundId);
+    const data = await fetchJSON<unknown>(path);
     return z.array(UtilityMeterReadSchema).parse(data);
   },
-  async listInvoicesByReservation(reservationId: string) {
-    const data = await fetchJSON<unknown>(`/reservations/${reservationId}/invoices`);
+  async listInvoicesByReservation(reservationId: string, campgroundId?: string) {
+    const path = withCampgroundId(`/reservations/${reservationId}/invoices`, campgroundId);
+    const data = await fetchJSON<unknown>(path);
     return z.array(InvoiceSchema).parse(data);
   },
-  async getInvoice(invoiceId: string) {
-    const data = await fetchJSON<unknown>(`/invoices/${invoiceId}`);
+  async getInvoice(invoiceId: string, campgroundId?: string) {
+    const path = withCampgroundId(`/invoices/${invoiceId}`, campgroundId);
+    const data = await fetchJSON<unknown>(path);
     return InvoiceSchema.parse(data);
   },
-  async generateInvoiceForCycle(cycleId: string) {
-    const res = await fetch(`${API_BASE}/billing/cycles/${cycleId}/generate`, {
+  async generateInvoiceForCycle(cycleId: string, campgroundId?: string) {
+    const path = withCampgroundId(`/billing/cycles/${cycleId}/generate`, campgroundId);
+    const res = await fetch(`${API_BASE}${path}`, {
       method: "POST",
       headers: { ...scopedHeaders() },
     });
     const data = await parseResponse<unknown>(res);
     return InvoiceSchema.parse(data);
   },
-  async runLateFees() {
-    const res = await fetch(`${API_BASE}/billing/late-fees/run`, {
+  async runLateFees(campgroundId?: string) {
+    const path = withCampgroundId(`/billing/late-fees/run`, campgroundId);
+    const res = await fetch(`${API_BASE}${path}`, {
       method: "POST",
       headers: scopedHeaders(),
     });

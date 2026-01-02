@@ -79,17 +79,17 @@ export class BlackoutsService {
         });
     }
 
-    async findOne(id: string) {
-        const blackout = await this.prisma.blackoutDate.findUnique({
-            where: { id },
+    async findOne(campgroundId: string, id: string) {
+        const blackout = await this.prisma.blackoutDate.findFirst({
+            where: { id, campgroundId },
             include: { site: true }
         });
         if (!blackout) throw new NotFoundException("Blackout date not found");
         return blackout;
     }
 
-    async update(id: string, data: UpdateBlackoutDateDto) {
-        const existing = await this.findOne(id);
+    async update(campgroundId: string, id: string, data: UpdateBlackoutDateDto) {
+        const existing = await this.findOne(campgroundId, id);
 
         const start = data.startDate ? new Date(data.startDate) : existing.startDate;
         const end = data.endDate ? new Date(data.endDate) : existing.endDate;
@@ -114,7 +114,8 @@ export class BlackoutsService {
         });
     }
 
-    async remove(id: string) {
+    async remove(campgroundId: string, id: string) {
+        await this.findOne(campgroundId, id);
         return this.prisma.blackoutDate.delete({ where: { id } });
     }
 }

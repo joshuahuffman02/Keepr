@@ -57,11 +57,14 @@ async function fetchStayRules(campgroundId: string): Promise<StayRule[]> {
   return response.json();
 }
 
-async function deleteStayRule(ruleId: string): Promise<void> {
-  const response = await fetch(`${API_BASE}/stay-rules/${ruleId}`, {
-    method: "DELETE",
-    credentials: "include",
-  });
+async function deleteStayRule(campgroundId: string, ruleId: string): Promise<void> {
+  const response = await fetch(
+    `${API_BASE}/stay-rules/${ruleId}?campgroundId=${encodeURIComponent(campgroundId)}`,
+    {
+      method: "DELETE",
+      credentials: "include",
+    }
+  );
   if (!response.ok) {
     throw new Error("Failed to delete stay rule");
   }
@@ -80,7 +83,7 @@ export default function StayRulesPage() {
   });
 
   const deleteMutation = useMutation({
-    mutationFn: deleteStayRule,
+    mutationFn: (ruleId: string) => deleteStayRule(selectedCampground!.id, ruleId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["stay-rules", selectedCampground?.id] });
     },

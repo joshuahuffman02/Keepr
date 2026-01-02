@@ -81,7 +81,7 @@ export default function StoreLocationsPage() {
 
     const updateMutation = useMutation({
         mutationFn: ({ id, data }: { id: string; data: Partial<typeof formData> & { isActive?: boolean } }) =>
-            apiClient.updateStoreLocation(id, data),
+            apiClient.updateStoreLocation(id, data, selectedCg),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["store-locations"] });
             setEditingLocation(null);
@@ -90,7 +90,7 @@ export default function StoreLocationsPage() {
     });
 
     const deleteMutation = useMutation({
-        mutationFn: (id: string) => apiClient.deleteStoreLocation(id),
+        mutationFn: (id: string) => apiClient.deleteStoreLocation(id, selectedCg),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["store-locations"] });
             setDeleteConfirm(null);

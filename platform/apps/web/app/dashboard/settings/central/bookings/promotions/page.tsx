@@ -180,7 +180,7 @@ export default function PromotionsPage() {
       };
 
       if (editingPromotion) {
-        await apiClient.updatePromotion(editingPromotion.id, payload);
+        await apiClient.updatePromotion(editingPromotion.id, payload, campgroundId);
       } else {
         await apiClient.createPromotion({ campgroundId, ...payload });
       }
@@ -196,7 +196,7 @@ export default function PromotionsPage() {
   const confirmDeletePromotion = async () => {
     if (!deleteConfirmId) return;
     try {
-      await apiClient.deletePromotion(deleteConfirmId);
+      await apiClient.deletePromotion(deleteConfirmId, campgroundId);
       if (campgroundId) loadPromotions(campgroundId);
     } catch (err) {
       console.error("Failed to delete promotion:", err);
@@ -207,7 +207,7 @@ export default function PromotionsPage() {
 
   const handleToggle = async (promo: Promotion) => {
     try {
-      await apiClient.updatePromotion(promo.id, { isActive: !promo.isActive });
+      await apiClient.updatePromotion(promo.id, { isActive: !promo.isActive }, campgroundId);
       if (campgroundId) loadPromotions(campgroundId);
     } catch (err) {
       console.error("Failed to toggle promotion:", err);

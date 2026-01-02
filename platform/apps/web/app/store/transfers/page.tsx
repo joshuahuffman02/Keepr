@@ -118,14 +118,14 @@ export default function TransfersPage() {
     });
 
     const approveMutation = useMutation({
-        mutationFn: (id: string) => apiClient.approveInventoryTransfer(id),
+        mutationFn: (id: string) => apiClient.approveInventoryTransfer(id, selectedCg),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["inventory-transfers"] });
         },
     });
 
     const completeMutation = useMutation({
-        mutationFn: (id: string) => apiClient.completeInventoryTransfer(id),
+        mutationFn: (id: string) => apiClient.completeInventoryTransfer(id, selectedCg),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["inventory-transfers"] });
             queryClient.invalidateQueries({ queryKey: ["location-inventory"] });
@@ -135,7 +135,7 @@ export default function TransfersPage() {
     });
 
     const cancelMutation = useMutation({
-        mutationFn: (id: string) => apiClient.cancelInventoryTransfer(id),
+        mutationFn: (id: string) => apiClient.cancelInventoryTransfer(id, selectedCg),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["inventory-transfers"] });
         },

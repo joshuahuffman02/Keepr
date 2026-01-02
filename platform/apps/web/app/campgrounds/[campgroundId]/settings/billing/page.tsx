@@ -165,7 +165,7 @@ export default function BillingSettingsPage() {
 
     const invoicesQuery = useQuery({
         queryKey: ["invoices", reservationId],
-        queryFn: () => apiClient.listInvoicesByReservation(reservationId),
+        queryFn: () => apiClient.listInvoicesByReservation(reservationId, campgroundId),
         enabled: !!reservationId
     });
 
@@ -248,7 +248,7 @@ export default function BillingSettingsPage() {
                 readingValue: Number(readForm.readingValue),
                 readAt: readForm.readAt || new Date().toISOString(),
                 ...(readForm.note && { note: readForm.note })
-            });
+            }, campgroundId);
             setReadMessage({ type: "success", text: "Reading saved! Usage will be calculated on next billing cycle." });
             setReadForm({ meterId: readForm.meterId, readingValue: "", readAt: "", note: "" });
         } catch (err: any) {
@@ -308,7 +308,7 @@ export default function BillingSettingsPage() {
         setRunningLateFees(true);
         setLateFeeMessage(null);
         try {
-            await apiClient.runLateFees();
+            await apiClient.runLateFees(campgroundId);
             setLateFeeMessage({ type: "success", text: "Late fee processing started. Overdue invoices will be updated shortly." });
         } catch (err: any) {
             setLateFeeMessage({ type: "error", text: err?.message || "Failed to run late fees. Please try again." });

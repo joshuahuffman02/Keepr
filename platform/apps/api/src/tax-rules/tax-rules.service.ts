@@ -37,13 +37,15 @@ export class TaxRulesService {
         });
     }
 
-    async findOne(id: string) {
-        const rule = await this.prisma.taxRule.findUnique({ where: { id } });
+    async findOne(campgroundId: string, id: string) {
+        const rule = await this.prisma.taxRule.findFirst({
+            where: { id, campgroundId },
+        });
         if (!rule) throw new NotFoundException('Tax rule not found');
         return rule;
     }
 
-    async update(id: string, data: Partial<{
+    async update(campgroundId: string, id: string, data: Partial<{
         name: string;
         type: TaxRuleType;
         rate: number;
@@ -53,19 +55,15 @@ export class TaxRulesService {
         waiverText: string;
         isActive: boolean;
     }>) {
+        await this.findOne(campgroundId, id);
         return this.prisma.taxRule.update({
             where: { id },
             data,
         });
     }
 
-    async remove(id: string) {
-        const existing = await this.prisma.taxRule.findUnique({ where: { id } });
-
-        if (!existing) {
-            throw new NotFoundException('Tax rule not found');
-        }
-
+    async remove(campgroundId: string, id: string) {
+        await this.findOne(campgroundId, id);
         return this.prisma.taxRule.delete({ where: { id } });
     }
 

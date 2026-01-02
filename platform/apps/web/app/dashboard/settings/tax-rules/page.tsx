@@ -189,7 +189,7 @@ export default function TaxRulesSettingsPage() {
             };
 
             if (editingRule) {
-                await apiClient.updateTaxRule(editingRule.id, payload);
+                await apiClient.updateTaxRule(editingRule.id, payload, campgroundId);
             } else {
                 await apiClient.createTaxRule({ campgroundId, ...payload });
             }
@@ -205,7 +205,7 @@ export default function TaxRulesSettingsPage() {
     const confirmDeleteRule = async () => {
         if (!deleteConfirmId) return;
         try {
-            await apiClient.deleteTaxRule(deleteConfirmId);
+            await apiClient.deleteTaxRule(deleteConfirmId, campgroundId ?? undefined);
             if (campgroundId) loadTaxRules(campgroundId);
         } catch (err) {
             console.error(err);
@@ -216,7 +216,7 @@ export default function TaxRulesSettingsPage() {
 
     const toggleActive = async (rule: TaxRule) => {
         try {
-            await apiClient.updateTaxRule(rule.id, { isActive: !rule.isActive });
+            await apiClient.updateTaxRule(rule.id, { isActive: !rule.isActive }, campgroundId ?? undefined);
             if (campgroundId) loadTaxRules(campgroundId);
         } catch (err) {
             console.error(err);
@@ -621,4 +621,3 @@ export default function TaxRulesSettingsPage() {
         </div>
     );
 }
-

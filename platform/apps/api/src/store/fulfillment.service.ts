@@ -73,9 +73,14 @@ export class FulfillmentService {
     /**
      * Assign an order to a location for fulfillment
      */
-    async assignToLocation(orderId: string, locationId: string, assignedById: string) {
-        const order = await this.prisma.storeOrder.findUnique({
-            where: { id: orderId },
+    async assignToLocation(
+        campgroundId: string,
+        orderId: string,
+        locationId: string,
+        assignedById: string
+    ) {
+        const order = await this.prisma.storeOrder.findFirst({
+            where: { id: orderId, campgroundId },
             include: { fulfillmentLocation: true },
         });
 
@@ -87,7 +92,7 @@ export class FulfillmentService {
         const location = await this.prisma.storeLocation.findFirst({
             where: {
                 id: locationId,
-                campgroundId: order.campgroundId,
+                campgroundId,
                 isActive: true,
             },
         });
@@ -121,12 +126,13 @@ export class FulfillmentService {
      * Update the fulfillment status of an order
      */
     async updateFulfillmentStatus(
+        campgroundId: string,
         orderId: string,
         status: FulfillmentAssignmentStatus,
         actorUserId: string
     ) {
-        const order = await this.prisma.storeOrder.findUnique({
-            where: { id: orderId },
+        const order = await this.prisma.storeOrder.findFirst({
+            where: { id: orderId, campgroundId },
         });
 
         if (!order) {
@@ -174,9 +180,22 @@ export class FulfillmentService {
     /**
      * Get orders assigned to a specific location
      */
-    async getLocationOrders(locationId: string, includeCompleted = false) {
+    async getLocationOrders(
+        campgroundId: string,
+        locationId: string,
+        includeCompleted = false
+    ) {
+        const location = await this.prisma.storeLocation.findFirst({
+            where: { id: locationId, campgroundId },
+        });
+
+        if (!location) {
+            throw new NotFoundException(`Location ${locationId} not found`);
+        }
+
         const orders = await this.prisma.storeOrder.findMany({
             where: {
+                campgroundId,
                 fulfillmentLocationId: locationId,
                 fulfillmentStatus: includeCompleted
                     ? undefined
@@ -200,23 +219,16 @@ export class FulfillmentService {
      * Bulk assign multiple orders to a location
      */
     async bulkAssignToLocation(
+        campgroundId: string,
         orderIds: string[],
         locationId: string,
         assignedById: string
     ) {
         // Verify location
-        const firstOrder = await this.prisma.storeOrder.findFirst({
-            where: { id: { in: orderIds } },
-        });
-
-        if (!firstOrder) {
-            throw new NotFoundException("No orders found");
-        }
-
         const location = await this.prisma.storeLocation.findFirst({
             where: {
                 id: locationId,
-                campgroundId: firstOrder.campgroundId,
+                campgroundId,
                 isActive: true,
                 acceptsOnline: true,
             },
@@ -226,9 +238,18 @@ export class FulfillmentService {
             throw new NotFoundException(`Location ${locationId} not found or cannot accept online orders`);
         }
 
+        const firstOrder = await this.prisma.storeOrder.findFirst({
+            where: { id: { in: orderIds }, campgroundId },
+        });
+
+        if (!firstOrder) {
+            throw new NotFoundException("No orders found");
+        }
+
         const result = await this.prisma.storeOrder.updateMany({
             where: {
                 id: { in: orderIds },
+                campgroundId,
                 fulfillmentStatus: FulfillmentAssignmentStatus.unassigned,
             },
             data: {

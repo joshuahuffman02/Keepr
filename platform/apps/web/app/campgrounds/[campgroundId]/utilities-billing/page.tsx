@@ -88,7 +88,7 @@ export default function UtilitiesBillingPage() {
       const meters = metersQuery.data ?? [];
       const pairs = await Promise.all(
         meters.map(async (m) => {
-          const reads = await apiClient.listUtilityMeterReads(m.id);
+          const reads = await apiClient.listUtilityMeterReads(m.id, undefined, campgroundId);
           const last = reads[reads.length - 1];
           return { meterId: m.id, last };
         })
@@ -101,7 +101,8 @@ export default function UtilitiesBillingPage() {
   });
 
   const updateMeterMutation = useMutation({
-    mutationFn: ({ meterId, config }: { meterId: string; config: MeterConfig }) => apiClient.updateUtilityMeter(meterId, config),
+    mutationFn: ({ meterId, config }: { meterId: string; config: MeterConfig }) =>
+      apiClient.updateUtilityMeter(meterId, config, campgroundId),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["utility-meters", campgroundId] });
       setMessage("Meter updated.");
@@ -110,7 +111,7 @@ export default function UtilitiesBillingPage() {
   });
 
   const billMeterMutation = useMutation({
-    mutationFn: (meterId: string) => apiClient.billUtilityMeter(meterId),
+    mutationFn: (meterId: string) => apiClient.billUtilityMeter(meterId, campgroundId),
     onSuccess: () => setMessage("Invoice created from latest reading."),
     onError: (err: any) => setMessage(err?.message || "Failed to bill meter")
   });
@@ -121,7 +122,7 @@ export default function UtilitiesBillingPage() {
         readingValue: Number(draft.readingValue),
         readAt: draft.readAt || new Date().toISOString(),
         note: draft.note || undefined
-      }),
+      }, campgroundId),
     onSuccess: () => {
       setMessage("Reading saved.");
       qc.invalidateQueries({ queryKey: ["utility-meter-reads-latest", campgroundId] });
@@ -130,13 +131,14 @@ export default function UtilitiesBillingPage() {
   });
 
   const saveSiteClassMutation = useMutation({
-    mutationFn: ({ id, draft }: { id: string; draft: SiteClassDraft }) => apiClient.updateSiteClass(id, draft),
+    mutationFn: ({ id, draft }: { id: string; draft: SiteClassDraft }) =>
+      apiClient.updateSiteClass(id, draft, campgroundId),
     onSuccess: () => setMessage("Site class metering defaults saved."),
     onError: (err: any) => setMessage(err?.message || "Failed to save site class")
   });
 
   const seedMetersMutation = useMutation({
-    mutationFn: (siteClassId: string) => apiClient.seedMetersForSiteClass(siteClassId),
+    mutationFn: (siteClassId: string) => apiClient.seedMetersForSiteClass(siteClassId, campgroundId),
     onSuccess: (res) => {
       setMessage(`Created ${res.created} meters (of ${res.totalSites} sites).`);
       qc.invalidateQueries({ queryKey: ["utility-meters", campgroundId] });

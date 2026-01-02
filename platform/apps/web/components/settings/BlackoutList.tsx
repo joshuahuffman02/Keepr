@@ -41,7 +41,7 @@ export function BlackoutList({ campgroundId }: BlackoutListProps) {
     });
 
     const deleteMutation = useMutation({
-        mutationFn: (id: string) => apiClient.deleteBlackout(id),
+        mutationFn: (id: string) => apiClient.deleteBlackout(id, campgroundId),
         onSuccess: () => qc.invalidateQueries({ queryKey: ["blackouts"] })
     });
 

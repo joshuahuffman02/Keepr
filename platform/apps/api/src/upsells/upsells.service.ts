@@ -43,17 +43,19 @@ export class UpsellsService {
     return item;
   }
 
-  async update(id: string, dto: UpdateUpsellDto, actorId?: string | null) {
-    const existing = await this.prisma.upsellItem.findUnique({ where: { id } });
+  async update(campgroundId: string, id: string, dto: UpdateUpsellDto, actorId?: string | null) {
+    const existing = await this.prisma.upsellItem.findFirst({ where: { id, campgroundId } });
     if (!existing) throw new NotFoundException("Upsell item not found");
+    const { campgroundId: _campgroundId, siteClassId, description, taxCode, inventoryTracking, ...rest } =
+      dto as UpdateUpsellDto & { campgroundId?: string };
     const updated = await this.prisma.upsellItem.update({
       where: { id },
       data: {
-        ...dto,
-        siteClassId: dto.siteClassId === undefined ? undefined : dto.siteClassId ?? null,
-        description: dto.description === undefined ? undefined : dto.description ?? null,
-        taxCode: dto.taxCode === undefined ? undefined : dto.taxCode ?? null,
-        inventoryTracking: dto.inventoryTracking === undefined ? undefined : dto.inventoryTracking
+        ...rest,
+        siteClassId: siteClassId === undefined ? undefined : siteClassId ?? null,
+        description: description === undefined ? undefined : description ?? null,
+        taxCode: taxCode === undefined ? undefined : taxCode ?? null,
+        inventoryTracking: inventoryTracking === undefined ? undefined : inventoryTracking
       }
     });
 
@@ -70,8 +72,8 @@ export class UpsellsService {
     return updated;
   }
 
-  async remove(id: string, actorId?: string | null) {
-    const existing = await this.prisma.upsellItem.findUnique({ where: { id } });
+  async remove(campgroundId: string, id: string, actorId?: string | null) {
+    const existing = await this.prisma.upsellItem.findFirst({ where: { id, campgroundId } });
     if (!existing) throw new NotFoundException("Upsell item not found");
     await this.prisma.upsellItem.delete({ where: { id } });
 
@@ -88,4 +90,3 @@ export class UpsellsService {
     return existing;
   }
 }
-

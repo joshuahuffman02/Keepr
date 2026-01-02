@@ -115,7 +115,7 @@ export default function DepositPoliciesPage() {
 
   const updateMutation = useMutation({
     mutationFn: ({ id, data }: { id: string; data: Parameters<typeof apiClient.updateDepositPolicy>[1] }) =>
-      apiClient.updateDepositPolicy(id, data),
+      apiClient.updateDepositPolicy(id, data, campgroundId!),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["deposit-policies", campgroundId] });
       closeModal();
@@ -123,7 +123,7 @@ export default function DepositPoliciesPage() {
   });
 
   const deleteMutation = useMutation({
-    mutationFn: (id: string) => apiClient.deleteDepositPolicy(id),
+    mutationFn: (id: string) => apiClient.deleteDepositPolicy(id, campgroundId!),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["deposit-policies", campgroundId] });
     },
@@ -528,4 +528,3 @@ export default function DepositPoliciesPage() {
     </div>
   );
 }
-
