@@ -1,4 +1,4 @@
-import { Injectable, Logger } from "@nestjs/common";
+import { BadGatewayException, Injectable, Logger } from "@nestjs/common";
 
 /**
  * Recreation.gov API integration for fetching federal campground data.
@@ -188,7 +188,7 @@ export class RecreationGovService {
       });
 
       if (!response.ok) {
-        throw new Error(
+        throw new BadGatewayException(
           `Recreation.gov API error: ${response.status} ${response.statusText}`
         );
       }
@@ -225,7 +225,7 @@ export class RecreationGovService {
       }
 
       if (!response.ok) {
-        throw new Error(
+        throw new BadGatewayException(
           `Recreation.gov API error: ${response.status} ${response.statusText}`
         );
       }

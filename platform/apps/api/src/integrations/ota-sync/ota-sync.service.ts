@@ -392,7 +392,7 @@ export class OtaSyncService {
     }
 
     if (!siteId) {
-      throw new Error("No site available for this booking");
+      throw new BadRequestException("No site available for this booking");
     }
 
     // Create reservation and import record in transaction

@@ -2,7 +2,7 @@ import { useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { apiClient } from "@/lib/api-client";
 import { format, startOfDay, endOfDay, isWithinInterval } from "date-fns";
-import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend } from "recharts";
+import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend } from "@/components/charts/recharts";
 
 interface RevenueBySiteTypeReportProps {
     campgroundId: string;

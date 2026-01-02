@@ -1,4 +1,11 @@
-import { Injectable, Logger, OnModuleInit } from "@nestjs/common";
+import {
+  BadGatewayException,
+  BadRequestException,
+  Injectable,
+  InternalServerErrorException,
+  Logger,
+  OnModuleInit,
+} from "@nestjs/common";
 import {
   IntegrationProvider,
   IntegrationCredentials,
@@ -53,7 +60,7 @@ export class QuickBooksMarketplaceProvider implements IntegrationProvider, OnMod
     const clientId = process.env.QUICKBOOKS_CLIENT_ID || process.env.QBO_CLIENT_ID;
 
     if (!clientId) {
-      throw new Error("QuickBooks client ID not configured");
+      throw new InternalServerErrorException("QuickBooks client ID not configured");
     }
 
     const params = new URLSearchParams({
@@ -138,11 +145,11 @@ export class QuickBooksMarketplaceProvider implements IntegrationProvider, OnMod
     const clientSecret = process.env.QUICKBOOKS_CLIENT_SECRET || process.env.QBO_CLIENT_SECRET;
 
     if (!clientId || !clientSecret) {
-      throw new Error("QuickBooks credentials not configured");
+      throw new InternalServerErrorException("QuickBooks credentials not configured");
     }
 
     if (!credentials.oauth?.refreshToken) {
-      throw new Error("No refresh token available");
+      throw new BadRequestException("No refresh token available");
     }
 
     const basicAuth = Buffer.from(`${clientId}:${clientSecret}`).toString("base64");
@@ -161,7 +168,7 @@ export class QuickBooksMarketplaceProvider implements IntegrationProvider, OnMod
     });
 
     if (!response.ok) {
-      throw new Error("Token refresh failed");
+      throw new BadGatewayException("Token refresh failed");
     }
 
     const tokens = await response.json();
@@ -526,7 +533,7 @@ export class QuickBooksMarketplaceProvider implements IntegrationProvider, OnMod
     const accessToken = credentials.oauth?.accessToken;
 
     if (!realmId || !accessToken) {
-      throw new Error("Missing QuickBooks credentials");
+      throw new BadRequestException("Missing QuickBooks credentials");
     }
 
     const apiBase = this.getApiBase();

@@ -1,4 +1,4 @@
-import { Injectable, Logger } from "@nestjs/common";
+import { BadGatewayException, Injectable, Logger, NotFoundException } from "@nestjs/common";
 import { AiProviderService } from "./ai-provider.service";
 import { AiFeatureType } from "@prisma/client";
 import { PrismaService } from "../prisma/prisma.service";
@@ -199,7 +199,7 @@ export class AiNaturalSearchService {
     });
 
     if (!campground) {
-      throw new Error("Campground not found");
+      throw new NotFoundException("Campground not found");
     }
 
     let intent: SearchIntent;
@@ -597,7 +597,7 @@ export class AiNaturalSearchService {
     // Try to extract JSON from the response
     const jsonMatch = content.match(/\{[\s\S]*\}/);
     if (!jsonMatch) {
-      throw new Error("No JSON found in AI response");
+      throw new BadGatewayException("No JSON found in AI response");
     }
 
     const parsed = JSON.parse(jsonMatch[0]);

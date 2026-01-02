@@ -1,3 +1,4 @@
+import { BadGatewayException, BadRequestException } from "@nestjs/common";
 import { BaseOtaProvider, OtaBooking, OtaProviderConfig } from "./base-ota.provider";
 
 /**
@@ -16,7 +17,7 @@ export class ICalProvider extends BaseOtaProvider {
 
   async fetchBookings(): Promise<OtaBooking[]> {
     if (!this.config.icalUrl) {
-      throw new Error("iCal URL is required for iCal provider");
+      throw new BadRequestException("iCal URL is required for iCal provider");
     }
 
     const icalData = await this.fetchWithRetry(
@@ -42,7 +43,7 @@ export class ICalProvider extends BaseOtaProvider {
     });
 
     if (!response.ok) {
-      throw new Error(`iCal fetch failed: HTTP ${response.status}`);
+      throw new BadGatewayException(`iCal fetch failed: HTTP ${response.status}`);
     }
 
     return response.text();

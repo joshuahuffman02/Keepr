@@ -1,4 +1,4 @@
-import { Injectable } from "@nestjs/common";
+import { BadRequestException, Injectable, NotFoundException } from "@nestjs/common";
 import { PrismaService } from "../prisma/prisma.service";
 import { CreateGuestDto } from "./dto/create-guest.dto";
 import { AuditService } from "../audit/audit.service";
@@ -290,7 +290,7 @@ export class GuestsService {
     options?: { actorId?: string; campgroundId?: string }
   ) {
     if (primaryId === secondaryId) {
-      throw new Error("Cannot merge a guest with itself");
+      throw new BadRequestException("Cannot merge a guest with itself");
     }
 
     const [primary, secondary] = await Promise.all([
@@ -304,8 +304,8 @@ export class GuestsService {
       })
     ]);
 
-    if (!primary) throw new Error("Primary guest not found");
-    if (!secondary) throw new Error("Secondary guest not found");
+    if (!primary) throw new NotFoundException("Primary guest not found");
+    if (!secondary) throw new NotFoundException("Secondary guest not found");
 
     const campgroundId = options?.campgroundId ||
       (primary.tags as string[] | null)?.find((t) => t.startsWith("campground:"))?.replace("campground:", "");

@@ -1,4 +1,4 @@
-import { Injectable, Logger, OnModuleInit } from "@nestjs/common";
+import { BadGatewayException, Injectable, Logger, OnModuleInit } from "@nestjs/common";
 import { Cron, CronExpression } from "@nestjs/schedule";
 
 type FxRate = {
@@ -122,13 +122,13 @@ export class CurrencyTaxService implements OnModuleInit {
 
       if (!response.ok) {
         const errorText = await response.text();
-        throw new Error(`OpenExchangeRates API error: ${response.status} ${errorText}`);
+        throw new BadGatewayException(`OpenExchangeRates API error: ${response.status} ${errorText}`);
       }
 
       const data = await response.json();
 
       if (!data.rates) {
-        throw new Error("Invalid response from OpenExchangeRates - no rates object");
+        throw new BadGatewayException("Invalid response from OpenExchangeRates - no rates object");
       }
 
       // Convert API response to our FxRate format
@@ -248,4 +248,3 @@ export class CurrencyTaxService implements OnModuleInit {
     };
   }
 }
-

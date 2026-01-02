@@ -1,4 +1,4 @@
-import { Injectable, Logger } from "@nestjs/common";
+import { BadRequestException, Injectable, Logger } from "@nestjs/common";
 import { Cron, CronExpression } from "@nestjs/schedule";
 import { AnalyticsActorType, AnalyticsEventName, Prisma } from "@prisma/client";
 import { PrismaService } from "../prisma/prisma.service";
@@ -244,7 +244,7 @@ export class EnhancedAnalyticsService {
   async trackFunnelStep(dto: TrackFunnelDto, scope: RequestScope) {
     const campgroundId = dto.campgroundId ?? scope.campgroundId;
     if (!campgroundId) {
-      throw new Error("campgroundId is required for funnel tracking");
+      throw new BadRequestException("campgroundId is required for funnel tracking");
     }
 
     // Find or create funnel
@@ -332,7 +332,7 @@ export class EnhancedAnalyticsService {
   async completeFunnel(dto: CompleteFunnelDto, scope: RequestScope) {
     const campgroundId = dto.campgroundId ?? scope.campgroundId;
     if (!campgroundId) {
-      throw new Error("campgroundId is required for funnel completion");
+      throw new BadRequestException("campgroundId is required for funnel completion");
     }
 
     const funnel = await this.prisma.analyticsFunnel.findFirst({
@@ -415,7 +415,7 @@ export class EnhancedAnalyticsService {
 
     const campgroundId = dto.campgroundId ?? scope.campgroundId;
     if (!campgroundId) {
-      throw new Error("campgroundId is required for feature tracking");
+      throw new BadRequestException("campgroundId is required for feature tracking");
     }
 
     // Upsert daily feature usage

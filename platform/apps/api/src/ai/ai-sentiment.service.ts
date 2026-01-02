@@ -1,4 +1,4 @@
-import { Injectable, Logger } from "@nestjs/common";
+import { BadGatewayException, Injectable, Logger } from "@nestjs/common";
 import { PrismaService } from "../prisma/prisma.service";
 import { AiProviderService } from "./ai-provider.service";
 import { AiFeatureGateService } from "./ai-feature-gate.service";
@@ -285,7 +285,7 @@ Guidelines:
       // Extract JSON from response
       const jsonMatch = response.match(/\{[\s\S]*\}/);
       if (!jsonMatch) {
-        throw new Error("No JSON found in response");
+        throw new BadGatewayException("No JSON found in response");
       }
 
       const parsed: AnalysisResult = JSON.parse(jsonMatch[0]);

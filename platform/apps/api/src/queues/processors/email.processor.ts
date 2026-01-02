@@ -1,4 +1,4 @@
-import { Injectable, Logger, OnModuleInit } from "@nestjs/common";
+import { BadRequestException, Injectable, Logger, OnModuleInit } from "@nestjs/common";
 import { BullQueueService, JobData } from "../bull-queue.service";
 
 export interface EmailJobData {
@@ -41,15 +41,15 @@ export class EmailQueueProcessor implements OnModuleInit {
     // In production, this would integrate with EmailService
     // For now, simulate email sending with validation
     if (!to || (Array.isArray(to) && to.length === 0)) {
-      throw new Error("No recipients specified");
+      throw new BadRequestException("No recipients specified");
     }
 
     if (!subject) {
-      throw new Error("No subject specified");
+      throw new BadRequestException("No subject specified");
     }
 
     if (!html && !text && !template) {
-      throw new Error("No content specified (html, text, or template required)");
+      throw new BadRequestException("No content specified (html, text, or template required)");
     }
 
     // Simulate network latency

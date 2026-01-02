@@ -1,4 +1,4 @@
-import { Injectable, Logger, OnModuleInit } from "@nestjs/common";
+import { BadGatewayException, Injectable, Logger, OnModuleInit } from "@nestjs/common";
 import { BullQueueService, JobData } from "../bull-queue.service";
 
 export interface WebhookJobData {
@@ -59,7 +59,7 @@ export class WebhookQueueProcessor implements OnModuleInit {
       const duration = Date.now() - startTime;
 
       if (!response.ok) {
-        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        throw new BadGatewayException(`HTTP ${response.status}: ${response.statusText}`);
       }
 
       this.logger.log(`Webhook delivered: ${event} to ${url} (${duration}ms)`);

@@ -1,4 +1,4 @@
-import { Injectable, Logger } from "@nestjs/common";
+import { Injectable, InternalServerErrorException, Logger } from "@nestjs/common";
 import * as crypto from "crypto";
 
 /**
@@ -46,7 +46,7 @@ export class CredentialEncryptionService {
       return combined.toString("base64");
     } catch (error) {
       this.logger.error("Encryption failed", (error as Error).stack);
-      throw new Error("Failed to encrypt credentials");
+      throw new InternalServerErrorException("Failed to encrypt credentials");
     }
   }
 
@@ -74,7 +74,7 @@ export class CredentialEncryptionService {
       return JSON.parse(decrypted.toString("utf8"));
     } catch (error) {
       this.logger.error("Decryption failed", (error as Error).stack);
-      throw new Error("Failed to decrypt credentials");
+      throw new InternalServerErrorException("Failed to decrypt credentials");
     }
   }
 

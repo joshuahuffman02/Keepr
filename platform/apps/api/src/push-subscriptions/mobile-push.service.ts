@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { PrismaService } from '../prisma/prisma.service';
 import { RegisterDeviceDto } from './dto/register-device.dto';
@@ -222,7 +222,7 @@ export class MobilePushService {
     } else if (platform === 'android') {
       return this.sendFcm(deviceToken, payload);
     }
-    throw new Error(`Unknown platform: ${platform}`);
+    throw new BadRequestException(`Unknown platform: ${platform}`);
   }
 
   /**
