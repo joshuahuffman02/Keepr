@@ -637,7 +637,7 @@ export class PaymentsController {
         throw new BadRequestException("Payment intent currency does not match expected currency");
       }
 
-      const { amountCents } = this.computeChargeAmounts({
+      const { amountCents: expectedAmountCents } = this.computeChargeAmounts({
         reservation,
         platformFeeMode: feeMode,
         applicationFeeCents,
@@ -645,7 +645,7 @@ export class PaymentsController {
         gatewayFeePercentBasisPoints,
         gatewayFeeFlatCents
       });
-      if (intent.amount !== amountCents) {
+      if (intent.amount !== expectedAmountCents) {
         throw new BadRequestException("Payment intent amount does not match expected total");
       }
 

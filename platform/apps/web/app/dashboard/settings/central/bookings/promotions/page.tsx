@@ -194,7 +194,7 @@ export default function PromotionsPage() {
   };
 
   const confirmDeletePromotion = async () => {
-    if (!deleteConfirmId) return;
+    if (!deleteConfirmId || !campgroundId) return;
     try {
       await apiClient.deletePromotion(deleteConfirmId, campgroundId);
       if (campgroundId) loadPromotions(campgroundId);
