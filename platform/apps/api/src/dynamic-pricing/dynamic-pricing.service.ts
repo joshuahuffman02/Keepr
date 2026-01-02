@@ -55,33 +55,37 @@ export class DynamicPricingService {
     });
   }
 
-  async getRule(id: string) {
-    const rule = await this.prisma.dynamicPricingRule.findUnique({ where: { id } });
+  async getRule(campgroundId: string, id: string) {
+    const rule = await this.prisma.dynamicPricingRule.findFirst({
+      where: { id, campgroundId }
+    });
     if (!rule) throw new NotFoundException('Rule not found');
     return rule;
   }
 
-  async updateRule(id: string, dto: Partial<CreateDynamicRuleDto>) {
-    const existing = await this.getRule(id);
+  async updateRule(campgroundId: string, id: string, dto: Partial<CreateDynamicRuleDto>) {
+    await this.getRule(campgroundId, id);
+    const { campgroundId: _campgroundId, ...rest } =
+      dto as Partial<CreateDynamicRuleDto> & { campgroundId?: string };
     return this.prisma.dynamicPricingRule.update({
       where: { id },
       data: {
-        name: dto.name,
-        trigger: dto.trigger,
-        conditions: dto.conditions,
-        adjustmentType: dto.adjustmentType,
-        adjustmentValue: dto.adjustmentValue,
-        priority: dto.priority,
-        siteClassIds: dto.siteClassIds,
-        isActive: dto.isActive,
-        validFrom: dto.validFrom ? new Date(dto.validFrom) : undefined,
-        validTo: dto.validTo ? new Date(dto.validTo) : undefined,
+        name: rest.name,
+        trigger: rest.trigger,
+        conditions: rest.conditions,
+        adjustmentType: rest.adjustmentType,
+        adjustmentValue: rest.adjustmentValue,
+        priority: rest.priority,
+        siteClassIds: rest.siteClassIds,
+        isActive: rest.isActive,
+        validFrom: rest.validFrom ? new Date(rest.validFrom) : undefined,
+        validTo: rest.validTo ? new Date(rest.validTo) : undefined,
       },
     });
   }
 
-  async deleteRule(id: string) {
-    await this.getRule(id);
+  async deleteRule(campgroundId: string, id: string) {
+    await this.getRule(campgroundId, id);
     return this.prisma.dynamicPricingRule.delete({ where: { id } });
   }
 
@@ -349,4 +353,3 @@ export class DynamicPricingService {
     });
   }
 }
-
