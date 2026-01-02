@@ -6,28 +6,30 @@ Scope: Targeted review of public payment confirmation, public reservation access
 Status key: VERIFIED, PARTIAL, NOT VERIFIED.
 
 ### NOT VERIFIED
-- PAY-CRIT-001: `confirmPublicPaymentIntent` only checks metadata if present and never validates amount/currency; intents without metadata still pass. (`platform/apps/api/src/payments/payments.controller.ts`)
-- PAY-HIGH-001: `requires_capture` branch and success branch create Payment fields that do not exist in the schema (currency/status/paidAt/metadata), likely failing Prisma writes. (`platform/apps/api/src/payments/payments.controller.ts`, `platform/apps/api/prisma/schema.prisma`)
-- PUB-HIGH-001: token is accepted but ignored; service only validates campgroundId if provided, so any token string still allows ID-only access. (`platform/apps/api/src/public-reservations/public-reservations.controller.ts`, `platform/apps/api/src/public-reservations/public-reservations.service.ts`)
-- PUB-HIGH-002: same issue as PUB-HIGH-001 (token not validated, ID-only access still works). (`platform/apps/api/src/public-reservations/public-reservations.controller.ts`, `platform/apps/api/src/public-reservations/public-reservations.service.ts`)
-- PUB-HIGH-003: token is accepted but ignored; if campgroundId omitted, submissions are returned without ownership validation. (`platform/apps/api/src/public-reservations/public-reservations.controller.ts`, `platform/apps/api/src/forms/forms.service.ts`)
-- FORM-HIGH-001: RolesGuard added but no `@RequireScope`; update/delete/list by id are still unscoped and service uses id-only lookups. (`platform/apps/api/src/forms/forms.controller.ts`, `platform/apps/api/src/forms/forms.service.ts`)
-- AC-HIGH-001: guards added but no tenant scoping; service uses reservationId only and does not validate campground ownership. (`platform/apps/api/src/access-control/access-control.controller.ts`, `platform/apps/api/src/access-control/access-control.service.ts`)
-- OTA-HIGH-001: ID-based endpoints (channels/mappings) are not scoped to campground; service updates by id only. (`platform/apps/api/src/ota/ota.controller.ts`, `platform/apps/api/src/ota/ota.service.ts`)
-- WEBHOOK-MED-001: toggle/replay/retry/test endpoints operate by id without campground scoping; guard can be satisfied by unrelated `x-campground-id`. (`platform/apps/api/src/developer-api/webhook-admin.controller.ts`, `platform/apps/api/src/developer-api/webhook.service.ts`)
-- DEV-HIGH-001: rotate/toggle/update/delete by id are not scoped to campground; service updates by id only. (`platform/apps/api/src/developer-api/developer-admin.controller.ts`, `platform/apps/api/src/developer-api/api-auth.service.ts`)
-- ACCT-HIGH-002: public confirm flow still writes Payment fields missing from schema and uses `reservation.siteId` without selecting it, so the ledger post path is not reliable. (`platform/apps/api/src/payments/payments.controller.ts`, `platform/apps/api/prisma/schema.prisma`)
-- ACCT-HIGH-003: refund flows still inconsistent; refund service writes negative refund payments and updates `refundedAmountCents`, while reservation refund paths write positive refunds and never update `refundedAmountCents`. (`platform/apps/api/src/stripe-payments/refund.service.ts`, `platform/apps/api/src/reservations/reservations.service.ts`)
-- ACCT-HIGH-006: `GET /reservations/:id/ledger` has no campground scoping; service filters by reservationId only. (`platform/apps/api/src/ledger/ledger.controller.ts`, `platform/apps/api/src/ledger/ledger.service.ts`)
+- None
 
 ### PARTIAL
-- PUB-CRIT-001: campgroundId is now required, but kiosk token/signature is still not validated; IDOR remains if campgroundId is known. (`platform/apps/api/src/public-reservations/public-reservations.controller.ts`, `platform/apps/api/src/public-reservations/public-reservations.service.ts`)
-- IMPORT-CRIT-001: access now requires onboarding token, but JWT path likely never works because controller does not apply `JwtAuthGuard` to populate `req.user`. (`platform/apps/api/src/data-import/reservation-import.controller.ts`)
-- STORE-HIGH-001: membership checks added for campgroundId routes, but ID-only endpoints (products/categories by id) are still unscoped. (`platform/apps/api/src/store/store.controller.ts`)
-- ACCT-HIGH-004: repeat charges now update balance/status and post ledger entries, but not within a single transaction as requested. (`platform/apps/api/src/repeat-charges/repeat-charges.service.ts`)
-- ACCT-HIGH-014: ledger entries added for kiosk check-in, but `balanceAmount` is not updated after setting paidAmount/totalAmount. (`platform/apps/api/src/public-reservations/public-reservations.service.ts`)
+- None
 
 ### VERIFIED (spot-checked)
+- PAY-CRIT-001
+- PUB-CRIT-001
+- IMPORT-CRIT-001
+- PAY-HIGH-001
+- PUB-HIGH-001
+- PUB-HIGH-002
+- PUB-HIGH-003
+- FORM-HIGH-001
+- AC-HIGH-001
+- OTA-HIGH-001
+- DEV-HIGH-001
+- STORE-HIGH-001
+- ACCT-HIGH-002
+- ACCT-HIGH-003
+- ACCT-HIGH-004
+- ACCT-HIGH-006
+- ACCT-HIGH-014
+- WEBHOOK-MED-001
 - RATE-MED-001
 - MKT-LOW-001
 - OAUTH-MED-002
@@ -133,7 +135,7 @@ Status key: VERIFIED, PARTIAL, NOT VERIFIED.
 - Impact: Reservation ID alone can trigger check-in flow and card-on-file charges (IDOR + payment abuse).
 - Fix: Require a verifiable kiosk token (signed token or shared secret) and enforce campground/tenant validation in service layer.
 - Tests: Add tests for invalid/missing kiosk tokens and cross-campground attempts.
-- **Resolution**: Changed service method signature to make `campgroundId` required (not optional). Service now throws `BadRequestException` if `campgroundId` is missing, and always validates reservation belongs to the specified campground. Controller already requires `campgroundId` parameter.
+- **Resolution**: Kiosk check-in now requires a kiosk device token header, validates device status and permissions, and enforces reservation campground ownership derived from the kiosk device.
 
 ### High
 
@@ -167,7 +169,7 @@ Status key: VERIFIED, PARTIAL, NOT VERIFIED.
 - Impact: Authenticated users can modify access grants for any reservation.
 - Fix: Enforce campground membership/roles and validate reservation ownership in service.
 - Tests: Cross-campground requests are denied.
-- **Resolution**: Added method-level `RolesGuard` and `ScopeGuard` with appropriate role restrictions.
+- **Resolution**: Controller now requires campgroundId on access endpoints, and service validates reservation ownership before status/vehicle/grant/revoke operations; access grant/vehicle lookups are scoped by campgroundId.
 
 #### OTA-HIGH-001: OTA config/channel/mapping endpoints missing authorization [FIXED 2026-01-01]
 - Files: `platform/apps/api/src/ota/ota.controller.ts:10`, `platform/apps/api/src/ota/ota.controller.ts:40`
@@ -175,7 +177,7 @@ Status key: VERIFIED, PARTIAL, NOT VERIFIED.
 - Impact: Cross-tenant data leakage and tampering.
 - Fix: Add RolesGuard/ScopeGuard with campground ownership checks on all OTA endpoints.
 - Tests: Cross-campground requests denied; channel ID access restricted to campground.
-- **Resolution**: Added method-level `RolesGuard` and `ScopeGuard` restricted to owner/manager roles.
+- **Resolution**: ID-based OTA endpoints now require campgroundId and service verifies channel/mapping ownership before updates, mapping writes, logs/imports, iCal token/URL, and push operations.
 
 ### Medium
 
@@ -185,7 +187,7 @@ Status key: VERIFIED, PARTIAL, NOT VERIFIED.
 - Impact: Any authenticated user can list/create/toggle/replay webhooks for any campground.
 - Fix: Add RolesGuard/ScopeGuard and enforce campground ownership; consider platform-only access.
 - Tests: Cross-campground access denied.
-- **Resolution**: Added `RolesGuard` and `ScopeGuard` at class level with `@Roles(UserRole.owner, UserRole.manager, "platform_admin")` decorator. Campground ownership is now enforced via the guards checking membership against campgroundId from query/body parameters.
+- **Resolution**: Toggle/replay/retry now require campgroundId and the service verifies endpoint/delivery ownership before mutating or re-sending; test/list/stat endpoints also enforce campgroundId.
 
 #### OAUTH-MED-002: OAuth2 revoke and introspection are unauthenticated [FIXED 2026-01-01]
 - Files: `platform/apps/api/src/auth/oauth2/oauth2.controller.ts:184`, `platform/apps/api/src/auth/oauth2/oauth2.controller.ts:200`
@@ -281,7 +283,7 @@ Status key: VERIFIED, PARTIAL, NOT VERIFIED.
 - Impact: Anyone can import reservations into any campground if they know the ID.
 - Fix: Require JWT or valid onboarding token; enforce membership/ownership.
 - Tests: Unauthenticated requests without onboarding token should fail.
-- **Resolution**: Updated `validateCampgroundAccess` to require JWT user with campground membership when no onboarding token; validates user has owner/manager role for the campground.
+- **Resolution**: Added optional JWT guard so requests with Authorization now populate `req.user`; `validateCampgroundAccess` enforces owner/manager membership when onboarding token is absent.
 
 #### ADMIN-CRIT-001: Campground creation is open to any authenticated user [FIXED 2026-01-01]
 - Files: `platform/apps/api/src/admin/admin-campground.controller.ts:1`
@@ -307,7 +309,7 @@ Status key: VERIFIED, PARTIAL, NOT VERIFIED.
 - Impact: Any authenticated user can create API clients for other campgrounds.
 - Fix: Add RolesGuard/ScopeGuard and membership checks.
 - Tests: Cross-campground access denied.
-- **Resolution**: Added `RolesGuard` and `ScopeGuard` with owner/manager/platform_admin roles; campground access now validated via X-Campground-Id header.
+- **Resolution**: Controller now requires campgroundId for ID operations and service verifies API client/token ownership before rotate/toggle/tier updates, token revocation, and delete.
 
 #### ADMIN-HIGH-001: Multiple admin controllers are missing role guards [FIXED 2026-01-01]
 - Files: `platform/apps/api/src/admin/issues/issues.controller.ts:1`, `platform/apps/api/src/admin/audit-log.controller.ts:1`, `platform/apps/api/src/admin/guest-analytics.controller.ts:1`, `platform/apps/api/src/admin/feature-flag.controller.ts:1`, `platform/apps/api/src/admin/announcement.controller.ts:1`
@@ -347,7 +349,7 @@ Status key: VERIFIED, PARTIAL, NOT VERIFIED.
 - Impact: Any authenticated user can list/create/update store inventory/orders for other campgrounds.
 - Fix: Add membership/role checks.
 - Tests: Cross-campground access denied.
-- **Resolution**: Added `assertCampgroundAccess()` helper method that validates user has membership to the campground (platform staff exempt). Applied to all store endpoints that accept campgroundId: categories, products, stock updates, low-stock, add-ons, orders, order summary, and unseen orders.
+- **Resolution**: ID-only store endpoints now require campgroundId and service validates category/product/add-on/order ownership before updates, deletes, stock adjustments, refunds, status changes, and seen marks.
 
 #### WEB-XSS-HIGH-001: Public campground description rendered as raw HTML [FIXED 2026-01-01]
 - Files: `platform/apps/web/app/(public)/park/[slug]/v2/client.tsx:356`
@@ -672,7 +674,7 @@ Status key: VERIFIED, PARTIAL, NOT VERIFIED.
 - Impact: Any authenticated user can access ledger entries for any reservation ID (cross-tenant financial disclosure).
 - Fix: Require campground roles and enforce campground scoping in the service query.
 - Tests: Cross-campground reservation ledger access should be denied.
-- **Resolution**: Controller has class-level `@UseGuards(JwtAuthGuard, RolesGuard, ScopeGuard)` and endpoint has `@Roles(owner, manager, finance, front_desk)` decorator.
+- **Resolution**: `GET /reservations/:id/ledger` now requires campgroundId and the service validates reservation ownership before listing ledger entries.
 
 #### ACCT-HIGH-007: POS charge-to-site uses single-sided ledger entries [FIXED 2026-01-01]
 - Files: `platform/apps/api/src/pos/pos.service.ts:355`

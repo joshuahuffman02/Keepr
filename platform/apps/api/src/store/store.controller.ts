@@ -9,6 +9,7 @@ import {
     Patch,
     Post,
     Query,
+    Req,
     UseGuards,
 } from "@nestjs/common";
 import { StoreService } from "./store.service";
@@ -23,7 +24,6 @@ import {
 } from "./dto/store.dto";
 import { JwtAuthGuard } from "../auth/guards";
 import { AuthGuard } from "@nestjs/passport";
-import { Req } from "@nestjs/common";
 import { RolesGuard, Roles } from "../auth/guards/roles.guard";
 import { ScopeGuard } from "../permissions/scope.guard";
 import { RequireScope } from "../permissions/scope.decorator";
@@ -34,6 +34,14 @@ import { UserRole } from "@prisma/client";
 @Controller()
 export class StoreController {
     constructor(private readonly store: StoreService) { }
+
+    private requireCampgroundId(req: any, fallback?: string): string {
+        const campgroundId = fallback || req?.campgroundId || req?.headers?.["x-campground-id"];
+        if (!campgroundId) {
+            throw new BadRequestException("campgroundId is required");
+        }
+        return campgroundId;
+    }
 
     /**
      * Verify the authenticated user has access to the specified campground.
@@ -75,14 +83,24 @@ export class StoreController {
     @Patch("store/categories/:id")
     updateCategory(
         @Param("id") id: string,
-        @Body() body: UpdateProductCategoryDto
+        @Body() body: UpdateProductCategoryDto,
+        @Query("campgroundId") campgroundId: string | undefined,
+        @Req() req: any
     ) {
-        return this.store.updateCategory(id, body);
+        const requiredCampgroundId = this.requireCampgroundId(req, campgroundId);
+        this.assertCampgroundAccess(requiredCampgroundId, req.user);
+        return this.store.updateCategory(requiredCampgroundId, id, body);
     }
 
     @Delete("store/categories/:id")
-    deleteCategory(@Param("id") id: string) {
-        return this.store.deleteCategory(id);
+    deleteCategory(
+        @Param("id") id: string,
+        @Query("campgroundId") campgroundId: string | undefined,
+        @Req() req: any
+    ) {
+        const requiredCampgroundId = this.requireCampgroundId(req, campgroundId);
+        this.assertCampgroundAccess(requiredCampgroundId, req.user);
+        return this.store.deleteCategory(requiredCampgroundId, id);
     }
 
     // ==================== PRODUCTS ====================
@@ -98,8 +116,14 @@ export class StoreController {
     }
 
     @Get("store/products/:id")
-    getProduct(@Param("id") id: string) {
-        return this.store.getProduct(id);
+    getProduct(
+        @Param("id") id: string,
+        @Query("campgroundId") campgroundId: string | undefined,
+        @Req() req: any
+    ) {
+        const requiredCampgroundId = this.requireCampgroundId(req, campgroundId);
+        this.assertCampgroundAccess(requiredCampgroundId, req.user);
+        return this.store.getProduct(requiredCampgroundId, id);
     }
 
     @Post("campgrounds/:campgroundId/store/products")
@@ -121,20 +145,33 @@ export class StoreController {
     ) {
         this.assertCampgroundAccess(campgroundId, req.user);
         if (typeof body.stockQty === "number") {
-            return this.store.setStock(id, body.stockQty, body.channel);
+            return this.store.setStock(campgroundId, id, body.stockQty, body.channel);
         }
         const delta = typeof body.delta === "number" ? body.delta : 0;
-        return this.store.adjustStock(id, delta, body.channel);
+        return this.store.adjustStock(campgroundId, id, delta, body.channel);
     }
 
   @Patch("store/products/:id")
-  updateProduct(@Param("id") id: string, @Body() body: UpdateProductDto) {
-    return this.store.updateProduct(id, body);
+  updateProduct(
+      @Param("id") id: string,
+      @Body() body: UpdateProductDto,
+      @Query("campgroundId") campgroundId: string | undefined,
+      @Req() req: any
+  ) {
+    const requiredCampgroundId = this.requireCampgroundId(req, campgroundId);
+    this.assertCampgroundAccess(requiredCampgroundId, req.user);
+    return this.store.updateProduct(requiredCampgroundId, id, body);
   }
 
   @Delete("store/products/:id")
-  deleteProduct(@Param("id") id: string) {
-    return this.store.deleteProduct(id);
+  deleteProduct(
+      @Param("id") id: string,
+      @Query("campgroundId") campgroundId: string | undefined,
+      @Req() req: any
+  ) {
+    const requiredCampgroundId = this.requireCampgroundId(req, campgroundId);
+    this.assertCampgroundAccess(requiredCampgroundId, req.user);
+    return this.store.deleteProduct(requiredCampgroundId, id);
   }
 
     @Get("campgrounds/:campgroundId/store/products/low-stock")
@@ -162,13 +199,26 @@ export class StoreController {
     }
 
     @Patch("store/addons/:id")
-    updateAddOn(@Param("id") id: string, @Body() body: UpdateAddOnDto) {
-        return this.store.updateAddOn(id, body);
+    updateAddOn(
+        @Param("id") id: string,
+        @Body() body: UpdateAddOnDto,
+        @Query("campgroundId") campgroundId: string | undefined,
+        @Req() req: any
+    ) {
+        const requiredCampgroundId = this.requireCampgroundId(req, campgroundId);
+        this.assertCampgroundAccess(requiredCampgroundId, req.user);
+        return this.store.updateAddOn(requiredCampgroundId, id, body);
     }
 
     @Delete("store/addons/:id")
-    deleteAddOn(@Param("id") id: string) {
-        return this.store.deleteAddOn(id);
+    deleteAddOn(
+        @Param("id") id: string,
+        @Query("campgroundId") campgroundId: string | undefined,
+        @Req() req: any
+    ) {
+        const requiredCampgroundId = this.requireCampgroundId(req, campgroundId);
+        this.assertCampgroundAccess(requiredCampgroundId, req.user);
+        return this.store.deleteAddOn(requiredCampgroundId, id);
     }
 
     // ==================== ORDERS ====================
@@ -198,8 +248,14 @@ export class StoreController {
     }
 
     @Get("store/orders/:id")
-    getOrder(@Param("id") id: string) {
-        return this.store.getOrder(id);
+    getOrder(
+        @Param("id") id: string,
+        @Query("campgroundId") campgroundId: string | undefined,
+        @Req() req: any
+    ) {
+        const requiredCampgroundId = this.requireCampgroundId(req, campgroundId);
+        this.assertCampgroundAccess(requiredCampgroundId, req.user);
+        return this.store.getOrder(requiredCampgroundId, id);
     }
 
     @Post("campgrounds/:campgroundId/store/orders")
@@ -252,20 +308,39 @@ export class StoreController {
 
     // Staff: mark order completed
     @Patch("store/orders/:id/complete")
-    completeOrder(@Param("id") id: string, @Req() req: any) {
+    completeOrder(
+        @Param("id") id: string,
+        @Query("campgroundId") campgroundId: string | undefined,
+        @Req() req: any
+    ) {
+        const requiredCampgroundId = this.requireCampgroundId(req, campgroundId);
         const user = req.user as any;
-    return this.store.updateOrderStatus(id, "completed", user?.id);
+    this.assertCampgroundAccess(requiredCampgroundId, req.user);
+    return this.store.updateOrderStatus(requiredCampgroundId, id, "completed", user?.id);
   }
 
   @Patch("store/orders/:id/status")
-  updateStatus(@Param("id") id: string, @Body() body: { status: "pending" | "ready" | "delivered" | "completed" | "cancelled" | "refunded" }, @Req() req: any) {
+  updateStatus(
+      @Param("id") id: string,
+      @Body() body: { status: "pending" | "ready" | "delivered" | "completed" | "cancelled" | "refunded" },
+      @Query("campgroundId") campgroundId: string | undefined,
+      @Req() req: any
+  ) {
+    const requiredCampgroundId = this.requireCampgroundId(req, campgroundId);
     const user = req.user as any;
-    return this.store.updateOrderStatus(id, body.status, user?.id);
+    this.assertCampgroundAccess(requiredCampgroundId, req.user);
+    return this.store.updateOrderStatus(requiredCampgroundId, id, body.status, user?.id);
     }
 
     @Get("store/orders/:id/history")
-    getOrderHistory(@Param("id") id: string) {
-        return this.store.getOrderAdjustments(id);
+    getOrderHistory(
+        @Param("id") id: string,
+        @Query("campgroundId") campgroundId: string | undefined,
+        @Req() req: any
+    ) {
+        const requiredCampgroundId = this.requireCampgroundId(req, campgroundId);
+        this.assertCampgroundAccess(requiredCampgroundId, req.user);
+        return this.store.getOrderAdjustments(id, requiredCampgroundId);
     }
 
     @Post("store/orders/:id/refunds")
@@ -278,10 +353,13 @@ export class StoreController {
             amountCents?: number;
             note?: string | null;
         },
+        @Query("campgroundId") campgroundId: string | undefined,
         @Req() req: any
     ) {
+        const requiredCampgroundId = this.requireCampgroundId(req, campgroundId);
         const user = req.user as any;
-        return this.store.recordRefundOrExchange(id, body, user);
+        this.assertCampgroundAccess(requiredCampgroundId, req.user);
+        return this.store.recordRefundOrExchange(id, requiredCampgroundId, body, user);
     }
 
     // Staff notifications: list unseen/pending orders
@@ -292,7 +370,13 @@ export class StoreController {
     }
 
     @Patch("store/orders/:id/seen")
-    markSeen(@Param("id") id: string) {
-        return this.store.markOrderSeen(id);
+    markSeen(
+        @Param("id") id: string,
+        @Query("campgroundId") campgroundId: string | undefined,
+        @Req() req: any
+    ) {
+        const requiredCampgroundId = this.requireCampgroundId(req, campgroundId);
+        this.assertCampgroundAccess(requiredCampgroundId, req.user);
+        return this.store.markOrderSeen(requiredCampgroundId, id);
     }
 }

@@ -6,10 +6,12 @@ Scope: Brand, marketing pages, and in-app UX (not tied to any single feature).
 Use this as a QA list before launch and as a guiding rubric for new UI work.
 
 ## 1) Visual system consistency
-- [x] A defined typography pairing (headline + body) with a documented type scale.
-- [x] Color tokens for brand, neutrals, semantic states, and data viz.
-  - See: Color Token System documentation below (NOTE: Data viz palette needs expansion)
-- [x] Consistent spacing scale (4/8/12/16/24/32/48/64).
+- [ ] A defined typography pairing (headline + body) with a documented type scale.
+  - NOTE: Only body font is defined in `platform/apps/web/app/globals.css:145`; no documented type scale found.
+- [ ] Color tokens for brand, neutrals, semantic states, and data viz.
+  - NOTE: Core UI tokens exist, but no data viz palette found in `platform/apps/web/tailwind.config.ts:15`.
+- [ ] Consistent spacing scale (4/8/12/16/24/32/48/64).
+  - NOTE: Non-scale spacing is used (e.g., `p-5`) in `platform/apps/web/app/booking-lab/page.tsx:668`.
 - [x] Grid and container widths defined per breakpoint.
 - [ ] Buttons, inputs, tables, cards, modals, and alerts share a single design language.
 
@@ -27,7 +29,8 @@ INCONSISTENCIES PREVENT COMPLETION - requires standardization:
 ## 2) Navigation and information architecture
 - [x] Primary nav groups match how operators think (Bookings, Ops, Guests, Revenue, Integrations).
 - [ ] Each section has a clear landing page with a visible next step.
-- [x] Breadcrumbs or clear sub-nav for deep pages.
+- [ ] Breadcrumbs or clear sub-nav for deep pages.
+  - NOTE: Some deep pages lack breadcrumbs (e.g., `platform/apps/web/app/messages/page.tsx`), and multiple breadcrumb components are used (`platform/apps/web/app/finance/page.tsx:8`, `platform/apps/web/app/guests/page.tsx:5`).
 - [x] Search is globally available (or obvious per major section).
 
 ## 3) Marketing page structure
@@ -48,12 +51,12 @@ INCONSISTENCIES PREVENT COMPLETION - requires standardization:
   - NOTE: /security page exists with good content, needs trust badges on marketing pages
 - [ ] Partner and integration logos are real and current.
   - NOTE: Using Lucide icons, not real partner logos (Stripe, QuickBooks, etc.)
-- [x] Case studies show measurable results, not just quotes.
-  - DONE: Case studies include +18% revenue, -27% no-shows, 2x upsells
+- [ ] Case studies show measurable results, not just quotes.
+  - NOTE: Case studies are mock examples flagged as placeholders in `platform/apps/web/app/(public)/case-studies/CaseStudiesClient.tsx:5`.
 
 ## 6) Conversion UX polish
-- [x] All CTAs have a single, predictable flow (no dead ends).
-  - DONE: Fixed #add-ons anchor, /signup route works correctly
+- [ ] All CTAs have a single, predictable flow (no dead ends).
+  - NOTE: `/contact` and `/help/contact` links exist but routes are missing.
 - [ ] Forms are short, progressive, and include validation feedback.
   - NOTE: Checkout forms excellent (ValidatedFormField), marketing forms need inline validation
 - [ ] Live scheduling or demo request feels premium (no generic forms).
@@ -71,7 +74,8 @@ INCONSISTENCIES PREVENT COMPLETION - requires standardization:
   - NOTE: Data Import flow could use step indicator
 - [ ] Filters are visible, persistent, and show active filter pills.
   - NOTE: FilterChip component exists; pages show counts but not individual removable pills
-- [x] Export is flexible (column pickers, saved presets, CSV/XLSX).
+- [ ] Export is flexible (column pickers, saved presets, CSV/XLSX).
+  - NOTE: Exports are CSV/JSON only (e.g., `platform/apps/web/app/campgrounds/[campgroundId]/reservations/page.tsx:1644`).
 - [x] Inline help exists for complex forms (tooltips or "Learn more").
 
 ## 8) Data clarity and reporting
@@ -88,14 +92,17 @@ INCONSISTENCIES PREVENT COMPLETION - requires standardization:
 - [ ] Core Web Vitals are in the green for public pages.
   - NOTE: web-vitals.ts monitoring exists but analytics endpoint incomplete (TODO)
 - [x] Inputs and tables are keyboard friendly.
-- [x] Contrast and focus states are consistent and visible.
+- [ ] Contrast and focus states are consistent and visible.
+  - NOTE: Focus ring styles vary (ring-4 vs ring-2) between inputs and tables (`platform/apps/web/components/ui/input.tsx:14`, `platform/apps/web/components/ui/table.tsx:74`).
 - [x] Motion is purposeful and minimal (avoid gratuitous animation).
   - DONE: 53+ motion-safe: instances, proper reduced motion support throughout
 
 ## 10) Release notes and product cadence
 - [x] Release notes have "New", "Update", "Enhancement" tags with dates.
-- [x] Each update includes: What changed, Why it matters, Who it helps.
-- [x] Major updates include short demo videos or screenshots.
+- [ ] Each update includes: What changed, Why it matters, Who it helps.
+  - NOTE: Only a few updates have these fields; most update entries omit them (e.g., `platform/apps/web/lib/roadmap-data.ts:610`).
+- [ ] Major updates include short demo videos or screenshots.
+  - NOTE: Updates UI supports media (`platform/apps/web/app/updates/page.tsx:186`), but no `screenshot` or `videoUrl` fields exist in update data (`platform/apps/web/lib/roadmap-data.ts:610`).
 - [x] Public roadmap or changelog makes the product feel actively maintained.
 
 ## 11) Design QA before shipping
@@ -128,7 +135,7 @@ Use these as a checklist for "product maturity signals" in Campreserv.
 
 ## Color Token System
 
-Campreserv has a comprehensive, well-defined color token system built on shadcn/ui with semantic extensions.
+Campreserv has a well-defined core UI token system built on shadcn/ui with semantic extensions, but still needs a data viz palette.
 
 ### Architecture
 

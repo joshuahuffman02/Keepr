@@ -73,8 +73,12 @@ export class AccessControlController {
   @UseGuards(JwtAuthGuard, RolesGuard, ScopeGuard)
   @Get("/access/providers")
   @Roles(UserRole.owner, UserRole.manager)
-  listProviders(@Req() req: any) {
-    return this.service.listIntegrations(req.user?.campgroundId ?? req.campgroundId ?? null);
+  listProviders(
+    @Query("campgroundId") campgroundId: string | undefined,
+    @Req() req: any
+  ) {
+    const requiredCampgroundId = this.requireCampgroundId(req, campgroundId);
+    return this.service.listIntegrations(requiredCampgroundId);
   }
 
   @UseGuards(JwtAuthGuard, RolesGuard, ScopeGuard)
@@ -83,9 +87,11 @@ export class AccessControlController {
   upsertProvider(
     @Param("provider") provider: AccessProviderType,
     @Body() dto: UpsertAccessIntegrationDto,
+    @Query("campgroundId") campgroundId: string | undefined,
     @Req() req: any
   ) {
-    return this.service.upsertIntegration(req.user?.campgroundId ?? req.campgroundId ?? null, {
+    const requiredCampgroundId = this.requireCampgroundId(req, campgroundId);
+    return this.service.upsertIntegration(requiredCampgroundId, {
       ...dto,
       provider
     });

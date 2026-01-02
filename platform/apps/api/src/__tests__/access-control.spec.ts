@@ -76,18 +76,23 @@ describe("AccessControlService", () => {
       fail: jest.fn()
     } as unknown as IdempotencyService);
 
+  const makeAudit = () => ({
+    record: jest.fn()
+  });
+
   it("uses idempotent grant responses when available", async () => {
     const prisma = makePrisma();
     const idempotency = makeIdempotency();
+    const audit = makeAudit();
 
     // First call performs the work
     (idempotency.start as any).mockResolvedValueOnce({ status: IdempotencyStatus.pending });
-    const service = new AccessControlService(prisma as any, registry as any, idempotency);
+    const service = new AccessControlService(prisma as any, registry as any, idempotency, audit as any);
 
     await service.grantAccess("res-1", {
       provider: AccessProviderType.kisi,
       credentialValue: "1234"
-    } as any);
+    } as any, "camp-1");
     expect(adapter.provisionAccess).toHaveBeenCalledTimes(1);
 
     // Second call returns cached response
@@ -99,7 +104,7 @@ describe("AccessControlService", () => {
     const result = await service.grantAccess("res-1", {
       provider: AccessProviderType.kisi,
       credentialValue: "1234"
-    } as any);
+    } as any, "camp-1");
 
     expect(result.grant.status).toBe(AccessGrantStatus.active);
     expect(adapter.provisionAccess).toHaveBeenCalledTimes(1);
@@ -108,7 +113,8 @@ describe("AccessControlService", () => {
   it("verifies webhook signatures with adapter", async () => {
     const prisma = makePrisma();
     const idempotency = makeIdempotency();
-    const service = new AccessControlService(prisma as any, registry as any, idempotency);
+    const audit = makeAudit();
+    const service = new AccessControlService(prisma as any, registry as any, idempotency, audit as any);
 
     const ok = await service.verifyWebhook(AccessProviderType.kisi, "sig", '{"hello":"world"}');
     expect(ok).toBe(true);
@@ -118,7 +124,8 @@ describe("AccessControlService", () => {
   it("blocks active grants on cancel/expiry", async () => {
     const prisma = makePrisma();
     const idempotency = makeIdempotency();
-    const service = new AccessControlService(prisma as any, registry as any, idempotency);
+    const audit = makeAudit();
+    const service = new AccessControlService(prisma as any, registry as any, idempotency, audit as any);
 
     await service.blockAccessForReservation("res-1", "cancelled");
     expect(prisma.accessGrant.updateMany).toHaveBeenCalledWith({

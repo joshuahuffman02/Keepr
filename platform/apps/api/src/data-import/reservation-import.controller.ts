@@ -10,7 +10,7 @@ import {
   UseGuards,
 } from "@nestjs/common";
 import { PrismaService } from "../prisma/prisma.service";
-import { JwtAuthGuard } from "../auth/guards";
+import { OptionalJwtAuthGuard } from "../auth/guards";
 import {
   ReservationImportService,
   ReservationImportColumnMapping,
@@ -43,6 +43,7 @@ class ExecuteDto {
  * These endpoints are designed to work with or without JWT auth,
  * since they may be called during onboarding with just the onboarding token.
  */
+@UseGuards(OptionalJwtAuthGuard)
 @Controller()
 export class ReservationImportController {
   constructor(

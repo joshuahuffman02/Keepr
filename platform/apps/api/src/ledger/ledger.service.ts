@@ -91,12 +91,20 @@ export class LedgerService {
     });
   }
 
-  listByReservation(reservationId: string, options?: { limit?: number; offset?: number }) {
+  async listByReservation(reservationId: string, campgroundId: string, options?: { limit?: number; offset?: number }) {
     const limit = Math.min(options?.limit ?? 100, 500);
     const offset = options?.offset ?? 0;
 
+    const reservation = await this.prisma.reservation.findFirst({
+      where: { id: reservationId, campgroundId },
+      select: { id: true }
+    });
+    if (!reservation) {
+      throw new NotFoundException("Reservation not found");
+    }
+
     return this.prisma.ledgerEntry.findMany({
-      where: { reservationId },
+      where: { reservationId, campgroundId },
       orderBy: { occurredAt: "desc" },
       take: limit,
       skip: offset
@@ -295,8 +303,8 @@ export class LedgerService {
     });
   }
 
-  async closePeriod(id: string, actorId?: string) {
-    const period = await (this.prisma as any).glPeriod.findUnique({ where: { id } });
+  async closePeriod(campgroundId: string, id: string, actorId?: string) {
+    const period = await (this.prisma as any).glPeriod.findFirst({ where: { id, campgroundId } });
     if (!period) throw new NotFoundException("GL period not found");
     if (period.status === "locked") {
       throw new BadRequestException("GL period is locked");
@@ -308,8 +316,8 @@ export class LedgerService {
     });
   }
 
-  async lockPeriod(id: string, actorId?: string) {
-    const period = await (this.prisma as any).glPeriod.findUnique({ where: { id } });
+  async lockPeriod(campgroundId: string, id: string, actorId?: string) {
+    const period = await (this.prisma as any).glPeriod.findFirst({ where: { id, campgroundId } });
     if (!period) throw new NotFoundException("GL period not found");
     if (period.status === "locked") return period;
     return (this.prisma as any).glPeriod.update({

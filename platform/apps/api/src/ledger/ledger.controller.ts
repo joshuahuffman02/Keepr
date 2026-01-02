@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post, Query, Req, Res, UseGuards, ForbiddenException } from "@nestjs/common";
+import { BadRequestException, Body, Controller, Get, Param, Post, Query, Req, Res, UseGuards } from "@nestjs/common";
 import { LedgerService } from "./ledger.service";
 import type { Response } from "express";
 import { JwtAuthGuard } from "../auth/guards";
@@ -11,6 +11,14 @@ import { UserRole } from "@prisma/client";
 @Controller()
 export class LedgerController {
   constructor(private readonly ledger: LedgerService) { }
+
+  private requireCampgroundId(req: any, fallback?: string): string {
+    const campgroundId = fallback || req?.campgroundId || req?.headers?.["x-campground-id"];
+    if (!campgroundId) {
+      throw new BadRequestException("campgroundId is required");
+    }
+    return campgroundId;
+  }
 
   @Roles(UserRole.owner, UserRole.manager, UserRole.finance)
   @Get("campgrounds/:campgroundId/ledger")
@@ -66,8 +74,13 @@ export class LedgerController {
   // SECURITY: Added role check for reservation ledger access
   @Roles(UserRole.owner, UserRole.manager, UserRole.finance, UserRole.front_desk)
   @Get("reservations/:id/ledger")
-  listByReservation(@Param("id") reservationId: string) {
-    return this.ledger.listByReservation(reservationId);
+  listByReservation(
+    @Param("id") reservationId: string,
+    @Query("campgroundId") campgroundId: string | undefined,
+    @Req() req: any
+  ) {
+    const requiredCampgroundId = this.requireCampgroundId(req, campgroundId);
+    return this.ledger.listByReservation(reservationId, requiredCampgroundId);
   }
 
   // SECURITY: Added role check for ledger summary
@@ -102,12 +115,12 @@ export class LedgerController {
   @Post("campgrounds/:campgroundId/gl-periods/:id/close")
   async closePeriod(@Param("campgroundId") campgroundId: string, @Param("id") id: string, @Req() req?: any) {
     // campgroundId path param for scoping; service checks id existence
-    return this.ledger.closePeriod(id, req?.user?.id);
+    return this.ledger.closePeriod(campgroundId, id, req?.user?.id);
   }
 
   @Roles(UserRole.owner, UserRole.manager, UserRole.finance)
   @Post("campgrounds/:campgroundId/gl-periods/:id/lock")
   async lockPeriod(@Param("campgroundId") campgroundId: string, @Param("id") id: string, @Req() req?: any) {
-    return this.ledger.lockPeriod(id, req?.user?.id);
+    return this.ledger.lockPeriod(campgroundId, id, req?.user?.id);
   }
 }

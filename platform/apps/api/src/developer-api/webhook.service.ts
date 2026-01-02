@@ -101,7 +101,14 @@ export class WebhookService {
   /**
    * Toggle webhook endpoint active status
    */
-  async toggleEndpoint(id: string, isActive: boolean) {
+  async toggleEndpoint(id: string, campgroundId: string, isActive: boolean) {
+    const endpoint = await this.prisma.webhookEndpoint.findFirst({
+      where: { id, campgroundId },
+      select: { id: true }
+    });
+    if (!endpoint) {
+      throw new NotFoundException("Webhook endpoint not found");
+    }
     const updated = await this.prisma.webhookEndpoint.update({
       where: { id },
       data: { isActive, disabledAt: isActive ? null : new Date() },
@@ -431,9 +438,9 @@ export class WebhookService {
   /**
    * Replay a failed delivery
    */
-  async replay(deliveryId: string) {
-    const delivery = await this.prisma.webhookDelivery.findUnique({
-      where: { id: deliveryId },
+  async replay(deliveryId: string, campgroundId: string) {
+    const delivery = await this.prisma.webhookDelivery.findFirst({
+      where: { id: deliveryId, webhookEndpoint: { campgroundId } },
       include: { webhookEndpoint: true },
     });
 
@@ -521,9 +528,9 @@ export class WebhookService {
   /**
    * Retry a dead letter queue entry
    */
-  async retryDeadLetter(deliveryId: string) {
-    const delivery = await this.prisma.webhookDelivery.findUnique({
-      where: { id: deliveryId },
+  async retryDeadLetter(deliveryId: string, campgroundId: string) {
+    const delivery = await this.prisma.webhookDelivery.findFirst({
+      where: { id: deliveryId, webhookEndpoint: { campgroundId } },
     });
 
     if (!delivery) {
@@ -545,7 +552,7 @@ export class WebhookService {
       },
     });
 
-    return this.replay(deliveryId);
+    return this.replay(deliveryId, campgroundId);
   }
 
   /**

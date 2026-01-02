@@ -46,6 +46,24 @@ export class OtaService {
 
   constructor(private readonly prisma: PrismaService) { }
 
+  private async requireChannel(campgroundId: string, channelId: string, select?: Record<string, boolean>) {
+    const channel = await (this.prisma as any).otaChannel.findFirst({
+      where: { id: channelId, campgroundId },
+      ...(select ? { select } : {})
+    });
+    if (!channel) throw new NotFoundException("Channel not found");
+    return channel;
+  }
+
+  private async requireMapping(campgroundId: string, mappingId: string, select?: Record<string, boolean>) {
+    const mapping = await (this.prisma as any).otaListingMapping.findFirst({
+      where: { id: mappingId, channel: { campgroundId } },
+      ...(select ? { select } : {})
+    });
+    if (!mapping) throw new NotFoundException("Mapping not found");
+    return mapping;
+  }
+
   private defaultConfig(campgroundId: string): OtaConfig {
     return {
       campgroundId,
@@ -123,14 +141,16 @@ export class OtaService {
     });
   }
 
-  updateChannel(id: string, data: UpdateOtaChannelDto) {
+  async updateChannel(id: string, campgroundId: string, data: UpdateOtaChannelDto) {
+    await this.requireChannel(campgroundId, id, { id: true });
     return (this.prisma as any).otaChannel.update({
       where: { id },
       data,
     });
   }
 
-  listMappings(channelId: string) {
+  async listMappings(channelId: string, campgroundId: string) {
+    await this.requireChannel(campgroundId, channelId, { id: true });
     return (this.prisma as any).otaListingMapping.findMany({
       where: { channelId },
       include: {
@@ -141,7 +161,8 @@ export class OtaService {
     });
   }
 
-  upsertMapping(channelId: string, body: UpsertOtaMappingDto) {
+  async upsertMapping(channelId: string, campgroundId: string, body: UpsertOtaMappingDto) {
+    await this.requireChannel(campgroundId, channelId, { id: true });
     return (this.prisma as any).otaListingMapping.upsert({
       where: { channelId_externalId: { channelId, externalId: body.externalId } },
       create: {
@@ -160,7 +181,8 @@ export class OtaService {
     });
   }
 
-  listImports(channelId: string) {
+  async listImports(channelId: string, campgroundId: string) {
+    await this.requireChannel(campgroundId, channelId, { id: true });
     return (this.prisma as any).otaReservationImport.findMany({
       where: { channelId },
       orderBy: { createdAt: "desc" },
@@ -168,7 +190,8 @@ export class OtaService {
     });
   }
 
-  listSyncLogs(channelId: string) {
+  async listSyncLogs(channelId: string, campgroundId: string) {
+    await this.requireChannel(campgroundId, channelId, { id: true });
     return (this.prisma as any).otaSyncLog.findMany({
       where: { channelId },
       orderBy: { createdAt: "desc" },
@@ -208,12 +231,8 @@ export class OtaService {
     return true;
   }
 
-  async ensureIcalToken(mappingId: string) {
-    const mapping = await (this.prisma as any).otaListingMapping.findUnique({
-      where: { id: mappingId },
-      select: { id: true, icalToken: true },
-    });
-    if (!mapping) throw new NotFoundException("Mapping not found");
+  async ensureIcalToken(mappingId: string, campgroundId: string) {
+    const mapping = await this.requireMapping(campgroundId, mappingId, { id: true, icalToken: true });
     if (mapping.icalToken) return mapping.icalToken;
 
     const token = randomUUID();
@@ -224,8 +243,8 @@ export class OtaService {
     return token;
   }
 
-  async setIcalUrl(mappingId: string, url: string) {
-    await this.ensureIcalToken(mappingId);
+  async setIcalUrl(mappingId: string, campgroundId: string, url: string) {
+    await this.ensureIcalToken(mappingId, campgroundId);
     await (this.prisma as any).otaListingMapping.update({
       where: { id: mappingId },
       data: { icalUrl: url || null },
@@ -306,16 +325,14 @@ export class OtaService {
     return lines.join("\r\n");
   }
 
-  async importIcal(mappingId: string) {
-    const mapping = await (this.prisma as any).otaListingMapping.findUnique({
-      where: { id: mappingId },
-      select: { id: true, icalUrl: true, siteId: true, channelId: true, channel: { select: { campgroundId: true } } },
+  async importIcal(mappingId: string, campgroundId: string) {
+    const mapping = await (this.prisma as any).otaListingMapping.findFirst({
+      where: { id: mappingId, channel: { campgroundId } },
+      select: { id: true, icalUrl: true, siteId: true, channelId: true },
     });
     if (!mapping) throw new NotFoundException("Mapping not found");
     if (!mapping.icalUrl) throw new BadRequestException("No iCal URL configured for this mapping");
     if (!mapping.siteId) throw new BadRequestException("Mapping missing siteId for import");
-    const campgroundId = mapping.channel?.campgroundId;
-    if (!campgroundId) throw new BadRequestException("Mapping missing campground context");
 
     const res = await fetch(mapping.icalUrl);
     if (!res.ok) throw new BadRequestException("Failed to fetch iCal feed");
@@ -618,9 +635,9 @@ export class OtaService {
    * Push availability and pricing data to OTA provider for all mapped listings.
    * This method orchestrates the sync process, handles errors, and updates sync status.
    */
-  async pushAvailability(channelId: string) {
-    const channel = await (this.prisma as any).otaChannel.findUnique({
-      where: { id: channelId },
+  async pushAvailability(channelId: string, campgroundId: string) {
+    const channel = await (this.prisma as any).otaChannel.findFirst({
+      where: { id: channelId, campgroundId },
       select: { id: true, campgroundId: true, name: true, status: true, provider: true },
     });
     if (!channel) throw new NotFoundException("Channel not found");
@@ -963,4 +980,3 @@ export class OtaService {
     this.stats.set(key, s);
   }
 }
-

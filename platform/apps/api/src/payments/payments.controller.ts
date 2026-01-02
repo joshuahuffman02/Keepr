@@ -700,9 +700,9 @@ export class PaymentsController {
 
       // Record the payment and update reservation via standard accounting pipeline
       // At this point, intent.status === "succeeded" (requires_capture handled above)
-      const amountCents = intent.amount_received ?? intent.amount;
+      const receivedAmountCents = intent.amount_received ?? intent.amount;
       const receiptLines = this.buildReceiptLinesFromIntent(intent);
-      await this.reservations.recordPayment(body.reservationId, amountCents, {
+      await this.reservations.recordPayment(body.reservationId, receivedAmountCents, {
         transactionId: intent.id,
         paymentMethod: intent.payment_method_types?.[0] || "card",
         source: intent.metadata?.source || "public_checkout",
@@ -715,7 +715,7 @@ export class PaymentsController {
         totalCents: receiptLines.totalCents,
         receiptKind: "payment",
         tenders: [
-          { method: intent.payment_method_types?.[0] || "card", amountCents, note: "public_checkout" }
+          { method: intent.payment_method_types?.[0] || "card", amountCents: receivedAmountCents, note: "public_checkout" }
         ]
       });
 
@@ -737,7 +737,7 @@ export class PaymentsController {
         status: intent.status,
         reservationId: body.reservationId,
         paymentId: recordedPayment?.id,
-        amountCents,
+        amountCents: receivedAmountCents,
         message: "Payment confirmed and reservation updated"
       };
 

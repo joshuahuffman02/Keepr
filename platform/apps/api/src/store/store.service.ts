@@ -28,6 +28,49 @@ export class StoreService {
         private readonly locationService: LocationService
     ) { }
 
+    private async requireCategory(campgroundId: string, id: string) {
+        const category = await this.prisma.productCategory.findFirst({
+            where: { id, campgroundId },
+            select: { id: true }
+        });
+        if (!category) {
+            throw new NotFoundException("Category not found");
+        }
+        return category;
+    }
+
+    private async requireProduct(campgroundId: string, id: string) {
+        const product = await this.prisma.product.findFirst({
+            where: { id, campgroundId },
+            select: { id: true, trackInventory: true, channelInventoryMode: true, stockQty: true, onlineStockQty: true, posStockQty: true }
+        });
+        if (!product) {
+            throw new NotFoundException("Product not found");
+        }
+        return product;
+    }
+
+    private async requireAddOn(campgroundId: string, id: string) {
+        const addOn = await this.prisma.addOnService.findFirst({
+            where: { id, campgroundId },
+            select: { id: true }
+        });
+        if (!addOn) {
+            throw new NotFoundException("Add-on not found");
+        }
+        return addOn;
+    }
+
+    private async requireOrder(campgroundId: string, id: string) {
+        const order = await (this.prisma as any).storeOrder.findFirst({
+            where: { id, campgroundId }
+        });
+        if (!order) {
+            throw new NotFoundException("Order not found");
+        }
+        return order;
+    }
+
     // ==================== CATEGORIES ====================
 
     listCategories(campgroundId: string) {
@@ -43,7 +86,13 @@ export class StoreService {
     /**
      * Update order status with timestamp tracking
      */
-    async updateOrderStatus(id: string, status: "pending" | "ready" | "delivered" | "completed" | "cancelled" | "refunded", userId?: string) {
+    async updateOrderStatus(
+        campgroundId: string,
+        id: string,
+        status: "pending" | "ready" | "delivered" | "completed" | "cancelled" | "refunded",
+        userId?: string
+    ) {
+        await this.requireOrder(campgroundId, id);
         const data: any = { status };
         const now = new Date();
         if (status === "ready") data.readyAt = now;
@@ -59,11 +108,13 @@ export class StoreService {
         return this.prisma.productCategory.create({ data });
     }
 
-    updateCategory(id: string, data: UpdateProductCategoryDto) {
+    async updateCategory(campgroundId: string, id: string, data: UpdateProductCategoryDto) {
+        await this.requireCategory(campgroundId, id);
         return this.prisma.productCategory.update({ where: { id }, data });
     }
 
-    deleteCategory(id: string) {
+    async deleteCategory(campgroundId: string, id: string) {
+        await this.requireCategory(campgroundId, id);
         return this.prisma.productCategory.delete({ where: { id } });
     }
 
@@ -82,28 +133,31 @@ export class StoreService {
         });
     }
 
-    getProduct(id: string) {
-        return this.prisma.product.findUnique({
-            where: { id },
+    async getProduct(campgroundId: string, id: string) {
+        const product = await this.prisma.product.findFirst({
+            where: { id, campgroundId },
             include: { category: true },
         });
+        if (!product) throw new NotFoundException("Product not found");
+        return product;
     }
 
     createProduct(data: CreateProductDto) {
         return this.prisma.product.create({ data });
     }
 
-    updateProduct(id: string, data: UpdateProductDto) {
+    async updateProduct(campgroundId: string, id: string, data: UpdateProductDto) {
+        await this.requireProduct(campgroundId, id);
         return this.prisma.product.update({ where: { id }, data });
     }
 
-    deleteProduct(id: string) {
+    async deleteProduct(campgroundId: string, id: string) {
+        await this.requireProduct(campgroundId, id);
         return this.prisma.product.delete({ where: { id } });
     }
 
-    async setStock(id: string, stockQty: number, channel?: OrderChannel | null) {
-        const product = await this.prisma.product.findUnique({ where: { id } });
-        if (!product) throw new NotFoundException("Product not found");
+    async setStock(campgroundId: string, id: string, stockQty: number, channel?: OrderChannel | null) {
+        const product = await this.requireProduct(campgroundId, id);
         const next = Math.max(0, stockQty);
         if (channel && product.channelInventoryMode === "split") {
             if (channel === "online" || channel === "portal") {
@@ -117,9 +171,8 @@ export class StoreService {
         });
     }
 
-    async adjustStock(id: string, adjustment: number, channel?: OrderChannel | null) {
-        const product = await this.prisma.product.findUnique({ where: { id } });
-        if (!product) throw new NotFoundException("Product not found");
+    async adjustStock(campgroundId: string, id: string, adjustment: number, channel?: OrderChannel | null) {
+        const product = await this.requireProduct(campgroundId, id);
 
         if (channel && product.channelInventoryMode === "split") {
             if (channel === "online" || channel === "portal") {
@@ -168,7 +221,8 @@ export class StoreService {
         });
     }
 
-    updateAddOn(id: string, data: UpdateAddOnDto) {
+    async updateAddOn(campgroundId: string, id: string, data: UpdateAddOnDto) {
+        await this.requireAddOn(campgroundId, id);
         return this.prisma.addOnService.update({
             where: { id },
             data: {
@@ -180,7 +234,8 @@ export class StoreService {
         });
     }
 
-    deleteAddOn(id: string) {
+    async deleteAddOn(campgroundId: string, id: string) {
+        await this.requireAddOn(campgroundId, id);
         return this.prisma.addOnService.delete({ where: { id } });
     }
 
@@ -244,7 +299,8 @@ export class StoreService {
     /**
      * Mark an order as seen by staff
      */
-    async markOrderSeen(id: string) {
+    async markOrderSeen(campgroundId: string, id: string) {
+        await this.requireOrder(campgroundId, id);
         return (this.prisma as any).storeOrder.update({
             where: { id },
             data: { seenAt: new Date() }
@@ -598,9 +654,9 @@ export class StoreService {
         return order;
     }
 
-    getOrder(id: string) {
-        return this.prisma.storeOrder.findUnique({
-            where: { id },
+    async getOrder(campgroundId: string, id: string) {
+        const order = await this.prisma.storeOrder.findFirst({
+            where: { id, campgroundId },
             include: {
                 items: {
                     include: {
@@ -615,13 +671,16 @@ export class StoreService {
                     },
                 },
             },
-        }).then((order) => order ? this.attachAdjustments(order) : null);
+        });
+        if (!order) throw new NotFoundException("Order not found");
+        return this.attachAdjustments(order);
     }
 
     /**
      * Get order adjustments (refunds/exchanges)
      */
-    async getOrderAdjustments(orderId: string) {
+    async getOrderAdjustments(orderId: string, campgroundId: string) {
+        await this.requireOrder(campgroundId, orderId);
         return (this.prisma as any).storeOrderAdjustment.findMany({
             where: { orderId },
             orderBy: { createdAt: "desc" },
@@ -637,7 +696,7 @@ export class StoreService {
      * Attach adjustments to order object
      */
     private async attachAdjustments(order: any) {
-        const adjustments = await this.getOrderAdjustments(order.id);
+        const adjustments = await this.getOrderAdjustments(order.id, order.campgroundId);
         return { ...order, adjustments };
     }
 
@@ -652,6 +711,7 @@ export class StoreService {
      */
     async recordRefundOrExchange(
         orderId: string,
+        campgroundId: string,
         payload: {
             type?: "refund" | "exchange";
             items?: Array<{ itemId?: string; qty?: number; amountCents?: number; name?: string; productId?: string }>;
@@ -662,8 +722,8 @@ export class StoreService {
         },
         user?: any
     ) {
-        const order = await (this.prisma as any).storeOrder.findUnique({
-            where: { id: orderId },
+        const order = await (this.prisma as any).storeOrder.findFirst({
+            where: { id: orderId, campgroundId },
             include: {
                 items: true,
                 campground: { select: { name: true } },
@@ -782,7 +842,7 @@ export class StoreService {
 
         // Update order status
         if (adjustmentType === "refund" && order.status !== "refunded") {
-            await this.updateOrderStatus(orderId, "refunded", user?.id);
+            await this.updateOrderStatus(campgroundId, orderId, "refunded", user?.id);
         }
 
         // 3. If order was charged to site, create offsetting ledger entry

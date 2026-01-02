@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Get,
@@ -7,6 +8,7 @@ import {
   Patch,
   Post,
   Query,
+  Req,
   UseGuards,
 } from "@nestjs/common";
 import { JwtAuthGuard, RolesGuard, ScopeGuard, Roles } from "../auth/guards";
@@ -70,6 +72,14 @@ export class WebhookAdminController {
     this.securityService = new WebhookSecurityService();
   }
 
+  private requireCampgroundId(req: any, fallback?: string): string {
+    const campgroundId = fallback || req?.campgroundId || req?.headers?.["x-campground-id"];
+    if (!campgroundId) {
+      throw new BadRequestException("campgroundId is required");
+    }
+    return campgroundId;
+  }
+
   // ============================================
   // EVENT CATALOG (v2.0)
   // ============================================
@@ -114,18 +124,26 @@ export class WebhookAdminController {
   // ============================================
 
   @Get()
-  list(@Query("campgroundId") campgroundId: string) {
-    return this.webhookService.listEndpoints(campgroundId);
+  list(@Query("campgroundId") campgroundId: string, @Req() req: any) {
+    const requiredCampgroundId = this.requireCampgroundId(req, campgroundId);
+    return this.webhookService.listEndpoints(requiredCampgroundId);
   }
 
   @Post()
-  create(@Body() body: CreateWebhookDto) {
-    return this.webhookService.createEndpoint(body);
+  create(@Body() body: CreateWebhookDto, @Req() req: any) {
+    const requiredCampgroundId = this.requireCampgroundId(req, body.campgroundId);
+    return this.webhookService.createEndpoint({ ...body, campgroundId: requiredCampgroundId });
   }
 
   @Patch(":id/toggle")
-  toggle(@Param("id") id: string, @Body() body: ToggleWebhookDto) {
-    return this.webhookService.toggleEndpoint(id, body.isActive);
+  toggle(
+    @Param("id") id: string,
+    @Body() body: ToggleWebhookDto,
+    @Query("campgroundId") campgroundId: string | undefined,
+    @Req() req: any
+  ) {
+    const requiredCampgroundId = this.requireCampgroundId(req, campgroundId);
+    return this.webhookService.toggleEndpoint(id, requiredCampgroundId, body.isActive);
   }
 
   // ============================================
@@ -133,13 +151,19 @@ export class WebhookAdminController {
   // ============================================
 
   @Get("deliveries")
-  listDeliveries(@Query("campgroundId") campgroundId: string) {
-    return this.webhookService.listDeliveries(campgroundId);
+  listDeliveries(@Query("campgroundId") campgroundId: string, @Req() req: any) {
+    const requiredCampgroundId = this.requireCampgroundId(req, campgroundId);
+    return this.webhookService.listDeliveries(requiredCampgroundId);
   }
 
   @Post("deliveries/:id/replay")
-  replay(@Param("id") id: string) {
-    return this.webhookService.replay(id);
+  replay(
+    @Param("id") id: string,
+    @Query("campgroundId") campgroundId: string | undefined,
+    @Req() req: any
+  ) {
+    const requiredCampgroundId = this.requireCampgroundId(req, campgroundId);
+    return this.webhookService.replay(id, requiredCampgroundId);
   }
 
   // ============================================
@@ -152,10 +176,12 @@ export class WebhookAdminController {
   @Get("dead-letter")
   getDeadLetterQueue(
     @Query("campgroundId") campgroundId: string,
-    @Query("limit") limit?: string
+    @Query("limit") limit?: string,
+    @Req() req?: any
   ) {
+    const requiredCampgroundId = this.requireCampgroundId(req, campgroundId);
     return this.webhookService.getDeadLetterQueue(
-      campgroundId,
+      requiredCampgroundId,
       limit ? parseInt(limit, 10) : 50
     );
   }
@@ -164,8 +190,13 @@ export class WebhookAdminController {
    * Retry a dead letter queue entry
    */
   @Post("dead-letter/:id/retry")
-  retryDeadLetter(@Param("id") id: string) {
-    return this.webhookService.retryDeadLetter(id);
+  retryDeadLetter(
+    @Param("id") id: string,
+    @Query("campgroundId") campgroundId: string | undefined,
+    @Req() req: any
+  ) {
+    const requiredCampgroundId = this.requireCampgroundId(req, campgroundId);
+    return this.webhookService.retryDeadLetter(id, requiredCampgroundId);
   }
 
   // ============================================
@@ -179,11 +210,13 @@ export class WebhookAdminController {
   async testWebhook(
     @Param("id") id: string,
     @Query("campgroundId") campgroundId: string,
-    @Body() dto: TestWebhookDto
+    @Body() dto: TestWebhookDto,
+    @Req() req: any
   ) {
+    const requiredCampgroundId = this.requireCampgroundId(req, campgroundId);
     // Get the endpoint
     const endpoint = await this.prisma.webhookEndpoint.findFirst({
-      where: { id, campgroundId },
+      where: { id, campgroundId: requiredCampgroundId },
     });
 
     if (!endpoint) {
@@ -323,8 +356,9 @@ export class WebhookAdminController {
   // ============================================
 
   @Get("stats")
-  getStats(@Query("campgroundId") campgroundId: string) {
-    return this.webhookService.getStats(campgroundId);
+  getStats(@Query("campgroundId") campgroundId: string, @Req() req: any) {
+    const requiredCampgroundId = this.requireCampgroundId(req, campgroundId);
+    return this.webhookService.getStats(requiredCampgroundId);
   }
 
   // ============================================

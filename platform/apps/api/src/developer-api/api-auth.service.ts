@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable, UnauthorizedException, Logger } from "@nestjs/common";
+import { BadRequestException, Injectable, UnauthorizedException, Logger, NotFoundException } from "@nestjs/common";
 import { PrismaService } from "../prisma/prisma.service";
 import { ApiScope, ApiClientTier, TIER_LIMITS, DEFAULT_TIER_SCOPES } from "./types";
 import { randomBytes, createHash } from "crypto";
@@ -145,13 +145,24 @@ export class ApiAuthService {
     return { client, clientSecret };
   }
 
+  private async requireClient(campgroundId: string, clientId: string) {
+    const client = await this.prisma.apiClient.findFirst({
+      where: { id: clientId, campgroundId }
+    });
+    if (!client) {
+      throw new NotFoundException("API client not found");
+    }
+    return client;
+  }
+
   /**
    * Update client tier and associated limits
    */
-  async updateClientTier(clientId: string, tier: ApiClientTier) {
+  async updateClientTier(campgroundId: string, clientId: string, tier: ApiClientTier) {
     const tierLimits = TIER_LIMITS[tier];
     const allowedScopes = DEFAULT_TIER_SCOPES[tier] as string[];
 
+    await this.requireClient(campgroundId, clientId);
     const client = await this.prisma.apiClient.update({
       where: { id: clientId },
       data: {
@@ -186,9 +197,10 @@ export class ApiAuthService {
     });
   }
 
-  async rotateSecret(clientId: string) {
+  async rotateSecret(campgroundId: string, clientId: string) {
     const secret = randomBytes(24).toString("hex");
     const hashedSecret = await bcrypt.hash(secret, 12);
+    await this.requireClient(campgroundId, clientId);
     const client = await this.prisma.apiClient.update({
       where: { id: clientId },
       data: { clientSecretHash: hashedSecret }
@@ -196,21 +208,30 @@ export class ApiAuthService {
     return { client, clientSecret: secret };
   }
 
-  async setClientActive(clientId: string, isActive: boolean) {
+  async setClientActive(campgroundId: string, clientId: string, isActive: boolean) {
+    await this.requireClient(campgroundId, clientId);
     return this.prisma.apiClient.update({
       where: { id: clientId },
       data: { isActive }
     });
   }
 
-  async revokeToken(tokenId: string) {
+  async revokeToken(campgroundId: string, tokenId: string) {
+    const token = await this.prisma.apiToken.findFirst({
+      where: { id: tokenId, apiClient: { campgroundId } },
+      select: { id: true }
+    });
+    if (!token) {
+      throw new NotFoundException("API token not found");
+    }
     return this.prisma.apiToken.update({
       where: { id: tokenId },
       data: { revokedAt: new Date() }
     });
   }
 
-  async deleteClient(clientId: string) {
+  async deleteClient(campgroundId: string, clientId: string) {
+    await this.requireClient(campgroundId, clientId);
     await this.prisma.apiToken.deleteMany({ where: { apiClientId: clientId } });
     return this.prisma.apiClient.delete({ where: { id: clientId } });
   }
@@ -219,4 +240,3 @@ export class ApiAuthService {
     return DEFAULT_SCOPES;
   }
 }
-

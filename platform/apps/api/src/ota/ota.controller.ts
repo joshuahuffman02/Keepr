@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Headers, Param, Patch, Post, RawBodyRequest, Req, UseGuards } from "@nestjs/common";
+import { BadRequestException, Body, Controller, Get, Headers, Param, Patch, Post, RawBodyRequest, Req, UseGuards, Query } from "@nestjs/common";
 import type { Request } from "express";
 import { JwtAuthGuard, RolesGuard, Roles } from "../auth/guards";
 import { ScopeGuard } from "../permissions/scope.guard";
@@ -12,6 +12,14 @@ import { SaveOtaConfigDto } from "./dto/save-ota-config.dto";
 @Controller("ota")
 export class OtaController {
   constructor(private readonly ota: OtaService) {}
+
+  private requireCampgroundId(req: any, fallback?: string): string {
+    const campgroundId = fallback || req?.campgroundId || req?.headers?.["x-campground-id"];
+    if (!campgroundId) {
+      throw new BadRequestException("campgroundId is required");
+    }
+    return campgroundId;
+  }
 
   @UseGuards(JwtAuthGuard, RolesGuard, ScopeGuard)
   @Get("campgrounds/:campgroundId/config")
@@ -51,64 +59,112 @@ export class OtaController {
   @UseGuards(JwtAuthGuard, RolesGuard, ScopeGuard)
   @Patch("channels/:id")
   @Roles(UserRole.owner, UserRole.manager)
-  updateChannel(@Param("id") id: string, @Body() body: UpdateOtaChannelDto) {
-    return this.ota.updateChannel(id, body);
+  updateChannel(
+    @Param("id") id: string,
+    @Body() body: UpdateOtaChannelDto,
+    @Query("campgroundId") campgroundId: string | undefined,
+    @Req() req: any
+  ) {
+    const requiredCampgroundId = this.requireCampgroundId(req, campgroundId);
+    return this.ota.updateChannel(id, requiredCampgroundId, body);
   }
 
   @UseGuards(JwtAuthGuard, RolesGuard, ScopeGuard)
   @Get("channels/:id/mappings")
   @Roles(UserRole.owner, UserRole.manager)
-  listMappings(@Param("id") id: string) {
-    return this.ota.listMappings(id);
+  listMappings(
+    @Param("id") id: string,
+    @Query("campgroundId") campgroundId: string | undefined,
+    @Req() req: any
+  ) {
+    const requiredCampgroundId = this.requireCampgroundId(req, campgroundId);
+    return this.ota.listMappings(id, requiredCampgroundId);
   }
 
   @UseGuards(JwtAuthGuard, RolesGuard, ScopeGuard)
   @Post("channels/:id/mappings")
   @Roles(UserRole.owner, UserRole.manager)
-  upsertMapping(@Param("id") id: string, @Body() body: UpsertOtaMappingDto) {
-    return this.ota.upsertMapping(id, body);
+  upsertMapping(
+    @Param("id") id: string,
+    @Body() body: UpsertOtaMappingDto,
+    @Query("campgroundId") campgroundId: string | undefined,
+    @Req() req: any
+  ) {
+    const requiredCampgroundId = this.requireCampgroundId(req, campgroundId);
+    return this.ota.upsertMapping(id, requiredCampgroundId, body);
   }
 
   @UseGuards(JwtAuthGuard, RolesGuard, ScopeGuard)
   @Post("mappings/:id/ical/token")
   @Roles(UserRole.owner, UserRole.manager)
-  ensureIcalToken(@Param("id") id: string) {
-    return this.ota.ensureIcalToken(id);
+  ensureIcalToken(
+    @Param("id") id: string,
+    @Query("campgroundId") campgroundId: string | undefined,
+    @Req() req: any
+  ) {
+    const requiredCampgroundId = this.requireCampgroundId(req, campgroundId);
+    return this.ota.ensureIcalToken(id, requiredCampgroundId);
   }
 
   @UseGuards(JwtAuthGuard, RolesGuard, ScopeGuard)
   @Post("mappings/:id/ical/url")
   @Roles(UserRole.owner, UserRole.manager)
-  setIcalUrl(@Param("id") id: string, @Body() body: { url: string }) {
-    return this.ota.setIcalUrl(id, body?.url || "");
+  setIcalUrl(
+    @Param("id") id: string,
+    @Body() body: { url: string },
+    @Query("campgroundId") campgroundId: string | undefined,
+    @Req() req: any
+  ) {
+    const requiredCampgroundId = this.requireCampgroundId(req, campgroundId);
+    return this.ota.setIcalUrl(id, requiredCampgroundId, body?.url || "");
   }
 
   @UseGuards(JwtAuthGuard, RolesGuard, ScopeGuard)
   @Post("mappings/:id/ical/import")
   @Roles(UserRole.owner, UserRole.manager)
-  importIcal(@Param("id") id: string) {
-    return this.ota.importIcal(id);
+  importIcal(
+    @Param("id") id: string,
+    @Query("campgroundId") campgroundId: string | undefined,
+    @Req() req: any
+  ) {
+    const requiredCampgroundId = this.requireCampgroundId(req, campgroundId);
+    return this.ota.importIcal(id, requiredCampgroundId);
   }
 
   @UseGuards(JwtAuthGuard, RolesGuard, ScopeGuard)
   @Get("channels/:id/logs")
   @Roles(UserRole.owner, UserRole.manager)
-  listLogs(@Param("id") id: string) {
-    return (this.ota as any).listSyncLogs?.(id) ?? [];
+  listLogs(
+    @Param("id") id: string,
+    @Query("campgroundId") campgroundId: string | undefined,
+    @Req() req: any
+  ) {
+    const requiredCampgroundId = this.requireCampgroundId(req, campgroundId);
+    return (this.ota as any).listSyncLogs?.(id, requiredCampgroundId) ?? [];
   }
 
   @UseGuards(JwtAuthGuard, RolesGuard, ScopeGuard)
   @Post("channels/:id/push")
   @Roles(UserRole.owner, UserRole.manager)
-  pushAvailability(@Param("id") id: string) {
-    return this.ota.pushAvailability(id);
+  pushAvailability(
+    @Param("id") id: string,
+    @Query("campgroundId") campgroundId: string | undefined,
+    @Req() req: any
+  ) {
+    const requiredCampgroundId = this.requireCampgroundId(req, campgroundId);
+    return this.ota.pushAvailability(id, requiredCampgroundId);
   }
 
   @UseGuards(JwtAuthGuard, RolesGuard, ScopeGuard)
   @Get("channels/:id/imports")
   @Roles(UserRole.owner, UserRole.manager)
-  listImports(@Param("id") id: string) {
-    return (this.ota as any).listImports?.(id) ?? [];
+  listImports(
+    @Param("id") id: string,
+    @Query("campgroundId") campgroundId: string | undefined,
+    @Req() req: any
+  ) {
+    const requiredCampgroundId = this.requireCampgroundId(req, campgroundId);
+    return (this.ota as any).listImports?.(id, requiredCampgroundId) ?? [];
   }
 
   // Webhook endpoint - no auth (called by external OTA providers)
