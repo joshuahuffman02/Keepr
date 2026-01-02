@@ -1,11 +1,13 @@
-import { Body, Controller, Get, Param, Post, Query, Req, Res, UseGuards } from "@nestjs/common";
+import { Body, Controller, Get, Param, Post, Query, Req, Res, UseGuards, ForbiddenException } from "@nestjs/common";
 import { LedgerService } from "./ledger.service";
 import type { Response } from "express";
 import { JwtAuthGuard } from "../auth/guards";
 import { RolesGuard, Roles } from "../auth/guards/roles.guard";
+import { ScopeGuard } from "../permissions/scope.guard";
 import { UserRole } from "@prisma/client";
 
-@UseGuards(JwtAuthGuard, RolesGuard)
+// SECURITY: Added ScopeGuard for tenant validation
+@UseGuards(JwtAuthGuard, RolesGuard, ScopeGuard)
 @Controller()
 export class LedgerController {
   constructor(private readonly ledger: LedgerService) { }
@@ -59,11 +61,15 @@ export class LedgerController {
     return (res as any).send(csv);
   }
 
+  // SECURITY: Added role check for reservation ledger access
+  @Roles(UserRole.owner, UserRole.manager, UserRole.finance, UserRole.front_desk)
   @Get("reservations/:id/ledger")
   listByReservation(@Param("id") reservationId: string) {
     return this.ledger.listByReservation(reservationId);
   }
 
+  // SECURITY: Added role check for ledger summary
+  @Roles(UserRole.owner, UserRole.manager, UserRole.finance)
   @Get("campgrounds/:campgroundId/ledger/summary")
   summary(
     @Param("campgroundId") campgroundId: string,

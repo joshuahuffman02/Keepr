@@ -24,8 +24,13 @@ import {
 import { JwtAuthGuard } from "../auth/guards";
 import { AuthGuard } from "@nestjs/passport";
 import { Req } from "@nestjs/common";
+import { RolesGuard, Roles } from "../auth/guards/roles.guard";
+import { ScopeGuard } from "../permissions/scope.guard";
+import { RequireScope } from "../permissions/scope.decorator";
+import { UserRole } from "@prisma/client";
 
-@UseGuards(JwtAuthGuard)
+// SECURITY: Added RolesGuard and ScopeGuard to prevent cross-tenant access
+@UseGuards(JwtAuthGuard, RolesGuard, ScopeGuard)
 @Controller()
 export class StoreController {
     constructor(private readonly store: StoreService) { }

@@ -26,14 +26,13 @@ while [ $RETRY_COUNT -lt $MAX_RETRIES ]; do
 done
 
 if [ "$DB_READY" = true ]; then
-    echo "=== Pushing schema to database ==="
-    if npx prisma db push --accept-data-loss; then
-        echo "Schema push successful"
-    else
-        echo "WARNING: Schema push failed, but continuing..."
-    fi
+    echo "=== Database is ready ==="
+    # NOTE: Schema changes should be applied via migrations before deployment
+    # DO NOT use 'prisma db push --accept-data-loss' in production
+    # Use 'prisma migrate deploy' for production schema updates
+    echo "Skipping schema push - use migrations for production deployments"
 else
-    echo "WARNING: Database not reachable after $MAX_RETRIES attempts, skipping schema push"
+    echo "WARNING: Database not reachable after $MAX_RETRIES attempts"
     echo "The app will attempt to connect when handling requests"
 fi
 

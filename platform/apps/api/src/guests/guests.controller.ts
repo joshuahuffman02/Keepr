@@ -3,8 +3,12 @@ import { GuestsService } from "./guests.service";
 import { CreateGuestDto } from "./dto/create-guest.dto";
 import { JwtAuthGuard } from "../auth/guards";
 import { CurrentUser } from "../auth/decorators/current-user.decorator";
+import { RolesGuard, Roles } from "../auth/guards/roles.guard";
+import { ScopeGuard } from "../permissions/scope.guard";
+import { UserRole } from "@prisma/client";
 
-@UseGuards(JwtAuthGuard)
+// SECURITY: Added RolesGuard and ScopeGuard to prevent cross-tenant access
+@UseGuards(JwtAuthGuard, RolesGuard, ScopeGuard)
 @Controller("guests")
 export class GuestsController {
   constructor(private readonly guests: GuestsService) { }

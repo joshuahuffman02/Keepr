@@ -980,6 +980,34 @@ Scope: Targeted review of public payment confirmation, public reservation access
 - Fix: Store Stripe invoice line items or reconcile to internal usage line items on webhook.
 - Tests: Invoice paid webhook should populate line items and totals consistently.
 
+#### ACCT-MED-039: Org billing periods use calendar months instead of Stripe subscription periods
+- Files: `platform/apps/api/src/org-billing/org-billing.service.ts:53`, `platform/apps/api/src/org-billing/subscription.service.ts:468`
+- Problem: Internal billing periods are created using calendar month boundaries, while Stripe invoices use subscription period start/end timestamps that can fall mid-month.
+- Impact: Duplicate or overlapping periods, mismatched usage totals, and invoice reconciliation drift when subscription periods are not calendar-aligned.
+- Fix: Align internal period boundaries to Stripe subscription periods (or store a separate Stripe period mapping and reconcile accordingly).
+- Tests: Stripe invoice period should map to a single internal period without creating duplicates.
+
+#### ACCT-MED-040: Subscription creation does not guard against duplicates
+- Files: `platform/apps/api/src/org-billing/subscription.service.ts:111`
+- Problem: `createSubscription` always creates a new Stripe subscription even if the organization already has an active subscription.
+- Impact: Duplicate active subscriptions can cause double billing and inconsistent tier state.
+- Fix: Check for an existing active subscription before creating a new one; block or reuse as appropriate.
+- Tests: Creating a subscription twice should not create multiple active subscriptions.
+
+#### ACCT-MED-041: Stripe usage reporting lacks idempotency
+- Files: `platform/apps/api/src/org-billing/subscription.service.ts:222`, `platform/apps/api/src/org-billing/subscription.service.ts:275`
+- Problem: Usage reporting to Stripe uses increment calls without idempotency keys or dedupe tracking per reservation/message.
+- Impact: Retries can over-report usage and overcharge customers.
+- Fix: Add idempotency keys and store/report usage per referenceId to prevent duplicate increments.
+- Tests: Retried usage reporting should not increase Stripe usage totals.
+
+#### ACCT-MED-042: Booking usage summaries ignore event quantity
+- Files: `platform/apps/api/src/org-billing/org-billing.service.ts:238`, `platform/apps/api/src/org-billing/org-billing.service.ts:316`
+- Problem: Booking usage counts events with `count()` rather than summing `quantity`, so batch/manual events with quantity > 1 are undercounted.
+- Impact: Underbilling for bulk-imported or aggregated booking usage events.
+- Fix: Aggregate `quantity` for `booking_created` events in usage summaries and invoicing.
+- Tests: A booking usage event with quantity 5 should bill 5 units.
+
 ### Low / Best Practice
 
 #### ACCT-LOW-001: Overpayment/credit balances are clamped to zero

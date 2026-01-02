@@ -28,9 +28,10 @@ import { RepeatChargesModule } from "../repeat-charges/repeat-charges.module";
 import { PoliciesModule } from "../policies/policies.module";
 import { GuestWalletModule } from "../guest-wallet/guest-wallet.module";
 import { PaymentsModule } from "../payments/payments.module";
+import { PermissionsModule } from "../permissions/permissions.module";
 
 @Module({
-  imports: [WaitlistModule, LoyaltyModule, SeasonalRatesModule, TaxRulesModule, GamificationModule, AuditModule, AccessControlModule, SignaturesModule, PoliciesModule, ApprovalsModule, UsageTrackerModule, RepeatChargesModule, GuestWalletModule, IdempotencyModule, forwardRef(() => PaymentsModule)],
+  imports: [WaitlistModule, LoyaltyModule, SeasonalRatesModule, TaxRulesModule, GamificationModule, AuditModule, AccessControlModule, SignaturesModule, PoliciesModule, ApprovalsModule, UsageTrackerModule, RepeatChargesModule, GuestWalletModule, IdempotencyModule, PermissionsModule, forwardRef(() => PaymentsModule)],
   controllers: [ReservationsController],
   providers: [
     ReservationsService,

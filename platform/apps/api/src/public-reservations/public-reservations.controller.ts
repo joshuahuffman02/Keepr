@@ -93,13 +93,14 @@ export class PublicReservationsController {
     @Throttle({ default: { limit: 10, ttl: 60000 } }) // Stricter rate limit: 10 per minute
     kioskCheckIn(
         @Param("id") id: string,
-        @Body() body: { upsellTotalCents: number; kioskToken?: string },
-        @Query("campgroundId") campgroundId?: string
+        @Body() body: { upsellTotalCents: number },
+        @Query("campgroundId") campgroundId: string
     ) {
-        // SECURITY: Kiosk check-in requires either campgroundId for validation or kioskToken
+        // SECURITY: Always require campgroundId for kiosk check-in
         // This prevents IDOR by ensuring reservation belongs to expected campground
-        if (!campgroundId && !body.kioskToken) {
-            throw new BadRequestException("campgroundId or kioskToken required for kiosk check-in");
+        // For proper kiosk device flows, use /kiosk/... endpoints with X-Kiosk-Token header
+        if (!campgroundId) {
+            throw new BadRequestException("campgroundId required for kiosk check-in");
         }
         return this.service.kioskCheckIn(id, body.upsellTotalCents || 0, campgroundId);
     }

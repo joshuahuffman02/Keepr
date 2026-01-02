@@ -20,6 +20,7 @@ import { IsInt, IsOptional, Min } from "class-validator";
 import { Type } from "class-transformer";
 import { IdempotencyService } from "./idempotency.service";
 import { GatewayConfigService } from "./gateway-config.service";
+import { postBalancedLedgerEntries } from "../ledger/ledger-posting.util";
 
 import { IsNotEmpty, IsString } from "class-validator";
 
@@ -672,6 +673,8 @@ export class PaymentsController {
 
       // Record the payment AND update reservation atomically
       const amountCents = intent.amount;
+      const isAuthorizedOnly = intent.status === "requires_capture";
+
       const { payment, updatedReservation } = await this.prisma.$transaction(async (tx) => {
         // Create payment record
         const payment = await tx.payment.create({
@@ -680,10 +683,10 @@ export class PaymentsController {
             campgroundId: reservation.campground.id,
             amountCents,
             currency: intent.currency?.toUpperCase() || "USD",
-            status: intent.status === "succeeded" ? "completed" : "authorized",
+            status: isAuthorizedOnly ? "authorized" : "completed",
             method: "card",
             stripePaymentIntentId: paymentIntentId,
-            paidAt: new Date(),
+            paidAt: isAuthorizedOnly ? null : new Date(),
             metadata: {
               source: "public_checkout_confirm",
               paymentIntentStatus: intent.status
@@ -691,30 +694,83 @@ export class PaymentsController {
           }
         });
 
-        // Update reservation status to confirmed AND update payment amounts
-        // CRITICAL FIX: Must update paidAmount/balanceAmount or reservation shows $0 paid
+        // Get current reservation state
         const currentReservation = await tx.reservation.findUnique({
           where: { id: body.reservationId },
           select: { paidAmount: true, balanceAmount: true, totalAmountCents: true }
         });
 
-        const newPaidAmount = (currentReservation?.paidAmount ?? 0) + amountCents;
-        const newBalanceAmount = Math.max(0, (currentReservation?.balanceAmount ?? currentReservation?.totalAmountCents ?? 0) - amountCents);
-        const paymentStatus = newBalanceAmount === 0 ? "paid" : newPaidAmount > 0 ? "partial" : "unpaid";
+        // Only update paidAmount/balanceAmount for completed payments (not authorized)
+        // Authorized payments will update these when captured via payment_intent.succeeded webhook
+        let updateData: any = {
+          status: "confirmed",
+          confirmedAt: new Date()
+        };
 
-        const updatedReservation = await tx.reservation.update({
-          where: { id: body.reservationId },
-          data: {
-            status: "confirmed",
-            confirmedAt: new Date(),
+        if (!isAuthorizedOnly) {
+          // Payment succeeded - update financial fields
+          const newPaidAmount = (currentReservation?.paidAmount ?? 0) + amountCents;
+          const newBalanceAmount = Math.max(0, (currentReservation?.balanceAmount ?? currentReservation?.totalAmountCents ?? 0) - amountCents);
+          const paymentStatus = newBalanceAmount === 0 ? "paid" : newPaidAmount > 0 ? "partial" : "unpaid";
+
+          updateData = {
+            ...updateData,
             paidAmount: newPaidAmount,
             balanceAmount: newBalanceAmount,
             paymentStatus
-          }
+          };
+        }
+
+        const updatedReservation = await tx.reservation.update({
+          where: { id: body.reservationId },
+          data: updateData
         });
 
         return { payment, updatedReservation };
       });
+
+      // SECURITY FIX: Post ledger entries for completed payments (not authorized-only)
+      // This ensures proper accounting trail for public checkout payments
+      if (!isAuthorizedOnly) {
+        try {
+          // Get site info for GL codes
+          const siteInfo = await this.prisma.site.findUnique({
+            where: { id: reservation.siteId },
+            include: { siteClass: { select: { glCode: true, clientAccount: true } } }
+          });
+          const revenueGl = siteInfo?.siteClass?.glCode ?? "REVENUE_UNMAPPED";
+          const revenueAccount = siteInfo?.siteClass?.clientAccount ?? "Revenue";
+          const dedupeKey = `public-confirm:${paymentIntentId}`;
+
+          await postBalancedLedgerEntries(this.prisma, [
+            {
+              campgroundId: reservation.campground.id,
+              reservationId: body.reservationId,
+              glCode: "CASH",
+              account: "Cash",
+              description: `Online payment (card)`,
+              amountCents,
+              direction: "debit" as const,
+              externalRef: paymentIntentId,
+              dedupeKey: `${dedupeKey}:debit`
+            },
+            {
+              campgroundId: reservation.campground.id,
+              reservationId: body.reservationId,
+              glCode: revenueGl,
+              account: revenueAccount,
+              description: `Online payment (card)`,
+              amountCents,
+              direction: "credit" as const,
+              externalRef: paymentIntentId,
+              dedupeKey: `${dedupeKey}:credit`
+            }
+          ]);
+        } catch (ledgerErr) {
+          // Log but don't fail the payment - ledger can be reconciled later
+          this.logger.error(`Failed to post ledger entries for ${paymentIntentId}:`, ledgerErr);
+        }
+      }
 
       const response = {
         success: true,
@@ -1183,7 +1239,7 @@ export class PaymentsController {
       await this.recon.upsertDispute(dispute);
     }
 
-    // Handle refund events
+    // Handle refund events - use individual refund objects to avoid double-processing
     if (event.type === "charge.refunded") {
       const charge = event.data.object as any;
       const paymentIntentId = charge.payment_intent;
@@ -1193,22 +1249,48 @@ export class PaymentsController {
           const intent = await this.stripeService.retrievePaymentIntent(paymentIntentId);
           const reservationId = intent.metadata?.reservationId;
           if (reservationId) {
+            // Get the most recent refund from the charge's refunds list
+            // charge.refunds.data is ordered by created date descending
+            const latestRefund = charge.refunds?.data?.[0];
+            if (!latestRefund) {
+              this.logger.warn(`charge.refunded event with no refunds for charge ${charge.id}`);
+              return { received: true };
+            }
+
+            // Use the individual refund ID for deduplication (not charge.id which is shared across all refunds)
+            const refundId = latestRefund.id;
+            const refundAmount = latestRefund.amount;
+
+            // Check if we've already processed this specific refund
+            const existingPayment = await this.prisma.payment.findFirst({
+              where: {
+                reservationId,
+                externalRef: refundId,
+                direction: "refund"
+              }
+            });
+
+            if (existingPayment) {
+              this.logger.log(`Skipping duplicate refund ${refundId} for reservation ${reservationId}`);
+              return { received: true };
+            }
+
             const receiptLines = this.buildReceiptLinesFromIntent(intent);
-            await this.reservations.recordRefund(reservationId, charge.amount_refunded, charge.id, {
+            await this.reservations.recordRefund(reservationId, refundAmount, refundId, {
               lineItems: receiptLines.lineItems,
               taxCents: receiptLines.taxCents,
               feeCents: receiptLines.feeCents,
-              totalCents: charge.amount_refunded,
+              totalCents: refundAmount,
               paymentMethod: intent.payment_method_types?.[0] || "card",
               source: intent.metadata?.source || "online",
               tenders: [
-                { method: intent.payment_method_types?.[0] || "card", amountCents: charge.amount_refunded, note: "webhook_refund" }
+                { method: intent.payment_method_types?.[0] || "card", amountCents: refundAmount, note: "webhook_refund" }
               ]
             });
           }
-        } catch {
+        } catch (err) {
           // Log but don't fail - the refund still happened in Stripe
-          this.logger.error('Failed to update reservation after refund webhook');
+          this.logger.error(`Failed to update reservation after refund webhook: ${err instanceof Error ? err.message : err}`);
         }
       }
     }

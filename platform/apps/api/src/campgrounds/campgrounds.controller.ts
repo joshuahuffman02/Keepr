@@ -86,7 +86,8 @@ export class CampgroundsController {
   }
 
   // Admin endpoints (auth required)
-  @UseGuards(JwtAuthGuard)
+  // SECURITY: Added RolesGuard and ScopeGuard to validate campground membership
+  @UseGuards(JwtAuthGuard, RolesGuard, ScopeGuard)
   @Get("campgrounds")
   listAll(@Req() req: Request) {
     const org = (req as any).organizationId || null;
@@ -94,7 +95,7 @@ export class CampgroundsController {
     return this.campgrounds.listAll(org || undefined);
   }
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard, ScopeGuard)
   @Get("campgrounds/:id")
   getOne(@Param("id") id: string, @Req() req: Request) {
     const org = (req as any).organizationId || null;
@@ -103,7 +104,8 @@ export class CampgroundsController {
     return cg;
   }
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard, ScopeGuard)
+  @Roles(UserRole.owner, UserRole.manager)
   @Patch("campgrounds/:id/store-hours")
   updateStoreHours(
     @Param("id") id: string,
@@ -114,7 +116,8 @@ export class CampgroundsController {
     return this.campgrounds.updateStoreHours(id, body.storeOpenHour, body.storeCloseHour, org || undefined);
   }
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard, ScopeGuard)
+  @Roles(UserRole.owner, UserRole.manager)
   @Patch("campgrounds/:id/order-webhook")
   updateOrderWebhook(
     @Param("id") id: string,

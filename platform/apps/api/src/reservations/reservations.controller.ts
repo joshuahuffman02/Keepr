@@ -7,8 +7,12 @@ import { QuoteReservationDto } from "./dto/quote-reservation.dto";
 import { JwtAuthGuard } from "../auth/guards";
 import { ReservationImportExportService } from "./reservation-import-export.service";
 import { PrismaService } from "../prisma/prisma.service";
+import { RolesGuard, Roles } from "../auth/guards/roles.guard";
+import { ScopeGuard } from "../permissions/scope.guard";
+import { UserRole } from "@prisma/client";
 
-@UseGuards(JwtAuthGuard)
+// SECURITY: Added RolesGuard and ScopeGuard to validate campground membership
+@UseGuards(JwtAuthGuard, RolesGuard, ScopeGuard)
 @Controller()
 export class ReservationsController {
   constructor(
