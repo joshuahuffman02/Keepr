@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable, NotFoundException } from "@nestjs/common";
+import { BadRequestException, ForbiddenException, Injectable, NotFoundException } from "@nestjs/common";
 import { PrismaService } from "../prisma/prisma.service";
 import { StoredValueStatus } from "@prisma/client";
 import { StoredValueService } from "../stored-value/stored-value.service";
@@ -51,6 +51,9 @@ export class GiftCardsService {
   async redeemAgainstBooking(code: string, amountCents: number, bookingId: string, actor?: any) {
     if (!code) throw new BadRequestException("Gift card code is required to process redemption");
     if (!amountCents || amountCents <= 0) throw new BadRequestException("Redemption amount must be greater than zero");
+    if (!actor?.campgroundId) {
+      throw new BadRequestException("campground context required");
+    }
 
     const card = await this.loadCard(code);
     if (!card) throw new NotFoundException("Gift card or store credit not found. Please verify the code and try again");
@@ -74,6 +77,9 @@ export class GiftCardsService {
         FOR UPDATE
       `;
       if (!lockedReservation) throw new NotFoundException("Reservation not found");
+      if (lockedReservation.campgroundId !== actor.campgroundId) {
+        throw new ForbiddenException("You do not have access to this campground");
+      }
 
       // 2. Redeem the stored value (debits the gift card balance)
       const redeemResult = await this.storedValue.redeem(
@@ -172,6 +178,17 @@ export class GiftCardsService {
   }
 
   async redeemAgainstPosOrder(code: string, amountCents: number, orderId: string, actor?: any) {
+    if (!actor?.campgroundId) {
+      throw new BadRequestException("campground context required");
+    }
+    const order = await this.prisma.storeOrder.findUnique({
+      where: { id: orderId },
+      select: { id: true, campgroundId: true }
+    });
+    if (!order) throw new NotFoundException("Order not found");
+    if (order.campgroundId !== actor.campgroundId) {
+      throw new ForbiddenException("You do not have access to this campground");
+    }
     return this.redeem(code, amountCents, { channel: "pos", referenceId: orderId }, actor);
   }
 

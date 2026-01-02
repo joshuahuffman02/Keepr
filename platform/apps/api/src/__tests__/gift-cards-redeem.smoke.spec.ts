@@ -8,6 +8,7 @@ import { PrismaService } from "../prisma/prisma.service";
 import { StoredValueService } from "../stored-value/stored-value.service";
 import { JwtAuthGuard } from "../auth/guards";
 import { RolesGuard } from "../auth/guards/roles.guard";
+import { ScopeGuard } from "../permissions/scope.guard";
 
 // Mock the ledger posting utility
 jest.mock("../ledger/ledger-posting.util", () => ({
@@ -29,6 +30,9 @@ describe("Gift cards & store credit redeem smoke", () => {
     },
     payment: {
       create: jest.fn()
+    },
+    storeOrder: {
+      findUnique: jest.fn()
     },
     site: {
       findUnique: jest.fn()
@@ -54,8 +58,21 @@ describe("Gift cards & store credit redeem smoke", () => {
       ]
     })
       .overrideGuard(JwtAuthGuard)
-      .useValue({ canActivate: () => true })
+      .useValue({
+        canActivate: (context) => {
+          const req = context.switchToHttp().getRequest();
+          req.user = {
+            id: "user-1",
+            role: "owner",
+            platformRole: null,
+            memberships: [{ campgroundId: "camp-1" }]
+          };
+          return true;
+        }
+      })
       .overrideGuard(RolesGuard)
+      .useValue({ canActivate: () => true })
+      .overrideGuard(ScopeGuard)
       .useValue({ canActivate: () => true })
       .compile();
 
@@ -119,6 +136,11 @@ describe("Gift cards & store credit redeem smoke", () => {
       }
     });
 
+    prisma.storeOrder.findUnique.mockResolvedValue({
+      id: "order-99",
+      campgroundId: "camp-1"
+    });
+
     prisma.reservation.update.mockResolvedValue({
       id: "booking-1",
       paidAmount: 2500
@@ -138,6 +160,7 @@ describe("Gift cards & store credit redeem smoke", () => {
 
     const res = await api
       .post("/api/bookings/booking-1/gift-cards/redeem")
+      .set("x-campground-id", "camp-1")
       .send({ code: "CARD-BOOK-100", amountCents: 2500 })
       .expect(200);
 
@@ -159,6 +182,7 @@ describe("Gift cards & store credit redeem smoke", () => {
 
     const res = await api
       .post("/api/pos/orders/order-99/gift-cards/redeem")
+      .set("x-campground-id", "camp-1")
       .send({ code: "CREDIT-POS-20", amountCents: 1500 })
       .expect(200);
 
