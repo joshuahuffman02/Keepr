@@ -25,12 +25,9 @@ import { postBalancedLedgerEntries } from "../ledger/ledger-posting.util";
 import { IsNotEmpty, IsString } from "class-validator";
 
 // DTO for public payment intent creation
+// Note: amountCents is NOT accepted - the server computes the amount from the reservation balance
+// to prevent amount tampering and ensure consistency with the reservation's actual due amount.
 class CreatePublicPaymentIntentDto {
-  @IsInt()
-  @Min(1)
-  @Type(() => Number)
-  amountCents!: number;
-
   @IsOptional()
   @IsString()
   currency?: string;

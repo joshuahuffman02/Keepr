@@ -7,6 +7,9 @@ import { DashboardShell } from "../../../components/ui/layout/DashboardShell";
 import { BarChart3, FileText, Lightbulb } from "lucide-react";
 import { useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { Card } from "../../../components/ui/card";
+import { Input } from "../../../components/ui/input";
+import { Button } from "../../../components/ui/button";
 
 export default function SocialPlannerReports() {
   const { data: campgrounds = [] } = useQuery({
@@ -80,38 +83,38 @@ export default function SocialPlannerReports() {
       </div>
 
       <div className="grid md:grid-cols-4 gap-3">
-        <div className="card p-4">
+        <Card className="p-4">
           <div className="flex items-center gap-2 text-sm text-slate-600">
             <FileText className="h-4 w-4 text-emerald-600" />
             Posts created
           </div>
           <div className="text-3xl font-bold text-slate-900 mt-2">{report.posts}</div>
-        </div>
-        <div className="card p-4">
+        </Card>
+        <Card className="p-4">
           <div className="flex items-center gap-2 text-sm text-slate-600">
             <Lightbulb className="h-4 w-4 text-amber-600" />
             Open suggestions
           </div>
           <div className="text-3xl font-bold text-slate-900 mt-2">{report.openSuggestions}</div>
-        </div>
-        <div className="card p-4">
+        </Card>
+        <Card className="p-4">
           <div className="flex items-center gap-2 text-sm text-slate-600">
             <BarChart3 className="h-4 w-4 text-blue-600" />
             Templates
           </div>
           <div className="text-3xl font-bold text-slate-900 mt-2">{report.templates}</div>
-        </div>
-        <div className="card p-4">
+        </Card>
+        <Card className="p-4">
           <div className="flex items-center gap-2 text-sm text-slate-600">
             <Lightbulb className="h-4 w-4 text-amber-600" />
             Consistency score (stub)
           </div>
           <div className="text-3xl font-bold text-slate-900 mt-2">{Math.min(report.posts * 5, 100)}%</div>
           <div className="text-xs text-slate-500 mt-1">Improves as you add drafts and record performance.</div>
-        </div>
+        </Card>
       </div>
 
-      <div className="card p-4 mt-4">
+      <Card className="p-4 mt-4">
         <h3 className="text-lg font-semibold text-slate-900 mb-2">Performance (manual inputs)</h3>
         <div className="grid md:grid-cols-5 gap-3 text-sm text-slate-700">
           <div className="p-3 rounded border border-slate-200 bg-slate-50">
@@ -138,21 +141,21 @@ export default function SocialPlannerReports() {
         <p className="text-xs text-slate-500 mt-2">Because there is no auto-posting, enter reach/likes/comments manually to help the rule-based engine learn.</p>
 
         <div className="grid md:grid-cols-6 gap-2 mt-3">
-          <input className="input" placeholder="Post ID (optional)" value={postId} onChange={e => setPostId(e.target.value)} />
-          <input className="input" placeholder="Reach" value={reach} onChange={e => setReach(e.target.value)} />
-          <input className="input" placeholder="Likes" value={likes} onChange={e => setLikes(e.target.value)} />
-          <input className="input" placeholder="Comments" value={comments} onChange={e => setComments(e.target.value)} />
-          <input className="input" placeholder="Shares" value={shares} onChange={e => setShares(e.target.value)} />
-          <input className="input" placeholder="Saves" value={saves} onChange={e => setSaves(e.target.value)} />
+          <Input placeholder="Post ID (optional)" value={postId} onChange={e => setPostId(e.target.value)} />
+          <Input placeholder="Reach" value={reach} onChange={e => setReach(e.target.value)} />
+          <Input placeholder="Likes" value={likes} onChange={e => setLikes(e.target.value)} />
+          <Input placeholder="Comments" value={comments} onChange={e => setComments(e.target.value)} />
+          <Input placeholder="Shares" value={shares} onChange={e => setShares(e.target.value)} />
+          <Input placeholder="Saves" value={saves} onChange={e => setSaves(e.target.value)} />
         </div>
-        <button
-          className="btn-primary mt-3"
+        <Button
+          className="mt-3"
           onClick={() => record.mutate()}
           disabled={!campgroundId || record.isPending}
         >
           Save performance
-        </button>
-      </div>
+        </Button>
+      </Card>
     </DashboardShell>
   );
 }

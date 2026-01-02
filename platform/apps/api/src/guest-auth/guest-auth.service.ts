@@ -87,8 +87,8 @@ export class GuestAuthService {
                 `
             });
         } catch (err) {
-            // Fallback: still log the link for debugging if email fails
-            this.logger.log(`Magic link for ${normalizedEmail}: ${link}`);
+            // Log email failure without exposing the token for security
+            this.logger.error(`Failed to send magic link email to ${normalizedEmail}. Token: ${token.substring(0, 8)}... (redacted)`, err instanceof Error ? err.stack : String(err));
         }
 
         return { message: 'Magic link sent' };

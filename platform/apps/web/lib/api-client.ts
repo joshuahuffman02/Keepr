@@ -3854,17 +3854,17 @@ export const apiClient = {
 
   /**
    * Create a payment intent for public/guest checkout (no auth required)
+   * Note: The server computes amountCents from the reservation balance - clients should not specify it
    */
   async createPublicPaymentIntent(params: {
-    amountCents: number;
-    currency?: string;
     reservationId: string;
+    currency?: string;
     guestEmail?: string;
     captureMethod?: 'automatic' | 'manual';
     idempotencyKey?: string;
   }) {
     const { idempotencyKey, ...payload } = params;
-    const fallbackKey = `public:${params.reservationId}:${params.amountCents}`;
+    const fallbackKey = `public:${params.reservationId}`;
     const res = await fetch(`${API_BASE}/public/payments/intents`, {
       method: "POST",
       headers: {

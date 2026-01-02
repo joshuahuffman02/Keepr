@@ -61,10 +61,10 @@ export function usePaymentIntent(options: UsePaymentIntentOptions = {}): UsePaym
 
         if (props.context === "public_booking" || props.context === "portal") {
           // Public payment intent (no auth required)
+          // Note: Server computes amount from reservation balance
           data = await apiClient.createPublicPaymentIntent({
-            amountCents: amount,
-            currency: "usd",
             reservationId: reservationId || "",
+            currency: "usd",
             guestEmail: props.guestEmail,
             captureMethod,
           });

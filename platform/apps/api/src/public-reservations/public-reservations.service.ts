@@ -84,14 +84,16 @@ export class PublicReservationsService {
         }
 
         // Find or create guest
-        let guest = await this.prisma.guest.findUnique({
-            where: { email: dto.email }
+        const emailNormalized = dto.email.trim().toLowerCase();
+        let guest = await this.prisma.guest.findFirst({
+            where: { emailNormalized }
         });
 
         if (!guest) {
             guest = await this.prisma.guest.create({
                 data: {
                     email: dto.email,
+                    emailNormalized,
                     primaryFirstName: dto.firstName,
                     primaryLastName: dto.lastName,
                     phone: dto.phone || "",
@@ -992,8 +994,9 @@ export class PublicReservationsService {
                 }
 
                 // Find or create guest
-                let guest = await this.prisma.guest.findUnique({
-                    where: { email: dto.guest.email }
+                const emailNormalized = dto.guest.email.trim().toLowerCase();
+                let guest = await this.prisma.guest.findFirst({
+                    where: { emailNormalized }
                 });
 
                 if (!guest) {
@@ -1002,6 +1005,7 @@ export class PublicReservationsService {
                             primaryFirstName: dto.guest.firstName,
                             primaryLastName: dto.guest.lastName,
                             email: dto.guest.email,
+                            emailNormalized,
                             phone: dto.guest.phone,
                             postalCode: dto.guest.zipCode
                         }
@@ -1325,12 +1329,14 @@ export class PublicReservationsService {
         if (!payload.campgroundId) throw new BadRequestException("campgroundId required");
         let guestId: string | null = null;
         if (payload.email) {
-            const existing = await this.prisma.guest.findFirst({ where: { email: payload.email } });
+            const emailNormalized = payload.email.trim().toLowerCase();
+            const existing = await this.prisma.guest.findFirst({ where: { emailNormalized } });
             if (existing) guestId = existing.id;
             else {
                 const guest = await this.prisma.guest.create({
                     data: {
                         email: payload.email,
+                        emailNormalized,
                         phone: payload.phone || "",
                         primaryFirstName: "Guest",
                         primaryLastName: "Abandoned"

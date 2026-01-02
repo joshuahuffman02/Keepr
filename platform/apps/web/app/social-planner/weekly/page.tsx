@@ -5,6 +5,8 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { apiClient } from "../../../lib/api-client";
 import { DashboardShell } from "../../../components/ui/layout/DashboardShell";
 import { Clock, RefreshCw, Sparkles, PlusCircle } from "lucide-react";
+import { Card } from "../../../components/ui/card";
+import { Button } from "../../../components/ui/button";
 
 export default function SocialPlannerWeekly() {
   const qc = useQueryClient();
@@ -65,18 +67,19 @@ export default function SocialPlannerWeekly() {
           <h1 className="text-2xl font-bold text-slate-900">Auto-generated Monday bundles</h1>
           <p className="text-slate-600">Three posts + cadence tailored to your park style without external AI.</p>
         </div>
-        <button
-          className="btn-secondary flex items-center"
+        <Button
+          variant="secondary"
+          className="flex items-center"
           onClick={() => regenerate.mutate()}
           disabled={!campgroundId || regenerate.isPending}
         >
           <RefreshCw className="h-4 w-4 mr-1" /> Regenerate
-        </button>
+        </Button>
       </div>
 
       {weekly ? (
         <div className="space-y-4">
-          <div className="card p-4">
+          <Card className="p-4">
             <div className="flex items-center gap-2 text-sm text-slate-600">
               <Sparkles className="h-4 w-4 text-emerald-600" />
               Generated for week of {new Date(weekly.generatedFor).toLocaleDateString()}
@@ -87,19 +90,20 @@ export default function SocialPlannerWeekly() {
                   <p className="text-xs uppercase text-slate-500">{idea.type}</p>
                   <div className="text-sm font-semibold text-slate-900">{idea.idea}</div>
                   <div className="text-xs text-slate-500">Platform: {idea.platform}</div>
-                  <button
-                    className="btn-secondary w-full justify-center flex items-center text-emerald-700"
+                  <Button
+                    variant="secondary"
+                    className="w-full justify-center flex items-center text-emerald-700"
                     onClick={() => addIdeaToCalendar.mutate(idea)}
                     disabled={addIdeaToCalendar.isPending || !campgroundId}
                   >
                     <PlusCircle className="h-4 w-4 mr-1" /> Send to parking lot
-                  </button>
+                  </Button>
                 </div>
               ))}
             </div>
-          </div>
+          </Card>
 
-          <div className="card p-4">
+          <Card className="p-4">
             <div className="flex items-center gap-2 text-sm text-slate-600 mb-2">
               <Clock className="h-4 w-4 text-emerald-600" />
               Recommended cadence
@@ -112,7 +116,7 @@ export default function SocialPlannerWeekly() {
                 </div>
               ))}
             </div>
-          </div>
+          </Card>
         </div>
       ) : (
         <div className="text-sm text-slate-500">Generate a bundle to see this week's ideas.</div>

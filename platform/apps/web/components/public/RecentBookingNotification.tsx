@@ -10,15 +10,6 @@ interface Booking {
   timeAgo: string;
 }
 
-// Stubbed recent bookings - in production, fetch from API
-const stubBookings: Booking[] = [
-  { guestName: "Sarah M.", siteType: "RV Site", timeAgo: "5 minutes ago" },
-  { guestName: "Mike T.", siteType: "Cabin", timeAgo: "12 minutes ago" },
-  { guestName: "Lisa K.", siteType: "Tent Site", timeAgo: "20 minutes ago" },
-  { guestName: "David R.", siteType: "Glamping", timeAgo: "35 minutes ago" },
-  { guestName: "Emma W.", siteType: "RV Site", timeAgo: "1 hour ago" },
-];
-
 export function RecentBookingNotification({ campgroundId }: { campgroundId?: string }) {
   const [visible, setVisible] = useState(false);
   const [booking, setBooking] = useState<Booking | null>(null);
@@ -27,28 +18,28 @@ export function RecentBookingNotification({ campgroundId }: { campgroundId?: str
   useEffect(() => {
     if (dismissed) return;
 
-    let index = 0;
+    // TODO: Fetch real recent bookings from API endpoint
+    // Example: GET /api/public/campgrounds/{campgroundId}/recent-bookings
+    // Only show notifications if real bookings exist from the last hour
+    // For now, this component is disabled to avoid showing fake data
 
-    // Show first notification after 8 seconds
-    const initialTimeout = setTimeout(() => {
-      setBooking(stubBookings[index]);
-      setVisible(true);
-    }, 8000);
+    const fetchRecentBookings = async () => {
+      if (!campgroundId) return;
 
-    // Show subsequent notifications every 30 seconds
-    const interval = setInterval(() => {
-      index = (index + 1) % stubBookings.length;
-      setBooking(stubBookings[index]);
-      setVisible(true);
-
-      // Auto-hide after 6 seconds
-      setTimeout(() => setVisible(false), 6000);
-    }, 30000);
-
-    return () => {
-      clearTimeout(initialTimeout);
-      clearInterval(interval);
+      try {
+        // const response = await fetch(`/api/public/campgrounds/${campgroundId}/recent-bookings`);
+        // const bookings = await response.json();
+        // if (bookings.length > 0) {
+        //   setBooking(bookings[0]);
+        //   setVisible(true);
+        // }
+      } catch (err) {
+        console.error("Failed to fetch recent bookings", err);
+      }
     };
+
+    // Disabled until real API is implemented
+    // fetchRecentBookings();
   }, [campgroundId, dismissed]);
 
   // Auto-hide current notification after 6 seconds
@@ -77,6 +68,7 @@ export function RecentBookingNotification({ campgroundId }: { campgroundId?: str
             <button
               onClick={handleDismiss}
               className="absolute top-2 right-2 p-1 text-slate-400 hover:text-slate-600 transition-colors"
+              aria-label="Dismiss notification"
             >
               <X className="h-4 w-4" />
             </button>

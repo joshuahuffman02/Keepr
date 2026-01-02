@@ -313,6 +313,7 @@ function BookingPageInner() {
       errors.site = "Please select a site";
     }
 
+    // Only validate payment if we're collecting payment now
     if (formData.collectPayment) {
       const amount = parseFloat(formData.paymentAmount);
       if (isNaN(amount) || amount <= 0) {
@@ -685,11 +686,13 @@ function BookingPageInner() {
         }
       }
 
-      const isCardPayment = formData.paymentMethod === "card";
+      // If not collecting payment, skip payment logic
+      const isCardPayment = formData.collectPayment && formData.paymentMethod === "card";
       // For card payments, paid amount starts at 0 until payment modal confirms
-      const paidAmountCents = isCardPayment ? 0 : paymentAmountCents;
+      // For pay later, paid amount is also 0
+      const paidAmountCents = (isCardPayment || !formData.collectPayment) ? 0 : paymentAmountCents;
       const cashNote =
-        formData.paymentMethod === "cash" && cashReceivedCents > 0
+        formData.collectPayment && formData.paymentMethod === "cash" && cashReceivedCents > 0
           ? `Cash received $${(cashReceivedCents / 100).toFixed(2)}${cashChangeDueCents ? ` • Change due $${(cashChangeDueCents / 100).toFixed(2)}` : ""}`
           : "";
       const paymentNotes = [formData.paymentNotes, cashNote].filter(Boolean).join(" • ") || undefined;
@@ -716,10 +719,10 @@ function BookingPageInner() {
         totalAmount: totalCents,
         paidAmount: paidAmountCents,
         balanceAmount: Math.max(0, totalCents - paidAmountCents),
-        // Card payments start as "pending" until payment completes
-        status: isCardPayment ? "pending" : "confirmed",
-        paymentMethod: formData.paymentMethod,
-        paymentNotes: !isCardPayment ? paymentNotes : undefined,
+        // Card payments and pay later start as "pending" until payment completes
+        status: (isCardPayment || !formData.collectPayment) ? "pending" : "confirmed",
+        paymentMethod: formData.collectPayment ? formData.paymentMethod : undefined,
+        paymentNotes: (formData.collectPayment && !isCardPayment) ? paymentNotes : undefined,
         siteLocked: formData.lockSite,
         overrideReason,
         overrideApprovedBy
@@ -732,6 +735,17 @@ function BookingPageInner() {
       queryClient.invalidateQueries({ queryKey: ["booking-v2-guests", selectedCampground?.id] });
       // Clear saved form data on successful booking
       clearFormData();
+
+      // Pay later: redirect to reservation with success message
+      if (!formData.collectPayment) {
+        toast({
+          title: "Reservation created",
+          description: "Invoice will be sent to guest. Reservation is pending payment."
+        });
+        router.push(`/reservations/${reservation.id}`);
+        return;
+      }
+
       // Card payment: open modal to complete payment
       if (formData.paymentMethod === "card") {
         setPaymentModal({ reservationId: reservation.id, amountCents: paymentAmountCents });
@@ -760,10 +774,12 @@ function BookingPageInner() {
   const hasPricing = displayTotalCents !== null;
   const cardEntryBlocked = formData.paymentMethod === "card" && formData.cardEntryMode === "reader";
   const paymentReady =
-    !!formData.paymentMethod &&
-    paymentAmountCents > 0 &&
-    (formData.paymentMethod !== "cash" || cashReceivedCents >= paymentAmountCents) &&
-    !cardEntryBlocked;
+    !formData.collectPayment || (
+      !!formData.paymentMethod &&
+      paymentAmountCents > 0 &&
+      (formData.paymentMethod !== "cash" || cashReceivedCents >= paymentAmountCents) &&
+      !cardEntryBlocked
+    );
   const canCreate =
     !!selectedCampground?.id &&
     !!formData.guestId &&
@@ -1544,7 +1560,29 @@ function BookingPageInner() {
                   </div>
                 </div>
 
-                <div className="mt-4 space-y-2">
+                <div className="mt-4 border-t border-slate-200 pt-4">
+                  <div className="flex items-center justify-between mb-3">
+                    <div>
+                      <div className="text-xs font-bold uppercase tracking-widest text-slate-500">Payment</div>
+                      <div className="text-sm font-semibold text-slate-900">Collection timing</div>
+                    </div>
+                    <Switch
+                      checked={formData.collectPayment}
+                      onCheckedChange={(value) => setFormData((prev) => ({ ...prev, collectPayment: value }))}
+                    />
+                  </div>
+                  <div className="flex items-center gap-2 text-xs text-slate-600">
+                    <CircleDollarSign className="h-3.5 w-3.5 text-emerald-600" />
+                    <span>
+                      {formData.collectPayment
+                        ? "Collect payment now during booking"
+                        : "Send invoice / Pay later - guest will receive invoice by email"}
+                    </span>
+                  </div>
+                </div>
+
+                {formData.collectPayment && (
+                  <div className="mt-4 space-y-2">
                   {formData.paymentMethod === "card" && (
                     <div className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-[11px] text-slate-500">
                       {formData.cardEntryMode === "reader"
@@ -1639,6 +1677,7 @@ function BookingPageInner() {
                     onChange={(e) => setFormData((prev) => ({ ...prev, paymentNotes: e.target.value }))}
                   />
                 </div>
+                )}
 
                 <div className="mt-4 flex flex-col gap-2">
                   <Button
@@ -1664,7 +1703,11 @@ function BookingPageInner() {
                     }}
                     disabled={createReservationMutation.isPending}
                   >
-                    {createReservationMutation.isPending ? "Creating..." : "Collect payment & book"}
+                    {createReservationMutation.isPending
+                      ? "Creating..."
+                      : formData.collectPayment
+                      ? "Collect payment & book"
+                      : "Create reservation (invoice later)"}
                     <ArrowRight className="h-4 w-4" />
                   </Button>
                 </div>

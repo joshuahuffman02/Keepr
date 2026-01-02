@@ -188,12 +188,13 @@ Scope: Targeted review of public payment confirmation, public reservation access
 - Fix: Remove token logging or log redacted token.
 - Tests: Logging should not include full token.
 
-#### PAY-LOW-001: Public payment intent DTO requires `amountCents` but server ignores it
+#### PAY-LOW-001: Public payment intent DTO requires `amountCents` but server ignores it [FIXED 2026-01-01]
 - Files: `platform/apps/api/src/payments/payments.controller.ts:27`, `platform/apps/api/src/payments/payments.controller.ts:455`
 - Problem: DTO requires `amountCents` but server computes amount from reservation and does not validate against input.
 - Impact: Confusing API contract, potential client misuse.
 - Fix: Remove `amountCents` from DTO or validate it matches server-calculated amount.
 - Tests: Mismatched amount is rejected if kept.
+- **Resolution**: Removed `amountCents` field from `CreatePublicPaymentIntentDto`. The server always computes the amount from the reservation balance to prevent tampering and ensure consistency. Updated all frontend callers (api-client.ts, usePaymentIntent.ts, book/page.tsx) and tests to remove the field. Added clear documentation explaining that the server computes the amount.
 
 #### PAY-LOW-002: Public payment confirmation idempotency defaults to time-based key
 - Files: `platform/apps/api/src/payments/payments.controller.ts:589`

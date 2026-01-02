@@ -43,7 +43,7 @@ describe("PaymentsController public intents", () => {
 
   it("reuses idempotent response for public intents", async () => {
     idempotency.start.mockResolvedValue({ status: IdempotencyStatus.succeeded, responseJson: { ok: true } });
-    const resp = await controller.createPublicIntent({ reservationId: "r1", amountCents: 100 } as any, "abc");
+    const resp = await controller.createPublicIntent({ reservationId: "r1" } as any, "abc");
     expect(resp).toEqual({ ok: true });
     expect(stripeService.createPaymentIntent).not.toHaveBeenCalled();
   });
@@ -51,11 +51,11 @@ describe("PaymentsController public intents", () => {
   it("applies 3DS policy for EU currencies", async () => {
     idempotency.start.mockResolvedValue({ status: IdempotencyStatus.failed });
     stripeService.createPaymentIntent.mockResolvedValue({ id: "pi_1", client_secret: "secret", status: "requires_action" });
-    const resp = await controller.createPublicIntent({ reservationId: "r1", amountCents: 100, currency: "EUR" } as any, "abc2");
+    const resp = await controller.createPublicIntent({ reservationId: "r1", currency: "EUR" } as any, "abc2");
     expect(resp.threeDsPolicy).toBe("any");
     // Verify the 3DS policy is passed as "any" for EU currency
     expect(stripeService.createPaymentIntent).toHaveBeenCalledWith(
-      expect.any(Number), // amount comes from context
+      expect.any(Number), // amount comes from reservation balance
       "eur",
       expect.any(Object),
       "acct_123",

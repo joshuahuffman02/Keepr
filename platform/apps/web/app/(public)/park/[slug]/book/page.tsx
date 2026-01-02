@@ -2134,12 +2134,12 @@ function ReviewStep({
                 }
             }
 
-            // Create payment intent with discounted amount (using public endpoint for guest checkout)
+            // Create payment intent (using public endpoint for guest checkout)
+            // Note: Server computes amount from reservation balance - we don't specify it
             try {
                 const intent = await apiClient.createPublicPaymentIntent({
-                    amountCents: finalTotalWithFees,
-                    currency: "usd",
                     reservationId: reservation.id,
+                    currency: "usd",
                     guestEmail: guestInfo.email
                 });
                 setPaymentIntentId(intent.id);

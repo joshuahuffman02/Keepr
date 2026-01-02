@@ -287,33 +287,13 @@ export default function MyStayPage() {
       if (!token || !currentReservation) return;
       setCommsLoading(true);
       try {
-        const stubComms = [
-          {
-            id: "c1",
-            type: "email",
-            subject: "Reservation Confirmation",
-            preview: `Your reservation at ${currentReservation.campground.name} is confirmed!`,
-            sentAt: new Date(currentReservation.arrivalDate).toISOString(),
-            status: "delivered",
-          },
-          {
-            id: "c2",
-            type: "sms",
-            subject: "Check-in Reminder",
-            preview: `Reminder: You can check in starting at ${currentReservation.campground.checkInTime || "3:00 PM"} tomorrow`,
-            sentAt: new Date(new Date(currentReservation.arrivalDate).getTime() - 24 * 60 * 60 * 1000).toISOString(),
-            status: "delivered",
-          },
-          {
-            id: "c3",
-            type: "email",
-            subject: "Welcome to Your Stay",
-            preview: "Here's everything you need to know for your stay...",
-            sentAt: currentReservation.arrivalDate,
-            status: "delivered",
-          },
-        ];
-        setCommsHistory(stubComms);
+        // TODO: Fetch real communication history from API
+        // Example: GET /api/portal/reservations/{id}/communications
+        // const response = await apiClient.getReservationCommunications(token, currentReservation.id);
+        // setCommsHistory(response);
+
+        // For now, show empty state instead of fake data
+        setCommsHistory([]);
       } catch (err) {
         console.error("Failed to load comms history", err);
         setCommsHistory([]);
