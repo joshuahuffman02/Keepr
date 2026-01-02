@@ -229,7 +229,7 @@ export default function KioskDevicesPage() {
                     transition={{ ...SPRING_CONFIG, delay: 0.05 }}
                 >
                     <Card className="border-border bg-card overflow-hidden">
-                        <div className="bg-gradient-to-r from-emerald-500/10 to-teal-500/10 dark:from-emerald-500/5 dark:to-teal-500/5">
+                        <div className="bg-status-success/10">
                             <CardHeader>
                                 <div className="flex items-center gap-2">
                                     <Key className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />

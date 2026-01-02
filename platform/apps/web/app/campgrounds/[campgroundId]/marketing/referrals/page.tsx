@@ -296,7 +296,7 @@ export default function ReferralsPage() {
                             exit={{ opacity: 0, y: -20 }}
                         >
                             <Card className="border-emerald-200 dark:border-emerald-800 bg-card">
-                                <CardHeader className="bg-gradient-to-r from-emerald-500/10 to-teal-500/10 dark:from-emerald-500/5 dark:to-teal-500/5">
+                                <CardHeader className="bg-status-success/10">
                                     <div className="flex items-center justify-between">
                                         <div className="flex items-center gap-2">
                                             <Zap className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />

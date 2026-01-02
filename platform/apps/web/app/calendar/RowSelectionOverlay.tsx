@@ -36,7 +36,7 @@ export const RowSelectionOverlay = ({ siteId, siteName, dayCount }: RowSelection
             </div>
 
             {/* Checkout indicator on the last night */}
-            <div className="absolute right-0 inset-y-0 w-8 bg-gradient-to-l from-status-info/20 to-transparent flex items-center justify-end pr-1">
+            <div className="absolute right-0 inset-y-0 w-8 bg-status-info/20 flex items-center justify-end pr-1">
                 <div className="w-1 h-4 bg-status-info/50 rounded-full" />
             </div>
         </div>

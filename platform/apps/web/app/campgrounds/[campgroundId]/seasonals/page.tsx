@@ -229,7 +229,7 @@ function StatusBadge({ status }: { status: SeasonalStatus }) {
     active: { class: "bg-status-success/15 text-status-success border-status-success/20", label: "Active" },
     pending_renewal: { class: "bg-status-warning/15 text-status-warning border-status-warning/20", label: "Pending Renewal" },
     not_renewing: { class: "bg-rose-100 text-rose-700 border-rose-200", label: "Not Renewing" },
-    departed: { class: "bg-slate-100 text-slate-700 border-slate-200", label: "Departed" },
+    departed: { class: "bg-muted text-foreground border-border", label: "Departed" },
     waitlist: { class: "bg-status-info/15 text-status-info border-status-info/20", label: "Waitlist" },
   };
   return (
@@ -240,7 +240,7 @@ function StatusBadge({ status }: { status: SeasonalStatus }) {
 }
 
 function RenewalIntentBadge({ intent }: { intent?: RenewalIntent }) {
-  if (!intent) return <Badge variant="outline" className="bg-slate-50 text-slate-500">Unknown</Badge>;
+  if (!intent) return <Badge variant="outline" className="bg-muted/60 text-muted-foreground">Unknown</Badge>;
   const config: Record<RenewalIntent, { class: string; label: string; icon: any }> = {
     committed: { class: "bg-status-success/15 text-status-success border-status-success/20", label: "Committed", icon: CheckCircle },
     likely: { class: "bg-status-success/15 text-status-success border-status-success/20", label: "Likely", icon: TrendingUp },
@@ -285,71 +285,42 @@ function PaymentStatusBadge({ seasonal }: { seasonal: SeasonalGuest }) {
 }
 
 function TenureBadge({ years, showCelebration = false }: { years: number; showCelebration?: boolean }) {
-  // Legendary: 20+ years - rainbow shimmer with glow
+  // Legendary: 20+ years
   if (years >= 20) {
     return (
-      <Badge
-        className="relative overflow-hidden bg-gradient-to-r from-purple-500 via-pink-500 to-rose-500 text-white border-0 shadow-lg shadow-purple-300/50 animate-pulse hover:scale-110 transition-transform cursor-default"
-        style={{
-          animation: "pulse 2s infinite, shimmer 3s infinite",
-        }}
-      >
-        <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent animate-shimmer"
-          style={{
-            animation: "shimmer 2s infinite",
-            backgroundSize: "200% 100%",
-          }}
-        />
-        <Crown className="h-3 w-3 mr-1 relative z-10" />
-        <span className="relative z-10">{years} Years - Legend!</span>
-        {showCelebration && <PartyPopper className="h-3 w-3 ml-1 relative z-10 animate-bounce" />}
+      <Badge variant="outline" className="bg-status-info/15 text-status-info border-status-info/30 shadow-sm cursor-default">
+        <Crown className="h-3 w-3 mr-1" />
+        {years} Years - Legend!
+        {showCelebration && <PartyPopper className="h-3 w-3 ml-1 animate-bounce" />}
       </Badge>
     );
   }
 
-  // Gold Elite: 15+ years - gold shimmer
+  // Gold Elite: 15+ years
   if (years >= 15) {
     return (
-      <Badge
-        className="relative overflow-hidden bg-gradient-to-r from-amber-400 via-yellow-400 to-amber-500 text-white border-0 shadow-md shadow-amber-300/50 hover:scale-105 transition-transform cursor-default"
-      >
-        <span
-          className="absolute inset-0 bg-gradient-to-r from-transparent via-white/25 to-transparent"
-          style={{
-            animation: "shimmer 2.5s infinite",
-            backgroundSize: "200% 100%",
-          }}
-        />
-        <Crown className="h-3 w-3 mr-1 relative z-10" />
-        <span className="relative z-10">{years} Years</span>
-        {showCelebration && <Sparkles className="h-3 w-3 ml-1 relative z-10" />}
+      <Badge variant="outline" className="bg-status-warning/15 text-status-warning border-status-warning/30 shadow-sm cursor-default">
+        <Crown className="h-3 w-3 mr-1" />
+        {years} Years
+        {showCelebration && <Sparkles className="h-3 w-3 ml-1" />}
       </Badge>
     );
   }
 
-  // Gold: 10+ years - subtle gold shine
+  // Gold: 10+ years
   if (years >= 10) {
     return (
-      <Badge
-        className="relative overflow-hidden bg-gradient-to-r from-amber-400 to-yellow-500 text-white border-0 shadow-sm hover:scale-105 transition-transform cursor-default"
-      >
-        <span
-          className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent"
-          style={{
-            animation: "shimmer 3s infinite",
-            backgroundSize: "200% 100%",
-          }}
-        />
-        <Award className="h-3 w-3 mr-1 relative z-10" />
-        <span className="relative z-10">{years} Years</span>
+      <Badge variant="outline" className="bg-status-warning/10 text-status-warning border-status-warning/20 shadow-sm cursor-default">
+        <Award className="h-3 w-3 mr-1" />
+        {years} Years
       </Badge>
     );
   }
 
-  // Silver: 5+ years - subtle silver effect
+  // Silver: 5+ years
   if (years >= 5) {
     return (
-      <Badge className="bg-gradient-to-r from-slate-400 to-slate-500 text-white border-0 hover:scale-105 transition-transform cursor-default">
+      <Badge variant="outline" className="bg-muted text-foreground border-border shadow-sm cursor-default">
         <Star className="h-3 w-3 mr-1" />
         {years} Years
       </Badge>
@@ -358,7 +329,7 @@ function TenureBadge({ years, showCelebration = false }: { years: number; showCe
 
   // Standard: Under 5 years
   return (
-    <Badge variant="outline" className="bg-slate-50 hover:bg-slate-100 transition-colors cursor-default">
+    <Badge variant="outline" className="bg-muted/60 text-foreground border-border cursor-default">
       {years} {years === 1 ? "Year" : "Years"}
     </Badge>
   );
@@ -388,11 +359,11 @@ function ShimmerStyles() {
 }
 
 function ContractStatusBadge({ status }: { status?: ContractStatus }) {
-  if (!status) return <Badge variant="outline" className="bg-slate-50 text-slate-500">Not Sent</Badge>;
+  if (!status) return <Badge variant="outline" className="bg-muted/60 text-muted-foreground">Not Sent</Badge>;
   const config: Record<ContractStatus, { class: string; label: string; icon: any }> = {
     signed: { class: "bg-status-success/15 text-status-success border-status-success/20", label: "Signed", icon: CheckCircle },
     sent: { class: "bg-status-info/15 text-status-info border-status-info/20", label: "Sent", icon: Send },
-    not_sent: { class: "bg-slate-100 text-slate-500 border-slate-200", label: "Not Sent", icon: FileText },
+    not_sent: { class: "bg-muted text-muted-foreground border-border", label: "Not Sent", icon: FileText },
     expired: { class: "bg-rose-100 text-rose-700 border-rose-200", label: "Expired", icon: AlertCircle },
   };
   const Icon = config[status].icon;
@@ -431,7 +402,7 @@ function HeroStatCard({
     rose: "text-rose-600 bg-rose-50",
     blue: "text-status-info bg-status-info/15",
     purple: "text-purple-600 bg-purple-50",
-    slate: "text-slate-600 bg-slate-50",
+    slate: "text-muted-foreground bg-muted/60",
   };
 
   return (
@@ -442,9 +413,9 @@ function HeroStatCard({
       <CardContent className="p-4">
         <div className="flex items-start justify-between">
           <div>
-            <p className="text-xs font-medium text-slate-500 uppercase tracking-wide">{title}</p>
+            <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">{title}</p>
             <p className={`text-2xl font-bold mt-1 ${colorClasses[color].split(" ")[0]}`}>{value}</p>
-            {subtitle && <p className="text-xs text-slate-400 mt-1">{subtitle}</p>}
+            {subtitle && <p className="text-xs text-muted-foreground mt-1">{subtitle}</p>}
             {trend && (
               <p className={`text-xs flex items-center gap-1 mt-1 ${trend.value >= 0 ? "text-status-success" : "text-rose-600"}`}>
                 <TrendingUp className={`h-3 w-3 ${trend.value < 0 ? "rotate-180" : ""}`} />
@@ -480,15 +451,15 @@ function CriticalAlertsBanner({
 
   if (alerts.length === 0) {
     return (
-      <div className="bg-gradient-to-r from-emerald-50 to-teal-50 border border-status-success/20 rounded-xl p-4 flex items-center justify-center gap-3">
+      <div className="bg-status-success/10 border border-status-success/20 rounded-xl p-4 flex items-center justify-center gap-3">
         <div className="p-2 bg-status-success/15 rounded-full">
           <CheckCircle className="h-5 w-5 text-status-success" />
         </div>
         <div>
-          <p className="font-medium text-emerald-800">All caught up!</p>
-          <p className="text-sm text-status-success">No urgent items need attention</p>
+          <p className="font-medium text-foreground">All caught up!</p>
+          <p className="text-sm text-muted-foreground">No urgent items need attention</p>
         </div>
-        <PartyPopper className="h-5 w-5 text-emerald-500 ml-2" />
+        <PartyPopper className="h-5 w-5 text-status-success ml-2" />
       </div>
     );
   }
@@ -502,11 +473,11 @@ function CriticalAlertsBanner({
   };
 
   return (
-    <div className="bg-gradient-to-r from-slate-50 to-slate-100 border border-slate-200 rounded-xl p-3">
+    <div className="bg-muted/60 border border-border rounded-xl p-3">
       <div className="flex items-center gap-2 mb-2">
-        <Bell className="h-4 w-4 text-slate-500" />
-        <span className="text-sm font-medium text-slate-600">Needs Attention</span>
-        <Badge variant="secondary" className="bg-slate-200 text-slate-700">
+        <Bell className="h-4 w-4 text-muted-foreground" />
+        <span className="text-sm font-medium text-foreground">Needs Attention</span>
+        <Badge variant="secondary" className="bg-muted text-foreground">
           {alerts.reduce((sum, a) => sum + a.count, 0)}
         </Badge>
       </div>
@@ -547,11 +518,11 @@ function MilestonesCelebration({ milestones }: { milestones: DashboardStats["mil
 
   const getColor = (type: string) => {
     switch (type) {
-      case "20year": return "from-purple-500 via-pink-500 to-rose-500";
-      case "15year": return "from-amber-400 via-yellow-400 to-amber-500";
-      case "10year": return "from-amber-400 to-yellow-500";
-      case "5year": return "from-slate-400 to-slate-500";
-      default: return "from-slate-300 to-slate-400";
+      case "20year": return "bg-status-info/15 text-status-info border border-status-info/30";
+      case "15year": return "bg-status-warning/15 text-status-warning border border-status-warning/30";
+      case "10year": return "bg-status-warning/10 text-status-warning border border-status-warning/20";
+      case "5year": return "bg-muted text-foreground border border-border";
+      default: return "bg-muted/60 text-muted-foreground border border-border";
     }
   };
 
@@ -574,7 +545,7 @@ function MilestonesCelebration({ milestones }: { milestones: DashboardStats["mil
   };
 
   return (
-    <Card className="bg-gradient-to-br from-amber-50 via-yellow-50 to-orange-50 border-amber-200 overflow-hidden relative">
+    <Card className="bg-status-warning/10 border-status-warning/20 overflow-hidden relative">
       {/* Subtle celebration sparkles */}
       <div className="absolute top-2 right-2 opacity-50">
         <Sparkles className="h-5 w-5 text-amber-400 animate-pulse" />
@@ -600,21 +571,11 @@ function MilestonesCelebration({ milestones }: { milestones: DashboardStats["mil
             return (
               <div
                 key={i}
-                className={`relative overflow-hidden flex items-center gap-2 px-3 py-1.5 bg-gradient-to-r ${getColor(m.type)} text-white rounded-full text-sm font-medium ${getShadow(m.type)} hover:scale-105 transition-transform cursor-default`}
+                className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-medium ${getColor(m.type)} ${getShadow(m.type)} hover:scale-105 transition-transform cursor-default`}
                 style={animStyle}
               >
-                {/* Shimmer overlay for top milestones */}
-                {(m.type === "20year" || m.type === "15year") && (
-                  <span
-                    className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent"
-                    style={{
-                      animation: "shimmer 2.5s infinite",
-                      backgroundSize: "200% 100%",
-                    }}
-                  />
-                )}
-                <Icon className="h-3.5 w-3.5 relative z-10" />
-                <span className="relative z-10">{m.guestName} - {m.years} yrs</span>
+                <Icon className="h-3.5 w-3.5" />
+                <span>{m.guestName} - {m.years} yrs</span>
               </div>
             );
           })}
@@ -653,7 +614,7 @@ function RenewalProgressCard({ stats }: { stats: DashboardStats["renewalsByInten
       </CardHeader>
       <CardContent>
         {/* Progress bar */}
-        <div className="h-3 rounded-full bg-slate-100 overflow-hidden flex mb-3">
+        <div className="h-3 rounded-full bg-muted overflow-hidden flex mb-3">
           {segments.map((seg) => (
             <div
               key={seg.key}
@@ -667,7 +628,7 @@ function RenewalProgressCard({ stats }: { stats: DashboardStats["renewalsByInten
           {segments.map((seg) => (
             <div key={seg.key} className="flex items-center gap-2 text-sm">
               <div className={`w-3 h-3 rounded-full ${seg.color}`} />
-              <span className="text-slate-600">{seg.label}</span>
+              <span className="text-muted-foreground">{seg.label}</span>
               <span className="font-semibold ml-auto">{seg.value}</span>
             </div>
           ))}
@@ -683,9 +644,9 @@ function ChurnRiskCard({ guests }: { guests: DashboardStats["churnRiskGuests"] }
   if (!guests?.length) return null;
 
   const riskColors = {
-    high: "bg-rose-100 text-rose-700 border-rose-200",
+    high: "bg-status-error/15 text-status-error border-status-error/30",
     medium: "bg-status-warning/15 text-status-warning border-status-warning/20",
-    low: "bg-slate-100 text-slate-600 border-slate-200",
+    low: "bg-muted text-muted-foreground border-border",
   };
 
   const riskIcons = {
@@ -695,13 +656,13 @@ function ChurnRiskCard({ guests }: { guests: DashboardStats["churnRiskGuests"] }
   };
 
   return (
-    <Card className="border-rose-200 bg-gradient-to-br from-rose-50 to-orange-50">
+    <Card className="border-status-error/30 bg-status-error/10">
       <CardHeader className="pb-2">
-        <CardTitle className="text-sm flex items-center gap-2 text-rose-800">
+        <CardTitle className="text-sm flex items-center gap-2 text-status-error">
           <AlertTriangle className="h-4 w-4" />
           Churn Risk - Attention Needed
         </CardTitle>
-        <CardDescription className="text-rose-600 text-xs">
+        <CardDescription className="text-status-error text-xs">
           Long-tenured guests who haven&apos;t committed to renewal
         </CardDescription>
       </CardHeader>
@@ -712,7 +673,7 @@ function ChurnRiskCard({ guests }: { guests: DashboardStats["churnRiskGuests"] }
             return (
               <div
                 key={guest.guestId}
-                className="flex items-center justify-between p-2 rounded-lg bg-white/60 border border-rose-100"
+                className="flex items-center justify-between p-2 rounded-lg bg-card/80 border border-border"
               >
                 <div className="flex items-center gap-2">
                   <Badge variant="outline" className={riskColors[guest.riskLevel]}>
@@ -721,7 +682,7 @@ function ChurnRiskCard({ guests }: { guests: DashboardStats["churnRiskGuests"] }
                   </Badge>
                   <span className="font-medium text-sm">{guest.guestName}</span>
                 </div>
-                <div className="flex items-center gap-2 text-sm text-slate-600">
+                <div className="flex items-center gap-2 text-sm text-muted-foreground">
                   <Award className="h-3.5 w-3.5 text-amber-500" />
                   {guest.tenure} years
                 </div>
@@ -730,7 +691,7 @@ function ChurnRiskCard({ guests }: { guests: DashboardStats["churnRiskGuests"] }
           })}
         </div>
         {guests.length > 5 && (
-          <p className="text-xs text-rose-600 mt-2 text-center">
+          <p className="text-xs text-status-error mt-2 text-center">
             +{guests.length - 5} more at risk
           </p>
         )}
@@ -743,32 +704,32 @@ function ChurnRiskCard({ guests }: { guests: DashboardStats["churnRiskGuests"] }
 
 function CommunityStatsCard({ stats }: { stats: DashboardStats }) {
   return (
-    <Card className="border-purple-200 bg-gradient-to-br from-purple-50 to-indigo-50">
+    <Card className="border-status-info/20 bg-status-info/10">
       <CardHeader className="pb-2">
-        <CardTitle className="text-sm flex items-center gap-2 text-purple-800">
+        <CardTitle className="text-sm flex items-center gap-2 text-status-info">
           <Heart className="h-4 w-4" />
           Your Seasonal Family
         </CardTitle>
       </CardHeader>
       <CardContent>
         <div className="text-center py-2">
-          <div className="text-4xl font-bold text-purple-700 mb-1">
+          <div className="text-4xl font-bold text-foreground mb-1">
             {stats.combinedTenureYears}
           </div>
-          <div className="text-sm text-purple-600">combined years of loyalty</div>
+          <div className="text-sm text-muted-foreground">combined years of loyalty</div>
         </div>
         <div className="grid grid-cols-3 gap-2 mt-4 pt-4 border-t border-purple-100">
           <div className="text-center">
-            <div className="text-lg font-semibold text-slate-700">{stats.activeSeasonals}</div>
-            <div className="text-xs text-slate-500">Active</div>
+            <div className="text-lg font-semibold text-foreground">{stats.activeSeasonals}</div>
+            <div className="text-xs text-muted-foreground">Active</div>
           </div>
           <div className="text-center">
-            <div className="text-lg font-semibold text-slate-700">{stats.averageTenure}yr</div>
-            <div className="text-xs text-slate-500">Avg Tenure</div>
+            <div className="text-lg font-semibold text-foreground">{stats.averageTenure}yr</div>
+            <div className="text-xs text-muted-foreground">Avg Tenure</div>
           </div>
           <div className="text-center">
-            <div className="text-lg font-semibold text-slate-700">{stats.longestTenure}yr</div>
-            <div className="text-xs text-slate-500">Longest</div>
+            <div className="text-lg font-semibold text-foreground">{stats.longestTenure}yr</div>
+            <div className="text-xs text-muted-foreground">Longest</div>
           </div>
         </div>
       </CardContent>
@@ -799,7 +760,7 @@ function PaymentAgingCard({ aging }: { aging: DashboardStats["paymentAging"] }) 
       </CardHeader>
       <CardContent>
         {/* Progress bar */}
-        <div className="h-3 rounded-full bg-slate-100 overflow-hidden flex mb-3">
+        <div className="h-3 rounded-full bg-muted overflow-hidden flex mb-3">
           {segments.map((seg) => (
             <div
               key={seg.key}
@@ -844,7 +805,7 @@ function RenewalDeadlineCountdown({ deadline }: { deadline?: Date }) {
               <p className={`text-sm font-medium ${isUrgent ? 'text-rose-800' : isSoon ? 'text-status-warning' : 'text-status-info'}`}>
                 Renewal Deadline
               </p>
-              <p className="text-xs text-slate-500">
+              <p className="text-xs text-muted-foreground">
                 {format(renewalDeadline, "MMMM d, yyyy")}
               </p>
             </div>
@@ -853,7 +814,7 @@ function RenewalDeadlineCountdown({ deadline }: { deadline?: Date }) {
             <div className={`text-2xl font-bold ${isUrgent ? 'text-rose-600' : isSoon ? 'text-status-warning' : 'text-status-info'}`}>
               {daysUntil}
             </div>
-            <div className="text-xs text-slate-500">days left</div>
+            <div className="text-xs text-muted-foreground">days left</div>
           </div>
         </div>
       </CardContent>
@@ -884,12 +845,12 @@ function FloatingActionPanel({
 
   return (
     <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 animate-in slide-in-from-bottom-4 duration-300">
-      <Card className="shadow-2xl border-slate-300 bg-white/95 backdrop-blur">
+      <Card className="shadow-2xl border-border bg-card/95 backdrop-blur">
         <CardContent className="p-3 flex flex-wrap items-center gap-2 md:gap-3">
           <Badge className="bg-status-info text-white px-3 py-1">
             {selectedCount} selected
           </Badge>
-          <div className="h-6 w-px bg-slate-200 hidden md:block" />
+          <div className="h-6 w-px bg-border hidden md:block" />
 
           {/* Message */}
           <Button size="sm" onClick={onSendMessage}>
@@ -974,7 +935,7 @@ function SeasonalRow({
   const currentContract = seasonal.contracts?.find(c => c.seasonYear === new Date().getFullYear());
 
   return (
-    <div className={`border rounded-lg transition-all duration-200 ${isSelected ? "ring-2 ring-blue-500 bg-blue-50/30" : "hover:shadow-md bg-white"}`}>
+    <div className={`border rounded-lg transition-all duration-200 ${isSelected ? "ring-2 ring-blue-500 bg-blue-50/30" : "hover:shadow-md bg-card"}`}>
       {/* Mobile Card View */}
       <div className="md:hidden p-4 space-y-3">
         <div className="flex items-start justify-between">
@@ -983,17 +944,17 @@ function SeasonalRow({
               type="checkbox"
               checked={isSelected}
               onChange={onSelect}
-              className="rounded border-slate-300 mt-1"
+              className="rounded border-border mt-1"
               onClick={(e) => e.stopPropagation()}
             />
             {/* Avatar with tenure indicator */}
             <div className="relative">
-              <div className={`w-12 h-12 rounded-full flex items-center justify-center text-white font-medium text-lg ${
+              <div className={`w-12 h-12 rounded-full flex items-center justify-center font-medium text-lg ${
                 seasonal.totalSeasons >= 10
-                  ? "bg-gradient-to-br from-amber-400 to-yellow-500 shadow-lg"
+                  ? "bg-status-warning/15 text-status-warning"
                   : seasonal.totalSeasons >= 5
-                    ? "bg-gradient-to-br from-slate-400 to-slate-500"
-                    : "bg-gradient-to-br from-blue-500 to-purple-600"
+                    ? "bg-muted text-foreground"
+                    : "bg-status-info/15 text-status-info"
               }`}>
                 {seasonal.guest.primaryFirstName[0]}{seasonal.guest.primaryLastName[0]}
               </div>
@@ -1004,13 +965,13 @@ function SeasonalRow({
               )}
             </div>
             <div>
-              <p className="font-semibold text-slate-900">
+              <p className="font-semibold text-foreground">
                 {seasonal.guest.primaryFirstName} {seasonal.guest.primaryLastName}
               </p>
               <div className="flex items-center gap-2 mt-1">
                 <TenureBadge years={seasonal.totalSeasons} />
                 {seasonal.currentSite && (
-                  <span className="text-sm text-slate-500 flex items-center gap-1">
+                  <span className="text-sm text-muted-foreground flex items-center gap-1">
                     <MapPin className="h-3 w-3" />
                     {seasonal.currentSite.name}
                   </span>
@@ -1036,19 +997,19 @@ function SeasonalRow({
           <div className="space-y-3 pt-3 border-t">
             <div className="grid grid-cols-2 gap-3 text-sm">
               <div>
-                <p className="text-xs text-slate-400 uppercase">Email</p>
+                <p className="text-xs text-muted-foreground uppercase">Email</p>
                 <p className="font-medium truncate">{seasonal.guest.email}</p>
               </div>
               <div>
-                <p className="text-xs text-slate-400 uppercase">Phone</p>
+                <p className="text-xs text-muted-foreground uppercase">Phone</p>
                 <p className="font-medium">{seasonal.guest.phone || "—"}</p>
               </div>
               <div>
-                <p className="text-xs text-slate-400 uppercase">Rate</p>
+                <p className="text-xs text-muted-foreground uppercase">Rate</p>
                 <p className="font-medium">${seasonal.pricing?.[0]?.finalRate?.toLocaleString() || "—"}/mo</p>
               </div>
               <div>
-                <p className="text-xs text-slate-400 uppercase">Since</p>
+                <p className="text-xs text-muted-foreground uppercase">Since</p>
                 <p className="font-medium">{seasonal.firstSeasonYear}</p>
               </div>
             </div>
@@ -1090,18 +1051,18 @@ function SeasonalRow({
             type="checkbox"
             checked={isSelected}
             onChange={onSelect}
-            className="rounded border-slate-300"
+            className="rounded border-border"
             onClick={(e) => e.stopPropagation()}
           />
 
           {/* Avatar with tenure indicator */}
           <div className="relative">
-            <div className={`w-11 h-11 rounded-full flex items-center justify-center text-white font-medium ${
+            <div className={`w-11 h-11 rounded-full flex items-center justify-center font-medium ${
               seasonal.totalSeasons >= 10
-                ? "bg-gradient-to-br from-amber-400 to-yellow-500 shadow-lg"
+                ? "bg-status-warning/15 text-status-warning"
                 : seasonal.totalSeasons >= 5
-                  ? "bg-gradient-to-br from-slate-400 to-slate-500"
-                  : "bg-gradient-to-br from-blue-500 to-purple-600"
+                  ? "bg-muted text-foreground"
+                  : "bg-status-info/15 text-status-info"
             }`}>
               {seasonal.guest.primaryFirstName[0]}{seasonal.guest.primaryLastName[0]}
             </div>
@@ -1115,12 +1076,12 @@ function SeasonalRow({
           {/* Info */}
           <div className="flex-1 min-w-0" onClick={() => setExpanded(!expanded)}>
             <div className="flex items-center gap-2 flex-wrap cursor-pointer">
-              <span className="font-medium text-slate-900">
+              <span className="font-medium text-foreground">
                 {seasonal.guest.primaryFirstName} {seasonal.guest.primaryLastName}
               </span>
               <TenureBadge years={seasonal.totalSeasons} />
             </div>
-            <div className="flex items-center gap-3 text-sm text-slate-500 mt-0.5">
+            <div className="flex items-center gap-3 text-sm text-muted-foreground mt-0.5">
               {seasonal.currentSite && (
                 <span className="flex items-center gap-1">
                   <MapPin className="h-3 w-3" />
@@ -1155,26 +1116,26 @@ function SeasonalRow({
 
         {/* Desktop Expanded Details */}
         {expanded && (
-          <div className="px-4 pb-4 pt-0 border-t bg-slate-50/50">
+          <div className="px-4 pb-4 pt-0 border-t bg-muted/60/50">
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 py-3">
               <div>
-                <p className="text-xs text-slate-500 uppercase tracking-wide">Phone</p>
+                <p className="text-xs text-muted-foreground uppercase tracking-wide">Phone</p>
                 <p className="text-sm font-medium">{seasonal.guest.phone || "—"}</p>
               </div>
               <div>
-                <p className="text-xs text-slate-500 uppercase tracking-wide">Current Rate</p>
+                <p className="text-xs text-muted-foreground uppercase tracking-wide">Current Rate</p>
                 <p className="text-sm font-medium">
                   ${seasonal.pricing?.[0]?.finalRate?.toLocaleString() || "—"}/mo
                 </p>
               </div>
               <div>
-                <p className="text-xs text-slate-500 uppercase tracking-wide">Billing</p>
+                <p className="text-xs text-muted-foreground uppercase tracking-wide">Billing</p>
                 <p className="text-sm font-medium">
                   {seasonal.paysInFull ? "Paid in Full" : "Monthly"} • {seasonal.isMetered ? "Metered" : "Flat Rate"}
                 </p>
               </div>
               <div>
-                <p className="text-xs text-slate-500 uppercase tracking-wide">Member Since</p>
+                <p className="text-xs text-muted-foreground uppercase tracking-wide">Member Since</p>
                 <p className="text-sm font-medium">{seasonal.firstSeasonYear}</p>
               </div>
             </div>
@@ -1231,12 +1192,12 @@ function WaitlistRow({
         <div className="w-8 h-8 rounded-full bg-status-info/15 flex items-center justify-center text-status-info font-bold text-sm">
           #{entry.priority}
         </div>
-        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white font-medium">
+        <div className="w-10 h-10 rounded-full bg-status-info/15 flex items-center justify-center text-status-info font-medium">
           {entry.guest.primaryFirstName[0]}{entry.guest.primaryLastName[0]}
         </div>
         <div className="flex-1">
           <p className="font-medium">{entry.guest.primaryFirstName} {entry.guest.primaryLastName}</p>
-          <p className="text-sm text-slate-500">
+          <p className="text-sm text-muted-foreground">
             Added {formatDistanceToNow(new Date(entry.addedAt), { addSuffix: true })}
             {entry.preferredSites?.length ? ` • Prefers: ${entry.preferredSites.join(", ")}` : ""}
           </p>
@@ -1255,7 +1216,7 @@ function WaitlistRow({
             <UserPlus className="h-4 w-4 mr-1" />
             Convert
           </Button>
-          <Button size="sm" variant="ghost" className="text-slate-400" onClick={onRemove}>
+          <Button size="sm" variant="ghost" className="text-muted-foreground" onClick={onRemove}>
             <X className="h-4 w-4" />
           </Button>
         </div>
@@ -1299,13 +1260,13 @@ function RateCardDisplay({
       <CardContent>
         <div className="space-y-3">
           <div className="flex items-baseline gap-1">
-            <span className="text-3xl font-bold text-slate-900">${rateCard.baseRate.toLocaleString()}</span>
-            <span className="text-slate-500">/{rateCard.billingFrequency}</span>
+            <span className="text-3xl font-bold text-foreground">${rateCard.baseRate.toLocaleString()}</span>
+            <span className="text-muted-foreground">/{rateCard.billingFrequency}</span>
           </div>
 
           {(rateCard.includedUtilities?.length ?? 0) > 0 && (
             <div>
-              <p className="text-xs text-slate-500 uppercase tracking-wide mb-1">Included</p>
+              <p className="text-xs text-muted-foreground uppercase tracking-wide mb-1">Included</p>
               <div className="flex flex-wrap gap-1">
                 {rateCard.includedUtilities?.map((u) => (
                   <Badge key={u} variant="secondary" className="text-xs">{u}</Badge>
@@ -1316,7 +1277,7 @@ function RateCardDisplay({
 
           {(rateCard.discounts?.length ?? 0) > 0 && (
             <div>
-              <p className="text-xs text-slate-500 uppercase tracking-wide mb-1">Discounts</p>
+              <p className="text-xs text-muted-foreground uppercase tracking-wide mb-1">Discounts</p>
               <div className="space-y-1">
                 {rateCard.discounts?.map((d, i) => (
                   <div key={i} className="text-sm flex items-center gap-2">
@@ -1333,14 +1294,14 @@ function RateCardDisplay({
 
           {(rateCard.incentives?.length ?? 0) > 0 && (
             <div>
-              <p className="text-xs text-slate-500 uppercase tracking-wide mb-1">Incentives</p>
+              <p className="text-xs text-muted-foreground uppercase tracking-wide mb-1">Incentives</p>
               <div className="space-y-1">
                 {rateCard.incentives?.map((inc, i) => (
                   <div key={i} className="text-sm flex items-center gap-2">
                     <Zap className="h-3 w-3 text-amber-500" />
                     <span>{inc.name}</span>
                     {inc.deadline && (
-                      <span className="text-xs text-slate-400">by {format(new Date(inc.deadline), "MMM d")}</span>
+                      <span className="text-xs text-muted-foreground">by {format(new Date(inc.deadline), "MMM d")}</span>
                     )}
                   </div>
                 ))}
@@ -1367,7 +1328,7 @@ function MessageTemplateCard({
   const categoryColors: Record<string, string> = {
     renewal: "bg-status-info/15 text-status-info",
     payment: "bg-status-success/15 text-status-success",
-    general: "bg-slate-100 text-slate-700",
+    general: "bg-muted text-foreground",
     welcome: "bg-purple-100 text-purple-700",
     contract: "bg-status-warning/15 text-status-warning",
   };
@@ -1386,9 +1347,9 @@ function MessageTemplateCard({
             </Badge>
           </div>
           {template.subject && (
-            <p className="text-sm text-slate-600 mb-1">{template.subject}</p>
+            <p className="text-sm text-muted-foreground mb-1">{template.subject}</p>
           )}
-          <p className="text-sm text-slate-500 line-clamp-2">{template.body}</p>
+          <p className="text-sm text-muted-foreground line-clamp-2">{template.body}</p>
         </div>
         <div className="flex gap-1">
           <Button size="sm" onClick={onUse}>
@@ -1685,17 +1646,17 @@ export default function SeasonalsPage() {
         {/* Header */}
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
-            <h1 className="text-2xl font-bold text-slate-900 flex items-center gap-2">
+            <h1 className="text-2xl font-bold text-foreground flex items-center gap-2">
               Seasonal Guests
               <Badge variant="secondary" className="text-lg">{stats?.totalSeasonals || 0}</Badge>
             </h1>
-            <p className="text-xs text-slate-400 mt-0.5">Long-term campers with seasonal agreements (not individual reservations)</p>
-            <p className="text-sm text-slate-500 flex items-center gap-2 mt-1">
+            <p className="text-xs text-muted-foreground mt-0.5">Long-term campers with seasonal agreements (not individual reservations)</p>
+            <p className="text-sm text-muted-foreground flex items-center gap-2 mt-1">
               <Calendar className="h-4 w-4" />
               <select
                 value={seasonYear}
                 onChange={(e) => setSeasonYear(parseInt(e.target.value))}
-                className="border-0 bg-transparent font-medium text-slate-700 cursor-pointer hover:text-slate-900"
+                className="border-0 bg-transparent font-medium text-foreground cursor-pointer hover:text-foreground"
               >
                 {[currentYear - 1, currentYear, currentYear + 1].map((y) => (
                   <option key={y} value={y}>{y} Season</option>
@@ -1806,7 +1767,7 @@ export default function SeasonalsPage() {
         {/* Main Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
           <div className="flex flex-wrap items-center justify-between gap-3">
-            <TabsList className="bg-slate-100">
+            <TabsList className="bg-muted">
               <TabsTrigger value="all" className="flex items-center gap-1.5">
                 <Users className="h-4 w-4" />
                 All
@@ -1849,7 +1810,7 @@ export default function SeasonalsPage() {
             {/* Search & Filters */}
             <div className="flex flex-wrap gap-2 items-center">
               <div className="relative">
-                <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <Input
                   placeholder="Search guests..."
                   value={searchQuery}
@@ -1862,7 +1823,7 @@ export default function SeasonalsPage() {
                   <select
                     value={statusFilter}
                     onChange={(e) => setStatusFilter(e.target.value as SeasonalStatus | "all")}
-                    className="text-sm border border-slate-200 rounded-lg px-3 py-2"
+                    className="text-sm border border-border rounded-lg px-3 py-2"
                   >
                     <option value="all">All Status</option>
                     <option value="active">Active</option>
@@ -1873,7 +1834,7 @@ export default function SeasonalsPage() {
                   <select
                     value={renewalFilter}
                     onChange={(e) => setRenewalFilter(e.target.value as RenewalIntent | "all")}
-                    className="text-sm border border-slate-200 rounded-lg px-3 py-2"
+                    className="text-sm border border-border rounded-lg px-3 py-2"
                   >
                     <option value="all">All Renewal</option>
                     <option value="committed">Committed</option>
@@ -1894,21 +1855,21 @@ export default function SeasonalsPage() {
                 type="checkbox"
                 checked={selectedIds.length === seasonals.length && seasonals.length > 0}
                 onChange={toggleSelectAll}
-                className="rounded border-slate-300"
+                className="rounded border-border"
               />
-              <span className="text-slate-500">
+              <span className="text-muted-foreground">
                 {selectedIds.length > 0 ? `${selectedIds.length} selected` : `${seasonals.length} seasonal guests`}
               </span>
             </div>
 
             {seasonalsQuery.isLoading ? (
               <div className="flex items-center justify-center py-12">
-                <Loader2 className="h-8 w-8 animate-spin text-slate-400" />
+                <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
               </div>
             ) : seasonals.length === 0 ? (
               <Card className="p-12 text-center">
-                <Users className="h-12 w-12 text-slate-300 mx-auto mb-3" />
-                <p className="text-slate-500 mb-3">No seasonal guests found</p>
+                <Users className="h-12 w-12 text-muted-foreground mx-auto mb-3" />
+                <p className="text-muted-foreground mb-3">No seasonal guests found</p>
                 <Button size="sm" asChild>
                   <a href={`/campgrounds/${campgroundId}/seasonals/new`}>
                     <Plus className="h-4 w-4 mr-1" />
@@ -1977,7 +1938,7 @@ export default function SeasonalsPage() {
                   .map((seasonal) => (
                     <div
                       key={seasonal.id}
-                      className="flex items-center justify-between p-3 bg-slate-50 rounded-lg hover:bg-slate-100 transition-colors"
+                      className="flex items-center justify-between p-3 bg-muted/60 rounded-lg hover:bg-muted transition-colors"
                     >
                       <div className="flex items-center gap-3">
                         <div className="w-9 h-9 rounded-full bg-status-warning/15 flex items-center justify-center text-status-warning font-medium text-sm">
@@ -1985,7 +1946,7 @@ export default function SeasonalsPage() {
                         </div>
                         <div>
                           <p className="font-medium">{seasonal.guest.primaryFirstName} {seasonal.guest.primaryLastName}</p>
-                          <p className="text-sm text-slate-500">
+                          <p className="text-sm text-muted-foreground">
                             {seasonal.totalSeasons} years at {seasonal.currentSite?.name || "TBD"}
                           </p>
                         </div>
@@ -2024,7 +1985,7 @@ export default function SeasonalsPage() {
                     </div>
                   ))}
                 {seasonals.filter((s) => !s.renewalIntent || s.renewalIntent === "undecided").length === 0 && (
-                  <div className="text-center py-8 text-slate-500">
+                  <div className="text-center py-8 text-muted-foreground">
                     <CheckCircle className="h-8 w-8 text-emerald-500 mx-auto mb-2" />
                     All guests have responded!
                   </div>
@@ -2081,7 +2042,7 @@ export default function SeasonalsPage() {
                           </div>
                           <div>
                             <p className="font-medium">{seasonal.guest.primaryFirstName} {seasonal.guest.primaryLastName}</p>
-                            <p className="text-sm text-slate-500">
+                            <p className="text-sm text-muted-foreground">
                               ${pastDue?.amount.toLocaleString()} due {pastDue?.dueDate && format(new Date(pastDue.dueDate), "MMM d")}
                               <span className="text-rose-600 ml-2">({daysOverdue} days overdue)</span>
                             </p>
@@ -2105,7 +2066,7 @@ export default function SeasonalsPage() {
                     );
                   })}
                 {!seasonals.some((s) => s.payments?.some((p) => p.status === "past_due")) && (
-                  <div className="text-center py-8 text-slate-500">
+                  <div className="text-center py-8 text-muted-foreground">
                     <CheckCircle className="h-8 w-8 text-emerald-500 mx-auto mb-2" />
                     No past due payments!
                   </div>
@@ -2124,7 +2085,7 @@ export default function SeasonalsPage() {
                 <CardContent>
                   <div className="flex items-center gap-4">
                     <div className="flex-1">
-                      <div className="h-3 rounded-full bg-slate-100 overflow-hidden">
+                      <div className="h-3 rounded-full bg-muted overflow-hidden">
                         <div
                           className="h-full bg-emerald-500 transition-all"
                           style={{ width: `${stats ? (stats.contractsSigned / stats.contractsTotal) * 100 : 0}%` }}
@@ -2135,7 +2096,7 @@ export default function SeasonalsPage() {
                       {stats?.contractsSigned || 0}/{stats?.contractsTotal || 0}
                     </span>
                   </div>
-                  <p className="text-sm text-slate-500 mt-2">contracts signed</p>
+                  <p className="text-sm text-muted-foreground mt-2">contracts signed</p>
                 </CardContent>
               </Card>
               <Card>
@@ -2145,13 +2106,13 @@ export default function SeasonalsPage() {
                 <CardContent>
                   <div className="flex items-center gap-4">
                     <div className="flex-1">
-                      <div className="h-3 rounded-full bg-slate-100 overflow-hidden">
+                      <div className="h-3 rounded-full bg-muted overflow-hidden">
                         <div className="h-full bg-blue-500 transition-all" style={{ width: "25%" }} />
                       </div>
                     </div>
                     <span className="text-lg font-bold">22/88</span>
                   </div>
-                  <p className="text-sm text-slate-500 mt-2">contracts signed</p>
+                  <p className="text-sm text-muted-foreground mt-2">contracts signed</p>
                 </CardContent>
               </Card>
             </div>
@@ -2176,15 +2137,15 @@ export default function SeasonalsPage() {
                     return (
                       <div
                         key={seasonal.id}
-                        className="flex items-center justify-between p-3 bg-slate-50 rounded-lg"
+                        className="flex items-center justify-between p-3 bg-muted/60 rounded-lg"
                       >
                         <div className="flex items-center gap-3">
-                          <div className="w-9 h-9 rounded-full bg-slate-200 flex items-center justify-center text-slate-700 font-medium text-sm">
+                          <div className="w-9 h-9 rounded-full bg-muted flex items-center justify-center text-foreground font-medium text-sm">
                             {seasonal.guest.primaryFirstName[0]}{seasonal.guest.primaryLastName[0]}
                           </div>
                           <div>
                             <p className="font-medium">{seasonal.guest.primaryFirstName} {seasonal.guest.primaryLastName}</p>
-                            <p className="text-sm text-slate-500">
+                            <p className="text-sm text-muted-foreground">
                               {contract?.status === "sent"
                                 ? `Sent ${contract.sentAt && formatDistanceToNow(new Date(contract.sentAt), { addSuffix: true })}`
                                 : "Not sent"}
@@ -2212,8 +2173,8 @@ export default function SeasonalsPage() {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="text-center py-8 text-slate-500">
-                  <Shield className="h-8 w-8 text-slate-300 mx-auto mb-2" />
+                <div className="text-center py-8 text-muted-foreground">
+                  <Shield className="h-8 w-8 text-muted-foreground mx-auto mb-2" />
                   Contact support to enable certificate of insurance tracking
                 </div>
               </CardContent>
@@ -2225,7 +2186,7 @@ export default function SeasonalsPage() {
             <div className="flex items-center justify-between">
               <div>
                 <h3 className="text-lg font-medium">Waitlist Queue</h3>
-                <p className="text-sm text-slate-500">
+                <p className="text-sm text-muted-foreground">
                   {waitlist.length} on waitlist • Est. {3} spots available next season
                 </p>
               </div>
@@ -2237,8 +2198,8 @@ export default function SeasonalsPage() {
 
             {waitlist.length === 0 ? (
               <Card className="p-12 text-center">
-                <Clock className="h-12 w-12 text-slate-300 mx-auto mb-3" />
-                <p className="text-slate-500 mb-3">No one on the waitlist yet</p>
+                <Clock className="h-12 w-12 text-muted-foreground mx-auto mb-3" />
+                <p className="text-muted-foreground mb-3">No one on the waitlist yet</p>
                 <Button size="sm">
                   <UserPlus className="h-4 w-4 mr-1" />
                   Add First Guest
@@ -2302,8 +2263,8 @@ export default function SeasonalsPage() {
               <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {rateCards.length === 0 ? (
                   <Card className="col-span-full p-8 text-center">
-                    <Receipt className="h-8 w-8 text-slate-300 mx-auto mb-2" />
-                    <p className="text-slate-500">No rate cards yet</p>
+                    <Receipt className="h-8 w-8 text-muted-foreground mx-auto mb-2" />
+                    <p className="text-muted-foreground">No rate cards yet</p>
                     <Button size="sm" className="mt-3" onClick={() => setShowRateCardModal(true)}>
                       Create First Rate Card
                     </Button>
@@ -2333,7 +2294,7 @@ export default function SeasonalsPage() {
                 <div className="grid md:grid-cols-3 gap-4">
                   <div>
                     <Label>Default Billing Frequency</Label>
-                    <select className="w-full mt-1 border border-slate-200 rounded-lg px-3 py-2">
+                    <select className="w-full mt-1 border border-border rounded-lg px-3 py-2">
                       <option value="monthly">Monthly</option>
                       <option value="quarterly">Quarterly</option>
                       <option value="seasonal">Seasonal (Full)</option>
@@ -2341,7 +2302,7 @@ export default function SeasonalsPage() {
                   </div>
                   <div>
                     <Label>Payment Due Day</Label>
-                    <select className="w-full mt-1 border border-slate-200 rounded-lg px-3 py-2">
+                    <select className="w-full mt-1 border border-border rounded-lg px-3 py-2">
                       <option value="1">1st of month</option>
                       <option value="15">15th of month</option>
                     </select>
@@ -2350,7 +2311,7 @@ export default function SeasonalsPage() {
                     <Label>Late Fee</Label>
                     <div className="flex gap-2 mt-1">
                       <Input type="number" defaultValue="25" className="w-20" />
-                      <select className="flex-1 border border-slate-200 rounded-lg px-3 py-2">
+                      <select className="flex-1 border border-border rounded-lg px-3 py-2">
                         <option value="flat">Flat fee</option>
                         <option value="percent">Percentage</option>
                       </select>
@@ -2375,7 +2336,7 @@ export default function SeasonalsPage() {
                 <CardContent className="space-y-4">
                   <div>
                     <Label>Recipients</Label>
-                    <select className="w-full mt-1 border border-slate-200 rounded-lg px-3 py-2">
+                    <select className="w-full mt-1 border border-border rounded-lg px-3 py-2">
                       <option value="all">All Seasonals ({stats?.totalSeasonals || 0})</option>
                       <option value="committed">Committed ({stats?.renewalsByIntent.committed || 0})</option>
                       <option value="undecided">Undecided ({stats?.renewalsByIntent.undecided || 0})</option>
@@ -2424,7 +2385,7 @@ export default function SeasonalsPage() {
                       rows={5}
                       className="mt-1"
                     />
-                    <p className="text-xs text-slate-500 mt-1">
+                    <p className="text-xs text-muted-foreground mt-1">
                       Tokens: {"{{first_name}}"}, {"{{last_name}}"}, {"{{site}}"}, {"{{tenure_years}}"}, {"{{amount_due}}"}
                     </p>
                   </div>
@@ -2468,13 +2429,13 @@ export default function SeasonalsPage() {
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
-                  <History className="h-5 w-5 text-slate-600" />
+                  <History className="h-5 w-5 text-muted-foreground" />
                   Recent Messages
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="text-center py-8 text-slate-500">
-                  <Mail className="h-8 w-8 text-slate-300 mx-auto mb-2" />
+                <div className="text-center py-8 text-muted-foreground">
+                  <Mail className="h-8 w-8 text-muted-foreground mx-auto mb-2" />
                   Message history will appear here
                 </div>
               </CardContent>
@@ -2592,7 +2553,7 @@ export default function SeasonalsPage() {
                 rows={5}
                 className="mt-1"
               />
-              <p className="text-xs text-slate-500 mt-1">
+              <p className="text-xs text-muted-foreground mt-1">
                 Tokens: {"{{first_name}}"}, {"{{last_name}}"}, {"{{site}}"}, {"{{tenure_years}}"}
               </p>
             </div>
@@ -2679,7 +2640,7 @@ export default function SeasonalsPage() {
                 id="method"
                 name="method"
                 required
-                className="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-sm"
+                className="mt-1 w-full rounded-md border border-border px-3 py-2 text-sm"
               >
                 <option value="check">Check</option>
                 <option value="cash">Cash</option>

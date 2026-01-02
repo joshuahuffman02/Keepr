@@ -92,25 +92,25 @@ export function ReservationPill({
 
     const statusConfig = {
         confirmed: {
-            bg: "bg-gradient-to-br from-emerald-500/90 to-emerald-600/95",
+            bg: "bg-emerald-500/90",
             icon: CheckCircle,
             border: "border-emerald-400/30",
             shadow: "shadow-[0_2px_8px_-2px_rgba(16,185,129,0.4)]"
         },
         checked_in: {
-            bg: "bg-gradient-to-br from-blue-500/90 to-blue-600/95",
+            bg: "bg-blue-500/90",
             icon: Clock,
             border: "border-blue-400/30",
             shadow: "shadow-[0_2px_8px_-2px_rgba(59,130,246,0.4)]"
         },
         cancelled: {
-            bg: "bg-gradient-to-br from-rose-400/90 to-rose-500/95",
+            bg: "bg-rose-500/90",
             icon: XCircle,
             border: "border-rose-400/30",
             shadow: "shadow-[0_2px_8px_-2px_rgba(244,63,94,0.4)]"
         },
         pending: {
-            bg: "bg-gradient-to-br from-amber-400/90 to-amber-500/95",
+            bg: "bg-amber-500/90",
             icon: HelpCircle,
             border: "border-amber-400/30",
             shadow: "shadow-[0_2px_8px_-2px_rgba(245,158,11,0.4)]"
@@ -171,7 +171,7 @@ export function ReservationPill({
                 <>
                     {/* Left edge - extend start date */}
                     <div
-                        className="absolute left-0 top-0 bottom-0 w-3 cursor-ew-resize opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center bg-gradient-to-r from-black/20 to-transparent rounded-l-lg"
+                        className="absolute left-0 top-0 bottom-0 w-3 cursor-ew-resize opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center bg-black/20 rounded-l-lg"
                         onPointerDown={handleExtendStartDrag}
                         title="Drag to change arrival date"
                     >
@@ -180,7 +180,7 @@ export function ReservationPill({
 
                     {/* Right edge - extend end date */}
                     <div
-                        className="absolute right-0 top-0 bottom-0 w-3 cursor-ew-resize opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center bg-gradient-to-l from-black/20 to-transparent rounded-r-lg"
+                        className="absolute right-0 top-0 bottom-0 w-3 cursor-ew-resize opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center bg-black/20 rounded-r-lg"
                         onPointerDown={handleExtendEndDrag}
                         title="Drag to change departure date"
                     >
@@ -197,9 +197,6 @@ export function ReservationPill({
                     </div>
                 </>
             )}
-
-            {/* Gloss Highlight effect */}
-            <div className="absolute inset-0 bg-gradient-to-b from-white/10 to-transparent pointer-events-none" />
 
             {/* Quick Check-in Button */}
             {showQuickCheckIn && (

@@ -333,20 +333,20 @@ function OpsCard({
   tone: "emerald" | "amber" | "blue" | "purple" | "rose";
 }) {
   const toneMap: Record<typeof tone, string> = {
-    emerald: "from-emerald-50 to-emerald-100 text-emerald-800 border-emerald-100",
-    amber: "from-amber-50 to-amber-100 text-amber-800 border-amber-100",
-    blue: "from-blue-50 to-blue-100 text-blue-800 border-blue-100",
-    purple: "from-purple-50 to-purple-100 text-purple-800 border-purple-100",
-    rose: "from-rose-50 to-rose-100 text-rose-800 border-rose-100"
+    emerald: "bg-status-success/10 text-emerald-800 border-status-success/20",
+    amber: "bg-status-warning/10 text-amber-800 border-status-warning/20",
+    blue: "bg-status-info/10 text-blue-800 border-status-info/20",
+    purple: "bg-purple-50 text-purple-800 border-purple-200",
+    rose: "bg-status-error/10 text-rose-800 border-status-error/20"
   };
 
   return (
     <Link
       href={href}
-      className={`card flex items-center justify-between gap-3 border ${toneMap[tone]} bg-gradient-to-br p-4 hover:shadow-md transition`}
+      className={`card flex items-center justify-between gap-3 border ${toneMap[tone]} p-4 hover:shadow-md transition`}
     >
       <div className="flex items-center gap-3">
-        <span className="rounded-lg bg-white/70 p-2 text-slate-700">{icon}</span>
+        <span className="rounded-lg bg-background p-2 text-slate-700">{icon}</span>
         <div>
           <div className="text-xs font-semibold uppercase tracking-wide text-slate-500">{label}</div>
           <div className="text-xl font-bold text-slate-900">{value}</div>
@@ -539,4 +539,3 @@ function ActivityList({ title, rows, tone }: { title: string; rows: Reservation[
     </div>
   );
 }
-

@@ -125,21 +125,21 @@ export default function WelcomePage() {
   const completedTasks = setupTasks.filter((t) => t.isComplete).length;
   const progressPercent = Math.round((completedTasks / setupTasks.length) * 100);
 
-  const tierDisplayNames: Record<string, { name: string; icon: React.ReactNode; color: string }> = {
+  const tierDisplayNames: Record<string, { name: string; icon: React.ReactNode; className: string }> = {
     founders_circle: {
       name: "Founder's Circle",
       icon: <Crown className="h-5 w-5" />,
-      color: "from-amber-500 to-orange-500"
+      className: "bg-status-warning"
     },
     pioneer: {
       name: "Pioneer",
       icon: <Rocket className="h-5 w-5" />,
-      color: "from-emerald-500 to-teal-500"
+      className: "bg-status-success"
     },
     trailblazer: {
       name: "Trailblazer",
       icon: <Star className="h-5 w-5" />,
-      color: "from-violet-500 to-purple-500"
+      className: "bg-status-info"
     }
   };
 
@@ -150,8 +150,8 @@ export default function WelcomePage() {
       <div className="max-w-4xl mx-auto space-y-8">
         {/* Welcome Header */}
         <div className="text-center space-y-4">
-          <div className="mx-auto w-16 h-16 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-2xl flex items-center justify-center shadow-lg">
-            <Sparkles className="h-8 w-8 text-white" />
+          <div className="mx-auto w-16 h-16 bg-status-success/15 rounded-2xl flex items-center justify-center">
+            <Sparkles className="h-8 w-8 text-status-success" />
           </div>
 
           <h1 className="text-3xl font-bold text-slate-900">
@@ -172,7 +172,7 @@ export default function WelcomePage() {
           {/* Early Access Badge */}
           {tierInfo && (
             <div
-              className={`inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r ${tierInfo.color} text-white rounded-full text-sm font-semibold shadow-md`}
+              className={`inline-flex items-center gap-2 px-4 py-2 ${tierInfo.className} text-white rounded-full text-sm font-semibold shadow-sm`}
             >
               {tierInfo.icon}
               Early Access: {tierInfo.name}
@@ -196,7 +196,7 @@ export default function WelcomePage() {
             {/* Progress Bar */}
             <div className="h-3 bg-slate-100 rounded-full overflow-hidden">
               <div
-                className="h-full bg-gradient-to-r from-emerald-500 to-teal-500 transition-all duration-500"
+                className="h-full bg-status-success transition-all duration-500"
                 style={{ width: `${progressPercent}%` }}
               />
             </div>
@@ -256,13 +256,13 @@ export default function WelcomePage() {
 
         {/* Quick Start Actions */}
         <div className="grid md:grid-cols-2 gap-4">
-          <div className="bg-gradient-to-br from-emerald-500 to-teal-600 rounded-2xl p-6 text-white">
-            <Calendar className="h-8 w-8 mb-4 opacity-90" />
-            <h3 className="text-xl font-semibold mb-2">View Your Calendar</h3>
-            <p className="text-emerald-100 text-sm mb-4">
+          <div className="bg-card border border-border rounded-2xl p-6">
+            <Calendar className="h-8 w-8 mb-4 text-status-success" />
+            <h3 className="text-xl font-semibold text-foreground mb-2">View Your Calendar</h3>
+            <p className="text-muted-foreground text-sm mb-4">
               See your availability at a glance and manage reservations.
             </p>
-            <Button asChild variant="secondary" className="bg-white text-emerald-700 hover:bg-emerald-50">
+            <Button asChild variant="outline" className="border-status-success text-status-success hover:bg-status-success/10">
               <Link href="/calendar">
                 Open Calendar
                 <ArrowRight className="ml-2 h-4 w-4" />
@@ -270,16 +270,16 @@ export default function WelcomePage() {
             </Button>
           </div>
 
-          <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl p-6 text-white">
-            <ExternalLink className="h-8 w-8 mb-4 opacity-90" />
-            <h3 className="text-xl font-semibold mb-2">Share Your Booking Page</h3>
-            <p className="text-slate-300 text-sm mb-4">
+          <div className="bg-muted border border-border rounded-2xl p-6">
+            <ExternalLink className="h-8 w-8 mb-4 text-status-info" />
+            <h3 className="text-xl font-semibold text-foreground mb-2">Share Your Booking Page</h3>
+            <p className="text-muted-foreground text-sm mb-4">
               Let guests book directly on your custom booking page.
             </p>
             <Button
               asChild
-              variant="secondary"
-              className="bg-white text-slate-800 hover:bg-slate-100"
+              variant="outline"
+              className="border-status-info text-status-info hover:bg-status-info/10"
             >
               <Link href={`/park/${selectedCampground?.slug || ""}`} target="_blank">
                 Preview Booking Page

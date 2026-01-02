@@ -266,39 +266,39 @@ export default function LedgerPage() {
             <div className="card p-5 space-y-4">
               {/* Key Metrics Row */}
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <div className="p-4 rounded-xl bg-gradient-to-br from-slate-50 to-slate-100 border border-slate-200">
-                  <div className="flex items-center gap-2 text-slate-500 text-xs font-medium mb-1">
+                <div className="p-4 rounded-xl bg-card border border-border">
+                  <div className="flex items-center gap-2 text-muted-foreground text-xs font-medium mb-1">
                     <FileText className="h-3.5 w-3.5" />
                     Total Entries
                   </div>
-                  <div className="text-2xl font-bold text-slate-900">
+                  <div className="text-2xl font-bold text-foreground">
                     {ledgerQuery.isLoading ? "—" : filteredEntries.length}
                   </div>
                 </div>
-                <div className="p-4 rounded-xl bg-gradient-to-br from-emerald-50 to-teal-50 border border-emerald-200">
-                  <div className="flex items-center gap-2 text-emerald-600 text-xs font-medium mb-1">
+                <div className="p-4 rounded-xl bg-status-success/10 border border-status-success/20">
+                  <div className="flex items-center gap-2 text-status-success text-xs font-medium mb-1">
                     <TrendingUp className="h-3.5 w-3.5" />
                     Total Credits
                   </div>
-                  <div className="text-2xl font-bold text-emerald-700">
+                  <div className="text-2xl font-bold text-status-success">
                     ${ledgerQuery.isLoading ? "—" : ((ledgerQuery.data || []).filter(e => e.direction === 'credit').reduce((sum, e) => sum + e.amountCents, 0) / 100).toFixed(2)}
                   </div>
                 </div>
-                <div className="p-4 rounded-xl bg-gradient-to-br from-rose-50 to-pink-50 border border-rose-200">
-                  <div className="flex items-center gap-2 text-rose-600 text-xs font-medium mb-1">
+                <div className="p-4 rounded-xl bg-status-error/10 border border-status-error/20">
+                  <div className="flex items-center gap-2 text-status-error text-xs font-medium mb-1">
                     <TrendingDown className="h-3.5 w-3.5" />
                     Total Debits
                   </div>
-                  <div className="text-2xl font-bold text-rose-700">
+                  <div className="text-2xl font-bold text-status-error">
                     ${ledgerQuery.isLoading ? "—" : ((ledgerQuery.data || []).filter(e => e.direction === 'debit').reduce((sum, e) => sum + e.amountCents, 0) / 100).toFixed(2)}
                   </div>
                 </div>
-                <div className={`p-4 rounded-xl border ${total >= 0 ? "bg-gradient-to-br from-emerald-50 to-teal-50 border-emerald-200" : "bg-gradient-to-br from-rose-50 to-pink-50 border-rose-200"}`}>
-                  <div className={`flex items-center gap-2 text-xs font-medium mb-1 ${total >= 0 ? "text-emerald-600" : "text-rose-600"}`}>
+                <div className={`p-4 rounded-xl border ${total >= 0 ? "bg-status-success/10 border-status-success/20" : "bg-status-error/10 border-status-error/20"}`}>
+                  <div className={`flex items-center gap-2 text-xs font-medium mb-1 ${total >= 0 ? "text-status-success" : "text-status-error"}`}>
                     <DollarSign className="h-3.5 w-3.5" />
                     Net Balance
                   </div>
-                  <div className={`text-2xl font-bold ${total >= 0 ? "text-emerald-700" : "text-rose-700"}`}>
+                  <div className={`text-2xl font-bold ${total >= 0 ? "text-status-success" : "text-status-error"}`}>
                     {total >= 0 ? "+" : "-"}${ledgerQuery.isLoading ? "—" : (Math.abs(total) / 100).toFixed(2)}
                   </div>
                 </div>
@@ -377,8 +377,8 @@ export default function LedgerPage() {
 
                 return (
                   <div className={`rounded-xl border p-4 transition-all duration-300 ${needsReview
-                      ? 'border-amber-200 bg-gradient-to-br from-amber-50 to-orange-50'
-                      : 'border-emerald-200 bg-gradient-to-br from-emerald-50 to-teal-50'
+                      ? 'border-status-warning/20 bg-status-warning/10'
+                      : 'border-status-success/20 bg-status-success/10'
                     }`}>
                     <div className="flex items-center justify-between mb-3">
                       <h3 className="font-semibold text-slate-900 flex items-center gap-2">
@@ -399,7 +399,7 @@ export default function LedgerPage() {
                     </div>
 
                     {isBalanced && (
-                      <div className="mb-3 p-3 bg-emerald-100/50 rounded-lg border border-emerald-200/50">
+                      <div className="mb-3 p-3 bg-status-success/10 rounded-lg border border-status-success/20">
                         <p className="text-sm text-emerald-800 font-medium">
                           Great news! Your books are balanced for this period.
                         </p>
@@ -410,7 +410,7 @@ export default function LedgerPage() {
                     )}
 
                     {needsReview && (
-                      <div className="mb-3 p-3 bg-amber-100/50 rounded-lg border border-amber-200/50 space-y-1">
+                      <div className="mb-3 p-3 bg-status-warning/10 rounded-lg border border-status-warning/20 space-y-1">
                         {hasUnbalanced && (
                           <div className="flex items-center gap-2 text-sm text-amber-800">
                             <AlertTriangle className="h-4 w-4 flex-shrink-0" />

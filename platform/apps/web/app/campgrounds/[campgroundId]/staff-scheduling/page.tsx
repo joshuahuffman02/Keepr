@@ -49,7 +49,7 @@ type StaffMember = { id: string; firstName?: string; lastName?: string; email?: 
 const STATUS_OPTIONS = ["all", "scheduled", "in_progress", "submitted", "approved", "rejected"];
 
 const STATUS_COLORS: Record<string, { bg: string; text: string; dot: string }> = {
-  scheduled: { bg: "bg-slate-100", text: "text-slate-700", dot: "bg-slate-400" },
+  scheduled: { bg: "bg-muted", text: "text-foreground", dot: "bg-slate-400" },
   in_progress: { bg: "bg-status-info/15", text: "text-status-info", dot: "bg-status-info" },
   submitted: { bg: "bg-status-warning/15", text: "text-status-warning", dot: "bg-status-warning" },
   approved: { bg: "bg-status-success/15", text: "text-status-success", dot: "bg-status-success" },
@@ -502,23 +502,23 @@ export default function StaffSchedulingPage({ params }: { params: { campgroundId
                 initial={{ scale: 0.95, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
                 exit={{ scale: 0.95, opacity: 0 }}
-                className="bg-white rounded-2xl shadow-xl max-w-md w-full overflow-hidden"
+                className="bg-card rounded-2xl shadow-xl max-w-md w-full overflow-hidden"
                 onClick={(e) => e.stopPropagation()}
               >
-                <div className="bg-gradient-to-r from-violet-50 to-purple-50 border-b border-violet-100 px-6 py-4">
+                <div className="bg-status-info/10 border-b border-status-info/20 px-6 py-4">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
                       <div className="w-10 h-10 rounded-lg bg-violet-100 flex items-center justify-center">
                         <ArrowLeftRight className="w-5 h-5 text-violet-600" />
                       </div>
                       <div>
-                        <h3 className="font-semibold text-slate-900">Request Shift Swap</h3>
-                        <p className="text-sm text-slate-600">Find someone to take your shift</p>
+                        <h3 className="font-semibold text-foreground">Request Shift Swap</h3>
+                        <p className="text-sm text-muted-foreground">Find someone to take your shift</p>
                       </div>
                     </div>
                     <button
                       onClick={closeSwapModal}
-                      className="p-2 text-slate-400 hover:text-slate-600 rounded-lg hover:bg-slate-100"
+                      className="p-2 text-muted-foreground hover:text-muted-foreground rounded-lg hover:bg-muted"
                     >
                       <X className="w-5 h-5" />
                     </button>
@@ -527,26 +527,26 @@ export default function StaffSchedulingPage({ params }: { params: { campgroundId
 
                 <div className="p-6 space-y-4">
                   {/* Shift info */}
-                  <div className="p-4 bg-slate-50 rounded-xl">
-                    <div className="text-sm font-medium text-slate-500 mb-1">Shift to swap</div>
-                    <div className="font-semibold text-slate-900">
+                  <div className="p-4 bg-muted/60 rounded-xl">
+                    <div className="text-sm font-medium text-muted-foreground mb-1">Shift to swap</div>
+                    <div className="font-semibold text-foreground">
                       {new Date(swapShift.shiftDate).toLocaleDateString(undefined, { weekday: "long", month: "short", day: "numeric" })}
                     </div>
-                    <div className="text-sm text-slate-600">
+                    <div className="text-sm text-muted-foreground">
                       {new Date(swapShift.startTime).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" })} - {new Date(swapShift.endTime).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" })}
-                      {swapShift.role && <span className="ml-2 text-slate-400">({swapShift.role})</span>}
+                      {swapShift.role && <span className="ml-2 text-muted-foreground">({swapShift.role})</span>}
                     </div>
                   </div>
 
                   {/* Recipient selector */}
                   <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-2">
+                    <label className="block text-sm font-medium text-foreground mb-2">
                       Ask someone to take it
                     </label>
                     <select
                       value={swapRecipientId}
                       onChange={(e) => setSwapRecipientId(e.target.value)}
-                      className="w-full px-4 py-3 border border-slate-200 rounded-lg focus:ring-2 focus:ring-violet-500 focus:border-violet-500"
+                      className="w-full px-4 py-3 border border-border rounded-lg focus:ring-2 focus:ring-violet-500 focus:border-violet-500"
                     >
                       <option value="">Select a team member...</option>
                       {swapRecipients.map((s) => (
@@ -559,7 +559,7 @@ export default function StaffSchedulingPage({ params }: { params: { campgroundId
 
                   {/* Note */}
                   <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-2">
+                    <label className="block text-sm font-medium text-foreground mb-2">
                       Note (optional)
                     </label>
                     <textarea
@@ -567,7 +567,7 @@ export default function StaffSchedulingPage({ params }: { params: { campgroundId
                       onChange={(e) => setSwapNote(e.target.value)}
                       placeholder="e.g., I have a doctor's appointment..."
                       rows={2}
-                      className="w-full px-4 py-3 border border-slate-200 rounded-lg focus:ring-2 focus:ring-violet-500 focus:border-violet-500"
+                      className="w-full px-4 py-3 border border-border rounded-lg focus:ring-2 focus:ring-violet-500 focus:border-violet-500"
                     />
                   </div>
 
@@ -575,7 +575,7 @@ export default function StaffSchedulingPage({ params }: { params: { campgroundId
                   <div className="flex gap-3 pt-2">
                     <button
                       onClick={closeSwapModal}
-                      className="flex-1 px-4 py-3 bg-slate-100 text-slate-700 rounded-xl font-medium hover:bg-slate-200"
+                      className="flex-1 px-4 py-3 bg-muted text-foreground rounded-xl font-medium hover:bg-slate-200"
                     >
                       Cancel
                     </button>
@@ -609,24 +609,24 @@ export default function StaffSchedulingPage({ params }: { params: { campgroundId
           transition={{ ...SPRING_CONFIG, delay: 0.1 }}
           className="grid grid-cols-1 md:grid-cols-4 gap-4"
         >
-          <div className="bg-white rounded-xl border border-slate-200 p-5 shadow-sm">
+          <div className="bg-card rounded-xl border border-border p-5 shadow-sm">
             <div className="flex items-center justify-between">
               <div>
-                <div className="text-xs font-semibold text-slate-500 uppercase tracking-wider">This Window</div>
-                <div className="text-3xl font-bold text-slate-900 mt-1">{totalShiftsCount}</div>
+                <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">This Window</div>
+                <div className="text-3xl font-bold text-foreground mt-1">{totalShiftsCount}</div>
               </div>
               <div className="w-12 h-12 rounded-xl bg-teal-100 flex items-center justify-center">
                 <Calendar className="w-6 h-6 text-teal-600" />
               </div>
             </div>
-            <p className="text-xs text-slate-500 mt-2">Total shifts scheduled</p>
+            <p className="text-xs text-muted-foreground mt-2">Total shifts scheduled</p>
           </div>
 
-          <div className="bg-white rounded-xl border border-slate-200 p-5 shadow-sm">
+          <div className="bg-card rounded-xl border border-border p-5 shadow-sm">
             <div className="flex items-center justify-between">
               <div>
-                <div className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Pending Approval</div>
-                <div className="text-3xl font-bold text-slate-900 mt-1">{pendingApprovalCount}</div>
+                <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Pending Approval</div>
+                <div className="text-3xl font-bold text-foreground mt-1">{pendingApprovalCount}</div>
               </div>
               <div className={cn(
                 "w-12 h-12 rounded-xl flex items-center justify-center",
@@ -639,27 +639,27 @@ export default function StaffSchedulingPage({ params }: { params: { campgroundId
                 )}
               </div>
             </div>
-            <p className="text-xs text-slate-500 mt-2">Awaiting manager review</p>
+            <p className="text-xs text-muted-foreground mt-2">Awaiting manager review</p>
           </div>
 
-          <div className="bg-white rounded-xl border border-slate-200 p-5 shadow-sm">
+          <div className="bg-card rounded-xl border border-border p-5 shadow-sm">
             <div className="flex items-center justify-between">
               <div>
-                <div className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Staff Members</div>
-                <div className="text-3xl font-bold text-slate-900 mt-1">{staffMembers.length}</div>
+                <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Staff Members</div>
+                <div className="text-3xl font-bold text-foreground mt-1">{staffMembers.length}</div>
               </div>
-              <div className="w-12 h-12 rounded-xl bg-slate-100 flex items-center justify-center">
-                <User className="w-6 h-6 text-slate-600" />
+              <div className="w-12 h-12 rounded-xl bg-muted flex items-center justify-center">
+                <User className="w-6 h-6 text-muted-foreground" />
               </div>
             </div>
-            <p className="text-xs text-slate-500 mt-2">Available to schedule</p>
+            <p className="text-xs text-muted-foreground mt-2">Available to schedule</p>
           </div>
 
-          <div className="bg-white rounded-xl border border-slate-200 p-5 shadow-sm">
+          <div className="bg-card rounded-xl border border-border p-5 shadow-sm">
             <div className="flex items-center justify-between">
               <div>
-                <div className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Conflicts</div>
-                <div className="text-3xl font-bold text-slate-900 mt-1">{conflicts.size}</div>
+                <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Conflicts</div>
+                <div className="text-3xl font-bold text-foreground mt-1">{conflicts.size}</div>
               </div>
               <div className={cn(
                 "w-12 h-12 rounded-xl flex items-center justify-center",
@@ -672,7 +672,7 @@ export default function StaffSchedulingPage({ params }: { params: { campgroundId
                 )}
               </div>
             </div>
-            <p className="text-xs text-slate-500 mt-2">{conflicts.size > 0 ? "Overlapping shifts detected" : "No scheduling conflicts"}</p>
+            <p className="text-xs text-muted-foreground mt-2">{conflicts.size > 0 ? "Overlapping shifts detected" : "No scheduling conflicts"}</p>
           </div>
         </motion.div>
 
@@ -682,16 +682,16 @@ export default function StaffSchedulingPage({ params }: { params: { campgroundId
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ ...SPRING_CONFIG, delay: 0.15 }}
-            className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden"
+            className="bg-card rounded-xl border border-border shadow-sm overflow-hidden"
           >
-            <div className="bg-gradient-to-r from-teal-50 to-emerald-50 border-b border-teal-100 px-6 py-4">
+            <div className="bg-status-success/10 border-b border-status-success/20 px-6 py-4">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-lg bg-teal-100 flex items-center justify-center">
                   <Plus className="w-5 h-5 text-teal-600" />
                 </div>
                 <div>
-                  <h2 className="text-lg font-semibold text-slate-900">Create Shift</h2>
-                  <p className="text-sm text-slate-600">Schedule a new shift for staff</p>
+                  <h2 className="text-lg font-semibold text-foreground">Create Shift</h2>
+                  <p className="text-sm text-muted-foreground">Schedule a new shift for staff</p>
                 </div>
               </div>
             </div>
@@ -699,13 +699,13 @@ export default function StaffSchedulingPage({ params }: { params: { campgroundId
             <div className="p-6 space-y-4">
               {/* Staff Member Selector */}
               <div className="relative">
-                <label className="block text-sm font-medium text-slate-700 mb-2">
+                <label className="block text-sm font-medium text-foreground mb-2">
                   Staff Member
                 </label>
                 <div className="relative">
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                   <input
-                    className="w-full pl-10 pr-10 rounded-lg border border-slate-200 px-4 py-3 text-sm focus:ring-2 focus:ring-teal-500 focus:border-teal-500 focus:outline-none transition-shadow"
+                    className="w-full pl-10 pr-10 rounded-lg border border-border px-4 py-3 text-sm focus:ring-2 focus:ring-teal-500 focus:border-teal-500 focus:outline-none transition-shadow"
                     placeholder="Search staff..."
                     value={form.userId ? `${selectedStaff?.firstName || ""} ${selectedStaff?.lastName || ""}`.trim() || form.userId : staffSearch}
                     onChange={(e) => {
@@ -719,7 +719,7 @@ export default function StaffSchedulingPage({ params }: { params: { campgroundId
                     <button
                       type="button"
                       onClick={() => { setForm({ ...form, userId: "" }); setStaffSearch(""); }}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-muted-foreground"
                     >×</button>
                   )}
                 </div>
@@ -729,7 +729,7 @@ export default function StaffSchedulingPage({ params }: { params: { campgroundId
                       initial={{ opacity: 0, y: -10 }}
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, y: -10 }}
-                      className="absolute z-10 w-full mt-1 bg-white border border-slate-200 rounded-lg shadow-lg max-h-48 overflow-y-auto"
+                      className="absolute z-10 w-full mt-1 bg-card border border-border rounded-lg shadow-lg max-h-48 overflow-y-auto"
                     >
                       {filteredStaff.length > 0 ? filteredStaff.map(s => (
                         <button
@@ -740,18 +740,18 @@ export default function StaffSchedulingPage({ params }: { params: { campgroundId
                             setShowStaffDropdown(false);
                             setStaffSearch("");
                           }}
-                          className="w-full px-4 py-3 text-left hover:bg-slate-50 text-sm border-b last:border-b-0 flex items-center gap-3"
+                          className="w-full px-4 py-3 text-left hover:bg-muted/60 text-sm border-b last:border-b-0 flex items-center gap-3"
                         >
-                          <div className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center">
-                            <User className="w-4 h-4 text-slate-500" />
+                          <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center">
+                            <User className="w-4 h-4 text-muted-foreground" />
                           </div>
                           <div>
-                            <div className="font-medium text-slate-900">{s.firstName} {s.lastName}</div>
-                            <div className="text-xs text-slate-500">{s.email}</div>
+                            <div className="font-medium text-foreground">{s.firstName} {s.lastName}</div>
+                            <div className="text-xs text-muted-foreground">{s.email}</div>
                           </div>
                         </button>
                       )) : (
-                        <div className="px-4 py-3 text-sm text-slate-500">
+                        <div className="px-4 py-3 text-sm text-muted-foreground">
                           {staffMembers.length === 0 ? "No staff members found. Add members in Settings." : "No matching staff."}
                         </div>
                       )}
@@ -762,9 +762,9 @@ export default function StaffSchedulingPage({ params }: { params: { campgroundId
 
               {/* Date */}
               <div>
-                <label className="block text-sm font-medium text-slate-700 mb-2">Date</label>
+                <label className="block text-sm font-medium text-foreground mb-2">Date</label>
                 <input
-                  className="w-full rounded-lg border border-slate-200 px-4 py-3 text-sm focus:ring-2 focus:ring-teal-500 focus:border-teal-500 focus:outline-none transition-shadow"
+                  className="w-full rounded-lg border border-border px-4 py-3 text-sm focus:ring-2 focus:ring-teal-500 focus:border-teal-500 focus:outline-none transition-shadow"
                   type="date"
                   value={form.date}
                   onChange={(e) => setForm({ ...form, date: e.target.value })}
@@ -773,17 +773,17 @@ export default function StaffSchedulingPage({ params }: { params: { campgroundId
 
               {/* Time Range */}
               <div>
-                <label className="block text-sm font-medium text-slate-700 mb-2">Time</label>
+                <label className="block text-sm font-medium text-foreground mb-2">Time</label>
                 <div className="flex gap-2 items-center">
                   <input
-                    className="w-full rounded-lg border border-slate-200 px-4 py-3 text-sm focus:ring-2 focus:ring-teal-500 focus:border-teal-500 focus:outline-none transition-shadow"
+                    className="w-full rounded-lg border border-border px-4 py-3 text-sm focus:ring-2 focus:ring-teal-500 focus:border-teal-500 focus:outline-none transition-shadow"
                     type="time"
                     value={form.start}
                     onChange={(e) => setForm({ ...form, start: e.target.value })}
                   />
-                  <span className="text-slate-400">to</span>
+                  <span className="text-muted-foreground">to</span>
                   <input
-                    className="w-full rounded-lg border border-slate-200 px-4 py-3 text-sm focus:ring-2 focus:ring-teal-500 focus:border-teal-500 focus:outline-none transition-shadow"
+                    className="w-full rounded-lg border border-border px-4 py-3 text-sm focus:ring-2 focus:ring-teal-500 focus:border-teal-500 focus:outline-none transition-shadow"
                     type="time"
                     value={form.end}
                     onChange={(e) => setForm({ ...form, end: e.target.value })}
@@ -793,9 +793,9 @@ export default function StaffSchedulingPage({ params }: { params: { campgroundId
 
               {/* Role */}
               <div>
-                <label className="block text-sm font-medium text-slate-700 mb-2">Role</label>
+                <label className="block text-sm font-medium text-foreground mb-2">Role</label>
                 <select
-                  className="w-full rounded-lg border border-slate-200 px-4 py-3 text-sm focus:ring-2 focus:ring-teal-500 focus:border-teal-500 focus:outline-none transition-shadow"
+                  className="w-full rounded-lg border border-border px-4 py-3 text-sm focus:ring-2 focus:ring-teal-500 focus:border-teal-500 focus:outline-none transition-shadow"
                   value={form.role}
                   onChange={(e) => setForm({ ...form, role: e.target.value })}
                 >
@@ -839,17 +839,17 @@ export default function StaffSchedulingPage({ params }: { params: { campgroundId
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ ...SPRING_CONFIG, delay: 0.2 }}
-            className="lg:col-span-2 bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden"
+            className="lg:col-span-2 bg-card rounded-xl border border-border shadow-sm overflow-hidden"
           >
-            <div className="bg-gradient-to-r from-slate-50 to-slate-100 border-b border-slate-200 px-6 py-4">
+            <div className="bg-muted/60 border-b border-border px-6 py-4">
               <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 rounded-lg bg-slate-200 flex items-center justify-center">
-                    <Calendar className="w-5 h-5 text-slate-600" />
+                    <Calendar className="w-5 h-5 text-muted-foreground" />
                   </div>
                   <div>
-                    <h2 className="text-lg font-semibold text-slate-900">Shift Schedule</h2>
-                    <p className="text-sm text-slate-600">
+                    <h2 className="text-lg font-semibold text-foreground">Shift Schedule</h2>
+                    <p className="text-sm text-muted-foreground">
                       {windowStart.toLocaleDateString(undefined, { month: "short", day: "numeric" })} — {windowEnd.toLocaleDateString(undefined, { month: "short", day: "numeric" })}
                     </p>
                   </div>
@@ -857,12 +857,12 @@ export default function StaffSchedulingPage({ params }: { params: { campgroundId
 
                 <div className="flex items-center gap-2 flex-wrap">
                   {/* View Toggle */}
-                  <div className="flex rounded-lg border border-slate-200 overflow-hidden">
+                  <div className="flex rounded-lg border border-border overflow-hidden">
                     <button
                       onClick={() => setViewMode("calendar")}
                       className={cn(
                         "px-3 py-2 flex items-center gap-1.5 text-sm",
-                        viewMode === "calendar" ? "bg-slate-100 text-slate-900" : "text-slate-600 hover:bg-slate-50"
+                        viewMode === "calendar" ? "bg-muted text-foreground" : "text-muted-foreground hover:bg-muted/60"
                       )}
                     >
                       <LayoutGrid className="w-4 h-4" />
@@ -871,8 +871,8 @@ export default function StaffSchedulingPage({ params }: { params: { campgroundId
                     <button
                       onClick={() => setViewMode("list")}
                       className={cn(
-                        "px-3 py-2 flex items-center gap-1.5 text-sm border-l border-slate-200",
-                        viewMode === "list" ? "bg-slate-100 text-slate-900" : "text-slate-600 hover:bg-slate-50"
+                        "px-3 py-2 flex items-center gap-1.5 text-sm border-l border-border",
+                        viewMode === "list" ? "bg-muted text-foreground" : "text-muted-foreground hover:bg-muted/60"
                       )}
                     >
                       <List className="w-4 h-4" />
@@ -882,9 +882,9 @@ export default function StaffSchedulingPage({ params }: { params: { campgroundId
 
                   {/* Status Filter */}
                   <div className="flex items-center gap-2">
-                    <Filter className="w-4 h-4 text-slate-500" />
+                    <Filter className="w-4 h-4 text-muted-foreground" />
                     <select
-                      className="rounded-lg border border-slate-200 px-3 py-2 text-sm focus:ring-2 focus:ring-teal-500 focus:border-teal-500 focus:outline-none"
+                      className="rounded-lg border border-border px-3 py-2 text-sm focus:ring-2 focus:ring-teal-500 focus:border-teal-500 focus:outline-none"
                       value={statusFilter}
                       onChange={(e) => setStatusFilter(e.target.value)}
                     >
@@ -902,7 +902,7 @@ export default function StaffSchedulingPage({ params }: { params: { campgroundId
                     whileTap={{ scale: 0.95 }}
                     onClick={load}
                     disabled={loading}
-                    className="p-2 rounded-lg border border-slate-200 text-slate-600 hover:bg-slate-50 disabled:opacity-50"
+                    className="p-2 rounded-lg border border-border text-muted-foreground hover:bg-muted/60 disabled:opacity-50"
                   >
                     <RefreshCw className={cn("w-4 h-4", loading && "animate-spin")} />
                   </motion.button>
@@ -911,19 +911,19 @@ export default function StaffSchedulingPage({ params }: { params: { campgroundId
                   <div className="flex items-center gap-1">
                     <button
                       onClick={() => setStartDay(new Date(windowStart.getTime() - 7 * 24 * 60 * 60 * 1000))}
-                      className="p-2 rounded-lg border border-slate-200 text-slate-600 hover:bg-slate-50"
+                      className="p-2 rounded-lg border border-border text-muted-foreground hover:bg-muted/60"
                     >
                       <ChevronLeft className="w-4 h-4" />
                     </button>
                     <button
                       onClick={() => setStartDay(new Date())}
-                      className="px-3 py-2 rounded-lg border border-slate-200 text-sm text-slate-600 hover:bg-slate-50"
+                      className="px-3 py-2 rounded-lg border border-border text-sm text-muted-foreground hover:bg-muted/60"
                     >
                       Today
                     </button>
                     <button
                       onClick={() => setStartDay(new Date(windowStart.getTime() + 7 * 24 * 60 * 60 * 1000))}
-                      className="p-2 rounded-lg border border-slate-200 text-slate-600 hover:bg-slate-50"
+                      className="p-2 rounded-lg border border-border text-muted-foreground hover:bg-muted/60"
                     >
                       <ChevronRight className="w-4 h-4" />
                     </button>
@@ -936,7 +936,7 @@ export default function StaffSchedulingPage({ params }: { params: { campgroundId
               {loading ? (
                 <div className="space-y-3">
                   {[1, 2, 3].map((i) => (
-                    <div key={i} className="h-20 bg-slate-100 rounded-lg animate-pulse" />
+                    <div key={i} className="h-20 bg-muted rounded-lg animate-pulse" />
                   ))}
                 </div>
               ) : viewMode === "list" ? (
@@ -948,11 +948,11 @@ export default function StaffSchedulingPage({ params }: { params: { campgroundId
                         animate={{ opacity: 1 }}
                         className="flex flex-col items-center justify-center py-16 text-center"
                       >
-                        <div className="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mb-4">
-                          <Inbox className="w-8 h-8 text-slate-400" />
+                        <div className="w-16 h-16 bg-muted rounded-full flex items-center justify-center mb-4">
+                          <Inbox className="w-8 h-8 text-muted-foreground" />
                         </div>
-                        <h3 className="text-lg font-semibold text-slate-900">No shifts scheduled</h3>
-                        <p className="text-sm text-slate-600 mt-1">Create a shift using the form on the left.</p>
+                        <h3 className="text-lg font-semibold text-foreground">No shifts scheduled</h3>
+                        <p className="text-sm text-muted-foreground mt-1">Create a shift using the form on the left.</p>
                       </motion.div>
                     ) : (
                       shifts.map((shift, index) => (
@@ -965,17 +965,17 @@ export default function StaffSchedulingPage({ params }: { params: { campgroundId
                           transition={{ ...SPRING_CONFIG, delay: index * 0.03 }}
                           className={cn(
                             "rounded-xl border p-4 transition-colors",
-                            conflicts.has(shift.id) ? "bg-status-error/15" : "border-slate-200 hover:bg-slate-50"
+                            conflicts.has(shift.id) ? "bg-status-error/15" : "border-border hover:bg-muted/60"
                           )}
                         >
                           <div className="flex items-center justify-between">
                             <div className="flex items-center gap-3">
-                              <div className="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center">
-                                <User className="w-5 h-5 text-slate-500" />
+                              <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center">
+                                <User className="w-5 h-5 text-muted-foreground" />
                               </div>
                               <div>
-                                <div className="font-semibold text-slate-900">{shift.role || "Shift"}</div>
-                                <div className="flex items-center gap-2 text-sm text-slate-600">
+                                <div className="font-semibold text-foreground">{shift.role || "Shift"}</div>
+                                <div className="flex items-center gap-2 text-sm text-muted-foreground">
                                   <Calendar className="w-3.5 h-3.5" />
                                   <span>{new Date(shift.shiftDate).toLocaleDateString(undefined, { weekday: "short", month: "short", day: "numeric" })}</span>
                                   <span>·</span>
@@ -985,7 +985,7 @@ export default function StaffSchedulingPage({ params }: { params: { campgroundId
                                   </span>
                                 </div>
                                 {(shift.scheduledMinutes || shift.actualMinutes) && (
-                                  <div className="text-xs text-slate-500 mt-1">
+                                  <div className="text-xs text-muted-foreground mt-1">
                                     {shift.actualMinutes ? (
                                       <span className="text-emerald-600 font-medium">Actual: {formatDuration(shift.actualMinutes)}</span>
                                     ) : (
@@ -1014,7 +1014,7 @@ export default function StaffSchedulingPage({ params }: { params: { campgroundId
                             </div>
                           </div>
 
-                          <div className="flex items-center gap-2 mt-3 pt-3 border-t border-slate-100">
+                          <div className="flex items-center gap-2 mt-3 pt-3 border-t border-border">
                             {(shift.status === "scheduled" || shift.status === "in_progress") && (
                               <motion.button
                                 whileHover={{ scale: 1.02 }}
@@ -1052,7 +1052,7 @@ export default function StaffSchedulingPage({ params }: { params: { campgroundId
                             )}
                             <button
                               onClick={() => duplicateToForm(shift)}
-                              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-slate-600 text-xs font-medium hover:bg-slate-100 transition-colors"
+                              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-muted-foreground text-xs font-medium hover:bg-muted transition-colors"
                             >
                               <Copy className="w-3.5 h-3.5" />
                               Prefill
@@ -1069,7 +1069,7 @@ export default function StaffSchedulingPage({ params }: { params: { campgroundId
                             <button
                               onClick={() => moveShiftByDays(shift, -1)}
                               disabled={processing.has(shift.id)}
-                              className="flex items-center gap-1 px-2 py-1.5 rounded-lg text-slate-600 text-xs font-medium hover:bg-slate-100 transition-colors disabled:opacity-50"
+                              className="flex items-center gap-1 px-2 py-1.5 rounded-lg text-muted-foreground text-xs font-medium hover:bg-muted transition-colors disabled:opacity-50"
                             >
                               <ArrowLeft className="w-3.5 h-3.5" />
                               -1d
@@ -1077,7 +1077,7 @@ export default function StaffSchedulingPage({ params }: { params: { campgroundId
                             <button
                               onClick={() => moveShiftByDays(shift, 1)}
                               disabled={processing.has(shift.id)}
-                              className="flex items-center gap-1 px-2 py-1.5 rounded-lg text-slate-600 text-xs font-medium hover:bg-slate-100 transition-colors disabled:opacity-50"
+                              className="flex items-center gap-1 px-2 py-1.5 rounded-lg text-muted-foreground text-xs font-medium hover:bg-muted transition-colors disabled:opacity-50"
                             >
                               +1d
                               <ArrowRight className="w-3.5 h-3.5" />
@@ -1097,11 +1097,11 @@ export default function StaffSchedulingPage({ params }: { params: { campgroundId
                         animate={{ opacity: 1 }}
                         className="md:col-span-2 flex flex-col items-center justify-center py-16 text-center"
                       >
-                        <div className="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mb-4">
-                          <Inbox className="w-8 h-8 text-slate-400" />
+                        <div className="w-16 h-16 bg-muted rounded-full flex items-center justify-center mb-4">
+                          <Inbox className="w-8 h-8 text-muted-foreground" />
                         </div>
-                        <h3 className="text-lg font-semibold text-slate-900">No shifts in this window</h3>
-                        <p className="text-sm text-slate-600 mt-1">Create a shift or navigate to a different date range.</p>
+                        <h3 className="text-lg font-semibold text-foreground">No shifts in this window</h3>
+                        <p className="text-sm text-muted-foreground mt-1">Create a shift or navigate to a different date range.</p>
                       </motion.div>
                     ) : (
                       Object.keys(groupedByDay)
@@ -1113,19 +1113,19 @@ export default function StaffSchedulingPage({ params }: { params: { campgroundId
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ ...SPRING_CONFIG, delay: dayIndex * 0.05 }}
-                            className="rounded-xl border border-slate-200 overflow-hidden"
+                            className="rounded-xl border border-border overflow-hidden"
                             onDragOver={(e) => e.preventDefault()}
                             onDrop={(e) => {
                               e.preventDefault();
                               handleDropOnDay(day);
                             }}
                           >
-                            <div className="bg-gradient-to-r from-slate-50 to-slate-100 px-4 py-3 border-b border-slate-200">
+                            <div className="bg-muted/60 px-4 py-3 border-b border-border">
                               <div className="flex items-center justify-between">
-                                <div className="font-semibold text-slate-900">
+                                <div className="font-semibold text-foreground">
                                   {new Date(day).toLocaleDateString(undefined, { weekday: "short", month: "short", day: "numeric" })}
                                 </div>
-                                <span className="text-xs text-slate-500 bg-white px-2 py-1 rounded-full">
+                                <span className="text-xs text-muted-foreground bg-card px-2 py-1 rounded-full">
                                   {groupedByDay[day].length} shift{groupedByDay[day].length !== 1 ? "s" : ""}
                                 </span>
                               </div>
@@ -1133,7 +1133,7 @@ export default function StaffSchedulingPage({ params }: { params: { campgroundId
                                 {[8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18].map((h) => (
                                   <button
                                     key={h}
-                                    className="rounded px-2 py-0.5 text-[10px] bg-white border border-slate-200 text-slate-600 hover:bg-slate-50"
+                                    className="rounded px-2 py-0.5 text-[10px] bg-card border border-border text-muted-foreground hover:bg-muted/60"
                                     onDragOver={(e) => e.preventDefault()}
                                     onDrop={(e) => {
                                       e.preventDefault();
@@ -1156,7 +1156,7 @@ export default function StaffSchedulingPage({ params }: { params: { campgroundId
                                   transition={{ delay: index * 0.02 }}
                                   className={cn(
                                     "rounded-lg border p-3 cursor-grab active:cursor-grabbing transition-shadow hover:shadow-md",
-                                    conflicts.has(shift.id) ? "bg-status-error/15" : "border-slate-200 bg-white"
+                                    conflicts.has(shift.id) ? "bg-status-error/15" : "border-border bg-card"
                                   )}
                                   draggable
                                   onDragStart={() => handleDragStart(shift.id)}
@@ -1166,8 +1166,8 @@ export default function StaffSchedulingPage({ params }: { params: { campgroundId
                                     <div className="flex items-center gap-2">
                                       <GripVertical className="w-4 h-4 text-slate-300" />
                                       <div>
-                                        <div className="font-medium text-slate-900 text-sm">{shift.role || "Shift"}</div>
-                                        <div className="text-xs text-slate-600">
+                                        <div className="font-medium text-foreground text-sm">{shift.role || "Shift"}</div>
+                                        <div className="text-xs text-muted-foreground">
                                           {new Date(shift.startTime).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" })} - {new Date(shift.endTime).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" })}
                                         </div>
                                       </div>
@@ -1189,7 +1189,7 @@ export default function StaffSchedulingPage({ params }: { params: { campgroundId
                                     </div>
                                   )}
 
-                                  <div className="flex items-center gap-1.5 mt-2 pt-2 border-t border-slate-100 flex-wrap">
+                                  <div className="flex items-center gap-1.5 mt-2 pt-2 border-t border-border flex-wrap">
                                     {(shift.status === "scheduled" || shift.status === "in_progress") && (
                                       <button
                                         disabled={processing.has(shift.id)}
@@ -1219,7 +1219,7 @@ export default function StaffSchedulingPage({ params }: { params: { campgroundId
                                     )}
                                     <button
                                       onClick={() => duplicateToForm(shift)}
-                                      className="text-[10px] text-slate-600 font-medium hover:underline"
+                                      className="text-[10px] text-muted-foreground font-medium hover:underline"
                                     >
                                       Prefill
                                     </button>
@@ -1234,28 +1234,28 @@ export default function StaffSchedulingPage({ params }: { params: { campgroundId
                                     <button
                                       disabled={processing.has(shift.id)}
                                       onClick={() => moveShiftByDays(shift, -1)}
-                                      className="text-[10px] text-slate-600 font-medium hover:underline disabled:opacity-50"
+                                      className="text-[10px] text-muted-foreground font-medium hover:underline disabled:opacity-50"
                                     >
                                       -1d
                                     </button>
                                     <button
                                       disabled={processing.has(shift.id)}
                                       onClick={() => moveShiftByDays(shift, 1)}
-                                      className="text-[10px] text-slate-600 font-medium hover:underline disabled:opacity-50"
+                                      className="text-[10px] text-muted-foreground font-medium hover:underline disabled:opacity-50"
                                     >
                                       +1d
                                     </button>
                                     <button
                                       disabled={processing.has(shift.id)}
                                       onClick={() => moveShiftTime(shift, -60)}
-                                      className="text-[10px] text-slate-600 font-medium hover:underline disabled:opacity-50"
+                                      className="text-[10px] text-muted-foreground font-medium hover:underline disabled:opacity-50"
                                     >
                                       -1h
                                     </button>
                                     <button
                                       disabled={processing.has(shift.id)}
                                       onClick={() => moveShiftTime(shift, 60)}
-                                      className="text-[10px] text-slate-600 font-medium hover:underline disabled:opacity-50"
+                                      className="text-[10px] text-muted-foreground font-medium hover:underline disabled:opacity-50"
                                     >
                                       +1h
                                     </button>

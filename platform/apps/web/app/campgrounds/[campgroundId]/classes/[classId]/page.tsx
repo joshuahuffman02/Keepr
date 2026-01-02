@@ -218,7 +218,7 @@ export default function SiteClassDetailPage() {
 
   const classQuery = useQuery({
     queryKey: ["site-class", classId],
-    queryFn: () => apiClient.getSiteClass(classId),
+    queryFn: () => apiClient.getSiteClass(classId, campgroundId),
     enabled: !!classId
   });
 
@@ -289,7 +289,7 @@ export default function SiteClassDetailPage() {
         meteredBillingMode: data.meteredBillingMode,
         amenityTags: data.amenityTags,
       };
-      return apiClient.updateSiteClass(classId, payload);
+      return apiClient.updateSiteClass(classId, payload, campgroundId);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["site-class", classId] });
@@ -499,7 +499,7 @@ export default function SiteClassDetailPage() {
                   <X className="h-4 w-4 mr-1" />
                   Cancel
                 </Button>
-                <Button onClick={saveChanges} disabled={updateMutation.isPending} className="gap-2 bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700">
+                <Button onClick={saveChanges} disabled={updateMutation.isPending} className="gap-2 bg-status-success text-white hover:bg-status-success/90">
                   {updateMutation.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
                   Save
                 </Button>
@@ -775,7 +775,7 @@ export default function SiteClassDetailPage() {
                     </div>
                     <div className="flex items-center justify-between p-3 rounded-lg border border-border bg-background">
                       <div className="flex items-center gap-2">
-                        <Waves className="h-4 w-4 text-slate-500" />
+                        <Waves className="h-4 w-4 text-muted-foreground" />
                         <span className="text-sm">Sewer</span>
                       </div>
                       <Switch
@@ -1177,7 +1177,7 @@ export default function SiteClassDetailPage() {
                       )}
                       {siteClass.hookupsSewer && (
                         <Badge variant="secondary" className="gap-1">
-                          <Waves className="h-3 w-3 text-slate-500" /> Sewer
+                          <Waves className="h-3 w-3 text-muted-foreground" /> Sewer
                         </Badge>
                       )}
                       {siteClass.petFriendly && (

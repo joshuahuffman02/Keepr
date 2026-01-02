@@ -248,7 +248,7 @@ export default function SiteClassesPage() {
   });
   const updateClass = useMutation({
     mutationFn: (payload: { id: string; data: ReturnType<typeof mapClassFormToPayload> }) =>
-      apiClient.updateSiteClass(payload.id, payload.data),
+      apiClient.updateSiteClass(payload.id, payload.data, campgroundId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["site-classes", campgroundId] });
       setEditingId(null);
@@ -258,7 +258,7 @@ export default function SiteClassesPage() {
   });
   const updateInlineRate = useMutation({
     mutationFn: (payload: { id: string; rate: number; previousRate: number; className: string }) =>
-      apiClient.updateSiteClass(payload.id, { defaultRate: Math.round(payload.rate * 100) }),
+      apiClient.updateSiteClass(payload.id, { defaultRate: Math.round(payload.rate * 100) }, campgroundId),
     onSuccess: (_data, variables) => {
       queryClient.invalidateQueries({ queryKey: ["site-classes", campgroundId] });
       setInlineEditingRate(null);
@@ -268,7 +268,7 @@ export default function SiteClassesPage() {
         description: `${className} rate set to $${variables.rate.toFixed(2)}`,
         action: (
           <ToastAction altText="Undo" onClick={() => {
-            apiClient.updateSiteClass(id, { defaultRate: Math.round(previousRate * 100) }).then(() => {
+            apiClient.updateSiteClass(id, { defaultRate: Math.round(previousRate * 100) }, campgroundId).then(() => {
               queryClient.invalidateQueries({ queryKey: ["site-classes", campgroundId] });
               toast({ title: "Undone", description: `Rate reverted to $${previousRate.toFixed(2)}` });
             });
@@ -280,7 +280,7 @@ export default function SiteClassesPage() {
     }
   });
   const deleteClass = useMutation({
-    mutationFn: (id: string) => apiClient.deleteSiteClass(id),
+    mutationFn: (id: string) => apiClient.deleteSiteClass(id, campgroundId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["site-classes", campgroundId] });
       toast({ title: "Site class deleted", description: "The site class has been removed." });
@@ -361,8 +361,8 @@ export default function SiteClassesPage() {
         >
           <div>
             <h1 className="text-3xl font-bold text-foreground flex items-center gap-3">
-              <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-purple-500 to-indigo-500 flex items-center justify-center">
-                <Layers className="h-5 w-5 text-white" />
+              <div className="h-10 w-10 rounded-xl bg-status-info/15 flex items-center justify-center">
+                <Layers className="h-5 w-5 text-status-info" />
               </div>
               Site Classes
             </h1>
@@ -373,7 +373,7 @@ export default function SiteClassesPage() {
           {!showCreateForm && (
             <Button
               onClick={() => setShowCreateForm(true)}
-              className="gap-2 bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700"
+              className="gap-2 bg-status-success text-white hover:bg-status-success/90"
             >
               <Plus className="h-4 w-4" />
               Add Class
@@ -524,7 +524,7 @@ export default function SiteClassesPage() {
                     {[
                       { key: "hookupsPower", label: "Power", icon: <Zap className="h-4 w-4" />, color: "text-amber-500" },
                       { key: "hookupsWater", label: "Water", icon: <Droplet className="h-4 w-4" />, color: "text-blue-500" },
-                      { key: "hookupsSewer", label: "Sewer", icon: <Waves className="h-4 w-4" />, color: "text-slate-500" },
+                      { key: "hookupsSewer", label: "Sewer", icon: <Waves className="h-4 w-4" />, color: "text-muted-foreground" },
                     ].map((hookup) => (
                       <motion.button
                         key={hookup.key}
@@ -918,7 +918,7 @@ export default function SiteClassesPage() {
                               <div className="flex items-center gap-1">
                                 {cls.hookupsPower && <Zap className="h-3.5 w-3.5 text-amber-500" />}
                                 {cls.hookupsWater && <Droplet className="h-3.5 w-3.5 text-blue-500" />}
-                                {cls.hookupsSewer && <Waves className="h-3.5 w-3.5 text-slate-500" />}
+                                {cls.hookupsSewer && <Waves className="h-3.5 w-3.5 text-muted-foreground" />}
                               </div>
                             )}
                             {meteredEnabled && (

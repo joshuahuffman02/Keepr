@@ -531,8 +531,8 @@ export default function SitesPage() {
         >
           <div>
             <h1 className="text-3xl font-bold text-foreground flex items-center gap-3">
-              <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-500 flex items-center justify-center">
-                <Trees className="h-5 w-5 text-white" />
+              <div className="h-10 w-10 rounded-xl bg-status-success/15 flex items-center justify-center">
+                <Trees className="h-5 w-5 text-status-success" />
               </div>
               Sites
             </h1>
@@ -543,7 +543,7 @@ export default function SitesPage() {
           {!showCreateForm && (
             <Button
               onClick={() => setShowCreateForm(true)}
-              className="gap-2 bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700"
+              className="gap-2 bg-status-success text-white hover:bg-status-success/90"
             >
               <Plus className="h-4 w-4" />
               Add Site
@@ -1066,7 +1066,7 @@ export default function SitesPage() {
               <Button
                 disabled={createSite.isPending || !formState.name || !formState.siteNumber}
                 onClick={() => createSite.mutate()}
-                className="bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700"
+                className="bg-status-success text-white hover:bg-status-success/90"
               >
                 {createSite.isPending ? "Saving..." : "Create Site"}
               </Button>
@@ -1542,7 +1542,7 @@ export default function SitesPage() {
                                   updateSite.mutate({ id: site.id, data: mapFormToPayload(editForm, { clearEmptyAsNull: true }) });
                                 }}
                                 disabled={updateSite.isPending}
-                                className="bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700"
+                                className="bg-status-success text-white hover:bg-status-success/90"
                               >
                                 {updateSite.isPending ? "Saving..." : "Save changes"}
                               </Button>
@@ -1576,8 +1576,8 @@ export default function SitesPage() {
                       transition={SPRING_CONFIG}
                       className="flex flex-col items-center gap-4"
                     >
-                      <div className="h-20 w-20 rounded-full bg-gradient-to-br from-emerald-100 to-teal-100 flex items-center justify-center">
-                        <Trees className="h-10 w-10 text-emerald-600" />
+                      <div className="h-20 w-20 rounded-full bg-status-success/15 flex items-center justify-center">
+                        <Trees className="h-10 w-10 text-status-success" />
                       </div>
                       <div className="space-y-2">
                         <p className="text-lg font-semibold text-foreground">
@@ -1593,7 +1593,7 @@ export default function SitesPage() {
                         <div className="flex gap-2 mt-2">
                           <Button
                             onClick={() => setShowCreateForm(true)}
-                            className="gap-2 bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700"
+                            className="gap-2 bg-status-success text-white hover:bg-status-success/90"
                           >
                             <Plus className="h-4 w-4" />
                             Add Your First Site

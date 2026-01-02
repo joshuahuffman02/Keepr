@@ -279,8 +279,8 @@ export default function FeedbackDashboard() {
         {/* Header */}
         <motion.div variants={itemVariants}>
           <div className="flex items-center gap-3">
-            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-pink-500 to-rose-600 flex items-center justify-center shadow-lg shadow-pink-500/20">
-              <Heart className="w-6 h-6 text-white" />
+            <div className="w-12 h-12 rounded-xl bg-status-info/15 flex items-center justify-center">
+              <Heart className="w-6 h-6 text-status-info" />
             </div>
             <div>
               <h1 className="text-3xl font-bold text-slate-900">Guest Feedback</h1>
@@ -358,7 +358,7 @@ export default function FeedbackDashboard() {
             variants={itemVariants}
             className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden"
           >
-            <div className="bg-gradient-to-r from-indigo-50 to-purple-50 border-b border-indigo-100 px-6 py-4">
+            <div className="bg-status-info/10 border-b border-status-info/20 px-6 py-4">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-lg bg-indigo-100 flex items-center justify-center">
                   <Trophy className="w-5 h-5 text-indigo-600" />
@@ -454,7 +454,7 @@ export default function FeedbackDashboard() {
                   </div>
 
                   {metrics?.isWorldClass ? (
-                    <div className="bg-gradient-to-br from-purple-50 to-indigo-50 border border-purple-200 rounded-xl p-4 text-center">
+                    <div className="bg-purple-50 border border-purple-200 rounded-xl p-4 text-center">
                       <motion.div
                         animate={{ rotate: [0, -5, 5, -5, 0] }}
                         transition={{ duration: 0.5, repeat: Infinity, repeatDelay: 3 }}
@@ -475,7 +475,7 @@ export default function FeedbackDashboard() {
                       <div className="space-y-2">
                         <div className="h-2 bg-purple-200 rounded-full overflow-hidden">
                           <motion.div
-                            className="h-full bg-gradient-to-r from-purple-500 to-indigo-500 rounded-full"
+                            className="h-full bg-purple-500 rounded-full"
                             initial={{ width: 0 }}
                             animate={{
                               width: `${Math.min(100, (metrics.promoters / (metrics.promoters + metrics.toReachWorldClass)) * 100)}%`
@@ -493,7 +493,7 @@ export default function FeedbackDashboard() {
                       </p>
                     </div>
                   ) : npsScore >= 70 ? (
-                    <div className="bg-gradient-to-br from-purple-50 to-indigo-50 border border-purple-200 rounded-xl p-4 text-center">
+                    <div className="bg-purple-50 border border-purple-200 rounded-xl p-4 text-center">
                       <Crown className="w-10 h-10 text-purple-500 mx-auto mb-2" />
                       <div className="font-bold text-purple-800 text-lg">World-Class!</div>
                       <p className="text-sm text-purple-600 mt-1">
@@ -562,7 +562,7 @@ export default function FeedbackDashboard() {
           variants={itemVariants}
           className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden"
         >
-          <div className="bg-gradient-to-r from-emerald-50 to-teal-50 border-b border-emerald-100 px-6 py-4">
+          <div className="bg-status-success/10 border-b border-status-success/20 px-6 py-4">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-lg bg-emerald-100 flex items-center justify-center">
                 <Megaphone className="w-5 h-5 text-emerald-600" />
@@ -704,7 +704,7 @@ export default function FeedbackDashboard() {
           variants={itemVariants}
           className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden"
         >
-          <div className="bg-gradient-to-r from-slate-50 to-slate-100 border-b border-slate-200 px-6 py-4">
+          <div className="bg-muted border-b border-border px-6 py-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-lg bg-slate-200 flex items-center justify-center">
