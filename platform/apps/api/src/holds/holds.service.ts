@@ -104,8 +104,10 @@ export class HoldsService implements OnModuleInit, OnModuleDestroy {
     });
   }
 
-  async release(id: string) {
-    const existing = await this.prisma.siteHold.findUnique({ where: { id } });
+  async release(campgroundId: string, id: string) {
+    const existing = await this.prisma.siteHold.findFirst({
+      where: { id, campgroundId }
+    });
     if (!existing) throw new NotFoundException("Hold not found");
     return this.prisma.siteHold.update({
       where: { id },
@@ -126,10 +128,13 @@ export class HoldsService implements OnModuleInit, OnModuleDestroy {
     });
   }
 
-  async expireStale() {
+  async expireStale(campgroundId?: string) {
     const now = new Date();
+    const where = campgroundId
+      ? { status: "active", expiresAt: { lte: now }, campgroundId }
+      : { status: "active", expiresAt: { lte: now } };
     const expired = await (this.prisma as any).siteHold.findMany({
-      where: { status: "active", expiresAt: { lte: now } },
+      where,
       include: { site: { select: { id: true, siteClassId: true } } }
     });
 
@@ -162,5 +167,4 @@ export class HoldsService implements OnModuleInit, OnModuleDestroy {
     return expired.length;
   }
 }
-
 
