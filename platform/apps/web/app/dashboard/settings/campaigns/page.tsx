@@ -2,8 +2,13 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import DOMPurify from "dompurify";
 import { apiClient } from "@/lib/api-client";
+
+// DOMPurify requires browser DOM - lazy load only on client
+let DOMPurify: { sanitize: (html: string) => string } | null = null;
+if (typeof window !== "undefined") {
+  DOMPurify = require("dompurify");
+}
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
@@ -174,7 +179,7 @@ export default function CampaignsPage() {
           contentEditable
           suppressContentEditableWarning
           onInput={(e) => setHtml((e.target as HTMLDivElement).innerHTML)}
-          dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(html) }}
+          dangerouslySetInnerHTML={{ __html: DOMPurify?.sanitize(html) || html }}
         />
       );
     }

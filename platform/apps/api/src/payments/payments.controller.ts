@@ -606,7 +606,7 @@ export class PaymentsController {
         select: {
           id: true,
           status: true,
-          totalCents: true,
+          totalAmount: true,
           campground: {
             select: { id: true, stripeAccountId: true as any }
           }
@@ -735,12 +735,12 @@ export class PaymentsController {
         // Get current reservation state
         const currentReservation = await tx.reservation.findUnique({
           where: { id: body.reservationId },
-          select: { paidAmount: true, balanceAmount: true, totalAmountCents: true }
+          select: { paidAmount: true, balanceAmount: true, totalAmount: true }
         });
 
         // Payment succeeded - update financial fields and confirm reservation
         const newPaidAmount = (currentReservation?.paidAmount ?? 0) + amountCents;
-        const newBalanceAmount = Math.max(0, (currentReservation?.balanceAmount ?? currentReservation?.totalAmountCents ?? 0) - amountCents);
+        const newBalanceAmount = Math.max(0, (currentReservation?.balanceAmount ?? currentReservation?.totalAmount ?? 0) - amountCents);
         const paymentStatus = newBalanceAmount === 0 ? "paid" : newPaidAmount > 0 ? "partial" : "unpaid";
 
         const updatedReservation = await tx.reservation.update({
@@ -1558,40 +1558,121 @@ export class PaymentsController {
     ];
   }
 
-  // ACH return handling: create refund ledger entry and record refund
+  /**
+   * ACH return handling: create refund ledger entry and record refund.
+   *
+   * IMPORTANT: This method only processes ACH returns for payments that were
+   * previously successful. ACH failures BEFORE settlement should NOT create
+   * refund ledger entries because no money was ever received.
+   *
+   * The method includes idempotency checks using the payment intent ID to
+   * prevent double-processing from webhook retries.
+   */
   private async handleAchReturn(paymentIntent: any) {
     const reservationId = paymentIntent.metadata?.reservationId;
-    const amount = paymentIntent.amount_received ?? paymentIntent.amount ?? 0;
-    if (!reservationId || amount <= 0) return;
+    const campgroundId = paymentIntent.metadata?.campgroundId ?? "";
+    const paymentIntentId = paymentIntent.id;
+
+    if (!reservationId) {
+      this.logger.log(`[ACH] No reservationId in metadata for PI ${paymentIntentId}, skipping`);
+      return;
+    }
+
+    // CRITICAL: Check if the original payment was ever successfully recorded.
+    // ACH failures BEFORE settlement should NOT create refund entries because
+    // no money was ever received.
+    const existingPayment = await this.prisma.payment.findFirst({
+      where: {
+        stripePaymentIntentId: paymentIntentId,
+        direction: "charge"
+      }
+    });
+
+    if (!existingPayment) {
+      // No successful payment was ever recorded for this payment intent.
+      // This is an ACH failure BEFORE settlement - skip refund processing.
+      this.logger.log(
+        `[ACH] No successful payment found for PI ${paymentIntentId}. ` +
+        `ACH failed before settlement - skipping refund/ledger entries.`
+      );
+      return;
+    }
+
+    // Use the original payment's amount for the refund, not the intent amount
+    const amount = existingPayment.amountCents;
+    if (amount <= 0) {
+      this.logger.log(`[ACH] Payment amount is zero for PI ${paymentIntentId}, skipping`);
+      return;
+    }
+
+    // Idempotency check: prevent double-processing ACH returns
+    const idempotencyKey = `ach-return:${paymentIntentId}`;
     try {
-      await this.reservations.recordRefund(reservationId, amount, `ACH return ${paymentIntent.last_payment_error?.code ?? ""}`);
+      const existing = await this.idempotency.start(
+        idempotencyKey,
+        { paymentIntentId, reservationId, amount },
+        campgroundId,
+        { endpoint: "ach-return" }
+      );
+
+      if (existing.status === IdempotencyStatus.succeeded) {
+        this.logger.log(`[ACH] Return already processed for PI ${paymentIntentId}, skipping`);
+        return;
+      }
+    } catch (err) {
+      if (err instanceof ConflictException) {
+        this.logger.log(`[ACH] Return processing in progress for PI ${paymentIntentId}, skipping`);
+        return;
+      }
+      // Rate limit or other errors - log but continue to try processing
+      this.logger.warn(`[ACH] Idempotency check error for PI ${paymentIntentId}: ${err instanceof Error ? err.message : err}`);
+    }
+
+    try {
+      // Record the refund against the reservation
+      await this.reservations.recordRefund(
+        reservationId,
+        amount,
+        `ACH return ${paymentIntent.last_payment_error?.code ?? ""}`.trim()
+      );
+
+      // Create balanced ledger entries for the ACH return
       await (this.prisma as any).ledgerEntry.create({
         data: {
-          campgroundId: paymentIntent.metadata?.campgroundId ?? "",
+          campgroundId,
           reservationId,
           glCode: "CHARGEBACK",
           account: "Chargebacks",
-          description: `ACH return ${paymentIntent.id}`,
+          description: `ACH return ${paymentIntentId}`,
           amountCents: amount,
           direction: "debit",
           occurredAt: new Date()
         }
       });
+
       await (this.prisma as any).ledgerEntry.create({
         data: {
-          campgroundId: paymentIntent.metadata?.campgroundId ?? "",
+          campgroundId,
           reservationId,
           glCode: "CASH",
           account: "Cash",
-          description: `ACH return ${paymentIntent.id} (offset)`,
+          description: `ACH return ${paymentIntentId} (offset)`,
           amountCents: amount,
           direction: "credit",
           occurredAt: new Date()
         }
       });
+
+      // Mark idempotency as complete
+      await this.idempotency.complete(idempotencyKey, { processed: true, amount });
+
+      this.logger.log(`[ACH] Successfully processed return for PI ${paymentIntentId}, amount: ${amount}`);
     } catch (err) {
-      this.logger.warn(`[ACH] Failed to record ACH return for PI ${paymentIntent.id}: ${err instanceof Error ? err.message : err}`);
-    await this.recon.sendAlert(`[ACH] Failed to record ACH return for PI ${paymentIntent.id}: ${err instanceof Error ? err.message : err}`);
+      // Mark idempotency as failed so it can be retried
+      await this.idempotency.fail(idempotencyKey).catch(() => null);
+
+      this.logger.warn(`[ACH] Failed to record ACH return for PI ${paymentIntentId}: ${err instanceof Error ? err.message : err}`);
+      await this.recon.sendAlert(`[ACH] Failed to record ACH return for PI ${paymentIntentId}: ${err instanceof Error ? err.message : err}`);
     }
   }
 }

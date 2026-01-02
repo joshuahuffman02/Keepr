@@ -14,6 +14,7 @@ describe('PaymentsReconciliationService', () => {
       },
       payment: {
         findFirst: jest.fn(),
+        create: jest.fn(),
       },
       payout: {
         upsert: jest.fn(),
@@ -31,6 +32,11 @@ describe('PaymentsReconciliationService', () => {
       },
       dispute: {
         upsert: jest.fn(),
+        findUnique: jest.fn(),
+      },
+      reservation: {
+        findUnique: jest.fn(),
+        update: jest.fn(),
       },
       ledgerEntry: {
         findFirst: jest.fn(),
@@ -170,7 +176,17 @@ describe('PaymentsReconciliationService', () => {
       };
 
       mockPrisma.campground.findFirst.mockResolvedValue({ id: 'cg-1' });
+      mockPrisma.dispute.findUnique.mockResolvedValue(null); // No existing dispute
       mockPrisma.dispute.upsert.mockResolvedValue({ id: 'dispute-1' });
+      mockPrisma.ledgerEntry.findFirst.mockResolvedValue(null); // No existing ledger
+      mockPrisma.reservation.findUnique.mockResolvedValue({
+        id: 'res-1',
+        paidAmount: 10000,
+        totalAmount: 10000,
+        site: { siteClass: { glCode: 'REVENUE', clientAccount: 'Revenue' } },
+      });
+      mockPrisma.reservation.update.mockResolvedValue({ id: 'res-1' });
+      mockPrisma.payment.create.mockResolvedValue({ id: 'payment-1' });
 
       await service.upsertDispute(dispute);
 
@@ -188,6 +204,173 @@ describe('PaymentsReconciliationService', () => {
           reservationId: 'res-1',
         }),
       });
+    });
+
+    it('should adjust reservation balance on first dispute creation', async () => {
+      const dispute = {
+        id: 'dp_new',
+        charge: 'ch_456',
+        payment_intent: 'pi_789',
+        account: 'acct_123',
+        amount: 5000, // $50 dispute
+        currency: 'usd',
+        status: 'needs_response',
+        reason: 'fraudulent',
+        metadata: { reservationId: 'res-1' },
+        evidence_details: {},
+        evidence: {},
+      };
+
+      mockPrisma.campground.findFirst.mockResolvedValue({ id: 'cg-1' });
+      mockPrisma.dispute.findUnique.mockResolvedValue(null); // New dispute
+      mockPrisma.dispute.upsert.mockResolvedValue({ id: 'dispute-1', stripeDisputeId: 'dp_new', reason: 'fraudulent' });
+      mockPrisma.ledgerEntry.findFirst.mockResolvedValue(null); // No existing ledger entries
+      mockPrisma.reservation.findUnique.mockResolvedValue({
+        id: 'res-1',
+        paidAmount: 10000, // $100 paid
+        totalAmount: 10000, // $100 total
+        site: { siteClass: { glCode: 'REVENUE', clientAccount: 'Revenue' } },
+      });
+      mockPrisma.reservation.update.mockResolvedValue({ id: 'res-1' });
+      mockPrisma.payment.create.mockResolvedValue({ id: 'payment-1' });
+
+      await service.upsertDispute(dispute);
+
+      // Should update reservation balance
+      expect(mockPrisma.reservation.update).toHaveBeenCalledWith({
+        where: { id: 'res-1' },
+        data: {
+          paidAmount: 5000, // Reduced from 10000 to 5000
+          balanceAmount: 5000, // Now has $50 balance
+          paymentStatus: 'partial', // Changed from paid to partial
+        },
+      });
+
+      // Should create a chargeback payment record
+      expect(mockPrisma.payment.create).toHaveBeenCalledWith({
+        data: {
+          campgroundId: 'cg-1',
+          reservationId: 'res-1',
+          amountCents: 5000,
+          method: 'chargeback',
+          direction: 'refund',
+          note: 'Chargeback/dispute: dp_new',
+        },
+      });
+
+      // Should post ledger entries
+      expect(mockLedger.postEntries).toHaveBeenCalledWith(
+        expect.objectContaining({
+          campgroundId: 'cg-1',
+          reservationId: 'res-1',
+          description: 'Chargeback: dispute dp_new',
+        })
+      );
+    });
+
+    it('should not adjust balance if dispute already exists (idempotency)', async () => {
+      const dispute = {
+        id: 'dp_existing',
+        charge: 'ch_456',
+        payment_intent: 'pi_789',
+        account: 'acct_123',
+        amount: 5000,
+        currency: 'usd',
+        status: 'under_review', // Status update
+        reason: 'fraudulent',
+        metadata: { reservationId: 'res-1' },
+        evidence_details: {},
+        evidence: {},
+      };
+
+      mockPrisma.campground.findFirst.mockResolvedValue({ id: 'cg-1' });
+      mockPrisma.dispute.findUnique.mockResolvedValue({ id: 'dispute-1', stripeDisputeId: 'dp_existing' }); // Already exists
+      mockPrisma.dispute.upsert.mockResolvedValue({ id: 'dispute-1' });
+
+      await service.upsertDispute(dispute);
+
+      // Should NOT update reservation or create payment (already processed)
+      expect(mockPrisma.reservation.update).not.toHaveBeenCalled();
+      expect(mockPrisma.payment.create).not.toHaveBeenCalled();
+      expect(mockLedger.postEntries).not.toHaveBeenCalled();
+    });
+
+    it('should find reservation via payment if not in metadata', async () => {
+      const dispute = {
+        id: 'dp_lookup',
+        charge: 'ch_456',
+        payment_intent: null, // No payment intent
+        account: 'acct_123',
+        amount: 3000,
+        currency: 'usd',
+        status: 'needs_response',
+        reason: 'product_not_received',
+        metadata: {}, // No reservationId in metadata
+        evidence_details: {},
+        evidence: {},
+      };
+
+      mockPrisma.campground.findFirst.mockResolvedValue({ id: 'cg-1' });
+      mockPrisma.dispute.findUnique.mockResolvedValue(null);
+      // Payment lookup returns the reservation ID
+      mockPrisma.payment.findFirst.mockResolvedValue({ reservationId: 'res-found' });
+      mockPrisma.dispute.upsert.mockResolvedValue({ id: 'dispute-1', stripeDisputeId: 'dp_lookup', reason: 'product_not_received' });
+      mockPrisma.ledgerEntry.findFirst.mockResolvedValue(null);
+      mockPrisma.reservation.findUnique.mockResolvedValue({
+        id: 'res-found',
+        paidAmount: 5000,
+        totalAmount: 5000,
+        site: { siteClass: null },
+      });
+      mockPrisma.reservation.update.mockResolvedValue({ id: 'res-found' });
+      mockPrisma.payment.create.mockResolvedValue({ id: 'payment-1' });
+
+      await service.upsertDispute(dispute);
+
+      // Should lookup payment by charge ID
+      expect(mockPrisma.payment.findFirst).toHaveBeenCalledWith({
+        where: {
+          OR: [{ stripeChargeId: 'ch_456' }],
+        },
+        select: { reservationId: true },
+      });
+
+      // Should adjust the found reservation
+      expect(mockPrisma.reservation.update).toHaveBeenCalledWith({
+        where: { id: 'res-found' },
+        data: expect.objectContaining({
+          paidAmount: 2000, // 5000 - 3000
+        }),
+      });
+    });
+
+    it('should skip ledger entries if they already exist (double idempotency)', async () => {
+      const dispute = {
+        id: 'dp_ledger_exists',
+        charge: 'ch_456',
+        payment_intent: 'pi_789',
+        account: 'acct_123',
+        amount: 5000,
+        currency: 'usd',
+        status: 'needs_response',
+        reason: 'fraudulent',
+        metadata: { reservationId: 'res-1' },
+        evidence_details: {},
+        evidence: {},
+      };
+
+      mockPrisma.campground.findFirst.mockResolvedValue({ id: 'cg-1' });
+      mockPrisma.dispute.findUnique.mockResolvedValue(null); // Dispute record doesn't exist yet
+      mockPrisma.dispute.upsert.mockResolvedValue({ id: 'dispute-1' });
+      // Ledger entry already exists (e.g., from partial processing)
+      mockPrisma.ledgerEntry.findFirst.mockResolvedValue({ id: 'ledger-1', dedupeKey: 'dispute:dp_ledger_exists:balance_adjustment' });
+
+      await service.upsertDispute(dispute);
+
+      // Should NOT update reservation or create payment or post ledger
+      expect(mockPrisma.reservation.update).not.toHaveBeenCalled();
+      expect(mockPrisma.payment.create).not.toHaveBeenCalled();
+      expect(mockLedger.postEntries).not.toHaveBeenCalled();
     });
   });
 

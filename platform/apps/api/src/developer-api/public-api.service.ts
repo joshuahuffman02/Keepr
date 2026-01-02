@@ -1,4 +1,5 @@
 import { BadRequestException, Injectable, NotFoundException } from "@nestjs/common";
+import { Prisma } from "@prisma/client";
 import { PrismaService } from "../prisma/prisma.service";
 import { WebhookService, WebhookEvent } from "./webhook.service";
 import { GuestsService } from "../guests/guests.service";
@@ -7,6 +8,7 @@ import { evaluatePricingV2 } from "../reservations/reservation-pricing";
 import { DepositPoliciesService } from "../deposit-policies/deposit-policies.service";
 import { calculateReservationDepositV2 } from "../reservations/reservation-deposit";
 import { AuditService } from "../audit/audit.service";
+import { postBalancedLedgerEntries } from "../ledger/ledger-posting.util";
 
 export interface ApiReservationInput {
   siteId: string;
@@ -49,6 +51,19 @@ export class PublicApiService {
     private readonly depositPoliciesService: DepositPoliciesService,
     private readonly audit: AuditService
   ) { }
+
+  private computePaymentStatus(total: number, paid: number): string {
+    if (!total || total <= 0) return "unpaid";
+    if (paid >= total) return "paid";
+    if (paid > 0) return "partial";
+    return "unpaid";
+  }
+
+  private buildPaymentFields(totalAmount: number, paidAmount: number) {
+    const balanceAmount = Math.max(0, totalAmount - paidAmount);
+    const paymentStatus = this.computePaymentStatus(totalAmount, paidAmount);
+    return { balanceAmount, paymentStatus };
+  }
 
   private async assertSiteInCampground(siteId: string, campgroundId: string) {
     const site = await this.prisma.site.findUnique({ where: { id: siteId }, select: { campgroundId: true } });
@@ -255,15 +270,116 @@ export class PublicApiService {
   }
 
   async recordPayment(campgroundId: string, reservationId: string, amountCents: number, method = "card") {
-    await this.assertReservationCampground(reservationId, campgroundId);
-    const payment = await this.prisma.payment.create({
-      data: {
-        campgroundId,
-        reservationId,
-        amountCents,
-        method
+    if (amountCents <= 0) {
+      throw new BadRequestException("Payment amount must be positive");
+    }
+
+    const paymentRef = `api-${method}-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+
+    // Wrap entire operation in transaction with row-level locking to prevent race conditions
+    const { payment, updated } = await this.prisma.$transaction(async (tx: Prisma.TransactionClient) => {
+      // Lock the reservation row using SELECT FOR UPDATE to prevent concurrent modifications
+      const [lockedReservation] = await tx.$queryRaw<Array<{
+        id: string;
+        campgroundId: string;
+        siteId: string;
+        paidAmount: number | null;
+        totalAmount: number;
+      }>>`
+        SELECT id, "campgroundId", "siteId", "paidAmount", "totalAmount"
+        FROM "Reservation"
+        WHERE id = ${reservationId} AND "campgroundId" = ${campgroundId}
+        FOR UPDATE
+      `;
+      if (!lockedReservation) {
+        throw new NotFoundException("Reservation not found for this campground");
       }
+
+      // Calculate new paid amount atomically with the locked row
+      const newPaid = (lockedReservation.paidAmount ?? 0) + amountCents;
+      const paymentFields = this.buildPaymentFields(lockedReservation.totalAmount, newPaid);
+
+      // Get site class for GL code mapping
+      const site = await tx.site.findUnique({
+        where: { id: lockedReservation.siteId },
+        include: { siteClass: true }
+      });
+
+      const revenueGl = site?.siteClass?.glCode ?? "REVENUE_UNMAPPED";
+      const revenueAccount = site?.siteClass?.clientAccount ?? "Revenue";
+
+      // Update reservation with new payment totals
+      const updatedReservation = await tx.reservation.update({
+        where: { id: reservationId },
+        data: {
+          paidAmount: newPaid,
+          ...paymentFields
+        }
+      });
+
+      // Create payment record
+      const paymentRecord = await tx.payment.create({
+        data: {
+          campgroundId,
+          reservationId,
+          amountCents,
+          method,
+          direction: "charge",
+          note: "API payment"
+        }
+      });
+
+      // Post balanced ledger entries (debit cash, credit revenue)
+      await postBalancedLedgerEntries(tx, [
+        {
+          campgroundId,
+          reservationId,
+          glCode: "CASH",
+          account: "Cash",
+          description: `API payment (${method})`,
+          amountCents,
+          direction: "debit",
+          externalRef: paymentRef,
+          dedupeKey: `api:${reservationId}:payment:${paymentRef}:debit`
+        },
+        {
+          campgroundId,
+          reservationId,
+          glCode: revenueGl,
+          account: revenueAccount,
+          description: `API payment (${method})`,
+          amountCents,
+          direction: "credit",
+          externalRef: paymentRef,
+          dedupeKey: `api:${reservationId}:payment:${paymentRef}:credit`
+        }
+      ]);
+
+      return { payment: paymentRecord, updated: updatedReservation };
     });
+
+    // Audit the payment
+    try {
+      await this.audit.record({
+        campgroundId,
+        actorId: null,
+        action: "api.payment.recorded",
+        entity: "reservation",
+        entityId: reservationId,
+        before: {
+          paidAmount: updated.paidAmount ? updated.paidAmount - amountCents : 0
+        },
+        after: {
+          paidAmount: updated.paidAmount,
+          paymentMethod: method,
+          paymentAmount: amountCents,
+          paymentId: payment.id
+        }
+      });
+    } catch {
+      // Audit failures shouldn't fail the payment
+    }
+
     await this.webhook.emit("payment.created", campgroundId, { reservationId, paymentId: payment.id });
     return payment;
   }

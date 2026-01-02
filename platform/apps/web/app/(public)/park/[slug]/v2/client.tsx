@@ -6,7 +6,12 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 import { apiClient } from "@/lib/api-client";
-import DOMPurify from "dompurify";
+
+// DOMPurify requires browser DOM - lazy load only on client
+let DOMPurify: { sanitize: (html: string) => string } | null = null;
+if (typeof window !== "undefined") {
+  DOMPurify = require("dompurify");
+}
 import {
   MapPin,
   Star,
@@ -378,7 +383,7 @@ export function CampgroundV2Client({
                   </h2>
                   <div
                     className="text-slate-600 prose prose-sm prose-slate max-w-none [&>p]:mb-4"
-                    dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(campground.description || "") }}
+                    dangerouslySetInnerHTML={{ __html: DOMPurify?.sanitize(campground.description || "") || campground.description || "" }}
                   />
                 </section>
               </FadeInSection>

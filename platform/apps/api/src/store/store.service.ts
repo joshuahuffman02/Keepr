@@ -15,6 +15,7 @@ import { StripeService } from "../payments/stripe.service";
 import { randomUUID } from "crypto";
 import { Decimal } from "@prisma/client/runtime/library";
 import { LocationService } from "./location.service";
+import { postBalancedLedgerEntries } from "../ledger/ledger-posting.util";
 
 @Injectable()
 export class StoreService {
@@ -514,19 +515,33 @@ export class StoreService {
             await this.adjustInventoryForChannel(item.product, channel, -item.qty);
         }
 
-        // If charged to site, create a ledger entry
+        // Handle payment recording and GL entries based on payment method
+        const dedupeKeyBase = `store_order_${order.id}`;
+
         if (data.paymentMethod === "charge_to_site" && data.reservationId) {
-            await this.prisma.ledgerEntry.create({
-                data: {
+            // Charge to site: debit A/R (guest owes more), credit Store Revenue
+            await postBalancedLedgerEntries(this.prisma, [
+                {
                     campgroundId: data.campgroundId,
                     reservationId: data.reservationId,
-                    glCode: "STORE",
-                    account: "Store Charges",
+                    glCode: "AR",
+                    account: "Accounts Receivable",
                     description: `Store order #${order.id.slice(-6)}`,
                     amountCents: totalCents,
                     direction: "debit",
+                    dedupeKey: `${dedupeKeyBase}:ar:debit`
                 },
-            });
+                {
+                    campgroundId: data.campgroundId,
+                    reservationId: data.reservationId,
+                    glCode: "STORE_REVENUE",
+                    account: "Store Revenue",
+                    description: `Store order #${order.id.slice(-6)}`,
+                    amountCents: totalCents,
+                    direction: "credit",
+                    dedupeKey: `${dedupeKeyBase}:store_revenue:credit`
+                }
+            ]);
 
             // Update reservation balance
             await this.prisma.reservation.update({
@@ -536,6 +551,48 @@ export class StoreService {
                     totalAmount: { increment: totalCents },
                 },
             });
+        } else if (data.paymentMethod === "card" || data.paymentMethod === "cash") {
+            // Card/Cash payment: debit Cash (money received), credit Store Revenue
+            const glCode = data.paymentMethod === "card" ? "CARD" : "CASH";
+            const accountName = data.paymentMethod === "card" ? "Card Receipts" : "Cash";
+
+            await postBalancedLedgerEntries(this.prisma, [
+                {
+                    campgroundId: data.campgroundId,
+                    reservationId: data.reservationId ?? null,
+                    glCode,
+                    account: accountName,
+                    description: `Store order #${order.id.slice(-6)} (${data.paymentMethod})`,
+                    amountCents: totalCents,
+                    direction: "debit",
+                    dedupeKey: `${dedupeKeyBase}:${glCode.toLowerCase()}:debit`
+                },
+                {
+                    campgroundId: data.campgroundId,
+                    reservationId: data.reservationId ?? null,
+                    glCode: "STORE_REVENUE",
+                    account: "Store Revenue",
+                    description: `Store order #${order.id.slice(-6)} (${data.paymentMethod})`,
+                    amountCents: totalCents,
+                    direction: "credit",
+                    dedupeKey: `${dedupeKeyBase}:store_revenue:credit`
+                }
+            ]);
+
+            // If linked to a reservation, also create a Payment record for tracking
+            if (data.reservationId) {
+                await this.prisma.payment.create({
+                    data: {
+                        campgroundId: data.campgroundId,
+                        reservationId: data.reservationId,
+                        amountCents: totalCents,
+                        method: data.paymentMethod,
+                        direction: "charge",
+                        note: `Store order #${order.id.slice(-6)}`,
+                        paymentSource: "store"
+                    }
+                });
+            }
         }
 
         return order;

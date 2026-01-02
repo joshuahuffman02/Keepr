@@ -4,8 +4,13 @@ import { useEffect, useState, useRef, useMemo } from "react";
 import { useForm } from "react-hook-form";
 import Link from "next/link";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import DOMPurify from "dompurify";
 import { FormField } from "@/components/ui/form-field";
+
+// DOMPurify requires browser DOM - lazy load only on client
+let DOMPurify: { sanitize: (html: string) => string } | null = null;
+if (typeof window !== "undefined") {
+  DOMPurify = require("dompurify");
+}
 import { FormTextarea } from "@/components/ui/form-textarea";
 import { apiClient } from "@/lib/api-client";
 import {
@@ -879,7 +884,7 @@ function TemplateEditor({
             {template.channel === "email" ? (
               <div
                 className="p-4 bg-white"
-                dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(previewHtml) }}
+                dangerouslySetInnerHTML={{ __html: DOMPurify?.sanitize(previewHtml) || previewHtml }}
               />
             ) : (
               <div className="p-4 bg-slate-900 text-white font-mono text-sm whitespace-pre-wrap">

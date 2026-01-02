@@ -11,7 +11,7 @@ import { WaitlistService } from '../waitlist/waitlist.service';
 import { EmailService } from '../email/email.service';
 import { LoyaltyService } from '../loyalty/loyalty.service';
 import { TaxRulesService } from '../tax-rules/tax-rules.service';
-import { postBalancedLedgerEntries } from "../ledger/ledger-posting.util";
+import { postBalancedLedgerEntries, LedgerEntryInput } from "../ledger/ledger-posting.util";
 import { AuditService } from "../audit/audit.service";
 
 import { MatchScoreService } from "./match-score.service";
@@ -2212,7 +2212,13 @@ export class ReservationsService {
             capturedAt: options?.capturedAt
           }
         });
-        await postBalancedLedgerEntries(tx, [
+        // Build ledger entries with tax/fee split when available
+        // ACCT-HIGH-005: Split payment into revenue, tax liability, and fee revenue
+        const taxCents = options?.taxCents ?? 0;
+        const feeCents = options?.feeCents ?? 0;
+        const revenueAmount = tender.amountCents - taxCents - feeCents;
+
+        const ledgerEntries: LedgerEntryInput[] = [
           {
             campgroundId: fullReservation.campgroundId,
             reservationId: fullReservation.id,
@@ -2223,19 +2229,55 @@ export class ReservationsService {
             direction: "debit",
             externalRef: externalRef ?? paymentRef,
             dedupeKey: `res:${fullReservation.id}:payment:${paymentRef}:${tender.method}:debit`
-          },
-          {
+          }
+        ];
+
+        // Credit site revenue for the net amount (after tax and fees)
+        if (revenueAmount > 0) {
+          ledgerEntries.push({
             campgroundId: fullReservation.campgroundId,
             reservationId: fullReservation.id,
             glCode: revenueGl,
             account: revenueAccount,
             description: `Reservation payment (${tender.method})`,
-            amountCents: tender.amountCents,
+            amountCents: revenueAmount,
             direction: "credit",
             externalRef: externalRef ?? paymentRef,
-            dedupeKey: `res:${fullReservation.id}:payment:${paymentRef}:${tender.method}:credit`
-          }
-        ]);
+            dedupeKey: `res:${fullReservation.id}:payment:${paymentRef}:${tender.method}:credit:revenue`
+          });
+        }
+
+        // Credit tax liability if tax was collected
+        if (taxCents > 0) {
+          ledgerEntries.push({
+            campgroundId: fullReservation.campgroundId,
+            reservationId: fullReservation.id,
+            glCode: "TAX_LIABILITY",
+            account: "Tax Liability",
+            description: `Sales tax collected (${tender.method})`,
+            amountCents: taxCents,
+            direction: "credit",
+            externalRef: externalRef ?? paymentRef,
+            dedupeKey: `res:${fullReservation.id}:payment:${paymentRef}:${tender.method}:credit:tax`
+          });
+        }
+
+        // Credit fee revenue if fees were collected
+        if (feeCents > 0) {
+          ledgerEntries.push({
+            campgroundId: fullReservation.campgroundId,
+            reservationId: fullReservation.id,
+            glCode: "FEE_REVENUE",
+            account: "Fee Revenue",
+            description: `Booking fees (${tender.method})`,
+            amountCents: feeCents,
+            direction: "credit",
+            externalRef: externalRef ?? paymentRef,
+            dedupeKey: `res:${fullReservation.id}:payment:${paymentRef}:${tender.method}:credit:fees`
+          });
+        }
+
+        await postBalancedLedgerEntries(tx, ledgerEntries);
       }
 
       return {

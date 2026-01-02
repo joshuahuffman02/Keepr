@@ -498,41 +498,75 @@ export class PosService {
               undefined,
               p.idempotencyKey
             );
+
+            // Map Stripe intent status to POS payment status
+            let stripePaymentStatus: PosPaymentStatus;
+            if (intent.status === "succeeded") {
+              stripePaymentStatus = PosPaymentStatus.succeeded;
+            } else if (intent.status === "canceled") {
+              stripePaymentStatus = PosPaymentStatus.failed;
+            } else {
+              // requires_payment_method, requires_confirmation, requires_action,
+              // processing, requires_capture - all kept as pending
+              stripePaymentStatus = PosPaymentStatus.pending;
+            }
+
             await tx.posPayment.create({
               data: {
                 cartId,
                 method: p.method,
                 amountCents: p.amountCents,
                 currency: p.currency.toLowerCase(),
-                status: PosPaymentStatus.succeeded,
+                status: stripePaymentStatus,
                 idempotencyKey: p.idempotencyKey,
                 referenceType: p.referenceType,
                 referenceId: p.referenceId,
-                processorIds: { intentId: intent.id }
+                processorIds: { intentId: intent.id, clientSecret: intent.client_secret }
               }
             });
 
-            // Post ledger entries for Stripe card payments
-            await postBalancedLedgerEntries(tx, [
-              {
-                campgroundId: cart.campgroundId,
-                glCode: "CASH",
-                account: "Cash",
-                description: `POS card payment (Stripe) for cart #${cartId.slice(-6)}`,
-                amountCents: p.amountCents,
-                direction: "debit" as const,
-                dedupeKey: `pos_stripe_${cartId}_${p.idempotencyKey}:debit`
-              },
-              {
-                campgroundId: cart.campgroundId,
-                glCode: "POS_REVENUE",
-                account: "POS Revenue",
-                description: `POS card payment (Stripe) for cart #${cartId.slice(-6)}`,
-                amountCents: p.amountCents,
-                direction: "credit" as const,
-                dedupeKey: `pos_stripe_${cartId}_${p.idempotencyKey}:credit`
-              }
-            ]);
+            // Only post ledger entries when payment actually succeeds
+            if (stripePaymentStatus === PosPaymentStatus.succeeded) {
+              await postBalancedLedgerEntries(tx, [
+                {
+                  campgroundId: cart.campgroundId,
+                  glCode: "CASH",
+                  account: "Cash",
+                  description: `POS card payment (Stripe) for cart #${cartId.slice(-6)}`,
+                  amountCents: p.amountCents,
+                  direction: "debit" as const,
+                  dedupeKey: `pos_stripe_${cartId}_${p.idempotencyKey}:debit`
+                },
+                {
+                  campgroundId: cart.campgroundId,
+                  glCode: "POS_REVENUE",
+                  account: "POS Revenue",
+                  description: `POS card payment (Stripe) for cart #${cartId.slice(-6)}`,
+                  amountCents: p.amountCents,
+                  direction: "credit" as const,
+                  dedupeKey: `pos_stripe_${cartId}_${p.idempotencyKey}:credit`
+                }
+              ]);
+            }
+
+            // If payment requires client action, return early with pending status
+            if (stripePaymentStatus === PosPaymentStatus.pending) {
+              // Don't close the cart - keep it in current state for retry
+              return {
+                cartId,
+                status: "pending_payment",
+                paymentIntentId: intent.id,
+                clientSecret: intent.client_secret,
+                paymentStatus: intent.status,
+                message: "Payment requires additional action",
+                totalCents: expected.totalCents,
+                breakdown: expected
+              };
+            }
+
+            if (stripePaymentStatus === PosPaymentStatus.failed) {
+              throw new BadRequestException("Card payment failed");
+            }
             continue;
           }
 

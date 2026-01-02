@@ -56,6 +56,27 @@ export class OrgBillingController {
   }
 
   /**
+   * Validates that a billing period belongs to the specified organization.
+   * This prevents cross-organization billing manipulation.
+   */
+  private async validatePeriodOwnership(periodId: string, organizationId: string): Promise<void> {
+    const period = await this.prisma.organizationBillingPeriod.findUnique({
+      where: { id: periodId },
+      select: { organizationId: true },
+    });
+
+    if (!period) {
+      throw new ForbiddenException("Billing period not found");
+    }
+
+    if (period.organizationId !== organizationId) {
+      throw new ForbiddenException(
+        "Billing period does not belong to the specified organization"
+      );
+    }
+  }
+
+  /**
    * Get billing summary for current period
    */
   @Get("summary")
@@ -144,22 +165,42 @@ export class OrgBillingController {
 
   /**
    * Finalize a billing period (admin only)
+   * SECURITY: Validates that the period belongs to the organization in the URL
    */
   @Post("periods/:periodId/finalize")
   @Roles(PlatformRole.platform_admin)
-  async finalizePeriod(@Param("periodId") periodId: string) {
+  async finalizePeriod(
+    @Param("organizationId") organizationId: string,
+    @Param("periodId") periodId: string,
+    @Req() req: any
+  ) {
+    // Validate period ownership to prevent cross-org manipulation
+    await this.validatePeriodOwnership(periodId, organizationId);
+    
+    // Even for platform admins, validate org access for audit trail
+    await this.validateOrgAccess(organizationId, req.user);
+    
     return this.billingService.finalizePeriod(periodId);
   }
 
   /**
    * Mark period as paid (webhook / admin)
+   * SECURITY: Validates that the period belongs to the organization in the URL
    */
   @Post("periods/:periodId/paid")
   @Roles(PlatformRole.platform_admin)
   async markPeriodPaid(
+    @Param("organizationId") organizationId: string,
     @Param("periodId") periodId: string,
-    @Body() body: { stripePaymentIntentId?: string }
+    @Body() body: { stripePaymentIntentId?: string },
+    @Req() req: any
   ) {
+    // Validate period ownership to prevent cross-org manipulation
+    await this.validatePeriodOwnership(periodId, organizationId);
+    
+    // Even for platform admins, validate org access for audit trail
+    await this.validateOrgAccess(organizationId, req.user);
+    
     return this.billingService.markPeriodPaid(periodId, body.stripePaymentIntentId);
   }
 

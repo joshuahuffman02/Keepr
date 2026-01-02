@@ -177,25 +177,57 @@ export class PaymentsReconciliationService {
   }
 
   async upsertDispute(dispute: any) {
-    const reservationId = dispute.metadata?.reservationId ?? null;
+    const disputeId = dispute.id as string;
+    const amountCents = dispute.amount as number;
+    const chargeId = dispute.charge ?? null;
+    const paymentIntentId = dispute.payment_intent ?? null;
+
+    // Check if we've already processed this dispute (idempotency)
+    const existingDispute = await (this.prisma as any).dispute.findUnique({
+      where: { stripeDisputeId: disputeId }
+    });
+
+    // Lookup campground from the Stripe connected account
     const campgroundId = await this.lookupCampgroundIdByStripeAccount(dispute.account);
-    return (this.prisma as any).dispute.upsert({
-      where: { stripeDisputeId: dispute.id },
+
+    // Find the reservation via the payment's stripeChargeId or stripePaymentIntentId
+    // This is more reliable than metadata since disputes may not have reservationId in metadata
+    let reservationId = dispute.metadata?.reservationId ?? null;
+
+    if (!reservationId && (chargeId || paymentIntentId)) {
+      // Try to find the payment that matches this charge or payment intent
+      const payment = await this.prisma.payment.findFirst({
+        where: {
+          OR: [
+            chargeId ? { stripeChargeId: chargeId } : null,
+            paymentIntentId ? { stripePaymentIntentId: paymentIntentId } : null
+          ].filter(Boolean) as any[]
+        },
+        select: { reservationId: true }
+      });
+      if (payment?.reservationId) {
+        reservationId = payment.reservationId;
+      }
+    }
+
+    // Upsert the dispute record
+    const disputeRecord = await (this.prisma as any).dispute.upsert({
+      where: { stripeDisputeId: disputeId },
       update: {
-        amountCents: dispute.amount,
+        amountCents,
         status: (dispute.status as string) ?? "needs_response",
         reason: dispute.reason ?? null,
         evidenceDueBy: dispute.evidence_details?.due_by ? new Date(dispute.evidence_details.due_by * 1000) : null,
         notes: dispute.evidence?.product_description ?? null
       },
       create: {
-        stripeDisputeId: dispute.id,
-        stripeChargeId: dispute.charge ?? null,
-        stripePaymentIntentId: dispute.payment_intent ?? null,
+        stripeDisputeId: disputeId,
+        stripeChargeId: chargeId,
+        stripePaymentIntentId: paymentIntentId,
         campgroundId,
         reservationId,
         payoutId: null,
-        amountCents: dispute.amount,
+        amountCents,
         currency: dispute.currency || 'usd',
         status: (dispute.status as string) ?? "needs_response",
         reason: dispute.reason ?? null,
@@ -203,6 +235,112 @@ export class PaymentsReconciliationService {
         notes: dispute.evidence?.product_description ?? null
       }
     });
+
+    // Only adjust reservation balance on first creation (idempotency)
+    // If existingDispute exists, we've already processed this dispute
+    if (!existingDispute && reservationId && amountCents > 0 && campgroundId) {
+      await this.adjustReservationForDispute(reservationId, campgroundId, amountCents, disputeId);
+    }
+
+    return disputeRecord;
+  }
+
+  /**
+   * Adjust reservation balance when a chargeback/dispute occurs.
+   * This reduces paidAmount and increases balanceAmount.
+   * Uses dedupeKey for idempotency so re-processing webhooks won't double-adjust.
+   */
+  private async adjustReservationForDispute(
+    reservationId: string,
+    campgroundId: string,
+    amountCents: number,
+    stripeDisputeId: string
+  ) {
+    const dedupeKey = `dispute:${stripeDisputeId}:balance_adjustment`;
+
+    // Check if we've already created ledger entries for this dispute (idempotency)
+    const existingLedger = await this.prisma.ledgerEntry.findFirst({
+      where: { dedupeKey }
+    });
+    if (existingLedger) {
+      this.logger.log(`[Dispute] Ledger entries already exist for dispute ${stripeDisputeId}, skipping balance adjustment`);
+      return;
+    }
+
+    // Find the reservation
+    const reservation = await this.prisma.reservation.findUnique({
+      where: { id: reservationId },
+      include: {
+        site: { include: { siteClass: true } }
+      }
+    });
+
+    if (!reservation) {
+      this.logger.warn(`[Dispute] Reservation ${reservationId} not found for dispute ${stripeDisputeId}`);
+      return;
+    }
+
+    // Calculate new paid amount (reduce by disputed amount)
+    const currentPaid = reservation.paidAmount ?? 0;
+    const newPaid = Math.max(0, currentPaid - amountCents);
+    const newBalance = Math.max(0, reservation.totalAmount - newPaid);
+
+    // Determine payment status
+    let paymentStatus: string;
+    if (newPaid >= reservation.totalAmount) {
+      paymentStatus = "paid";
+    } else if (newPaid > 0) {
+      paymentStatus = "partial";
+    } else {
+      paymentStatus = "unpaid";
+    }
+
+    // Update the reservation balance
+    await this.prisma.reservation.update({
+      where: { id: reservationId },
+      data: {
+        paidAmount: newPaid,
+        balanceAmount: newBalance,
+        paymentStatus
+      }
+    });
+
+    // Record a payment entry for the chargeback
+    await this.prisma.payment.create({
+      data: {
+        campgroundId,
+        reservationId,
+        amountCents,
+        method: "chargeback",
+        direction: "refund",
+        note: `Chargeback/dispute: ${stripeDisputeId}`
+      }
+    });
+
+    // Post balanced ledger entries: debit Chargeback Expense, credit Cash
+    // This is the accounting entry for the money leaving the account
+    await this.postDoubleEntry({
+      campgroundId,
+      reservationId,
+      glDebit: { code: "CHARGEBACK", name: "Chargebacks", type: GlAccountType.expense },
+      glCredit: { code: "CASH", name: "Cash", type: GlAccountType.asset },
+      amountCents,
+      description: `Chargeback: dispute ${stripeDisputeId}`,
+      sourceTxId: stripeDisputeId,
+      occurredAt: new Date(),
+      reconciliationKey: dedupeKey
+    });
+
+    this.logger.log(
+      `[Dispute] Adjusted reservation ${reservationId} for dispute ${stripeDisputeId}: ` +
+      `paidAmount ${currentPaid} -> ${newPaid}, balanceAmount -> ${newBalance}`
+    );
+
+    // Send alert about the chargeback
+    await this.sendAlert(
+      `Chargeback received for reservation ${reservationId}: $${(amountCents / 100).toFixed(2)} ` +
+      `(dispute ${stripeDisputeId}, reason: ${(await (this.prisma as any).dispute.findUnique({ where: { stripeDisputeId } }))?.reason ?? 'unknown'})`
+    );
   }
 
   async upsertPayoutFromStripe(payout: any) {
