@@ -524,53 +524,53 @@ export default function TemplatesPage() {
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
           <div>
-            <h1 className="text-2xl font-bold text-slate-900">Email & SMS Templates</h1>
-            <p className="text-slate-500 mt-1">Create message templates, then connect them to triggers to automate sending</p>
+            <h1 className="text-2xl font-bold text-foreground">Email & SMS Templates</h1>
+            <p className="text-muted-foreground mt-1">Create message templates, then connect them to triggers to automate sending</p>
           </div>
           <button
             onClick={() => setShowCreateModal(true)}
-            className="px-4 py-2 bg-violet-600 text-white rounded-lg font-medium hover:bg-violet-700 transition-colors flex items-center gap-2"
+            className="px-4 py-2 bg-action-primary text-action-primary-foreground rounded-lg font-medium hover:bg-action-primary-hover transition-colors flex items-center gap-2"
           >
             <Plus className="h-4 w-4" /> New Template
           </button>
         </div>
 
         {/* Workflow Hint */}
-        <div className="bg-gradient-to-r from-violet-50 to-indigo-50 border border-violet-100 rounded-xl p-4 mb-6">
+        <div className="bg-status-info/10 border border-status-info/20 rounded-xl p-4 mb-6">
           <div className="flex items-center gap-6 text-sm">
             <div className="flex items-center gap-2">
-              <div className="p-2 bg-white rounded-lg border border-violet-200">
-                <FileText className="h-5 w-5 text-violet-600" />
+              <div className="p-2 bg-card rounded-lg border border-border">
+                <FileText className="h-5 w-5 text-status-info" />
               </div>
               <div>
-                <div className="font-medium text-slate-900">1. Create Template</div>
-                <div className="text-slate-500">Design your message</div>
+                <div className="font-medium text-foreground">1. Create Template</div>
+                <div className="text-muted-foreground">Design your message</div>
               </div>
             </div>
-            <ArrowRight className="h-5 w-5 text-slate-300" />
+            <ArrowRight className="h-5 w-5 text-muted-foreground/60" />
             <div className="flex items-center gap-2">
-              <div className="p-2 bg-white rounded-lg border border-violet-200">
-                <LinkIcon className="h-5 w-5 text-violet-600" />
+              <div className="p-2 bg-card rounded-lg border border-border">
+                <LinkIcon className="h-5 w-5 text-status-info" />
               </div>
               <div>
-                <div className="font-medium text-slate-900">2. Connect to Trigger</div>
-                <div className="text-slate-500">Choose when to send</div>
+                <div className="font-medium text-foreground">2. Connect to Trigger</div>
+                <div className="text-muted-foreground">Choose when to send</div>
               </div>
             </div>
-            <ArrowRight className="h-5 w-5 text-slate-300" />
+            <ArrowRight className="h-5 w-5 text-muted-foreground/60" />
             <div className="flex items-center gap-2">
-              <div className="p-2 bg-white rounded-lg border border-violet-200">
-                <Zap className="h-5 w-5 text-violet-600" />
+              <div className="p-2 bg-card rounded-lg border border-border">
+                <Zap className="h-5 w-5 text-status-info" />
               </div>
               <div>
-                <div className="font-medium text-slate-900">3. Automatic!</div>
-                <div className="text-slate-500">Guests get notified</div>
+                <div className="font-medium text-foreground">3. Automatic!</div>
+                <div className="text-muted-foreground">Guests get notified</div>
               </div>
             </div>
             <div className="ml-auto">
               <Link
                 href="/dashboard/settings/notification-triggers"
-                className="text-violet-600 hover:text-violet-700 font-medium flex items-center gap-1"
+                className="text-action-primary hover:text-action-primary-hover font-medium flex items-center gap-1"
               >
                 Go to Triggers <ExternalLink className="h-4 w-4" />
               </Link>
@@ -582,32 +582,32 @@ export default function TemplatesPage() {
           {/* Templates List */}
           <div className="lg:col-span-1 space-y-4" ref={templateListRef}>
             <div className="flex items-center justify-between">
-              <h2 className="font-semibold text-slate-900">Your Templates</h2>
-              <span className="text-sm text-slate-500">{templates.length} total</span>
+              <h2 className="font-semibold text-foreground">Your Templates</h2>
+              <span className="text-sm text-muted-foreground">{templates.length} total</span>
             </div>
 
             {templatesQuery.isLoading ? (
               <div className="flex items-center justify-center py-12">
-                <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-violet-600" />
+                <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-action-primary" />
               </div>
             ) : templates.length === 0 ? (
-              <div className="bg-gradient-to-br from-violet-50 to-indigo-50 rounded-2xl p-8 text-center border border-violet-100">
+              <div className="bg-status-info/10 rounded-2xl p-8 text-center border border-status-info/20">
                 <div className="flex justify-center mb-4">
-                  <div className="p-4 bg-violet-100 rounded-full">
-                    <Sparkles className="h-10 w-10 text-violet-600" />
+                  <div className="p-4 bg-status-info/15 rounded-full">
+                    <Sparkles className="h-10 w-10 text-status-info" />
                   </div>
                 </div>
-                <h3 className="text-xl font-bold text-slate-900 mb-2">
+                <h3 className="text-xl font-bold text-foreground mb-2">
                   No Templates Yet
                 </h3>
-                <p className="text-slate-600 mb-6 max-w-sm mx-auto">
+                <p className="text-muted-foreground mb-6 max-w-sm mx-auto">
                   Start by adding a prebuilt template below, or create a custom one from scratch.
                 </p>
                 <button
                   onClick={() => setShowCreateModal(true)}
-                  className="px-6 py-2.5 bg-violet-600 text-white rounded-lg font-medium
-                    hover:bg-violet-700 active:scale-[0.98] transition-all
-                    focus-visible:ring-2 focus-visible:ring-violet-500 focus-visible:ring-offset-2"
+                  className="px-6 py-2.5 bg-action-primary text-action-primary-foreground rounded-lg font-medium
+                    hover:bg-action-primary-hover active:scale-[0.98] transition-all
+                    focus-visible:ring-2 focus-visible:ring-action-primary focus-visible:ring-offset-2"
                 >
                   Create Template
                 </button>
@@ -617,7 +617,7 @@ export default function TemplatesPage() {
                 const catTemplates = templatesByCategory[cat];
                 if (catTemplates.length === 0) return null;
                 return (
-                  <div key={cat} className="bg-white rounded-xl border border-slate-200 overflow-hidden">
+                  <div key={cat} className="bg-card rounded-xl border border-border overflow-hidden">
                     <div className="px-4 py-2 bg-slate-50 border-b border-slate-200">
                       <h3 className="font-medium text-slate-700 capitalize">{cat}</h3>
                     </div>
