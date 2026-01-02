@@ -18,7 +18,7 @@ const ScrollArea = React.forwardRef<HTMLDivElement, ScrollAreaProps>(
         orientation === "horizontal" && "overflow-x-auto overflow-y-hidden",
         orientation === "both" && "overflow-auto",
         // Custom scrollbar styling
-        "scrollbar-thin scrollbar-track-transparent scrollbar-thumb-slate-200 dark:scrollbar-thumb-slate-800",
+        "scrollbar-thin scrollbar-track-transparent scrollbar-thumb-border",
         className
       )}
       {...props}
@@ -47,7 +47,7 @@ const ScrollBar = React.forwardRef<HTMLDivElement, ScrollBarProps>(
       )}
       {...props}
     >
-      <div className="relative flex-1 rounded-full bg-slate-200 dark:bg-slate-800" />
+      <div className="relative flex-1 rounded-full bg-muted" />
     </div>
   )
 )

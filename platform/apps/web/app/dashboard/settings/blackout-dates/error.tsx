@@ -21,7 +21,7 @@ export default function BlackoutDatesError({
                 <div className="mx-auto w-12 h-12 rounded-full bg-rose-100 flex items-center justify-center">
                     <AlertCircle className="h-6 w-6 text-rose-600" />
                 </div>
-                <h2 className="text-xl font-semibold text-slate-900">Failed to load blackout dates</h2>
+                <h2 className="text-xl font-semibold text-foreground">Failed to load blackout dates</h2>
                 <p className="text-sm text-muted-foreground">
                     {error.message || "An unexpected error occurred while loading the blackout dates."}
                 </p>

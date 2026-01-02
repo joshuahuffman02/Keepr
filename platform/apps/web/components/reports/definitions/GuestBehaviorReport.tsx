@@ -103,7 +103,7 @@ export function GuestBehaviorReport({ campgroundId, dateRange }: GuestBehaviorRe
     }, [reservations, dateRange]);
 
     if (isLoading) {
-        return <div className="text-sm text-slate-500">Loading behavior data...</div>;
+        return <div className="text-sm text-muted-foreground">Loading behavior data...</div>;
     }
 
     if (error) {
@@ -112,9 +112,9 @@ export function GuestBehaviorReport({ campgroundId, dateRange }: GuestBehaviorRe
 
     if (!reportData) {
         return (
-            <div className="flex flex-col items-center justify-center p-12 bg-slate-50 rounded-lg border border-slate-200">
-                <div className="text-slate-400 mb-2">No booking data found</div>
-                <p className="text-xs text-slate-500">Try adjusting the date range.</p>
+            <div className="flex flex-col items-center justify-center p-12 bg-muted rounded-lg border border-border">
+                <div className="text-muted-foreground mb-2">No booking data found</div>
+                <p className="text-xs text-muted-foreground">Try adjusting the date range.</p>
             </div>
         );
     }
@@ -125,7 +125,7 @@ export function GuestBehaviorReport({ campgroundId, dateRange }: GuestBehaviorRe
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                 <Card>
                     <CardHeader className="pb-2">
-                        <CardTitle className="text-sm font-medium text-slate-500">Total Bookings</CardTitle>
+                        <CardTitle className="text-sm font-medium text-muted-foreground">Total Bookings</CardTitle>
                     </CardHeader>
                     <CardContent>
                         <div className="text-2xl font-bold">{reportData.totalBookings}</div>
@@ -133,7 +133,7 @@ export function GuestBehaviorReport({ campgroundId, dateRange }: GuestBehaviorRe
                 </Card>
                 <Card>
                     <CardHeader className="pb-2">
-                        <CardTitle className="text-sm font-medium text-slate-500">Avg Lead Time</CardTitle>
+                        <CardTitle className="text-sm font-medium text-muted-foreground">Avg Lead Time</CardTitle>
                     </CardHeader>
                     <CardContent>
                         <div className="text-2xl font-bold">{reportData.avgLeadTime} days</div>
@@ -141,7 +141,7 @@ export function GuestBehaviorReport({ campgroundId, dateRange }: GuestBehaviorRe
                 </Card>
                 <Card>
                     <CardHeader className="pb-2">
-                        <CardTitle className="text-sm font-medium text-slate-500">Avg Length of Stay</CardTitle>
+                        <CardTitle className="text-sm font-medium text-muted-foreground">Avg Length of Stay</CardTitle>
                     </CardHeader>
                     <CardContent>
                         <div className="text-2xl font-bold">{reportData.avgLOS} nights</div>
@@ -149,11 +149,11 @@ export function GuestBehaviorReport({ campgroundId, dateRange }: GuestBehaviorRe
                 </Card>
                 <Card className={Number(reportData.cancellationRate) > 10 ? "border-amber-200 bg-amber-50" : ""}>
                     <CardHeader className="pb-2">
-                        <CardTitle className="text-sm font-medium text-slate-500">Cancellation Rate</CardTitle>
+                        <CardTitle className="text-sm font-medium text-muted-foreground">Cancellation Rate</CardTitle>
                     </CardHeader>
                     <CardContent>
                         <div className="text-2xl font-bold">{reportData.cancellationRate}%</div>
-                        <p className="text-xs text-slate-500">{reportData.cancelledCount} cancelled</p>
+                        <p className="text-xs text-muted-foreground">{reportData.cancelledCount} cancelled</p>
                     </CardContent>
                 </Card>
             </div>
@@ -163,7 +163,7 @@ export function GuestBehaviorReport({ campgroundId, dateRange }: GuestBehaviorRe
                 <Card className="p-4">
                     <CardHeader>
                         <CardTitle>Lead Time Distribution</CardTitle>
-                        <p className="text-xs text-slate-500">Days between booking and arrival</p>
+                        <p className="text-xs text-muted-foreground">Days between booking and arrival</p>
                     </CardHeader>
                     <div className="h-[250px] w-full mt-4">
                         <ResponsiveContainer width="100%" height="100%">
@@ -185,7 +185,7 @@ export function GuestBehaviorReport({ campgroundId, dateRange }: GuestBehaviorRe
                 <Card className="p-4">
                     <CardHeader>
                         <CardTitle>Length of Stay Distribution</CardTitle>
-                        <p className="text-xs text-slate-500">Nights per reservation</p>
+                        <p className="text-xs text-muted-foreground">Nights per reservation</p>
                     </CardHeader>
                     <div className="h-[250px] w-full mt-4">
                         <ResponsiveContainer width="100%" height="100%">

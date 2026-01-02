@@ -9,8 +9,8 @@ export default function LocalizationPage() {
   return (
     <div className="max-w-4xl space-y-6">
       <div>
-        <h2 className="text-2xl font-bold text-slate-900">Localization</h2>
-        <p className="text-slate-500 mt-1">
+        <h2 className="text-2xl font-bold text-foreground">Localization</h2>
+        <p className="text-muted-foreground mt-1">
           Configure timezone, currency, and regional settings
         </p>
       </div>
@@ -22,8 +22,8 @@ export default function LocalizationPage() {
               <Globe className="h-6 w-6 text-green-600" />
             </div>
             <div className="flex-1">
-              <h3 className="font-semibold text-slate-900">Regional Settings</h3>
-              <p className="text-sm text-slate-500 mt-1">
+              <h3 className="font-semibold text-foreground">Regional Settings</h3>
+              <p className="text-sm text-muted-foreground mt-1">
                 Set your campground's timezone, date format, and currency preferences.
                 These settings affect how dates and prices are displayed.
               </p>

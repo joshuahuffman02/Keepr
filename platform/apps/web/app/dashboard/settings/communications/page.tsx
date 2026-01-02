@@ -111,7 +111,7 @@ export default function CommunicationsSettingsPage() {
   if (!campgroundId) {
     return (
       <div>
-        <div className="p-6 text-slate-600">Select or create a campground to manage communications.</div>
+        <div className="p-6 text-muted-foreground">Select or create a campground to manage communications.</div>
       </div>
     );
   }
@@ -120,8 +120,8 @@ export default function CommunicationsSettingsPage() {
     <div>
       <div className="max-w-5xl space-y-6">
         <div>
-          <h1 className="text-2xl font-bold text-slate-900">Communications — NPS</h1>
-          <p className="text-sm text-slate-600">Auto post-checkout NPS and flexible pre/post-arrival messaging.</p>
+          <h1 className="text-2xl font-bold text-foreground">Communications — NPS</h1>
+          <p className="text-sm text-muted-foreground">Auto post-checkout NPS and flexible pre/post-arrival messaging.</p>
         </div>
 
         <Card>
@@ -133,7 +133,7 @@ export default function CommunicationsSettingsPage() {
             <div className="flex items-center justify-between">
               <div>
                 <Label className="text-sm font-medium">Auto send enabled</Label>
-                <p className="text-xs text-slate-500">Enqueue NPS messages on the schedule below.</p>
+                <p className="text-xs text-muted-foreground">Enqueue NPS messages on the schedule below.</p>
               </div>
               <Switch checked={npsEnabled} onCheckedChange={setNpsEnabled} />
             </div>
@@ -151,7 +151,7 @@ export default function CommunicationsSettingsPage() {
               <div className="space-y-1 md:col-span-2">
                 <Label>Default template</Label>
                 <select
-                  className="h-10 w-full rounded border border-slate-200 bg-white px-2 text-sm"
+                  className="h-10 w-full rounded border border-border bg-card px-2 text-sm"
                   value={defaultTemplateId || ""}
                   onChange={(e) => setDefaultTemplateId(e.target.value || null)}
                 >
@@ -160,7 +160,7 @@ export default function CommunicationsSettingsPage() {
                     <option key={t.id} value={t.id}>{t.name} (v{t.version})</option>
                   ))}
                 </select>
-                <p className="text-xs text-slate-500">Templates with <code>{"{nps_link}"}</code> or <code>{"{npsLink}"}</code> will have the NPS link injected.</p>
+                <p className="text-xs text-muted-foreground">Templates with <code>{"{nps_link}"}</code> or <code>{"{npsLink}"}</code> will have the NPS link injected.</p>
               </div>
             </div>
           </CardContent>
@@ -174,7 +174,7 @@ export default function CommunicationsSettingsPage() {
           <CardContent className="space-y-3">
             <div className="space-y-2">
               {schedule.length === 0 && (
-                <div className="overflow-hidden rounded border border-slate-200 bg-white">
+                <div className="overflow-hidden rounded border border-border bg-card">
                   <table className="w-full text-sm">
                     <tbody>
                       <TableEmpty>No custom entries yet. The day-after departure send is always included.</TableEmpty>
@@ -183,17 +183,17 @@ export default function CommunicationsSettingsPage() {
                 </div>
               )}
               {schedule.map((entry, idx) => (
-                <div key={entry.id} className="grid gap-2 rounded border border-slate-200 p-3 md:grid-cols-7 md:items-center">
+                <div key={entry.id} className="grid gap-2 rounded border border-border p-3 md:grid-cols-7 md:items-center">
                   <div className="flex items-center gap-2">
                     <Switch checked={entry.enabled !== false} onCheckedChange={(v) => {
                       const next = [...schedule];
                       next[idx] = { ...entry, enabled: v };
                       setSchedule(next);
                     }} />
-                    <span className="text-sm text-slate-700">On</span>
+                    <span className="text-sm text-foreground">On</span>
                   </div>
                   <select
-                    className="h-9 rounded border border-slate-200 bg-white px-2 text-sm"
+                    className="h-9 rounded border border-border bg-card px-2 text-sm"
                     value={entry.direction}
                     onChange={(e) => {
                       const next = [...schedule];
@@ -214,7 +214,7 @@ export default function CommunicationsSettingsPage() {
                     }}
                   />
                   <select
-                    className="h-9 rounded border border-slate-200 bg-white px-2 text-sm"
+                    className="h-9 rounded border border-border bg-card px-2 text-sm"
                     value={entry.unit}
                     onChange={(e) => {
                       const next = [...schedule];
@@ -226,7 +226,7 @@ export default function CommunicationsSettingsPage() {
                     <option value="days">Days</option>
                   </select>
                   <select
-                    className="h-9 rounded border border-slate-200 bg-white px-2 text-sm"
+                    className="h-9 rounded border border-border bg-card px-2 text-sm"
                     value={entry.anchor}
                     onChange={(e) => {
                       const next = [...schedule];
@@ -238,7 +238,7 @@ export default function CommunicationsSettingsPage() {
                     <option value="departure">Departure</option>
                   </select>
                   <select
-                    className="h-9 rounded border border-slate-200 bg-white px-2 text-sm"
+                    className="h-9 rounded border border-border bg-card px-2 text-sm"
                     value={entry.templateId || ""}
                     onChange={(e) => {
                       const next = [...schedule];
@@ -269,13 +269,13 @@ export default function CommunicationsSettingsPage() {
             <CardDescription>Arrival in 3 days, departure in 5 days. Times use the selected send hour.</CardDescription>
           </CardHeader>
           <CardContent className="space-y-2">
-            {preview.length === 0 && <div className="text-sm text-slate-500">No sends configured.</div>}
+            {preview.length === 0 && <div className="text-sm text-muted-foreground">No sends configured.</div>}
             {preview.map((p) => (
-              <div key={p.id} className="flex items-center justify-between rounded border border-slate-200 px-3 py-2">
-                <div className="text-sm text-slate-700">
+              <div key={p.id} className="flex items-center justify-between rounded border border-border px-3 py-2">
+                <div className="text-sm text-foreground">
                   {p.direction === "before" ? "-" : "+"}{p.offset}{p.unit === "days" ? "d" : "h"} • {p.anchor}
                 </div>
-                <div className="text-sm text-slate-600">{p.when.toLocaleString()}</div>
+                <div className="text-sm text-muted-foreground">{p.when.toLocaleString()}</div>
               </div>
             ))}
           </CardContent>

@@ -137,10 +137,10 @@ export default function MaintenancePage() {
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between mb-6 pb-2 md:pb-0">
         <div>
           <div className="flex items-center gap-2">
-            <h1 className="text-2xl font-bold text-slate-900">Maintenance</h1>
+            <h1 className="text-2xl font-bold text-foreground">Maintenance</h1>
             <HelpAnchor topicId="maintenance-work-orders" label="Maintenance help" />
           </div>
-          <p className="text-slate-500">Track repairs, work orders, and site maintenance.</p>
+          <p className="text-muted-foreground">Track repairs, work orders, and site maintenance.</p>
         </div>
         <Button onClick={() => setIsCreateOpen(true)}>
           <Plus className="h-4 w-4 mr-2" />
@@ -151,16 +151,16 @@ export default function MaintenancePage() {
       <div className="grid gap-2 mb-4 md:hidden">
         <Card>
           <CardContent className="p-3 flex items-center justify-between">
-            <div className="text-sm text-slate-600">Open / In progress</div>
-            <div className="text-lg font-semibold text-slate-900">
+            <div className="text-sm text-muted-foreground">Open / In progress</div>
+            <div className="text-lg font-semibold text-foreground">
               {tickets.filter((t) => t.status !== "closed").length}
             </div>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="p-3 flex items-center justify-between">
-            <div className="text-sm text-slate-600">Closed today</div>
-            <div className="text-lg font-semibold text-slate-900">
+            <div className="text-sm text-muted-foreground">Closed today</div>
+            <div className="text-lg font-semibold text-foreground">
               {tickets.filter((t) => t.status === "closed").length}
             </div>
           </CardContent>
@@ -177,10 +177,10 @@ export default function MaintenancePage() {
 
         <div className="grid gap-4">
           {loading ? (
-            <div className="text-center py-10 text-slate-500">Loading tickets...</div>
+            <div className="text-center py-10 text-muted-foreground">Loading tickets...</div>
           ) : tickets.length === 0 ? (
-            <div className="text-center py-10 border rounded-lg bg-slate-50">
-              <p className="text-slate-500">No tickets found.</p>
+            <div className="text-center py-10 border rounded-lg bg-muted">
+              <p className="text-muted-foreground">No tickets found.</p>
             </div>
           ) : (
             tickets.map((ticket) => (
@@ -196,7 +196,7 @@ export default function MaintenancePage() {
                   <div className="flex-1">
                     <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between mb-1">
                       <div className="flex flex-wrap items-center gap-2">
-                        <h3 className="font-semibold text-slate-900">{ticket.title}</h3>
+                        <h3 className="font-semibold text-foreground">{ticket.title}</h3>
                         <Badge variant="outline" className={getPriorityColor(ticket.priority)}>
                           {ticket.priority}
                         </Badge>
@@ -211,14 +211,14 @@ export default function MaintenancePage() {
                       </Badge>
                     </div>
 
-                    <p className="text-slate-600 text-sm mb-3 whitespace-pre-wrap">{ticket.description}</p>
+                    <p className="text-muted-foreground text-sm mb-3 whitespace-pre-wrap">{ticket.description}</p>
 
-                    <div className="flex flex-wrap items-center gap-3 text-xs text-slate-500 mb-3">
-                      <span className="rounded-full border border-slate-200 bg-slate-50 px-2 py-1">
+                    <div className="flex flex-wrap items-center gap-3 text-xs text-muted-foreground mb-3">
+                      <span className="rounded-full border border-border bg-muted px-2 py-1">
                         Created {format(new Date(ticket.createdAt || new Date()), 'MMM d, yyyy')}
                       </span>
                       {ticket.siteId && (
-                        <span className="flex items-center gap-1 bg-slate-100 px-2 py-1 rounded border border-slate-200">
+                        <span className="flex items-center gap-1 bg-muted px-2 py-1 rounded border border-border">
                           Site: {ticket.siteId}
                         </span>
                       )}
@@ -230,7 +230,7 @@ export default function MaintenancePage() {
                     </div>
 
                     {/* Quick Actions */}
-                    <div className="flex flex-wrap items-center gap-2 pt-2 border-t border-slate-100">
+                    <div className="flex flex-wrap items-center gap-2 pt-2 border-t border-border">
                       {ticket.status === "open" && (
                         <Button
                           size="sm"
@@ -265,7 +265,7 @@ export default function MaintenancePage() {
                         <Button
                           size="sm"
                           variant="outline"
-                          className="text-slate-600 border-slate-200 hover:bg-slate-50"
+                          className="text-muted-foreground border-border hover:bg-muted"
                           disabled={updatingTicket === ticket.id}
                           onClick={(e) => {
                             e.stopPropagation();
@@ -292,7 +292,7 @@ export default function MaintenancePage() {
                           <Button
                             size="sm"
                             variant="outline"
-                            className="text-slate-600"
+                            className="text-muted-foreground"
                             onClick={(e) => e.stopPropagation()}
                           >
                             <StickyNote className="h-3 w-3 mr-1" />
@@ -335,7 +335,7 @@ export default function MaintenancePage() {
                       <Button
                         size="sm"
                         variant="ghost"
-                        className="text-slate-500"
+                        className="text-muted-foreground"
                         onClick={(e) => {
                           e.stopPropagation();
                           setSelectedTicket(ticket as unknown as MaintenanceTicket);

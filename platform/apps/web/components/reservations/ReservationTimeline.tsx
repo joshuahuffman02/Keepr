@@ -22,8 +22,8 @@ export function ReservationTimeline({ reservation }: ReservationTimelineProps) {
             title: "Reservation Created",
             date: normalizeDate(reservation.createdAt),
             icon: Clock,
-            color: "text-slate-500",
-            bg: "bg-slate-100"
+            color: "text-muted-foreground",
+            bg: "bg-muted"
         }
     ];
 
@@ -37,8 +37,8 @@ export function ReservationTimeline({ reservation }: ReservationTimelineProps) {
                     : `Payment Received ($${((payment.amountCents ?? 0) / 100).toFixed(2)})`,
                 date: normalizeDate(payment.createdAt),
                 icon: CreditCard,
-                color: isRefund ? "text-red-600" : "text-emerald-600",
-                bg: isRefund ? "bg-red-100" : "bg-emerald-100"
+                color: isRefund ? "text-status-error" : "text-status-success",
+                bg: isRefund ? "bg-status-error/10" : "bg-status-success/10"
             });
         });
     } else if (paidCents > 0) {
@@ -47,8 +47,8 @@ export function ReservationTimeline({ reservation }: ReservationTimelineProps) {
             title: `Payment Received ($${(paidCents / 100).toFixed(2)})`,
             date: normalizeDate(reservation.updatedAt), // Use updatedAt as better approximation
             icon: CreditCard,
-            color: "text-emerald-600",
-            bg: "bg-emerald-100"
+            color: "text-status-success",
+            bg: "bg-status-success/10"
         });
     }
 
@@ -57,8 +57,8 @@ export function ReservationTimeline({ reservation }: ReservationTimelineProps) {
             title: "Guest Checked In",
             date: normalizeDate(reservation.checkInAt),
             icon: CheckCircle2,
-            color: "text-blue-600",
-            bg: "bg-blue-100"
+            color: "text-status-info",
+            bg: "bg-status-info/10"
         });
     }
 
@@ -67,8 +67,8 @@ export function ReservationTimeline({ reservation }: ReservationTimelineProps) {
             title: "Guest Checked Out",
             date: normalizeDate(reservation.checkOutAt),
             icon: DoorOpen,
-            color: "text-slate-600",
-            bg: "bg-slate-100"
+            color: "text-muted-foreground",
+            bg: "bg-muted"
         });
     }
 
@@ -77,8 +77,8 @@ export function ReservationTimeline({ reservation }: ReservationTimelineProps) {
             title: "Reservation Cancelled",
             date: normalizeDate(reservation.updatedAt),
             icon: XCircle,
-            color: "text-red-600",
-            bg: "bg-red-100"
+            color: "text-status-error",
+            bg: "bg-status-error/10"
         });
     }
 
@@ -89,7 +89,7 @@ export function ReservationTimeline({ reservation }: ReservationTimelineProps) {
         <Card>
             <CardHeader>
                 <CardTitle className="flex items-center gap-2 text-lg">
-                    <Clock className="w-5 h-5 text-slate-500" />
+                    <Clock className="w-5 h-5 text-muted-foreground" />
                     Timeline
                 </CardTitle>
             </CardHeader>
@@ -99,16 +99,16 @@ export function ReservationTimeline({ reservation }: ReservationTimelineProps) {
                         <div key={i} className="relative flex gap-4">
                             {/* Line */}
                             {i !== events.length - 1 && (
-                                <div className="absolute left-[19px] top-10 bottom-[-24px] w-0.5 bg-slate-200" />
+                                <div className="absolute left-[19px] top-10 bottom-[-24px] w-0.5 bg-border" />
                             )}
 
-                            <div className={`relative z-10 w-10 h-10 rounded-full flex items-center justify-center ${event.bg} border-2 border-white shadow-sm`}>
+                            <div className={`relative z-10 w-10 h-10 rounded-full flex items-center justify-center ${event.bg} border-2 border-card shadow-sm`}>
                                 <event.icon className={`w-5 h-5 ${event.color}`} />
                             </div>
 
                             <div className="flex-1 pt-2">
-                                <div className="font-medium text-slate-900">{event.title}</div>
-                                <div className="text-sm text-slate-500">
+                                <div className="font-medium text-foreground">{event.title}</div>
+                                <div className="text-sm text-muted-foreground">
                                     {format(new Date(event.date), "MMM d, yyyy 'at' h:mm a")}
                                 </div>
                             </div>

@@ -144,7 +144,7 @@ export function SheetContent({ side = "bottom", className, children }: SheetCont
     <div
       ref={contentRef}
       className={cn(
-        "fixed z-50 bg-white dark:bg-slate-900 shadow-lg border-slate-200 dark:border-slate-800 p-6",
+        "fixed z-50 bg-card dark:bg-muted shadow-lg border-border dark:border-border p-6",
         "data-[state=open]:animate-in data-[state=closed]:animate-out",
         "data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
         "data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95",
@@ -186,7 +186,7 @@ interface SheetTitleProps {
 
 export function SheetTitle({ className, children }: SheetTitleProps) {
   return (
-    <h2 className={cn("text-lg font-semibold text-slate-900 dark:text-slate-100", className)}>
+    <h2 className={cn("text-lg font-semibold text-foreground dark:text-foreground", className)}>
       {children}
     </h2>
   );
@@ -199,7 +199,7 @@ interface SheetDescriptionProps {
 
 export function SheetDescription({ className, children }: SheetDescriptionProps) {
   return (
-    <p className={cn("text-sm text-slate-500 dark:text-slate-400", className)}>
+    <p className={cn("text-sm text-muted-foreground dark:text-muted-foreground", className)}>
       {children}
     </p>
   );

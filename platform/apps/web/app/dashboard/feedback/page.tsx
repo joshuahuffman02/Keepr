@@ -193,11 +193,11 @@ export default function FeedbackDashboard() {
             animate={{ opacity: 1, scale: 1 }}
             className="text-center"
           >
-            <div className="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <MessageSquareHeart className="w-8 h-8 text-slate-400" />
+            <div className="w-16 h-16 bg-muted rounded-full flex items-center justify-center mx-auto mb-4">
+              <MessageSquareHeart className="w-8 h-8 text-muted-foreground" />
             </div>
-            <h2 className="text-xl font-semibold text-slate-900">No Campground Selected</h2>
-            <p className="text-slate-600 mt-2">Select a campground to view guest feedback.</p>
+            <h2 className="text-xl font-semibold text-foreground">No Campground Selected</h2>
+            <p className="text-muted-foreground mt-2">Select a campground to view guest feedback.</p>
           </motion.div>
         </div>
       </DashboardShell>
@@ -261,7 +261,7 @@ export default function FeedbackDashboard() {
                 animate={{ scale: 1, rotate: 0 }}
                 exit={{ scale: 0, opacity: 0 }}
                 transition={{ type: "spring", stiffness: 200, damping: 15 }}
-                className="bg-white rounded-2xl shadow-2xl p-8 text-center"
+                className="bg-card rounded-2xl shadow-2xl p-8 text-center"
               >
                 <motion.div
                   animate={{ rotate: [0, -10, 10, -10, 0] }}
@@ -269,8 +269,8 @@ export default function FeedbackDashboard() {
                 >
                   <PartyPopper className="w-16 h-16 text-emerald-500 mx-auto mb-4" />
                 </motion.div>
-                <h3 className="text-2xl font-bold text-slate-900">Outstanding NPS!</h3>
-                <p className="text-slate-600 mt-2">Your guests love you! Keep up the great work.</p>
+                <h3 className="text-2xl font-bold text-foreground">Outstanding NPS!</h3>
+                <p className="text-muted-foreground mt-2">Your guests love you! Keep up the great work.</p>
               </motion.div>
             </motion.div>
           )}
@@ -283,8 +283,8 @@ export default function FeedbackDashboard() {
               <Heart className="w-6 h-6 text-status-info" />
             </div>
             <div>
-              <h1 className="text-3xl font-bold text-slate-900">Guest Feedback</h1>
-              <p className="text-slate-600">Track happiness and turn feedback into action</p>
+              <h1 className="text-3xl font-bold text-foreground">Guest Feedback</h1>
+              <p className="text-muted-foreground">Track happiness and turn feedback into action</p>
             </div>
           </div>
         </motion.div>
@@ -303,7 +303,7 @@ export default function FeedbackDashboard() {
             <div className="flex items-start justify-between">
               <div>
                 <div className="flex items-center gap-2">
-                  <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">NPS Score</span>
+                  <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">NPS Score</span>
                   <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${npsStyle.bg} ${npsStyle.color}`}>
                     {npsStyle.label}
                   </span>
@@ -322,7 +322,7 @@ export default function FeedbackDashboard() {
               </motion.div>
             </div>
             {!hasResponses && (
-              <p className="text-xs text-slate-500 mt-2">Send your first survey to see your score</p>
+              <p className="text-xs text-muted-foreground mt-2">Send your first survey to see your score</p>
             )}
           </motion.div>
 
@@ -356,7 +356,7 @@ export default function FeedbackDashboard() {
         {hasResponses && (
           <motion.div
             variants={itemVariants}
-            className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden"
+            className="bg-card rounded-xl border border-border shadow-sm overflow-hidden"
           >
             <div className="bg-status-info/10 border-b border-status-info/20 px-6 py-4">
               <div className="flex items-center gap-3">
@@ -364,8 +364,8 @@ export default function FeedbackDashboard() {
                   <Trophy className="w-5 h-5 text-indigo-600" />
                 </div>
                 <div>
-                  <h2 className="text-lg font-semibold text-slate-900">NPS Benchmarks</h2>
-                  <p className="text-sm text-slate-600">See how you compare and what it takes to level up</p>
+                  <h2 className="text-lg font-semibold text-foreground">NPS Benchmarks</h2>
+                  <p className="text-sm text-muted-foreground">See how you compare and what it takes to level up</p>
                 </div>
               </div>
             </div>
@@ -375,21 +375,21 @@ export default function FeedbackDashboard() {
                 {/* Your Score vs System Average */}
                 {/* System comparison - feature coming soon */}
                 <div className="space-y-4">
-                  <div className="flex items-center gap-2 text-sm font-medium text-slate-700">
+                  <div className="flex items-center gap-2 text-sm font-medium text-foreground">
                     <Target className="w-4 h-4 text-indigo-500" />
                     <span>Your Performance</span>
                   </div>
 
                   <div className="flex items-center gap-4">
                     <div className="flex-1">
-                      <div className="text-xs text-slate-500 mb-1">Your NPS</div>
+                      <div className="text-xs text-muted-foreground mb-1">Your NPS</div>
                       <div className={`text-2xl font-bold ${npsStyle.color}`}>
                         {npsScore > 0 ? `+${npsScore}` : npsScore}
                       </div>
                     </div>
                     <div className="flex-1">
-                      <div className="text-xs text-slate-500 mb-1">Responses</div>
-                      <div className="text-2xl font-bold text-slate-600">
+                      <div className="text-xs text-muted-foreground mb-1">Responses</div>
+                      <div className="text-2xl font-bold text-muted-foreground">
                         {metrics?.totalResponses ?? 0}
                       </div>
                     </div>
@@ -398,7 +398,7 @@ export default function FeedbackDashboard() {
 
                 {/* Path to Average */}
                 <div className="space-y-4">
-                  <div className="flex items-center gap-2 text-sm font-medium text-slate-700">
+                  <div className="flex items-center gap-2 text-sm font-medium text-foreground">
                     <Zap className="w-4 h-4 text-amber-500" />
                     <span>Path to Above Average</span>
                   </div>
@@ -438,8 +438,8 @@ export default function FeedbackDashboard() {
                       </p>
                     </div>
                   ) : (
-                    <div className="bg-slate-50 border border-slate-200 rounded-xl p-4 text-center">
-                      <p className="text-sm text-slate-600">
+                    <div className="bg-muted border border-border rounded-xl p-4 text-center">
+                      <p className="text-sm text-muted-foreground">
                         Need more data to calculate
                       </p>
                     </div>
@@ -448,7 +448,7 @@ export default function FeedbackDashboard() {
 
                 {/* Path to World-Class */}
                 <div className="space-y-4">
-                  <div className="flex items-center gap-2 text-sm font-medium text-slate-700">
+                  <div className="flex items-center gap-2 text-sm font-medium text-foreground">
                     <Crown className="w-4 h-4 text-purple-500" />
                     <span>Path to World-Class (70+)</span>
                   </div>
@@ -501,8 +501,8 @@ export default function FeedbackDashboard() {
                       </p>
                     </div>
                   ) : (
-                    <div className="bg-slate-50 border border-slate-200 rounded-xl p-4 text-center">
-                      <p className="text-sm text-slate-600">
+                    <div className="bg-muted border border-border rounded-xl p-4 text-center">
+                      <p className="text-sm text-muted-foreground">
                         Need more data to calculate
                       </p>
                     </div>
@@ -516,38 +516,38 @@ export default function FeedbackDashboard() {
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.3 }}
-                  className="mt-6 pt-6 border-t border-slate-100"
+                  className="mt-6 pt-6 border-t border-border"
                 >
-                  <h3 className="text-sm font-semibold text-slate-700 mb-3 flex items-center gap-2">
+                  <h3 className="text-sm font-semibold text-foreground mb-3 flex items-center gap-2">
                     <Sparkles className="w-4 h-4 text-amber-500" />
                     Tips to Boost Your NPS
                   </h3>
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
-                    <div className="flex items-start gap-3 p-3 bg-slate-50 rounded-lg">
+                    <div className="flex items-start gap-3 p-3 bg-muted rounded-lg">
                       <div className="w-6 h-6 rounded-full bg-emerald-100 flex items-center justify-center flex-shrink-0 mt-0.5">
                         <span className="text-emerald-600 text-xs font-bold">1</span>
                       </div>
                       <div>
-                        <div className="font-medium text-slate-800">Follow up with detractors</div>
-                        <p className="text-slate-500 text-xs mt-1">Reach out personally to guests who scored 0-6. Often they just want to be heard.</p>
+                        <div className="font-medium text-foreground">Follow up with detractors</div>
+                        <p className="text-muted-foreground text-xs mt-1">Reach out personally to guests who scored 0-6. Often they just want to be heard.</p>
                       </div>
                     </div>
-                    <div className="flex items-start gap-3 p-3 bg-slate-50 rounded-lg">
+                    <div className="flex items-start gap-3 p-3 bg-muted rounded-lg">
                       <div className="w-6 h-6 rounded-full bg-emerald-100 flex items-center justify-center flex-shrink-0 mt-0.5">
                         <span className="text-emerald-600 text-xs font-bold">2</span>
                       </div>
                       <div>
-                        <div className="font-medium text-slate-800">Convert passives to promoters</div>
-                        <p className="text-slate-500 text-xs mt-1">Guests scoring 7-8 are almost fans. A small extra touch can push them over.</p>
+                        <div className="font-medium text-foreground">Convert passives to promoters</div>
+                        <p className="text-muted-foreground text-xs mt-1">Guests scoring 7-8 are almost fans. A small extra touch can push them over.</p>
                       </div>
                     </div>
-                    <div className="flex items-start gap-3 p-3 bg-slate-50 rounded-lg">
+                    <div className="flex items-start gap-3 p-3 bg-muted rounded-lg">
                       <div className="w-6 h-6 rounded-full bg-emerald-100 flex items-center justify-center flex-shrink-0 mt-0.5">
                         <span className="text-emerald-600 text-xs font-bold">3</span>
                       </div>
                       <div>
-                        <div className="font-medium text-slate-800">Celebrate your promoters</div>
-                        <p className="text-slate-500 text-xs mt-1">Thank guests who scored 9-10 and ask for reviews. They're your best marketing.</p>
+                        <div className="font-medium text-foreground">Celebrate your promoters</div>
+                        <p className="text-muted-foreground text-xs mt-1">Thank guests who scored 9-10 and ask for reviews. They're your best marketing.</p>
                       </div>
                     </div>
                   </div>
@@ -560,7 +560,7 @@ export default function FeedbackDashboard() {
         {/* Send NPS Survey Section */}
         <motion.div
           variants={itemVariants}
-          className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden"
+          className="bg-card rounded-xl border border-border shadow-sm overflow-hidden"
         >
           <div className="bg-status-success/10 border-b border-status-success/20 px-6 py-4">
             <div className="flex items-center gap-3">
@@ -568,8 +568,8 @@ export default function FeedbackDashboard() {
                 <Megaphone className="w-5 h-5 text-emerald-600" />
               </div>
               <div>
-                <h2 className="text-lg font-semibold text-slate-900">Collect Feedback</h2>
-                <p className="text-sm text-slate-600">Send NPS surveys to understand how guests feel</p>
+                <h2 className="text-lg font-semibold text-foreground">Collect Feedback</h2>
+                <p className="text-sm text-muted-foreground">Send NPS surveys to understand how guests feel</p>
               </div>
             </div>
           </div>
@@ -598,7 +598,7 @@ export default function FeedbackDashboard() {
                           id="survey-name"
                           value={surveyName}
                           onChange={(e) => setSurveyName(e.target.value)}
-                          className="w-full border border-amber-300 rounded-lg px-4 py-3 text-sm bg-white focus:ring-2 focus:ring-amber-500 focus:border-amber-500 focus:outline-none transition-shadow"
+                          className="w-full border border-amber-300 rounded-lg px-4 py-3 text-sm bg-card focus:ring-2 focus:ring-amber-500 focus:border-amber-500 focus:outline-none transition-shadow"
                           placeholder="Survey name (e.g., Post-Stay Survey)"
                           aria-describedby="survey-help"
                         />
@@ -644,7 +644,7 @@ export default function FeedbackDashboard() {
 
                 <div className="flex flex-col sm:flex-row gap-3">
                   <div className="flex-1 relative">
-                    <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+                    <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
                     <label htmlFor="invite-email" className="sr-only">Guest email address</label>
                     <input
                       id="invite-email"
@@ -652,7 +652,7 @@ export default function FeedbackDashboard() {
                       value={inviteEmail}
                       onChange={(e) => setInviteEmail(e.target.value)}
                       placeholder="guest@example.com"
-                      className="w-full border border-slate-200 rounded-lg pl-12 pr-4 py-3 text-sm focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 focus:outline-none transition-shadow"
+                      className="w-full border border-border rounded-lg pl-12 pr-4 py-3 text-sm focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 focus:outline-none transition-shadow"
                       aria-describedby="email-help"
                     />
                     <p id="email-help" className="sr-only">Enter the guest's email address to send an NPS survey</p>
@@ -702,30 +702,30 @@ export default function FeedbackDashboard() {
         {/* Reviews Moderation Section */}
         <motion.div
           variants={itemVariants}
-          className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden"
+          className="bg-card rounded-xl border border-border shadow-sm overflow-hidden"
         >
           <div className="bg-muted border-b border-border px-6 py-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-lg bg-slate-200 flex items-center justify-center">
-                  <MessageSquareHeart className="w-5 h-5 text-slate-600" />
+                <div className="w-10 h-10 rounded-lg bg-muted flex items-center justify-center">
+                  <MessageSquareHeart className="w-5 h-5 text-muted-foreground" />
                 </div>
                 <div>
                   <div className="flex items-center gap-2">
-                    <h2 className="text-lg font-semibold text-slate-900">Guest Reviews</h2>
+                    <h2 className="text-lg font-semibold text-foreground">Guest Reviews</h2>
                     {pendingReviews.length > 0 && (
                       <span className="bg-status-warning/15 text-status-warning text-xs font-semibold px-2 py-1 rounded-full">
                         {pendingReviews.length} pending
                       </span>
                     )}
                   </div>
-                  <p className="text-sm text-slate-600">Approve reviews to display them publicly</p>
+                  <p className="text-sm text-muted-foreground">Approve reviews to display them publicly</p>
                 </div>
               </div>
-              <label className="flex items-center gap-2 text-sm text-slate-600 cursor-pointer">
+              <label className="flex items-center gap-2 text-sm text-muted-foreground cursor-pointer">
                 <input
                   type="checkbox"
-                  className="h-4 w-4 rounded border-slate-300 text-emerald-600 focus:ring-emerald-500 transition-colors"
+                  className="h-4 w-4 rounded border-border text-emerald-600 focus:ring-emerald-500 transition-colors"
                   checked={showRemoved}
                   onChange={(e) => setShowRemoved(e.target.checked)}
                   aria-describedby="show-removed-help"
@@ -746,11 +746,11 @@ export default function FeedbackDashboard() {
                 animate={{ opacity: 1 }}
                 className="text-center py-12"
               >
-                <div className="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <Star className="w-8 h-8 text-slate-400" />
+                <div className="w-16 h-16 bg-muted rounded-full flex items-center justify-center mx-auto mb-4">
+                  <Star className="w-8 h-8 text-muted-foreground" />
                 </div>
-                <h3 className="text-lg font-semibold text-slate-900">No Reviews Yet</h3>
-                <p className="text-slate-600 mt-2 max-w-md mx-auto">
+                <h3 className="text-lg font-semibold text-foreground">No Reviews Yet</h3>
+                <p className="text-muted-foreground mt-2 max-w-md mx-auto">
                   When guests leave reviews, they'll appear here for moderation before going public.
                 </p>
               </motion.div>
@@ -770,7 +770,7 @@ export default function FeedbackDashboard() {
                           ? "border-amber-200 bg-amber-50/50"
                           : review.status === "approved"
                           ? "border-emerald-200 bg-emerald-50/30"
-                          : "border-slate-200 bg-slate-50/50"
+                          : "border-border bg-muted/50"
                       }`}
                     >
                       <div className="space-y-4">
@@ -785,7 +785,7 @@ export default function FeedbackDashboard() {
                                     className={`w-4 h-4 ${
                                       star <= review.rating
                                         ? "text-amber-400 fill-amber-400"
-                                        : "text-slate-300"
+                                        : "text-muted-foreground"
                                     }`}
                                     aria-hidden="true"
                                   />
@@ -797,10 +797,10 @@ export default function FeedbackDashboard() {
 
                             {/* Review Content */}
                             {review.title && (
-                              <h4 className="font-semibold text-slate-900 mb-1">{review.title}</h4>
+                              <h4 className="font-semibold text-foreground mb-1">{review.title}</h4>
                             )}
                             {review.body && (
-                              <p className="text-sm text-slate-700">{review.body}</p>
+                              <p className="text-sm text-foreground">{review.body}</p>
                             )}
                           </div>
 
@@ -823,7 +823,7 @@ export default function FeedbackDashboard() {
                                 whileHover={{ scale: 1.05 }}
                                 whileTap={{ scale: 0.95 }}
                                 onClick={() => moderateMutation.mutate({ reviewId: review.id, status: "rejected" })}
-                                className="flex items-center gap-1.5 text-sm px-3 py-2 rounded-lg border border-slate-300 text-slate-700 font-medium hover:bg-slate-50 transition-colors focus:outline-none focus:ring-2 focus:ring-slate-500 focus:ring-offset-2"
+                                className="flex items-center gap-1.5 text-sm px-3 py-2 rounded-lg border border-border text-foreground font-medium hover:bg-muted transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
                                 aria-label={`Reject review: ${review.title || 'Untitled'}`}
                               >
                                 <XCircle className="w-4 h-4" />
@@ -845,7 +845,7 @@ export default function FeedbackDashboard() {
 
                         {/* Existing Replies */}
                         {review.replies && review.replies.length > 0 && (
-                          <div className="ml-4 pl-4 border-l-2 border-slate-200 space-y-3">
+                          <div className="ml-4 pl-4 border-l-2 border-border space-y-3">
                             {review.replies.map((reply) => (
                               <div key={reply.id} className="bg-blue-50 rounded-lg p-3">
                                 <div className="flex items-center gap-2 mb-1">
@@ -856,12 +856,12 @@ export default function FeedbackDashboard() {
                                     {reply.authorType === "staff" ? "Management Response" : "Guest"}
                                   </span>
                                   {reply.createdAt && (
-                                    <span className="text-xs text-slate-500">
+                                    <span className="text-xs text-muted-foreground">
                                       {new Date(reply.createdAt).toLocaleDateString()}
                                     </span>
                                   )}
                                 </div>
-                                <p className="text-sm text-slate-700">{reply.body}</p>
+                                <p className="text-sm text-foreground">{reply.body}</p>
                               </div>
                             ))}
                           </div>
@@ -886,7 +886,7 @@ export default function FeedbackDashboard() {
                                 value={replyText}
                                 onChange={(e) => setReplyText(e.target.value)}
                                 placeholder="Write a professional, helpful response that will be visible to all guests..."
-                                className="w-full border border-blue-200 rounded-lg px-4 py-3 text-sm bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:outline-none transition-shadow resize-none"
+                                className="w-full border border-blue-200 rounded-lg px-4 py-3 text-sm bg-card focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:outline-none transition-shadow resize-none"
                                 rows={3}
                                 aria-label="Reply to review"
                               />
@@ -900,7 +900,7 @@ export default function FeedbackDashboard() {
                                       setReplyingTo(null);
                                       setReplyText("");
                                     }}
-                                    className="px-3 py-2 text-sm text-slate-600 hover:text-slate-800 transition-colors"
+                                    className="px-3 py-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
                                   >
                                     Cancel
                                   </button>
@@ -932,7 +932,7 @@ export default function FeedbackDashboard() {
                             </div>
                           </motion.div>
                         ) : (
-                          <div className="flex items-center gap-3 pt-2 border-t border-slate-100">
+                          <div className="flex items-center gap-3 pt-2 border-t border-border">
                             <motion.button
                               whileHover={{ scale: 1.02 }}
                               whileTap={{ scale: 0.98 }}
@@ -943,7 +943,7 @@ export default function FeedbackDashboard() {
                               {review.replies && review.replies.length > 0 ? "Add Another Reply" : "Reply Publicly"}
                             </motion.button>
                             {review.replies && review.replies.length > 0 && (
-                              <span className="text-xs text-slate-500">
+                              <span className="text-xs text-muted-foreground">
                                 {review.replies.length} {review.replies.length === 1 ? "reply" : "replies"}
                               </span>
                             )}
@@ -955,7 +955,7 @@ export default function FeedbackDashboard() {
                 </AnimatePresence>
 
                 {filteredReviews.length > 6 && (
-                  <p className="text-sm text-slate-500 text-center pt-2">
+                  <p className="text-sm text-muted-foreground text-center pt-2">
                     Showing 6 of {filteredReviews.length} reviews
                   </p>
                 )}
@@ -986,16 +986,16 @@ function MetricCard({
 }) {
   return (
     <motion.div
-      className="bg-white rounded-xl border border-slate-200 p-5 shadow-sm"
+      className="bg-card rounded-xl border border-border p-5 shadow-sm"
       whileHover={{ scale: 1.02, y: -2 }}
       transition={{ type: "spring", stiffness: 300, damping: 20 }}
     >
       <div className="flex items-start justify-between">
         <div>
-          <div className="text-xs font-semibold text-slate-500 uppercase tracking-wider">{label}</div>
-          <div className="text-3xl font-bold text-slate-900 mt-2">{value}</div>
+          <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">{label}</div>
+          <div className="text-3xl font-bold text-foreground mt-2">{value}</div>
           {subtitle && (
-            <div className="text-xs text-slate-500 mt-1">{subtitle}</div>
+            <div className="text-xs text-muted-foreground mt-1">{subtitle}</div>
           )}
         </div>
         <div className={`w-10 h-10 rounded-lg ${iconBg} flex items-center justify-center`}>
@@ -1011,7 +1011,7 @@ function StatusBadge({ status }: { status: string }) {
   const styles: Record<string, { bg: string; text: string; icon: React.ElementType }> = {
     pending: { bg: "bg-status-warning/15", text: "text-status-warning", icon: Clock },
     approved: { bg: "bg-status-success/15", text: "text-status-success", icon: CheckCircle2 },
-    rejected: { bg: "bg-slate-100", text: "text-slate-600", icon: XCircle },
+    rejected: { bg: "bg-muted", text: "text-muted-foreground", icon: XCircle },
     removed: { bg: "bg-status-error/15", text: "text-status-error", icon: Trash2 },
   };
 

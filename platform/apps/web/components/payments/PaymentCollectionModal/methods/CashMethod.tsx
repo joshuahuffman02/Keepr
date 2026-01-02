@@ -105,14 +105,14 @@ export function CashMethod({ onSuccess, onError, onCancel }: CashMethodProps) {
   return (
     <div className="space-y-6">
       {/* Amount due display */}
-      <div className="text-center p-4 bg-slate-50 rounded-lg">
-        <p className="text-sm text-slate-500">Amount Due</p>
-        <p className="text-3xl font-bold text-slate-900">${amountDue.toFixed(2)}</p>
+      <div className="text-center p-4 bg-muted rounded-lg">
+        <p className="text-sm text-muted-foreground">Amount Due</p>
+        <p className="text-3xl font-bold text-foreground">${amountDue.toFixed(2)}</p>
       </div>
 
       {/* Quick amount buttons */}
       <div className="space-y-2">
-        <Label className="text-sm text-slate-600">Quick Amounts</Label>
+        <Label className="text-sm text-muted-foreground">Quick Amounts</Label>
         <div className="grid grid-cols-3 gap-2">
           {QUICK_AMOUNTS.map((amount) => (
             <Button
@@ -146,11 +146,11 @@ export function CashMethod({ onSuccess, onError, onCancel }: CashMethodProps) {
 
       {/* Amount received input */}
       <div className="space-y-2">
-        <Label htmlFor="amount-received" className="text-sm text-slate-600">
+        <Label htmlFor="amount-received" className="text-sm text-muted-foreground">
           Amount Received
         </Label>
         <div className="relative">
-          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500">$</span>
+          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">$</span>
           <Input
             id="amount-received"
             type="number"
@@ -176,8 +176,8 @@ export function CashMethod({ onSuccess, onError, onCancel }: CashMethodProps) {
         >
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <Calculator className="h-5 w-5 text-slate-600" />
-              <span className="font-medium text-slate-700">
+              <Calculator className="h-5 w-5 text-muted-foreground" />
+              <span className="font-medium text-foreground">
                 {canComplete ? "Change Due" : "Amount Short"}
               </span>
             </div>

@@ -81,7 +81,7 @@ export function GuestOriginsTab({ campgroundId, dateRange }: GuestOriginsTabProp
                             ))}
                             {typedData.byZipCode.length === 0 && (
                                 <TableRow>
-                                    <TableCell colSpan={4} className="text-center py-6 text-slate-500">
+                                    <TableCell colSpan={4} className="text-center py-6 text-muted-foreground">
                                         No location data found matching these dates.
                                     </TableCell>
                                 </TableRow>
@@ -116,7 +116,7 @@ export function GuestOriginsTab({ campgroundId, dateRange }: GuestOriginsTabProp
                             ))}
                             {typedData.byState.length === 0 && (
                                 <TableRow>
-                                    <TableCell colSpan={3} className="text-center py-6 text-slate-500">
+                                    <TableCell colSpan={3} className="text-center py-6 text-muted-foreground">
                                         No state data found matching these dates.
                                     </TableCell>
                                 </TableRow>

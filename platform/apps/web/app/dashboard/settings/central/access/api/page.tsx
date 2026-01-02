@@ -9,8 +9,8 @@ export default function APIPage() {
   return (
     <div className="max-w-4xl space-y-6">
       <div>
-        <h2 className="text-2xl font-bold text-slate-900">API Keys</h2>
-        <p className="text-slate-500 mt-1">
+        <h2 className="text-2xl font-bold text-foreground">API Keys</h2>
+        <p className="text-muted-foreground mt-1">
           Manage API access for developers
         </p>
       </div>
@@ -18,12 +18,12 @@ export default function APIPage() {
       <Card>
         <CardContent className="pt-6">
           <div className="flex items-start gap-4">
-            <div className="p-3 rounded-lg bg-slate-100">
-              <Code className="h-6 w-6 text-slate-600" />
+            <div className="p-3 rounded-lg bg-muted">
+              <Code className="h-6 w-6 text-muted-foreground" />
             </div>
             <div className="flex-1">
-              <h3 className="font-semibold text-slate-900">Developer Settings</h3>
-              <p className="text-sm text-slate-500 mt-1">
+              <h3 className="font-semibold text-foreground">Developer Settings</h3>
+              <p className="text-sm text-muted-foreground mt-1">
                 Generate API keys, configure webhooks, and access developer
                 documentation for integrating with external systems.
               </p>

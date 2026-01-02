@@ -123,17 +123,17 @@ export function SyncDetailsDrawer({ open, onOpenChange }: SyncDetailsDrawerProps
           {/* Queue Details */}
           {status.queues.length > 0 && (
             <div className="space-y-3">
-              <h3 className="text-sm font-semibold text-slate-900">Pending Items by Queue</h3>
+              <h3 className="text-sm font-semibold text-foreground">Pending Items by Queue</h3>
               {status.queues
                 .filter((q) => q.count > 0)
                 .map((queue) => (
                   <div
                     key={queue.key}
-                    className="rounded-lg border border-slate-200 bg-slate-50 p-3 space-y-2"
+                    className="rounded-lg border border-border bg-muted p-3 space-y-2"
                   >
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2">
-                        <span className="text-sm font-medium text-slate-900">{queue.label}</span>
+                        <span className="text-sm font-medium text-foreground">{queue.label}</span>
                         <Badge variant={queue.count > 0 ? "secondary" : "outline"}>
                           {queue.count} items
                         </Badge>
@@ -152,7 +152,7 @@ export function SyncDetailsDrawer({ open, onOpenChange }: SyncDetailsDrawerProps
                     </div>
 
                     {queue.nextRetry && (
-                      <div className="text-xs text-slate-600">
+                      <div className="text-xs text-muted-foreground">
                         Next retry: {new Date(queue.nextRetry).toLocaleTimeString()}
                       </div>
                     )}
@@ -164,8 +164,8 @@ export function SyncDetailsDrawer({ open, onOpenChange }: SyncDetailsDrawerProps
                     )}
 
                     {queue.conflicts > 0 && (
-                      <div className="pt-2 border-t border-slate-200">
-                        <div className="text-xs font-medium text-slate-700 mb-2">Conflicts require attention:</div>
+                      <div className="pt-2 border-t border-border">
+                        <div className="text-xs font-medium text-foreground mb-2">Conflicts require attention:</div>
                         <div className="flex gap-2">
                           <Button
                             size="sm"
@@ -199,8 +199,8 @@ export function SyncDetailsDrawer({ open, onOpenChange }: SyncDetailsDrawerProps
               <div className="flex justify-center mb-2">
                 <Check className="h-10 w-10 text-emerald-600" />
               </div>
-              <div className="text-sm font-medium text-slate-900">All caught up!</div>
-              <div className="text-xs text-slate-500 mt-1">
+              <div className="text-sm font-medium text-foreground">All caught up!</div>
+              <div className="text-xs text-muted-foreground mt-1">
                 No pending changes to sync
               </div>
             </div>
@@ -225,8 +225,8 @@ export function SyncDetailsDrawer({ open, onOpenChange }: SyncDetailsDrawerProps
           )}
 
           {/* Help Text */}
-          <div className="rounded-lg border border-slate-200 bg-slate-50 p-3 text-xs text-slate-600">
-            <div className="font-medium text-slate-900 mb-1">How sync works</div>
+          <div className="rounded-lg border border-border bg-muted p-3 text-xs text-muted-foreground">
+            <div className="font-medium text-foreground mb-1">How sync works</div>
             <ul className="space-y-1 list-disc list-inside">
               <li>Changes are saved locally when offline</li>
               <li>Automatic sync when connection returns</li>

@@ -146,13 +146,13 @@ export default function WebhooksPage() {
     return (
       <div className="max-w-5xl space-y-6">
         <div>
-          <h2 className="text-2xl font-bold text-slate-900">Webhooks</h2>
-          <p className="text-slate-500 mt-1">
+          <h2 className="text-2xl font-bold text-foreground">Webhooks</h2>
+          <p className="text-muted-foreground mt-1">
             Configure webhook endpoints for integrations
           </p>
         </div>
         <div className="flex items-center justify-center py-12">
-          <Loader2 className="h-8 w-8 animate-spin text-slate-400" />
+          <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
         </div>
       </div>
     );
@@ -162,15 +162,15 @@ export default function WebhooksPage() {
     return (
       <div className="max-w-5xl space-y-6">
         <div>
-          <h2 className="text-2xl font-bold text-slate-900">Webhooks</h2>
-          <p className="text-slate-500 mt-1">
+          <h2 className="text-2xl font-bold text-foreground">Webhooks</h2>
+          <p className="text-muted-foreground mt-1">
             Configure webhook endpoints for integrations
           </p>
         </div>
         <Card>
           <CardContent className="py-8 text-center">
             <Info className="h-8 w-8 text-amber-500 mx-auto mb-3" />
-            <p className="text-slate-600">Please select a campground first.</p>
+            <p className="text-muted-foreground">Please select a campground first.</p>
           </CardContent>
         </Card>
       </div>
@@ -182,8 +182,8 @@ export default function WebhooksPage() {
       {/* Header */}
       <div className="flex items-start justify-between">
         <div>
-          <h2 className="text-2xl font-bold text-slate-900">Webhooks</h2>
-          <p className="text-slate-500 mt-1">
+          <h2 className="text-2xl font-bold text-foreground">Webhooks</h2>
+          <p className="text-muted-foreground mt-1">
             Configure webhook endpoints for integrations
           </p>
         </div>
@@ -211,8 +211,8 @@ export default function WebhooksPage() {
                 <Webhook className="h-5 w-5 text-orange-600" />
               </div>
               <div>
-                <p className="text-2xl font-bold text-slate-900">{webhooks.length}</p>
-                <p className="text-sm text-slate-500">Total Webhooks</p>
+                <p className="text-2xl font-bold text-foreground">{webhooks.length}</p>
+                <p className="text-sm text-muted-foreground">Total Webhooks</p>
               </div>
             </div>
           </CardContent>
@@ -224,8 +224,8 @@ export default function WebhooksPage() {
                 <CheckCircle className="h-5 w-5 text-emerald-600" />
               </div>
               <div>
-                <p className="text-2xl font-bold text-slate-900">{activeCount}</p>
-                <p className="text-sm text-slate-500">Active</p>
+                <p className="text-2xl font-bold text-foreground">{activeCount}</p>
+                <p className="text-sm text-muted-foreground">Active</p>
               </div>
             </div>
           </CardContent>
@@ -233,14 +233,14 @@ export default function WebhooksPage() {
         <Card>
           <CardContent className="pt-6">
             <div className="flex items-center gap-3">
-              <div className="p-2 rounded-lg bg-slate-100">
-                <XCircle className="h-5 w-5 text-slate-600" />
+              <div className="p-2 rounded-lg bg-muted">
+                <XCircle className="h-5 w-5 text-muted-foreground" />
               </div>
               <div>
-                <p className="text-2xl font-bold text-slate-900">
+                <p className="text-2xl font-bold text-foreground">
                   {webhooks.length - activeCount}
                 </p>
-                <p className="text-sm text-slate-500">Inactive</p>
+                <p className="text-sm text-muted-foreground">Inactive</p>
               </div>
             </div>
           </CardContent>
@@ -251,11 +251,11 @@ export default function WebhooksPage() {
       {webhooks.length === 0 ? (
         <Card className="border-dashed">
           <CardContent className="py-12 text-center">
-            <Webhook className="h-12 w-12 mx-auto text-slate-300 mb-4" />
-            <h3 className="text-lg font-semibold text-slate-900 mb-2">
+            <Webhook className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+            <h3 className="text-lg font-semibold text-foreground mb-2">
               No webhooks configured
             </h3>
-            <p className="text-slate-500 mb-4 max-w-md mx-auto">
+            <p className="text-muted-foreground mb-4 max-w-md mx-auto">
               Add webhook endpoints to receive real-time notifications when
               events occur in your campground.
             </p>
@@ -280,11 +280,11 @@ export default function WebhooksPage() {
                       <Globe className="h-5 w-5 text-orange-600" />
                     </div>
                     <div className="min-w-0">
-                      <p className="font-mono text-sm text-slate-900 truncate max-w-md">
+                      <p className="font-mono text-sm text-foreground truncate max-w-md">
                         {webhook.url}
                       </p>
                       {webhook.description && (
-                        <p className="text-sm text-slate-500">{webhook.description}</p>
+                        <p className="text-sm text-muted-foreground">{webhook.description}</p>
                       )}
                       <div className="flex flex-wrap gap-1 mt-1">
                         {webhook.eventTypes.slice(0, 3).map((eventType) => (
@@ -365,13 +365,13 @@ export default function WebhooksPage() {
                 {EVENT_TYPES.map((event) => (
                   <label
                     key={event.value}
-                    className="flex items-center gap-2 p-2 rounded hover:bg-slate-50 cursor-pointer"
+                    className="flex items-center gap-2 p-2 rounded hover:bg-muted cursor-pointer"
                   >
                     <input
                       type="checkbox"
                       checked={selectedEvents.includes(event.value)}
                       onChange={() => toggleEventType(event.value)}
-                      className="rounded border-slate-300"
+                      className="rounded border-border"
                     />
                     <span className="text-sm">{event.label}</span>
                   </label>

@@ -63,7 +63,7 @@ export default function SocialPlannerReports() {
           <Link href="/social-planner" className="text-sm text-emerald-700 hover:text-emerald-600">
             ← Back to Social Planner
           </Link>
-          <p className="text-slate-600">Select a campground to view planner reports.</p>
+          <p className="text-muted-foreground">Select a campground to view planner reports.</p>
         </div>
       </DashboardShell>
     );
@@ -77,68 +77,68 @@ export default function SocialPlannerReports() {
       <div className="flex items-center justify-between mb-4">
         <div>
           <p className="text-xs uppercase tracking-wide text-emerald-600 font-semibold">Reports</p>
-          <h1 className="text-2xl font-bold text-slate-900">Planner reporting & learning</h1>
-          <p className="text-slate-600">Suggested vs completed, template usage, categories, and performance inputs.</p>
+          <h1 className="text-2xl font-bold text-foreground">Planner reporting & learning</h1>
+          <p className="text-muted-foreground">Suggested vs completed, template usage, categories, and performance inputs.</p>
         </div>
       </div>
 
       <div className="grid md:grid-cols-4 gap-3">
         <Card className="p-4">
-          <div className="flex items-center gap-2 text-sm text-slate-600">
+          <div className="flex items-center gap-2 text-sm text-muted-foreground">
             <FileText className="h-4 w-4 text-emerald-600" />
             Posts created
           </div>
-          <div className="text-3xl font-bold text-slate-900 mt-2">{report.posts}</div>
+          <div className="text-3xl font-bold text-foreground mt-2">{report.posts}</div>
         </Card>
         <Card className="p-4">
-          <div className="flex items-center gap-2 text-sm text-slate-600">
+          <div className="flex items-center gap-2 text-sm text-muted-foreground">
             <Lightbulb className="h-4 w-4 text-amber-600" />
             Open suggestions
           </div>
-          <div className="text-3xl font-bold text-slate-900 mt-2">{report.openSuggestions}</div>
+          <div className="text-3xl font-bold text-foreground mt-2">{report.openSuggestions}</div>
         </Card>
         <Card className="p-4">
-          <div className="flex items-center gap-2 text-sm text-slate-600">
+          <div className="flex items-center gap-2 text-sm text-muted-foreground">
             <BarChart3 className="h-4 w-4 text-blue-600" />
             Templates
           </div>
-          <div className="text-3xl font-bold text-slate-900 mt-2">{report.templates}</div>
+          <div className="text-3xl font-bold text-foreground mt-2">{report.templates}</div>
         </Card>
         <Card className="p-4">
-          <div className="flex items-center gap-2 text-sm text-slate-600">
+          <div className="flex items-center gap-2 text-sm text-muted-foreground">
             <Lightbulb className="h-4 w-4 text-amber-600" />
             Consistency score (stub)
           </div>
-          <div className="text-3xl font-bold text-slate-900 mt-2">{Math.min(report.posts * 5, 100)}%</div>
-          <div className="text-xs text-slate-500 mt-1">Improves as you add drafts and record performance.</div>
+          <div className="text-3xl font-bold text-foreground mt-2">{Math.min(report.posts * 5, 100)}%</div>
+          <div className="text-xs text-muted-foreground mt-1">Improves as you add drafts and record performance.</div>
         </Card>
       </div>
 
       <Card className="p-4 mt-4">
-        <h3 className="text-lg font-semibold text-slate-900 mb-2">Performance (manual inputs)</h3>
-        <div className="grid md:grid-cols-5 gap-3 text-sm text-slate-700">
-          <div className="p-3 rounded border border-slate-200 bg-slate-50">
-            <div className="text-xs text-slate-500 uppercase">Reach</div>
-            <div className="text-lg font-semibold text-slate-900">{report.performance?.reach ?? 0}</div>
+        <h3 className="text-lg font-semibold text-foreground mb-2">Performance (manual inputs)</h3>
+        <div className="grid md:grid-cols-5 gap-3 text-sm text-foreground">
+          <div className="p-3 rounded border border-border bg-muted">
+            <div className="text-xs text-muted-foreground uppercase">Reach</div>
+            <div className="text-lg font-semibold text-foreground">{report.performance?.reach ?? 0}</div>
           </div>
-          <div className="p-3 rounded border border-slate-200 bg-slate-50">
-            <div className="text-xs text-slate-500 uppercase">Likes</div>
-            <div className="text-lg font-semibold text-slate-900">{report.performance?.likes ?? 0}</div>
+          <div className="p-3 rounded border border-border bg-muted">
+            <div className="text-xs text-muted-foreground uppercase">Likes</div>
+            <div className="text-lg font-semibold text-foreground">{report.performance?.likes ?? 0}</div>
           </div>
-          <div className="p-3 rounded border border-slate-200 bg-slate-50">
-            <div className="text-xs text-slate-500 uppercase">Comments</div>
-            <div className="text-lg font-semibold text-slate-900">{report.performance?.comments ?? 0}</div>
+          <div className="p-3 rounded border border-border bg-muted">
+            <div className="text-xs text-muted-foreground uppercase">Comments</div>
+            <div className="text-lg font-semibold text-foreground">{report.performance?.comments ?? 0}</div>
           </div>
-          <div className="p-3 rounded border border-slate-200 bg-slate-50">
-            <div className="text-xs text-slate-500 uppercase">Shares</div>
-            <div className="text-lg font-semibold text-slate-900">{report.performance?.shares ?? 0}</div>
+          <div className="p-3 rounded border border-border bg-muted">
+            <div className="text-xs text-muted-foreground uppercase">Shares</div>
+            <div className="text-lg font-semibold text-foreground">{report.performance?.shares ?? 0}</div>
           </div>
-          <div className="p-3 rounded border border-slate-200 bg-slate-50">
-            <div className="text-xs text-slate-500 uppercase">Saves</div>
-            <div className="text-lg font-semibold text-slate-900">{report.performance?.saves ?? 0}</div>
+          <div className="p-3 rounded border border-border bg-muted">
+            <div className="text-xs text-muted-foreground uppercase">Saves</div>
+            <div className="text-lg font-semibold text-foreground">{report.performance?.saves ?? 0}</div>
           </div>
         </div>
-        <p className="text-xs text-slate-500 mt-2">Because there is no auto-posting, enter reach/likes/comments manually to help the rule-based engine learn.</p>
+        <p className="text-xs text-muted-foreground mt-2">Because there is no auto-posting, enter reach/likes/comments manually to help the rule-based engine learn.</p>
 
         <div className="grid md:grid-cols-6 gap-2 mt-3">
           <Input placeholder="Post ID (optional)" value={postId} onChange={e => setPostId(e.target.value)} />

@@ -87,7 +87,7 @@ export const metadata: Metadata = {
 
 export default function OwnersPage() {
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-card">
       <FAQJsonLd faqs={ownerFaqs} />
 
       {/* Header */}
@@ -128,7 +128,7 @@ export default function OwnersPage() {
         faqs={ownerFaqs}
         title="Frequently Asked Questions"
         subtitle="Everything you need to know about getting started with Camp Everyday."
-        className="bg-slate-50"
+        className="bg-muted"
       />
 
       {/* Demo CTA */}

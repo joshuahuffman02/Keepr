@@ -36,8 +36,8 @@ export default function SeasonalRatesPage() {
     <div className="max-w-4xl space-y-6">
       <div className="flex items-start justify-between">
         <div>
-          <h2 className="text-2xl font-bold text-slate-900">Seasonal Rates</h2>
-          <p className="text-slate-500 mt-1">
+          <h2 className="text-2xl font-bold text-foreground">Seasonal Rates</h2>
+          <p className="text-muted-foreground mt-1">
             Configure rate adjustments for different seasons
           </p>
         </div>
@@ -59,7 +59,7 @@ export default function SeasonalRatesPage() {
       <Card>
         <CardHeader>
           <CardTitle className="text-base flex items-center gap-2">
-            <Calendar className="h-5 w-5 text-slate-500" />
+            <Calendar className="h-5 w-5 text-muted-foreground" />
             Current Season Overview
           </CardTitle>
           <CardDescription>
@@ -81,7 +81,7 @@ export default function SeasonalRatesPage() {
                     <p className="text-sm opacity-80">{season.dates}</p>
                   </div>
                 </div>
-                <Badge variant="outline" className="bg-white/50">
+                <Badge variant="outline" className="bg-card/50">
                   {season.rateChange}
                 </Badge>
               </div>

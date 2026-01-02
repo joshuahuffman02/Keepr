@@ -66,24 +66,24 @@ export function LengthOfStayReport({ campgroundId, dateRange }: LengthOfStayRepo
     return (
         <div className="space-y-8">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div className="p-6 bg-white rounded-xl border border-slate-200 shadow-sm">
-                    <div className="text-sm font-medium text-slate-500 uppercase tracking-wider">Average Length of Stay</div>
+                <div className="p-6 bg-card rounded-xl border border-border shadow-sm">
+                    <div className="text-sm font-medium text-muted-foreground uppercase tracking-wider">Average Length of Stay</div>
                     <div className="mt-2 flex items-baseline gap-2">
-                        <span className="text-3xl font-bold text-slate-900">{reportData.averageLos}</span>
-                        <span className="text-sm text-slate-600">nights</span>
+                        <span className="text-3xl font-bold text-foreground">{reportData.averageLos}</span>
+                        <span className="text-sm text-muted-foreground">nights</span>
                     </div>
                 </div>
-                <div className="p-6 bg-white rounded-xl border border-slate-200 shadow-sm">
-                    <div className="text-sm font-medium text-slate-500 uppercase tracking-wider">Total Stays Analyzed</div>
+                <div className="p-6 bg-card rounded-xl border border-border shadow-sm">
+                    <div className="text-sm font-medium text-muted-foreground uppercase tracking-wider">Total Stays Analyzed</div>
                     <div className="mt-2 flex items-baseline gap-2">
-                        <span className="text-3xl font-bold text-slate-900">{reportData.totalStays}</span>
-                        <span className="text-sm text-slate-600">reservations</span>
+                        <span className="text-3xl font-bold text-foreground">{reportData.totalStays}</span>
+                        <span className="text-sm text-muted-foreground">reservations</span>
                     </div>
                 </div>
             </div>
 
-            <div className="h-[400px] bg-white rounded-xl border border-slate-200 shadow-sm p-6">
-                <h3 className="text-lg font-semibold text-slate-900 mb-6">Stay Duration Distribution</h3>
+            <div className="h-[400px] bg-card rounded-xl border border-border shadow-sm p-6">
+                <h3 className="text-lg font-semibold text-foreground mb-6">Stay Duration Distribution</h3>
                 <ResponsiveContainer width="100%" height="100%">
                     <BarChart data={reportData.chartData}>
                         <CartesianGrid strokeDasharray="3 3" vertical={false} />

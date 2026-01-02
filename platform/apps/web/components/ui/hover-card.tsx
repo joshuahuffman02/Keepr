@@ -119,7 +119,7 @@ export function HoverCard({
     >
       <div
         className={cn(
-          "bg-white rounded-lg shadow-xl border border-slate-200 p-0",
+          "bg-card rounded-lg shadow-xl border border-border p-0",
           "min-w-[280px] max-w-[360px]",
           "animate-in fade-in-0 zoom-in-95 duration-200",
           className
@@ -146,7 +146,7 @@ interface HoverCardHeaderProps {
 
 export function HoverCardHeader({ children, className }: HoverCardHeaderProps) {
   return (
-    <div className={cn("px-4 py-3 border-b border-slate-100", className)}>
+    <div className={cn("px-4 py-3 border-b border-border", className)}>
       {children}
     </div>
   );
@@ -172,7 +172,7 @@ interface HoverCardFooterProps {
 
 export function HoverCardFooter({ children, className }: HoverCardFooterProps) {
   return (
-    <div className={cn("px-4 py-2 border-t border-slate-100 bg-slate-50 rounded-b-lg", className)}>
+    <div className={cn("px-4 py-2 border-t border-border bg-muted rounded-b-lg", className)}>
       {children}
     </div>
   );

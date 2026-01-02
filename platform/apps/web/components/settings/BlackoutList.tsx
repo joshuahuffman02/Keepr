@@ -52,30 +52,30 @@ export function BlackoutList({ campgroundId }: BlackoutListProps) {
     const blackouts = blackoutsQuery.data || [];
     const sites = sitesQuery.data || [];
 
-    if (blackoutsQuery.isLoading) return <div className="text-slate-500">Loading blackout dates...</div>;
+    if (blackoutsQuery.isLoading) return <div className="text-muted-foreground">Loading blackout dates...</div>;
 
     return (
         <div className="space-y-4">
             <div className="flex justify-between items-center">
-                <h3 className="text-lg font-medium text-slate-900">Blackout Dates</h3>
+                <h3 className="text-lg font-medium text-foreground">Blackout Dates</h3>
                 <Button onClick={() => setIsModalOpen(true)}>Add Blackout Date</Button>
             </div>
 
             <div className="space-y-2">
                 {blackouts.map((blackout) => (
-                    <div key={blackout.id} className="flex items-center justify-between rounded-lg border border-slate-200 bg-white p-4">
+                    <div key={blackout.id} className="flex items-center justify-between rounded-lg border border-border bg-card p-4">
                         <div className="space-y-1">
-                            <div className="font-medium text-slate-900">
+                            <div className="font-medium text-foreground">
                                 {format(new Date(blackout.startDate), "MMM d, yyyy")} - {format(new Date(blackout.endDate), "MMM d, yyyy")}
                             </div>
-                            <div className="text-sm text-slate-500">
+                            <div className="text-sm text-muted-foreground">
                                 {blackout.site ? (
                                     <span>Site: {blackout.site.name} ({blackout.site.siteNumber})</span>
                                 ) : (
                                     <span className="font-medium text-amber-600">Entire Campground</span>
                                 )}
                             </div>
-                            {blackout.reason && <div className="text-sm text-slate-500 italic">{blackout.reason}</div>}
+                            {blackout.reason && <div className="text-sm text-muted-foreground italic">{blackout.reason}</div>}
                         </div>
                         <Button
                             variant="ghost"
@@ -88,7 +88,7 @@ export function BlackoutList({ campgroundId }: BlackoutListProps) {
                     </div>
                 ))}
                 {blackouts.length === 0 && (
-                    <div className="text-center py-8 text-slate-500 border border-dashed border-slate-200 rounded-lg">
+                    <div className="text-center py-8 text-muted-foreground border border-dashed border-border rounded-lg">
                         No blackout dates found.
                     </div>
                 )}

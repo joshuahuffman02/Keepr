@@ -37,7 +37,7 @@ export function EarlyCheckInsReport({ campgroundId, dateRange }: DailyReportProp
             <Card>
                 <CardHeader>
                     <CardTitle>Early Check-ins Today</CardTitle>
-                    <p className="text-sm text-slate-500">Guests arriving before standard check-in time</p>
+                    <p className="text-sm text-muted-foreground">Guests arriving before standard check-in time</p>
                 </CardHeader>
                 <CardContent>
                     {reportData.length === 0 ? (
@@ -45,12 +45,12 @@ export function EarlyCheckInsReport({ campgroundId, dateRange }: DailyReportProp
                     ) : (
                         <div className="space-y-2">
                             {reportData.map(r => (
-                                <div key={r.id} className="flex justify-between items-center p-3 bg-slate-50 rounded-lg">
+                                <div key={r.id} className="flex justify-between items-center p-3 bg-muted rounded-lg">
                                     <div>
                                         <div className="font-medium">{r.guest?.primaryFirstName} {r.guest?.primaryLastName}</div>
-                                        <div className="text-sm text-slate-500">Site: {r.site?.name || 'TBD'}</div>
+                                        <div className="text-sm text-muted-foreground">Site: {r.site?.name || 'TBD'}</div>
                                     </div>
-                                    <div className="text-sm text-slate-600">{r.notes}</div>
+                                    <div className="text-sm text-muted-foreground">{r.notes}</div>
                                 </div>
                             ))}
                         </div>
@@ -87,7 +87,7 @@ export function LateCheckOutsReport({ campgroundId, dateRange }: DailyReportProp
             <Card>
                 <CardHeader>
                     <CardTitle>Late Check-outs Today</CardTitle>
-                    <p className="text-sm text-slate-500">Guests departing after standard check-out time</p>
+                    <p className="text-sm text-muted-foreground">Guests departing after standard check-out time</p>
                 </CardHeader>
                 <CardContent>
                     {reportData.length === 0 ? (
@@ -95,12 +95,12 @@ export function LateCheckOutsReport({ campgroundId, dateRange }: DailyReportProp
                     ) : (
                         <div className="space-y-2">
                             {reportData.map(r => (
-                                <div key={r.id} className="flex justify-between items-center p-3 bg-slate-50 rounded-lg">
+                                <div key={r.id} className="flex justify-between items-center p-3 bg-muted rounded-lg">
                                     <div>
                                         <div className="font-medium">{r.guest?.primaryFirstName} {r.guest?.primaryLastName}</div>
-                                        <div className="text-sm text-slate-500">Site: {r.site?.name || 'TBD'}</div>
+                                        <div className="text-sm text-muted-foreground">Site: {r.site?.name || 'TBD'}</div>
                                     </div>
-                                    <div className="text-sm text-slate-600">{r.notes}</div>
+                                    <div className="text-sm text-muted-foreground">{r.notes}</div>
                                 </div>
                             ))}
                         </div>
@@ -154,7 +154,7 @@ export function NoShowReport({ campgroundId, dateRange }: DailyReportProps) {
                 </Card>
                 <Card>
                     <CardHeader className="pb-2">
-                        <CardTitle className="text-sm text-slate-500">Revenue at Risk</CardTitle>
+                        <CardTitle className="text-sm text-muted-foreground">Revenue at Risk</CardTitle>
                     </CardHeader>
                     <CardContent>
                         <div className="text-2xl font-bold">${reportData.revenue.toLocaleString()}</div>
@@ -170,7 +170,7 @@ export function NoShowReport({ campgroundId, dateRange }: DailyReportProps) {
                         <InlineEmpty>No missed arrivals</InlineEmpty>
                     ) : (
                         <table className="w-full text-sm">
-                            <thead className="bg-slate-50">
+                            <thead className="bg-muted">
                                 <tr>
                                     <th className="px-4 py-2 text-left">Guest</th>
                                     <th className="px-4 py-2 text-left">Site</th>
@@ -222,7 +222,7 @@ export function DueOutsReport({ campgroundId, dateRange }: DailyReportProps) {
                     <CardTitle className={reportData.length > 0 ? "text-amber-900" : ""}>
                         Overstays / Due Outs
                     </CardTitle>
-                    <p className="text-sm text-slate-500">Guests past their scheduled departure</p>
+                    <p className="text-sm text-muted-foreground">Guests past their scheduled departure</p>
                 </CardHeader>
                 <CardContent>
                     {reportData.length === 0 ? (
@@ -233,10 +233,10 @@ export function DueOutsReport({ campgroundId, dateRange }: DailyReportProps) {
                     ) : (
                         <div className="space-y-2">
                             {reportData.map(r => (
-                                <div key={r.id} className="flex justify-between items-center p-3 bg-white rounded-lg border border-amber-200">
+                                <div key={r.id} className="flex justify-between items-center p-3 bg-card rounded-lg border border-amber-200">
                                     <div>
                                         <div className="font-medium">{r.guest?.primaryFirstName} {r.guest?.primaryLastName}</div>
-                                        <div className="text-sm text-slate-500">Site: {r.site?.name}</div>
+                                        <div className="text-sm text-muted-foreground">Site: {r.site?.name}</div>
                                     </div>
                                     <div className="text-sm text-amber-700">Due: {r.departureDate?.slice(0, 10)}</div>
                                 </div>
@@ -291,22 +291,22 @@ export function ExpectedOccupancyReport({ campgroundId, dateRange }: DailyReport
     }, [reservations, sites]);
 
     if (isLoading) return <CardSkeleton />;
-    if (!reportData) return <div className="text-slate-400">No data</div>;
+    if (!reportData) return <div className="text-muted-foreground">No data</div>;
 
     return (
         <div className="space-y-4">
             <Card>
                 <CardHeader>
                     <CardTitle>7-Day Occupancy Forecast</CardTitle>
-                    <p className="text-sm text-slate-500">{reportData.totalSites} total sites</p>
+                    <p className="text-sm text-muted-foreground">{reportData.totalSites} total sites</p>
                 </CardHeader>
                 <CardContent>
                     <div className="grid grid-cols-7 gap-2">
                         {reportData.forecast.map(day => (
-                            <div key={day.date} className="text-center p-3 bg-slate-50 rounded-lg">
-                                <div className="text-xs text-slate-500">{day.day}</div>
+                            <div key={day.date} className="text-center p-3 bg-muted rounded-lg">
+                                <div className="text-xs text-muted-foreground">{day.day}</div>
                                 <div className="text-lg font-bold">{day.occupancy}%</div>
-                                <div className="text-xs text-slate-400">{day.occupied} sites</div>
+                                <div className="text-xs text-muted-foreground">{day.occupied} sites</div>
                             </div>
                         ))}
                     </div>

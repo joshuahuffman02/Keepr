@@ -64,11 +64,11 @@ export function UrgencySection({
           <div>
             <div className="flex items-center gap-2 mb-2">
               <Flame className="h-6 w-6 text-orange-500" />
-              <h2 className="text-2xl md:text-3xl font-bold text-slate-900">{title}</h2>
+              <h2 className="text-2xl md:text-3xl font-bold text-foreground">{title}</h2>
             </div>
-            <p className="text-slate-600">{subtitle}</p>
+            <p className="text-muted-foreground">{subtitle}</p>
           </div>
-          <div className="flex items-center gap-2 text-sm text-slate-500">
+          <div className="flex items-center gap-2 text-sm text-muted-foreground">
             <TrendingUp className="h-4 w-4" />
             <span>Based on recent bookings</span>
           </div>

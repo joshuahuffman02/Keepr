@@ -154,11 +154,11 @@ export default function WelcomePage() {
             <Sparkles className="h-8 w-8 text-status-success" />
           </div>
 
-          <h1 className="text-3xl font-bold text-slate-900">
+          <h1 className="text-3xl font-bold text-foreground">
             Welcome to Camp Everyday!
           </h1>
 
-          <p className="text-lg text-slate-600 max-w-xl mx-auto">
+          <p className="text-lg text-muted-foreground max-w-xl mx-auto">
             {selectedCampground ? (
               <>
                 Great job setting up <span className="font-semibold">{selectedCampground.name}</span>.
@@ -181,12 +181,12 @@ export default function WelcomePage() {
         </div>
 
         {/* Progress Card */}
-        <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
-          <div className="p-6 border-b border-slate-100">
+        <div className="bg-card rounded-2xl border border-border shadow-sm overflow-hidden">
+          <div className="p-6 border-b border-border">
             <div className="flex items-center justify-between mb-4">
               <div>
-                <h2 className="text-lg font-semibold text-slate-900">Setup Progress</h2>
-                <p className="text-sm text-slate-600">
+                <h2 className="text-lg font-semibold text-foreground">Setup Progress</h2>
+                <p className="text-sm text-muted-foreground">
                   {completedTasks} of {setupTasks.length} tasks completed
                 </p>
               </div>
@@ -194,7 +194,7 @@ export default function WelcomePage() {
             </div>
 
             {/* Progress Bar */}
-            <div className="h-3 bg-slate-100 rounded-full overflow-hidden">
+            <div className="h-3 bg-muted rounded-full overflow-hidden">
               <div
                 className="h-full bg-status-success transition-all duration-500"
                 style={{ width: `${progressPercent}%` }}
@@ -203,20 +203,20 @@ export default function WelcomePage() {
           </div>
 
           {/* Task List */}
-          <div className="divide-y divide-slate-100">
+          <div className="divide-y divide-border">
             {setupTasks
               .sort((a, b) => a.priority - b.priority)
               .map((task) => (
                 <Link
                   key={task.id}
                   href={task.href}
-                  className="flex items-center gap-4 p-4 hover:bg-slate-50 transition-colors group"
+                  className="flex items-center gap-4 p-4 hover:bg-muted transition-colors group"
                 >
                   <div
                     className={`flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center ${
                       task.isComplete
                         ? "bg-status-success/15 text-status-success"
-                        : "bg-slate-100 text-slate-400 group-hover:bg-emerald-50 group-hover:text-emerald-500"
+                        : "bg-muted text-muted-foreground group-hover:bg-emerald-50 group-hover:text-emerald-500"
                     }`}
                   >
                     {task.isComplete ? (
@@ -230,7 +230,7 @@ export default function WelcomePage() {
                     <div className="flex items-center gap-2">
                       <h3
                         className={`font-medium ${
-                          task.isComplete ? "text-slate-500 line-through" : "text-slate-900"
+                          task.isComplete ? "text-muted-foreground line-through" : "text-foreground"
                         }`}
                       >
                         {task.title}
@@ -241,12 +241,12 @@ export default function WelcomePage() {
                         </span>
                       )}
                     </div>
-                    <p className="text-sm text-slate-500">{task.description}</p>
+                    <p className="text-sm text-muted-foreground">{task.description}</p>
                   </div>
 
                   <ArrowRight
                     className={`h-5 w-5 flex-shrink-0 transition-transform group-hover:translate-x-1 ${
-                      task.isComplete ? "text-slate-300" : "text-slate-400"
+                      task.isComplete ? "text-muted-foreground" : "text-muted-foreground"
                     }`}
                   />
                 </Link>
@@ -290,9 +290,9 @@ export default function WelcomePage() {
         </div>
 
         {/* Help Section */}
-        <div className="bg-slate-50 rounded-2xl p-6 text-center">
-          <h3 className="text-lg font-semibold text-slate-900 mb-2">Need Help?</h3>
-          <p className="text-slate-600 mb-4">
+        <div className="bg-muted rounded-2xl p-6 text-center">
+          <h3 className="text-lg font-semibold text-foreground mb-2">Need Help?</h3>
+          <p className="text-muted-foreground mb-4">
             Our support team is here to help you get started.
           </p>
           <div className="flex flex-wrap justify-center gap-3">
@@ -313,7 +313,7 @@ export default function WelcomePage() {
         <div className="text-center">
           <Link
             href="/dashboard"
-            className="text-sm text-slate-500 hover:text-slate-700 underline"
+            className="text-sm text-muted-foreground hover:text-foreground underline"
           >
             Skip to full dashboard
           </Link>

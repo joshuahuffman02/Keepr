@@ -99,7 +99,7 @@ export default function SocialPlannerSuggestions() {
           <Link href="/social-planner" className="text-sm text-emerald-700 hover:text-emerald-600">
             ← Back to Social Planner
           </Link>
-          <p className="text-slate-600">Select a campground to view suggestions.</p>
+          <p className="text-muted-foreground">Select a campground to view suggestions.</p>
         </div>
       </DashboardShell>
     );
@@ -113,8 +113,8 @@ export default function SocialPlannerSuggestions() {
       <div className="flex items-center justify-between mb-4">
         <div>
           <p className="text-xs uppercase tracking-wide text-emerald-600 font-semibold">Suggestions</p>
-          <h1 className="text-2xl font-bold text-slate-900">Rule-based ideas & alerts</h1>
-          <p className="text-slate-600">Occupancy, events, deals, seasonal, and historical heuristics. No external AI required.</p>
+          <h1 className="text-2xl font-bold text-foreground">Rule-based ideas & alerts</h1>
+          <p className="text-muted-foreground">Occupancy, events, deals, seasonal, and historical heuristics. No external AI required.</p>
         </div>
         <div className="flex items-center gap-2">
           <select
@@ -142,10 +142,10 @@ export default function SocialPlannerSuggestions() {
           <div key={s.id} className="card p-4">
             <div className="flex items-start justify-between">
               <div>
-                <p className="text-xs uppercase text-slate-500">{s.type}</p>
-                <h3 className="text-lg font-semibold text-slate-900">{s.message}</h3>
-                    <div className="text-xs text-slate-500 mt-1">Generated: {new Date(s.createdAt || Date.now()).toLocaleString()}</div>
-                <div className="text-xs text-slate-500 flex gap-2 mt-2">
+                <p className="text-xs uppercase text-muted-foreground">{s.type}</p>
+                <h3 className="text-lg font-semibold text-foreground">{s.message}</h3>
+                    <div className="text-xs text-muted-foreground mt-1">Generated: {new Date(s.createdAt || Date.now()).toLocaleString()}</div>
+                <div className="text-xs text-muted-foreground flex gap-2 mt-2">
                   {s.category && <span className="badge">{s.category}</span>}
                   {s.platform && <span className="badge bg-status-success/15 text-status-success">{s.platform}</span>}
                   {s.proposedDate && <span className="badge bg-status-info/15 text-status-info">Target {new Date(s.proposedDate).toLocaleDateString()}</span>}
@@ -167,12 +167,12 @@ export default function SocialPlannerSuggestions() {
                       <AlertTriangle className="h-4 w-4 mr-1" /> Dismiss
                     </button>
                     {s.status && s.status !== "new" && (
-                      <span className="text-xs text-slate-500">Status: {s.status}</span>
+                      <span className="text-xs text-muted-foreground">Status: {s.status}</span>
                     )}
                   </div>
             </div>
             {s.reason && (
-              <div className="mt-2 text-xs text-slate-600 bg-slate-50 p-2 rounded border border-slate-100 flex flex-wrap gap-2">
+              <div className="mt-2 text-xs text-muted-foreground bg-muted p-2 rounded border border-border flex flex-wrap gap-2">
                 {Object.entries(s.reason).map(([key, val]) => {
                   const label = key.replace(/([A-Z])/g, ' $1').toLowerCase();
                   const display =
@@ -180,7 +180,7 @@ export default function SocialPlannerSuggestions() {
                       ? `${Math.round(val * 100)}%`
                       : String(val);
                   return (
-                    <span key={`${s.id}-${key}`} className="badge bg-white text-slate-700 border border-slate-200">
+                    <span key={`${s.id}-${key}`} className="badge bg-card text-foreground border border-border">
                       {label}: {display}
                     </span>
                   );
@@ -199,7 +199,7 @@ export default function SocialPlannerSuggestions() {
           </div>
         ))}
         {!suggestionsQuery.data?.length && (
-          <div className="text-sm text-slate-500">No suggestions yet. Refresh to generate ideas from your data.</div>
+          <div className="text-sm text-muted-foreground">No suggestions yet. Refresh to generate ideas from your data.</div>
         )}
       </div>
     </DashboardShell>

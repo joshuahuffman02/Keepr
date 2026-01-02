@@ -271,7 +271,7 @@ export default function OptimizationPage() {
                     {selectedLogEntry.moves.map((move, index) => (
                       <div
                         key={index}
-                        className="flex items-center gap-4 p-4 rounded-lg border bg-white"
+                        className="flex items-center gap-4 p-4 rounded-lg border bg-card"
                       >
                         <div className="flex-1">
                           <div className="flex items-center gap-2 mb-1">

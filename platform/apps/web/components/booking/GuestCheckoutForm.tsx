@@ -64,14 +64,14 @@ export function GuestCheckoutForm({
     >
       {/* Header with guest checkout as primary */}
       <div className="text-center space-y-2">
-        <h2 className="text-xl font-bold text-slate-900">Almost there!</h2>
-        <p className="text-sm text-slate-600">
+        <h2 className="text-xl font-bold text-foreground">Almost there!</h2>
+        <p className="text-sm text-muted-foreground">
           Complete your booking in under a minute
         </p>
       </div>
 
       {/* Trust badges */}
-      <div className="flex items-center justify-center gap-4 text-xs text-slate-500">
+      <div className="flex items-center justify-center gap-4 text-xs text-muted-foreground">
         <div className="flex items-center gap-1">
           <Shield className="h-3.5 w-3.5 text-emerald-600" />
           <span>Secure checkout</span>
@@ -154,7 +154,7 @@ export function GuestCheckoutForm({
         </Button>
 
         {/* Security note */}
-        <p className="text-xs text-center text-slate-500">
+        <p className="text-xs text-center text-muted-foreground">
           Your information is encrypted and secure. We never share your data.
         </p>
       </form>
@@ -162,10 +162,10 @@ export function GuestCheckoutForm({
       {/* Sign in option - secondary */}
       <div className="relative">
         <div className="absolute inset-0 flex items-center">
-          <div className="w-full border-t border-slate-200" />
+          <div className="w-full border-t border-border" />
         </div>
         <div className="relative flex justify-center text-xs">
-          <span className="bg-white px-3 text-slate-500">or</span>
+          <span className="bg-card px-3 text-muted-foreground">or</span>
         </div>
       </div>
 
@@ -176,7 +176,7 @@ export function GuestCheckoutForm({
             if (onSignIn) onSignIn();
             else setShowSignIn(true);
           }}
-          className="text-sm text-slate-600 hover:text-emerald-600 transition-colors"
+          className="text-sm text-muted-foreground hover:text-emerald-600 transition-colors"
         >
           Already have an account?{" "}
           <span className="font-medium text-emerald-600 hover:underline">Sign in</span>
@@ -185,14 +185,14 @@ export function GuestCheckoutForm({
         {/* Benefits of signing in - collapsed by default */}
         {showSignIn && !onSignIn && (
           <motion.div
-            className="mt-4 p-4 bg-slate-50 rounded-lg text-left"
+            className="mt-4 p-4 bg-muted rounded-lg text-left"
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: "auto" }}
           >
-            <p className="text-sm font-medium text-slate-900 mb-2">
+            <p className="text-sm font-medium text-foreground mb-2">
               Benefits of signing in:
             </p>
-            <ul className="text-sm text-slate-600 space-y-1">
+            <ul className="text-sm text-muted-foreground space-y-1">
               <li className="flex items-center gap-2">
                 <span className="text-emerald-500">&#10003;</span>
                 View all your reservations in one place
@@ -231,9 +231,9 @@ export function GuestInfoSummary({
   onEdit?: () => void;
 }) {
   return (
-    <div className="p-4 bg-slate-50 rounded-lg">
+    <div className="p-4 bg-muted rounded-lg">
       <div className="flex items-center justify-between mb-3">
-        <h3 className="text-sm font-semibold text-slate-900">Guest Information</h3>
+        <h3 className="text-sm font-semibold text-foreground">Guest Information</h3>
         {onEdit && (
           <button
             type="button"
@@ -246,23 +246,23 @@ export function GuestInfoSummary({
       </div>
 
       <div className="space-y-2 text-sm">
-        <div className="flex items-center gap-2 text-slate-700">
-          <User className="h-4 w-4 text-slate-400" />
+        <div className="flex items-center gap-2 text-foreground">
+          <User className="h-4 w-4 text-muted-foreground" />
           <span>
             {guest.firstName} {guest.lastName}
           </span>
         </div>
-        <div className="flex items-center gap-2 text-slate-700">
-          <Mail className="h-4 w-4 text-slate-400" />
+        <div className="flex items-center gap-2 text-foreground">
+          <Mail className="h-4 w-4 text-muted-foreground" />
           <span>{guest.email}</span>
         </div>
-        <div className="flex items-center gap-2 text-slate-700">
-          <Phone className="h-4 w-4 text-slate-400" />
+        <div className="flex items-center gap-2 text-foreground">
+          <Phone className="h-4 w-4 text-muted-foreground" />
           <span>{guest.phone}</span>
         </div>
         {guest.zipCode && (
-          <div className="flex items-center gap-2 text-slate-700">
-            <MapPin className="h-4 w-4 text-slate-400" />
+          <div className="flex items-center gap-2 text-foreground">
+            <MapPin className="h-4 w-4 text-muted-foreground" />
             <span>{guest.zipCode}</span>
           </div>
         )}

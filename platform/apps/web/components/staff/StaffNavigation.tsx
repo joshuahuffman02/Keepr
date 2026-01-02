@@ -157,18 +157,18 @@ export function StaffNavigation({ campgroundId }: StaffNavigationProps) {
     <div className="mb-6" ref={navRef}>
       {/* Header */}
       <div className="flex items-center gap-3 mb-4">
-        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-teal-500 to-emerald-600 flex items-center justify-center shadow-lg shadow-teal-500/20">
-          <Users className="w-5 h-5 text-white" />
+        <div className="w-10 h-10 rounded-xl bg-action-primary flex items-center justify-center shadow-lg">
+          <Users className="w-5 h-5 text-action-primary-foreground" />
         </div>
         <div>
-          <h1 className="text-2xl font-bold text-slate-900">Staff Management</h1>
-          <p className="text-sm text-slate-600">Schedule, track time, and manage your team</p>
+          <h1 className="text-2xl font-bold text-foreground">Staff Management</h1>
+          <p className="text-sm text-muted-foreground">Schedule, track time, and manage your team</p>
         </div>
       </div>
 
       {/* Tab Navigation */}
       <nav
-        className="flex flex-wrap gap-2 p-1.5 bg-slate-100 rounded-xl"
+        className="flex flex-wrap gap-2 p-1.5 bg-muted rounded-xl"
         role="navigation"
         aria-label="Staff management sections"
       >
@@ -183,16 +183,16 @@ export function StaffNavigation({ campgroundId }: StaffNavigationProps) {
                 onClick={() => setOpenGroup(isOpen ? null : group.id)}
                 className={cn(
                   "relative flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium transition-all duration-200",
-                  "focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-500 focus-visible:ring-offset-2",
+                  "focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
                   groupActive
-                    ? "bg-white text-slate-900 shadow-sm"
-                    : "text-slate-600 hover:text-slate-900 hover:bg-slate-50"
+                    ? "bg-card text-foreground shadow-sm"
+                    : "text-muted-foreground hover:text-foreground hover:bg-muted"
                 )}
                 aria-expanded={isOpen}
                 aria-haspopup="true"
               >
                 <GroupIcon
-                  className={cn("w-4 h-4", groupActive ? "text-teal-600" : "text-slate-500")}
+                  className={cn("w-4 h-4", groupActive ? "text-action-primary" : "text-muted-foreground")}
                 />
                 <span className="hidden sm:inline">
                   {groupActive ? getActiveLabel(group) : group.label}
@@ -212,7 +212,7 @@ export function StaffNavigation({ campgroundId }: StaffNavigationProps) {
                     animate={{ opacity: 1, y: 0, scale: 1 }}
                     exit={{ opacity: 0, y: -8, scale: 0.95 }}
                     transition={{ duration: 0.15 }}
-                    className="absolute z-50 mt-1 left-0 min-w-[180px] bg-white rounded-xl shadow-lg border border-slate-200 py-1 overflow-hidden"
+                    className="absolute z-50 mt-1 left-0 min-w-[180px] bg-card rounded-xl shadow-lg border border-border py-1 overflow-hidden"
                   >
                     {group.items.map((item) => {
                       const Icon = item.icon;
@@ -227,13 +227,13 @@ export function StaffNavigation({ campgroundId }: StaffNavigationProps) {
                             "flex items-center gap-3 px-4 py-2.5 text-sm transition-colors",
                             active
                               ? "bg-teal-50 text-teal-700"
-                              : "text-slate-700 hover:bg-slate-50"
+                              : "text-foreground hover:bg-muted"
                           )}
                         >
                           <Icon
                             className={cn(
                               "w-4 h-4",
-                              active ? "text-teal-600" : "text-slate-400"
+                              active ? "text-teal-600" : "text-muted-foreground"
                             )}
                           />
                           <span className="font-medium">{item.label}</span>

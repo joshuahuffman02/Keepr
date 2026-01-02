@@ -51,8 +51,8 @@ export function ReportChart({ series, chart }: { series: Series[]; chart: "line"
 
   if (!isRechartsLoaded) {
     return (
-      <div className="w-full h-[320px] flex items-center justify-center bg-slate-50 rounded-lg">
-        <div className="flex items-center gap-2 text-sm text-slate-600">
+      <div className="w-full h-[320px] flex items-center justify-center bg-muted rounded-lg">
+        <div className="flex items-center gap-2 text-sm text-muted-foreground">
           <div className="h-4 w-4 animate-spin rounded-full border-2 border-emerald-500 border-t-transparent" />
           Loading chart…
         </div>

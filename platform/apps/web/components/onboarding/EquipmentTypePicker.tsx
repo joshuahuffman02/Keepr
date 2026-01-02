@@ -116,12 +116,12 @@ export function EquipmentTypePicker({
             className={cn(
               "relative p-4 rounded-xl border-2 transition-all duration-200",
               "flex flex-col items-center justify-center gap-2",
-              "focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 focus:ring-offset-slate-900",
+              "focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 focus:ring-offset-background",
               !disabled && "hover:border-emerald-500/50",
               disabled && "opacity-50 cursor-not-allowed",
               isSelected
                 ? "border-emerald-500 bg-emerald-500/10"
-                : "border-slate-700 bg-slate-800/50",
+                : "border-border bg-muted/50",
               isAnyOption && "sm:col-span-3 lg:col-span-1"
             )}
           >
@@ -131,7 +131,7 @@ export function EquipmentTypePicker({
                 "p-2 rounded-lg transition-colors",
                 isSelected
                   ? "bg-emerald-500/20 text-emerald-400"
-                  : "bg-slate-700 text-slate-400"
+                  : "bg-muted text-muted-foreground"
               )}
             >
               <Icon className="w-6 h-6" />
@@ -141,7 +141,7 @@ export function EquipmentTypePicker({
             <span
               className={cn(
                 "text-sm font-medium text-center transition-colors",
-                isSelected ? "text-emerald-400" : "text-slate-300"
+                isSelected ? "text-emerald-400" : "text-muted-foreground"
               )}
             >
               {equipment.label}

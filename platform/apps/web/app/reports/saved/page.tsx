@@ -67,11 +67,11 @@ export default function SavedReportsPage() {
     <DashboardShell>
       <div className="space-y-4">
         <Breadcrumbs items={[{ label: "Reports", href: "/reports" }, { label: "Saved" }]} />
-        <div className="rounded-xl border border-slate-200 bg-white shadow-sm p-5 space-y-4">
+        <div className="rounded-xl border border-border bg-card shadow-sm p-5 space-y-4">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
             <div className="space-y-1">
-              <h1 className="text-2xl font-semibold text-slate-900">Saved reports</h1>
-              <p className="text-slate-600 text-sm">Your favorite report views by tab/sub-report.</p>
+              <h1 className="text-2xl font-semibold text-foreground">Saved reports</h1>
+              <p className="text-muted-foreground text-sm">Your favorite report views by tab/sub-report.</p>
             </div>
             <div className="flex flex-wrap gap-2">
               <Input
@@ -85,20 +85,20 @@ export default function SavedReportsPage() {
           </div>
 
           {filtered.length === 0 ? (
-            <div className="text-sm text-slate-500">No saved reports yet. Use “Save report” from the Reports page.</div>
+            <div className="text-sm text-muted-foreground">No saved reports yet. Use “Save report” from the Reports page.</div>
           ) : (
             <div className="grid gap-3">
               {filtered.map((r) => (
-                <Card key={r.id} className="border-slate-200">
+                <Card key={r.id} className="border-border">
                   <CardHeader className="flex flex-col md:flex-row md:items-center md:justify-between gap-2">
                     <div className="space-y-1">
                       <div className="flex items-center gap-2">
-                        <CardTitle className="text-slate-900">{r.name}</CardTitle>
+                        <CardTitle className="text-foreground">{r.name}</CardTitle>
                         <Badge variant="secondary">{r.tab}</Badge>
                         {r.subTab && <Badge variant="outline">{r.subTab}</Badge>}
                       </div>
                       {r.description && <CardDescription>{r.description}</CardDescription>}
-                      <div className="text-xs text-slate-500">
+                      <div className="text-xs text-muted-foreground">
                         Saved {new Date(r.updatedAt).toLocaleString()}
                         {r.dateRange && ` • ${r.dateRange.start} → ${r.dateRange.end}`}
                       </div>
@@ -147,10 +147,10 @@ export default function SavedReportsPage() {
           )}
         </div>
 
-        <Card className="border-slate-200">
+        <Card className="border-border">
           <CardHeader className="flex flex-col md:flex-row md:items-center md:justify-between gap-2">
             <div className="space-y-1">
-              <CardTitle className="text-slate-900">Recent exports</CardTitle>
+              <CardTitle className="text-foreground">Recent exports</CardTitle>
               <CardDescription>Exports are scoped per campground with filters captured for auditing.</CardDescription>
             </div>
             <Button
@@ -164,23 +164,23 @@ export default function SavedReportsPage() {
             </Button>
           </CardHeader>
           <CardContent className="space-y-3">
-            {!campgroundId && <div className="text-sm text-slate-500">Select a campground to view exports.</div>}
-            {campgroundId && exportsQuery.isLoading && <div className="text-sm text-slate-500">Loading exports...</div>}
+            {!campgroundId && <div className="text-sm text-muted-foreground">Select a campground to view exports.</div>}
+            {campgroundId && exportsQuery.isLoading && <div className="text-sm text-muted-foreground">Loading exports...</div>}
             {campgroundId && !exportsQuery.isLoading && (exportsQuery.data?.length ?? 0) === 0 && (
-              <div className="text-sm text-slate-500">No exports yet for this campground.</div>
+              <div className="text-sm text-muted-foreground">No exports yet for this campground.</div>
             )}
             {campgroundId && (exportsQuery.data ?? []).map((exp) => (
-              <div key={exp.id} className="rounded-lg border border-slate-200 p-3 space-y-2">
+              <div key={exp.id} className="rounded-lg border border-border p-3 space-y-2">
                 <div className="flex items-center justify-between gap-2">
                   <div className="space-y-1">
                     <div className="flex items-center gap-2">
-                      <span className="font-medium text-slate-900">{exp.resource || "reports"}</span>
+                      <span className="font-medium text-foreground">{exp.resource || "reports"}</span>
                       <Badge variant={exp.status === "success" ? "default" : exp.status === "failed" ? "destructive" : "secondary"}>
                         {exp.status}
                       </Badge>
                       {exp.location && <Badge variant="outline">{exp.location}</Badge>}
                     </div>
-                    <div className="text-xs text-slate-500">
+                    <div className="text-xs text-muted-foreground">
                       Requested {new Date(exp.createdAt || "").toLocaleString()} {exp.completedAt ? `• Completed ${new Date(exp.completedAt).toLocaleString()}` : ""}
                     </div>
                   </div>
@@ -195,7 +195,7 @@ export default function SavedReportsPage() {
                   </Button>
                 </div>
                 {exp.filters && (
-                  <pre className="bg-slate-50 text-xs text-slate-700 rounded-md p-2 overflow-x-auto">
+                  <pre className="bg-muted text-xs text-foreground rounded-md p-2 overflow-x-auto">
                     {JSON.stringify(exp.filters, null, 2)}
                   </pre>
                 )}

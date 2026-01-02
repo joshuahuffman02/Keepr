@@ -118,9 +118,9 @@ export function SavedCardMethod({ onSuccess, onError, onCancel }: SavedCardMetho
   if (!loading && cards.length === 0) {
     return (
       <div className="py-8 text-center space-y-4">
-        <CreditCard className="h-12 w-12 mx-auto text-slate-300" />
-        <p className="text-slate-600">No saved cards found</p>
-        <p className="text-sm text-slate-500">
+        <CreditCard className="h-12 w-12 mx-auto text-muted-foreground" />
+        <p className="text-muted-foreground">No saved cards found</p>
+        <p className="text-sm text-muted-foreground">
           You can save a card during your next card payment
         </p>
         <Button variant="outline" onClick={handleCancel}>
@@ -157,7 +157,7 @@ export function SavedCardMethod({ onSuccess, onError, onCancel }: SavedCardMetho
                 "flex items-center gap-3 p-4 border-2 rounded-lg cursor-pointer transition-all",
                 isSelected
                   ? "border-emerald-500 bg-emerald-50"
-                  : "border-slate-200 hover:border-slate-300"
+                  : "border-border hover:border-border"
               )}
               onClick={() => selectCard(card.id)}
             >
@@ -168,8 +168,8 @@ export function SavedCardMethod({ onSuccess, onError, onCancel }: SavedCardMetho
                 {CardIcon ? (
                   <CardIcon className="h-8 w-12" />
                 ) : (
-                  <div className="h-8 w-12 bg-slate-200 rounded flex items-center justify-center">
-                    <CreditCard className="h-5 w-5 text-slate-500" />
+                  <div className="h-8 w-12 bg-muted rounded flex items-center justify-center">
+                    <CreditCard className="h-5 w-5 text-muted-foreground" />
                   </div>
                 )}
               </div>
@@ -177,17 +177,17 @@ export function SavedCardMethod({ onSuccess, onError, onCancel }: SavedCardMetho
               {/* Card details */}
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2">
-                  <span className="font-medium text-slate-900">
+                  <span className="font-medium text-foreground">
                     {formatCardBrand(card.brand)} •••• {card.last4}
                   </span>
                   {card.isDefault && (
-                    <span className="text-xs bg-slate-100 text-slate-600 px-2 py-0.5 rounded">
+                    <span className="text-xs bg-muted text-muted-foreground px-2 py-0.5 rounded">
                       Default
                     </span>
                   )}
                 </div>
                 {card.nickname && (
-                  <span className="text-sm text-slate-500">{card.nickname}</span>
+                  <span className="text-sm text-muted-foreground">{card.nickname}</span>
                 )}
               </div>
 

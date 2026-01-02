@@ -50,15 +50,15 @@ export function SettingsPageLayout({
       {/* Page Header */}
       <div>
         <div className="flex items-center gap-2">
-          <Icon className="h-6 w-6 text-slate-500" />
-          <h2 className="text-2xl font-bold text-slate-900 dark:text-white">
+          <Icon className="h-6 w-6 text-muted-foreground" />
+          <h2 className="text-2xl font-bold text-foreground">
             {title}
           </h2>
           {helpTopicId && (
             <HelpAnchor topicId={helpTopicId} label={`${title} help`} />
           )}
         </div>
-        <p className="text-slate-500 mt-1">{description}</p>
+        <p className="text-muted-foreground mt-1">{description}</p>
       </div>
 
       {/* Optional Info Banner */}
@@ -67,7 +67,7 @@ export function SettingsPageLayout({
       {/* Loading State */}
       {isLoading && (
         <div className="flex items-center justify-center py-12">
-          <Loader2 className="h-8 w-8 animate-spin text-slate-400" />
+          <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
         </div>
       )}
 
@@ -75,8 +75,8 @@ export function SettingsPageLayout({
       {!hasCampground && !isLoading && (
         <Card>
           <CardContent className="py-12 text-center">
-            <Icon className="h-12 w-12 text-slate-300 mx-auto mb-4" />
-            <p className="text-slate-500">{emptyMessage}</p>
+            <Icon className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+            <p className="text-muted-foreground">{emptyMessage}</p>
           </CardContent>
         </Card>
       )}
@@ -95,19 +95,19 @@ export function SettingsCardSkeleton({ rows = 3 }: { rows?: number }) {
     <Card>
       <CardContent className="p-6 space-y-4">
         <div className="space-y-2">
-          <div className="h-5 w-32 bg-slate-200 rounded animate-pulse" />
-          <div className="h-4 w-48 bg-slate-100 rounded animate-pulse" />
+          <div className="h-5 w-32 bg-muted rounded animate-pulse" />
+          <div className="h-4 w-48 bg-muted rounded animate-pulse" />
         </div>
         <div className="space-y-3">
           {Array.from({ length: rows }).map((_, i) => (
             <div key={i} className="grid md:grid-cols-2 gap-4">
               <div className="space-y-2">
-                <div className="h-4 w-20 bg-slate-100 rounded animate-pulse" />
-                <div className="h-10 bg-slate-100 rounded animate-pulse" />
+                <div className="h-4 w-20 bg-muted rounded animate-pulse" />
+                <div className="h-10 bg-muted rounded animate-pulse" />
               </div>
               <div className="space-y-2">
-                <div className="h-4 w-24 bg-slate-100 rounded animate-pulse" />
-                <div className="h-10 bg-slate-100 rounded animate-pulse" />
+                <div className="h-4 w-24 bg-muted rounded animate-pulse" />
+                <div className="h-10 bg-muted rounded animate-pulse" />
               </div>
             </div>
           ))}

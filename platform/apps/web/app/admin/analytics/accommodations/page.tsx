@@ -63,16 +63,16 @@ export default function AccommodationsPage() {
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-2xl font-bold text-white">Accommodation Mix</h1>
-            <p className="text-slate-400 mt-1">
+            <p className="text-muted-foreground mt-1">
               Site types, RV breakdown, and utilization analysis
             </p>
           </div>
           <DateRangePicker value={dateRange} onChange={setDateRange} />
         </div>
         <div className="flex flex-col items-center justify-center py-12 text-center">
-          <Building2 className="h-16 w-16 text-slate-600 mb-4" />
+          <Building2 className="h-16 w-16 text-muted-foreground mb-4" />
           <h3 className="text-lg font-medium text-white mb-2">No Accommodation Data Available</h3>
-          <p className="text-slate-400 max-w-md">
+          <p className="text-muted-foreground max-w-md">
             There is no accommodation data for the selected time period. Data will appear here once sites are configured.
           </p>
         </div>
@@ -86,7 +86,7 @@ export default function AccommodationsPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-white">Accommodation Mix</h1>
-          <p className="text-slate-400 mt-1">
+          <p className="text-muted-foreground mt-1">
             Site types, RV breakdown, and utilization analysis
           </p>
         </div>

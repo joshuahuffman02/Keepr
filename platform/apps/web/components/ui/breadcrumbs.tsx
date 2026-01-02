@@ -54,7 +54,7 @@ export function Breadcrumbs({
         <BreadcrumbJsonLd items={normalizedItems} />
         <nav
           aria-label="Breadcrumb"
-          className={cn("flex items-center text-sm text-slate-600", className)}
+          className={cn("flex items-center text-sm text-muted-foreground", className)}
         >
           <ol className="flex items-center gap-1 flex-wrap" itemScope itemType="https://schema.org/BreadcrumbList">
             {normalizedItems.map((item, index) => {
@@ -70,11 +70,11 @@ export function Breadcrumbs({
                   itemType="https://schema.org/ListItem"
                 >
                   {index > 0 && (
-                    <ChevronRight className="h-4 w-4 mx-1 text-slate-400 flex-shrink-0" />
+                    <ChevronRight className="h-4 w-4 mx-1 text-muted-foreground/70 flex-shrink-0" />
                   )}
                   {isLast ? (
                     <span
-                      className="text-slate-900 font-medium truncate max-w-[200px]"
+                      className="text-foreground font-medium truncate max-w-[200px]"
                       itemProp="name"
                       aria-current="page"
                     >
@@ -83,7 +83,7 @@ export function Breadcrumbs({
                   ) : (
                     <Link
                       href={item.href || "#"}
-                      className="hover:text-emerald-600 transition-colors flex items-center gap-1"
+                      className="hover:text-action-primary transition-colors flex items-center gap-1"
                       itemProp="item"
                     >
                       {isFirst && showHome && (
@@ -106,13 +106,13 @@ export function Breadcrumbs({
 
   // Simple breadcrumbs without SEO
   return (
-    <nav aria-label="Breadcrumb" className={cn("flex flex-wrap items-center gap-1 text-sm text-slate-500", className)}>
+    <nav aria-label="Breadcrumb" className={cn("flex flex-wrap items-center gap-1 text-sm text-muted-foreground", className)}>
       {normalizedItems.map((item, idx) => {
         const isLast = idx === normalizedItems.length - 1;
         return (
           <span key={`${item.label}-${idx}`} className="flex items-center gap-2">
             {item.href && !isLast ? (
-              <Link href={item.href} className="hover:underline font-medium transition-colors">
+              <Link href={item.href} className="hover:text-foreground font-medium transition-colors">
                 {item.label}
               </Link>
             ) : (
@@ -197,4 +197,3 @@ export function getDashboardBreadcrumbs(
     ...sections,
   ];
 }
-

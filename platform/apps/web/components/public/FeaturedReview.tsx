@@ -25,7 +25,7 @@ function StarRating({ rating }: { rating: number }) {
           key={star}
           className={cn(
             "h-4 w-4",
-            star <= rating ? "fill-amber-400 text-amber-400" : "fill-slate-200 text-slate-200"
+            star <= rating ? "fill-amber-400 text-amber-400" : "fill-slate-200 text-muted-foreground"
           )}
         />
       ))}
@@ -46,9 +46,9 @@ export function FeaturedReview({
     <div
       className={cn(
         "rounded-xl p-4",
-        variant === "light" && "bg-white shadow-lg border border-slate-100",
-        variant === "dark" && "bg-slate-800 border border-slate-700",
-        variant === "glass" && "bg-white/10 backdrop-blur-sm border border-white/20",
+        variant === "light" && "bg-card shadow-lg border border-border",
+        variant === "dark" && "bg-muted border border-border",
+        variant === "glass" && "bg-card/10 backdrop-blur-sm border border-white/20",
         className
       )}
     >
@@ -74,8 +74,8 @@ export function FeaturedReview({
       <blockquote
         className={cn(
           "text-sm mb-3",
-          variant === "light" && "text-slate-700",
-          variant === "dark" && "text-slate-200",
+          variant === "light" && "text-foreground",
+          variant === "dark" && "text-muted-foreground",
           variant === "glass" && "text-white"
         )}
       >
@@ -90,7 +90,7 @@ export function FeaturedReview({
             "w-8 h-8 rounded-full flex items-center justify-center text-xs font-semibold",
             variant === "light" && "bg-status-success/15 text-status-success",
             variant === "dark" && "bg-status-success/15 text-status-success",
-            variant === "glass" && "bg-white/20 text-white"
+            variant === "glass" && "bg-card/20 text-foreground"
           )}
         >
           {review.guestName
@@ -104,7 +104,7 @@ export function FeaturedReview({
           <p
             className={cn(
               "text-sm font-medium",
-              variant === "light" && "text-slate-900",
+              variant === "light" && "text-foreground",
               variant === "dark" && "text-white",
               variant === "glass" && "text-white"
             )}
@@ -115,8 +115,8 @@ export function FeaturedReview({
             <p
               className={cn(
                 "text-xs",
-                variant === "light" && "text-slate-500",
-                variant === "dark" && "text-slate-400",
+                variant === "light" && "text-muted-foreground",
+                variant === "dark" && "text-muted-foreground",
                 variant === "glass" && "text-white/70"
               )}
             >

@@ -69,7 +69,7 @@ export function IntegrationCard({
                 className={cn(
                     "group relative h-full transition-all duration-200",
                     "border-border bg-card hover:shadow-lg",
-                    "hover:border-slate-300 dark:hover:border-slate-600",
+                    "hover:border-border dark:hover:border-border",
                     isConnected && "ring-2 ring-emerald-500/20 border-emerald-200 dark:border-emerald-800",
                     hasError && "ring-2 ring-red-500/20 border-red-200 dark:border-red-800",
                     isComingSoon && "opacity-75"
@@ -88,7 +88,7 @@ export function IntegrationCard({
                 {/* Coming soon badge */}
                 {isComingSoon && (
                     <div className="absolute -top-2 -right-2 z-10">
-                        <span className="inline-flex items-center rounded-full bg-slate-100 dark:bg-slate-800 px-2 py-0.5 text-xs font-medium text-slate-600 dark:text-slate-400">
+                        <span className="inline-flex items-center rounded-full bg-muted dark:bg-muted px-2 py-0.5 text-xs font-medium text-muted-foreground dark:text-muted-foreground">
                             Coming Soon
                         </span>
                     </div>
@@ -104,7 +104,7 @@ export function IntegrationCard({
                                     ? "bg-status-success/15 text-status-success"
                                     : hasError
                                     ? "bg-status-error/15 text-status-error"
-                                    : "bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 group-hover:bg-status-info/15 group-hover:text-status-info"
+                                    : "bg-muted dark:bg-muted text-muted-foreground dark:text-muted-foreground group-hover:bg-status-info/15 group-hover:text-status-info"
                             )}
                         >
                             <Icon className="h-6 w-6" />
@@ -189,8 +189,8 @@ export function IntegrationCard({
                             <Button
                                 className={cn(
                                     "w-full group/btn transition-all",
-                                    "bg-slate-900 hover:bg-slate-800 dark:bg-slate-100 dark:hover:bg-slate-200",
-                                    "dark:text-slate-900"
+                                    "bg-muted hover:bg-muted dark:bg-muted dark:hover:bg-muted",
+                                    "dark:text-foreground"
                                 )}
                                 onClick={onConnect}
                             >

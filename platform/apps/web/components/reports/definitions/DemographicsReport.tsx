@@ -74,7 +74,7 @@ export function DemographicsReport({ campgroundId, dateRange }: DemographicsRepo
     }, [reservations, dateRange]);
 
     if (isLoading) {
-        return <div className="text-sm text-slate-500">Loading demographics data...</div>;
+        return <div className="text-sm text-muted-foreground">Loading demographics data...</div>;
     }
 
     if (error) {
@@ -83,9 +83,9 @@ export function DemographicsReport({ campgroundId, dateRange }: DemographicsRepo
 
     if (!reportData) {
         return (
-            <div className="flex flex-col items-center justify-center p-12 bg-slate-50 rounded-lg border border-slate-200">
-                <div className="text-slate-400 mb-2">No booking data found</div>
-                <p className="text-xs text-slate-500">Try adjusting the date range.</p>
+            <div className="flex flex-col items-center justify-center p-12 bg-muted rounded-lg border border-border">
+                <div className="text-muted-foreground mb-2">No booking data found</div>
+                <p className="text-xs text-muted-foreground">Try adjusting the date range.</p>
             </div>
         );
     }
@@ -96,7 +96,7 @@ export function DemographicsReport({ campgroundId, dateRange }: DemographicsRepo
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                 <Card>
                     <CardHeader className="pb-2">
-                        <CardTitle className="text-sm font-medium text-slate-500">Total Reservations</CardTitle>
+                        <CardTitle className="text-sm font-medium text-muted-foreground">Total Reservations</CardTitle>
                     </CardHeader>
                     <CardContent>
                         <div className="text-2xl font-bold">{reportData.totalReservations}</div>
@@ -104,7 +104,7 @@ export function DemographicsReport({ campgroundId, dateRange }: DemographicsRepo
                 </Card>
                 <Card>
                     <CardHeader className="pb-2">
-                        <CardTitle className="text-sm font-medium text-slate-500">Avg Party Size</CardTitle>
+                        <CardTitle className="text-sm font-medium text-muted-foreground">Avg Party Size</CardTitle>
                     </CardHeader>
                     <CardContent>
                         <div className="text-2xl font-bold">{reportData.avgPartySize}</div>

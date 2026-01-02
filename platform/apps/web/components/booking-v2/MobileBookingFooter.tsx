@@ -90,7 +90,7 @@ export function MobileBookingFooter({
       {/* Footer bar */}
       <motion.div
         className={cn(
-          "bg-white border-t border-slate-200 shadow-lg z-50",
+          "bg-card border-t border-border shadow-lg z-50",
           className
         )}
         initial={prefersReducedMotion ? {} : { y: 100 }}
@@ -105,26 +105,26 @@ export function MobileBookingFooter({
               animate={{ height: "auto", opacity: 1 }}
               exit={{ height: 0, opacity: 0 }}
               transition={{ duration: 0.2 }}
-              className="overflow-hidden border-b border-slate-100"
+              className="overflow-hidden border-b border-border"
             >
               <div className="p-4 space-y-3">
                 {/* Header */}
                 <div className="flex items-center justify-between">
-                  <h3 className="font-semibold text-slate-900">
+                  <h3 className="font-semibold text-foreground">
                     Booking Summary
                   </h3>
                   <button
                     onClick={() => setIsExpanded(false)}
-                    className="p-1 rounded-full hover:bg-slate-100"
+                    className="p-1 rounded-full hover:bg-muted"
                   >
-                    <X className="h-5 w-5 text-slate-500" />
+                    <X className="h-5 w-5 text-muted-foreground" />
                   </button>
                 </div>
 
                 {/* Site class */}
                 {siteClassName && (
-                  <div className="text-sm text-slate-600">
-                    <span className="font-medium text-slate-900">
+                  <div className="text-sm text-muted-foreground">
+                    <span className="font-medium text-foreground">
                       {siteClassName}
                     </span>
                   </div>
@@ -132,8 +132,8 @@ export function MobileBookingFooter({
 
                 {/* Dates */}
                 {arrivalDate && departureDate && (
-                  <div className="flex items-center gap-2 text-sm text-slate-600">
-                    <Calendar className="h-4 w-4 text-slate-400" />
+                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                    <Calendar className="h-4 w-4 text-muted-foreground" />
                     <span>
                       {formatDate(arrivalDate)} - {formatDate(departureDate)} ({nights} night{nights !== 1 ? "s" : ""})
                     </span>
@@ -142,7 +142,7 @@ export function MobileBookingFooter({
 
                 {/* Price breakdown */}
                 {breakdown && breakdown.length > 0 && (
-                  <div className="space-y-2 pt-2 border-t border-slate-100">
+                  <div className="space-y-2 pt-2 border-t border-border">
                     {breakdown.map((item, idx) => (
                       <div
                         key={idx}
@@ -152,7 +152,7 @@ export function MobileBookingFooter({
                           className={cn(
                             item.isDiscount
                               ? "text-emerald-600"
-                              : "text-slate-600"
+                              : "text-muted-foreground"
                           )}
                         >
                           {item.label}
@@ -161,7 +161,7 @@ export function MobileBookingFooter({
                           className={cn(
                             item.isDiscount
                               ? "text-emerald-600"
-                              : "text-slate-900"
+                              : "text-foreground"
                           )}
                         >
                           {item.isDiscount ? "-" : ""}
@@ -173,7 +173,7 @@ export function MobileBookingFooter({
                 )}
 
                 {/* Trust signal */}
-                <div className="flex items-center gap-1.5 text-xs text-slate-500 pt-2">
+                <div className="flex items-center gap-1.5 text-xs text-muted-foreground pt-2">
                   <Shield className="h-3.5 w-3.5 text-emerald-500" />
                   <span>Secure checkout with instant confirmation</span>
                 </div>
@@ -193,12 +193,12 @@ export function MobileBookingFooter({
               <div className="flex items-center gap-2">
                 <div>
                   <div className="flex items-baseline gap-1">
-                    <span className="text-xl font-bold text-slate-900">
+                    <span className="text-xl font-bold text-foreground">
                       {formatCurrency(totalAmount)}
                     </span>
-                    <span className="text-sm text-slate-500">total</span>
+                    <span className="text-sm text-muted-foreground">total</span>
                   </div>
-                  <div className="flex items-center gap-1 text-xs text-slate-500">
+                  <div className="flex items-center gap-1 text-xs text-muted-foreground">
                     <span>
                       {nights} night{nights !== 1 ? "s" : ""}
                     </span>
@@ -246,10 +246,10 @@ export function MobileBookingFooterPlaceholder({
   ctaDisabled?: boolean;
 }) {
   return (
-    <div className="bg-white border-t border-slate-200 shadow-lg safe-area-inset-bottom">
+    <div className="bg-card border-t border-border shadow-lg safe-area-inset-bottom">
       <div className="flex items-center gap-4 p-4">
         <div className="flex-1">
-          <p className="text-sm text-slate-500">{message}</p>
+          <p className="text-sm text-muted-foreground">{message}</p>
         </div>
         <Button
           onClick={onCtaClick}

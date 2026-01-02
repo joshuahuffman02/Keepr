@@ -70,7 +70,7 @@ export default function PermissionsPage() {
           <div className="flex items-center justify-between">
             <div>
               <div className="text-lg font-semibold">Role & permission rules</div>
-              <div className="text-sm text-slate-600">Scoped RBAC with field-level rules.</div>
+              <div className="text-sm text-muted-foreground">Scoped RBAC with field-level rules.</div>
             </div>
             <Button size="sm" onClick={() => upsertRule.mutate()} disabled={upsertRule.isPending}>
               {upsertRule.isPending ? "Saving..." : "Save rule"}
@@ -112,7 +112,7 @@ export default function PermissionsPage() {
 
           <div className="overflow-auto">
             <table className="w-full text-sm">
-              <thead className="text-left text-slate-500 border-b">
+              <thead className="text-left text-muted-foreground border-b">
                 <tr>
                   <th className="py-2">Role</th>
                   <th className="py-2">Resource</th>
@@ -140,7 +140,7 @@ export default function PermissionsPage() {
           <div className="flex items-center justify-between">
             <div>
               <div className="text-lg font-semibold">Approval workflows</div>
-              <div className="text-sm text-slate-600">Require approval for sensitive actions.</div>
+              <div className="text-sm text-muted-foreground">Require approval for sensitive actions.</div>
             </div>
             <Button size="sm" variant="secondary" onClick={() => submitApproval.mutate()} disabled={submitApproval.isPending}>
               {submitApproval.isPending ? "Submitting..." : "Submit approval request"}
@@ -168,7 +168,7 @@ export default function PermissionsPage() {
 
           <div className="overflow-auto">
             <table className="w-full text-sm">
-              <thead className="text-left text-slate-500 border-b">
+              <thead className="text-left text-muted-foreground border-b">
                 <tr>
                   <th className="py-2">Action</th>
                   <th className="py-2">Resource</th>

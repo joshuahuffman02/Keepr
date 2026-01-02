@@ -50,7 +50,7 @@ export default function SocialPlannerWeekly() {
           <Link href="/social-planner" className="text-sm text-emerald-700 hover:text-emerald-600">
             ← Back to Social Planner
           </Link>
-          <p className="text-slate-600">Select a campground to view weekly ideas.</p>
+          <p className="text-muted-foreground">Select a campground to view weekly ideas.</p>
         </div>
       </DashboardShell>
     );
@@ -64,8 +64,8 @@ export default function SocialPlannerWeekly() {
       <div className="flex items-center justify-between mb-4">
         <div>
           <p className="text-xs uppercase tracking-wide text-emerald-600 font-semibold">Weekly ideas</p>
-          <h1 className="text-2xl font-bold text-slate-900">Auto-generated Monday bundles</h1>
-          <p className="text-slate-600">Three posts + cadence tailored to your park style without external AI.</p>
+          <h1 className="text-2xl font-bold text-foreground">Auto-generated Monday bundles</h1>
+          <p className="text-muted-foreground">Three posts + cadence tailored to your park style without external AI.</p>
         </div>
         <Button
           variant="secondary"
@@ -80,16 +80,16 @@ export default function SocialPlannerWeekly() {
       {weekly ? (
         <div className="space-y-4">
           <Card className="p-4">
-            <div className="flex items-center gap-2 text-sm text-slate-600">
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
               <Sparkles className="h-4 w-4 text-emerald-600" />
               Generated for week of {new Date(weekly.generatedFor).toLocaleDateString()}
             </div>
             <div className="grid md:grid-cols-3 gap-3 mt-3">
               {weekly.ideas?.map((idea: any, idx: number) => (
-                <div key={idx} className="p-3 rounded border border-slate-200 bg-slate-50 space-y-2">
-                  <p className="text-xs uppercase text-slate-500">{idea.type}</p>
-                  <div className="text-sm font-semibold text-slate-900">{idea.idea}</div>
-                  <div className="text-xs text-slate-500">Platform: {idea.platform}</div>
+                <div key={idx} className="p-3 rounded border border-border bg-muted space-y-2">
+                  <p className="text-xs uppercase text-muted-foreground">{idea.type}</p>
+                  <div className="text-sm font-semibold text-foreground">{idea.idea}</div>
+                  <div className="text-xs text-muted-foreground">Platform: {idea.platform}</div>
                   <Button
                     variant="secondary"
                     className="w-full justify-center flex items-center text-emerald-700"
@@ -104,7 +104,7 @@ export default function SocialPlannerWeekly() {
           </Card>
 
           <Card className="p-4">
-            <div className="flex items-center gap-2 text-sm text-slate-600 mb-2">
+            <div className="flex items-center gap-2 text-sm text-muted-foreground mb-2">
               <Clock className="h-4 w-4 text-emerald-600" />
               Recommended cadence
             </div>
@@ -119,7 +119,7 @@ export default function SocialPlannerWeekly() {
           </Card>
         </div>
       ) : (
-        <div className="text-sm text-slate-500">Generate a bundle to see this week's ideas.</div>
+        <div className="text-sm text-muted-foreground">Generate a bundle to see this week's ideas.</div>
       )}
     </DashboardShell>
   );

@@ -168,14 +168,14 @@ export default function SystemHealthPage() {
             <div className="flex items-center justify-between">
                 <div>
                     <h1 className="text-2xl font-bold text-white">System Health</h1>
-                    <p className="text-slate-400 mt-1">
+                    <p className="text-muted-foreground mt-1">
                         Real-time status of platform services
                     </p>
                 </div>
                 <button
                     onClick={runHealthChecks}
                     disabled={loading}
-                    className="inline-flex items-center gap-2 px-4 py-2 bg-slate-800 text-slate-300 border border-slate-700 rounded-lg hover:bg-slate-700 disabled:opacity-50 transition-colors"
+                    className="inline-flex items-center gap-2 px-4 py-2 bg-muted text-muted-foreground border border-border rounded-lg hover:bg-muted disabled:opacity-50 transition-colors"
                 >
                     <RefreshCw className={`h-4 w-4 ${loading ? "animate-spin" : ""}`} />
                     {loading ? "Checking..." : "Refresh"}
@@ -193,14 +193,14 @@ export default function SystemHealthPage() {
                                 {overallStatus === "degraded" && "Partial System Degradation"}
                                 {overallStatus === "down" && "System Outage Detected"}
                             </div>
-                            <div className="text-sm text-slate-400">
+                            <div className="text-sm text-muted-foreground">
                                 {checks.filter((c) => c.status === "healthy").length} of {checks.length} services healthy
                             </div>
                         </div>
                     </div>
                     <div className="text-right">
                         <div className="text-2xl font-bold text-white">{avgLatency}ms</div>
-                        <div className="text-sm text-slate-400">Avg Response</div>
+                        <div className="text-sm text-muted-foreground">Avg Response</div>
                     </div>
                 </div>
             </div>
@@ -210,22 +210,22 @@ export default function SystemHealthPage() {
                 {checks.map((check) => (
                     <div
                         key={check.name}
-                        className="bg-slate-800 rounded-lg border border-slate-700 p-4"
+                        className="bg-muted rounded-lg border border-border p-4"
                     >
                         <div className="flex items-start justify-between">
                             <div className="flex items-center gap-3">
-                                {check.name === "API Server" && <Server className="h-5 w-5 text-slate-400" />}
-                                {check.name === "Database" && <Database className="h-5 w-5 text-slate-400" />}
-                                {check.name === "Auth Service" && <Activity className="h-5 w-5 text-slate-400" />}
-                                {check.name === "Local Storage" && <Clock className="h-5 w-5 text-slate-400" />}
+                                {check.name === "API Server" && <Server className="h-5 w-5 text-muted-foreground" />}
+                                {check.name === "Database" && <Database className="h-5 w-5 text-muted-foreground" />}
+                                {check.name === "Auth Service" && <Activity className="h-5 w-5 text-muted-foreground" />}
+                                {check.name === "Local Storage" && <Clock className="h-5 w-5 text-muted-foreground" />}
                                 <div>
                                     <div className="font-medium text-white">{check.name}</div>
-                                    <div className="text-sm text-slate-400">{check.message}</div>
+                                    <div className="text-sm text-muted-foreground">{check.message}</div>
                                 </div>
                             </div>
                             <StatusIcon status={check.status} />
                         </div>
-                        <div className="mt-3 flex items-center justify-between text-xs text-slate-500">
+                        <div className="mt-3 flex items-center justify-between text-xs text-muted-foreground">
                             <span>Last checked: {check.lastChecked.toLocaleTimeString()}</span>
                             {check.latency && <span>{check.latency}ms</span>}
                         </div>
@@ -234,7 +234,7 @@ export default function SystemHealthPage() {
             </div>
 
             {lastRefresh && (
-                <div className="text-sm text-slate-500 text-center">
+                <div className="text-sm text-muted-foreground text-center">
                     Last refreshed: {lastRefresh.toLocaleTimeString()} • Auto-refreshes every 30s
                 </div>
             )}

@@ -75,12 +75,12 @@ export function ProductList({ campgroundId }: ProductListProps) {
     const categories = categoriesQuery.data || [];
     const products = productsQuery.data || [];
 
-    if (productsQuery.isLoading) return <div className="text-slate-500">Loading products...</div>;
+    if (productsQuery.isLoading) return <div className="text-muted-foreground">Loading products...</div>;
 
     return (
         <div className="space-y-4">
             <div className="flex justify-between items-center">
-                <h3 className="text-lg font-medium text-slate-900">Products</h3>
+                <h3 className="text-lg font-medium text-foreground">Products</h3>
                 <div className="flex items-center gap-3">
                     <ProductImportExport campgroundId={campgroundId} />
                     <Button onClick={handleCreate}>Add Product</Button>
@@ -91,28 +91,28 @@ export function ProductList({ campgroundId }: ProductListProps) {
                 {products.map((product) => {
                     const category = categories.find((c) => c.id === product.categoryId);
                     return (
-                        <div key={product.id} className="rounded-lg border border-slate-200 bg-white p-4 space-y-3">
+                        <div key={product.id} className="rounded-lg border border-border bg-card p-4 space-y-3">
                             <div className="flex justify-between items-start">
                                 <div className="space-y-1">
-                                    <div className="font-medium text-slate-900">{product.name}</div>
-                                    <div className="text-sm text-slate-500">
+                                    <div className="font-medium text-foreground">{product.name}</div>
+                                    <div className="text-sm text-muted-foreground">
                                         ${(product.priceCents / 100).toFixed(2)}
                                     </div>
                                 </div>
                                 {!product.isActive && (
-                                    <span className="rounded-full bg-slate-100 px-2 py-1 text-xs font-medium text-slate-600">
+                                    <span className="rounded-full bg-muted px-2 py-1 text-xs font-medium text-muted-foreground">
                                         Inactive
                                     </span>
                                 )}
                             </div>
 
                             {product.imageUrl && (
-                                <div className="aspect-video w-full overflow-hidden rounded-md bg-slate-100">
+                                <div className="aspect-video w-full overflow-hidden rounded-md bg-muted">
                                     <img src={product.imageUrl} alt={product.name} className="h-full w-full object-cover" />
                                 </div>
                             )}
 
-                            <div className="text-sm text-slate-600 space-y-1">
+                            <div className="text-sm text-muted-foreground space-y-1">
                                 {category && <div>Category: {category.name}</div>}
                                 <div>Stock: {product.trackInventory ? product.stockQty : "Unlimited"}</div>
                                 {product.sku && <div>SKU: {product.sku}</div>}

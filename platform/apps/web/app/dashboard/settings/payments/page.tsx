@@ -178,7 +178,7 @@ export default function PaymentsSettingsPage() {
         <TabsList className="grid w-full grid-cols-3 h-auto p-1">
           <TabsTrigger
             value="gateway"
-            className="flex items-center gap-2 py-2.5 data-[state=active]:bg-white data-[state=active]:shadow-sm"
+            className="flex items-center gap-2 py-2.5 data-[state=active]:bg-card data-[state=active]:shadow-sm"
           >
             <CreditCard className="w-4 h-4" aria-hidden="true" />
             <span className="hidden sm:inline">Gateway & Fees</span>
@@ -186,7 +186,7 @@ export default function PaymentsSettingsPage() {
           </TabsTrigger>
           <TabsTrigger
             value="methods"
-            className="flex items-center gap-2 py-2.5 data-[state=active]:bg-white data-[state=active]:shadow-sm"
+            className="flex items-center gap-2 py-2.5 data-[state=active]:bg-card data-[state=active]:shadow-sm"
           >
             <Smartphone className="w-4 h-4" aria-hidden="true" />
             <span className="hidden sm:inline">Payment Methods</span>
@@ -194,7 +194,7 @@ export default function PaymentsSettingsPage() {
           </TabsTrigger>
           <TabsTrigger
             value="terminals"
-            className="flex items-center gap-2 py-2.5 data-[state=active]:bg-white data-[state=active]:shadow-sm"
+            className="flex items-center gap-2 py-2.5 data-[state=active]:bg-card data-[state=active]:shadow-sm"
           >
             <Settings2 className="w-4 h-4" aria-hidden="true" />
             <span>Terminals</span>

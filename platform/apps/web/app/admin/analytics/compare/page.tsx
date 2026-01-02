@@ -200,7 +200,7 @@ function getCategoryColor(category: string): string {
     case "satisfaction":
       return "text-amber-400";
     default:
-      return "text-slate-400";
+      return "text-muted-foreground";
   }
 }
 
@@ -248,27 +248,27 @@ export default function ComparisonPage() {
       <div className="flex items-center justify-between">
         <div>
           <div className="flex items-center gap-3">
-            <h1 className="text-2xl font-bold text-slate-900 dark:text-white">Period Comparison</h1>
+            <h1 className="text-2xl font-bold text-foreground dark:text-white">Period Comparison</h1>
             {isUsingMockData && (
               <Badge className="bg-amber-100 dark:bg-amber-600/20 text-amber-700 dark:text-amber-400 border border-amber-300 dark:border-amber-600/50">
                 Demo Data
               </Badge>
             )}
           </div>
-          <p className="text-slate-600 dark:text-slate-400 mt-1">Compare performance across different time periods</p>
+          <p className="text-muted-foreground dark:text-muted-foreground mt-1">Compare performance across different time periods</p>
         </div>
       </div>
 
       {/* Period Selectors */}
-      <Card className="bg-white dark:bg-slate-800/50 border-slate-200 dark:border-slate-700">
+      <Card className="bg-card dark:bg-muted/50 border-border dark:border-border">
         <CardContent className="p-6">
           <div className="flex items-center gap-6">
             <div className="flex-1">
-              <label className="block text-sm font-medium text-slate-600 dark:text-slate-400 mb-2">Period 1 (Baseline)</label>
+              <label className="block text-sm font-medium text-muted-foreground dark:text-muted-foreground mb-2">Period 1 (Baseline)</label>
               <select
                 value={period1}
                 onChange={(e) => setPeriod1(e.target.value)}
-                className="w-full bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-lg px-4 py-2 text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full bg-card dark:bg-muted border border-border dark:border-border rounded-lg px-4 py-2 text-foreground dark:text-foreground focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               >
                 {periodOptions.map((opt) => (
                   <option key={opt.value} value={opt.value}>
@@ -278,14 +278,14 @@ export default function ComparisonPage() {
               </select>
             </div>
             <div className="pt-6">
-              <ArrowRight className="h-6 w-6 text-slate-400 dark:text-slate-500" />
+              <ArrowRight className="h-6 w-6 text-muted-foreground dark:text-muted-foreground" />
             </div>
             <div className="flex-1">
-              <label className="block text-sm font-medium text-slate-600 dark:text-slate-400 mb-2">Period 2 (Compare To)</label>
+              <label className="block text-sm font-medium text-muted-foreground dark:text-muted-foreground mb-2">Period 2 (Compare To)</label>
               <select
                 value={period2}
                 onChange={(e) => setPeriod2(e.target.value)}
-                className="w-full bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-lg px-4 py-2 text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full bg-card dark:bg-muted border border-border dark:border-border rounded-lg px-4 py-2 text-foreground dark:text-foreground focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               >
                 {periodOptions.map((opt) => (
                   <option key={opt.value} value={opt.value}>
@@ -306,7 +306,7 @@ export default function ComparisonPage() {
               <TrendingUp className="h-8 w-8 text-green-500 dark:text-green-400" />
               <div>
                 <p className="text-2xl font-bold text-green-600 dark:text-green-400">{improvements}</p>
-                <p className="text-sm text-slate-600 dark:text-slate-400">Metrics Improved</p>
+                <p className="text-sm text-muted-foreground dark:text-muted-foreground">Metrics Improved</p>
               </div>
             </div>
           </CardContent>
@@ -317,18 +317,18 @@ export default function ComparisonPage() {
               <TrendingDown className="h-8 w-8 text-red-500 dark:text-red-400" />
               <div>
                 <p className="text-2xl font-bold text-red-600 dark:text-red-400">{declines}</p>
-                <p className="text-sm text-slate-600 dark:text-slate-400">Metrics Declined</p>
+                <p className="text-sm text-muted-foreground dark:text-muted-foreground">Metrics Declined</p>
               </div>
             </div>
           </CardContent>
         </Card>
-        <Card className="bg-slate-100 dark:bg-slate-700/50 border-slate-200 dark:border-slate-600">
+        <Card className="bg-muted dark:bg-muted/50 border-border dark:border-border">
           <CardContent className="p-4">
             <div className="flex items-center gap-3">
-              <Minus className="h-8 w-8 text-slate-400" />
+              <Minus className="h-8 w-8 text-muted-foreground" />
               <div>
-                <p className="text-2xl font-bold text-slate-700 dark:text-slate-300">{data.length - improvements - declines}</p>
-                <p className="text-sm text-slate-600 dark:text-slate-400">Unchanged</p>
+                <p className="text-2xl font-bold text-foreground dark:text-muted-foreground">{data.length - improvements - declines}</p>
+                <p className="text-sm text-muted-foreground dark:text-muted-foreground">Unchanged</p>
               </div>
             </div>
           </CardContent>
@@ -357,9 +357,9 @@ export default function ComparisonPage() {
 
       {/* Comparison Tables by Category */}
       {Object.entries(groupedData).map(([category, metrics]) => (
-        <Card key={category} className="bg-white dark:bg-slate-800/50 border-slate-200 dark:border-slate-700">
+        <Card key={category} className="bg-card dark:bg-muted/50 border-border dark:border-border">
           <CardHeader>
-            <CardTitle className="text-lg text-slate-900 dark:text-white flex items-center gap-2">
+            <CardTitle className="text-lg text-foreground dark:text-white flex items-center gap-2">
               <span className={getCategoryColor(category)}>{getCategoryIcon(category)}</span>
               <span className="capitalize">{category}</span>
             </CardTitle>
@@ -368,12 +368,12 @@ export default function ComparisonPage() {
             <div className="overflow-x-auto">
               <table className="w-full">
                 <thead>
-                  <tr className="border-b border-slate-200 dark:border-slate-700">
-                    <th className="text-left py-3 px-4 text-sm font-medium text-slate-600 dark:text-slate-400">Metric</th>
-                    <th className="text-right py-3 px-4 text-sm font-medium text-slate-600 dark:text-slate-400">{period1Label}</th>
-                    <th className="text-right py-3 px-4 text-sm font-medium text-slate-600 dark:text-slate-400">{period2Label}</th>
-                    <th className="text-right py-3 px-4 text-sm font-medium text-slate-600 dark:text-slate-400">Change</th>
-                    <th className="text-right py-3 px-4 text-sm font-medium text-slate-600 dark:text-slate-400">% Change</th>
+                  <tr className="border-b border-border dark:border-border">
+                    <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground dark:text-muted-foreground">Metric</th>
+                    <th className="text-right py-3 px-4 text-sm font-medium text-muted-foreground dark:text-muted-foreground">{period1Label}</th>
+                    <th className="text-right py-3 px-4 text-sm font-medium text-muted-foreground dark:text-muted-foreground">{period2Label}</th>
+                    <th className="text-right py-3 px-4 text-sm font-medium text-muted-foreground dark:text-muted-foreground">Change</th>
+                    <th className="text-right py-3 px-4 text-sm font-medium text-muted-foreground dark:text-muted-foreground">% Change</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -383,15 +383,15 @@ export default function ComparisonPage() {
                     const isNegative = isPositiveGood ? metric.changePercent < 0 : metric.changePercent > 0;
 
                     return (
-                      <tr key={metric.label} className={idx % 2 === 0 ? "bg-slate-50 dark:bg-slate-800/30" : ""}>
-                        <td className="py-3 px-4 text-sm text-slate-900 dark:text-white">{metric.label}</td>
-                        <td className="py-3 px-4 text-sm text-right text-slate-700 dark:text-slate-300">
+                      <tr key={metric.label} className={idx % 2 === 0 ? "bg-muted dark:bg-muted/30" : ""}>
+                        <td className="py-3 px-4 text-sm text-foreground dark:text-white">{metric.label}</td>
+                        <td className="py-3 px-4 text-sm text-right text-foreground dark:text-muted-foreground">
                           {formatValue(metric.period1Value, metric.format)}
                         </td>
-                        <td className="py-3 px-4 text-sm text-right text-slate-700 dark:text-slate-300">
+                        <td className="py-3 px-4 text-sm text-right text-foreground dark:text-muted-foreground">
                           {formatValue(metric.period2Value, metric.format)}
                         </td>
-                        <td className={`py-3 px-4 text-sm text-right font-medium ${isPositive ? "text-green-600 dark:text-green-400" : isNegative ? "text-red-600 dark:text-red-400" : "text-slate-500 dark:text-slate-400"}`}>
+                        <td className={`py-3 px-4 text-sm text-right font-medium ${isPositive ? "text-green-600 dark:text-green-400" : isNegative ? "text-red-600 dark:text-red-400" : "text-muted-foreground dark:text-muted-foreground"}`}>
                           {metric.change > 0 ? "+" : ""}
                           {metric.format === "currency"
                             ? `$${Math.abs(metric.change).toLocaleString()}`
@@ -406,9 +406,9 @@ export default function ComparisonPage() {
                             ) : isNegative ? (
                               <TrendingDown className="h-4 w-4 text-red-600 dark:text-red-400" />
                             ) : (
-                              <Minus className="h-4 w-4 text-slate-400" />
+                              <Minus className="h-4 w-4 text-muted-foreground" />
                             )}
-                            <span className={isPositive ? "text-green-600 dark:text-green-400" : isNegative ? "text-red-600 dark:text-red-400" : "text-slate-500 dark:text-slate-400"}>
+                            <span className={isPositive ? "text-green-600 dark:text-green-400" : isNegative ? "text-red-600 dark:text-red-400" : "text-muted-foreground dark:text-muted-foreground"}>
                               {metric.changePercent > 0 ? "+" : ""}{metric.changePercent.toFixed(1)}%
                             </span>
                           </div>
@@ -426,11 +426,11 @@ export default function ComparisonPage() {
       {/* Insights */}
       <Card className="bg-blue-50 dark:bg-blue-500/10 border-blue-200 dark:border-blue-500/30">
         <CardHeader>
-          <CardTitle className="text-lg text-slate-900 dark:text-white">Key Insights</CardTitle>
+          <CardTitle className="text-lg text-foreground dark:text-white">Key Insights</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="p-4 bg-white dark:bg-slate-800/50 rounded-lg border border-slate-200 dark:border-transparent">
+            <div className="p-4 bg-card dark:bg-muted/50 rounded-lg border border-border dark:border-transparent">
               <p className="text-sm text-blue-800 dark:text-blue-300">
                 <strong>Revenue Growth:</strong> Total revenue increased by{" "}
                 {data.find((m) => m.label === "Total Revenue")?.changePercent.toFixed(1)}%, driven by both
@@ -438,7 +438,7 @@ export default function ComparisonPage() {
                 more bookings (+{data.find((m) => m.label === "Total Reservations")?.changePercent.toFixed(1)}%).
               </p>
             </div>
-            <div className="p-4 bg-white dark:bg-slate-800/50 rounded-lg border border-slate-200 dark:border-transparent">
+            <div className="p-4 bg-card dark:bg-muted/50 rounded-lg border border-border dark:border-transparent">
               <p className="text-sm text-blue-800 dark:text-blue-300">
                 <strong>Guest Loyalty:</strong> Repeat guest rate improved by{" "}
                 {data.find((m) => m.label === "Repeat Guest Rate")?.changePercent.toFixed(1)}% while NPS
@@ -446,14 +446,14 @@ export default function ComparisonPage() {
                 guest satisfaction.
               </p>
             </div>
-            <div className="p-4 bg-white dark:bg-slate-800/50 rounded-lg border border-slate-200 dark:border-transparent">
+            <div className="p-4 bg-card dark:bg-muted/50 rounded-lg border border-border dark:border-transparent">
               <p className="text-sm text-blue-800 dark:text-blue-300">
                 <strong>Operational Efficiency:</strong> Cancellation rate dropped by{" "}
                 {Math.abs(data.find((m) => m.label === "Cancellation Rate")?.changePercent || 0).toFixed(1)}%,
                 reducing lost revenue and improving planning.
               </p>
             </div>
-            <div className="p-4 bg-white dark:bg-slate-800/50 rounded-lg border border-slate-200 dark:border-transparent">
+            <div className="p-4 bg-card dark:bg-muted/50 rounded-lg border border-border dark:border-transparent">
               <p className="text-sm text-blue-800 dark:text-blue-300">
                 <strong>Booking Behavior:</strong> Average lead time increased to{" "}
                 {data.find((m) => m.label === "Avg Lead Time")?.period1Value.toFixed(1)} days, allowing for

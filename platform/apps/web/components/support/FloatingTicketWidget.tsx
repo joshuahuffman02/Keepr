@@ -249,7 +249,7 @@ export function FloatingTicketWidget() {
               <div>
                 <p className="text-xs font-semibold uppercase tracking-wide text-emerald-700">Fast lane</p>
                 <DialogTitle className="text-xl">Report, ask, or request</DialogTitle>
-                <p className="text-sm text-slate-600">We auto-capture URL, device, and page context for you.</p>
+                <p className="text-sm text-muted-foreground">We auto-capture URL, device, and page context for you.</p>
               </div>
               <div className="rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-700 border border-emerald-100">
                 {form.category === "issue" ? "Bug" : form.category === "feature" ? "Feature" : form.category === "question" ? "Question" : "Other"}
@@ -258,7 +258,7 @@ export function FloatingTicketWidget() {
           </DialogHeader>
           <div className="space-y-3">
             <div className="space-y-1">
-              <label className="text-sm font-medium text-slate-900">Type</label>
+              <label className="text-sm font-medium text-foreground">Type</label>
               <Select
                 value={form.category}
                 onValueChange={(val: TicketForm["category"]) => setForm((prev) => ({ ...prev, category: val }))}
@@ -273,7 +273,7 @@ export function FloatingTicketWidget() {
                   <SelectItem value="other">Other</SelectItem>
                 </SelectContent>
               </Select>
-              <div className="flex flex-wrap gap-2 text-xs text-slate-600">
+              <div className="flex flex-wrap gap-2 text-xs text-muted-foreground">
                 {[
                   { id: "issue", label: "Issue" },
                   { id: "question", label: "Question" },
@@ -285,7 +285,7 @@ export function FloatingTicketWidget() {
                     type="button"
                     onClick={() => setForm((prev) => ({ ...prev, category: opt.id as TicketForm["category"] }))}
                     className={`rounded-full border px-2 py-1 ${
-                      form.category === opt.id ? "border-emerald-500 bg-emerald-50 text-emerald-700" : "border-slate-200 text-slate-700 hover:bg-slate-50"
+                      form.category === opt.id ? "border-emerald-500 bg-emerald-50 text-emerald-700" : "border-border text-foreground hover:bg-muted"
                     }`}
                   >
                     {opt.label}
@@ -294,7 +294,7 @@ export function FloatingTicketWidget() {
               </div>
             </div>
             <div className="space-y-1">
-              <label className="text-sm font-medium text-slate-900">What happened? (title)</label>
+              <label className="text-sm font-medium text-foreground">What happened? (title)</label>
               <Input
                 placeholder="e.g., “Filter drawer won't open on mobile”"
                 value={form.title}
@@ -302,8 +302,8 @@ export function FloatingTicketWidget() {
               />
             </div>
             <div className="space-y-1">
-              <label className="text-sm font-medium text-slate-900">
-                Steps / details <span className="text-slate-500 text-xs">(optional)</span>
+              <label className="text-sm font-medium text-foreground">
+                Steps / details <span className="text-muted-foreground text-xs">(optional)</span>
               </label>
               <Textarea
                 placeholder="Steps to reproduce, expected vs actual, error text, or your idea. Add any quick notes."
@@ -311,11 +311,11 @@ export function FloatingTicketWidget() {
                 value={form.notes}
                 onChange={(e) => setForm((prev) => ({ ...prev, notes: e.target.value }))}
               />
-              <div className="text-[11px] text-slate-500">
+              <div className="text-[11px] text-muted-foreground">
                 We’ll auto-attach: URL, page title, device, selection, viewport. Paste links or repro GIFs if helpful.
               </div>
             </div>
-            <div className="grid grid-cols-1 gap-2 text-xs text-slate-600">
+            <div className="grid grid-cols-1 gap-2 text-xs text-muted-foreground">
               {form.url && (
                 <div className="break-all">
                   <span className="font-semibold">URL:</span> {form.url}
@@ -340,7 +340,7 @@ export function FloatingTicketWidget() {
           </div>
           <DialogFooter>
             <div className="flex w-full justify-between items-center gap-3">
-              <div className="text-xs text-slate-500">Your report keeps working—even if you close this page.</div>
+              <div className="text-xs text-muted-foreground">Your report keeps working—even if you close this page.</div>
               <div className="flex gap-2">
                 <Button variant="ghost" onClick={() => setOpen(false)} disabled={isSubmitting}>
                   Cancel

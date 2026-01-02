@@ -199,10 +199,10 @@ export function QuickFacts({
       {facts.map((fact, index) => (
         <div
           key={index}
-          className="flex items-center gap-2 text-sm text-slate-600 bg-slate-50 px-3 py-2 rounded-full"
+          className="flex items-center gap-2 text-sm text-muted-foreground bg-muted px-3 py-2 rounded-full"
           role="listitem"
         >
-          <span className="text-slate-400" aria-hidden="true">
+          <span className="text-muted-foreground" aria-hidden="true">
             {fact.icon}
           </span>
           <span>{fact.label}</span>
@@ -275,7 +275,7 @@ export function QuickFactsCompact({
       {facts.map((fact, index) => (
         <div
           key={index}
-          className="flex items-center gap-1 text-xs text-slate-500"
+          className="flex items-center gap-1 text-xs text-muted-foreground"
           role="listitem"
         >
           <span aria-hidden="true">{fact.icon}</span>

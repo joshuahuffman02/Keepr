@@ -128,7 +128,7 @@ const DialogContent = React.forwardRef<
                     ;(contentRef as React.MutableRefObject<HTMLDivElement | null>).current = node
                 }}
                 className={cn(
-                    "z-50 grid w-full max-w-lg gap-4 border border-slate-200 bg-white p-6 shadow-lg duration-200 sm:rounded-lg md:w-full",
+                    "z-50 grid w-full max-w-lg gap-4 border border-border bg-popover p-6 text-popover-foreground shadow-lg duration-200 sm:rounded-lg md:w-full",
                     className
                 )}
                 role="dialog"
@@ -199,7 +199,7 @@ const DialogDescription = React.forwardRef<
 >(({ className, ...props }, ref) => (
     <p
         ref={ref}
-        className={cn("text-sm text-slate-500", className)}
+        className={cn("text-sm text-muted-foreground", className)}
         id="dialog-description"
         {...props}
     />
@@ -221,4 +221,3 @@ const DialogFooter = ({
 DialogFooter.displayName = "DialogFooter"
 
 export { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogDescription, DialogFooter }
-

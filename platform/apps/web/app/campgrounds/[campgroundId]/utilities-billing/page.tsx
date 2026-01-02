@@ -270,19 +270,19 @@ export default function UtilitiesBillingPage() {
       <div className="p-6 space-y-6">
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div>
-            <h1 className="text-2xl font-bold text-slate-900">Utilities & Billing</h1>
-            <p className="text-sm text-slate-600">
+            <h1 className="text-2xl font-bold text-foreground">Utilities & Billing</h1>
+            <p className="text-sm text-muted-foreground">
               Metered sites, billing cadence, and quick billing from the latest reads.
             </p>
           </div>
-          <div className="flex flex-wrap items-center gap-2 text-sm text-slate-600">
-            <span className="rounded border border-slate-200 px-2 py-1 bg-white">
+          <div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
+            <span className="rounded border border-border px-2 py-1 bg-card">
               Total meters: <strong>{meters.length}</strong>
             </span>
-            <span className="rounded border border-slate-200 px-2 py-1 bg-white">
+            <span className="rounded border border-border px-2 py-1 bg-card">
               With recent reads: <strong>{lastReadsQuery.data ? lastReadsQuery.data.size : 0}</strong>
             </span>
-            <span className="rounded border border-slate-200 px-2 py-1 bg-white">
+            <span className="rounded border border-border px-2 py-1 bg-card">
               Power: <strong>{totalByType.power ?? 0}</strong> · Water: <strong>{totalByType.water ?? 0}</strong> · Sewer:{" "}
               <strong>{totalByType.sewer ?? 0}</strong>
             </span>
@@ -303,18 +303,18 @@ export default function UtilitiesBillingPage() {
         <Card className="p-4 space-y-4">
           <div className="flex items-center justify-between">
             <div>
-              <h2 className="text-lg font-semibold text-slate-900">Site class defaults & auto meters</h2>
-              <p className="text-sm text-slate-600">
+              <h2 className="text-lg font-semibold text-foreground">Site class defaults & auto meters</h2>
+              <p className="text-sm text-muted-foreground">
                 Mark a site class as metered, set defaults, and auto-create meters for its sites.
               </p>
             </div>
-            {siteClassesQuery.isFetching && <span className="text-xs text-slate-500">Refreshing…</span>}
+            {siteClassesQuery.isFetching && <span className="text-xs text-muted-foreground">Refreshing…</span>}
           </div>
           <div className="grid gap-4 md:grid-cols-3">
             <div className="space-y-2">
-              <Label className="text-xs text-slate-600">Site class</Label>
+              <Label className="text-xs text-muted-foreground">Site class</Label>
               <select
-                className="w-full rounded border border-slate-200 px-3 py-2 text-sm"
+                className="w-full rounded border border-border px-3 py-2 text-sm"
                 value={selectedClassId}
                 onChange={(e) => selectClass(e.target.value)}
               >
@@ -327,9 +327,9 @@ export default function UtilitiesBillingPage() {
               </select>
             </div>
             <div className="space-y-2">
-              <Label className="text-xs text-slate-600">Meter type</Label>
+              <Label className="text-xs text-muted-foreground">Meter type</Label>
               <select
-                className="w-full rounded border border-slate-200 px-3 py-2 text-sm"
+                className="w-full rounded border border-border px-3 py-2 text-sm"
                 value={classDraft.meteredType ?? ""}
                 onChange={(e) => setClassDraft((d) => ({ ...d, meteredType: e.target.value }))}
                 disabled={!selectedClassId}
@@ -352,9 +352,9 @@ export default function UtilitiesBillingPage() {
 
           <div className="grid gap-4 md:grid-cols-4">
             <div className="space-y-2">
-              <Label className="text-xs text-slate-600">Billing mode</Label>
+              <Label className="text-xs text-muted-foreground">Billing mode</Label>
               <select
-                className="w-full rounded border border-slate-200 px-3 py-2 text-sm"
+                className="w-full rounded border border-border px-3 py-2 text-sm"
                 value={classDraft.meteredBillingMode ?? "cycle"}
                 onChange={(e) => setClassDraft((d) => ({ ...d, meteredBillingMode: e.target.value }))}
                 disabled={!selectedClassId}
@@ -367,9 +367,9 @@ export default function UtilitiesBillingPage() {
               </select>
             </div>
             <div className="space-y-2">
-              <Label className="text-xs text-slate-600">Bill to</Label>
+              <Label className="text-xs text-muted-foreground">Bill to</Label>
               <select
-                className="w-full rounded border border-slate-200 px-3 py-2 text-sm"
+                className="w-full rounded border border-border px-3 py-2 text-sm"
                 value={classDraft.meteredBillTo ?? "reservation"}
                 onChange={(e) => setClassDraft((d) => ({ ...d, meteredBillTo: e.target.value }))}
                 disabled={!selectedClassId}
@@ -379,20 +379,20 @@ export default function UtilitiesBillingPage() {
               </select>
             </div>
             <div className="space-y-2">
-              <Label className="text-xs text-slate-600">Usage multiplier</Label>
+              <Label className="text-xs text-muted-foreground">Usage multiplier</Label>
               <input
                 type="number"
                 step="0.01"
-                className="w-full rounded border border-slate-200 px-3 py-2 text-sm"
+                className="w-full rounded border border-border px-3 py-2 text-sm"
                 value={classDraft.meteredMultiplier ?? 1}
                 onChange={(e) => setClassDraft((d) => ({ ...d, meteredMultiplier: Number(e.target.value) }))}
                 disabled={!selectedClassId}
               />
             </div>
             <div className="space-y-2">
-              <Label className="text-xs text-slate-600">Rate plan</Label>
+              <Label className="text-xs text-muted-foreground">Rate plan</Label>
               <select
-                className="w-full rounded border border-slate-200 px-3 py-2 text-sm"
+                className="w-full rounded border border-border px-3 py-2 text-sm"
                 value={classDraft.meteredRatePlanId ?? ""}
                 onChange={(e) => setClassDraft((d) => ({ ...d, meteredRatePlanId: e.target.value || undefined }))}
                 disabled={!selectedClassId}
@@ -439,9 +439,9 @@ export default function UtilitiesBillingPage() {
         <Card className="p-4">
           <div className="flex flex-wrap items-center gap-3">
             <div className="flex flex-col text-sm">
-              <Label className="text-xs text-slate-600">Meter type</Label>
+              <Label className="text-xs text-muted-foreground">Meter type</Label>
               <select
-                className="rounded border border-slate-200 px-3 py-2 text-sm"
+                className="rounded border border-border px-3 py-2 text-sm"
                 value={filterType}
                 onChange={(e) => setFilterType(e.target.value)}
               >
@@ -452,22 +452,22 @@ export default function UtilitiesBillingPage() {
               </select>
             </div>
             <div className="flex flex-col text-sm">
-              <Label className="text-xs text-slate-600">Search site or meter</Label>
+              <Label className="text-xs text-muted-foreground">Search site or meter</Label>
               <input
-                className="rounded border border-slate-200 px-3 py-2 text-sm"
+                className="rounded border border-border px-3 py-2 text-sm"
                 placeholder="e.g. SITE-12 or meter id"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
               />
             </div>
-            {metersQuery.isFetching && <span className="text-xs text-slate-500">Refreshing…</span>}
+            {metersQuery.isFetching && <span className="text-xs text-muted-foreground">Refreshing…</span>}
           </div>
         </Card>
 
         {message && <div className="rounded border border-emerald-100 bg-emerald-50 px-4 py-2 text-sm text-emerald-900">{message}</div>}
 
         <Card className="p-0 overflow-hidden">
-          <div className="grid grid-cols-13 bg-slate-50 px-4 py-3 text-xs font-semibold uppercase text-slate-600">
+          <div className="grid grid-cols-13 bg-muted px-4 py-3 text-xs font-semibold uppercase text-muted-foreground">
             <div className="col-span-2">Site / Meter</div>
             <div className="col-span-1">Type</div>
             <div className="col-span-2">Billing mode</div>
@@ -501,9 +501,9 @@ export default function UtilitiesBillingPage() {
               return (
                 <div key={m.id} className="grid grid-cols-13 px-4 py-3 text-sm items-center">
                   <div className="col-span-2">
-                    <div className="font-semibold text-slate-900">{m.siteId}</div>
-                    <div className="text-xs text-slate-500 truncate">{m.id}</div>
-                    <div className="mt-1 flex items-center gap-2 text-xs text-slate-500">
+                    <div className="font-semibold text-foreground">{m.siteId}</div>
+                    <div className="text-xs text-muted-foreground truncate">{m.id}</div>
+                    <div className="mt-1 flex items-center gap-2 text-xs text-muted-foreground">
                       <Switch
                         checked={active}
                         onCheckedChange={(val) => applyDraft(m.id, { active: val })}
@@ -513,11 +513,11 @@ export default function UtilitiesBillingPage() {
                     </div>
                   </div>
 
-                  <div className="col-span-1 capitalize text-slate-700">{m.type}</div>
+                  <div className="col-span-1 capitalize text-foreground">{m.type}</div>
 
                   <div className="col-span-2">
                     <select
-                      className="w-full rounded border border-slate-200 px-2 py-1 text-sm"
+                      className="w-full rounded border border-border px-2 py-1 text-sm"
                       value={billingMode}
                       onChange={(e) => applyDraft(m.id, { billingMode: e.target.value })}
                     >
@@ -527,7 +527,7 @@ export default function UtilitiesBillingPage() {
                         </option>
                       ))}
                     </select>
-                    <div className="mt-1 flex items-center gap-2 text-xs text-slate-500">
+                    <div className="mt-1 flex items-center gap-2 text-xs text-muted-foreground">
                       <Switch
                         checked={autoEmail}
                         onCheckedChange={(val) => applyDraft(m.id, { autoEmail: val })}
@@ -539,7 +539,7 @@ export default function UtilitiesBillingPage() {
 
                   <div className="col-span-1">
                     <select
-                      className="w-full rounded border border-slate-200 px-2 py-1 text-sm"
+                      className="w-full rounded border border-border px-2 py-1 text-sm"
                       value={billTo}
                       onChange={(e) => applyDraft(m.id, { billTo: e.target.value })}
                     >
@@ -552,16 +552,16 @@ export default function UtilitiesBillingPage() {
                     <input
                       type="number"
                       step="0.01"
-                      className="w-full rounded border border-slate-200 px-2 py-1 text-right text-sm"
+                      className="w-full rounded border border-border px-2 py-1 text-right text-sm"
                       value={multiplier}
                       onChange={(e) => applyDraft(m.id, { multiplier: Number(e.target.value) })}
                     />
-                    <div className="text-[11px] text-slate-500 mt-1">x usage</div>
+                    <div className="text-[11px] text-muted-foreground mt-1">x usage</div>
                   </div>
 
                   <div className="col-span-1">
                     <select
-                      className="w-full rounded border border-slate-200 px-2 py-1 text-sm"
+                      className="w-full rounded border border-border px-2 py-1 text-sm"
                       value={draft.ratePlanId ?? m.ratePlanId ?? ""}
                       onChange={(e) => applyDraft(m.id, { ratePlanId: e.target.value || null })}
                     >
@@ -574,12 +574,12 @@ export default function UtilitiesBillingPage() {
                     </select>
                   </div>
 
-                  <div className="col-span-1 text-sm text-slate-700">
+                  <div className="col-span-1 text-sm text-foreground">
                     <div className="font-medium">{lastValue}</div>
-                    <div className="text-xs text-slate-500">{lastDate}</div>
+                    <div className="text-xs text-muted-foreground">{lastDate}</div>
                   </div>
 
-                  <div className="col-span-1 text-xs text-slate-600">
+                  <div className="col-span-1 text-xs text-muted-foreground">
                     {(() => {
                       const lastVal = last ? Number(last.readingValue) : undefined;
                       const newVal = parseFloat(readDraft.readingValue || "NaN");
@@ -593,10 +593,10 @@ export default function UtilitiesBillingPage() {
                       if (!preview) return "Preview: —";
                       return (
                         <>
-                          <div className="font-semibold text-slate-800">
+                          <div className="font-semibold text-foreground">
                             Δ {preview.usage.toFixed(2)} → ${preview.amount.toFixed(2)}
                           </div>
-                          <div className="text-[11px] text-slate-500">
+                          <div className="text-[11px] text-muted-foreground">
                             {preview.billedUsage.toFixed(2)} units @ ${preview.rate.toFixed(2)}
                           </div>
                         </>
@@ -607,24 +607,24 @@ export default function UtilitiesBillingPage() {
                   <div className="col-span-2">
                     <div className="flex flex-col gap-1">
                       <input
-                        className="rounded border border-slate-200 px-2 py-1 text-sm"
+                        className="rounded border border-border px-2 py-1 text-sm"
                         placeholder="Reading value"
                         value={readDraft.readingValue}
                         onChange={(e) => applyReadDraft(m.id, { readingValue: e.target.value })}
                       />
                       <input
-                        className="rounded border border-slate-200 px-2 py-1 text-sm"
+                        className="rounded border border-border px-2 py-1 text-sm"
                         type="datetime-local"
                         value={readDraft.readAt}
                         onChange={(e) => applyReadDraft(m.id, { readAt: e.target.value })}
                       />
                       <input
-                        className="rounded border border-slate-200 px-2 py-1 text-sm"
+                        className="rounded border border-border px-2 py-1 text-sm"
                         placeholder="Note (optional)"
                         value={readDraft.note ?? ""}
                         onChange={(e) => applyReadDraft(m.id, { note: e.target.value })}
                       />
-                      <div className="text-[11px] text-slate-500">
+                      <div className="text-[11px] text-muted-foreground">
                         {(() => {
                           const lastVal = last ? Number(last.readingValue) : undefined;
                           const newVal = parseFloat(readDraft.readingValue || "NaN");
@@ -637,7 +637,7 @@ export default function UtilitiesBillingPage() {
                           return `Preview: ${billedUsage.toFixed(2)} units · $${amount.toFixed(2)}`;
                         })()}
                       </div>
-                      <div className="flex items-center gap-2 text-xs text-slate-500">
+                      <div className="flex items-center gap-2 text-xs text-muted-foreground">
                         <Switch
                           checked={readDraft.billNow ?? m.billingMode === "per_reading"}
                           onCheckedChange={(val) => applyReadDraft(m.id, { billNow: val })}
@@ -680,9 +680,9 @@ export default function UtilitiesBillingPage() {
             })}
 
             {filteredMeters.length === 0 && !metersQuery.isLoading && (
-              <div className="px-4 py-6 text-sm text-slate-600">No meters match your filters.</div>
+              <div className="px-4 py-6 text-sm text-muted-foreground">No meters match your filters.</div>
             )}
-            {metersQuery.isLoading && <div className="px-4 py-6 text-sm text-slate-600">Loading meters...</div>}
+            {metersQuery.isLoading && <div className="px-4 py-6 text-sm text-muted-foreground">Loading meters...</div>}
           </div>
         </Card>
       </div>

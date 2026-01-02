@@ -120,7 +120,7 @@ export default function SocialPlannerCalendar() {
           <Link href="/social-planner" className="text-sm text-emerald-700 hover:text-emerald-600">
             ← Back to Social Planner
           </Link>
-          <p className="text-slate-600">Select a campground to use the Social Media Planner.</p>
+          <p className="text-muted-foreground">Select a campground to use the Social Media Planner.</p>
         </div>
       </DashboardShell>
     );
@@ -134,8 +134,8 @@ export default function SocialPlannerCalendar() {
       <div className="flex items-center justify-between mb-6">
         <div>
           <p className="text-xs uppercase tracking-wide text-emerald-600 font-semibold">Social Media Planner</p>
-          <h1 className="text-2xl font-bold text-slate-900">Content Calendar</h1>
-          <p className="text-slate-600">Month, week, and list views with parking lot and quick slots.</p>
+          <h1 className="text-2xl font-bold text-foreground">Content Calendar</h1>
+          <p className="text-muted-foreground">Month, week, and list views with parking lot and quick slots.</p>
         </div>
         <div className="flex items-center gap-2">
           <button
@@ -160,7 +160,7 @@ export default function SocialPlannerCalendar() {
       </div>
 
       <div className="card p-4 mb-4">
-        <h3 className="text-lg font-semibold text-slate-900 mb-2">Quick add to parking lot</h3>
+        <h3 className="text-lg font-semibold text-foreground mb-2">Quick add to parking lot</h3>
         <div className="grid md:grid-cols-5 gap-3">
           <input
             className="input md:col-span-2"
@@ -190,7 +190,7 @@ export default function SocialPlannerCalendar() {
             <PlusCircle className="h-4 w-4 mr-1" /> Add to parking lot
           </button>
         </div>
-        <div className="flex items-center gap-2 mt-3 text-sm text-slate-600">
+        <div className="flex items-center gap-2 mt-3 text-sm text-muted-foreground">
           <label className="flex items-center gap-2">
             <input type="checkbox" checked={ideaParkingLot} onChange={e => setIdeaParkingLot(e.target.checked)} />
             Keep in idea parking lot
@@ -202,7 +202,7 @@ export default function SocialPlannerCalendar() {
       <div className="card p-3 mb-4">
         <div className="flex flex-wrap gap-3 text-sm">
           <div className="flex items-center gap-2">
-            <span className="text-slate-600">Platform</span>
+            <span className="text-muted-foreground">Platform</span>
             <select className="input" value={filterPlatform} onChange={e => setFilterPlatform(e.target.value)}>
               <option value="all">All</option>
               <option value="facebook">Facebook</option>
@@ -213,7 +213,7 @@ export default function SocialPlannerCalendar() {
             </select>
           </div>
           <div className="flex items-center gap-2">
-            <span className="text-slate-600">Status</span>
+            <span className="text-muted-foreground">Status</span>
             <select className="input" value={filterStatus} onChange={e => setFilterStatus(e.target.value)}>
               <option value="all">All</option>
               <option value="draft">Draft</option>
@@ -224,7 +224,7 @@ export default function SocialPlannerCalendar() {
             </select>
           </div>
           <div className="flex items-center gap-2">
-            <span className="text-slate-600">Category</span>
+            <span className="text-muted-foreground">Category</span>
             <select className="input" value={filterCategory} onChange={e => setFilterCategory(e.target.value)}>
               <option value="all">All</option>
               <option value="promo">Promo</option>
@@ -239,7 +239,7 @@ export default function SocialPlannerCalendar() {
       </div>
 
       <div className="flex justify-between items-center mb-3">
-        <h3 className="text-lg font-semibold text-slate-900">
+        <h3 className="text-lg font-semibold text-foreground">
           {view === "list" ? "All posts (list)" : view === "week" ? "This week" : "Calendar overview"}
         </h3>
         <div className="flex gap-2">
@@ -262,7 +262,7 @@ export default function SocialPlannerCalendar() {
 
       {view === "list" && (
         <div className="card p-0 overflow-hidden">
-          <div className="grid grid-cols-12 px-4 py-2 text-xs font-semibold text-slate-500 border-b border-slate-100">
+          <div className="grid grid-cols-12 px-4 py-2 text-xs font-semibold text-muted-foreground border-b border-border">
             <div className="col-span-4">Title</div>
             <div className="col-span-2">Platform</div>
             <div className="col-span-2">Status</div>
@@ -270,22 +270,22 @@ export default function SocialPlannerCalendar() {
             <div className="col-span-2">Category</div>
           </div>
           {filtered.map((post: any) => (
-            <div key={post.id} className="grid grid-cols-12 px-4 py-3 border-b border-slate-100 text-sm">
+            <div key={post.id} className="grid grid-cols-12 px-4 py-3 border-b border-border text-sm">
               <div className="col-span-4">
-                <div className="font-semibold text-slate-900">{post.title}</div>
-                <div className="text-xs text-slate-500 line-clamp-1">{post.caption || "Caption TBD"}</div>
+                <div className="font-semibold text-foreground">{post.title}</div>
+                <div className="text-xs text-muted-foreground line-clamp-1">{post.caption || "Caption TBD"}</div>
               </div>
-              <div className="col-span-2 text-slate-600">{post.platform}</div>
+              <div className="col-span-2 text-muted-foreground">{post.platform}</div>
               <div className="col-span-2">
                 <span className="badge bg-status-info/15 text-status-info">{post.status}</span>
               </div>
-              <div className="col-span-2 text-slate-600">
+              <div className="col-span-2 text-muted-foreground">
                 {post.scheduledFor ? new Date(post.scheduledFor).toLocaleDateString() : "Parking lot"}
               </div>
-              <div className="col-span-2 text-slate-600">{post.category || "—"}</div>
+              <div className="col-span-2 text-muted-foreground">{post.category || "—"}</div>
             </div>
           ))}
-          {!filtered.length && <div className="px-4 py-3 text-sm text-slate-500">No posts yet.</div>}
+          {!filtered.length && <div className="px-4 py-3 text-sm text-muted-foreground">No posts yet.</div>}
         </div>
       )}
 
@@ -295,20 +295,20 @@ export default function SocialPlannerCalendar() {
           <div key={post.id} className="card p-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-xs uppercase text-slate-500">{post.platform}</p>
-                <h4 className="text-lg font-semibold text-slate-900">{post.title}</h4>
+                <p className="text-xs uppercase text-muted-foreground">{post.platform}</p>
+                <h4 className="text-lg font-semibold text-foreground">{post.title}</h4>
               </div>
-              <span className="text-xs px-2 py-1 rounded-full bg-slate-100 text-slate-700">{post.status}</span>
+              <span className="text-xs px-2 py-1 rounded-full bg-muted text-foreground">{post.status}</span>
             </div>
-            <p className="text-sm text-slate-600 mt-1 line-clamp-2">{post.caption || "Caption TBD"}</p>
-            <div className="text-xs text-slate-500 mt-2 flex flex-wrap gap-2">
+            <p className="text-sm text-muted-foreground mt-1 line-clamp-2">{post.caption || "Caption TBD"}</p>
+            <div className="text-xs text-muted-foreground mt-2 flex flex-wrap gap-2">
               {post.category && <span className="badge">{post.category}</span>}
-              <span className="badge bg-slate-100 text-slate-700">{post.platform}</span>
+              <span className="badge bg-muted text-foreground">{post.platform}</span>
                 {post.scheduledFor && <span className="badge bg-status-success/15 text-status-success">Due {new Date(post.scheduledFor).toLocaleDateString()}</span>}
               </div>
             </div>
           ))}
-          {!upcomingWeek.length && <div className="col-span-full text-slate-500 text-sm">Nothing scheduled in the next 7 days.</div>}
+          {!upcomingWeek.length && <div className="col-span-full text-muted-foreground text-sm">Nothing scheduled in the next 7 days.</div>}
         </div>
       )}
 
@@ -317,20 +317,20 @@ export default function SocialPlannerCalendar() {
           {Object.entries(groupedByDate).map(([date, posts]) => (
             <div key={date} className="card p-4">
               <div className="flex items-center justify-between mb-2">
-                <div className="text-sm font-semibold text-slate-900">{date}</div>
-                <span className="text-xs text-slate-500">{posts.length} posts</span>
+                <div className="text-sm font-semibold text-foreground">{date}</div>
+                <span className="text-xs text-muted-foreground">{posts.length} posts</span>
               </div>
               <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-3">
                 {posts.map((post: any) => (
-                  <div key={post.id} className="p-3 rounded border border-slate-200 bg-slate-50">
+                  <div key={post.id} className="p-3 rounded border border-border bg-muted">
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className="text-xs uppercase text-slate-500">{post.platform}</p>
-                        <div className="text-sm font-semibold text-slate-900 line-clamp-1">{post.title}</div>
+                        <p className="text-xs uppercase text-muted-foreground">{post.platform}</p>
+                        <div className="text-sm font-semibold text-foreground line-clamp-1">{post.title}</div>
                       </div>
-                      <span className="text-xs px-2 py-1 rounded-full bg-slate-100 text-slate-700">{post.status}</span>
+                      <span className="text-xs px-2 py-1 rounded-full bg-muted text-foreground">{post.status}</span>
                     </div>
-                    <div className="text-xs text-slate-500 mt-1 flex flex-wrap gap-2">
+                    <div className="text-xs text-muted-foreground mt-1 flex flex-wrap gap-2">
                       {post.category && <span className="badge">{post.category}</span>}
               {post.ideaParkingLot && <span className="badge bg-status-warning/15 text-status-warning">Parking lot</span>}
                     </div>
@@ -339,17 +339,17 @@ export default function SocialPlannerCalendar() {
               </div>
             </div>
           ))}
-          {!Object.keys(groupedByDate).length && <div className="text-sm text-slate-500">No scheduled posts yet.</div>}
+          {!Object.keys(groupedByDate).length && <div className="text-sm text-muted-foreground">No scheduled posts yet.</div>}
         </div>
       )}
 
       <div className="card p-4 mt-4">
         <div className="flex items-center justify-between mb-2">
           <div>
-            <h3 className="text-lg font-semibold text-slate-900">Idea parking lot</h3>
-            <p className="text-sm text-slate-600">Unscheduled ideas stay here until you move them into a slot.</p>
+            <h3 className="text-lg font-semibold text-foreground">Idea parking lot</h3>
+            <p className="text-sm text-muted-foreground">Unscheduled ideas stay here until you move them into a slot.</p>
           </div>
-          <span className="text-xs text-slate-500">{parkingLot.length} items</span>
+          <span className="text-xs text-muted-foreground">{parkingLot.length} items</span>
         </div>
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-3">
           {parkingLot.map((post: any) => (
@@ -357,18 +357,18 @@ export default function SocialPlannerCalendar() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-xs uppercase text-amber-700">{post.platform}</p>
-                  <div className="text-sm font-semibold text-slate-900 line-clamp-1">{post.title}</div>
+                  <div className="text-sm font-semibold text-foreground line-clamp-1">{post.title}</div>
                 </div>
-                <span className="text-xs px-2 py-1 rounded-full bg-white text-amber-700 border border-amber-200">Parking</span>
+                <span className="text-xs px-2 py-1 rounded-full bg-card text-amber-700 border border-amber-200">Parking</span>
               </div>
-              <div className="text-xs text-slate-600 mt-1 line-clamp-2">{post.caption || "Caption TBD"}</div>
-              <div className="text-xs text-slate-500 mt-2 flex flex-wrap gap-2">
+              <div className="text-xs text-muted-foreground mt-1 line-clamp-2">{post.caption || "Caption TBD"}</div>
+              <div className="text-xs text-muted-foreground mt-2 flex flex-wrap gap-2">
                 {post.category && <span className="badge">{post.category}</span>}
-                <span className="badge bg-slate-100 text-slate-700">{post.status || "draft"}</span>
+                <span className="badge bg-muted text-foreground">{post.status || "draft"}</span>
             </div>
           </div>
         ))}
-          {!parkingLot.length && <div className="text-sm text-slate-500">No parking-lot items.</div>}
+          {!parkingLot.length && <div className="text-sm text-muted-foreground">No parking-lot items.</div>}
         </div>
       </div>
     </DashboardShell>

@@ -40,26 +40,26 @@ export function TransactionLogReport({ campgroundId, dateRange }: TransactionLog
     }, [ledgerEntries, dateRange]);
 
     if (isLoading) {
-        return <div className="text-sm text-slate-500">Loading transactions...</div>;
+        return <div className="text-sm text-muted-foreground">Loading transactions...</div>;
     }
 
     if (!ledgerEntries) {
-        return <div className="text-sm text-slate-500">No transactions found.</div>;
+        return <div className="text-sm text-muted-foreground">No transactions found.</div>;
     }
 
     return (
         <div className="space-y-6">
             <div className="flex items-center justify-between">
                 <div>
-                    <h2 className="text-lg font-semibold text-slate-900">Transaction Log</h2>
-                    <p className="text-sm text-slate-500">{reportData.length} entries in period</p>
+                    <h2 className="text-lg font-semibold text-foreground">Transaction Log</h2>
+                    <p className="text-sm text-muted-foreground">{reportData.length} entries in period</p>
                 </div>
             </div>
 
-            <div className="rounded-xl border border-slate-200 bg-white shadow-sm overflow-hidden">
+            <div className="rounded-xl border border-border bg-card shadow-sm overflow-hidden">
                 <div className="overflow-x-auto">
                     <table className="min-w-full text-sm text-left">
-                        <thead className="bg-slate-50 text-xs uppercase font-semibold text-slate-500">
+                        <thead className="bg-muted text-xs uppercase font-semibold text-muted-foreground">
                             <tr>
                                 <th className="px-4 py-3">Date</th>
                                 <th className="px-4 py-3">Description</th>
@@ -68,20 +68,20 @@ export function TransactionLogReport({ campgroundId, dateRange }: TransactionLog
                                 <th className="px-4 py-3 text-right">Amount</th>
                             </tr>
                         </thead>
-                        <tbody className="divide-y divide-slate-100">
+                        <tbody className="divide-y divide-border">
                             {reportData.length === 0 ? (
                                 <tr>
-                                    <td colSpan={5} className="px-4 py-8 text-center text-slate-500">
+                                    <td colSpan={5} className="px-4 py-8 text-center text-muted-foreground">
                                         No transactions for this period.
                                     </td>
                                 </tr>
                             ) : (
                                 reportData.map((e) => (
-                                    <tr key={e.id} className="hover:bg-slate-50">
-                                        <td className="px-4 py-3 text-slate-600 font-mono text-xs">
+                                    <tr key={e.id} className="hover:bg-muted">
+                                        <td className="px-4 py-3 text-muted-foreground font-mono text-xs">
                                             {format(new Date(e.occurredAt), "yyyy-MM-dd HH:mm")}
                                         </td>
-                                        <td className="px-4 py-3 font-medium text-slate-900">
+                                        <td className="px-4 py-3 font-medium text-foreground">
                                             {e.description || "N/A"}
                                         </td>
                                         <td className="px-4 py-3">
@@ -89,10 +89,10 @@ export function TransactionLogReport({ campgroundId, dateRange }: TransactionLog
                                                 {e.direction.toUpperCase()}
                                             </Badge>
                                         </td>
-                                        <td className="px-4 py-3 text-slate-500 text-xs">
+                                        <td className="px-4 py-3 text-muted-foreground text-xs">
                                             {e.glCode || "—"}
                                         </td>
-                                        <td className={`px-4 py-3 text-right font-mono ${e.direction === 'credit' ? 'text-emerald-700' : 'text-slate-900'}`}>
+                                        <td className={`px-4 py-3 text-right font-mono ${e.direction === 'credit' ? 'text-emerald-700' : 'text-foreground'}`}>
                                             {formatCurrency(e.amountCents / 100)}
                                         </td>
                                     </tr>

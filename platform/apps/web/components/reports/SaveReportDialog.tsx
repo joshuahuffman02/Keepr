@@ -104,9 +104,9 @@ export function SaveReportDialog({ open, onOpenChange, reportConfig, onSaved }: 
             />
           </div>
 
-          <div className="rounded-lg border border-slate-200 bg-slate-50 p-4 space-y-2">
-            <h4 className="text-sm font-medium text-slate-900">Current Configuration</h4>
-            <div className="grid grid-cols-2 gap-2 text-xs text-slate-600">
+          <div className="rounded-lg border border-border bg-muted p-4 space-y-2">
+            <h4 className="text-sm font-medium text-foreground">Current Configuration</h4>
+            <div className="grid grid-cols-2 gap-2 text-xs text-muted-foreground">
               <div>
                 <span className="font-medium">Report:</span> {reportConfig.tab}
                 {reportConfig.subTab && <span> / {reportConfig.subTab}</span>}

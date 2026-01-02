@@ -52,7 +52,7 @@ const POS_PROVIDERS: { id: POSProvider; label: string; color: string }[] = [
   { id: "square", label: "Square", color: "bg-black" },
   { id: "clover", label: "Clover", color: "bg-emerald-600" },
   { id: "toast", label: "Toast", color: "bg-orange-500" },
-  { id: "other", label: "Other", color: "bg-slate-500" },
+  { id: "other", label: "Other", color: "bg-muted" },
 ];
 
 interface ExternalPayment {
@@ -188,48 +188,48 @@ export function ExternalPOSRecording({ campgroundId }: ExternalPOSRecordingProps
     <div className="space-y-6">
       {/* Header with Stats */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <div className="bg-gradient-to-br from-slate-50 to-zinc-50 rounded-xl p-4 border border-slate-100">
-          <div className="flex items-center gap-2 text-slate-600 mb-1">
+        <div className="bg-card rounded-xl p-4 border border-border">
+          <div className="flex items-center gap-2 text-muted-foreground mb-1">
             <FileText className="w-4 h-4" />
             <span className="text-xs font-medium">Total Recorded</span>
           </div>
-          <p className="text-2xl font-bold text-slate-900">{stats.totalCount}</p>
+          <p className="text-2xl font-bold text-foreground">{stats.totalCount}</p>
         </div>
-        <div className="bg-gradient-to-br from-emerald-50 to-green-50 rounded-xl p-4 border border-emerald-100">
-          <div className="flex items-center gap-2 text-emerald-600 mb-1">
+        <div className="bg-status-success-bg rounded-xl p-4 border border-status-success-border">
+          <div className="flex items-center gap-2 text-status-success mb-1">
             <DollarSign className="w-4 h-4" />
             <span className="text-xs font-medium">Total Amount</span>
           </div>
-          <p className="text-2xl font-bold text-emerald-900">{formatCurrency(stats.totalAmount)}</p>
+          <p className="text-2xl font-bold text-status-success-text">{formatCurrency(stats.totalAmount)}</p>
         </div>
-        <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl p-4 border border-blue-100">
-          <div className="flex items-center gap-2 text-blue-600 mb-1">
+        <div className="bg-status-info-bg rounded-xl p-4 border border-status-info-border">
+          <div className="flex items-center gap-2 text-status-info mb-1">
             <Calendar className="w-4 h-4" />
             <span className="text-xs font-medium">Today</span>
           </div>
-          <p className="text-2xl font-bold text-blue-900">{stats.todayCount}</p>
+          <p className="text-2xl font-bold text-status-info-text">{stats.todayCount}</p>
         </div>
-        <div className="bg-gradient-to-br from-violet-50 to-purple-50 rounded-xl p-4 border border-violet-100">
-          <div className="flex items-center gap-2 text-violet-600 mb-1">
+        <div className="bg-status-warning-bg rounded-xl p-4 border border-status-warning-border">
+          <div className="flex items-center gap-2 text-status-warning mb-1">
             <CreditCard className="w-4 h-4" />
             <span className="text-xs font-medium">Today&apos;s Total</span>
           </div>
-          <p className="text-2xl font-bold text-violet-900">{formatCurrency(stats.todayAmount)}</p>
+          <p className="text-2xl font-bold text-status-warning-text">{formatCurrency(stats.todayAmount)}</p>
         </div>
       </div>
 
       {/* Info Banner */}
       <div
-        className="p-4 bg-gradient-to-r from-amber-50 to-yellow-50 border border-amber-100 rounded-xl"
+        className="p-4 bg-status-warning-bg border border-status-warning-border rounded-xl"
         role="status"
       >
         <div className="flex items-start gap-3">
-          <div className="w-8 h-8 rounded-full bg-amber-100 flex items-center justify-center flex-shrink-0">
-            <AlertCircle className="h-4 w-4 text-amber-600" aria-hidden="true" />
+          <div className="w-8 h-8 rounded-full bg-status-warning/10 flex items-center justify-center flex-shrink-0">
+            <AlertCircle className="h-4 w-4 text-status-warning" aria-hidden="true" />
           </div>
           <div>
-            <p className="font-medium text-amber-900">Record External Payments</p>
-            <p className="text-sm text-amber-700 mt-1">
+            <p className="font-medium text-foreground">Record External Payments</p>
+            <p className="text-sm text-status-warning-text mt-1">
               Use this feature to log payments processed through external POS systems (Square, Clover, etc.) so they appear in your reports.
             </p>
           </div>
@@ -239,7 +239,7 @@ export function ExternalPOSRecording({ campgroundId }: ExternalPOSRecordingProps
       {/* Actions Bar */}
       <div className="flex flex-col sm:flex-row gap-3">
         <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
           <Input
             placeholder="Search by reference or description..."
             value={searchTerm}
@@ -251,7 +251,7 @@ export function ExternalPOSRecording({ campgroundId }: ExternalPOSRecordingProps
         {/* Record Payment Dialog */}
         <Dialog open={isRecordDialogOpen} onOpenChange={setIsRecordDialogOpen}>
           <DialogTrigger asChild>
-            <Button className="gap-2 bg-slate-800 hover:bg-slate-900">
+            <Button className="gap-2 bg-action-primary text-action-primary-foreground hover:bg-action-primary-hover">
               <Plus className="w-4 h-4" />
               Record Payment
             </Button>
@@ -259,7 +259,7 @@ export function ExternalPOSRecording({ campgroundId }: ExternalPOSRecordingProps
           <DialogContent className="sm:max-w-md">
             <DialogHeader>
               <DialogTitle className="flex items-center gap-2">
-                <Smartphone className="w-5 h-5 text-slate-500" />
+                <Smartphone className="w-5 h-5 text-muted-foreground" />
                 Record External Payment
               </DialogTitle>
               <DialogDescription>
@@ -269,11 +269,11 @@ export function ExternalPOSRecording({ campgroundId }: ExternalPOSRecordingProps
 
             {showSuccess ? (
               <div className="py-8 text-center motion-safe:animate-in motion-safe:fade-in motion-safe:zoom-in">
-                <div className="w-16 h-16 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <Check className="w-8 h-8 text-emerald-600" />
+                <div className="w-16 h-16 bg-status-success-bg rounded-full flex items-center justify-center mx-auto mb-4">
+                  <Check className="w-8 h-8 text-status-success" />
                 </div>
-                <h3 className="font-medium text-lg text-slate-900">Payment Recorded!</h3>
-                <p className="text-slate-500 mt-1">The payment has been added to your records.</p>
+                <h3 className="font-medium text-lg text-foreground">Payment Recorded!</h3>
+                <p className="text-muted-foreground mt-1">The payment has been added to your records.</p>
               </div>
             ) : (
               <>
@@ -302,7 +302,7 @@ export function ExternalPOSRecording({ campgroundId }: ExternalPOSRecordingProps
                   <div className="space-y-2">
                     <Label htmlFor="payment-amount">Amount</Label>
                     <div className="relative">
-                      <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                      <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                       <Input
                         id="payment-amount"
                         type="number"
@@ -319,10 +319,10 @@ export function ExternalPOSRecording({ campgroundId }: ExternalPOSRecordingProps
                   {/* Reference Number */}
                   <div className="space-y-2">
                     <Label htmlFor="reference-number">
-                      Reference Number <span className="text-slate-400 font-normal">(optional)</span>
+                      Reference Number <span className="text-muted-foreground font-normal">(optional)</span>
                     </Label>
                     <div className="relative">
-                      <Hash className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                      <Hash className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                       <Input
                         id="reference-number"
                         placeholder="Transaction ID from POS"
@@ -347,7 +347,7 @@ export function ExternalPOSRecording({ campgroundId }: ExternalPOSRecordingProps
                   {/* Description */}
                   <div className="space-y-2">
                     <Label htmlFor="payment-description">
-                      Description <span className="text-slate-400 font-normal">(optional)</span>
+                      Description <span className="text-muted-foreground font-normal">(optional)</span>
                     </Label>
                     <Textarea
                       id="payment-description"
@@ -366,7 +366,7 @@ export function ExternalPOSRecording({ campgroundId }: ExternalPOSRecordingProps
                   <Button
                     onClick={handleRecord}
                     disabled={isSubmitting || !amount}
-                    className="bg-slate-800 hover:bg-slate-900"
+                    className="bg-muted hover:bg-muted"
                   >
                     {isSubmitting ? (
                       <>
@@ -388,7 +388,7 @@ export function ExternalPOSRecording({ campgroundId }: ExternalPOSRecordingProps
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-base">
-            <History className="w-5 h-5 text-slate-500" />
+            <History className="w-5 h-5 text-muted-foreground" />
             Recorded Payments
           </CardTitle>
           <CardDescription>
@@ -398,9 +398,9 @@ export function ExternalPOSRecording({ campgroundId }: ExternalPOSRecordingProps
         <CardContent>
           {filteredPayments.length === 0 ? (
             <div className="p-8 text-center">
-              <Smartphone className="w-12 h-12 text-slate-300 mx-auto mb-4" />
-              <h3 className="font-medium text-slate-700 mb-1">No payments recorded</h3>
-              <p className="text-sm text-slate-500 mb-4">
+              <Smartphone className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
+              <h3 className="font-medium text-foreground mb-1">No payments recorded</h3>
+              <p className="text-sm text-muted-foreground mb-4">
                 External POS payments will appear here once recorded.
               </p>
               <Button
@@ -418,7 +418,7 @@ export function ExternalPOSRecording({ campgroundId }: ExternalPOSRecordingProps
                 return (
                   <div
                     key={payment.id}
-                    className="flex items-center gap-3 p-3 bg-white rounded-lg border hover:bg-slate-50 transition-colors"
+                    className="flex items-center gap-3 p-3 bg-card rounded-lg border hover:bg-muted transition-colors"
                   >
                     <div
                       className={cn(
@@ -430,14 +430,14 @@ export function ExternalPOSRecording({ campgroundId }: ExternalPOSRecordingProps
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2">
-                        <p className="text-sm font-medium text-slate-800 truncate">
+                        <p className="text-sm font-medium text-foreground truncate">
                           {payment.description}
                         </p>
                         <Badge variant="outline" className="text-xs shrink-0">
                           {providerInfo.label}
                         </Badge>
                       </div>
-                      <div className="flex items-center gap-2 text-xs text-slate-500 mt-0.5">
+                      <div className="flex items-center gap-2 text-xs text-muted-foreground mt-0.5">
                         <span>{formatDate(payment.createdAt)}</span>
                         {payment.referenceNumber && (
                           <>
@@ -448,7 +448,7 @@ export function ExternalPOSRecording({ campgroundId }: ExternalPOSRecordingProps
                       </div>
                     </div>
                     <div className="text-right">
-                      <p className="font-semibold text-slate-900">
+                      <p className="font-semibold text-foreground">
                         {formatCurrency(payment.amount)}
                       </p>
                     </div>

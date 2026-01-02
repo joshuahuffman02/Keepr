@@ -21,7 +21,7 @@ interface CohortHeatmapProps {
 
 // Color interpolation for smooth gradients
 function getRetentionColor(value: number, thresholds = { good: 80, warning: 60 }): string {
-  if (value === 0) return "bg-slate-200 dark:bg-slate-700";
+  if (value === 0) return "bg-muted dark:bg-muted";
   if (value >= 90) return "bg-emerald-500";
   if (value >= thresholds.good) return "bg-emerald-400";
   if (value >= 70) return "bg-lime-400";
@@ -31,9 +31,9 @@ function getRetentionColor(value: number, thresholds = { good: 80, warning: 60 }
 }
 
 function getRetentionTextColor(value: number): string {
-  if (value === 0) return "text-slate-400 dark:text-slate-500";
+  if (value === 0) return "text-muted-foreground dark:text-muted-foreground";
   if (value >= 70) return "text-white";
-  return "text-slate-900 dark:text-white";
+  return "text-foreground dark:text-white";
 }
 
 // Calculate cell opacity for gradient effect (higher value = more opaque)
@@ -59,19 +59,19 @@ export function CohortHeatmap({
 
   if (loading) {
     return (
-      <Card className="border-slate-200 dark:border-slate-700">
+      <Card className="border-border dark:border-border">
         <CardHeader>
-          <CardTitle className="text-lg text-slate-900 dark:text-white">{title}</CardTitle>
-          {description && <p className="text-sm text-slate-500 dark:text-slate-400">{description}</p>}
+          <CardTitle className="text-lg text-foreground dark:text-white">{title}</CardTitle>
+          {description && <p className="text-sm text-muted-foreground dark:text-muted-foreground">{description}</p>}
         </CardHeader>
         <CardContent>
           <div className="animate-pulse space-y-3">
-            <div className="h-8 bg-slate-200 dark:bg-slate-700 rounded" />
+            <div className="h-8 bg-muted dark:bg-muted rounded" />
             {[...Array(5)].map((_, i) => (
               <div key={i} className="flex gap-2">
-                <div className="h-10 w-32 bg-slate-200 dark:bg-slate-700 rounded" />
+                <div className="h-10 w-32 bg-muted dark:bg-muted rounded" />
                 {[...Array(5)].map((_, j) => (
-                  <div key={j} className="h-10 w-16 bg-slate-200 dark:bg-slate-700 rounded" />
+                  <div key={j} className="h-10 w-16 bg-muted dark:bg-muted rounded" />
                 ))}
               </div>
             ))}
@@ -82,23 +82,23 @@ export function CohortHeatmap({
   }
 
   return (
-    <Card className="border-slate-200 dark:border-slate-700">
+    <Card className="border-border dark:border-border">
       <CardHeader>
-        <CardTitle className="text-lg text-slate-900 dark:text-white">{title}</CardTitle>
-        {description && <p className="text-sm text-slate-500 dark:text-slate-400">{description}</p>}
+        <CardTitle className="text-lg text-foreground dark:text-white">{title}</CardTitle>
+        {description && <p className="text-sm text-muted-foreground dark:text-muted-foreground">{description}</p>}
       </CardHeader>
       <CardContent>
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead>
               <tr>
-                <th className="text-left py-3 px-3 text-sm font-medium text-slate-500 dark:text-slate-400 min-w-[140px]">
+                <th className="text-left py-3 px-3 text-sm font-medium text-muted-foreground dark:text-muted-foreground min-w-[140px]">
                   Cohort
                 </th>
                 {labels.map((label, idx) => (
                   <th
                     key={idx}
-                    className="text-center py-3 px-2 text-sm font-medium text-slate-500 dark:text-slate-400 min-w-[70px]"
+                    className="text-center py-3 px-2 text-sm font-medium text-muted-foreground dark:text-muted-foreground min-w-[70px]"
                   >
                     {label}
                   </th>
@@ -108,7 +108,7 @@ export function CohortHeatmap({
             <tbody>
               {data.map((row, rowIdx) => (
                 <tr key={rowIdx}>
-                  <td className="py-2 px-3 text-sm font-medium text-slate-900 dark:text-white whitespace-nowrap">
+                  <td className="py-2 px-3 text-sm font-medium text-foreground dark:text-white whitespace-nowrap">
                     {row.cohort}
                   </td>
                   {periodKeys.map((key, colIdx) => {
@@ -137,7 +137,7 @@ export function CohortHeatmap({
         </div>
 
         {/* Legend */}
-        <div className="mt-6 flex flex-wrap items-center justify-center gap-4 text-xs text-slate-500 dark:text-slate-400">
+        <div className="mt-6 flex flex-wrap items-center justify-center gap-4 text-xs text-muted-foreground dark:text-muted-foreground">
           <div className="flex items-center gap-4">
             <span className="font-medium">Retention:</span>
             <span className="flex items-center gap-1.5">

@@ -208,7 +208,7 @@ export function GiftCardsManagement({ campgroundId }: GiftCardsManagementProps) 
     return (
       <Card>
         <CardContent className="p-8 flex items-center justify-center">
-          <Loader2 className="w-6 h-6 animate-spin text-slate-400" />
+          <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
         </CardContent>
       </Card>
     );
@@ -218,40 +218,40 @@ export function GiftCardsManagement({ campgroundId }: GiftCardsManagementProps) 
     <div className="space-y-6">
       {/* Header with Stats */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <div className="bg-gradient-to-br from-violet-50 to-purple-50 rounded-xl p-4 border border-violet-100">
-          <div className="flex items-center gap-2 text-violet-600 mb-1">
+        <div className="rounded-xl border border-border bg-card p-4">
+          <div className="flex items-center gap-2 text-status-info-text mb-1">
             <Gift className="w-4 h-4" />
             <span className="text-xs font-medium">Total Cards</span>
           </div>
-          <p className="text-2xl font-bold text-violet-900">{stats.totalCards}</p>
+          <p className="text-2xl font-bold text-foreground">{stats.totalCards}</p>
         </div>
-        <div className="bg-gradient-to-br from-emerald-50 to-green-50 rounded-xl p-4 border border-emerald-100">
-          <div className="flex items-center gap-2 text-emerald-600 mb-1">
+        <div className="rounded-xl border border-border bg-card p-4">
+          <div className="flex items-center gap-2 text-status-success-text mb-1">
             <CreditCard className="w-4 h-4" />
             <span className="text-xs font-medium">Active</span>
           </div>
-          <p className="text-2xl font-bold text-emerald-900">{stats.activeCards}</p>
+          <p className="text-2xl font-bold text-foreground">{stats.activeCards}</p>
         </div>
-        <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl p-4 border border-blue-100">
-          <div className="flex items-center gap-2 text-blue-600 mb-1">
+        <div className="rounded-xl border border-border bg-card p-4">
+          <div className="flex items-center gap-2 text-status-warning-text mb-1">
             <DollarSign className="w-4 h-4" />
             <span className="text-xs font-medium">Outstanding</span>
           </div>
-          <p className="text-2xl font-bold text-blue-900">{formatCurrency(stats.totalValue)}</p>
+          <p className="text-2xl font-bold text-foreground">{formatCurrency(stats.totalValue)}</p>
         </div>
-        <div className="bg-gradient-to-br from-amber-50 to-orange-50 rounded-xl p-4 border border-amber-100">
-          <div className="flex items-center gap-2 text-amber-600 mb-1">
+        <div className="rounded-xl border border-border bg-card p-4">
+          <div className="flex items-center gap-2 text-status-info-text mb-1">
             <Sparkles className="w-4 h-4" />
             <span className="text-xs font-medium">This Week</span>
           </div>
-          <p className="text-2xl font-bold text-amber-900">{stats.recentlyIssued}</p>
+          <p className="text-2xl font-bold text-foreground">{stats.recentlyIssued}</p>
         </div>
       </div>
 
       {/* Actions Bar */}
       <div className="flex flex-col sm:flex-row gap-3">
         <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
           <Input
             placeholder="Search by code..."
             value={searchTerm}
@@ -287,9 +287,9 @@ export function GiftCardsManagement({ campgroundId }: GiftCardsManagementProps) 
                   />
                 </div>
                 {checkedBalance && (
-                  <div className="p-4 bg-emerald-50 rounded-lg border border-emerald-200 motion-safe:animate-in motion-safe:fade-in">
-                    <p className="text-sm text-emerald-700">Balance for {checkedBalance.code}:</p>
-                    <p className="text-3xl font-bold text-emerald-900 mt-1">
+                  <div className="p-4 bg-status-success-bg rounded-lg border border-status-success-border motion-safe:animate-in motion-safe:fade-in">
+                    <p className="text-sm text-status-success-text">Balance for {checkedBalance.code}:</p>
+                    <p className="text-3xl font-bold text-status-success-text mt-1">
                       {formatCurrency(checkedBalance.balance)}
                     </p>
                   </div>
@@ -309,7 +309,7 @@ export function GiftCardsManagement({ campgroundId }: GiftCardsManagementProps) 
           {/* Issue Gift Card Dialog */}
           <Dialog open={isIssueDialogOpen} onOpenChange={setIsIssueDialogOpen}>
             <DialogTrigger asChild>
-              <Button className="gap-2 bg-violet-600 hover:bg-violet-700">
+              <Button className="gap-2 bg-action-primary text-action-primary-foreground hover:bg-action-primary-hover">
                 <Plus className="w-4 h-4" />
                 Issue Gift Card
               </Button>
@@ -317,7 +317,7 @@ export function GiftCardsManagement({ campgroundId }: GiftCardsManagementProps) 
             <DialogContent>
               <DialogHeader>
                 <DialogTitle className="flex items-center gap-2">
-                  <Gift className="w-5 h-5 text-violet-500" />
+                  <Gift className="w-5 h-5 text-action-primary" />
                   Issue New Gift Card
                 </DialogTitle>
                 <DialogDescription>
@@ -328,7 +328,7 @@ export function GiftCardsManagement({ campgroundId }: GiftCardsManagementProps) 
                 <div className="space-y-2">
                   <Label htmlFor="issue-amount">Amount</Label>
                   <div className="relative">
-                    <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                    <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                     <Input
                       id="issue-amount"
                       type="number"
@@ -350,9 +350,9 @@ export function GiftCardsManagement({ campgroundId }: GiftCardsManagementProps) 
                         type="checkbox"
                         checked={generateCode}
                         onChange={(e) => setGenerateCode(e.target.checked)}
-                        className="rounded border-slate-300"
+                        className="rounded border-border"
                       />
-                      <span className="text-slate-600">Auto-generate</span>
+                      <span className="text-muted-foreground">Auto-generate</span>
                     </label>
                   </div>
                   {!generateCode && (
@@ -368,15 +368,15 @@ export function GiftCardsManagement({ campgroundId }: GiftCardsManagementProps) 
 
                 {/* Preview */}
                 {issueAmount && (
-                  <div className="p-4 bg-gradient-to-r from-violet-100 to-purple-100 rounded-xl border border-violet-200 motion-safe:animate-in motion-safe:fade-in">
+                  <div className="p-4 bg-status-info-bg rounded-xl border border-status-info-border motion-safe:animate-in motion-safe:fade-in">
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className="text-xs text-violet-600 font-medium">Gift Card Preview</p>
-                        <p className="text-2xl font-bold text-violet-900 mt-1">
+                        <p className="text-xs text-status-info-text font-medium">Gift Card Preview</p>
+                        <p className="text-2xl font-bold text-foreground mt-1">
                           {formatCurrency(Math.round(parseFloat(issueAmount || "0") * 100))}
                         </p>
                       </div>
-                      <Gift className="w-10 h-10 text-violet-400" />
+                      <Gift className="w-10 h-10 text-status-info" />
                     </div>
                   </div>
                 )}
@@ -388,7 +388,7 @@ export function GiftCardsManagement({ campgroundId }: GiftCardsManagementProps) 
                 <Button
                   onClick={handleIssue}
                   disabled={issueMutation.isPending || !issueAmount}
-                  className="bg-violet-600 hover:bg-violet-700"
+                  className="bg-action-primary text-action-primary-foreground hover:bg-action-primary-hover"
                 >
                   {issueMutation.isPending ? (
                     <>
@@ -422,14 +422,14 @@ export function GiftCardsManagement({ campgroundId }: GiftCardsManagementProps) 
           {filteredCards.length === 0 ? (
             <Card className="border-dashed">
               <CardContent className="p-8 text-center">
-                <Gift className="w-12 h-12 text-slate-300 mx-auto mb-4" />
-                <h3 className="font-medium text-slate-700 mb-1">No gift cards yet</h3>
-                <p className="text-sm text-slate-500 mb-4">
+                <Gift className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
+                <h3 className="font-medium text-foreground mb-1">No gift cards yet</h3>
+                <p className="text-sm text-muted-foreground mb-4">
                   Issue your first gift card to get started.
                 </p>
                 <Button
                   onClick={() => setIsIssueDialogOpen(true)}
-                  className="bg-violet-600 hover:bg-violet-700"
+                  className="bg-action-primary text-action-primary-foreground hover:bg-action-primary-hover"
                 >
                   <Plus className="w-4 h-4 mr-2" />
                   Issue Gift Card
@@ -454,30 +454,35 @@ export function GiftCardsManagement({ campgroundId }: GiftCardsManagementProps) 
                         className={cn(
                           "w-12 h-12 rounded-xl flex items-center justify-center",
                           isActive
-                            ? "bg-gradient-to-br from-violet-500 to-purple-600"
-                            : "bg-slate-200"
+                            ? "bg-status-success"
+                            : "bg-muted"
                         )}
                       >
-                        <Gift className="w-6 h-6 text-white" />
+                        <Gift
+                          className={cn(
+                            "w-6 h-6",
+                            isActive ? "text-status-success-foreground" : "text-muted-foreground"
+                          )}
+                        />
                       </div>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2">
-                          <code className="font-mono text-sm font-medium text-slate-800">
+                          <code className="font-mono text-sm font-medium text-foreground">
                             {primaryCode}
                           </code>
                           <button
                             onClick={() => handleCopyCode(primaryCode)}
-                            className="p-1 hover:bg-slate-100 rounded transition-colors"
+                            className="p-1 hover:bg-muted rounded transition-colors"
                             aria-label="Copy code"
                           >
                             {copiedCode === primaryCode ? (
-                              <Check className="w-3.5 h-3.5 text-emerald-500" />
+                              <Check className="w-3.5 h-3.5 text-status-success" />
                             ) : (
-                              <Copy className="w-3.5 h-3.5 text-slate-400" />
+                              <Copy className="w-3.5 h-3.5 text-muted-foreground" />
                             )}
                           </button>
                         </div>
-                        <p className="text-xs text-slate-500 mt-0.5">
+                        <p className="text-xs text-muted-foreground mt-0.5">
                           Issued {formatDate(card.issuedAt)}
                           {card.expiresAt && ` • Expires ${formatDate(card.expiresAt)}`}
                         </p>
@@ -485,7 +490,7 @@ export function GiftCardsManagement({ campgroundId }: GiftCardsManagementProps) 
                       <div className="text-right">
                         <p className={cn(
                           "text-lg font-bold",
-                          isActive ? "text-emerald-600" : "text-slate-400"
+                          isActive ? "text-status-success-text" : "text-muted-foreground"
                         )}>
                           {formatCurrency(card.balanceCents)}
                         </p>
@@ -494,8 +499,8 @@ export function GiftCardsManagement({ campgroundId }: GiftCardsManagementProps) 
                           className={cn(
                             "text-xs",
                             isActive
-                              ? "border-emerald-200 text-emerald-700 bg-emerald-50"
-                              : "border-slate-200 text-slate-500"
+                              ? "border-status-success-border text-status-success-text bg-status-success-bg"
+                              : "border-border text-muted-foreground"
                           )}
                         >
                           {isActive ? "Active" : "Used"}
@@ -512,14 +517,14 @@ export function GiftCardsManagement({ campgroundId }: GiftCardsManagementProps) 
         <TabsContent value="history" className="mt-4">
           {ledgerLoading ? (
             <div className="p-8 flex items-center justify-center">
-              <Loader2 className="w-6 h-6 animate-spin text-slate-400" />
+              <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
             </div>
           ) : giftLedger.length === 0 ? (
             <Card className="border-dashed">
               <CardContent className="p-8 text-center">
-                <History className="w-12 h-12 text-slate-300 mx-auto mb-4" />
-                <h3 className="font-medium text-slate-700 mb-1">No transactions yet</h3>
-                <p className="text-sm text-slate-500">
+                <History className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
+                <h3 className="font-medium text-foreground mb-1">No transactions yet</h3>
+                <p className="text-sm text-muted-foreground">
                   Gift card activity will appear here.
                 </p>
               </CardContent>
@@ -531,25 +536,25 @@ export function GiftCardsManagement({ campgroundId }: GiftCardsManagementProps) 
                 return (
                   <div
                     key={entry.id}
-                    className="flex items-center gap-3 p-3 bg-white rounded-lg border hover:bg-slate-50 transition-colors"
+                    className="flex items-center gap-3 p-3 bg-card rounded-lg border hover:bg-muted transition-colors"
                   >
                     <div
                       className={cn(
                         "w-8 h-8 rounded-full flex items-center justify-center",
-                        isCredit ? "bg-emerald-100" : "bg-amber-100"
+                        isCredit ? "bg-status-success-bg" : "bg-status-warning-bg"
                       )}
                     >
                       {isCredit ? (
-                        <ArrowDownLeft className="w-4 h-4 text-emerald-600" />
+                        <ArrowDownLeft className="w-4 h-4 text-status-success-text" />
                       ) : (
-                        <ArrowUpRight className="w-4 h-4 text-amber-600" />
+                        <ArrowUpRight className="w-4 h-4 text-status-warning-text" />
                       )}
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-slate-800 truncate">
+                      <p className="text-sm font-medium text-foreground truncate">
                         {entry.reason || entry.direction}
                       </p>
-                      <p className="text-xs text-slate-500">
+                      <p className="text-xs text-muted-foreground">
                         {formatDate(entry.createdAt)}
                         {entry.referenceType && ` • ${entry.referenceType}`}
                       </p>
@@ -558,12 +563,12 @@ export function GiftCardsManagement({ campgroundId }: GiftCardsManagementProps) 
                       <p
                         className={cn(
                           "font-medium",
-                          isCredit ? "text-emerald-600" : "text-amber-600"
+                          isCredit ? "text-status-success-text" : "text-status-warning-text"
                         )}
                       >
                         {isCredit ? "+" : ""}{formatCurrency(Math.abs(entry.amountCents))}
                       </p>
-                      <p className="text-xs text-slate-500">
+                      <p className="text-xs text-muted-foreground">
                         Bal: {formatCurrency(entry.afterBalanceCents ?? 0)}
                       </p>
                     </div>

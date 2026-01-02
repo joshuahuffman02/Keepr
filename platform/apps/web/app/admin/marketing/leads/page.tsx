@@ -103,9 +103,9 @@ export default function AdminMarketingLeadsPage() {
       <div className="space-y-6">
         <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
           <div className="space-y-1">
-            <div className="text-xs font-semibold uppercase text-slate-500">Admin · Marketing</div>
-            <h1 className="text-2xl font-bold text-slate-900">Leads</h1>
-            <p className="text-sm text-slate-600">
+            <div className="text-xs font-semibold uppercase text-muted-foreground">Admin · Marketing</div>
+            <h1 className="text-2xl font-bold text-foreground">Leads</h1>
+            <p className="text-sm text-muted-foreground">
               Landing-form leads stay in-app. Track statuses (new, contacted, qualified) per campground and mark CRM sync
               without hitting real providers.
             </p>
@@ -135,32 +135,32 @@ export default function AdminMarketingLeadsPage() {
         </div>
 
         <div className="grid gap-3 md:grid-cols-3">
-          <div className="rounded-lg border border-slate-200 bg-white p-4">
-            <div className="text-xs uppercase font-semibold text-slate-500">New</div>
-            <div className="text-2xl font-bold text-slate-900">{newCount}</div>
-            <p className="text-xs text-slate-600">Fresh hands-up leads waiting for outreach.</p>
+          <div className="rounded-lg border border-border bg-card p-4">
+            <div className="text-xs uppercase font-semibold text-muted-foreground">New</div>
+            <div className="text-2xl font-bold text-foreground">{newCount}</div>
+            <p className="text-xs text-muted-foreground">Fresh hands-up leads waiting for outreach.</p>
           </div>
-          <div className="rounded-lg border border-slate-200 bg-white p-4">
-            <div className="text-xs uppercase font-semibold text-slate-500">Contacted</div>
-            <div className="text-2xl font-bold text-slate-900">{contactedCount}</div>
-            <p className="text-xs text-slate-600">In-progress conversations — keep notes in interest.</p>
+          <div className="rounded-lg border border-border bg-card p-4">
+            <div className="text-xs uppercase font-semibold text-muted-foreground">Contacted</div>
+            <div className="text-2xl font-bold text-foreground">{contactedCount}</div>
+            <p className="text-xs text-muted-foreground">In-progress conversations — keep notes in interest.</p>
           </div>
-          <div className="rounded-lg border border-slate-200 bg-white p-4">
-            <div className="text-xs uppercase font-semibold text-slate-500">Qualified</div>
-            <div className="text-2xl font-bold text-slate-900">{qualifiedCount}</div>
-            <p className="text-xs text-slate-600">Ready to handoff to sales/CRM. Sync remains stubbed.</p>
+          <div className="rounded-lg border border-border bg-card p-4">
+            <div className="text-xs uppercase font-semibold text-muted-foreground">Qualified</div>
+            <div className="text-2xl font-bold text-foreground">{qualifiedCount}</div>
+            <p className="text-xs text-muted-foreground">Ready to handoff to sales/CRM. Sync remains stubbed.</p>
           </div>
         </div>
 
-        <div className="rounded-xl border border-slate-200 bg-white overflow-hidden">
-          <div className="flex flex-col gap-2 border-b border-slate-100 p-4 md:flex-row md:items-center md:justify-between">
+        <div className="rounded-xl border border-border bg-card overflow-hidden">
+          <div className="flex flex-col gap-2 border-b border-border p-4 md:flex-row md:items-center md:justify-between">
             <div>
-              <div className="text-sm font-semibold text-slate-900">Lead list</div>
-              <p className="text-xs text-slate-600">
+              <div className="text-sm font-semibold text-foreground">Lead list</div>
+              <p className="text-xs text-muted-foreground">
                 Status is internal only; “Sync to CRM” sets a timestamp locally. No external calls.
               </p>
             </div>
-            <div className="flex items-center gap-2 text-xs text-slate-500">
+            <div className="flex items-center gap-2 text-xs text-muted-foreground">
               <Badge variant="secondary">Stubbed</Badge>
               <span>Data persists locally per browser.</span>
             </div>
@@ -169,7 +169,7 @@ export default function AdminMarketingLeadsPage() {
           <div className="overflow-auto">
             <Table>
               <TableHeader>
-                <TableRow className="bg-slate-50">
+                <TableRow className="bg-muted">
                   <TableHead>Name</TableHead>
                   <TableHead>Email</TableHead>
                   <TableHead>Interest</TableHead>
@@ -184,9 +184,9 @@ export default function AdminMarketingLeadsPage() {
               <TableBody>
                 {leads.map((lead) => (
                   <TableRow key={lead.id}>
-                    <TableCell className="font-medium text-slate-900">{lead.name}</TableCell>
-                    <TableCell className="text-slate-700">{lead.email}</TableCell>
-                    <TableCell className="text-slate-700">{lead.interest}</TableCell>
+                    <TableCell className="font-medium text-foreground">{lead.name}</TableCell>
+                    <TableCell className="text-foreground">{lead.email}</TableCell>
+                    <TableCell className="text-foreground">{lead.interest}</TableCell>
                     <TableCell className="space-y-1">
                       <Select
                         value={lead.status}
@@ -206,10 +206,10 @@ export default function AdminMarketingLeadsPage() {
                       </Select>
                       <Badge variant={statusBadge[lead.status].variant}>{statusBadge[lead.status].label}</Badge>
                     </TableCell>
-                    <TableCell className="text-slate-700">{lead.campgroundName || lead.campgroundId}</TableCell>
-                    <TableCell className="text-slate-600">{lead.source || "—"}</TableCell>
-                    <TableCell className="text-slate-600">{formatDate(lead.createdAt)}</TableCell>
-                    <TableCell className="text-slate-600">{formatDate(lead.lastSyncedAt)}</TableCell>
+                    <TableCell className="text-foreground">{lead.campgroundName || lead.campgroundId}</TableCell>
+                    <TableCell className="text-muted-foreground">{lead.source || "—"}</TableCell>
+                    <TableCell className="text-muted-foreground">{formatDate(lead.createdAt)}</TableCell>
+                    <TableCell className="text-muted-foreground">{formatDate(lead.lastSyncedAt)}</TableCell>
                     <TableCell className="text-right">
                       <Button
                         size="sm"
@@ -226,9 +226,9 @@ export default function AdminMarketingLeadsPage() {
             </Table>
           </div>
 
-          {leadsQuery.isLoading && <div className="text-center text-sm text-slate-600 py-8">Loading leads…</div>}
+          {leadsQuery.isLoading && <div className="text-center text-sm text-muted-foreground py-8">Loading leads…</div>}
           {!leadsQuery.isLoading && leads.length === 0 && (
-            <div className="text-center text-sm text-slate-600 py-8">No leads yet for this campground.</div>
+            <div className="text-center text-sm text-muted-foreground py-8">No leads yet for this campground.</div>
           )}
         </div>
       </div>

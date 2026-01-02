@@ -75,10 +75,10 @@ export function USStateHeatmap({
 
   if (loading) {
     return (
-      <Card className="border-slate-200 dark:border-slate-700">
+      <Card className="border-border dark:border-border">
         <CardHeader>
-          <CardTitle className="text-lg text-slate-900 dark:text-white">{title}</CardTitle>
-          {description && <p className="text-sm text-slate-500 dark:text-slate-400">{description}</p>}
+          <CardTitle className="text-lg text-foreground dark:text-white">{title}</CardTitle>
+          {description && <p className="text-sm text-muted-foreground dark:text-muted-foreground">{description}</p>}
         </CardHeader>
         <CardContent>
           <div className="animate-pulse">
@@ -86,7 +86,7 @@ export function USStateHeatmap({
               {[...Array(8)].map((_, row) => (
                 <div key={row} className="contents">
                   {[...Array(12)].map((_, col) => (
-                    <div key={col} className="aspect-square bg-slate-200 dark:bg-slate-700 rounded" />
+                    <div key={col} className="aspect-square bg-muted dark:bg-muted rounded" />
                   ))}
                 </div>
               ))}
@@ -98,10 +98,10 @@ export function USStateHeatmap({
   }
 
   return (
-    <Card className="border-slate-200 dark:border-slate-700">
+    <Card className="border-border dark:border-border">
       <CardHeader>
-        <CardTitle className="text-lg text-slate-900 dark:text-white">{title}</CardTitle>
-        {description && <p className="text-sm text-slate-500 dark:text-slate-400">{description}</p>}
+        <CardTitle className="text-lg text-foreground dark:text-white">{title}</CardTitle>
+        {description && <p className="text-sm text-muted-foreground dark:text-muted-foreground">{description}</p>}
       </CardHeader>
       <CardContent>
         <div className="grid grid-cols-12 gap-1">
@@ -121,8 +121,8 @@ export function USStateHeatmap({
                     key={colIdx}
                     className={cn(
                       "aspect-square rounded flex items-center justify-center text-xs font-semibold cursor-default transition-transform hover:scale-110 hover:z-10",
-                      value > 0 ? colors.bg[colorIdx] : "bg-slate-100 dark:bg-slate-700/50",
-                      value > 0 ? colors.text[colorIdx] : "text-slate-400 dark:text-slate-500"
+                      value > 0 ? colors.bg[colorIdx] : "bg-muted dark:bg-muted/50",
+                      value > 0 ? colors.text[colorIdx] : "text-muted-foreground dark:text-muted-foreground"
                     )}
                     title={stateData ? `${state}: ${formatValue(value)}` : state}
                   >
@@ -137,13 +137,13 @@ export function USStateHeatmap({
         {/* Legend */}
         <div className="mt-6 flex flex-col items-center gap-2">
           <div className="flex items-center gap-1">
-            <span className="text-xs text-slate-500 dark:text-slate-400 mr-2">Low</span>
+            <span className="text-xs text-muted-foreground dark:text-muted-foreground mr-2">Low</span>
             {colors.bg.map((bg, idx) => (
               <div key={idx} className={cn("w-6 h-4 rounded", bg)} />
             ))}
-            <span className="text-xs text-slate-500 dark:text-slate-400 ml-2">High</span>
+            <span className="text-xs text-muted-foreground dark:text-muted-foreground ml-2">High</span>
           </div>
-          <p className="text-xs text-slate-500 dark:text-slate-400">
+          <p className="text-xs text-muted-foreground dark:text-muted-foreground">
             Hover over states for details
           </p>
         </div>
@@ -151,9 +151,9 @@ export function USStateHeatmap({
         {/* Top 5 States Summary */}
         <div className="mt-6 grid grid-cols-5 gap-2">
           {data.slice(0, 5).map((state, idx) => (
-            <div key={idx} className="text-center p-2 bg-slate-50 dark:bg-slate-700/30 rounded">
-              <span className="text-lg font-bold text-slate-900 dark:text-white">{state.state}</span>
-              <p className="text-xs text-slate-500 dark:text-slate-400">{formatValue(state.value)}</p>
+            <div key={idx} className="text-center p-2 bg-muted dark:bg-muted/30 rounded">
+              <span className="text-lg font-bold text-foreground dark:text-white">{state.state}</span>
+              <p className="text-xs text-muted-foreground dark:text-muted-foreground">{formatValue(state.value)}</p>
             </div>
           ))}
         </div>

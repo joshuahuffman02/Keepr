@@ -162,35 +162,35 @@ export function ListView({
           const isExpanded = expandedGroups.has(groupKey) || groupMode === "none";
 
           return (
-            <div key={groupKey} className="rounded-xl border border-slate-200 bg-white shadow-sm overflow-hidden">
+            <div key={groupKey} className="rounded-xl border border-border bg-card shadow-sm overflow-hidden">
               {/* Group Header */}
               {groupMode !== "none" && (
                 <button
                   onClick={() => toggleGroup(groupKey)}
-                  className="w-full px-4 py-3 bg-slate-50 border-b border-slate-200 flex items-center justify-between hover:bg-slate-100 transition-colors"
+                  className="w-full px-4 py-3 bg-muted border-b border-border flex items-center justify-between hover:bg-muted transition-colors"
                 >
                   <div className="flex items-center gap-2">
                     {groupMode === "date" ? (
-                      <Calendar className="h-4 w-4 text-slate-600" />
+                      <Calendar className="h-4 w-4 text-muted-foreground" />
                     ) : (
-                      <MapPin className="h-4 w-4 text-slate-600" />
+                      <MapPin className="h-4 w-4 text-muted-foreground" />
                     )}
-                    <span className="font-semibold text-slate-900">{groupKey}</span>
+                    <span className="font-semibold text-foreground">{groupKey}</span>
                     <Badge variant="outline" className="text-xs">
                       {groupReservations.length}
                     </Badge>
                   </div>
                   {isExpanded ? (
-                    <ChevronUp className="h-4 w-4 text-slate-600" />
+                    <ChevronUp className="h-4 w-4 text-muted-foreground" />
                   ) : (
-                    <ChevronDown className="h-4 w-4 text-slate-600" />
+                    <ChevronDown className="h-4 w-4 text-muted-foreground" />
                   )}
                 </button>
               )}
 
               {/* Group Items */}
               {isExpanded && (
-                <div className="divide-y divide-slate-200">
+                <div className="divide-y divide-border">
                   {groupReservations.map((res) => {
                     const site = sites.find(s => s.id === res.siteId);
                     const hasBalance = res.balanceAmount && res.balanceAmount > 0;
@@ -199,7 +199,7 @@ export function ListView({
                     return (
                       <div
                         key={res.id}
-                        className="p-4 hover:bg-slate-50 transition-colors cursor-pointer"
+                        className="p-4 hover:bg-muted transition-colors cursor-pointer"
                         onClick={() => onReservationClick(res)}
                       >
                         {/* Mobile-friendly card layout */}
@@ -209,7 +209,7 @@ export function ListView({
                             <div className="flex items-center gap-3 flex-1 min-w-0">
                               <div className={`w-1 h-12 rounded-full ${statusColor}`} />
                               <div className="flex-1 min-w-0">
-                                <div className="font-semibold text-slate-900 text-base truncate">
+                                <div className="font-semibold text-foreground text-base truncate">
                                   {res.guest?.primaryFirstName} {res.guest?.primaryLastName}
                                 </div>
                                 <Badge
@@ -230,19 +230,19 @@ export function ListView({
                           {/* Details Grid */}
                           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
                             {/* Site */}
-                            <div className="flex items-center gap-2 text-slate-700">
-                              <MapPin className="h-4 w-4 text-slate-400 shrink-0" />
+                            <div className="flex items-center gap-2 text-foreground">
+                              <MapPin className="h-4 w-4 text-muted-foreground shrink-0" />
                               <span className="font-medium">{site?.name || "Unassigned"}</span>
                               {site?.siteType && (
-                                <span className="text-xs text-slate-500 capitalize">
+                                <span className="text-xs text-muted-foreground capitalize">
                                   ({site.siteType.replace(/_/g, " ")})
                                 </span>
                               )}
                             </div>
 
                             {/* Dates */}
-                            <div className="flex items-center gap-2 text-slate-700">
-                              <Clock className="h-4 w-4 text-slate-400 shrink-0" />
+                            <div className="flex items-center gap-2 text-foreground">
+                              <Clock className="h-4 w-4 text-muted-foreground shrink-0" />
                               <span>
                                 {new Date(res.arrivalDate).toLocaleDateString()} → {new Date(res.departureDate).toLocaleDateString()}
                               </span>
@@ -250,8 +250,8 @@ export function ListView({
 
                             {/* Guest Count */}
                             {(res.adults || res.children || res.pets) && (
-                              <div className="flex items-center gap-2 text-slate-700">
-                                <User className="h-4 w-4 text-slate-400 shrink-0" />
+                              <div className="flex items-center gap-2 text-foreground">
+                                <User className="h-4 w-4 text-muted-foreground shrink-0" />
                                 <span>
                                   {res.adults || 0} adults
                                   {res.children ? `, ${res.children} children` : ""}
@@ -262,8 +262,8 @@ export function ListView({
 
                             {/* Total Amount */}
                             {res.totalAmount && (
-                              <div className="flex items-center gap-2 text-slate-700">
-                                <DollarSign className="h-4 w-4 text-slate-400 shrink-0" />
+                              <div className="flex items-center gap-2 text-foreground">
+                                <DollarSign className="h-4 w-4 text-muted-foreground shrink-0" />
                                 <span className="font-semibold">
                                   {formatCurrency(res.totalAmount)}
                                   {hasBalance && (
@@ -290,7 +290,7 @@ export function ListView({
                   })}
 
                   {groupReservations.length === 0 && (
-                    <div className="p-8 text-center text-sm text-slate-500">
+                    <div className="p-8 text-center text-sm text-muted-foreground">
                       No reservations in this group
                     </div>
                   )}
@@ -301,10 +301,10 @@ export function ListView({
         })}
 
         {Object.keys(groupedReservations).length === 0 && (
-          <div className="rounded-xl border border-slate-200 bg-white shadow-sm p-8 text-center">
-            <Calendar className="h-12 w-12 text-slate-400 mx-auto mb-3" />
-            <h3 className="text-lg font-semibold text-slate-900 mb-2">No reservations found</h3>
-            <p className="text-sm text-slate-600">
+          <div className="rounded-xl border border-border bg-card shadow-sm p-8 text-center">
+            <Calendar className="h-12 w-12 text-muted-foreground mx-auto mb-3" />
+            <h3 className="text-lg font-semibold text-foreground mb-2">No reservations found</h3>
+            <p className="text-sm text-muted-foreground">
               Try adjusting your filters or date range
             </p>
           </div>
@@ -319,9 +319,9 @@ export function ListView({
           </DialogHeader>
           <div className="space-y-4">
             <div className="space-y-2">
-              <label className="text-sm font-medium text-slate-700">Site</label>
+              <label className="text-sm font-medium text-foreground">Site</label>
               <select
-                className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm"
+                className="w-full rounded-md border border-border px-3 py-2 text-sm"
                 value={newBookingData.siteId}
                 onChange={(e) => setNewBookingData({ ...newBookingData, siteId: e.target.value })}
               >
@@ -335,20 +335,20 @@ export function ListView({
             </div>
 
             <div className="space-y-2">
-              <label className="text-sm font-medium text-slate-700">Check-in Date</label>
+              <label className="text-sm font-medium text-foreground">Check-in Date</label>
               <input
                 type="date"
-                className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm"
+                className="w-full rounded-md border border-border px-3 py-2 text-sm"
                 value={newBookingData.arrivalDate}
                 onChange={(e) => setNewBookingData({ ...newBookingData, arrivalDate: e.target.value })}
               />
             </div>
 
             <div className="space-y-2">
-              <label className="text-sm font-medium text-slate-700">Check-out Date</label>
+              <label className="text-sm font-medium text-foreground">Check-out Date</label>
               <input
                 type="date"
-                className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm"
+                className="w-full rounded-md border border-border px-3 py-2 text-sm"
                 value={newBookingData.departureDate}
                 onChange={(e) => setNewBookingData({ ...newBookingData, departureDate: e.target.value })}
               />

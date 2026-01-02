@@ -135,7 +135,7 @@ function LevelUpModal({
           onClick={onClose}
         >
           <motion.div
-            className="bg-white rounded-3xl p-8 max-w-md w-full mx-4 text-center shadow-2xl relative overflow-hidden"
+            className="bg-card rounded-3xl p-8 max-w-md w-full mx-4 text-center shadow-2xl relative overflow-hidden"
             initial={{ scale: 0.5, rotateY: -180, opacity: 0 }}
             animate={{ scale: 1, rotateY: 0, opacity: 1 }}
             exit={{ scale: 0.5, opacity: 0 }}
@@ -143,15 +143,15 @@ function LevelUpModal({
             onClick={(e) => e.stopPropagation()}
           >
             {/* Background decoration */}
-            <div className="absolute inset-0 bg-gradient-to-br from-emerald-50 via-white to-cyan-50" />
-            <div className="absolute -top-20 -right-20 w-40 h-40 bg-emerald-200/30 rounded-full blur-3xl" />
-            <div className="absolute -bottom-20 -left-20 w-40 h-40 bg-cyan-200/30 rounded-full blur-3xl" />
+            <div className="absolute inset-0 bg-muted" />
+            <div className="absolute -top-20 -right-20 w-40 h-40 bg-status-success/10 rounded-full blur-3xl" />
+            <div className="absolute -bottom-20 -left-20 w-40 h-40 bg-status-info/10 rounded-full blur-3xl" />
 
             <div className="relative">
               {/* Close button */}
               <button
                 onClick={onClose}
-                className="absolute -top-2 -right-2 p-2 text-slate-400 hover:text-slate-600 transition-colors"
+                className="absolute -top-2 -right-2 p-2 text-muted-foreground hover:text-muted-foreground transition-colors"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -162,7 +162,7 @@ function LevelUpModal({
                 animate={{ scale: 1, rotate: 0 }}
                 transition={{ delay: 0.3, type: "spring", stiffness: 200 }}
               >
-                <div className="w-32 h-32 mx-auto mb-6 rounded-full bg-gradient-to-br from-emerald-400 via-teal-500 to-cyan-500 flex items-center justify-center shadow-2xl shadow-emerald-500/30">
+                <div className="w-32 h-32 mx-auto mb-6 rounded-full bg-action-primary flex items-center justify-center shadow-lg">
                   <span className="text-6xl font-bold text-white">{newLevel}</span>
                 </div>
               </motion.div>
@@ -172,13 +172,13 @@ function LevelUpModal({
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.5 }}
               >
-                <h2 className="text-3xl font-bold text-slate-900 mb-2 flex items-center justify-center gap-2">
-                  Level Up! <Sparkles className="h-8 w-8 text-amber-500" />
+                <h2 className="text-3xl font-bold text-foreground mb-2 flex items-center justify-center gap-2">
+                  Level Up! <Sparkles className="h-8 w-8 text-status-warning" />
                 </h2>
-                <p className="text-xl text-emerald-600 font-semibold mb-4">
-                  You're now a <span className="text-emerald-700">{levelTitle}</span>!
+                <p className="text-xl text-status-success font-semibold mb-4">
+                  You're now a <span className="text-status-success-text">{levelTitle}</span>!
                 </p>
-                <p className="text-slate-600 mb-6">
+                <p className="text-muted-foreground mb-6">
                   Keep up the amazing work! New challenges and rewards await.
                 </p>
               </motion.div>
@@ -190,7 +190,7 @@ function LevelUpModal({
               >
                 <Button
                   onClick={onClose}
-                  className="bg-gradient-to-r from-emerald-500 to-cyan-500 hover:from-emerald-600 hover:to-cyan-600 text-white px-8 py-3 text-lg font-semibold shadow-lg shadow-emerald-500/30"
+                  className="bg-action-primary text-action-primary-foreground hover:bg-action-primary-hover px-8 py-3 text-lg font-semibold shadow-lg"
                 >
                   <Sparkles className="w-5 h-5 mr-2" />
                   Keep Crushing It!
@@ -223,7 +223,7 @@ function XpToast({
 
   return (
     <motion.div
-      className="bg-gradient-to-r from-emerald-500 to-teal-500 text-white rounded-xl p-4 shadow-2xl min-w-[280px] max-w-sm"
+      className="bg-action-primary text-action-primary-foreground rounded-xl p-4 shadow-2xl min-w-[280px] max-w-sm"
       initial={{ opacity: 0, x: 100, scale: 0.8 }}
       animate={{ opacity: 1, x: 0, scale: 1 }}
       exit={{ opacity: 0, x: 100, scale: 0.8 }}
@@ -271,7 +271,7 @@ function XpToast({
 
         <button
           onClick={onClose}
-          className="p-1 hover:bg-white/20 rounded transition-colors"
+          className="p-1 hover:bg-card/20 rounded transition-colors"
         >
           <X className="w-4 h-4" />
         </button>
@@ -387,9 +387,13 @@ function Podium({ leaderboard }: { leaderboard: any[] }) {
   const top3 = leaderboard.slice(0, 3);
   const podiumOrder = top3.length >= 3 ? [top3[1], top3[0], top3[2]] : top3;
   const heights = ["h-24", "h-32", "h-20"];
-  const colors = ["bg-gradient-to-t from-slate-300 to-slate-200", "bg-gradient-to-t from-amber-400 to-yellow-300", "bg-gradient-to-t from-amber-700 to-amber-600"];
+  const colors = ["bg-muted", "bg-status-warning", "bg-status-warning/80"];
   const positions = ["2nd", "1st", "3rd"];
-  const icons = [<Medal key="2" className="w-6 h-6 text-slate-500" />, <Crown key="1" className="w-8 h-8 text-yellow-500" />, <Medal key="3" className="w-5 h-5 text-amber-700" />];
+  const icons = [
+    <Medal key="2" className="w-6 h-6 text-muted-foreground" />,
+    <Crown key="1" className="w-8 h-8 text-status-warning" />,
+    <Medal key="3" className="w-5 h-5 text-status-warning-text" />
+  ];
 
   if (top3.length === 0) return null;
 
@@ -399,13 +403,13 @@ function Podium({ leaderboard }: { leaderboard: any[] }) {
         if (!person) return null;
         return (
           <div key={person.userId} className="flex flex-col items-center">
-            <div className="mb-2 text-center">
-              {icons[idx]}
-              <div className="w-16 h-16 rounded-full bg-gradient-to-br from-emerald-100 to-cyan-100 border-4 border-white shadow-lg flex items-center justify-center text-2xl font-bold text-emerald-600 mx-auto mb-2">
-                {person.name?.charAt(0) || "?"}
-              </div>
-              <div className="font-semibold text-slate-900 text-sm truncate max-w-[80px]">{person.name}</div>
-              <div className="text-xs text-slate-500">{person.xp.toLocaleString()} XP</div>
+              <div className="mb-2 text-center">
+                {icons[idx]}
+                <div className="w-16 h-16 rounded-full bg-muted border-4 border-card shadow-lg flex items-center justify-center text-2xl font-bold text-status-success mx-auto mb-2">
+                  {person.name?.charAt(0) || "?"}
+                </div>
+                <div className="font-semibold text-foreground text-sm truncate max-w-[80px]">{person.name}</div>
+              <div className="text-xs text-muted-foreground">{person.xp.toLocaleString()} XP</div>
             </div>
             <div className={`w-20 ${heights[idx]} ${colors[idx]} rounded-t-lg flex items-center justify-center shadow-md`}>
               <span className="font-bold text-white text-lg drop-shadow">{positions[idx]}</span>
@@ -428,9 +432,9 @@ function StreakDisplay({ recentEvents }: { recentEvents: XpEvent[] }) {
   const hasStreak = weeklyXp > 0;
 
   return (
-    <div className={`flex items-center gap-2 px-4 py-2 rounded-full ${hasStreak ? "bg-gradient-to-r from-orange-100 to-amber-100 border border-orange-200" : "bg-slate-100 border border-slate-200"}`}>
-      <Flame className={`w-5 h-5 ${hasStreak ? "text-orange-500 animate-pulse" : "text-slate-400"}`} />
-      <span className={`font-semibold ${hasStreak ? "text-orange-700" : "text-slate-500"}`}>
+    <div className={`flex items-center gap-2 px-4 py-2 rounded-full ${hasStreak ? "bg-status-warning-bg border border-status-warning-border" : "bg-muted border border-border"}`}>
+      <Flame className={`w-5 h-5 ${hasStreak ? "text-status-warning animate-pulse" : "text-muted-foreground"}`} />
+      <span className={`font-semibold ${hasStreak ? "text-status-warning-text" : "text-muted-foreground"}`}>
         {hasStreak ? `${weeklyXp} XP this week!` : "Start your streak!"}
       </span>
     </div>
@@ -442,21 +446,21 @@ function XpEventRow({ event }: { event: XpEvent }) {
   const isPositive = event.xp >= 0;
 
   return (
-    <div className="flex items-center justify-between py-3 border-b border-slate-100 last:border-0 hover:bg-slate-50/50 transition-colors px-2 rounded">
+    <div className="flex items-center justify-between py-3 border-b border-border last:border-0 hover:bg-muted/50 transition-colors px-2 rounded">
       <div className="flex items-center gap-3">
-        <div className={`w-10 h-10 rounded-full flex items-center justify-center ${isPositive ? "bg-emerald-100" : "bg-amber-100"}`}>
-          {isPositive ? <TrendingUp className="w-5 h-5 text-emerald-600" /> : <Zap className="w-5 h-5 text-amber-600" />}
+        <div className={`w-10 h-10 rounded-full flex items-center justify-center ${isPositive ? "bg-status-success-bg" : "bg-status-warning-bg"}`}>
+          {isPositive ? <TrendingUp className="w-5 h-5 text-status-success" /> : <Zap className="w-5 h-5 text-status-warning" />}
         </div>
         <div>
-          <div className="font-medium text-slate-900 text-sm">{categoryLabels[event.category] || event.category}</div>
-          <div className="text-xs text-slate-500">{event.reason || "Activity completed"}</div>
+          <div className="font-medium text-foreground text-sm">{categoryLabels[event.category] || event.category}</div>
+          <div className="text-xs text-muted-foreground">{event.reason || "Activity completed"}</div>
         </div>
       </div>
       <div className="text-right">
-        <div className={`font-bold ${isPositive ? "text-emerald-600" : "text-amber-600"}`}>
+        <div className={`font-bold ${isPositive ? "text-status-success" : "text-status-warning"}`}>
           {isPositive ? "+" : ""}{event.xp} XP
         </div>
-        <div className="text-xs text-slate-400">{new Date(event.createdAt).toLocaleDateString()}</div>
+        <div className="text-xs text-muted-foreground">{new Date(event.createdAt).toLocaleDateString()}</div>
       </div>
     </div>
   );
@@ -591,8 +595,8 @@ export default function GamificationDashboardPage() {
     return (
       <DashboardShell>
         <div className="flex flex-col items-center justify-center py-24">
-          <Loader2 className="w-12 h-12 text-emerald-500 animate-spin mb-4" />
-          <p className="text-slate-500">Loading your stats...</p>
+          <Loader2 className="w-12 h-12 text-status-success animate-spin mb-4" />
+          <p className="text-muted-foreground">Loading your stats...</p>
         </div>
       </DashboardShell>
     );
@@ -606,13 +610,13 @@ export default function GamificationDashboardPage() {
           <div className="w-24 h-24 rounded-full bg-red-100 flex items-center justify-center mb-6">
             <Trophy className="w-12 h-12 text-red-400" />
           </div>
-          <h1 className="text-2xl font-bold text-slate-900 mb-2">Unable to Load Stats</h1>
-          <p className="text-slate-500 max-w-md mb-4">
+          <h1 className="text-2xl font-bold text-foreground mb-2">Unable to Load Stats</h1>
+          <p className="text-muted-foreground max-w-md mb-4">
             {loadingTimedOut
               ? "Loading took too long. The server may be unavailable. Please try again later."
               : "There was an error loading your gamification data. Please try refreshing the page."}
           </p>
-          <p className="text-xs text-slate-400 mb-4">
+          <p className="text-xs text-muted-foreground mb-4">
             {(dashboardError as Error)?.message || (whoamiError as Error)?.message || (loadingTimedOut ? "Request timeout" : "Unknown error")}
           </p>
           <Button onClick={() => window.location.reload()} variant="outline">
@@ -628,11 +632,11 @@ export default function GamificationDashboardPage() {
     return (
       <DashboardShell>
         <div className="flex flex-col items-center justify-center py-24 text-center">
-          <div className="w-24 h-24 rounded-full bg-slate-100 flex items-center justify-center mb-6">
-            <Trophy className="w-12 h-12 text-slate-400" />
+          <div className="w-24 h-24 rounded-full bg-muted flex items-center justify-center mb-6">
+            <Trophy className="w-12 h-12 text-muted-foreground" />
           </div>
-          <h1 className="text-2xl font-bold text-slate-900 mb-2">Select a Campground</h1>
-          <p className="text-slate-500 max-w-md">
+          <h1 className="text-2xl font-bold text-foreground mb-2">Select a Campground</h1>
+          <p className="text-muted-foreground max-w-md">
             Please select a campground from the sidebar to view your gamification stats.
           </p>
         </div>
@@ -645,11 +649,11 @@ export default function GamificationDashboardPage() {
     return (
       <DashboardShell>
         <div className="flex flex-col items-center justify-center py-24 text-center">
-          <div className="w-24 h-24 rounded-full bg-slate-100 flex items-center justify-center mb-6">
-            <Trophy className="w-12 h-12 text-slate-400" />
+          <div className="w-24 h-24 rounded-full bg-muted flex items-center justify-center mb-6">
+            <Trophy className="w-12 h-12 text-muted-foreground" />
           </div>
-          <h1 className="text-2xl font-bold text-slate-900 mb-2">Gamification Not Available</h1>
-          <p className="text-slate-500 max-w-md">
+          <h1 className="text-2xl font-bold text-foreground mb-2">Gamification Not Available</h1>
+          <p className="text-muted-foreground max-w-md">
             {!dashboard?.enabled
               ? "Gamification is not enabled for this property. Ask your manager to turn it on in Settings."
               : "Your role doesn't currently participate in gamification."}
@@ -674,10 +678,10 @@ export default function GamificationDashboardPage() {
 
       <div className="space-y-6 max-w-6xl">
         {/* Hero Section */}
-        <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-emerald-500 via-teal-500 to-cyan-500 p-8 text-white">
+        <div className="relative overflow-hidden rounded-2xl bg-action-primary p-8 text-action-primary-foreground">
           <div className="absolute inset-0 bg-[url('/grid-pattern.svg')] opacity-10" />
-          <div className="absolute -top-24 -right-24 w-64 h-64 bg-white/10 rounded-full blur-3xl" />
-          <div className="absolute -bottom-24 -left-24 w-64 h-64 bg-white/10 rounded-full blur-3xl" />
+          <div className="absolute -top-24 -right-24 w-64 h-64 bg-card/10 rounded-full blur-3xl" />
+          <div className="absolute -bottom-24 -left-24 w-64 h-64 bg-card/10 rounded-full blur-3xl" />
 
           <div className="relative flex flex-col md:flex-row items-center gap-8">
             {/* Level Ring */}
@@ -693,17 +697,17 @@ export default function GamificationDashboardPage() {
               <h1 className="text-3xl font-bold mb-2">{userName}</h1>
 
               <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mt-6">
-                <div className="bg-white/10 backdrop-blur rounded-xl p-4">
+                <div className="bg-card/10 backdrop-blur rounded-xl p-4">
                   <div className="text-3xl font-bold">
                     <AnimatedNumber value={totalXp} />
                   </div>
                   <div className="text-sm opacity-90">Total XP</div>
                 </div>
-                <div className="bg-white/10 backdrop-blur rounded-xl p-4">
+                <div className="bg-card/10 backdrop-blur rounded-xl p-4">
                   <div className="text-3xl font-bold">{recentEvents.length}</div>
                   <div className="text-sm opacity-90">Recent Activities</div>
                 </div>
-                <div className="bg-white/10 backdrop-blur rounded-xl p-4">
+                <div className="bg-card/10 backdrop-blur rounded-xl p-4">
                   <div className="text-3xl font-bold">{xpRemaining > 0 ? xpRemaining : "MAX"}</div>
                   <div className="text-sm opacity-90">XP to Level {currentLevel + 1}</div>
                 </div>
@@ -740,22 +744,22 @@ export default function GamificationDashboardPage() {
               <Card>
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
-                    <Star className="w-5 h-5 text-amber-500" />
+                    <Star className="w-5 h-5 text-status-warning" />
                     XP Breakdown
                   </CardTitle>
                   <CardDescription>Where your XP comes from (last 30 days)</CardDescription>
                 </CardHeader>
                 <CardContent>
                   {!isRechartsLoaded ? (
-                    <div className="text-center py-8 text-slate-500">
+                    <div className="text-center py-8 text-muted-foreground">
                       <div className="flex items-center justify-center gap-2">
-                        <div className="h-4 w-4 animate-spin rounded-full border-2 border-emerald-500 border-t-transparent" />
+                        <div className="h-4 w-4 animate-spin rounded-full border-2 border-status-success border-t-transparent" />
                         <p>Loading chart...</p>
                       </div>
                     </div>
                   ) : categoryData.length === 0 ? (
-                    <div className="text-center py-8 text-slate-500">
-                      <Star className="w-12 h-12 mx-auto mb-3 text-slate-300" />
+                    <div className="text-center py-8 text-muted-foreground">
+                      <Star className="w-12 h-12 mx-auto mb-3 text-muted-foreground" />
                       <p>No XP earned yet</p>
                     </div>
                   ) : (
@@ -791,8 +795,8 @@ export default function GamificationDashboardPage() {
                         {categoryData.map((cat: any) => (
                           <div key={cat.name} className="flex items-center gap-2 text-sm">
                             <div className="w-3 h-3 rounded-full" style={{ backgroundColor: cat.color }} />
-                            <span className="text-slate-600">{cat.name}</span>
-                            <span className="font-medium text-slate-900">{cat.value}</span>
+                            <span className="text-muted-foreground">{cat.name}</span>
+                            <span className="font-medium text-foreground">{cat.value}</span>
                           </div>
                         ))}
                       </div>
@@ -807,7 +811,7 @@ export default function GamificationDashboardPage() {
                   <div className="flex items-center justify-between">
                     <div>
                       <CardTitle className="flex items-center gap-2">
-                        <Clock className="w-5 h-5 text-blue-600" />
+                        <Clock className="w-5 h-5 text-status-info" />
                         Recent Activity
                       </CardTitle>
                       <CardDescription>Your latest XP earnings</CardDescription>
@@ -816,12 +820,12 @@ export default function GamificationDashboardPage() {
                 </CardHeader>
                 <CardContent>
                   {recentEvents.length === 0 ? (
-                    <div className="text-center py-8 text-slate-500">
-                      <Clock className="w-12 h-12 mx-auto mb-3 text-slate-300" />
+                    <div className="text-center py-8 text-muted-foreground">
+                      <Clock className="w-12 h-12 mx-auto mb-3 text-muted-foreground" />
                       <p>No activity yet. Start earning XP!</p>
                     </div>
                   ) : (
-                    <div className="divide-y divide-slate-100">
+                    <div className="divide-y divide-border">
                       {recentEvents.slice(0, 5).map((event) => (
                         <XpEventRow key={event.id} event={event} />
                       ))}
@@ -833,39 +837,39 @@ export default function GamificationDashboardPage() {
 
             {/* Quick Stats */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              <Card className="bg-gradient-to-br from-emerald-50 to-white">
+              <Card className="bg-card">
                 <CardContent className="pt-6">
                   <div className="text-center">
-                    <TrendingUp className="w-8 h-8 mx-auto text-emerald-600 mb-2" />
-                    <div className="text-2xl font-bold text-slate-900">{totalXp}</div>
-                    <div className="text-sm text-slate-500">Total XP</div>
+                    <TrendingUp className="w-8 h-8 mx-auto text-status-success mb-2" />
+                    <div className="text-2xl font-bold text-foreground">{totalXp}</div>
+                    <div className="text-sm text-muted-foreground">Total XP</div>
                   </div>
                 </CardContent>
               </Card>
-              <Card className="bg-gradient-to-br from-blue-50 to-white">
+              <Card className="bg-card">
                 <CardContent className="pt-6">
                   <div className="text-center">
-                    <Target className="w-8 h-8 mx-auto text-blue-600 mb-2" />
-                    <div className="text-2xl font-bold text-slate-900">Level {currentLevel}</div>
-                    <div className="text-sm text-slate-500">{levelTitle}</div>
+                    <Target className="w-8 h-8 mx-auto text-status-info mb-2" />
+                    <div className="text-2xl font-bold text-foreground">Level {currentLevel}</div>
+                    <div className="text-sm text-muted-foreground">{levelTitle}</div>
                   </div>
                 </CardContent>
               </Card>
-              <Card className="bg-gradient-to-br from-amber-50 to-white">
+              <Card className="bg-card">
                 <CardContent className="pt-6">
                   <div className="text-center">
-                    <Flame className="w-8 h-8 mx-auto text-amber-600 mb-2" />
-                    <div className="text-2xl font-bold text-slate-900">{recentEvents.length}</div>
-                    <div className="text-sm text-slate-500">Activities</div>
+                    <Flame className="w-8 h-8 mx-auto text-status-warning mb-2" />
+                    <div className="text-2xl font-bold text-foreground">{recentEvents.length}</div>
+                    <div className="text-sm text-muted-foreground">Activities</div>
                   </div>
                 </CardContent>
               </Card>
-              <Card className="bg-gradient-to-br from-purple-50 to-white">
+              <Card className="bg-card">
                 <CardContent className="pt-6">
                   <div className="text-center">
-                    <Award className="w-8 h-8 mx-auto text-purple-600 mb-2" />
-                    <div className="text-2xl font-bold text-slate-900">{progressPercent}%</div>
-                    <div className="text-sm text-slate-500">To Next Level</div>
+                    <Award className="w-8 h-8 mx-auto text-status-info mb-2" />
+                    <div className="text-2xl font-bold text-foreground">{progressPercent}%</div>
+                    <div className="text-sm text-muted-foreground">To Next Level</div>
                   </div>
                 </CardContent>
               </Card>
@@ -879,7 +883,7 @@ export default function GamificationDashboardPage() {
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                   <div>
                     <CardTitle className="flex items-center gap-2">
-                      <Trophy className="w-5 h-5 text-amber-500" />
+                      <Trophy className="w-5 h-5 text-status-warning" />
                       Leaderboard
                     </CardTitle>
                     <CardDescription>See how you stack up against the team</CardDescription>
@@ -891,7 +895,7 @@ export default function GamificationDashboardPage() {
                         size="sm"
                         variant={windowKey === key ? "default" : "outline"}
                         onClick={() => setWindowKey(key)}
-                        className={windowKey === key ? "bg-emerald-600 hover:bg-emerald-700" : ""}
+                        className={windowKey === key ? "bg-action-primary text-action-primary-foreground hover:bg-action-primary-hover" : ""}
                       >
                         {key === "all" ? "All-time" : key === "monthly" ? "Monthly" : "Weekly"}
                       </Button>
@@ -916,39 +920,39 @@ export default function GamificationDashboardPage() {
                         key={row.userId}
                         className={`
                           flex items-center justify-between p-4 rounded-xl transition-all
-                          ${isViewer ? "bg-gradient-to-r from-emerald-50 to-cyan-50 border-2 border-emerald-200 shadow-sm" : "bg-slate-50 border border-slate-100 hover:border-slate-200"}
+                          ${isViewer ? "bg-status-success-bg border-2 border-status-success-border shadow-sm" : "bg-muted border border-border hover:border-border"}
                         `}
                       >
                         <div className="flex items-center gap-4">
                           <div className={`
                             w-10 h-10 rounded-full flex items-center justify-center font-bold
                             ${isTop3
-                              ? row.rank === 1 ? "bg-gradient-to-br from-amber-400 to-yellow-300 text-white"
-                                : row.rank === 2 ? "bg-gradient-to-br from-slate-300 to-slate-200 text-slate-700"
-                                : "bg-gradient-to-br from-amber-700 to-amber-600 text-white"
-                              : "bg-slate-200 text-slate-600"
+                              ? row.rank === 1 ? "bg-status-warning text-status-warning-foreground"
+                                : row.rank === 2 ? "bg-muted text-foreground"
+                                : "bg-status-warning/80 text-status-warning-foreground"
+                              : "bg-muted text-muted-foreground"
                             }
                           `}>
                             {isTop3 ? ["", "🥇", "🥈", "🥉"][row.rank] : row.rank}
                           </div>
                           <div>
-                            <div className="font-semibold text-slate-900 flex items-center gap-2">
+                            <div className="font-semibold text-foreground flex items-center gap-2">
                               {row.name}
                               {isViewer && <Badge className="bg-status-success/15 text-status-success text-xs">You</Badge>}
                             </div>
-                            <div className="text-sm text-slate-500">{row.role || "Staff"}</div>
+                            <div className="text-sm text-muted-foreground">{row.role || "Staff"}</div>
                           </div>
                         </div>
                         <div className="text-right">
-                          <div className="font-bold text-lg text-emerald-600">+{row.xp.toLocaleString()}</div>
-                          <div className="text-xs text-slate-500">XP</div>
+                          <div className="font-bold text-lg text-status-success">+{row.xp.toLocaleString()}</div>
+                          <div className="text-xs text-muted-foreground">XP</div>
                         </div>
                       </div>
                     );
                   })}
                   {(leaderboardData?.leaderboard?.length ?? 0) === 0 && (
-                    <div className="text-center py-12 text-slate-500">
-                      <Trophy className="w-12 h-12 mx-auto mb-3 text-slate-300" />
+                    <div className="text-center py-12 text-muted-foreground">
+                      <Trophy className="w-12 h-12 mx-auto mb-3 text-muted-foreground" />
                       <p>No leaderboard data yet. Start earning XP!</p>
                     </div>
                   )}
@@ -962,19 +966,19 @@ export default function GamificationDashboardPage() {
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
-                  <Clock className="w-5 h-5 text-blue-600" />
+                  <Clock className="w-5 h-5 text-status-info" />
                   Recent Activity
                 </CardTitle>
                 <CardDescription>Your XP earning history</CardDescription>
               </CardHeader>
               <CardContent>
                 {recentEvents.length === 0 ? (
-                  <div className="text-center py-12 text-slate-500">
-                    <Clock className="w-12 h-12 mx-auto mb-3 text-slate-300" />
+                  <div className="text-center py-12 text-muted-foreground">
+                    <Clock className="w-12 h-12 mx-auto mb-3 text-muted-foreground" />
                     <p>No activity yet. Start earning XP!</p>
                   </div>
                 ) : (
-                  <div className="divide-y divide-slate-100">
+                  <div className="divide-y divide-border">
                     {recentEvents.map((event) => (
                       <XpEventRow key={event.id} event={event} />
                     ))}
@@ -989,117 +993,117 @@ export default function GamificationDashboardPage() {
         <Card className="mt-8">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <Sparkles className="w-5 h-5 text-amber-500" />
+              <Sparkles className="w-5 h-5 text-status-warning" />
               How to Earn XP
             </CardTitle>
             <CardDescription>Complete these activities to level up and climb the leaderboard</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              <div className="flex items-start gap-3 p-4 rounded-lg bg-emerald-50 border border-emerald-100">
-                <div className="w-10 h-10 rounded-full bg-emerald-100 flex items-center justify-center flex-shrink-0">
-                  <Check className="w-5 h-5 text-emerald-600" />
+              <div className="flex items-start gap-3 p-4 rounded-lg bg-status-success-bg border border-status-success-border">
+                <div className="w-10 h-10 rounded-full bg-status-success-bg flex items-center justify-center flex-shrink-0">
+                  <Check className="w-5 h-5 text-status-success" />
                 </div>
                 <div>
-                  <div className="font-semibold text-slate-900">Check-ins</div>
-                  <div className="text-sm text-slate-600">Check guests in smoothly</div>
-                  <div className="text-xs text-emerald-600 font-medium mt-1">+5 to +25 XP</div>
+                  <div className="font-semibold text-foreground">Check-ins</div>
+                  <div className="text-sm text-muted-foreground">Check guests in smoothly</div>
+                  <div className="text-xs text-status-success-text font-medium mt-1">+5 to +25 XP</div>
                 </div>
               </div>
 
-              <div className="flex items-start gap-3 p-4 rounded-lg bg-blue-50 border border-blue-100">
-                <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0">
-                  <Target className="w-5 h-5 text-blue-600" />
+              <div className="flex items-start gap-3 p-4 rounded-lg bg-status-info-bg border border-status-info-border">
+                <div className="w-10 h-10 rounded-full bg-status-info-bg flex items-center justify-center flex-shrink-0">
+                  <Target className="w-5 h-5 text-status-info" />
                 </div>
                 <div>
-                  <div className="font-semibold text-slate-900">Tasks</div>
-                  <div className="text-sm text-slate-600">Complete assigned tasks</div>
-                  <div className="text-xs text-blue-600 font-medium mt-1">+5 to +25 XP</div>
+                  <div className="font-semibold text-foreground">Tasks</div>
+                  <div className="text-sm text-muted-foreground">Complete assigned tasks</div>
+                  <div className="text-xs text-status-info-text font-medium mt-1">+5 to +25 XP</div>
                 </div>
               </div>
 
-              <div className="flex items-start gap-3 p-4 rounded-lg bg-amber-50 border border-amber-100">
-                <div className="w-10 h-10 rounded-full bg-amber-100 flex items-center justify-center flex-shrink-0">
-                  <Zap className="w-5 h-5 text-amber-600" />
+              <div className="flex items-start gap-3 p-4 rounded-lg bg-status-warning-bg border border-status-warning-border">
+                <div className="w-10 h-10 rounded-full bg-status-warning-bg flex items-center justify-center flex-shrink-0">
+                  <Zap className="w-5 h-5 text-status-warning" />
                 </div>
                 <div>
-                  <div className="font-semibold text-slate-900">Maintenance</div>
-                  <div className="text-sm text-slate-600">Complete maintenance work orders</div>
-                  <div className="text-xs text-amber-600 font-medium mt-1">+10 to +40 XP</div>
+                  <div className="font-semibold text-foreground">Maintenance</div>
+                  <div className="text-sm text-muted-foreground">Complete maintenance work orders</div>
+                  <div className="text-xs text-status-warning-text font-medium mt-1">+10 to +40 XP</div>
                 </div>
               </div>
 
-              <div className="flex items-start gap-3 p-4 rounded-lg bg-purple-50 border border-purple-100">
-                <div className="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center flex-shrink-0">
-                  <Star className="w-5 h-5 text-purple-600" />
+              <div className="flex items-start gap-3 p-4 rounded-lg bg-status-info-bg border border-status-info-border">
+                <div className="w-10 h-10 rounded-full bg-status-info-bg flex items-center justify-center flex-shrink-0">
+                  <Star className="w-5 h-5 text-status-info" />
                 </div>
                 <div>
-                  <div className="font-semibold text-slate-900">Quality Reservations</div>
-                  <div className="text-sm text-slate-600">Complete reservations with all details</div>
-                  <div className="text-xs text-purple-600 font-medium mt-1">+5 to +20 XP</div>
+                  <div className="font-semibold text-foreground">Quality Reservations</div>
+                  <div className="text-sm text-muted-foreground">Complete reservations with all details</div>
+                  <div className="text-xs text-status-info-text font-medium mt-1">+5 to +20 XP</div>
                 </div>
               </div>
 
-              <div className="flex items-start gap-3 p-4 rounded-lg bg-pink-50 border border-pink-100">
-                <div className="w-10 h-10 rounded-full bg-pink-100 flex items-center justify-center flex-shrink-0">
-                  <Check className="w-5 h-5 text-pink-600" />
+              <div className="flex items-start gap-3 p-4 rounded-lg bg-status-success-bg border border-status-success-border">
+                <div className="w-10 h-10 rounded-full bg-status-success-bg flex items-center justify-center flex-shrink-0">
+                  <Check className="w-5 h-5 text-status-success" />
                 </div>
                 <div>
-                  <div className="font-semibold text-slate-900">Checklists</div>
-                  <div className="text-sm text-slate-600">Complete daily checklists</div>
-                  <div className="text-xs text-pink-600 font-medium mt-1">+2 to +10 XP</div>
+                  <div className="font-semibold text-foreground">Checklists</div>
+                  <div className="text-sm text-muted-foreground">Complete daily checklists</div>
+                  <div className="text-xs text-status-success-text font-medium mt-1">+2 to +10 XP</div>
                 </div>
               </div>
 
-              <div className="flex items-start gap-3 p-4 rounded-lg bg-cyan-50 border border-cyan-100">
-                <div className="w-10 h-10 rounded-full bg-cyan-100 flex items-center justify-center flex-shrink-0">
-                  <Award className="w-5 h-5 text-cyan-600" />
+              <div className="flex items-start gap-3 p-4 rounded-lg bg-status-info-bg border border-status-info-border">
+                <div className="w-10 h-10 rounded-full bg-status-info-bg flex items-center justify-center flex-shrink-0">
+                  <Award className="w-5 h-5 text-status-info" />
                 </div>
                 <div>
-                  <div className="font-semibold text-slate-900">Review Mentions</div>
-                  <div className="text-sm text-slate-600">Get mentioned positively in guest reviews</div>
-                  <div className="text-xs text-cyan-600 font-medium mt-1">+15 to +50 XP</div>
+                  <div className="font-semibold text-foreground">Review Mentions</div>
+                  <div className="text-sm text-muted-foreground">Get mentioned positively in guest reviews</div>
+                  <div className="text-xs text-status-info-text font-medium mt-1">+15 to +50 XP</div>
                 </div>
               </div>
 
-              <div className="flex items-start gap-3 p-4 rounded-lg bg-orange-50 border border-orange-100">
-                <div className="w-10 h-10 rounded-full bg-orange-100 flex items-center justify-center flex-shrink-0">
-                  <Clock className="w-5 h-5 text-orange-600" />
+              <div className="flex items-start gap-3 p-4 rounded-lg bg-status-warning-bg border border-status-warning-border">
+                <div className="w-10 h-10 rounded-full bg-status-warning-bg flex items-center justify-center flex-shrink-0">
+                  <Clock className="w-5 h-5 text-status-warning" />
                 </div>
                 <div>
-                  <div className="font-semibold text-slate-900">On-time Assignments</div>
-                  <div className="text-sm text-slate-600">Complete assignments before deadline</div>
-                  <div className="text-xs text-orange-600 font-medium mt-1">+5 to +20 XP</div>
+                  <div className="font-semibold text-foreground">On-time Assignments</div>
+                  <div className="text-sm text-muted-foreground">Complete assignments before deadline</div>
+                  <div className="text-xs text-status-warning-text font-medium mt-1">+5 to +20 XP</div>
                 </div>
               </div>
 
-              <div className="flex items-start gap-3 p-4 rounded-lg bg-teal-50 border border-teal-100">
-                <div className="w-10 h-10 rounded-full bg-teal-100 flex items-center justify-center flex-shrink-0">
-                  <Users className="w-5 h-5 text-teal-600" />
+              <div className="flex items-start gap-3 p-4 rounded-lg bg-status-info-bg border border-status-info-border">
+                <div className="w-10 h-10 rounded-full bg-status-info-bg flex items-center justify-center flex-shrink-0">
+                  <Users className="w-5 h-5 text-status-info" />
                 </div>
                 <div>
-                  <div className="font-semibold text-slate-900">Team Assists</div>
-                  <div className="text-sm text-slate-600">Help teammates with their tasks</div>
-                  <div className="text-xs text-teal-600 font-medium mt-1">+5 to +20 XP</div>
+                  <div className="font-semibold text-foreground">Team Assists</div>
+                  <div className="text-sm text-muted-foreground">Help teammates with their tasks</div>
+                  <div className="text-xs text-status-info-text font-medium mt-1">+5 to +20 XP</div>
                 </div>
               </div>
 
-              <div className="flex items-start gap-3 p-4 rounded-lg bg-indigo-50 border border-indigo-100">
-                <div className="w-10 h-10 rounded-full bg-indigo-100 flex items-center justify-center flex-shrink-0">
-                  <Gift className="w-5 h-5 text-indigo-600" />
+              <div className="flex items-start gap-3 p-4 rounded-lg bg-status-info-bg border border-status-info-border">
+                <div className="w-10 h-10 rounded-full bg-status-info-bg flex items-center justify-center flex-shrink-0">
+                  <Gift className="w-5 h-5 text-status-info" />
                 </div>
                 <div>
-                  <div className="font-semibold text-slate-900">Merit Awards</div>
-                  <div className="text-sm text-slate-600">Receive recognition from managers</div>
-                  <div className="text-xs text-indigo-600 font-medium mt-1">+5 to +100 XP</div>
+                  <div className="font-semibold text-foreground">Merit Awards</div>
+                  <div className="text-sm text-muted-foreground">Receive recognition from managers</div>
+                  <div className="text-xs text-status-info-text font-medium mt-1">+5 to +100 XP</div>
                 </div>
               </div>
             </div>
 
             {/* Level Guide */}
-            <div className="mt-8 pt-6 border-t border-slate-200">
-              <h3 className="font-semibold text-slate-900 mb-4 flex items-center gap-2">
-                <TrendingUp className="w-5 h-5 text-emerald-600" />
+            <div className="mt-8 pt-6 border-t border-border">
+              <h3 className="font-semibold text-foreground mb-4 flex items-center gap-2">
+                <TrendingUp className="w-5 h-5 text-status-success" />
                 Level Progression
               </h3>
               <div className="flex flex-wrap gap-2">
@@ -1108,17 +1112,17 @@ export default function GamificationDashboardPage() {
                     key={level}
                     className={`px-3 py-2 rounded-lg border text-sm ${
                       parseInt(level) === currentLevel
-                        ? "bg-emerald-100 border-emerald-300 text-emerald-800 font-semibold"
+                        ? "bg-status-success-bg border-status-success-border text-status-success-text font-semibold"
                         : parseInt(level) < currentLevel
-                        ? "bg-slate-100 border-slate-200 text-slate-500"
-                        : "bg-white border-slate-200 text-slate-600"
+                        ? "bg-muted border-border text-muted-foreground"
+                        : "bg-card border-border text-muted-foreground"
                     }`}
                   >
                     <span className="font-medium">Lvl {level}:</span> {title}
                   </div>
                 ))}
               </div>
-              <p className="text-sm text-slate-500 mt-4">
+              <p className="text-sm text-muted-foreground mt-4">
                 Each level requires progressively more XP. Keep earning to unlock new titles and climb the leaderboard!
               </p>
             </div>

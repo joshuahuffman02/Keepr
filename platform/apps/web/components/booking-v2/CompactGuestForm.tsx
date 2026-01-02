@@ -575,44 +575,44 @@ function ExpandableSection({
     <div
       className={cn(
         "border rounded-lg overflow-hidden transition-colors",
-        isOpen ? "border-slate-300 bg-slate-50/50" : "border-slate-200"
+        isOpen ? "border-border bg-muted/50" : "border-border"
       )}
     >
       <button
         type="button"
         onClick={onToggle}
-        className="w-full flex items-center gap-3 p-3 hover:bg-slate-50 transition-colors"
+        className="w-full flex items-center gap-3 p-3 hover:bg-muted transition-colors"
       >
         <div
           className={cn(
             "w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0",
-            hasContent ? "bg-emerald-100" : "bg-slate-100"
+            hasContent ? "bg-emerald-100" : "bg-muted"
           )}
         >
           <Icon
             className={cn(
               "h-4 w-4",
-              hasContent ? "text-emerald-600" : "text-slate-500"
+              hasContent ? "text-emerald-600" : "text-muted-foreground"
             )}
           />
         </div>
 
         <div className="flex-1 text-left">
           <div className="flex items-center gap-2">
-            <span className="font-medium text-slate-900">{title}</span>
+            <span className="font-medium text-foreground">{title}</span>
             {hasContent && (
               <span className="text-xs text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded">
                 Added
               </span>
             )}
           </div>
-          <p className="text-sm text-slate-500">{description}</p>
+          <p className="text-sm text-muted-foreground">{description}</p>
         </div>
 
         {isOpen ? (
-          <ChevronUp className="h-5 w-5 text-slate-400" />
+          <ChevronUp className="h-5 w-5 text-muted-foreground" />
         ) : (
-          <ChevronDown className="h-5 w-5 text-slate-400" />
+          <ChevronDown className="h-5 w-5 text-muted-foreground" />
         )}
       </button>
 

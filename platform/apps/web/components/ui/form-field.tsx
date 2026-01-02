@@ -39,12 +39,12 @@ const FormField = React.forwardRef<HTMLInputElement, FormFieldProps>(
             id={fieldId}
             ref={ref}
             className={cn(
-              "flex h-10 w-full rounded-md border bg-white px-3 py-2 text-sm ring-offset-white file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-slate-500 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 transition-colors",
+              "flex h-10 w-full rounded-md border bg-card px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 transition-colors",
               hasError
                 ? "border-status-error focus-visible:ring-status-error/50"
                 : isValid
                 ? "border-status-success focus-visible:ring-status-success/50"
-                : "border-slate-200 focus-visible:ring-slate-950/20",
+                : "border-border focus-visible:ring-ring/20",
               isValid && "pr-10",
               className
             )}
@@ -72,7 +72,7 @@ const FormField = React.forwardRef<HTMLInputElement, FormFieldProps>(
         {helperText && !error && (
           <p
             id={helperId}
-            className="text-sm text-slate-500"
+            className="text-sm text-muted-foreground"
           >
             {helperText}
           </p>

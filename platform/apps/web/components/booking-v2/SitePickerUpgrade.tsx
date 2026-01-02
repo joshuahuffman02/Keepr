@@ -84,14 +84,14 @@ export function SitePickerUpgrade({
 
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2">
-            <h3 className="font-semibold text-slate-900">
+            <h3 className="font-semibold text-foreground">
               Pick Your Exact Site
             </h3>
             <Badge className="bg-amber-500 text-white border-0 text-xs">
               +{formatCurrency(upgradeFee)}
             </Badge>
           </div>
-          <p className="text-sm text-slate-600 mt-0.5">
+          <p className="text-sm text-muted-foreground mt-0.5">
             {hasSelection
               ? `Selected: ${selectedSite.name || `Site ${selectedSite.siteNumber}`}`
               : "Choose your specific spot instead of being assigned"}
@@ -106,7 +106,7 @@ export function SitePickerUpgrade({
           ) : (
             <ChevronRight
               className={cn(
-                "h-5 w-5 text-slate-400 transition-transform",
+                "h-5 w-5 text-muted-foreground transition-transform",
                 isExpanded && "rotate-90"
               )}
             />
@@ -129,7 +129,7 @@ export function SitePickerUpgrade({
               {hasSelection && (
                 <button
                   onClick={() => onSelectSite(null)}
-                  className="w-full flex items-center gap-2 p-2 text-sm text-slate-500 hover:text-slate-700 hover:bg-slate-50 rounded-lg transition-colors"
+                  className="w-full flex items-center gap-2 p-2 text-sm text-muted-foreground hover:text-foreground hover:bg-muted rounded-lg transition-colors"
                 >
                   <X className="h-4 w-4" />
                   Remove selection (save {formatCurrency(upgradeFee)})
@@ -149,7 +149,7 @@ export function SitePickerUpgrade({
                         "relative p-3 rounded-lg border-2 text-left transition-all",
                         isSelected
                           ? "border-emerald-500 bg-emerald-50"
-                          : "border-slate-200 bg-white hover:border-slate-300 hover:shadow-sm"
+                          : "border-border bg-card hover:border-border hover:shadow-sm"
                       )}
                       whileHover={prefersReducedMotion ? {} : { scale: 1.02 }}
                       whileTap={prefersReducedMotion ? {} : { scale: 0.98 }}
@@ -175,11 +175,11 @@ export function SitePickerUpgrade({
                       )}
 
                       <div className="space-y-0.5">
-                        <div className="font-medium text-sm text-slate-900">
+                        <div className="font-medium text-sm text-foreground">
                           Site {site.siteNumber}
                         </div>
                         {site.name && site.name !== `Site ${site.siteNumber}` && (
-                          <div className="text-xs text-slate-500 truncate">
+                          <div className="text-xs text-muted-foreground truncate">
                             {site.name}
                           </div>
                         )}
@@ -226,14 +226,14 @@ export function SitePickerBanner({
     >
       <Sparkles className="h-5 w-5 text-amber-500 flex-shrink-0" />
       <div className="flex-1 min-w-0">
-        <span className="text-sm font-medium text-slate-900">
+        <span className="text-sm font-medium text-foreground">
           Want a specific site?
         </span>
-        <span className="text-sm text-slate-600 ml-1">
+        <span className="text-sm text-muted-foreground ml-1">
           Pick your spot for +{formatCurrency(upgradeFee)}
         </span>
       </div>
-      <ChevronRight className="h-4 w-4 text-slate-400 flex-shrink-0" />
+      <ChevronRight className="h-4 w-4 text-muted-foreground flex-shrink-0" />
     </button>
   );
 }

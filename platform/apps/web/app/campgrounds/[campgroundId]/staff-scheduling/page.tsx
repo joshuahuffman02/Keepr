@@ -49,7 +49,7 @@ type StaffMember = { id: string; firstName?: string; lastName?: string; email?: 
 const STATUS_OPTIONS = ["all", "scheduled", "in_progress", "submitted", "approved", "rejected"];
 
 const STATUS_COLORS: Record<string, { bg: string; text: string; dot: string }> = {
-  scheduled: { bg: "bg-muted", text: "text-foreground", dot: "bg-slate-400" },
+  scheduled: { bg: "bg-muted", text: "text-foreground", dot: "bg-muted" },
   in_progress: { bg: "bg-status-info/15", text: "text-status-info", dot: "bg-status-info" },
   submitted: { bg: "bg-status-warning/15", text: "text-status-warning", dot: "bg-status-warning" },
   approved: { bg: "bg-status-success/15", text: "text-status-success", dot: "bg-status-success" },
@@ -575,7 +575,7 @@ export default function StaffSchedulingPage({ params }: { params: { campgroundId
                   <div className="flex gap-3 pt-2">
                     <button
                       onClick={closeSwapModal}
-                      className="flex-1 px-4 py-3 bg-muted text-foreground rounded-xl font-medium hover:bg-slate-200"
+                      className="flex-1 px-4 py-3 bg-muted text-foreground rounded-xl font-medium hover:bg-muted"
                     >
                       Cancel
                     </button>
@@ -844,7 +844,7 @@ export default function StaffSchedulingPage({ params }: { params: { campgroundId
             <div className="bg-muted/60 border-b border-border px-6 py-4">
               <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-lg bg-slate-200 flex items-center justify-center">
+                  <div className="w-10 h-10 rounded-lg bg-muted flex items-center justify-center">
                     <Calendar className="w-5 h-5 text-muted-foreground" />
                   </div>
                   <div>
@@ -1164,7 +1164,7 @@ export default function StaffSchedulingPage({ params }: { params: { campgroundId
                                 >
                                   <div className="flex items-start justify-between gap-2">
                                     <div className="flex items-center gap-2">
-                                      <GripVertical className="w-4 h-4 text-slate-300" />
+                                      <GripVertical className="w-4 h-4 text-muted-foreground" />
                                       <div>
                                         <div className="font-medium text-foreground text-sm">{shift.role || "Shift"}</div>
                                         <div className="text-xs text-muted-foreground">

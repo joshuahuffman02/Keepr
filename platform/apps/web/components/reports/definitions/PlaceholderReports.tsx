@@ -25,7 +25,7 @@ export function DataNotAvailableReport({ reportName, description, requiredData }
                         <p className="text-sm text-amber-800">
                             This report requires additional data that hasn't been configured yet.
                         </p>
-                        <div className="bg-white/50 rounded-lg p-4 border border-amber-200">
+                        <div className="bg-card/50 rounded-lg p-4 border border-amber-200">
                             <div className="text-xs font-medium text-amber-700 uppercase mb-2">Required Data</div>
                             <ul className="text-sm text-amber-800 space-y-1">
                                 {requiredData.map((item, idx) => (

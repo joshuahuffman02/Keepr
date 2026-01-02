@@ -176,13 +176,13 @@ export default function DynamicPricingPage() {
     return (
       <div className="max-w-4xl space-y-6">
         <div>
-          <h2 className="text-2xl font-bold text-slate-900">Dynamic Pricing</h2>
-          <p className="text-slate-500 mt-1">
+          <h2 className="text-2xl font-bold text-foreground">Dynamic Pricing</h2>
+          <p className="text-muted-foreground mt-1">
             Automatically adjust rates based on demand and occupancy
           </p>
         </div>
         <div className="flex items-center justify-center py-12">
-          <Loader2 className="h-8 w-8 animate-spin text-slate-400" />
+          <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
         </div>
       </div>
     );
@@ -192,15 +192,15 @@ export default function DynamicPricingPage() {
     return (
       <div className="max-w-4xl space-y-6">
         <div>
-          <h2 className="text-2xl font-bold text-slate-900">Dynamic Pricing</h2>
-          <p className="text-slate-500 mt-1">
+          <h2 className="text-2xl font-bold text-foreground">Dynamic Pricing</h2>
+          <p className="text-muted-foreground mt-1">
             Automatically adjust rates based on demand and occupancy
           </p>
         </div>
         <Card>
           <CardContent className="py-8 text-center">
             <Info className="h-8 w-8 text-amber-500 mx-auto mb-3" />
-            <p className="text-slate-600">Please select a campground first.</p>
+            <p className="text-muted-foreground">Please select a campground first.</p>
           </CardContent>
         </Card>
       </div>
@@ -211,8 +211,8 @@ export default function DynamicPricingPage() {
     <div className="max-w-4xl space-y-6">
       <div className="flex items-start justify-between">
         <div>
-          <h2 className="text-2xl font-bold text-slate-900">Dynamic Pricing</h2>
-          <p className="text-slate-500 mt-1">
+          <h2 className="text-2xl font-bold text-foreground">Dynamic Pricing</h2>
+          <p className="text-muted-foreground mt-1">
             Automatically adjust rates based on demand and occupancy
           </p>
         </div>
@@ -253,7 +253,7 @@ export default function DynamicPricingPage() {
       <Card className={!dynamicPricingEnabled ? "opacity-50" : ""}>
         <CardHeader>
           <CardTitle className="text-base flex items-center gap-2">
-            <Percent className="h-5 w-5 text-slate-500" />
+            <Percent className="h-5 w-5 text-muted-foreground" />
             Occupancy-Based Adjustments
           </CardTitle>
           <CardDescription>
@@ -263,11 +263,11 @@ export default function DynamicPricingPage() {
         <CardContent className="space-y-4">
           <div className="grid grid-cols-3 gap-4">
             <div className="p-4 rounded-lg border text-center">
-              <p className="text-sm text-slate-500 mb-1">0-50% Occupied</p>
-              <p className="text-lg font-semibold text-slate-900">Base Rate</p>
+              <p className="text-sm text-muted-foreground mb-1">0-50% Occupied</p>
+              <p className="text-lg font-semibold text-foreground">Base Rate</p>
             </div>
             <div className="p-4 rounded-lg border text-center">
-              <p className="text-sm text-slate-500 mb-1">50-75% Occupied</p>
+              <p className="text-sm text-muted-foreground mb-1">50-75% Occupied</p>
               <div className="flex items-center justify-center gap-1">
                 <Input
                   type="number"
@@ -280,7 +280,7 @@ export default function DynamicPricingPage() {
               </div>
             </div>
             <div className="p-4 rounded-lg border text-center">
-              <p className="text-sm text-slate-500 mb-1">75-100% Occupied</p>
+              <p className="text-sm text-muted-foreground mb-1">75-100% Occupied</p>
               <div className="flex items-center justify-center gap-1">
                 <Input
                   type="number"
@@ -299,7 +299,7 @@ export default function DynamicPricingPage() {
       <Card className={!dynamicPricingEnabled ? "opacity-50" : ""}>
         <CardHeader>
           <CardTitle className="text-base flex items-center gap-2">
-            <Calendar className="h-5 w-5 text-slate-500" />
+            <Calendar className="h-5 w-5 text-muted-foreground" />
             Lead Time Adjustments
           </CardTitle>
           <CardDescription>
@@ -310,7 +310,7 @@ export default function DynamicPricingPage() {
           <div className="flex items-center justify-between p-3 rounded-lg border">
             <div>
               <Label className="font-medium">Early Bird Discount</Label>
-              <p className="text-sm text-slate-500">
+              <p className="text-sm text-muted-foreground">
                 Bookings made 60+ days in advance
               </p>
             </div>
@@ -322,13 +322,13 @@ export default function DynamicPricingPage() {
                 disabled={!dynamicPricingEnabled}
                 className="w-16 text-center"
               />
-              <span className="text-sm text-slate-500">% off</span>
+              <span className="text-sm text-muted-foreground">% off</span>
             </div>
           </div>
           <div className="flex items-center justify-between p-3 rounded-lg border">
             <div>
               <Label className="font-medium">Last Minute Premium</Label>
-              <p className="text-sm text-slate-500">
+              <p className="text-sm text-muted-foreground">
                 Bookings made within 3 days of arrival
               </p>
             </div>
@@ -340,7 +340,7 @@ export default function DynamicPricingPage() {
                 disabled={!dynamicPricingEnabled}
                 className="w-16 text-center"
               />
-              <span className="text-sm text-slate-500">% increase</span>
+              <span className="text-sm text-muted-foreground">% increase</span>
             </div>
           </div>
         </CardContent>
@@ -349,7 +349,7 @@ export default function DynamicPricingPage() {
       <Card className={!dynamicPricingEnabled ? "opacity-50" : ""}>
         <CardHeader>
           <CardTitle className="text-base flex items-center gap-2">
-            <Users className="h-5 w-5 text-slate-500" />
+            <Users className="h-5 w-5 text-muted-foreground" />
             Length of Stay Incentives
           </CardTitle>
         </CardHeader>
@@ -357,7 +357,7 @@ export default function DynamicPricingPage() {
           <div className="flex items-center justify-between p-3 rounded-lg border">
             <div>
               <Label className="font-medium">Weekly Discount</Label>
-              <p className="text-sm text-slate-500">7+ night stays</p>
+              <p className="text-sm text-muted-foreground">7+ night stays</p>
             </div>
             <div className="flex items-center gap-2">
               <Input
@@ -367,13 +367,13 @@ export default function DynamicPricingPage() {
                 disabled={!dynamicPricingEnabled}
                 className="w-16 text-center"
               />
-              <span className="text-sm text-slate-500">% off</span>
+              <span className="text-sm text-muted-foreground">% off</span>
             </div>
           </div>
           <div className="flex items-center justify-between p-3 rounded-lg border">
             <div>
               <Label className="font-medium">Monthly Discount</Label>
-              <p className="text-sm text-slate-500">28+ night stays</p>
+              <p className="text-sm text-muted-foreground">28+ night stays</p>
             </div>
             <div className="flex items-center gap-2">
               <Input
@@ -383,7 +383,7 @@ export default function DynamicPricingPage() {
                 disabled={!dynamicPricingEnabled}
                 className="w-16 text-center"
               />
-              <span className="text-sm text-slate-500">% off</span>
+              <span className="text-sm text-muted-foreground">% off</span>
             </div>
           </div>
         </CardContent>

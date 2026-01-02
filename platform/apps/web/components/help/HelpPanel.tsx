@@ -328,20 +328,20 @@ export function HelpPanel({ open, onClose }: HelpPanelProps) {
     const isPinned = pinnedIds.includes(topic.id);
     const fb = feedback[topic.id];
     return (
-      <div key={topic.id} className="border border-slate-200 rounded-lg p-3 hover:border-emerald-500 transition-colors">
+      <div key={topic.id} className="border border-border rounded-lg p-3 hover:border-emerald-500 transition-colors">
         <div className="flex items-center justify-between gap-2">
-          <div className="text-sm font-semibold text-slate-900">{topic.title}</div>
-          <span className="text-[10px] px-2 py-0.5 rounded-full bg-slate-100 text-slate-600">{topic.category}</span>
+          <div className="text-sm font-semibold text-foreground">{topic.title}</div>
+          <span className="text-[10px] px-2 py-0.5 rounded-full bg-muted text-muted-foreground">{topic.category}</span>
         </div>
-        <p className="mt-1 text-sm text-slate-600">{topic.summary}</p>
-        <ul className="mt-2 space-y-1 text-xs text-slate-600 list-disc list-inside">
+        <p className="mt-1 text-sm text-muted-foreground">{topic.summary}</p>
+        <ul className="mt-2 space-y-1 text-xs text-muted-foreground list-disc list-inside">
           {topic.steps.slice(0, 3).map((step, idx) => (
             <li key={idx}>{step}</li>
           ))}
         </ul>
         <div className="mt-2 flex flex-wrap gap-1">
           {topic.tags.slice(0, 4).map((tag) => (
-            <span key={tag} className="text-[11px] px-2 py-0.5 bg-slate-100 text-slate-600 rounded">
+            <span key={tag} className="text-[11px] px-2 py-0.5 bg-muted text-muted-foreground rounded">
               {tag}
             </span>
           ))}
@@ -357,7 +357,7 @@ export function HelpPanel({ open, onClose }: HelpPanelProps) {
           </Link>
           <button
             onClick={() => copyLink(topic.id)}
-            className="inline-flex items-center gap-1 text-slate-500 hover:text-slate-700"
+            className="inline-flex items-center gap-1 text-muted-foreground hover:text-foreground"
             title="Copy link"
           >
             <CopyIcon />
@@ -367,24 +367,24 @@ export function HelpPanel({ open, onClose }: HelpPanelProps) {
               togglePin(topic.id);
               recordRecent(topic.id);
             }}
-            className={`inline-flex items-center gap-1 ${isPinned ? "text-amber-600" : "text-slate-500 hover:text-slate-700"}`}
+            className={`inline-flex items-center gap-1 ${isPinned ? "text-amber-600" : "text-muted-foreground hover:text-foreground"}`}
             title={isPinned ? "Unpin" : "Pin for quick access"}
           >
             <PinIcon filled={isPinned} />
             {isPinned ? "Pinned" : "Pin"}
           </button>
-          <div className="ml-auto flex items-center gap-1 text-slate-500">
+          <div className="ml-auto flex items-center gap-1 text-muted-foreground">
             <span className="text-[11px] uppercase">Helpful?</span>
             <button
               onClick={() => handleFeedback(topic.id, true)}
-              className={`p-1 rounded ${fb?.helpful === true ? "text-emerald-600 bg-emerald-50" : "hover:bg-slate-100"}`}
+              className={`p-1 rounded ${fb?.helpful === true ? "text-emerald-600 bg-emerald-50" : "hover:bg-muted"}`}
               title="Helpful"
             >
               👍
             </button>
             <button
               onClick={() => handleFeedback(topic.id, false)}
-              className={`p-1 rounded ${fb?.helpful === false ? "text-rose-600 bg-rose-50" : "hover:bg-slate-100"}`}
+              className={`p-1 rounded ${fb?.helpful === false ? "text-rose-600 bg-rose-50" : "hover:bg-muted"}`}
               title="Not helpful"
             >
               👎
@@ -392,7 +392,7 @@ export function HelpPanel({ open, onClose }: HelpPanelProps) {
           </div>
         </div>
         {fb && (
-          <div className="mt-2 text-[11px] text-slate-500">
+          <div className="mt-2 text-[11px] text-muted-foreground">
             {fb.helpful ? "Thanks! We’ll keep this handy." : "Thanks for the flag. We’ll tune this guide."}
           </div>
         )}
@@ -402,30 +402,30 @@ export function HelpPanel({ open, onClose }: HelpPanelProps) {
 
   return (
     <div className={`fixed inset-0 z-50 transition-pointer-events ${open ? "pointer-events-auto" : "pointer-events-none"}`} aria-hidden={!open}>
-      <div className={`absolute inset-0 bg-slate-900/40 backdrop-blur-sm transition-opacity ${open ? "opacity-100" : "opacity-0"}`} onClick={onClose} />
+      <div className={`absolute inset-0 bg-muted/40 backdrop-blur-sm transition-opacity ${open ? "opacity-100" : "opacity-0"}`} onClick={onClose} />
 
       <div
-        className={`absolute top-0 right-0 h-full w-full max-w-xl bg-white shadow-2xl border-l border-slate-200 flex flex-col transform transition-transform ${
+        className={`absolute top-0 right-0 h-full w-full max-w-xl bg-card shadow-2xl border-l border-border flex flex-col transform transition-transform ${
           open ? "translate-x-0" : "translate-x-full"
         }`}
         role="dialog"
         aria-modal="true"
       >
-        <div className="flex items-center gap-3 px-5 py-4 border-b border-slate-200">
+        <div className="flex items-center gap-3 px-5 py-4 border-b border-border">
           <div className="flex-1">
-            <div className="text-sm font-semibold text-slate-900">Help & guidance</div>
-            <p className="text-xs text-slate-500">
+            <div className="text-sm font-semibold text-foreground">Help & guidance</div>
+            <p className="text-xs text-muted-foreground">
               Contextual tips for <span className="font-medium">{pathname || "/"}</span>
             </p>
           </div>
-          <button onClick={onClose} className="p-2 rounded-full hover:bg-slate-100 text-slate-600" aria-label="Close help">
+          <button onClick={onClose} className="p-2 rounded-full hover:bg-muted text-muted-foreground" aria-label="Close help">
             <CloseIcon />
           </button>
         </div>
 
-        <div className="px-5 py-3 border-b border-slate-100 space-y-2">
+        <div className="px-5 py-3 border-b border-border space-y-2">
           <label className="relative block">
-            <span className="absolute left-3 top-2.5 text-slate-400">
+            <span className="absolute left-3 top-2.5 text-muted-foreground">
               <SearchIcon />
             </span>
             <input
@@ -433,24 +433,24 @@ export function HelpPanel({ open, onClose }: HelpPanelProps) {
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder="Search how-tos, e.g. refunds, pricing rules, OTA"
-              className="w-full rounded-lg border border-slate-200 pl-10 pr-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+              className="w-full rounded-lg border border-border pl-10 pr-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
             />
           </label>
-          <div className="flex flex-wrap items-center gap-2 text-[11px] text-slate-500">
-            <span className="font-semibold text-slate-600">Context</span>
-            <span className="rounded-full bg-slate-100 px-2 py-0.5">{pathname || "/"}</span>
-            <span className="text-slate-400">|</span>
+          <div className="flex flex-wrap items-center gap-2 text-[11px] text-muted-foreground">
+            <span className="font-semibold text-muted-foreground">Context</span>
+            <span className="rounded-full bg-muted px-2 py-0.5">{pathname || "/"}</span>
+            <span className="text-muted-foreground">|</span>
             <Link href="/help" className="text-emerald-600 font-semibold hover:text-emerald-700">
               Open full help
             </Link>
-            <span className="text-slate-400">|</span>
-            <span className="font-semibold text-slate-600">Role</span>
+            <span className="text-muted-foreground">|</span>
+            <span className="font-semibold text-muted-foreground">Role</span>
             {["owner", "manager", "frontdesk", "maintenance", "finance", "marketing"].map((role) => (
               <button
                 key={role}
                 onClick={() => setRoleFilter(roleFilter === role ? null : role)}
                 className={`px-2 py-0.5 rounded-full border text-[11px] ${
-                  roleFilter === role ? "bg-emerald-50 border-emerald-200 text-emerald-700" : "border-slate-200 text-slate-600 hover:bg-slate-50"
+                  roleFilter === role ? "bg-emerald-50 border-emerald-200 text-emerald-700" : "border-border text-muted-foreground hover:bg-muted"
                 }`}
               >
                 {role}
@@ -458,12 +458,12 @@ export function HelpPanel({ open, onClose }: HelpPanelProps) {
             ))}
           </div>
           <div className="flex flex-wrap gap-2 text-[11px]">
-            <span className="font-semibold text-slate-600">Tasks</span>
+            <span className="font-semibold text-muted-foreground">Tasks</span>
             {taskShortcuts.map((t) => (
               <button
                 key={t.id}
                 onClick={() => setQuery(t.title)}
-                className="px-2 py-1 rounded-full bg-slate-100 text-slate-700 hover:bg-emerald-50 hover:text-emerald-700"
+                className="px-2 py-1 rounded-full bg-muted text-foreground hover:bg-emerald-50 hover:text-emerald-700"
               >
                 {t.title}
               </button>
@@ -480,14 +480,14 @@ export function HelpPanel({ open, onClose }: HelpPanelProps) {
         <div className="flex-1 overflow-y-auto px-5 py-4 space-y-4">
           {pinnedTopics.length > 0 && !query && (
             <section>
-              <div className="text-xs uppercase font-semibold text-slate-500 mb-2">Pinned</div>
+              <div className="text-xs uppercase font-semibold text-muted-foreground mb-2">Pinned</div>
               <div className="grid grid-cols-1 gap-3">{pinnedTopics.map(renderTopic)}</div>
             </section>
           )}
 
           {recentTopics.length > 0 && !query && (
             <section>
-              <div className="text-xs uppercase font-semibold text-slate-500 mb-2">Recently viewed</div>
+              <div className="text-xs uppercase font-semibold text-muted-foreground mb-2">Recently viewed</div>
               <div className="grid grid-cols-1 gap-3">{recentTopics.map(renderTopic)}</div>
             </section>
           )}
@@ -495,26 +495,26 @@ export function HelpPanel({ open, onClose }: HelpPanelProps) {
           {/* AI Response Section */}
           {query && (aiLoading || aiResponse) && (
             <section className="mb-4">
-              <div className="rounded-lg border-2 border-blue-200 bg-gradient-to-br from-blue-50 to-indigo-50 p-4">
+              <div className="rounded-lg border border-status-info-border bg-status-info-bg p-4">
                 <div className="flex items-start gap-3">
-                  <div className="flex-shrink-0 w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
+                  <div className="flex-shrink-0 w-8 h-8 bg-status-info rounded-full flex items-center justify-center text-status-info-foreground">
                     <AiSparklesIcon />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <div className="text-xs font-semibold text-blue-600 uppercase tracking-wide mb-1">
+                    <div className="text-xs font-semibold text-status-info-text uppercase tracking-wide mb-1">
                       AI Assistant
                     </div>
                     {aiLoading ? (
-                      <div className="flex items-center gap-2 text-sm text-slate-600">
+                      <div className="flex items-center gap-2 text-sm text-muted-foreground">
                         <div className="flex gap-1">
-                          <span className="w-2 h-2 bg-blue-400 rounded-full animate-bounce" />
-                          <span className="w-2 h-2 bg-blue-400 rounded-full animate-bounce [animation-delay:0.1s]" />
-                          <span className="w-2 h-2 bg-blue-400 rounded-full animate-bounce [animation-delay:0.2s]" />
+                          <span className="w-2 h-2 bg-status-info rounded-full animate-bounce" />
+                          <span className="w-2 h-2 bg-status-info rounded-full animate-bounce [animation-delay:0.1s]" />
+                          <span className="w-2 h-2 bg-status-info rounded-full animate-bounce [animation-delay:0.2s]" />
                         </div>
                         Searching for an answer...
                       </div>
                     ) : (
-                      <p className="text-sm text-slate-700 whitespace-pre-wrap">{aiResponse}</p>
+                      <p className="text-sm text-foreground whitespace-pre-wrap">{aiResponse}</p>
                     )}
                   </div>
                 </div>
@@ -523,44 +523,44 @@ export function HelpPanel({ open, onClose }: HelpPanelProps) {
           )}
 
           {emptyState && !aiLoading && !aiResponse && (
-            <div className="text-sm text-slate-600">
+            <div className="text-sm text-muted-foreground">
               No results for <span className="font-semibold">"{query}"</span>. Try a different keyword or browse below.
             </div>
           )}
 
           {!query && contextTopics.length > 0 && (
             <section>
-              <div className="text-xs uppercase font-semibold text-slate-500 mb-2">Relevant to this page</div>
+              <div className="text-xs uppercase font-semibold text-muted-foreground mb-2">Relevant to this page</div>
               <div className="grid grid-cols-1 gap-3">{contextTopics.map(renderTopic)}</div>
             </section>
           )}
 
           {query && searchResults.length > 0 && (
             <section>
-              <div className="text-xs uppercase font-semibold text-slate-500 mb-2">Search results</div>
+              <div className="text-xs uppercase font-semibold text-muted-foreground mb-2">Search results</div>
               <div className="grid grid-cols-1 gap-3">{searchResults.map(renderTopic)}</div>
             </section>
           )}
 
           {!query && (
             <section>
-              <div className="text-xs uppercase font-semibold text-slate-500 mb-2">Popular</div>
+              <div className="text-xs uppercase font-semibold text-muted-foreground mb-2">Popular</div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">{popular.map(renderTopic)}</div>
             </section>
           )}
 
           {!query && (
             <section>
-              <div className="text-xs uppercase font-semibold text-slate-500 mb-2">Browse all</div>
+              <div className="text-xs uppercase font-semibold text-muted-foreground mb-2">Browse all</div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 {allTopics.map((topic) => (
                   <Link
                     href={`/help#${topic.id}`}
                     key={topic.id}
                     onClick={() => recordRecent(topic.id)}
-                    className="flex items-center gap-2 px-3 py-2 rounded-lg border border-slate-200 hover:border-emerald-500 text-sm text-slate-700"
+                    className="flex items-center gap-2 px-3 py-2 rounded-lg border border-border hover:border-emerald-500 text-sm text-foreground"
                   >
-                    <span className="text-[11px] px-2 py-0.5 bg-slate-100 text-slate-600 rounded">{topic.category}</span>
+                    <span className="text-[11px] px-2 py-0.5 bg-muted text-muted-foreground rounded">{topic.category}</span>
                     <span className="truncate">{topic.title}</span>
                   </Link>
                 ))}
@@ -576,7 +576,7 @@ export function HelpPanel({ open, onClose }: HelpPanelProps) {
             </DialogHeader>
             <div className="space-y-3">
               <div className="space-y-1">
-                <label className="text-sm font-medium text-slate-700">What went wrong?</label>
+                <label className="text-sm font-medium text-foreground">What went wrong?</label>
                 <Textarea
                   value={reportDescription}
                   onChange={(e) => setReportDescription(e.target.value)}
@@ -585,7 +585,7 @@ export function HelpPanel({ open, onClose }: HelpPanelProps) {
                 />
               </div>
               <div className="space-y-1">
-                <label className="text-sm font-medium text-slate-700">Steps or details (optional)</label>
+                <label className="text-sm font-medium text-foreground">Steps or details (optional)</label>
                 <Textarea
                   value={reportSteps}
                   onChange={(e) => setReportSteps(e.target.value)}
@@ -594,7 +594,7 @@ export function HelpPanel({ open, onClose }: HelpPanelProps) {
                 />
               </div>
               <div className="space-y-1">
-                <label className="text-sm font-medium text-slate-700">Contact (optional)</label>
+                <label className="text-sm font-medium text-foreground">Contact (optional)</label>
                 <Input
                   value={reportEmail}
                   onChange={(e) => setReportEmail(e.target.value)}
@@ -602,7 +602,7 @@ export function HelpPanel({ open, onClose }: HelpPanelProps) {
                   type="email"
                 />
               </div>
-              <p className="text-xs text-slate-500">
+              <p className="text-xs text-muted-foreground">
                 We’ll send page URL, browser info, timezone, viewport, role filter, pinned/recent topics, and selected campground to help troubleshoot.
               </p>
             </div>

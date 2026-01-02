@@ -209,20 +209,6 @@ export function GlobalCommandPalette() {
       action: () => setTheme("light"),
       keywords: ["theme", "appearance", "bright"],
     },
-    {
-      id: "theme-dark",
-      label: "Dark Mode",
-      icon: Moon,
-      action: () => setTheme("dark"),
-      keywords: ["theme", "appearance", "night"],
-    },
-    {
-      id: "theme-system",
-      label: "System Theme",
-      icon: Laptop,
-      action: () => setTheme("system"),
-      keywords: ["theme", "appearance", "auto"],
-    },
   ];
 
   const helpCommands: CommandOption[] = [

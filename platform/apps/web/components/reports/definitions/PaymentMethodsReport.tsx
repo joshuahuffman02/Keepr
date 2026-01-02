@@ -65,7 +65,7 @@ export function PaymentMethodsReport({ campgroundId, dateRange }: PaymentMethods
         <div className="space-y-8">
             <div className="flex flex-col md:flex-row gap-8 items-center h-[400px]">
                 <div className="w-full md:w-1/2 h-full">
-                    <h3 className="text-lg font-semibold text-slate-900 mb-4">Distribution</h3>
+                    <h3 className="text-lg font-semibold text-foreground mb-4">Distribution</h3>
                     {reportData.pieData.length > 0 ? (
                         <ResponsiveContainer width="100%" height="80%">
                             <PieChart>
@@ -91,32 +91,32 @@ export function PaymentMethodsReport({ campgroundId, dateRange }: PaymentMethods
                             </PieChart>
                         </ResponsiveContainer>
                     ) : (
-                        <div className="h-full flex items-center justify-center text-slate-400">No payments found</div>
+                        <div className="h-full flex items-center justify-center text-muted-foreground">No payments found</div>
                     )}
                 </div>
 
                 <div className="w-full md:w-1/2 h-full overflow-auto">
-                    <h3 className="text-lg font-semibold text-slate-900 mb-4 text-right">Details</h3>
-                    <div className="rounded-xl border border-slate-200 bg-white shadow-sm overflow-hidden">
+                    <h3 className="text-lg font-semibold text-foreground mb-4 text-right">Details</h3>
+                    <div className="rounded-xl border border-border bg-card shadow-sm overflow-hidden">
                         <table className="min-w-full text-sm text-left">
-                            <thead className="bg-slate-50 text-xs uppercase font-semibold text-slate-500">
+                            <thead className="bg-muted text-xs uppercase font-semibold text-muted-foreground">
                                 <tr>
                                     <th className="px-4 py-3">Method</th>
                                     <th className="px-4 py-3 text-right">Amount</th>
                                     <th className="px-4 py-3 text-right">%</th>
                                 </tr>
                             </thead>
-                            <tbody className="divide-y divide-slate-100">
+                            <tbody className="divide-y divide-border">
                                 {reportData.pieData.map((item) => (
-                                    <tr key={item.name} className="hover:bg-slate-50">
-                                        <td className="px-4 py-3 font-medium text-slate-900">{item.name}</td>
-                                        <td className="px-4 py-3 text-right font-mono text-slate-900">{formatCurrency(item.value)}</td>
-                                        <td className="px-4 py-3 text-right text-slate-500">
+                                    <tr key={item.name} className="hover:bg-muted">
+                                        <td className="px-4 py-3 font-medium text-foreground">{item.name}</td>
+                                        <td className="px-4 py-3 text-right font-mono text-foreground">{formatCurrency(item.value)}</td>
+                                        <td className="px-4 py-3 text-right text-muted-foreground">
                                             {reportData.total > 0 ? ((item.value / reportData.total) * 100).toFixed(1) : 0}%
                                         </td>
                                     </tr>
                                 ))}
-                                <tr className="bg-slate-50 font-semibold">
+                                <tr className="bg-muted font-semibold">
                                     <td className="px-4 py-3">Total</td>
                                     <td className="px-4 py-3 text-right">{formatCurrency(reportData.total)}</td>
                                     <td className="px-4 py-3 text-right">100%</td>

@@ -155,8 +155,8 @@ export default function SecuritySettingsPage() {
 
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold text-slate-900">Security quick audit</h1>
-            <p className="text-sm text-slate-600">
+            <h1 className="text-2xl font-bold text-foreground">Security quick audit</h1>
+            <p className="text-sm text-muted-foreground">
               Snapshot of privacy defaults, PII coverage, and recent audit activity.
             </p>
           </div>
@@ -207,39 +207,39 @@ export default function SecuritySettingsPage() {
               </Badge>
             </CardHeader>
             <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-3">
-              <div className="rounded border border-slate-200 p-3">
+              <div className="rounded border border-border p-3">
                 <div className="flex items-center justify-between">
-                  <div className="text-sm font-semibold text-slate-800">Redact PII in logs</div>
+                  <div className="text-sm font-semibold text-foreground">Redact PII in logs</div>
                   {statusBadge(settings?.redactPII)}
                 </div>
-                <p className="text-xs text-slate-600 mt-1">
+                <p className="text-xs text-muted-foreground mt-1">
                   Removes or masks PII from audit trails and previews.
                 </p>
               </div>
-              <div className="rounded border border-slate-200 p-3">
+              <div className="rounded border border-border p-3">
                 <div className="flex items-center justify-between">
-                  <div className="text-sm font-semibold text-slate-800">Consent required</div>
+                  <div className="text-sm font-semibold text-foreground">Consent required</div>
                   {statusBadge(settings?.consentRequired)}
                 </div>
-                <p className="text-xs text-slate-600 mt-1">
+                <p className="text-xs text-muted-foreground mt-1">
                   Requires opt-in before sending outbound communications.
                 </p>
               </div>
-              <div className="rounded border border-slate-200 p-3">
+              <div className="rounded border border-border p-3">
                 <div className="flex items-center justify-between">
-                  <div className="text-sm font-semibold text-slate-800">Backup retention</div>
+                  <div className="text-sm font-semibold text-foreground">Backup retention</div>
                   <Badge variant="secondary">{settings?.backupRetentionDays ?? "—"} days</Badge>
                 </div>
-                <p className="text-xs text-slate-600 mt-1">
+                <p className="text-xs text-muted-foreground mt-1">
                   Retention window for encrypted backups.
                 </p>
               </div>
-              <div className="rounded border border-slate-200 p-3">
+              <div className="rounded border border-border p-3">
                 <div className="flex items-center justify-between">
-                  <div className="text-sm font-semibold text-slate-800">Key rotation</div>
+                  <div className="text-sm font-semibold text-foreground">Key rotation</div>
                   <Badge variant="secondary">{settings?.keyRotationDays ?? "—"} days</Badge>
                 </div>
-                <p className="text-xs text-slate-600 mt-1">
+                <p className="text-xs text-muted-foreground mt-1">
                   Cadence for rotating encryption and signing keys.
                 </p>
               </div>
@@ -253,7 +253,7 @@ export default function SecuritySettingsPage() {
             </CardHeader>
             <CardContent className="space-y-3">
               <div className="flex items-center justify-between">
-                <div className="text-sm text-slate-700">Tracked fields</div>
+                <div className="text-sm text-foreground">Tracked fields</div>
                 <Badge variant="default" className="gap-1">
                   <CheckCircle2 className="w-4 h-4" />
                   {piiCount}
@@ -263,25 +263,25 @@ export default function SecuritySettingsPage() {
               <div className="space-y-2">
                 {piiTagsPreview.slice(0, 4).map((tag: { resource: string; field: string; classification: string; redactionMode?: string | null }) => (
                   <div key={`${tag.resource}:${tag.field}`} className="flex items-center justify-between text-sm">
-                    <span className="text-slate-700">{tag.resource}.{tag.field}</span>
+                    <span className="text-foreground">{tag.resource}.{tag.field}</span>
                     <Badge variant="outline" className="text-[11px] uppercase">
                       {tag.classification}
                     </Badge>
                   </div>
                 ))}
                 {piiTagsPreview.length === 0 && (
-                  <div className="overflow-hidden rounded border border-slate-200 bg-white">
+                  <div className="overflow-hidden rounded border border-border bg-card">
                     <table className="w-full text-sm">
                       <tbody>
                         <tr>
-                          <td className="px-4 py-6 text-center text-slate-500">No PII tags defined yet.</td>
+                          <td className="px-4 py-6 text-center text-muted-foreground">No PII tags defined yet.</td>
                         </tr>
                       </tbody>
                     </table>
                   </div>
                 )}
                 {piiTagsPreview.length > 4 && (
-                  <div className="text-xs text-slate-500">Showing 4 of {piiCount} tags.</div>
+                  <div className="text-xs text-muted-foreground">Showing 4 of {piiCount} tags.</div>
                 )}
               </div>
             </CardContent>
@@ -300,32 +300,32 @@ export default function SecuritySettingsPage() {
             </Badge>
           </CardHeader>
           <CardContent className="space-y-3">
-            {backupQuery.isLoading && <div className="text-sm text-slate-500">Loading backup posture…</div>}
+            {backupQuery.isLoading && <div className="text-sm text-muted-foreground">Loading backup posture…</div>}
             {!backupQuery.isLoading && !backupStatus && (
-              <div className="text-sm text-slate-500">Select a campground to view backup posture.</div>
+              <div className="text-sm text-muted-foreground">Select a campground to view backup posture.</div>
             )}
             {backupStatus && (
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
-                  <div className="text-sm text-slate-700">Last backup</div>
-                  <div className="text-xs text-right text-slate-600">
+                  <div className="text-sm text-foreground">Last backup</div>
+                  <div className="text-xs text-right text-muted-foreground">
                     <div>{formatDate(backupStatus.lastBackupAt)}</div>
-                    <div className="text-[11px] text-slate-500">{backupStatus.lastBackupLocation}</div>
+                    <div className="text-[11px] text-muted-foreground">{backupStatus.lastBackupLocation}</div>
                   </div>
                 </div>
                 <div className="flex items-center justify-between">
-                  <div className="text-sm text-slate-700">Retention window</div>
+                  <div className="text-sm text-foreground">Retention window</div>
                   <Badge variant="secondary">{backupStatus.retentionDays} days</Badge>
                 </div>
-                <div className="rounded border border-slate-200 p-3 bg-slate-50">
+                <div className="rounded border border-border p-3 bg-muted">
                   <div className="flex items-center justify-between">
                     <div>
-                      <div className="text-sm font-semibold text-slate-800">Restore simulation (stub)</div>
-                      <p className="text-xs text-slate-600">Records a drill only — no data moved.</p>
+                      <div className="text-sm font-semibold text-foreground">Restore simulation (stub)</div>
+                      <p className="text-xs text-muted-foreground">Records a drill only — no data moved.</p>
                     </div>
                     {restoreStatusBadge(backupStatus.restoreSimulation?.status as "idle" | "running" | "ok" | "error" | undefined)}
                   </div>
-                  <div className="text-xs text-slate-600 mt-2">
+                  <div className="text-xs text-muted-foreground mt-2">
                     Last run: {formatDate(backupStatus.restoreSimulation?.lastRunAt)}
                   </div>
                   <div className="flex items-center gap-2 mt-3">
@@ -355,27 +355,27 @@ export default function SecuritySettingsPage() {
           </CardHeader>
           <CardContent className="space-y-3">
             {latestAudit ? (
-              <div className="rounded border border-slate-200 p-3 bg-slate-50">
-                <div className="flex items-center justify-between text-sm text-slate-800">
+              <div className="rounded border border-border p-3 bg-muted">
+                <div className="flex items-center justify-between text-sm text-foreground">
                   <div className="flex items-center gap-2">
                     <ShieldCheck className="w-4 h-4 text-emerald-600" />
                     <span className="font-semibold">{latestAudit.action}</span>
-                    <span className="text-slate-500">on {latestAudit.entity}</span>
+                    <span className="text-muted-foreground">on {latestAudit.entity}</span>
                   </div>
-                  <span className="text-xs text-slate-500">
+                  <span className="text-xs text-muted-foreground">
                     {new Date(latestAudit.createdAt).toLocaleString()}
                   </span>
                 </div>
-                <div className="text-xs text-slate-600 mt-1">
+                <div className="text-xs text-muted-foreground mt-1">
                   Actor: {latestAudit.actor?.email ?? "unknown"} • Entity ID: {latestAudit.entityId ?? "n/a"}
                 </div>
               </div>
             ) : (
-              <div className="overflow-hidden rounded border border-slate-200 bg-white">
+              <div className="overflow-hidden rounded border border-border bg-card">
                 <table className="w-full text-sm">
                   <tbody>
                     <tr>
-                      <td className="px-4 py-6 text-center text-slate-500">No audit entries yet.</td>
+                      <td className="px-4 py-6 text-center text-muted-foreground">No audit entries yet.</td>
                     </tr>
                   </tbody>
                 </table>
@@ -386,16 +386,16 @@ export default function SecuritySettingsPage() {
 
             <div className="grid gap-2">
               {auditEvents.map((row: AuditLogRow) => (
-                <div key={row.id} className="rounded border border-slate-200 p-2 text-sm">
+                <div key={row.id} className="rounded border border-border p-2 text-sm">
                   <div className="flex items-center justify-between">
-                    <span className="font-medium text-slate-800">
+                    <span className="font-medium text-foreground">
                       {row.action} • {row.entity}
                     </span>
-                    <span className="text-xs text-slate-500">
+                    <span className="text-xs text-muted-foreground">
                       {new Date(row.createdAt).toLocaleString()}
                     </span>
                   </div>
-                  <div className="text-xs text-slate-600">
+                  <div className="text-xs text-muted-foreground">
                     Actor: {row.actor?.email ?? "unknown"} | Entity ID: {row.entityId ?? "n/a"}
                   </div>
                 </div>

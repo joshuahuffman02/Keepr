@@ -204,7 +204,7 @@ export default function NpsAnalyticsPage() {
       case "negative":
         return <Badge className="bg-red-500/20 text-red-400 border-0">Negative</Badge>;
       default:
-        return <Badge className="bg-slate-500/20 text-slate-400 border-0">Neutral</Badge>;
+        return <Badge className="bg-muted0/20 text-muted-foreground border-0">Neutral</Badge>;
     }
   };
 
@@ -214,14 +214,14 @@ export default function NpsAnalyticsPage() {
       <div className="flex items-center justify-between">
         <div>
           <div className="flex items-center gap-3">
-            <h1 className="text-2xl font-bold text-slate-900 dark:text-white">NPS Analytics</h1>
+            <h1 className="text-2xl font-bold text-foreground dark:text-white">NPS Analytics</h1>
             {isUsingMockData && (
               <Badge className="bg-amber-100 dark:bg-amber-600/20 text-amber-700 dark:text-amber-400 border border-amber-300 dark:border-amber-600/50">
                 Demo Data
               </Badge>
             )}
           </div>
-          <p className="text-slate-600 dark:text-slate-400 mt-1">
+          <p className="text-muted-foreground dark:text-muted-foreground mt-1">
             Net Promoter Score tracking and guest sentiment analysis
           </p>
         </div>
@@ -238,7 +238,7 @@ export default function NpsAnalyticsPage() {
           loading={loading}
         />
 
-        <Card className="border-slate-200 dark:border-slate-700">
+        <Card className="border-border dark:border-border">
           <CardContent className="p-6">
             <div className="grid grid-cols-3 gap-4 text-center">
               <div>
@@ -246,7 +246,7 @@ export default function NpsAnalyticsPage() {
                   <ThumbsUp className="h-5 w-5 text-green-500 dark:text-green-400" />
                 </div>
                 <p className="text-2xl font-bold text-green-600 dark:text-green-400">{data.overview.promoters}</p>
-                <p className="text-xs text-slate-500 dark:text-slate-400">Promoters</p>
+                <p className="text-xs text-muted-foreground dark:text-muted-foreground">Promoters</p>
                 <p className="text-sm text-green-600 dark:text-green-400">{data.overview.promoterPercentage.toFixed(0)}%</p>
               </div>
               <div>
@@ -254,7 +254,7 @@ export default function NpsAnalyticsPage() {
                   <Minus className="h-5 w-5 text-amber-500 dark:text-amber-400" />
                 </div>
                 <p className="text-2xl font-bold text-amber-600 dark:text-amber-400">{data.overview.passives}</p>
-                <p className="text-xs text-slate-500 dark:text-slate-400">Passives</p>
+                <p className="text-xs text-muted-foreground dark:text-muted-foreground">Passives</p>
                 <p className="text-sm text-amber-600 dark:text-amber-400">{data.overview.passivePercentage.toFixed(0)}%</p>
               </div>
               <div>
@@ -262,22 +262,22 @@ export default function NpsAnalyticsPage() {
                   <ThumbsDown className="h-5 w-5 text-red-500 dark:text-red-400" />
                 </div>
                 <p className="text-2xl font-bold text-red-600 dark:text-red-400">{data.overview.detractors}</p>
-                <p className="text-xs text-slate-500 dark:text-slate-400">Detractors</p>
+                <p className="text-xs text-muted-foreground dark:text-muted-foreground">Detractors</p>
                 <p className="text-sm text-red-600 dark:text-red-400">{data.overview.detractorPercentage.toFixed(0)}%</p>
               </div>
             </div>
-            <div className="mt-4 pt-4 border-t border-slate-200 dark:border-slate-700">
+            <div className="mt-4 pt-4 border-t border-border dark:border-border">
               <div className="flex justify-between text-sm">
-                <span className="text-slate-500 dark:text-slate-400">Total Responses</span>
-                <span className="text-slate-900 dark:text-white font-medium">{data.overview.totalResponses.toLocaleString()}</span>
+                <span className="text-muted-foreground dark:text-muted-foreground">Total Responses</span>
+                <span className="text-foreground dark:text-white font-medium">{data.overview.totalResponses.toLocaleString()}</span>
               </div>
               <div className="flex justify-between text-sm mt-2">
-                <span className="text-slate-500 dark:text-slate-400">Response Rate</span>
-                <span className="text-slate-900 dark:text-white font-medium">{data.overview.responseRate.toFixed(1)}%</span>
+                <span className="text-muted-foreground dark:text-muted-foreground">Response Rate</span>
+                <span className="text-foreground dark:text-white font-medium">{data.overview.responseRate.toFixed(1)}%</span>
               </div>
               {data.overview.yoyResponses !== null && data.overview.yoyResponses !== undefined && (
                 <div className="flex justify-between text-sm mt-2">
-                  <span className="text-slate-500 dark:text-slate-400">YoY Response Growth</span>
+                  <span className="text-muted-foreground dark:text-muted-foreground">YoY Response Growth</span>
                   <span className={data.overview.yoyResponsesChange !== null && data.overview.yoyResponsesChange >= 0 ? "text-green-600 dark:text-green-400 font-medium" : "text-red-600 dark:text-red-400 font-medium"}>
                     {data.overview.yoyResponsesChange !== null && data.overview.yoyResponsesChange > 0 ? "+" : ""}{data.overview.yoyResponsesChange?.toFixed(1)}%
                   </span>
@@ -394,9 +394,9 @@ export default function NpsAnalyticsPage() {
           <CardHeader>
             <div className="flex items-center gap-2">
               <Frown className="h-5 w-5 text-red-500 dark:text-red-400" />
-              <CardTitle className="text-lg text-slate-900 dark:text-white">Needs Attention</CardTitle>
+              <CardTitle className="text-lg text-foreground dark:text-white">Needs Attention</CardTitle>
             </div>
-            <p className="text-sm text-slate-600 dark:text-slate-400">
+            <p className="text-sm text-muted-foreground dark:text-muted-foreground">
               Campgrounds with lowest NPS scores - prioritize for improvement
             </p>
           </CardHeader>
@@ -404,22 +404,22 @@ export default function NpsAnalyticsPage() {
             <div className="overflow-x-auto">
               <table className="w-full">
                 <thead>
-                  <tr className="border-b border-red-200 dark:border-slate-700">
-                    <th className="text-left py-3 px-4 text-sm font-medium text-slate-600 dark:text-slate-400">Campground</th>
-                    <th className="text-right py-3 px-4 text-sm font-medium text-slate-600 dark:text-slate-400">NPS</th>
-                    <th className="text-right py-3 px-4 text-sm font-medium text-slate-600 dark:text-slate-400">Responses</th>
-                    <th className="text-right py-3 px-4 text-sm font-medium text-slate-600 dark:text-slate-400">Detractors</th>
-                    <th className="text-left py-3 px-4 text-sm font-medium text-slate-600 dark:text-slate-400">Top Issues</th>
+                  <tr className="border-b border-red-200 dark:border-border">
+                    <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground dark:text-muted-foreground">Campground</th>
+                    <th className="text-right py-3 px-4 text-sm font-medium text-muted-foreground dark:text-muted-foreground">NPS</th>
+                    <th className="text-right py-3 px-4 text-sm font-medium text-muted-foreground dark:text-muted-foreground">Responses</th>
+                    <th className="text-right py-3 px-4 text-sm font-medium text-muted-foreground dark:text-muted-foreground">Detractors</th>
+                    <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground dark:text-muted-foreground">Top Issues</th>
                   </tr>
                 </thead>
                 <tbody>
                   {data.worstCampgrounds.map((cg, idx) => (
-                    <tr key={cg.campgroundId} className={idx % 2 === 0 ? "bg-red-100/50 dark:bg-slate-800/30" : ""}>
-                      <td className="py-3 px-4 text-sm text-slate-900 dark:text-white">{cg.campgroundName}</td>
+                    <tr key={cg.campgroundId} className={idx % 2 === 0 ? "bg-red-100/50 dark:bg-muted/30" : ""}>
+                      <td className="py-3 px-4 text-sm text-foreground dark:text-white">{cg.campgroundName}</td>
                       <td className={`py-3 px-4 text-sm text-right font-semibold ${getNpsColor(cg.score)}`}>
                         {cg.score}
                       </td>
-                      <td className="py-3 px-4 text-sm text-right text-slate-700 dark:text-slate-300">
+                      <td className="py-3 px-4 text-sm text-right text-foreground dark:text-muted-foreground">
                         {cg.responses.toLocaleString()}
                       </td>
                       <td className="py-3 px-4 text-sm text-right text-red-600 dark:text-red-400 font-medium">
@@ -449,13 +449,13 @@ export default function NpsAnalyticsPage() {
       {/* Guest Type & Seasonal Analysis */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* NPS by Guest Type */}
-        <Card className="bg-slate-800/50 border-slate-700">
+        <Card className="bg-muted/50 border-border">
           <CardHeader>
             <CardTitle className="text-lg text-white flex items-center gap-2">
               <Users className="h-5 w-5 text-blue-400" />
               NPS by Guest Type
             </CardTitle>
-            <p className="text-sm text-slate-400">First-time vs returning guests</p>
+            <p className="text-sm text-muted-foreground">First-time vs returning guests</p>
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-2 gap-4">
@@ -465,12 +465,12 @@ export default function NpsAnalyticsPage() {
                   className={`p-4 rounded-lg border ${
                     gt.guestType === "repeat"
                       ? "bg-blue-500/10 border-blue-500/30"
-                      : "bg-slate-700/50 border-slate-600"
+                      : "bg-muted/50 border-border"
                   }`}
                 >
                   <div className="flex items-center gap-2 mb-3">
                     {gt.guestType === "first_time" ? (
-                      <UserPlus className="h-5 w-5 text-slate-400" />
+                      <UserPlus className="h-5 w-5 text-muted-foreground" />
                     ) : (
                       <Repeat className="h-5 w-5 text-blue-400" />
                     )}
@@ -479,7 +479,7 @@ export default function NpsAnalyticsPage() {
                     </span>
                   </div>
                   <p className={`text-3xl font-bold ${getNpsColor(gt.score)}`}>{gt.score}</p>
-                  <p className="text-sm text-slate-400 mt-1">{gt.responses.toLocaleString()} responses</p>
+                  <p className="text-sm text-muted-foreground mt-1">{gt.responses.toLocaleString()} responses</p>
                   <div className="flex gap-3 mt-2 text-xs">
                     <span className="text-green-400">{gt.promoters} promoters</span>
                     <span className="text-red-400">{gt.detractors} detractors</span>
@@ -502,13 +502,13 @@ export default function NpsAnalyticsPage() {
         </Card>
 
         {/* NPS by Season */}
-        <Card className="bg-slate-800/50 border-slate-700">
+        <Card className="bg-muted/50 border-border">
           <CardHeader>
             <CardTitle className="text-lg text-white flex items-center gap-2">
               <Sun className="h-5 w-5 text-amber-400" />
               NPS by Season
             </CardTitle>
-            <p className="text-sm text-slate-400">How satisfaction varies throughout the year</p>
+            <p className="text-sm text-muted-foreground">How satisfaction varies throughout the year</p>
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-2 gap-3">
@@ -522,7 +522,7 @@ export default function NpsAnalyticsPage() {
                   s.season === "Winter" ? "text-blue-300" :
                   s.season === "Fall" ? "text-orange-400" : "text-pink-400";
                 return (
-                  <div key={s.season} className="p-3 rounded-lg bg-slate-700/50 border border-slate-600">
+                  <div key={s.season} className="p-3 rounded-lg bg-muted/50 border border-border">
                     <div className="flex items-center justify-between mb-2">
                       <div className="flex items-center gap-2">
                         <SeasonIcon className={`h-4 w-4 ${seasonColor}`} />
@@ -530,7 +530,7 @@ export default function NpsAnalyticsPage() {
                       </div>
                       <span className={`text-xl font-bold ${getNpsColor(s.score)}`}>{s.score}</span>
                     </div>
-                    <p className="text-xs text-slate-400">{s.responses.toLocaleString()} responses</p>
+                    <p className="text-xs text-muted-foreground">{s.responses.toLocaleString()} responses</p>
                   </div>
                 );
               })}
@@ -552,7 +552,7 @@ export default function NpsAnalyticsPage() {
 
       {/* Detractor Follow-ups */}
       {data.detractorFollowUps && data.detractorFollowUps.length > 0 && (
-        <Card className="bg-slate-800/50 border-slate-700">
+        <Card className="bg-muted/50 border-border">
           <CardHeader>
             <div className="flex items-center justify-between">
               <div>
@@ -560,7 +560,7 @@ export default function NpsAnalyticsPage() {
                   <AlertCircle className="h-5 w-5 text-amber-400" />
                   Detractor Follow-ups
                 </CardTitle>
-                <p className="text-sm text-slate-400">Track outreach to unhappy guests</p>
+                <p className="text-sm text-muted-foreground">Track outreach to unhappy guests</p>
               </div>
               <div className="flex gap-2 text-sm">
                 <span className="px-2 py-1 bg-red-500/20 text-red-400 rounded">
@@ -592,7 +592,7 @@ export default function NpsAnalyticsPage() {
                     <div className="flex-1">
                       <div className="flex items-center gap-3 mb-2">
                         <span className="text-lg font-bold text-red-400">{d.score}</span>
-                        <span className="text-slate-400">{d.campgroundName}</span>
+                        <span className="text-muted-foreground">{d.campgroundName}</span>
                         {d.resolved ? (
                           <Badge className="bg-green-500/20 text-green-400 border-0">
                             <CheckCircle className="h-3 w-3 mr-1" /> Resolved
@@ -607,12 +607,12 @@ export default function NpsAnalyticsPage() {
                           </Badge>
                         )}
                       </div>
-                      <p className="text-slate-300 text-sm">{d.comment}</p>
+                      <p className="text-muted-foreground text-sm">{d.comment}</p>
                       {d.followUpNote && (
-                        <p className="text-xs text-slate-500 mt-2 italic">Note: {d.followUpNote}</p>
+                        <p className="text-xs text-muted-foreground mt-2 italic">Note: {d.followUpNote}</p>
                       )}
                     </div>
-                    <div className="text-right text-xs text-slate-500">
+                    <div className="text-right text-xs text-muted-foreground">
                       <p>{new Date(d.createdAt).toLocaleDateString()}</p>
                       {d.guestEmail && (
                         <div className="flex items-center gap-1 mt-1 text-blue-400">
@@ -630,10 +630,10 @@ export default function NpsAnalyticsPage() {
       )}
 
       {/* Tag Analysis */}
-      <Card className="bg-slate-800/50 border-slate-700">
+      <Card className="bg-muted/50 border-border">
         <CardHeader>
           <CardTitle className="text-lg text-white">Feedback Themes</CardTitle>
-          <p className="text-sm text-slate-400">Common topics mentioned in NPS feedback</p>
+          <p className="text-sm text-muted-foreground">Common topics mentioned in NPS feedback</p>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -645,7 +645,7 @@ export default function NpsAnalyticsPage() {
                     ? "bg-green-500/10 border-green-500/30"
                     : tag.sentiment === "negative"
                       ? "bg-red-500/10 border-red-500/30"
-                      : "bg-slate-700/50 border-slate-600"
+                      : "bg-muted/50 border-border"
                 }`}
               >
                 <div className="flex items-center justify-between mb-2">
@@ -653,7 +653,7 @@ export default function NpsAnalyticsPage() {
                   {getSentimentBadge(tag.sentiment)}
                 </div>
                 <p className="text-2xl font-bold text-white">{tag.count}</p>
-                <p className="text-xs text-slate-400">
+                <p className="text-xs text-muted-foreground">
                   Avg score: <span className={getNpsColor(tag.avgScore * 10 - 50)}>{tag.avgScore.toFixed(1)}</span>
                 </p>
               </div>
@@ -663,7 +663,7 @@ export default function NpsAnalyticsPage() {
       </Card>
 
       {/* Recent Comments */}
-      <Card className="bg-slate-800/50 border-slate-700">
+      <Card className="bg-muted/50 border-border">
         <CardHeader>
           <CardTitle className="text-lg text-white flex items-center gap-2">
             <MessageSquare className="h-5 w-5 text-blue-400" />
@@ -680,7 +680,7 @@ export default function NpsAnalyticsPage() {
                     ? "bg-green-500/5 border-green-500/20"
                     : comment.category === "detractor"
                       ? "bg-red-500/5 border-red-500/20"
-                      : "bg-slate-700/30 border-slate-600"
+                      : "bg-muted/30 border-border"
                 }`}
               >
                 <div className="flex items-start justify-between mb-2">
@@ -697,17 +697,17 @@ export default function NpsAnalyticsPage() {
                     >
                       {comment.score}
                     </span>
-                    <span className="text-slate-400 text-sm">{comment.campgroundName}</span>
+                    <span className="text-muted-foreground text-sm">{comment.campgroundName}</span>
                   </div>
-                  <span className="text-xs text-slate-500">
+                  <span className="text-xs text-muted-foreground">
                     {new Date(comment.createdAt).toLocaleDateString()}
                   </span>
                 </div>
-                <p className="text-slate-200">{comment.comment}</p>
+                <p className="text-muted-foreground">{comment.comment}</p>
                 {comment.tags.length > 0 && (
                   <div className="flex gap-2 mt-2">
                     {comment.tags.map((tag, idx) => (
-                      <Badge key={idx} variant="outline" className="text-xs border-slate-600">
+                      <Badge key={idx} variant="outline" className="text-xs border-border">
                         {tag}
                       </Badge>
                     ))}
@@ -720,7 +720,7 @@ export default function NpsAnalyticsPage() {
       </Card>
 
       {/* NPS Explanation */}
-      <Card className="bg-slate-800/50 border-slate-700">
+      <Card className="bg-muted/50 border-border">
         <CardContent className="p-6">
           <h3 className="text-lg font-medium text-white mb-4">Understanding NPS</h3>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -730,7 +730,7 @@ export default function NpsAnalyticsPage() {
               </div>
               <div>
                 <p className="font-medium text-white">Promoters (9-10)</p>
-                <p className="text-sm text-slate-400">Loyal enthusiasts who will keep booking and refer others</p>
+                <p className="text-sm text-muted-foreground">Loyal enthusiasts who will keep booking and refer others</p>
               </div>
             </div>
             <div className="flex items-start gap-3">
@@ -739,7 +739,7 @@ export default function NpsAnalyticsPage() {
               </div>
               <div>
                 <p className="font-medium text-white">Passives (7-8)</p>
-                <p className="text-sm text-slate-400">Satisfied but unenthusiastic, vulnerable to competitors</p>
+                <p className="text-sm text-muted-foreground">Satisfied but unenthusiastic, vulnerable to competitors</p>
               </div>
             </div>
             <div className="flex items-start gap-3">
@@ -748,12 +748,12 @@ export default function NpsAnalyticsPage() {
               </div>
               <div>
                 <p className="font-medium text-white">Detractors (0-6)</p>
-                <p className="text-sm text-slate-400">Unhappy guests who can damage reputation through negative word-of-mouth</p>
+                <p className="text-sm text-muted-foreground">Unhappy guests who can damage reputation through negative word-of-mouth</p>
               </div>
             </div>
           </div>
-          <div className="mt-4 pt-4 border-t border-slate-700 text-center">
-            <p className="text-slate-400">
+          <div className="mt-4 pt-4 border-t border-border text-center">
+            <p className="text-muted-foreground">
               <strong className="text-white">NPS = % Promoters - % Detractors</strong>
               <span className="block text-sm mt-1">Scores range from -100 to +100. Above 0 is good, above 50 is excellent.</span>
             </p>

@@ -229,7 +229,7 @@ export function TourOverlay({
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 10 }}
-            className="fixed z-[10000] w-80 bg-white dark:bg-slate-800 rounded-xl shadow-2xl border border-slate-200 dark:border-slate-700"
+            className="fixed z-[10000] w-80 bg-card dark:bg-muted rounded-xl shadow-2xl border border-border dark:border-border"
             style={{
               top: tooltipPosition?.top ?? 0,
               left: tooltipPosition?.left ?? 0,
@@ -240,7 +240,7 @@ export function TourOverlay({
             {tooltipPosition && (
               <div
                 className={cn(
-                  "absolute w-3 h-3 bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 rotate-45",
+                  "absolute w-3 h-3 bg-card dark:bg-muted border-border dark:border-border rotate-45",
                   tooltipPosition.arrowPosition === "top" && "top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 border-l border-t",
                   tooltipPosition.arrowPosition === "bottom" && "bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2 border-r border-b",
                   tooltipPosition.arrowPosition === "left" && "left-0 top-1/2 -translate-x-1/2 -translate-y-1/2 border-l border-b",
@@ -253,14 +253,14 @@ export function TourOverlay({
             <div className="flex items-start justify-between p-4 pb-2">
               <div className="flex items-center gap-2">
                 <Sparkles className="h-5 w-5 text-emerald-500" />
-                <h3 className="font-semibold text-slate-900 dark:text-white">
+                <h3 className="font-semibold text-foreground dark:text-white">
                   {currentStep.title}
                 </h3>
               </div>
               <Button
                 variant="ghost"
                 size="icon"
-                className="h-6 w-6 text-slate-400 hover:text-slate-600"
+                className="h-6 w-6 text-muted-foreground hover:text-muted-foreground"
                 onClick={onSkip}
               >
                 <X className="h-4 w-4" />
@@ -269,13 +269,13 @@ export function TourOverlay({
 
             {/* Content */}
             <div className="px-4 pb-4">
-              <p className="text-sm text-slate-600 dark:text-slate-300">
+              <p className="text-sm text-muted-foreground dark:text-muted-foreground">
                 {currentStep.content}
               </p>
             </div>
 
             {/* Footer */}
-            <div className="flex items-center justify-between px-4 py-3 bg-slate-50 dark:bg-slate-900/50 rounded-b-xl border-t border-slate-100 dark:border-slate-700">
+            <div className="flex items-center justify-between px-4 py-3 bg-muted dark:bg-muted/50 rounded-b-xl border-t border-border dark:border-border">
               {/* Progress dots */}
               <div className="flex items-center gap-1">
                 {Array.from({ length: totalSteps }).map((_, i) => (
@@ -287,7 +287,7 @@ export function TourOverlay({
                         ? "bg-emerald-500"
                         : i < currentStepIndex
                         ? "bg-emerald-300"
-                        : "bg-slate-300 dark:bg-slate-600"
+                        : "bg-muted dark:bg-muted"
                     )}
                   />
                 ))}

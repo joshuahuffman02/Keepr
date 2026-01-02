@@ -162,9 +162,9 @@ export default function SupportStaffDirectoryPage() {
       <div className="space-y-4">
         <div className="flex items-center justify-between">
           <div>
-            <div className="text-xs uppercase font-semibold text-slate-500">Support</div>
-            <h1 className="text-2xl font-bold text-slate-900">Staff directory</h1>
-            <p className="text-sm text-slate-600">Scoped by campground and region for assignments/notifications.</p>
+            <div className="text-xs uppercase font-semibold text-muted-foreground">Support</div>
+            <h1 className="text-2xl font-bold text-foreground">Staff directory</h1>
+            <p className="text-sm text-muted-foreground">Scoped by campground and region for assignments/notifications.</p>
           </div>
           <div className="flex items-center gap-2">
             <Select value={regionFilter} onValueChange={setRegionFilter}>
@@ -194,10 +194,10 @@ export default function SupportStaffDirectoryPage() {
         <Card className="p-4 space-y-3">
           <div className="flex items-center justify-between">
             <div>
-              <div className="text-xs uppercase font-semibold text-slate-500">Directory</div>
-              <p className="text-sm text-slate-600">Only staff permitted for the selected region/campground are shown.</p>
+              <div className="text-xs uppercase font-semibold text-muted-foreground">Directory</div>
+              <p className="text-sm text-muted-foreground">Only staff permitted for the selected region/campground are shown.</p>
             </div>
-            {loading && <div className="text-xs text-slate-500">Loading…</div>}
+            {loading && <div className="text-xs text-muted-foreground">Loading…</div>}
             {whoamiError && <div className="text-xs text-rose-600">Scope fetch failed: {(whoamiError as Error)?.message}</div>}
           </div>
 
@@ -205,18 +205,18 @@ export default function SupportStaffDirectoryPage() {
             {staff.map((s) => {
               const draft = getDraft(s);
               return (
-                <div key={s.id} className="rounded border border-slate-200 p-3 space-y-2">
+                <div key={s.id} className="rounded border border-border p-3 space-y-2">
                   <div className="flex items-center justify-between gap-3">
                     <div>
-                      <div className="text-sm font-semibold text-slate-900">{s.email}</div>
-                      <div className="text-xs text-slate-600">
+                      <div className="text-sm font-semibold text-foreground">{s.email}</div>
+                      <div className="text-xs text-muted-foreground">
                         {(s.firstName || s.lastName) ? `${s.firstName ?? ""} ${s.lastName ?? ""}`.trim() : "—"}
                       </div>
-                      <div className="text-[11px] text-slate-500">
+                      <div className="text-[11px] text-muted-foreground">
                         Region: {s.region ?? "n/a"} • Ownership: {(s.ownershipRoles ?? []).join(", ") || "none"}
                       </div>
                       {s.memberships?.length ? (
-                        <div className="text-[11px] text-slate-500">
+                        <div className="text-[11px] text-muted-foreground">
                           Campgrounds: {s.memberships.map((m) => m.campgroundId).join(", ")}
                         </div>
                       ) : null}
@@ -233,7 +233,7 @@ export default function SupportStaffDirectoryPage() {
                     </div>
                   </div>
 
-                  <div className="flex flex-wrap items-center gap-2 text-xs text-slate-600">
+                  <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
                     <span>Region scope:</span>
                     <Select
                       value={draft.region || "unassigned"}
@@ -278,7 +278,7 @@ export default function SupportStaffDirectoryPage() {
                 </div>
               );
             })}
-            {staff.length === 0 && !loading && <div className="text-sm text-slate-500">No staff match this scope.</div>}
+            {staff.length === 0 && !loading && <div className="text-sm text-muted-foreground">No staff match this scope.</div>}
           </div>
         </Card>
       </div>

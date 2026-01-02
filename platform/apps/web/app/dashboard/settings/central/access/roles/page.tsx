@@ -132,13 +132,13 @@ export default function RolesPage() {
     return (
       <div className="max-w-4xl space-y-6">
         <div>
-          <h2 className="text-2xl font-bold text-slate-900">Roles</h2>
-          <p className="text-slate-500 mt-1">
+          <h2 className="text-2xl font-bold text-foreground">Roles</h2>
+          <p className="text-muted-foreground mt-1">
             Define roles and their permissions for team members
           </p>
         </div>
         <div className="flex items-center justify-center py-12">
-          <Loader2 className="h-8 w-8 animate-spin text-slate-400" />
+          <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
         </div>
       </div>
     );
@@ -148,8 +148,8 @@ export default function RolesPage() {
     <div className="max-w-4xl space-y-6">
       <div className="flex items-start justify-between">
         <div>
-          <h2 className="text-2xl font-bold text-slate-900">Roles</h2>
-          <p className="text-slate-500 mt-1">
+          <h2 className="text-2xl font-bold text-foreground">Roles</h2>
+          <p className="text-muted-foreground mt-1">
             Define roles and their permissions for team members
           </p>
         </div>
@@ -178,16 +178,16 @@ export default function RolesPage() {
                 <div className="flex gap-4">
                   <div className={cn(
                     "p-2 rounded-lg",
-                    role.isSystem ? "bg-purple-100" : "bg-slate-100"
+                    role.isSystem ? "bg-purple-100" : "bg-muted"
                   )}>
                     <Shield className={cn(
                       "h-5 w-5",
-                      role.isSystem ? "text-purple-600" : "text-slate-600"
+                      role.isSystem ? "text-purple-600" : "text-muted-foreground"
                     )} />
                   </div>
                   <div className="space-y-2">
                     <div className="flex items-center gap-2">
-                      <h3 className="font-semibold text-slate-900">{role.name}</h3>
+                      <h3 className="font-semibold text-foreground">{role.name}</h3>
                       {role.isSystem && (
                         <Badge variant="outline" className="text-xs">
                           <Lock className="h-3 w-3 mr-1" />
@@ -195,7 +195,7 @@ export default function RolesPage() {
                         </Badge>
                       )}
                     </div>
-                    <p className="text-sm text-slate-500">{role.description}</p>
+                    <p className="text-sm text-muted-foreground">{role.description}</p>
                     <div className="flex flex-wrap gap-1 mt-2">
                       {role.permissions.slice(0, 4).map((permission) => (
                         <Badge
@@ -216,7 +216,7 @@ export default function RolesPage() {
                 </div>
 
                 <div className="flex items-center gap-4">
-                  <div className="flex items-center gap-2 text-sm text-slate-500">
+                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
                     <Users className="h-4 w-4" />
                     {role.userCount} user{role.userCount !== 1 && "s"}
                   </div>

@@ -112,7 +112,7 @@ export function ConversationalEmptyState({
       {/* Title */}
       <h3
         className={cn(
-          "font-bold text-slate-900 mb-2 max-w-md",
+          "font-bold text-foreground mb-2 max-w-md",
           styles.title
         )}
       >
@@ -122,7 +122,7 @@ export function ConversationalEmptyState({
       {/* Description */}
       <p
         className={cn(
-          "text-slate-500 mb-6 max-w-sm",
+          "text-muted-foreground mb-6 max-w-sm",
           styles.description
         )}
       >
@@ -168,7 +168,7 @@ export function InlineEmptyState({
   return (
     <div
       className={cn(
-        "flex items-center gap-3 p-4 bg-slate-50 rounded-xl text-sm text-slate-500",
+        "flex items-center gap-3 p-4 bg-muted rounded-xl text-sm text-muted-foreground",
         className
       )}
     >

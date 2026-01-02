@@ -82,7 +82,7 @@ export default function DepartmentsPage() {
             className="w-4 h-4 rounded-full"
             style={{ backgroundColor: item.color }}
           />
-          <span className="font-medium text-slate-900">{item.name}</span>
+          <span className="font-medium text-foreground">{item.name}</span>
         </div>
       ),
     },
@@ -104,7 +104,7 @@ export default function DepartmentsPage() {
           className={cn(
             item.isActive
               ? "bg-status-success/15 text-status-success"
-              : "bg-slate-100 text-slate-600"
+              : "bg-muted text-muted-foreground"
           )}
         >
           {item.isActive ? "Active" : "Inactive"}
@@ -118,14 +118,14 @@ export default function DepartmentsPage() {
       <div className="max-w-4xl space-y-6">
         <div className="flex items-start justify-between">
           <div>
-            <h2 className="text-2xl font-bold text-slate-900">Departments</h2>
-            <p className="text-slate-500 mt-1">
+            <h2 className="text-2xl font-bold text-foreground">Departments</h2>
+            <p className="text-muted-foreground mt-1">
               Organize your store products into categories
             </p>
           </div>
         </div>
         <div className="flex items-center justify-center py-12">
-          <Loader2 className="h-8 w-8 animate-spin text-slate-400" />
+          <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
         </div>
       </div>
     );
@@ -135,8 +135,8 @@ export default function DepartmentsPage() {
     <div className="max-w-4xl space-y-6">
       <div className="flex items-start justify-between">
         <div>
-          <h2 className="text-2xl font-bold text-slate-900">Departments</h2>
-          <p className="text-slate-500 mt-1">
+          <h2 className="text-2xl font-bold text-foreground">Departments</h2>
+          <p className="text-muted-foreground mt-1">
             Organize your store products into categories
           </p>
         </div>

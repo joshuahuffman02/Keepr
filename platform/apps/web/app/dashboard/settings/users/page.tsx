@@ -297,7 +297,7 @@ export default function UsersPage() {
                     value={onboardingLink}
                     readOnly
                     onFocus={(e) => e.target.select()}
-                    className="flex h-10 w-full rounded-md border border-slate-200 bg-slate-50 px-3 py-2 text-sm"
+                    className="flex h-10 w-full rounded-md border border-border bg-muted px-3 py-2 text-sm"
                   />
                   <p className="text-xs text-muted-foreground">Share this link with the campground to start setup. A new resend generates a fresh link.</p>
                 </div>
@@ -339,7 +339,7 @@ export default function UsersPage() {
                         </div>
                         <div className="text-sm text-muted-foreground">{member.user.email}</div>
                         {invitePending && member.lastInviteSentAt && (
-                          <div className="text-xs text-slate-500">
+                          <div className="text-xs text-muted-foreground">
                             Sent {new Date(member.lastInviteSentAt).toLocaleDateString()} {member.inviteExpiresAt ? `(expires ${new Date(member.inviteExpiresAt).toLocaleDateString()})` : ""}
                           </div>
                         )}

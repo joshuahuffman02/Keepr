@@ -194,7 +194,7 @@ export function BookingSidebar({
   return (
     <motion.div
       className={cn(
-        "bg-white border border-slate-200 rounded-2xl shadow-xl overflow-hidden",
+        "bg-card border border-border rounded-2xl shadow-xl overflow-hidden",
         className
       )}
       initial={prefersReducedMotion ? {} : { opacity: 0, y: 20 }}
@@ -206,26 +206,26 @@ export function BookingSidebar({
         <div className="flex items-baseline justify-between mb-1">
           {selectedClass && quote && effectiveNightlyRate ? (
             <div className="flex items-baseline gap-1">
-              <span className="text-2xl font-bold text-slate-900">
+              <span className="text-2xl font-bold text-foreground">
                 ${(effectiveNightlyRate / 100).toFixed(0)}
               </span>
-              <span className="text-slate-500">/ night</span>
+              <span className="text-muted-foreground">/ night</span>
             </div>
           ) : selectedClass && isLoadingQuote ? (
             <div className="flex items-center gap-2">
               <Loader2 className="h-5 w-5 animate-spin text-emerald-600" />
-              <span className="text-slate-500">Calculating...</span>
+              <span className="text-muted-foreground">Calculating...</span>
             </div>
           ) : lowestPrice ? (
             <div className="flex items-baseline gap-1">
-              <span className="text-sm text-slate-500">from</span>
-              <span className="text-2xl font-bold text-slate-900">
+              <span className="text-sm text-muted-foreground">from</span>
+              <span className="text-2xl font-bold text-foreground">
                 ${lowestPrice.toFixed(0)}
               </span>
-              <span className="text-slate-500">/ night</span>
+              <span className="text-muted-foreground">/ night</span>
             </div>
           ) : (
-            <span className="text-lg font-medium text-slate-600">
+            <span className="text-lg font-medium text-muted-foreground">
               Check availability
             </span>
           )}
@@ -234,7 +234,7 @@ export function BookingSidebar({
             <div className="flex items-center gap-1 text-sm">
               <Star className="h-4 w-4 fill-amber-400 text-amber-400" />
               <span className="font-semibold">{Number(reviewScore).toFixed(1)}</span>
-              <span className="text-slate-500">({reviewCount})</span>
+              <span className="text-muted-foreground">({reviewCount})</span>
             </div>
           )}
         </div>
@@ -256,31 +256,31 @@ export function BookingSidebar({
         {/* Date inputs */}
         <div className="grid grid-cols-2 gap-2">
           <div className="space-y-1">
-            <label className="text-xs font-medium text-slate-600 uppercase tracking-wider">
+            <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
               Check-in
             </label>
             <div className="relative">
-              <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+              <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
                 type="date"
                 value={arrivalDate}
                 onChange={(e) => onArrivalChange(e.target.value)}
-                className="pl-10 border-slate-300 focus:border-emerald-500 focus:ring-emerald-500"
+                className="pl-10 border-border focus:border-emerald-500 focus:ring-emerald-500"
                 aria-label="Check-in date"
               />
             </div>
           </div>
           <div className="space-y-1">
-            <label className="text-xs font-medium text-slate-600 uppercase tracking-wider">
+            <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
               Check-out
             </label>
             <div className="relative">
-              <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+              <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
                 type="date"
                 value={departureDate}
                 onChange={(e) => onDepartureChange(e.target.value)}
-                className="pl-10 border-slate-300 focus:border-emerald-500 focus:ring-emerald-500"
+                className="pl-10 border-border focus:border-emerald-500 focus:ring-emerald-500"
                 aria-label="Check-out date"
               />
             </div>
@@ -289,13 +289,13 @@ export function BookingSidebar({
 
         {/* Guests selector */}
         <div className="space-y-1">
-          <label className="text-xs font-medium text-slate-600 uppercase tracking-wider">
+          <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
             Guests
           </label>
           <div className="relative">
-            <Users className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400 z-10 pointer-events-none" />
+            <Users className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground z-10 pointer-events-none" />
             <Select value={guests} onValueChange={onGuestsChange}>
-              <SelectTrigger className="pl-10 border-slate-300 focus:border-emerald-500 focus:ring-emerald-500">
+              <SelectTrigger className="pl-10 border-border focus:border-emerald-500 focus:ring-emerald-500">
                 <SelectValue placeholder="Select guests" />
               </SelectTrigger>
               <SelectContent>
@@ -312,16 +312,16 @@ export function BookingSidebar({
         {/* Site class selector */}
         {siteClasses.length > 0 && (
           <div className="space-y-1">
-            <label className="text-xs font-medium text-slate-600 uppercase tracking-wider">
+            <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
               Accommodation
             </label>
             <div className="relative">
-              <Tent className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400 z-10 pointer-events-none" />
+              <Tent className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground z-10 pointer-events-none" />
               <Select
                 value={selectedSiteClassId || ""}
                 onValueChange={(value) => setSelectedSiteClassId(value || null)}
               >
-                <SelectTrigger className="pl-10 border-slate-300 focus:border-emerald-500 focus:ring-emerald-500">
+                <SelectTrigger className="pl-10 border-border focus:border-emerald-500 focus:ring-emerald-500">
                   <SelectValue placeholder="Select accommodation" />
                 </SelectTrigger>
                 <SelectContent>
@@ -330,7 +330,7 @@ export function BookingSidebar({
                       <span className="flex items-center justify-between gap-2 w-full">
                         <span>{sc.name}</span>
                         {sc.defaultRate && (
-                          <span className="text-slate-500 text-xs">
+                          <span className="text-muted-foreground text-xs">
                             ${(sc.defaultRate / 100).toFixed(0)}/nt
                           </span>
                         )}
@@ -349,7 +349,7 @@ export function BookingSidebar({
         <div className="px-6 pb-4">
           <button
             onClick={() => setShowPriceBreakdown(!showPriceBreakdown)}
-            className="flex items-center justify-between w-full text-sm text-slate-600 hover:text-slate-900 transition-colors"
+            className="flex items-center justify-between w-full text-sm text-muted-foreground hover:text-foreground transition-colors"
             aria-expanded={showPriceBreakdown}
           >
             <span className="underline decoration-dashed underline-offset-4">
@@ -364,12 +364,12 @@ export function BookingSidebar({
 
           {showPriceBreakdown && (
             <motion.div
-              className="mt-3 pt-3 border-t border-slate-200 space-y-2 text-sm"
+              className="mt-3 pt-3 border-t border-border space-y-2 text-sm"
               initial={prefersReducedMotion ? {} : { opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: "auto" }}
             >
               {priceBreakdown.map((item, idx) => (
-                <div key={idx} className="flex justify-between text-slate-600">
+                <div key={idx} className="flex justify-between text-muted-foreground">
                   <span className={item.isDiscount ? "text-emerald-600" : ""}>
                     {item.label}
                   </span>
@@ -378,11 +378,11 @@ export function BookingSidebar({
                   </span>
                 </div>
               ))}
-              <div className="pt-2 border-t border-slate-200 flex justify-between font-semibold text-slate-900">
+              <div className="pt-2 border-t border-border flex justify-between font-semibold text-foreground">
                 <span>Total</span>
                 <span>${(totalAmount / 100).toFixed(2)}</span>
               </div>
-              <p className="text-xs text-slate-500">
+              <p className="text-xs text-muted-foreground">
                 Includes taxes, fees, and all charges
               </p>
             </motion.div>
@@ -393,7 +393,7 @@ export function BookingSidebar({
       {/* Prompt to select accommodation if not selected */}
       {!selectedSiteClassId && nights > 0 && (
         <div className="px-6 pb-4">
-          <p className="text-sm text-slate-500 text-center">
+          <p className="text-sm text-muted-foreground text-center">
             Select accommodation to see price
           </p>
         </div>
@@ -407,7 +407,7 @@ export function BookingSidebar({
         >
           Reserve
         </Button>
-        <p className="text-center text-xs text-slate-500 mt-2">
+        <p className="text-center text-xs text-muted-foreground mt-2">
           You won't be charged yet
         </p>
       </div>
@@ -427,7 +427,7 @@ export function BookingSidebar({
 
       {/* Trust signals */}
       <div className="px-6 pb-6">
-        <div className="flex items-center justify-center gap-4 text-xs text-slate-500">
+        <div className="flex items-center justify-center gap-4 text-xs text-muted-foreground">
           <div className="flex items-center gap-1">
             <Shield className="h-3.5 w-3.5 text-emerald-600" />
             <span>Secure booking</span>

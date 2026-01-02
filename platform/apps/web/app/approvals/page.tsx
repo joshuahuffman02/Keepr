@@ -1174,7 +1174,7 @@ export default function ApprovalsPage() {
                                 "flex items-center gap-2 px-3 py-2 rounded-lg border cursor-pointer transition-all",
                                 policyForm.appliesTo.includes(type)
                                   ? "border-emerald-500 bg-emerald-50 dark:bg-emerald-900/30"
-                                  : "border-slate-200 dark:border-slate-700 hover:border-slate-300"
+                                  : "border-border dark:border-border hover:border-border"
                               )}
                             >
                               <Checkbox
@@ -1236,7 +1236,7 @@ export default function ApprovalsPage() {
                                 "flex items-center gap-2 px-3 py-1.5 rounded-md border cursor-pointer transition-all text-sm",
                                 policyForm.approverRoles.includes(role.value)
                                   ? "border-emerald-500 bg-emerald-50 dark:bg-emerald-900/30"
-                                  : "border-slate-200 dark:border-slate-700 hover:border-slate-300"
+                                  : "border-border dark:border-border hover:border-border"
                               )}
                             >
                               <Checkbox

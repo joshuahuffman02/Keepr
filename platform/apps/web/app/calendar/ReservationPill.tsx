@@ -131,7 +131,7 @@ export function ReservationPill({
                 config.border,
                 config.shadow,
                 lockedAccent,
-                isHighlighted ? "ring-2 ring-white/60 ring-offset-2 ring-offset-slate-100 z-20 shadow-lg" : "z-10",
+                isHighlighted ? "ring-2 ring-white/60 ring-offset-2 ring-offset-background z-20 shadow-lg" : "z-10",
                 isDragging && !isBeingDragged && "pointer-events-none opacity-40 grayscale-[0.5]",
                 isBeingDragged && "ring-2 ring-status-info ring-offset-1 opacity-90 scale-[1.02] shadow-2xl z-50"
             )}
@@ -175,7 +175,7 @@ export function ReservationPill({
                         onPointerDown={handleExtendStartDrag}
                         title="Drag to change arrival date"
                     >
-                        <div className="w-0.5 h-4 bg-white/60 rounded-full" />
+                        <div className="w-0.5 h-4 bg-card/60 rounded-full" />
                     </div>
 
                     {/* Right edge - extend end date */}
@@ -184,7 +184,7 @@ export function ReservationPill({
                         onPointerDown={handleExtendEndDrag}
                         title="Drag to change departure date"
                     >
-                        <div className="w-0.5 h-4 bg-white/60 rounded-full" />
+                        <div className="w-0.5 h-4 bg-card/60 rounded-full" />
                     </div>
 
                     {/* Center grip - move reservation */}
@@ -203,7 +203,7 @@ export function ReservationPill({
                 <button
                     type="button"
                     onClick={handleQuickCheckIn}
-                    className="absolute right-1.5 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-all duration-200 bg-white shadow-md text-status-success rounded-full p-1.5 hover:scale-110 active:scale-90"
+                    className="absolute right-1.5 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-all duration-200 bg-card shadow-md text-status-success rounded-full p-1.5 hover:scale-110 active:scale-90"
                     title="Quick Check-in"
                 >
                     <LogIn className="h-3 w-3" />

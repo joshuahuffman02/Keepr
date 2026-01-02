@@ -8,8 +8,8 @@
 ## Core rules
 - Prefer larger, end-to-end tasks when the goal is clear; propose a breakdown when helpful but proceed.
 - Avoid refactors unrelated to the request; touch adjacent files only when needed to fix the issue.
-- Stop when acceptance checks pass or the task is complete.
-- Ask before proceeding only when the goal is unclear (max 3 questions).
+- Use judgment on when to stop; continue if there are clear, aligned improvements that advance the request.
+- Ask questions only when genuinely blocked or ambiguity would cause rework.
 
 ## Default workflow
 - Plan briefly when helpful, then implement and self-review.
@@ -19,8 +19,7 @@
 - Coordinate if scope overlaps or conflicts arise.
 
 ## Stop conditions
-- Acceptance checklist passes, or task is blocked, or scope is exceeded.
-- No extra improvements beyond acceptance.
+- Task is complete or blocked.
 
 ## Output format
 - Short bullets: what changed, files touched, tests run (or "not run").

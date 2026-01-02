@@ -146,8 +146,8 @@ export default function GroupsPage() {
 
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
-            <h1 className="text-2xl font-bold text-slate-900">Groups & Blocks</h1>
-            <p className="text-sm text-slate-500">
+            <h1 className="text-2xl font-bold text-foreground">Groups & Blocks</h1>
+            <p className="text-sm text-muted-foreground">
               Manage group bookings and inventory blocks
             </p>
           </div>
@@ -166,11 +166,11 @@ export default function GroupsPage() {
         <div className="grid md:grid-cols-3 gap-4">
           {/* Groups List */}
           <div className="md:col-span-1 space-y-3">
-            <h2 className="font-semibold text-slate-700">Groups</h2>
+            <h2 className="font-semibold text-foreground">Groups</h2>
             {groupsQuery.isLoading ? (
-              <div className="text-sm text-slate-500">Loading...</div>
+              <div className="text-sm text-muted-foreground">Loading...</div>
             ) : groups.length === 0 ? (
-              <Card className="p-4 text-center text-sm text-slate-500">
+              <Card className="p-4 text-center text-sm text-muted-foreground">
                 No groups yet. Create one to link reservations.
               </Card>
             ) : (
@@ -183,12 +183,12 @@ export default function GroupsPage() {
                 >
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
-                      <Users className="h-4 w-4 text-slate-400" />
+                      <Users className="h-4 w-4 text-muted-foreground" />
                       <span className="font-medium text-sm">
                         Group {group.id.slice(-6)}
                       </span>
                     </div>
-                    <ChevronRight className="h-4 w-4 text-slate-400" />
+                    <ChevronRight className="h-4 w-4 text-muted-foreground" />
                   </div>
                   <div className="mt-2 flex flex-wrap gap-2 text-xs">
                     <Badge variant="secondary">
@@ -234,11 +234,11 @@ export default function GroupsPage() {
                 <CardContent className="space-y-4">
                   <div className="grid grid-cols-2 gap-4 text-sm">
                     <div>
-                      <div className="text-xs text-slate-500">Group ID</div>
+                      <div className="text-xs text-muted-foreground">Group ID</div>
                       <div className="font-mono text-xs">{selectedGroup.id}</div>
                     </div>
                     <div>
-                      <div className="text-xs text-slate-500">Settings</div>
+                      <div className="text-xs text-muted-foreground">Settings</div>
                       <div className="flex gap-2 mt-1">
                         <Badge variant={selectedGroup.sharedPayment ? "default" : "secondary"}>
                           {selectedGroup.sharedPayment ? "Shared Payment" : "Separate Payment"}
@@ -251,21 +251,21 @@ export default function GroupsPage() {
                   </div>
 
                   <div>
-                    <div className="text-xs text-slate-500 mb-2">Linked Reservations</div>
+                    <div className="text-xs text-muted-foreground mb-2">Linked Reservations</div>
                     {selectedGroup.reservations?.length === 0 ? (
-                      <div className="text-sm text-slate-500">No reservations linked.</div>
+                      <div className="text-sm text-muted-foreground">No reservations linked.</div>
                     ) : (
                       <div className="space-y-2">
                         {selectedGroup.reservations?.map((res: any) => (
                           <div
                             key={res.id}
-                            className="flex items-center justify-between p-2 border border-slate-200 rounded text-sm"
+                            className="flex items-center justify-between p-2 border border-border rounded text-sm"
                           >
                             <div>
                               <div className="font-medium">
                                 {res.guest?.firstName} {res.guest?.lastName}
                               </div>
-                              <div className="text-xs text-slate-500">
+                              <div className="text-xs text-muted-foreground">
                                 {res.site?.name} #{res.site?.siteNumber} •{" "}
                                 {formatDate(res.arrivalDate)} → {formatDate(res.departureDate)}
                               </div>
@@ -302,7 +302,7 @@ export default function GroupsPage() {
                 </CardContent>
               </Card>
             ) : (
-              <Card className="p-8 text-center text-slate-500">
+              <Card className="p-8 text-center text-muted-foreground">
                 Select a group to view details
               </Card>
             )}
@@ -311,11 +311,11 @@ export default function GroupsPage() {
 
         {/* Inventory Blocks Section */}
         <div className="mt-8">
-          <h2 className="font-semibold text-slate-700 mb-3">Inventory Blocks</h2>
+          <h2 className="font-semibold text-foreground mb-3">Inventory Blocks</h2>
           {blocksQuery.isLoading ? (
-            <div className="text-sm text-slate-500">Loading blocks...</div>
+            <div className="text-sm text-muted-foreground">Loading blocks...</div>
           ) : blocks.length === 0 ? (
-            <Card className="p-4 text-center text-sm text-slate-500">
+            <Card className="p-4 text-center text-sm text-muted-foreground">
               No inventory blocks. Create one to hold sites for groups or maintenance.
             </Card>
           ) : (
@@ -327,7 +327,7 @@ export default function GroupsPage() {
                       {block.state === "active" ? (
                         <Lock className="h-4 w-4 text-amber-600" />
                       ) : (
-                        <Unlock className="h-4 w-4 text-slate-400" />
+                        <Unlock className="h-4 w-4 text-muted-foreground" />
                       )}
                       <span className="font-medium text-sm">{block.reason}</span>
                     </div>
@@ -336,13 +336,13 @@ export default function GroupsPage() {
                       className={
                         block.state === "active"
                           ? "bg-amber-50 text-amber-700 border-amber-200"
-                          : "bg-slate-50 text-slate-600"
+                          : "bg-muted text-muted-foreground"
                       }
                     >
                       {block.state}
                     </Badge>
                   </div>
-                  <div className="text-xs text-slate-500 space-y-1">
+                  <div className="text-xs text-muted-foreground space-y-1">
                     <div className="flex items-center gap-1">
                       <Calendar className="h-3 w-3" />
                       {formatDate(block.windowStart)} → {formatDate(block.windowEnd)}
@@ -388,8 +388,8 @@ export default function GroupsPage() {
               </CardHeader>
               <CardContent className="space-y-4">
                 <div>
-                  <label className="text-sm font-medium text-slate-700">Sites</label>
-                  <div className="mt-1 max-h-40 overflow-auto border border-slate-200 rounded p-2 space-y-1">
+                  <label className="text-sm font-medium text-foreground">Sites</label>
+                  <div className="mt-1 max-h-40 overflow-auto border border-border rounded p-2 space-y-1">
                     {sites.map((site: any) => (
                       <label key={site.id} className="flex items-center gap-2 text-sm">
                         <input
@@ -408,48 +408,48 @@ export default function GroupsPage() {
                               });
                             }
                           }}
-                          className="rounded border-slate-300"
+                          className="rounded border-border"
                         />
                         {site.name} #{site.siteNumber}
                       </label>
                     ))}
                   </div>
-                  <div className="text-xs text-slate-500 mt-1">
+                  <div className="text-xs text-muted-foreground mt-1">
                     {newBlock.siteIds.length} site(s) selected
                   </div>
                 </div>
 
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <label className="text-sm font-medium text-slate-700">Start Date</label>
+                    <label className="text-sm font-medium text-foreground">Start Date</label>
                     <input
                       type="date"
                       value={newBlock.windowStart}
                       onChange={(e) =>
                         setNewBlock({ ...newBlock, windowStart: e.target.value })
                       }
-                      className="w-full mt-1 border border-slate-200 rounded px-3 py-2 text-sm"
+                      className="w-full mt-1 border border-border rounded px-3 py-2 text-sm"
                     />
                   </div>
                   <div>
-                    <label className="text-sm font-medium text-slate-700">End Date</label>
+                    <label className="text-sm font-medium text-foreground">End Date</label>
                     <input
                       type="date"
                       value={newBlock.windowEnd}
                       onChange={(e) =>
                         setNewBlock({ ...newBlock, windowEnd: e.target.value })
                       }
-                      className="w-full mt-1 border border-slate-200 rounded px-3 py-2 text-sm"
+                      className="w-full mt-1 border border-border rounded px-3 py-2 text-sm"
                     />
                   </div>
                 </div>
 
                 <div>
-                  <label className="text-sm font-medium text-slate-700">Reason</label>
+                  <label className="text-sm font-medium text-foreground">Reason</label>
                   <select
                     value={newBlock.reason}
                     onChange={(e) => setNewBlock({ ...newBlock, reason: e.target.value })}
-                    className="w-full mt-1 border border-slate-200 rounded px-3 py-2"
+                    className="w-full mt-1 border border-border rounded px-3 py-2"
                   >
                     <option value="group_hold">Group Hold</option>
                     <option value="maintenance">Maintenance</option>
@@ -517,16 +517,16 @@ export default function GroupsPage() {
                 </Button>
               </CardHeader>
               <CardContent className="space-y-4">
-                <p className="text-sm text-slate-500">
+                <p className="text-sm text-muted-foreground">
                   Create a group to link multiple reservations together. You can link existing
                   reservations after the group is created.
                 </p>
 
                 <div className="space-y-3">
-                  <div className="flex items-center justify-between p-3 border border-slate-200 rounded">
+                  <div className="flex items-center justify-between p-3 border border-border rounded">
                     <div>
                       <div className="font-medium text-sm">Shared Payment</div>
-                      <div className="text-xs text-slate-500">
+                      <div className="text-xs text-muted-foreground">
                         One guest pays for all reservations in the group
                       </div>
                     </div>
@@ -536,14 +536,14 @@ export default function GroupsPage() {
                       onChange={(e) =>
                         setNewGroup({ ...newGroup, sharedPayment: e.target.checked })
                       }
-                      className="h-4 w-4 rounded border-slate-300"
+                      className="h-4 w-4 rounded border-border"
                     />
                   </div>
 
-                  <div className="flex items-center justify-between p-3 border border-slate-200 rounded">
+                  <div className="flex items-center justify-between p-3 border border-border rounded">
                     <div>
                       <div className="font-medium text-sm">Shared Communications</div>
-                      <div className="text-xs text-slate-500">
+                      <div className="text-xs text-muted-foreground">
                         Send group-wide emails and updates
                       </div>
                     </div>
@@ -553,7 +553,7 @@ export default function GroupsPage() {
                       onChange={(e) =>
                         setNewGroup({ ...newGroup, sharedComm: e.target.checked })
                       }
-                      className="h-4 w-4 rounded border-slate-300"
+                      className="h-4 w-4 rounded border-border"
                     />
                   </div>
                 </div>

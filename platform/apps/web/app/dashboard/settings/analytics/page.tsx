@@ -57,8 +57,8 @@ export default function AnalyticsSettingsPage() {
     <div>
       <div className="max-w-3xl space-y-4">
         <div>
-          <h1 className="text-2xl font-semibold text-slate-900">Analytics & Tracking</h1>
-          <p className="text-slate-600 text-sm">
+          <h1 className="text-2xl font-semibold text-foreground">Analytics & Tracking</h1>
+          <p className="text-muted-foreground text-sm">
             Set per-campground tracking IDs for Google Analytics (GA4) and Meta Pixel. These load on public park pages only.
           </p>
         </div>
@@ -69,7 +69,7 @@ export default function AnalyticsSettingsPage() {
             <CardDescription>Campground-scoped analytics identifiers.</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            {isLoading && <div className="text-sm text-slate-500">Loading...</div>}
+            {isLoading && <div className="text-sm text-muted-foreground">Loading...</div>}
             {!isLoading && (
               <div className="space-y-4">
                 <div className="space-y-2">
@@ -94,7 +94,7 @@ export default function AnalyticsSettingsPage() {
                   <Button onClick={handleSave} disabled={!campgroundId || mutation.isPending}>
                     Save
                   </Button>
-                  <div className="text-xs text-slate-500 self-center">
+                  <div className="text-xs text-muted-foreground self-center">
                     Tracking loads on public pages only; leave blank to disable.
                   </div>
                 </div>

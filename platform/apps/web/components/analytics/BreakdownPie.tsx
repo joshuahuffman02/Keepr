@@ -62,13 +62,13 @@ export function BreakdownPie({
 
   if (loading || !isRechartsLoaded) {
     return (
-      <Card className="bg-slate-800/50 border-slate-700">
+      <Card className="bg-muted/50 border-border">
         <CardHeader>
           <CardTitle className="text-lg text-white">{title}</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="animate-pulse flex items-center justify-center" style={{ height }}>
-            <div className="h-48 w-48 rounded-full bg-slate-700/50" />
+            <div className="h-48 w-48 rounded-full bg-muted/50" />
           </div>
         </CardContent>
       </Card>
@@ -82,7 +82,7 @@ export function BreakdownPie({
       const entry = payload[0];
       const percentage = ((entry.value / total) * 100).toFixed(1);
       return (
-        <div className="bg-slate-900 border border-slate-700 rounded-lg p-3 shadow-lg">
+        <div className="bg-muted border border-border rounded-lg p-3 shadow-lg">
           <p className="text-sm font-medium" style={{ color: entry.payload.fill }}>
             {entry.name}
           </p>
@@ -110,7 +110,7 @@ export function BreakdownPie({
               className="w-2.5 h-2.5 rounded-full flex-shrink-0"
               style={{ backgroundColor: entry.color }}
             />
-            <span className="text-slate-400 text-xs truncate">{entry.value}</span>
+            <span className="text-muted-foreground text-xs truncate">{entry.value}</span>
           </li>
         ))}
       </ul>
@@ -118,10 +118,10 @@ export function BreakdownPie({
   };
 
   return (
-    <Card className="bg-slate-800/50 border-slate-700">
+    <Card className="bg-muted/50 border-border">
       <CardHeader className="pb-2">
         <CardTitle className="text-lg text-white">{title}</CardTitle>
-        {description && <p className="text-sm text-slate-400">{description}</p>}
+        {description && <p className="text-sm text-muted-foreground">{description}</p>}
       </CardHeader>
       <CardContent>
         <ResponsiveContainer width="100%" height={height}>

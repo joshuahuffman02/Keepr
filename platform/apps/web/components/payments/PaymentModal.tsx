@@ -108,7 +108,7 @@ function CheckoutForm({
     return (
         <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-1">
-                <Label className="text-xs text-slate-500">Billing ZIP</Label>
+                <Label className="text-xs text-muted-foreground">Billing ZIP</Label>
                 <Input
                     value={postalCode}
                     onChange={(e) => setPostalCode(e.target.value)}
@@ -179,7 +179,7 @@ export function PaymentModal({
             <DialogContent className="sm:max-w-md">
                 <DialogHeader>
                     <DialogTitle>Pay Balance</DialogTitle>
-                    <div className="text-xs text-slate-500">
+                    <div className="text-xs text-muted-foreground">
                         {entryMode === "reader" ? "Card reader" : "Manual entry"}
                     </div>
                 </DialogHeader>
@@ -225,7 +225,7 @@ export function PaymentModal({
                 )}
 
                 {isLoading && !initError && (
-                    <div className="py-8 text-center text-slate-500">
+                    <div className="py-8 text-center text-muted-foreground">
                         <RefreshCw className="h-5 w-5 animate-spin mx-auto mb-2" />
                         Initializing payment...
                     </div>

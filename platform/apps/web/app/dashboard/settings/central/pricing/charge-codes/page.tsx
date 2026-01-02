@@ -140,10 +140,10 @@ export default function ChargeCodesPage() {
       label: "Code",
       render: (item: ChargeCode) => (
         <div className="flex items-center gap-3">
-          <div className="p-2 rounded-lg bg-slate-100">
-            <Receipt className="h-4 w-4 text-slate-600" />
+          <div className="p-2 rounded-lg bg-muted">
+            <Receipt className="h-4 w-4 text-muted-foreground" />
           </div>
-          <code className="px-2 py-1 rounded bg-slate-100 font-mono text-sm">
+          <code className="px-2 py-1 rounded bg-muted font-mono text-sm">
             {item.code}
           </code>
         </div>
@@ -154,8 +154,8 @@ export default function ChargeCodesPage() {
       label: "Description",
       render: (item: ChargeCode) => (
         <div>
-          <p className="font-medium text-slate-900">{item.name}</p>
-          <p className="text-sm text-slate-500">{item.category}</p>
+          <p className="font-medium text-foreground">{item.name}</p>
+          <p className="text-sm text-muted-foreground">{item.category}</p>
         </div>
       ),
     },
@@ -172,7 +172,7 @@ export default function ChargeCodesPage() {
               ? "bg-status-info/15 text-status-info border-blue-200"
               : item.source === "ledger"
               ? "bg-status-warning/15 text-status-warning border-amber-200"
-              : "bg-slate-50 text-slate-700"
+              : "bg-muted text-foreground"
           }
         >
           {item.source === "system"
@@ -189,7 +189,7 @@ export default function ChargeCodesPage() {
       key: "usage",
       label: "Usage",
       render: (item: ChargeCode) => (
-        <span className="text-sm text-slate-500">
+        <span className="text-sm text-muted-foreground">
           {item.usageCount > 0 ? `${item.usageCount} items` : "Not used"}
         </span>
       ),
@@ -212,13 +212,13 @@ export default function ChargeCodesPage() {
     return (
       <div className="max-w-5xl space-y-6">
         <div>
-          <h2 className="text-2xl font-bold text-slate-900">Charge Codes / GL Codes</h2>
-          <p className="text-slate-500 mt-1">
+          <h2 className="text-2xl font-bold text-foreground">Charge Codes / GL Codes</h2>
+          <p className="text-muted-foreground mt-1">
             Define charge codes used for billing and accounting
           </p>
         </div>
         <div className="flex items-center justify-center py-12">
-          <Loader2 className="h-8 w-8 animate-spin text-slate-400" />
+          <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
         </div>
       </div>
     );
@@ -228,15 +228,15 @@ export default function ChargeCodesPage() {
     return (
       <div className="max-w-5xl space-y-6">
         <div>
-          <h2 className="text-2xl font-bold text-slate-900">Charge Codes / GL Codes</h2>
-          <p className="text-slate-500 mt-1">
+          <h2 className="text-2xl font-bold text-foreground">Charge Codes / GL Codes</h2>
+          <p className="text-muted-foreground mt-1">
             Define charge codes used for billing and accounting
           </p>
         </div>
         <Card>
           <CardContent className="py-8 text-center">
             <Info className="h-8 w-8 text-amber-500 mx-auto mb-3" />
-            <p className="text-slate-600">Please select a campground first.</p>
+            <p className="text-muted-foreground">Please select a campground first.</p>
           </CardContent>
         </Card>
       </div>
@@ -247,8 +247,8 @@ export default function ChargeCodesPage() {
     <div className="max-w-5xl space-y-6">
       <div className="flex items-start justify-between">
         <div>
-          <h2 className="text-2xl font-bold text-slate-900">Charge Codes / GL Codes</h2>
-          <p className="text-slate-500 mt-1">
+          <h2 className="text-2xl font-bold text-foreground">Charge Codes / GL Codes</h2>
+          <p className="text-muted-foreground mt-1">
             Define charge codes used for billing and accounting
           </p>
         </div>
@@ -284,10 +284,10 @@ export default function ChargeCodesPage() {
                 <Receipt className="h-5 w-5 text-purple-600" />
               </div>
               <div>
-                <p className="text-2xl font-bold text-slate-900">
+                <p className="text-2xl font-bold text-foreground">
                   {chargeCodes.filter((c) => c.source === "system").length}
                 </p>
-                <p className="text-sm text-slate-500">System</p>
+                <p className="text-sm text-muted-foreground">System</p>
               </div>
             </div>
           </CardContent>
@@ -299,10 +299,10 @@ export default function ChargeCodesPage() {
                 <Receipt className="h-5 w-5 text-status-info" />
               </div>
               <div>
-                <p className="text-2xl font-bold text-slate-900">
+                <p className="text-2xl font-bold text-foreground">
                   {chargeCodes.filter((c) => c.source === "product").length}
                 </p>
-                <p className="text-sm text-slate-500">From Products</p>
+                <p className="text-sm text-muted-foreground">From Products</p>
               </div>
             </div>
           </CardContent>
@@ -314,10 +314,10 @@ export default function ChargeCodesPage() {
                 <Receipt className="h-5 w-5 text-status-warning" />
               </div>
               <div>
-                <p className="text-2xl font-bold text-slate-900">
+                <p className="text-2xl font-bold text-foreground">
                   {chargeCodes.filter((c) => c.source === "ledger").length}
                 </p>
-                <p className="text-sm text-slate-500">From Ledger</p>
+                <p className="text-sm text-muted-foreground">From Ledger</p>
               </div>
             </div>
           </CardContent>
@@ -329,10 +329,10 @@ export default function ChargeCodesPage() {
                 <Receipt className="h-5 w-5 text-status-success" />
               </div>
               <div>
-                <p className="text-2xl font-bold text-slate-900">
+                <p className="text-2xl font-bold text-foreground">
                   {chargeCodes.length}
                 </p>
-                <p className="text-sm text-slate-500">Total</p>
+                <p className="text-sm text-muted-foreground">Total</p>
               </div>
             </div>
           </CardContent>

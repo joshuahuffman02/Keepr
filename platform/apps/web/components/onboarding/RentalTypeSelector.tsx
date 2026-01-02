@@ -61,13 +61,13 @@ export function RentalTypeSelector({
             disabled={disabled}
             className={cn(
               "relative p-6 rounded-xl border-2 text-left transition-all duration-200",
-              "focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 focus:ring-offset-slate-900",
+              "focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 focus:ring-offset-background",
               disabled
                 ? "cursor-not-allowed opacity-50"
-                : "hover:border-emerald-500/50 hover:bg-slate-800/50",
+                : "hover:border-emerald-500/50 hover:bg-muted/50",
               isSelected
                 ? "border-emerald-500 bg-emerald-500/10"
-                : "border-slate-700 bg-slate-800/30"
+                : "border-border bg-muted/30"
             )}
           >
             <div className="flex flex-col items-center text-center gap-4">
@@ -76,7 +76,7 @@ export function RentalTypeSelector({
                   "p-4 rounded-lg",
                   isSelected
                     ? "bg-emerald-500/20 text-emerald-400"
-                    : "bg-slate-700 text-slate-400"
+                    : "bg-muted text-muted-foreground"
                 )}
               >
                 <Icon className="w-8 h-8" />
@@ -85,12 +85,12 @@ export function RentalTypeSelector({
                 <h4
                   className={cn(
                     "font-semibold text-lg",
-                    isSelected ? "text-emerald-400" : "text-slate-200"
+                    isSelected ? "text-emerald-400" : "text-muted-foreground"
                   )}
                 >
                   {rentalType.label}
                 </h4>
-                <p className="text-sm text-slate-400 leading-relaxed">
+                <p className="text-sm text-muted-foreground leading-relaxed">
                   {rentalType.description}
                 </p>
               </div>

@@ -9,8 +9,8 @@ export default function DepositsPage() {
   return (
     <div className="max-w-4xl space-y-6">
       <div>
-        <h2 className="text-2xl font-bold text-slate-900">Deposits</h2>
-        <p className="text-slate-500 mt-1">
+        <h2 className="text-2xl font-bold text-foreground">Deposits</h2>
+        <p className="text-muted-foreground mt-1">
           Configure deposit requirements and payment schedules
         </p>
       </div>
@@ -22,8 +22,8 @@ export default function DepositsPage() {
               <Wallet className="h-6 w-6 text-emerald-600" />
             </div>
             <div className="flex-1">
-              <h3 className="font-semibold text-slate-900">Deposit Policies</h3>
-              <p className="text-sm text-slate-500 mt-1">
+              <h3 className="font-semibold text-foreground">Deposit Policies</h3>
+              <p className="text-sm text-muted-foreground mt-1">
                 Set deposit amounts, due dates, and automatic payment collection rules.
                 Configure different policies for different booking types.
               </p>

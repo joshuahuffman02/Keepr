@@ -114,35 +114,35 @@ export function OfflineTelemetryPanel({
   const tone: Tone =
     variant === "dark"
       ? {
-          card: "pwa-card border-slate-800 bg-slate-900/70 text-slate-50",
+          card: "pwa-card border-border bg-card text-foreground",
           header: "p-4 sm:p-5",
-          title: "text-slate-50",
-          sub: "text-slate-400 text-sm",
+          title: "text-foreground",
+          sub: "text-muted-foreground text-sm",
           content: "p-4 pt-0 sm:p-5 sm:pt-2",
-          row: "border border-slate-800 bg-slate-900/60",
-          meta: "text-xs text-slate-400",
-          name: "text-sm font-semibold text-slate-50",
-          bucketLabel: "w-14 text-xs text-slate-400",
-          bucketStats: "w-36 text-[11px] text-right text-slate-400",
-          meterBg: "bg-slate-800/80",
-          notice: "bg-slate-800 text-slate-50 border border-slate-700",
-          metaLabel: "text-xs text-slate-400",
-          button: "border-slate-700 bg-slate-800 text-slate-50 hover:bg-slate-700",
+          row: "border border-border bg-muted/60",
+          meta: "text-xs text-muted-foreground",
+          name: "text-sm font-semibold text-foreground",
+          bucketLabel: "w-14 text-xs text-muted-foreground",
+          bucketStats: "w-36 text-[11px] text-right text-muted-foreground",
+          meterBg: "bg-muted/80",
+          notice: "bg-muted text-foreground border border-border",
+          metaLabel: "text-xs text-muted-foreground",
+          button: "border-border bg-muted text-foreground hover:bg-muted",
         }
       : {
-          card: "border-slate-200 bg-white",
+          card: "border-border bg-card",
           header: "p-4 sm:p-6",
-          title: "text-slate-900",
-          sub: "text-slate-600 text-sm",
+          title: "text-foreground",
+          sub: "text-muted-foreground text-sm",
           content: "p-4 pt-0 sm:p-6 sm:pt-2",
-          row: "border border-slate-200 bg-slate-50",
-          meta: "text-xs text-slate-600",
-          name: "text-sm font-semibold text-slate-900",
-          bucketLabel: "w-14 text-xs text-slate-500",
-          bucketStats: "w-40 text-[11px] text-right text-slate-500",
-          meterBg: "bg-slate-200",
+          row: "border border-border bg-muted",
+          meta: "text-xs text-muted-foreground",
+          name: "text-sm font-semibold text-foreground",
+          bucketLabel: "w-14 text-xs text-muted-foreground",
+          bucketStats: "w-40 text-[11px] text-right text-muted-foreground",
+          meterBg: "bg-muted",
           notice: "",
-          metaLabel: "text-xs text-slate-600",
+          metaLabel: "text-xs text-muted-foreground",
           button: undefined,
         };
 
@@ -193,7 +193,7 @@ export function OfflineTelemetryPanel({
                     <Badge variant={row.queued > 0 ? "secondary" : "outline"}>{row.queued} queued</Badge>
                     <Badge
                       variant={row.paused ? "outline" : "secondary"}
-                      className={row.paused ? "border-amber-400 text-amber-500" : undefined}
+                      className={row.paused ? "border-status-warning text-status-warning" : undefined}
                     >
                       {row.paused ? "Paused" : "Draining"}
                     </Badge>
@@ -244,5 +244,4 @@ export function OfflineTelemetryPanel({
     </Card>
   );
 }
-
 

@@ -9,8 +9,8 @@ export default function PermissionsPage() {
   return (
     <div className="max-w-4xl space-y-6">
       <div>
-        <h2 className="text-2xl font-bold text-slate-900">Permissions</h2>
-        <p className="text-slate-500 mt-1">
+        <h2 className="text-2xl font-bold text-foreground">Permissions</h2>
+        <p className="text-muted-foreground mt-1">
           Configure granular access permissions
         </p>
       </div>
@@ -22,8 +22,8 @@ export default function PermissionsPage() {
               <ShieldCheck className="h-6 w-6 text-indigo-600" />
             </div>
             <div className="flex-1">
-              <h3 className="font-semibold text-slate-900">Permission Settings</h3>
-              <p className="text-sm text-slate-500 mt-1">
+              <h3 className="font-semibold text-foreground">Permission Settings</h3>
+              <p className="text-sm text-muted-foreground mt-1">
                 Fine-tune which actions each role can perform. Control access to
                 reservations, payments, settings, and more.
               </p>

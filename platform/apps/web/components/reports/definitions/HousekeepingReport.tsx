@@ -35,11 +35,11 @@ export function HousekeepingReport({ campgroundId }: HousekeepingReportProps) {
     }, [sites]);
 
     if (isLoading) {
-        return <div className="text-sm text-slate-500">Loading housekeeping status...</div>;
+        return <div className="text-sm text-muted-foreground">Loading housekeeping status...</div>;
     }
 
     if (!sites) {
-        return <div className="text-sm text-slate-500">No sites found.</div>;
+        return <div className="text-sm text-muted-foreground">No sites found.</div>;
     }
 
     return (
@@ -77,27 +77,27 @@ export function HousekeepingReport({ campgroundId }: HousekeepingReportProps) {
 
             {/* Dirty Sites List */}
             <div className="space-y-4">
-                <h3 className="text-lg font-semibold text-slate-900 flex items-center gap-2">
+                <h3 className="text-lg font-semibold text-foreground flex items-center gap-2">
                     <Sparkles className="w-5 h-5 text-rose-500" />
                     Requires Cleaning ({reportData.dirty.length})
                 </h3>
-                <div className="rounded-xl border border-slate-200 bg-white shadow-sm overflow-hidden">
+                <div className="rounded-xl border border-border bg-card shadow-sm overflow-hidden">
                     <table className="min-w-full text-sm text-left">
-                        <thead className="bg-slate-50 text-xs uppercase font-semibold text-slate-500">
+                        <thead className="bg-muted text-xs uppercase font-semibold text-muted-foreground">
                             <tr>
                                 <th className="px-4 py-3">Site</th>
                                 <th className="px-4 py-3">Category</th>
                                 <th className="px-4 py-3">Status</th>
                             </tr>
                         </thead>
-                        <tbody className="divide-y divide-slate-100">
+                        <tbody className="divide-y divide-border">
                             {reportData.dirty.length === 0 ? (
-                                <tr><td colSpan={3} className="px-4 py-8 text-center text-slate-500">All clean!</td></tr>
+                                <tr><td colSpan={3} className="px-4 py-8 text-center text-muted-foreground">All clean!</td></tr>
                             ) : (
                                 reportData.dirty.map((s) => (
-                                    <tr key={s.id} className="hover:bg-slate-50">
-                                        <td className="px-4 py-3 font-medium text-slate-900">{s.name}</td>
-                                        <td className="px-4 py-3 text-slate-600">{s.siteClassId || "Standard"}</td>
+                                    <tr key={s.id} className="hover:bg-muted">
+                                        <td className="px-4 py-3 font-medium text-foreground">{s.name}</td>
+                                        <td className="px-4 py-3 text-muted-foreground">{s.siteClassId || "Standard"}</td>
                                         <td className="px-4 py-3">
                                             <Badge variant="destructive">Dirty</Badge>
                                         </td>
@@ -111,14 +111,14 @@ export function HousekeepingReport({ campgroundId }: HousekeepingReportProps) {
 
             {/* Other Lists (Collapsible or Secondary) */}
             <div className="space-y-4">
-                <h3 className="text-lg font-semibold text-slate-900">Inspecting ({reportData.inspecting.length})</h3>
+                <h3 className="text-lg font-semibold text-foreground">Inspecting ({reportData.inspecting.length})</h3>
                 {reportData.inspecting.length > 0 && (
-                    <div className="rounded-xl border border-slate-200 bg-white shadow-sm overflow-hidden">
+                    <div className="rounded-xl border border-border bg-card shadow-sm overflow-hidden">
                         <table className="min-w-full text-sm text-left">
-                            <tbody className="divide-y divide-slate-100">
+                            <tbody className="divide-y divide-border">
                                 {reportData.inspecting.map((s) => (
-                                    <tr key={s.id} className="hover:bg-slate-50">
-                                        <td className="px-4 py-3 font-medium text-slate-900">{s.name}</td>
+                                    <tr key={s.id} className="hover:bg-muted">
+                                        <td className="px-4 py-3 font-medium text-foreground">{s.name}</td>
                                         <td className="px-4 py-3"><Badge variant="secondary">Inspecting</Badge></td>
                                     </tr>
                                 ))}

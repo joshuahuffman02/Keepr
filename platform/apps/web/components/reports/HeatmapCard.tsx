@@ -145,28 +145,27 @@ export function HeatmapCard({ title, subtitle, points, center, maxValue, isLoadi
     <div className="card p-4 space-y-3">
       <div className="flex items-center justify-between">
         <div>
-          <div className="text-sm font-semibold text-slate-900">{title}</div>
-          {subtitle && <div className="text-xs text-slate-500">{subtitle}</div>}
+          <div className="text-sm font-semibold text-foreground">{title}</div>
+          {subtitle && <div className="text-xs text-muted-foreground">{subtitle}</div>}
         </div>
-        <div className="flex items-center gap-2 text-xs text-slate-500">
+        <div className="flex items-center gap-2 text-xs text-muted-foreground">
           <span>Hotspots</span>
           <div className="flex h-3 w-16 overflow-hidden rounded-full">
-            <div className="flex-1 bg-gradient-to-r from-emerald-200 via-sky-300 to-blue-700" />
+            <div className="flex-1 bg-status-info" />
           </div>
         </div>
       </div>
-      <div className="relative h-[360px] w-full overflow-hidden rounded-lg border border-slate-200 bg-slate-50">
+      <div className="relative h-[360px] w-full overflow-hidden rounded-lg border border-border bg-muted">
         <div ref={containerRef} className="absolute inset-0" />
         {(isLoading || !isMapLibreLoaded) && (
-          <div className="absolute inset-0 z-10 flex items-center justify-center bg-white/70 text-sm text-slate-600">
+          <div className="absolute inset-0 z-10 flex items-center justify-center bg-card/70 text-sm text-muted-foreground">
             {!isMapLibreLoaded ? "Loading map library…" : "Loading heatmap…"}
           </div>
         )}
       </div>
-      <div className="text-xs text-slate-500">
+      <div className="text-xs text-muted-foreground">
         Higher density indicates higher utilization/revenue. Circles show top individual sites.
       </div>
     </div>
   );
 }
-

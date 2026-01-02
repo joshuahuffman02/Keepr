@@ -92,8 +92,8 @@ export function MergeGuestsDialog({
             </DialogDescription>
           </DialogHeader>
           <div className="py-6 text-center">
-            <AlertTriangle className="h-12 w-12 text-amber-500 mx-auto mb-3" />
-            <p className="text-slate-600">
+            <AlertTriangle className="h-12 w-12 text-status-warning mx-auto mb-3" />
+            <p className="text-muted-foreground">
               You have selected {guests.length} guest{guests.length !== 1 ? "s" : ""}.
               <br />
               Select exactly 2 guests to merge.
@@ -133,8 +133,8 @@ export function MergeGuestsDialog({
                 className={cn(
                   "flex items-center space-x-3 rounded-lg border p-4 cursor-pointer transition-all",
                   primaryId === guest.id
-                    ? "border-emerald-500 bg-emerald-50 ring-2 ring-emerald-500/20"
-                    : "border-slate-200 hover:border-slate-300"
+                    ? "border-status-success-border bg-status-success-bg ring-2 ring-status-success/20"
+                    : "border-border hover:border-border"
                 )}
                 onClick={() => setPrimaryId(guest.id)}
               >
@@ -143,28 +143,28 @@ export function MergeGuestsDialog({
                   <div className="flex items-center justify-between">
                     <div>
                       <div className="flex items-center gap-2">
-                        <span className="font-medium text-slate-900">
+                        <span className="font-medium text-foreground">
                           {guest.primaryFirstName} {guest.primaryLastName}
                         </span>
                         {guest.vip && (
-                          <Badge variant="outline" className="border-amber-300 bg-amber-50 text-amber-800">
+                          <Badge variant="outline" className="border-status-warning-border bg-status-warning-bg text-status-warning-text">
                             <Crown className="h-3 w-3 mr-1" />
                             VIP
                           </Badge>
                         )}
                       </div>
-                      <div className="text-sm text-slate-500 mt-1">
+                      <div className="text-sm text-muted-foreground mt-1">
                         {guest.email}
                         {guest.phone && ` | ${guest.phone}`}
                       </div>
                       {(guest.city || guest.state) && (
-                        <div className="text-xs text-slate-400 mt-0.5">
+                        <div className="text-xs text-muted-foreground mt-0.5">
                           {[guest.city, guest.state].filter(Boolean).join(", ")}
                         </div>
                       )}
                     </div>
                     {primaryId === guest.id && (
-                      <Badge className="bg-emerald-600">
+                      <Badge className="bg-status-success text-status-success-foreground">
                         <Check className="h-3 w-3 mr-1" />
                         Primary
                       </Badge>
@@ -176,19 +176,19 @@ export function MergeGuestsDialog({
           </RadioGroup>
         </div>
 
-        <div className="rounded-lg bg-slate-50 border border-slate-200 p-4 space-y-2">
-          <div className="flex items-center gap-2 text-sm font-medium text-slate-700">
-            <AlertTriangle className="h-4 w-4 text-amber-500" />
+        <div className="rounded-lg bg-muted border border-border p-4 space-y-2">
+          <div className="flex items-center gap-2 text-sm font-medium text-foreground">
+            <AlertTriangle className="h-4 w-4 text-status-warning" />
             What will happen:
           </div>
-          <ul className="text-sm text-slate-600 space-y-1 ml-6 list-disc">
+          <ul className="text-sm text-muted-foreground space-y-1 ml-6 list-disc">
             <li>
               All reservations from <strong>{secondaryGuest?.primaryFirstName} {secondaryGuest?.primaryLastName}</strong> will be transferred to <strong>{primaryGuest?.primaryFirstName} {primaryGuest?.primaryLastName}</strong>
             </li>
             <li>Messages, equipment, and loyalty points will be combined</li>
             <li>Missing contact info will be filled from the secondary profile</li>
             <li>VIP status and marketing opt-in will be preserved if either guest had them</li>
-            <li className="text-rose-600">
+            <li className="text-status-error">
               <strong>{secondaryGuest?.primaryFirstName} {secondaryGuest?.primaryLastName}</strong>'s profile will be deleted
             </li>
           </ul>
@@ -205,7 +205,7 @@ export function MergeGuestsDialog({
           <Button
             onClick={() => mergeMutation.mutate()}
             disabled={mergeMutation.isPending}
-            className="bg-emerald-600 hover:bg-emerald-700"
+            className="bg-action-primary text-action-primary-foreground hover:bg-action-primary-hover"
           >
             {mergeMutation.isPending ? (
               <>

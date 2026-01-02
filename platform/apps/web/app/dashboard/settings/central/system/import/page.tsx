@@ -9,8 +9,8 @@ export default function ImportPage() {
   return (
     <div className="max-w-4xl space-y-6">
       <div>
-        <h2 className="text-2xl font-bold text-slate-900">Import</h2>
-        <p className="text-slate-500 mt-1">
+        <h2 className="text-2xl font-bold text-foreground">Import</h2>
+        <p className="text-muted-foreground mt-1">
           Import data from other systems
         </p>
       </div>
@@ -22,8 +22,8 @@ export default function ImportPage() {
               <Upload className="h-6 w-6 text-green-600" />
             </div>
             <div className="flex-1">
-              <h3 className="font-semibold text-slate-900">Data Import</h3>
-              <p className="text-sm text-slate-500 mt-1">
+              <h3 className="font-semibold text-foreground">Data Import</h3>
+              <p className="text-sm text-muted-foreground mt-1">
                 Import reservations, guests, and other data from CSV files
                 or migrate from other campground management systems.
               </p>

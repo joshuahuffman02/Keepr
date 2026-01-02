@@ -109,12 +109,12 @@ export function DailySummaryReport({ campgroundId, dateRange }: DailySummaryRepo
     }, [reservations, sites, ledgerEntries, tickets, dateRange]);
 
     if (!summary) {
-        return <div className="text-sm text-slate-500">Loading summary data...</div>;
+        return <div className="text-sm text-muted-foreground">Loading summary data...</div>;
     }
 
     return (
         <div className="space-y-6">
-            <h2 className="text-lg font-semibold text-slate-900">
+            <h2 className="text-lg font-semibold text-foreground">
                 Summary for {dateRange.start === dateRange.end ? format(new Date(dateRange.start), "MMM d") : `${dateRange.start} - ${dateRange.end}`}
             </h2>
 
@@ -122,48 +122,48 @@ export function DailySummaryReport({ campgroundId, dateRange }: DailySummaryRepo
                 {/* Arrivals */}
                 <Card>
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-medium text-slate-500">Arrivals</CardTitle>
+                        <CardTitle className="text-sm font-medium text-muted-foreground">Arrivals</CardTitle>
                         <ArrowDownRight className="h-4 w-4 text-emerald-500" />
                     </CardHeader>
                     <CardContent>
                         <div className="text-2xl font-bold">{summary.arrivals}</div>
-                        <p className="text-xs text-slate-500">Expect Check-ins</p>
+                        <p className="text-xs text-muted-foreground">Expect Check-ins</p>
                     </CardContent>
                 </Card>
 
                 {/* Departures */}
                 <Card>
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-medium text-slate-500">Departures</CardTitle>
+                        <CardTitle className="text-sm font-medium text-muted-foreground">Departures</CardTitle>
                         <ArrowUpRight className="h-4 w-4 text-orange-500" />
                     </CardHeader>
                     <CardContent>
                         <div className="text-2xl font-bold">{summary.departures}</div>
-                        <p className="text-xs text-slate-500">Expect Check-outs</p>
+                        <p className="text-xs text-muted-foreground">Expect Check-outs</p>
                     </CardContent>
                 </Card>
 
                 {/* In House */}
                 <Card>
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-medium text-slate-500">In House</CardTitle>
+                        <CardTitle className="text-sm font-medium text-muted-foreground">In House</CardTitle>
                         <BedDouble className="h-4 w-4 text-indigo-500" />
                     </CardHeader>
                     <CardContent>
                         <div className="text-2xl font-bold">{summary.inHouse}</div>
-                        <p className="text-xs text-slate-500">Occupied Sites ({summary.occupancy}% peak)</p>
+                        <p className="text-xs text-muted-foreground">Occupied Sites ({summary.occupancy}% peak)</p>
                     </CardContent>
                 </Card>
 
                 {/* Revenue */}
                 <Card>
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-medium text-slate-500">Revenue</CardTitle>
+                        <CardTitle className="text-sm font-medium text-muted-foreground">Revenue</CardTitle>
                         <DollarSign className="h-4 w-4 text-emerald-600" />
                     </CardHeader>
                     <CardContent>
                         <div className="text-2xl font-bold">{formatCurrencyLocal(summary.revenue)}</div>
-                        <p className="text-xs text-slate-500">Charges posted</p>
+                        <p className="text-xs text-muted-foreground">Charges posted</p>
                     </CardContent>
                 </Card>
             </div>
@@ -174,18 +174,18 @@ export function DailySummaryReport({ campgroundId, dateRange }: DailySummaryRepo
                     <CardHeader className="pb-2">
                         <div className="flex items-center gap-2">
                             <Wrench className="h-4 w-4 text-rose-500" />
-                            <CardTitle className="text-base font-semibold text-slate-900">Maintenance Issues</CardTitle>
+                            <CardTitle className="text-base font-semibold text-foreground">Maintenance Issues</CardTitle>
                         </div>
                     </CardHeader>
                     <CardContent>
                         <div className="flex items-center justify-between">
                             <div>
-                                <span className="text-3xl font-bold text-slate-900">{summary.openTickets}</span>
-                                <span className="text-sm text-slate-500 ml-2">Active</span>
+                                <span className="text-3xl font-bold text-foreground">{summary.openTickets}</span>
+                                <span className="text-sm text-muted-foreground ml-2">Active</span>
                             </div>
                             <div className="text-right">
-                                <span className="text-xl font-semibold text-slate-700">{summary.closedTickets}</span>
-                                <span className="text-sm text-slate-500 ml-2">Closed today</span>
+                                <span className="text-xl font-semibold text-foreground">{summary.closedTickets}</span>
+                                <span className="text-sm text-muted-foreground ml-2">Closed today</span>
                             </div>
                         </div>
                     </CardContent>

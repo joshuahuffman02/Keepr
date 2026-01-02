@@ -76,7 +76,7 @@ export function NewVsReturningReport({ campgroundId, dateRange }: NewVsReturning
     }, [reservations, dateRange]);
 
     if (isLoading) {
-        return <div className="text-sm text-slate-500">Loading analysis...</div>;
+        return <div className="text-sm text-muted-foreground">Loading analysis...</div>;
     }
 
     if (error) {
@@ -87,7 +87,7 @@ export function NewVsReturningReport({ campgroundId, dateRange }: NewVsReturning
         <div className="space-y-8">
             <div className="flex flex-col md:flex-row gap-8 items-center h-[300px]">
                 <div className="w-full md:w-1/2 h-full">
-                    <h3 className="text-lg font-semibold text-slate-900 mb-4">Guest Loyalty Mix</h3>
+                    <h3 className="text-lg font-semibold text-foreground mb-4">Guest Loyalty Mix</h3>
                     {reportData.total > 0 ? (
                         <ResponsiveContainer width="100%" height="100%">
                             <PieChart>
@@ -113,7 +113,7 @@ export function NewVsReturningReport({ campgroundId, dateRange }: NewVsReturning
                             </PieChart>
                         </ResponsiveContainer>
                     ) : (
-                        <div className="h-full flex flex-col items-center justify-center text-slate-400 border-2 border-dashed border-slate-200 rounded-xl">
+                        <div className="h-full flex flex-col items-center justify-center text-muted-foreground border-2 border-dashed border-border rounded-xl">
                             <p>No guest arrivals in this period</p>
                         </div>
                     )}

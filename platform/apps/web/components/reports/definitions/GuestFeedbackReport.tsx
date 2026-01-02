@@ -92,7 +92,7 @@ export function GuestFeedbackReport({ campgroundId, dateRange }: GuestFeedbackRe
     }, [reviews, dateRange]);
 
     if (isLoading) {
-        return <div className="text-sm text-slate-500">Loading feedback data...</div>;
+        return <div className="text-sm text-muted-foreground">Loading feedback data...</div>;
     }
 
     if (error) {
@@ -101,9 +101,9 @@ export function GuestFeedbackReport({ campgroundId, dateRange }: GuestFeedbackRe
 
     if (!reportData) {
         return (
-            <div className="flex flex-col items-center justify-center p-12 bg-slate-50 rounded-lg border border-slate-200">
-                <div className="text-slate-400 mb-2">No reviews found</div>
-                <p className="text-xs text-slate-500">Try adjusting the date range.</p>
+            <div className="flex flex-col items-center justify-center p-12 bg-muted rounded-lg border border-border">
+                <div className="text-muted-foreground mb-2">No reviews found</div>
+                <p className="text-xs text-muted-foreground">Try adjusting the date range.</p>
             </div>
         );
     }
@@ -114,12 +114,12 @@ export function GuestFeedbackReport({ campgroundId, dateRange }: GuestFeedbackRe
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <Card>
                     <CardHeader className="pb-2">
-                        <CardTitle className="text-sm font-medium text-slate-500">Average Rating</CardTitle>
+                        <CardTitle className="text-sm font-medium text-muted-foreground">Average Rating</CardTitle>
                     </CardHeader>
                     <CardContent>
                         <div className="flex items-baseline gap-2">
                             <div className="text-2xl font-bold">{reportData.avgRating}</div>
-                            <div className="text-sm text-slate-400">/ 5.0</div>
+                            <div className="text-sm text-muted-foreground">/ 5.0</div>
                         </div>
                         <div className="flex mt-2">
                             {[1, 2, 3, 4, 5].map((star) => (
@@ -127,7 +127,7 @@ export function GuestFeedbackReport({ campgroundId, dateRange }: GuestFeedbackRe
                                     key={star}
                                     className={`h-4 w-4 ${star <= Math.round(Number(reportData.avgRating))
                                         ? "text-yellow-400 fill-yellow-400"
-                                        : "text-slate-200"
+                                        : "text-muted-foreground"
                                         }`}
                                 />
                             ))}
@@ -136,19 +136,19 @@ export function GuestFeedbackReport({ campgroundId, dateRange }: GuestFeedbackRe
                 </Card>
                 <Card>
                     <CardHeader className="pb-2">
-                        <CardTitle className="text-sm font-medium text-slate-500">Net Promoter Score</CardTitle>
+                        <CardTitle className="text-sm font-medium text-muted-foreground">Net Promoter Score</CardTitle>
                     </CardHeader>
                     <CardContent>
-                        <div className={`text-2xl font-bold ${reportData.nps > 0 ? "text-green-600" : reportData.nps < 0 ? "text-red-600" : "text-slate-600"
+                        <div className={`text-2xl font-bold ${reportData.nps > 0 ? "text-green-600" : reportData.nps < 0 ? "text-red-600" : "text-muted-foreground"
                             }`}>
                             {reportData.nps > 0 ? "+" : ""}{reportData.nps}
                         </div>
-                        <p className="text-xs text-slate-500">Based on rating proxy</p>
+                        <p className="text-xs text-muted-foreground">Based on rating proxy</p>
                     </CardContent>
                 </Card>
                 <Card>
                     <CardHeader className="pb-2">
-                        <CardTitle className="text-sm font-medium text-slate-500">Total Reviews</CardTitle>
+                        <CardTitle className="text-sm font-medium text-muted-foreground">Total Reviews</CardTitle>
                     </CardHeader>
                     <CardContent>
                         <div className="text-2xl font-bold">{reportData.totalReviews}</div>

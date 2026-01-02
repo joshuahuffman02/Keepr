@@ -24,11 +24,11 @@ interface CalendarFiltersProps {
 
 export function CalendarFilters({ filters, actions }: CalendarFiltersProps) {
     return (
-        <div className="flex flex-wrap gap-4 items-end bg-white p-4 rounded-xl border border-slate-200 shadow-sm mb-6">
+        <div className="flex flex-wrap gap-4 items-end bg-card p-4 rounded-xl border border-border shadow-sm mb-6">
             <div className="space-y-1.5 min-w-[140px]">
                 <Label className="text-xs font-medium text-muted-foreground">Guest Search</Label>
                 <div className="relative">
-                    <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-slate-400" />
+                    <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
                     <Input
                         placeholder="Name, email, phone..."
                         className="h-9 pl-9 text-sm"
@@ -78,7 +78,7 @@ export function CalendarFilters({ filters, actions }: CalendarFiltersProps) {
                             actions.setStatusFilter("all");
                             actions.setSiteTypeFilter("all");
                         }}
-                        className="h-9 text-xs text-slate-500 hover:text-slate-900"
+                        className="h-9 text-xs text-muted-foreground hover:text-foreground"
                     >
                         Clear Filters
                     </Button>

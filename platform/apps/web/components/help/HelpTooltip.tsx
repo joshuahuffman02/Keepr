@@ -115,7 +115,7 @@ export function HelpTooltip({
           onClick={handleToggle}
           onMouseEnter={handleMouseEnter}
           onMouseLeave={handleMouseLeave}
-          className={`inline-flex items-center justify-center text-slate-400 hover:text-emerald-600 transition-colors focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-1 rounded-full ${iconClassName}`}
+          className={`inline-flex items-center justify-center text-muted-foreground hover:text-emerald-600 transition-colors focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-1 rounded-full ${iconClassName}`}
           aria-label="Show help"
         >
           <HelpCircle className="h-4 w-4" />
@@ -125,22 +125,22 @@ export function HelpTooltip({
             <div className="absolute pointer-events-auto">
               <div
                 ref={tooltipRef}
-                className="bg-white border-2 border-emerald-200 rounded-lg shadow-xl p-4"
+                className="bg-card border-2 border-emerald-200 rounded-lg shadow-xl p-4"
                 style={{ maxWidth: `${maxWidth}px` }}
               >
                 <div className="flex items-start justify-between gap-3 mb-2">
-                  {title && <h4 className="text-sm font-semibold text-slate-900">{title}</h4>}
+                  {title && <h4 className="text-sm font-semibold text-foreground">{title}</h4>}
                   {isMobile && (
                     <button
                       onClick={() => setIsOpen(false)}
-                      className="flex-shrink-0 text-slate-400 hover:text-slate-600"
+                      className="flex-shrink-0 text-muted-foreground hover:text-muted-foreground"
                       aria-label="Close help"
                     >
                       <X className="h-4 w-4" />
                     </button>
                   )}
                 </div>
-                <div className="text-sm text-slate-700 leading-relaxed">{content}</div>
+                <div className="text-sm text-foreground leading-relaxed">{content}</div>
               </div>
             </div>
           </div>
@@ -157,7 +157,7 @@ export function HelpTooltip({
         onClick={handleToggle}
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
-        className={`inline-flex items-center justify-center w-5 h-5 rounded-full border border-slate-200 text-slate-400 hover:text-emerald-600 hover:border-emerald-400 transition-colors focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-1 ${iconClassName}`}
+        className={`inline-flex items-center justify-center w-5 h-5 rounded-full border border-border text-muted-foreground hover:text-emerald-600 hover:border-emerald-400 transition-colors focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-1 ${iconClassName}`}
         aria-label="Show help"
         aria-expanded={isOpen}
       >
@@ -167,27 +167,27 @@ export function HelpTooltip({
       {isOpen && (
         <div
           ref={tooltipRef}
-          className={`absolute z-50 bg-white border-2 border-emerald-200 rounded-lg shadow-xl p-4 ${getTooltipPosition()}`}
+          className={`absolute z-50 bg-card border-2 border-emerald-200 rounded-lg shadow-xl p-4 ${getTooltipPosition()}`}
           style={{ maxWidth: `${maxWidth}px` }}
           role="tooltip"
         >
           <div className="flex items-start justify-between gap-3 mb-2">
-            {title && <h4 className="text-sm font-semibold text-slate-900">{title}</h4>}
+            {title && <h4 className="text-sm font-semibold text-foreground">{title}</h4>}
             {isMobile && (
               <button
                 onClick={() => setIsOpen(false)}
-                className="flex-shrink-0 text-slate-400 hover:text-slate-600"
+                className="flex-shrink-0 text-muted-foreground hover:text-muted-foreground"
                 aria-label="Close help"
               >
                 <X className="h-4 w-4" />
               </button>
             )}
           </div>
-          <div className="text-sm text-slate-700 leading-relaxed">{content}</div>
+          <div className="text-sm text-foreground leading-relaxed">{content}</div>
 
           {/* Arrow indicator */}
           <div
-            className={`absolute w-3 h-3 bg-white border-emerald-200 transform rotate-45 ${
+            className={`absolute w-3 h-3 bg-card border-emerald-200 transform rotate-45 ${
               side === "top"
                 ? "bottom-[-7px] border-b-2 border-r-2"
                 : side === "bottom"
@@ -216,15 +216,15 @@ export function HelpTooltipContent({ children, className = "" }: { children: Rea
 export function HelpTooltipSection({ title, children }: { title?: string; children: ReactNode }) {
   return (
     <div>
-      {title && <div className="font-semibold text-slate-900 mb-1">{title}</div>}
-      <div className="text-slate-700">{children}</div>
+      {title && <div className="font-semibold text-foreground mb-1">{title}</div>}
+      <div className="text-foreground">{children}</div>
     </div>
   );
 }
 
 export function HelpTooltipList({ items }: { items: string[] }) {
   return (
-    <ul className="list-disc list-inside space-y-1 text-slate-700">
+    <ul className="list-disc list-inside space-y-1 text-foreground">
       {items.map((item, idx) => (
         <li key={idx}>{item}</li>
       ))}

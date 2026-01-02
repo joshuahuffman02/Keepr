@@ -435,17 +435,17 @@ export default function GiftCardsPage() {
       />
 
       <div className="mb-4">
-        <h1 className="text-2xl font-semibold text-slate-900">Gift Cards & Store Credit</h1>
-        <p className="text-sm text-slate-600">
+        <h1 className="text-2xl font-semibold text-foreground">Gift Cards & Store Credit</h1>
+        <p className="text-sm text-muted-foreground">
           Issue and redeem gift cards against reservations or POS orders. Balances are tracked in the stored value ledger—no external processors needed.
         </p>
       </div>
 
-      <Card className="mb-4 border-slate-200 bg-slate-50">
+      <Card className="mb-4 border-border bg-muted">
         <CardContent className="flex flex-col gap-3 py-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <div className="text-sm font-semibold text-slate-900">Wallets are available in Guest profiles.</div>
-            <div className="text-xs text-slate-600">View balances and add guest credit from the Wallet tab.</div>
+            <div className="text-sm font-semibold text-foreground">Wallets are available in Guest profiles.</div>
+            <div className="text-xs text-muted-foreground">View balances and add guest credit from the Wallet tab.</div>
           </div>
           <Button asChild size="sm" variant="outline">
             <Link href="/guests">Open Guests</Link>
@@ -456,25 +456,25 @@ export default function GiftCardsPage() {
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         <Card>
           <CardHeader>
-            <CardTitle className="text-sm text-slate-500">Outstanding balance</CardTitle>
-            <CardDescription className="text-2xl font-semibold text-slate-900">{formatMoney(stats.outstanding)}</CardDescription>
+            <CardTitle className="text-sm text-muted-foreground">Outstanding balance</CardTitle>
+            <CardDescription className="text-2xl font-semibold text-foreground">{formatMoney(stats.outstanding)}</CardDescription>
           </CardHeader>
         </Card>
         <Card>
           <CardHeader>
-            <CardTitle className="text-sm text-slate-500">Redeemed to date</CardTitle>
+            <CardTitle className="text-sm text-muted-foreground">Redeemed to date</CardTitle>
             <CardDescription className="text-2xl font-semibold text-emerald-700">{formatMoney(stats.redeemed)}</CardDescription>
           </CardHeader>
         </Card>
         <Card>
           <CardHeader>
-            <CardTitle className="text-sm text-slate-500">Cards issued</CardTitle>
-            <CardDescription className="text-2xl font-semibold text-slate-900">{cards.length}</CardDescription>
+            <CardTitle className="text-sm text-muted-foreground">Cards issued</CardTitle>
+            <CardDescription className="text-2xl font-semibold text-foreground">{cards.length}</CardDescription>
           </CardHeader>
         </Card>
         <Card>
           <CardHeader>
-            <CardTitle className="text-sm text-slate-500">Expiring soon (30d)</CardTitle>
+            <CardTitle className="text-sm text-muted-foreground">Expiring soon (30d)</CardTitle>
             <CardDescription className="text-2xl font-semibold text-amber-700">{stats.expiringSoon}</CardDescription>
           </CardHeader>
         </Card>
@@ -486,10 +486,10 @@ export default function GiftCardsPage() {
           <CardDescription>Use guest wallet credit alongside gift cards and stored value.</CardDescription>
         </CardHeader>
         <CardContent>
-          <ol className="list-decimal space-y-2 pl-5 text-sm text-slate-600">
+          <ol className="list-decimal space-y-2 pl-5 text-sm text-muted-foreground">
             <li>
               Open the guest profile to add wallet credit or review balances.{" "}
-              <Link className="text-slate-900 underline" href="/guests">
+              <Link className="text-foreground underline" href="/guests">
                 Go to Guests
               </Link>
               .
@@ -734,11 +734,11 @@ export default function GiftCardsPage() {
                       return (
                         <TableRow key={card.code} className={cn(status === "expired" ? "bg-amber-50" : "", status === "empty" ? "opacity-80" : "")}>
                           <TableCell>
-                            <div className="font-semibold text-slate-900">{card.code}</div>
-                            <div className="text-xs text-slate-500">
+                            <div className="font-semibold text-foreground">{card.code}</div>
+                            <div className="text-xs text-muted-foreground">
                               Issued {new Date(card.createdAt).toLocaleDateString()}
                             </div>
-                            <div className="text-xs text-slate-500">
+                            <div className="text-xs text-muted-foreground">
                               {scopeLabel(card.scopeType)}{card.issuerName ? ` · ${card.issuerName}` : ""}
                             </div>
                           </TableCell>
@@ -754,11 +754,11 @@ export default function GiftCardsPage() {
                             )}
                           </TableCell>
                           <TableCell>
-                            <div className="font-semibold text-slate-900">{formatMoney(card.balance)}</div>
-                            <div className="text-xs text-slate-500">Issued {formatMoney(card.amount)}</div>
+                            <div className="font-semibold text-foreground">{formatMoney(card.balance)}</div>
+                            <div className="text-xs text-muted-foreground">Issued {formatMoney(card.amount)}</div>
                           </TableCell>
-                          <TableCell className="text-slate-700">{card.issuedTo ?? "—"}</TableCell>
-                          <TableCell className="text-slate-700">{card.expiresOn ? new Date(card.expiresOn).toLocaleDateString() : "No expiry"}</TableCell>
+                          <TableCell className="text-foreground">{card.issuedTo ?? "—"}</TableCell>
+                          <TableCell className="text-foreground">{card.expiresOn ? new Date(card.expiresOn).toLocaleDateString() : "No expiry"}</TableCell>
                           <TableCell className="text-right">
                             <div className="flex justify-end gap-2">
                               <Button size="sm" variant="outline" onClick={() => setRedeemForm((prev) => ({ ...prev, code: card.code }))}>
@@ -790,7 +790,7 @@ export default function GiftCardsPage() {
                     })
                   ) : (
                     <TableRow>
-                      <TableCell colSpan={6} className="text-center text-sm text-slate-500 py-6">
+                      <TableCell colSpan={6} className="text-center text-sm text-muted-foreground py-6">
                         No gift cards yet.
                       </TableCell>
                     </TableRow>
@@ -804,17 +804,17 @@ export default function GiftCardsPage() {
                 {history.map((entry) => (
                   <div
                     key={entry.id}
-                    className="flex flex-col gap-1 rounded-lg border border-slate-200 bg-white p-3 md:flex-row md:items-center md:justify-between"
+                    className="flex flex-col gap-1 rounded-lg border border-border bg-card p-3 md:flex-row md:items-center md:justify-between"
                   >
                     <div>
                       <div className="flex items-center gap-2">
                         <Badge variant={entry.type === "issued" ? "secondary" : entry.type === "redeemed" ? "outline" : "default"}>
                           {entry.type === "issued" ? "Issued" : entry.type === "redeemed" ? "Redeemed" : "Adjusted"}
                         </Badge>
-                        <span className="font-semibold text-slate-900">{entry.code}</span>
-                        <span className="text-sm text-slate-600">· {channelLabel(entry.channel)}</span>
+                        <span className="font-semibold text-foreground">{entry.code}</span>
+                        <span className="text-sm text-muted-foreground">· {channelLabel(entry.channel)}</span>
                       </div>
-                      <div className="text-sm text-slate-600">
+                      <div className="text-sm text-muted-foreground">
                         {entry.note || "No note"} {entry.ref ? `(${entry.ref})` : ""}
                       </div>
                     </div>
@@ -823,18 +823,18 @@ export default function GiftCardsPage() {
                         {entry.type === "redeemed" ? "-" : "+"}
                         {formatMoney(entry.amount)}
                       </div>
-                      <div className="text-xs text-slate-500">
+                      <div className="text-xs text-muted-foreground">
                         {new Date(entry.createdAt).toLocaleString()} · Balance {formatMoney(entry.balanceAfter)}
                       </div>
                     </div>
                   </div>
                 ))}
                 {!history.length && (
-                  <div className="overflow-hidden rounded border border-slate-200 bg-white">
+                  <div className="overflow-hidden rounded border border-border bg-card">
                     <table className="w-full text-sm">
                       <tbody>
                         <TableRow>
-                          <TableCell colSpan={5} className="text-center text-sm text-slate-500 py-6">
+                          <TableCell colSpan={5} className="text-center text-sm text-muted-foreground py-6">
                             No usage yet.
                           </TableCell>
                         </TableRow>

@@ -61,8 +61,8 @@ export function KeyboardSequenceIndicator() {
 
   return (
     <div className="fixed bottom-8 right-8 z-[90] animate-in fade-in slide-in-from-bottom-4 duration-200">
-      <div className="bg-slate-900 text-white rounded-xl shadow-2xl border border-slate-700 p-4 min-w-[280px]">
-        <div className="flex items-center gap-2 mb-3 pb-2 border-b border-slate-700">
+      <div className="bg-muted text-foreground rounded-xl shadow-2xl border border-border p-4 min-w-[280px]">
+        <div className="flex items-center gap-2 mb-3 pb-2 border-b border-border">
           <Command className="h-4 w-4 text-emerald-400" />
           <span className="text-sm font-semibold text-emerald-400">
             Sequential Navigation Active
@@ -73,17 +73,17 @@ export function KeyboardSequenceIndicator() {
           {shortcuts.map((shortcut) => (
             <div
               key={shortcut.key}
-              className="flex items-center justify-between text-xs hover:bg-slate-800 px-2 py-1 rounded transition-colors"
+              className="flex items-center justify-between text-xs hover:bg-muted px-2 py-1 rounded transition-colors"
             >
-              <span className="text-slate-300">{shortcut.label}</span>
-              <kbd className="px-2 py-0.5 bg-slate-800 border border-slate-600 rounded text-white font-mono min-w-[24px] text-center">
+              <span className="text-muted-foreground">{shortcut.label}</span>
+              <kbd className="px-2 py-0.5 bg-muted border border-border rounded text-foreground font-mono min-w-[24px] text-center">
                 {shortcut.key}
               </kbd>
             </div>
           ))}
         </div>
 
-        <div className="mt-3 pt-2 border-t border-slate-700 text-[10px] text-slate-500 text-center">
+        <div className="mt-3 pt-2 border-t border-border text-[10px] text-muted-foreground text-center">
           Press any key or wait 1 second to cancel
         </div>
       </div>

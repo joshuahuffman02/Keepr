@@ -49,17 +49,17 @@ export default function GuestJourneyPage() {
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold text-slate-900 dark:text-white">Guest Journey Analytics</h1>
-            <p className="text-slate-600 dark:text-slate-400 mt-1">
+            <h1 className="text-2xl font-bold text-foreground dark:text-white">Guest Journey Analytics</h1>
+            <p className="text-muted-foreground dark:text-muted-foreground mt-1">
               Understand guest behavior, progression, and lifetime value
             </p>
           </div>
           <DateRangePicker value={dateRange} onChange={setDateRange} />
         </div>
         <div className="flex flex-col items-center justify-center py-12 text-center">
-          <Users className="h-16 w-16 text-slate-400 dark:text-slate-600 mb-4" />
-          <h3 className="text-lg font-medium text-slate-900 dark:text-white mb-2">No Guest Data Available</h3>
-          <p className="text-slate-600 dark:text-slate-400 max-w-md">
+          <Users className="h-16 w-16 text-muted-foreground dark:text-muted-foreground mb-4" />
+          <h3 className="text-lg font-medium text-foreground dark:text-white mb-2">No Guest Data Available</h3>
+          <p className="text-muted-foreground dark:text-muted-foreground max-w-md">
             There is no guest data for the selected time period. Data will appear here once guests make reservations.
           </p>
         </div>
@@ -72,8 +72,8 @@ export default function GuestJourneyPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-slate-900 dark:text-white">Guest Journey Analytics</h1>
-          <p className="text-slate-600 dark:text-slate-400 mt-1">
+          <h1 className="text-2xl font-bold text-foreground dark:text-white">Guest Journey Analytics</h1>
+          <p className="text-muted-foreground dark:text-muted-foreground mt-1">
             Understand guest behavior, progression, and lifetime value
           </p>
         </div>
@@ -164,10 +164,10 @@ export default function GuestJourneyPage() {
               </div>
               <div>
                 <p className="text-sm text-green-600 dark:text-green-400 font-medium">Upgrade Rate</p>
-                <p className="text-3xl font-bold text-slate-900 dark:text-white">
+                <p className="text-3xl font-bold text-foreground dark:text-white">
                   {data?.accommodationProgression?.upgradeRate?.toFixed(1) || 0}%
                 </p>
-                <p className="text-xs text-slate-600 dark:text-slate-400 mt-1">
+                <p className="text-xs text-muted-foreground dark:text-muted-foreground mt-1">
                   Guests moving to higher-tier accommodations
                 </p>
               </div>
@@ -182,10 +182,10 @@ export default function GuestJourneyPage() {
               </div>
               <div>
                 <p className="text-sm text-red-600 dark:text-red-400 font-medium">Downgrade Rate</p>
-                <p className="text-3xl font-bold text-slate-900 dark:text-white">
+                <p className="text-3xl font-bold text-foreground dark:text-white">
                   {data?.accommodationProgression?.downgradeRate?.toFixed(1) || 0}%
                 </p>
-                <p className="text-xs text-slate-600 dark:text-slate-400 mt-1">
+                <p className="text-xs text-muted-foreground dark:text-muted-foreground mt-1">
                   Guests moving to lower-tier accommodations
                 </p>
               </div>

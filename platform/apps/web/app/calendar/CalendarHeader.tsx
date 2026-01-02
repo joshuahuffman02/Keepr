@@ -43,16 +43,16 @@ export function CalendarHeader({
         <div className="flex flex-col gap-4 mb-8">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div className="flex flex-col gap-1">
-                    <h1 className="text-3xl font-black tracking-tight text-slate-900 flex items-center gap-3">
+                    <h1 className="text-3xl font-black tracking-tight text-foreground flex items-center gap-3">
                         <CalendarIcon className="h-8 w-8 text-emerald-600" />
                         Interactive Calendar
                     </h1>
-                    <p className="text-sm text-slate-500 font-medium">Manage bookings, site availability, and ops in real-time.</p>
+                    <p className="text-sm text-muted-foreground font-medium">Manage bookings, site availability, and ops in real-time.</p>
                 </div>
 
                 <div className="flex flex-wrap items-center gap-3">
                     {/* View Toggles (7d, 14d, 30d) */}
-                    <div className="flex items-center bg-white rounded-lg border border-slate-200 shadow-sm p-1">
+                    <div className="flex items-center bg-card rounded-lg border border-border shadow-sm p-1">
                         {[7, 14, 30].map((d) => (
                             <Button
                                 key={d}
@@ -77,19 +77,19 @@ export function CalendarHeader({
                         </Button>
                     </div>
 
-                    <div className="flex items-center bg-white rounded-lg border border-slate-200 shadow-sm p-1">
-                        <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-600" onClick={handlePrev}>
+                    <div className="flex items-center bg-card rounded-lg border border-border shadow-sm p-1">
+                        <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground" onClick={handlePrev}>
                             <ChevronLeft className="h-4 w-4" />
                         </Button>
                         <Button variant="ghost" size="sm" className="px-3 h-8 text-xs font-bold uppercase tracking-tight" onClick={onToday}>
                             Today
                         </Button>
-                        <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-600" onClick={handleNext}>
+                        <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground" onClick={handleNext}>
                             <ChevronRight className="h-4 w-4" />
                         </Button>
                     </div>
 
-                    <div className="flex items-center bg-slate-100 rounded-lg p-1">
+                    <div className="flex items-center bg-muted rounded-lg p-1">
                         <Button
                             variant={viewMode === "week" ? "secondary" : "ghost"}
                             size="sm"

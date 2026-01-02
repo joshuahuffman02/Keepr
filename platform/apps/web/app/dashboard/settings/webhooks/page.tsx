@@ -233,7 +233,7 @@ export default function WebhooksSettingsPage() {
                     </TabsList>
 
                     <TabsContent value="endpoints" className="space-y-4">
-                        <div className="rounded-md border bg-white dark:bg-slate-950">
+                        <div className="rounded-md border bg-card dark:bg-muted">
                             <Table>
                                 <TableHeader>
                                     <TableRow>
@@ -246,13 +246,13 @@ export default function WebhooksSettingsPage() {
                                 <TableBody>
                                     {isLoadingEndpoints ? (
                                         <TableRow>
-                                            <TableCell colSpan={4} className="text-center py-8 text-slate-500">
+                                            <TableCell colSpan={4} className="text-center py-8 text-muted-foreground">
                                                 Loading...
                                             </TableCell>
                                         </TableRow>
                                     ) : endpoints?.length === 0 ? (
                                         <TableRow>
-                                            <TableCell colSpan={4} className="text-center py-8 text-slate-500">
+                                            <TableCell colSpan={4} className="text-center py-8 text-muted-foreground">
                                                 No webhooks configured.
                                             </TableCell>
                                         </TableRow>
@@ -261,8 +261,8 @@ export default function WebhooksSettingsPage() {
                                             <TableRow key={webhook.id}>
                                                 <TableCell>
                                                     <div className="font-medium text-sm gap-1 flex flex-col">
-                                                        <span className="font-mono text-xs text-slate-600">{webhook.url}</span>
-                                                        {webhook.description && <span className="text-slate-500">{webhook.description}</span>}
+                                                        <span className="font-mono text-xs text-muted-foreground">{webhook.url}</span>
+                                                        {webhook.description && <span className="text-muted-foreground">{webhook.description}</span>}
                                                     </div>
                                                 </TableCell>
                                                 <TableCell>
@@ -280,10 +280,10 @@ export default function WebhooksSettingsPage() {
                                                             checked={webhook.isActive}
                                                             onCheckedChange={(checked) => toggleMutation.mutate({ id: webhook.id, isActive: checked })}
                                                         />
-                                                        <span className="text-xs text-slate-500">{webhook.isActive ? "Active" : "Inactive"}</span>
+                                                        <span className="text-xs text-muted-foreground">{webhook.isActive ? "Active" : "Inactive"}</span>
                                                     </div>
                                                 </TableCell>
-                                                <TableCell className="text-slate-500">
+                                                <TableCell className="text-muted-foreground">
                                                     {format(new Date(webhook.createdAt), "MMM d, yyyy")}
                                                 </TableCell>
                                             </TableRow>
@@ -295,7 +295,7 @@ export default function WebhooksSettingsPage() {
                     </TabsContent>
 
                     <TabsContent value="deliveries" className="space-y-4">
-                        <div className="rounded-md border bg-white dark:bg-slate-950">
+                        <div className="rounded-md border bg-card dark:bg-muted">
                             <Table>
                                 <TableHeader>
                                     <TableRow>
@@ -309,13 +309,13 @@ export default function WebhooksSettingsPage() {
                                 <TableBody>
                                     {isLoadingDeliveries ? (
                                         <TableRow>
-                                            <TableCell colSpan={5} className="text-center py-8 text-slate-500">
+                                            <TableCell colSpan={5} className="text-center py-8 text-muted-foreground">
                                                 Loading...
                                             </TableCell>
                                         </TableRow>
                                     ) : deliveries?.length === 0 ? (
                                         <TableRow>
-                                            <TableCell colSpan={5} className="text-center py-8 text-slate-500">
+                                            <TableCell colSpan={5} className="text-center py-8 text-muted-foreground">
                                                 No events delivered yet.
                                             </TableCell>
                                         </TableRow>
@@ -324,7 +324,7 @@ export default function WebhooksSettingsPage() {
                                             <TableRow key={delivery.id}>
                                                 <TableCell>
                                                     <div className="font-medium text-sm">{delivery.eventType}</div>
-                                                    <div className="text-xs text-slate-500 font-mono truncate max-w-[200px]">
+                                                    <div className="text-xs text-muted-foreground font-mono truncate max-w-[200px]">
                                                         ID: {delivery.id}
                                                     </div>
                                                 </TableCell>
@@ -337,10 +337,10 @@ export default function WebhooksSettingsPage() {
                                                         {delivery.responseStatus && ` (${delivery.responseStatus})`}
                                                     </div>
                                                 </TableCell>
-                                                <TableCell className="max-w-[200px] truncate text-xs text-slate-500" title={delivery.webhookEndpoint?.url}>
+                                                <TableCell className="max-w-[200px] truncate text-xs text-muted-foreground" title={delivery.webhookEndpoint?.url}>
                                                     {delivery.webhookEndpoint?.url}
                                                 </TableCell>
-                                                <TableCell className="text-slate-500 text-xs">
+                                                <TableCell className="text-muted-foreground text-xs">
                                                     {format(new Date(delivery.createdAt), "MMM d, HH:mm:ss")}
                                                 </TableCell>
                                                 <TableCell className="text-right">

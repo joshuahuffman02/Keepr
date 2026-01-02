@@ -75,7 +75,7 @@ export function RepeatGuestsReport({ campgroundId, dateRange }: RepeatGuestsRepo
     }, [reservations, dateRange]);
 
     if (isLoading) {
-        return <div className="text-sm text-slate-500">Loading guest data...</div>;
+        return <div className="text-sm text-muted-foreground">Loading guest data...</div>;
     }
 
     if (error) {
@@ -84,9 +84,9 @@ export function RepeatGuestsReport({ campgroundId, dateRange }: RepeatGuestsRepo
 
     if (!reportData || reportData.totalGuests === 0) {
         return (
-            <div className="flex flex-col items-center justify-center p-12 bg-slate-50 rounded-lg border border-slate-200">
-                <div className="text-slate-400 mb-2">No guest data found</div>
-                <p className="text-xs text-slate-500">Guests will appear after reservations are made.</p>
+            <div className="flex flex-col items-center justify-center p-12 bg-muted rounded-lg border border-border">
+                <div className="text-muted-foreground mb-2">No guest data found</div>
+                <p className="text-xs text-muted-foreground">Guests will appear after reservations are made.</p>
             </div>
         );
     }
@@ -97,7 +97,7 @@ export function RepeatGuestsReport({ campgroundId, dateRange }: RepeatGuestsRepo
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                 <Card>
                     <CardHeader className="pb-2">
-                        <CardTitle className="text-sm font-medium text-slate-500">Total Guests</CardTitle>
+                        <CardTitle className="text-sm font-medium text-muted-foreground">Total Guests</CardTitle>
                     </CardHeader>
                     <CardContent>
                         <div className="text-2xl font-bold">{reportData.totalGuests}</div>
@@ -160,19 +160,19 @@ export function RepeatGuestsReport({ campgroundId, dateRange }: RepeatGuestsRepo
                     </CardHeader>
                     <div className="overflow-x-auto max-h-[300px]">
                         <table className="w-full text-sm text-left">
-                            <thead className="bg-slate-50 text-xs uppercase text-slate-500 sticky top-0">
+                            <thead className="bg-muted text-xs uppercase text-muted-foreground sticky top-0">
                                 <tr>
                                     <th className="px-4 py-3 font-medium">Guest</th>
                                     <th className="px-4 py-3 font-medium text-right">Stays</th>
                                     <th className="px-4 py-3 font-medium text-right">Total Spent</th>
                                 </tr>
                             </thead>
-                            <tbody className="divide-y divide-slate-100">
+                            <tbody className="divide-y divide-border">
                                 {reportData.topRepeatGuests.map((guest, idx) => (
-                                    <tr key={idx} className="hover:bg-slate-50">
-                                        <td className="px-4 py-3 font-medium text-slate-900">{guest.name}</td>
-                                        <td className="px-4 py-3 text-right text-slate-600">{guest.count}</td>
-                                        <td className="px-4 py-3 text-right text-slate-600">
+                                    <tr key={idx} className="hover:bg-muted">
+                                        <td className="px-4 py-3 font-medium text-foreground">{guest.name}</td>
+                                        <td className="px-4 py-3 text-right text-muted-foreground">{guest.count}</td>
+                                        <td className="px-4 py-3 text-right text-muted-foreground">
                                             ${guest.totalSpent.toLocaleString(undefined, { minimumFractionDigits: 0 })}
                                         </td>
                                     </tr>

@@ -235,7 +235,7 @@ export default function SeasonalRatesSettingsPage() {
             case "weekly": return "bg-status-info/15 text-status-info";
             case "monthly": return "bg-teal-100 text-teal-600";
             case "seasonal": return "bg-status-warning/15 text-status-warning";
-            default: return "bg-slate-100 text-slate-600";
+            default: return "bg-muted text-muted-foreground";
         }
     };
 
@@ -279,7 +279,7 @@ export default function SeasonalRatesSettingsPage() {
 
                 <div className="flex items-center justify-between">
                     <div>
-                        <h1 className="text-2xl font-bold text-slate-900">Seasonal Rates</h1>
+                        <h1 className="text-2xl font-bold text-foreground">Seasonal Rates</h1>
                         <p className="text-muted-foreground">Configure rate schedules, payment plans, and pricing structures.</p>
                     </div>
                     <Button onClick={openCreateModal}>
@@ -362,11 +362,11 @@ export default function SeasonalRatesSettingsPage() {
                                                     )}
                                                 </div>
                                                 <div className="flex items-center gap-3 mt-2">
-                                                    <div className="flex items-center gap-1 text-xs text-muted-foreground bg-slate-100 px-2 py-1 rounded">
+                                                    <div className="flex items-center gap-1 text-xs text-muted-foreground bg-muted px-2 py-1 rounded">
                                                         <CreditCard className="h-3 w-3" />
                                                         {paymentScheduleLabels[rate.paymentSchedule]}
                                                     </div>
-                                                    <div className="flex items-center gap-1 text-xs text-muted-foreground bg-slate-100 px-2 py-1 rounded">
+                                                    <div className="flex items-center gap-1 text-xs text-muted-foreground bg-muted px-2 py-1 rounded">
                                                         <Repeat className="h-3 w-3" />
                                                         {pricingStructureLabels[rate.pricingStructure]}
                                                     </div>
@@ -570,7 +570,7 @@ export default function SeasonalRatesSettingsPage() {
 
                             {/* Offseason installments options */}
                             {formData.paymentSchedule === "offseason_installments" && (
-                                <div className="grid grid-cols-2 gap-4 p-4 bg-slate-50 rounded-lg">
+                                <div className="grid grid-cols-2 gap-4 p-4 bg-muted rounded-lg">
                                     <div className="space-y-2">
                                         <Label>Payment Interval (Months)</Label>
                                         <Select
@@ -602,7 +602,7 @@ export default function SeasonalRatesSettingsPage() {
 
                             {/* Prorate option for flat rates */}
                             {(formData.pricingStructure === "flat_week" || formData.pricingStructure === "flat_month") && (
-                                <div className="flex items-center gap-3 p-4 bg-slate-50 rounded-lg">
+                                <div className="flex items-center gap-3 p-4 bg-muted rounded-lg">
                                     <Switch
                                         id="prorate-excess"
                                         checked={formData.prorateExcess}

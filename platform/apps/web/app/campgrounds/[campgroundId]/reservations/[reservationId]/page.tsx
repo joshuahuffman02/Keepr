@@ -400,7 +400,7 @@ export default function ReservationDetailPage() {
     return (
       <DashboardShell>
         <div className="flex h-80 items-center justify-center">
-          <Loader2 className="h-8 w-8 animate-spin text-slate-400" />
+          <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
         </div>
       </DashboardShell>
     );
@@ -410,7 +410,7 @@ export default function ReservationDetailPage() {
   if (!reservation) {
     return (
       <DashboardShell>
-        <div className="flex h-80 flex-col items-center justify-center gap-4 text-slate-600">
+        <div className="flex h-80 flex-col items-center justify-center gap-4 text-muted-foreground">
           <div>Reservation not found</div>
           <Button onClick={() => router.push(`/campgrounds/${campgroundId}/reservations`)}>
             Back to list
@@ -452,7 +452,7 @@ export default function ReservationDetailPage() {
   const statusConfig: Record<string, { bg: string; text: string; border: string }> = {
     confirmed: { bg: "bg-status-success/15", text: "text-status-success", border: "border-status-success/20" },
     checked_in: { bg: "bg-status-info/15", text: "text-status-info", border: "border-status-info/20" },
-    checked_out: { bg: "bg-slate-50", text: "text-slate-600", border: "border-slate-200" },
+    checked_out: { bg: "bg-muted", text: "text-muted-foreground", border: "border-border" },
     cancelled: { bg: "bg-rose-50", text: "text-rose-700", border: "border-rose-200" },
     pending: { bg: "bg-status-warning/15", text: "text-status-warning", border: "border-status-warning/20" }
   };
@@ -540,17 +540,17 @@ export default function ReservationDetailPage() {
                       Confirm check-in for {guestName}
                     </AlertDialogDescription>
                     <div className="space-y-3">
-                      <div className="rounded-lg border border-slate-200 bg-slate-50 p-3">
-                        <div className="flex items-center gap-2 text-sm text-slate-600">
+                      <div className="rounded-lg border border-border bg-muted p-3">
+                        <div className="flex items-center gap-2 text-sm text-muted-foreground">
                           <MapPin className="h-4 w-4" />
                           <span>{siteLabel}</span>
                         </div>
-                        <div className="flex items-center gap-2 text-sm text-slate-600 mt-1">
+                        <div className="flex items-center gap-2 text-sm text-muted-foreground mt-1">
                           <Calendar className="h-4 w-4" />
                           <span>{formatDate(reservation.arrivalDate)} - {formatDate(reservation.departureDate)}</span>
                         </div>
                       </div>
-                      <div className="text-xs text-slate-500 space-y-1">
+                      <div className="text-xs text-muted-foreground space-y-1">
                         <div className="flex items-center gap-2">
                           <Check className="h-3 w-3 text-emerald-600" />
                           <span>Access credentials will be activated</span>
@@ -598,8 +598,8 @@ export default function ReservationDetailPage() {
                 <AlertDialogContent>
                   <AlertDialogHeader>
                     <AlertDialogTitle className="flex items-center gap-3">
-                      <div className="h-10 w-10 rounded-full bg-slate-100 flex items-center justify-center">
-                        <DoorOpen className="h-5 w-5 text-slate-600" />
+                      <div className="h-10 w-10 rounded-full bg-muted flex items-center justify-center">
+                        <DoorOpen className="h-5 w-5 text-muted-foreground" />
                       </div>
                       Check out {guestName}?
                     </AlertDialogTitle>
@@ -618,7 +618,7 @@ export default function ReservationDetailPage() {
                           </p>
                         </div>
                       )}
-                      <div className="text-xs text-slate-500 space-y-1">
+                      <div className="text-xs text-muted-foreground space-y-1">
                         <div className="flex items-center gap-2">
                           <Check className="h-3 w-3 text-emerald-600" />
                           <span>Access credentials will be deactivated</span>
@@ -756,16 +756,16 @@ export default function ReservationDetailPage() {
             <Card className="lg:col-span-2">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
-                  <User className="h-5 w-5 text-slate-500" />
+                  <User className="h-5 w-5 text-muted-foreground" />
                   Stay Details
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="grid gap-6 sm:grid-cols-2">
                   <div className="space-y-1">
-                    <div className="text-xs font-medium text-slate-500 uppercase tracking-wide">Guest</div>
-                    <div className="font-semibold text-slate-900">{guestName}</div>
-                    <div className="text-sm text-slate-600">{reservation.guest?.email || "--"}</div>
+                    <div className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Guest</div>
+                    <div className="font-semibold text-foreground">{guestName}</div>
+                    <div className="text-sm text-muted-foreground">{reservation.guest?.email || "--"}</div>
                     <Button
                       variant="ghost"
                       size="sm"
@@ -776,9 +776,9 @@ export default function ReservationDetailPage() {
                     </Button>
                   </div>
                   <div className="space-y-1">
-                    <div className="text-xs font-medium text-slate-500 uppercase tracking-wide">Site</div>
-                    <div className="font-semibold text-slate-900">{siteLabel}</div>
-                    <div className="text-sm text-slate-600">{siteClassName || "Standard"}</div>
+                    <div className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Site</div>
+                    <div className="font-semibold text-foreground">{siteLabel}</div>
+                    <div className="text-sm text-muted-foreground">{siteClassName || "Standard"}</div>
                     <Button
                       variant="ghost"
                       size="sm"
@@ -789,28 +789,28 @@ export default function ReservationDetailPage() {
                     </Button>
                   </div>
                   <div className="space-y-1">
-                    <div className="text-xs font-medium text-slate-500 uppercase tracking-wide">Dates</div>
-                    <div className="font-semibold text-slate-900">
+                    <div className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Dates</div>
+                    <div className="font-semibold text-foreground">
                       {formatDate(reservation.arrivalDate)} - {formatDate(reservation.departureDate)}
                     </div>
-                    <div className="text-sm text-slate-600">{nights} night{nights !== 1 ? "s" : ""}</div>
+                    <div className="text-sm text-muted-foreground">{nights} night{nights !== 1 ? "s" : ""}</div>
                   </div>
                   <div className="space-y-1">
-                    <div className="text-xs font-medium text-slate-500 uppercase tracking-wide">Party Size</div>
-                    <div className="font-semibold text-slate-900">
+                    <div className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Party Size</div>
+                    <div className="font-semibold text-foreground">
                       {(reservation.adults ?? 0) + (reservation.children ?? 0)} guest{(reservation.adults ?? 0) + (reservation.children ?? 0) !== 1 ? "s" : ""}
                     </div>
-                    <div className="text-sm text-slate-600">
+                    <div className="text-sm text-muted-foreground">
                       {reservation.adults ?? 0} adult{(reservation.adults ?? 0) !== 1 ? "s" : ""}, {reservation.children ?? 0} child{(reservation.children ?? 0) !== 1 ? "ren" : ""}
                     </div>
                   </div>
                   {(vehiclePlate || reservation.vehiclePlate) && (
                     <div className="space-y-1">
-                      <div className="text-xs font-medium text-slate-500 uppercase tracking-wide">Vehicle</div>
-                      <div className="font-semibold text-slate-900">
+                      <div className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Vehicle</div>
+                      <div className="font-semibold text-foreground">
                         {vehiclePlate || reservation.vehiclePlate} {vehicleState || reservation.vehicleState}
                       </div>
-                      <div className="text-sm text-slate-600">
+                      <div className="text-sm text-muted-foreground">
                         {vehicleRigType || reservation.rigType || ""}
                         {(vehicleRigLength || reservation.rigLength) ? ` - ${vehicleRigLength || reservation.rigLength}ft` : ""}
                       </div>
@@ -894,19 +894,19 @@ export default function ReservationDetailPage() {
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
-                  <Clock className="h-5 w-5 text-slate-500" />
+                  <Clock className="h-5 w-5 text-muted-foreground" />
                   Timeline
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="space-y-3">
                   <div className="flex items-center justify-between text-sm">
-                    <span className="text-slate-600">Created</span>
+                    <span className="text-muted-foreground">Created</span>
                     <span className="font-medium">{formatDateTime(reservation.createdAt)}</span>
                   </div>
                   {payments.slice(0, 3).map((p, i) => (
                     <div key={p.id} className="flex items-center justify-between text-sm">
-                      <span className="text-slate-600">
+                      <span className="text-muted-foreground">
                         {p.direction === "refund" ? "Refund" : "Payment"}
                       </span>
                       <span className={cn(
@@ -919,13 +919,13 @@ export default function ReservationDetailPage() {
                   ))}
                   {reservation.checkInAt && (
                     <div className="flex items-center justify-between text-sm">
-                      <span className="text-slate-600">Checked in</span>
+                      <span className="text-muted-foreground">Checked in</span>
                       <span className="font-medium text-blue-600">{formatDateTime(reservation.checkInAt)}</span>
                     </div>
                   )}
                   {reservation.checkOutAt && (
                     <div className="flex items-center justify-between text-sm">
-                      <span className="text-slate-600">Checked out</span>
+                      <span className="text-muted-foreground">Checked out</span>
                       <span className="font-medium">{formatDateTime(reservation.checkOutAt)}</span>
                     </div>
                   )}
@@ -937,7 +937,7 @@ export default function ReservationDetailPage() {
               <CardHeader>
                 <CardTitle className="flex items-center justify-between">
                   <span className="flex items-center gap-2">
-                    <Users className="h-5 w-5 text-slate-500" />
+                    <Users className="h-5 w-5 text-muted-foreground" />
                     Related Stays
                   </span>
                   {related.length > 0 && (
@@ -947,20 +947,20 @@ export default function ReservationDetailPage() {
               </CardHeader>
               <CardContent>
                 {related.length === 0 ? (
-                  <p className="text-sm text-slate-500">First time guest - no previous stays</p>
+                  <p className="text-sm text-muted-foreground">First time guest - no previous stays</p>
                 ) : (
                   <div className="space-y-2">
                     {related.map((r: any) => (
                       <button
                         key={r.id}
                         onClick={() => router.push(`/campgrounds/${campgroundId}/reservations/${r.id}`)}
-                        className="w-full flex items-center justify-between p-2 rounded-lg border border-slate-200 hover:bg-slate-50 transition-colors text-left"
+                        className="w-full flex items-center justify-between p-2 rounded-lg border border-border hover:bg-muted transition-colors text-left"
                       >
                         <div>
                           <div className="text-sm font-medium">
                             {formatDate(r.arrivalDate)} - {formatDate(r.departureDate)}
                           </div>
-                          <div className="text-xs text-slate-500">
+                          <div className="text-xs text-muted-foreground">
                             {r.site?.name || r.site?.siteNumber || r.siteId}
                           </div>
                         </div>
@@ -988,9 +988,9 @@ export default function ReservationDetailPage() {
                     Advanced Options
                   </CardTitle>
                   {showAdvanced ? (
-                    <ChevronUp className="h-5 w-5 text-slate-400" />
+                    <ChevronUp className="h-5 w-5 text-muted-foreground" />
                   ) : (
-                    <ChevronDown className="h-5 w-5 text-slate-400" />
+                    <ChevronDown className="h-5 w-5 text-muted-foreground" />
                   )}
                 </button>
               </CardHeader>
@@ -1071,14 +1071,14 @@ export default function ReservationDetailPage() {
               <CardContent className="space-y-4">
                 <div className="space-y-3">
                   <div className="flex justify-between">
-                    <span className="text-slate-600">Total</span>
+                    <span className="text-muted-foreground">Total</span>
                     <span className="font-semibold">{formatCurrency(total * 100)}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-slate-600">Paid</span>
+                    <span className="text-muted-foreground">Paid</span>
                     <span className="font-semibold text-emerald-600">{formatCurrency(paid * 100)}</span>
                   </div>
-                  <div className="h-2 rounded-full bg-slate-200 overflow-hidden">
+                  <div className="h-2 rounded-full bg-muted overflow-hidden">
                     <div
                       className="h-full bg-emerald-500 transition-all"
                       style={{ width: `${Math.min(100, (paid / total) * 100)}%` }}
@@ -1127,7 +1127,7 @@ export default function ReservationDetailPage() {
                     <span>{formatCurrency(quote?.rulesDeltaCents ?? 0)}</span>
                   </div>
                 )}
-                <div className="h-px bg-slate-200 my-2" />
+                <div className="h-px bg-muted my-2" />
                 <div className="flex justify-between font-medium">
                   <span>Quoted Total</span>
                   <span>{formatCurrency(quote?.totalCents ?? reservation.totalAmount)}</span>
@@ -1143,22 +1143,22 @@ export default function ReservationDetailPage() {
             </CardHeader>
             <CardContent>
               {payments.length === 0 ? (
-                <p className="text-sm text-slate-500 text-center py-8">
+                <p className="text-sm text-muted-foreground text-center py-8">
                   No payments recorded yet
                 </p>
               ) : (
                 <div className="rounded-lg border overflow-hidden">
                   <table className="w-full text-sm">
-                    <thead className="bg-slate-50 border-b">
+                    <thead className="bg-muted border-b">
                       <tr>
-                        <th className="text-left px-4 py-3 font-medium text-slate-600">Date</th>
-                        <th className="text-left px-4 py-3 font-medium text-slate-600">Method</th>
-                        <th className="text-right px-4 py-3 font-medium text-slate-600">Amount</th>
+                        <th className="text-left px-4 py-3 font-medium text-muted-foreground">Date</th>
+                        <th className="text-left px-4 py-3 font-medium text-muted-foreground">Method</th>
+                        <th className="text-right px-4 py-3 font-medium text-muted-foreground">Amount</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y">
                       {payments.map((p) => (
-                        <tr key={p.id} className="hover:bg-slate-50">
+                        <tr key={p.id} className="hover:bg-muted">
                           <td className="px-4 py-3">{formatDateTime(p.createdAt || p.date)}</td>
                           <td className="px-4 py-3 capitalize">{p.method || p.direction}</td>
                           <td className={cn(
@@ -1201,26 +1201,26 @@ export default function ReservationDetailPage() {
               <CardContent>
                 {chargesQuery.isLoading ? (
                   <div className="text-center py-8">
-                    <Loader2 className="h-6 w-6 animate-spin mx-auto text-slate-400" />
+                    <Loader2 className="h-6 w-6 animate-spin mx-auto text-muted-foreground" />
                   </div>
                 ) : chargesQuery.data?.length === 0 ? (
-                  <p className="text-sm text-slate-500 text-center py-8">
+                  <p className="text-sm text-muted-foreground text-center py-8">
                     No recurring charges scheduled
                   </p>
                 ) : (
                   <div className="rounded-lg border overflow-hidden">
                     <table className="w-full text-sm">
-                      <thead className="bg-slate-50 border-b">
+                      <thead className="bg-muted border-b">
                         <tr>
-                          <th className="text-left px-4 py-3 font-medium text-slate-600">Due Date</th>
-                          <th className="text-left px-4 py-3 font-medium text-slate-600">Amount</th>
-                          <th className="text-left px-4 py-3 font-medium text-slate-600">Status</th>
-                          <th className="text-right px-4 py-3 font-medium text-slate-600">Action</th>
+                          <th className="text-left px-4 py-3 font-medium text-muted-foreground">Due Date</th>
+                          <th className="text-left px-4 py-3 font-medium text-muted-foreground">Amount</th>
+                          <th className="text-left px-4 py-3 font-medium text-muted-foreground">Status</th>
+                          <th className="text-right px-4 py-3 font-medium text-muted-foreground">Action</th>
                         </tr>
                       </thead>
                       <tbody className="divide-y">
                         {chargesQuery.data?.map((charge: any) => (
-                          <tr key={charge.id} className="hover:bg-slate-50">
+                          <tr key={charge.id} className="hover:bg-muted">
                             <td className="px-4 py-3">{formatDate(charge.dueDate)}</td>
                             <td className="px-4 py-3 font-medium">{formatCurrency(charge.amount)}</td>
                             <td className="px-4 py-3">
@@ -1288,12 +1288,12 @@ export default function ReservationDetailPage() {
             <CardContent>
               {commsQuery.isLoading ? (
                 <div className="text-center py-8">
-                  <Loader2 className="h-6 w-6 animate-spin mx-auto text-slate-400" />
+                  <Loader2 className="h-6 w-6 animate-spin mx-auto text-muted-foreground" />
                 </div>
               ) : comms.length === 0 ? (
                 <div className="text-center py-12">
-                  <MessageSquare className="h-12 w-12 mx-auto text-slate-300 mb-4" />
-                  <p className="text-slate-500">No messages yet</p>
+                  <MessageSquare className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+                  <p className="text-muted-foreground">No messages yet</p>
                   <Button
                     variant="outline"
                     className="mt-4"
@@ -1310,24 +1310,24 @@ export default function ReservationDetailPage() {
                   {comms.map((c: any) => (
                     <div
                       key={c.id}
-                      className="p-4 rounded-lg border border-slate-200 hover:bg-slate-50 transition-colors"
+                      className="p-4 rounded-lg border border-border hover:bg-muted transition-colors"
                     >
                       <div className="flex items-center justify-between mb-2">
                         <div className="flex items-center gap-2">
                           <Badge variant="outline" className="capitalize text-xs">
                             {c.type}
                           </Badge>
-                          <span className="text-xs text-slate-500">{c.direction}</span>
+                          <span className="text-xs text-muted-foreground">{c.direction}</span>
                         </div>
-                        <span className="text-xs text-slate-500">
+                        <span className="text-xs text-muted-foreground">
                           {formatDateTime(c.createdAt)}
                         </span>
                       </div>
                       {c.subject && (
-                        <div className="font-medium text-slate-900 mb-1">{c.subject}</div>
+                        <div className="font-medium text-foreground mb-1">{c.subject}</div>
                       )}
                       {(c.preview || c.body) && (
-                        <div className="text-sm text-slate-600 line-clamp-2">
+                        <div className="text-sm text-muted-foreground line-clamp-2">
                           {c.preview || c.body}
                         </div>
                       )}
@@ -1372,7 +1372,7 @@ export default function ReservationDetailPage() {
                   <>
                     <div className="space-y-3">
                       <div className="flex items-center justify-between">
-                        <span className="text-slate-600">Check-in</span>
+                        <span className="text-muted-foreground">Check-in</span>
                         <Badge
                           variant="outline"
                           className={cn(
@@ -1385,19 +1385,19 @@ export default function ReservationDetailPage() {
                         </Badge>
                       </div>
                       <div className="flex items-center justify-between">
-                        <span className="text-slate-600">Check-out</span>
+                        <span className="text-muted-foreground">Check-out</span>
                         <Badge
                           variant="outline"
                           className={cn(
                             checkinStatus.checkOutStatus === "completed" && "bg-status-success/15 text-status-success border-status-success/20",
-                            checkinStatus.checkOutStatus !== "completed" && "bg-slate-50 text-slate-600 border-slate-200"
+                            checkinStatus.checkOutStatus !== "completed" && "bg-muted text-muted-foreground border-border"
                           )}
                         >
                           {checkinStatus.checkOutStatus?.replace("_", " ") || "not started"}
                         </Badge>
                       </div>
                       <div className="flex items-center justify-between">
-                        <span className="text-slate-600">Site ready</span>
+                        <span className="text-muted-foreground">Site ready</span>
                         {checkinStatus.siteReady ? (
                           <span className="flex items-center gap-1 text-status-success text-sm">
                             <CheckCircle className="h-4 w-4" /> Ready
@@ -1410,13 +1410,13 @@ export default function ReservationDetailPage() {
                       </div>
                       {checkinStatus.idVerificationRequired && (
                         <div className="flex items-center justify-between">
-                          <span className="text-slate-600">ID verified</span>
+                          <span className="text-muted-foreground">ID verified</span>
                           <span className="text-amber-600 text-sm">Required</span>
                         </div>
                       )}
                       {checkinStatus.waiverRequired && (
                         <div className="flex items-center justify-between">
-                          <span className="text-slate-600">Waiver signed</span>
+                          <span className="text-muted-foreground">Waiver signed</span>
                           <span className="text-amber-600 text-sm">Required</span>
                         </div>
                       )}
@@ -1429,7 +1429,7 @@ export default function ReservationDetailPage() {
                     )}
                   </>
                 ) : (
-                  <p className="text-sm text-slate-500">No check-in data available</p>
+                  <p className="text-sm text-muted-foreground">No check-in data available</p>
                 )}
               </CardContent>
             </Card>
@@ -1502,7 +1502,7 @@ export default function ReservationDetailPage() {
                   <div className="flex items-center justify-between">
                     <div>
                       <div className="font-medium">Access Control</div>
-                      <div className="text-xs text-slate-500">Gate/lock credentials</div>
+                      <div className="text-xs text-muted-foreground">Gate/lock credentials</div>
                     </div>
                     <select
                       value={accessProvider}
@@ -1558,7 +1558,7 @@ export default function ReservationDetailPage() {
                             variant="outline"
                             className={cn(
                               g.status === "active" && "bg-status-success/15 text-status-success",
-                              g.status !== "active" && "bg-slate-50 text-slate-600"
+                              g.status !== "active" && "bg-muted text-muted-foreground"
                             )}
                           >
                             {g.status}
@@ -1575,7 +1575,7 @@ export default function ReservationDetailPage() {
             <Card className="lg:col-span-2">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
-                  <FileText className="h-5 w-5 text-slate-600" />
+                  <FileText className="h-5 w-5 text-muted-foreground" />
                   Signatures & Documents
                 </CardTitle>
               </CardHeader>
@@ -1583,14 +1583,14 @@ export default function ReservationDetailPage() {
                 {/* Existing signatures */}
                 {signatureRequests.length > 0 && (
                   <div className="space-y-2">
-                    <h4 className="text-sm font-medium text-slate-700">Signature Requests</h4>
+                    <h4 className="text-sm font-medium text-foreground">Signature Requests</h4>
                     {signatureRequests.map((req: any) => (
                       <div key={req.id} className="flex items-center justify-between p-3 rounded-lg border">
                         <div>
                           <div className="font-medium capitalize">
                             {(req.documentType || "document").replace(/_/g, " ")}
                           </div>
-                          <div className="text-xs text-slate-500">
+                          <div className="text-xs text-muted-foreground">
                             {req.recipientEmail} - {formatDateTime(req.sentAt)}
                           </div>
                         </div>
@@ -1614,7 +1614,7 @@ export default function ReservationDetailPage() {
 
                 {/* New signature request */}
                 <div className="space-y-3">
-                  <h4 className="text-sm font-medium text-slate-700">Request New Signature</h4>
+                  <h4 className="text-sm font-medium text-foreground">Request New Signature</h4>
                   <div className="grid gap-3 sm:grid-cols-4">
                     <Input
                       placeholder="Email"
@@ -1655,7 +1655,7 @@ export default function ReservationDetailPage() {
 
                 {/* COI Upload */}
                 <div className="border-t pt-4 space-y-3">
-                  <h4 className="text-sm font-medium text-slate-700">Certificate of Insurance</h4>
+                  <h4 className="text-sm font-medium text-foreground">Certificate of Insurance</h4>
                   <div className="grid gap-3 sm:grid-cols-3">
                     <Input
                       placeholder="COI URL"
@@ -1695,7 +1695,7 @@ export default function ReservationDetailPage() {
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <ClipboardList className="h-5 w-5 text-slate-600" />
+                <ClipboardList className="h-5 w-5 text-muted-foreground" />
                 Change History
               </CardTitle>
             </CardHeader>
@@ -1752,9 +1752,9 @@ export default function ReservationDetailPage() {
           </DialogHeader>
 
           <div className="space-y-4 py-4">
-            <div className="rounded-lg border bg-slate-50 p-3">
+            <div className="rounded-lg border bg-muted p-3">
               <div className="font-medium">{guestName}</div>
-              <div className="text-sm text-slate-500">
+              <div className="text-sm text-muted-foreground">
                 {formatDate(reservation.arrivalDate)} - {formatDate(reservation.departureDate)} - {siteLabel}
               </div>
             </div>
@@ -1763,14 +1763,14 @@ export default function ReservationDetailPage() {
               <div className="flex items-center justify-between">
                 <div>
                   <Label>Metered Utilities</Label>
-                  <p className="text-xs text-slate-500">Guest pays for usage separately</p>
+                  <p className="text-xs text-muted-foreground">Guest pays for usage separately</p>
                 </div>
                 <Switch checked={convertIsMetered} onCheckedChange={setConvertIsMetered} />
               </div>
               <div className="flex items-center justify-between">
                 <div>
                   <Label>Pays in Full</Label>
-                  <p className="text-xs text-slate-500">Full payment upfront vs monthly</p>
+                  <p className="text-xs text-muted-foreground">Full payment upfront vs monthly</p>
                 </div>
                 <Switch checked={convertPaysInFull} onCheckedChange={setConvertPaysInFull} />
               </div>

@@ -35,17 +35,17 @@ const earlyAccessBenefits = [
 
 export function Testimonials() {
   return (
-    <section className="py-24 bg-white">
+    <section className="py-24 bg-card">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
         <div className="text-center max-w-3xl mx-auto mb-16">
           <h2 className="text-base font-semibold text-emerald-600 tracking-wide uppercase mb-3">
             Early Access
           </h2>
-          <p className="text-4xl font-bold text-slate-900 mb-4">
+          <p className="text-4xl font-bold text-foreground mb-4">
             Be part of something new
           </p>
-          <p className="text-xl text-slate-600">
+          <p className="text-xl text-muted-foreground">
             We're building Camp Everyday with campground owners, not just for them.
             Early adopters get unique benefits you won't find anywhere else.
           </p>
@@ -58,7 +58,7 @@ export function Testimonials() {
             return (
               <div
                 key={benefit.id}
-                className="bg-white rounded-2xl border-2 border-slate-200 p-8 hover:border-emerald-300 hover:shadow-xl transition-all duration-300"
+                className="bg-card rounded-2xl border-2 border-border p-8 hover:border-emerald-300 hover:shadow-xl transition-all duration-300"
               >
                 {/* Icon */}
                 <div className="h-12 w-12 rounded-xl bg-emerald-100 flex items-center justify-center mb-4">
@@ -66,8 +66,8 @@ export function Testimonials() {
                 </div>
 
                 {/* Content */}
-                <h3 className="font-bold text-slate-900 mb-2">{benefit.title}</h3>
-                <p className="text-slate-600 text-sm">{benefit.description}</p>
+                <h3 className="font-bold text-foreground mb-2">{benefit.title}</h3>
+                <p className="text-muted-foreground text-sm">{benefit.description}</p>
               </div>
             );
           })}
@@ -75,7 +75,7 @@ export function Testimonials() {
 
         {/* CTA */}
         <div className="mt-12 text-center">
-          <p className="text-slate-600 mb-4">
+          <p className="text-muted-foreground mb-4">
             Limited spots available in each early access tier
           </p>
           <a

@@ -21,7 +21,7 @@ export function StatusFilter({ value, onChange, className }: StatusFilterProps) 
     <div
       role="radiogroup"
       aria-label="Filter by status"
-      className={cn("flex rounded-lg border p-1 bg-white", className)}
+      className={cn("flex rounded-lg border p-1 bg-card", className)}
     >
       {options.map((option) => (
         <button

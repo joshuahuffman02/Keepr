@@ -80,7 +80,7 @@ export function TopSpendersReport({ campgroundId, dateRange }: TopSpendersReport
     }, [reservations]);
 
     if (isLoading) {
-        return <div className="text-sm text-slate-500">Loading guest spending data...</div>;
+        return <div className="text-sm text-muted-foreground">Loading guest spending data...</div>;
     }
 
     if (error) {
@@ -89,9 +89,9 @@ export function TopSpendersReport({ campgroundId, dateRange }: TopSpendersReport
 
     if (!reportData || reportData.totalGuests === 0) {
         return (
-            <div className="flex flex-col items-center justify-center p-12 bg-slate-50 rounded-lg border border-slate-200">
-                <div className="text-slate-400 mb-2">No guest data found</div>
-                <p className="text-xs text-slate-500">Guests will appear after reservations are made.</p>
+            <div className="flex flex-col items-center justify-center p-12 bg-muted rounded-lg border border-border">
+                <div className="text-muted-foreground mb-2">No guest data found</div>
+                <p className="text-xs text-muted-foreground">Guests will appear after reservations are made.</p>
             </div>
         );
     }
@@ -102,7 +102,7 @@ export function TopSpendersReport({ campgroundId, dateRange }: TopSpendersReport
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                 <Card>
                     <CardHeader className="pb-2">
-                        <CardTitle className="text-sm font-medium text-slate-500">Total Guests</CardTitle>
+                        <CardTitle className="text-sm font-medium text-muted-foreground">Total Guests</CardTitle>
                     </CardHeader>
                     <CardContent>
                         <div className="text-2xl font-bold">{reportData.totalGuests}</div>
@@ -110,7 +110,7 @@ export function TopSpendersReport({ campgroundId, dateRange }: TopSpendersReport
                 </Card>
                 <Card>
                     <CardHeader className="pb-2">
-                        <CardTitle className="text-sm font-medium text-slate-500">Total Revenue</CardTitle>
+                        <CardTitle className="text-sm font-medium text-muted-foreground">Total Revenue</CardTitle>
                     </CardHeader>
                     <CardContent>
                         <div className="text-2xl font-bold">
@@ -173,7 +173,7 @@ export function TopSpendersReport({ campgroundId, dateRange }: TopSpendersReport
                     </CardHeader>
                     <div className="overflow-x-auto max-h-[350px]">
                         <table className="w-full text-sm text-left">
-                            <thead className="bg-slate-50 text-xs uppercase text-slate-500 sticky top-0">
+                            <thead className="bg-muted text-xs uppercase text-muted-foreground sticky top-0">
                                 <tr>
                                     <th className="px-4 py-3 font-medium">#</th>
                                     <th className="px-4 py-3 font-medium">Guest</th>
@@ -181,17 +181,17 @@ export function TopSpendersReport({ campgroundId, dateRange }: TopSpendersReport
                                     <th className="px-4 py-3 font-medium text-right">Total Spent</th>
                                 </tr>
                             </thead>
-                            <tbody className="divide-y divide-slate-100">
+                            <tbody className="divide-y divide-border">
                                 {reportData.topSpenders.map((guest, idx) => (
-                                    <tr key={guest.guestId} className="hover:bg-slate-50">
-                                        <td className="px-4 py-3 text-slate-500">{idx + 1}</td>
+                                    <tr key={guest.guestId} className="hover:bg-muted">
+                                        <td className="px-4 py-3 text-muted-foreground">{idx + 1}</td>
                                         <td className="px-4 py-3">
-                                            <div className="font-medium text-slate-900">{guest.name}</div>
+                                            <div className="font-medium text-foreground">{guest.name}</div>
                                             {guest.email && (
-                                                <div className="text-xs text-slate-500">{guest.email}</div>
+                                                <div className="text-xs text-muted-foreground">{guest.email}</div>
                                             )}
                                         </td>
-                                        <td className="px-4 py-3 text-right text-slate-600">{guest.reservationCount}</td>
+                                        <td className="px-4 py-3 text-right text-muted-foreground">{guest.reservationCount}</td>
                                         <td className="px-4 py-3 text-right font-medium text-emerald-600">
                                             ${guest.totalSpent.toLocaleString(undefined, { minimumFractionDigits: 0 })}
                                         </td>

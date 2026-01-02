@@ -71,7 +71,7 @@ const TableRow = React.forwardRef<
             ref={ref}
             className={cn(
                 "border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted",
-                interactive && "cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-950 focus-visible:ring-offset-2",
+                interactive && "cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/40 focus-visible:ring-offset-2 focus-visible:ring-offset-background",
                 className
             )}
             tabIndex={interactive ? 0 : undefined}

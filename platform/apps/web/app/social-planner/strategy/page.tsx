@@ -78,7 +78,7 @@ export default function SocialPlannerStrategy() {
           <Link href="/social-planner" className="text-sm text-emerald-700 hover:text-emerald-600">
             ← Back to Social Planner
           </Link>
-          <p className="text-slate-600">Select a campground to manage strategy and alerts.</p>
+          <p className="text-muted-foreground">Select a campground to manage strategy and alerts.</p>
         </div>
       </DashboardShell>
     );
@@ -92,13 +92,13 @@ export default function SocialPlannerStrategy() {
       <div className="flex items-center justify-between mb-4">
         <div>
           <p className="text-xs uppercase tracking-wide text-emerald-600 font-semibold">Strategy & alerts</p>
-          <h1 className="text-2xl font-bold text-slate-900">Monthly plan, annual planner, and opportunity alerts</h1>
-          <p className="text-slate-600">Top 10 ideas, cadence, promos/events to push, and smart triggers you can toggle.</p>
+          <h1 className="text-2xl font-bold text-foreground">Monthly plan, annual planner, and opportunity alerts</h1>
+          <p className="text-muted-foreground">Top 10 ideas, cadence, promos/events to push, and smart triggers you can toggle.</p>
         </div>
       </div>
 
       <div className="card p-4 mb-4">
-        <h3 className="text-lg font-semibold text-slate-900 mb-2">Monthly strategy</h3>
+        <h3 className="text-lg font-semibold text-foreground mb-2">Monthly strategy</h3>
         <div className="grid md:grid-cols-3 gap-3">
           <input className="input" type="month" value={month} onChange={e => setMonth(e.target.value)} />
           <input className="input" placeholder="Hero content (e.g., summer kickoff)" value={hero} onChange={e => setHero(e.target.value)} />
@@ -117,29 +117,29 @@ export default function SocialPlannerStrategy() {
         <div className="card p-4">
           <div className="flex items-center gap-2 mb-2">
             <CalendarRange className="h-4 w-4 text-emerald-600" />
-            <h3 className="text-lg font-semibold text-slate-900">Monthly & annual plans</h3>
+            <h3 className="text-lg font-semibold text-foreground">Monthly & annual plans</h3>
           </div>
           <div className="space-y-3">
             {strategiesQuery.data?.map((s: any) => (
-              <div key={s.id} className="p-3 rounded border border-slate-200 bg-slate-50">
-                <div className="text-sm font-semibold text-slate-900">
+              <div key={s.id} className="p-3 rounded border border-border bg-muted">
+                <div className="text-sm font-semibold text-foreground">
                   {new Date(s.month).toLocaleDateString(undefined, { month: "long", year: "numeric" })}
                   {s.annual ? " (Annual)" : ""}
                 </div>
-                <div className="text-xs text-slate-600">Hero: {s.plan?.hero || s.plan?.heroContent || "TBD"}</div>
+                <div className="text-xs text-muted-foreground">Hero: {s.plan?.hero || s.plan?.heroContent || "TBD"}</div>
                 {s.plan?.topIdeas?.length ? (
-                  <div className="text-xs text-slate-500 mt-1">Top ideas: {s.plan.topIdeas.join(", ")}</div>
+                  <div className="text-xs text-muted-foreground mt-1">Top ideas: {s.plan.topIdeas.join(", ")}</div>
                 ) : null}
               </div>
             ))}
-            {!strategiesQuery.data?.length && <div className="text-sm text-slate-500">No strategies yet.</div>}
+            {!strategiesQuery.data?.length && <div className="text-sm text-muted-foreground">No strategies yet.</div>}
           </div>
         </div>
 
         <div className="card p-4">
           <div className="flex items-center gap-2 mb-2">
             <Bell className="h-4 w-4 text-amber-600" />
-            <h3 className="text-lg font-semibold text-slate-900">Opportunity alerts</h3>
+            <h3 className="text-lg font-semibold text-foreground">Opportunity alerts</h3>
           </div>
           <div className="grid md:grid-cols-2 gap-2 mb-3">
             <select className="input" value={alertCategory} onChange={e => setAlertCategory(e.target.value)}>
@@ -175,7 +175,7 @@ export default function SocialPlannerStrategy() {
                 )}
               </div>
             ))}
-            {!alertsQuery.data?.length && <div className="text-sm text-slate-500">No alerts configured.</div>}
+            {!alertsQuery.data?.length && <div className="text-sm text-muted-foreground">No alerts configured.</div>}
           </div>
         </div>
       </div>

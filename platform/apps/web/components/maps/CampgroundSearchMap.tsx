@@ -332,9 +332,9 @@ export function CampgroundSearchMap({
 
           const popupContent = `
             <div class="p-3 min-w-[200px]">
-              <h3 class="font-bold text-slate-900">${escapeHtml(campground.name)}</h3>
-              ${campground.city && campground.state ? `<p class="text-sm text-slate-600">${escapeHtml(campground.city)}, ${escapeHtml(campground.state)}</p>` : ""}
-              ${campground.rating ? `<div class="flex items-center gap-1 mt-1"><span class="text-amber-500">&#9733;</span><span class="text-sm font-medium">${campground.rating.toFixed(1)}</span><span class="text-xs text-slate-500">(${campground.reviewCount || 0})</span></div>` : ""}
+              <h3 class="font-bold text-foreground">${escapeHtml(campground.name)}</h3>
+              ${campground.city && campground.state ? `<p class="text-sm text-muted-foreground">${escapeHtml(campground.city)}, ${escapeHtml(campground.state)}</p>` : ""}
+              ${campground.rating ? `<div class="flex items-center gap-1 mt-1"><span class="text-amber-500">&#9733;</span><span class="text-sm font-medium">${campground.rating.toFixed(1)}</span><span class="text-xs text-muted-foreground">(${campground.reviewCount || 0})</span></div>` : ""}
               ${campground.priceFrom ? `<p class="text-sm font-medium text-emerald-600 mt-1">From $${campground.priceFrom}/night</p>` : ""}
             </div>
           `;
@@ -436,8 +436,8 @@ export function CampgroundSearchMap({
 
       {/* Loading overlay */}
       {!isMapReady && (
-        <div className="absolute inset-0 flex items-center justify-center bg-slate-100 rounded-xl">
-          <div className="flex items-center gap-2 text-slate-600">
+        <div className="absolute inset-0 flex items-center justify-center bg-muted rounded-xl">
+          <div className="flex items-center gap-2 text-muted-foreground">
             <Loader2 className="h-5 w-5 animate-spin" />
             <span>Loading map...</span>
           </div>
@@ -447,16 +447,16 @@ export function CampgroundSearchMap({
       {/* Search bar */}
       {showSearch && (
         <div className="absolute top-4 left-4 right-4 z-10 flex gap-2">
-          <div className="flex-1 flex gap-2 bg-white rounded-lg shadow-lg p-2">
+          <div className="flex-1 flex gap-2 bg-card rounded-lg shadow-lg p-2">
             <div className="flex-1 relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <input
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && handleSearch()}
                 placeholder="Search campgrounds, cities, or states..."
-                className="w-full pl-10 pr-4 py-2 text-sm border border-slate-200 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                className="w-full pl-10 pr-4 py-2 text-sm border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500"
               />
             </div>
             <Button size="sm" onClick={handleSearch}>
@@ -470,7 +470,7 @@ export function CampgroundSearchMap({
               size="icon"
               onClick={handleLocateUser}
               disabled={isLocating}
-              className="bg-white shadow-lg"
+              className="bg-card shadow-lg"
             >
               {isLocating ? (
                 <Loader2 className="h-4 w-4 animate-spin" />
@@ -485,7 +485,7 @@ export function CampgroundSearchMap({
       {/* Filters */}
       {showFilters && (
         <div className="absolute top-20 left-4 z-10">
-          <div className="flex flex-wrap gap-2 bg-white/90 backdrop-blur-sm rounded-lg shadow-lg p-2">
+          <div className="flex flex-wrap gap-2 bg-card/90 backdrop-blur-sm rounded-lg shadow-lg p-2">
             {["rv", "tent", "cabin", "glamping", "lake", "mountain", "forest"].map((filter) => (
               <Badge
                 key={filter}
@@ -494,7 +494,7 @@ export function CampgroundSearchMap({
                   "cursor-pointer capitalize transition-colors",
                   activeFilters.includes(filter)
                     ? "bg-emerald-500 hover:bg-emerald-600"
-                    : "hover:bg-slate-100"
+                    : "hover:bg-muted"
                 )}
                 onClick={() => toggleFilter(filter)}
               >
@@ -518,8 +518,8 @@ export function CampgroundSearchMap({
 
       {/* Results count */}
       <div className="absolute bottom-4 left-4 z-10">
-        <div className="bg-white/90 backdrop-blur-sm rounded-lg shadow-lg px-4 py-2">
-          <p className="text-sm font-medium text-slate-700">
+        <div className="bg-card/90 backdrop-blur-sm rounded-lg shadow-lg px-4 py-2">
+          <p className="text-sm font-medium text-foreground">
             <span className="text-emerald-600">{visibleCampgrounds.length}</span> campgrounds in view
           </p>
         </div>
@@ -528,9 +528,9 @@ export function CampgroundSearchMap({
       {/* Selected campground card */}
       {selectedCampground && (
         <div className="absolute bottom-4 right-4 z-10 w-80">
-          <div className="bg-white rounded-xl shadow-xl overflow-hidden">
+          <div className="bg-card rounded-xl shadow-xl overflow-hidden">
             {selectedCampground.imageUrl && (
-              <div className="h-32 bg-slate-200">
+              <div className="h-32 bg-muted">
                 <img
                   src={selectedCampground.imageUrl}
                   alt={selectedCampground.name}
@@ -541,18 +541,18 @@ export function CampgroundSearchMap({
             <div className="p-4">
               <div className="flex items-start justify-between">
                 <div>
-                  <h3 className="font-bold text-slate-900">{selectedCampground.name}</h3>
+                  <h3 className="font-bold text-foreground">{selectedCampground.name}</h3>
                   {selectedCampground.city && selectedCampground.state && (
-                    <p className="text-sm text-slate-600">
+                    <p className="text-sm text-muted-foreground">
                       {selectedCampground.city}, {selectedCampground.state}
                     </p>
                   )}
                 </div>
                 <button
                   onClick={() => setSelectedCampground(null)}
-                  className="p-1 hover:bg-slate-100 rounded"
+                  className="p-1 hover:bg-muted rounded"
                 >
-                  <X className="h-4 w-4 text-slate-400" />
+                  <X className="h-4 w-4 text-muted-foreground" />
                 </button>
               </div>
 
@@ -560,7 +560,7 @@ export function CampgroundSearchMap({
                 <div className="flex items-center gap-1 mt-2">
                   <Star className="h-4 w-4 fill-amber-400 text-amber-400" />
                   <span className="font-medium">{selectedCampground.rating.toFixed(1)}</span>
-                  <span className="text-sm text-slate-500">
+                  <span className="text-sm text-muted-foreground">
                     ({selectedCampground.reviewCount || 0} reviews)
                   </span>
                 </div>
@@ -580,7 +580,7 @@ export function CampgroundSearchMap({
                 {selectedCampground.priceFrom && (
                   <p className="text-lg font-bold text-emerald-600">
                     ${selectedCampground.priceFrom}
-                    <span className="text-sm font-normal text-slate-500">/night</span>
+                    <span className="text-sm font-normal text-muted-foreground">/night</span>
                   </p>
                 )}
                 <Button size="sm" className="gap-1">

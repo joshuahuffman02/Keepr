@@ -44,14 +44,14 @@ export function BookingProgressBar({
       {/* Mobile: Simple progress bar */}
       <div className="md:hidden">
         <div className="flex items-center justify-between mb-2">
-          <span className="text-sm font-medium text-slate-900">
+          <span className="text-sm font-medium text-foreground">
             Step {currentStep} of {steps.length}
           </span>
           <span className="text-sm text-emerald-600 font-medium">
             {steps[currentStep - 1].label}
           </span>
         </div>
-        <div className="h-2 bg-slate-100 rounded-full overflow-hidden">
+        <div className="h-2 bg-muted rounded-full overflow-hidden">
           <motion.div
             className="h-full bg-emerald-500 rounded-full"
             initial={{ width: 0 }}
@@ -65,7 +65,7 @@ export function BookingProgressBar({
       <div className="hidden md:block">
         <div className="flex items-center justify-between relative">
           {/* Progress line background */}
-          <div className="absolute top-5 left-8 right-8 h-0.5 bg-slate-200" />
+          <div className="absolute top-5 left-8 right-8 h-0.5 bg-muted" />
 
           {/* Progress line filled */}
           <motion.div
@@ -96,7 +96,7 @@ export function BookingProgressBar({
                       ? "bg-emerald-500"
                       : isCurrent
                       ? "bg-emerald-500"
-                      : "bg-white border-2 border-slate-200"
+                      : "bg-card border-2 border-border"
                   )}
                   initial={false}
                   animate={
@@ -121,7 +121,7 @@ export function BookingProgressBar({
                     <Icon
                       className={cn(
                         "h-5 w-5",
-                        isCurrent ? "text-white" : "text-slate-400"
+                        isCurrent ? "text-white" : "text-muted-foreground"
                       )}
                     />
                   )}
@@ -132,8 +132,8 @@ export function BookingProgressBar({
                   className={cn(
                     "mt-2 text-sm font-medium",
                     isComplete || isCurrent
-                      ? "text-slate-900"
-                      : "text-slate-400"
+                      ? "text-foreground"
+                      : "text-muted-foreground"
                   )}
                 >
                   {step.label}
@@ -169,7 +169,7 @@ export function BookingProgressInline({
                   ? "bg-emerald-500 text-white"
                   : isCurrent
                   ? "bg-emerald-500 text-white"
-                  : "bg-slate-200 text-slate-500"
+                  : "bg-muted text-muted-foreground"
               )}
             >
               {isComplete ? (
@@ -182,7 +182,7 @@ export function BookingProgressInline({
               <div
                 className={cn(
                   "w-8 h-0.5",
-                  isComplete ? "bg-emerald-500" : "bg-slate-200"
+                  isComplete ? "bg-emerald-500" : "bg-muted"
                 )}
               />
             )}
@@ -213,7 +213,7 @@ export function BookingBackButton({
     <button
       onClick={onBack}
       className={cn(
-        "flex items-center gap-2 text-sm text-slate-600 hover:text-slate-900 transition-colors",
+        "flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors",
         className
       )}
     >

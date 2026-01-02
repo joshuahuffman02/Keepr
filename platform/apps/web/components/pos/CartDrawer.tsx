@@ -31,14 +31,14 @@ export function CartDrawer({ open, onOpenChange, cart, onUpdateQty, onClear, onC
                 <SheetContent side="bottom" className="flex flex-col">
                     {/* Drag Handle */}
                     <div className="flex justify-center pt-3 pb-2">
-                        <div className="w-12 h-1.5 rounded-full bg-slate-300" />
+                        <div className="w-12 h-1.5 rounded-full bg-muted" />
                     </div>
 
                     {/* Header */}
-                    <div className="px-4 pb-3 border-b border-slate-200 flex items-center justify-between">
+                    <div className="px-4 pb-3 border-b border-border flex items-center justify-between">
                         <div>
-                            <h2 className="font-semibold text-slate-900 text-lg">Current Order</h2>
-                            <p className="text-sm text-slate-500">{itemCount} {itemCount === 1 ? 'item' : 'items'}</p>
+                            <h2 className="font-semibold text-foreground text-lg">Current Order</h2>
+                            <p className="text-sm text-muted-foreground">{itemCount} {itemCount === 1 ? 'item' : 'items'}</p>
                         </div>
                         {cart.length > 0 && (
                             <button
@@ -53,7 +53,7 @@ export function CartDrawer({ open, onOpenChange, cart, onUpdateQty, onClear, onC
                     {/* Cart Items */}
                     <div className="flex-1 overflow-y-auto px-4 py-4 space-y-3">
                         {cart.length === 0 ? (
-                            <div className="h-full flex flex-col items-center justify-center text-slate-400 space-y-2 py-12">
+                            <div className="h-full flex flex-col items-center justify-center text-muted-foreground space-y-2 py-12">
                                 <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="opacity-50">
                                     <circle cx="9" cy="21" r="1" />
                                     <circle cx="20" cy="21" r="1" />
@@ -63,15 +63,15 @@ export function CartDrawer({ open, onOpenChange, cart, onUpdateQty, onClear, onC
                             </div>
                         ) : (
                             cart.map((item) => (
-                                <div key={item.id} className="flex items-center justify-between gap-3 bg-slate-50 p-3 rounded-lg border border-slate-100">
+                                <div key={item.id} className="flex items-center justify-between gap-3 bg-muted p-3 rounded-lg border border-border">
                                     <div className="flex-1 min-w-0">
-                                        <div className="font-medium text-slate-900">{item.name}</div>
-                                        <div className="text-sm text-slate-500">${(item.priceCents / 100).toFixed(2)}</div>
+                                        <div className="font-medium text-foreground">{item.name}</div>
+                                        <div className="text-sm text-muted-foreground">${(item.priceCents / 100).toFixed(2)}</div>
                                     </div>
-                                    <div className="flex items-center gap-3 bg-white rounded-md border border-slate-200 px-2 py-1.5 shadow-sm">
+                                    <div className="flex items-center gap-3 bg-card rounded-md border border-border px-2 py-1.5 shadow-sm">
                                         <button
                                             onClick={() => onUpdateQty(item.id, -1)}
-                                            className="w-10 h-10 flex items-center justify-center text-slate-500 hover:text-slate-900 hover:bg-slate-100 rounded active:scale-95 transition-transform"
+                                            className="w-10 h-10 flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted rounded active:scale-95 transition-transform"
                                             aria-label="Decrease quantity"
                                         >
                                             <span className="text-xl font-semibold">-</span>
@@ -79,7 +79,7 @@ export function CartDrawer({ open, onOpenChange, cart, onUpdateQty, onClear, onC
                                         <span className="w-8 text-center font-medium">{item.qty}</span>
                                         <button
                                             onClick={() => onUpdateQty(item.id, 1)}
-                                            className="w-10 h-10 flex items-center justify-center text-slate-500 hover:text-slate-900 hover:bg-slate-100 rounded active:scale-95 transition-transform"
+                                            className="w-10 h-10 flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted rounded active:scale-95 transition-transform"
                                             aria-label="Increase quantity"
                                         >
                                             <span className="text-xl font-semibold">+</span>
@@ -91,17 +91,17 @@ export function CartDrawer({ open, onOpenChange, cart, onUpdateQty, onClear, onC
                     </div>
 
                     {/* Footer with Total and Checkout */}
-                    <div className="px-4 pb-4 pt-3 bg-slate-50 border-t border-slate-200 space-y-4">
+                    <div className="px-4 pb-4 pt-3 bg-muted border-t border-border space-y-4">
                         <div className="space-y-2">
-                            <div className="flex justify-between text-sm text-slate-600">
+                            <div className="flex justify-between text-sm text-muted-foreground">
                                 <span>Subtotal</span>
                                 <span>${(totalCents / 100).toFixed(2)}</span>
                             </div>
-                            <div className="flex justify-between text-sm text-slate-600">
+                            <div className="flex justify-between text-sm text-muted-foreground">
                                 <span>Tax (0%)</span>
                                 <span>$0.00</span>
                             </div>
-                            <div className="flex justify-between text-lg font-bold text-slate-900 pt-2 border-t border-slate-200">
+                            <div className="flex justify-between text-lg font-bold text-foreground pt-2 border-t border-border">
                                 <span>Total</span>
                                 <span>${(totalCents / 100).toFixed(2)}</span>
                             </div>

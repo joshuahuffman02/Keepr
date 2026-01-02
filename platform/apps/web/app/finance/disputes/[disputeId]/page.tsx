@@ -65,8 +65,8 @@ export default function DisputeDetailPage() {
       <div className="max-w-5xl space-y-4">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-semibold text-slate-900">Dispute Detail</h1>
-            <p className="text-sm text-slate-600">Evidence kit and links for dispute resolution.</p>
+            <h1 className="text-2xl font-semibold text-foreground">Dispute Detail</h1>
+            <p className="text-sm text-muted-foreground">Evidence kit and links for dispute resolution.</p>
           </div>
           <div className="flex gap-2">
             <Button
@@ -85,7 +85,7 @@ export default function DisputeDetailPage() {
             <CardTitle className="flex items-center gap-2">
               <span className="font-mono text-xs">{data?.stripeDisputeId ?? disputeId}</span>
               {data?.status && (
-                <Badge className={statusColors[data.status] || "bg-slate-100 text-slate-700"}>
+                <Badge className={statusColors[data.status] || "bg-muted text-foreground"}>
                   {data.status.replace("_", " ")}
                 </Badge>
               )}
@@ -94,16 +94,16 @@ export default function DisputeDetailPage() {
               )}
             </CardTitle>
           </CardHeader>
-          <CardContent className="space-y-2 text-sm text-slate-700">
+          <CardContent className="space-y-2 text-sm text-foreground">
             <div className="flex flex-wrap gap-4">
               <div>Amount: {formatMoney(data?.amountCents, data?.currency?.toUpperCase())}</div>
               <div>Reason: {data?.reason ?? "—"}</div>
               <div>Reservation: {data?.reservationId ? <Link className="text-indigo-600 hover:underline" href={`/campgrounds/${campgroundId}/reservations/${data.reservationId}`}>{data.reservationId}</Link> : "—"}</div>
             </div>
-            <div className="text-xs text-slate-600">
+            <div className="text-xs text-muted-foreground">
               Evidence due: {data?.evidenceDueBy ? format(new Date(data.evidenceDueBy), "yyyy-MM-dd") : "—"}
             </div>
-            <div className="text-xs text-slate-600 flex gap-3">
+            <div className="text-xs text-muted-foreground flex gap-3">
               <span>Charge: {data?.stripeChargeId ?? "—"}</span>
               <span>Intent: {data?.stripePaymentIntentId ?? "—"}</span>
             </div>

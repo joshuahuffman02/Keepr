@@ -69,10 +69,10 @@ export default function AdminUsersPage() {
 
     if (!whoamiLoading && !canManage) {
         return (
-            <div className="p-8 text-center bg-slate-800 rounded-lg border border-slate-700">
-                <Shield className="h-10 w-10 text-slate-500 mx-auto mb-3" />
-                <h2 className="text-xl font-semibold text-slate-200">Access Restricted</h2>
-                <p className="text-slate-400">You must be a Platform Admin to view this directory.</p>
+            <div className="p-8 text-center bg-muted rounded-lg border border-border">
+                <Shield className="h-10 w-10 text-muted-foreground mx-auto mb-3" />
+                <h2 className="text-xl font-semibold text-muted-foreground">Access Restricted</h2>
+                <p className="text-muted-foreground">You must be a Platform Admin to view this directory.</p>
             </div>
         );
     }
@@ -81,20 +81,20 @@ export default function AdminUsersPage() {
         <div className="space-y-6">
             <div className="flex items-center justify-between">
                 <div>
-                    <h1 className="text-2xl font-bold text-slate-100 flex items-center gap-2">
+                    <h1 className="text-2xl font-bold text-foreground flex items-center gap-2">
                         <User className="h-6 w-6 text-blue-400" />
                         User Directory
                     </h1>
-                    <p className="text-sm text-slate-400">Manage all users registered on the platform.</p>
+                    <p className="text-sm text-muted-foreground">Manage all users registered on the platform.</p>
                 </div>
                 <div className="flex items-center gap-3">
                     <div className="relative">
-                        <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-slate-500" />
+                        <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
                         <Input
                             value={search}
                             onChange={(e) => setSearch(e.target.value)}
                             placeholder="Search name or email..."
-                            className="pl-9 h-9 w-64 bg-slate-800 border-slate-700 text-slate-200 placeholder:text-slate-500"
+                            className="pl-9 h-9 w-64 bg-muted border-border text-muted-foreground placeholder:text-muted-foreground"
                         />
                     </div>
                     <Button variant="secondary" size="sm" onClick={() => void loadUsers()} disabled={loading}>
@@ -103,10 +103,10 @@ export default function AdminUsersPage() {
                 </div>
             </div>
 
-            <Card className="bg-slate-900 border-slate-800 overflow-hidden">
+            <Card className="bg-muted border-border overflow-hidden">
                 <div className="overflow-x-auto">
                     <table className="w-full text-sm text-left">
-                        <thead className="bg-slate-950 text-xs uppercase font-semibold text-slate-500 border-b border-slate-800">
+                        <thead className="bg-muted text-xs uppercase font-semibold text-muted-foreground border-b border-border">
                             <tr>
                                 <th className="px-4 py-3">User</th>
                                 <th className="px-4 py-3">Role</th>
@@ -114,19 +114,19 @@ export default function AdminUsersPage() {
                                 <th className="px-4 py-3">Active</th>
                             </tr>
                         </thead>
-                        <tbody className="divide-y divide-slate-800">
+                        <tbody className="divide-y divide-border">
                             {loading ? (
-                                <tr><td colSpan={4} className="p-8 text-center text-slate-500">Loading users...</td></tr>
+                                <tr><td colSpan={4} className="p-8 text-center text-muted-foreground">Loading users...</td></tr>
                             ) : filteredUsers.length === 0 ? (
-                                <tr><td colSpan={4} className="p-8 text-center text-slate-500">No users found.</td></tr>
+                                <tr><td colSpan={4} className="p-8 text-center text-muted-foreground">No users found.</td></tr>
                             ) : (
                                 filteredUsers.map(user => (
-                                    <tr key={user.id} className="hover:bg-slate-800/50 transition-colors">
+                                    <tr key={user.id} className="hover:bg-muted/50 transition-colors">
                                         <td className="px-4 py-3">
-                                            <div className="font-medium text-slate-200">
+                                            <div className="font-medium text-muted-foreground">
                                                 {(user.firstName || user.lastName) ? `${user.firstName ?? ""} ${user.lastName ?? ""}`.trim() : "—"}
                                             </div>
-                                            <div className="text-xs text-slate-500">{user.email}</div>
+                                            <div className="text-xs text-muted-foreground">{user.email}</div>
                                         </td>
                                         <td className="px-4 py-3">
                                             {user.platformRole ? (
@@ -134,7 +134,7 @@ export default function AdminUsersPage() {
                                                     {user.platformRole.replace('_', ' ')}
                                                 </Badge>
                                             ) : (
-                                                <span className="text-slate-600">—</span>
+                                                <span className="text-muted-foreground">—</span>
                                             )}
                                         </td>
                                         <td className="px-4 py-3">
@@ -143,7 +143,7 @@ export default function AdminUsersPage() {
                                                     {user.memberships.length} associated
                                                 </div>
                                             ) : (
-                                                <span className="text-slate-600">None</span>
+                                                <span className="text-muted-foreground">None</span>
                                             )}
                                         </td>
                                         <td className="px-4 py-3">

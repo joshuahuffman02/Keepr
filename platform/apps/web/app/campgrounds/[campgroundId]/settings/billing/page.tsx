@@ -82,7 +82,7 @@ type SiteClass = {
 const meterTypeConfig = {
     power: { icon: Zap, label: "Power", color: "text-amber-600 dark:text-amber-400", bg: "bg-status-warning/15", unit: "kWh" },
     water: { icon: Droplets, label: "Water", color: "text-blue-600 dark:text-blue-400", bg: "bg-status-info/15", unit: "gal" },
-    sewer: { icon: Waves, label: "Sewer", color: "text-slate-600 dark:text-slate-400", bg: "bg-slate-100 dark:bg-slate-800/50", unit: "gal" },
+    sewer: { icon: Waves, label: "Sewer", color: "text-muted-foreground dark:text-muted-foreground", bg: "bg-muted dark:bg-muted/50", unit: "gal" },
 };
 
 // Celebration confetti effect

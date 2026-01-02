@@ -70,7 +70,7 @@ export function GuestPricingPanel({
     <motion.div
       initial={prefersReducedMotion ? {} : { opacity: 0, y: 10 }}
       animate={prefersReducedMotion ? {} : { opacity: 1, y: 0 }}
-      className="border-t border-slate-700 pt-6"
+      className="border-t border-border pt-6"
     >
       {/* Header - Always visible */}
       <button
@@ -88,15 +88,15 @@ export function GuestPricingPanel({
           </div>
           <div>
             <h3 className="text-sm font-medium text-white">Guest Pricing</h3>
-            <p className="text-xs text-slate-500 mt-0.5">
+            <p className="text-xs text-muted-foreground mt-0.5">
               {getSummaryText()}
             </p>
           </div>
         </div>
         {isExpanded ? (
-          <ChevronUp className="w-5 h-5 text-slate-400" />
+          <ChevronUp className="w-5 h-5 text-muted-foreground" />
         ) : (
-          <ChevronDown className="w-5 h-5 text-slate-400" />
+          <ChevronDown className="w-5 h-5 text-muted-foreground" />
         )}
       </button>
 
@@ -113,8 +113,8 @@ export function GuestPricingPanel({
             <div className="mt-6 space-y-4 pl-[52px]">
               {/* Occupants Included */}
               <div className="space-y-2">
-                <Label className="text-sm text-slate-300 flex items-center gap-2">
-                  <Users className="w-4 h-4 text-slate-500" />
+                <Label className="text-sm text-muted-foreground flex items-center gap-2">
+                  <Users className="w-4 h-4 text-muted-foreground" />
                   Occupants Included in Base Rate
                 </Label>
                 <Input
@@ -125,25 +125,25 @@ export function GuestPricingPanel({
                   placeholder="2"
                   disabled={disabled}
                   className={cn(
-                    "bg-slate-800/50 border-slate-700 text-white placeholder:text-slate-500",
+                    "bg-muted/50 border-border text-foreground placeholder:text-muted-foreground",
                     "transition-all duration-200",
-                    "focus:bg-slate-800 focus:border-emerald-500/50 focus:shadow-[0_0_20px_-5px_rgba(16,185,129,0.3)]",
+                    "focus:bg-muted focus:border-emerald-500/50 focus:shadow-[0_0_20px_-5px_rgba(16,185,129,0.3)]",
                     disabled && "cursor-not-allowed opacity-50"
                   )}
                 />
-                <p className="text-xs text-slate-500">
+                <p className="text-xs text-muted-foreground">
                   Number of guests included in your base nightly rate
                 </p>
               </div>
 
               {/* Extra Adult Fee */}
               <div className="space-y-2">
-                <Label className="text-sm text-slate-300 flex items-center gap-2">
-                  <DollarSign className="w-4 h-4 text-slate-500" />
+                <Label className="text-sm text-muted-foreground flex items-center gap-2">
+                  <DollarSign className="w-4 h-4 text-muted-foreground" />
                   Extra Adult Fee (per night)
                 </Label>
                 <div className="relative">
-                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500">
+                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">
                     $
                   </span>
                   <Input
@@ -155,26 +155,26 @@ export function GuestPricingPanel({
                     placeholder="0.00"
                     disabled={disabled}
                     className={cn(
-                      "bg-slate-800/50 border-slate-700 text-white placeholder:text-slate-500 pl-7",
+                      "bg-muted/50 border-border text-foreground placeholder:text-muted-foreground pl-7",
                       "transition-all duration-200",
-                      "focus:bg-slate-800 focus:border-emerald-500/50 focus:shadow-[0_0_20px_-5px_rgba(16,185,129,0.3)]",
+                      "focus:bg-muted focus:border-emerald-500/50 focus:shadow-[0_0_20px_-5px_rgba(16,185,129,0.3)]",
                       disabled && "cursor-not-allowed opacity-50"
                     )}
                   />
                 </div>
-                <p className="text-xs text-slate-500">
+                <p className="text-xs text-muted-foreground">
                   Optional fee for each adult beyond the base occupancy
                 </p>
               </div>
 
               {/* Extra Child Fee */}
               <div className="space-y-2">
-                <Label className="text-sm text-slate-300 flex items-center gap-2">
-                  <DollarSign className="w-4 h-4 text-slate-500" />
+                <Label className="text-sm text-muted-foreground flex items-center gap-2">
+                  <DollarSign className="w-4 h-4 text-muted-foreground" />
                   Extra Child Fee (per night)
                 </Label>
                 <div className="relative">
-                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500">
+                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">
                     $
                   </span>
                   <Input
@@ -186,22 +186,22 @@ export function GuestPricingPanel({
                     placeholder="0.00"
                     disabled={disabled}
                     className={cn(
-                      "bg-slate-800/50 border-slate-700 text-white placeholder:text-slate-500 pl-7",
+                      "bg-muted/50 border-border text-foreground placeholder:text-muted-foreground pl-7",
                       "transition-all duration-200",
-                      "focus:bg-slate-800 focus:border-emerald-500/50 focus:shadow-[0_0_20px_-5px_rgba(16,185,129,0.3)]",
+                      "focus:bg-muted focus:border-emerald-500/50 focus:shadow-[0_0_20px_-5px_rgba(16,185,129,0.3)]",
                       disabled && "cursor-not-allowed opacity-50"
                     )}
                   />
                 </div>
-                <p className="text-xs text-slate-500">
+                <p className="text-xs text-muted-foreground">
                   Optional fee for each child beyond the base occupancy
                 </p>
               </div>
 
               {/* Info box */}
-              <div className="p-3 rounded-lg bg-slate-800/30 border border-slate-700">
-                <p className="text-xs text-slate-400">
-                  <strong className="text-slate-300">Example:</strong> If you set 2 occupants included
+              <div className="p-3 rounded-lg bg-muted/30 border border-border">
+                <p className="text-xs text-muted-foreground">
+                  <strong className="text-muted-foreground">Example:</strong> If you set 2 occupants included
                   with a $10 extra adult fee, a reservation for 4 adults would add $20 to the base rate.
                 </p>
               </div>

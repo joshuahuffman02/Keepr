@@ -145,7 +145,7 @@ const STATE_CONFIG: Record<OpTaskState, { label: string; color: string; bgColor:
   blocked: { label: "Blocked", color: "text-status-error", bgColor: "bg-status-error/15 border-status-error/30" },
   completed: { label: "Completed", color: "text-status-success", bgColor: "bg-status-success/15 border-status-success/30" },
   verified: { label: "Verified", color: "text-teal-800", bgColor: "bg-teal-100 border-teal-200" },
-  cancelled: { label: "Cancelled", color: "text-slate-600", bgColor: "bg-slate-100 border-slate-200" },
+  cancelled: { label: "Cancelled", color: "text-muted-foreground", bgColor: "bg-muted border-border" },
 };
 
 const SLA_CONFIG: Record<OpSlaStatus, { label: string; color: string; icon: string }> = {
@@ -162,11 +162,11 @@ const CATEGORY_CONFIG: Record<OpTaskCategory, { label: string; icon: string; col
   grounds: { label: "Grounds", icon: "trees", color: "text-green-600" },
   pool: { label: "Pool", icon: "waves", color: "text-cyan-600" },
   front_desk: { label: "Front Desk", icon: "ticket", color: "text-pink-600" },
-  custom: { label: "Custom", icon: "clipboard-list", color: "text-slate-600" },
+  custom: { label: "Custom", icon: "clipboard-list", color: "text-muted-foreground" },
 };
 
 const PRIORITY_CONFIG: Record<OpTaskPriority, { label: string; color: string; dot: string }> = {
-  low: { label: "Low", color: "text-slate-500", dot: "bg-slate-400" },
+  low: { label: "Low", color: "text-muted-foreground", dot: "bg-muted" },
   medium: { label: "Medium", color: "text-blue-600", dot: "bg-blue-500" },
   high: { label: "High", color: "text-orange-600", dot: "bg-orange-500" },
   urgent: { label: "Urgent", color: "text-red-600", dot: "bg-red-500" },
@@ -311,7 +311,7 @@ export default function OperationsPage() {
     return (
       <DashboardShell>
         <div className="flex items-center justify-center h-64">
-          <p className="text-slate-500">Select a campground to view operations</p>
+          <p className="text-muted-foreground">Select a campground to view operations</p>
         </div>
       </DashboardShell>
     );
@@ -323,14 +323,14 @@ export default function OperationsPage() {
         {/* Header - stacks on mobile */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
           <div>
-            <h1 className="text-xl md:text-2xl font-bold text-slate-900">Operations</h1>
-            <p className="text-slate-500 mt-1 text-sm md:text-base hidden sm:block">Manage tasks, turnovers, maintenance, and team assignments</p>
+            <h1 className="text-xl md:text-2xl font-bold text-foreground">Operations</h1>
+            <p className="text-muted-foreground mt-1 text-sm md:text-base hidden sm:block">Manage tasks, turnovers, maintenance, and team assignments</p>
           </div>
           <div className="flex gap-2">
             {activeTab === "templates" && (
               <button
                 onClick={() => setShowTemplateModal(true)}
-                className="px-3 md:px-4 py-2 border border-slate-200 bg-white text-slate-700 rounded-lg font-medium hover:bg-slate-50 transition-colors flex items-center gap-2 text-sm"
+                className="px-3 md:px-4 py-2 border border-border bg-card text-foreground rounded-lg font-medium hover:bg-muted transition-colors flex items-center gap-2 text-sm"
               >
                 <span>+</span> <span className="hidden sm:inline">New</span> Template
               </button>
@@ -338,7 +338,7 @@ export default function OperationsPage() {
             {activeTab === "teams" && (
               <button
                 onClick={() => setShowTeamModal(true)}
-                className="px-3 md:px-4 py-2 border border-slate-200 bg-white text-slate-700 rounded-lg font-medium hover:bg-slate-50 transition-colors flex items-center gap-2 text-sm"
+                className="px-3 md:px-4 py-2 border border-border bg-card text-foreground rounded-lg font-medium hover:bg-muted transition-colors flex items-center gap-2 text-sm"
               >
                 <span>+</span> <span className="hidden sm:inline">New</span> Team
               </button>
@@ -353,7 +353,7 @@ export default function OperationsPage() {
         </div>
 
         {/* Tabs - horizontally scrollable on mobile */}
-        <div className="flex gap-1 mb-6 border-b border-slate-200 overflow-x-auto scrollbar-hide -mx-4 px-4 md:mx-0 md:px-0">
+        <div className="flex gap-1 mb-6 border-b border-border overflow-x-auto scrollbar-hide -mx-4 px-4 md:mx-0 md:px-0">
           {[
             { id: "board" as const, label: "Tasks", fullLabel: "Task Board", icon: "" },
             { id: "sla" as const, label: "SLA", fullLabel: "SLA Dashboard", icon: "" },
@@ -367,7 +367,7 @@ export default function OperationsPage() {
               className={`px-3 md:px-4 py-3 text-sm font-medium border-b-2 transition-colors whitespace-nowrap min-h-[44px] ${
                 activeTab === tab.id
                   ? "border-emerald-600 text-emerald-600"
-                  : "border-transparent text-slate-500 hover:text-slate-700"
+                  : "border-transparent text-muted-foreground hover:text-foreground"
               }`}
             >
               <span className="mr-1.5 md:mr-2">{tab.icon}</span>
@@ -559,11 +559,11 @@ function TaskBoardTab({
       {/* Filters - scrollable on mobile */}
       <div className="flex flex-wrap gap-2 md:gap-3 mb-4 md:mb-6">
         {/* View mode toggle */}
-        <div className="flex bg-slate-100 rounded-lg p-1 mr-auto md:mr-2">
+        <div className="flex bg-muted rounded-lg p-1 mr-auto md:mr-2">
           <button
             onClick={() => setViewMode('board')}
             className={`px-3 py-1.5 text-xs font-medium rounded transition-colors min-h-[36px] ${
-              viewMode === 'board' ? 'bg-white shadow text-slate-900' : 'text-slate-500'
+              viewMode === 'board' ? 'bg-card shadow text-foreground' : 'text-muted-foreground'
             }`}
           >
             <span className="hidden sm:inline">Board</span>
@@ -572,7 +572,7 @@ function TaskBoardTab({
           <button
             onClick={() => setViewMode('list')}
             className={`px-3 py-1.5 text-xs font-medium rounded transition-colors min-h-[36px] ${
-              viewMode === 'list' ? 'bg-white shadow text-slate-900' : 'text-slate-500'
+              viewMode === 'list' ? 'bg-card shadow text-foreground' : 'text-muted-foreground'
             }`}
           >
             <span className="hidden sm:inline">List</span>
@@ -583,7 +583,7 @@ function TaskBoardTab({
         <select
           value={filter.category ?? ""}
           onChange={e => setFilter((f: any) => ({ ...f, category: e.target.value || undefined }))}
-          className="px-2 md:px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm min-h-[44px]"
+          className="px-2 md:px-3 py-2 bg-card border border-border rounded-lg text-sm min-h-[44px]"
         >
           <option value="">All Types</option>
           {Object.entries(CATEGORY_CONFIG).map(([key, config]) => (
@@ -594,7 +594,7 @@ function TaskBoardTab({
         <select
           value={filter.slaStatus ?? ""}
           onChange={e => setFilter((f: any) => ({ ...f, slaStatus: e.target.value || undefined }))}
-          className="px-2 md:px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm min-h-[44px]"
+          className="px-2 md:px-3 py-2 bg-card border border-border rounded-lg text-sm min-h-[44px]"
         >
           <option value="">All SLA</option>
           <option value="on_track">On Track</option>
@@ -606,7 +606,7 @@ function TaskBoardTab({
           <select
             value={filter.assignedToTeamId ?? ""}
             onChange={e => setFilter((f: any) => ({ ...f, assignedToTeamId: e.target.value || undefined }))}
-            className="px-2 md:px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm min-h-[44px] hidden sm:block"
+            className="px-2 md:px-3 py-2 bg-card border border-border rounded-lg text-sm min-h-[44px] hidden sm:block"
           >
             <option value="">All Teams</option>
             {teams.map(team => (
@@ -618,7 +618,7 @@ function TaskBoardTab({
         {Object.keys(filter).length > 0 && (
           <button
             onClick={() => setFilter({})}
-            className="px-3 py-2 text-slate-500 hover:text-slate-700 text-sm min-h-[44px]"
+            className="px-3 py-2 text-muted-foreground hover:text-foreground text-sm min-h-[44px]"
           >
             Clear
           </button>
@@ -689,7 +689,7 @@ function TaskBoardTab({
                 className={`px-3 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-colors min-h-[44px] ${
                   mobileStateFilter === tab.id
                     ? 'bg-status-success/15 text-status-success'
-                    : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                    : 'bg-muted text-muted-foreground hover:bg-muted'
                 }`}
               >
                 {tab.label} <span className="text-xs opacity-70">({tab.count})</span>
@@ -699,8 +699,8 @@ function TaskBoardTab({
 
           {/* Task list */}
           {filteredTasks.length === 0 ? (
-            <div className="text-center py-12 text-slate-400">
-              <div className="text-4xl mb-2 text-slate-300">Tasks</div>
+            <div className="text-center py-12 text-muted-foreground">
+              <div className="text-4xl mb-2 text-muted-foreground">Tasks</div>
               <p>No tasks to show</p>
             </div>
           ) : (
@@ -725,7 +725,7 @@ function StatsCard({
   label,
   value,
   icon,
-  color = "text-slate-900",
+  color = "text-foreground",
   subtext
 }: {
   label: string;
@@ -735,10 +735,10 @@ function StatsCard({
   subtext?: string;
 }) {
   return (
-    <div className="bg-white rounded-xl border border-slate-200 p-3 md:p-4">
+    <div className="bg-card rounded-xl border border-border p-3 md:p-4">
       <div className="flex items-center gap-1.5 md:gap-2 mb-0.5 md:mb-1">
         <span className="text-base md:text-lg">{icon}</span>
-        <span className="text-xs md:text-sm text-slate-500">{label}</span>
+        <span className="text-xs md:text-sm text-muted-foreground">{label}</span>
       </div>
       <div className="flex items-baseline gap-1.5 md:gap-2">
         <span className={`text-xl md:text-2xl font-bold ${color}`}>{value}</span>
@@ -768,14 +768,14 @@ function KanbanColumn({
   return (
     <div className="flex-shrink-0 w-[280px] md:w-[300px] snap-center md:snap-align-none">
       <div className="flex items-center gap-2 mb-3 md:mb-4 px-1">
-        <h3 className="font-semibold text-slate-800 text-sm md:text-base">{title}</h3>
+        <h3 className="font-semibold text-foreground text-sm md:text-base">{title}</h3>
         <span className={`px-2 py-0.5 rounded-full text-xs font-medium border ${config.bgColor} ${config.color}`}>
           {tasks.length}
         </span>
       </div>
       <div className="space-y-2 md:space-y-3 min-h-[200px]">
         {tasks.length === 0 ? (
-          <div className="text-center py-6 md:py-8 text-slate-400 text-xs md:text-sm border-2 border-dashed border-slate-200 rounded-xl">
+          <div className="text-center py-6 md:py-8 text-muted-foreground text-xs md:text-sm border-2 border-dashed border-border rounded-xl">
             No tasks
           </div>
         ) : (
@@ -811,12 +811,12 @@ function TaskCard({
   const timeRemaining = formatTimeRemaining(task.slaDueAt);
 
   return (
-    <div className="bg-white rounded-xl border border-slate-200 p-4 shadow-sm hover:shadow-md transition-all duration-200 group">
+    <div className="bg-card rounded-xl border border-border p-4 shadow-sm hover:shadow-md transition-all duration-200 group">
       {/* Header */}
       <div className="flex items-start justify-between gap-2 mb-3">
         <div className="flex items-center gap-2">
           <span className="text-lg" title={categoryConfig.label}>{categoryConfig.icon}</span>
-          <span className="font-medium text-slate-900 text-sm line-clamp-1">{task.title}</span>
+          <span className="font-medium text-foreground text-sm line-clamp-1">{task.title}</span>
         </div>
         {slaConfig && (
           <div
@@ -831,7 +831,7 @@ function TaskCard({
       {/* Details */}
       <div className="space-y-2 text-xs mb-3">
         {/* Location */}
-        <div className="flex items-center gap-2 text-slate-600">
+        <div className="flex items-center gap-2 text-muted-foreground">
           <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
           <span>{task.site?.name || task.locationDescription || "-"}</span>
         </div>
@@ -846,7 +846,7 @@ function TaskCard({
         {task.slaDueAt && (
           <div className={`flex items-center gap-2 ${
             task.slaStatus === "breached" ? "text-status-error font-medium" :
-            task.slaStatus === "at_risk" ? "text-status-warning" : "text-slate-600"
+            task.slaStatus === "at_risk" ? "text-status-warning" : "text-muted-foreground"
           }`}>
             <span>Due:</span>
             <span>{timeRemaining}</span>
@@ -855,7 +855,7 @@ function TaskCard({
 
         {/* Team/Assignee */}
         {(task.assignedToTeam || task.assignedToUser) && (
-          <div className="flex items-center gap-2 text-slate-600">
+          <div className="flex items-center gap-2 text-muted-foreground">
             <span>Assigned:</span>
             <span>
               {task.assignedToUser
@@ -868,13 +868,13 @@ function TaskCard({
         {/* Checklist progress */}
         {task.checklist && task.checklist.length > 0 && (
           <div className="flex items-center gap-2">
-            <div className="flex-1 h-1.5 bg-slate-100 rounded-full overflow-hidden">
+            <div className="flex-1 h-1.5 bg-muted rounded-full overflow-hidden">
               <div
                 className="h-full bg-status-success transition-all duration-300"
                 style={{ width: `${task.checklistProgress || 0}%` }}
               />
             </div>
-            <span className="text-slate-500">
+            <span className="text-muted-foreground">
               {task.checklist.filter(i => i.completed).length}/{task.checklist.length}
             </span>
           </div>
@@ -926,7 +926,7 @@ function TaskCard({
         {(task.state === "completed" || task.state === "verified") && (
           <button
             onClick={() => updateTaskState(task.id, "pending")}
-            className="flex-1 px-3 py-1.5 bg-slate-50 text-slate-700 rounded-lg text-xs font-medium hover:bg-slate-100 transition-colors"
+            className="flex-1 px-3 py-1.5 bg-muted text-foreground rounded-lg text-xs font-medium hover:bg-muted transition-colors"
           >
             Reopen
           </button>
@@ -954,7 +954,7 @@ function MobileTaskRow({
   const stateConfig = STATE_CONFIG[task.state];
 
   return (
-    <div className="bg-white rounded-xl border border-slate-200 overflow-hidden">
+    <div className="bg-card rounded-xl border border-border overflow-hidden">
       {/* Main row - always visible */}
       <button
         onClick={() => setExpanded(!expanded)}
@@ -971,10 +971,10 @@ function MobileTaskRow({
         {/* Content */}
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2">
-            <span className="font-medium text-slate-900 truncate text-sm">{task.title}</span>
+            <span className="font-medium text-foreground truncate text-sm">{task.title}</span>
             <span className={`w-2 h-2 rounded-full flex-shrink-0 ${priorityConfig.dot}`} />
           </div>
-          <div className="flex items-center gap-2 text-xs text-slate-500 mt-0.5">
+          <div className="flex items-center gap-2 text-xs text-muted-foreground mt-0.5">
             <span className={`px-1.5 py-0.5 rounded ${stateConfig.bgColor} ${stateConfig.color} text-[10px] font-medium`}>
               {stateConfig.label}
             </span>
@@ -988,31 +988,31 @@ function MobileTaskRow({
         </div>
 
         {/* Expand indicator */}
-        <span className={`text-slate-400 transition-transform ${expanded ? 'rotate-180' : ''}`}>
+        <span className={`text-muted-foreground transition-transform ${expanded ? 'rotate-180' : ''}`}>
           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
         </span>
       </button>
 
       {/* Expanded content */}
       {expanded && (
-        <div className="px-4 pb-4 pt-2 border-t border-slate-100 space-y-3">
+        <div className="px-4 pb-4 pt-2 border-t border-border space-y-3">
           {/* Description */}
           {task.description && (
-            <p className="text-sm text-slate-600">{task.description}</p>
+            <p className="text-sm text-muted-foreground">{task.description}</p>
           )}
 
           {/* Details */}
           <div className="flex flex-wrap gap-2 text-xs">
-            <span className={`px-2 py-1 rounded-full bg-slate-100 ${priorityConfig.color}`}>
+            <span className={`px-2 py-1 rounded-full bg-muted ${priorityConfig.color}`}>
               {priorityConfig.label} Priority
             </span>
             {task.assignedToTeam && (
-              <span className="px-2 py-1 rounded-full bg-slate-100 text-slate-600">
+              <span className="px-2 py-1 rounded-full bg-muted text-muted-foreground">
                 Team: {task.assignedToTeam.name}
               </span>
             )}
             {task.assignedToUser && (
-              <span className="px-2 py-1 rounded-full bg-slate-100 text-slate-600">
+              <span className="px-2 py-1 rounded-full bg-muted text-muted-foreground">
                 {task.assignedToUser.firstName} {task.assignedToUser.lastName}
               </span>
             )}
@@ -1021,13 +1021,13 @@ function MobileTaskRow({
           {/* Checklist progress */}
           {task.checklist && task.checklist.length > 0 && (
             <div className="flex items-center gap-2">
-              <div className="flex-1 h-2 bg-slate-100 rounded-full overflow-hidden">
+              <div className="flex-1 h-2 bg-muted rounded-full overflow-hidden">
                 <div
                   className="h-full bg-status-success transition-all duration-300"
                   style={{ width: `${task.checklistProgress || 0}%` }}
                 />
               </div>
-              <span className="text-xs text-slate-500">
+              <span className="text-xs text-muted-foreground">
                 {task.checklist.filter(i => i.completed).length}/{task.checklist.length}
               </span>
             </div>
@@ -1078,7 +1078,7 @@ function MobileTaskRow({
             {(task.state === "completed" || task.state === "verified") && (
               <button
                 onClick={(e) => { e.stopPropagation(); updateTaskState(task.id, "pending"); }}
-                className="flex-1 px-4 py-3 bg-slate-100 text-slate-700 rounded-lg text-sm font-medium active:bg-slate-200 transition-colors min-h-[48px]"
+                className="flex-1 px-4 py-3 bg-muted text-foreground rounded-lg text-sm font-medium active:bg-muted transition-colors min-h-[48px]"
               >
                 Reopen
               </button>
@@ -1127,46 +1127,46 @@ function SlaDashboardTab({
     <div className="space-y-6">
       {/* SLA Overview */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <div className="bg-white rounded-xl border border-slate-200 p-6">
-          <div className="text-sm text-slate-500 mb-2">Current On Track</div>
+        <div className="bg-card rounded-xl border border-border p-6">
+          <div className="text-sm text-muted-foreground mb-2">Current On Track</div>
           <div className="text-3xl font-bold text-status-success">{slaMetrics?.current.onTrack || 0}</div>
         </div>
-        <div className="bg-white rounded-xl border border-slate-200 p-6">
-          <div className="text-sm text-slate-500 mb-2">At Risk</div>
+        <div className="bg-card rounded-xl border border-border p-6">
+          <div className="text-sm text-muted-foreground mb-2">At Risk</div>
           <div className="text-3xl font-bold text-status-warning">{slaMetrics?.current.atRisk || 0}</div>
         </div>
-        <div className="bg-white rounded-xl border border-slate-200 p-6">
-          <div className="text-sm text-slate-500 mb-2">Breached</div>
+        <div className="bg-card rounded-xl border border-border p-6">
+          <div className="text-sm text-muted-foreground mb-2">Breached</div>
           <div className="text-3xl font-bold text-status-error">{slaMetrics?.current.breached || 0}</div>
         </div>
-        <div className="bg-white rounded-xl border border-slate-200 p-6">
-          <div className="text-sm text-slate-500 mb-2">Today's Compliance</div>
+        <div className="bg-card rounded-xl border border-border p-6">
+          <div className="text-sm text-muted-foreground mb-2">Today's Compliance</div>
           <div className="text-3xl font-bold text-status-info">{slaMetrics?.today.complianceRate || 100}%</div>
         </div>
       </div>
 
       {/* Today's Stats */}
-      <div className="bg-white rounded-xl border border-slate-200 p-6">
-        <h3 className="text-lg font-semibold text-slate-900 mb-4">Today's Performance</h3>
+      <div className="bg-card rounded-xl border border-border p-6">
+        <h3 className="text-lg font-semibold text-foreground mb-4">Today's Performance</h3>
         <div className="grid grid-cols-3 gap-6">
           <div>
-            <div className="text-2xl font-bold text-slate-900">{slaMetrics?.today.completed || 0}</div>
-            <div className="text-sm text-slate-500">Tasks Completed</div>
+            <div className="text-2xl font-bold text-foreground">{slaMetrics?.today.completed || 0}</div>
+            <div className="text-sm text-muted-foreground">Tasks Completed</div>
           </div>
           <div>
             <div className="text-2xl font-bold text-status-success">{slaMetrics?.today.onTime || 0}</div>
-            <div className="text-sm text-slate-500">On Time</div>
+            <div className="text-sm text-muted-foreground">On Time</div>
           </div>
           <div>
             <div className="text-2xl font-bold text-status-error">{slaMetrics?.today.late || 0}</div>
-            <div className="text-sm text-slate-500">Late</div>
+            <div className="text-sm text-muted-foreground">Late</div>
           </div>
         </div>
       </div>
 
       {/* Breached Tasks */}
       {breachedTasks.length > 0 && (
-        <div className="bg-white rounded-xl border border-status-error/30 p-6">
+        <div className="bg-card rounded-xl border border-status-error/30 p-6">
           <h3 className="text-lg font-semibold text-status-error mb-4 flex items-center gap-2">
             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>
             SLA Breached ({breachedTasks.length})
@@ -1181,7 +1181,7 @@ function SlaDashboardTab({
 
       {/* At Risk Tasks */}
       {atRiskTasks.length > 0 && (
-        <div className="bg-white rounded-xl border border-status-warning/30 p-6">
+        <div className="bg-card rounded-xl border border-status-warning/30 p-6">
           <h3 className="text-lg font-semibold text-status-warning mb-4 flex items-center gap-2">
             At Risk ({atRiskTasks.length})
           </h3>
@@ -1216,12 +1216,12 @@ function SlaTaskRow({
   const timeRemaining = formatTimeRemaining(task.slaDueAt);
 
   return (
-    <div className="flex items-center justify-between p-3 bg-slate-50 rounded-lg">
+    <div className="flex items-center justify-between p-3 bg-muted rounded-lg">
       <div className="flex items-center gap-3">
         <span className="text-lg">{categoryConfig.icon}</span>
         <div>
-          <div className="font-medium text-slate-900">{task.title}</div>
-          <div className="text-xs text-slate-500">
+          <div className="font-medium text-foreground">{task.title}</div>
+          <div className="text-xs text-muted-foreground">
             {task.site?.name || task.locationDescription} • {task.assignedToTeam?.name || "Unassigned"}
           </div>
         </div>
@@ -1269,9 +1269,9 @@ function TemplatesTab({
 
       {/* Templates Grid */}
       {templates.length === 0 ? (
-        <div className="text-center py-12 border-2 border-dashed border-slate-200 rounded-xl">
-          <h3 className="text-lg font-medium text-slate-900">No Templates Yet</h3>
-          <p className="text-slate-500 mt-1 mb-4">Create your first template to standardize common tasks</p>
+        <div className="text-center py-12 border-2 border-dashed border-border rounded-xl">
+          <h3 className="text-lg font-medium text-foreground">No Templates Yet</h3>
+          <p className="text-muted-foreground mt-1 mb-4">Create your first template to standardize common tasks</p>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -1295,7 +1295,7 @@ function TemplateCard({
   const priorityConfig = PRIORITY_CONFIG[template.priority];
 
   return (
-    <div className="bg-white rounded-xl border border-slate-200 p-5 hover:shadow-md transition-shadow">
+    <div className="bg-card rounded-xl border border-border p-5 hover:shadow-md transition-shadow">
       <div className="flex items-start justify-between mb-3">
         <div className="flex items-center gap-2">
           <span className="text-xl">{categoryConfig.icon}</span>
@@ -1304,16 +1304,16 @@ function TemplateCard({
           </span>
         </div>
         {!template.isActive && (
-          <span className="text-xs px-2 py-0.5 rounded bg-slate-100 text-slate-500">Inactive</span>
+          <span className="text-xs px-2 py-0.5 rounded bg-muted text-muted-foreground">Inactive</span>
         )}
       </div>
 
-      <h4 className="font-semibold text-slate-900 mb-1">{template.name}</h4>
+      <h4 className="font-semibold text-foreground mb-1">{template.name}</h4>
       {template.description && (
-        <p className="text-sm text-slate-500 line-clamp-2 mb-3">{template.description}</p>
+        <p className="text-sm text-muted-foreground line-clamp-2 mb-3">{template.description}</p>
       )}
 
-      <div className="flex items-center gap-4 text-xs text-slate-500">
+      <div className="flex items-center gap-4 text-xs text-muted-foreground">
         <span className="flex items-center gap-1">
           <span className={`w-2 h-2 rounded-full ${priorityConfig.dot}`} />
           {priorityConfig.label}
@@ -1326,8 +1326,8 @@ function TemplateCard({
         )}
       </div>
 
-      <div className="flex items-center justify-between mt-4 pt-3 border-t border-slate-100">
-        <span className="text-xs text-slate-400">
+      <div className="flex items-center justify-between mt-4 pt-3 border-t border-border">
+        <span className="text-xs text-muted-foreground">
           {template._count?.tasks || 0} tasks created
         </span>
         <button className="text-xs text-emerald-600 hover:text-emerald-700 font-medium">
@@ -1358,9 +1358,9 @@ function TeamsTab({
   return (
     <div className="space-y-6">
       {teams.length === 0 ? (
-        <div className="text-center py-12 border-2 border-dashed border-slate-200 rounded-xl">
-          <h3 className="text-lg font-medium text-slate-900">No Teams Yet</h3>
-          <p className="text-slate-500 mt-1 mb-4">Create teams to organize your staff and assign tasks</p>
+        <div className="text-center py-12 border-2 border-dashed border-border rounded-xl">
+          <h3 className="text-lg font-medium text-foreground">No Teams Yet</h3>
+          <p className="text-muted-foreground mt-1 mb-4">Create teams to organize your staff and assign tasks</p>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -1381,7 +1381,7 @@ function TeamCard({
   onRefresh: () => void;
 }) {
   return (
-    <div className="bg-white rounded-xl border border-slate-200 p-5 hover:shadow-md transition-shadow">
+    <div className="bg-card rounded-xl border border-border p-5 hover:shadow-md transition-shadow">
       <div className="flex items-start justify-between mb-3">
         <div
           className="w-10 h-10 rounded-lg flex items-center justify-center text-white font-bold"
@@ -1390,18 +1390,18 @@ function TeamCard({
           {team.name.charAt(0).toUpperCase()}
         </div>
         {!team.isActive && (
-          <span className="text-xs px-2 py-0.5 rounded bg-slate-100 text-slate-500">Inactive</span>
+          <span className="text-xs px-2 py-0.5 rounded bg-muted text-muted-foreground">Inactive</span>
         )}
       </div>
 
-      <h4 className="font-semibold text-slate-900 mb-3">{team.name}</h4>
+      <h4 className="font-semibold text-foreground mb-3">{team.name}</h4>
 
-      <div className="flex items-center gap-4 text-sm text-slate-500">
+      <div className="flex items-center gap-4 text-sm text-muted-foreground">
         <span>{team._count?.members || 0} members</span>
         <span>{team._count?.tasks || 0} tasks</span>
       </div>
 
-      <div className="flex justify-end mt-4 pt-3 border-t border-slate-100">
+      <div className="flex justify-end mt-4 pt-3 border-t border-border">
         <button className="text-xs text-emerald-600 hover:text-emerald-700 font-medium">
           Manage
         </button>
@@ -1495,21 +1495,21 @@ function CreateTaskModal({
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
-        <div className="sticky top-0 bg-white border-b border-slate-100 px-6 py-4 flex items-center justify-between">
-          <h2 className="text-xl font-bold text-slate-900">Create Task</h2>
-          <button onClick={onClose} className="text-slate-400 hover:text-slate-600 text-2xl">×</button>
+      <div className="bg-card rounded-2xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
+        <div className="sticky top-0 bg-card border-b border-border px-6 py-4 flex items-center justify-between">
+          <h2 className="text-xl font-bold text-foreground">Create Task</h2>
+          <button onClick={onClose} className="text-muted-foreground hover:text-muted-foreground text-2xl">×</button>
         </div>
 
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
           {/* Template selector */}
           {templates.length > 0 && (
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1">Use Template (optional)</label>
+              <label className="block text-sm font-medium text-foreground mb-1">Use Template (optional)</label>
               <select
                 value={templateId}
                 onChange={e => setTemplateId(e.target.value)}
-                className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm"
+                className="w-full px-3 py-2 border border-border rounded-lg text-sm"
               >
                 <option value="">Start from scratch</option>
                 {templates.filter(t => t.isActive).map(t => (
@@ -1521,11 +1521,11 @@ function CreateTaskModal({
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1">Category</label>
+              <label className="block text-sm font-medium text-foreground mb-1">Category</label>
               <select
                 value={category}
                 onChange={e => setCategory(e.target.value as OpTaskCategory)}
-                className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm"
+                className="w-full px-3 py-2 border border-border rounded-lg text-sm"
               >
                 {Object.entries(CATEGORY_CONFIG).map(([key, config]) => (
                   <option key={key} value={key}>{config.icon} {config.label}</option>
@@ -1533,11 +1533,11 @@ function CreateTaskModal({
               </select>
             </div>
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1">Priority</label>
+              <label className="block text-sm font-medium text-foreground mb-1">Priority</label>
               <select
                 value={priority}
                 onChange={e => setPriority(e.target.value as OpTaskPriority)}
-                className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm"
+                className="w-full px-3 py-2 border border-border rounded-lg text-sm"
               >
                 {Object.entries(PRIORITY_CONFIG).map(([key, config]) => (
                   <option key={key} value={key}>{config.label}</option>
@@ -1547,35 +1547,35 @@ function CreateTaskModal({
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">Title *</label>
+            <label className="block text-sm font-medium text-foreground mb-1">Title *</label>
             <input
               type="text"
               value={title}
               onChange={e => setTitle(e.target.value)}
-              className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm"
+              className="w-full px-3 py-2 border border-border rounded-lg text-sm"
               placeholder="e.g., Clean cabin after checkout"
               required
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">Description</label>
+            <label className="block text-sm font-medium text-foreground mb-1">Description</label>
             <textarea
               value={description}
               onChange={e => setDescription(e.target.value)}
               rows={2}
-              className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm resize-none"
+              className="w-full px-3 py-2 border border-border rounded-lg text-sm resize-none"
               placeholder="Additional details or instructions..."
             />
           </div>
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1">Site</label>
+              <label className="block text-sm font-medium text-foreground mb-1">Site</label>
               <select
                 value={siteId}
                 onChange={e => setSiteId(e.target.value)}
-                className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm"
+                className="w-full px-3 py-2 border border-border rounded-lg text-sm"
               >
                 <option value="">No specific site</option>
                 {sites.map(site => (
@@ -1584,12 +1584,12 @@ function CreateTaskModal({
               </select>
             </div>
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1">Or Location</label>
+              <label className="block text-sm font-medium text-foreground mb-1">Or Location</label>
               <input
                 type="text"
                 value={locationDescription}
                 onChange={e => setLocationDescription(e.target.value)}
-                className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm"
+                className="w-full px-3 py-2 border border-border rounded-lg text-sm"
                 placeholder="e.g., Pool area"
                 disabled={!!siteId}
               />
@@ -1598,11 +1598,11 @@ function CreateTaskModal({
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1">Assign to Team</label>
+              <label className="block text-sm font-medium text-foreground mb-1">Assign to Team</label>
               <select
                 value={assignedToTeamId}
                 onChange={e => setAssignedToTeamId(e.target.value)}
-                className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm"
+                className="w-full px-3 py-2 border border-border rounded-lg text-sm"
               >
                 <option value="">Unassigned</option>
                 {teams.filter(t => t.isActive).map(team => (
@@ -1611,21 +1611,21 @@ function CreateTaskModal({
               </select>
             </div>
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1">Due Date/Time</label>
+              <label className="block text-sm font-medium text-foreground mb-1">Due Date/Time</label>
               <input
                 type="datetime-local"
                 value={slaDueAt}
                 onChange={e => setSlaDueAt(e.target.value)}
-                className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm"
+                className="w-full px-3 py-2 border border-border rounded-lg text-sm"
               />
             </div>
           </div>
 
-          <div className="flex gap-3 pt-4 border-t border-slate-100">
+          <div className="flex gap-3 pt-4 border-t border-border">
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 px-4 py-2 border border-slate-200 text-slate-700 rounded-lg hover:bg-slate-50 text-sm font-medium"
+              className="flex-1 px-4 py-2 border border-border text-foreground rounded-lg hover:bg-muted text-sm font-medium"
             >
               Cancel
             </button>
@@ -1698,20 +1698,20 @@ function CreateTemplateModal({
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
-        <div className="sticky top-0 bg-white border-b border-slate-100 px-6 py-4 flex items-center justify-between">
-          <h2 className="text-xl font-bold text-slate-900">Create Template</h2>
-          <button onClick={onClose} className="text-slate-400 hover:text-slate-600 text-2xl">×</button>
+      <div className="bg-card rounded-2xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
+        <div className="sticky top-0 bg-card border-b border-border px-6 py-4 flex items-center justify-between">
+          <h2 className="text-xl font-bold text-foreground">Create Template</h2>
+          <button onClick={onClose} className="text-muted-foreground hover:text-muted-foreground text-2xl">×</button>
         </div>
 
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">Template Name *</label>
+            <label className="block text-sm font-medium text-foreground mb-1">Template Name *</label>
             <input
               type="text"
               value={name}
               onChange={e => setName(e.target.value)}
-              className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm"
+              className="w-full px-3 py-2 border border-border rounded-lg text-sm"
               placeholder="e.g., Cabin Turnover Checklist"
               required
             />
@@ -1719,11 +1719,11 @@ function CreateTemplateModal({
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1">Category</label>
+              <label className="block text-sm font-medium text-foreground mb-1">Category</label>
               <select
                 value={category}
                 onChange={e => setCategory(e.target.value as OpTaskCategory)}
-                className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm"
+                className="w-full px-3 py-2 border border-border rounded-lg text-sm"
               >
                 {Object.entries(CATEGORY_CONFIG).map(([key, config]) => (
                   <option key={key} value={key}>{config.icon} {config.label}</option>
@@ -1731,11 +1731,11 @@ function CreateTemplateModal({
               </select>
             </div>
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1">Default Priority</label>
+              <label className="block text-sm font-medium text-foreground mb-1">Default Priority</label>
               <select
                 value={priority}
                 onChange={e => setPriority(e.target.value as OpTaskPriority)}
-                className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm"
+                className="w-full px-3 py-2 border border-border rounded-lg text-sm"
               >
                 {Object.entries(PRIORITY_CONFIG).map(([key, config]) => (
                   <option key={key} value={key}>{config.label}</option>
@@ -1745,36 +1745,36 @@ function CreateTemplateModal({
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">Description</label>
+            <label className="block text-sm font-medium text-foreground mb-1">Description</label>
             <textarea
               value={description}
               onChange={e => setDescription(e.target.value)}
               rows={2}
-              className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm resize-none"
+              className="w-full px-3 py-2 border border-border rounded-lg text-sm resize-none"
               placeholder="What is this template for?"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">SLA (minutes)</label>
+            <label className="block text-sm font-medium text-foreground mb-1">SLA (minutes)</label>
             <input
               type="number"
               value={slaMinutes}
               onChange={e => setSlaMinutes(e.target.value)}
-              className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm"
+              className="w-full px-3 py-2 border border-border rounded-lg text-sm"
               placeholder="e.g., 60 for 1 hour"
               min="1"
             />
-            <p className="text-xs text-slate-500 mt-1">How long staff has to complete tasks from this template</p>
+            <p className="text-xs text-muted-foreground mt-1">How long staff has to complete tasks from this template</p>
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">Checklist Items</label>
+            <label className="block text-sm font-medium text-foreground mb-1">Checklist Items</label>
             {checklistItems.length > 0 && (
               <div className="space-y-2 mb-3">
                 {checklistItems.map((item, index) => (
-                  <div key={index} className="flex items-center gap-2 bg-slate-50 px-3 py-2 rounded-lg">
-                    <span className="text-sm text-slate-700 flex-1">{item}</span>
+                  <div key={index} className="flex items-center gap-2 bg-muted px-3 py-2 rounded-lg">
+                    <span className="text-sm text-foreground flex-1">{item}</span>
                     <button
                       type="button"
                       onClick={() => removeChecklistItem(index)}
@@ -1791,25 +1791,25 @@ function CreateTemplateModal({
                 type="text"
                 value={newChecklistItem}
                 onChange={e => setNewChecklistItem(e.target.value)}
-                className="flex-1 px-3 py-2 border border-slate-200 rounded-lg text-sm"
+                className="flex-1 px-3 py-2 border border-border rounded-lg text-sm"
                 placeholder="Add checklist item..."
                 onKeyPress={e => e.key === "Enter" && (e.preventDefault(), addChecklistItem())}
               />
               <button
                 type="button"
                 onClick={addChecklistItem}
-                className="px-4 py-2 bg-slate-100 text-slate-700 rounded-lg text-sm font-medium hover:bg-slate-200"
+                className="px-4 py-2 bg-muted text-foreground rounded-lg text-sm font-medium hover:bg-muted"
               >
                 Add
               </button>
             </div>
           </div>
 
-          <div className="flex gap-3 pt-4 border-t border-slate-100">
+          <div className="flex gap-3 pt-4 border-t border-border">
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 px-4 py-2 border border-slate-200 text-slate-700 rounded-lg hover:bg-slate-50 text-sm font-medium"
+              className="flex-1 px-4 py-2 border border-border text-foreground rounded-lg hover:bg-muted text-sm font-medium"
             >
               Cancel
             </button>
@@ -1868,45 +1868,45 @@ function CreateTeamModal({
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md">
-        <div className="border-b border-slate-100 px-6 py-4 flex items-center justify-between">
-          <h2 className="text-xl font-bold text-slate-900">Create Team</h2>
-          <button onClick={onClose} className="text-slate-400 hover:text-slate-600 text-2xl">×</button>
+      <div className="bg-card rounded-2xl shadow-2xl w-full max-w-md">
+        <div className="border-b border-border px-6 py-4 flex items-center justify-between">
+          <h2 className="text-xl font-bold text-foreground">Create Team</h2>
+          <button onClick={onClose} className="text-muted-foreground hover:text-muted-foreground text-2xl">×</button>
         </div>
 
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">Team Name *</label>
+            <label className="block text-sm font-medium text-foreground mb-1">Team Name *</label>
             <input
               type="text"
               value={name}
               onChange={e => setName(e.target.value)}
-              className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm"
+              className="w-full px-3 py-2 border border-border rounded-lg text-sm"
               placeholder="e.g., Housekeeping, Maintenance"
               required
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-2">Team Color</label>
+            <label className="block text-sm font-medium text-foreground mb-2">Team Color</label>
             <div className="flex gap-2">
               {colorOptions.map(c => (
                 <button
                   key={c}
                   type="button"
                   onClick={() => setColor(c)}
-                  className={`w-8 h-8 rounded-lg transition-transform ${color === c ? "ring-2 ring-offset-2 ring-slate-400 scale-110" : ""}`}
+                  className={`w-8 h-8 rounded-lg transition-transform ${color === c ? "ring-2 ring-offset-2 ring-ring scale-110" : ""}`}
                   style={{ backgroundColor: c }}
                 />
               ))}
             </div>
           </div>
 
-          <div className="flex gap-3 pt-4 border-t border-slate-100">
+          <div className="flex gap-3 pt-4 border-t border-border">
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 px-4 py-2 border border-slate-200 text-slate-700 rounded-lg hover:bg-slate-50 text-sm font-medium"
+              className="flex-1 px-4 py-2 border border-border text-foreground rounded-lg hover:bg-muted text-sm font-medium"
             >
               Cancel
             </button>
@@ -1930,7 +1930,7 @@ function CreateTeamModal({
 
 const TIER_CONFIG: Record<string, { color: string; bg: string }> = {
   bronze: { color: "text-status-warning", bg: "bg-status-warning/15" },
-  silver: { color: "text-slate-500", bg: "bg-slate-100" },
+  silver: { color: "text-muted-foreground", bg: "bg-muted" },
   gold: { color: "text-yellow-600", bg: "bg-yellow-100" },
   platinum: { color: "text-purple-600", bg: "bg-purple-100" },
 };
@@ -1984,8 +1984,8 @@ function LeaderboardTab({
   if (badges.length === 0) {
     return (
       <div className="text-center py-16">
-        <h3 className="text-xl font-semibold text-slate-900 mb-2">Set Up Gamification</h3>
-        <p className="text-slate-500 mb-6 max-w-md mx-auto">
+        <h3 className="text-xl font-semibold text-foreground mb-2">Set Up Gamification</h3>
+        <p className="text-muted-foreground mb-6 max-w-md mx-auto">
           Motivate your team with points, badges, and leaderboards. Track performance and celebrate achievements!
         </p>
         <button
@@ -2057,7 +2057,7 @@ function LeaderboardTab({
                 {myStats.badges.map(badge => (
                   <span
                     key={badge.id}
-                    className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${TIER_CONFIG[badge.tier]?.bg || 'bg-slate-100'} ${TIER_CONFIG[badge.tier]?.color || 'text-slate-700'}`}
+                    className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${TIER_CONFIG[badge.tier]?.bg || 'bg-muted'} ${TIER_CONFIG[badge.tier]?.color || 'text-foreground'}`}
                     title={badge.name}
                   >
                     <span>{badge.icon}</span>
@@ -2071,15 +2071,15 @@ function LeaderboardTab({
       )}
 
       {/* Leaderboard */}
-      <div className="bg-white rounded-xl border border-slate-200 overflow-hidden">
-        <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
-          <h3 className="font-semibold text-slate-900 flex items-center gap-2">
+      <div className="bg-card rounded-xl border border-border overflow-hidden">
+        <div className="px-6 py-4 border-b border-border flex items-center justify-between">
+          <h3 className="font-semibold text-foreground flex items-center gap-2">
             Team Leaderboard
           </h3>
           <select
             value={period}
             onChange={e => setPeriod(e.target.value as 'week' | 'month' | 'all_time')}
-            className="px-3 py-1.5 border border-slate-200 rounded-lg text-sm"
+            className="px-3 py-1.5 border border-border rounded-lg text-sm"
           >
             <option value="week">This Week</option>
             <option value="month">This Month</option>
@@ -2088,12 +2088,12 @@ function LeaderboardTab({
         </div>
 
         {leaderboard.length === 0 ? (
-          <div className="p-8 text-center text-slate-500">
+          <div className="p-8 text-center text-muted-foreground">
             <p>No activity yet this {period === 'week' ? 'week' : period === 'month' ? 'month' : 'period'}.</p>
             <p className="text-sm mt-1">Complete tasks to appear on the leaderboard!</p>
           </div>
         ) : (
-          <div className="divide-y divide-slate-100">
+          <div className="divide-y divide-border">
             {leaderboard.map((entry, index) => (
               <div key={entry.userId} className={`px-6 py-4 flex items-center gap-4 ${index < 3 ? 'bg-amber-50/50' : ''}`}>
                 {/* Rank */}
@@ -2101,19 +2101,19 @@ function LeaderboardTab({
                   {index === 0 ? (
                     <span className="text-lg font-bold text-amber-500">#1</span>
                   ) : index === 1 ? (
-                    <span className="text-lg font-bold text-slate-400">#2</span>
+                    <span className="text-lg font-bold text-muted-foreground">#2</span>
                   ) : index === 2 ? (
                     <span className="text-lg font-bold text-amber-600">#3</span>
                   ) : (
-                    <span className="text-lg font-bold text-slate-400">#{index + 1}</span>
+                    <span className="text-lg font-bold text-muted-foreground">#{index + 1}</span>
                   )}
                 </div>
 
                 {/* User Info */}
                 <div className="flex-1">
                   <div className="flex items-center gap-2">
-                    <span className="font-medium text-slate-900">{entry.userName}</span>
-                    <span className="text-xs px-2 py-0.5 bg-slate-100 text-slate-600 rounded-full">
+                    <span className="font-medium text-foreground">{entry.userName}</span>
+                    <span className="text-xs px-2 py-0.5 bg-muted text-muted-foreground rounded-full">
                       Lvl {entry.level}
                     </span>
                     {entry.streak >= 3 && (
@@ -2122,7 +2122,7 @@ function LeaderboardTab({
                       </span>
                     )}
                   </div>
-                  <div className="text-sm text-slate-500">
+                  <div className="text-sm text-muted-foreground">
                     {entry.tasksCompleted} tasks • {entry.badges} badges
                   </div>
                 </div>
@@ -2130,7 +2130,7 @@ function LeaderboardTab({
                 {/* Points */}
                 <div className="text-right">
                   <div className="text-xl font-bold text-status-success">{entry.periodPoints}</div>
-                  <div className="text-xs text-slate-500">pts</div>
+                  <div className="text-xs text-muted-foreground">pts</div>
                 </div>
               </div>
             ))}
@@ -2139,9 +2139,9 @@ function LeaderboardTab({
       </div>
 
       {/* Available Badges */}
-      <div className="bg-white rounded-xl border border-slate-200 overflow-hidden">
-        <div className="px-6 py-4 border-b border-slate-100">
-          <h3 className="font-semibold text-slate-900 flex items-center gap-2">
+      <div className="bg-card rounded-xl border border-border overflow-hidden">
+        <div className="px-6 py-4 border-b border-border">
+          <h3 className="font-semibold text-foreground flex items-center gap-2">
             Available Badges
           </h3>
         </div>
@@ -2149,14 +2149,14 @@ function LeaderboardTab({
           {badges.map(badge => (
             <div
               key={badge.id}
-              className={`p-4 rounded-xl border-2 ${badge.earnedCount > 0 ? 'border-status-success/30 bg-status-success/15' : 'border-slate-100 bg-slate-50'} text-center`}
+              className={`p-4 rounded-xl border-2 ${badge.earnedCount > 0 ? 'border-status-success/30 bg-status-success/15' : 'border-border bg-muted'} text-center`}
             >
               <div className="text-3xl mb-2">{badge.icon}</div>
-              <div className="font-medium text-slate-900 text-sm">{badge.name}</div>
-              <div className={`text-xs ${TIER_CONFIG[badge.tier]?.color || 'text-slate-500'} capitalize mb-1`}>
+              <div className="font-medium text-foreground text-sm">{badge.name}</div>
+              <div className={`text-xs ${TIER_CONFIG[badge.tier]?.color || 'text-muted-foreground'} capitalize mb-1`}>
                 {badge.tier}
               </div>
-              <div className="text-xs text-slate-500 mb-2">{badge.description}</div>
+              <div className="text-xs text-muted-foreground mb-2">{badge.description}</div>
               <div className="text-xs text-status-success font-medium">+{badge.points} pts</div>
               {badge.earnedCount > 0 && (
                 <div className="mt-2 text-xs text-status-success bg-status-success/15 rounded-full px-2 py-0.5">

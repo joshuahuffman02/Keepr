@@ -284,7 +284,7 @@ export default function AccessibilitySettingsPage() {
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.5, opacity: 0 }}
               transition={{ type: "spring", stiffness: 200, damping: 20 }}
-              className="bg-card dark:bg-slate-900 rounded-2xl p-8 max-w-md mx-4 text-center shadow-2xl"
+              className="bg-card dark:bg-muted rounded-2xl p-8 max-w-md mx-4 text-center shadow-2xl"
               onClick={(e) => e.stopPropagation()}
             >
               <motion.div
@@ -410,7 +410,7 @@ export default function AccessibilitySettingsPage() {
           <CardContent>
             <div className="grid md:grid-cols-3 gap-6">
               {/* Certification Badge */}
-              <div className="flex flex-col items-center text-center p-4 rounded-xl bg-card dark:bg-slate-800 border border-border dark:border-slate-700">
+              <div className="flex flex-col items-center text-center p-4 rounded-xl bg-card dark:bg-muted border border-border dark:border-border">
                 {badgeInfo ? (
                   <>
                     <motion.div
@@ -433,7 +433,7 @@ export default function AccessibilitySettingsPage() {
                   </>
                 ) : (
                   <>
-                    <div className="w-16 h-16 rounded-full flex items-center justify-center mb-3 bg-muted dark:bg-slate-700">
+                    <div className="w-16 h-16 rounded-full flex items-center justify-center mb-3 bg-muted dark:bg-muted">
                       <Accessibility className="w-8 h-8 text-muted-foreground" />
                     </div>
                     <Badge variant="secondary" className="mb-2">Not Certified</Badge>
@@ -450,7 +450,7 @@ export default function AccessibilitySettingsPage() {
                     <span className="font-medium text-foreground dark:text-white">{totalPoints} / {maxPoints}</span>
                   </div>
                   <div
-                    className="h-2 bg-muted dark:bg-slate-700 rounded-full overflow-hidden"
+                    className="h-2 bg-muted dark:bg-muted rounded-full overflow-hidden"
                     role="progressbar"
                     aria-valuenow={totalPoints}
                     aria-valuemax={maxPoints}
@@ -473,7 +473,7 @@ export default function AccessibilitySettingsPage() {
                     <span className="font-medium text-foreground dark:text-white">{completedRequired.length} / {requiredItems.length}</span>
                   </div>
                   <div
-                    className="h-2 bg-muted dark:bg-slate-700 rounded-full overflow-hidden"
+                    className="h-2 bg-muted dark:bg-muted rounded-full overflow-hidden"
                     role="progressbar"
                     aria-valuenow={completedRequired.length}
                     aria-valuemax={requiredItems.length}
@@ -490,7 +490,7 @@ export default function AccessibilitySettingsPage() {
               </div>
 
               {/* Scoping Requirement */}
-              <div className="p-4 rounded-xl bg-card dark:bg-slate-800 border border-border dark:border-slate-700">
+              <div className="p-4 rounded-xl bg-card dark:bg-muted border border-border dark:border-border">
                 <h4 className="font-medium text-foreground dark:text-white mb-2">Accessible Units</h4>
                 <div className="flex items-center gap-2 mb-2">
                   {meetsScoping ? (
@@ -511,7 +511,7 @@ export default function AccessibilitySettingsPage() {
         </Card>
 
         {/* Site Inventory */}
-        <Card className="dark:bg-slate-900 dark:border-slate-700">
+        <Card className="dark:bg-muted dark:border-border">
           <CardHeader>
             <CardTitle className="flex items-center justify-between text-foreground dark:text-white">
               <span>Site Inventory</span>
@@ -537,7 +537,7 @@ export default function AccessibilitySettingsPage() {
             ) : (
               <div className="space-y-4">
                 <div className="grid sm:grid-cols-2 gap-6">
-                  <div className="p-4 rounded-xl bg-muted/60 dark:bg-slate-800 border border-border dark:border-slate-700">
+                  <div className="p-4 rounded-xl bg-muted/60 dark:bg-muted border border-border dark:border-border">
                     <div className="text-3xl font-bold text-foreground dark:text-white">{totalSiteCount}</div>
                     <div className="text-sm text-muted-foreground dark:text-muted-foreground">Total Sites</div>
                     <p className="text-xs text-muted-foreground dark:text-muted-foreground mt-2">
@@ -686,7 +686,7 @@ export default function AccessibilitySettingsPage() {
                       ]
                     }
                   ].map(section => (
-                    <div key={section.num} className="p-4 rounded-lg bg-card dark:bg-slate-800 border border-border dark:border-slate-700">
+                    <div key={section.num} className="p-4 rounded-lg bg-card dark:bg-muted border border-border dark:border-border">
                       <div className="flex items-center gap-2 mb-3">
                         <div className="w-8 h-8 rounded-lg bg-status-info/15 text-status-info dark:bg-blue-900 flex items-center justify-center">
                           <span className="dark:text-blue-300 font-bold text-sm">{section.num}</span>
@@ -815,7 +815,7 @@ export default function AccessibilitySettingsPage() {
 
         {/* Quick wins */}
         {certificationLevel !== "excellence" && (
-          <div className="p-4 rounded-lg bg-muted/60 dark:bg-slate-800 border border-border dark:border-slate-700">
+          <div className="p-4 rounded-lg bg-muted/60 dark:bg-muted border border-border dark:border-border">
             <h4 className="font-semibold text-foreground dark:text-white mb-2">Quick Wins (Highest Point Items)</h4>
             <div className="space-y-2">
               {ADA_CHECKLIST
@@ -823,9 +823,9 @@ export default function AccessibilitySettingsPage() {
                 .sort((a, b) => b.points - a.points)
                 .slice(0, 5)
                 .map(item => (
-                  <div key={item.id} className="flex items-center justify-between p-2 bg-card dark:bg-slate-900 rounded border border-border dark:border-slate-700">
+                  <div key={item.id} className="flex items-center justify-between p-2 bg-card dark:bg-muted rounded border border-border dark:border-border">
                     <div>
-                      <span className="text-sm text-foreground dark:text-slate-300">{item.label}</span>
+                      <span className="text-sm text-foreground dark:text-muted-foreground">{item.label}</span>
                       {item.required && (
                         <Badge variant="outline" className="ml-2 text-xs">Required</Badge>
                       )}
@@ -838,7 +838,7 @@ export default function AccessibilitySettingsPage() {
         )}
 
         {/* Certification Tiers */}
-        <Card className="dark:bg-slate-900 dark:border-slate-700">
+        <Card className="dark:bg-muted dark:border-border">
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-foreground dark:text-white">
               <Award className="w-5 h-5 text-amber-500" />
@@ -866,7 +866,7 @@ export default function AccessibilitySettingsPage() {
                       "p-4 rounded-xl border-2 transition-all cursor-pointer",
                       isAchieved
                         ? `${tone.border} ${tone.bg}`
-                        : "border-border dark:border-slate-700 bg-card dark:bg-slate-800 hover:border-border dark:hover:border-slate-600 hover:shadow-lg"
+                        : "border-border dark:border-border bg-card dark:bg-muted hover:border-border dark:hover:border-border hover:shadow-lg"
                     )}
                     whileHover={prefersReducedMotion || isAchieved ? {} : { scale: 1.03, y: -2 }}
                     transition={{ type: "spring", stiffness: 300, damping: 20 }}
@@ -877,7 +877,7 @@ export default function AccessibilitySettingsPage() {
                           "w-8 h-8 rounded-full flex items-center justify-center",
                           isAchieved
                             ? tone.bg
-                            : "bg-muted dark:bg-slate-700"
+                            : "bg-muted dark:bg-muted"
                         )}
                         whileHover={prefersReducedMotion || isAchieved ? {} : { rotate: [0, -10, 10, -10, 0] }}
                         transition={{ duration: 0.5 }}
@@ -918,7 +918,7 @@ export default function AccessibilitySettingsPage() {
             <Card
               key={category}
               className={cn(
-                "transition-all duration-300 dark:bg-slate-900 dark:border-slate-700",
+                "transition-all duration-300 dark:bg-muted dark:border-border",
                 isComplete && "ring-2 ring-emerald-400 dark:ring-emerald-600 shadow-lg shadow-emerald-100 dark:shadow-emerald-900/20"
               )}
             >
@@ -952,7 +952,7 @@ export default function AccessibilitySettingsPage() {
                 {/* Required items section */}
                 {requiredInCategory.length > 0 && (
                   <div>
-                    <h4 className="text-sm font-semibold text-foreground dark:text-slate-300 mb-3 flex items-center gap-2">
+                    <h4 className="text-sm font-semibold text-foreground dark:text-muted-foreground mb-3 flex items-center gap-2">
                       <Shield className="w-4 h-4" /> Required for Compliance
                     </h4>
                     <div className="space-y-3">
@@ -964,7 +964,7 @@ export default function AccessibilitySettingsPage() {
                           return (
                             <div
                               key={item.id}
-                              className="flex items-start gap-3 p-3 rounded-lg border bg-muted/60 dark:bg-slate-800 border-border dark:border-slate-700 cursor-not-allowed"
+                              className="flex items-start gap-3 p-3 rounded-lg border bg-muted/60 dark:bg-muted border-border dark:border-border cursor-not-allowed"
                             >
                               <Checkbox
                                 checked={meetsScoping}
@@ -973,7 +973,7 @@ export default function AccessibilitySettingsPage() {
                               />
                               <div className="flex-1 min-w-0">
                                 <div className="flex items-center gap-2 flex-wrap">
-                                  <span className="font-medium text-foreground dark:text-slate-300">
+                                  <span className="font-medium text-foreground dark:text-muted-foreground">
                                     {item.label}
                                   </span>
                                   <Badge variant="secondary" className="text-xs flex items-center gap-1">
@@ -1006,11 +1006,11 @@ export default function AccessibilitySettingsPage() {
                             key={item.id}
                             className={cn(
                               "flex items-start gap-3 p-3 rounded-lg border transition-all cursor-pointer",
-                              "focus-within:ring-2 focus-within:ring-emerald-500 focus-within:ring-offset-2 dark:focus-within:ring-offset-slate-900",
+                              "focus-within:ring-2 focus-within:ring-emerald-500 focus-within:ring-offset-2 dark:focus-within:ring-offset-background",
                               "motion-safe:hover:translate-x-1 hover:shadow-md",
                               isChecked
                                 ? "border-emerald-200 dark:border-emerald-700 bg-emerald-50 dark:bg-emerald-950"
-                                : "border-border dark:border-slate-700 bg-card dark:bg-slate-800 hover:border-border dark:hover:border-slate-600"
+                                : "border-border dark:border-border bg-card dark:bg-muted hover:border-border dark:hover:border-border"
                             )}
                             onClick={() => toggleItem(item.id)}
                             whileTap={prefersReducedMotion ? {} : { scale: 0.99 }}
@@ -1061,7 +1061,7 @@ export default function AccessibilitySettingsPage() {
                 {/* Optional items section */}
                 {optionalInCategory.length > 0 && (
                   <div>
-                    <h4 className="text-sm font-semibold text-foreground dark:text-slate-300 mb-3 flex items-center gap-2">
+                    <h4 className="text-sm font-semibold text-foreground dark:text-muted-foreground mb-3 flex items-center gap-2">
                       <Sparkles className="w-4 h-4" /> Bonus Points
                     </h4>
                     <div className="space-y-3">
@@ -1073,11 +1073,11 @@ export default function AccessibilitySettingsPage() {
                             key={item.id}
                             className={cn(
                               "flex items-start gap-3 p-3 rounded-lg border transition-all cursor-pointer",
-                              "focus-within:ring-2 focus-within:ring-emerald-500 focus-within:ring-offset-2 dark:focus-within:ring-offset-slate-900",
+                              "focus-within:ring-2 focus-within:ring-emerald-500 focus-within:ring-offset-2 dark:focus-within:ring-offset-background",
                               "motion-safe:hover:translate-x-1 hover:shadow-md",
                               isChecked
                                 ? "border-emerald-200 dark:border-emerald-700 bg-emerald-50 dark:bg-emerald-950"
-                                : "border-border dark:border-slate-700 bg-card dark:bg-slate-800 hover:border-border dark:hover:border-slate-600"
+                                : "border-border dark:border-border bg-card dark:bg-muted hover:border-border dark:hover:border-border"
                             )}
                             onClick={() => toggleItem(item.id)}
                             whileTap={prefersReducedMotion ? {} : { scale: 0.99 }}
@@ -1127,7 +1127,7 @@ export default function AccessibilitySettingsPage() {
         })}
 
         {/* Resources */}
-        <Card className="dark:bg-slate-900 dark:border-slate-700">
+        <Card className="dark:bg-muted dark:border-border">
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-foreground dark:text-white">
               <Info className="w-5 h-5 text-blue-500" />
@@ -1140,7 +1140,7 @@ export default function AccessibilitySettingsPage() {
                 href="https://www.access-board.gov/ada/"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center gap-3 p-4 rounded-lg border border-border dark:border-slate-700 hover:border-blue-200 dark:hover:border-blue-700 hover:bg-blue-50 dark:hover:bg-blue-950 transition-colors"
+                className="flex items-center gap-3 p-4 rounded-lg border border-border dark:border-border hover:border-blue-200 dark:hover:border-blue-700 hover:bg-blue-50 dark:hover:bg-blue-950 transition-colors"
               >
                 <ExternalLink className="w-5 h-5 text-blue-500" aria-hidden="true" />
                 <div>
@@ -1152,7 +1152,7 @@ export default function AccessibilitySettingsPage() {
                 href="https://www.fs.usda.gov/recreation/programs/accessibility/"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center gap-3 p-4 rounded-lg border border-border dark:border-slate-700 hover:border-blue-200 dark:hover:border-blue-700 hover:bg-blue-50 dark:hover:bg-blue-950 transition-colors"
+                className="flex items-center gap-3 p-4 rounded-lg border border-border dark:border-border hover:border-blue-200 dark:hover:border-blue-700 hover:bg-blue-50 dark:hover:bg-blue-950 transition-colors"
               >
                 <ExternalLink className="w-5 h-5 text-blue-500" aria-hidden="true" />
                 <div>

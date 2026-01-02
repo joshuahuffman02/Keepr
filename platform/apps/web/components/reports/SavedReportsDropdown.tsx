@@ -63,12 +63,12 @@ export function SavedReportsDropdown({ campgroundId, onLoadReport }: SavedReport
           />
 
           {/* Dropdown */}
-          <div className="absolute right-0 mt-2 w-96 bg-white rounded-lg border border-slate-200 shadow-lg z-50">
-            <div className="p-3 border-b border-slate-100">
+          <div className="absolute right-0 mt-2 w-96 bg-card rounded-lg border border-border shadow-lg z-50">
+            <div className="p-3 border-b border-border">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <Clock className="h-4 w-4 text-slate-500" />
-                  <span className="font-medium text-slate-900 text-sm">Recent Saved Reports</span>
+                  <Clock className="h-4 w-4 text-muted-foreground" />
+                  <span className="font-medium text-foreground text-sm">Recent Saved Reports</span>
                 </div>
                 <Link href="/reports/saved" onClick={() => setIsOpen(false)}>
                   <span className="text-xs text-indigo-600 hover:text-indigo-700 hover:underline">
@@ -80,18 +80,18 @@ export function SavedReportsDropdown({ campgroundId, onLoadReport }: SavedReport
 
             <div className="max-h-96 overflow-y-auto">
               {reports.length === 0 ? (
-                <div className="p-4 text-center text-sm text-slate-500">
+                <div className="p-4 text-center text-sm text-muted-foreground">
                   No saved reports yet. Save your current configuration to get started.
                 </div>
               ) : (
-                <div className="divide-y divide-slate-100">
+                <div className="divide-y divide-border">
                   {reports.map((report) => {
                     const url = `/reports?tab=${report.tab}${report.subTab ? `&sub=${report.subTab}` : ""}${report.dateRange ? `&start=${report.dateRange.start}&end=${report.dateRange.end}` : ""}${report.filters?.status ? `&status=${report.filters.status}` : ""}${report.filters?.siteType ? `&siteType=${report.filters.siteType}` : ""}${report.filters?.groupBy ? `&groupBy=${report.filters.groupBy}` : ""}`;
 
                     return (
                       <div
                         key={report.id}
-                        className="p-3 hover:bg-slate-50 transition-colors"
+                        className="p-3 hover:bg-muted transition-colors"
                       >
                         <div className="flex items-start justify-between gap-2">
                           <Link
@@ -100,11 +100,11 @@ export function SavedReportsDropdown({ campgroundId, onLoadReport }: SavedReport
                             onClick={() => handleLoadReport(report)}
                           >
                             <div className="space-y-1">
-                              <div className="font-medium text-slate-900 text-sm truncate">
+                              <div className="font-medium text-foreground text-sm truncate">
                                 {report.name}
                               </div>
                               {report.description && (
-                                <div className="text-xs text-slate-500 truncate">
+                                <div className="text-xs text-muted-foreground truncate">
                                   {report.description}
                                 </div>
                               )}
@@ -118,7 +118,7 @@ export function SavedReportsDropdown({ campgroundId, onLoadReport }: SavedReport
                                   </Badge>
                                 )}
                                 {report.dateRange && (
-                                  <span className="text-xs text-slate-400">
+                                  <span className="text-xs text-muted-foreground">
                                     {report.dateRange.start} → {report.dateRange.end}
                                   </span>
                                 )}
@@ -142,7 +142,7 @@ export function SavedReportsDropdown({ campgroundId, onLoadReport }: SavedReport
                                   )}
                                 </div>
                               )}
-                              <div className="text-xs text-slate-400">
+                              <div className="text-xs text-muted-foreground">
                                 Saved {new Date(report.updatedAt).toLocaleDateString()}
                               </div>
                             </div>
@@ -163,7 +163,7 @@ export function SavedReportsDropdown({ campgroundId, onLoadReport }: SavedReport
             </div>
 
             {reports.length > 0 && (
-              <div className="p-2 border-t border-slate-100 bg-slate-50">
+              <div className="p-2 border-t border-border bg-muted">
                 <Link href="/reports/saved" onClick={() => setIsOpen(false)}>
                   <Button variant="ghost" size="sm" className="w-full text-xs">
                     View all saved reports ({listSavedReports(campgroundId).length})

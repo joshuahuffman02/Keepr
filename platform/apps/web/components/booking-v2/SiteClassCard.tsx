@@ -114,10 +114,10 @@ export function SiteClassCard({
   return (
     <motion.div
       className={cn(
-        "relative bg-white rounded-xl border-2 overflow-hidden transition-all cursor-pointer",
+        "relative bg-card rounded-xl border-2 overflow-hidden transition-all cursor-pointer",
         isSelected
           ? "border-emerald-500 ring-2 ring-emerald-500/20 shadow-lg"
-          : "border-slate-200 hover:border-slate-300 hover:shadow-md",
+          : "border-border hover:border-border hover:shadow-md",
         className
       )}
       onClick={onSelect}
@@ -173,7 +173,7 @@ export function SiteClassCard({
               "shadow-md",
               availableCount <= 2
                 ? "bg-amber-100 text-amber-800"
-                : "bg-white/90 text-slate-700"
+                : "bg-card/90 text-foreground"
             )}
           >
             {availableCount} available
@@ -186,9 +186,9 @@ export function SiteClassCard({
         {/* Title and price */}
         <div className="flex items-start justify-between gap-2">
           <div>
-            <h3 className="font-semibold text-slate-900">{siteClass.name}</h3>
+            <h3 className="font-semibold text-foreground">{siteClass.name}</h3>
             {siteClass.description && (
-              <p className="text-sm text-slate-500 line-clamp-1 mt-0.5">
+              <p className="text-sm text-muted-foreground line-clamp-1 mt-0.5">
                 {siteClass.description}
               </p>
             )}
@@ -197,7 +197,7 @@ export function SiteClassCard({
             <div className="text-lg font-bold text-emerald-600">
               {formatCurrency(pricePerNight)}
             </div>
-            <div className="text-xs text-slate-500">/ night</div>
+            <div className="text-xs text-muted-foreground">/ night</div>
           </div>
         </div>
 
@@ -207,9 +207,9 @@ export function SiteClassCard({
             {features.slice(0, 3).map((feature, idx) => (
               <div
                 key={idx}
-                className="flex items-center gap-1 text-xs text-slate-600 bg-slate-50 rounded-full px-2 py-1"
+                className="flex items-center gap-1 text-xs text-muted-foreground bg-muted rounded-full px-2 py-1"
               >
-                <feature.icon className="h-3 w-3 text-slate-400" />
+                <feature.icon className="h-3 w-3 text-muted-foreground" />
                 <span>{feature.label}</span>
               </div>
             ))}
@@ -218,11 +218,11 @@ export function SiteClassCard({
 
         {/* Total price */}
         {nights > 1 && (
-          <div className="flex items-center justify-between pt-2 border-t border-slate-100">
-            <span className="text-sm text-slate-500">
+          <div className="flex items-center justify-between pt-2 border-t border-border">
+            <span className="text-sm text-muted-foreground">
               {nights} nights total
             </span>
-            <span className="font-semibold text-slate-900">
+            <span className="font-semibold text-foreground">
               {formatCurrency(totalPrice)}
             </span>
           </div>
@@ -287,10 +287,10 @@ export function SiteClassEmpty({
   onChangeDates?: () => void;
 }) {
   return (
-    <div className="text-center py-12 bg-slate-50 rounded-xl border border-slate-200 border-dashed">
-      <Tent className="h-12 w-12 text-slate-300 mx-auto mb-4" />
-      <p className="text-slate-600 font-medium">{message}</p>
-      <p className="text-sm text-slate-500 mt-1">
+    <div className="text-center py-12 bg-muted rounded-xl border border-border border-dashed">
+      <Tent className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+      <p className="text-muted-foreground font-medium">{message}</p>
+      <p className="text-sm text-muted-foreground mt-1">
         Try different dates or check back later
       </p>
       {onChangeDates && (

@@ -178,7 +178,7 @@ function getStatusColor(status: string): string {
     case "critical":
       return "text-red-400";
     default:
-      return "text-slate-400";
+      return "text-muted-foreground";
   }
 }
 
@@ -191,7 +191,7 @@ function getStatusBgColor(status: string): string {
     case "critical":
       return "bg-red-500/10 border-red-500/30";
     default:
-      return "bg-slate-700/50 border-slate-600";
+      return "bg-muted/50 border-border";
   }
 }
 
@@ -238,7 +238,7 @@ export default function ExecutiveDashboardPage() {
               </Badge>
             )}
           </div>
-          <p className="text-slate-400 mt-1">Platform-wide performance at a glance</p>
+          <p className="text-muted-foreground mt-1">Platform-wide performance at a glance</p>
         </div>
         <DateRangePicker value={dateRange} onChange={setDateRange} />
       </div>
@@ -263,7 +263,7 @@ export default function ExecutiveDashboardPage() {
         {data.kpis.map((kpi, idx) => (
           <Card key={idx} className={`border ${getStatusBgColor(kpi.status)}`}>
             <CardContent className="p-4">
-              <p className="text-xs text-slate-400 mb-1">{kpi.label}</p>
+              <p className="text-xs text-muted-foreground mb-1">{kpi.label}</p>
               <p className={`text-2xl font-bold ${getStatusColor(kpi.status)}`}>
                 {formatValue(kpi.value as number, kpi.format)}
               </p>
@@ -274,7 +274,7 @@ export default function ExecutiveDashboardPage() {
                   ) : kpi.changeType === "decrease" ? (
                     <ArrowDownRight className="h-3 w-3 text-red-400" />
                   ) : (
-                    <Minus className="h-3 w-3 text-slate-400" />
+                    <Minus className="h-3 w-3 text-muted-foreground" />
                   )}
                   <span className={`text-xs ${kpi.format === "percentage" && kpi.change < 0 ? "text-green-400" : kpi.change >= 0 ? "text-green-400" : "text-red-400"}`}>
                     {kpi.change > 0 ? "+" : ""}{kpi.change.toFixed(1)}{kpi.format === "score" ? " pts" : "%"}
@@ -289,7 +289,7 @@ export default function ExecutiveDashboardPage() {
       {/* Main Content Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Alerts & Issues */}
-        <Card className="bg-slate-800/50 border-slate-700">
+        <Card className="bg-muted/50 border-border">
           <CardHeader>
             <CardTitle className="text-lg text-white flex items-center gap-2">
               <AlertTriangle className="h-5 w-5 text-amber-400" />
@@ -300,7 +300,7 @@ export default function ExecutiveDashboardPage() {
             {data.alerts.length === 0 ? (
               <div className="text-center py-6">
                 <CheckCircle className="h-10 w-10 text-green-400 mx-auto mb-2" />
-                <p className="text-slate-400">All systems healthy</p>
+                <p className="text-muted-foreground">All systems healthy</p>
               </div>
             ) : (
               <div className="space-y-3">
@@ -318,7 +318,7 @@ export default function ExecutiveDashboardPage() {
                         <p className={`text-sm font-medium ${alert.severity === "critical" ? "text-red-400" : "text-amber-400"}`}>
                           {alert.campgroundName}
                         </p>
-                        <p className="text-xs text-slate-400 mt-1">
+                        <p className="text-xs text-muted-foreground mt-1">
                           {alert.type === "nps" ? `NPS: ${alert.value}` : `Rate: ${alert.value.toFixed(1)}%`}
                         </p>
                       </div>
@@ -334,7 +334,7 @@ export default function ExecutiveDashboardPage() {
         </Card>
 
         {/* Top Performers */}
-        <Card className="bg-slate-800/50 border-slate-700">
+        <Card className="bg-muted/50 border-border">
           <CardHeader>
             <CardTitle className="text-lg text-white flex items-center gap-2">
               <Star className="h-5 w-5 text-amber-400" />
@@ -348,9 +348,9 @@ export default function ExecutiveDashboardPage() {
                   <div className="flex items-center gap-3">
                     <span className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${
                       idx === 0 ? "bg-amber-500 text-black" :
-                      idx === 1 ? "bg-slate-400 text-black" :
+                      idx === 1 ? "bg-muted text-black" :
                       idx === 2 ? "bg-amber-700 text-white" :
-                      "bg-slate-600 text-slate-300"
+                      "bg-muted text-muted-foreground"
                     }`}>
                       {p.rank}
                     </span>
@@ -366,7 +366,7 @@ export default function ExecutiveDashboardPage() {
         </Card>
 
         {/* Recent Activity */}
-        <Card className="bg-slate-800/50 border-slate-700">
+        <Card className="bg-muted/50 border-border">
           <CardHeader>
             <CardTitle className="text-lg text-white flex items-center gap-2">
               <Activity className="h-5 w-5 text-blue-400" />
@@ -381,7 +381,7 @@ export default function ExecutiveDashboardPage() {
                     activity.type === "reservation" ? "bg-green-500/20" :
                     activity.type === "nps_response" ? "bg-blue-500/20" :
                     activity.type === "cancellation" ? "bg-red-500/20" :
-                    "bg-slate-600"
+                    "bg-muted"
                   }`}>
                     {activity.type === "reservation" ? (
                       <DollarSign className="h-3 w-3 text-green-400" />
@@ -394,10 +394,10 @@ export default function ExecutiveDashboardPage() {
                     )}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-xs text-slate-300 truncate">{activity.description}</p>
-                    <p className="text-xs text-slate-500">{activity.campgroundName}</p>
+                    <p className="text-xs text-muted-foreground truncate">{activity.description}</p>
+                    <p className="text-xs text-muted-foreground">{activity.campgroundName}</p>
                   </div>
-                  <span className="text-xs text-slate-500">
+                  <span className="text-xs text-muted-foreground">
                     {new Date(activity.timestamp).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
                   </span>
                 </div>
@@ -409,28 +409,28 @@ export default function ExecutiveDashboardPage() {
 
       {/* Needs Attention */}
       {data.needsAttention.length > 0 && (
-        <Card className="bg-slate-800/50 border-slate-700">
+        <Card className="bg-muted/50 border-border">
           <CardHeader>
             <CardTitle className="text-lg text-white flex items-center gap-2">
               <Building2 className="h-5 w-5 text-red-400" />
               Campgrounds Needing Attention
             </CardTitle>
-            <p className="text-sm text-slate-400">Prioritized list of properties requiring intervention</p>
+            <p className="text-sm text-muted-foreground">Prioritized list of properties requiring intervention</p>
           </CardHeader>
           <CardContent>
             <div className="overflow-x-auto">
               <table className="w-full">
                 <thead>
-                  <tr className="border-b border-slate-700">
-                    <th className="text-left py-3 px-4 text-sm font-medium text-slate-400">Campground</th>
-                    <th className="text-left py-3 px-4 text-sm font-medium text-slate-400">Issue</th>
-                    <th className="text-right py-3 px-4 text-sm font-medium text-slate-400">Metric</th>
-                    <th className="text-left py-3 px-4 text-sm font-medium text-slate-400">Recommendation</th>
+                  <tr className="border-b border-border">
+                    <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground">Campground</th>
+                    <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground">Issue</th>
+                    <th className="text-right py-3 px-4 text-sm font-medium text-muted-foreground">Metric</th>
+                    <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground">Recommendation</th>
                   </tr>
                 </thead>
                 <tbody>
                   {data.needsAttention.map((item, idx) => (
-                    <tr key={item.campgroundId} className={idx % 2 === 0 ? "bg-slate-800/30" : ""}>
+                    <tr key={item.campgroundId} className={idx % 2 === 0 ? "bg-muted/30" : ""}>
                       <td className="py-3 px-4">
                         <span className="text-sm text-white">{item.campgroundName}</span>
                       </td>
@@ -445,7 +445,7 @@ export default function ExecutiveDashboardPage() {
                         </span>
                       </td>
                       <td className="py-3 px-4">
-                        <span className="text-xs text-slate-400">{item.recommendation}</span>
+                        <span className="text-xs text-muted-foreground">{item.recommendation}</span>
                       </td>
                     </tr>
                   ))}
@@ -458,20 +458,20 @@ export default function ExecutiveDashboardPage() {
 
       {/* Quick Stats Footer */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <div className="bg-slate-800/30 rounded-lg p-4 border border-slate-700">
-          <p className="text-xs text-slate-500">Total Campgrounds</p>
+        <div className="bg-muted/30 rounded-lg p-4 border border-border">
+          <p className="text-xs text-muted-foreground">Total Campgrounds</p>
           <p className="text-2xl font-bold text-white">47</p>
         </div>
-        <div className="bg-slate-800/30 rounded-lg p-4 border border-slate-700">
-          <p className="text-xs text-slate-500">Healthy (NPS 30+)</p>
+        <div className="bg-muted/30 rounded-lg p-4 border border-border">
+          <p className="text-xs text-muted-foreground">Healthy (NPS 30+)</p>
           <p className="text-2xl font-bold text-green-400">38</p>
         </div>
-        <div className="bg-slate-800/30 rounded-lg p-4 border border-slate-700">
-          <p className="text-xs text-slate-500">At Risk (NPS 0-30)</p>
+        <div className="bg-muted/30 rounded-lg p-4 border border-border">
+          <p className="text-xs text-muted-foreground">At Risk (NPS 0-30)</p>
           <p className="text-2xl font-bold text-amber-400">7</p>
         </div>
-        <div className="bg-slate-800/30 rounded-lg p-4 border border-slate-700">
-          <p className="text-xs text-slate-500">Critical (NPS &lt;0)</p>
+        <div className="bg-muted/30 rounded-lg p-4 border border-border">
+          <p className="text-xs text-muted-foreground">Critical (NPS &lt;0)</p>
           <p className="text-2xl font-bold text-red-400">2</p>
         </div>
       </div>

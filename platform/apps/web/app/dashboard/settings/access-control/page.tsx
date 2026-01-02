@@ -88,7 +88,7 @@ export default function AccessControlSettingsPage() {
   if (whoamiLoading) {
     return (
       <div>
-        <div className="text-sm text-slate-600">Loading access control…</div>
+        <div className="text-sm text-muted-foreground">Loading access control…</div>
       </div>
     );
   }
@@ -96,7 +96,7 @@ export default function AccessControlSettingsPage() {
   if (!allowed || !campgroundId) {
     return (
       <div>
-        <div className="text-sm text-slate-600">Access control is restricted to authorized users.</div>
+        <div className="text-sm text-muted-foreground">Access control is restricted to authorized users.</div>
       </div>
     );
   }
@@ -145,12 +145,12 @@ export default function AccessControlSettingsPage() {
           <CardTitle>Provider setup</CardTitle>
           <Badge variant="outline">Per-campground</Badge>
         </CardHeader>
-        <CardContent className="text-sm text-slate-700 space-y-4">
+        <CardContent className="text-sm text-foreground space-y-4">
           <div className="grid gap-3 sm:grid-cols-2">
             <div className="space-y-1">
-              <Label className="text-xs text-slate-500">Provider</Label>
+              <Label className="text-xs text-muted-foreground">Provider</Label>
               <select
-                className="border border-slate-200 rounded px-2 py-1 text-sm"
+                className="border border-border rounded px-2 py-1 text-sm"
                 value={selectedProvider}
                 onChange={(e) => setSelectedProvider(e.target.value as typeof selectedProvider)}
               >
@@ -162,13 +162,13 @@ export default function AccessControlSettingsPage() {
               </select>
             </div>
             <div className="space-y-1">
-              <Label className="text-xs text-slate-500">Display name</Label>
+              <Label className="text-xs text-muted-foreground">Display name</Label>
               <Input value={displayName} onChange={(e) => setDisplayName(e.target.value)} placeholder="Front gate" />
             </div>
             <div className="space-y-1">
-              <Label className="text-xs text-slate-500">Status</Label>
+              <Label className="text-xs text-muted-foreground">Status</Label>
               <select
-                className="border border-slate-200 rounded px-2 py-1 text-sm"
+                className="border border-border rounded px-2 py-1 text-sm"
                 value={status}
                 onChange={(e) => setStatus(e.target.value)}
               >
@@ -177,7 +177,7 @@ export default function AccessControlSettingsPage() {
               </select>
             </div>
             <div className="space-y-1">
-              <Label className="text-xs text-slate-500 flex items-center gap-1">
+              <Label className="text-xs text-muted-foreground flex items-center gap-1">
                 Webhook secret <KeyRound className="h-3 w-3" />
               </Label>
               <Input
@@ -189,14 +189,14 @@ export default function AccessControlSettingsPage() {
           </div>
 
           <div className="space-y-1">
-            <Label className="text-xs text-slate-500">Credentials (JSON)</Label>
+            <Label className="text-xs text-muted-foreground">Credentials (JSON)</Label>
             <Textarea
               className="font-mono text-xs"
               rows={10}
               value={credentialsText}
               onChange={(e) => setCredentialsText(e.target.value)}
             />
-            <p className="text-[11px] text-slate-500">
+            <p className="text-[11px] text-muted-foreground">
               Store API keys, org/site ids, or other provider config. This is saved server-side.
             </p>
           </div>
@@ -208,11 +208,11 @@ export default function AccessControlSettingsPage() {
           </div>
 
           <div className="border-t pt-3 space-y-2">
-            <div className="text-xs text-slate-500">
-              Webhook endpoint: <code className="bg-slate-50 px-1 py-0.5 rounded">/api/access/webhooks/{selectedProvider}</code>
+            <div className="text-xs text-muted-foreground">
+              Webhook endpoint: <code className="bg-muted px-1 py-0.5 rounded">/api/access/webhooks/{selectedProvider}</code>
             </div>
-            <div className="text-xs text-slate-500">
-              Pass <code className="bg-slate-50 px-1 py-0.5 rounded">x-signature</code> with HMAC of raw body.
+            <div className="text-xs text-muted-foreground">
+              Pass <code className="bg-muted px-1 py-0.5 rounded">x-signature</code> with HMAC of raw body.
             </div>
           </div>
         </CardContent>

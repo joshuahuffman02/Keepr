@@ -303,7 +303,7 @@ export default function DevelopersSettingsPage() {
                                             <div className="flex items-center gap-2">
                                                 <code
                                                     id="client-id"
-                                                    className="flex-1 rounded-lg bg-slate-100 px-3 py-2.5 font-mono text-sm dark:bg-slate-800"
+                                                    className="flex-1 rounded-lg bg-muted px-3 py-2.5 font-mono text-sm dark:bg-muted"
                                                 >
                                                     {createdClientId}
                                                 </code>
@@ -366,19 +366,19 @@ export default function DevelopersSettingsPage() {
                                                     )}
                                                 </Button>
                                             </div>
-                                            <p className="flex items-start gap-2 text-xs text-slate-500">
+                                            <p className="flex items-start gap-2 text-xs text-muted-foreground">
                                                 <Lock className="mt-0.5 h-3 w-3 shrink-0" />
                                                 Store this securely. For security reasons, we can't show it again.
                                             </p>
                                         </div>
 
                                         {/* Security tips */}
-                                        <div className="rounded-lg bg-slate-50 p-4 dark:bg-slate-800/50">
+                                        <div className="rounded-lg bg-muted p-4 dark:bg-muted/50">
                                             <h4 className="mb-2 flex items-center gap-2 text-sm font-medium">
                                                 <Shield className="h-4 w-4 text-violet-600" />
                                                 Security Best Practices
                                             </h4>
-                                            <ul className="space-y-1 text-xs text-slate-600 dark:text-slate-400">
+                                            <ul className="space-y-1 text-xs text-muted-foreground dark:text-muted-foreground">
                                                 <li>• Never commit secrets to version control</li>
                                                 <li>• Use environment variables in production</li>
                                                 <li>• Rotate secrets regularly (every 90 days)</li>
@@ -405,7 +405,7 @@ export default function DevelopersSettingsPage() {
                                                 onKeyDown={(e) => e.key === "Enter" && handleCreate()}
                                                 aria-describedby="client-name-hint"
                                             />
-                                            <p id="client-name-hint" className="text-xs text-slate-500">
+                                            <p id="client-name-hint" className="text-xs text-muted-foreground">
                                                 Choose a descriptive name to identify this integration later
                                             </p>
                                         </div>
@@ -494,7 +494,7 @@ export default function DevelopersSettingsPage() {
                                     <h4 className="mb-2 text-sm font-medium text-muted-foreground">
                                         Authentication
                                     </h4>
-                                    <pre className="overflow-x-auto rounded-lg bg-slate-900 p-4 text-xs text-slate-100">
+                                    <pre className="overflow-x-auto rounded-lg bg-muted p-4 text-xs text-foreground">
                                         <code>{codeExample}</code>
                                     </pre>
                                 </div>
@@ -585,7 +585,7 @@ export default function DevelopersSettingsPage() {
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className="rounded-xl border bg-white shadow-sm dark:bg-slate-950"
+                    className="rounded-xl border bg-card shadow-sm dark:bg-muted"
                 >
                     <Table>
                         <TableHeader>
@@ -612,13 +612,13 @@ export default function DevelopersSettingsPage() {
                                             <div className={`flex h-9 w-9 items-center justify-center rounded-lg transition-colors ${
                                                 client.isActive
                                                     ? "bg-violet-100 text-violet-600 dark:bg-violet-900/30"
-                                                    : "bg-slate-100 text-slate-400 dark:bg-slate-800"
+                                                    : "bg-muted text-muted-foreground dark:bg-muted"
                                             }`}>
                                                 <Key className="h-4 w-4" />
                                             </div>
                                             <div>
                                                 <p className="font-medium">{client.name}</p>
-                                                <p className="text-xs text-slate-500">
+                                                <p className="text-xs text-muted-foreground">
                                                     {client.isActive ? "Ready to use" : "Deactivated"}
                                                 </p>
                                             </div>
@@ -626,7 +626,7 @@ export default function DevelopersSettingsPage() {
                                     </TableCell>
                                     <TableCell>
                                         <div className="flex items-center gap-2">
-                                            <code className="rounded bg-slate-100 px-2 py-1 font-mono text-xs dark:bg-slate-800">
+                                            <code className="rounded bg-muted px-2 py-1 font-mono text-xs dark:bg-muted">
                                                 {client.clientId}
                                             </code>
                                             <Button
@@ -644,17 +644,17 @@ export default function DevelopersSettingsPage() {
                                             </Button>
                                         </div>
                                     </TableCell>
-                                    <TableCell className="text-slate-500">
+                                    <TableCell className="text-muted-foreground">
                                         <div className="flex items-center gap-1.5">
                                             <Clock className="h-3.5 w-3.5" />
                                             {format(new Date(client.createdAt), "MMM d, yyyy")}
                                         </div>
                                     </TableCell>
-                                    <TableCell className="text-slate-500">
+                                    <TableCell className="text-muted-foreground">
                                         {client.lastUsedAt ? (
                                             formatDistanceToNow(new Date(client.lastUsedAt), { addSuffix: true })
                                         ) : (
-                                            <span className="text-slate-400">Never</span>
+                                            <span className="text-muted-foreground">Never</span>
                                         )}
                                     </TableCell>
                                     <TableCell>
@@ -665,7 +665,7 @@ export default function DevelopersSettingsPage() {
                                                 aria-label={`${client.isActive ? "Deactivate" : "Activate"} ${client.name}`}
                                             />
                                             <span className={`text-xs font-medium ${
-                                                client.isActive ? "text-status-success" : "text-slate-400"
+                                                client.isActive ? "text-status-success" : "text-muted-foreground"
                                             }`}>
                                                 {client.isActive ? "Active" : "Inactive"}
                                             </span>
@@ -682,7 +682,7 @@ export default function DevelopersSettingsPage() {
                                                         title="Rotate Secret"
                                                         aria-label={`Rotate secret for ${client.name}`}
                                                     >
-                                                        <RefreshCw className="h-4 w-4 text-slate-500" />
+                                                        <RefreshCw className="h-4 w-4 text-muted-foreground" />
                                                     </Button>
                                                 }
                                                 title="Rotate client secret?"
@@ -718,9 +718,9 @@ export default function DevelopersSettingsPage() {
                     </Table>
 
                     {/* Rate Limit Info */}
-                    <div className="border-t bg-slate-50 px-6 py-4 dark:bg-slate-900">
+                    <div className="border-t bg-muted px-6 py-4 dark:bg-muted">
                         <div className="flex items-center justify-between text-sm">
-                            <div className="flex items-center gap-2 text-slate-500">
+                            <div className="flex items-center gap-2 text-muted-foreground">
                                 <Shield className="h-4 w-4" />
                                 <span>Rate limit: 1,000 requests/minute per key</span>
                             </div>

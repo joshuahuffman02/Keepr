@@ -69,7 +69,7 @@ export default function AdminCampgroundsListPage() {
             <div className="flex items-center justify-between">
                 <div>
                     <h1 className="text-2xl font-bold text-white">All Campgrounds</h1>
-                    <p className="text-slate-400 mt-1">
+                    <p className="text-muted-foreground mt-1">
                         Manage all campgrounds on the platform
                     </p>
                 </div>
@@ -84,19 +84,19 @@ export default function AdminCampgroundsListPage() {
 
             <div className="flex items-center gap-3">
                 <div className="relative flex-1 max-w-md">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" />
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                     <input
                         type="text"
                         value={search}
                         onChange={(e) => setSearch(e.target.value)}
                         placeholder="Search by name, slug, city, or state..."
-                        className="w-full pl-10 pr-4 py-2 bg-slate-800 border border-slate-700 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="w-full pl-10 pr-4 py-2 bg-muted border border-border rounded-lg text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
                 </div>
                 <button
                     onClick={loadCampgrounds}
                     disabled={loading}
-                    className="px-4 py-2 bg-slate-800 text-slate-300 border border-slate-700 rounded-lg hover:bg-slate-700 disabled:opacity-50 transition-colors"
+                    className="px-4 py-2 bg-muted text-muted-foreground border border-border rounded-lg hover:bg-muted disabled:opacity-50 transition-colors"
                 >
                     {loading ? "Loading..." : "Refresh"}
                 </button>
@@ -108,16 +108,16 @@ export default function AdminCampgroundsListPage() {
                 </div>
             )}
 
-            <div className="bg-slate-800 rounded-lg border border-slate-700 overflow-hidden">
-                <div className="grid gap-px bg-slate-700">
+            <div className="bg-muted rounded-lg border border-border overflow-hidden">
+                <div className="grid gap-px bg-muted">
                     {loading && campgrounds.length === 0 && (
-                        <div className="bg-slate-800 p-8 text-center text-slate-400">
+                        <div className="bg-muted p-8 text-center text-muted-foreground">
                             Loading campgrounds...
                         </div>
                     )}
 
                     {!loading && filtered.length === 0 && (
-                        <div className="bg-slate-800 p-8 text-center text-slate-400">
+                        <div className="bg-muted p-8 text-center text-muted-foreground">
                             {search ? "No campgrounds match your search" : "No campgrounds found"}
                         </div>
                     )}
@@ -125,11 +125,11 @@ export default function AdminCampgroundsListPage() {
                     {filtered.map((campground) => (
                         <div
                             key={campground.id}
-                            className="bg-slate-800 p-4 flex items-center justify-between gap-4"
+                            className="bg-muted p-4 flex items-center justify-between gap-4"
                         >
                             <div className="flex items-start gap-4">
-                                <div className="p-2 bg-slate-700 rounded-lg">
-                                    <Building2 className="h-5 w-5 text-slate-400" />
+                                <div className="p-2 bg-muted rounded-lg">
+                                    <Building2 className="h-5 w-5 text-muted-foreground" />
                                 </div>
                                 <div>
                                     <div className="flex items-center gap-2">
@@ -140,7 +140,7 @@ export default function AdminCampgroundsListPage() {
                                             </span>
                                         )}
                                     </div>
-                                    <div className="flex items-center gap-3 text-sm text-slate-400 mt-1">
+                                    <div className="flex items-center gap-3 text-sm text-muted-foreground mt-1">
                                         <span className="flex items-center gap-1">
                                             <Globe className="h-3 w-3" />
                                             /{campground.slug}
@@ -153,7 +153,7 @@ export default function AdminCampgroundsListPage() {
                                         )}
                                     </div>
                                     {campground.email && (
-                                        <div className="text-xs text-slate-500 mt-1">{campground.email}</div>
+                                        <div className="text-xs text-muted-foreground mt-1">{campground.email}</div>
                                     )}
                                 </div>
                             </div>
@@ -162,14 +162,14 @@ export default function AdminCampgroundsListPage() {
                                 <Link
                                     href={`/park/${campground.slug}`}
                                     target="_blank"
-                                    className="p-2 text-slate-400 hover:text-white hover:bg-slate-700 rounded-lg transition-colors"
+                                    className="p-2 text-muted-foreground hover:text-foreground hover:bg-muted rounded-lg transition-colors"
                                     title="View public page"
                                 >
                                     <ExternalLink className="h-4 w-4" />
                                 </Link>
                                 <Link
                                     href={`/campgrounds/${campground.id}`}
-                                    className="px-3 py-1.5 text-sm bg-slate-700 text-slate-300 rounded-lg hover:bg-slate-600 transition-colors"
+                                    className="px-3 py-1.5 text-sm bg-muted text-muted-foreground rounded-lg hover:bg-muted transition-colors"
                                 >
                                     Manage
                                 </Link>
@@ -179,7 +179,7 @@ export default function AdminCampgroundsListPage() {
                 </div>
             </div>
 
-            <div className="text-sm text-slate-500">
+            <div className="text-sm text-muted-foreground">
                 Showing {filtered.length} of {campgrounds.length} campgrounds
             </div>
         </div>

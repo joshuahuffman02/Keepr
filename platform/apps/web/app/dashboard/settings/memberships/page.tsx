@@ -84,8 +84,8 @@ export default function MembershipSettingsPage() {
             <div className="space-y-6">
                 <div className="flex items-center justify-between">
                     <div>
-                        <h1 className="text-2xl font-bold text-slate-900">Membership Programs</h1>
-                        <p className="text-slate-500">Configure loyalty tiers and membership benefits.</p>
+                        <h1 className="text-2xl font-bold text-foreground">Membership Programs</h1>
+                        <p className="text-muted-foreground">Configure loyalty tiers and membership benefits.</p>
                     </div>
                     <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
                         <DialogTrigger asChild>
@@ -162,15 +162,15 @@ export default function MembershipSettingsPage() {
                     </CardHeader>
                     <CardContent className="grid gap-4 md:grid-cols-2">
                         <div className="space-y-1">
-                            <div className="font-semibold text-slate-900">Buy-in</div>
-                            <p className="text-sm text-slate-600">
+                            <div className="font-semibold text-foreground">Buy-in</div>
+                            <p className="text-sm text-muted-foreground">
                                 Sell a membership tier by charging the price above (e.g., via POS or a manual charge), then assign the member to that tier in CRM.
                                 Discounts/benefits are determined by the tier’s settings here.
                             </p>
                         </div>
                         <div className="space-y-1">
-                            <div className="font-semibold text-slate-900">Auto-earn (planned)</div>
-                            <p className="text-sm text-slate-600">
+                            <div className="font-semibold text-foreground">Auto-earn (planned)</div>
+                            <p className="text-sm text-muted-foreground">
                                 Auto-enrollment after X stays or Y spend is not wired yet. If you need this, capture the target thresholds and we’ll add the trigger once the rule engine ships.
                             </p>
                         </div>
@@ -193,7 +193,7 @@ export default function MembershipSettingsPage() {
                             </CardHeader>
                             <CardContent>
                                 <div className="space-y-4">
-                                    <div className="flex items-center justify-between text-sm text-slate-600">
+                                    <div className="flex items-center justify-between text-sm text-muted-foreground">
                                         <div className="flex items-center gap-2">
                                             <Tag className="w-4 h-4" />
                                             <span>${(type.price / 100).toFixed(2)}</span>
@@ -207,7 +207,7 @@ export default function MembershipSettingsPage() {
                                             <span>{type.durationDays} Days</span>
                                         </div>
                                     </div>
-                                    <div className="flex gap-2 pt-4 border-t border-slate-100 justify-end">
+                                    <div className="flex gap-2 pt-4 border-t border-border justify-end">
                                         <ConfirmDialog
                                             trigger={
                                                 <Button
@@ -231,10 +231,10 @@ export default function MembershipSettingsPage() {
                         </Card>
                     ))}
                     {types?.length === 0 && (
-                        <div className="col-span-full text-center py-12 bg-slate-50 rounded-lg border border-dashed border-slate-200">
-                            <Tag className="w-12 h-12 text-slate-300 mx-auto mb-4" />
-                            <h3 className="text-lg font-medium text-slate-900">No membership programs</h3>
-                            <p className="text-slate-500">Create a membership type to start offering benefits.</p>
+                        <div className="col-span-full text-center py-12 bg-muted rounded-lg border border-dashed border-border">
+                            <Tag className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
+                            <h3 className="text-lg font-medium text-foreground">No membership programs</h3>
+                            <p className="text-muted-foreground">Create a membership type to start offering benefits.</p>
                         </div>
                     )}
                 </div>

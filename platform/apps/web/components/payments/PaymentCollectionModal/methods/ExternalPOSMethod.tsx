@@ -22,12 +22,12 @@ export default function ExternalPOSMethod({
     <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center gap-3 pb-4 border-b">
-        <div className="p-2 bg-slate-100 rounded-lg">
-          <CreditCard className="h-5 w-5 text-slate-600" />
+        <div className="p-2 bg-muted rounded-lg">
+          <CreditCard className="h-5 w-5 text-muted-foreground" />
         </div>
         <div>
-          <h3 className="font-semibold text-slate-900">External POS</h3>
-          <p className="text-sm text-slate-500">
+          <h3 className="font-semibold text-foreground">External POS</h3>
+          <p className="text-sm text-muted-foreground">
             Record a payment from Square, Clover, or another terminal
           </p>
         </div>
@@ -49,7 +49,7 @@ export default function ExternalPOSMethod({
       </div>
 
       {/* Info about external POS */}
-      <div className="text-sm text-slate-600 space-y-2">
+      <div className="text-sm text-muted-foreground space-y-2">
         <p>External POS recording is useful for:</p>
         <ul className="list-disc list-inside space-y-1 ml-2">
           <li>Recording payments from Square terminals</li>

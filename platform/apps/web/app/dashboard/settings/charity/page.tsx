@@ -273,7 +273,7 @@ export default function CharitySettingsPage() {
             <motion.div
               initial={prefersReducedMotion ? {} : { opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
-              className="mt-6 p-4 rounded-xl bg-card/70 dark:bg-slate-800/70 backdrop-blur border border-amber-200 dark:border-amber-800"
+              className="mt-6 p-4 rounded-xl bg-card/70 dark:bg-muted/70 backdrop-blur border border-amber-200 dark:border-amber-800"
             >
               <div className="flex items-center gap-3">
                 <PartyPopper className="h-5 w-5 text-amber-500" />
@@ -378,7 +378,7 @@ export default function CharitySettingsPage() {
           <CardContent className="py-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <div className={`p-2 rounded-full transition-colors ${isEnabled ? 'bg-emerald-100 dark:bg-emerald-900/50' : 'bg-muted dark:bg-slate-800'}`}>
+                <div className={`p-2 rounded-full transition-colors ${isEnabled ? 'bg-emerald-100 dark:bg-emerald-900/50' : 'bg-muted dark:bg-muted'}`}>
                   {isEnabled ? (
                     <CheckCircle className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
                   ) : (
@@ -478,7 +478,7 @@ export default function CharitySettingsPage() {
                       className={`p-4 rounded-xl border-2 cursor-pointer transition-all text-left w-full ${
                         selectedCharityId === charity.id
                           ? "border-rose-500 bg-rose-50 dark:bg-rose-950/30 shadow-md"
-                          : "border-border dark:border-slate-700 hover:border-rose-300 dark:hover:border-rose-700"
+                          : "border-border dark:border-border hover:border-rose-300 dark:hover:border-rose-700"
                       }`}
                     >
                       <div className="flex items-start justify-between gap-3">
@@ -531,7 +531,7 @@ export default function CharitySettingsPage() {
                         placeholder="e.g., Local Veterans Foundation"
                         value={customCharity.name}
                         onChange={(e) => setCustomCharity({ ...customCharity, name: e.target.value })}
-                        className="bg-card dark:bg-slate-900"
+                        className="bg-card dark:bg-muted"
                       />
                     </div>
                     <div className="space-y-2">
@@ -542,7 +542,7 @@ export default function CharitySettingsPage() {
                         value={customCharity.description}
                         onChange={(e) => setCustomCharity({ ...customCharity, description: e.target.value })}
                         rows={2}
-                        className="bg-card dark:bg-slate-900"
+                        className="bg-card dark:bg-muted"
                       />
                     </div>
                     <div className="grid gap-4 md:grid-cols-2">
@@ -553,7 +553,7 @@ export default function CharitySettingsPage() {
                           placeholder="XX-XXXXXXX"
                           value={customCharity.taxId}
                           onChange={(e) => setCustomCharity({ ...customCharity, taxId: e.target.value })}
-                          className="bg-card dark:bg-slate-900"
+                          className="bg-card dark:bg-muted"
                         />
                       </div>
                       <div className="space-y-2">
@@ -563,7 +563,7 @@ export default function CharitySettingsPage() {
                           placeholder="https://..."
                           value={customCharity.website}
                           onChange={(e) => setCustomCharity({ ...customCharity, website: e.target.value })}
-                          className="bg-card dark:bg-slate-900"
+                          className="bg-card dark:bg-muted"
                         />
                       </div>
                     </div>
@@ -623,7 +623,7 @@ export default function CharitySettingsPage() {
             </div>
 
             {/* Default Opt-In */}
-            <div className="flex items-center justify-between p-4 rounded-xl border bg-muted/60 dark:bg-slate-800/50">
+            <div className="flex items-center justify-between p-4 rounded-xl border bg-muted/60 dark:bg-muted/50">
               <div>
                 <Label htmlFor="default-optin" className="font-medium">Pre-check the donation box</Label>
                 <p className="text-xs text-muted-foreground mt-1">
@@ -638,7 +638,7 @@ export default function CharitySettingsPage() {
             </div>
 
             {/* GL Code */}
-            <div className="p-4 rounded-xl border bg-muted/60 dark:bg-slate-800/50">
+            <div className="p-4 rounded-xl border bg-muted/60 dark:bg-muted/50">
               <div className="flex items-start gap-3">
                 <div className="p-2 rounded-lg bg-blue-100 dark:bg-blue-900/50">
                   <BookOpen className="h-4 w-4 text-blue-600 dark:text-blue-400" />
@@ -655,7 +655,7 @@ export default function CharitySettingsPage() {
                     value={glCode}
                     onChange={(e) => setGlCode(e.target.value)}
                     placeholder="2400"
-                    className="max-w-[200px] bg-card dark:bg-slate-900"
+                    className="max-w-[200px] bg-card dark:bg-muted"
                   />
                   <p className="text-xs text-muted-foreground">
                     Default: 2400 (Charity Donations Payable)

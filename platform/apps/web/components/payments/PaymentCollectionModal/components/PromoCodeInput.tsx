@@ -96,7 +96,7 @@ export function PromoCodeInput({ disabled = false }: PromoCodeInputProps) {
       {/* Promo code input */}
       {!hasAppliedPromo && (
         <div className="space-y-1">
-          <Label htmlFor="promo-code" className="text-sm text-slate-600">
+          <Label htmlFor="promo-code" className="text-sm text-muted-foreground">
             Promo Code
           </Label>
           <div className="flex gap-2">

@@ -52,7 +52,7 @@ export default function SocialPlannerBuilder() {
           <Link href="/social-planner" className="text-sm text-emerald-700 hover:text-emerald-600">
             ← Back to Social Planner
           </Link>
-          <p className="text-slate-600">Select a campground to compose posts.</p>
+          <p className="text-muted-foreground">Select a campground to compose posts.</p>
         </div>
       </DashboardShell>
     );
@@ -66,8 +66,8 @@ export default function SocialPlannerBuilder() {
       <div className="flex items-center justify-between mb-4">
         <div>
           <p className="text-xs uppercase tracking-wide text-emerald-600 font-semibold">Post builder</p>
-          <h1 className="text-2xl font-bold text-slate-900">Compose and save posts</h1>
-          <p className="text-slate-600">Tone toggles are rule-based — no external AI calls. Pick platform, captions, hashtags, and image prompts.</p>
+          <h1 className="text-2xl font-bold text-foreground">Compose and save posts</h1>
+          <p className="text-muted-foreground">Tone toggles are rule-based — no external AI calls. Pick platform, captions, hashtags, and image prompts.</p>
         </div>
       </div>
 
@@ -144,10 +144,10 @@ export default function SocialPlannerBuilder() {
           </button>
         </div>
 
-        <div className="card bg-slate-50 border border-slate-200 p-3">
-          <div className="text-xs uppercase text-slate-500 mb-1">Preview (local stub)</div>
-          <div className="text-sm font-semibold text-slate-900">{applyTone(caption || captionStarter(category), tone)}</div>
-          <div className="text-xs text-slate-600 mt-2">Hashtags: {hashtags}</div>
+        <div className="card bg-muted border border-border p-3">
+          <div className="text-xs uppercase text-muted-foreground mb-1">Preview (local stub)</div>
+          <div className="text-sm font-semibold text-foreground">{applyTone(caption || captionStarter(category), tone)}</div>
+          <div className="text-xs text-muted-foreground mt-2">Hashtags: {hashtags}</div>
         </div>
 
         <div className="flex gap-2">
@@ -158,7 +158,7 @@ export default function SocialPlannerBuilder() {
           >
             <Save className="h-4 w-4 mr-1" /> Save draft
           </button>
-          <div className="text-xs text-slate-500 flex items-center gap-2">
+          <div className="text-xs text-muted-foreground flex items-center gap-2">
             <Sparkles className="h-4 w-4 text-emerald-600" />
             Tone helpers run locally — no external AI calls.
           </div>

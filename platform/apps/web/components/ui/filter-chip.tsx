@@ -55,13 +55,13 @@ export function FilterChip({
   const variantStyles = {
     default: selected
       ? "bg-emerald-500 text-white border-emerald-500 hover:bg-emerald-600"
-      : "bg-white text-slate-700 border-slate-200 hover:border-emerald-300 hover:bg-emerald-50",
+      : "bg-card text-foreground border-border hover:border-emerald-300 hover:bg-emerald-50",
     outline: selected
       ? "bg-emerald-50 text-emerald-700 border-emerald-500"
-      : "bg-transparent text-slate-600 border-slate-300 hover:border-emerald-400",
+      : "bg-transparent text-muted-foreground border-border hover:border-emerald-400",
     subtle: selected
       ? "bg-emerald-100 text-emerald-800 border-transparent"
-      : "bg-slate-100 text-slate-600 border-transparent hover:bg-slate-200",
+      : "bg-muted text-muted-foreground border-transparent hover:bg-muted",
   };
 
   return (
@@ -89,8 +89,8 @@ export function FilterChip({
           className={cn(
             "ml-0.5 text-xs px-1.5 py-0.5 rounded-full",
             selected
-              ? "bg-white/20 text-white"
-              : "bg-slate-200 text-slate-600"
+              ? "bg-card/20 text-foreground"
+              : "bg-muted text-muted-foreground"
           )}
         >
           {count}
@@ -103,8 +103,8 @@ export function FilterChip({
           className={cn(
             "ml-0.5 p-0.5 rounded-full transition-colors",
             selected
-              ? "hover:bg-white/20 text-white"
-              : "hover:bg-slate-200 text-slate-500"
+              ? "hover:bg-card/20 text-foreground"
+              : "hover:bg-muted text-muted-foreground"
           )}
           aria-label={`Remove ${label} filter`}
         >

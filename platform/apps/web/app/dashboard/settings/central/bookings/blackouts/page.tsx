@@ -9,8 +9,8 @@ export default function BlackoutsPage() {
   return (
     <div className="max-w-4xl space-y-6">
       <div>
-        <h2 className="text-2xl font-bold text-slate-900">Blackout Dates</h2>
-        <p className="text-slate-500 mt-1">
+        <h2 className="text-2xl font-bold text-foreground">Blackout Dates</h2>
+        <p className="text-muted-foreground mt-1">
           Block dates from online booking
         </p>
       </div>
@@ -22,8 +22,8 @@ export default function BlackoutsPage() {
               <CalendarOff className="h-6 w-6 text-red-600" />
             </div>
             <div className="flex-1">
-              <h3 className="font-semibold text-slate-900">Blackout Dates Manager</h3>
-              <p className="text-sm text-slate-500 mt-1">
+              <h3 className="font-semibold text-foreground">Blackout Dates Manager</h3>
+              <p className="text-sm text-muted-foreground mt-1">
                 Block specific dates from online booking. Useful for private events,
                 maintenance periods, or staff-only booking windows.
               </p>

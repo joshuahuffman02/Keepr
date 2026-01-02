@@ -9,8 +9,8 @@ export default function JobsPage() {
   return (
     <div className="max-w-4xl space-y-6">
       <div>
-        <h2 className="text-2xl font-bold text-slate-900">Jobs</h2>
-        <p className="text-slate-500 mt-1">
+        <h2 className="text-2xl font-bold text-foreground">Jobs</h2>
+        <p className="text-muted-foreground mt-1">
           Monitor background jobs and scheduled tasks
         </p>
       </div>
@@ -18,12 +18,12 @@ export default function JobsPage() {
       <Card>
         <CardContent className="pt-6">
           <div className="flex items-start gap-4">
-            <div className="p-3 rounded-lg bg-slate-100">
-              <ListTodo className="h-6 w-6 text-slate-600" />
+            <div className="p-3 rounded-lg bg-muted">
+              <ListTodo className="h-6 w-6 text-muted-foreground" />
             </div>
             <div className="flex-1">
-              <h3 className="font-semibold text-slate-900">Background Jobs</h3>
-              <p className="text-sm text-slate-500 mt-1">
+              <h3 className="font-semibold text-foreground">Background Jobs</h3>
+              <p className="text-sm text-muted-foreground mt-1">
                 View status of background jobs like email sending, report generation,
                 and data imports. Retry failed jobs or cancel pending ones.
               </p>

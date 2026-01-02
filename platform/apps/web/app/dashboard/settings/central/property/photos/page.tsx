@@ -9,8 +9,8 @@ export default function PhotosPage() {
   return (
     <div className="max-w-4xl space-y-6">
       <div>
-        <h2 className="text-2xl font-bold text-slate-900">Photos</h2>
-        <p className="text-slate-500 mt-1">
+        <h2 className="text-2xl font-bold text-foreground">Photos</h2>
+        <p className="text-muted-foreground mt-1">
           Manage campground photos and gallery images
         </p>
       </div>
@@ -22,8 +22,8 @@ export default function PhotosPage() {
               <Camera className="h-6 w-6 text-blue-600" />
             </div>
             <div className="flex-1">
-              <h3 className="font-semibold text-slate-900">Photo Gallery</h3>
-              <p className="text-sm text-slate-500 mt-1">
+              <h3 className="font-semibold text-foreground">Photo Gallery</h3>
+              <p className="text-sm text-muted-foreground mt-1">
                 Upload and manage photos that appear on your public booking page.
                 Add hero images, site photos, and amenity galleries.
               </p>

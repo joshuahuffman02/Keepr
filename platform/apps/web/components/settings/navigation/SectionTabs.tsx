@@ -50,7 +50,7 @@ export function SectionTabs({ sections, categoryId, className }: SectionTabsProp
     <div
       ref={containerRef}
       className={cn(
-        "border-b bg-slate-50/80 overflow-x-auto scrollbar-hide",
+        "border-b bg-muted/80 overflow-x-auto scrollbar-hide",
         className
       )}
     >
@@ -76,8 +76,8 @@ export function SectionTabs({ sections, categoryId, className }: SectionTabsProp
                 "border-b-2 -mb-px",
                 "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-inset",
                 isActive
-                  ? "border-slate-900 text-slate-900 font-medium"
-                  : "border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300"
+                  ? "border-border text-foreground font-medium"
+                  : "border-transparent text-muted-foreground hover:text-foreground hover:border-border"
               )}
             >
               {section.label}

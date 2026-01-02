@@ -6,7 +6,7 @@ import { formatLocalDateInput, toLocalDate, parseLocalDateInput, diffInDays } fr
 import type { ReservationDragMode, CalendarReservation } from "./types";
 
 function Skeleton({ className }: { className?: string }) {
-    return <div className={cn("animate-pulse bg-slate-200 rounded", className)} />;
+    return <div className={cn("animate-pulse bg-muted rounded", className)} />;
 }
 
 import { cn } from "../../lib/utils";
@@ -256,22 +256,22 @@ export function CalendarGrid({ data, onSelectionComplete, onReservationMove }: C
         <div
             id="calendar-grid-root"
             className={cn(
-                "rounded-xl border border-slate-200 bg-white shadow-sm overflow-hidden select-none"
+                "rounded-xl border border-border bg-card shadow-sm overflow-hidden select-none"
             )}
         >
             <div className="overflow-x-auto">
                 {/* Header Row */}
                 <div
-                    className="grid text-xs font-medium text-muted-foreground border-b border-slate-200 bg-slate-50/50"
+                    className="grid text-xs font-medium text-muted-foreground border-b border-border bg-muted/50"
                     style={{ gridTemplateColumns: gridTemplate }}
                 >
-                    <div className="px-4 py-3 sticky left-0 z-30 bg-slate-50 border-r border-slate-200">
+                    <div className="px-4 py-3 sticky left-0 z-30 bg-muted border-r border-border">
                         Sites
                     </div>
                     {days.map((d, idx) => (
                         <div
                             key={idx}
-                            className={`px-2 py-3 text-center border-r border-slate-100 last:border-r-0 relative ${d.isToday ? "bg-status-info/10 text-status-info" : ""}`}
+                            className={`px-2 py-3 text-center border-r border-border last:border-r-0 relative ${d.isToday ? "bg-status-info/10 text-status-info" : ""}`}
                         >
                             {d.label}
                             {d.isToday && <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-status-info rounded-full mx-2" />}
@@ -281,7 +281,7 @@ export function CalendarGrid({ data, onSelectionComplete, onReservationMove }: C
 
                 <div
                     ref={gridRef}
-                    className="divide-y divide-slate-100"
+                    className="divide-y divide-border"
                     onPointerUp={() => handleDragEnd(null, null)}
                     onPointerMove={handleGridPointerMove}
                 >
@@ -299,7 +299,7 @@ export function CalendarGrid({ data, onSelectionComplete, onReservationMove }: C
                             reservations={reservationsBySite[site.id] || []}
                             gridTemplate={gridTemplate}
                             dayCount={dayCount}
-                            zebra={idx % 2 === 0 ? "bg-white" : "bg-slate-50/30"}
+                            zebra={idx % 2 === 0 ? "bg-card" : "bg-muted/30"}
                             selection={state.reservationDraft ? {
                                 siteId: state.reservationDraft.siteId,
                                 arrival: state.reservationDraft.arrival,

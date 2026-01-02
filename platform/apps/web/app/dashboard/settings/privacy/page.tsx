@@ -162,7 +162,7 @@ export default function PrivacySettingsPage() {
           <div className="flex items-center justify-between">
             <div>
               <div className="text-lg font-semibold">DSR / consent export</div>
-              <div className="text-sm text-slate-600">Export PII redaction settings and consent log for compliance requests.</div>
+              <div className="text-sm text-muted-foreground">Export PII redaction settings and consent log for compliance requests.</div>
             </div>
             <div className="flex items-center gap-2">
               <Button
@@ -184,7 +184,7 @@ export default function PrivacySettingsPage() {
               </Button>
             </div>
           </div>
-          <div className="text-xs text-slate-500">
+          <div className="text-xs text-muted-foreground">
             Downloads a compliance bundle containing all PII settings and consent records.
           </div>
         </div>
@@ -193,7 +193,7 @@ export default function PrivacySettingsPage() {
           <div className="flex items-center justify-between">
             <div>
               <div className="text-lg font-semibold">Privacy redaction dashboard</div>
-              <div className="text-sm text-slate-600">View redaction rules, recent activity, and test your configuration.</div>
+              <div className="text-sm text-muted-foreground">View redaction rules, recent activity, and test your configuration.</div>
             </div>
             <Button
               size="sm"
@@ -207,18 +207,18 @@ export default function PrivacySettingsPage() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-3">
-              <div className="rounded border border-slate-200 p-3">
+              <div className="rounded border border-border p-3">
                 <div className="text-sm font-semibold mb-2">Current redaction rules</div>
-                <div className="text-xs text-slate-500 mb-2">Showing the first few PII tags (full list below).</div>
+                <div className="text-xs text-muted-foreground mb-2">Showing the first few PII tags (full list below).</div>
                 <div className="flex flex-col gap-2">
                   {(tagsQuery.data ?? []).slice(0, 5).map((tag: any) => (
                     <div key={`${tag.resource}:${tag.field}`} className="flex items-center justify-between text-sm">
-                      <span className="text-slate-700">{tag.resource}.{tag.field}</span>
-                      <span className="text-slate-500 uppercase text-[11px]">{tag.classification} • {tag.redactionMode}</span>
+                      <span className="text-foreground">{tag.resource}.{tag.field}</span>
+                      <span className="text-muted-foreground uppercase text-[11px]">{tag.classification} • {tag.redactionMode}</span>
                     </div>
                   ))}
                   {(tagsQuery.data ?? []).length === 0 && (
-                    <div className="overflow-hidden rounded border border-slate-200 bg-white">
+                    <div className="overflow-hidden rounded border border-border bg-card">
                       <table className="w-full text-sm">
                         <tbody>
                           <TableEmpty>No PII tags yet.</TableEmpty>
@@ -229,26 +229,26 @@ export default function PrivacySettingsPage() {
                 </div>
               </div>
 
-              <div className="rounded border border-slate-200 p-3">
+              <div className="rounded border border-border p-3">
                 <div className="text-sm font-semibold mb-2">Recent redactions</div>
-                <div className="text-xs text-slate-500 mb-2">Audit samples scrubbed for PII.</div>
+                <div className="text-xs text-muted-foreground mb-2">Audit samples scrubbed for PII.</div>
                 <div className="space-y-2 max-h-64 overflow-auto">
                   {(redactionsQuery.data ?? []).map((row: any) => (
-                    <div key={row.id} className="border border-slate-100 rounded p-2 text-sm">
-                      <div className="flex items-center justify-between text-slate-700">
+                    <div key={row.id} className="border border-border rounded p-2 text-sm">
+                      <div className="flex items-center justify-between text-foreground">
                         <span>{row.action} {row.entity}</span>
-                        <span className="text-xs text-slate-500">{new Date(row.createdAt).toLocaleString()}</span>
+                        <span className="text-xs text-muted-foreground">{new Date(row.createdAt).toLocaleString()}</span>
                       </div>
-                      <div className="text-xs text-slate-500 truncate">Entity ID: {row.entityId ?? "n/a"}</div>
+                      <div className="text-xs text-muted-foreground truncate">Entity ID: {row.entityId ?? "n/a"}</div>
                       {row.sample ? (
-                        <pre className="bg-slate-50 text-xs rounded p-2 mt-2 whitespace-pre-wrap break-all">
+                        <pre className="bg-muted text-xs rounded p-2 mt-2 whitespace-pre-wrap break-all">
                           {JSON.stringify(row.sample, null, 2)}
                         </pre>
                       ) : null}
                     </div>
                   ))}
                   {(redactionsQuery.data ?? []).length === 0 && (
-                    <div className="overflow-hidden rounded border border-slate-200 bg-white">
+                    <div className="overflow-hidden rounded border border-border bg-card">
                       <table className="w-full text-sm">
                         <tbody>
                           <TableEmpty>No redactions recorded yet.</TableEmpty>
@@ -264,7 +264,7 @@ export default function PrivacySettingsPage() {
               <div className="flex items-center justify-between">
                 <div>
                   <div className="text-sm font-semibold">Test redaction</div>
-                  <div className="text-xs text-slate-500">Sends sample payload to the preview endpoint for testing.</div>
+                  <div className="text-xs text-muted-foreground">Sends sample payload to the preview endpoint for testing.</div>
                 </div>
               </div>
               <Textarea
@@ -275,14 +275,14 @@ export default function PrivacySettingsPage() {
               />
               {previewError && <div className="text-xs text-red-600">{previewError}</div>}
               {previewResult ? (
-                <div className="rounded border border-slate-200 bg-slate-50 p-3">
+                <div className="rounded border border-border bg-muted p-3">
                   <div className="text-sm font-semibold mb-1">Preview output</div>
                   <pre className="text-xs whitespace-pre-wrap break-all">
                     {JSON.stringify(previewResult, null, 2)}
                   </pre>
                 </div>
               ) : (
-                <div className="overflow-hidden rounded border border-slate-200 bg-white">
+                <div className="overflow-hidden rounded border border-border bg-card">
                   <table className="w-full text-sm">
                     <tbody>
                       <TableEmpty>No preview yet.</TableEmpty>
@@ -298,22 +298,22 @@ export default function PrivacySettingsPage() {
           <div className="flex items-center justify-between">
             <div>
               <div className="text-lg font-semibold">Privacy defaults</div>
-              <div className="text-sm text-slate-600">Redaction, retention, and consent requirements.</div>
+              <div className="text-sm text-muted-foreground">Redaction, retention, and consent requirements.</div>
             </div>
-            <div className="text-xs text-slate-500">Campground: {campgroundId ?? "not selected"}</div>
+            <div className="text-xs text-muted-foreground">Campground: {campgroundId ?? "not selected"}</div>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-            <label className="flex items-center justify-between gap-3 rounded border border-slate-200 px-3 py-2">
-              <span className="text-sm text-slate-700">Redact PII in audit/logs</span>
+            <label className="flex items-center justify-between gap-3 rounded border border-border px-3 py-2">
+              <span className="text-sm text-foreground">Redact PII in audit/logs</span>
               <input
                 type="checkbox"
                 checked={!!settings?.redactPII}
                 onChange={(e) => updateField("redactPII", e.target.checked)}
               />
             </label>
-            <label className="flex items-center justify-between gap-3 rounded border border-slate-200 px-3 py-2">
-              <span className="text-sm text-slate-700">Consent required for communications</span>
+            <label className="flex items-center justify-between gap-3 rounded border border-border px-3 py-2">
+              <span className="text-sm text-foreground">Consent required for communications</span>
               <input
                 type="checkbox"
                 checked={!!settings?.consentRequired}
@@ -327,7 +327,7 @@ export default function PrivacySettingsPage() {
                 value={settings?.backupRetentionDays ?? ""}
                 onChange={(e) => updateField("backupRetentionDays", Number(e.target.value))}
               />
-              <div className="text-xs text-slate-500">{retentionLabel}</div>
+              <div className="text-xs text-muted-foreground">{retentionLabel}</div>
             </div>
             <div className="flex flex-col gap-1">
               <Label className="text-sm">Key rotation (days)</Label>
@@ -336,7 +336,7 @@ export default function PrivacySettingsPage() {
                 value={settings?.keyRotationDays ?? ""}
                 onChange={(e) => updateField("keyRotationDays", Number(e.target.value))}
               />
-              <div className="text-xs text-slate-500">Rotate keys on this cadence.</div>
+              <div className="text-xs text-muted-foreground">Rotate keys on this cadence.</div>
             </div>
           </div>
         </div>
@@ -345,7 +345,7 @@ export default function PrivacySettingsPage() {
           <div className="flex items-center justify-between">
             <div>
               <div className="text-lg font-semibold">Consent log</div>
-              <div className="text-sm text-slate-600">Capture and view consent events.</div>
+              <div className="text-sm text-muted-foreground">Capture and view consent events.</div>
             </div>
             <Button size="sm" onClick={() => recordConsent.mutate()} disabled={!campgroundId || recordConsent.isPending}>
               {recordConsent.isPending ? "Saving..." : "Record consent"}
@@ -382,7 +382,7 @@ export default function PrivacySettingsPage() {
           </div>
           <div className="overflow-auto">
             <table className="w-full text-sm">
-              <thead className="text-left text-slate-500 border-b">
+              <thead className="text-left text-muted-foreground border-b">
                 <tr>
                   <th className="py-2">Subject</th>
                   <th className="py-2">Type</th>
@@ -410,7 +410,7 @@ export default function PrivacySettingsPage() {
           <div className="flex items-center justify-between">
             <div>
               <div className="text-lg font-semibold">PII fields & redaction</div>
-              <div className="text-sm text-slate-600">Classify fields for masking or removal.</div>
+              <div className="text-sm text-muted-foreground">Classify fields for masking or removal.</div>
             </div>
             <Button size="sm" variant="secondary" onClick={() => upsertTag.mutate()} disabled={!campgroundId || upsertTag.isPending}>
               {upsertTag.isPending ? "Saving..." : "Save tag"}
@@ -451,7 +451,7 @@ export default function PrivacySettingsPage() {
 
           <div className="overflow-auto">
             <table className="w-full text-sm">
-              <thead className="text-left text-slate-500 border-b">
+              <thead className="text-left text-muted-foreground border-b">
                 <tr>
                   <th className="py-2">Resource</th>
                   <th className="py-2">Field</th>

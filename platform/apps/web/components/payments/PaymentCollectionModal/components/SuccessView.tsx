@@ -215,15 +215,15 @@ export function SuccessView({
         animate={prefersReducedMotion ? { opacity: 1 } : { opacity: 1, y: 0 }}
         transition={{ delay: 0.2, ...SPRING_CONFIG }}
       >
-        <h2 className="text-2xl font-bold text-slate-900">Payment Complete!</h2>
-        <p className="mt-1 text-slate-600">
+        <h2 className="text-2xl font-bold text-foreground">Payment Complete!</h2>
+        <p className="mt-1 text-muted-foreground">
           Thank you for your payment
         </p>
       </motion.div>
 
       {/* Email sent indicator */}
       {emailSending && (
-        <div className="flex items-center gap-2 text-sm text-slate-500">
+        <div className="flex items-center gap-2 text-sm text-muted-foreground">
           <Loader2 className="h-4 w-4 animate-spin" />
           Sending receipt to {props.guestEmail}...
         </div>
@@ -243,11 +243,11 @@ export function SuccessView({
         transition={{ delay: 0.3, ...SPRING_CONFIG }}
       >
         {/* Payment Breakdown */}
-        <div className="bg-slate-50 rounded-lg p-4 space-y-3">
+        <div className="bg-muted rounded-lg p-4 space-y-3">
           {/* Original amount */}
           <div className="flex justify-between text-sm">
-            <span className="text-slate-600">Subtotal</span>
-            <span className="text-slate-900">
+            <span className="text-muted-foreground">Subtotal</span>
+            <span className="text-foreground">
               ${(originalAmountCents / 100).toFixed(2)}
             </span>
           </div>
@@ -281,9 +281,9 @@ export function SuccessView({
           )}
 
           {/* Divider */}
-          <div className="border-t border-slate-200 pt-2">
+          <div className="border-t border-border pt-2">
             <div className="flex justify-between font-medium">
-              <span className="text-slate-900">Total Paid</span>
+              <span className="text-foreground">Total Paid</span>
               <span className="text-emerald-600 text-lg">
                 ${(totalPaid / 100).toFixed(2)}
               </span>
@@ -294,7 +294,7 @@ export function SuccessView({
         {/* Payment Methods Used */}
         {completedEntries.length > 0 && (
           <div className="space-y-2">
-            <h3 className="text-sm font-medium text-slate-700">
+            <h3 className="text-sm font-medium text-foreground">
               Payment{completedEntries.length > 1 ? "s" : ""} received via:
             </h3>
             <div className="space-y-2">
@@ -355,7 +355,7 @@ export function SuccessView({
 
       {/* Transaction reference */}
       {completedEntries.length > 0 && completedEntries[0].reference && (
-        <p className="text-xs text-slate-400 font-mono">
+        <p className="text-xs text-muted-foreground font-mono">
           Ref: {completedEntries[0].reference}
         </p>
       )}
@@ -372,14 +372,14 @@ function PaymentMethodRow({ entry }: PaymentMethodRowProps) {
   const Icon = getMethodIcon(entry.method);
 
   return (
-    <div className="flex items-center justify-between p-2 bg-white border border-slate-200 rounded-lg">
+    <div className="flex items-center justify-between p-2 bg-card border border-border rounded-lg">
       <div className="flex items-center gap-2">
         <div className="h-7 w-7 rounded-full bg-emerald-50 flex items-center justify-center">
           <Icon className="h-3.5 w-3.5 text-emerald-600" />
         </div>
-        <span className="text-sm text-slate-700">{methodInfo.label}</span>
+        <span className="text-sm text-foreground">{methodInfo.label}</span>
       </div>
-      <span className="text-sm font-medium text-slate-900">
+      <span className="text-sm font-medium text-foreground">
         ${(entry.amountCents / 100).toFixed(2)}
       </span>
     </div>

@@ -65,14 +65,14 @@ export function WhyBookDirect({
   }
 
   return (
-    <section className={cn("py-12 md:py-16 bg-slate-50", className)}>
+    <section className={cn("py-12 md:py-16 bg-muted", className)}>
       <div className="max-w-7xl mx-auto px-6">
         {/* Section header */}
         <div className="text-center mb-8 md:mb-12">
-          <h2 className="text-xl md:text-2xl font-bold text-slate-900 mb-2">
+          <h2 className="text-xl md:text-2xl font-bold text-foreground mb-2">
             Why Book Direct{campgroundName ? ` with ${campgroundName}` : ""}?
           </h2>
-          <p className="text-slate-600">
+          <p className="text-muted-foreground">
             Skip the middleman and enjoy these benefits when you book directly.
           </p>
         </div>
@@ -80,7 +80,7 @@ export function WhyBookDirect({
         {/* Benefits grid */}
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
           {benefits.map((benefit, i) => (
-            <div key={i} className="bg-white rounded-xl p-6 shadow-sm">
+            <div key={i} className="bg-card rounded-xl p-6 shadow-sm">
               <div
                 className={cn(
                   "w-10 h-10 rounded-lg flex items-center justify-center mb-4",
@@ -89,15 +89,15 @@ export function WhyBookDirect({
               >
                 <benefit.icon className={cn("h-5 w-5", benefit.iconColor)} />
               </div>
-              <h3 className="font-semibold text-slate-900 mb-2">{benefit.title}</h3>
-              <p className="text-sm text-slate-600">{benefit.description}</p>
+              <h3 className="font-semibold text-foreground mb-2">{benefit.title}</h3>
+              <p className="text-sm text-muted-foreground">{benefit.description}</p>
             </div>
           ))}
         </div>
 
         {/* Trust statement */}
         <div className="mt-8 text-center">
-          <p className="text-sm text-slate-500">
+          <p className="text-sm text-muted-foreground">
             <CheckCircle2 className="h-4 w-4 inline mr-1 text-emerald-500" />
             Trusted by thousands of campers nationwide
           </p>

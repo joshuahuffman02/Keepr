@@ -31,10 +31,10 @@ interface CategoryTheme {
 
 const categoryThemes: Record<CategoryType, CategoryTheme> = {
   all: {
-    bg: "bg-slate-50",
-    hoverBg: "hover:bg-slate-100",
-    accent: "text-slate-600",
-    activeBg: "bg-slate-800",
+    bg: "bg-muted",
+    hoverBg: "hover:bg-muted",
+    accent: "text-muted-foreground",
+    activeBg: "bg-muted",
     activeText: "text-white",
     ring: "ring-slate-300"
   },
@@ -244,10 +244,10 @@ export function CategoryTabs({
               onClick={() => scroll("left")}
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.9 }}
-              className="relative ml-1 w-8 h-8 rounded-full bg-white border border-slate-200 shadow-md flex items-center justify-center hover:bg-slate-50 transition-colors"
+              className="relative ml-1 w-8 h-8 rounded-full bg-card border border-border shadow-md flex items-center justify-center hover:bg-muted transition-colors"
               aria-label="Scroll left"
             >
-              <ChevronLeft className="w-4 h-4 text-slate-600" />
+              <ChevronLeft className="w-4 h-4 text-muted-foreground" />
             </motion.button>
           </motion.div>
         )}
@@ -279,8 +279,8 @@ export function CategoryTabs({
                 relative flex-shrink-0 flex flex-col items-center gap-1.5 px-4 py-2 rounded-2xl
                 transition-all duration-200 border
                 ${isActive
-                  ? `bg-white border-slate-200 shadow-md`
-                  : `bg-transparent border-transparent hover:bg-slate-50`
+                  ? `bg-card border-border shadow-md`
+                  : `bg-transparent border-transparent hover:bg-muted`
                 }
               `}
             >
@@ -311,7 +311,7 @@ export function CategoryTabs({
 
               {/* Label */}
               <span className={`text-xs font-medium whitespace-nowrap transition-colors ${
-                isActive ? "text-slate-900" : "text-slate-600"
+                isActive ? "text-foreground" : "text-muted-foreground"
               }`}>
                 {category.label}
               </span>
@@ -320,7 +320,7 @@ export function CategoryTabs({
               {isActive && (
                 <motion.div
                   layoutId="activeIndicator"
-                  className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-8 h-0.5 rounded-full bg-slate-900"
+                  className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-8 h-0.5 rounded-full bg-muted"
                   initial={false}
                   transition={
                     prefersReducedMotion
@@ -348,10 +348,10 @@ export function CategoryTabs({
               onClick={() => scroll("right")}
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.9 }}
-              className="relative mr-1 w-8 h-8 rounded-full bg-white border border-slate-200 shadow-md flex items-center justify-center hover:bg-slate-50 transition-colors"
+              className="relative mr-1 w-8 h-8 rounded-full bg-card border border-border shadow-md flex items-center justify-center hover:bg-muted transition-colors"
               aria-label="Scroll right"
             >
-              <ChevronRight className="w-4 h-4 text-slate-600" />
+              <ChevronRight className="w-4 h-4 text-muted-foreground" />
             </motion.button>
           </motion.div>
         )}

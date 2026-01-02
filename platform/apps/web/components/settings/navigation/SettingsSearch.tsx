@@ -151,7 +151,7 @@ export function SettingsSearch({ open, onOpenChange }: SettingsSearchProps) {
 
         {/* Search Input */}
         <div className="flex items-center gap-3 px-4 py-3 border-b">
-          <Search className="h-5 w-5 text-slate-400 flex-shrink-0" aria-hidden="true" />
+          <Search className="h-5 w-5 text-muted-foreground flex-shrink-0" aria-hidden="true" />
           <Input
             type="text"
             placeholder="Search settings..."
@@ -164,7 +164,7 @@ export function SettingsSearch({ open, onOpenChange }: SettingsSearchProps) {
             aria-controls="search-results"
             aria-activedescendant={results[selectedIndex]?.id}
           />
-          <kbd className="hidden sm:inline-flex px-2 py-1 text-xs font-medium bg-slate-100 text-slate-500 rounded">
+          <kbd className="hidden sm:inline-flex px-2 py-1 text-xs font-medium bg-muted text-muted-foreground rounded">
             ESC
           </kbd>
         </div>
@@ -176,7 +176,7 @@ export function SettingsSearch({ open, onOpenChange }: SettingsSearchProps) {
           className="max-h-[50vh] overflow-auto p-2"
         >
           {results.length === 0 ? (
-            <div className="py-8 text-center text-slate-500">
+            <div className="py-8 text-center text-muted-foreground">
               <p>No settings found for "{query}"</p>
             </div>
           ) : (
@@ -198,7 +198,7 @@ export function SettingsSearch({ open, onOpenChange }: SettingsSearchProps) {
                       "transition-colors duration-75",
                       isSelected
                         ? "bg-emerald-50 text-emerald-900"
-                        : "hover:bg-slate-50"
+                        : "hover:bg-muted"
                     )}
                     style={{
                       animationDelay: `${index * 30}ms`,
@@ -207,24 +207,24 @@ export function SettingsSearch({ open, onOpenChange }: SettingsSearchProps) {
                     <div
                       className={cn(
                         "flex items-center justify-center h-8 w-8 rounded-lg",
-                        isSelected ? "bg-emerald-100" : "bg-slate-100"
+                        isSelected ? "bg-emerald-100" : "bg-muted"
                       )}
                     >
                       <Icon
                         className={cn(
                           "h-4 w-4",
-                          isSelected ? "text-emerald-600" : "text-slate-500"
+                          isSelected ? "text-emerald-600" : "text-muted-foreground"
                         )}
                         aria-hidden="true"
                       />
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className="font-medium text-sm truncate">{item.label}</p>
-                      <p className="text-xs text-slate-500 truncate">
+                      <p className="text-xs text-muted-foreground truncate">
                         {item.description}
                       </p>
                     </div>
-                    <span className="text-xs text-slate-400 hidden sm:inline">
+                    <span className="text-xs text-muted-foreground hidden sm:inline">
                       {item.category}
                     </span>
                   </button>
@@ -235,17 +235,17 @@ export function SettingsSearch({ open, onOpenChange }: SettingsSearchProps) {
         </div>
 
         {/* Footer */}
-        <div className="flex items-center gap-4 px-4 py-2 border-t bg-slate-50 text-xs text-slate-500">
+        <div className="flex items-center gap-4 px-4 py-2 border-t bg-muted text-xs text-muted-foreground">
           <span className="flex items-center gap-1">
-            <kbd className="px-1.5 py-0.5 bg-white rounded border text-[10px]">↑↓</kbd>
+            <kbd className="px-1.5 py-0.5 bg-card rounded border text-[10px]">↑↓</kbd>
             Navigate
           </span>
           <span className="flex items-center gap-1">
-            <kbd className="px-1.5 py-0.5 bg-white rounded border text-[10px]">↵</kbd>
+            <kbd className="px-1.5 py-0.5 bg-card rounded border text-[10px]">↵</kbd>
             Open
           </span>
           <span className="flex items-center gap-1">
-            <kbd className="px-1.5 py-0.5 bg-white rounded border text-[10px]">ESC</kbd>
+            <kbd className="px-1.5 py-0.5 bg-card rounded border text-[10px]">ESC</kbd>
             Close
           </span>
         </div>

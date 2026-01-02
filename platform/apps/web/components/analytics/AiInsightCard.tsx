@@ -52,39 +52,39 @@ export function AiInsightCard({
   const getInsightIcon = (type: Insight["type"]) => {
     switch (type) {
       case "positive":
-        return <TrendingUp className="h-4 w-4 text-green-400" />;
+        return <TrendingUp className="h-4 w-4 text-status-success" />;
       case "negative":
-        return <TrendingDown className="h-4 w-4 text-red-400" />;
+        return <TrendingDown className="h-4 w-4 text-status-error" />;
       case "warning":
-        return <AlertTriangle className="h-4 w-4 text-amber-400" />;
+        return <AlertTriangle className="h-4 w-4 text-status-warning" />;
       default:
-        return <Lightbulb className="h-4 w-4 text-blue-400" />;
+        return <Lightbulb className="h-4 w-4 text-status-info" />;
     }
   };
 
   const getInsightBg = (type: Insight["type"]) => {
     switch (type) {
       case "positive":
-        return "bg-green-500/10 border-green-500/20";
+        return "bg-status-success/10 border-status-success/20";
       case "negative":
-        return "bg-red-500/10 border-red-500/20";
+        return "bg-status-error/10 border-status-error/20";
       case "warning":
-        return "bg-amber-500/10 border-amber-500/20";
+        return "bg-status-warning/10 border-status-warning/20";
       default:
-        return "bg-blue-500/10 border-blue-500/20";
+        return "bg-status-info/10 border-status-info/20";
     }
   };
 
   return (
-    <Card className="bg-gradient-to-br from-purple-900/20 to-slate-800/50 border-purple-500/20">
+    <Card className="bg-card border-border">
       <CardHeader className="pb-2">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <div className="p-1.5 bg-purple-500/20 rounded-lg">
-              <Sparkles className="h-4 w-4 text-purple-400" />
+            <div className="p-1.5 bg-action-primary/10 rounded-lg">
+              <Sparkles className="h-4 w-4 text-action-primary" />
             </div>
-            <CardTitle className="text-base text-white">{title}</CardTitle>
-            <Badge className="bg-purple-600/20 text-purple-400 border border-purple-600/50 text-xs">
+            <CardTitle className="text-base text-foreground">{title}</CardTitle>
+            <Badge className="bg-status-info-bg text-status-info-text border border-status-info-border text-xs">
               AI-Powered
             </Badge>
           </div>
@@ -121,12 +121,12 @@ export function AiInsightCard({
       {expanded && (
         <CardContent className="space-y-4">
           {/* Summary */}
-          <p className="text-sm text-slate-300 leading-relaxed">{summary}</p>
+          <p className="text-sm text-muted-foreground leading-relaxed">{summary}</p>
 
           {/* Key Insights */}
           {insights.length > 0 && (
             <div className="space-y-2">
-              <p className="text-xs font-medium text-slate-400 uppercase tracking-wide">
+              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
                 Key Insights
               </p>
               <div className="grid gap-2">
@@ -138,26 +138,26 @@ export function AiInsightCard({
                     <div className="flex items-start gap-2">
                       {getInsightIcon(insight.type)}
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium text-white">
+                        <p className="text-sm font-medium text-foreground">
                           {insight.title}
                         </p>
-                        <p className="text-xs text-slate-400 mt-0.5">
+                        <p className="text-xs text-muted-foreground mt-0.5">
                           {insight.description}
                         </p>
                         {insight.metric && (
                           <div className="flex items-center gap-2 mt-2">
-                            <span className="text-xs text-slate-500">
+                            <span className="text-xs text-muted-foreground">
                               {insight.metric.label}:
                             </span>
-                            <span className="text-sm font-medium text-white">
+                            <span className="text-sm font-medium text-foreground">
                               {insight.metric.value}
                             </span>
                             {insight.metric.change !== undefined && (
                               <span
                                 className={`text-xs ${
                                   insight.metric.change >= 0
-                                    ? "text-green-400"
-                                    : "text-red-400"
+                                    ? "text-status-success"
+                                    : "text-status-error"
                                 }`}
                               >
                                 {insight.metric.change >= 0 ? "+" : ""}
@@ -177,16 +177,16 @@ export function AiInsightCard({
           {/* Recommendations */}
           {recommendations.length > 0 && (
             <div className="space-y-2">
-              <p className="text-xs font-medium text-slate-400 uppercase tracking-wide">
+              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
                 Recommendations
               </p>
               <ul className="space-y-1.5">
                 {recommendations.map((rec, idx) => (
                   <li
                     key={idx}
-                    className="flex items-start gap-2 text-sm text-slate-300"
+                    className="flex items-start gap-2 text-sm text-muted-foreground"
                   >
-                    <span className="text-purple-400 mt-1">→</span>
+                    <span className="text-action-primary mt-1">→</span>
                     {rec}
                   </li>
                 ))}
@@ -204,23 +204,23 @@ export function AiInsightCard({
  */
 export function AiInsightCardSkeleton() {
   return (
-    <Card className="bg-gradient-to-br from-purple-900/20 to-slate-800/50 border-purple-500/20">
+    <Card className="bg-card border-border">
       <CardHeader className="pb-2">
         <div className="flex items-center gap-2">
-          <div className="p-1.5 bg-purple-500/20 rounded-lg animate-pulse">
-            <Sparkles className="h-4 w-4 text-purple-400" />
+          <div className="p-1.5 bg-action-primary/10 rounded-lg animate-pulse">
+            <Sparkles className="h-4 w-4 text-action-primary" />
           </div>
-          <div className="h-5 w-24 bg-slate-700 rounded animate-pulse" />
+          <div className="h-5 w-24 bg-muted rounded animate-pulse" />
         </div>
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="space-y-2">
-          <div className="h-4 w-full bg-slate-700 rounded animate-pulse" />
-          <div className="h-4 w-3/4 bg-slate-700 rounded animate-pulse" />
+          <div className="h-4 w-full bg-muted rounded animate-pulse" />
+          <div className="h-4 w-3/4 bg-muted rounded animate-pulse" />
         </div>
         <div className="space-y-2">
-          <div className="h-16 w-full bg-slate-700/50 rounded animate-pulse" />
-          <div className="h-16 w-full bg-slate-700/50 rounded animate-pulse" />
+          <div className="h-16 w-full bg-muted/50 rounded animate-pulse" />
+          <div className="h-16 w-full bg-muted/50 rounded animate-pulse" />
         </div>
       </CardContent>
     </Card>

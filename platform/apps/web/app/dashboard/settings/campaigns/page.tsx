@@ -120,9 +120,9 @@ export default function CampaignsPage() {
       case "scheduled":
         return <Badge className="bg-status-warning/15 text-status-warning border border-status-warning/30">Scheduled</Badge>;
       case "cancelled":
-        return <Badge className="bg-slate-100 text-slate-700 border border-slate-200">Cancelled</Badge>;
+        return <Badge className="bg-muted text-foreground border border-border">Cancelled</Badge>;
       default:
-        return <Badge className="bg-slate-100 text-slate-700 border border-slate-200">Draft</Badge>;
+        return <Badge className="bg-muted text-foreground border border-border">Draft</Badge>;
     }
   };
 
@@ -175,7 +175,7 @@ export default function CampaignsPage() {
     if (htmlMode === "visual") {
       return (
         <div
-          className="border rounded-md p-3 min-h-[200px] bg-white"
+          className="border rounded-md p-3 min-h-[200px] bg-card"
           contentEditable
           suppressContentEditableWarning
           onInput={(e) => setHtml((e.target as HTMLDivElement).innerHTML)}
@@ -196,8 +196,8 @@ export default function CampaignsPage() {
     <div>
       <div className="max-w-6xl space-y-6">
         <div>
-          <h1 className="text-2xl font-semibold text-slate-900">Email Campaigns</h1>
-          <p className="text-slate-600 text-sm">
+          <h1 className="text-2xl font-semibold text-foreground">Email Campaigns</h1>
+          <p className="text-muted-foreground text-sm">
             Draft and send marketing campaigns (email and SMS) to guests who opted in for the selected campground.
           </p>
         </div>
@@ -247,7 +247,7 @@ export default function CampaignsPage() {
               <div className="space-y-1">
                 <div className="flex items-center justify-between">
                   <Label>HTML body</Label>
-                  <div className="text-xs text-slate-500 flex items-center gap-2">
+                  <div className="text-xs text-muted-foreground flex items-center gap-2">
                     <Tabs value={htmlMode} onValueChange={(v) => setHtmlMode(v as "visual" | "html")}>
                       <TabsList className="h-7">
                         <TabsTrigger value="visual" className="text-xs h-7 px-2">Visual</TabsTrigger>
@@ -280,7 +280,7 @@ export default function CampaignsPage() {
                   onChange={(e) => setTextBody(e.target.value)}
                   placeholder="Short text for SMS (will include STOP to opt-out)."
                 />
-                <div className="text-xs text-slate-500">{textBody.length} chars</div>
+                <div className="text-xs text-muted-foreground">{textBody.length} chars</div>
               </div>
               <div className="space-y-1">
                 <Label>Template</Label>
@@ -426,7 +426,7 @@ export default function CampaignsPage() {
                   <Button type="button" variant="secondary" onClick={loadSuggestions}>
                     Refresh suggestions
                   </Button>
-                  <div className="text-xs text-slate-500 self-center">
+                  <div className="text-xs text-muted-foreground self-center">
                     Audience always honors marketing opt-in.
                   </div>
                 </div>
@@ -436,7 +436,7 @@ export default function CampaignsPage() {
                 <Button onClick={() => createMutation.mutate()} disabled={!campgroundId || createMutation.isPending}>
                   Save draft
                 </Button>
-                <div className="text-xs text-slate-500 self-center">
+                <div className="text-xs text-muted-foreground self-center">
                   Sends honor marketing opt-in and log via Postmark (email) / Twilio (SMS). Channel: {channelLabel}.
                 </div>
               </div>
@@ -450,21 +450,21 @@ export default function CampaignsPage() {
                 <CardDescription>Drafts and sends for this campground.</CardDescription>
               </CardHeader>
               <CardContent className="space-y-3">
-                {campaignsQuery.isLoading && <div className="text-sm text-slate-500">Loading campaigns…</div>}
+                {campaignsQuery.isLoading && <div className="text-sm text-muted-foreground">Loading campaigns…</div>}
                 {!campaignsQuery.isLoading && (campaignsQuery.data?.length ?? 0) === 0 && (
-                  <div className="text-sm text-slate-500">No campaigns yet.</div>
+                  <div className="text-sm text-muted-foreground">No campaigns yet.</div>
                 )}
                 <div className="space-y-3">
                   {campaignsQuery.data?.map((c) => (
-                    <div key={c.id} className="rounded-lg border border-slate-200 p-4">
+                    <div key={c.id} className="rounded-lg border border-border p-4">
                       <div className="flex items-center justify-between gap-3">
                         <div>
-                          <div className="font-semibold text-slate-900">{c.name}</div>
-                          <div className="text-sm text-slate-600">{c.subject}</div>
+                          <div className="font-semibold text-foreground">{c.name}</div>
+                          <div className="text-sm text-muted-foreground">{c.subject}</div>
                         </div>
                         {statusBadge(c.status)}
                       </div>
-                      <div className="text-xs text-slate-500 mt-1">From: {c.fromName ? `${c.fromName} ` : ""}&lt;{c.fromEmail}&gt;</div>
+                      <div className="text-xs text-muted-foreground mt-1">From: {c.fromName ? `${c.fromName} ` : ""}&lt;{c.fromEmail}&gt;</div>
                       <div className="flex gap-3 mt-3">
                         <Button
                           variant="secondary"
@@ -504,11 +504,11 @@ export default function CampaignsPage() {
                   <CardTitle>Audience preview</CardTitle>
                   <CardDescription>Honors marketing opt-in</CardDescription>
                 </CardHeader>
-                <CardContent className="space-y-3 text-sm text-slate-700">
+                <CardContent className="space-y-3 text-sm text-foreground">
                   <div>Audience size: {audiencePreview.count}</div>
                   <div className="space-y-1">
-                    <div className="font-semibold text-slate-900 text-xs">Sample</div>
-                    <ul className="text-xs text-slate-600 list-disc pl-4">
+                    <div className="font-semibold text-foreground text-xs">Sample</div>
+                    <ul className="text-xs text-muted-foreground list-disc pl-4">
                       {audiencePreview.sample.map((s) => (
                         <li key={s.id}>{s.name || s.email || s.phone} ({s.email || "no email"})</li>
                       ))}
@@ -524,12 +524,12 @@ export default function CampaignsPage() {
                 <CardDescription>Auto-detected gaps based on upcoming occupancy.</CardDescription>
               </CardHeader>
               <CardContent className="space-y-3">
-                {suggestions.length === 0 && <div className="text-sm text-slate-500">No suggestions right now.</div>}
+                {suggestions.length === 0 && <div className="text-sm text-muted-foreground">No suggestions right now.</div>}
                 {suggestions.map((s, idx) => (
-                  <div key={idx} className="rounded-lg border border-slate-200 p-4 flex items-center justify-between">
+                  <div key={idx} className="rounded-lg border border-border p-4 flex items-center justify-between">
                     <div>
-                      <div className="font-semibold text-slate-900">{s.reason}</div>
-                      <div className="text-xs text-slate-600">Click apply to load filters.</div>
+                      <div className="font-semibold text-foreground">{s.reason}</div>
+                      <div className="text-xs text-muted-foreground">Click apply to load filters.</div>
                     </div>
                     <Button
                       variant="outline"
@@ -553,15 +553,15 @@ export default function CampaignsPage() {
                 <CardDescription>Saved email/SMS templates for quick reuse.</CardDescription>
               </CardHeader>
               <CardContent className="space-y-3">
-                {templatesQuery.isLoading && <div className="text-sm text-slate-500">Loading templates…</div>}
+                {templatesQuery.isLoading && <div className="text-sm text-muted-foreground">Loading templates…</div>}
                 {!templatesQuery.isLoading && (templatesQuery.data?.length ?? 0) === 0 && (
-                  <div className="text-sm text-slate-500">No templates yet. Save one from the create form.</div>
+                  <div className="text-sm text-muted-foreground">No templates yet. Save one from the create form.</div>
                 )}
                 {templatesQuery.data?.map((t) => (
-                  <div key={t.id} className="rounded-lg border border-slate-200 p-4 flex items-center justify-between">
+                  <div key={t.id} className="rounded-lg border border-border p-4 flex items-center justify-between">
                     <div>
-                      <div className="font-semibold text-slate-900">{t.name}</div>
-                      <div className="text-xs text-slate-600">{t.channel.toUpperCase()} • {t.subject || "No subject"} • {t.category || "general"}</div>
+                      <div className="font-semibold text-foreground">{t.name}</div>
+                      <div className="text-xs text-muted-foreground">{t.channel.toUpperCase()} • {t.subject || "No subject"} • {t.category || "general"}</div>
                     </div>
                     <Button variant="secondary" onClick={() => applyTemplate(t.id)}>
                       Use
@@ -578,7 +578,7 @@ export default function CampaignsPage() {
             <DialogHeader>
               <DialogTitle>Send campaign</DialogTitle>
             </DialogHeader>
-            <div className="space-y-3 text-sm text-slate-700">
+            <div className="space-y-3 text-sm text-foreground">
               <div className="font-semibold">{confirmSend?.name}</div>
               <div className="grid gap-3 md:grid-cols-2">
                 <div>
@@ -588,7 +588,7 @@ export default function CampaignsPage() {
                     value={sendAt}
                     onChange={(e) => setSendAt(e.target.value)}
                   />
-                  <p className="text-xs text-slate-500">Uses campground timezone if set; otherwise browser local.</p>
+                  <p className="text-xs text-muted-foreground">Uses campground timezone if set; otherwise browser local.</p>
                 </div>
                 <div>
                   <Label>Throttle (optional)</Label>
@@ -599,10 +599,10 @@ export default function CampaignsPage() {
                     value={batchPerMinute}
                     onChange={(e) => setBatchPerMinute(e.target.value)}
                   />
-                  <p className="text-xs text-slate-500">Leave blank to send as fast as provider allows.</p>
+                  <p className="text-xs text-muted-foreground">Leave blank to send as fast as provider allows.</p>
                 </div>
               </div>
-              <div className="text-xs text-slate-500">
+              <div className="text-xs text-muted-foreground">
                 Audience uses saved filters for this campaign and honors marketing opt-in. Email adds unsubscribe footer; SMS adds STOP instructions.
               </div>
             </div>

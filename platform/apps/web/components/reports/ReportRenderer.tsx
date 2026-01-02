@@ -231,13 +231,13 @@ export function ReportRenderer({ tab, subTab, campgroundId, dateRange, reportFil
 
     // 10. Fallback
     return (
-        <div className="rounded-xl border border-slate-200 bg-white shadow-sm p-12 text-center space-y-4">
-            <div className="w-12 h-12 bg-slate-50 rounded-full flex items-center justify-center mx-auto">
+        <div className="rounded-xl border border-border bg-card shadow-sm p-12 text-center space-y-4">
+            <div className="w-12 h-12 bg-muted rounded-full flex items-center justify-center mx-auto">
                 <div className="text-2xl">🚧</div>
             </div>
             <div>
-                <h3 className="text-lg font-medium text-slate-900">Coming Soon</h3>
-                <p className="text-slate-500 max-w-sm mx-auto mt-1">
+                <h3 className="text-lg font-medium text-foreground">Coming Soon</h3>
+                <p className="text-muted-foreground max-w-sm mx-auto mt-1">
                     This report ({tab} / {subTab}) is defined in the registry but implementation is pending.
                 </p>
             </div>

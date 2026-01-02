@@ -101,7 +101,7 @@ export default function SystemCheckPage() {
   if (!isHydrated || !selectedCampground) {
     return (
       <div className="flex items-center justify-center py-12">
-        <Loader2 className="h-8 w-8 animate-spin text-slate-400" />
+        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
       </div>
     );
   }
@@ -130,8 +130,8 @@ export default function SystemCheckPage() {
       {/* Header */}
       <div className="flex items-start justify-between">
         <div>
-          <h2 className="text-2xl font-bold text-slate-900">System Check</h2>
-          <p className="text-slate-500 mt-1">
+          <h2 className="text-2xl font-bold text-foreground">System Check</h2>
+          <p className="text-muted-foreground mt-1">
             Review configuration issues and recommendations
           </p>
         </div>
@@ -153,16 +153,16 @@ export default function SystemCheckPage() {
             <div className="flex items-center gap-3">
               <div className={cn(
                 "h-10 w-10 rounded-lg flex items-center justify-center",
-                errorCount > 0 ? "bg-status-error/15" : "bg-slate-100"
+                errorCount > 0 ? "bg-status-error/15" : "bg-muted"
               )}>
                 <XCircle className={cn(
                   "h-5 w-5",
-                  errorCount > 0 ? "text-status-error" : "text-slate-400"
+                  errorCount > 0 ? "text-status-error" : "text-muted-foreground"
                 )} />
               </div>
               <div>
-                <p className="text-2xl font-bold text-slate-900">{errorCount}</p>
-                <p className="text-sm text-slate-500">Errors</p>
+                <p className="text-2xl font-bold text-foreground">{errorCount}</p>
+                <p className="text-sm text-muted-foreground">Errors</p>
               </div>
             </div>
           </CardContent>
@@ -174,16 +174,16 @@ export default function SystemCheckPage() {
             <div className="flex items-center gap-3">
               <div className={cn(
                 "h-10 w-10 rounded-lg flex items-center justify-center",
-                warningCount > 0 ? "bg-status-warning/15" : "bg-slate-100"
+                warningCount > 0 ? "bg-status-warning/15" : "bg-muted"
               )}>
                 <AlertTriangle className={cn(
                   "h-5 w-5",
-                  warningCount > 0 ? "text-status-warning" : "text-slate-400"
+                  warningCount > 0 ? "text-status-warning" : "text-muted-foreground"
                 )} />
               </div>
               <div>
-                <p className="text-2xl font-bold text-slate-900">{warningCount}</p>
-                <p className="text-sm text-slate-500">Warnings</p>
+                <p className="text-2xl font-bold text-foreground">{warningCount}</p>
+                <p className="text-sm text-muted-foreground">Warnings</p>
               </div>
             </div>
           </CardContent>
@@ -197,8 +197,8 @@ export default function SystemCheckPage() {
                 <Info className="h-5 w-5 text-status-info" />
               </div>
               <div>
-                <p className="text-2xl font-bold text-slate-900">{infoCount}</p>
-                <p className="text-sm text-slate-500">Suggestions</p>
+                <p className="text-2xl font-bold text-foreground">{infoCount}</p>
+                <p className="text-sm text-muted-foreground">Suggestions</p>
               </div>
             </div>
           </CardContent>
@@ -211,11 +211,11 @@ export default function SystemCheckPage() {
           variant={filter === "actionable" ? "default" : "ghost"}
           size="sm"
           onClick={() => setFilter("actionable")}
-          className={filter === "actionable" ? "" : "text-slate-600"}
+          className={filter === "actionable" ? "" : "text-muted-foreground"}
         >
           Actionable
           {actionableCount > 0 && (
-            <Badge variant="secondary" className="ml-2 bg-white/20">
+            <Badge variant="secondary" className="ml-2 bg-card/20">
               {actionableCount}
             </Badge>
           )}
@@ -224,7 +224,7 @@ export default function SystemCheckPage() {
           variant={filter === "info" ? "default" : "ghost"}
           size="sm"
           onClick={() => setFilter("info")}
-          className={filter === "info" ? "" : "text-slate-600"}
+          className={filter === "info" ? "" : "text-muted-foreground"}
         >
           Suggestions
           {infoCount > 0 && (
@@ -237,7 +237,7 @@ export default function SystemCheckPage() {
           variant={filter === "all" ? "default" : "ghost"}
           size="sm"
           onClick={() => setFilter("all")}
-          className={filter === "all" ? "" : "text-slate-600"}
+          className={filter === "all" ? "" : "text-muted-foreground"}
         >
           All
         </Button>
@@ -250,8 +250,8 @@ export default function SystemCheckPage() {
             <div className="inline-flex items-center justify-center h-16 w-16 rounded-full bg-status-success/15 mb-4">
               <CheckCircle2 className="h-8 w-8 text-status-success" />
             </div>
-            <h3 className="text-lg font-medium text-slate-900">All clear!</h3>
-            <p className="text-slate-500 mt-1 max-w-sm mx-auto">
+            <h3 className="text-lg font-medium text-foreground">All clear!</h3>
+            <p className="text-muted-foreground mt-1 max-w-sm mx-auto">
               {filter === "actionable"
                 ? "No errors or warnings to address."
                 : filter === "info"
@@ -286,18 +286,18 @@ export default function SystemCheckPage() {
                     {/* Content */}
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 flex-wrap">
-                        <h4 className="font-medium text-slate-900">
+                        <h4 className="font-medium text-foreground">
                           {issue.message}
                         </h4>
                         <Badge variant="outline" className={cn("text-xs", severity.badge)}>
                           {severity.label}
                         </Badge>
-                        <Badge variant="outline" className="text-xs text-slate-600">
+                        <Badge variant="outline" className="text-xs text-muted-foreground">
                           <CategoryIcon className="h-3 w-3 mr-1" />
                           {category.label}
                         </Badge>
                       </div>
-                      <p className="text-sm text-slate-500 mt-1">
+                      <p className="text-sm text-muted-foreground mt-1">
                         {issue.description}
                       </p>
                     </div>

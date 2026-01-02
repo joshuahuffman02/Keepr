@@ -105,7 +105,7 @@ export function AccessibleReservationCard({
   return (
     <article
       className={cn(
-        "rounded-lg border border-slate-200 bg-white p-4 shadow-sm transition-shadow",
+        "rounded-lg border border-border bg-card p-4 shadow-sm transition-shadow",
         "hover:shadow-md focus-within:shadow-md"
       )}
       aria-labelledby={`reservation-${id}-title`}
@@ -116,7 +116,7 @@ export function AccessibleReservationCard({
           {/* Guest name as h2 for proper hierarchy */}
           <h2
             id={`reservation-${id}-title`}
-            className="text-lg font-semibold text-slate-900 truncate"
+            className="text-lg font-semibold text-foreground truncate"
           >
             <Link
               href={`/reservations/${id}`}
@@ -128,7 +128,7 @@ export function AccessibleReservationCard({
           </h2>
 
           {/* Site number */}
-          <p className="text-sm text-slate-600 flex items-center gap-1 mt-1">
+          <p className="text-sm text-muted-foreground flex items-center gap-1 mt-1">
             <MapPin className="h-3.5 w-3.5" aria-hidden="true" />
             <span>Site {siteNumber}</span>
           </p>
@@ -149,8 +149,8 @@ export function AccessibleReservationCard({
         {/* Dates */}
         <div className="flex items-center gap-2 text-sm">
           <dt className="sr-only">Check-in and check-out dates</dt>
-          <Calendar className="h-4 w-4 text-slate-500" aria-hidden="true" />
-          <dd className="text-slate-700">
+          <Calendar className="h-4 w-4 text-muted-foreground" aria-hidden="true" />
+          <dd className="text-foreground">
             <time dateTime={checkIn.toISOString()}>
               {formatDate(checkIn)}
             </time>
@@ -164,8 +164,8 @@ export function AccessibleReservationCard({
         {/* Guests */}
         <div className="flex items-center gap-2 text-sm">
           <dt className="sr-only">Number of guests</dt>
-          <Users className="h-4 w-4 text-slate-500" aria-hidden="true" />
-          <dd className="text-slate-700">
+          <Users className="h-4 w-4 text-muted-foreground" aria-hidden="true" />
+          <dd className="text-foreground">
             {adults} {adults === 1 ? "adult" : "adults"}
             {children > 0 && `, ${children} ${children === 1 ? "child" : "children"}`}
           </dd>
@@ -186,14 +186,14 @@ export function AccessibleReservationCard({
       )}
 
       {/* Actions */}
-      <footer className="flex items-center gap-2 pt-3 border-t border-slate-100">
+      <footer className="flex items-center gap-2 pt-3 border-t border-border">
         <Link
           href={`/reservations/${id}`}
           className={cn(
             "inline-flex items-center justify-center rounded-md px-3 py-1.5 text-sm font-medium",
-            "border border-slate-200 bg-white text-slate-900",
-            "hover:bg-slate-50",
-            "focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-slate-950/20 focus-visible:ring-offset-2",
+            "border border-border bg-card text-foreground",
+            "hover:bg-muted",
+            "focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-ring/20 focus-visible:ring-offset-2",
             "transition-colors"
           )}
         >

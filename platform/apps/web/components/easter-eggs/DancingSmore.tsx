@@ -195,7 +195,7 @@ export function DancingSmore({ visible, onClose }: DancingSmoreProps) {
               You found a secret! Have a s'more.
             </motion.p>
             <motion.button
-              className="mt-4 px-4 py-2 bg-white text-slate-900 rounded-full font-medium hover:bg-white/90 transition-colors"
+              className="mt-4 px-4 py-2 bg-card text-foreground rounded-full font-medium hover:bg-card/90 transition-colors"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.7 }}

@@ -158,8 +158,8 @@ export default function LedgerPage() {
         </div>
         {!campgroundId && (
           <div className="card p-5">
-            <div className="text-lg font-semibold text-slate-900">Select a campground</div>
-            <p className="text-sm text-slate-600 mt-1">Use the left sidebar switcher to choose a campground.</p>
+            <div className="text-lg font-semibold text-foreground">Select a campground</div>
+            <p className="text-sm text-muted-foreground mt-1">Use the left sidebar switcher to choose a campground.</p>
           </div>
         )}
         {campgroundId && (
@@ -175,7 +175,7 @@ export default function LedgerPage() {
                     className={`px-3 py-1.5 text-sm rounded-full transition-all duration-150 ${
                       start === preset.start && end === preset.end
                         ? "bg-status-success/15 text-status-success border-2 border-status-success font-medium"
-                        : "bg-muted text-muted-foreground border border-slate-200 hover:bg-slate-200"
+                        : "bg-muted text-muted-foreground border border-border hover:bg-muted"
                     }`}
                   >
                     {preset.label}
@@ -186,51 +186,51 @@ export default function LedgerPage() {
               {/* Custom Date Range & Filters */}
               <div className="flex flex-wrap gap-3 items-end">
                 <div className="space-y-1">
-                  <label htmlFor="ledger-start" className="text-xs font-medium text-slate-600 flex items-center gap-1">
+                  <label htmlFor="ledger-start" className="text-xs font-medium text-muted-foreground flex items-center gap-1">
                     <Calendar className="h-3 w-3" />
                     Start Date
                   </label>
                   <input
                     id="ledger-start"
                     type="date"
-                    className="rounded-lg border border-slate-200 px-3 py-2 text-sm focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none"
+                    className="rounded-lg border border-border px-3 py-2 text-sm focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none"
                     value={start}
                     onChange={(e) => setStart(e.target.value)}
                   />
                 </div>
                 <div className="space-y-1">
-                  <label htmlFor="ledger-end" className="text-xs font-medium text-slate-600 flex items-center gap-1">
+                  <label htmlFor="ledger-end" className="text-xs font-medium text-muted-foreground flex items-center gap-1">
                     <Calendar className="h-3 w-3" />
                     End Date
                   </label>
                   <input
                     id="ledger-end"
                     type="date"
-                    className="rounded-lg border border-slate-200 px-3 py-2 text-sm focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none"
+                    className="rounded-lg border border-border px-3 py-2 text-sm focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none"
                     value={end}
                     onChange={(e) => setEnd(e.target.value)}
                   />
                 </div>
                 <div className="space-y-1">
-                  <label htmlFor="ledger-gl" className="text-xs font-medium text-slate-600">
+                  <label htmlFor="ledger-gl" className="text-xs font-medium text-muted-foreground">
                     GL Code
                   </label>
                   <input
                     id="ledger-gl"
-                    className="rounded-lg border border-slate-200 px-3 py-2 text-sm focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none"
+                    className="rounded-lg border border-border px-3 py-2 text-sm focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none"
                     placeholder="Filter by GL code"
                     value={glCode}
                     onChange={(e) => setGlCode(e.target.value)}
                   />
                 </div>
                 <div className="space-y-1">
-                  <label htmlFor="ledger-search" className="text-xs font-medium text-slate-600 flex items-center gap-1">
+                  <label htmlFor="ledger-search" className="text-xs font-medium text-muted-foreground flex items-center gap-1">
                     <Search className="h-3 w-3" />
                     Search
                   </label>
                   <input
                     id="ledger-search"
-                    className="rounded-lg border border-slate-200 px-3 py-2 text-sm focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none"
+                    className="rounded-lg border border-border px-3 py-2 text-sm focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none"
                     placeholder="Description, account..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
@@ -307,11 +307,11 @@ export default function LedgerPage() {
               {/* GL Code Summary */}
               {summaryQuery.data && summaryQuery.data.length > 0 && (
                 <div>
-                  <h3 className="text-sm font-medium text-slate-700 mb-2">By GL Code</h3>
+                  <h3 className="text-sm font-medium text-foreground mb-2">By GL Code</h3>
                   <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-2">
                     {summaryQuery.data?.map((row) => (
-                      <div key={row.glCode} className="rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 hover:bg-slate-100 transition-colors cursor-pointer" onClick={() => setGlCode(row.glCode)}>
-                        <div className="text-xs text-slate-500">GL {row.glCode}</div>
+                      <div key={row.glCode} className="rounded-lg border border-border bg-muted px-3 py-2 hover:bg-muted transition-colors cursor-pointer" onClick={() => setGlCode(row.glCode)}>
+                        <div className="text-xs text-muted-foreground">GL {row.glCode}</div>
                         <div className={`text-sm font-semibold ${row.netCents >= 0 ? "text-emerald-700" : "text-rose-700"}`}>
                           {row.netCents >= 0 ? "+" : "-"}${(Math.abs(row.netCents) / 100).toFixed(2)}
                         </div>
@@ -323,7 +323,7 @@ export default function LedgerPage() {
               {/* Aging Receivables */}
               {agingQuery.data && (
                 <div>
-                  <h3 className="text-sm font-medium text-slate-700 mb-2 flex items-center gap-2">
+                  <h3 className="text-sm font-medium text-foreground mb-2 flex items-center gap-2">
                     <Clock className="h-4 w-4 text-amber-600" />
                     Aging Receivables
                   </h3>
@@ -341,7 +341,7 @@ export default function LedgerPage() {
                           key={b.key}
                           className={`rounded-lg border px-3 py-2 transition-colors ${
                             !hasBalance
-                              ? "border-slate-200 bg-slate-50"
+                              ? "border-border bg-muted"
                               : b.severity === "critical"
                               ? "border-red-200 bg-red-50"
                               : b.severity === "high"
@@ -351,10 +351,10 @@ export default function LedgerPage() {
                               : "border-emerald-200 bg-emerald-50"
                           }`}
                         >
-                          <div className={`text-xs ${hasBalance ? (b.severity === "critical" ? "text-red-700" : b.severity === "high" ? "text-orange-700" : b.severity === "medium" ? "text-amber-700" : "text-emerald-700") : "text-slate-500"}`}>
+                          <div className={`text-xs ${hasBalance ? (b.severity === "critical" ? "text-red-700" : b.severity === "high" ? "text-orange-700" : b.severity === "medium" ? "text-amber-700" : "text-emerald-700") : "text-muted-foreground"}`}>
                             {b.label}
                           </div>
-                          <div className={`text-sm font-semibold ${hasBalance ? (b.severity === "critical" ? "text-red-900" : b.severity === "high" ? "text-orange-900" : b.severity === "medium" ? "text-amber-900" : "text-emerald-900") : "text-slate-400"}`}>
+                          <div className={`text-sm font-semibold ${hasBalance ? (b.severity === "critical" ? "text-red-900" : b.severity === "high" ? "text-orange-900" : b.severity === "medium" ? "text-amber-900" : "text-emerald-900") : "text-muted-foreground"}`}>
                             ${(amount / 100).toFixed(2)}
                           </div>
                         </div>
@@ -381,7 +381,7 @@ export default function LedgerPage() {
                       : 'border-status-success/20 bg-status-success/10'
                     }`}>
                     <div className="flex items-center justify-between mb-3">
-                      <h3 className="font-semibold text-slate-900 flex items-center gap-2">
+                      <h3 className="font-semibold text-foreground flex items-center gap-2">
                         {isBalanced ? (
                           <CheckCircle className="h-5 w-5 text-emerald-600" />
                         ) : needsReview ? (
@@ -428,22 +428,22 @@ export default function LedgerPage() {
 
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
                       <div>
-                        <div className="text-slate-500 text-xs">Total Credits</div>
+                        <div className="text-muted-foreground text-xs">Total Credits</div>
                         <div className="font-bold text-emerald-700 text-lg">${(totalCredits / 100).toFixed(2)}</div>
                       </div>
                       <div>
-                        <div className="text-slate-500 text-xs">Total Debits</div>
+                        <div className="text-muted-foreground text-xs">Total Debits</div>
                         <div className="font-bold text-rose-700 text-lg">${(totalDebits / 100).toFixed(2)}</div>
                       </div>
                       <div>
-                        <div className="text-slate-500 text-xs">Net Balance</div>
+                        <div className="text-muted-foreground text-xs">Net Balance</div>
                         <div className={`font-bold text-lg ${netBalance >= 0 ? 'text-emerald-700' : 'text-rose-700'}`}>
                           {netBalance >= 0 ? '+' : ''}${(netBalance / 100).toFixed(2)}
                         </div>
                       </div>
                       <div>
-                        <div className="text-slate-500 text-xs">Missing GL Codes</div>
-                        <div className={`font-bold text-lg ${missingGlCount > 0 ? 'text-amber-700' : 'text-slate-400'}`}>
+                        <div className="text-muted-foreground text-xs">Missing GL Codes</div>
+                        <div className={`font-bold text-lg ${missingGlCount > 0 ? 'text-amber-700' : 'text-muted-foreground'}`}>
                           {missingGlCount}
                         </div>
                       </div>
@@ -455,33 +455,33 @@ export default function LedgerPage() {
               {ledgerQuery.isLoading && (
                 <div className="space-y-2">
                   {[...Array(5)].map((_, i) => (
-                    <div key={i} className="h-12 bg-slate-100 rounded animate-pulse" />
+                    <div key={i} className="h-12 bg-muted rounded animate-pulse" />
                   ))}
                 </div>
               )}
 
               {/* Ledger Table */}
               {!ledgerQuery.isLoading && (
-                <div className="overflow-auto rounded-lg border border-slate-200">
+                <div className="overflow-auto rounded-lg border border-border">
                   <table className="min-w-full text-sm">
-                    <thead className="bg-slate-50">
-                      <tr className="text-left text-slate-600">
+                    <thead className="bg-muted">
+                      <tr className="text-left text-muted-foreground">
                         <th scope="col" className="px-3 py-3">
                           <button
                             onClick={() => handleSort("occurredAt")}
-                            className="flex items-center gap-1 font-medium hover:text-slate-900 transition-colors"
+                            className="flex items-center gap-1 font-medium hover:text-foreground transition-colors"
                           >
                             Date
-                            <ArrowUpDown className={`h-3.5 w-3.5 ${sortField === "occurredAt" ? "text-emerald-600" : "text-slate-400"}`} />
+                            <ArrowUpDown className={`h-3.5 w-3.5 ${sortField === "occurredAt" ? "text-emerald-600" : "text-muted-foreground"}`} />
                           </button>
                         </th>
                         <th scope="col" className="px-3 py-3">
                           <button
                             onClick={() => handleSort("glCode")}
-                            className="flex items-center gap-1 font-medium hover:text-slate-900 transition-colors"
+                            className="flex items-center gap-1 font-medium hover:text-foreground transition-colors"
                           >
                             GL Code
-                            <ArrowUpDown className={`h-3.5 w-3.5 ${sortField === "glCode" ? "text-emerald-600" : "text-slate-400"}`} />
+                            <ArrowUpDown className={`h-3.5 w-3.5 ${sortField === "glCode" ? "text-emerald-600" : "text-muted-foreground"}`} />
                           </button>
                         </th>
                         <th scope="col" className="px-3 py-3 font-medium">Account</th>
@@ -489,41 +489,41 @@ export default function LedgerPage() {
                         <th scope="col" className="px-3 py-3">
                           <button
                             onClick={() => handleSort("direction")}
-                            className="flex items-center gap-1 font-medium hover:text-slate-900 transition-colors"
+                            className="flex items-center gap-1 font-medium hover:text-foreground transition-colors"
                           >
                             Type
-                            <ArrowUpDown className={`h-3.5 w-3.5 ${sortField === "direction" ? "text-emerald-600" : "text-slate-400"}`} />
+                            <ArrowUpDown className={`h-3.5 w-3.5 ${sortField === "direction" ? "text-emerald-600" : "text-muted-foreground"}`} />
                           </button>
                         </th>
                         <th scope="col" className="px-3 py-3">
                           <button
                             onClick={() => handleSort("amountCents")}
-                            className="flex items-center gap-1 font-medium hover:text-slate-900 transition-colors"
+                            className="flex items-center gap-1 font-medium hover:text-foreground transition-colors"
                           >
                             Amount
-                            <ArrowUpDown className={`h-3.5 w-3.5 ${sortField === "amountCents" ? "text-emerald-600" : "text-slate-400"}`} />
+                            <ArrowUpDown className={`h-3.5 w-3.5 ${sortField === "amountCents" ? "text-emerald-600" : "text-muted-foreground"}`} />
                           </button>
                         </th>
                         <th scope="col" className="px-3 py-3 font-medium">Description</th>
                       </tr>
                     </thead>
-                    <tbody className="bg-white divide-y divide-slate-100">
+                    <tbody className="bg-card divide-y divide-border">
                       {filteredEntries.map((row) => (
-                        <tr key={row.id} className="hover:bg-slate-50 transition-colors">
-                          <td className="px-3 py-3 text-slate-700 whitespace-nowrap">
+                        <tr key={row.id} className="hover:bg-muted transition-colors">
+                          <td className="px-3 py-3 text-foreground whitespace-nowrap">
                             {new Date(row.occurredAt).toLocaleDateString()}
                           </td>
                           <td className="px-3 py-3">
                             {row.glCode ? (
-                              <span className="px-2 py-0.5 bg-slate-100 text-slate-700 rounded text-xs font-mono">
+                              <span className="px-2 py-0.5 bg-muted text-foreground rounded text-xs font-mono">
                                 {row.glCode}
                               </span>
                             ) : (
                               <span className="text-amber-600 text-xs">Missing</span>
                             )}
                           </td>
-                          <td className="px-3 py-3 text-slate-700">{row.account || "—"}</td>
-                          <td className="px-3 py-3 text-slate-700 font-mono text-xs">
+                          <td className="px-3 py-3 text-foreground">{row.account || "—"}</td>
+                          <td className="px-3 py-3 text-foreground font-mono text-xs">
                             {row.reservationId ? row.reservationId.slice(0, 8) : "—"}
                           </td>
                           <td className="px-3 py-3">
@@ -540,10 +540,10 @@ export default function LedgerPage() {
                               {row.direction}
                             </span>
                           </td>
-                          <td className="px-3 py-3 font-semibold text-slate-900 tabular-nums">
+                          <td className="px-3 py-3 font-semibold text-foreground tabular-nums">
                             ${(row.amountCents / 100).toFixed(2)}
                           </td>
-                          <td className="px-3 py-3 text-slate-600 max-w-[200px] truncate">
+                          <td className="px-3 py-3 text-muted-foreground max-w-[200px] truncate">
                             {row.description || "—"}
                           </td>
                         </tr>
@@ -552,12 +552,12 @@ export default function LedgerPage() {
                         <tr>
                           <td colSpan={7} className="px-3 py-12 text-center">
                             <div className="flex flex-col items-center gap-3">
-                              <div className="p-4 bg-slate-100 rounded-full">
-                                <FileText className="h-8 w-8 text-slate-400" />
+                              <div className="p-4 bg-muted rounded-full">
+                                <FileText className="h-8 w-8 text-muted-foreground" />
                               </div>
                               <div>
-                                <p className="text-slate-600 font-medium">No ledger entries found</p>
-                                <p className="text-sm text-slate-500 mt-1">
+                                <p className="text-muted-foreground font-medium">No ledger entries found</p>
+                                <p className="text-sm text-muted-foreground mt-1">
                                   {searchQuery
                                     ? "Try adjusting your search or filters"
                                     : start || end
@@ -584,7 +584,7 @@ export default function LedgerPage() {
 
               {/* Entry Count */}
               {!ledgerQuery.isLoading && filteredEntries.length > 0 && (
-                <div className="text-xs text-slate-500 text-right">
+                <div className="text-xs text-muted-foreground text-right">
                   Showing {filteredEntries.length} of {ledgerQuery.data?.length || 0} entries
                   {searchQuery && ` matching "${searchQuery}"`}
                 </div>

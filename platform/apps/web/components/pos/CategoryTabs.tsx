@@ -26,8 +26,8 @@ export function CategoryTabs({ categories, selected, onSelect }: CategoryTabsPro
                 className={cn(
                     "px-5 py-3 rounded-full text-sm font-medium whitespace-nowrap transition-colors",
                     selected === "all"
-                        ? "bg-slate-900 text-white shadow-md"
-                        : "bg-white text-slate-600 border border-slate-200 hover:bg-slate-50"
+                        ? "bg-muted text-foreground shadow-md"
+                        : "bg-card text-muted-foreground border border-border hover:bg-muted"
                 )}
             >
                 All items
@@ -40,8 +40,8 @@ export function CategoryTabs({ categories, selected, onSelect }: CategoryTabsPro
                     className={cn(
                         "px-5 py-3 rounded-full text-sm font-medium whitespace-nowrap transition-colors",
                         selected === cat.id
-                            ? "bg-slate-900 text-white shadow-md"
-                            : "bg-white text-slate-600 border border-slate-200 hover:bg-slate-50"
+                            ? "bg-muted text-foreground shadow-md"
+                            : "bg-card text-muted-foreground border border-border hover:bg-muted"
                     )}
                 >
                     {cat.name}

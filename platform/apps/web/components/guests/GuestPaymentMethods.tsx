@@ -35,11 +35,11 @@ type PaymentMethod = {
 };
 
 const CARD_BRAND_COLORS: Record<string, string> = {
-  visa: "bg-blue-600",
-  mastercard: "bg-red-500",
-  amex: "bg-blue-400",
-  discover: "bg-orange-500",
-  default: "bg-slate-600",
+  visa: "bg-status-info",
+  mastercard: "bg-status-error",
+  amex: "bg-status-info/80",
+  discover: "bg-status-warning",
+  default: "bg-muted-foreground",
 };
 
 function getCardBrandColor(brand: string | null): string {
@@ -164,7 +164,7 @@ export function GuestPaymentMethods({ guestId, campgroundId, additionalCampgroun
     return (
       <Card>
         <CardContent className="py-8 flex justify-center">
-          <Loader2 className="w-6 h-6 animate-spin text-slate-400" />
+          <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
         </CardContent>
       </Card>
     );
@@ -193,9 +193,9 @@ export function GuestPaymentMethods({ guestId, campgroundId, additionalCampgroun
         <CardContent>
           {!paymentMethods?.length ? (
             <div className="text-center py-8">
-              <CreditCard className="w-12 h-12 mx-auto text-slate-300 mb-3" />
-              <p className="text-sm text-slate-500">No saved payment methods</p>
-              <p className="text-xs text-slate-400 mt-1">
+              <CreditCard className="w-12 h-12 mx-auto text-muted-foreground/60 mb-3" />
+              <p className="text-sm text-muted-foreground">No saved payment methods</p>
+              <p className="text-xs text-muted-foreground/70 mt-1">
                 Cards are automatically saved when guests pay online, or you can add them manually.
               </p>
             </div>
@@ -205,7 +205,7 @@ export function GuestPaymentMethods({ guestId, campgroundId, additionalCampgroun
                 <div
                   key={pm.id}
                   className={`flex items-center justify-between p-4 rounded-lg border ${
-                    pm.isDefault ? "border-emerald-200 bg-emerald-50/50" : "border-slate-200 bg-slate-50"
+                    pm.isDefault ? "border-status-success-border bg-status-success-bg" : "border-border bg-muted/40"
                   }`}
                 >
                   <div className="flex items-center gap-4">
@@ -228,10 +228,10 @@ export function GuestPaymentMethods({ guestId, campgroundId, additionalCampgroun
                           </Badge>
                         )}
                         {pm.nickname && (
-                          <span className="text-sm text-slate-500">({pm.nickname})</span>
+                          <span className="text-sm text-muted-foreground">({pm.nickname})</span>
                         )}
                       </div>
-                      <div className="text-xs text-slate-500 mt-1">
+                      <div className="text-xs text-muted-foreground mt-1">
                         Expires {formatExpiry(pm.expMonth, pm.expYear)} · {getAddedByLabel(pm.addedBy)}
                       </div>
                     </div>
@@ -262,7 +262,7 @@ export function GuestPaymentMethods({ guestId, campgroundId, additionalCampgroun
                       size="sm"
                       onClick={() => setDeleteConfirm(pm.id)}
                     >
-                      <Trash2 className="w-4 h-4 text-slate-400" />
+                      <Trash2 className="w-4 h-4 text-muted-foreground" />
                     </Button>
                   </div>
                 </div>
@@ -270,10 +270,10 @@ export function GuestPaymentMethods({ guestId, campgroundId, additionalCampgroun
             </div>
           )}
 
-          <div className="mt-4 p-3 bg-blue-50 rounded-lg border border-blue-100">
+          <div className="mt-4 p-3 bg-status-info-bg rounded-lg border border-status-info-border">
             <div className="flex items-start gap-2">
-              <Shield className="w-4 h-4 text-blue-600 mt-0.5" />
-              <div className="text-xs text-blue-800">
+              <Shield className="w-4 h-4 text-status-info mt-0.5" />
+              <div className="text-xs text-status-info-text">
                 <p className="font-medium">PCI Compliant Card Storage</p>
                 <p className="mt-0.5">
                   Card details are securely stored with Stripe. We never store raw card numbers.
@@ -295,12 +295,12 @@ export function GuestPaymentMethods({ guestId, campgroundId, additionalCampgroun
             </DialogDescription>
           </DialogHeader>
           <div className="py-4">
-            <p className="text-sm text-slate-600 mb-4">
+            <p className="text-sm text-muted-foreground mb-4">
               This will create a Stripe SetupIntent. In production, you would use Stripe Elements
               or the Payment Element to collect card details securely.
             </p>
-            <div className="p-4 bg-slate-50 rounded-lg border">
-              <p className="text-xs text-slate-500">
+            <div className="p-4 bg-muted/40 rounded-lg border border-border">
+              <p className="text-xs text-muted-foreground">
                 The guest can also add cards themselves through the guest portal, or cards are
                 automatically saved when they make payments online.
               </p>

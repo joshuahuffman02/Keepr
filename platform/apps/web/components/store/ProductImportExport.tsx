@@ -294,8 +294,8 @@ export function ProductImportExport({ campgroundId }: ProductImportExportProps) 
                                     }`}>
                                     {idx + 1}
                                 </div>
-                                <span className="text-sm text-slate-600 capitalize">{step}</span>
-                                {idx < 3 && <ArrowRight className="h-4 w-4 text-slate-300" />}
+                                <span className="text-sm text-muted-foreground capitalize">{step}</span>
+                                {idx < 3 && <ArrowRight className="h-4 w-4 text-muted-foreground" />}
                             </div>
                         ))}
                     </div>
@@ -303,9 +303,9 @@ export function ProductImportExport({ campgroundId }: ProductImportExportProps) 
                     {/* Step 1: Upload */}
                     {importStep === "upload" && (
                         <div className="py-8 text-center space-y-4">
-                            <div className="border-2 border-dashed border-slate-200 rounded-lg p-8">
-                                <Upload className="h-12 w-12 mx-auto text-slate-400 mb-4" />
-                                <p className="text-slate-600 mb-4">Drop a CSV file here or click to browse</p>
+                            <div className="border-2 border-dashed border-border rounded-lg p-8">
+                                <Upload className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+                                <p className="text-muted-foreground mb-4">Drop a CSV file here or click to browse</p>
                                 <input
                                     ref={fileInputRef}
                                     type="file"
@@ -320,7 +320,7 @@ export function ProductImportExport({ campgroundId }: ProductImportExportProps) 
                                     </label>
                                 </Button>
                             </div>
-                            <p className="text-xs text-slate-500">
+                            <p className="text-xs text-muted-foreground">
                                 Need a template? <button onClick={downloadTemplate} className="text-emerald-600 underline">Download here</button>
                             </p>
                         </div>
@@ -329,21 +329,21 @@ export function ProductImportExport({ campgroundId }: ProductImportExportProps) 
                     {/* Step 2: Column Mapping */}
                     {importStep === "mapping" && (
                         <div className="space-y-4">
-                            <p className="text-sm text-slate-600">
+                            <p className="text-sm text-muted-foreground">
                                 Map your CSV columns to product fields. Found {rawData.length} rows.
                             </p>
                             <div className="space-y-2 max-h-[300px] overflow-y-auto">
                                 {PRODUCT_COLUMNS.map(col => (
-                                    <div key={col.key} className="flex items-center gap-4 p-2 rounded-lg bg-slate-50">
-                                        <div className="w-40 text-sm font-medium text-slate-700">
+                                    <div key={col.key} className="flex items-center gap-4 p-2 rounded-lg bg-muted">
+                                        <div className="w-40 text-sm font-medium text-foreground">
                                             {col.label}
                                             {col.required && <span className="text-red-500 ml-1">*</span>}
                                         </div>
-                                        <ArrowRight className="h-4 w-4 text-slate-400" />
+                                        <ArrowRight className="h-4 w-4 text-muted-foreground" />
                                         <select
                                             value={columnMapping[col.key] ?? ""}
                                             onChange={(e) => setColumnMapping({ ...columnMapping, [col.key]: e.target.value })}
-                                            className="flex-1 rounded-md border border-slate-200 px-3 py-2 text-sm"
+                                            className="flex-1 rounded-md border border-border px-3 py-2 text-sm"
                                         >
                                             <option value="">-- Skip --</option>
                                             {headers.map((h, idx) => (
@@ -365,12 +365,12 @@ export function ProductImportExport({ campgroundId }: ProductImportExportProps) 
                     {/* Step 3: Preview */}
                     {importStep === "preview" && (
                         <div className="space-y-4">
-                            <p className="text-sm text-slate-600">
+                            <p className="text-sm text-muted-foreground">
                                 Preview of first 5 rows ({rawData.length} total)
                             </p>
                             <div className="overflow-x-auto border rounded-lg">
                                 <table className="w-full text-sm">
-                                    <thead className="bg-slate-50">
+                                    <thead className="bg-muted">
                                         <tr>
                                             <th className="px-3 py-2 text-left">Row</th>
                                             <th className="px-3 py-2 text-left">Name</th>
@@ -382,7 +382,7 @@ export function ProductImportExport({ campgroundId }: ProductImportExportProps) 
                                     <tbody className="divide-y">
                                         {previewData.map(row => (
                                             <tr key={row._rowNum}>
-                                                <td className="px-3 py-2 text-slate-500">{row._rowNum}</td>
+                                                <td className="px-3 py-2 text-muted-foreground">{row._rowNum}</td>
                                                 <td className="px-3 py-2 font-medium">{row.name || <span className="text-red-500">Missing</span>}</td>
                                                 <td className="px-3 py-2">{row.priceCents ? `$${(parseInt(row.priceCents) / 100).toFixed(2)}` : <span className="text-red-500">Missing</span>}</td>
                                                 <td className="px-3 py-2">{row.sku || "—"}</td>
@@ -405,7 +405,7 @@ export function ProductImportExport({ campgroundId }: ProductImportExportProps) 
                     {importStep === "importing" && (
                         <div className="py-12 text-center">
                             <div className="animate-spin w-12 h-12 border-4 border-emerald-500 border-t-transparent rounded-full mx-auto mb-4" />
-                            <p className="text-slate-600">Importing products...</p>
+                            <p className="text-muted-foreground">Importing products...</p>
                         </div>
                     )}
 
@@ -421,8 +421,8 @@ export function ProductImportExport({ campgroundId }: ProductImportExportProps) 
                                 )}
                             </div>
                             <div>
-                                <p className="text-lg font-medium text-slate-900">Import Complete</p>
-                                <p className="text-sm text-slate-600 mt-1">
+                                <p className="text-lg font-medium text-foreground">Import Complete</p>
+                                <p className="text-sm text-muted-foreground mt-1">
                                     {importResults.success} products imported successfully
                                     {importResults.failed > 0 && `, ${importResults.failed} failed`}
                                 </p>

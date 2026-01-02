@@ -149,7 +149,7 @@ export function ReservationBreakdown({ compact = false }: ReservationBreakdownPr
 
   if (compact) {
     return (
-      <div className="text-xs text-slate-500 space-y-1 py-2">
+      <div className="text-xs text-muted-foreground space-y-1 py-2">
         <div className="flex justify-between">
           <span>Base ({quote?.nights ?? '?'} nights)</span>
           <span>{formatCurrency(quote?.baseSubtotalCents ?? baseCents)}</span>
@@ -187,7 +187,7 @@ export function ReservationBreakdown({ compact = false }: ReservationBreakdownPr
   return (
     <Collapsible open={isOpen} onOpenChange={setIsOpen}>
       <CollapsibleTrigger asChild>
-        <button className="flex items-center justify-between w-full py-2 text-sm font-medium text-slate-700 hover:text-slate-900 transition-colors border-b border-slate-100">
+        <button className="flex items-center justify-between w-full py-2 text-sm font-medium text-foreground hover:text-foreground transition-colors border-b border-border">
           <span className="flex items-center gap-2">
             <Info className="w-4 h-4" />
             Pricing Breakdown
@@ -200,11 +200,11 @@ export function ReservationBreakdown({ compact = false }: ReservationBreakdownPr
           {/* Base Rate */}
           <div className="space-y-1">
             <div className="flex justify-between">
-              <span className="text-slate-600">Base Lodging ({quote?.nights ?? '?'} nights)</span>
-              <span className="text-slate-900">{formatCurrency(quote?.baseSubtotalCents ?? baseCents)}</span>
+              <span className="text-muted-foreground">Base Lodging ({quote?.nights ?? '?'} nights)</span>
+              <span className="text-foreground">{formatCurrency(quote?.baseSubtotalCents ?? baseCents)}</span>
             </div>
             {quote?.perNightCents && (
-              <div className="flex justify-between text-xs text-slate-400 pl-3">
+              <div className="flex justify-between text-xs text-muted-foreground pl-3">
                 <span>Avg per night</span>
                 <span>{formatCurrency(quote.perNightCents)}/night</span>
               </div>
@@ -214,12 +214,12 @@ export function ReservationBreakdown({ compact = false }: ReservationBreakdownPr
           {/* Applied Pricing Rules */}
           {quote?.appliedRules && quote.appliedRules.length > 0 && (
             <div className="space-y-1 pt-1">
-              <div className="text-xs font-medium text-slate-500 uppercase tracking-wide">
+              <div className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
                 Pricing Rules
               </div>
               {quote.appliedRules.map((rule, idx) => (
                 <div key={rule.id + idx} className="flex justify-between pl-2">
-                  <span className="flex items-center gap-1.5 text-slate-600">
+                  <span className="flex items-center gap-1.5 text-muted-foreground">
                     {getRuleIcon(rule.type)}
                     <TooltipProvider>
                       <Tooltip>
@@ -243,7 +243,7 @@ export function ReservationBreakdown({ compact = false }: ReservationBreakdownPr
           {/* Dynamic pricing (if no detailed rules) */}
           {quote?.rulesDeltaCents !== undefined && quote.rulesDeltaCents !== 0 && !quote.appliedRules?.length && (
             <div className="flex justify-between">
-              <span className="flex items-center gap-1.5 text-slate-600">
+              <span className="flex items-center gap-1.5 text-muted-foreground">
                 <TrendingUp className="w-3 h-3" />
                 Dynamic Pricing
               </span>
@@ -256,34 +256,34 @@ export function ReservationBreakdown({ compact = false }: ReservationBreakdownPr
           {/* Early check-in / Late checkout */}
           {earlyCheckInCharge > 0 && (
             <div className="flex justify-between">
-              <span className="flex items-center gap-1.5 text-slate-600">
+              <span className="flex items-center gap-1.5 text-muted-foreground">
                 <Clock className="w-3 h-3" />
                 Early Check-in
               </span>
-              <span className="text-slate-900">+{formatCurrency(earlyCheckInCharge)}</span>
+              <span className="text-foreground">+{formatCurrency(earlyCheckInCharge)}</span>
             </div>
           )}
           {lateCheckoutCharge > 0 && (
             <div className="flex justify-between">
-              <span className="flex items-center gap-1.5 text-slate-600">
+              <span className="flex items-center gap-1.5 text-muted-foreground">
                 <Clock className="w-3 h-3" />
                 Late Checkout
               </span>
-              <span className="text-slate-900">+{formatCurrency(lateCheckoutCharge)}</span>
+              <span className="text-foreground">+{formatCurrency(lateCheckoutCharge)}</span>
             </div>
           )}
 
           {/* Fees Section - Platform Fee + CC Processing Fee */}
           {(feesCents > 0 || platformFeeCents > 0) && (
-            <div className="space-y-1.5 pt-2 border-t border-slate-100">
-              <div className="text-xs font-medium text-slate-500 uppercase tracking-wide">
+            <div className="space-y-1.5 pt-2 border-t border-border">
+              <div className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
                 Fees & Processing
               </div>
 
               {/* Platform Fee (goes to Campreserv) */}
               {platformFeeCents > 0 && (
                 <div className="flex justify-between pl-2">
-                  <span className="flex items-center gap-1.5 text-slate-600">
+                  <span className="flex items-center gap-1.5 text-muted-foreground">
                     <Building2 className="w-3 h-3" />
                     <TooltipProvider>
                       <Tooltip>
@@ -292,13 +292,13 @@ export function ReservationBreakdown({ compact = false }: ReservationBreakdownPr
                         </TooltipTrigger>
                         <TooltipContent>
                           <p className="text-xs">Per-booking fee ({billingPlanLabel} plan)</p>
-                          <p className="text-xs text-slate-400">Goes to Campreserv</p>
+                          <p className="text-xs text-muted-foreground">Goes to Campreserv</p>
                         </TooltipContent>
                       </Tooltip>
                     </TooltipProvider>
                   </span>
                   <span className="flex items-center gap-1 text-xs">
-                    <span className={platformFeeMode === "absorb" ? "line-through text-slate-400" : "text-slate-900"}>
+                    <span className={platformFeeMode === "absorb" ? "line-through text-muted-foreground" : "text-foreground"}>
                       {formatCurrency(platformFeeCents)}
                     </span>
                     {platformFeeMode === "absorb" && (
@@ -311,7 +311,7 @@ export function ReservationBreakdown({ compact = false }: ReservationBreakdownPr
               {/* CC Processing Fee (goes to Stripe) - only show for card payments */}
               {isCardPayment && (
                 <div className="flex justify-between pl-2">
-                  <span className="flex items-center gap-1.5 text-slate-600">
+                  <span className="flex items-center gap-1.5 text-muted-foreground">
                     <CreditCard className="w-3 h-3" />
                     <TooltipProvider>
                       <Tooltip>
@@ -320,12 +320,12 @@ export function ReservationBreakdown({ compact = false }: ReservationBreakdownPr
                         </TooltipTrigger>
                         <TooltipContent>
                           <p className="text-xs">{ccFeePercent}% + ${(ccFeeFlatCents / 100).toFixed(2)} per transaction</p>
-                          <p className="text-xs text-slate-400">Goes to Stripe (card payments only)</p>
+                          <p className="text-xs text-muted-foreground">Goes to Stripe (card payments only)</p>
                         </TooltipContent>
                       </Tooltip>
                     </TooltipProvider>
                   </span>
-                  <span className="text-xs text-slate-900">
+                  <span className="text-xs text-foreground">
                     ~{formatCurrency(estimatedCCFeeCents)}
                   </span>
                 </div>
@@ -333,9 +333,9 @@ export function ReservationBreakdown({ compact = false }: ReservationBreakdownPr
 
               {/* Total fees if guest pays any */}
               {feesCents > 0 && (
-                <div className="flex justify-between text-xs text-slate-500 pl-4 pt-1 border-t border-slate-50">
+                <div className="flex justify-between text-xs text-muted-foreground pl-4 pt-1 border-t border-border">
                   <span>Fees charged to guest</span>
-                  <span className="text-slate-900">+{formatCurrency(feesCents)}</span>
+                  <span className="text-foreground">+{formatCurrency(feesCents)}</span>
                 </div>
               )}
             </div>
@@ -344,8 +344,8 @@ export function ReservationBreakdown({ compact = false }: ReservationBreakdownPr
           {/* Taxes */}
           {taxCents > 0 && (
             <div className="flex justify-between">
-              <span className="text-slate-600">Taxes</span>
-              <span className="text-slate-900">+{formatCurrency(taxCents)}</span>
+              <span className="text-muted-foreground">Taxes</span>
+              <span className="text-foreground">+{formatCurrency(taxCents)}</span>
             </div>
           )}
 
@@ -361,9 +361,9 @@ export function ReservationBreakdown({ compact = false }: ReservationBreakdownPr
           )}
 
           {/* Subtotal before extras */}
-          <div className="flex justify-between pt-2 border-t border-slate-200">
-            <span className="text-slate-600">Reservation Subtotal</span>
-            <span className="text-slate-900">{formatCurrency(totalCents)}</span>
+          <div className="flex justify-between pt-2 border-t border-border">
+            <span className="text-muted-foreground">Reservation Subtotal</span>
+            <span className="text-foreground">{formatCurrency(totalCents)}</span>
           </div>
 
           {/* Charity Round-Up (from context - shows when opted in) */}
@@ -379,7 +379,7 @@ export function ReservationBreakdown({ compact = false }: ReservationBreakdownPr
                       </TooltipTrigger>
                       <TooltipContent>
                         <p className="text-xs">100% goes to charity</p>
-                        <p className="text-xs text-slate-400">CC fee (~{formatCurrency(charityDonationCCFeeCents)}) absorbed by campground</p>
+                        <p className="text-xs text-muted-foreground">CC fee (~{formatCurrency(charityDonationCCFeeCents)}) absorbed by campground</p>
                       </TooltipContent>
                     </Tooltip>
                   </TooltipProvider>
@@ -393,9 +393,9 @@ export function ReservationBreakdown({ compact = false }: ReservationBreakdownPr
           )}
 
           {/* Grand Total - should be a nice round number when charity is opted in */}
-          <div className="flex justify-between pt-2 border-t border-slate-200 font-medium">
-            <span className="text-slate-900">You Pay</span>
-            <span className="text-lg text-slate-900">{formatCurrency(grandTotalCents)}</span>
+          <div className="flex justify-between pt-2 border-t border-border font-medium">
+            <span className="text-foreground">You Pay</span>
+            <span className="text-lg text-foreground">{formatCurrency(grandTotalCents)}</span>
           </div>
         </div>
       </CollapsibleContent>

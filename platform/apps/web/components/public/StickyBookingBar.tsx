@@ -33,7 +33,7 @@ export function StickyBookingBar({
     <div
       className={cn(
         "fixed bottom-0 left-0 right-0 z-50 md:hidden",
-        "bg-white border-t border-slate-200 shadow-lg",
+        "bg-card border-t border-border shadow-lg",
         "transform transition-transform duration-300 ease-out",
         isVisible ? "translate-y-0" : "translate-y-full",
         className
@@ -44,14 +44,14 @@ export function StickyBookingBar({
         <div className="flex-1 min-w-0">
           {priceFrom ? (
             <>
-              <div className="text-lg font-bold text-slate-900">
+              <div className="text-lg font-bold text-foreground">
                 From ${priceFrom}
-                <span className="text-sm font-normal text-slate-500">/night</span>
+                <span className="text-sm font-normal text-muted-foreground">/night</span>
               </div>
-              <p className="text-xs text-slate-500 truncate">{campgroundName}</p>
+              <p className="text-xs text-muted-foreground truncate">{campgroundName}</p>
             </>
           ) : (
-            <div className="text-sm font-medium text-slate-900 truncate">
+            <div className="text-sm font-medium text-foreground truncate">
               {campgroundName}
             </div>
           )}

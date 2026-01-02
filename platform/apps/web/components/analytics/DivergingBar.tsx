@@ -41,17 +41,17 @@ export function DivergingBar({
 
   if (loading) {
     return (
-      <Card className="border-slate-200 dark:border-slate-700">
+      <Card className="border-border dark:border-border">
         <CardHeader>
-          <CardTitle className="text-lg text-slate-900 dark:text-white">{title}</CardTitle>
-          {description && <p className="text-sm text-slate-500 dark:text-slate-400">{description}</p>}
+          <CardTitle className="text-lg text-foreground dark:text-white">{title}</CardTitle>
+          {description && <p className="text-sm text-muted-foreground dark:text-muted-foreground">{description}</p>}
         </CardHeader>
         <CardContent>
           <div className="animate-pulse space-y-4">
             {[...Array(4)].map((_, i) => (
               <div key={i} className="flex items-center gap-4">
-                <div className="w-24 h-4 bg-slate-200 dark:bg-slate-700 rounded" />
-                <div className="flex-1 h-6 bg-slate-200 dark:bg-slate-700 rounded" />
+                <div className="w-24 h-4 bg-muted dark:bg-muted rounded" />
+                <div className="flex-1 h-6 bg-muted dark:bg-muted rounded" />
               </div>
             ))}
           </div>
@@ -61,25 +61,25 @@ export function DivergingBar({
   }
 
   return (
-    <Card className="border-slate-200 dark:border-slate-700">
+    <Card className="border-border dark:border-border">
       <CardHeader>
-        <CardTitle className="text-lg text-slate-900 dark:text-white">{title}</CardTitle>
-        {description && <p className="text-sm text-slate-500 dark:text-slate-400">{description}</p>}
+        <CardTitle className="text-lg text-foreground dark:text-white">{title}</CardTitle>
+        {description && <p className="text-sm text-muted-foreground dark:text-muted-foreground">{description}</p>}
       </CardHeader>
       <CardContent>
         {/* Legend */}
         <div className="flex items-center justify-center gap-6 mb-6 text-sm">
           <div className="flex items-center gap-2">
             <div className="w-4 h-4 rounded bg-green-500" />
-            <span className="text-slate-600 dark:text-slate-400">{positiveLabel}</span>
+            <span className="text-muted-foreground dark:text-muted-foreground">{positiveLabel}</span>
           </div>
           <div className="flex items-center gap-2">
             <div className="w-4 h-4 rounded bg-amber-500" />
-            <span className="text-slate-600 dark:text-slate-400">{neutralLabel}</span>
+            <span className="text-muted-foreground dark:text-muted-foreground">{neutralLabel}</span>
           </div>
           <div className="flex items-center gap-2">
             <div className="w-4 h-4 rounded bg-red-500" />
-            <span className="text-slate-600 dark:text-slate-400">{negativeLabel}</span>
+            <span className="text-muted-foreground dark:text-muted-foreground">{negativeLabel}</span>
           </div>
         </div>
 
@@ -94,7 +94,7 @@ export function DivergingBar({
               <div key={idx} className="flex items-center gap-3">
                 {/* Label */}
                 <div className="w-28 flex-shrink-0 text-right">
-                  <span className="text-sm font-medium text-slate-700 dark:text-slate-300 truncate block">
+                  <span className="text-sm font-medium text-foreground dark:text-muted-foreground truncate block">
                     {item.label}
                   </span>
                   {showScore && item.score !== undefined && (
@@ -124,7 +124,7 @@ export function DivergingBar({
                   </div>
 
                   {/* Center line */}
-                  <div className="w-px h-8 bg-slate-300 dark:bg-slate-600" />
+                  <div className="w-px h-8 bg-muted dark:bg-muted" />
 
                   {/* Positive side (promoters) - left aligned */}
                   <div className="w-1/2 flex justify-start">
@@ -144,7 +144,7 @@ export function DivergingBar({
         </div>
 
         {/* Axis labels */}
-        <div className="flex items-center mt-4 text-xs text-slate-500 dark:text-slate-400">
+        <div className="flex items-center mt-4 text-xs text-muted-foreground dark:text-muted-foreground">
           <div className="w-28 flex-shrink-0" />
           <div className="flex-1 flex justify-between px-2">
             <span>{negativeLabel}</span>

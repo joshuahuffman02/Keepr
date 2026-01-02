@@ -14,12 +14,12 @@ export function GuestCard({ guest }: GuestCardProps) {
         <Card>
             <CardHeader className="flex flex-row items-center justify-between">
                 <CardTitle className="flex items-center gap-2 text-lg">
-                    <User className="w-5 h-5 text-slate-500" />
+                    <User className="w-5 h-5 text-muted-foreground" />
                     Guest Details
                 </CardTitle>
                 <Link
                     href={`/guests/${guest.id}`}
-                    className="text-sm text-blue-600 hover:text-blue-700 flex items-center gap-1"
+                    className="text-sm text-action-primary hover:text-action-primary-hover flex items-center gap-1"
                 >
                     View Profile <ExternalLink className="w-3 h-3" />
                 </Link>
@@ -28,28 +28,28 @@ export function GuestCard({ guest }: GuestCardProps) {
                 <div>
                     <Link
                         href={`/guests/${guest.id}`}
-                        className="font-semibold text-slate-900 text-lg hover:text-blue-600 transition-colors"
+                        className="font-semibold text-foreground text-lg hover:text-action-primary transition-colors"
                     >
                         {guest.primaryFirstName} {guest.primaryLastName}
                     </Link>
-                    <div className="text-sm text-slate-500">Guest since {createdYear}</div>
+                    <div className="text-sm text-muted-foreground">Guest since {createdYear}</div>
                 </div>
 
                 <div className="space-y-3">
-                    <div className="flex items-center gap-3 text-slate-600">
+                    <div className="flex items-center gap-3 text-muted-foreground">
                         <Mail className="w-4 h-4" />
-                        <a href={`mailto:${guest.email}`} className="hover:text-blue-600 transition-colors">
+                        <a href={`mailto:${guest.email}`} className="hover:text-action-primary transition-colors">
                             {guest.email}
                         </a>
                     </div>
-                    <div className="flex items-center gap-3 text-slate-600">
+                    <div className="flex items-center gap-3 text-muted-foreground">
                         <Phone className="w-4 h-4" />
-                        <a href={`tel:${guest.phone}`} className="hover:text-blue-600 transition-colors">
+                        <a href={`tel:${guest.phone}`} className="hover:text-action-primary transition-colors">
                             {guest.phone}
                         </a>
                     </div>
                     {(guest.city || guest.state) && (
-                        <div className="flex items-center gap-3 text-slate-600">
+                        <div className="flex items-center gap-3 text-muted-foreground">
                             <MapPin className="w-4 h-4" />
                             <span>
                                 {[guest.city, guest.state].filter(Boolean).join(", ")}

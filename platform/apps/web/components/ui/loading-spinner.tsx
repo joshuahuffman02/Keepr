@@ -42,7 +42,7 @@ export function LoadingSpinner({
     >
       <div
         className={cn(
-          "animate-spin rounded-full border-slate-300 border-t-action-primary",
+          "animate-spin rounded-full border-border border-t-action-primary",
           sizeClasses[size]
         )}
       />

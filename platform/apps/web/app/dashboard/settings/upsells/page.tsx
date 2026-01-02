@@ -25,7 +25,7 @@ export default function UpsellsPage() {
     <div className="space-y-6">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
-            <h1 className="text-2xl font-bold text-slate-900">Upsells & Add-ons</h1>
+            <h1 className="text-2xl font-bold text-foreground">Upsells & Add-ons</h1>
             <p className="text-muted-foreground">
               Upsells now use your Store add-ons for booking extras and guest portal offers.
             </p>

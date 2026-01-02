@@ -214,12 +214,12 @@ export function PricingPreview() {
             Be One of Our First 45 Founding Campgrounds
           </h2>
 
-          <p className="text-xl text-slate-300 mb-8">
+          <p className="text-xl text-muted-foreground mb-8">
             Lock in per-booking fees that will never increase — $0.75 to $1.25 vs $2.30 standard.
             Once these 45 spots are gone, you'll have helped shape the future of campground software.
           </p>
 
-          <div className="flex flex-wrap items-center justify-center gap-6 text-slate-400">
+          <div className="flex flex-wrap items-center justify-center gap-6 text-muted-foreground">
             <div className="flex items-center gap-2">
               <Shield className="h-5 w-5 text-emerald-400" />
               <span>Per-booking fee locked forever</span>
@@ -242,7 +242,7 @@ export function PricingPreview() {
               amber: {
                 border: "border-amber-500",
                 bg: "bg-amber-500/10",
-                badge: "bg-amber-500 text-slate-900",
+                badge: "bg-amber-500 text-foreground",
                 icon: "text-amber-400",
                 button: "bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400",
                 urgency: "text-amber-400",
@@ -285,7 +285,7 @@ export function PricingPreview() {
                   <div className="flex items-center justify-center gap-2 mb-4">
                     <div className="flex -space-x-1">
                       {[...Array(Math.min(tier.spotsRemaining, 5))].map((_, i) => (
-                        <div key={i} className="w-6 h-6 rounded-full bg-slate-600 border-2 border-slate-800" />
+                        <div key={i} className="w-6 h-6 rounded-full bg-muted border-2 border-border" />
                       ))}
                     </div>
                     <span className={`text-sm font-semibold ${colorStyles.urgency}`}>
@@ -296,16 +296,16 @@ export function PricingPreview() {
                   {/* Pricing */}
                   <div className="space-y-2">
                     <div className="flex items-baseline justify-center gap-1">
-                      <span className="text-3xl text-slate-400">$</span>
+                      <span className="text-3xl text-muted-foreground">$</span>
                       <span className="text-6xl font-bold text-white">{tier.monthlyPrice}</span>
-                      <span className="text-slate-400">/mo</span>
+                      <span className="text-muted-foreground">/mo</span>
                     </div>
-                    <p className="text-slate-400">{tier.monthlyDuration}</p>
-                    <div className="pt-2 border-t border-slate-700/50">
+                    <p className="text-muted-foreground">{tier.monthlyDuration}</p>
+                    <div className="pt-2 border-t border-border/50">
                       <span className="text-emerald-400 font-semibold">
                         ${tier.bookingFee.toFixed(2)} per booking
                       </span>
-                      <span className="text-slate-500 text-sm block">
+                      <span className="text-muted-foreground text-sm block">
                         (pass to guest or absorb)
                       </span>
                     </div>
@@ -317,7 +317,7 @@ export function PricingPreview() {
                   {tier.benefits.map((benefit) => (
                     <li key={benefit} className="flex items-start gap-3">
                       <Check className="h-5 w-5 text-emerald-400 flex-shrink-0 mt-0.5" />
-                      <span className="text-slate-300">{benefit}</span>
+                      <span className="text-muted-foreground">{benefit}</span>
                     </li>
                   ))}
                 </ul>
@@ -339,10 +339,10 @@ export function PricingPreview() {
 
         {/* After Early Access Note */}
         <div className="text-center mb-16">
-          <p className="text-slate-400">
+          <p className="text-muted-foreground">
             After early access fills: <span className="text-white font-semibold">$100/month + $2.30/booking</span>
           </p>
-          <p className="text-slate-500 text-sm mt-2">
+          <p className="text-muted-foreground text-sm mt-2">
             Includes $5/month AI credits. SMS at cost + small markup.
           </p>
         </div>
@@ -357,7 +357,7 @@ export function PricingPreview() {
             <h3 className="text-3xl font-bold text-white mb-4">
               Want Help Getting Set Up?
             </h3>
-            <p className="text-slate-400 max-w-2xl mx-auto">
+            <p className="text-muted-foreground max-w-2xl mx-auto">
               DIY setup is always free with our guides and documentation. But if you'd rather have us handle
               the heavy lifting, we've got you covered.
             </p>
@@ -365,48 +365,48 @@ export function PricingPreview() {
 
           <div className="grid md:grid-cols-2 gap-8">
             {/* Quick Start */}
-            <div className="rounded-2xl border border-slate-700 bg-slate-800/50 p-8">
+            <div className="rounded-2xl border border-border bg-muted/50 p-8">
               <div className="flex items-center gap-3 mb-4">
                 <div className="p-3 rounded-xl bg-blue-500/20">
                   <Headphones className="h-6 w-6 text-blue-400" />
                 </div>
                 <div>
                   <h4 className="text-xl font-bold text-white">Quick Start</h4>
-                  <p className="text-slate-400 text-sm">We configure, you relax</p>
+                  <p className="text-muted-foreground text-sm">We configure, you relax</p>
                 </div>
               </div>
 
               <div className="flex items-baseline gap-1 mb-6">
-                <span className="text-2xl text-slate-400">$</span>
+                <span className="text-2xl text-muted-foreground">$</span>
                 <span className="text-5xl font-bold text-white">249</span>
-                <span className="text-slate-400">one-time</span>
+                <span className="text-muted-foreground">one-time</span>
               </div>
 
               <ul className="space-y-3 mb-8">
                 <li className="flex items-start gap-3">
                   <Check className="h-5 w-5 text-blue-400 flex-shrink-0 mt-0.5" />
-                  <span className="text-slate-300">Site & rate configuration</span>
+                  <span className="text-muted-foreground">Site & rate configuration</span>
                 </li>
                 <li className="flex items-start gap-3">
                   <Check className="h-5 w-5 text-blue-400 flex-shrink-0 mt-0.5" />
-                  <span className="text-slate-300">Payment gateway setup</span>
+                  <span className="text-muted-foreground">Payment gateway setup</span>
                 </li>
                 <li className="flex items-start gap-3">
                   <Check className="h-5 w-5 text-blue-400 flex-shrink-0 mt-0.5" />
-                  <span className="text-slate-300">30-minute training call</span>
+                  <span className="text-muted-foreground">30-minute training call</span>
                 </li>
                 <li className="flex items-start gap-3">
                   <Check className="h-5 w-5 text-blue-400 flex-shrink-0 mt-0.5" />
-                  <span className="text-slate-300">Policy & email template setup</span>
+                  <span className="text-muted-foreground">Policy & email template setup</span>
                 </li>
               </ul>
 
-              <p className="text-sm text-slate-500">
+              <p className="text-sm text-muted-foreground">
                 Perfect for campgrounds who want to hit the ground running.
               </p>
 
-              <div className="mt-6 pt-6 border-t border-slate-700/50">
-                <p className="text-sm text-slate-400">
+              <div className="mt-6 pt-6 border-t border-border/50">
+                <p className="text-sm text-muted-foreground">
                   <span className="text-blue-400 font-medium">Prefer to pay over time?</span>{" "}
                   Add $1/booking until paid off.
                 </p>
@@ -414,46 +414,46 @@ export function PricingPreview() {
             </div>
 
             {/* Data Import Service */}
-            <div className="rounded-2xl border border-slate-700 bg-slate-800/50 p-8">
+            <div className="rounded-2xl border border-border bg-muted/50 p-8">
               <div className="flex items-center gap-3 mb-4">
                 <div className="p-3 rounded-xl bg-emerald-500/20">
                   <Database className="h-6 w-6 text-emerald-400" />
                 </div>
                 <div>
                   <h4 className="text-xl font-bold text-white">Data Import Service</h4>
-                  <p className="text-slate-400 text-sm">We import your existing reservations</p>
+                  <p className="text-muted-foreground text-sm">We import your existing reservations</p>
                 </div>
               </div>
 
-              <p className="text-slate-300 mb-6">
+              <p className="text-muted-foreground mb-6">
                 You export from your old system, we clean it up and import it. No more manual data entry.
               </p>
 
               <div className="space-y-3 mb-6">
-                <div className="flex justify-between items-center py-2 border-b border-slate-700/50">
-                  <span className="text-slate-300">Up to 500 reservations</span>
+                <div className="flex justify-between items-center py-2 border-b border-border/50">
+                  <span className="text-muted-foreground">Up to 500 reservations</span>
                   <span className="text-white font-semibold">$299</span>
                 </div>
-                <div className="flex justify-between items-center py-2 border-b border-slate-700/50">
-                  <span className="text-slate-300">501 – 2,000 reservations</span>
+                <div className="flex justify-between items-center py-2 border-b border-border/50">
+                  <span className="text-muted-foreground">501 – 2,000 reservations</span>
                   <span className="text-white font-semibold">$599</span>
                 </div>
-                <div className="flex justify-between items-center py-2 border-b border-slate-700/50">
-                  <span className="text-slate-300">2,001 – 5,000 reservations</span>
+                <div className="flex justify-between items-center py-2 border-b border-border/50">
+                  <span className="text-muted-foreground">2,001 – 5,000 reservations</span>
                   <span className="text-white font-semibold">$999</span>
                 </div>
                 <div className="flex justify-between items-center py-2">
-                  <span className="text-slate-300">5,000+ reservations</span>
+                  <span className="text-muted-foreground">5,000+ reservations</span>
                   <span className="text-emerald-400 font-semibold">Custom quote</span>
                 </div>
               </div>
 
-              <p className="text-sm text-slate-500">
+              <p className="text-sm text-muted-foreground">
                 Includes guest data, reservation history, and QA review.
               </p>
 
-              <div className="mt-6 pt-6 border-t border-slate-700/50">
-                <p className="text-sm text-slate-400">
+              <div className="mt-6 pt-6 border-t border-border/50">
+                <p className="text-sm text-muted-foreground">
                   <span className="text-emerald-400 font-medium">Prefer to pay over time?</span>{" "}
                   Add $1/booking until paid off.
                 </p>
@@ -461,7 +461,7 @@ export function PricingPreview() {
             </div>
           </div>
 
-          <p className="text-center text-slate-500 text-sm mt-8">
+          <p className="text-center text-muted-foreground text-sm mt-8">
             Early access tiers include free data migration assistance.
           </p>
         </div>
@@ -470,7 +470,7 @@ export function PricingPreview() {
         <div className="text-center mb-8">
           <button
             onClick={() => setShowComparison(!showComparison)}
-            className="inline-flex items-center gap-2 px-6 py-3 bg-white/10 hover:bg-white/20 text-white rounded-full transition-colors"
+            className="inline-flex items-center gap-2 px-6 py-3 bg-card/10 hover:bg-card/20 text-foreground rounded-full transition-colors"
           >
             {showComparison ? "Hide" : "Show"} Competitor Comparison
             <ArrowRight className={`h-4 w-4 transition-transform ${showComparison ? "rotate-90" : ""}`} />
@@ -479,11 +479,11 @@ export function PricingPreview() {
 
         {/* Competitor Comparison Table */}
         {showComparison && (
-          <div className="overflow-x-auto rounded-2xl border border-slate-700 bg-slate-800/50 backdrop-blur">
+          <div className="overflow-x-auto rounded-2xl border border-border bg-muted/50 backdrop-blur">
             <table className="w-full">
               <thead>
-                <tr className="border-b border-slate-700">
-                  <th className="text-left p-4 text-slate-400 font-medium">Feature</th>
+                <tr className="border-b border-border">
+                  <th className="text-left p-4 text-muted-foreground font-medium">Feature</th>
                   {competitors.map((c) => (
                     <th
                       key={c.name}
@@ -501,40 +501,40 @@ export function PricingPreview() {
               </thead>
               <tbody>
                 {/* Pricing rows */}
-                <tr className="border-b border-slate-700/50">
-                  <td className="p-4 text-slate-300">Monthly Base</td>
+                <tr className="border-b border-border/50">
+                  <td className="p-4 text-muted-foreground">Monthly Base</td>
                   {competitors.map((c) => (
                     <td key={c.name} className={`p-4 text-center ${c.isUs ? "bg-emerald-500/10 text-emerald-400 font-semibold" : "text-white"}`}>
                       {c.monthlyBase}
                     </td>
                   ))}
                 </tr>
-                <tr className="border-b border-slate-700/50">
-                  <td className="p-4 text-slate-300">Per Booking Fee</td>
+                <tr className="border-b border-border/50">
+                  <td className="p-4 text-muted-foreground">Per Booking Fee</td>
                   {competitors.map((c) => (
                     <td key={c.name} className={`p-4 text-center ${c.isUs ? "bg-emerald-500/10 text-emerald-400 font-semibold" : "text-white"}`}>
                       {c.perBooking}
                     </td>
                   ))}
                 </tr>
-                <tr className="border-b border-slate-700/50">
-                  <td className="p-4 text-slate-300">Marketplace Commission</td>
+                <tr className="border-b border-border/50">
+                  <td className="p-4 text-muted-foreground">Marketplace Commission</td>
                   {competitors.map((c) => (
                     <td key={c.name} className={`p-4 text-center ${c.isUs ? "bg-emerald-500/10 text-emerald-400 font-semibold" : c.marketplaceCommission === "10%" ? "text-red-400" : "text-white"}`}>
                       {c.marketplaceCommission}
                     </td>
                   ))}
                 </tr>
-                <tr className="border-b border-slate-700/50">
-                  <td className="p-4 text-slate-300">Setup Fee</td>
+                <tr className="border-b border-border/50">
+                  <td className="p-4 text-muted-foreground">Setup Fee</td>
                   {competitors.map((c) => (
                     <td key={c.name} className={`p-4 text-center ${c.isUs ? "bg-emerald-500/10 text-emerald-400 font-semibold" : "text-white"}`}>
                       {c.setupFee}
                     </td>
                   ))}
                 </tr>
-                <tr className="border-b border-slate-700/50">
-                  <td className="p-4 text-slate-300">Free Trial</td>
+                <tr className="border-b border-border/50">
+                  <td className="p-4 text-muted-foreground">Free Trial</td>
                   {competitors.map((c) => (
                     <td key={c.name} className={`p-4 text-center ${c.isUs ? "bg-emerald-500/10 text-emerald-400 font-semibold" : "text-white"}`}>
                       {c.freeTrialDays === "No" ? <X className="h-5 w-5 mx-auto text-red-400" /> : c.freeTrialDays + " days"}
@@ -544,14 +544,14 @@ export function PricingPreview() {
 
                 {/* Feature rows */}
                 {Object.entries(featureLabels).map(([key, label]) => (
-                  <tr key={key} className="border-b border-slate-700/50">
-                    <td className="p-4 text-slate-300">{label}</td>
+                  <tr key={key} className="border-b border-border/50">
+                    <td className="p-4 text-muted-foreground">{label}</td>
                     {competitors.map((c) => (
                       <td key={c.name} className={`p-4 text-center ${c.isUs ? "bg-emerald-500/10" : ""}`}>
                         {c.features[key as keyof typeof c.features] ? (
                           <Check className={`h-5 w-5 mx-auto ${c.isUs ? "text-emerald-400" : "text-emerald-500"}`} />
                         ) : (
-                          <X className="h-5 w-5 mx-auto text-slate-500" />
+                          <X className="h-5 w-5 mx-auto text-muted-foreground" />
                         )}
                       </td>
                     ))}
@@ -564,13 +564,13 @@ export function PricingPreview() {
 
         {/* Bottom CTA */}
         <div className="mt-16 text-center">
-          <p className="text-slate-400 mb-6">
+          <p className="text-muted-foreground mb-6">
             Join the first 45 campgrounds building the future of reservation software.
           </p>
           <Button
             asChild
             variant="outline"
-            className="border-slate-600 bg-slate-800 text-white hover:bg-slate-700 px-8 py-6 text-lg"
+            className="border-border bg-muted text-foreground hover:bg-muted px-8 py-6 text-lg"
           >
             <Link href="/signup">
               Claim Your Founding Spot
@@ -580,23 +580,23 @@ export function PricingPreview() {
         </div>
 
         {/* Trust Elements */}
-        <div className="mt-16 pt-16 border-t border-slate-700">
+        <div className="mt-16 pt-16 border-t border-border">
           <div className="grid md:grid-cols-4 gap-8 text-center">
             <div>
               <div className="text-4xl font-bold text-amber-400 mb-2">45</div>
-              <p className="text-slate-400">Founding spots available</p>
+              <p className="text-muted-foreground">Founding spots available</p>
             </div>
             <div>
               <div className="text-4xl font-bold text-white mb-2">30-Day</div>
-              <p className="text-slate-400">Money-back guarantee</p>
+              <p className="text-muted-foreground">Money-back guarantee</p>
             </div>
             <div>
               <div className="text-4xl font-bold text-white mb-2">48 Hours</div>
-              <p className="text-slate-400">Average time to go live</p>
+              <p className="text-muted-foreground">Average time to go live</p>
             </div>
             <div>
               <div className="text-4xl font-bold text-white mb-2">Free</div>
-              <p className="text-slate-400">DIY setup with guides</p>
+              <p className="text-muted-foreground">DIY setup with guides</p>
             </div>
           </div>
         </div>

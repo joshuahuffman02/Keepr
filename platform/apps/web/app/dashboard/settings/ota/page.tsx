@@ -224,12 +224,12 @@ function ChannelCard({
           Click to add site mappings
         </div>
       ) : channel.lastSyncAt ? (
-        <div className="mt-3 pt-3 border-t border-slate-100 flex items-center gap-2 text-xs text-slate-500">
+        <div className="mt-3 pt-3 border-t border-border flex items-center gap-2 text-xs text-muted-foreground">
           <Clock className="h-3 w-3" />
           Last sync: {new Date(channel.lastSyncAt).toLocaleString()}
         </div>
       ) : (
-        <div className="mt-3 pt-3 border-t border-slate-100 flex items-center gap-2 text-xs text-slate-500">
+        <div className="mt-3 pt-3 border-t border-border flex items-center gap-2 text-xs text-muted-foreground">
           <Clock className="h-3 w-3" />
           {mappingCount} mapping{mappingCount !== 1 ? "s" : ""} · Never synced
         </div>
@@ -257,7 +257,7 @@ function StatusBadge({ status }: { status?: string }) {
     );
   }
   return (
-    <Badge className="bg-slate-100 text-slate-700 border-slate-200">
+    <Badge className="bg-muted text-foreground border-border">
       <WifiOff className="h-3 w-3 mr-1" />
       Disabled
     </Badge>
@@ -283,7 +283,7 @@ function SyncBadge({ status }: { status?: string }) {
     );
   }
   return (
-    <Badge className="bg-slate-100 text-slate-700 border-slate-200">
+    <Badge className="bg-muted text-foreground border-border">
       <Clock className="h-3 w-3 mr-1" />
       Not started
     </Badge>
@@ -317,7 +317,7 @@ function SecureInput({
       <button
         type="button"
         onClick={() => setShow(!show)}
-        className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors"
+        className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-muted-foreground transition-colors"
         aria-label={show ? "Hide API key" : "Show API key"}
       >
         {show ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
@@ -844,7 +844,7 @@ export default function OtaSettingsPage() {
           {/* Channels list */}
           <div className="lg:col-span-1 space-y-4">
             <div className="flex items-center justify-between">
-              <h2 className="text-lg font-semibold text-slate-900">Your Channels</h2>
+              <h2 className="text-lg font-semibold text-foreground">Your Channels</h2>
               <Button
                 size="sm"
                 variant="ghost"
@@ -873,7 +873,7 @@ export default function OtaSettingsPage() {
                       value={form.name}
                       onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
                       placeholder="e.g., My Hipcamp Listings"
-                      className="bg-white"
+                      className="bg-card"
                     />
                   </div>
 
@@ -883,7 +883,7 @@ export default function OtaSettingsPage() {
                       value={form.provider}
                       onValueChange={(v) => setForm((f) => ({ ...f, provider: v }))}
                     >
-                      <SelectTrigger id="channel-provider" className="bg-white">
+                      <SelectTrigger id="channel-provider" className="bg-card">
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
@@ -905,7 +905,7 @@ export default function OtaSettingsPage() {
                       value={form.status}
                       onValueChange={(v) => setForm((f) => ({ ...f, status: v }))}
                     >
-                      <SelectTrigger id="channel-status" className="bg-white">
+                      <SelectTrigger id="channel-status" className="bg-card">
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
@@ -913,7 +913,7 @@ export default function OtaSettingsPage() {
                           <SelectItem key={opt.value} value={opt.value}>
                             <div>
                               <p>{opt.label}</p>
-                              <p className="text-xs text-slate-500">{opt.description}</p>
+                              <p className="text-xs text-muted-foreground">{opt.description}</p>
                             </div>
                           </SelectItem>
                         ))}
@@ -931,9 +931,9 @@ export default function OtaSettingsPage() {
                         min="0"
                         value={form.rateMultiplier}
                         onChange={(e) => setForm((f) => ({ ...f, rateMultiplier: e.target.value }))}
-                        className="bg-white"
+                        className="bg-card"
                       />
-                      <p className="text-xs text-slate-500">1.15 = 15% markup</p>
+                      <p className="text-xs text-muted-foreground">1.15 = 15% markup</p>
                     </div>
                     <div className="space-y-2">
                       <Label htmlFor="fee-mode">Fee Handling</Label>
@@ -941,7 +941,7 @@ export default function OtaSettingsPage() {
                         value={form.feeMode}
                         onValueChange={(v) => setForm((f) => ({ ...f, feeMode: v }))}
                       >
-                        <SelectTrigger id="fee-mode" className="bg-white">
+                        <SelectTrigger id="fee-mode" className="bg-card">
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
@@ -987,7 +987,7 @@ export default function OtaSettingsPage() {
               {channelsQuery.isLoading ? (
                 <div className="space-y-3">
                   {[1, 2, 3].map((i) => (
-                    <div key={i} className="h-24 rounded-xl bg-slate-100 animate-pulse" />
+                    <div key={i} className="h-24 rounded-xl bg-muted animate-pulse" />
                   ))}
                 </div>
               ) : channelsQuery.data?.map((ch) => (
@@ -1102,14 +1102,14 @@ export default function OtaSettingsPage() {
                   </CardHeader>
                   <CardContent>
                     {/* Mode toggle tabs */}
-                    <div className="mb-4 flex border-b border-slate-200">
+                    <div className="mb-4 flex border-b border-border">
                       <button
                         onClick={() => setMappingMode("sites")}
                         className={cn(
                           "flex items-center gap-2 px-4 py-2 text-sm font-medium border-b-2 transition-colors",
                           mappingMode === "sites"
                             ? "border-blue-600 text-blue-600"
-                            : "border-transparent text-slate-500 hover:text-slate-700"
+                            : "border-transparent text-muted-foreground hover:text-foreground"
                         )}
                       >
                         <MapPin className="h-4 w-4" />
@@ -1124,7 +1124,7 @@ export default function OtaSettingsPage() {
                           "flex items-center gap-2 px-4 py-2 text-sm font-medium border-b-2 transition-colors",
                           mappingMode === "classes"
                             ? "border-blue-600 text-blue-600"
-                            : "border-transparent text-slate-500 hover:text-slate-700"
+                            : "border-transparent text-muted-foreground hover:text-foreground"
                         )}
                       >
                         <Layers className="h-4 w-4" />
@@ -1168,7 +1168,7 @@ export default function OtaSettingsPage() {
                         <div className="rounded-lg border overflow-hidden">
                           <Table>
                             <TableHeader>
-                              <TableRow className="bg-slate-50">
+                              <TableRow className="bg-muted">
                                 <TableHead className="w-1/3">Your Site</TableHead>
                                 <TableHead className="w-1/3">OTA Listing ID</TableHead>
                                 <TableHead className="w-1/6">Status</TableHead>
@@ -1179,8 +1179,8 @@ export default function OtaSettingsPage() {
                               {sitesQuery.isLoading ? (
                                 <TableRow>
                                   <TableCell colSpan={4} className="text-center py-8">
-                                    <Loader2 className="h-6 w-6 mx-auto animate-spin text-slate-400" />
-                                    <p className="mt-2 text-sm text-slate-500">Loading sites...</p>
+                                    <Loader2 className="h-6 w-6 mx-auto animate-spin text-muted-foreground" />
+                                    <p className="mt-2 text-sm text-muted-foreground">Loading sites...</p>
                                   </TableCell>
                                 </TableRow>
                               ) : sitesQuery.data?.length ? (
@@ -1222,7 +1222,7 @@ export default function OtaSettingsPage() {
                                             Unsaved
                                           </Badge>
                                         ) : (
-                                          <Badge variant="outline" className="text-slate-500">
+                                          <Badge variant="outline" className="text-muted-foreground">
                                             Not mapped
                                           </Badge>
                                         )}
@@ -1258,8 +1258,8 @@ export default function OtaSettingsPage() {
                                 })
                               ) : (
                                 <TableRow>
-                                  <TableCell colSpan={4} className="text-center py-8 text-slate-500">
-                                    <AlertCircle className="h-8 w-8 mx-auto mb-2 text-slate-300" />
+                                  <TableCell colSpan={4} className="text-center py-8 text-muted-foreground">
+                                    <AlertCircle className="h-8 w-8 mx-auto mb-2 text-muted-foreground" />
                                     <p>No sites found in this campground.</p>
                                     <p className="text-sm mt-1">Add sites first, then come back to map them.</p>
                                   </TableCell>
@@ -1271,7 +1271,7 @@ export default function OtaSettingsPage() {
 
                         {/* Summary footer for sites */}
                         {sitesQuery.data && sitesQuery.data.length > 0 && (
-                          <div className="mt-4 flex items-center justify-between text-sm text-slate-600">
+                          <div className="mt-4 flex items-center justify-between text-sm text-muted-foreground">
                             <div>
                               {mappingsQuery.data?.filter(m => m.siteId).length || 0} of {sitesQuery.data.length} sites mapped
                             </div>
@@ -1296,7 +1296,7 @@ export default function OtaSettingsPage() {
                         <div className="rounded-lg border overflow-hidden">
                           <Table>
                             <TableHeader>
-                              <TableRow className="bg-slate-50">
+                              <TableRow className="bg-muted">
                                 <TableHead className="w-1/4">Site Class</TableHead>
                                 <TableHead className="w-1/6">Sites</TableHead>
                                 <TableHead className="w-1/3">OTA Listing ID</TableHead>
@@ -1308,8 +1308,8 @@ export default function OtaSettingsPage() {
                               {siteClassesQuery.isLoading ? (
                                 <TableRow>
                                   <TableCell colSpan={5} className="text-center py-8">
-                                    <Loader2 className="h-6 w-6 mx-auto animate-spin text-slate-400" />
-                                    <p className="mt-2 text-sm text-slate-500">Loading site classes...</p>
+                                    <Loader2 className="h-6 w-6 mx-auto animate-spin text-muted-foreground" />
+                                    <p className="mt-2 text-sm text-muted-foreground">Loading site classes...</p>
                                   </TableCell>
                                 </TableRow>
                               ) : siteClassesQuery.data?.length ? (
@@ -1327,13 +1327,13 @@ export default function OtaSettingsPage() {
                                       <TableCell>
                                         <div className="font-medium">{siteClass.name}</div>
                                         {siteClass.description && (
-                                          <div className="text-xs text-slate-500 truncate max-w-[200px]">
+                                          <div className="text-xs text-muted-foreground truncate max-w-[200px]">
                                             {siteClass.description}
                                           </div>
                                         )}
                                       </TableCell>
                                       <TableCell>
-                                        <Badge variant="outline" className="text-slate-600">
+                                        <Badge variant="outline" className="text-muted-foreground">
                                           <Layers className="h-3 w-3 mr-1" />
                                           {siteCount} site{siteCount !== 1 ? "s" : ""}
                                         </Badge>
@@ -1364,7 +1364,7 @@ export default function OtaSettingsPage() {
                                             Unsaved
                                           </Badge>
                                         ) : (
-                                          <Badge variant="outline" className="text-slate-500">
+                                          <Badge variant="outline" className="text-muted-foreground">
                                             Not mapped
                                           </Badge>
                                         )}
@@ -1400,8 +1400,8 @@ export default function OtaSettingsPage() {
                                 })
                               ) : (
                                 <TableRow>
-                                  <TableCell colSpan={5} className="text-center py-8 text-slate-500">
-                                    <Layers className="h-8 w-8 mx-auto mb-2 text-slate-300" />
+                                  <TableCell colSpan={5} className="text-center py-8 text-muted-foreground">
+                                    <Layers className="h-8 w-8 mx-auto mb-2 text-muted-foreground" />
                                     <p>No site classes found in this campground.</p>
                                     <p className="text-sm mt-1">Create site classes first, or use "Map by Site" for 1:1 mapping.</p>
                                   </TableCell>
@@ -1413,7 +1413,7 @@ export default function OtaSettingsPage() {
 
                         {/* Summary footer for site classes */}
                         {siteClassesQuery.data && siteClassesQuery.data.length > 0 && (
-                          <div className="mt-4 flex items-center justify-between text-sm text-slate-600">
+                          <div className="mt-4 flex items-center justify-between text-sm text-muted-foreground">
                             <div>
                               {mappingsQuery.data?.filter(m => m.siteClassId).length || 0} of {siteClassesQuery.data.length} site classes mapped
                             </div>
@@ -1461,10 +1461,10 @@ export default function OtaSettingsPage() {
                       <div className="space-y-2 max-h-48 overflow-y-auto">
                         {importsQuery.data?.length ? (
                           importsQuery.data.slice(0, 5).map((imp) => (
-                            <div key={imp.id} className="flex items-center justify-between p-2 rounded-lg bg-slate-50">
+                            <div key={imp.id} className="flex items-center justify-between p-2 rounded-lg bg-muted">
                               <div>
                                 <p className="font-mono text-sm">{imp.externalReservationId}</p>
-                                <p className="text-xs text-slate-500">{imp.message || "Imported"}</p>
+                                <p className="text-xs text-muted-foreground">{imp.message || "Imported"}</p>
                               </div>
                               <Badge
                                 variant="outline"
@@ -1478,7 +1478,7 @@ export default function OtaSettingsPage() {
                             </div>
                           ))
                         ) : (
-                          <p className="text-center text-sm text-slate-500 py-4">No imports yet</p>
+                          <p className="text-center text-sm text-muted-foreground py-4">No imports yet</p>
                         )}
                       </div>
                     </CardContent>
@@ -1509,7 +1509,7 @@ export default function OtaSettingsPage() {
                       <div className="space-y-2 max-h-48 overflow-y-auto">
                         {logsQuery.data?.length ? (
                           logsQuery.data.slice(0, 5).map((log) => (
-                            <div key={log.id} className="flex items-center justify-between p-2 rounded-lg bg-slate-50">
+                            <div key={log.id} className="flex items-center justify-between p-2 rounded-lg bg-muted">
                               <div className="flex items-center gap-2">
                                 {log.direction === "push" ? (
                                   <Upload className="h-4 w-4 text-blue-500" />
@@ -1518,7 +1518,7 @@ export default function OtaSettingsPage() {
                                 )}
                                 <div>
                                   <p className="text-sm font-medium capitalize">{log.eventType}</p>
-                                  <p className="text-xs text-slate-500">
+                                  <p className="text-xs text-muted-foreground">
                                     {log.createdAt ? new Date(log.createdAt).toLocaleTimeString() : ""}
                                   </p>
                                 </div>
@@ -1527,7 +1527,7 @@ export default function OtaSettingsPage() {
                                 variant="outline"
                                 className={log.status === "success"
                                   ? "text-emerald-700 border-emerald-200"
-                                  : "text-slate-600"
+                                  : "text-muted-foreground"
                                 }
                               >
                                 {log.status}
@@ -1535,7 +1535,7 @@ export default function OtaSettingsPage() {
                             </div>
                           ))
                         ) : (
-                          <p className="text-center text-sm text-slate-500 py-4">No activity yet</p>
+                          <p className="text-center text-sm text-muted-foreground py-4">No activity yet</p>
                         )}
                       </div>
                     </CardContent>
@@ -1545,11 +1545,11 @@ export default function OtaSettingsPage() {
             ) : (
               <Card className="h-full min-h-[400px] flex items-center justify-center">
                 <CardContent className="text-center">
-                  <div className="w-16 h-16 rounded-full bg-slate-100 flex items-center justify-center mx-auto mb-4">
-                    <ChevronRight className="h-8 w-8 text-slate-400" />
+                  <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center mx-auto mb-4">
+                    <ChevronRight className="h-8 w-8 text-muted-foreground" />
                   </div>
-                  <h3 className="font-semibold text-slate-900 mb-1">Select a Channel</h3>
-                  <p className="text-sm text-slate-500">
+                  <h3 className="font-semibold text-foreground mb-1">Select a Channel</h3>
+                  <p className="text-sm text-muted-foreground">
                     Choose a channel from the list to view mappings and sync status
                   </p>
                 </CardContent>
@@ -1562,7 +1562,7 @@ export default function OtaSettingsPage() {
       {/* Advanced settings (collapsible) */}
       {hasChannels && (
         <details className="group">
-          <summary className="flex items-center gap-2 cursor-pointer text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors">
+          <summary className="flex items-center gap-2 cursor-pointer text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
             <Settings2 className="h-4 w-4" />
             Advanced Configuration
             <ChevronRight className="h-4 w-4 transition-transform group-open:rotate-90" />
@@ -1571,7 +1571,7 @@ export default function OtaSettingsPage() {
             <Card>
               <CardHeader>
                 <CardTitle className="text-base flex items-center gap-2">
-                  <Lock className="h-4 w-4 text-slate-600" />
+                  <Lock className="h-4 w-4 text-muted-foreground" />
                   API Credentials
                 </CardTitle>
                 <CardDescription>
@@ -1643,7 +1643,7 @@ export default function OtaSettingsPage() {
                   />
                 </div>
                 <div className="flex items-center justify-between pt-2">
-                  <p className="text-xs text-slate-500">
+                  <p className="text-xs text-muted-foreground">
                     {otaConfigQuery.data?.lastUpdatedAt
                       ? `Last saved ${new Date(otaConfigQuery.data.lastUpdatedAt).toLocaleString()}`
                       : "Not saved yet"}

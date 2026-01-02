@@ -129,7 +129,7 @@ export default function BookingBehaviorPage() {
               </Badge>
             )}
           </div>
-          <p className="text-slate-400 mt-1">
+          <p className="text-muted-foreground mt-1">
             Lead times, channels, and cancellation patterns
           </p>
         </div>
@@ -229,7 +229,7 @@ export default function BookingBehaviorPage() {
       </div>
 
       {/* Cancellation Analysis */}
-      <Card className="bg-slate-800/50 border-slate-700">
+      <Card className="bg-muted/50 border-border">
         <CardHeader>
           <CardTitle className="text-lg text-white flex items-center gap-2">
             <TrendingDown className="h-5 w-5 text-red-400" />
@@ -240,15 +240,15 @@ export default function BookingBehaviorPage() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
             <div className="p-4 bg-red-500/10 border border-red-500/30 rounded-lg text-center">
               <p className="text-3xl font-bold text-white">{data.cancellationAnalysis.overallRate}%</p>
-              <p className="text-sm text-slate-400">Overall Rate</p>
+              <p className="text-sm text-muted-foreground">Overall Rate</p>
             </div>
-            <div className="p-4 bg-slate-700/50 rounded-lg text-center">
+            <div className="p-4 bg-muted/50 rounded-lg text-center">
               <p className="text-3xl font-bold text-white">{data.cancellationAnalysis.totalCancelled.toLocaleString()}</p>
-              <p className="text-sm text-slate-400">Total Cancelled</p>
+              <p className="text-sm text-muted-foreground">Total Cancelled</p>
             </div>
-            <div className="p-4 bg-slate-700/50 rounded-lg text-center">
+            <div className="p-4 bg-muted/50 rounded-lg text-center">
               <p className="text-3xl font-bold text-white">{formatCurrency(data.cancellationAnalysis.lostRevenue)}</p>
-              <p className="text-sm text-slate-400">Lost Revenue</p>
+              <p className="text-sm text-muted-foreground">Lost Revenue</p>
             </div>
           </div>
 

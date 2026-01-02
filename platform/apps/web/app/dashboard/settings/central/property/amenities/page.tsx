@@ -49,8 +49,8 @@ export default function AmenitiesPage() {
     <div className="max-w-4xl space-y-6">
       <div className="flex items-start justify-between">
         <div>
-          <h2 className="text-2xl font-bold text-slate-900">Amenities</h2>
-          <p className="text-slate-500 mt-1">
+          <h2 className="text-2xl font-bold text-foreground">Amenities</h2>
+          <p className="text-muted-foreground mt-1">
             Manage your campground's features and amenities
           </p>
         </div>
@@ -73,8 +73,8 @@ export default function AmenitiesPage() {
                       <Icon className={`h-6 w-6 ${category.color.split(" ")[1]}`} />
                     </div>
                     <div>
-                      <h3 className="font-semibold text-slate-900">{category.name}</h3>
-                      <p className="text-sm text-slate-500 mt-1">
+                      <h3 className="font-semibold text-foreground">{category.name}</h3>
+                      <p className="text-sm text-muted-foreground mt-1">
                         {category.description}
                       </p>
                       <div className="flex gap-2 mt-3">

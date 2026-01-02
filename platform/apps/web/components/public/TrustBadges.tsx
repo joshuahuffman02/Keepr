@@ -54,7 +54,7 @@ export function TrustBadges({ variant = "inline", className, showIcons = true }:
             <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-100 flex-shrink-0">
               <badge.icon className="h-4 w-4 text-emerald-600" />
             </div>
-            <p className="text-sm font-medium text-slate-700">{badge.shortText}</p>
+            <p className="text-sm font-medium text-foreground">{badge.shortText}</p>
           </div>
         ))}
       </div>
@@ -67,7 +67,7 @@ export function TrustBadges({ variant = "inline", className, showIcons = true }:
       {badges.map((badge, i) => (
         <div
           key={i}
-          className="flex items-center gap-2 rounded-full bg-white/10 backdrop-blur-sm px-3 py-1.5 text-sm text-white/90"
+          className="flex items-center gap-2 rounded-full bg-card/10 backdrop-blur-sm px-3 py-1.5 text-sm text-foreground/90"
         >
           {showIcons && (
             <badge.icon className="h-4 w-4" />

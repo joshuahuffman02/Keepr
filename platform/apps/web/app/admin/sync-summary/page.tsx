@@ -59,7 +59,7 @@ export default function SyncSummaryPage() {
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-2xl font-semibold text-white">Sync Summary</h1>
-            <p className="text-slate-400 text-sm">Queue health across offline flows.</p>
+            <p className="text-muted-foreground text-sm">Queue health across offline flows.</p>
           </div>
           <Link href="/pwa/sync-log" className="text-sm text-blue-400 hover:underline">
             View detailed sync log
@@ -72,13 +72,13 @@ export default function SyncSummaryPage() {
           {queueStats.map((q) => (
             <Card key={q.key}>
               <CardHeader>
-                <CardTitle className="text-slate-900 text-base flex items-center gap-2">
+                <CardTitle className="text-foreground text-base flex items-center gap-2">
                   {q.label}
                   <Badge variant={q.count > 0 ? "secondary" : "outline"}>{q.count} queued</Badge>
                   {q.conflicts > 0 && <Badge variant="destructive">{q.conflicts} conflicts</Badge>}
                 </CardTitle>
               </CardHeader>
-              <CardContent className="text-sm text-slate-600 space-y-1">
+              <CardContent className="text-sm text-muted-foreground space-y-1">
                 <div>Next retry: {q.nextRetry ? new Date(q.nextRetry).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }) : "—"}</div>
                 <div>Last error: {q.lastError || "—"}</div>
               </CardContent>

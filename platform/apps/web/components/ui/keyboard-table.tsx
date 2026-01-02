@@ -129,7 +129,7 @@ export const KeyboardTableRow = React.forwardRef<HTMLTableRowElement, KeyboardTa
         tabIndex={0}
         className={cn(
           "border-b transition-colors hover:bg-muted/50",
-          "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-950 focus-visible:ring-offset-2 focus-visible:bg-muted/50",
+          "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:bg-muted/50",
           onActivate && "cursor-pointer",
           className
         )}

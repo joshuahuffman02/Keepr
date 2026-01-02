@@ -161,7 +161,7 @@ function RefundExchangeDialog({ open, onClose, orders, defaultOrderId, onSubmit,
                         <Label htmlFor="order-select">Recent POS order</Label>
                         <select
                             id="order-select"
-                            className="w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm"
+                            className="w-full rounded-md border border-border bg-card px-3 py-2 text-sm"
                             value={orderId}
                             onChange={(e) => setOrderId(e.target.value)}
                         >
@@ -195,7 +195,7 @@ function RefundExchangeDialog({ open, onClose, orders, defaultOrderId, onSubmit,
                                 </Button>
                             </div>
 
-                            <div className="rounded-lg border border-slate-200 p-3">
+                            <div className="rounded-lg border border-border p-3">
                                 <p className="text-sm font-medium mb-2">Items</p>
                                 {activeOrder.items?.length ? (
                                     <div className="space-y-2">
@@ -206,15 +206,15 @@ function RefundExchangeDialog({ open, onClose, orders, defaultOrderId, onSubmit,
                                                         checked={!!selectedItems[item.id]}
                                                         onCheckedChange={(checked) => setSelectedItems((prev) => ({ ...prev, [item.id]: Boolean(checked) }))}
                                                     />
-                                                    <span className="text-slate-800">{item.name}</span>
-                                                    <span className="text-slate-500">× {item.qty}</span>
+                                                    <span className="text-foreground">{item.name}</span>
+                                                    <span className="text-muted-foreground">× {item.qty}</span>
                                                 </div>
-                                                <span className="font-mono text-xs text-slate-700">${((item.totalCents ?? 0) / 100).toFixed(2)}</span>
+                                                <span className="font-mono text-xs text-foreground">${((item.totalCents ?? 0) / 100).toFixed(2)}</span>
                                             </label>
                                         ))}
                                     </div>
                                 ) : (
-                                    <div className="overflow-hidden rounded border border-slate-200 bg-white">
+                                    <div className="overflow-hidden rounded border border-border bg-card">
                                         <table className="w-full text-xs">
                                             <tbody>
                                                 <TableEmpty>No line items available.</TableEmpty>
@@ -235,7 +235,7 @@ function RefundExchangeDialog({ open, onClose, orders, defaultOrderId, onSubmit,
                                     value={overrideAmount}
                                     onChange={(e) => setOverrideAmount(e.target.value)}
                                 />
-                                <p className="text-xs text-slate-500">
+                                <p className="text-xs text-muted-foreground">
                                     Leave blank to use the sum of selected items (${(computedAmount / 100).toFixed(2)}).
                                 </p>
                             </div>
@@ -632,12 +632,12 @@ export default function POSPage() {
                 <div className="flex-1 flex flex-col gap-4 sm:gap-6 min-w-0">
                     <div className="flex items-center justify-between flex-wrap gap-3">
                         <div className="flex items-center gap-3">
-                            <h1 className="text-xl sm:text-2xl font-bold text-slate-900">Point of Sale</h1>
+                            <h1 className="text-xl sm:text-2xl font-bold text-foreground">Point of Sale</h1>
                             {locations.length > 1 && (
                                 <select
                                     value={selectedLocationId || ""}
                                     onChange={(e) => setSelectedLocationId(e.target.value || null)}
-                                    className="rounded-md border border-slate-300 bg-white px-3 py-1.5 text-sm font-medium text-slate-700 shadow-sm hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                                    className="rounded-md border border-border bg-card px-3 py-1.5 text-sm font-medium text-foreground shadow-sm hover:bg-muted focus:outline-none focus:ring-2 focus:ring-emerald-500"
                                 >
                                     {locations.map((loc) => (
                                         <option key={loc.id} value={loc.id}>
@@ -698,10 +698,10 @@ export default function POSPage() {
                                     placeholder="Search products..."
                                     value={searchQuery}
                                     onChange={(e) => setSearchQuery(e.target.value)}
-                                    className="w-full pl-10 pr-4 py-2 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition-shadow"
+                                    className="w-full pl-10 pr-4 py-2 border border-border rounded-lg text-sm focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition-shadow"
                                 />
                                 <svg
-                                    className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400"
+                                    className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground"
                                     fill="none"
                                     stroke="currentColor"
                                     viewBox="0 0 24 24"
@@ -711,7 +711,7 @@ export default function POSPage() {
                                 {searchQuery && (
                                     <button
                                         onClick={() => setSearchQuery("")}
-                                        className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+                                        className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-muted-foreground"
                                         aria-label="Clear search"
                                     >
                                         <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -720,11 +720,11 @@ export default function POSPage() {
                                     </button>
                                 )}
                             </div>
-                            <div className="hidden sm:flex items-center gap-1.5 text-xs text-slate-400">
-                                <kbd className="px-1.5 py-0.5 bg-slate-100 border border-slate-200 rounded text-[10px] font-mono">⌘K</kbd>
+                            <div className="hidden sm:flex items-center gap-1.5 text-xs text-muted-foreground">
+                                <kbd className="px-1.5 py-0.5 bg-muted border border-border rounded text-[10px] font-mono">⌘K</kbd>
                                 <span>search</span>
                                 <span className="mx-1">·</span>
-                                <kbd className="px-1.5 py-0.5 bg-slate-100 border border-slate-200 rounded text-[10px] font-mono">⌘↵</kbd>
+                                <kbd className="px-1.5 py-0.5 bg-muted border border-border rounded text-[10px] font-mono">⌘↵</kbd>
                                 <span>checkout</span>
                             </div>
                         </div>
@@ -796,9 +796,9 @@ export default function POSPage() {
                                     <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 p-4">
                                         {[...Array(8)].map((_, i) => (
                                             <div key={i} className="animate-pulse">
-                                                <div className="aspect-square bg-slate-200 dark:bg-slate-700 rounded-lg mb-3" />
-                                                <div className="h-4 bg-slate-200 dark:bg-slate-700 rounded w-3/4 mb-2" />
-                                                <div className="h-3 bg-slate-200 dark:bg-slate-700 rounded w-1/2" />
+                                                <div className="aspect-square bg-muted dark:bg-muted rounded-lg mb-3" />
+                                                <div className="h-4 bg-muted dark:bg-muted rounded w-3/4 mb-2" />
+                                                <div className="h-3 bg-muted dark:bg-muted rounded w-1/2" />
                                             </div>
                                         ))}
                                     </div>
@@ -809,14 +809,14 @@ export default function POSPage() {
                         </>
                     ) : (
                         <div className="flex-1 flex items-center justify-center">
-                            <div className="text-center text-slate-500">Please select a campground first.</div>
+                            <div className="text-center text-muted-foreground">Please select a campground first.</div>
                         </div>
                     )}
                 </div>
 
                 {/* Desktop Cart Sidebar - hidden on mobile/tablet */}
                 {showContent ? (
-                    <div className="hidden xl:flex w-96 flex-shrink-0 flex-col bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden h-full">
+                    <div className="hidden xl:flex w-96 flex-shrink-0 flex-col bg-card rounded-xl border border-border shadow-sm overflow-hidden h-full">
                         <CartSidebar
                             cart={cart}
                             onUpdateQty={updateQty}
@@ -846,11 +846,11 @@ export default function POSPage() {
             )}
 
             {showContent && (
-                <div className="hidden md:block border-t border-slate-200 bg-slate-50/40 px-6 pb-6">
+                <div className="hidden md:block border-t border-border bg-muted/40 px-6 pb-6">
                     <div className="flex items-center justify-between py-4">
                         <div>
-                            <p className="text-sm font-semibold text-slate-900">Recent POS orders</p>
-                            <p className="text-xs text-slate-500">Click an order to process a refund or exchange.</p>
+                            <p className="text-sm font-semibold text-foreground">Recent POS orders</p>
+                            <p className="text-xs text-muted-foreground">Click an order to process a refund or exchange.</p>
                         </div>
                         <Button size="sm" variant="outline" onClick={() => void loadRecentOrders()} disabled={ordersLoading}>
                             Refresh
@@ -860,30 +860,30 @@ export default function POSPage() {
                     {ordersLoading ? (
                         <div className="grid gap-3 lg:grid-cols-2 xl:grid-cols-3">
                             {[...Array(3)].map((_, i) => (
-                                <div key={i} className="animate-pulse rounded-lg border border-slate-200 bg-white p-4">
+                                <div key={i} className="animate-pulse rounded-lg border border-border bg-card p-4">
                                     <div className="flex items-start justify-between gap-2 mb-3">
                                         <div className="flex-1 space-y-2">
-                                            <div className="h-4 bg-slate-200 dark:bg-slate-700 rounded w-32" />
-                                            <div className="h-3 bg-slate-200 dark:bg-slate-700 rounded w-48" />
+                                            <div className="h-4 bg-muted dark:bg-muted rounded w-32" />
+                                            <div className="h-3 bg-muted dark:bg-muted rounded w-48" />
                                         </div>
-                                        <div className="h-6 w-16 bg-slate-200 dark:bg-slate-700 rounded" />
+                                        <div className="h-6 w-16 bg-muted dark:bg-muted rounded" />
                                     </div>
                                     <div className="space-y-2">
-                                        <div className="h-3 bg-slate-200 dark:bg-slate-700 rounded w-full" />
-                                        <div className="h-3 bg-slate-200 dark:bg-slate-700 rounded w-5/6" />
+                                        <div className="h-3 bg-muted dark:bg-muted rounded w-full" />
+                                        <div className="h-3 bg-muted dark:bg-muted rounded w-5/6" />
                                     </div>
                                 </div>
                             ))}
                         </div>
                     ) : recentOrders.length === 0 ? (
-                        <div className="rounded-lg border-2 border-dashed border-slate-300 bg-slate-50 p-8 text-center">
-                            <div className="mx-auto w-12 h-12 rounded-full bg-slate-100 flex items-center justify-center mb-4">
-                                <svg className="w-6 h-6 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <div className="rounded-lg border-2 border-dashed border-border bg-muted p-8 text-center">
+                            <div className="mx-auto w-12 h-12 rounded-full bg-muted flex items-center justify-center mb-4">
+                                <svg className="w-6 h-6 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
                                 </svg>
                             </div>
-                            <p className="text-sm font-medium text-slate-900 mb-1">No POS orders yet</p>
-                            <p className="text-xs text-slate-500 mb-4">Start selling by adding products to your cart</p>
+                            <p className="text-sm font-medium text-foreground mb-1">No POS orders yet</p>
+                            <p className="text-xs text-muted-foreground mb-4">Start selling by adding products to your cart</p>
                             {cart.length > 0 ? (
                                 <Button size="sm" onClick={() => setIsCheckoutOpen(true)}>
                                     Checkout {cart.length} {cart.length === 1 ? 'item' : 'items'}
@@ -899,14 +899,14 @@ export default function POSPage() {
                     ) : (
                         <div className="grid gap-3 lg:grid-cols-2 xl:grid-cols-3">
                             {recentOrders.slice(0, 5).map((order) => (
-                                <div key={order.id} className="rounded-lg border border-slate-200 bg-white p-4 shadow-sm">
+                                <div key={order.id} className="rounded-lg border border-border bg-card p-4 shadow-sm">
                                     <div className="flex items-start justify-between gap-2">
                                         <div>
-                                            <div className="text-sm font-semibold text-slate-900">Order #{order.id.slice(0, 8)}</div>
-                                            <div className="text-xs text-slate-500">
+                                            <div className="text-sm font-semibold text-foreground">Order #{order.id.slice(0, 8)}</div>
+                                            <div className="text-xs text-muted-foreground">
                                                 {order.createdAt ? new Date(order.createdAt).toLocaleString() : "recent"} • ${(order.totalCents / 100).toFixed(2)}
                                             </div>
-                                            {order.siteNumber && <div className="text-xs text-slate-500">Site {order.siteNumber}</div>}
+                                            {order.siteNumber && <div className="text-xs text-muted-foreground">Site {order.siteNumber}</div>}
                                         </div>
                                         <div className="flex items-center gap-2">
                                             <Badge variant="outline" className="text-[11px] uppercase">{order.status}</Badge>
@@ -922,28 +922,28 @@ export default function POSPage() {
                                             </Button>
                                         </div>
                                     </div>
-                                    <div className="mt-3 space-y-1 text-xs text-slate-600">
+                                    <div className="mt-3 space-y-1 text-xs text-muted-foreground">
                                         {order.items?.slice(0, 3).map((item: any) => (
                                             <div key={item.id} className="flex justify-between">
                                                 <span className="truncate">{item.name} × {item.qty}</span>
                                                 <span className="font-mono">${((item.totalCents ?? 0) / 100).toFixed(2)}</span>
                                             </div>
                                         ))}
-                                        {order.items?.length > 3 && <div className="text-[11px] text-slate-400">+{order.items.length - 3} more item(s)</div>}
+                                        {order.items?.length > 3 && <div className="text-[11px] text-muted-foreground">+{order.items.length - 3} more item(s)</div>}
                                     </div>
-                                    <div className="mt-3 rounded-md border border-slate-100 bg-slate-50 px-3 py-2">
-                                        <div className="text-[11px] font-semibold text-slate-700 mb-1">History</div>
+                                    <div className="mt-3 rounded-md border border-border bg-muted px-3 py-2">
+                                        <div className="text-[11px] font-semibold text-foreground mb-1">History</div>
                                         {order.adjustments && order.adjustments.length > 0 ? (
                                             <div className="space-y-1">
                                                 {order.adjustments.slice(0, 3).map((adj: any) => (
                                                     <div key={adj.id} className="flex items-center justify-between text-[11px]">
-                                                        <span className="uppercase text-slate-600">{adj.type}</span>
-                                                        <span className="font-mono text-slate-800">${(adj.amountCents / 100).toFixed(2)}</span>
+                                                        <span className="uppercase text-muted-foreground">{adj.type}</span>
+                                                        <span className="font-mono text-foreground">${(adj.amountCents / 100).toFixed(2)}</span>
                                                     </div>
                                                 ))}
                                             </div>
                                         ) : (
-                                            <div className="overflow-hidden rounded border border-slate-200 bg-white">
+                                            <div className="overflow-hidden rounded border border-border bg-card">
                                                 <table className="w-full text-xs">
                                                     <tbody>
                                                         <TableEmpty>No refunds or exchanges yet.</TableEmpty>
@@ -996,7 +996,7 @@ export default function POSPage() {
             {/* Success Celebration Modal */}
             {showSuccessCelebration && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 motion-safe:animate-in motion-safe:fade-in motion-safe:duration-200">
-                    <div className="bg-white rounded-2xl shadow-2xl p-8 text-center max-w-sm mx-4 motion-safe:animate-in motion-safe:zoom-in-95 motion-safe:duration-300">
+                    <div className="bg-card rounded-2xl shadow-2xl p-8 text-center max-w-sm mx-4 motion-safe:animate-in motion-safe:zoom-in-95 motion-safe:duration-300">
                         {/* Success checkmark animation */}
                         <div className="relative mx-auto w-20 h-20 mb-4">
                             <div className="absolute inset-0 bg-emerald-100 rounded-full motion-safe:animate-ping opacity-75" />
@@ -1011,14 +1011,14 @@ export default function POSPage() {
                                 </svg>
                             </div>
                         </div>
-                        <h2 className="text-2xl font-bold text-slate-900 mb-2">Order Complete!</h2>
+                        <h2 className="text-2xl font-bold text-foreground mb-2">Order Complete!</h2>
                         <p className="text-3xl font-bold text-emerald-600 mb-1">
                             ${(successOrderTotal / 100).toFixed(2)}
                         </p>
-                        <p className="text-slate-500 text-sm">
+                        <p className="text-muted-foreground text-sm">
                             Payment processed successfully
                         </p>
-                        <div className="mt-4 flex items-center justify-center gap-1 text-xs text-slate-400">
+                        <div className="mt-4 flex items-center justify-center gap-1 text-xs text-muted-foreground">
                             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
                             </svg>

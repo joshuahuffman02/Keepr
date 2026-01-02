@@ -95,14 +95,14 @@ export default function ReportsPage({ params }: { params: { campgroundId: string
     <div className="p-6 space-y-4">
       <div>
         <h1 className="text-2xl font-semibold">Reports</h1>
-        <p className="text-slate-500 text-sm">Browse the metadata catalog and run chart-ready reports.</p>
+        <p className="text-muted-foreground text-sm">Browse the metadata catalog and run chart-ready reports.</p>
       </div>
 
       <div className="flex flex-wrap gap-2">
         {categories.map((cat) => (
           <button
             key={cat}
-            className={`rounded border px-3 py-1 text-sm ${category === cat ? "border-indigo-600 text-indigo-700 bg-indigo-50" : "border-slate-200 text-slate-700"}`}
+            className={`rounded border px-3 py-1 text-sm ${category === cat ? "border-indigo-600 text-indigo-700 bg-indigo-50" : "border-border text-foreground"}`}
             onClick={() => setCategory(cat)}
           >
             {cat}
@@ -121,17 +121,17 @@ export default function ReportsPage({ params }: { params: { campgroundId: string
       <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
         {loadingCatalog
           ? Array.from({ length: 6 }).map((_, idx) => (
-              <div key={`s-${idx}`} className="h-24 animate-pulse rounded border border-slate-200 bg-slate-100" />
+              <div key={`s-${idx}`} className="h-24 animate-pulse rounded border border-border bg-muted" />
             ))
           : filtered.map((entry) => (
               <button
                 key={entry.id}
-                className={`rounded border p-3 text-left hover:border-indigo-400 ${selected?.id === entry.id ? "border-indigo-600 bg-indigo-50" : "border-slate-200"}`}
+                className={`rounded border p-3 text-left hover:border-indigo-400 ${selected?.id === entry.id ? "border-indigo-600 bg-indigo-50" : "border-border"}`}
                 onClick={() => setSelected(entry)}
               >
                 <div className="text-sm font-semibold">{entry.name}</div>
-                <div className="text-xs text-slate-500">{entry.category}</div>
-                <div className="mt-2 flex gap-2 text-xs text-slate-500">
+                <div className="text-xs text-muted-foreground">{entry.category}</div>
+                <div className="mt-2 flex gap-2 text-xs text-muted-foreground">
                   <span>{entry.dimensions.length} dims</span>
                   <span>{entry.metrics.length} metrics</span>
                 </div>
@@ -140,11 +140,11 @@ export default function ReportsPage({ params }: { params: { campgroundId: string
       </div>
 
       {selected && (
-        <div className="rounded border border-slate-200 p-4 space-y-3">
+        <div className="rounded border border-border p-4 space-y-3">
           <div className="flex items-center gap-3">
             <div>
               <div className="text-lg font-semibold">{selected.name}</div>
-              <div className="text-sm text-slate-500">{selected.id}</div>
+              <div className="text-sm text-muted-foreground">{selected.id}</div>
             </div>
             <button
               className="ml-auto rounded bg-indigo-600 px-3 py-2 text-white text-sm disabled:opacity-50"
@@ -161,18 +161,18 @@ export default function ReportsPage({ params }: { params: { campgroundId: string
               chart={(run.series[0]?.chart ?? "line") as "line" | "bar" | "pie"}
             />
           ) : (
-            <div className="rounded border border-dashed border-slate-200 p-6 text-sm text-slate-500">
+            <div className="rounded border border-dashed border-border p-6 text-sm text-muted-foreground">
               {running ? "Generating chart..." : "Run the report to see a chart."}
             </div>
           )}
 
-          <div className="overflow-x-auto rounded border border-slate-200">
+          <div className="overflow-x-auto rounded border border-border">
             <table className="min-w-full text-sm">
-              <thead className="bg-slate-50">
+              <thead className="bg-muted">
                 <tr>
                   {run?.rows?.[0] &&
                     Object.keys(run.rows[0]).map((key) => (
-                      <th key={key} className="px-3 py-2 text-left font-medium text-slate-600">
+                      <th key={key} className="px-3 py-2 text-left font-medium text-muted-foreground">
                         {key}
                       </th>
                     ))}
@@ -180,14 +180,14 @@ export default function ReportsPage({ params }: { params: { campgroundId: string
               </thead>
               <tbody>
                 {run?.rows?.map((row, idx) => (
-                  <tr key={idx} className="border-t border-slate-100">
+                  <tr key={idx} className="border-t border-border">
                     {Object.keys(row).map((key) => {
                       const value = row[key];
                       const displayValue = value !== null && value !== undefined
                         ? String(value)
                         : "";
                       return (
-                        <td key={key} className="px-3 py-2 text-slate-700">
+                        <td key={key} className="px-3 py-2 text-foreground">
                           {displayValue}
                         </td>
                       );
@@ -196,7 +196,7 @@ export default function ReportsPage({ params }: { params: { campgroundId: string
                 ))}
                 {!run?.rows?.length && (
                   <tr>
-                    <td className="px-3 py-2 text-slate-500">No data yet</td>
+                    <td className="px-3 py-2 text-muted-foreground">No data yet</td>
                   </tr>
                 )}
               </tbody>

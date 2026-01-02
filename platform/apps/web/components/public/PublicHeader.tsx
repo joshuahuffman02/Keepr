@@ -104,7 +104,7 @@ export function PublicHeader() {
         <div ref={exploreRef} className="relative">
             <button
                 onClick={() => setExploreOpen(!exploreOpen)}
-                className="flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100 rounded-full transition-colors"
+                className="flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-foreground hover:bg-muted rounded-full transition-colors"
             >
                 <Compass className="w-4 h-4" />
                 Explore
@@ -118,10 +118,10 @@ export function PublicHeader() {
                         animate={{ opacity: 1, y: 0, scale: 1 }}
                         exit={{ opacity: 0, y: 8, scale: 0.96 }}
                         transition={{ duration: 0.15 }}
-                        className="absolute left-0 mt-2 w-80 bg-white rounded-xl shadow-lg border border-slate-200 overflow-hidden z-50"
+                        className="absolute left-0 mt-2 w-80 bg-card rounded-xl shadow-lg border border-border overflow-hidden z-50"
                     >
                         {/* Browse All */}
-                        <div className="p-3 border-b border-slate-100">
+                        <div className="p-3 border-b border-border">
                             <Link
                                 href="/camping"
                                 onClick={() => setExploreOpen(false)}
@@ -131,15 +131,15 @@ export function PublicHeader() {
                                     <MapPin className="w-5 h-5 text-white" />
                                 </div>
                                 <div>
-                                    <p className="text-sm font-semibold text-slate-900">Browse All Campgrounds</p>
-                                    <p className="text-xs text-slate-500">Explore by state, region, or amenity</p>
+                                    <p className="text-sm font-semibold text-foreground">Browse All Campgrounds</p>
+                                    <p className="text-xs text-muted-foreground">Explore by state, region, or amenity</p>
                                 </div>
                             </Link>
                         </div>
 
                         {/* Popular Destinations */}
                         <div className="p-3">
-                            <p className="px-3 text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Popular Destinations</p>
+                            <p className="px-3 text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">Popular Destinations</p>
                             <div className="grid grid-cols-2 gap-1">
                                 {exploreDestinations.map((dest) => {
                                     const Icon = dest.icon;
@@ -148,9 +148,9 @@ export function PublicHeader() {
                                             key={dest.slug}
                                             href={`/near/${dest.slug}`}
                                             onClick={() => setExploreOpen(false)}
-                                            className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-slate-700 hover:bg-slate-50 transition-colors"
+                                            className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-foreground hover:bg-muted transition-colors"
                                         >
-                                            <Icon className="w-4 h-4 text-slate-400" />
+                                            <Icon className="w-4 h-4 text-muted-foreground" />
                                             {dest.name}
                                         </Link>
                                     );
@@ -159,15 +159,15 @@ export function PublicHeader() {
                         </div>
 
                         {/* Popular States */}
-                        <div className="p-3 border-t border-slate-100">
-                            <p className="px-3 text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">By State</p>
+                        <div className="p-3 border-t border-border">
+                            <p className="px-3 text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">By State</p>
                             <div className="grid grid-cols-3 gap-1">
                                 {popularStates.map((state) => (
                                     <Link
                                         key={state.slug}
                                         href={`/camping/${state.slug}`}
                                         onClick={() => setExploreOpen(false)}
-                                        className="px-3 py-2 rounded-lg text-sm text-slate-700 hover:bg-slate-50 transition-colors text-center"
+                                        className="px-3 py-2 rounded-lg text-sm text-foreground hover:bg-muted transition-colors text-center"
                                     >
                                         {state.name}
                                     </Link>
@@ -184,9 +184,9 @@ export function PublicHeader() {
         <div ref={profileRef} className="relative">
             <button
                 onClick={() => setProfileOpen(!profileOpen)}
-                className="flex items-center gap-2 px-2 py-1.5 rounded-full border border-slate-200 hover:shadow-md transition-all bg-white"
+                className="flex items-center gap-2 px-2 py-1.5 rounded-full border border-border hover:shadow-md transition-all bg-card"
             >
-                <Menu className="w-4 h-4 text-slate-500 ml-1" />
+                <Menu className="w-4 h-4 text-muted-foreground ml-1" />
                 <div className="w-8 h-8 rounded-full bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center text-white text-sm font-semibold">
                     {getInitials(session?.user?.name)}
                 </div>
@@ -199,14 +199,14 @@ export function PublicHeader() {
                         animate={{ opacity: 1, y: 0, scale: 1 }}
                         exit={{ opacity: 0, y: 8, scale: 0.96 }}
                         transition={{ duration: 0.15 }}
-                        className="absolute right-0 mt-2 w-64 bg-white rounded-xl shadow-lg border border-slate-200 overflow-hidden z-50"
+                        className="absolute right-0 mt-2 w-64 bg-card rounded-xl shadow-lg border border-border overflow-hidden z-50"
                     >
                         {/* User info section */}
-                        <div className="px-4 py-3 border-b border-slate-100 bg-slate-50">
-                            <p className="text-sm font-semibold text-slate-900">
+                        <div className="px-4 py-3 border-b border-border bg-muted">
+                            <p className="text-sm font-semibold text-foreground">
                                 {session?.user?.name || "Guest"}
                             </p>
-                            <p className="text-xs text-slate-500 truncate">
+                            <p className="text-xs text-muted-foreground truncate">
                                 {session?.user?.email}
                             </p>
                         </div>
@@ -216,31 +216,31 @@ export function PublicHeader() {
                             <Link
                                 href="/trips"
                                 onClick={() => setProfileOpen(false)}
-                                className="flex items-center gap-3 px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50 transition-colors"
+                                className="flex items-center gap-3 px-4 py-2.5 text-sm text-foreground hover:bg-muted transition-colors"
                             >
-                                <Calendar className="w-4 h-4 text-slate-400" />
+                                <Calendar className="w-4 h-4 text-muted-foreground" />
                                 My Trips
                             </Link>
                             <Link
                                 href="/wishlists"
                                 onClick={() => setProfileOpen(false)}
-                                className="flex items-center gap-3 px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50 transition-colors"
+                                className="flex items-center gap-3 px-4 py-2.5 text-sm text-foreground hover:bg-muted transition-colors"
                             >
-                                <Heart className="w-4 h-4 text-slate-400" />
+                                <Heart className="w-4 h-4 text-muted-foreground" />
                                 Wishlists
                             </Link>
                             <Link
                                 href="/account"
                                 onClick={() => setProfileOpen(false)}
-                                className="flex items-center gap-3 px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50 transition-colors"
+                                className="flex items-center gap-3 px-4 py-2.5 text-sm text-foreground hover:bg-muted transition-colors"
                             >
-                                <Settings className="w-4 h-4 text-slate-400" />
+                                <Settings className="w-4 h-4 text-muted-foreground" />
                                 Account Settings
                             </Link>
                         </div>
 
                         {/* Hosting section */}
-                        <div className="border-t border-slate-100 py-2">
+                        <div className="border-t border-border py-2">
                             {hasCampgroundAccess ? (
                                 <Link
                                     href="/dashboard"
@@ -254,24 +254,24 @@ export function PublicHeader() {
                                 <Link
                                     href="/host"
                                     onClick={() => setProfileOpen(false)}
-                                    className="flex items-center gap-3 px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50 transition-colors"
+                                    className="flex items-center gap-3 px-4 py-2.5 text-sm text-foreground hover:bg-muted transition-colors"
                                 >
-                                    <Building2 className="w-4 h-4 text-slate-400" />
+                                    <Building2 className="w-4 h-4 text-muted-foreground" />
                                     Become a Host
                                 </Link>
                             )}
                         </div>
 
                         {/* Sign out */}
-                        <div className="border-t border-slate-100 py-2">
+                        <div className="border-t border-border py-2">
                             <button
                                 onClick={() => {
                                     setProfileOpen(false);
                                     signOut({ callbackUrl: "/" });
                                 }}
-                                className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50 transition-colors"
+                                className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-foreground hover:bg-muted transition-colors"
                             >
-                                <LogOut className="w-4 h-4 text-slate-400" />
+                                <LogOut className="w-4 h-4 text-muted-foreground" />
                                 Sign Out
                             </button>
                         </div>
@@ -284,14 +284,14 @@ export function PublicHeader() {
     const authButtons = (
         <>
             {isLoading ? (
-                <div className="w-24 h-10 bg-slate-100 rounded-lg animate-pulse" />
+                <div className="w-24 h-10 bg-muted rounded-lg animate-pulse" />
             ) : session ? (
                 <div className="flex items-center gap-3">
                     {/* Switch to hosting button - only visible if user has campgrounds */}
                     {hasCampgroundAccess && (
                         <Link
                             href="/dashboard"
-                            className="hidden lg:flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100 rounded-full transition-colors"
+                            className="hidden lg:flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-foreground hover:bg-muted rounded-full transition-colors"
                         >
                             Switch to hosting
                         </Link>
@@ -302,7 +302,7 @@ export function PublicHeader() {
                 <>
                     <Link
                         href="/auth/signin"
-                        className="px-4 py-2.5 text-sm font-medium text-slate-700 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 hover:border-slate-300 transition-all"
+                        className="px-4 py-2.5 text-sm font-medium text-foreground bg-card border border-border rounded-lg hover:bg-muted hover:border-border transition-all"
                     >
                         Sign In
                     </Link>
@@ -318,7 +318,7 @@ export function PublicHeader() {
     );
 
     return (
-        <header className="fixed top-0 left-0 right-0 z-50 bg-white/85 backdrop-blur-xl border-b border-slate-200/60">
+        <header className="fixed top-0 left-0 right-0 z-50 bg-card/85 backdrop-blur-xl border-b border-border/60">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3 sm:py-4 flex items-center justify-between gap-3">
                 {/* Logo */}
                 <Link href="/" className="flex items-center gap-3 group min-w-0" onClick={handleLogoClick}>
@@ -345,7 +345,7 @@ export function PublicHeader() {
                 {/* Right side buttons */}
                 <div className="flex items-center gap-3">
                     <button
-                        className="md:hidden inline-flex h-10 w-10 items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-700 hover:bg-slate-50 transition-colors"
+                        className="md:hidden inline-flex h-10 w-10 items-center justify-center rounded-lg border border-border bg-card text-foreground hover:bg-muted transition-colors"
                         onClick={() => setMobileOpen((v) => !v)}
                         aria-label="Toggle menu"
                     >
@@ -362,11 +362,11 @@ export function PublicHeader() {
                         initial={{ opacity: 0, height: 0 }}
                         animate={{ opacity: 1, height: "auto" }}
                         exit={{ opacity: 0, height: 0 }}
-                        className="md:hidden border-t border-slate-200 bg-white shadow-lg overflow-hidden"
+                        className="md:hidden border-t border-border bg-card shadow-lg overflow-hidden"
                     >
                         <nav className="px-4 py-4 space-y-3">
                             {/* Explore Section */}
-                            <div className="pb-3 border-b border-slate-100">
+                            <div className="pb-3 border-b border-border">
                                 <Link
                                     href="/camping"
                                     className="flex items-center gap-3 rounded-lg px-3 py-3 bg-gradient-to-r from-emerald-50 to-teal-50"
@@ -374,8 +374,8 @@ export function PublicHeader() {
                                 >
                                     <Compass className="w-5 h-5 text-emerald-600" />
                                     <div>
-                                        <p className="text-base font-medium text-slate-900">Explore Campgrounds</p>
-                                        <p className="text-xs text-slate-500">Browse all states & destinations</p>
+                                        <p className="text-base font-medium text-foreground">Explore Campgrounds</p>
+                                        <p className="text-xs text-muted-foreground">Browse all states & destinations</p>
                                     </div>
                                 </Link>
 
@@ -388,9 +388,9 @@ export function PublicHeader() {
                                                 key={dest.slug}
                                                 href={`/near/${dest.slug}`}
                                                 onClick={closeMobile}
-                                                className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-slate-600 hover:bg-slate-50"
+                                                className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-muted-foreground hover:bg-muted"
                                             >
-                                                <Icon className="w-4 h-4 text-slate-400" />
+                                                <Icon className="w-4 h-4 text-muted-foreground" />
                                                 {dest.name}
                                             </Link>
                                         );
@@ -402,7 +402,7 @@ export function PublicHeader() {
                                 <Link
                                     key={link.href}
                                     href={link.href}
-                                    className="block rounded-lg px-3 py-3 text-base font-medium text-slate-800 hover:bg-slate-50"
+                                    className="block rounded-lg px-3 py-3 text-base font-medium text-foreground hover:bg-muted"
                                     onClick={closeMobile}
                                 >
                                     {link.label}
@@ -421,9 +421,9 @@ export function PublicHeader() {
                                 </Link>
                             )}
 
-                            <div className="pt-2 space-y-2 border-t border-slate-100">
+                            <div className="pt-2 space-y-2 border-t border-border">
                                 {isLoading ? (
-                                    <div className="w-full h-12 bg-slate-100 rounded-lg animate-pulse" />
+                                    <div className="w-full h-12 bg-muted rounded-lg animate-pulse" />
                                 ) : session ? (
                                     <>
                                         <div className="flex items-center gap-3 px-3 py-2">
@@ -431,31 +431,31 @@ export function PublicHeader() {
                                                 {getInitials(session?.user?.name)}
                                             </div>
                                             <div>
-                                                <p className="text-sm font-semibold text-slate-900">
+                                                <p className="text-sm font-semibold text-foreground">
                                                     {session?.user?.name || "Guest"}
                                                 </p>
-                                                <p className="text-xs text-slate-500">
+                                                <p className="text-xs text-muted-foreground">
                                                     {session?.user?.email}
                                                 </p>
                                             </div>
                                         </div>
                                         <Link
                                             href="/trips"
-                                            className="block rounded-lg px-3 py-3 text-base font-medium text-slate-700 hover:bg-slate-50"
+                                            className="block rounded-lg px-3 py-3 text-base font-medium text-foreground hover:bg-muted"
                                             onClick={closeMobile}
                                         >
                                             My Trips
                                         </Link>
                                         <Link
                                             href="/wishlists"
-                                            className="block rounded-lg px-3 py-3 text-base font-medium text-slate-700 hover:bg-slate-50"
+                                            className="block rounded-lg px-3 py-3 text-base font-medium text-foreground hover:bg-muted"
                                             onClick={closeMobile}
                                         >
                                             Wishlists
                                         </Link>
                                         <Link
                                             href="/account"
-                                            className="block rounded-lg px-3 py-3 text-base font-medium text-slate-700 hover:bg-slate-50"
+                                            className="block rounded-lg px-3 py-3 text-base font-medium text-foreground hover:bg-muted"
                                             onClick={closeMobile}
                                         >
                                             Account Settings
@@ -465,7 +465,7 @@ export function PublicHeader() {
                                                 closeMobile();
                                                 signOut({ callbackUrl: "/" });
                                             }}
-                                            className="w-full text-left rounded-lg px-3 py-3 text-base font-medium text-slate-700 hover:bg-slate-50"
+                                            className="w-full text-left rounded-lg px-3 py-3 text-base font-medium text-foreground hover:bg-muted"
                                         >
                                             Sign Out
                                         </button>
@@ -474,7 +474,7 @@ export function PublicHeader() {
                                     <div className="flex flex-col gap-2">
                                         <Link
                                             href="/auth/signin"
-                                            className="block text-center px-4 py-2.5 text-sm font-medium text-slate-700 bg-white border border-slate-200 rounded-lg hover:bg-slate-50"
+                                            className="block text-center px-4 py-2.5 text-sm font-medium text-foreground bg-card border border-border rounded-lg hover:bg-muted"
                                             onClick={closeMobile}
                                         >
                                             Sign In

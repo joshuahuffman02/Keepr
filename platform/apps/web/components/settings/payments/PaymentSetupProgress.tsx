@@ -55,15 +55,15 @@ export function PaymentSetupProgress({
 
   return (
     <div
-      className="mb-6 p-4 bg-gradient-to-r from-emerald-50 to-teal-50 rounded-xl border border-emerald-100"
+      className="mb-6 rounded-xl border border-status-info-border bg-status-info-bg p-4"
       role="navigation"
       aria-label="Payment setup progress"
     >
       <div className="flex items-center justify-between mb-3">
-        <h3 className="text-sm font-medium text-emerald-900">
+        <h3 className="text-sm font-medium text-status-info-text">
           Getting started with payments
         </h3>
-        <span className="text-xs text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded-full">
+        <span className="rounded-full border border-status-info-border bg-status-info-bg px-2 py-0.5 text-xs text-status-info-text">
           {completedCount} of {steps.length} complete
         </span>
       </div>
@@ -77,8 +77,8 @@ export function PaymentSetupProgress({
                 className={cn(
                   "w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium transition-all duration-300",
                   step.completed
-                    ? "bg-emerald-500 text-white motion-safe:animate-in motion-safe:zoom-in"
-                    : "bg-white border-2 border-slate-200 text-slate-500"
+                    ? "bg-status-success text-status-success-foreground motion-safe:animate-in motion-safe:zoom-in"
+                    : "bg-card border-2 border-border text-muted-foreground"
                 )}
                 aria-current={!step.completed && steps.slice(0, index).every(s => s.completed) ? "step" : undefined}
               >
@@ -94,11 +94,11 @@ export function PaymentSetupProgress({
               <div className="hidden sm:block">
                 <p className={cn(
                   "text-sm font-medium",
-                  step.completed ? "text-emerald-700" : "text-slate-600"
+                  step.completed ? "text-status-success-text" : "text-muted-foreground"
                 )}>
                   {step.label}
                 </p>
-                <p className="text-xs text-slate-500">{step.description}</p>
+                <p className="text-xs text-muted-foreground">{step.description}</p>
               </div>
             </div>
 
@@ -107,7 +107,7 @@ export function PaymentSetupProgress({
               <div
                 className={cn(
                   "hidden sm:block h-0.5 w-8 mx-3 transition-colors duration-300",
-                  step.completed ? "bg-emerald-300" : "bg-slate-200"
+                  step.completed ? "bg-status-success/30" : "bg-muted"
                 )}
                 aria-hidden="true"
               />

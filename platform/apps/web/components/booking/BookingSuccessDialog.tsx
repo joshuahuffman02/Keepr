@@ -280,10 +280,10 @@ export function BookingSuccessDialog({
               animate={prefersReducedMotion ? { opacity: 1 } : { opacity: 1, y: 0 }}
               transition={{ delay: 0.2, ...SPRING_CONFIG }}
             >
-              <h2 className="text-xl font-bold text-slate-900">
+              <h2 className="text-xl font-bold text-foreground">
                 You&apos;re going camping, {firstName}!
               </h2>
-              <p className="mt-1 text-sm text-slate-500">
+              <p className="mt-1 text-sm text-muted-foreground">
                 Reservation #{receiptData.reservationId.slice(0, 8)}
               </p>
               {daysUntilArrival > 0 && (
@@ -308,15 +308,15 @@ export function BookingSuccessDialog({
             animate={prefersReducedMotion ? { opacity: 1 } : { opacity: 1, y: 0 }}
             transition={{ delay: 0.3, ...SPRING_CONFIG }}
           >
-            <div className="rounded-xl border border-slate-200 bg-slate-50 p-4 space-y-3">
+            <div className="rounded-xl border border-border bg-muted p-4 space-y-3">
               {/* Guest */}
               <div className="flex items-center gap-3">
-                <div className="h-8 w-8 rounded-full bg-slate-100 flex items-center justify-center">
-                  <User className="h-4 w-4 text-slate-500" />
+                <div className="h-8 w-8 rounded-full bg-muted flex items-center justify-center">
+                  <User className="h-4 w-4 text-muted-foreground" />
                 </div>
                 <div>
-                  <div className="text-xs text-slate-500">Guest</div>
-                  <div className="text-sm font-semibold text-slate-900">
+                  <div className="text-xs text-muted-foreground">Guest</div>
+                  <div className="text-sm font-semibold text-foreground">
                     {receiptData.guestName}
                   </div>
                 </div>
@@ -324,12 +324,12 @@ export function BookingSuccessDialog({
 
               {/* Site */}
               <div className="flex items-center gap-3">
-                <div className="h-8 w-8 rounded-full bg-slate-100 flex items-center justify-center">
-                  <MapPin className="h-4 w-4 text-slate-500" />
+                <div className="h-8 w-8 rounded-full bg-muted flex items-center justify-center">
+                  <MapPin className="h-4 w-4 text-muted-foreground" />
                 </div>
                 <div>
-                  <div className="text-xs text-slate-500">Site</div>
-                  <div className="text-sm font-semibold text-slate-900">
+                  <div className="text-xs text-muted-foreground">Site</div>
+                  <div className="text-sm font-semibold text-foreground">
                     {receiptData.siteName}
                   </div>
                 </div>
@@ -337,12 +337,12 @@ export function BookingSuccessDialog({
 
               {/* Dates */}
               <div className="flex items-center gap-3">
-                <div className="h-8 w-8 rounded-full bg-slate-100 flex items-center justify-center">
-                  <Calendar className="h-4 w-4 text-slate-500" />
+                <div className="h-8 w-8 rounded-full bg-muted flex items-center justify-center">
+                  <Calendar className="h-4 w-4 text-muted-foreground" />
                 </div>
                 <div>
-                  <div className="text-xs text-slate-500">Dates</div>
-                  <div className="text-sm font-semibold text-slate-900">
+                  <div className="text-xs text-muted-foreground">Dates</div>
+                  <div className="text-sm font-semibold text-foreground">
                     {receiptData.arrivalDate} → {receiptData.departureDate}
                   </div>
                 </div>
@@ -405,7 +405,7 @@ export function BookingSuccessDialog({
 
                 {showCalendarMenu && (
                   <motion.div
-                    className="absolute top-full left-0 right-0 mt-2 p-2 bg-white rounded-lg border border-slate-200 shadow-lg z-10"
+                    className="absolute top-full left-0 right-0 mt-2 p-2 bg-card rounded-lg border border-border shadow-lg z-10"
                     initial={{ opacity: 0, y: -10 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.15 }}
@@ -414,7 +414,7 @@ export function BookingSuccessDialog({
                       href={calendarLinks.google}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="flex items-center gap-3 px-3 py-2 rounded-md hover:bg-slate-50 text-sm text-slate-700 transition-colors"
+                      className="flex items-center gap-3 px-3 py-2 rounded-md hover:bg-muted text-sm text-foreground transition-colors"
                     >
                       <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none">
                         <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
@@ -428,7 +428,7 @@ export function BookingSuccessDialog({
                       href={calendarLinks.outlook}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="flex items-center gap-3 px-3 py-2 rounded-md hover:bg-slate-50 text-sm text-slate-700 transition-colors"
+                      className="flex items-center gap-3 px-3 py-2 rounded-md hover:bg-muted text-sm text-foreground transition-colors"
                     >
                       <svg className="h-4 w-4" viewBox="0 0 24 24" fill="#0078D4">
                         <path d="M24 7.387v10.478c0 .23-.08.424-.238.576-.16.152-.354.228-.586.228h-8.5v-6.5L17 12l2.5-.186V7.387c0-.11-.037-.205-.11-.282-.073-.077-.167-.116-.28-.116H10.5V4.73L24 7.387zm-13.5 6.802V20.5H2.724c-.23 0-.424-.076-.584-.228-.16-.152-.24-.347-.24-.576V7.387L10.5 4.73v2.259H2.5v6.5l8 .7zM0 7.387c0-.23.08-.424.24-.576.16-.152.354-.228.584-.228h8.676v3.406H.5c-.11 0-.205.04-.282.116-.077.077-.116.172-.116.282v4.427L0 14.189V7.387z"/>
@@ -438,7 +438,7 @@ export function BookingSuccessDialog({
                     <a
                       href={calendarLinks.apple}
                       download="camping-reservation.ics"
-                      className="flex items-center gap-3 px-3 py-2 rounded-md hover:bg-slate-50 text-sm text-slate-700 transition-colors"
+                      className="flex items-center gap-3 px-3 py-2 rounded-md hover:bg-muted text-sm text-foreground transition-colors"
                     >
                       <svg className="h-4 w-4" viewBox="0 0 24 24" fill="currentColor">
                         <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/>

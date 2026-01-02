@@ -78,7 +78,7 @@ export function Footer() {
   }, [copyrightClicks, showEasterEgg]);
 
   return (
-    <footer className="bg-slate-900 text-slate-300">
+    <footer className="bg-muted text-muted-foreground">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         {/* Main Footer */}
         <div className="py-16">
@@ -95,18 +95,18 @@ export function Footer() {
                   Camp Everyday Host
                 </span>
               </Link>
-              <p className="text-slate-400 mb-6 max-w-sm">
+              <p className="text-muted-foreground mb-6 max-w-sm">
                 The most powerful platform for campground and RV park owners to streamline operations
                 and grow their business.
               </p>
 
               {/* Contact Info */}
               <div className="space-y-2">
-                <a href="tel:+1234567890" className="flex items-center gap-2 text-slate-400 hover:text-emerald-400 transition-colors">
+                <a href="tel:+1234567890" className="flex items-center gap-2 text-muted-foreground hover:text-emerald-400 transition-colors">
                   <Phone className="h-4 w-4" />
                   <span className="text-sm">(800) 555-CAMP</span>
                 </a>
-                <a href="mailto:hello@campeveryday.com" className="flex items-center gap-2 text-slate-400 hover:text-emerald-400 transition-colors">
+                <a href="mailto:hello@campeveryday.com" className="flex items-center gap-2 text-muted-foreground hover:text-emerald-400 transition-colors">
                   <Mail className="h-4 w-4" />
                   <span className="text-sm">hello@campeveryday.com</span>
                 </a>
@@ -121,7 +121,7 @@ export function Footer() {
                   <li key={item.name}>
                     <Link
                       href={item.href}
-                      className="text-slate-400 hover:text-emerald-400 transition-colors text-sm"
+                      className="text-muted-foreground hover:text-emerald-400 transition-colors text-sm"
                     >
                       {item.name}
                     </Link>
@@ -138,7 +138,7 @@ export function Footer() {
                   <li key={item.name}>
                     <Link
                       href={item.href}
-                      className="text-slate-400 hover:text-emerald-400 transition-colors text-sm"
+                      className="text-muted-foreground hover:text-emerald-400 transition-colors text-sm"
                     >
                       {item.name}
                     </Link>
@@ -155,7 +155,7 @@ export function Footer() {
                   <li key={item.name}>
                     <Link
                       href={item.href}
-                      className="text-slate-400 hover:text-emerald-400 transition-colors text-sm"
+                      className="text-muted-foreground hover:text-emerald-400 transition-colors text-sm"
                     >
                       {item.name}
                     </Link>
@@ -172,7 +172,7 @@ export function Footer() {
                   <li key={item.name}>
                     <Link
                       href={item.href}
-                      className="text-slate-400 hover:text-emerald-400 transition-colors text-sm"
+                      className="text-muted-foreground hover:text-emerald-400 transition-colors text-sm"
                     >
                       {item.name}
                     </Link>
@@ -184,10 +184,10 @@ export function Footer() {
         </div>
 
         {/* Bottom Footer */}
-        <div className="border-t border-slate-800 py-8">
+        <div className="border-t border-border py-8">
           <div className="flex flex-col md:flex-row items-center justify-between gap-4">
             {/* Made with love message */}
-            <div className="flex items-center gap-1 text-sm text-slate-400">
+            <div className="flex items-center gap-1 text-sm text-muted-foreground">
               <span>Made with</span>
               <Heart className="h-4 w-4 text-rose-400 fill-rose-400 animate-pulse" />
               <span>and s'mores in Austin, Texas</span>
@@ -196,7 +196,7 @@ export function Footer() {
             {/* Copyright with easter egg */}
             <button
               onClick={handleCopyrightClick}
-              className="text-sm text-slate-500 hover:text-slate-400 transition-colors cursor-default select-none"
+              className="text-sm text-muted-foreground hover:text-muted-foreground transition-colors cursor-default select-none"
             >
               Keep the campfire burning - {new Date().getFullYear()} Camp Everyday
             </button>
@@ -209,7 +209,7 @@ export function Footer() {
                   <a
                     key={item.name}
                     href={item.href}
-                    className="text-slate-400 hover:text-emerald-400 transition-colors"
+                    className="text-muted-foreground hover:text-emerald-400 transition-colors"
                     aria-label={item.name}
                   >
                     <Icon className="h-5 w-5" />

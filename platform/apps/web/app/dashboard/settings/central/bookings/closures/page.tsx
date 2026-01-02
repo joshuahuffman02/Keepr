@@ -88,7 +88,7 @@ const reasonConfig = {
   other: {
     label: "Other",
     icon: XCircle,
-    color: "bg-slate-100 text-slate-800",
+    color: "bg-muted text-foreground",
   },
 };
 
@@ -306,7 +306,7 @@ export default function SiteClosuresPage() {
   if (!isHydrated || !selectedCampground) {
     return (
       <div className="flex items-center justify-center py-12">
-        <Loader2 className="h-8 w-8 animate-spin text-slate-400" />
+        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
       </div>
     );
   }
@@ -314,7 +314,7 @@ export default function SiteClosuresPage() {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-12">
-        <Loader2 className="h-8 w-8 animate-spin text-slate-400" />
+        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
       </div>
     );
   }
@@ -346,7 +346,7 @@ export default function SiteClosuresPage() {
               <Icon className={cn("h-4 w-4", config.color.split(" ")[1])} />
             </div>
             <div>
-              <p className="font-medium text-slate-900">{item.name}</p>
+              <p className="font-medium text-foreground">{item.name}</p>
               <Badge variant="outline" className="text-xs mt-1">
                 {config.label}
               </Badge>
@@ -379,7 +379,7 @@ export default function SiteClosuresPage() {
       label: "Date Range",
       render: (item: SiteClosure) => (
         <div className="flex items-center gap-2 text-sm">
-          <Calendar className="h-4 w-4 text-slate-400" />
+          <Calendar className="h-4 w-4 text-muted-foreground" />
           {formatDateRange(item.startDate, item.endDate)}
         </div>
       ),
@@ -397,14 +397,14 @@ export default function SiteClosuresPage() {
 
         if (!item.isActive) {
           return (
-            <Badge variant="secondary" className="bg-slate-100 text-slate-600">
+            <Badge variant="secondary" className="bg-muted text-muted-foreground">
               Cancelled
             </Badge>
           );
         }
         if (isPast) {
           return (
-            <Badge variant="secondary" className="bg-slate-100 text-slate-600">
+            <Badge variant="secondary" className="bg-muted text-muted-foreground">
               Completed
             </Badge>
           );
@@ -430,8 +430,8 @@ export default function SiteClosuresPage() {
       {/* Header */}
       <div className="flex items-start justify-between">
         <div>
-          <h2 className="text-2xl font-bold text-slate-900">Site Closures</h2>
-          <p className="text-slate-500 mt-1">
+          <h2 className="text-2xl font-bold text-foreground">Site Closures</h2>
+          <p className="text-muted-foreground mt-1">
             Temporarily close sites for maintenance, seasonal shutdowns, or events
           </p>
         </div>
@@ -575,7 +575,7 @@ export default function SiteClosuresPage() {
                   </Button>
                 ))}
               </div>
-              <p className="text-xs text-slate-500">
+              <p className="text-xs text-muted-foreground">
                 Or leave empty and select specific sites below
               </p>
             </div>

@@ -228,7 +228,7 @@ export function CreateEventDialog({ open, onOpenChange, onSuccess, campgroundId 
                                     }
                                 }}
                             />
-                            {uploading && <Loader2 className="h-4 w-4 animate-spin text-slate-500" />}
+                            {uploading && <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />}
                         </div>
                     </div>
 

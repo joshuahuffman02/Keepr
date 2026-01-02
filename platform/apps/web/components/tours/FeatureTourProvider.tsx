@@ -311,22 +311,22 @@ export function FeatureTourProvider({
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: 10 }}
-              className="fixed z-[9999] w-[360px] bg-white rounded-2xl shadow-2xl overflow-hidden pointer-events-auto"
+              className="fixed z-[9999] w-[360px] bg-card rounded-2xl shadow-2xl overflow-hidden pointer-events-auto"
               style={getTooltipPosition()}
               onClick={(e) => e.stopPropagation()}
             >
               {/* Header */}
-              <div className="bg-gradient-to-r from-emerald-500 to-teal-500 px-5 py-4">
+              <div className="bg-action-primary px-5 py-4">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <Sparkles className="h-5 w-5 text-white" />
-                    <span className="text-white/90 text-sm font-medium">
+                    <Sparkles className="h-5 w-5 text-action-primary-foreground" />
+                    <span className="text-action-primary-foreground/90 text-sm font-medium">
                       {tour?.name}
                     </span>
                   </div>
                   <button
                     onClick={skipTour}
-                    className="text-white/70 hover:text-white transition-colors"
+                    className="text-action-primary-foreground/70 hover:text-action-primary-foreground transition-colors"
                     aria-label="Close tour"
                   >
                     <X className="h-5 w-5" />
@@ -336,10 +336,10 @@ export function FeatureTourProvider({
 
               {/* Content */}
               <div className="p-5">
-                <h3 className="text-lg font-bold text-slate-900 mb-2">
+                <h3 className="text-lg font-bold text-foreground mb-2">
                   {currentStep.title}
                 </h3>
-                <p className="text-slate-600 text-sm leading-relaxed mb-4">
+                <p className="text-muted-foreground text-sm leading-relaxed mb-4">
                   {currentStep.content}
                 </p>
 
@@ -362,7 +362,7 @@ export function FeatureTourProvider({
                 )}
 
                 {/* Progress and navigation */}
-                <div className="flex items-center justify-between pt-4 border-t border-slate-100">
+                <div className="flex items-center justify-between pt-4 border-t border-border">
                   {/* Progress dots */}
                   <div className="flex items-center gap-1.5">
                     {tour?.steps.map((_, idx) => (
@@ -373,11 +373,11 @@ export function FeatureTourProvider({
                             ? "bg-emerald-500"
                             : idx < currentStepIndex
                             ? "bg-emerald-200"
-                            : "bg-slate-200"
+                            : "bg-muted"
                         }`}
                       />
                     ))}
-                    <span className="ml-2 text-xs text-slate-500">
+                    <span className="ml-2 text-xs text-muted-foreground">
                       {currentStepIndex + 1} of {totalSteps}
                     </span>
                   </div>
@@ -399,7 +399,7 @@ export function FeatureTourProvider({
                         variant="ghost"
                         size="sm"
                         onClick={skipTour}
-                        className="text-slate-500"
+                        className="text-muted-foreground"
                       >
                         <SkipForward className="h-4 w-4 mr-1" />
                         Skip

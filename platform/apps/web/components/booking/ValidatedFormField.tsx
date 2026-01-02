@@ -76,7 +76,7 @@ export function ValidatedFormField({
           htmlFor={id}
           className={cn(
             "text-sm font-medium",
-            hasError ? "text-red-600" : "text-slate-700"
+            hasError ? "text-red-600" : "text-foreground"
           )}
         >
           {label}
@@ -143,7 +143,7 @@ export function ValidatedFormField({
             <button
               type="button"
               onClick={() => setShowPassword(!showPassword)}
-              className="text-slate-400 hover:text-slate-600 transition-colors"
+              className="text-muted-foreground hover:text-muted-foreground transition-colors"
               tabIndex={-1}
             >
               {showPassword ? (
@@ -202,7 +202,7 @@ export function ValidatedFormField({
 
       {/* Hint text */}
       {hint && !hasError && (
-        <p id={hintId} className="text-xs text-slate-500">
+        <p id={hintId} className="text-xs text-muted-foreground">
           {hint}
         </p>
       )}

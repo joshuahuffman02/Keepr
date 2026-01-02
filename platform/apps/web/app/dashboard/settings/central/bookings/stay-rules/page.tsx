@@ -92,7 +92,7 @@ export default function StayRulesPage() {
   if (!isHydrated || !selectedCampground) {
     return (
       <div className="flex items-center justify-center py-12">
-        <Loader2 className="h-8 w-8 animate-spin text-slate-400" />
+        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
       </div>
     );
   }
@@ -100,7 +100,7 @@ export default function StayRulesPage() {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-12">
-        <Loader2 className="h-8 w-8 animate-spin text-slate-400" />
+        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
       </div>
     );
   }
@@ -110,8 +110,8 @@ export default function StayRulesPage() {
       {/* Header */}
       <div className="flex items-start justify-between">
         <div>
-          <h2 className="text-2xl font-bold text-slate-900">Stay Rules</h2>
-          <p className="text-slate-500 mt-1">
+          <h2 className="text-2xl font-bold text-foreground">Stay Rules</h2>
+          <p className="text-muted-foreground mt-1">
             Set minimum and maximum night requirements for bookings
           </p>
         </div>
@@ -155,18 +155,18 @@ export default function StayRulesPage() {
 
       {/* Rules List */}
       <div className="space-y-3">
-        <h3 className="text-sm font-medium text-slate-900">
+        <h3 className="text-sm font-medium text-foreground">
           Custom Rules ({rules.length})
         </h3>
 
         {rules.length === 0 ? (
           <Card className="border-dashed">
             <CardContent className="py-12 text-center">
-              <div className="inline-flex items-center justify-center h-16 w-16 rounded-full bg-slate-100 mb-4">
-                <Moon className="h-8 w-8 text-slate-400" />
+              <div className="inline-flex items-center justify-center h-16 w-16 rounded-full bg-muted mb-4">
+                <Moon className="h-8 w-8 text-muted-foreground" />
               </div>
-              <h3 className="text-lg font-medium text-slate-900">No stay rules</h3>
-              <p className="text-slate-500 mt-1 max-w-sm mx-auto">
+              <h3 className="text-lg font-medium text-foreground">No stay rules</h3>
+              <p className="text-muted-foreground mt-1 max-w-sm mx-auto">
                 Create stay rules to set minimum and maximum night requirements
               </p>
               <Button className="mt-4" onClick={() => setIsEditorOpen(true)}>
@@ -187,20 +187,20 @@ export default function StayRulesPage() {
             <CardContent className="py-4">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-4">
-                  <div className="p-2 rounded-lg bg-slate-100">
-                    <Moon className="h-5 w-5 text-slate-600" />
+                  <div className="p-2 rounded-lg bg-muted">
+                    <Moon className="h-5 w-5 text-muted-foreground" />
                   </div>
                   <div>
                     <div className="flex items-center gap-2">
-                      <p className="font-medium text-slate-900">{rule.name}</p>
+                      <p className="font-medium text-foreground">{rule.name}</p>
                       {!rule.isActive && (
                         <Badge variant="secondary" className="text-xs">
                           Inactive
                         </Badge>
                       )}
                     </div>
-                    <div className="flex items-center gap-2 mt-1 text-sm text-slate-500">
-                      <span className="font-medium text-slate-900">
+                    <div className="flex items-center gap-2 mt-1 text-sm text-muted-foreground">
+                      <span className="font-medium text-foreground">
                         {rule.minNights}-{rule.maxNights} nights
                       </span>
                       <span>•</span>
@@ -308,7 +308,7 @@ export default function StayRulesPage() {
               <Label>Ignore Minimum</Label>
               <div className="flex items-center gap-2">
                 <Input type="number" defaultValue={14} className="w-20" />
-                <span className="text-sm text-slate-500">
+                <span className="text-sm text-muted-foreground">
                   days before arrival (allows last-minute bookings)
                 </span>
               </div>

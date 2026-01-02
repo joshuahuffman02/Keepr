@@ -201,7 +201,7 @@ export function BookingMap({
   if (!isReady || !isMapLibreLoaded) {
     return (
       <div className={className} style={heightStyle}>
-        <div className="absolute inset-0 flex items-center justify-center bg-slate-50 text-sm text-slate-600">
+        <div className="absolute inset-0 flex items-center justify-center bg-muted text-sm text-muted-foreground">
           <div className="flex items-center gap-2">
             <div className="h-4 w-4 animate-spin rounded-full border-2 border-emerald-500 border-t-transparent" />
             Loading map library…
@@ -215,7 +215,7 @@ export function BookingMap({
     <div
       className={cn(
         "relative w-full overflow-hidden",
-        variant === "immersive" ? "border-none" : "rounded-xl border border-slate-200 bg-slate-50 shadow-inner",
+        variant === "immersive" ? "border-none" : "rounded-xl border border-border bg-muted shadow-inner",
         className
       )}
       style={heightStyle}
@@ -223,7 +223,7 @@ export function BookingMap({
       <div ref={containerRef} className="absolute inset-0" />
 
       {isLoading && (
-        <div className="absolute inset-0 z-10 flex items-center justify-center bg-white/70 backdrop-blur-[2px] text-sm font-medium text-slate-600">
+        <div className="absolute inset-0 z-10 flex items-center justify-center bg-card/70 backdrop-blur-[2px] text-sm font-medium text-muted-foreground">
           <div className="flex items-center gap-2">
             <div className="h-4 w-4 animate-spin rounded-full border-2 border-emerald-500 border-t-transparent" />
             Loading immersive map…
@@ -231,11 +231,11 @@ export function BookingMap({
         </div>
       )}
 
-      <div className="absolute left-4 bottom-4 z-10 flex flex-wrap items-center gap-4 rounded-xl bg-white/90 backdrop-blur-md px-4 py-2.5 text-xs shadow-xl border border-white/20">
-        <span className="font-bold text-slate-900 uppercase tracking-wider">Park Map</span>
-        <div className="h-4 w-px bg-slate-200" />
+      <div className="absolute left-4 bottom-4 z-10 flex flex-wrap items-center gap-4 rounded-xl bg-card/90 backdrop-blur-md px-4 py-2.5 text-xs shadow-xl border border-white/20">
+        <span className="font-bold text-foreground uppercase tracking-wider">Park Map</span>
+        <div className="h-4 w-px bg-muted" />
         {Object.entries(STATUS_COLORS).map(([status, color]) => (
-          <span key={status} className="flex items-center gap-1.5 font-medium text-slate-600 capitalize">
+          <span key={status} className="flex items-center gap-1.5 font-medium text-muted-foreground capitalize">
             <span className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: color }} />
             {status}
           </span>

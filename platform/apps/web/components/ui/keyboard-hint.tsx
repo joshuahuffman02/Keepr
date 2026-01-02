@@ -31,9 +31,9 @@ export function KeyboardHint({ keys, className = "", size = "sm" }: KeyboardHint
     <span className={`inline-flex items-center gap-0.5 ${className}`}>
       {keys.map((key, idx) => (
         <React.Fragment key={idx}>
-          {idx > 0 && <span className="text-slate-400 text-xs mx-0.5">+</span>}
+          {idx > 0 && <span className="text-muted-foreground text-xs mx-0.5">+</span>}
           <kbd
-            className={`${sizeClasses[size]} bg-white border border-slate-200 rounded font-mono text-slate-700 shadow-sm min-w-[20px] text-center inline-block`}
+            className={`${sizeClasses[size]} bg-card border border-border rounded font-mono text-foreground shadow-sm min-w-[20px] text-center inline-block`}
           >
             {formatKey(key)}
           </kbd>

@@ -81,20 +81,20 @@ export default function SettingsLayout({ children }: { children: ReactNode }) {
         <div className="mb-6 flex items-center gap-2 text-sm">
           <Link
             href="/dashboard/settings"
-            className="flex items-center gap-1.5 text-slate-500 hover:text-emerald-600 transition-colors"
+            className="flex items-center gap-1.5 text-muted-foreground hover:text-emerald-600 transition-colors"
           >
             <Settings className="h-4 w-4" />
             <span>Settings</span>
           </Link>
           {breadcrumbs.map((crumb, index) => (
             <div key={crumb.href} className="flex items-center gap-2">
-              <ChevronRight className="h-4 w-4 text-slate-300" />
+              <ChevronRight className="h-4 w-4 text-muted-foreground" />
               {index === breadcrumbs.length - 1 ? (
-                <span className="font-medium text-slate-900 dark:text-slate-100">{crumb.label}</span>
+                <span className="font-medium text-foreground dark:text-foreground">{crumb.label}</span>
               ) : (
                 <Link
                   href={crumb.href}
-                  className="text-slate-500 hover:text-emerald-600 transition-colors"
+                  className="text-muted-foreground hover:text-emerald-600 transition-colors"
                 >
                   {crumb.label}
                 </Link>

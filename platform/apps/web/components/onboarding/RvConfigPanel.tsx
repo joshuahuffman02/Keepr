@@ -50,7 +50,7 @@ export function RvConfigPanel({
     >
       {/* Orientation Selection */}
       <div className="space-y-3">
-        <h4 className="text-sm font-medium text-slate-300">Site Orientation</h4>
+        <h4 className="text-sm font-medium text-muted-foreground">Site Orientation</h4>
         <div className="grid grid-cols-2 gap-3">
           <OrientationButton
             selected={orientation === "back_in"}
@@ -71,7 +71,7 @@ export function RvConfigPanel({
 
       {/* Hookups Section */}
       <div className="space-y-3">
-        <h4 className="text-sm font-medium text-slate-300">Hookups Available</h4>
+        <h4 className="text-sm font-medium text-muted-foreground">Hookups Available</h4>
         <div className="grid grid-cols-2 gap-3">
           <HookupToggle
             selected={hookupsWater}
@@ -92,8 +92,8 @@ export function RvConfigPanel({
       <div className="space-y-3">
         <div className="flex items-center gap-2">
           <Zap className="w-4 h-4 text-yellow-400" />
-          <h4 className="text-sm font-medium text-slate-300">Electric Options</h4>
-          <span className="text-xs text-slate-500">(select all that apply)</span>
+          <h4 className="text-sm font-medium text-muted-foreground">Electric Options</h4>
+          <span className="text-xs text-muted-foreground">(select all that apply)</span>
         </div>
         <div className="grid grid-cols-4 gap-2">
           {ampOptions.map((option, index) => {
@@ -108,25 +108,25 @@ export function RvConfigPanel({
                 className={cn(
                   "relative p-3 rounded-lg border-2 text-center transition-all duration-200",
                   "hover:border-yellow-500/50",
-                  "focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-offset-2 focus:ring-offset-slate-900",
+                  "focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-offset-2 focus:ring-offset-background",
                   isSelected
                     ? "border-yellow-500 bg-yellow-500/10"
-                    : "border-slate-700 bg-slate-800/50"
+                    : "border-border bg-muted/50"
                 )}
               >
                 <div className="font-bold text-lg">
-                  <span className={isSelected ? "text-yellow-400" : "text-slate-300"}>
+                  <span className={isSelected ? "text-yellow-400" : "text-muted-foreground"}>
                     {option.label}
                   </span>
                 </div>
-                <div className="text-xs text-slate-500 mt-1">{option.description}</div>
+                <div className="text-xs text-muted-foreground mt-1">{option.description}</div>
                 {isSelected && (
                   <motion.div
                     initial={{ scale: 0 }}
                     animate={{ scale: 1 }}
                     className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-yellow-500 flex items-center justify-center"
                   >
-                    <Check className="w-3 h-3 text-slate-900" />
+                    <Check className="w-3 h-3 text-foreground" />
                   </motion.div>
                 )}
               </motion.button>
@@ -160,26 +160,26 @@ function OrientationButton({ selected, onClick, icon, label, description }: Orie
       className={cn(
         "relative p-4 rounded-xl border-2 text-left transition-all duration-200",
         "hover:border-emerald-500/50",
-        "focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 focus:ring-offset-slate-900",
+        "focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 focus:ring-offset-background",
         selected
           ? "border-emerald-500 bg-emerald-500/10"
-          : "border-slate-700 bg-slate-800/50"
+          : "border-border bg-muted/50"
       )}
     >
       <div className="flex items-center gap-3">
         <div
           className={cn(
             "p-2 rounded-lg",
-            selected ? "bg-emerald-500/20 text-emerald-400" : "bg-slate-700 text-slate-400"
+            selected ? "bg-emerald-500/20 text-emerald-400" : "bg-muted text-muted-foreground"
           )}
         >
           {icon}
         </div>
         <div>
-          <div className={cn("font-medium", selected ? "text-emerald-400" : "text-slate-200")}>
+          <div className={cn("font-medium", selected ? "text-emerald-400" : "text-muted-foreground")}>
             {label}
           </div>
-          <div className="text-xs text-slate-500">{description}</div>
+          <div className="text-xs text-muted-foreground">{description}</div>
         </div>
       </div>
       {selected && (
@@ -208,22 +208,22 @@ function HookupToggle({ selected, onClick, icon, label }: HookupToggleProps) {
       className={cn(
         "relative p-4 rounded-xl border-2 transition-all duration-200",
         "hover:border-blue-500/50",
-        "focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-slate-900",
+        "focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-background",
         selected
           ? "border-blue-500 bg-blue-500/10"
-          : "border-slate-700 bg-slate-800/50"
+          : "border-border bg-muted/50"
       )}
     >
       <div className="flex items-center justify-center gap-3">
         <div
           className={cn(
             "p-2 rounded-lg",
-            selected ? "bg-blue-500/20 text-blue-400" : "bg-slate-700 text-slate-400"
+            selected ? "bg-blue-500/20 text-blue-400" : "bg-muted text-muted-foreground"
           )}
         >
           {icon}
         </div>
-        <span className={cn("font-medium", selected ? "text-blue-400" : "text-slate-300")}>
+        <span className={cn("font-medium", selected ? "text-blue-400" : "text-muted-foreground")}>
           {label}
         </span>
       </div>

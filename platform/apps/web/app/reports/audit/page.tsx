@@ -60,13 +60,13 @@ export default function AuditLogPage() {
     const keys = Array.from(new Set([...(before ? Object.keys(before) : []), ...(after ? Object.keys(after) : [])]));
     if (keys.length === 0) return null;
     return (
-      <div className="flex flex-wrap gap-2 text-xs text-slate-600">
+      <div className="flex flex-wrap gap-2 text-xs text-muted-foreground">
         {keys.map((key) => {
           const prev = before ? before[key] : undefined;
           const next = after ? after[key] : undefined;
           if (prev === next) return null;
           return (
-            <span key={key} className="rounded bg-slate-100 px-2 py-1 border border-slate-200">
+            <span key={key} className="rounded bg-muted px-2 py-1 border border-border">
               <span className="font-semibold">{key}</span>: {String(prev ?? "—")} → <span className="font-semibold text-emerald-700">{String(next ?? "—")}</span>
             </span>
           );
@@ -81,13 +81,13 @@ export default function AuditLogPage() {
         <Breadcrumbs items={[{ label: "Reports" }, { label: "Audit log" }]} />
         <div className="card p-4 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
           <div>
-            <div className="text-xl font-semibold text-slate-900">Audit log</div>
-            <div className="text-sm text-slate-600">Role changes, invites, and future sensitive actions.</div>
+            <div className="text-xl font-semibold text-foreground">Audit log</div>
+            <div className="text-sm text-muted-foreground">Role changes, invites, and future sensitive actions.</div>
           </div>
           <div className="flex flex-wrap gap-2">
             <div className="flex items-center gap-2">
               <Input type="date" value={start} onChange={(e) => setStart(e.target.value)} className="w-40" />
-              <span className="text-slate-500 text-xs">to</span>
+              <span className="text-muted-foreground text-xs">to</span>
               <Input type="date" value={end} onChange={(e) => setEnd(e.target.value)} className="w-40" />
             </div>
             <Select value={actionFilter} onValueChange={setActionFilter}>
@@ -139,12 +139,12 @@ export default function AuditLogPage() {
         </div>
 
         <div className="card">
-          <div className="p-4 border-b border-slate-200 flex items-center justify-between">
-            <div className="text-sm text-slate-600">Showing {rows.length} entries</div>
+          <div className="p-4 border-b border-border flex items-center justify-between">
+            <div className="text-sm text-muted-foreground">Showing {rows.length} entries</div>
           </div>
           <div className="overflow-auto">
             <table className="min-w-full text-sm">
-              <thead className="border-b border-slate-200 text-left text-slate-600">
+              <thead className="border-b border-border text-left text-muted-foreground">
                 <tr>
                   <th className="px-3 py-2">Time</th>
                   <th className="px-3 py-2">Action</th>
@@ -158,30 +158,30 @@ export default function AuditLogPage() {
               <tbody>
                 {auditQuery.isLoading ? (
                   <tr>
-                    <td colSpan={7} className="px-3 py-4 text-sm text-slate-500">Loading…</td>
+                    <td colSpan={7} className="px-3 py-4 text-sm text-muted-foreground">Loading…</td>
                   </tr>
                 ) : rows.length === 0 ? (
                   <tr>
-                    <td colSpan={5} className="px-3 py-4 text-sm text-slate-500">No audit entries yet.</td>
+                    <td colSpan={5} className="px-3 py-4 text-sm text-muted-foreground">No audit entries yet.</td>
                   </tr>
                 ) : (
                   rows.map((row) => (
-                    <tr key={row.id} className="border-b border-slate-100">
-                      <td className="px-3 py-2 text-slate-700 whitespace-nowrap">{new Date(row.createdAt).toLocaleString()}</td>
+                    <tr key={row.id} className="border-b border-border">
+                      <td className="px-3 py-2 text-foreground whitespace-nowrap">{new Date(row.createdAt).toLocaleString()}</td>
                       <td className="px-3 py-2">
                         <Badge variant="secondary">{row.action}</Badge>
                       </td>
-                      <td className="px-3 py-2 text-slate-700">
+                      <td className="px-3 py-2 text-foreground">
                         {row.entity}:{row.entityId.slice(0, 6)}
                       </td>
-                      <td className="px-3 py-2 text-slate-700">
+                      <td className="px-3 py-2 text-foreground">
                         {row.actor ? `${row.actor.firstName ?? ""} ${row.actor.lastName ?? ""}`.trim() || row.actor.email : "System"}
                       </td>
-                      <td className="px-3 py-2 text-slate-700">
+                      <td className="px-3 py-2 text-foreground">
                         {formatDiff(row.before, row.after) ?? "—"}
                       </td>
-                      <td className="px-3 py-2 text-slate-700">{row.ip || "—"}</td>
-                      <td className="px-3 py-2 text-slate-700 max-w-xs truncate" title={row.userAgent || undefined}>
+                      <td className="px-3 py-2 text-foreground">{row.ip || "—"}</td>
+                      <td className="px-3 py-2 text-foreground max-w-xs truncate" title={row.userAgent || undefined}>
                         {row.userAgent || "—"}
                       </td>
                     </tr>

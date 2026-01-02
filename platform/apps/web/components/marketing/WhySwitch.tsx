@@ -51,14 +51,14 @@ const colorClasses = {
 
 export function WhySwitch() {
   return (
-    <section className="py-16 md:py-24 bg-slate-50">
+    <section className="py-16 md:py-24 bg-muted">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="text-center mb-12">
-          <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-4">
+          <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
             Why Campgrounds Choose Camp Everyday
           </h2>
-          <p className="text-xl text-slate-600 max-w-2xl mx-auto">
+          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
             We built the platform we wished existed - modern, powerful, and designed
             specifically for campground operations.
           </p>
@@ -72,13 +72,13 @@ export function WhySwitch() {
             return (
               <div
                 key={feature.name}
-                className={`bg-white rounded-2xl p-6 border-2 ${colors.border} hover:shadow-lg transition-shadow`}
+                className={`bg-card rounded-2xl p-6 border-2 ${colors.border} hover:shadow-lg transition-shadow`}
               >
                 <div className={`inline-flex h-12 w-12 items-center justify-center rounded-xl ${colors.bg} mb-4`}>
                   <Icon className={`h-6 w-6 ${colors.icon}`} />
                 </div>
-                <h3 className="font-bold text-slate-900 mb-2">{feature.name}</h3>
-                <p className="text-sm text-slate-600">{feature.description}</p>
+                <h3 className="font-bold text-foreground mb-2">{feature.name}</h3>
+                <p className="text-sm text-muted-foreground">{feature.description}</p>
               </div>
             );
           })}
@@ -92,7 +92,7 @@ export function WhySwitch() {
                 <CheckCircle className="h-5 w-5 text-emerald-600" />
               </div>
               <div>
-                <h3 className="font-bold text-slate-900">What You Get</h3>
+                <h3 className="font-bold text-foreground">What You Get</h3>
                 <p className="text-sm text-emerald-600">Everything you need to run your park</p>
               </div>
             </div>
@@ -100,7 +100,7 @@ export function WhySwitch() {
               {benefits.map((benefit, i) => (
                 <li key={i} className="flex items-start gap-3">
                   <CheckCircle className="h-5 w-5 text-emerald-500 mt-0.5 flex-shrink-0" />
-                  <span className="text-slate-700">{benefit}</span>
+                  <span className="text-foreground">{benefit}</span>
                 </li>
               ))}
             </ul>
@@ -109,10 +109,10 @@ export function WhySwitch() {
 
         {/* Bottom CTA */}
         <div className="text-center">
-          <div className="inline-flex flex-col sm:flex-row items-center gap-6 p-6 bg-white rounded-2xl shadow-lg border border-slate-100">
+          <div className="inline-flex flex-col sm:flex-row items-center gap-6 p-6 bg-card rounded-2xl shadow-lg border border-border">
             <div className="text-left">
-              <p className="font-semibold text-slate-900">Ready to get started?</p>
-              <p className="text-sm text-slate-500">Try the live demo or calculate your potential savings.</p>
+              <p className="font-semibold text-foreground">Ready to get started?</p>
+              <p className="text-sm text-muted-foreground">Try the live demo or calculate your potential savings.</p>
             </div>
             <div className="flex gap-3">
               <Button

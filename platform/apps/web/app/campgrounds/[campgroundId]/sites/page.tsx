@@ -957,7 +957,7 @@ export default function SitesPage() {
                           onChange={(e) => setFormState((s) => ({ ...s, hookupsSewer: e.target.checked }))}
                           className="rounded border-border"
                         />
-                        <Waves className="h-3.5 w-3.5 text-slate-500" />
+                        <Waves className="h-3.5 w-3.5 text-muted-foreground" />
                         Sewer
                       </label>
                       {formState.hookupsPower && (
@@ -1250,7 +1250,7 @@ export default function SitesPage() {
                               {effectiveSewer && (
                                 <Waves className={cn(
                                   "h-3.5 w-3.5",
-                                  isInheritedHookups ? "text-slate-400/70 dark:text-slate-400/70" : "text-slate-500 dark:text-slate-400"
+                                  isInheritedHookups ? "text-muted-foreground/70 dark:text-muted-foreground/70" : "text-muted-foreground dark:text-muted-foreground"
                                 )} />
                               )}
                               {isInheritedHookups && (
@@ -1509,7 +1509,7 @@ export default function SitesPage() {
                                   onChange={(e) => setEditForm((s) => (s ? { ...s, hookupsSewer: e.target.checked } : s))}
                                   className="rounded border-border"
                                 />
-                                <Waves className="h-3.5 w-3.5 text-slate-500" />
+                                <Waves className="h-3.5 w-3.5 text-muted-foreground" />
                                 Sewer
                               </label>
                               <span className="text-xs font-semibold text-muted-foreground ml-4">Features:</span>

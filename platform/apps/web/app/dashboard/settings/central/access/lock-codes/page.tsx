@@ -364,7 +364,7 @@ export default function LockCodesPage() {
               <Icon className={cn("h-4 w-4", config.color.split(" ")[1])} />
             </div>
             <div>
-              <p className="font-medium text-slate-900">{item.name}</p>
+              <p className="font-medium text-foreground">{item.name}</p>
               <Badge variant="outline" className="text-xs mt-1">
                 {config.label}
               </Badge>
@@ -378,7 +378,7 @@ export default function LockCodesPage() {
       label: "Code",
       render: (item: LockCode) => (
         <div className="flex items-center gap-2">
-          <code className="px-2 py-1 rounded bg-slate-100 font-mono text-sm">
+          <code className="px-2 py-1 rounded bg-muted font-mono text-sm">
             {item.type === "master" ? "••••" : item.code}
           </code>
           <Button
@@ -390,7 +390,7 @@ export default function LockCodesPage() {
             {copiedId === item.id ? (
               <Check className="h-3 w-3 text-emerald-600" />
             ) : (
-              <Copy className="h-3 w-3 text-slate-400" />
+              <Copy className="h-3 w-3 text-muted-foreground" />
             )}
           </Button>
         </div>
@@ -401,9 +401,9 @@ export default function LockCodesPage() {
       label: "Rotation",
       render: (item: LockCode) => (
         <div className="text-sm">
-          <p className="text-slate-900">{rotationLabels[item.rotationSchedule]}</p>
+          <p className="text-foreground">{rotationLabels[item.rotationSchedule]}</p>
           {item.lastRotated && (
-            <p className="text-slate-500 text-xs">
+            <p className="text-muted-foreground text-xs">
               Last: {new Date(item.lastRotated).toLocaleDateString()}
             </p>
           )}
@@ -426,7 +426,7 @@ export default function LockCodesPage() {
             </Badge>
           )}
           {!item.showOnConfirmation && !item.showAtCheckin && (
-            <span className="text-slate-400 text-sm">Staff only</span>
+            <span className="text-muted-foreground text-sm">Staff only</span>
           )}
         </div>
       ),
@@ -440,7 +440,7 @@ export default function LockCodesPage() {
           className={cn(
             item.isActive
               ? "bg-status-success/15 text-status-success"
-              : "bg-slate-100 text-slate-600"
+              : "bg-muted text-muted-foreground"
           )}
         >
           {item.isActive ? "Active" : "Disabled"}
@@ -453,7 +453,7 @@ export default function LockCodesPage() {
     return (
       <div className="max-w-5xl space-y-6">
         <div className="flex items-center justify-center py-12">
-          <Loader2 className="h-8 w-8 animate-spin text-slate-400" />
+          <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
         </div>
       </div>
     );
@@ -477,8 +477,8 @@ export default function LockCodesPage() {
       {/* Header */}
       <div className="flex items-start justify-between">
         <div>
-          <h2 className="text-2xl font-bold text-slate-900">Lock Codes</h2>
-          <p className="text-slate-500 mt-1">
+          <h2 className="text-2xl font-bold text-foreground">Lock Codes</h2>
+          <p className="text-muted-foreground mt-1">
             Manage gate codes, WiFi passwords, and facility access codes
           </p>
         </div>
@@ -596,7 +596,7 @@ export default function LockCodesPage() {
                         <config.icon className="h-4 w-4" />
                         <div>
                           <span>{config.label}</span>
-                          <span className="text-slate-400 ml-2 text-xs">
+                          <span className="text-muted-foreground ml-2 text-xs">
                             {config.description}
                           </span>
                         </div>
@@ -641,7 +641,7 @@ export default function LockCodesPage() {
                   ))}
                 </SelectContent>
               </Select>
-              <p className="text-xs text-slate-500">
+              <p className="text-xs text-muted-foreground">
                 Per Guest generates a unique code for each reservation
               </p>
             </div>
@@ -654,7 +654,7 @@ export default function LockCodesPage() {
                   <Label htmlFor="show-confirmation" className="font-normal">
                     Confirmation Email
                   </Label>
-                  <p className="text-sm text-slate-500">
+                  <p className="text-sm text-muted-foreground">
                     Include in booking confirmation
                   </p>
                 </div>
@@ -670,7 +670,7 @@ export default function LockCodesPage() {
                   <Label htmlFor="show-checkin" className="font-normal">
                     Check-in Instructions
                   </Label>
-                  <p className="text-sm text-slate-500">
+                  <p className="text-sm text-muted-foreground">
                     Show during self check-in
                   </p>
                 </div>

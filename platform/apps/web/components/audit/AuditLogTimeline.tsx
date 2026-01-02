@@ -135,7 +135,7 @@ function DiffView({ before, after }: { before: Record<string, any> | null; after
 
   if (changedKeys.length === 0) {
     return (
-      <p className="text-xs text-slate-500 italic">No field changes recorded</p>
+      <p className="text-xs text-muted-foreground italic">No field changes recorded</p>
     );
   }
 
@@ -143,7 +143,7 @@ function DiffView({ before, after }: { before: Record<string, any> | null; after
     <div className="space-y-1.5">
       {changedKeys.map((key) => (
         <div key={key} className="text-xs">
-          <span className="font-medium text-slate-700 capitalize">
+          <span className="font-medium text-foreground capitalize">
             {key.replace(/([A-Z])/g, " $1").replace(/^./, (str) => str.toUpperCase())}:
           </span>
           <div className="flex items-center gap-2 mt-0.5">
@@ -153,7 +153,7 @@ function DiffView({ before, after }: { before: Record<string, any> | null; after
               </span>
             )}
             {before?.[key] !== undefined && after?.[key] !== undefined && (
-              <span className="text-slate-400">→</span>
+              <span className="text-muted-foreground">→</span>
             )}
             {after?.[key] !== undefined && (
               <span className="text-emerald-600">
@@ -176,14 +176,14 @@ function AuditLogEntry({ log }: { log: AuditLog }) {
 
   const icon = actionIcons[log.action] || <RefreshCw className="h-4 w-4" />;
   const label = actionLabels[log.action] || log.action;
-  const colorClass = actionColors[log.action] || "bg-slate-100 text-slate-700 border-slate-200";
+  const colorClass = actionColors[log.action] || "bg-muted text-foreground border-border";
 
   const hasDiff = log.before || log.after;
 
   return (
     <div className="relative pl-8 pb-6 last:pb-0">
       {/* Timeline line */}
-      <div className="absolute left-3 top-6 bottom-0 w-px bg-slate-200 last:hidden" />
+      <div className="absolute left-3 top-6 bottom-0 w-px bg-muted last:hidden" />
 
       {/* Icon circle */}
       <div
@@ -196,14 +196,14 @@ function AuditLogEntry({ log }: { log: AuditLog }) {
       </div>
 
       {/* Content */}
-      <div className="bg-white border border-slate-200 rounded-lg p-3 shadow-sm">
+      <div className="bg-card border border-border rounded-lg p-3 shadow-sm">
         <div className="flex items-start justify-between gap-2">
           <div>
-            <span className="font-medium text-slate-900">{label}</span>
-            <span className="text-slate-500 text-sm ml-2">by {actorName}</span>
+            <span className="font-medium text-foreground">{label}</span>
+            <span className="text-muted-foreground text-sm ml-2">by {actorName}</span>
           </div>
           <time
-            className="text-xs text-slate-500 whitespace-nowrap"
+            className="text-xs text-muted-foreground whitespace-nowrap"
             title={format(new Date(log.createdAt), "PPpp")}
           >
             {formatDistanceToNow(new Date(log.createdAt), { addSuffix: true })}
@@ -213,7 +213,7 @@ function AuditLogEntry({ log }: { log: AuditLog }) {
         {hasDiff && (
           <button
             onClick={() => setExpanded(!expanded)}
-            className="flex items-center gap-1 mt-2 text-xs text-slate-600 hover:text-slate-900 transition-colors"
+            className="flex items-center gap-1 mt-2 text-xs text-muted-foreground hover:text-foreground transition-colors"
           >
             {expanded ? (
               <ChevronDown className="h-3 w-3" />
@@ -225,7 +225,7 @@ function AuditLogEntry({ log }: { log: AuditLog }) {
         )}
 
         {expanded && hasDiff && (
-          <div className="mt-3 pt-3 border-t border-slate-100">
+          <div className="mt-3 pt-3 border-t border-border">
             <DiffView before={log.before} after={log.after} />
           </div>
         )}
@@ -273,8 +273,8 @@ export function AuditLogTimeline({
 
   if (error) {
     return (
-      <div className="text-center py-8 text-slate-500">
-        <AlertCircle className="h-8 w-8 mx-auto mb-2 text-slate-400" />
+      <div className="text-center py-8 text-muted-foreground">
+        <AlertCircle className="h-8 w-8 mx-auto mb-2 text-muted-foreground" />
         <p>Failed to load activity log</p>
       </div>
     );
@@ -282,8 +282,8 @@ export function AuditLogTimeline({
 
   if (!logs || logs.length === 0) {
     return (
-      <div className="text-center py-8 text-slate-500">
-        <History className="h-8 w-8 mx-auto mb-2 text-slate-400" />
+      <div className="text-center py-8 text-muted-foreground">
+        <History className="h-8 w-8 mx-auto mb-2 text-muted-foreground" />
         <p>No activity recorded yet</p>
         <p className="text-sm mt-1">
           Changes will appear here as they happen

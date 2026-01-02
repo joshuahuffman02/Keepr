@@ -67,7 +67,7 @@ export function RateGroupRow({
   return (
     <div
       className={cn(
-        "flex items-center gap-4 p-4 rounded-lg border bg-white",
+        "flex items-center gap-4 p-4 rounded-lg border bg-card",
         "transition-all duration-200 hover:shadow-md group",
         !group.isActive && "opacity-60"
       )}
@@ -104,19 +104,19 @@ export function RateGroupRow({
               className="h-8 w-8"
               onClick={handleCancelEdit}
             >
-              <X className="h-4 w-4 text-slate-400" />
+              <X className="h-4 w-4 text-muted-foreground" />
             </Button>
           </div>
         ) : (
           <div>
             <button
               onClick={() => setIsEditing(true)}
-              className="font-medium text-slate-900 hover:text-emerald-600 transition-colors flex items-center gap-2 group/name"
+              className="font-medium text-foreground hover:text-emerald-600 transition-colors flex items-center gap-2 group/name"
             >
               {group.name}
               <Pencil className="h-3 w-3 opacity-0 group-hover/name:opacity-100 transition-opacity" />
             </button>
-            <p className="text-sm text-slate-500">
+            <p className="text-sm text-muted-foreground">
               {group.dateRanges.length} date range{group.dateRanges.length !== 1 && "s"}
             </p>
           </div>
@@ -125,8 +125,8 @@ export function RateGroupRow({
 
       {/* Stats */}
       <div className="text-right hidden sm:block">
-        <p className="font-medium text-slate-900">{group.totalDays}</p>
-        <p className="text-sm text-slate-500">days this year</p>
+        <p className="font-medium text-foreground">{group.totalDays}</p>
+        <p className="text-sm text-muted-foreground">days this year</p>
       </div>
 
       {/* Status Badge */}

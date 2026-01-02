@@ -216,7 +216,7 @@ function getPriorityColor(priority: string): string {
     case "low":
       return "bg-blue-500/20 text-blue-400 border-blue-500/30";
     default:
-      return "bg-slate-500/20 text-slate-400";
+      return "bg-muted0/20 text-muted-foreground";
   }
 }
 
@@ -303,14 +303,14 @@ export default function AiInsightsPage() {
               </Badge>
             )}
           </div>
-          <p className="text-slate-400 mt-1">AI-generated improvement recommendations and anomaly detection</p>
+          <p className="text-muted-foreground mt-1">AI-generated improvement recommendations and anomaly detection</p>
         </div>
         <DateRangePicker value={dateRange} onChange={setDateRange} />
       </div>
 
       {/* Summary Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <Card className="bg-slate-800/50 border-slate-700">
+        <Card className="bg-muted/50 border-border">
           <CardContent className="p-4">
             <div className="flex items-center gap-3">
               <div className="p-2 bg-purple-500/20 rounded-lg">
@@ -318,7 +318,7 @@ export default function AiInsightsPage() {
               </div>
               <div>
                 <p className="text-2xl font-bold text-white">{totalSuggestions}</p>
-                <p className="text-sm text-slate-400">Total Suggestions</p>
+                <p className="text-sm text-muted-foreground">Total Suggestions</p>
               </div>
             </div>
           </CardContent>
@@ -331,12 +331,12 @@ export default function AiInsightsPage() {
               </div>
               <div>
                 <p className="text-2xl font-bold text-red-400">{highPrioritySuggestions}</p>
-                <p className="text-sm text-slate-400">High Priority</p>
+                <p className="text-sm text-muted-foreground">High Priority</p>
               </div>
             </div>
           </CardContent>
         </Card>
-        <Card className="bg-slate-800/50 border-slate-700">
+        <Card className="bg-muted/50 border-border">
           <CardContent className="p-4">
             <div className="flex items-center gap-3">
               <div className="p-2 bg-amber-500/20 rounded-lg">
@@ -344,12 +344,12 @@ export default function AiInsightsPage() {
               </div>
               <div>
                 <p className="text-2xl font-bold text-white">{suggestions.length}</p>
-                <p className="text-sm text-slate-400">Parks Need Help</p>
+                <p className="text-sm text-muted-foreground">Parks Need Help</p>
               </div>
             </div>
           </CardContent>
         </Card>
-        <Card className="bg-slate-800/50 border-slate-700">
+        <Card className="bg-muted/50 border-border">
           <CardContent className="p-4">
             <div className="flex items-center gap-3">
               <div className="p-2 bg-red-500/20 rounded-lg">
@@ -357,7 +357,7 @@ export default function AiInsightsPage() {
               </div>
               <div>
                 <p className="text-2xl font-bold text-white">{anomalies.length}</p>
-                <p className="text-sm text-slate-400">Anomalies Detected</p>
+                <p className="text-sm text-muted-foreground">Anomalies Detected</p>
               </div>
             </div>
           </CardContent>
@@ -372,7 +372,7 @@ export default function AiInsightsPage() {
               <AlertTriangle className="h-5 w-5 text-red-400" />
               Anomalies Detected
             </CardTitle>
-            <p className="text-sm text-slate-400">Unusual patterns that require attention</p>
+            <p className="text-sm text-muted-foreground">Unusual patterns that require attention</p>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
@@ -392,7 +392,7 @@ export default function AiInsightsPage() {
                           {anomaly.severity}
                         </Badge>
                         {anomaly.campgroundName && (
-                          <span className="text-slate-400">{anomaly.campgroundName}</span>
+                          <span className="text-muted-foreground">{anomaly.campgroundName}</span>
                         )}
                       </div>
                       <p className="font-medium text-white">{formatMessage(anomaly.message)}</p>
@@ -402,16 +402,16 @@ export default function AiInsightsPage() {
                         {typeof anomaly.currentValue === 'number' ? Math.round(anomaly.currentValue * 10) / 10 : anomaly.currentValue}
                         {anomaly.type === "cancellation_spike" ? "%" : ""}
                       </p>
-                      <p className="text-xs text-slate-500">
+                      <p className="text-xs text-muted-foreground">
                         Expected: {typeof anomaly.expectedValue === 'number' ? Math.round(anomaly.expectedValue * 10) / 10 : anomaly.expectedValue}{anomaly.type === "cancellation_spike" ? "%" : ""}
                       </p>
                     </div>
                   </div>
-                  <div className="border-t border-slate-700 pt-3">
-                    <p className="text-xs text-slate-400 mb-2">Recommendations:</p>
+                  <div className="border-t border-border pt-3">
+                    <p className="text-xs text-muted-foreground mb-2">Recommendations:</p>
                     <ul className="space-y-1">
                       {anomaly.recommendations.map((rec, idx) => (
-                        <li key={idx} className="flex items-start gap-2 text-sm text-slate-300">
+                        <li key={idx} className="flex items-start gap-2 text-sm text-muted-foreground">
                           <CheckCircle className="h-4 w-4 text-green-400 mt-0.5 flex-shrink-0" />
                           {rec}
                         </li>
@@ -432,7 +432,7 @@ export default function AiInsightsPage() {
           Improvement Plans by Campground
         </h2>
         {suggestions.map((cg) => (
-          <Card key={cg.campgroundId} className="bg-slate-800/50 border-slate-700">
+          <Card key={cg.campgroundId} className="bg-muted/50 border-border">
             <CardHeader
               className="cursor-pointer"
               onClick={() =>
@@ -443,42 +443,42 @@ export default function AiInsightsPage() {
                 <div className="flex items-center gap-4">
                   <div className="text-center">
                     <p className={`text-3xl font-bold ${getNpsColor(cg.npsScore)}`}>{cg.npsScore}</p>
-                    <p className="text-xs text-slate-500">NPS</p>
+                    <p className="text-xs text-muted-foreground">NPS</p>
                   </div>
                   <div>
                     <CardTitle className="text-white">{cg.campgroundName}</CardTitle>
                     <div className="flex items-center gap-2 mt-1">
-                      <span className="text-sm text-slate-400">{cg.detractorCount} detractors</span>
-                      <span className="text-slate-600">•</span>
-                      <span className="text-sm text-slate-400">{cg.suggestions.length} suggestions</span>
+                      <span className="text-sm text-muted-foreground">{cg.detractorCount} detractors</span>
+                      <span className="text-muted-foreground">•</span>
+                      <span className="text-sm text-muted-foreground">{cg.suggestions.length} suggestions</span>
                     </div>
                   </div>
                 </div>
                 <div className="flex items-center gap-3">
                   <div className="flex gap-1">
                     {cg.primaryIssues.slice(0, 3).map((issue, idx) => (
-                      <Badge key={idx} variant="outline" className="text-xs border-slate-600">
+                      <Badge key={idx} variant="outline" className="text-xs border-border">
                         {issue}
                       </Badge>
                     ))}
                   </div>
                   {expandedCampground === cg.campgroundId ? (
-                    <ChevronUp className="h-5 w-5 text-slate-400" />
+                    <ChevronUp className="h-5 w-5 text-muted-foreground" />
                   ) : (
-                    <ChevronDown className="h-5 w-5 text-slate-400" />
+                    <ChevronDown className="h-5 w-5 text-muted-foreground" />
                   )}
                 </div>
               </div>
             </CardHeader>
             {expandedCampground === cg.campgroundId && (
-              <CardContent className="border-t border-slate-700">
+              <CardContent className="border-t border-border">
                 {/* Top Complaints */}
                 {cg.topComplaints.length > 0 && (
                   <div className="mb-6">
-                    <h4 className="text-sm font-medium text-slate-400 mb-3">Recent Complaints</h4>
+                    <h4 className="text-sm font-medium text-muted-foreground mb-3">Recent Complaints</h4>
                     <div className="space-y-2">
                       {cg.topComplaints.map((complaint, idx) => (
-                        <p key={idx} className="text-sm text-slate-300 italic pl-4 border-l-2 border-red-500/50">
+                        <p key={idx} className="text-sm text-muted-foreground italic pl-4 border-l-2 border-red-500/50">
                           "{complaint}"
                         </p>
                       ))}
@@ -488,7 +488,7 @@ export default function AiInsightsPage() {
 
                 {/* Suggestions */}
                 <div>
-                  <h4 className="text-sm font-medium text-slate-400 mb-3">Recommended Actions</h4>
+                  <h4 className="text-sm font-medium text-muted-foreground mb-3">Recommended Actions</h4>
                   <div className="space-y-3">
                     {cg.suggestions.map((suggestion, idx) => (
                       <div
@@ -500,14 +500,14 @@ export default function AiInsightsPage() {
                             <Badge className={getPriorityColor(suggestion.priority)}>
                               {suggestion.priority} priority
                             </Badge>
-                            <Badge variant="outline" className="border-slate-600">
+                            <Badge variant="outline" className="border-border">
                               {suggestion.category}
                             </Badge>
                           </div>
                           {getEffortBadge(suggestion.estimatedEffort)}
                         </div>
                         <h5 className="font-medium text-white mb-1">{suggestion.title}</h5>
-                        <p className="text-sm text-slate-300 mb-2">{suggestion.description}</p>
+                        <p className="text-sm text-muted-foreground mb-2">{suggestion.description}</p>
                         <p className="text-xs text-green-400">
                           <Zap className="h-3 w-3 inline mr-1" />
                           Expected Impact: {suggestion.expectedImpact}

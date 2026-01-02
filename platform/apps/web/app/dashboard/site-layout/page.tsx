@@ -100,8 +100,8 @@ export default function SiteLayoutPage() {
             <div className="flex items-center gap-3">
               <Map className="h-8 w-8 text-emerald-600" />
               <div>
-                <h1 className="text-2xl font-bold text-slate-900">Site Layout Editor</h1>
-                <p className="text-slate-600">Design your campground layout visually</p>
+                <h1 className="text-2xl font-bold text-foreground">Site Layout Editor</h1>
+                <p className="text-muted-foreground">Design your campground layout visually</p>
               </div>
             </div>
           </div>
@@ -133,39 +133,39 @@ export default function SiteLayoutPage() {
                 <div className="space-y-2 text-sm">
                   <div className="flex justify-between">
                     <span>Select tool</span>
-                    <kbd className="px-2 py-1 bg-slate-100 rounded text-xs">V</kbd>
+                    <kbd className="px-2 py-1 bg-muted rounded text-xs">V</kbd>
                   </div>
                   <div className="flex justify-between">
                     <span>Add site tool</span>
-                    <kbd className="px-2 py-1 bg-slate-100 rounded text-xs">S</kbd>
+                    <kbd className="px-2 py-1 bg-muted rounded text-xs">S</kbd>
                   </div>
                   <div className="flex justify-between">
                     <span>Delete selected</span>
-                    <kbd className="px-2 py-1 bg-slate-100 rounded text-xs">Delete</kbd>
+                    <kbd className="px-2 py-1 bg-muted rounded text-xs">Delete</kbd>
                   </div>
                   <div className="flex justify-between">
                     <span>Duplicate selected</span>
-                    <kbd className="px-2 py-1 bg-slate-100 rounded text-xs">Cmd/Ctrl + D</kbd>
+                    <kbd className="px-2 py-1 bg-muted rounded text-xs">Cmd/Ctrl + D</kbd>
                   </div>
                   <div className="flex justify-between">
                     <span>Undo</span>
-                    <kbd className="px-2 py-1 bg-slate-100 rounded text-xs">Cmd/Ctrl + Z</kbd>
+                    <kbd className="px-2 py-1 bg-muted rounded text-xs">Cmd/Ctrl + Z</kbd>
                   </div>
                   <div className="flex justify-between">
                     <span>Redo</span>
-                    <kbd className="px-2 py-1 bg-slate-100 rounded text-xs">Cmd/Ctrl + Shift + Z</kbd>
+                    <kbd className="px-2 py-1 bg-muted rounded text-xs">Cmd/Ctrl + Shift + Z</kbd>
                   </div>
                   <div className="flex justify-between">
                     <span>Deselect</span>
-                    <kbd className="px-2 py-1 bg-slate-100 rounded text-xs">Escape</kbd>
+                    <kbd className="px-2 py-1 bg-muted rounded text-xs">Escape</kbd>
                   </div>
                   <div className="flex justify-between">
                     <span>Multi-select</span>
-                    <kbd className="px-2 py-1 bg-slate-100 rounded text-xs">Shift + Click</kbd>
+                    <kbd className="px-2 py-1 bg-muted rounded text-xs">Shift + Click</kbd>
                   </div>
                   <div className="flex justify-between">
                     <span>Zoom in/out</span>
-                    <kbd className="px-2 py-1 bg-slate-100 rounded text-xs">Scroll wheel</kbd>
+                    <kbd className="px-2 py-1 bg-muted rounded text-xs">Scroll wheel</kbd>
                   </div>
                 </div>
               </DialogContent>
@@ -182,25 +182,25 @@ export default function SiteLayoutPage() {
                 <DialogHeader>
                   <DialogTitle>How to use the Site Layout Editor</DialogTitle>
                 </DialogHeader>
-                <div className="space-y-4 text-sm text-slate-600">
+                <div className="space-y-4 text-sm text-muted-foreground">
                   <div>
-                    <h4 className="font-medium text-slate-900">Adding Sites</h4>
+                    <h4 className="font-medium text-foreground">Adding Sites</h4>
                     <p>Select the site tool (tent icon) from the toolbar, choose a site type, then click on the canvas to place sites.</p>
                   </div>
                   <div>
-                    <h4 className="font-medium text-slate-900">Moving Sites</h4>
+                    <h4 className="font-medium text-foreground">Moving Sites</h4>
                     <p>Use the select tool (arrow icon), click on a site, and drag it to move. Sites snap to the grid for easy alignment.</p>
                   </div>
                   <div>
-                    <h4 className="font-medium text-slate-900">Editing Properties</h4>
+                    <h4 className="font-medium text-foreground">Editing Properties</h4>
                     <p>Select a site to see its properties panel on the right. Change site number, type, size, and rotation.</p>
                   </div>
                   <div>
-                    <h4 className="font-medium text-slate-900">Navigation</h4>
+                    <h4 className="font-medium text-foreground">Navigation</h4>
                     <p>Use the pan tool (hand icon) or scroll wheel to zoom. Click the grid icon to toggle grid visibility.</p>
                   </div>
                   <div>
-                    <h4 className="font-medium text-slate-900">Saving</h4>
+                    <h4 className="font-medium text-foreground">Saving</h4>
                     <p>Click Save to store your layout. Use Export to download as JSON for backup.</p>
                   </div>
                 </div>
@@ -210,9 +210,9 @@ export default function SiteLayoutPage() {
         </div>
 
         {/* Site class legend */}
-        <div className="flex items-center gap-4 p-3 bg-white rounded-lg border">
-          <Layers className="h-4 w-4 text-slate-400" />
-          <span className="text-sm font-medium text-slate-700">Site Types:</span>
+        <div className="flex items-center gap-4 p-3 bg-card rounded-lg border">
+          <Layers className="h-4 w-4 text-muted-foreground" />
+          <span className="text-sm font-medium text-foreground">Site Types:</span>
           <div className="flex items-center gap-3">
             {SITE_CLASSES.map((sc) => (
               <div key={sc.id} className="flex items-center gap-1.5">
@@ -220,7 +220,7 @@ export default function SiteLayoutPage() {
                   className="w-3 h-3 rounded"
                   style={{ backgroundColor: sc.color }}
                 />
-                <span className="text-sm text-slate-600">{sc.name}</span>
+                <span className="text-sm text-muted-foreground">{sc.name}</span>
               </div>
             ))}
           </div>

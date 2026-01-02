@@ -116,7 +116,7 @@ export function MobileBookingBar({
           <motion.div
             className={cn(
               "fixed bottom-0 left-0 right-0 z-50 md:hidden",
-              "bg-white border-t border-slate-200 shadow-2xl shadow-black/20",
+              "bg-card border-t border-border shadow-2xl shadow-black/20",
               isExpanded ? "rounded-t-2xl" : "",
               className
             )}
@@ -132,7 +132,7 @@ export function MobileBookingBar({
                 className="absolute -top-3 left-1/2 -translate-x-1/2 w-10 h-3 flex items-center justify-center"
                 aria-label="Expand booking options"
               >
-                <div className="w-8 h-1 bg-slate-300 rounded-full" />
+                <div className="w-8 h-1 bg-muted rounded-full" />
               </button>
             )}
 
@@ -146,23 +146,23 @@ export function MobileBookingBar({
                   >
                     {priceFrom ? (
                       <div className="flex items-baseline gap-1">
-                        <span className="text-lg font-bold text-slate-900">
+                        <span className="text-lg font-bold text-foreground">
                           ${priceFrom.toFixed(0)}
                         </span>
-                        <span className="text-sm text-slate-500">/ night</span>
+                        <span className="text-sm text-muted-foreground">/ night</span>
                       </div>
                     ) : (
-                      <span className="text-sm font-medium text-slate-600">
+                      <span className="text-sm font-medium text-muted-foreground">
                         Check availability
                       </span>
                     )}
-                    <div className="flex items-center gap-2 text-sm text-slate-600 mt-0.5">
+                    <div className="flex items-center gap-2 text-sm text-muted-foreground mt-0.5">
                       <span>
                         {formatDisplayDate(arrivalDate)} - {formatDisplayDate(departureDate)}
                       </span>
                       {reviewScore && reviewCount && reviewCount > 0 && (
                         <>
-                          <span className="text-slate-300">|</span>
+                          <span className="text-muted-foreground">|</span>
                           <span className="flex items-center gap-1">
                             <Star className="h-3 w-3 fill-amber-400 text-amber-400" />
                             {Number(reviewScore).toFixed(1)}
@@ -192,22 +192,22 @@ export function MobileBookingBar({
                   className="overflow-hidden"
                 >
                   {/* Header */}
-                  <div className="flex items-center justify-between p-4 border-b border-slate-200">
+                  <div className="flex items-center justify-between p-4 border-b border-border">
                     <div>
                       {priceFrom ? (
                         <div className="flex items-baseline gap-1">
-                          <span className="text-xl font-bold text-slate-900">
+                          <span className="text-xl font-bold text-foreground">
                             ${priceFrom.toFixed(0)}
                           </span>
-                          <span className="text-sm text-slate-500">/ night</span>
+                          <span className="text-sm text-muted-foreground">/ night</span>
                         </div>
                       ) : (
-                        <span className="font-medium text-slate-600">
+                        <span className="font-medium text-muted-foreground">
                           Check availability
                         </span>
                       )}
                       {nights > 0 && priceFrom && (
-                        <p className="text-sm text-slate-500">
+                        <p className="text-sm text-muted-foreground">
                           ${(priceFrom * nights).toFixed(0)} estimated for {nights} night
                           {nights === 1 ? "" : "s"}
                         </p>
@@ -228,11 +228,11 @@ export function MobileBookingBar({
                     {/* Dates */}
                     <div className="grid grid-cols-2 gap-3">
                       <div className="space-y-1">
-                        <label className="text-xs font-medium text-slate-600 uppercase tracking-wider">
+                        <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
                           Check-in
                         </label>
                         <div className="relative">
-                          <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                          <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                           <Input
                             type="date"
                             value={arrivalDate}
@@ -242,11 +242,11 @@ export function MobileBookingBar({
                         </div>
                       </div>
                       <div className="space-y-1">
-                        <label className="text-xs font-medium text-slate-600 uppercase tracking-wider">
+                        <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
                           Check-out
                         </label>
                         <div className="relative">
-                          <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                          <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                           <Input
                             type="date"
                             value={departureDate}
@@ -259,11 +259,11 @@ export function MobileBookingBar({
 
                     {/* Guests */}
                     <div className="space-y-1">
-                      <label className="text-xs font-medium text-slate-600 uppercase tracking-wider">
+                      <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
                         Guests
                       </label>
                       <div className="relative">
-                        <Users className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400 z-10" />
+                        <Users className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground z-10" />
                         <Select value={guests} onValueChange={onGuestsChange}>
                           <SelectTrigger className="pl-10">
                             <SelectValue placeholder="Select guests" />
@@ -303,7 +303,7 @@ export function MobileBookingBar({
                       Reserve
                     </Button>
 
-                    <p className="text-center text-xs text-slate-500">
+                    <p className="text-center text-xs text-muted-foreground">
                       You won't be charged yet
                     </p>
                   </div>

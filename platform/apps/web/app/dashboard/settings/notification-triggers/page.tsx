@@ -184,7 +184,7 @@ export default function NotificationTriggersPage() {
   if (!campgroundId) {
     return (
       <div className="flex items-center justify-center h-64">
-        <p className="text-slate-500">Select a campground to manage notification triggers</p>
+        <p className="text-muted-foreground">Select a campground to manage notification triggers</p>
       </div>
     );
   }
@@ -282,26 +282,26 @@ export default function NotificationTriggersPage() {
           {triggersByEvent.map(({ value, label, description, triggers: eventTriggers }) => (
             <div
               key={value}
-              className="bg-white rounded-xl border border-slate-200 overflow-hidden
+              className="bg-card rounded-xl border border-border overflow-hidden
                 transition-all duration-200 ease-out hover:shadow-sm"
             >
-              <div className="px-5 py-4 bg-slate-50 border-b border-slate-200 flex items-center justify-between">
+              <div className="px-5 py-4 bg-muted border-b border-border flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <div className="p-2 bg-white rounded-lg border border-slate-200 text-slate-600">
+                  <div className="p-2 bg-card rounded-lg border border-border text-muted-foreground">
                     {EVENT_ICONS[value]}
                   </div>
                   <div>
-                    <h3 className="font-semibold text-slate-900">{label}</h3>
-                    <p className="text-sm text-slate-500">{description}</p>
+                    <h3 className="font-semibold text-foreground">{label}</h3>
+                    <p className="text-sm text-muted-foreground">{description}</p>
                   </div>
                 </div>
-                <span className="text-sm text-slate-400">
+                <span className="text-sm text-muted-foreground">
                   {eventTriggers.length} trigger{eventTriggers.length !== 1 ? "s" : ""}
                 </span>
               </div>
 
               {eventTriggers.length > 0 ? (
-                <div className="divide-y divide-slate-100">
+                <div className="divide-y divide-border">
                   {eventTriggers.map(trigger => (
                     <TriggerRow
                       key={trigger.id}
@@ -314,7 +314,7 @@ export default function NotificationTriggersPage() {
                   ))}
                 </div>
               ) : (
-                <div className="px-5 py-6 text-center text-slate-400 text-sm">
+                <div className="px-5 py-6 text-center text-muted-foreground text-sm">
                   No triggers configured for this event
                 </div>
               )}
@@ -366,15 +366,15 @@ function QuickStartCard({
   return (
     <button
       onClick={onClick}
-      className="p-4 bg-white rounded-xl border border-slate-200 text-left
+      className="p-4 bg-card rounded-xl border border-border text-left
         hover:border-violet-300 hover:shadow-sm transition-all duration-200 group
         focus-visible:ring-2 focus-visible:ring-violet-500 focus-visible:ring-offset-2"
     >
       <div className="group-hover:scale-110 inline-block transition-transform motion-safe:duration-200">
         {icon}
       </div>
-      <div className="font-medium text-slate-900 mt-2">{title}</div>
-      <div className="text-xs text-slate-500">{description}</div>
+      <div className="font-medium text-foreground mt-2">{title}</div>
+      <div className="text-xs text-muted-foreground">{description}</div>
     </button>
   );
 }
@@ -407,17 +407,17 @@ function TriggerRow({
           aria-label={`${trigger.enabled ? "Disable" : "Enable"} ${eventLabel} trigger`}
           className={`relative w-12 h-6 rounded-full transition-colors duration-200
             focus-visible:ring-2 focus-visible:ring-violet-500 focus-visible:ring-offset-2
-            ${trigger.enabled ? "bg-emerald-500" : "bg-slate-300"}`}
+            ${trigger.enabled ? "bg-emerald-500" : "bg-muted"}`}
         >
           <span
-            className={`absolute top-1 left-1 w-4 h-4 rounded-full bg-white shadow-sm
+            className={`absolute top-1 left-1 w-4 h-4 rounded-full bg-card shadow-sm
               transition-transform duration-200 ease-out
               ${trigger.enabled ? "translate-x-6" : "translate-x-0"}`}
           />
         </button>
         <div>
           <div className="flex items-center gap-2">
-            <span className="text-sm font-medium text-slate-900 flex items-center gap-1.5">
+            <span className="text-sm font-medium text-foreground flex items-center gap-1.5">
               {channelOption?.icon} {channelOption?.label}
             </span>
             {trigger.delayMinutes > 0 && (
@@ -427,7 +427,7 @@ function TriggerRow({
             )}
           </div>
           {trigger.template && (
-            <span className="text-xs text-slate-500">
+            <span className="text-xs text-muted-foreground">
               Template: {trigger.template.name}
             </span>
           )}
@@ -444,7 +444,7 @@ function TriggerRow({
         </button>
         <button
           onClick={onEdit}
-          className="px-3 py-1.5 text-sm text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded
+          className="px-3 py-1.5 text-sm text-muted-foreground hover:text-foreground hover:bg-muted rounded
             transition-colors duration-150
             focus-visible:ring-2 focus-visible:ring-violet-500"
         >
@@ -509,25 +509,25 @@ function DeleteConfirmModal({
       aria-labelledby="delete-title"
       aria-describedby="delete-desc"
     >
-      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-6 motion-safe:animate-in motion-safe:zoom-in-95 motion-safe:duration-200">
+      <div className="bg-card rounded-2xl shadow-2xl w-full max-w-sm p-6 motion-safe:animate-in motion-safe:zoom-in-95 motion-safe:duration-200">
         <div className="flex justify-center mb-4">
           <div className="p-3 bg-status-error/15 rounded-full">
             <Trash2 className="h-6 w-6 text-status-error" />
           </div>
         </div>
-        <h2 id="delete-title" className="text-xl font-bold text-slate-900 text-center mb-2">
+        <h2 id="delete-title" className="text-xl font-bold text-foreground text-center mb-2">
           Delete {itemName}?
         </h2>
-        <p id="delete-desc" className="text-slate-600 text-center mb-6">
+        <p id="delete-desc" className="text-muted-foreground text-center mb-6">
           This action cannot be undone. Guests will no longer receive this notification.
         </p>
         <div className="flex gap-3">
           <button
             ref={cancelRef}
             onClick={onCancel}
-            className="flex-1 px-4 py-2 border border-slate-200 text-slate-700 rounded-lg
-              hover:bg-slate-50 transition-colors
-              focus-visible:ring-2 focus-visible:ring-slate-500"
+            className="flex-1 px-4 py-2 border border-border text-foreground rounded-lg
+              hover:bg-muted transition-colors
+              focus-visible:ring-2 focus-visible:ring-ring"
           >
             Cancel
           </button>
@@ -638,16 +638,16 @@ function TriggerModal({
     >
       <div
         ref={modalRef}
-        className="bg-white rounded-2xl shadow-2xl w-full max-w-md p-6 motion-safe:animate-in motion-safe:zoom-in-95 motion-safe:duration-200"
+        className="bg-card rounded-2xl shadow-2xl w-full max-w-md p-6 motion-safe:animate-in motion-safe:zoom-in-95 motion-safe:duration-200"
       >
         <div className="flex items-center justify-between mb-6">
-          <h2 id="modal-title" className="text-xl font-bold text-slate-900">
+          <h2 id="modal-title" className="text-xl font-bold text-foreground">
             {trigger ? "Edit Trigger" : "New Trigger"}
           </h2>
           <button
             onClick={onClose}
             aria-label="Close dialog"
-            className="text-slate-400 hover:text-slate-600 p-1 rounded
+            className="text-muted-foreground hover:text-muted-foreground p-1 rounded
               focus-visible:ring-2 focus-visible:ring-violet-500"
           >
             <X className="h-5 w-5" />
@@ -657,7 +657,7 @@ function TriggerModal({
         <form onSubmit={handleSubmit} className="space-y-5">
           {/* Event Select */}
           <div>
-            <label htmlFor="event-select" className="block text-sm font-medium text-slate-700 mb-1">
+            <label htmlFor="event-select" className="block text-sm font-medium text-foreground mb-1">
               When this happens...
             </label>
             <select
@@ -665,7 +665,7 @@ function TriggerModal({
               ref={firstFocusRef}
               value={event}
               onChange={e => setEvent(e.target.value as TriggerEvent)}
-              className="w-full px-3 py-2 border border-slate-200 rounded-lg
+              className="w-full px-3 py-2 border border-border rounded-lg
                 focus:ring-2 focus:ring-violet-500 focus:border-violet-500"
             >
               {EVENT_OPTIONS.map(opt => (
@@ -678,7 +678,7 @@ function TriggerModal({
 
           {/* Channel Select */}
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-2">
+            <label className="block text-sm font-medium text-foreground mb-2">
               Send notification via...
             </label>
             <div className="flex gap-2" role="radiogroup" aria-label="Notification channel">
@@ -693,7 +693,7 @@ function TriggerModal({
                     focus-visible:ring-2 focus-visible:ring-violet-500 flex items-center justify-center gap-1.5
                     ${channel === opt.value
                       ? "bg-violet-100 text-violet-700 border-2 border-violet-300"
-                      : "bg-slate-50 text-slate-600 border border-slate-200 hover:border-slate-300"
+                      : "bg-muted text-muted-foreground border border-border hover:border-border"
                     }`}
                 >
                   {opt.icon} {opt.label}
@@ -704,11 +704,11 @@ function TriggerModal({
 
           {/* Template Select */}
           <div>
-            <label htmlFor="template-select" className="block text-sm font-medium text-slate-700 mb-1">
+            <label htmlFor="template-select" className="block text-sm font-medium text-foreground mb-1">
               Use template
             </label>
             {templatesQuery.isLoading ? (
-              <div className="w-full px-3 py-2 border border-slate-200 rounded-lg bg-slate-50 text-slate-400">
+              <div className="w-full px-3 py-2 border border-border rounded-lg bg-muted text-muted-foreground">
                 Loading templates...
               </div>
             ) : compatibleTemplates.length === 0 ? (
@@ -725,7 +725,7 @@ function TriggerModal({
                 id="template-select"
                 value={templateId ?? ""}
                 onChange={e => setTemplateId(e.target.value || null)}
-                className="w-full px-3 py-2 border border-slate-200 rounded-lg
+                className="w-full px-3 py-2 border border-border rounded-lg
                   focus:ring-2 focus:ring-violet-500 focus:border-violet-500"
               >
                 <option value="">Default system message</option>
@@ -736,14 +736,14 @@ function TriggerModal({
                 ))}
               </select>
             )}
-            <p className="mt-1 text-xs text-slate-500">
+            <p className="mt-1 text-xs text-muted-foreground">
               Choose a template or use the default message
             </p>
           </div>
 
           {/* Delay Presets */}
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-2">
+            <label className="block text-sm font-medium text-foreground mb-2">
               When to send
             </label>
             <div className="grid grid-cols-2 gap-2 mb-2">
@@ -759,7 +759,7 @@ function TriggerModal({
                     focus-visible:ring-2 focus-visible:ring-violet-500
                     ${delayMinutes === preset.value && !showCustomDelay
                       ? "bg-violet-100 text-violet-700 border-2 border-violet-300"
-                      : "bg-slate-50 text-slate-600 border border-slate-200 hover:border-slate-300"
+                      : "bg-muted text-muted-foreground border border-border hover:border-border"
                     }`}
                 >
                   {preset.label}
@@ -771,7 +771,7 @@ function TriggerModal({
             <button
               type="button"
               onClick={() => setShowCustomDelay(!showCustomDelay)}
-              className="text-sm text-slate-500 hover:text-slate-700 underline"
+              className="text-sm text-muted-foreground hover:text-foreground underline"
             >
               {showCustomDelay ? "Use preset" : "Custom timing..."}
             </button>
@@ -783,26 +783,26 @@ function TriggerModal({
                   min="0"
                   value={delayMinutes}
                   onChange={e => setDelayMinutes(parseInt(e.target.value) || 0)}
-                  className="w-24 px-3 py-2 border border-slate-200 rounded-lg
+                  className="w-24 px-3 py-2 border border-border rounded-lg
                     focus:ring-2 focus:ring-violet-500"
                   aria-label="Delay in minutes"
                 />
-                <span className="text-slate-500 text-sm">minutes</span>
+                <span className="text-muted-foreground text-sm">minutes</span>
               </div>
             )}
           </div>
 
           {/* Enabled Toggle */}
-          <label className="flex items-center gap-3 p-3 border border-slate-200 rounded-lg cursor-pointer hover:bg-slate-50 transition-colors">
+          <label className="flex items-center gap-3 p-3 border border-border rounded-lg cursor-pointer hover:bg-muted transition-colors">
             <input
               type="checkbox"
               checked={enabled}
               onChange={e => setEnabled(e.target.checked)}
-              className="rounded border-slate-300 text-violet-600 focus:ring-violet-500"
+              className="rounded border-border text-violet-600 focus:ring-violet-500"
             />
             <div>
-              <div className="font-medium text-slate-900">Enabled</div>
-              <div className="text-sm text-slate-500">Trigger will fire when event occurs</div>
+              <div className="font-medium text-foreground">Enabled</div>
+              <div className="text-sm text-muted-foreground">Trigger will fire when event occurs</div>
             </div>
           </label>
 
@@ -811,9 +811,9 @@ function TriggerModal({
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 px-4 py-2 border border-slate-200 text-slate-700 rounded-lg
-                hover:bg-slate-50 transition-colors
-                focus-visible:ring-2 focus-visible:ring-slate-500"
+              className="flex-1 px-4 py-2 border border-border text-foreground rounded-lg
+                hover:bg-muted transition-colors
+                focus-visible:ring-2 focus-visible:ring-ring"
             >
               Cancel
             </button>
@@ -880,34 +880,34 @@ function TestTriggerModal({
       aria-modal="true"
       aria-labelledby="test-modal-title"
     >
-      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md p-6 motion-safe:animate-in motion-safe:zoom-in-95 motion-safe:duration-200">
+      <div className="bg-card rounded-2xl shadow-2xl w-full max-w-md p-6 motion-safe:animate-in motion-safe:zoom-in-95 motion-safe:duration-200">
         <div className="flex items-center justify-between mb-4">
-          <h2 id="test-modal-title" className="text-xl font-bold text-slate-900">
+          <h2 id="test-modal-title" className="text-xl font-bold text-foreground">
             Test This Trigger
           </h2>
           <button
             onClick={onClose}
             aria-label="Close dialog"
-            className="text-slate-400 hover:text-slate-600 p-1 rounded
+            className="text-muted-foreground hover:text-muted-foreground p-1 rounded
               focus-visible:ring-2 focus-visible:ring-violet-500"
           >
             <X className="h-5 w-5" />
           </button>
         </div>
 
-        <div className="flex items-center gap-3 p-3 bg-slate-50 rounded-lg mb-4">
-          <div className="p-2 bg-white rounded-lg border border-slate-200 text-slate-600">
+        <div className="flex items-center gap-3 p-3 bg-muted rounded-lg mb-4">
+          <div className="p-2 bg-card rounded-lg border border-border text-muted-foreground">
             {EVENT_ICONS[trigger.event as TriggerEvent]}
           </div>
           <div>
-            <div className="font-medium text-slate-900">{eventInfo?.label}</div>
-            <div className="text-sm text-slate-500 flex items-center gap-1">
+            <div className="font-medium text-foreground">{eventInfo?.label}</div>
+            <div className="text-sm text-muted-foreground flex items-center gap-1">
               {channelOption?.icon} {channelOption?.label}
             </div>
           </div>
         </div>
 
-        <p className="text-slate-600 text-sm mb-4">
+        <p className="text-muted-foreground text-sm mb-4">
           Send a test notification to see exactly what your guests will receive.
           We'll use sample data to fill in the template variables.
         </p>
@@ -923,7 +923,7 @@ function TestTriggerModal({
         ) : (
           <>
             <div className="mb-4">
-              <label htmlFor="test-email" className="block text-sm font-medium text-slate-700 mb-1">
+              <label htmlFor="test-email" className="block text-sm font-medium text-foreground mb-1">
                 Send test to
               </label>
               <input
@@ -933,7 +933,7 @@ function TestTriggerModal({
                 value={testEmail}
                 onChange={e => setTestEmail(e.target.value)}
                 placeholder="your@email.com"
-                className="w-full px-3 py-2 border border-slate-200 rounded-lg
+                className="w-full px-3 py-2 border border-border rounded-lg
                   focus:ring-2 focus:ring-violet-500 focus:border-violet-500"
               />
             </div>
@@ -967,9 +967,9 @@ function TestTriggerModal({
         {sent && (
           <button
             onClick={onClose}
-            className="w-full mt-3 py-2 border border-slate-200 text-slate-700 rounded-lg
-              hover:bg-slate-50 transition-colors
-              focus-visible:ring-2 focus-visible:ring-slate-500"
+            className="w-full mt-3 py-2 border border-border text-foreground rounded-lg
+              hover:bg-muted transition-colors
+              focus-visible:ring-2 focus-visible:ring-ring"
           >
             Done
           </button>
@@ -1003,16 +1003,16 @@ function CelebrationModal({ onClose }: { onClose: () => void }) {
       aria-modal="true"
       aria-labelledby="celebration-title"
     >
-      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-8 text-center motion-safe:animate-in motion-safe:zoom-in-95 motion-safe:duration-300">
+      <div className="bg-card rounded-2xl shadow-2xl w-full max-w-sm p-8 text-center motion-safe:animate-in motion-safe:zoom-in-95 motion-safe:duration-300">
         <div className="flex justify-center mb-4">
           <div className="p-4 bg-violet-100 rounded-full">
             <Sparkles className="h-10 w-10 text-violet-600" />
           </div>
         </div>
-        <h2 id="celebration-title" className="text-2xl font-bold text-slate-900 mb-2">
+        <h2 id="celebration-title" className="text-2xl font-bold text-foreground mb-2">
           Your first automation is live!
         </h2>
-        <p className="text-slate-600 mb-6">
+        <p className="text-muted-foreground mb-6">
           Guests will now receive automatic notifications.
           You're saving hours of manual work!
         </p>

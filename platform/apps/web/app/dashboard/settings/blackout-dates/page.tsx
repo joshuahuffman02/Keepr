@@ -316,7 +316,7 @@ export default function BlackoutDatesPage() {
                                 {activeBlackouts.map((blackout) => (
                                     <div
                                         key={blackout.id}
-                                        className="flex items-center justify-between p-4 border rounded-lg hover:bg-slate-50"
+                                        className="flex items-center justify-between p-4 border rounded-lg hover:bg-muted"
                                     >
                                         <div className="flex items-start gap-4">
                                             <div className="p-2 rounded-lg bg-rose-50">

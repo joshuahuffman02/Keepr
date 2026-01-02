@@ -107,7 +107,7 @@ function HousekeepingStatusBadge({ status }: { status: string }) {
     inspection_failed: "bg-status-error/15 text-status-error",
     vacant_clean: "bg-status-success/15 text-status-success",
     vacant_inspected: "bg-status-success/15 text-status-success",
-    occupied: "bg-slate-100 text-slate-700 border-slate-200",
+    occupied: "bg-muted text-foreground border-border",
     occupied_service: "bg-purple-100 text-purple-700 border-purple-200",
     occupied_dnd: "bg-status-warning/15 text-status-warning",
     out_of_order: "bg-gray-100 text-gray-700 border-gray-200",
@@ -125,7 +125,7 @@ function HousekeepingStatusBadge({ status }: { status: string }) {
     out_of_order: "OOO",
   };
   return (
-    <Badge variant="outline" className={styles[status] || "bg-slate-100 text-slate-700"}>
+    <Badge variant="outline" className={styles[status] || "bg-muted text-foreground"}>
       {labels[status] || status}
     </Badge>
   );
@@ -146,7 +146,7 @@ function TaskStateDropdown({
       value={current}
       onChange={(e) => onChange(e.target.value as TaskState)}
       disabled={disabled}
-      className="text-xs border border-slate-200 rounded px-2 py-1 bg-white"
+      className="text-xs border border-border rounded px-2 py-1 bg-card"
     >
       {states.map((s) => (
         <option key={s} value={s}>
@@ -166,7 +166,7 @@ function TaskTypeBadge({ type }: { type: string }) {
     vip_prep: "bg-red-500",
     linen_change: "bg-cyan-500",
     pet_treatment: "bg-orange-500",
-    other: "bg-slate-500",
+    other: "bg-muted0",
   };
   const labels: Record<string, string> = {
     turnover: "Turnover",
@@ -294,8 +294,8 @@ export default function HousekeepingPage() {
 
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
-            <h1 className="text-2xl font-bold text-slate-900">Housekeeping</h1>
-            <p className="text-sm text-slate-500">
+            <h1 className="text-2xl font-bold text-foreground">Housekeeping</h1>
+            <p className="text-sm text-muted-foreground">
               Manage cleaning tasks, inspections, and room readiness
             </p>
           </div>
@@ -337,38 +337,38 @@ export default function HousekeepingPage() {
             {/* Stats Row */}
             <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3">
               <Card className="p-4">
-                <div className="text-2xl font-bold text-slate-900">{slaStats.total}</div>
-                <div className="text-xs text-slate-500">Total Tasks</div>
+                <div className="text-2xl font-bold text-foreground">{slaStats.total}</div>
+                <div className="text-xs text-muted-foreground">Total Tasks</div>
               </Card>
               <Card className="p-4">
                 <div className="text-2xl font-bold text-emerald-600">{slaStats.onTrack}</div>
-                <div className="text-xs text-slate-500">On Track</div>
+                <div className="text-xs text-muted-foreground">On Track</div>
               </Card>
               <Card className="p-4">
                 <div className="text-2xl font-bold text-amber-600">{slaStats.atRisk}</div>
-                <div className="text-xs text-slate-500">At Risk</div>
+                <div className="text-xs text-muted-foreground">At Risk</div>
               </Card>
               <Card className="p-4">
                 <div className="text-2xl font-bold text-rose-600">{slaStats.breached}</div>
-                <div className="text-xs text-slate-500">Breached</div>
+                <div className="text-xs text-muted-foreground">Breached</div>
               </Card>
               <Card className="p-4">
                 <div className="text-2xl font-bold text-blue-600">{inspectionStats?.passRate ?? 0}%</div>
-                <div className="text-xs text-slate-500">Inspection Pass Rate</div>
+                <div className="text-xs text-muted-foreground">Inspection Pass Rate</div>
               </Card>
               <Card className="p-4">
                 <div className="text-2xl font-bold text-purple-600">{inspectionStats?.averageScore ?? 0}</div>
-                <div className="text-xs text-slate-500">Avg Inspection Score</div>
+                <div className="text-xs text-muted-foreground">Avg Inspection Score</div>
               </Card>
             </div>
 
             {/* Filters */}
             <div className="flex flex-wrap gap-2 items-center">
-              <Filter className="h-4 w-4 text-slate-400" />
+              <Filter className="h-4 w-4 text-muted-foreground" />
               <select
                 value={stateFilter}
                 onChange={(e) => setStateFilter(e.target.value as TaskState | "all")}
-                className="text-sm border border-slate-200 rounded px-2 py-1"
+                className="text-sm border border-border rounded px-2 py-1"
               >
                 <option value="all">All States</option>
                 <option value="pending">Pending</option>
@@ -381,7 +381,7 @@ export default function HousekeepingPage() {
               <select
                 value={slaFilter}
                 onChange={(e) => setSlaFilter(e.target.value as SlaStatus | "all")}
-                className="text-sm border border-slate-200 rounded px-2 py-1"
+                className="text-sm border border-border rounded px-2 py-1"
               >
                 <option value="all">All SLA</option>
                 <option value="on_track">On Track</option>
@@ -391,7 +391,7 @@ export default function HousekeepingPage() {
               <select
                 value={typeFilter}
                 onChange={(e) => setTypeFilter(e.target.value)}
-                className="text-sm border border-slate-200 rounded px-2 py-1"
+                className="text-sm border border-border rounded px-2 py-1"
               >
                 <option value="all">All Types</option>
                 <option value="turnover">Turnover</option>
@@ -406,16 +406,16 @@ export default function HousekeepingPage() {
 
             {/* Task Board */}
             {tasksQuery.isLoading ? (
-              <div className="text-center py-12 text-slate-500">Loading tasks...</div>
+              <div className="text-center py-12 text-muted-foreground">Loading tasks...</div>
             ) : tasks.length === 0 ? (
-              <div className="text-center py-12 text-slate-500">
+              <div className="text-center py-12 text-muted-foreground">
                 No tasks found. Create a new task to get started.
               </div>
             ) : (
               <div className="grid md:grid-cols-4 gap-4">
                 {(["pending", "in_progress", "blocked", "done"] as const).map((stateKey) => (
                   <div key={stateKey} className="space-y-2">
-                    <div className="font-medium text-sm text-slate-700 capitalize flex items-center gap-2">
+                    <div className="font-medium text-sm text-foreground capitalize flex items-center gap-2">
                       {stateKey.replace("_", " ")}
                       <Badge variant="secondary" className="text-xs">
                         {tasksByState[stateKey].length}
@@ -430,20 +430,20 @@ export default function HousekeepingPage() {
                               <SlaStatusBadge status={task.slaStatus} />
                             </div>
 
-                            <div className="flex items-center gap-1 text-xs text-slate-500">
+                            <div className="flex items-center gap-1 text-xs text-muted-foreground">
                               <MapPin className="h-3 w-3" />
                               {task.site?.name || `Site ${task.siteId?.slice(-6) || "—"}`}
                             </div>
 
                             {task.assignedToUserId && (
-                              <div className="flex items-center gap-1 text-xs text-slate-500">
+                              <div className="flex items-center gap-1 text-xs text-muted-foreground">
                                 <User className="h-3 w-3" />
                                 {task.assignedToUserId.slice(-6)}
                               </div>
                             )}
 
                             {task.slaDueAt && (
-                              <div className="flex items-center gap-1 text-xs text-slate-500">
+                              <div className="flex items-center gap-1 text-xs text-muted-foreground">
                                 <Clock className="h-3 w-3" />
                                 Due: {formatTime(task.slaDueAt)}
                               </div>
@@ -456,7 +456,7 @@ export default function HousekeepingPage() {
                               </Badge>
                             )}
 
-                            <div className="pt-2 border-t border-slate-100">
+                            <div className="pt-2 border-t border-border">
                               <TaskStateDropdown
                                 current={task.state}
                                 onChange={(newState) =>
@@ -481,19 +481,19 @@ export default function HousekeepingPage() {
                 type="date"
                 value={selectedDate}
                 onChange={(e) => setSelectedDate(e.target.value)}
-                className="border border-slate-200 rounded px-3 py-2"
+                className="border border-border rounded px-3 py-2"
               />
               {dailySchedule && (
-                <div className="text-sm text-slate-500">
+                <div className="text-sm text-muted-foreground">
                   {dailySchedule.summary?.checkouts ?? 0} checkouts | {dailySchedule.summary?.checkins ?? 0} check-ins | {dailySchedule.summary?.turnovers ?? 0} turnovers
                 </div>
               )}
             </div>
 
             {dailyScheduleQuery.isLoading ? (
-              <div className="text-center py-12 text-slate-500">Loading schedule...</div>
+              <div className="text-center py-12 text-muted-foreground">Loading schedule...</div>
             ) : !dailySchedule ? (
-              <div className="text-center py-12 text-slate-500">No schedule data available.</div>
+              <div className="text-center py-12 text-muted-foreground">No schedule data available.</div>
             ) : (
               <div className="grid md:grid-cols-3 gap-4">
                 {/* Checkouts */}
@@ -508,11 +508,11 @@ export default function HousekeepingPage() {
                     {dailySchedule.expectedCheckouts?.slice(0, 10).map((checkout: any) => (
                       <div key={checkout.reservationId} className="p-2 border rounded text-sm">
                         <div className="font-medium">{checkout.siteName}</div>
-                        <div className="text-xs text-slate-500">{checkout.guestName}</div>
+                        <div className="text-xs text-muted-foreground">{checkout.guestName}</div>
                       </div>
                     ))}
                     {(dailySchedule.expectedCheckouts?.length ?? 0) === 0 && (
-                      <div className="text-sm text-slate-400">No checkouts today</div>
+                      <div className="text-sm text-muted-foreground">No checkouts today</div>
                     )}
                   </CardContent>
                 </Card>
@@ -533,11 +533,11 @@ export default function HousekeepingPage() {
                           {checkin.isVIP && <Badge variant="destructive" className="text-xs">VIP</Badge>}
                           {checkin.isEarlyArrival && <Badge variant="secondary" className="text-xs">Early</Badge>}
                         </div>
-                        <div className="text-xs text-slate-500">{checkin.guestName}</div>
+                        <div className="text-xs text-muted-foreground">{checkin.guestName}</div>
                       </div>
                     ))}
                     {(dailySchedule.expectedCheckins?.length ?? 0) === 0 && (
-                      <div className="text-sm text-slate-400">No check-ins today</div>
+                      <div className="text-sm text-muted-foreground">No check-ins today</div>
                     )}
                   </CardContent>
                 </Card>
@@ -558,7 +558,7 @@ export default function HousekeepingPage() {
                       </div>
                     ))}
                     {(dailySchedule.priorityUnits?.length ?? 0) === 0 && (
-                      <div className="text-sm text-slate-400">No priority units</div>
+                      <div className="text-sm text-muted-foreground">No priority units</div>
                     )}
                   </CardContent>
                 </Card>
@@ -574,14 +574,14 @@ export default function HousekeepingPage() {
                   <div className="flex items-center justify-between">
                     <div>
                       <div className="text-2xl font-bold">{count as number}</div>
-                      <div className="text-xs text-slate-500 capitalize">{status.replace(/_/g, " ")}</div>
+                      <div className="text-xs text-muted-foreground capitalize">{status.replace(/_/g, " ")}</div>
                     </div>
                     <HousekeepingStatusBadge status={status} />
                   </div>
                 </Card>
               ))}
               {!housekeepingStats?.byStatus && (
-                <div className="col-span-5 text-center py-8 text-slate-500">
+                <div className="col-span-5 text-center py-8 text-muted-foreground">
                   Loading room status...
                 </div>
               )}
@@ -605,11 +605,11 @@ export default function HousekeepingPage() {
                         .map((site: any) => (
                           <div key={site.id} className="text-sm p-2 border rounded flex justify-between">
                             <span>{site.name}</span>
-                            {site.zone && <span className="text-xs text-slate-400">{site.zone}</span>}
+                            {site.zone && <span className="text-xs text-muted-foreground">{site.zone}</span>}
                           </div>
                         ))}
                       {sites.filter((s: any) => s.housekeepingStatus === status).length === 0 && (
-                        <div className="text-sm text-slate-400">None</div>
+                        <div className="text-sm text-muted-foreground">None</div>
                       )}
                     </div>
                   </CardContent>
@@ -624,14 +624,14 @@ export default function HousekeepingPage() {
                 type="date"
                 value={selectedDate}
                 onChange={(e) => setSelectedDate(e.target.value)}
-                className="border border-slate-200 rounded px-3 py-2"
+                className="border border-border rounded px-3 py-2"
               />
             </div>
 
             {staffWorkloadQuery.isLoading ? (
-              <div className="text-center py-12 text-slate-500">Loading workload...</div>
+              <div className="text-center py-12 text-muted-foreground">Loading workload...</div>
             ) : Object.keys(staffWorkload).length === 0 ? (
-              <div className="text-center py-12 text-slate-500">No workload data available.</div>
+              <div className="text-center py-12 text-muted-foreground">No workload data available.</div>
             ) : (
               <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {Object.entries(staffWorkload).map(([userId, data]: [string, any]) => (
@@ -646,30 +646,30 @@ export default function HousekeepingPage() {
                       <div className="grid grid-cols-4 gap-2 text-center">
                         <div>
                           <div className="text-xl font-bold">{data.total}</div>
-                          <div className="text-xs text-slate-500">Total</div>
+                          <div className="text-xs text-muted-foreground">Total</div>
                         </div>
                         <div>
                           <div className="text-xl font-bold text-emerald-600">{data.completed}</div>
-                          <div className="text-xs text-slate-500">Done</div>
+                          <div className="text-xs text-muted-foreground">Done</div>
                         </div>
                         <div>
                           <div className="text-xl font-bold text-blue-600">{data.inProgress}</div>
-                          <div className="text-xs text-slate-500">Active</div>
+                          <div className="text-xs text-muted-foreground">Active</div>
                         </div>
                         <div>
-                          <div className="text-xl font-bold text-slate-600">{data.pending}</div>
-                          <div className="text-xs text-slate-500">Pending</div>
+                          <div className="text-xl font-bold text-muted-foreground">{data.pending}</div>
+                          <div className="text-xs text-muted-foreground">Pending</div>
                         </div>
                       </div>
                       {data.total > 0 && (
                         <div className="mt-3">
-                          <div className="h-2 bg-slate-100 rounded-full overflow-hidden">
+                          <div className="h-2 bg-muted rounded-full overflow-hidden">
                             <div
                               className="h-full bg-emerald-500"
                               style={{ width: `${(data.completed / data.total) * 100}%` }}
                             />
                           </div>
-                          <div className="text-xs text-slate-500 mt-1 text-center">
+                          <div className="text-xs text-muted-foreground mt-1 text-center">
                             {Math.round((data.completed / data.total) * 100)}% complete
                           </div>
                         </div>
@@ -698,13 +698,13 @@ export default function HousekeepingPage() {
               </CardHeader>
               <CardContent className="space-y-4">
                 <div>
-                  <label className="text-sm font-medium text-slate-700">Type</label>
+                  <label className="text-sm font-medium text-foreground">Type</label>
                   <select
                     value={newTask.type}
                     onChange={(e) =>
                       setNewTask({ ...newTask, type: e.target.value as TaskType })
                     }
-                    className="w-full mt-1 border border-slate-200 rounded px-3 py-2"
+                    className="w-full mt-1 border border-border rounded px-3 py-2"
                   >
                     <option value="turnover">Turnover</option>
                     <option value="deep_clean">Deep Clean</option>
@@ -717,13 +717,13 @@ export default function HousekeepingPage() {
                 </div>
 
                 <div>
-                  <label className="text-sm font-medium text-slate-700">Site</label>
+                  <label className="text-sm font-medium text-foreground">Site</label>
                   <select
                     value={newTask.siteId}
                     onChange={(e) =>
                       setNewTask({ ...newTask, siteId: e.target.value })
                     }
-                    className="w-full mt-1 border border-slate-200 rounded px-3 py-2"
+                    className="w-full mt-1 border border-border rounded px-3 py-2"
                   >
                     <option value="">Select a site...</option>
                     {sites.map((site: any) => (
@@ -735,13 +735,13 @@ export default function HousekeepingPage() {
                 </div>
 
                 <div>
-                  <label className="text-sm font-medium text-slate-700">Priority</label>
+                  <label className="text-sm font-medium text-foreground">Priority</label>
                   <select
                     value={newTask.priority}
                     onChange={(e) =>
                       setNewTask({ ...newTask, priority: e.target.value })
                     }
-                    className="w-full mt-1 border border-slate-200 rounded px-3 py-2"
+                    className="w-full mt-1 border border-border rounded px-3 py-2"
                   >
                     <option value="low">Low</option>
                     <option value="medium">Medium</option>
@@ -750,13 +750,13 @@ export default function HousekeepingPage() {
                 </div>
 
                 <div>
-                  <label className="text-sm font-medium text-slate-700">Notes</label>
+                  <label className="text-sm font-medium text-foreground">Notes</label>
                   <textarea
                     value={newTask.notes}
                     onChange={(e) =>
                       setNewTask({ ...newTask, notes: e.target.value })
                     }
-                    className="w-full mt-1 border border-slate-200 rounded px-3 py-2"
+                    className="w-full mt-1 border border-border rounded px-3 py-2"
                     rows={3}
                     placeholder="Optional notes..."
                   />

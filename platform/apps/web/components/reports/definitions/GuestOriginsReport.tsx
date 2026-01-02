@@ -56,14 +56,14 @@ export function GuestOriginsReport({ campgroundId, dateRange }: GuestOriginsRepo
     const totalBookings = data.reduce((acc, curr) => acc + curr.count, 0);
 
     if (isLoading) {
-        return <div className="text-sm text-slate-500">Loading guest data...</div>;
+        return <div className="text-sm text-muted-foreground">Loading guest data...</div>;
     }
 
     if (data.length === 0) {
         return (
-            <div className="flex flex-col items-center justify-center p-12 bg-slate-50 rounded-lg border border-slate-200">
-                <div className="text-slate-400 mb-2">No guest data found</div>
-                <p className="text-xs text-slate-500">Try adjusting the date range.</p>
+            <div className="flex flex-col items-center justify-center p-12 bg-muted rounded-lg border border-border">
+                <div className="text-muted-foreground mb-2">No guest data found</div>
+                <p className="text-xs text-muted-foreground">Try adjusting the date range.</p>
             </div>
         );
     }
@@ -77,20 +77,20 @@ export function GuestOriginsReport({ campgroundId, dateRange }: GuestOriginsRepo
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <Card>
                     <CardHeader className="pb-2">
-                        <CardTitle className="text-sm font-medium text-slate-500">Total Guests</CardTitle>
+                        <CardTitle className="text-sm font-medium text-muted-foreground">Total Guests</CardTitle>
                     </CardHeader>
                     <CardContent>
                         <div className="text-2xl font-bold">{formatNumber(totalBookings)}</div>
-                        <p className="text-xs text-slate-500">Unique bookings in period</p>
+                        <p className="text-xs text-muted-foreground">Unique bookings in period</p>
                     </CardContent>
                 </Card>
                 <Card>
                     <CardHeader className="pb-2">
-                        <CardTitle className="text-sm font-medium text-slate-500">Top Origin</CardTitle>
+                        <CardTitle className="text-sm font-medium text-muted-foreground">Top Origin</CardTitle>
                     </CardHeader>
                     <CardContent>
                         <div className="text-2xl font-bold">{data[0]?.state || "—"}</div>
-                        <p className="text-xs text-slate-500">
+                        <p className="text-xs text-muted-foreground">
                             {data[0] ? `${data[0].count} guests (${Math.round((data[0].count / totalBookings) * 100)}%)` : "—"}
                         </p>
                     </CardContent>
@@ -137,19 +137,19 @@ export function GuestOriginsReport({ campgroundId, dateRange }: GuestOriginsRepo
                     </CardHeader>
                     <div className="overflow-x-auto max-h-[400px]">
                         <table className="w-full text-sm text-left">
-                            <thead className="bg-slate-50 text-xs uppercase text-slate-500 sticky top-0">
+                            <thead className="bg-muted text-xs uppercase text-muted-foreground sticky top-0">
                                 <tr>
                                     <th className="px-4 py-3 font-medium">State / Region</th>
                                     <th className="px-4 py-3 font-medium text-right">Guests</th>
                                     <th className="px-4 py-3 font-medium text-right">%</th>
                                 </tr>
                             </thead>
-                            <tbody className="divide-y divide-slate-100">
+                            <tbody className="divide-y divide-border">
                                 {data.map((row) => (
-                                    <tr key={row.state} className="hover:bg-slate-50">
-                                        <td className="px-4 py-3 font-medium text-slate-900">{row.state}</td>
-                                        <td className="px-4 py-3 text-right text-slate-600">{row.count}</td>
-                                        <td className="px-4 py-3 text-right text-slate-500">
+                                    <tr key={row.state} className="hover:bg-muted">
+                                        <td className="px-4 py-3 font-medium text-foreground">{row.state}</td>
+                                        <td className="px-4 py-3 text-right text-muted-foreground">{row.count}</td>
+                                        <td className="px-4 py-3 text-right text-muted-foreground">
                                             {Math.round((row.count / totalBookings) * 100)}%
                                         </td>
                                     </tr>

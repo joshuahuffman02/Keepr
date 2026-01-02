@@ -243,7 +243,7 @@ export default function TaxRulesSettingsPage() {
             case "percentage": return "bg-status-info/15 text-status-info";
             case "flat": return "bg-status-success/15 text-status-success";
             case "exemption": return "bg-status-warning/15 text-status-warning";
-            default: return "bg-slate-100 text-slate-600";
+            default: return "bg-muted text-muted-foreground";
         }
     };
 
@@ -258,18 +258,18 @@ export default function TaxRulesSettingsPage() {
     return (
         <div className="space-y-6">
                 <div>
-                    <h1 className="text-2xl font-bold text-slate-900">Tax & Currency Settings</h1>
+                    <h1 className="text-2xl font-bold text-foreground">Tax & Currency Settings</h1>
                     <p className="text-muted-foreground">Configure tax rates, exemptions, and currency for reservations, POS, and upsells.</p>
                 </div>
 
                 {/* Tabs */}
-                <div className="border-b border-slate-200">
+                <div className="border-b border-border">
                     <div className="flex gap-1">
                         <button
                             onClick={() => setActiveTab("rules")}
                             className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${activeTab === "rules"
                                     ? "border-blue-600 text-blue-600"
-                                    : "border-transparent text-slate-600 hover:text-slate-900"
+                                    : "border-transparent text-muted-foreground hover:text-foreground"
                                 }`}
                         >
                             <Percent className="w-4 h-4 inline mr-2" />
@@ -279,7 +279,7 @@ export default function TaxRulesSettingsPage() {
                             onClick={() => setActiveTab("currency")}
                             className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${activeTab === "currency"
                                     ? "border-blue-600 text-blue-600"
-                                    : "border-transparent text-slate-600 hover:text-slate-900"
+                                    : "border-transparent text-muted-foreground hover:text-foreground"
                                 }`}
                         >
                             <DollarSign className="w-4 h-4 inline mr-2" />
@@ -382,7 +382,7 @@ export default function TaxRulesSettingsPage() {
                                     <div className="space-y-2">
                                         <Label>Base Currency</Label>
                                         <select
-                                            className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm"
+                                            className="w-full rounded-md border border-border px-3 py-2 text-sm"
                                             value={baseCurrency}
                                             onChange={(e) => setBaseCurrency(e.target.value)}
                                         >
@@ -394,7 +394,7 @@ export default function TaxRulesSettingsPage() {
                                     <div className="space-y-2">
                                         <Label>Reporting Currency</Label>
                                         <select
-                                            className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm"
+                                            className="w-full rounded-md border border-border px-3 py-2 text-sm"
                                             value={reportingCurrency}
                                             onChange={(e) => setReportingCurrency(e.target.value)}
                                         >
@@ -430,7 +430,7 @@ export default function TaxRulesSettingsPage() {
                                         className="w-28"
                                     />
                                     <select
-                                        className="rounded-md border border-slate-300 px-2 py-2 text-sm"
+                                        className="rounded-md border border-border px-2 py-2 text-sm"
                                         value={conversion.from}
                                         onChange={(e) => setConversion((prev) => ({ ...prev, from: e.target.value }))}
                                     >
@@ -438,9 +438,9 @@ export default function TaxRulesSettingsPage() {
                                             <option key={c} value={c}>{c}</option>
                                         ))}
                                     </select>
-                                    <span className="text-slate-400">→</span>
+                                    <span className="text-muted-foreground">→</span>
                                     <select
-                                        className="rounded-md border border-slate-300 px-2 py-2 text-sm"
+                                        className="rounded-md border border-border px-2 py-2 text-sm"
                                         value={conversion.to}
                                         onChange={(e) => setConversion((prev) => ({ ...prev, to: e.target.value }))}
                                     >

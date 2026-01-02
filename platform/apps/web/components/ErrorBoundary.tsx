@@ -32,7 +32,7 @@ export class ErrorBoundary extends Component<Props, State> {
       }
 
       return (
-        <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-slate-900">
+        <div className="min-h-screen flex items-center justify-center bg-muted dark:bg-muted">
           <div className="text-center p-8 max-w-md">
             <div className="w-16 h-16 mx-auto mb-6 rounded-full bg-red-100 dark:bg-red-900/50 flex items-center justify-center">
               <svg
@@ -49,10 +49,10 @@ export class ErrorBoundary extends Component<Props, State> {
                 />
               </svg>
             </div>
-            <h1 className="text-2xl font-bold text-slate-900 dark:text-white mb-2">
+            <h1 className="text-2xl font-bold text-foreground dark:text-white mb-2">
               Something went wrong
             </h1>
-            <p className="text-slate-600 dark:text-slate-400 mb-6">
+            <p className="text-muted-foreground dark:text-muted-foreground mb-6">
               We're sorry, but something unexpected happened. Please try refreshing the page.
             </p>
             <button
@@ -63,10 +63,10 @@ export class ErrorBoundary extends Component<Props, State> {
             </button>
             {process.env.NODE_ENV === "development" && this.state.error && (
               <details className="mt-6 text-left">
-                <summary className="text-sm text-slate-500 cursor-pointer">
+                <summary className="text-sm text-muted-foreground cursor-pointer">
                   Error details
                 </summary>
-                <pre className="mt-2 p-4 bg-slate-100 dark:bg-slate-800 rounded-lg text-xs overflow-auto">
+                <pre className="mt-2 p-4 bg-muted dark:bg-muted rounded-lg text-xs overflow-auto">
                   {this.state.error.toString()}
                   {"\n"}
                   {this.state.error.stack}

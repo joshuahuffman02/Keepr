@@ -15,19 +15,15 @@ interface NpsGaugeProps {
 }
 
 function getNpsColor(score: number): string {
-  if (score >= 50) return "#22c55e"; // green
-  if (score >= 30) return "#84cc16"; // lime
-  if (score >= 0) return "#f59e0b"; // amber
-  if (score >= -30) return "#f97316"; // orange
-  return "#ef4444"; // red
+  if (score >= 30) return "hsl(var(--status-success))";
+  if (score >= -30) return "hsl(var(--status-warning))";
+  return "hsl(var(--status-error))";
 }
 
 function getNpsTextColor(score: number): string {
-  if (score >= 50) return "text-green-500 dark:text-green-400";
-  if (score >= 30) return "text-lime-500 dark:text-lime-400";
-  if (score >= 0) return "text-amber-500 dark:text-amber-400";
-  if (score >= -30) return "text-orange-500 dark:text-orange-400";
-  return "text-red-500 dark:text-red-400";
+  if (score >= 30) return "text-status-success";
+  if (score >= -30) return "text-status-warning";
+  return "text-status-error";
 }
 
 function getNpsLabel(score: number): string {
@@ -38,12 +34,10 @@ function getNpsLabel(score: number): string {
   return "Critical";
 }
 
-function getNpsBgGradient(score: number): string {
-  if (score >= 50) return "from-green-500/10 to-green-500/5";
-  if (score >= 30) return "from-lime-500/10 to-lime-500/5";
-  if (score >= 0) return "from-amber-500/10 to-amber-500/5";
-  if (score >= -30) return "from-orange-500/10 to-orange-500/5";
-  return "from-red-500/10 to-red-500/5";
+function getNpsBackground(score: number): string {
+  if (score >= 30) return "bg-status-success-bg";
+  if (score >= -30) return "bg-status-warning-bg";
+  return "bg-status-error-bg";
 }
 
 export function NpsGauge({
@@ -93,11 +87,11 @@ export function NpsGauge({
 
   if (loading) {
     return (
-      <Card className="border-slate-200 dark:border-slate-700">
+      <Card className="border-border">
         <CardContent className="p-6">
           <div className="animate-pulse flex flex-col items-center">
-            <div className="h-32 w-56 bg-slate-200 dark:bg-slate-700 rounded-t-full" />
-            <div className="h-8 w-16 bg-slate-200 dark:bg-slate-700 rounded mt-2" />
+            <div className="h-32 w-56 bg-muted rounded-t-full" />
+            <div className="h-8 w-16 bg-muted rounded mt-2" />
           </div>
         </CardContent>
       </Card>
@@ -105,9 +99,9 @@ export function NpsGauge({
   }
 
   return (
-    <Card className={cn("border-slate-200 dark:border-slate-700 bg-gradient-to-b", getNpsBgGradient(score))}>
+    <Card className={cn("border-border", getNpsBackground(score))}>
       <CardHeader className="pb-0">
-        <CardTitle className="text-center text-sm font-medium text-slate-500 dark:text-slate-400">
+        <CardTitle className="text-center text-sm font-medium text-muted-foreground">
           Platform NPS Score
         </CardTitle>
       </CardHeader>
@@ -122,7 +116,7 @@ export function NpsGauge({
               stroke="currentColor"
               strokeWidth={strokeWidth}
               strokeLinecap="round"
-              className="text-slate-200 dark:text-slate-700"
+              className="text-muted-foreground"
             />
 
             {/* Color segments */}
@@ -130,7 +124,7 @@ export function NpsGauge({
             <path
               d={describeArc(centerX, centerY, radius, -180, -180 + 35)}
               fill="none"
-              stroke="#ef4444"
+              stroke="hsl(var(--status-error))"
               strokeWidth={strokeWidth}
               strokeLinecap="round"
               opacity={0.3}
@@ -139,7 +133,7 @@ export function NpsGauge({
             <path
               d={describeArc(centerX, centerY, radius, -180 + 35, -180 + 50)}
               fill="none"
-              stroke="#f97316"
+              stroke="hsl(var(--status-warning))"
               strokeWidth={strokeWidth}
               opacity={0.3}
             />
@@ -147,7 +141,7 @@ export function NpsGauge({
             <path
               d={describeArc(centerX, centerY, radius, -180 + 50, -180 + 65)}
               fill="none"
-              stroke="#f59e0b"
+              stroke="hsl(var(--status-warning))"
               strokeWidth={strokeWidth}
               opacity={0.3}
             />
@@ -155,7 +149,7 @@ export function NpsGauge({
             <path
               d={describeArc(centerX, centerY, radius, -180 + 65, -180 + 75)}
               fill="none"
-              stroke="#84cc16"
+              stroke="hsl(var(--status-success))"
               strokeWidth={strokeWidth}
               opacity={0.3}
             />
@@ -163,7 +157,7 @@ export function NpsGauge({
             <path
               d={describeArc(centerX, centerY, radius, -180 + 75, 0)}
               fill="none"
-              stroke="#22c55e"
+              stroke="hsl(var(--status-success))"
               strokeWidth={strokeWidth}
               strokeLinecap="round"
               opacity={0.3}
@@ -188,16 +182,16 @@ export function NpsGauge({
               stroke="currentColor"
               strokeWidth={3}
               strokeLinecap="round"
-              className="text-slate-800 dark:text-slate-200 transition-all duration-1000 ease-out"
+              className="text-foreground transition-all duration-1000 ease-out"
             />
-            <circle cx={centerX} cy={centerY} r={6} className="fill-slate-800 dark:fill-slate-200" />
+            <circle cx={centerX} cy={centerY} r={6} className="fill-foreground" />
 
             {/* Scale labels */}
             <text
               x={centerX - radius - 10}
               y={centerY + 5}
               textAnchor="end"
-              className="fill-slate-400 text-xs"
+              className="fill-muted-foreground text-xs"
             >
               -100
             </text>
@@ -205,7 +199,7 @@ export function NpsGauge({
               x={centerX + radius + 10}
               y={centerY + 5}
               textAnchor="start"
-              className="fill-slate-400 text-xs"
+              className="fill-muted-foreground text-xs"
             >
               100
             </text>
@@ -213,7 +207,7 @@ export function NpsGauge({
               x={centerX}
               y={centerY - radius - 10}
               textAnchor="middle"
-              className="fill-slate-400 text-xs"
+              className="fill-muted-foreground text-xs"
             >
               0
             </text>
@@ -233,40 +227,40 @@ export function NpsGauge({
           {scoreTrend !== undefined && scoreTrend !== null && (
             <div className="flex items-center justify-center gap-1 mt-3">
               {scoreTrend > 0 ? (
-                <TrendingUp className="h-4 w-4 text-green-500 dark:text-green-400" />
+                <TrendingUp className="h-4 w-4 text-status-success" />
               ) : scoreTrend < 0 ? (
-                <TrendingDown className="h-4 w-4 text-red-500 dark:text-red-400" />
+                <TrendingDown className="h-4 w-4 text-status-error" />
               ) : (
-                <Minus className="h-4 w-4 text-slate-400" />
+                <Minus className="h-4 w-4 text-muted-foreground" />
               )}
-              <span className={scoreTrend >= 0 ? "text-green-600 dark:text-green-400" : "text-red-600 dark:text-red-400"}>
+              <span className={scoreTrend >= 0 ? "text-status-success" : "text-status-error"}>
                 {scoreTrend > 0 ? "+" : ""}{scoreTrend} pts
               </span>
-              <span className="text-slate-500 dark:text-slate-400 text-sm">vs previous period</span>
+              <span className="text-muted-foreground text-sm">vs previous period</span>
             </div>
           )}
 
           {/* YoY Comparison */}
           {yoyScore !== undefined && yoyScore !== null && (
-            <div className="mt-3 pt-3 border-t border-slate-200 dark:border-slate-700 w-full text-center">
-              <p className="text-xs text-slate-500 dark:text-slate-400 mb-1">Year-over-Year</p>
+            <div className="mt-3 pt-3 border-t border-border w-full text-center">
+              <p className="text-xs text-muted-foreground mb-1">Year-over-Year</p>
               <div className="flex items-center justify-center gap-2">
                 {yoyChange !== null && yoyChange !== undefined && yoyChange > 0 ? (
-                  <TrendingUp className="h-4 w-4 text-green-500 dark:text-green-400" />
+                  <TrendingUp className="h-4 w-4 text-status-success" />
                 ) : yoyChange !== null && yoyChange !== undefined && yoyChange < 0 ? (
-                  <TrendingDown className="h-4 w-4 text-red-500 dark:text-red-400" />
+                  <TrendingDown className="h-4 w-4 text-status-error" />
                 ) : (
-                  <Minus className="h-4 w-4 text-slate-400" />
+                  <Minus className="h-4 w-4 text-muted-foreground" />
                 )}
                 <span className={cn(
                   "font-semibold",
                   yoyChange !== null && yoyChange !== undefined && yoyChange >= 0
-                    ? "text-green-600 dark:text-green-400"
-                    : "text-red-600 dark:text-red-400"
+                    ? "text-status-success"
+                    : "text-status-error"
                 )}>
                   {yoyChange !== null && yoyChange !== undefined && yoyChange > 0 ? "+" : ""}{yoyChange} pts
                 </span>
-                <span className="text-slate-500 dark:text-slate-400 text-sm">
+                <span className="text-muted-foreground text-sm">
                   (was {yoyScore})
                 </span>
               </div>

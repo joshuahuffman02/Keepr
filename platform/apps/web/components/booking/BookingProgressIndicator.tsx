@@ -32,7 +32,7 @@ export function BookingProgressIndicator({
       {/* Mobile: Compact horizontal with progress bar */}
       <div className="sm:hidden">
         <div className="flex items-center justify-between mb-2">
-          <span className="text-sm font-medium text-slate-700">
+          <span className="text-sm font-medium text-foreground">
             Step {currentStep} of {steps.length}
           </span>
           <span className="text-sm text-emerald-600 font-medium">
@@ -41,7 +41,7 @@ export function BookingProgressIndicator({
         </div>
 
         {/* Progress bar */}
-        <div className="relative h-2 bg-slate-200 rounded-full overflow-hidden">
+        <div className="relative h-2 bg-muted rounded-full overflow-hidden">
           <motion.div
             className="absolute inset-y-0 left-0 bg-gradient-to-r from-emerald-500 to-emerald-400 rounded-full"
             initial={{ width: 0 }}
@@ -63,7 +63,7 @@ export function BookingProgressIndicator({
                 "w-6 h-6 rounded-full flex items-center justify-center text-xs font-medium",
                 step.num < currentStep && "bg-emerald-500 text-white",
                 step.num === currentStep && "bg-emerald-500 text-white ring-2 ring-emerald-200",
-                step.num > currentStep && "bg-slate-200 text-slate-500"
+                step.num > currentStep && "bg-muted text-muted-foreground"
               )}
               initial={prefersReducedMotion ? {} : { scale: 0.8 }}
               animate={prefersReducedMotion ? {} : {
@@ -99,7 +99,7 @@ export function BookingProgressIndicator({
                       "relative flex items-center justify-center w-12 h-12 rounded-full text-sm font-semibold transition-colors",
                       isComplete && "bg-emerald-500 text-white",
                       isCurrent && "bg-emerald-500 text-white",
-                      isFuture && "bg-slate-100 text-slate-400 border-2 border-slate-200"
+                      isFuture && "bg-muted text-muted-foreground border-2 border-border"
                     )}
                     initial={prefersReducedMotion ? {} : { scale: 0.9 }}
                     animate={prefersReducedMotion ? {} : {
@@ -136,7 +136,7 @@ export function BookingProgressIndicator({
                       <StepIcon className={cn(
                         "h-5 w-5 relative z-10",
                         isCurrent && "text-white",
-                        isFuture && "text-slate-400"
+                        isFuture && "text-muted-foreground"
                       )} />
                     )}
                   </motion.div>
@@ -145,13 +145,13 @@ export function BookingProgressIndicator({
                   <div className="mt-2 text-center">
                     <span className={cn(
                       "block text-sm font-medium",
-                      (isComplete || isCurrent) ? "text-emerald-600" : "text-slate-400"
+                      (isComplete || isCurrent) ? "text-emerald-600" : "text-muted-foreground"
                     )}>
                       {step.label}
                     </span>
                     <span className={cn(
                       "block text-xs mt-0.5",
-                      isCurrent ? "text-slate-600" : "text-slate-400"
+                      isCurrent ? "text-muted-foreground" : "text-muted-foreground"
                     )}>
                       {step.sublabel}
                     </span>
@@ -161,7 +161,7 @@ export function BookingProgressIndicator({
                 {/* Connector line */}
                 {idx < steps.length - 1 && (
                   <div className="relative w-16 lg:w-24 h-0.5 mx-3 -mt-8">
-                    <div className="absolute inset-0 bg-slate-200 rounded-full" />
+                    <div className="absolute inset-0 bg-muted rounded-full" />
                     <motion.div
                       className="absolute inset-y-0 left-0 bg-emerald-500 rounded-full"
                       initial={{ width: 0 }}
@@ -189,7 +189,7 @@ export function BookingProgressIndicator({
         animate={prefersReducedMotion ? {} : { opacity: 1, y: 0 }}
         transition={{ delay: 0.2 }}
       >
-        <span className="text-xs text-slate-500">
+        <span className="text-xs text-muted-foreground">
           {currentStep === 1 && "About 3 minutes to complete"}
           {currentStep === 2 && "Almost there - 2 minutes left"}
           {currentStep === 3 && "Just a minute more"}

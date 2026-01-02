@@ -155,8 +155,8 @@ function HorizontalScrollSection({
             </div>
           )}
           <div>
-            <h3 className="text-xl font-bold text-slate-900">{title}</h3>
-            {subtitle && <p className="text-sm text-slate-500">{subtitle}</p>}
+            <h3 className="text-xl font-bold text-foreground">{title}</h3>
+            {subtitle && <p className="text-sm text-muted-foreground">{subtitle}</p>}
           </div>
         </div>
         {viewAllHref && (

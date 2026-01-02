@@ -129,13 +129,13 @@ export default function AuditLogPage() {
     return (
       <div className="max-w-5xl space-y-6">
         <div>
-          <h2 className="text-2xl font-bold text-slate-900">Audit Log</h2>
-          <p className="text-slate-500 mt-1">
+          <h2 className="text-2xl font-bold text-foreground">Audit Log</h2>
+          <p className="text-muted-foreground mt-1">
             Track all user actions and system changes
           </p>
         </div>
         <div className="flex items-center justify-center py-12">
-          <Loader2 className="h-8 w-8 animate-spin text-slate-400" />
+          <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
         </div>
       </div>
     );
@@ -145,15 +145,15 @@ export default function AuditLogPage() {
     return (
       <div className="max-w-5xl space-y-6">
         <div>
-          <h2 className="text-2xl font-bold text-slate-900">Audit Log</h2>
-          <p className="text-slate-500 mt-1">
+          <h2 className="text-2xl font-bold text-foreground">Audit Log</h2>
+          <p className="text-muted-foreground mt-1">
             Track all user actions and system changes
           </p>
         </div>
         <Card>
           <CardContent className="py-8 text-center">
             <AlertCircle className="h-8 w-8 text-amber-500 mx-auto mb-3" />
-            <p className="text-slate-600">Please select a campground first.</p>
+            <p className="text-muted-foreground">Please select a campground first.</p>
           </CardContent>
         </Card>
       </div>
@@ -164,8 +164,8 @@ export default function AuditLogPage() {
     <div className="max-w-5xl space-y-6">
       <div className="flex items-start justify-between">
         <div>
-          <h2 className="text-2xl font-bold text-slate-900">Audit Log</h2>
-          <p className="text-slate-500 mt-1">
+          <h2 className="text-2xl font-bold text-foreground">Audit Log</h2>
+          <p className="text-muted-foreground mt-1">
             Track all user actions and system changes
           </p>
         </div>
@@ -180,7 +180,7 @@ export default function AuditLogPage() {
         <CardContent className="py-4">
           <div className="flex items-center gap-4">
             <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
                 placeholder="Search by user, action, or details..."
                 value={searchQuery}
@@ -223,20 +223,20 @@ export default function AuditLogPage() {
 
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-1">
-                      <span className="font-medium text-slate-900">
+                      <span className="font-medium text-foreground">
                         {entry.action}
                       </span>
                       <Badge variant="outline" className="text-xs">
                         {entry.resource}
                       </Badge>
                     </div>
-                    <p className="text-sm text-slate-600">{entry.details}</p>
+                    <p className="text-sm text-muted-foreground">{entry.details}</p>
                   </div>
 
-                  <div className="flex items-center gap-4 text-sm text-slate-500 shrink-0">
+                  <div className="flex items-center gap-4 text-sm text-muted-foreground shrink-0">
                     <div className="flex items-center gap-2">
                       <Avatar className="h-6 w-6">
-                        <AvatarFallback className="text-xs bg-slate-100">
+                        <AvatarFallback className="text-xs bg-muted">
                           {getInitials(entry.userName)}
                         </AvatarFallback>
                       </Avatar>
@@ -244,7 +244,7 @@ export default function AuditLogPage() {
                     </div>
                     <div className="text-right">
                       <p>{date}</p>
-                      <p className="text-slate-400">{time}</p>
+                      <p className="text-muted-foreground">{time}</p>
                     </div>
                   </div>
                 </div>
@@ -256,9 +256,9 @@ export default function AuditLogPage() {
         {filteredLog.length === 0 && (
           <Card>
             <CardContent className="py-12 text-center">
-              <History className="h-12 w-12 text-slate-300 mx-auto mb-4" />
-              <h3 className="font-medium text-slate-900">No matching entries</h3>
-              <p className="text-sm text-slate-500 mt-1">
+              <History className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+              <h3 className="font-medium text-foreground">No matching entries</h3>
+              <p className="text-sm text-muted-foreground mt-1">
                 Try adjusting your search or filter criteria
               </p>
             </CardContent>

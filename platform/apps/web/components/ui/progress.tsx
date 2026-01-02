@@ -13,7 +13,7 @@ export function Progress({ value = 0, max = 100, className, ...props }: Progress
 
   return (
     <div
-      className={cn("relative w-full overflow-hidden rounded-full bg-slate-200", className)}
+      className={cn("relative w-full overflow-hidden rounded-full bg-muted", className)}
       role="progressbar"
       aria-valuemin={0}
       aria-valuemax={max}

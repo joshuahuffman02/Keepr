@@ -25,17 +25,17 @@ const dateRangeOptions = [
 export function DateRangePicker({ value, onChange }: DateRangePickerProps) {
   return (
     <div className="flex items-center gap-2">
-      <Calendar className="h-4 w-4 text-slate-400" />
+      <Calendar className="h-4 w-4 text-muted-foreground" />
       <Select value={value} onValueChange={onChange}>
-        <SelectTrigger className="w-[180px] bg-slate-800 border-slate-700 text-slate-200">
+        <SelectTrigger className="w-[180px] bg-muted border-border text-muted-foreground">
           <SelectValue placeholder="Select range" />
         </SelectTrigger>
-        <SelectContent className="bg-slate-800 border-slate-700">
+        <SelectContent className="bg-muted border-border">
           {dateRangeOptions.map((option) => (
             <SelectItem
               key={option.value}
               value={option.value}
-              className="text-slate-200 focus:bg-slate-700 focus:text-white"
+              className="text-muted-foreground focus:bg-muted focus:text-foreground"
             >
               {option.label}
             </SelectItem>

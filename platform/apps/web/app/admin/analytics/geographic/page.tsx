@@ -97,14 +97,14 @@ export default function GeographicPage() {
       <div className="flex items-center justify-between">
         <div>
           <div className="flex items-center gap-3">
-            <h1 className="text-2xl font-bold text-slate-900 dark:text-white">Geographic Intelligence</h1>
+            <h1 className="text-2xl font-bold text-foreground dark:text-white">Geographic Intelligence</h1>
             {isUsingMockData && (
               <Badge className="bg-amber-100 dark:bg-amber-600/20 text-amber-700 dark:text-amber-400 border border-amber-300 dark:border-amber-600/50">
                 Demo Data
               </Badge>
             )}
           </div>
-          <p className="text-slate-600 dark:text-slate-400 mt-1">
+          <p className="text-muted-foreground dark:text-muted-foreground mt-1">
             Where your guests come from and how far they travel
           </p>
         </div>
@@ -179,15 +179,15 @@ export default function GeographicPage() {
             formatValue={(v) => `${(v ?? 0).toFixed(1)}%`}
             loading={loading}
           />
-          <Card className="border-slate-200 dark:border-slate-700">
+          <Card className="border-border dark:border-border">
             <CardContent className="p-4 space-y-3">
               <div className="flex justify-between">
-                <span className="text-slate-600 dark:text-slate-400">Average Distance</span>
-                <span className="text-slate-900 dark:text-white font-medium">{Math.round(data.travelDistance.averageDistance ?? 0)} mi</span>
+                <span className="text-muted-foreground dark:text-muted-foreground">Average Distance</span>
+                <span className="text-foreground dark:text-white font-medium">{Math.round(data.travelDistance.averageDistance ?? 0)} mi</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-slate-600 dark:text-slate-400">Median Distance</span>
-                <span className="text-slate-900 dark:text-white font-medium">{Math.round(data.travelDistance.medianDistance ?? 0)} mi</span>
+                <span className="text-muted-foreground dark:text-muted-foreground">Median Distance</span>
+                <span className="text-foreground dark:text-white font-medium">{Math.round(data.travelDistance.medianDistance ?? 0)} mi</span>
               </div>
             </CardContent>
           </Card>
@@ -225,21 +225,21 @@ export default function GeographicPage() {
       />
 
       {/* Distance vs Spend Correlation */}
-      <Card className="border-slate-200 dark:border-slate-700">
+      <Card className="border-border dark:border-border">
         <CardHeader>
-          <CardTitle className="text-lg text-slate-900 dark:text-white">Distance vs Spend Insight</CardTitle>
+          <CardTitle className="text-lg text-foreground dark:text-white">Distance vs Spend Insight</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
             {data.travelDistance.buckets.map((bucket, idx) => (
-              <div key={idx} className="text-center p-4 bg-slate-50 dark:bg-slate-700/30 rounded-lg">
-                <p className="text-xs text-slate-600 dark:text-slate-400 mb-1">{bucket.range}</p>
-                <p className="text-xl font-bold text-slate-900 dark:text-white">{formatCurrency(bucket.averageSpend)}</p>
-                <p className="text-xs text-slate-500">avg spend</p>
+              <div key={idx} className="text-center p-4 bg-muted dark:bg-muted/30 rounded-lg">
+                <p className="text-xs text-muted-foreground dark:text-muted-foreground mb-1">{bucket.range}</p>
+                <p className="text-xl font-bold text-foreground dark:text-white">{formatCurrency(bucket.averageSpend)}</p>
+                <p className="text-xs text-muted-foreground">avg spend</p>
               </div>
             ))}
           </div>
-          <p className="text-sm text-slate-600 dark:text-slate-400 mt-4 text-center">
+          <p className="text-sm text-muted-foreground dark:text-muted-foreground mt-4 text-center">
             Guests traveling longer distances tend to spend more per reservation
           </p>
         </CardContent>

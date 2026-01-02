@@ -95,7 +95,7 @@ export function CustomFieldRow({
       ref={setNodeRef}
       style={style}
       className={cn(
-        "flex items-center gap-3 p-4 rounded-lg border bg-white group",
+        "flex items-center gap-3 p-4 rounded-lg border bg-card group",
         "transition-all duration-200",
         isDragging && "shadow-lg ring-2 ring-emerald-500 z-50",
         !field.isActive && "opacity-60"
@@ -103,7 +103,7 @@ export function CustomFieldRow({
     >
       {/* Drag Handle */}
       <button
-        className="cursor-grab active:cursor-grabbing p-1 -m-1 text-slate-400 hover:text-slate-600"
+        className="cursor-grab active:cursor-grabbing p-1 -m-1 text-muted-foreground hover:text-muted-foreground"
         {...attributes}
         {...listeners}
       >
@@ -111,14 +111,14 @@ export function CustomFieldRow({
       </button>
 
       {/* Icon */}
-      <div className="p-2 rounded-lg bg-slate-100 flex-shrink-0">
-        <Icon className="h-4 w-4 text-slate-600" />
+      <div className="p-2 rounded-lg bg-muted flex-shrink-0">
+        <Icon className="h-4 w-4 text-muted-foreground" />
       </div>
 
       {/* Content */}
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2">
-          <p className="font-medium text-slate-900 truncate">{field.question}</p>
+          <p className="font-medium text-foreground truncate">{field.question}</p>
           {field.isRequired && (
             <Badge variant="secondary" className="text-[10px] px-1.5 py-0 bg-status-warning-bg text-status-warning-text">
               Required
@@ -130,7 +130,7 @@ export function CustomFieldRow({
             {fieldTypeLabels[field.fieldType]}
           </Badge>
           {field.displayAt.map((context) => (
-            <Badge key={context} variant="outline" className="text-xs text-slate-500">
+            <Badge key={context} variant="outline" className="text-xs text-muted-foreground">
               {displayLabels[context]}
             </Badge>
           ))}
@@ -139,7 +139,7 @@ export function CustomFieldRow({
 
       {/* Active Toggle */}
       <div className="flex items-center gap-2">
-        <span className="text-sm text-slate-500">
+        <span className="text-sm text-muted-foreground">
           {field.isActive ? "Active" : "Inactive"}
         </span>
         <Switch

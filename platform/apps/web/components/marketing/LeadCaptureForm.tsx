@@ -69,18 +69,18 @@ export function LeadCaptureForm({
   };
 
   return (
-    <div className="bg-white rounded-2xl border border-slate-200 shadow-sm shadow-emerald-500/5">
-      <div className="border-b border-slate-100 p-6">
+    <div className="bg-card rounded-2xl border border-border shadow-sm shadow-emerald-500/5">
+      <div className="border-b border-border p-6">
         <div className="text-sm font-semibold text-emerald-700">Lead capture (internal only)</div>
-        <h3 className="text-xl font-bold text-slate-900 mt-1">{title}</h3>
-        <p className="text-sm text-slate-600 mt-1">
+        <h3 className="text-xl font-bold text-foreground mt-1">{title}</h3>
+        <p className="text-sm text-muted-foreground mt-1">
           We keep this in-app — no CRM calls are made. Leads are scoped per campground for easy routing with statuses
           (new, contacted, qualified) visible in Admin &gt; Marketing &gt; Leads.
         </p>
       </div>
       <form onSubmit={handleSubmit} className="p-6 space-y-4">
         <div className="space-y-2">
-          <label className="text-sm font-medium text-slate-700" htmlFor="name">
+          <label className="text-sm font-medium text-foreground" htmlFor="name">
             Name
           </label>
           <Input
@@ -93,7 +93,7 @@ export function LeadCaptureForm({
           />
         </div>
         <div className="space-y-2">
-          <label className="text-sm font-medium text-slate-700" htmlFor="email">
+          <label className="text-sm font-medium text-foreground" htmlFor="email">
             Email
           </label>
           <Input
@@ -107,7 +107,7 @@ export function LeadCaptureForm({
           />
         </div>
         <div className="space-y-2">
-          <label className="text-sm font-medium text-slate-700" htmlFor="interest">
+          <label className="text-sm font-medium text-foreground" htmlFor="interest">
             Interest
           </label>
           <Textarea
@@ -120,7 +120,7 @@ export function LeadCaptureForm({
             required
           />
         </div>
-        <div className="flex items-center justify-between text-xs text-slate-500">
+        <div className="flex items-center justify-between text-xs text-muted-foreground">
           <span>
             Routed to: {defaultCampgroundName} ({campgroundId || defaultCampgroundId})
           </span>

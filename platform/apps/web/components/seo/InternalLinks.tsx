@@ -41,7 +41,7 @@ export function RelatedCampgrounds({
 
   return (
     <section className={cn("py-8", className)} aria-labelledby="related-campgrounds-title">
-      <h2 id="related-campgrounds-title" className="text-xl font-bold text-slate-900 mb-4">
+      <h2 id="related-campgrounds-title" className="text-xl font-bold text-foreground mb-4">
         {title}
       </h2>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -49,10 +49,10 @@ export function RelatedCampgrounds({
           <Link
             key={campground.slug}
             href={`/park/${campground.slug}`}
-            className="group block bg-white rounded-xl border border-slate-200 overflow-hidden hover:shadow-md transition-shadow"
+            className="group block bg-card rounded-xl border border-border overflow-hidden hover:shadow-md transition-shadow"
           >
             {campground.heroImageUrl && (
-              <div className="aspect-[4/3] bg-slate-100 overflow-hidden">
+              <div className="aspect-[4/3] bg-muted overflow-hidden">
                 <img
                   src={campground.heroImageUrl}
                   alt={campground.name}
@@ -62,11 +62,11 @@ export function RelatedCampgrounds({
               </div>
             )}
             <div className="p-4">
-              <h3 className="font-semibold text-slate-900 group-hover:text-emerald-600 transition-colors line-clamp-1">
+              <h3 className="font-semibold text-foreground group-hover:text-emerald-600 transition-colors line-clamp-1">
                 {campground.name}
               </h3>
               {(campground.city || campground.state) && (
-                <p className="text-sm text-slate-600 flex items-center gap-1 mt-1">
+                <p className="text-sm text-muted-foreground flex items-center gap-1 mt-1">
                   <MapPin className="h-3.5 w-3.5" />
                   {[campground.city, campground.state].filter(Boolean).join(", ")}
                 </p>
@@ -111,7 +111,7 @@ export function LocationLinks({
 
   return (
     <section className={cn("py-8", className)} aria-labelledby="location-links-title">
-      <h2 id="location-links-title" className="text-xl font-bold text-slate-900 mb-4">
+      <h2 id="location-links-title" className="text-xl font-bold text-foreground mb-4">
         {title}
       </h2>
       <div className="flex flex-wrap gap-2">
@@ -119,11 +119,11 @@ export function LocationLinks({
           <Link
             key={location.slug}
             href={`/browse/${location.slug}`}
-            className="inline-flex items-center gap-2 px-4 py-2 bg-slate-50 hover:bg-emerald-50 border border-slate-200 hover:border-emerald-200 rounded-full text-sm text-slate-700 hover:text-emerald-700 transition-colors"
+            className="inline-flex items-center gap-2 px-4 py-2 bg-muted hover:bg-emerald-50 border border-border hover:border-emerald-200 rounded-full text-sm text-foreground hover:text-emerald-700 transition-colors"
           >
             <MapPin className="h-4 w-4" />
             {location.name}
-            <span className="text-xs text-slate-500">({location.count})</span>
+            <span className="text-xs text-muted-foreground">({location.count})</span>
           </Link>
         ))}
       </div>
@@ -155,7 +155,7 @@ export function SiteTypeLinks({
 
   return (
     <section className={cn("py-8", className)} aria-labelledby="site-type-links-title">
-      <h2 id="site-type-links-title" className="text-xl font-bold text-slate-900 mb-4">
+      <h2 id="site-type-links-title" className="text-xl font-bold text-foreground mb-4">
         {title}
       </h2>
       <div className="flex flex-wrap gap-2">
@@ -163,10 +163,10 @@ export function SiteTypeLinks({
           <Link
             key={siteType.type}
             href={`/browse?type=${siteType.type}`}
-            className="inline-flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 hover:border-emerald-300 rounded-lg text-sm text-slate-700 hover:text-emerald-700 transition-colors"
+            className="inline-flex items-center gap-2 px-4 py-2 bg-card border border-border hover:border-emerald-300 rounded-lg text-sm text-foreground hover:text-emerald-700 transition-colors"
           >
             {siteType.label}
-            <span className="text-xs bg-slate-100 px-2 py-0.5 rounded-full">
+            <span className="text-xs bg-muted px-2 py-0.5 rounded-full">
               {siteType.count}
             </span>
           </Link>
@@ -218,13 +218,13 @@ export function SEOFooterLinks({ sections, className }: SEOFooterLinksProps) {
     <div className={cn("grid grid-cols-2 md:grid-cols-4 gap-8", className)}>
       {sections.map((section) => (
         <div key={section.title}>
-          <h3 className="font-semibold text-slate-900 mb-3">{section.title}</h3>
+          <h3 className="font-semibold text-foreground mb-3">{section.title}</h3>
           <ul className="space-y-2">
             {section.links.map((link) => (
               <li key={link.href}>
                 <Link
                   href={link.href}
-                  className="text-sm text-slate-600 hover:text-emerald-600 transition-colors"
+                  className="text-sm text-muted-foreground hover:text-emerald-600 transition-colors"
                 >
                   {link.name}
                 </Link>
@@ -300,8 +300,8 @@ export function AvailabilityCta({
           <Calendar className="h-6 w-6 text-emerald-600" />
         </div>
         <div className="flex-1">
-          <h3 className="font-semibold text-slate-900">Check Availability</h3>
-          <p className="text-sm text-slate-600 mt-1">
+          <h3 className="font-semibold text-foreground">Check Availability</h3>
+          <p className="text-sm text-muted-foreground mt-1">
             See available dates and book your stay at {campgroundName}
           </p>
           <Link

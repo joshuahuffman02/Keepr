@@ -36,7 +36,7 @@ export function MarketingHeader() {
   ];
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 bg-white/90 backdrop-blur-md border-b border-slate-200">
+    <header className="fixed top-0 left-0 right-0 z-50 bg-card/90 backdrop-blur-md border-b border-border">
       <nav className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="flex h-16 items-center justify-between">
           {/* Logo */}
@@ -59,7 +59,7 @@ export function MarketingHeader() {
               <Link
                 key={item.name}
                 href={item.href}
-                className="text-slate-700 hover:text-emerald-600 transition-colors font-medium"
+                className="text-foreground hover:text-emerald-600 transition-colors font-medium"
               >
                 {item.name}
               </Link>
@@ -69,18 +69,18 @@ export function MarketingHeader() {
               <button
                 onClick={() => setCompareOpen(!compareOpen)}
                 onBlur={() => setTimeout(() => setCompareOpen(false), 150)}
-                className="flex items-center gap-1 text-slate-700 hover:text-emerald-600 transition-colors font-medium"
+                className="flex items-center gap-1 text-foreground hover:text-emerald-600 transition-colors font-medium"
               >
                 Compare
                 <ChevronDown className={`h-4 w-4 transition-transform ${compareOpen ? 'rotate-180' : ''}`} />
               </button>
               {compareOpen && (
-                <div className="absolute top-full left-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-slate-200 py-2 z-50">
+                <div className="absolute top-full left-0 mt-2 w-48 bg-card rounded-lg shadow-lg border border-border py-2 z-50">
                   {compareLinks.map((link) => (
                     <Link
                       key={link.href}
                       href={link.href}
-                      className="block px-4 py-2 text-sm text-slate-700 hover:bg-emerald-50 hover:text-emerald-600"
+                      className="block px-4 py-2 text-sm text-foreground hover:bg-emerald-50 hover:text-emerald-600"
                     >
                       {link.name}
                     </Link>
@@ -93,12 +93,12 @@ export function MarketingHeader() {
           {/* CTA Buttons */}
           <div className="hidden md:flex md:items-center md:space-x-4">
             <Link href="/">
-              <Button variant="ghost" className="text-slate-700">
+              <Button variant="ghost" className="text-foreground">
                 Book a Campsite
               </Button>
             </Link>
             <Link href="/auth/signin">
-              <Button variant="ghost" className="text-slate-700">
+              <Button variant="ghost" className="text-foreground">
                 Sign In
               </Button>
             </Link>
@@ -131,7 +131,7 @@ export function MarketingHeader() {
               <Link
                 key={item.name}
                 href={item.href}
-                className="block px-3 py-2 rounded-md text-base font-medium text-slate-700 hover:bg-slate-100"
+                className="block px-3 py-2 rounded-md text-base font-medium text-foreground hover:bg-muted"
                 onClick={() => setMobileMenuOpen(false)}
               >
                 {item.name}
@@ -139,12 +139,12 @@ export function MarketingHeader() {
             ))}
             {/* Compare Links */}
             <div className="px-3 py-2">
-              <div className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Compare</div>
+              <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">Compare</div>
               {compareLinks.map((link) => (
                 <Link
                   key={link.href}
                   href={link.href}
-                  className="block px-3 py-2 rounded-md text-base font-medium text-slate-700 hover:bg-slate-100"
+                  className="block px-3 py-2 rounded-md text-base font-medium text-foreground hover:bg-muted"
                   onClick={() => setMobileMenuOpen(false)}
                 >
                   {link.name}

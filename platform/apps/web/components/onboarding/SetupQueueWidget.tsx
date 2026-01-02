@@ -218,8 +218,7 @@ export function SetupQueueWidget({ campgroundId }: SetupQueueWidgetProps) {
     <motion.div
       className={cn(
         "rounded-2xl border backdrop-blur-sm transition-colors overflow-hidden",
-        "bg-gradient-to-br from-emerald-50 to-teal-50 border-emerald-200",
-        "dark:from-emerald-950/30 dark:to-teal-950/30 dark:border-emerald-800"
+        "bg-status-success-bg border-status-success-border"
       )}
       initial={prefersReducedMotion ? undefined : { opacity: 0, y: 20 }}
       animate={prefersReducedMotion ? undefined : { opacity: 1, y: 0 }}
@@ -231,12 +230,12 @@ export function SetupQueueWidget({ campgroundId }: SetupQueueWidgetProps) {
         onClick={() => setIsExpanded(!isExpanded)}
         className={cn(
           "w-full flex items-center justify-between p-4",
-          "hover:bg-emerald-100/50 dark:hover:bg-emerald-900/20 transition-colors"
+          "hover:bg-status-success-bg/70 transition-colors"
         )}
       >
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-emerald-500/20 flex items-center justify-center">
-            <ListTodo className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
+          <div className="w-10 h-10 rounded-xl bg-status-success/15 flex items-center justify-center">
+            <ListTodo className="w-5 h-5 text-status-success" />
           </div>
           <div className="text-left">
             <h3 className="font-semibold text-foreground">Setup Queue</h3>
@@ -251,7 +250,7 @@ export function SetupQueueWidget({ campgroundId }: SetupQueueWidgetProps) {
               e.stopPropagation();
               setIsDismissed(true);
             }}
-            className="p-1.5 rounded-lg text-muted-foreground hover:text-foreground hover:bg-slate-200/50 dark:hover:bg-slate-700/50 transition-colors"
+            className="p-1.5 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted/70 transition-colors"
             aria-label="Dismiss"
           >
             <X className="w-4 h-4" />
@@ -287,12 +286,12 @@ export function SetupQueueWidget({ campgroundId }: SetupQueueWidgetProps) {
                     transition={{ delay: index * 0.05 }}
                     className={cn(
                       "flex items-center gap-3 p-3 rounded-xl",
-                      "bg-white/60 dark:bg-slate-800/40",
-                      "border border-emerald-100 dark:border-emerald-800/50"
+                      "bg-card/70",
+                      "border border-status-success-border"
                     )}
                   >
-                    <div className="w-8 h-8 rounded-lg bg-emerald-500/10 flex items-center justify-center flex-shrink-0">
-                      <FeatureIcon className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                    <div className="w-8 h-8 rounded-lg bg-status-success/10 flex items-center justify-center flex-shrink-0">
+                      <FeatureIcon className="w-4 h-4 text-status-success-text" />
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className="font-medium text-sm text-foreground truncate">
@@ -302,7 +301,7 @@ export function SetupQueueWidget({ campgroundId }: SetupQueueWidgetProps) {
                     <div className="flex items-center gap-1">
                       <Link
                         href={featureInfo.path}
-                        className="p-1.5 rounded-lg text-emerald-600 hover:bg-emerald-100 dark:hover:bg-emerald-900/30 transition-colors"
+                        className="p-1.5 rounded-lg text-action-primary hover:bg-action-primary/10 transition-colors"
                         title="Open settings"
                       >
                         <ExternalLink className="w-4 h-4" />
@@ -310,7 +309,7 @@ export function SetupQueueWidget({ campgroundId }: SetupQueueWidgetProps) {
                       <button
                         onClick={() => completeMutation.mutate(item.featureKey)}
                         disabled={completeMutation.isPending}
-                        className="p-1.5 rounded-lg text-emerald-600 hover:bg-emerald-100 dark:hover:bg-emerald-900/30 transition-colors"
+                        className="p-1.5 rounded-lg text-action-primary hover:bg-action-primary/10 transition-colors"
                         title="Mark complete"
                       >
                         <Check className="w-4 h-4" />
@@ -318,7 +317,7 @@ export function SetupQueueWidget({ campgroundId }: SetupQueueWidgetProps) {
                       <button
                         onClick={() => skipMutation.mutate(item.featureKey)}
                         disabled={skipMutation.isPending}
-                        className="p-1.5 rounded-lg text-muted-foreground hover:bg-slate-200/50 dark:hover:bg-slate-700/50 transition-colors"
+                        className="p-1.5 rounded-lg text-muted-foreground hover:bg-muted/70 transition-colors"
                         title="Skip"
                       >
                         <SkipForward className="w-4 h-4" />
@@ -333,8 +332,8 @@ export function SetupQueueWidget({ campgroundId }: SetupQueueWidgetProps) {
                   href="/features?tab=queue"
                   className={cn(
                     "flex items-center justify-center gap-2 p-2.5 rounded-xl text-sm font-medium",
-                    "text-emerald-600 dark:text-emerald-400",
-                    "hover:bg-emerald-100/50 dark:hover:bg-emerald-900/30 transition-colors"
+                    "text-action-primary",
+                    "hover:bg-action-primary/10 transition-colors"
                   )}
                 >
                   View all {queueData.length} features

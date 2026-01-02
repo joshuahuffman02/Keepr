@@ -105,7 +105,7 @@ export default function SmsSettingsPage() {
   if (!campgroundId) {
     return (
       <div className="max-w-4xl">
-        <div className="p-6 text-slate-600">Select or create a campground to manage SMS settings.</div>
+        <div className="p-6 text-muted-foreground">Select or create a campground to manage SMS settings.</div>
       </div>
     );
   }
@@ -121,11 +121,11 @@ export default function SmsSettingsPage() {
   return (
     <div className="max-w-4xl space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2">
+        <h1 className="text-2xl font-bold text-foreground dark:text-foreground flex items-center gap-2">
           <Phone className="h-6 w-6" />
           SMS / Text Messages
         </h1>
-        <p className="text-sm text-slate-600 dark:text-slate-400 mt-1">
+        <p className="text-sm text-muted-foreground dark:text-muted-foreground mt-1">
           Configure SMS messaging for this campground.
         </p>
       </div>
@@ -140,8 +140,8 @@ export default function SmsSettingsPage() {
                   <Check className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
                 </div>
               ) : (
-                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-slate-100 dark:bg-slate-800">
-                  <MessageSquare className="h-5 w-5 text-slate-500" />
+                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-muted dark:bg-muted">
+                  <MessageSquare className="h-5 w-5 text-muted-foreground" />
                 </div>
               )}
               <div>
@@ -178,7 +178,7 @@ export default function SmsSettingsPage() {
               placeholder="+15551234567"
               className="font-mono"
             />
-            <p className="text-xs text-slate-500">
+            <p className="text-xs text-muted-foreground">
               E.164 format (e.g., +15551234567). This number must be in your Twilio account.
             </p>
           </div>
@@ -203,7 +203,7 @@ export default function SmsSettingsPage() {
               placeholder="Example: Thanks for booking at Sunny Pines! Reply STOP to opt out."
               rows={3}
             />
-            <p className="text-xs text-slate-500">
+            <p className="text-xs text-muted-foreground">
               Automatically sent when a guest's reservation is confirmed.
             </p>
           </div>
@@ -281,7 +281,7 @@ export default function SmsSettingsPage() {
                 <button
                   type="button"
                   onClick={() => setShowAuthToken(!showAuthToken)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-muted-foreground"
                 >
                   {showAuthToken ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                 </button>
@@ -311,7 +311,7 @@ export default function SmsSettingsPage() {
       <div className="flex justify-between items-center pt-4 border-t">
         <Link
           href="/messages"
-          className="text-sm text-slate-600 hover:text-emerald-600"
+          className="text-sm text-muted-foreground hover:text-emerald-600"
         >
           Go to Messages
         </Link>

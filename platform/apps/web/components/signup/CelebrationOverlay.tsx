@@ -25,7 +25,7 @@ export function CelebrationOverlay({
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/90 backdrop-blur-sm"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-muted/90 backdrop-blur-sm"
     >
       <motion.div
         initial={prefersReducedMotion ? { opacity: 0 } : { scale: 0.5, opacity: 0 }}
@@ -64,7 +64,7 @@ export function CelebrationOverlay({
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: prefersReducedMotion ? 0 : 0.3 }}
-            className="text-slate-300"
+            className="text-muted-foreground"
           >
             {subtitle}
           </motion.p>

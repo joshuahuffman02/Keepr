@@ -180,27 +180,27 @@ Note: The admin will be required to change their password on first login.`;
                         <h2 className="text-xl font-bold text-white">Campground Created!</h2>
                     </div>
 
-                    <div className="bg-slate-900 rounded-lg p-4 space-y-3 mb-4">
+                    <div className="bg-muted rounded-lg p-4 space-y-3 mb-4">
                         <div>
-                            <div className="text-xs text-slate-500 uppercase">Campground</div>
+                            <div className="text-xs text-muted-foreground uppercase">Campground</div>
                             <div className="text-white font-medium">{createdData.campgroundName}</div>
                         </div>
                         <div>
-                            <div className="text-xs text-slate-500 uppercase">Public URL</div>
+                            <div className="text-xs text-muted-foreground uppercase">Public URL</div>
                             <div className="text-blue-400 font-mono text-sm">/park/{createdData.campgroundSlug}</div>
                         </div>
-                        <hr className="border-slate-700" />
+                        <hr className="border-border" />
                         <div>
-                            <div className="text-xs text-slate-500 uppercase">Admin Email</div>
+                            <div className="text-xs text-muted-foreground uppercase">Admin Email</div>
                             <div className="text-white font-mono">{createdData.adminEmail}</div>
                         </div>
                         <div>
-                            <div className="text-xs text-slate-500 uppercase">Temporary Password</div>
+                            <div className="text-xs text-muted-foreground uppercase">Temporary Password</div>
                             <div className="text-amber-400 font-mono text-lg">{createdData.adminPassword}</div>
                         </div>
                     </div>
 
-                    <p className="text-sm text-slate-400 mb-4">
+                    <p className="text-sm text-muted-foreground mb-4">
                         <strong className="text-amber-400">Important:</strong> The admin will be required to
                         change their password on first login. Copy these credentials and send them to the
                         campground owner.
@@ -216,13 +216,13 @@ Note: The admin will be required to change their password on first login.`;
                         </button>
                         <button
                             onClick={resetForm}
-                            className="px-4 py-2 bg-slate-700 text-slate-300 rounded-lg hover:bg-slate-600 transition-colors"
+                            className="px-4 py-2 bg-muted text-muted-foreground rounded-lg hover:bg-muted transition-colors"
                         >
                             Create Another
                         </button>
                         <Link
                             href="/admin/campgrounds"
-                            className="px-4 py-2 bg-slate-800 text-slate-300 rounded-lg hover:bg-slate-700 transition-colors"
+                            className="px-4 py-2 bg-muted text-muted-foreground rounded-lg hover:bg-muted transition-colors"
                         >
                             Back to List
                         </Link>
@@ -237,13 +237,13 @@ Note: The admin will be required to change their password on first login.`;
             <div className="flex items-center gap-4">
                 <Link
                     href="/admin/campgrounds"
-                    className="p-2 rounded-lg bg-slate-800 text-slate-400 hover:text-white hover:bg-slate-700 transition-colors"
+                    className="p-2 rounded-lg bg-muted text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
                 >
                     <ArrowLeft className="h-5 w-5" />
                 </Link>
                 <div>
                     <h1 className="text-2xl font-bold text-white">Create Campground</h1>
-                    <p className="text-slate-400 mt-1">Add a new campground with an admin user</p>
+                    <p className="text-muted-foreground mt-1">Add a new campground with an admin user</p>
                 </div>
             </div>
 
@@ -255,14 +255,14 @@ Note: The admin will be required to change their password on first login.`;
 
             <form onSubmit={handleSubmit} className="space-y-6">
                 {/* Campground Info */}
-                <div className="bg-slate-800 rounded-lg border border-slate-700 p-6 space-y-4">
+                <div className="bg-muted rounded-lg border border-border p-6 space-y-4">
                     <div className="flex items-center gap-3 mb-4">
-                        <Building2 className="h-5 w-5 text-slate-400" />
+                        <Building2 className="h-5 w-5 text-muted-foreground" />
                         <h2 className="text-lg font-semibold text-white">Campground Info</h2>
                     </div>
 
                     <div>
-                        <label className="block text-sm font-medium text-slate-300 mb-1">
+                        <label className="block text-sm font-medium text-muted-foreground mb-1">
                             Campground Name *
                         </label>
                         <input
@@ -270,13 +270,13 @@ Note: The admin will be required to change their password on first login.`;
                             value={form.name}
                             onChange={(e) => handleNameChange(e.target.value)}
                             required
-                            className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                            className="w-full px-3 py-2 bg-muted border border-border rounded-lg text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                             placeholder="e.g., Pine Valley RV Resort"
                         />
                     </div>
 
                     <div>
-                        <label className="block text-sm font-medium text-slate-300 mb-1">
+                        <label className="block text-sm font-medium text-muted-foreground mb-1">
                             URL Slug *
                         </label>
                         <input
@@ -284,17 +284,17 @@ Note: The admin will be required to change their password on first login.`;
                             value={form.slug}
                             onChange={(e) => setForm((prev) => ({ ...prev, slug: e.target.value }))}
                             required
-                            className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                            className="w-full px-3 py-2 bg-muted border border-border rounded-lg text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                             placeholder="pine-valley-rv-resort"
                         />
-                        <p className="text-xs text-slate-500 mt-1">
+                        <p className="text-xs text-muted-foreground mt-1">
                             Used in URLs: /park/{form.slug || "your-slug"}
                         </p>
                     </div>
 
                     <div className="grid grid-cols-2 gap-4">
                         <div>
-                            <label className="block text-sm font-medium text-slate-300 mb-1">
+                            <label className="block text-sm font-medium text-muted-foreground mb-1">
                                 City *
                             </label>
                             <input
@@ -302,18 +302,18 @@ Note: The admin will be required to change their password on first login.`;
                                 value={form.city}
                                 onChange={(e) => setForm((prev) => ({ ...prev, city: e.target.value }))}
                                 required
-                                className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                className="w-full px-3 py-2 bg-muted border border-border rounded-lg text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                             />
                         </div>
                         <div>
-                            <label className="block text-sm font-medium text-slate-300 mb-1">
+                            <label className="block text-sm font-medium text-muted-foreground mb-1">
                                 State *
                             </label>
                             <select
                                 value={form.state}
                                 onChange={(e) => setForm((prev) => ({ ...prev, state: e.target.value }))}
                                 required
-                                className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                className="w-full px-3 py-2 bg-muted border border-border rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                             >
                                 <option value="">Select state</option>
                                 {states.map((s) => (
@@ -326,14 +326,14 @@ Note: The admin will be required to change their password on first login.`;
                     </div>
 
                     <div>
-                        <label className="block text-sm font-medium text-slate-300 mb-1">
+                        <label className="block text-sm font-medium text-muted-foreground mb-1">
                             Timezone *
                         </label>
                         <select
                             value={form.timezone}
                             onChange={(e) => setForm((prev) => ({ ...prev, timezone: e.target.value }))}
                             required
-                            className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                            className="w-full px-3 py-2 bg-muted border border-border rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                         >
                             {timezones.map((tz) => (
                                 <option key={tz} value={tz}>
@@ -345,22 +345,22 @@ Note: The admin will be required to change their password on first login.`;
 
                     <div className="grid grid-cols-2 gap-4">
                         <div>
-                            <label className="block text-sm font-medium text-slate-300 mb-1">Phone</label>
+                            <label className="block text-sm font-medium text-muted-foreground mb-1">Phone</label>
                             <input
                                 type="tel"
                                 value={form.phone}
                                 onChange={(e) => setForm((prev) => ({ ...prev, phone: e.target.value }))}
-                                className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                className="w-full px-3 py-2 bg-muted border border-border rounded-lg text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                                 placeholder="(555) 123-4567"
                             />
                         </div>
                         <div>
-                            <label className="block text-sm font-medium text-slate-300 mb-1">Email</label>
+                            <label className="block text-sm font-medium text-muted-foreground mb-1">Email</label>
                             <input
                                 type="email"
                                 value={form.email}
                                 onChange={(e) => setForm((prev) => ({ ...prev, email: e.target.value }))}
-                                className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                className="w-full px-3 py-2 bg-muted border border-border rounded-lg text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                                 placeholder="info@campground.com"
                             />
                         </div>
@@ -368,18 +368,18 @@ Note: The admin will be required to change their password on first login.`;
                 </div>
 
                 {/* Admin User */}
-                <div className="bg-slate-800 rounded-lg border border-slate-700 p-6 space-y-4">
+                <div className="bg-muted rounded-lg border border-border p-6 space-y-4">
                     <div className="flex items-center gap-3 mb-4">
-                        <User className="h-5 w-5 text-slate-400" />
+                        <User className="h-5 w-5 text-muted-foreground" />
                         <div>
                             <h2 className="text-lg font-semibold text-white">Admin User</h2>
-                            <p className="text-sm text-slate-400">Create the campground administrator account</p>
+                            <p className="text-sm text-muted-foreground">Create the campground administrator account</p>
                         </div>
                     </div>
 
                     <div className="grid grid-cols-2 gap-4">
                         <div>
-                            <label className="block text-sm font-medium text-slate-300 mb-1">
+                            <label className="block text-sm font-medium text-muted-foreground mb-1">
                                 First Name *
                             </label>
                             <input
@@ -387,11 +387,11 @@ Note: The admin will be required to change their password on first login.`;
                                 value={form.adminFirstName}
                                 onChange={(e) => setForm((prev) => ({ ...prev, adminFirstName: e.target.value }))}
                                 required
-                                className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                className="w-full px-3 py-2 bg-muted border border-border rounded-lg text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                             />
                         </div>
                         <div>
-                            <label className="block text-sm font-medium text-slate-300 mb-1">
+                            <label className="block text-sm font-medium text-muted-foreground mb-1">
                                 Last Name *
                             </label>
                             <input
@@ -399,13 +399,13 @@ Note: The admin will be required to change their password on first login.`;
                                 value={form.adminLastName}
                                 onChange={(e) => setForm((prev) => ({ ...prev, adminLastName: e.target.value }))}
                                 required
-                                className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                className="w-full px-3 py-2 bg-muted border border-border rounded-lg text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                             />
                         </div>
                     </div>
 
                     <div>
-                        <label className="block text-sm font-medium text-slate-300 mb-1">
+                        <label className="block text-sm font-medium text-muted-foreground mb-1">
                             Admin Email *
                         </label>
                         <input
@@ -413,10 +413,10 @@ Note: The admin will be required to change their password on first login.`;
                             value={form.adminEmail}
                             onChange={(e) => setForm((prev) => ({ ...prev, adminEmail: e.target.value }))}
                             required
-                            className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                            className="w-full px-3 py-2 bg-muted border border-border rounded-lg text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                             placeholder="owner@campground.com"
                         />
-                        <p className="text-xs text-slate-500 mt-1">
+                        <p className="text-xs text-muted-foreground mt-1">
                             A temporary password will be generated. The admin must change it on first login.
                         </p>
                     </div>
@@ -425,7 +425,7 @@ Note: The admin will be required to change their password on first login.`;
                 <div className="flex justify-end gap-3">
                     <Link
                         href="/admin/campgrounds"
-                        className="px-4 py-2 rounded-lg bg-slate-800 text-slate-300 hover:bg-slate-700 transition-colors"
+                        className="px-4 py-2 rounded-lg bg-muted text-muted-foreground hover:bg-muted transition-colors"
                     >
                         Cancel
                     </Link>

@@ -362,20 +362,20 @@ export default function CheckInOutPage() {
         {/* Header */}
         <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
           <div>
-            <div className="text-xs font-semibold uppercase tracking-wide text-slate-500">Operations · {date}</div>
-            <h1 className="text-3xl font-bold text-slate-900">Arrivals & Departures</h1>
-            <p className="text-sm text-slate-600">
+            <div className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Operations · {date}</div>
+            <h1 className="text-3xl font-bold text-foreground">Arrivals & Departures</h1>
+            <p className="text-sm text-muted-foreground">
               Move guests smoothly with balances, site status, and quick actions.
             </p>
           </div>
           <div className="flex flex-wrap gap-2">
             <div className="relative">
-              <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+              <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <input
                 type="date"
                 value={date}
                 onChange={(e) => setDate(e.target.value)}
-                className="pl-9 pr-4 py-2 border border-slate-200 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                className="pl-9 pr-4 py-2 border border-border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
               />
             </div>
             <Button variant="outline" onClick={() => {
@@ -409,8 +409,8 @@ export default function CheckInOutPage() {
 
         {/* Controls */}
         <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
-          <div className="flex items-center gap-3 bg-white p-3 rounded-lg border border-slate-200 shadow-sm w-full lg:max-w-md">
-            <Search className="h-5 w-5 text-slate-400" />
+          <div className="flex items-center gap-3 bg-card p-3 rounded-lg border border-border shadow-sm w-full lg:max-w-md">
+            <Search className="h-5 w-5 text-muted-foreground" />
             <input
               type="text"
               placeholder="Search guest, site, or notes"
@@ -497,7 +497,7 @@ export default function CheckInOutPage() {
 
         {/* Bulk actions bar */}
         {filteredList.length > 0 && (
-          <div className="flex flex-wrap items-center justify-between gap-3 p-4 bg-white border border-slate-200 rounded-lg shadow-sm">
+          <div className="flex flex-wrap items-center justify-between gap-3 p-4 bg-card border border-border rounded-lg shadow-sm">
             <div className="flex items-center gap-3">
               <Checkbox
                 checked={isAllSelected}
@@ -565,8 +565,8 @@ export default function CheckInOutPage() {
         {/* List */}
         <div className="space-y-3">
           {filteredList.length === 0 ? (
-            <div className="text-center py-12 bg-slate-50 rounded-lg border border-dashed border-slate-300">
-              <p className="text-slate-500">Nothing for this filter and date.</p>
+            <div className="text-center py-12 bg-muted rounded-lg border border-dashed border-border">
+              <p className="text-muted-foreground">Nothing for this filter and date.</p>
             </div>
           ) : (
             filteredList.map((res) => {
@@ -578,7 +578,7 @@ export default function CheckInOutPage() {
                   ? "border-blue-300 bg-blue-50/40"
                   : res.balanceAmount > 0
                   ? "border-amber-200 bg-amber-50/40"
-                  : "border-slate-200"
+                  : "border-border"
               } shadow-sm`}>
                 <div className="p-4 flex flex-col lg:flex-row lg:items-center justify-between gap-4">
                   <div className="flex items-start gap-3">
@@ -597,7 +597,7 @@ export default function CheckInOutPage() {
                             ? "bg-status-success/15 text-status-success"
                             : "bg-status-info/15 text-status-info"
                           : res.status === "checked_out"
-                          ? "bg-slate-100 text-slate-600"
+                          ? "bg-muted text-muted-foreground"
                           : "bg-status-warning/15 text-status-warning"
                       }`}
                     >
@@ -605,7 +605,7 @@ export default function CheckInOutPage() {
                     </div>
                     <div>
                       <div className="flex flex-wrap items-center gap-2">
-                        <h3 className="font-semibold text-lg text-slate-900">
+                        <h3 className="font-semibold text-lg text-foreground">
                           {res.guest.primaryFirstName} {res.guest.primaryLastName}
                         </h3>
                         {res.balanceAmount > 0 && (
@@ -619,7 +619,7 @@ export default function CheckInOutPage() {
                           </Badge>
                         )}
                       </div>
-                      <div className="flex flex-wrap items-center gap-2 text-sm text-slate-500 mt-1">
+                      <div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground mt-1">
                         <Badge variant="outline">{res.site?.name || "Unassigned"}</Badge>
                         <span>•</span>
                         <span>
@@ -652,7 +652,7 @@ export default function CheckInOutPage() {
 
                   <div className="flex flex-col items-end gap-3 min-w-[200px]">
                     <div className="text-right">
-                      <div className="text-xs text-slate-500">Balance</div>
+                      <div className="text-xs text-muted-foreground">Balance</div>
                       <div className={`font-bold ${res.balanceAmount > 0 ? "text-amber-700" : "text-emerald-700"}`}>
                         {formatMoney(res.balanceAmount)}
                       </div>
@@ -711,7 +711,7 @@ export default function CheckInOutPage() {
                         </Button>
                       </div>
                     ) : res.status === "checked_out" ? (
-                      <Button disabled variant="outline" className="bg-slate-50">
+                      <Button disabled variant="outline" className="bg-muted">
                         Checked Out
                       </Button>
                     ) : (
@@ -761,7 +761,7 @@ export default function CheckInOutPage() {
             <div className="grid gap-2">
               <Label>Payment Amount</Label>
               <div className="relative">
-                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500">$</span>
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">$</span>
                 <Input
                   type="number"
                   value={(paymentAmount ?? 0) / 100}
@@ -929,7 +929,7 @@ export default function CheckInOutPage() {
           <div className="grid gap-4 py-4">
             {/* Personalization Tags */}
             <div className="space-y-2">
-              <Label className="text-xs text-slate-500 flex items-center gap-1">
+              <Label className="text-xs text-muted-foreground flex items-center gap-1">
                 <Sparkles className="h-3 w-3" />
                 Personalization Tags (click to insert)
               </Label>
@@ -978,7 +978,7 @@ export default function CheckInOutPage() {
                 rows={4}
               />
               {messageType === "sms" && (
-                <p className="text-xs text-slate-500">
+                <p className="text-xs text-muted-foreground">
                   {messageBody.length}/160 characters {messageBody.length > 160 && "(will be split into multiple messages)"}
                 </p>
               )}
@@ -987,11 +987,11 @@ export default function CheckInOutPage() {
             {/* Preview */}
             {messageBody && (
               <div className="space-y-2">
-                <Label className="text-xs text-slate-500 flex items-center gap-1">
+                <Label className="text-xs text-muted-foreground flex items-center gap-1">
                   <Eye className="h-3 w-3" />
                   Preview (example with first selected guest)
                 </Label>
-                <div className="p-3 rounded-lg bg-slate-50 border border-slate-200 text-sm text-slate-700">
+                <div className="p-3 rounded-lg bg-muted border border-border text-sm text-foreground">
                   {(() => {
                     const firstSelected = filteredList.find(r => selectedIds.has(r.id));
                     if (!firstSelected) return messageBody;
@@ -1015,7 +1015,7 @@ export default function CheckInOutPage() {
 
             {/* Quick templates */}
             <div className="space-y-2">
-              <Label className="text-xs text-slate-500">Quick Templates</Label>
+              <Label className="text-xs text-muted-foreground">Quick Templates</Label>
               <div className="flex flex-wrap gap-2">
                 <Button
                   type="button"
@@ -1085,16 +1085,16 @@ function SummaryCard({ label, value, icon, href, onClick, highlight }: { label: 
     <div className={`card border p-4 shadow-sm flex items-center justify-between ${
       highlight
         ? "border-status-success/40 bg-status-success/10"
-        : "border-slate-200 bg-white"
+        : "border-border bg-card"
     }`}>
       <div className="flex items-center gap-3">
-        <span className={`rounded-md p-2 ${highlight ? "bg-status-success/15 text-status-success" : "bg-slate-50 text-slate-500"}`}>{icon}</span>
+        <span className={`rounded-md p-2 ${highlight ? "bg-status-success/15 text-status-success" : "bg-muted text-muted-foreground"}`}>{icon}</span>
         <div>
-          <div className={`text-xs font-semibold uppercase tracking-wide ${highlight ? "text-status-success" : "text-slate-500"}`}>{label}</div>
-          <div className={`text-xl font-bold ${highlight ? "text-status-success" : "text-slate-900"}`}>{value}</div>
+          <div className={`text-xs font-semibold uppercase tracking-wide ${highlight ? "text-status-success" : "text-muted-foreground"}`}>{label}</div>
+          <div className={`text-xl font-bold ${highlight ? "text-status-success" : "text-foreground"}`}>{value}</div>
         </div>
       </div>
-      <ArrowRight className={`h-4 w-4 ${highlight ? "text-status-success/60" : "text-slate-300"}`} />
+      <ArrowRight className={`h-4 w-4 ${highlight ? "text-status-success/60" : "text-muted-foreground"}`} />
     </div>
   );
   if (href) {
@@ -1116,11 +1116,11 @@ function SummaryCard({ label, value, icon, href, onClick, highlight }: { label: 
 
 function HintCard({ title, description, icon, href }: { title: string; description: string; icon: React.ReactNode; href: string }) {
   return (
-    <Link href={href} className="flex items-start gap-3 rounded-lg border border-slate-200 bg-white p-4 shadow-sm hover:border-status-success/40 hover:shadow-md transition">
+    <Link href={href} className="flex items-start gap-3 rounded-lg border border-border bg-card p-4 shadow-sm hover:border-status-success/40 hover:shadow-md transition">
       <span className="rounded-md bg-status-success/10 p-2 text-status-success">{icon}</span>
       <div>
-        <div className="text-sm font-semibold text-slate-900">{title}</div>
-        <div className="text-xs text-slate-600">{description}</div>
+        <div className="text-sm font-semibold text-foreground">{title}</div>
+        <div className="text-xs text-muted-foreground">{description}</div>
       </div>
     </Link>
   );

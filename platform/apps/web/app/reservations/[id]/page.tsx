@@ -139,7 +139,7 @@ export default function ReservationDetailPage() {
         if (normalized.includes("pending") || normalized.includes("processing")) {
             return "bg-status-warning/15 text-status-warning border border-status-warning/30";
         }
-        return "bg-slate-100 text-slate-700 border border-slate-200";
+        return "bg-muted text-muted-foreground border border-border";
     };
 
     const timelineItems = useMemo(() => {
@@ -288,13 +288,13 @@ export default function ReservationDetailPage() {
     if (!reservation) {
         return (
             <DashboardShell>
-                <div className="p-8 text-center text-slate-500">Reservation not found</div>
+                <div className="p-8 text-center text-muted-foreground">Reservation not found</div>
             </DashboardShell>
         );
     }
 
     return (
-        <DashboardShell className="bg-slate-50/50">
+        <DashboardShell className="bg-muted/40">
             <div className="flex flex-col h-full overflow-hidden">
                 <ReservationHeader
                     reservation={reservation}
@@ -310,26 +310,26 @@ export default function ReservationDetailPage() {
                         <div className="lg:col-span-2 space-y-6">
                             {reservation.guest && <GuestCard guest={reservation.guest} />}
                             {reservation.site && <StayDetails reservation={reservation} site={reservation.site as Parameters<typeof StayDetails>[0]["site"]} />}
-                            <div className="bg-white rounded-lg border border-slate-200 p-4 space-y-3">
+                            <div className="bg-card rounded-lg border border-border p-4 space-y-3">
                                 <div className="flex items-center justify-between gap-2">
-                                    <h2 className="text-lg font-semibold text-slate-900">Group assignment</h2>
+                                    <h2 className="text-lg font-semibold text-foreground">Group assignment</h2>
                                     <Badge variant={reservation.groupId ? "secondary" : "outline"} className="text-xs">
                                         {reservation.groupId ? `Group #${reservation.groupId.slice(0, 8)}` : "Not assigned"}
                                     </Badge>
                                 </div>
 
                                 {groupsQuery.isLoading ? (
-                                    <div className="flex items-center gap-2 text-sm text-slate-500">
+                                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
                                         <Loader2 className="h-4 w-4 animate-spin" />
                                         Loading groups...
                                     </div>
                                 ) : groupsQuery.isError ? (
-                                    <div className="text-sm text-rose-600">Unable to load groups.</div>
+                                    <div className="text-sm text-status-error">Unable to load groups.</div>
                                 ) : groupsQuery.data?.length === 0 ? (
                                     <div className="space-y-3">
-                                        <div className="flex items-center justify-between rounded border border-dashed border-slate-200 bg-slate-50 px-3 py-2">
-                                            <div className="text-sm text-slate-600">No groups for this campground yet.</div>
-                                            <Link href="/groups" className="text-sm font-medium text-indigo-600 hover:text-indigo-700">
+                                        <div className="flex items-center justify-between rounded border border-dashed border-border bg-muted px-3 py-2">
+                                            <div className="text-sm text-muted-foreground">No groups for this campground yet.</div>
+                                            <Link href="/groups" className="text-sm font-medium text-action-primary hover:text-action-primary-hover">
                                                 Go to Groups
                                             </Link>
                                         </div>
@@ -354,7 +354,7 @@ export default function ReservationDetailPage() {
                                         <div className="space-y-1">
                                             <Label className="text-xs">Group</Label>
                                             <select
-                                                className="h-10 rounded border border-slate-200 bg-white px-3 text-sm"
+                                                className="h-10 rounded border border-border bg-background px-3 text-sm"
                                                 value={selectedGroupId}
                                                 onChange={(e) => setSelectedGroupId(e.target.value)}
                                                 disabled={updateGroupMutation.isPending}
@@ -370,7 +370,7 @@ export default function ReservationDetailPage() {
 
                                         <div className="space-y-1">
                                             <Label className="text-xs">Role</Label>
-                                            <div className="flex items-center gap-4 text-sm text-slate-700">
+                                            <div className="flex items-center gap-4 text-sm text-foreground">
                                                 <label className="flex items-center gap-2">
                                                     <input
                                                         type="radio"
@@ -392,7 +392,7 @@ export default function ReservationDetailPage() {
                                                     <span>Member</span>
                                                 </label>
                                             </div>
-                                            <p className="text-xs text-slate-500">Primary is treated as the main contact for shared communications.</p>
+                                            <p className="text-xs text-muted-foreground">Primary is treated as the main contact for shared communications.</p>
                                         </div>
 
                                         <div className="flex items-center gap-2">
@@ -426,23 +426,23 @@ export default function ReservationDetailPage() {
                             </div>
                             <ReservationTimeline reservation={reservation} />
                             <MessagesPanel reservationId={reservation.id} guestId={reservation.guestId} />
-                            <div className="bg-white rounded-lg border border-slate-200 p-4 space-y-3">
+                            <div className="bg-card rounded-lg border border-border p-4 space-y-3">
                                 <div className="flex items-center justify-between gap-2">
                                     <div className="flex items-center gap-2">
-                                        <h2 className="text-lg font-semibold text-slate-900">Communications</h2>
+                                        <h2 className="text-lg font-semibold text-foreground">Communications</h2>
                                         {overdueCount > 0 && (
                                             <span className="px-2 py-0.5 rounded-full text-[11px] font-semibold bg-status-warning/15 text-status-warning border border-status-warning/30">
                                                 {overdueCount} need reply
                                             </span>
                                         )}
                                     </div>
-                                    <span className="text-xs text-slate-500">Last 20</span>
+                                    <span className="text-xs text-muted-foreground">Last 20</span>
                                 </div>
                                 <div className="flex flex-wrap gap-3 text-sm">
                                     <div className="space-y-1">
                                         <Label className="text-xs">Type</Label>
                                         <select
-                                            className="h-9 rounded border border-slate-200 bg-white px-2 text-sm"
+                                            className="h-9 rounded border border-border bg-background px-2 text-sm"
                                             value={commTypeFilter}
                                             onChange={(e) => setCommTypeFilter(e.target.value)}
                                         >
@@ -455,7 +455,7 @@ export default function ReservationDetailPage() {
                                     <div className="space-y-1">
                                         <Label className="text-xs">Status (stub)</Label>
                                         <select
-                                            className="h-9 rounded border border-slate-200 bg-white px-2 text-sm"
+                                            className="h-9 rounded border border-border bg-background px-2 text-sm"
                                             value={commStatusFilter}
                                             onChange={(e) => setCommStatusFilter(e.target.value)}
                                         >
@@ -471,7 +471,7 @@ export default function ReservationDetailPage() {
                                     <div className="space-y-1">
                                         <Label className="text-xs">Direction</Label>
                                         <select
-                                            className="h-9 rounded border border-slate-200 bg-white px-2 text-sm"
+                                            className="h-9 rounded border border-border bg-background px-2 text-sm"
                                             value={commDirectionFilter}
                                             onChange={(e) => setCommDirectionFilter(e.target.value)}
                                         >
@@ -484,16 +484,16 @@ export default function ReservationDetailPage() {
 
                                 {/* Collapsible Log Communication Form */}
                                 <details className="group">
-                                    <summary className="flex items-center gap-2 cursor-pointer text-sm text-slate-600 hover:text-slate-800 py-2 border-t border-slate-100 mt-2">
+                                    <summary className="flex items-center gap-2 cursor-pointer text-sm text-muted-foreground hover:text-foreground py-2 border-t border-border mt-2">
                                         <PlusCircle className="h-4 w-4" />
                                         <span>Log Communication</span>
                                     </summary>
-                                    <div className="mt-3 p-3 bg-slate-50 rounded-lg border border-slate-200 space-y-3">
+                                    <div className="mt-3 p-3 bg-muted rounded-lg border border-border space-y-3">
                                         <div className="grid grid-cols-2 gap-3">
                                             <div className="space-y-1">
                                                 <Label className="text-xs">Type</Label>
                                                 <select
-                                                    className="w-full h-9 rounded border border-slate-200 bg-white px-2 text-sm"
+                                                    className="w-full h-9 rounded border border-border bg-background px-2 text-sm"
                                                     value={composeType}
                                                     onChange={(e) => setComposeType(e.target.value as "email" | "sms" | "note" | "call")}
                                                 >
@@ -506,7 +506,7 @@ export default function ReservationDetailPage() {
                                             <div className="space-y-1">
                                                 <Label className="text-xs">Direction</Label>
                                                 <select
-                                                    className="w-full h-9 rounded border border-slate-200 bg-white px-2 text-sm"
+                                                    className="w-full h-9 rounded border border-border bg-background px-2 text-sm"
                                                     value={composeDirection}
                                                     onChange={(e) => setComposeDirection(e.target.value as "inbound" | "outbound")}
                                                 >
@@ -526,7 +526,7 @@ export default function ReservationDetailPage() {
                                         <div className="space-y-1">
                                             <Label className="text-xs">Body</Label>
                                             <textarea
-                                                className="w-full rounded border border-slate-200 bg-white px-3 py-2 text-sm min-h-[80px]"
+                                                className="w-full rounded border border-border bg-background px-3 py-2 text-sm min-h-[80px]"
                                                 value={composeBody}
                                                 onChange={(e) => setComposeBody(e.target.value)}
                                                 placeholder="Log the message content"
@@ -576,9 +576,9 @@ export default function ReservationDetailPage() {
 
                                 <div className="space-y-2 max-h-96 overflow-auto pr-1">
                                     {!timelineItems.length && (
-                                        <div className="text-sm text-slate-500">No communications yet.</div>
+                                        <div className="text-sm text-muted-foreground">No communications yet.</div>
                                     )}
-                                    <div className="relative pl-3 border-l border-slate-200 space-y-4">
+                                    <div className="relative pl-3 border-l border-border space-y-4">
                                         {timelineItems.map((item: any) => {
                                             const createdDate = item.date ? new Date(item.date) : null;
                                             const getCommIcon = () => {
@@ -593,11 +593,11 @@ export default function ReservationDetailPage() {
                                             const Icon = getCommIcon();
                                             return (
                                                 <div key={`${item.kind}-${item.id}`} className="relative pl-4">
-                                                    <span className="absolute -left-[9px] top-2 h-4 w-4 rounded-full bg-white border border-slate-300 flex items-center justify-center">
-                                                        <Icon className="h-3 w-3 text-slate-500" />
+                                                    <span className="absolute -left-[9px] top-2 h-4 w-4 rounded-full bg-card border border-border flex items-center justify-center">
+                                                        <Icon className="h-3 w-3 text-muted-foreground" />
                                                     </span>
                                                     <div className="flex items-start justify-between gap-2">
-                                                        <div className="flex items-center gap-2 text-xs text-slate-500">
+                                                        <div className="flex items-center gap-2 text-xs text-muted-foreground">
                                                             <span>{createdDate ? formatDistanceToNow(createdDate, { addSuffix: true }) : ""}</span>
                                                             {item.kind === "communication" && (
                                                                 <span
@@ -633,12 +633,12 @@ export default function ReservationDetailPage() {
                                                             <Badge variant="outline" className="text-[10px] font-semibold">
                                                                 {item.kind === "playbook" ? "Playbook" : item.type}
                                                             </Badge>
-                                                            {item.kind === "playbook" && <span className="text-xs text-slate-600">{item.name}</span>}
+                                                            {item.kind === "playbook" && <span className="text-xs text-muted-foreground">{item.name}</span>}
                                                             {item.kind === "communication" && item.subject && (
-                                                                <span className="text-sm font-medium text-slate-900">{item.subject}</span>
+                                                                <span className="text-sm font-medium text-foreground">{item.subject}</span>
                                                             )}
                                                         </div>
-                                                        <div className="text-sm text-slate-700 line-clamp-2">
+                                                        <div className="text-sm text-foreground line-clamp-2">
                                                             {item.kind === "playbook"
                                                                 ? item.lastError
                                                                     ? `Attempts: ${item.attempts ?? 0} • Last error: ${item.lastError}`
@@ -646,7 +646,7 @@ export default function ReservationDetailPage() {
                                                                 : item.body}
                                                         </div>
                                                         {item.kind === "communication" && (
-                                                            <div className="text-xs text-slate-500">
+                                                            <div className="text-xs text-muted-foreground">
                                                                 {item.provider ? `Provider: ${item.provider}` : ""}
                                                                 {item.toAddress ? ` • To: ${item.toAddress}` : ""}
                                                                 {item.fromAddress ? ` • From: ${item.fromAddress}` : ""}

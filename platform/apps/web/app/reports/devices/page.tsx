@@ -72,7 +72,7 @@ export default function DeviceAnalyticsPage() {
       case "tablet":
         return "bg-purple-50 text-purple-700 border-purple-200";
       default:
-        return "bg-slate-50 text-slate-700 border-slate-200";
+        return "bg-muted text-foreground border-border";
     }
   };
 
@@ -92,8 +92,8 @@ export default function DeviceAnalyticsPage() {
 
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold text-slate-900">Device Analytics</h1>
-            <p className="text-slate-500 mt-1">
+            <h1 className="text-2xl font-bold text-foreground">Device Analytics</h1>
+            <p className="text-muted-foreground mt-1">
               Understand how guests access your booking page across devices
             </p>
           </div>
@@ -113,7 +113,7 @@ export default function DeviceAnalyticsPage() {
         {!campgroundId ? (
           <Card>
             <CardContent className="py-12 text-center">
-              <p className="text-slate-500">Select a campground to view device analytics.</p>
+              <p className="text-muted-foreground">Select a campground to view device analytics.</p>
             </CardContent>
           </Card>
         ) : isLoading ? (
@@ -133,12 +133,12 @@ export default function DeviceAnalyticsPage() {
               <Card>
                 <CardContent className="pt-6">
                   <div className="flex items-center gap-3">
-                    <div className="p-2 bg-slate-100 rounded-lg">
-                      <Users className="w-5 h-5 text-slate-600" />
+                    <div className="p-2 bg-muted rounded-lg">
+                      <Users className="w-5 h-5 text-muted-foreground" />
                     </div>
                     <div>
-                      <p className="text-sm text-slate-500">Total Sessions</p>
-                      <p className="text-2xl font-bold text-slate-900">{totalSessions.toLocaleString()}</p>
+                      <p className="text-sm text-muted-foreground">Total Sessions</p>
+                      <p className="text-2xl font-bold text-foreground">{totalSessions.toLocaleString()}</p>
                     </div>
                   </div>
                 </CardContent>
@@ -150,7 +150,7 @@ export default function DeviceAnalyticsPage() {
                       <ShoppingCart className="w-5 h-5 text-emerald-600" />
                     </div>
                     <div>
-                      <p className="text-sm text-slate-500">Total Bookings</p>
+                      <p className="text-sm text-muted-foreground">Total Bookings</p>
                       <p className="text-2xl font-bold text-emerald-600">{totalBookings.toLocaleString()}</p>
                     </div>
                   </div>
@@ -163,7 +163,7 @@ export default function DeviceAnalyticsPage() {
                       <Percent className="w-5 h-5 text-blue-600" />
                     </div>
                     <div>
-                      <p className="text-sm text-slate-500">Conversion Rate</p>
+                      <p className="text-sm text-muted-foreground">Conversion Rate</p>
                       <p className="text-2xl font-bold text-blue-600">{overallConversion}%</p>
                     </div>
                   </div>
@@ -176,7 +176,7 @@ export default function DeviceAnalyticsPage() {
                       <TrendingUp className="w-5 h-5 text-purple-600" />
                     </div>
                     <div>
-                      <p className="text-sm text-slate-500">Device Types</p>
+                      <p className="text-sm text-muted-foreground">Device Types</p>
                       <p className="text-2xl font-bold text-purple-600">{data?.devices?.length || 0}</p>
                     </div>
                   </div>
@@ -226,7 +226,7 @@ export default function DeviceAnalyticsPage() {
                     })}
                   </div>
                 ) : (
-                  <p className="text-center text-slate-500 py-8">No device data available for this period.</p>
+                  <p className="text-center text-muted-foreground py-8">No device data available for this period.</p>
                 )}
               </CardContent>
             </Card>

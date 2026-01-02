@@ -505,14 +505,14 @@ function QuestionBuilder({
   return (
     <div className="space-y-3">
       <div className="flex items-center justify-between">
-        <label className="text-sm font-medium text-slate-900">Questions</label>
-        <span className="text-xs text-slate-500">{questions.length} question{questions.length !== 1 ? "s" : ""}</span>
+        <label className="text-sm font-medium text-foreground">Questions</label>
+        <span className="text-xs text-muted-foreground">{questions.length} question{questions.length !== 1 ? "s" : ""}</span>
       </div>
 
       {questions.length === 0 ? (
-        <div className="rounded-lg border-2 border-dashed border-slate-200 bg-slate-50 p-6 text-center">
-          <FileQuestion className="h-8 w-8 mx-auto text-slate-300 mb-2" />
-          <p className="text-sm text-slate-600 mb-3">No questions yet</p>
+        <div className="rounded-lg border-2 border-dashed border-border bg-muted p-6 text-center">
+          <FileQuestion className="h-8 w-8 mx-auto text-muted-foreground mb-2" />
+          <p className="text-sm text-muted-foreground mb-3">No questions yet</p>
           <Button size="sm" variant="outline" onClick={addQuestion}>
             <Plus className="h-4 w-4 mr-1" />
             Add your first question
@@ -524,8 +524,8 @@ function QuestionBuilder({
             <div
               key={q.id}
               className={cn(
-                "rounded-lg border border-slate-200 bg-white p-3",
-                "transition-all duration-200 hover:border-slate-300"
+                "rounded-lg border border-border bg-card p-3",
+                "transition-all duration-200 hover:border-border"
               )}
             >
               <div className="flex items-start gap-2">
@@ -535,24 +535,24 @@ function QuestionBuilder({
                     onClick={() => moveQuestion(q.id, "up")}
                     disabled={index === 0}
                     className={cn(
-                      "p-0.5 rounded hover:bg-slate-100 transition-colors",
+                      "p-0.5 rounded hover:bg-muted transition-colors",
                       index === 0 && "opacity-30 cursor-not-allowed"
                     )}
                     aria-label="Move question up"
                   >
-                    <ChevronUp className="h-4 w-4 text-slate-400" />
+                    <ChevronUp className="h-4 w-4 text-muted-foreground" />
                   </button>
                   <button
                     type="button"
                     onClick={() => moveQuestion(q.id, "down")}
                     disabled={index === questions.length - 1}
                     className={cn(
-                      "p-0.5 rounded hover:bg-slate-100 transition-colors",
+                      "p-0.5 rounded hover:bg-muted transition-colors",
                       index === questions.length - 1 && "opacity-30 cursor-not-allowed"
                     )}
                     aria-label="Move question down"
                   >
-                    <ChevronDown className="h-4 w-4 text-slate-400" />
+                    <ChevronDown className="h-4 w-4 text-muted-foreground" />
                   </button>
                 </div>
 
@@ -578,7 +578,7 @@ function QuestionBuilder({
                         {questionTypes.map((type) => (
                           <SelectItem key={type.value} value={type.value}>
                             <div className="flex items-center gap-2">
-                              <type.icon className="h-4 w-4 text-slate-500" />
+                              <type.icon className="h-4 w-4 text-muted-foreground" />
                               <span>{type.label}</span>
                             </div>
                           </SelectItem>
@@ -588,11 +588,11 @@ function QuestionBuilder({
                   </div>
 
                   {q.type === "select" && (
-                    <div className="pl-4 border-l-2 border-slate-100 space-y-1.5">
-                      <div className="text-xs text-slate-500 font-medium">Dropdown options:</div>
+                    <div className="pl-4 border-l-2 border-border space-y-1.5">
+                      <div className="text-xs text-muted-foreground font-medium">Dropdown options:</div>
                       {(q.options || []).map((opt, optIdx) => (
                         <div key={optIdx} className="flex items-center gap-1.5">
-                          <span className="text-xs text-slate-400 w-4">{optIdx + 1}.</span>
+                          <span className="text-xs text-muted-foreground w-4">{optIdx + 1}.</span>
                           <Input
                             value={opt}
                             onChange={(e) => updateOption(q.id, optIdx, e.target.value)}
@@ -602,7 +602,7 @@ function QuestionBuilder({
                           <button
                             type="button"
                             onClick={() => removeOption(q.id, optIdx)}
-                            className="p-1 rounded hover:bg-status-error/15 text-slate-400 hover:text-status-error transition-colors"
+                            className="p-1 rounded hover:bg-status-error/15 text-muted-foreground hover:text-status-error transition-colors"
                             aria-label="Remove option"
                           >
                             <X className="h-3.5 w-3.5" />
@@ -627,7 +627,7 @@ function QuestionBuilder({
                         onCheckedChange={(checked) => updateQuestion(q.id, { required: checked })}
                         id={`required-${q.id}`}
                       />
-                      <label htmlFor={`required-${q.id}`} className="text-xs text-slate-600">
+                      <label htmlFor={`required-${q.id}`} className="text-xs text-muted-foreground">
                         Required
                       </label>
                     </div>
@@ -637,7 +637,7 @@ function QuestionBuilder({
                 <button
                   type="button"
                   onClick={() => removeQuestion(q.id)}
-                  className="p-1.5 rounded hover:bg-status-error/15 text-slate-400 hover:text-status-error transition-colors"
+                  className="p-1.5 rounded hover:bg-status-error/15 text-muted-foreground hover:text-status-error transition-colors"
                   aria-label="Delete question"
                 >
                   <Trash2 className="h-4 w-4" />
@@ -678,10 +678,10 @@ function FormSettings({
       <div className="space-y-3">
         <div className="flex items-center gap-2">
           <Zap className="h-4 w-4 text-amber-500" />
-          <label className="text-sm font-medium text-slate-900">Auto-attach to bookings</label>
+          <label className="text-sm font-medium text-foreground">Auto-attach to bookings</label>
         </div>
         <div className="grid gap-2">
-          <label className="flex items-start gap-3 p-3 rounded-lg border border-slate-200 cursor-pointer hover:bg-slate-50 transition-colors">
+          <label className="flex items-start gap-3 p-3 rounded-lg border border-border cursor-pointer hover:bg-muted transition-colors">
             <input
               type="radio"
               name="autoAttachMode"
@@ -690,11 +690,11 @@ function FormSettings({
               className="mt-1"
             />
             <div>
-              <div className="font-medium text-sm text-slate-900">Manual only</div>
-              <div className="text-xs text-slate-500">Only attach when you manually select it</div>
+              <div className="font-medium text-sm text-foreground">Manual only</div>
+              <div className="text-xs text-muted-foreground">Only attach when you manually select it</div>
             </div>
           </label>
-          <label className="flex items-start gap-3 p-3 rounded-lg border border-slate-200 cursor-pointer hover:bg-slate-50 transition-colors">
+          <label className="flex items-start gap-3 p-3 rounded-lg border border-border cursor-pointer hover:bg-muted transition-colors">
             <input
               type="radio"
               name="autoAttachMode"
@@ -703,11 +703,11 @@ function FormSettings({
               className="mt-1"
             />
             <div>
-              <div className="font-medium text-sm text-slate-900">All bookings</div>
-              <div className="text-xs text-slate-500">Automatically attach to every booking</div>
+              <div className="font-medium text-sm text-foreground">All bookings</div>
+              <div className="text-xs text-muted-foreground">Automatically attach to every booking</div>
             </div>
           </label>
-          <label className="flex items-start gap-3 p-3 rounded-lg border border-slate-200 cursor-pointer hover:bg-slate-50 transition-colors">
+          <label className="flex items-start gap-3 p-3 rounded-lg border border-border cursor-pointer hover:bg-muted transition-colors">
             <input
               type="radio"
               name="autoAttachMode"
@@ -716,22 +716,22 @@ function FormSettings({
               className="mt-1"
             />
             <div className="flex-1">
-              <div className="font-medium text-sm text-slate-900">Specific site types</div>
-              <div className="text-xs text-slate-500">Only for selected accommodation types</div>
+              <div className="font-medium text-sm text-foreground">Specific site types</div>
+              <div className="text-xs text-muted-foreground">Only for selected accommodation types</div>
             </div>
           </label>
         </div>
 
         {/* Site Class Selection */}
         {form.autoAttachMode === "site_classes" && (
-          <div className="ml-6 p-3 rounded-lg border border-slate-200 bg-slate-50 space-y-2">
-            <div className="text-xs font-medium text-slate-700">Select site types:</div>
+          <div className="ml-6 p-3 rounded-lg border border-border bg-muted space-y-2">
+            <div className="text-xs font-medium text-foreground">Select site types:</div>
             {siteClassesLoading ? (
-              <div className="text-xs text-slate-500">Loading site classes...</div>
+              <div className="text-xs text-muted-foreground">Loading site classes...</div>
             ) : siteClassesError ? (
               <div className="text-xs text-status-error">Error loading site classes: {String(siteClassesError)}</div>
             ) : siteClasses.length === 0 ? (
-              <div className="text-xs text-slate-500">No site types found. Create site classes first.</div>
+              <div className="text-xs text-muted-foreground">No site types found. Create site classes first.</div>
             ) : (
               <div className="grid gap-1.5">
                 {siteClasses.map((sc) => (
@@ -746,7 +746,7 @@ function FormSettings({
                         }
                       }}
                     />
-                    <span className="text-sm text-slate-700">{sc.name}</span>
+                    <span className="text-sm text-foreground">{sc.name}</span>
                   </label>
                 ))}
               </div>
@@ -759,11 +759,11 @@ function FormSettings({
       <div className="space-y-3">
         <div className="flex items-center gap-2">
           <Calendar className="h-4 w-4 text-blue-500" />
-          <label className="text-sm font-medium text-slate-900">When to show this form</label>
+          <label className="text-sm font-medium text-foreground">When to show this form</label>
         </div>
         <div className="grid gap-2">
           {showAtOptions.map((option) => (
-            <label key={option.value} className="flex items-start gap-3 p-3 rounded-lg border border-slate-200 cursor-pointer hover:bg-slate-50 transition-colors">
+            <label key={option.value} className="flex items-start gap-3 p-3 rounded-lg border border-border cursor-pointer hover:bg-muted transition-colors">
               <Checkbox
                 checked={form.showAt.includes(option.value)}
                 onCheckedChange={(checked) => {
@@ -776,10 +776,10 @@ function FormSettings({
               />
               <div className="flex-1">
                 <div className="flex items-center gap-2">
-                  <option.icon className="h-4 w-4 text-slate-400" />
-                  <span className="font-medium text-sm text-slate-900">{option.label}</span>
+                  <option.icon className="h-4 w-4 text-muted-foreground" />
+                  <span className="font-medium text-sm text-foreground">{option.label}</span>
                 </div>
-                <div className="text-xs text-slate-500">{option.description}</div>
+                <div className="text-xs text-muted-foreground">{option.description}</div>
               </div>
             </label>
           ))}
@@ -790,13 +790,13 @@ function FormSettings({
       <div className="space-y-3">
         <div className="flex items-center gap-2">
           <CheckCircle2 className="h-4 w-4 text-emerald-500" />
-          <label className="text-sm font-medium text-slate-900">Completion requirements</label>
+          <label className="text-sm font-medium text-foreground">Completion requirements</label>
         </div>
-        <div className="space-y-3 p-3 rounded-lg border border-slate-200">
+        <div className="space-y-3 p-3 rounded-lg border border-border">
           <div className="flex items-center justify-between">
             <div>
-              <div className="text-sm font-medium text-slate-900">Required to complete</div>
-              <div className="text-xs text-slate-500">Guest must fill out this form</div>
+              <div className="text-sm font-medium text-foreground">Required to complete</div>
+              <div className="text-xs text-muted-foreground">Guest must fill out this form</div>
             </div>
             <Switch
               checked={form.isRequired}
@@ -804,10 +804,10 @@ function FormSettings({
             />
           </div>
           {form.isRequired && (
-            <div className="flex items-center justify-between pt-2 border-t border-slate-100">
+            <div className="flex items-center justify-between pt-2 border-t border-border">
               <div>
-                <div className="text-sm font-medium text-slate-900">Allow skip with note</div>
-                <div className="text-xs text-slate-500">Guest can skip but must provide reason</div>
+                <div className="text-sm font-medium text-foreground">Allow skip with note</div>
+                <div className="text-xs text-muted-foreground">Guest can skip but must provide reason</div>
               </div>
               <Switch
                 checked={form.allowSkipWithNote}
@@ -822,13 +822,13 @@ function FormSettings({
       <div className="space-y-3">
         <div className="flex items-center gap-2">
           <RefreshCw className="h-4 w-4 text-purple-500" />
-          <label className="text-sm font-medium text-slate-900">Form validity</label>
+          <label className="text-sm font-medium text-foreground">Form validity</label>
         </div>
-        <div className="space-y-3 p-3 rounded-lg border border-slate-200">
+        <div className="space-y-3 p-3 rounded-lg border border-border">
           <div className="flex items-center justify-between">
             <div>
-              <div className="text-sm font-medium text-slate-900">Expires after</div>
-              <div className="text-xs text-slate-500">Require re-signing after period</div>
+              <div className="text-sm font-medium text-foreground">Expires after</div>
+              <div className="text-xs text-muted-foreground">Require re-signing after period</div>
             </div>
             <Select
               value={form.validityDays?.toString() || "never"}
@@ -853,13 +853,13 @@ function FormSettings({
       <div className="space-y-3">
         <div className="flex items-center gap-2">
           <Bell className="h-4 w-4 text-orange-500" />
-          <label className="text-sm font-medium text-slate-900">Reminders</label>
+          <label className="text-sm font-medium text-foreground">Reminders</label>
         </div>
-        <div className="space-y-3 p-3 rounded-lg border border-slate-200">
+        <div className="space-y-3 p-3 rounded-lg border border-border">
           <div className="flex items-center justify-between">
             <div>
-              <div className="text-sm font-medium text-slate-900">Send email reminder</div>
-              <div className="text-xs text-slate-500">Remind guests to complete before arrival</div>
+              <div className="text-sm font-medium text-foreground">Send email reminder</div>
+              <div className="text-xs text-muted-foreground">Remind guests to complete before arrival</div>
             </div>
             <Switch
               checked={form.sendReminder}
@@ -867,8 +867,8 @@ function FormSettings({
             />
           </div>
           {form.sendReminder && (
-            <div className="flex items-center justify-between pt-2 border-t border-slate-100">
-              <div className="text-sm text-slate-700">Days before check-in</div>
+            <div className="flex items-center justify-between pt-2 border-t border-border">
+              <div className="text-sm text-foreground">Days before check-in</div>
               <Select
                 value={form.reminderDaysBefore?.toString() || "1"}
                 onValueChange={(v) => onChange({ reminderDaysBefore: parseInt(v) })}
@@ -892,16 +892,16 @@ function FormSettings({
       <div className="space-y-3">
         <div className="flex items-center gap-2">
           <Settings2 className="h-4 w-4 text-indigo-500" />
-          <label className="text-sm font-medium text-slate-900">Conditional display</label>
+          <label className="text-sm font-medium text-foreground">Conditional display</label>
         </div>
-        <div className="text-xs text-slate-500 -mt-1">
+        <div className="text-xs text-muted-foreground -mt-1">
           Only show this form when certain conditions are met
         </div>
 
-        <div className="space-y-3 p-3 rounded-lg border border-slate-200">
+        <div className="space-y-3 p-3 rounded-lg border border-border">
           {form.displayConditions.length === 0 ? (
             <div className="text-center py-4">
-              <div className="text-sm text-slate-500 mb-2">No conditions set - form shows for all bookings</div>
+              <div className="text-sm text-muted-foreground mb-2">No conditions set - form shows for all bookings</div>
               <Button
                 type="button"
                 variant="outline"
@@ -924,8 +924,8 @@ function FormSettings({
             <>
               {/* Condition Logic Toggle */}
               {form.displayConditions.length > 1 && (
-                <div className="flex items-center gap-2 pb-2 border-b border-slate-100">
-                  <span className="text-xs text-slate-500">Show when</span>
+                <div className="flex items-center gap-2 pb-2 border-b border-border">
+                  <span className="text-xs text-muted-foreground">Show when</span>
                   <Select
                     value={form.conditionLogic}
                     onValueChange={(v) => onChange({ conditionLogic: v as "all" | "any" })}
@@ -949,7 +949,7 @@ function FormSettings({
                   const operators = conditionOperators[operatorType as keyof typeof conditionOperators] || conditionOperators.text;
 
                   return (
-                    <div key={condition.id} className="flex items-center gap-2 p-2 rounded bg-slate-50">
+                    <div key={condition.id} className="flex items-center gap-2 p-2 rounded bg-muted">
                       {/* Field Select */}
                       <Select
                         value={condition.field}
@@ -1064,7 +1064,7 @@ function FormSettings({
                         type="button"
                         variant="ghost"
                         size="sm"
-                        className="h-8 w-8 p-0 text-slate-400 hover:text-status-error"
+                        className="h-8 w-8 p-0 text-muted-foreground hover:text-status-error"
                         onClick={() => {
                           onChange({
                             displayConditions: form.displayConditions.filter((_, i) => i !== index)
@@ -1083,7 +1083,7 @@ function FormSettings({
                 type="button"
                 variant="ghost"
                 size="sm"
-                className="w-full text-slate-600"
+                className="w-full text-muted-foreground"
                 onClick={() => {
                   const newCondition: DisplayCondition = {
                     id: generateId(),
@@ -1212,14 +1212,14 @@ function ManualAttach({
   return (
     <div className="space-y-4">
       <div className="flex items-center gap-2 mb-2">
-        <Link2 className="h-5 w-5 text-slate-400" />
-        <h3 className="font-semibold text-slate-900">Attach form manually</h3>
+        <Link2 className="h-5 w-5 text-muted-foreground" />
+        <h3 className="font-semibold text-foreground">Attach form manually</h3>
       </div>
 
       <div className="grid md:grid-cols-2 gap-4">
         {/* Select Form */}
         <div className="space-y-2">
-          <label className="text-sm font-medium text-slate-700">Select form</label>
+          <label className="text-sm font-medium text-foreground">Select form</label>
           <Select value={selectedTemplate} onValueChange={setSelectedTemplate}>
             <SelectTrigger>
               <SelectValue placeholder="Choose a form..." />
@@ -1239,7 +1239,7 @@ function ManualAttach({
 
         {/* Search Type */}
         <div className="space-y-2">
-          <label className="text-sm font-medium text-slate-700">Attach to</label>
+          <label className="text-sm font-medium text-foreground">Attach to</label>
           <div className="flex gap-2">
             <Button
               type="button"
@@ -1267,11 +1267,11 @@ function ManualAttach({
 
       {/* Search */}
       <div className="space-y-2">
-        <label className="text-sm font-medium text-slate-700">
+        <label className="text-sm font-medium text-foreground">
           {searchType === "reservation" ? "Search reservations" : "Search guests"}
         </label>
         <div className="relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
@@ -1284,7 +1284,7 @@ function ManualAttach({
         {searchQuery && (
           <div className="border rounded-lg divide-y max-h-48 overflow-y-auto">
             {filteredResults.length === 0 ? (
-              <div className="p-3 text-sm text-slate-500 text-center">No results found</div>
+              <div className="p-3 text-sm text-muted-foreground text-center">No results found</div>
             ) : (
               filteredResults.map((item: any) => (
                 <button
@@ -1292,25 +1292,25 @@ function ManualAttach({
                   type="button"
                   onClick={() => setSelectedId(item.id)}
                   className={cn(
-                    "w-full p-3 text-left hover:bg-slate-50 transition-colors",
+                    "w-full p-3 text-left hover:bg-muted transition-colors",
                     selectedId === item.id && "bg-status-success/15"
                   )}
                 >
                   {searchType === "reservation" ? (
                     <div>
-                      <div className="font-medium text-sm text-slate-900">
+                      <div className="font-medium text-sm text-foreground">
                         #{item.confirmationNumber} - {item.guest?.firstName} {item.guest?.lastName}
                       </div>
-                      <div className="text-xs text-slate-500">
+                      <div className="text-xs text-muted-foreground">
                         {new Date(item.startDate).toLocaleDateString()} - {new Date(item.endDate).toLocaleDateString()}
                       </div>
                     </div>
                   ) : (
                     <div>
-                      <div className="font-medium text-sm text-slate-900">
+                      <div className="font-medium text-sm text-foreground">
                         {item.firstName} {item.lastName}
                       </div>
-                      <div className="text-xs text-slate-500">{item.email}</div>
+                      <div className="text-xs text-muted-foreground">{item.email}</div>
                     </div>
                   )}
                 </button>
@@ -1347,7 +1347,7 @@ function ManualAttach({
 // Loading skeleton
 function FormCardSkeleton() {
   return (
-    <div className="rounded-lg border border-slate-200 bg-white p-4">
+    <div className="rounded-lg border border-border bg-card p-4">
       <div className="flex items-center justify-between">
         <div className="space-y-2 flex-1">
           <div className="flex items-center gap-2">
@@ -1370,12 +1370,12 @@ function FirstFormCelebration({ open, onClose, formName }: { open: boolean; onCl
   if (!open) return null;
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/20 backdrop-blur-sm">
-      <div className="bg-white rounded-2xl shadow-2xl p-8 text-center motion-safe:animate-in motion-safe:zoom-in-95 motion-safe:fade-in duration-300 max-w-md mx-4">
+      <div className="bg-card rounded-2xl shadow-2xl p-8 text-center motion-safe:animate-in motion-safe:zoom-in-95 motion-safe:fade-in duration-300 max-w-md mx-4">
         <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-status-success text-white mb-4 motion-safe:animate-bounce">
           <PartyPopper className="h-8 w-8" />
         </div>
-        <h3 className="text-xl font-bold text-slate-900 mb-2">Your First Form is Ready!</h3>
-        <p className="text-slate-600 mb-6">
+        <h3 className="text-xl font-bold text-foreground mb-2">Your First Form is Ready!</h3>
+        <p className="text-muted-foreground mb-6">
           <span className="font-medium text-status-success">{formName}</span> is now available.
         </p>
         <Button onClick={onClose} className="bg-status-success hover:bg-status-success/90">Got it!</Button>
@@ -1393,17 +1393,17 @@ function FormPreview({ open, onClose, form }: { open: boolean; onClose: () => vo
       <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
-            <Eye className="h-5 w-5 text-slate-400" />
+            <Eye className="h-5 w-5 text-muted-foreground" />
             Preview: {form.title}
           </DialogTitle>
         </DialogHeader>
-        <div className="border rounded-lg p-4 bg-slate-50 space-y-4">
+        <div className="border rounded-lg p-4 bg-muted space-y-4">
           <div className="text-center pb-3 border-b">
             <h3 className="font-semibold">{form.title}</h3>
-            {form.description && <p className="text-sm text-slate-600 mt-1">{form.description}</p>}
+            {form.description && <p className="text-sm text-muted-foreground mt-1">{form.description}</p>}
           </div>
           {questions.length === 0 ? (
-            <div className="text-center py-6 text-slate-500 text-sm">No questions</div>
+            <div className="text-center py-6 text-muted-foreground text-sm">No questions</div>
           ) : (
             questions.map((q: any, idx: number) => (
               <div key={idx} className="space-y-1.5">
@@ -1414,17 +1414,17 @@ function FormPreview({ open, onClose, form }: { open: boolean; onClose: () => vo
                 {q.type === "checkbox" ? (
                   <div className="flex items-center gap-2">
                     <input type="checkbox" disabled className="h-4 w-4" />
-                    <span className="text-sm text-slate-600">I agree</span>
+                    <span className="text-sm text-muted-foreground">I agree</span>
                   </div>
                 ) : q.type === "select" ? (
-                  <select disabled className="w-full px-3 py-2 text-sm border rounded-md bg-white">
+                  <select disabled className="w-full px-3 py-2 text-sm border rounded-md bg-card">
                     <option>Select...</option>
                     {q.options?.map((opt: string) => <option key={opt}>{opt}</option>)}
                   </select>
                 ) : q.type === "textarea" ? (
-                  <textarea disabled className="w-full px-3 py-2 text-sm border rounded-md bg-white" rows={2} />
+                  <textarea disabled className="w-full px-3 py-2 text-sm border rounded-md bg-card" rows={2} />
                 ) : (
-                  <input type="text" disabled className="w-full px-3 py-2 text-sm border rounded-md bg-white" />
+                  <input type="text" disabled className="w-full px-3 py-2 text-sm border rounded-md bg-card" />
                 )}
               </div>
             ))
@@ -1441,14 +1441,14 @@ function FormPreview({ open, onClose, form }: { open: boolean; onClose: () => vo
 // Empty state
 function EmptyFormsState({ onCreateClick, onTemplateClick }: { onCreateClick: () => void; onTemplateClick: (t: any) => void; }) {
   return (
-    <div className="relative overflow-hidden rounded-xl border-2 border-dashed border-slate-200 bg-muted p-8">
+    <div className="relative overflow-hidden rounded-xl border-2 border-dashed border-border bg-muted p-8">
       <div className="absolute top-0 right-0 w-48 h-48 bg-status-success/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
       <div className="relative text-center mb-8">
         <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-status-success/15 text-status-success mb-4">
           <FileText className="h-8 w-8" />
         </div>
-        <h3 className="text-xl font-bold text-slate-900 mb-2">Create Your First Form</h3>
-        <p className="text-slate-600 max-w-md mx-auto">
+        <h3 className="text-xl font-bold text-foreground mb-2">Create Your First Form</h3>
+        <p className="text-muted-foreground max-w-md mx-auto">
           Collect waivers, vehicle info, and custom questions from guests.
         </p>
       </div>
@@ -1457,13 +1457,13 @@ function EmptyFormsState({ onCreateClick, onTemplateClick }: { onCreateClick: ()
           <button
             key={t.name}
             onClick={() => onTemplateClick(t)}
-            className="group p-4 rounded-lg border-2 border-slate-200 bg-white text-left transition-all duration-200 hover:border-emerald-300 hover:shadow-md hover:-translate-y-0.5"
+            className="group p-4 rounded-lg border-2 border-border bg-card text-left transition-all duration-200 hover:border-emerald-300 hover:shadow-md hover:-translate-y-0.5"
           >
-            <div className="inline-flex items-center justify-center w-10 h-10 rounded-lg mb-3 bg-slate-100 text-slate-600 group-hover:bg-status-success/15 group-hover:text-status-success transition-colors">
+            <div className="inline-flex items-center justify-center w-10 h-10 rounded-lg mb-3 bg-muted text-muted-foreground group-hover:bg-status-success/15 group-hover:text-status-success transition-colors">
               {t.icon}
             </div>
-            <div className="font-medium text-slate-900 mb-1">{t.name}</div>
-            <div className="text-xs text-slate-500">{t.description}</div>
+            <div className="font-medium text-foreground mb-1">{t.name}</div>
+            <div className="text-xs text-muted-foreground">{t.description}</div>
           </button>
         ))}
       </div>
@@ -1784,7 +1784,7 @@ export default function FormsPage() {
               Delete Form Template?
             </AlertDialogTitle>
             <AlertDialogDescription>
-              Are you sure you want to delete <span className="font-medium text-slate-900">{formToDelete?.title}</span>?
+              Are you sure you want to delete <span className="font-medium text-foreground">{formToDelete?.title}</span>?
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
@@ -1862,14 +1862,14 @@ export default function FormsPage() {
                   <div
                     key={t.id}
                     className={cn(
-                      "rounded-lg border border-slate-200 bg-white p-4",
-                      "transition-all duration-200 hover:shadow-md hover:border-slate-300"
+                      "rounded-lg border border-border bg-card p-4",
+                      "transition-all duration-200 hover:shadow-md hover:border-border"
                     )}
                   >
                     <div className="flex items-center justify-between">
                       <div className="space-y-1.5">
                         <div className="flex items-center gap-2 flex-wrap">
-                          <span className="text-sm font-semibold text-slate-900">{t.title}</span>
+                          <span className="text-sm font-semibold text-foreground">{t.title}</span>
                           <Badge variant="secondary" className="uppercase flex items-center gap-1">
                             {typeIcons[t.type] || <FileText className="h-4 w-4" />}
                             {typeConfig[t.type]?.label || t.type}
@@ -1883,8 +1883,8 @@ export default function FormsPage() {
                             {t.isActive ? "Active" : "Inactive"}
                           </Badge>
                         </div>
-                        {t.description && <div className="text-sm text-slate-600">{t.description}</div>}
-                        <div className="flex items-center gap-3 text-xs text-slate-500">
+                        {t.description && <div className="text-sm text-muted-foreground">{t.description}</div>}
+                        <div className="flex items-center gap-3 text-xs text-muted-foreground">
                           <span>{t.fields?.questions?.length || 0} questions</span>
                           {isLegalDocumentType(t.type) && t.documentContent && (
                             <>
@@ -1904,7 +1904,7 @@ export default function FormsPage() {
                           <Edit3 className="h-4 w-4 mr-1" />
                           Edit
                         </Button>
-                        <Button size="sm" variant="ghost" onClick={() => setDeleteConfirmId(t.id)} className="text-slate-500 hover:text-status-error hover:bg-status-error/15">
+                        <Button size="sm" variant="ghost" onClick={() => setDeleteConfirmId(t.id)} className="text-muted-foreground hover:text-status-error hover:bg-status-error/15">
                           <Trash2 className="h-4 w-4" />
                         </Button>
                       </div>
@@ -1967,10 +1967,10 @@ export default function FormsPage() {
               <TabsContent value="questions" className="mt-0 space-y-5">
                 {!editingId && (
                   <div className="space-y-3">
-                    <label className="text-sm font-medium text-slate-900">Start with a template</label>
+                    <label className="text-sm font-medium text-foreground">Start with a template</label>
                     {/* Data Collection Templates */}
                     <div>
-                      <div className="text-xs font-medium text-slate-500 uppercase tracking-wide mb-2">Data Collection</div>
+                      <div className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2">Data Collection</div>
                       <div className="flex flex-wrap gap-2">
                         {starterTemplates.filter(t => t.category === "collection").map((t) => (
                           <button
@@ -1989,7 +1989,7 @@ export default function FormsPage() {
                             }))}
                             className={cn(
                               "inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium border",
-                              form.title === t.name ? "border-status-success/30 bg-status-success/15 text-status-success" : "border-slate-200 bg-slate-50 text-slate-600 hover:border-status-success/30"
+                              form.title === t.name ? "border-status-success/30 bg-status-success/15 text-status-success" : "border-border bg-muted text-muted-foreground hover:border-status-success/30"
                             )}
                           >
                             {t.icon}
@@ -2000,7 +2000,7 @@ export default function FormsPage() {
                     </div>
                     {/* Legal Document Templates */}
                     <div>
-                      <div className="text-xs font-medium text-slate-500 uppercase tracking-wide mb-2">Legal Documents</div>
+                      <div className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2">Legal Documents</div>
                       <div className="flex flex-wrap gap-2">
                         {starterTemplates.filter(t => t.category === "legal").map((t) => (
                           <button
@@ -2020,7 +2020,7 @@ export default function FormsPage() {
                             }))}
                             className={cn(
                               "inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium border",
-                              form.title === t.name ? "border-blue-400 bg-blue-50 text-blue-700" : "border-slate-200 bg-slate-50 text-slate-600 hover:border-blue-300"
+                              form.title === t.name ? "border-blue-400 bg-blue-50 text-blue-700" : "border-border bg-muted text-muted-foreground hover:border-blue-300"
                             )}
                           >
                             {t.icon}
@@ -2034,7 +2034,7 @@ export default function FormsPage() {
 
                 <div className="grid md:grid-cols-2 gap-3">
                   <div className="space-y-2">
-                    <label className="text-sm font-medium text-slate-900">
+                    <label className="text-sm font-medium text-foreground">
                       {isLegalDocumentType(form.type) ? "Document name" : "Form name"}
                     </label>
                     <Input
@@ -2044,15 +2044,15 @@ export default function FormsPage() {
                     />
                   </div>
                   <div className="space-y-2">
-                    <label className="text-sm font-medium text-slate-900">Type</label>
+                    <label className="text-sm font-medium text-foreground">Type</label>
                     <Select value={form.type} onValueChange={(v) => setForm(f => ({ ...f, type: v as FormType }))}>
                       <SelectTrigger><SelectValue /></SelectTrigger>
                       <SelectContent>
-                        <div className="px-2 py-1.5 text-xs font-medium text-slate-500">Data Collection</div>
+                        <div className="px-2 py-1.5 text-xs font-medium text-muted-foreground">Data Collection</div>
                         <SelectItem value="vehicle"><span className="flex items-center gap-2"><Car className="h-4 w-4" /> Vehicle Info</span></SelectItem>
                         <SelectItem value="intake"><span className="flex items-center gap-2"><ClipboardList className="h-4 w-4" /> Guest Intake</span></SelectItem>
                         <SelectItem value="custom"><span className="flex items-center gap-2"><FileQuestion className="h-4 w-4" /> Custom Form</span></SelectItem>
-                        <div className="px-2 py-1.5 text-xs font-medium text-slate-500 border-t mt-1 pt-2">Legal Documents</div>
+                        <div className="px-2 py-1.5 text-xs font-medium text-muted-foreground border-t mt-1 pt-2">Legal Documents</div>
                         <SelectItem value="park_rules"><span className="flex items-center gap-2"><ScrollText className="h-4 w-4" /> Park Rules</span></SelectItem>
                         <SelectItem value="liability_waiver"><span className="flex items-center gap-2"><Scale className="h-4 w-4" /> Liability Waiver</span></SelectItem>
                         <SelectItem value="long_term_stay"><span className="flex items-center gap-2"><FileSignature className="h-4 w-4" /> Long-Term Stay</span></SelectItem>
@@ -2063,7 +2063,7 @@ export default function FormsPage() {
                 </div>
 
                 <div className="space-y-2">
-                  <label className="text-sm font-medium text-slate-900">Description <span className="text-slate-400 font-normal">(optional)</span></label>
+                  <label className="text-sm font-medium text-foreground">Description <span className="text-muted-foreground font-normal">(optional)</span></label>
                   <Input
                     value={form.description}
                     onChange={(e) => setForm(f => ({ ...f, description: e.target.value }))}
@@ -2075,10 +2075,10 @@ export default function FormsPage() {
                 {isLegalDocumentType(form.type) && (
                   <div className="space-y-2">
                     <div className="flex items-center justify-between">
-                      <label className="text-sm font-medium text-slate-900">
+                      <label className="text-sm font-medium text-foreground">
                         Document Content
                       </label>
-                      <span className="text-xs text-slate-500">Supports Markdown formatting</span>
+                      <span className="text-xs text-muted-foreground">Supports Markdown formatting</span>
                     </div>
                     <Textarea
                       value={form.documentContent || ""}
@@ -2087,7 +2087,7 @@ export default function FormsPage() {
                       rows={12}
                       className="font-mono text-sm"
                     />
-                    <p className="text-xs text-slate-500">
+                    <p className="text-xs text-muted-foreground">
                       This text will be displayed to guests before they sign. You can add acknowledgement questions below.
                     </p>
                   </div>
@@ -2107,7 +2107,7 @@ export default function FormsPage() {
                           value={form.enforcement || "post_booking"}
                           onValueChange={(v: EnforcementType) => setForm(f => ({ ...f, enforcement: v }))}
                         >
-                          <SelectTrigger className="bg-white">
+                          <SelectTrigger className="bg-card">
                             <SelectValue />
                           </SelectTrigger>
                           <SelectContent>
@@ -2153,7 +2153,7 @@ export default function FormsPage() {
           <div className="flex items-center justify-between pt-4 border-t">
             <div className="flex items-center gap-2">
               <Switch checked={form.isActive} onCheckedChange={(checked) => setForm(f => ({ ...f, isActive: checked }))} id="form-active" />
-              <label htmlFor="form-active" className="text-sm text-slate-700">Active</label>
+              <label htmlFor="form-active" className="text-sm text-foreground">Active</label>
             </div>
             <div className="flex gap-2">
               <Button variant="outline" onClick={() => { setIsModalOpen(false); setEditingId(null); }}>Cancel</Button>

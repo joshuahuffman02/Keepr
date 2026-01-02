@@ -123,7 +123,7 @@ export default function AnnouncementsPage() {
             <div className="flex items-center justify-between">
                 <div>
                     <h1 className="text-2xl font-bold text-white">Platform Announcements</h1>
-                    <p className="text-slate-400 mt-1">
+                    <p className="text-muted-foreground mt-1">
                         Broadcast messages to staff across all campgrounds
                     </p>
                 </div>
@@ -131,7 +131,7 @@ export default function AnnouncementsPage() {
                     <button
                         onClick={loadAnnouncements}
                         disabled={loading}
-                        className="p-2 bg-slate-800 text-slate-300 border border-slate-700 rounded-lg hover:bg-slate-700 disabled:opacity-50 transition-colors"
+                        className="p-2 bg-muted text-muted-foreground border border-border rounded-lg hover:bg-muted disabled:opacity-50 transition-colors"
                     >
                         <RefreshCw className={`h-4 w-4 ${loading ? "animate-spin" : ""}`} />
                     </button>
@@ -153,34 +153,34 @@ export default function AnnouncementsPage() {
 
             {/* New Announcement Form */}
             {showNew && (
-                <div className="bg-slate-800 rounded-lg border border-slate-700 p-6 space-y-4">
+                <div className="bg-muted rounded-lg border border-border p-6 space-y-4">
                     <div className="flex items-center justify-between">
                         <h2 className="text-lg font-semibold text-white">Create Announcement</h2>
-                        <button onClick={() => setShowNew(false)} className="text-slate-400 hover:text-white">
+                        <button onClick={() => setShowNew(false)} className="text-muted-foreground hover:text-white">
                             <X className="h-5 w-5" />
                         </button>
                     </div>
                     <div className="grid gap-4 md:grid-cols-2">
                         <div>
-                            <label className="block text-sm text-slate-400 mb-1">Title</label>
+                            <label className="block text-sm text-muted-foreground mb-1">Title</label>
                             <input
                                 type="text"
                                 value={newAnnouncement.title}
                                 onChange={(e) => setNewAnnouncement({ ...newAnnouncement, title: e.target.value })}
-                                className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                className="w-full px-3 py-2 bg-muted border border-border rounded-lg text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-blue-500"
                                 placeholder="Announcement title"
                             />
                         </div>
                         <div className="flex gap-4">
                             <div className="flex-1">
-                                <label className="block text-sm text-slate-400 mb-1">Type</label>
+                                <label className="block text-sm text-muted-foreground mb-1">Type</label>
                                 <select
                                     value={newAnnouncement.type}
                                     onChange={(e) => {
                                         const value = e.target.value as AnnouncementType;
                                         setNewAnnouncement({ ...newAnnouncement, type: value });
                                     }}
-                                    className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    className="w-full px-3 py-2 bg-muted border border-border rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-blue-500"
                                 >
                                     <option value="info">Info</option>
                                     <option value="warning">Warning</option>
@@ -188,14 +188,14 @@ export default function AnnouncementsPage() {
                                 </select>
                             </div>
                             <div className="flex-1">
-                                <label className="block text-sm text-slate-400 mb-1">Target</label>
+                                <label className="block text-sm text-muted-foreground mb-1">Target</label>
                                 <select
                                     value={newAnnouncement.target}
                                     onChange={(e) => {
                                         const value = e.target.value as AnnouncementTarget;
                                         setNewAnnouncement({ ...newAnnouncement, target: value });
                                     }}
-                                    className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    className="w-full px-3 py-2 bg-muted border border-border rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-blue-500"
                                 >
                                     <option value="all">All Staff</option>
                                     <option value="admins">Admins Only</option>
@@ -204,19 +204,19 @@ export default function AnnouncementsPage() {
                         </div>
                     </div>
                     <div>
-                        <label className="block text-sm text-slate-400 mb-1">Message</label>
+                        <label className="block text-sm text-muted-foreground mb-1">Message</label>
                         <textarea
                             value={newAnnouncement.message}
                             onChange={(e) => setNewAnnouncement({ ...newAnnouncement, message: e.target.value })}
                             rows={3}
-                            className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            className="w-full px-3 py-2 bg-muted border border-border rounded-lg text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-blue-500"
                             placeholder="Your announcement message..."
                         />
                     </div>
                     <div className="flex justify-end gap-3">
                         <button
                             onClick={() => setShowNew(false)}
-                            className="px-4 py-2 text-slate-400 hover:text-white transition-colors"
+                            className="px-4 py-2 text-muted-foreground hover:text-white transition-colors"
                         >
                             Cancel
                         </button>
@@ -234,12 +234,12 @@ export default function AnnouncementsPage() {
             {/* Announcements List */}
             <div className="space-y-4">
                 {loading && announcements.length === 0 && (
-                    <div className="p-8 text-center text-slate-400">
+                    <div className="p-8 text-center text-muted-foreground">
                         Loading announcements...
                     </div>
                 )}
                 {!loading && announcements.length === 0 && (
-                    <div className="p-8 text-center text-slate-400">
+                    <div className="p-8 text-center text-muted-foreground">
                         No announcements yet. Create one to get started.
                     </div>
                 )}
@@ -255,7 +255,7 @@ export default function AnnouncementsPage() {
                                     <div className="flex items-center gap-2">
                                         <span className="font-semibold">{announcement.title}</span>
                                         <span className={`px-2 py-0.5 text-xs rounded ${announcement.status === "sent" ? "bg-emerald-500/30" :
-                                                announcement.status === "scheduled" ? "bg-blue-500/30" : "bg-slate-500/30"
+                                                announcement.status === "scheduled" ? "bg-blue-500/30" : "bg-muted0/30"
                                             }`}>
                                             {announcement.status}
                                         </span>
@@ -279,7 +279,7 @@ export default function AnnouncementsPage() {
                             {announcement.status === "draft" && (
                                 <button
                                     onClick={() => sendNow(announcement.id)}
-                                    className="flex items-center gap-1 px-3 py-1.5 bg-white/10 hover:bg-white/20 rounded-lg text-sm transition-colors"
+                                    className="flex items-center gap-1 px-3 py-1.5 bg-card/10 hover:bg-card/20 rounded-lg text-sm transition-colors"
                                 >
                                     <Send className="h-4 w-4" />
                                     Send Now
@@ -290,7 +290,7 @@ export default function AnnouncementsPage() {
                 ))}
             </div>
 
-            <div className="text-sm text-slate-500 text-center">
+            <div className="text-sm text-muted-foreground text-center">
                 Showing {announcements.length} announcements
             </div>
         </div>

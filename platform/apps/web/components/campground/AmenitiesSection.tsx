@@ -298,7 +298,7 @@ export function AmenitiesSection({
 
   return (
     <section className={cn("space-y-4", className)}>
-      <h2 className="text-xl font-semibold text-slate-900">
+      <h2 className="text-xl font-semibold text-foreground">
         What this place offers
       </h2>
 
@@ -310,8 +310,8 @@ export function AmenitiesSection({
             initial={prefersReducedMotion ? {} : { opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
           >
-            <div className="flex items-center gap-2 text-slate-600">
-              <span className="text-slate-400">{category.icon}</span>
+            <div className="flex items-center gap-2 text-muted-foreground">
+              <span className="text-muted-foreground">{category.icon}</span>
               <h3 className="text-sm font-semibold uppercase tracking-wider">
                 {category.name}
               </h3>
@@ -320,9 +320,9 @@ export function AmenitiesSection({
               {category.items.map((item, idx) => (
                 <li
                   key={idx}
-                  className="flex items-center gap-3 text-slate-700"
+                  className="flex items-center gap-3 text-foreground"
                 >
-                  <span className="text-slate-400">{item.icon}</span>
+                  <span className="text-muted-foreground">{item.icon}</span>
                   <span>{item.name}</span>
                 </li>
               ))}
@@ -372,15 +372,15 @@ export function AmenitiesInline({
         return (
           <div
             key={idx}
-            className="flex items-center gap-1.5 text-xs text-slate-600 bg-slate-100 px-2 py-1 rounded-full"
+            className="flex items-center gap-1.5 text-xs text-muted-foreground bg-muted px-2 py-1 rounded-full"
           >
-            <span className="text-slate-400">{icon}</span>
+            <span className="text-muted-foreground">{icon}</span>
             <span>{amenity}</span>
           </div>
         );
       })}
       {remaining > 0 && (
-        <div className="text-xs text-slate-500 bg-slate-100 px-2 py-1 rounded-full">
+        <div className="text-xs text-muted-foreground bg-muted px-2 py-1 rounded-full">
           +{remaining} more
         </div>
       )}

@@ -214,21 +214,21 @@ export function SankeyDiagram({
 
   if (loading) {
     return (
-      <Card className="border-slate-200 dark:border-slate-700">
+      <Card className="border-border dark:border-border">
         <CardHeader>
-          <CardTitle className="text-lg text-slate-900 dark:text-white">{title}</CardTitle>
-          {description && <p className="text-sm text-slate-500 dark:text-slate-400">{description}</p>}
+          <CardTitle className="text-lg text-foreground dark:text-white">{title}</CardTitle>
+          {description && <p className="text-sm text-muted-foreground dark:text-muted-foreground">{description}</p>}
         </CardHeader>
         <CardContent>
           <div className="animate-pulse" style={{ height }}>
             <div className="flex justify-between items-center h-full">
-              <div className="w-8 h-3/4 bg-slate-200 dark:bg-slate-700 rounded" />
+              <div className="w-8 h-3/4 bg-muted dark:bg-muted rounded" />
               <div className="flex-1 mx-8 h-full flex flex-col justify-center gap-4">
-                <div className="h-8 bg-slate-200 dark:bg-slate-700 rounded opacity-40" />
-                <div className="h-12 bg-slate-200 dark:bg-slate-700 rounded opacity-30" />
-                <div className="h-6 bg-slate-200 dark:bg-slate-700 rounded opacity-20" />
+                <div className="h-8 bg-muted dark:bg-muted rounded opacity-40" />
+                <div className="h-12 bg-muted dark:bg-muted rounded opacity-30" />
+                <div className="h-6 bg-muted dark:bg-muted rounded opacity-20" />
               </div>
-              <div className="w-8 h-3/4 bg-slate-200 dark:bg-slate-700 rounded" />
+              <div className="w-8 h-3/4 bg-muted dark:bg-muted rounded" />
             </div>
           </div>
         </CardContent>
@@ -244,10 +244,10 @@ export function SankeyDiagram({
   );
 
   return (
-    <Card className="border-slate-200 dark:border-slate-700">
+    <Card className="border-border dark:border-border">
       <CardHeader>
-        <CardTitle className="text-lg text-slate-900 dark:text-white">{title}</CardTitle>
-        {description && <p className="text-sm text-slate-500 dark:text-slate-400">{description}</p>}
+        <CardTitle className="text-lg text-foreground dark:text-white">{title}</CardTitle>
+        {description && <p className="text-sm text-muted-foreground dark:text-muted-foreground">{description}</p>}
       </CardHeader>
       <CardContent>
         <div className="overflow-x-auto">
@@ -298,7 +298,7 @@ export function SankeyDiagram({
                     y={node.y + node.height / 2}
                     textAnchor={node.x < width / 2 ? "end" : "start"}
                     dominantBaseline="middle"
-                    className="text-xs fill-slate-600 dark:fill-slate-300 font-medium"
+                    className="text-xs fill-muted-foreground font-medium"
                   >
                     {node.label}
                   </text>
@@ -309,7 +309,7 @@ export function SankeyDiagram({
         </div>
 
         {/* Legend */}
-        <div className="mt-4 flex flex-wrap items-center justify-center gap-4 text-xs text-slate-500 dark:text-slate-400">
+        <div className="mt-4 flex flex-wrap items-center justify-center gap-4 text-xs text-muted-foreground">
           {processedNodes.slice(0, 6).map((node, idx) => (
             <span key={node.id} className="flex items-center gap-1.5">
               <span

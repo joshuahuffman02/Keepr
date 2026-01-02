@@ -228,13 +228,13 @@ export default function CharityAdminPage() {
             <Heart className="h-6 w-6 text-rose-400" />
             Charity Round-Up
           </h1>
-          <p className="text-slate-400 mt-1">
+          <p className="text-muted-foreground mt-1">
             Manage charities and track donations across the platform
           </p>
         </div>
         <div className="flex items-center gap-3">
           <Link href="/admin/charity/reports">
-            <Button variant="outline" className="border-slate-600 text-slate-300 hover:bg-slate-700">
+            <Button variant="outline" className="border-border text-muted-foreground hover:bg-muted">
               <FileText className="h-4 w-4 mr-2" />
               View Reports
             </Button>
@@ -248,14 +248,14 @@ export default function CharityAdminPage() {
 
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <Card className="bg-slate-800 border-slate-700">
+        <Card className="bg-muted border-border">
           <CardContent className="pt-6">
             <div className="flex items-center gap-3">
               <div className="p-2 bg-status-success/15 rounded-lg">
                 <DollarSign className="h-5 w-5 text-status-success" />
               </div>
               <div>
-                <p className="text-sm text-slate-400">Total Raised</p>
+                <p className="text-sm text-muted-foreground">Total Raised</p>
                 <p className="text-2xl font-bold text-white">
                   {stats ? formatCurrency(stats.totalAmountCents) : "$0.00"}
                 </p>
@@ -264,14 +264,14 @@ export default function CharityAdminPage() {
           </CardContent>
         </Card>
 
-        <Card className="bg-slate-800 border-slate-700">
+        <Card className="bg-muted border-border">
           <CardContent className="pt-6">
             <div className="flex items-center gap-3">
               <div className="p-2 bg-status-info/15 rounded-lg">
                 <Users className="h-5 w-5 text-status-info" />
               </div>
               <div>
-                <p className="text-sm text-slate-400">Total Donors</p>
+                <p className="text-sm text-muted-foreground">Total Donors</p>
                 <p className="text-2xl font-bold text-white">
                   {stats?.donorCount.toLocaleString() ?? 0}
                 </p>
@@ -280,14 +280,14 @@ export default function CharityAdminPage() {
           </CardContent>
         </Card>
 
-        <Card className="bg-slate-800 border-slate-700">
+        <Card className="bg-muted border-border">
           <CardContent className="pt-6">
             <div className="flex items-center gap-3">
               <div className="p-2 bg-purple-500/20 rounded-lg">
                 <TrendingUp className="h-5 w-5 text-purple-400" />
               </div>
               <div>
-                <p className="text-sm text-slate-400">Avg Donation</p>
+                <p className="text-sm text-muted-foreground">Avg Donation</p>
                 <p className="text-2xl font-bold text-white">
                   {stats ? formatCurrency(stats.averageDonationCents) : "$0.00"}
                 </p>
@@ -296,14 +296,14 @@ export default function CharityAdminPage() {
           </CardContent>
         </Card>
 
-        <Card className="bg-slate-800 border-slate-700">
+        <Card className="bg-muted border-border">
           <CardContent className="pt-6">
             <div className="flex items-center gap-3">
               <div className="p-2 bg-status-warning/15 rounded-lg">
                 <Building2 className="h-5 w-5 text-status-warning" />
               </div>
               <div>
-                <p className="text-sm text-slate-400">Active Charities</p>
+                <p className="text-sm text-muted-foreground">Active Charities</p>
                 <p className="text-2xl font-bold text-white">
                   {charities.filter((c) => c.isActive).length}
                 </p>
@@ -315,7 +315,7 @@ export default function CharityAdminPage() {
 
       {/* Top Charities by Donations */}
       {stats && stats.byCharity.length > 0 && (
-        <Card className="bg-slate-800 border-slate-700">
+        <Card className="bg-muted border-border">
           <CardHeader>
             <CardTitle className="text-white text-lg">Top Charities by Donations</CardTitle>
           </CardHeader>
@@ -324,7 +324,7 @@ export default function CharityAdminPage() {
               {stats.byCharity.slice(0, 5).map((item, idx) => (
                 <div key={item.charity.id} className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    <span className="text-slate-500 text-sm w-6">{idx + 1}.</span>
+                    <span className="text-muted-foreground text-sm w-6">{idx + 1}.</span>
                     {item.charity.logoUrl ? (
                       <img
                         src={item.charity.logoUrl}
@@ -340,7 +340,7 @@ export default function CharityAdminPage() {
                   </div>
                   <div className="text-right">
                     <p className="text-white font-medium">{formatCurrency(item.amountCents)}</p>
-                    <p className="text-xs text-slate-400">{item.count} donations</p>
+                    <p className="text-xs text-muted-foreground">{item.count} donations</p>
                   </div>
                 </div>
               ))}
@@ -352,16 +352,16 @@ export default function CharityAdminPage() {
       {/* Filters */}
       <div className="flex gap-4">
         <div className="relative flex-1 max-w-sm">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
             placeholder="Search charities..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-10 bg-slate-800 border-slate-700 text-white"
+            className="pl-10 bg-muted border-border text-foreground"
           />
         </div>
         <Select value={categoryFilter} onValueChange={setCategoryFilter}>
-          <SelectTrigger className="w-[200px] bg-slate-800 border-slate-700 text-white">
+          <SelectTrigger className="w-[200px] bg-muted border-border text-foreground">
             <SelectValue placeholder="All Categories" />
           </SelectTrigger>
           <SelectContent>
@@ -378,14 +378,14 @@ export default function CharityAdminPage() {
       {/* Charities List */}
       <div className="grid gap-4">
         {loading ? (
-          <div className="text-center py-8 text-slate-400">Loading charities...</div>
+          <div className="text-center py-8 text-muted-foreground">Loading charities...</div>
         ) : filteredCharities.length === 0 ? (
-          <div className="text-center py-8 text-slate-400">
+          <div className="text-center py-8 text-muted-foreground">
             No charities found. Add one to get started.
           </div>
         ) : (
           filteredCharities.map((charity) => (
-            <Card key={charity.id} className={`bg-slate-800 border-slate-700 ${!charity.isActive ? "opacity-60" : ""}`}>
+            <Card key={charity.id} className={`bg-muted border-border ${!charity.isActive ? "opacity-60" : ""}`}>
               <CardContent className="py-4">
                 <div className="flex items-start justify-between">
                   <div className="flex items-start gap-4">
@@ -417,11 +417,11 @@ export default function CharityAdminPage() {
                         )}
                       </div>
                       {charity.description && (
-                        <p className="text-sm text-slate-400 mt-1 line-clamp-2">
+                        <p className="text-sm text-muted-foreground mt-1 line-clamp-2">
                           {charity.description}
                         </p>
                       )}
-                      <div className="flex items-center gap-4 mt-2 text-xs text-slate-500">
+                      <div className="flex items-center gap-4 mt-2 text-xs text-muted-foreground">
                         {charity.category && (
                           <span className="capitalize">{charity.category.replace("_", " ")}</span>
                         )}
@@ -441,10 +441,10 @@ export default function CharityAdminPage() {
                   </div>
                   <div className="flex items-center gap-4">
                     <div className="text-right">
-                      <p className="text-sm text-slate-400">
+                      <p className="text-sm text-muted-foreground">
                         {charity._count.campgroundCharities} campgrounds
                       </p>
-                      <p className="text-sm text-slate-400">
+                      <p className="text-sm text-muted-foreground">
                         {charity._count.donations} donations
                       </p>
                     </div>
@@ -453,7 +453,7 @@ export default function CharityAdminPage() {
                         variant="ghost"
                         size="sm"
                         onClick={() => openEdit(charity)}
-                        className="text-slate-400 hover:text-white"
+                        className="text-muted-foreground hover:text-white"
                       >
                         <Edit className="h-4 w-4" />
                       </Button>
@@ -462,7 +462,7 @@ export default function CharityAdminPage() {
                           variant="ghost"
                           size="sm"
                           onClick={() => setDeleteConfirmId(charity.id)}
-                          className="text-slate-400 hover:text-red-400"
+                          className="text-muted-foreground hover:text-red-400"
                         >
                           <Trash2 className="h-4 w-4" />
                         </Button>
@@ -484,7 +484,7 @@ export default function CharityAdminPage() {
           setFormData({ name: "", description: "", logoUrl: "", taxId: "", website: "", category: "" });
         }
       }}>
-        <DialogContent className="bg-slate-800 border-slate-700 text-white max-w-lg">
+        <DialogContent className="bg-muted border-border text-foreground max-w-lg">
           <DialogHeader>
             <DialogTitle>
               {editingCharity ? "Edit Charity" : "Add New Charity"}
@@ -497,7 +497,7 @@ export default function CharityAdminPage() {
                 value={formData.name}
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                 placeholder="Charity name"
-                className="mt-1 bg-slate-900 border-slate-700"
+                className="mt-1 bg-muted border-border"
               />
             </div>
             <div>
@@ -506,7 +506,7 @@ export default function CharityAdminPage() {
                 value={formData.description}
                 onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                 placeholder="Brief description of the charity's mission"
-                className="mt-1 bg-slate-900 border-slate-700"
+                className="mt-1 bg-muted border-border"
                 rows={3}
               />
             </div>
@@ -517,7 +517,7 @@ export default function CharityAdminPage() {
                   value={formData.category}
                   onValueChange={(v) => setFormData({ ...formData, category: v })}
                 >
-                  <SelectTrigger className="mt-1 bg-slate-900 border-slate-700">
+                  <SelectTrigger className="mt-1 bg-muted border-border">
                     <SelectValue placeholder="Select category" />
                   </SelectTrigger>
                   <SelectContent>
@@ -535,7 +535,7 @@ export default function CharityAdminPage() {
                   value={formData.taxId}
                   onChange={(e) => setFormData({ ...formData, taxId: e.target.value })}
                   placeholder="XX-XXXXXXX"
-                  className="mt-1 bg-slate-900 border-slate-700"
+                  className="mt-1 bg-muted border-border"
                 />
               </div>
             </div>
@@ -545,7 +545,7 @@ export default function CharityAdminPage() {
                 value={formData.website}
                 onChange={(e) => setFormData({ ...formData, website: e.target.value })}
                 placeholder="https://example.org"
-                className="mt-1 bg-slate-900 border-slate-700"
+                className="mt-1 bg-muted border-border"
               />
             </div>
             <div>
@@ -554,7 +554,7 @@ export default function CharityAdminPage() {
                 value={formData.logoUrl}
                 onChange={(e) => setFormData({ ...formData, logoUrl: e.target.value })}
                 placeholder="https://example.org/logo.png"
-                className="mt-1 bg-slate-900 border-slate-700"
+                className="mt-1 bg-muted border-border"
               />
             </div>
           </div>
@@ -565,7 +565,7 @@ export default function CharityAdminPage() {
                 setIsCreateOpen(false);
                 setEditingCharity(null);
               }}
-              className="border-slate-600"
+              className="border-border"
             >
               Cancel
             </Button>
@@ -581,15 +581,15 @@ export default function CharityAdminPage() {
       </Dialog>
 
       <AlertDialog open={!!deleteConfirmId} onOpenChange={(open) => !open && setDeleteConfirmId(null)}>
-        <AlertDialogContent className="bg-slate-800 border-slate-700">
+        <AlertDialogContent className="bg-muted border-border">
           <AlertDialogHeader>
             <AlertDialogTitle className="text-white">Deactivate Charity</AlertDialogTitle>
-            <AlertDialogDescription className="text-slate-400">
+            <AlertDialogDescription className="text-muted-foreground">
               Are you sure you want to deactivate this charity? This action can be reversed.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel className="border-slate-600 text-slate-300 hover:bg-slate-700">Cancel</AlertDialogCancel>
+            <AlertDialogCancel className="border-border text-muted-foreground hover:bg-muted">Cancel</AlertDialogCancel>
             <AlertDialogAction
               onClick={confirmDeleteCharity}
               className="bg-red-600 hover:bg-red-700"

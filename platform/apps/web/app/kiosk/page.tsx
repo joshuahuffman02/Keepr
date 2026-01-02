@@ -845,7 +845,7 @@ export default function KioskPage() {
                         exit="exit"
                         transition={springConfig}
                     >
-                        <Card className="w-full max-w-lg shadow-2xl bg-white/95 backdrop-blur">
+                        <Card className="w-full max-w-lg shadow-2xl bg-card/95 backdrop-blur">
                             <CardHeader className="text-center pb-6 pt-10">
                                 <motion.div
                                     initial={{ scale: 0 }}
@@ -945,7 +945,7 @@ export default function KioskPage() {
                         exit="exit"
                         transition={springConfig}
                     >
-                        <Card className="w-full max-w-4xl shadow-2xl bg-white/95 backdrop-blur">
+                        <Card className="w-full max-w-4xl shadow-2xl bg-card/95 backdrop-blur">
                             <CardContent className="p-12 md:p-16 text-center space-y-10 md:space-y-12">
                                 <motion.div
                                     initial={{ opacity: 0, y: -20 }}
@@ -970,7 +970,7 @@ export default function KioskPage() {
                                             className="w-full h-56 md:h-64 text-xl md:text-2xl flex flex-col gap-4 md:gap-6 bg-status-success hover:bg-status-success/90 active:scale-[0.98] shadow-xl transition-all"
                                             onClick={() => setState("lookup")}
                                         >
-                                            <div className="w-20 h-20 md:w-24 md:h-24 bg-white/20 rounded-full flex items-center justify-center">
+                                            <div className="w-20 h-20 md:w-24 md:h-24 bg-card/20 rounded-full flex items-center justify-center">
                                                 <Search className="w-10 h-10 md:w-12 md:h-12" />
                                             </div>
                                             I have a reservation
@@ -986,7 +986,7 @@ export default function KioskPage() {
                                             className="w-full h-56 md:h-64 text-xl md:text-2xl flex flex-col gap-4 md:gap-6 bg-status-info hover:bg-status-info/90 active:scale-[0.98] shadow-xl transition-all"
                                             onClick={() => setState("walkin-nights")}
                                         >
-                                            <div className="w-20 h-20 md:w-24 md:h-24 bg-white/20 rounded-full flex items-center justify-center">
+                                            <div className="w-20 h-20 md:w-24 md:h-24 bg-card/20 rounded-full flex items-center justify-center">
                                                 <Tent className="w-10 h-10 md:w-12 md:h-12" />
                                             </div>
                                             I need a site (Walk-in)
@@ -1557,7 +1557,7 @@ export default function KioskPage() {
                                 <div className="bg-gray-50 rounded-xl p-4 space-y-4">
                                     <p className="text-sm font-medium text-gray-700">Number of Guests</p>
                                     <div className="grid grid-cols-2 gap-4">
-                                        <div className="flex items-center justify-between bg-white rounded-lg p-3 border">
+                                        <div className="flex items-center justify-between bg-card rounded-lg p-3 border">
                                             <div className="flex items-center gap-2">
                                                 <Users className="w-5 h-5 text-gray-500" />
                                                 <span className="text-sm">Adults</span>
@@ -1584,7 +1584,7 @@ export default function KioskPage() {
                                                 </Button>
                                             </div>
                                         </div>
-                                        <div className="flex items-center justify-between bg-white rounded-lg p-3 border">
+                                        <div className="flex items-center justify-between bg-card rounded-lg p-3 border">
                                             <div className="flex items-center gap-2">
                                                 <Baby className="w-5 h-5 text-gray-500" />
                                                 <span className="text-sm">Children</span>
@@ -1960,7 +1960,7 @@ export default function KioskPage() {
                                     return (
                                         <motion.div
                                             key={form.id}
-                                            className={`rounded-xl border-2 transition-all ${isComplete ? "bg-status-success/15 border-status-success/30" : "bg-white border-gray-200"}`}
+                                            className={`rounded-xl border-2 transition-all ${isComplete ? "bg-status-success/15 border-status-success/30" : "bg-card border-gray-200"}`}
                                             initial={{ opacity: 0, y: 10 }}
                                             animate={{ opacity: 1, y: 0 }}
                                         >
@@ -2278,7 +2278,7 @@ export default function KioskPage() {
                                             </motion.div>
                                         ) : (
                                             <motion.div
-                                                className="bg-white border border-gray-200 rounded-xl p-5 md:p-6 space-y-4"
+                                                className="bg-card border border-gray-200 rounded-xl p-5 md:p-6 space-y-4"
                                                 initial={{ opacity: 0, y: 10 }}
                                                 animate={{ opacity: 1, y: 0 }}
                                                 transition={{ delay: 0.1 }}
@@ -2608,7 +2608,7 @@ export default function KioskPage() {
                             className={`flex items-center gap-2 md:gap-3 rounded-full px-4 md:px-5 py-2.5 md:py-3 shadow-lg transition-colors ${
                                 showTimeWarning
                                     ? "bg-status-error/150 text-white"
-                                    : "bg-white/90 backdrop-blur border border-gray-200 text-gray-600"
+                                    : "bg-card/90 backdrop-blur border border-gray-200 text-gray-600"
                             }`}
                         >
                             <Clock className={`w-4 h-4 md:w-5 md:h-5 ${showTimeWarning ? "animate-pulse" : ""}`} />
@@ -2620,7 +2620,7 @@ export default function KioskPage() {
                                     size="sm"
                                     variant="secondary"
                                     onClick={handleActivity}
-                                    className="ml-2 h-7 md:h-8 px-3 bg-white text-status-error hover:bg-gray-100 active:scale-[0.95]"
+                                    className="ml-2 h-7 md:h-8 px-3 bg-card text-status-error hover:bg-gray-100 active:scale-[0.95]"
                                 >
                                     I'm here
                                 </Button>

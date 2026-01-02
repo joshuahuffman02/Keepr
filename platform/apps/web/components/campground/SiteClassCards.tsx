@@ -89,7 +89,7 @@ export function SiteClassCards({
   return (
     <section className={cn("space-y-4", className)}>
       <div className="flex items-center justify-between">
-        <h2 className="text-xl font-semibold text-slate-900">Accommodations</h2>
+        <h2 className="text-xl font-semibold text-foreground">Accommodations</h2>
         {siteClasses.length > 2 && (
           <div className="hidden md:flex gap-2">
             <Button
@@ -138,9 +138,9 @@ export function SiteClassCards({
                 onClick={() => onSelectSiteClass(siteClass)}
                 className="w-full text-left group focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 rounded-xl"
               >
-                <div className="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+                <div className="bg-card border border-border rounded-xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
                   {/* Image */}
-                  <div className="relative h-40 bg-slate-100 overflow-hidden">
+                  <div className="relative h-40 bg-muted overflow-hidden">
                     {siteClass.photoUrl ? (
                       <Image
                         src={siteClass.photoUrl}
@@ -201,11 +201,11 @@ export function SiteClassCards({
                     {/* Title and price */}
                     <div className="flex items-start justify-between gap-2">
                       <div>
-                        <h3 className="font-semibold text-slate-900 group-hover:text-emerald-600 transition-colors">
+                        <h3 className="font-semibold text-foreground group-hover:text-emerald-600 transition-colors">
                           {siteClass.name}
                         </h3>
                         {siteClass.description && (
-                          <p className="text-sm text-slate-500 line-clamp-1 mt-0.5">
+                          <p className="text-sm text-muted-foreground line-clamp-1 mt-0.5">
                             {siteClass.description}
                           </p>
                         )}
@@ -215,7 +215,7 @@ export function SiteClassCards({
                           <div className="text-lg font-bold text-emerald-600">
                             ${price.toFixed(0)}
                           </div>
-                          <div className="text-xs text-slate-500">/ night</div>
+                          <div className="text-xs text-muted-foreground">/ night</div>
                         </div>
                       )}
                     </div>
@@ -223,31 +223,31 @@ export function SiteClassCards({
                     {/* Features */}
                     <div className="flex flex-wrap gap-2">
                       {siteClass.maxOccupancy && (
-                        <div className="flex items-center gap-1 text-xs text-slate-600">
-                          <Users className="h-3.5 w-3.5 text-slate-400" />
+                        <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                          <Users className="h-3.5 w-3.5 text-muted-foreground" />
                           <span>Up to {siteClass.maxOccupancy}</span>
                         </div>
                       )}
                       {hasFullHookups ? (
-                        <div className="flex items-center gap-1 text-xs text-slate-600">
-                          <Zap className="h-3.5 w-3.5 text-slate-400" />
+                        <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                          <Zap className="h-3.5 w-3.5 text-muted-foreground" />
                           <span>Full hookups</span>
                         </div>
                       ) : (
                         <>
                           {siteClass.hookupsPower && (
-                            <div className="flex items-center gap-1 text-xs text-slate-600">
-                              <Plug className="h-3.5 w-3.5 text-slate-400" />
+                            <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                              <Plug className="h-3.5 w-3.5 text-muted-foreground" />
                             </div>
                           )}
                           {siteClass.hookupsWater && (
-                            <div className="flex items-center gap-1 text-xs text-slate-600">
-                              <Droplets className="h-3.5 w-3.5 text-slate-400" />
+                            <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                              <Droplets className="h-3.5 w-3.5 text-muted-foreground" />
                             </div>
                           )}
                           {siteClass.hookupsSewer && (
-                            <div className="flex items-center gap-1 text-xs text-slate-600">
-                              <Trash2 className="h-3.5 w-3.5 text-slate-400" />
+                            <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                              <Trash2 className="h-3.5 w-3.5 text-muted-foreground" />
                             </div>
                           )}
                         </>
@@ -255,7 +255,7 @@ export function SiteClassCards({
                     </div>
 
                     {/* View details link */}
-                    <div className="pt-2 border-t border-slate-100">
+                    <div className="pt-2 border-t border-border">
                       <span className="text-sm font-medium text-emerald-600 group-hover:underline">
                         View details
                       </span>
@@ -284,7 +284,7 @@ export function SiteClassGrid({
 
   return (
     <section className={cn("space-y-4", className)}>
-      <h2 className="text-xl font-semibold text-slate-900">Accommodations</h2>
+      <h2 className="text-xl font-semibold text-foreground">Accommodations</h2>
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         {siteClasses.map((siteClass, idx) => {
           const price = siteClass.defaultRate ? siteClass.defaultRate / 100 : null;
@@ -300,9 +300,9 @@ export function SiteClassGrid({
                 onClick={() => onSelectSiteClass(siteClass)}
                 className="w-full text-left group focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 rounded-xl"
               >
-                <div className="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300">
+                <div className="bg-card border border-border rounded-xl overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300">
                   {/* Image */}
-                  <div className="relative h-48 bg-slate-100 overflow-hidden">
+                  <div className="relative h-48 bg-muted overflow-hidden">
                     {siteClass.photoUrl || heroImage ? (
                       <Image
                         src={siteClass.photoUrl || heroImage!}
@@ -335,22 +335,22 @@ export function SiteClassGrid({
                     </div>
 
                     {price && (
-                      <div className="absolute bottom-3 right-3 bg-white/95 backdrop-blur-sm rounded-lg px-2 py-1 shadow-lg">
+                      <div className="absolute bottom-3 right-3 bg-card/95 backdrop-blur-sm rounded-lg px-2 py-1 shadow-lg">
                         <span className="font-bold text-emerald-600">
                           ${price.toFixed(0)}
                         </span>
-                        <span className="text-xs text-slate-500">/night</span>
+                        <span className="text-xs text-muted-foreground">/night</span>
                       </div>
                     )}
                   </div>
 
                   {/* Content */}
                   <div className="p-4">
-                    <h3 className="font-semibold text-slate-900 group-hover:text-emerald-600 transition-colors">
+                    <h3 className="font-semibold text-foreground group-hover:text-emerald-600 transition-colors">
                       {siteClass.name}
                     </h3>
                     {siteClass.description && (
-                      <p className="text-sm text-slate-500 line-clamp-2 mt-1">
+                      <p className="text-sm text-muted-foreground line-clamp-2 mt-1">
                         {siteClass.description}
                       </p>
                     )}

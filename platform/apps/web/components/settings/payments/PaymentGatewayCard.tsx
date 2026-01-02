@@ -179,7 +179,7 @@ export function PaymentGatewayCard({
     <Card>
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
-          <Settings2 className="w-5 h-5 text-slate-400" aria-hidden="true" />
+          <Settings2 className="w-5 h-5 text-muted-foreground" aria-hidden="true" />
           Payment Gateway
         </CardTitle>
         <CardDescription>
@@ -282,13 +282,13 @@ export function PaymentGatewayCard({
               value={feePercent}
               onChange={(e) => setFeePercent(e.target.value)}
               disabled={presetId !== null}
-              className={cn(presetId !== null && "bg-slate-50")}
+              className={cn(presetId !== null && "bg-muted")}
             />
           </div>
           <div className="space-y-2">
             <Label htmlFor="fee-flat">Flat fee (USD)</Label>
             <div className="relative">
-              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">$</span>
+              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">$</span>
               <Input
                 id="fee-flat"
                 type="number"
@@ -297,29 +297,29 @@ export function PaymentGatewayCard({
                 value={feeFlat}
                 onChange={(e) => setFeeFlat(e.target.value)}
                 disabled={presetId !== null}
-                className={cn("pl-7", presetId !== null && "bg-slate-50")}
+                className={cn("pl-7", presetId !== null && "bg-muted")}
               />
             </div>
           </div>
         </div>
 
-        <div className="p-3 bg-slate-50 rounded-lg">
-          <p className="text-sm text-slate-700">
+        <div className="p-3 bg-muted rounded-lg">
+          <p className="text-sm text-foreground">
             <span className="font-medium">Effective fee:</span> {effectiveFeeLabel} per transaction
           </p>
         </div>
 
         {/* Credentials section */}
         <Collapsible open={showCredentials} onOpenChange={setShowCredentials}>
-          <CollapsibleTrigger className="flex items-center gap-2 text-sm font-medium text-slate-700 hover:text-slate-900 transition-colors">
+          <CollapsibleTrigger className="flex items-center gap-2 text-sm font-medium text-foreground hover:text-foreground transition-colors">
             <Lock className="w-4 h-4" aria-hidden="true" />
             API Credentials
-            <span className="text-xs text-slate-500 font-normal">
+            <span className="text-xs text-muted-foreground font-normal">
               {showCredentials ? "(click to hide)" : "(click to configure)"}
             </span>
           </CollapsibleTrigger>
           <CollapsibleContent className="mt-4 space-y-4">
-            <p className="text-xs text-slate-500">
+            <p className="text-xs text-muted-foreground">
               Enter secret references, not the actual keys. Keys are stored securely in your secrets manager.
             </p>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -403,7 +403,7 @@ export function PaymentGatewayCard({
               "Save gateway settings"
             )}
           </Button>
-          <p className="text-xs text-slate-500">
+          <p className="text-xs text-muted-foreground">
             Changes are logged for compliance.
           </p>
         </div>

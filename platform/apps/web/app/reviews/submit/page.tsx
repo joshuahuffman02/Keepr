@@ -21,8 +21,8 @@ function ReviewSubmitContent() {
   if (!token) {
     return (
       <div className="max-w-2xl mx-auto py-10 px-6">
-        <h1 className="text-2xl font-semibold text-slate-900">Invalid review link</h1>
-        <p className="text-slate-600 mt-2">This review link is missing a token.</p>
+        <h1 className="text-2xl font-semibold text-foreground">Invalid review link</h1>
+        <p className="text-muted-foreground mt-2">This review link is missing a token.</p>
       </div>
     );
   }
@@ -31,22 +31,22 @@ function ReviewSubmitContent() {
     return (
       <div className="max-w-2xl mx-auto py-10 px-6 text-center">
         <h1 className="text-3xl font-bold text-emerald-600 mb-2">Thank you!</h1>
-        <p className="text-slate-600">Your review was submitted for moderation.</p>
+        <p className="text-muted-foreground">Your review was submitted for moderation.</p>
       </div>
     );
   }
 
   return (
     <div className="max-w-2xl mx-auto py-10 px-6">
-      <h1 className="text-3xl font-bold text-slate-900 mb-6">Share your experience</h1>
+      <h1 className="text-3xl font-bold text-foreground mb-6">Share your experience</h1>
       <div className="mb-4">
-        <label className="block text-sm font-medium text-slate-700 mb-2">Rating</label>
+        <label className="block text-sm font-medium text-foreground mb-2">Rating</label>
         <div className="flex gap-2">
           {[1, 2, 3, 4, 5].map((val) => (
             <button
               key={val}
               onClick={() => setRating(val)}
-              className={`h-12 w-12 rounded-full border text-lg font-semibold ${rating === val ? "bg-amber-500 text-white border-amber-500" : "border-slate-300 text-slate-800"}`}
+              className={`h-12 w-12 rounded-full border text-lg font-semibold ${rating === val ? "bg-amber-500 text-white border-amber-500" : "border-border text-foreground"}`}
             >
               {val}
             </button>
@@ -54,7 +54,7 @@ function ReviewSubmitContent() {
         </div>
       </div>
       <div className="mb-4">
-        <label className="block text-sm font-medium text-slate-700 mb-2">Title (optional)</label>
+        <label className="block text-sm font-medium text-foreground mb-2">Title (optional)</label>
         <input
           value={title}
           onChange={(e) => setTitle(e.target.value)}
@@ -63,7 +63,7 @@ function ReviewSubmitContent() {
         />
       </div>
       <div className="mb-6">
-        <label className="block text-sm font-medium text-slate-700 mb-2">Details (optional)</label>
+        <label className="block text-sm font-medium text-foreground mb-2">Details (optional)</label>
         <textarea
           value={body}
           onChange={(e) => setBody(e.target.value)}
@@ -96,7 +96,7 @@ function ReviewSubmitContent() {
 
 export default function ReviewSubmitPage() {
   return (
-    <Suspense fallback={<div className="max-w-2xl mx-auto py-10 px-6 text-slate-500">Loading…</div>}>
+    <Suspense fallback={<div className="max-w-2xl mx-auto py-10 px-6 text-muted-foreground">Loading…</div>}>
       <ReviewSubmitContent />
     </Suspense>
   );

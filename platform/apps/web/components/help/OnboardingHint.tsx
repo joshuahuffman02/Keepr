@@ -84,19 +84,19 @@ export function OnboardingHint({
       role="alert"
       aria-live="polite"
     >
-      <div className="relative bg-gradient-to-br from-emerald-50 to-teal-50 border-2 border-emerald-300 rounded-xl shadow-xl max-w-sm animate-fade-in">
+      <div className="relative bg-status-success-bg border border-status-success-border rounded-xl shadow-xl max-w-sm animate-fade-in">
         <div className="p-4">
           {/* Header */}
           <div className="flex items-start justify-between gap-3 mb-3">
             <div className="flex items-center gap-2">
-              <div className="flex-shrink-0 w-8 h-8 rounded-full bg-emerald-500 text-white flex items-center justify-center">
+              <div className="flex-shrink-0 w-8 h-8 rounded-full bg-status-success text-status-success-foreground flex items-center justify-center">
                 <Lightbulb className="h-4 w-4" />
               </div>
-              <h4 className="text-sm font-bold text-slate-900">{title}</h4>
+              <h4 className="text-sm font-bold text-foreground">{title}</h4>
             </div>
             <button
               onClick={handleDismiss}
-              className="flex-shrink-0 text-slate-400 hover:text-slate-600 transition-colors"
+              className="flex-shrink-0 text-muted-foreground hover:text-muted-foreground transition-colors"
               aria-label="Dismiss hint"
             >
               <X className="h-4 w-4" />
@@ -104,14 +104,14 @@ export function OnboardingHint({
           </div>
 
           {/* Content */}
-          <div className="text-sm text-slate-700 leading-relaxed mb-4">{content}</div>
+          <div className="text-sm text-foreground leading-relaxed mb-4">{content}</div>
 
           {/* Actions */}
           <div className="flex items-center gap-2">
             <Button
               onClick={handleGotIt}
               size="sm"
-              className="bg-emerald-600 hover:bg-emerald-700 text-white"
+              className="bg-action-primary text-action-primary-foreground hover:bg-action-primary-hover"
             >
               Got it!
             </Button>
@@ -124,7 +124,7 @@ export function OnboardingHint({
                 }}
                 size="sm"
                 variant={action.variant || "ghost"}
-                className="text-slate-700"
+                className="text-foreground"
               >
                 {action.label}
                 <ChevronRight className="h-3 w-3 ml-1" />
@@ -135,7 +135,7 @@ export function OnboardingHint({
 
         {/* Arrow indicator */}
         <div
-          className={`absolute w-4 h-4 bg-gradient-to-br from-emerald-50 to-teal-50 border-emerald-300 transform rotate-45 ${
+          className={`absolute w-4 h-4 bg-status-success-bg border-status-success-border transform rotate-45 ${
             placement === "top"
               ? "bottom-[-9px] border-b-2 border-r-2 left-8"
               : placement === "bottom"
@@ -196,28 +196,28 @@ export function PageOnboardingHint({
   }
 
   return (
-    <div className="mb-6 bg-gradient-to-br from-emerald-50 to-teal-50 border-2 border-emerald-300 rounded-xl shadow-lg p-5 animate-fade-in">
+    <div className="mb-6 bg-status-success-bg border border-status-success-border rounded-xl shadow-lg p-5 animate-fade-in">
       <div className="flex items-start gap-4">
-        <div className="flex-shrink-0 w-10 h-10 rounded-full bg-emerald-500 text-white flex items-center justify-center">
+        <div className="flex-shrink-0 w-10 h-10 rounded-full bg-status-success text-status-success-foreground flex items-center justify-center">
           <Lightbulb className="h-5 w-5" />
         </div>
         <div className="flex-1">
           <div className="flex items-start justify-between gap-3 mb-2">
-            <h3 className="text-base font-bold text-slate-900">{title}</h3>
+            <h3 className="text-base font-bold text-foreground">{title}</h3>
             <button
               onClick={handleDismiss}
-              className="flex-shrink-0 text-slate-400 hover:text-slate-600 transition-colors"
+              className="flex-shrink-0 text-muted-foreground hover:text-muted-foreground transition-colors"
               aria-label="Dismiss hint"
             >
               <X className="h-5 w-5" />
             </button>
           </div>
-          <div className="text-sm text-slate-700 leading-relaxed mb-4">{content}</div>
+          <div className="text-sm text-foreground leading-relaxed mb-4">{content}</div>
           <div className="flex items-center gap-2">
             <Button
               onClick={handleDismiss}
               size="sm"
-              className="bg-emerald-600 hover:bg-emerald-700 text-white"
+              className="bg-action-primary text-action-primary-foreground hover:bg-action-primary-hover"
             >
               Got it!
             </Button>
@@ -230,7 +230,7 @@ export function PageOnboardingHint({
                 }}
                 size="sm"
                 variant={action.variant || "ghost"}
-                className="text-slate-700"
+                className="text-foreground"
               >
                 {action.label}
                 <ChevronRight className="h-3 w-3 ml-1" />

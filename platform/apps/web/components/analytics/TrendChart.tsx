@@ -90,13 +90,13 @@ export function TrendChart({
 
   if (loading || !isRechartsLoaded) {
     return (
-      <Card className="bg-slate-800/50 border-slate-700">
+      <Card className="bg-muted/50 border-border">
         <CardHeader>
           <CardTitle className="text-lg text-white">{title}</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="animate-pulse flex items-center justify-center" style={{ height }}>
-            <div className="h-full w-full bg-slate-700/50 rounded" />
+            <div className="h-full w-full bg-muted/50 rounded" />
           </div>
         </CardContent>
       </Card>
@@ -106,8 +106,8 @@ export function TrendChart({
   const CustomTooltip = ({ active, payload, label }: any) => {
     if (active && payload && payload.length) {
       return (
-        <div className="bg-slate-900 border border-slate-700 rounded-lg p-3 shadow-lg">
-          <p className="text-slate-400 text-sm mb-2">{label}</p>
+        <div className="bg-muted border border-border rounded-lg p-3 shadow-lg">
+          <p className="text-muted-foreground text-sm mb-2">{label}</p>
           {payload.map((entry: any, index: number) => (
             <p key={index} className="text-sm" style={{ color: entry.color }}>
               {entry.name}: {formatTooltip(entry.value)}
@@ -204,10 +204,10 @@ export function TrendChart({
   };
 
   return (
-    <Card className="bg-slate-800/50 border-slate-700">
+    <Card className="bg-muted/50 border-border">
       <CardHeader className="pb-2">
         <CardTitle className="text-lg text-white">{title}</CardTitle>
-        {description && <p className="text-sm text-slate-400">{description}</p>}
+        {description && <p className="text-sm text-muted-foreground">{description}</p>}
       </CardHeader>
       <CardContent>
         <ResponsiveContainer width="100%" height={height}>

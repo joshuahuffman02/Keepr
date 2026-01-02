@@ -212,7 +212,7 @@ export function PhotoGalleryGrid({
               onClick={() => openLightbox(0)}
               variant="secondary"
               size="sm"
-              className="absolute bottom-4 right-4 bg-white/95 hover:bg-white shadow-lg"
+              className="absolute bottom-4 right-4 bg-card/95 hover:bg-card shadow-lg"
             >
               <Images className="h-4 w-4 mr-2" />
               Show all {photos.length} photos
@@ -433,7 +433,7 @@ export function PhotoGalleryGrid({
           onClick={() => openLightbox(0)}
           variant="secondary"
           size="sm"
-          className="absolute bottom-4 right-4 bg-white/95 hover:bg-white shadow-lg hidden md:flex"
+          className="absolute bottom-4 right-4 bg-card/95 hover:bg-card shadow-lg hidden md:flex"
         >
           <Images className="h-4 w-4 mr-2" />
           Show all {photos.length} photos

@@ -24,7 +24,7 @@ export function BookingLayout({
   const prefersReducedMotion = useReducedMotion();
 
   return (
-    <div className={cn("min-h-screen bg-slate-50", className)}>
+    <div className={cn("min-h-screen bg-muted", className)}>
       {/* Main content area */}
       <div className="max-w-6xl mx-auto px-4 md:px-6 py-6 md:py-8">
         <div className="grid lg:grid-cols-[1fr,380px] gap-6 lg:gap-10">
@@ -83,17 +83,17 @@ export function BookingCard({
   return (
     <div
       className={cn(
-        "bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden",
+        "bg-card rounded-xl border border-border shadow-sm overflow-hidden",
         className
       )}
     >
       {(title || description) && (
-        <div className="px-5 py-4 border-b border-slate-100">
+        <div className="px-5 py-4 border-b border-border">
           {title && (
-            <h2 className="text-lg font-semibold text-slate-900">{title}</h2>
+            <h2 className="text-lg font-semibold text-foreground">{title}</h2>
           )}
           {description && (
-            <p className="text-sm text-slate-500 mt-1">{description}</p>
+            <p className="text-sm text-muted-foreground mt-1">{description}</p>
           )}
         </div>
       )}
@@ -109,13 +109,13 @@ export function BookingDivider({ label }: { label?: string }) {
   if (label) {
     return (
       <div className="flex items-center gap-4 py-2">
-        <div className="flex-1 h-px bg-slate-200" />
-        <span className="text-xs font-medium text-slate-400 uppercase tracking-wider">
+        <div className="flex-1 h-px bg-muted" />
+        <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
           {label}
         </span>
-        <div className="flex-1 h-px bg-slate-200" />
+        <div className="flex-1 h-px bg-muted" />
       </div>
     );
   }
-  return <div className="h-px bg-slate-200" />;
+  return <div className="h-px bg-muted" />;
 }

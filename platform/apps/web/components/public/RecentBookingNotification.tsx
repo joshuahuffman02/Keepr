@@ -64,10 +64,10 @@ export function RecentBookingNotification({ campgroundId }: { campgroundId?: str
           exit={{ opacity: 0, x: -100, scale: 0.9 }}
           transition={{ type: "spring", stiffness: 200, damping: 20 }}
         >
-          <div className="bg-white rounded-xl shadow-2xl border border-slate-200 p-4 pr-10">
+          <div className="bg-card rounded-xl shadow-2xl border border-border p-4 pr-10">
             <button
               onClick={handleDismiss}
-              className="absolute top-2 right-2 p-1 text-slate-400 hover:text-slate-600 transition-colors"
+              className="absolute top-2 right-2 p-1 text-muted-foreground hover:text-muted-foreground transition-colors"
               aria-label="Dismiss notification"
             >
               <X className="h-4 w-4" />
@@ -78,10 +78,10 @@ export function RecentBookingNotification({ campgroundId }: { campgroundId?: str
                 <CheckCircle2 className="h-5 w-5 text-emerald-600" />
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-semibold text-slate-900">
+                <p className="text-sm font-semibold text-foreground">
                   {booking.guestName} just booked
                 </p>
-                <p className="text-xs text-slate-600">
+                <p className="text-xs text-muted-foreground">
                   {booking.siteType} • {booking.timeAgo}
                 </p>
               </div>

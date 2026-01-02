@@ -29,25 +29,25 @@ export default function SocialPlannerHome() {
       <div className="space-y-6">
         <div>
           <p className="text-xs uppercase tracking-wide text-emerald-600 font-semibold">Social Media Planner</p>
-          <h1 className="text-3xl font-bold text-slate-900">Keep every post organized</h1>
-          <p className="text-slate-600 mt-2">
+          <h1 className="text-3xl font-bold text-foreground">Keep every post organized</h1>
+          <p className="text-muted-foreground mt-2">
             Plan across Facebook, Instagram, TikTok, email, and your blog without auto-posting. Light AI-free suggestions use your existing campground data.
           </p>
           {campground && (
-            <p className="text-xs text-slate-500 mt-1">Current campground: {campground.name}</p>
+            <p className="text-xs text-muted-foreground mt-1">Current campground: {campground.name}</p>
           )}
         </div>
 
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
           {tiles.map(tile => (
-            <Link key={tile.href} href={tile.href} className="card p-4 hover:shadow-lg transition-all border border-slate-200 hover:border-emerald-200">
+            <Link key={tile.href} href={tile.href} className="card p-4 hover:shadow-lg transition-all border border-border hover:border-emerald-200">
               <div className="flex items-center gap-3 mb-3">
                 <div className="p-2 bg-emerald-50 rounded-lg text-emerald-700">
                   <tile.icon className="h-5 w-5" />
                 </div>
                 <div>
-                  <h3 className="text-lg font-semibold text-slate-900">{tile.title}</h3>
-                  <p className="text-sm text-slate-600">{tile.description}</p>
+                  <h3 className="text-lg font-semibold text-foreground">{tile.title}</h3>
+                  <p className="text-sm text-muted-foreground">{tile.description}</p>
                 </div>
               </div>
             </Link>

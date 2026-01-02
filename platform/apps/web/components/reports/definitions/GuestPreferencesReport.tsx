@@ -81,7 +81,7 @@ export function GuestPreferencesReport({ campgroundId }: GuestPreferencesReportP
     }, [guests]);
 
     if (isLoading) {
-        return <div className="text-sm text-slate-500">Loading preferences data...</div>;
+        return <div className="text-sm text-muted-foreground">Loading preferences data...</div>;
     }
 
     if (error) {
@@ -90,8 +90,8 @@ export function GuestPreferencesReport({ campgroundId }: GuestPreferencesReportP
 
     if (!reportData) {
         return (
-            <div className="flex flex-col items-center justify-center p-12 bg-slate-50 rounded-lg border border-slate-200">
-                <div className="text-slate-400 mb-2">No guest data found</div>
+            <div className="flex flex-col items-center justify-center p-12 bg-muted rounded-lg border border-border">
+                <div className="text-muted-foreground mb-2">No guest data found</div>
             </div>
         );
     }
@@ -102,22 +102,22 @@ export function GuestPreferencesReport({ campgroundId }: GuestPreferencesReportP
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <Card>
                     <CardHeader className="pb-2">
-                        <CardTitle className="text-sm font-medium text-slate-500">Guests with Preferences</CardTitle>
+                        <CardTitle className="text-sm font-medium text-muted-foreground">Guests with Preferences</CardTitle>
                     </CardHeader>
                     <CardContent>
                         <div className="text-2xl font-bold">{reportData.guestsWithPreferences}</div>
-                        <p className="text-xs text-slate-500">{reportData.percentDocumented}% of database</p>
+                        <p className="text-xs text-muted-foreground">{reportData.percentDocumented}% of database</p>
                     </CardContent>
                 </Card>
                 <Card>
                     <CardHeader className="pb-2">
-                        <CardTitle className="text-sm font-medium text-slate-500">Most Requested</CardTitle>
+                        <CardTitle className="text-sm font-medium text-muted-foreground">Most Requested</CardTitle>
                     </CardHeader>
                     <CardContent>
                         <div className="text-2xl font-bold truncate">
                             {reportData.topPreferences[0]?.name || "N/A"}
                         </div>
-                        <p className="text-xs text-slate-500">Top preference</p>
+                        <p className="text-xs text-muted-foreground">Top preference</p>
                     </CardContent>
                 </Card>
             </div>
@@ -140,7 +140,7 @@ export function GuestPreferencesReport({ campgroundId }: GuestPreferencesReportP
                                 </BarChart>
                             </ResponsiveContainer>
                         ) : (
-                            <div className="flex items-center justify-center h-full text-slate-400 text-sm">No site preference data</div>
+                            <div className="flex items-center justify-center h-full text-muted-foreground text-sm">No site preference data</div>
                         )}
                     </div>
                 </Card>
@@ -165,7 +165,7 @@ export function GuestPreferencesReport({ campgroundId }: GuestPreferencesReportP
                                 </BarChart>
                             </ResponsiveContainer>
                         ) : (
-                            <div className="flex items-center justify-center h-full text-slate-400 text-sm">No specific preferences recorded</div>
+                            <div className="flex items-center justify-center h-full text-muted-foreground text-sm">No specific preferences recorded</div>
                         )}
                     </div>
                 </Card>

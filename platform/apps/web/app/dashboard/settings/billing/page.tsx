@@ -215,7 +215,7 @@ const tierColors: Record<string, string> = {
   founders_circle: "bg-amber-500",
   pioneer: "bg-emerald-500",
   trailblazer: "bg-violet-500",
-  standard: "bg-slate-600",
+  standard: "bg-muted",
 };
 
 const statusStyles: Record<string, { icon: React.ReactNode; color: string; bg: string }> = {
@@ -393,7 +393,7 @@ export default function BillingPage() {
     return (
       <div>
         <div className="flex items-center justify-center h-64">
-          <p className="text-slate-500">Please select a campground first.</p>
+          <p className="text-muted-foreground">Please select a campground first.</p>
         </div>
       </div>
     );
@@ -405,8 +405,8 @@ export default function BillingPage() {
         {/* Header */}
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold text-slate-900">Billing & Usage</h1>
-            <p className="text-slate-600 mt-1">
+            <h1 className="text-2xl font-bold text-foreground">Billing & Usage</h1>
+            <p className="text-muted-foreground mt-1">
               View your subscription, usage, and payment history
             </p>
           </div>
@@ -423,7 +423,7 @@ export default function BillingPage() {
             {[...Array(3)].map((_, i) => (
               <div
                 key={i}
-                className="h-48 bg-slate-100 rounded-2xl animate-pulse"
+                className="h-48 bg-muted rounded-2xl animate-pulse"
               />
             ))}
           </div>
@@ -435,7 +435,7 @@ export default function BillingPage() {
             >
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center">
+                  <div className="w-12 h-12 bg-card/20 rounded-xl flex items-center justify-center">
                     {tierIcons[summary.tier.name] || tierIcons.standard}
                   </div>
                   <div>
@@ -468,18 +468,18 @@ export default function BillingPage() {
 
             {/* Revenue Transparency Section */}
             {revenueSummary && (
-              <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
-                <div className="p-6 border-b border-slate-100">
+              <div className="bg-card rounded-2xl border border-border shadow-sm overflow-hidden">
+                <div className="p-6 border-b border-border">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
                       <div className="w-10 h-10 bg-emerald-50 rounded-lg flex items-center justify-center">
                         <DollarSign className="h-5 w-5 text-emerald-600" />
                       </div>
                       <div>
-                        <h3 className="text-lg font-semibold text-slate-900">
+                        <h3 className="text-lg font-semibold text-foreground">
                           Revenue This Month
                         </h3>
-                        <p className="text-sm text-slate-500">
+                        <p className="text-sm text-muted-foreground">
                           What you earned from guest payments
                         </p>
                       </div>
@@ -492,42 +492,42 @@ export default function BillingPage() {
                 </div>
 
                 {/* Revenue Summary Cards */}
-                <div className="grid md:grid-cols-4 gap-4 p-6 bg-slate-50">
-                  <div className="bg-white rounded-xl p-4 border border-slate-200">
-                    <div className="flex items-center gap-2 text-slate-600 text-sm mb-1">
+                <div className="grid md:grid-cols-4 gap-4 p-6 bg-muted">
+                  <div className="bg-card rounded-xl p-4 border border-border">
+                    <div className="flex items-center gap-2 text-muted-foreground text-sm mb-1">
                       <ArrowUpRight className="h-4 w-4 text-emerald-500" />
                       Gross Revenue
                     </div>
-                    <p className="text-2xl font-bold text-slate-900">
+                    <p className="text-2xl font-bold text-foreground">
                       {formatCents(revenueSummary.summary.revenue.grossRevenueCents)}
                     </p>
-                    <p className="text-xs text-slate-500 mt-1">
+                    <p className="text-xs text-muted-foreground mt-1">
                       {revenueSummary.summary.revenue.reservationCount} bookings
                     </p>
                   </div>
 
-                  <div className="bg-white rounded-xl p-4 border border-slate-200">
-                    <div className="flex items-center gap-2 text-slate-600 text-sm mb-1">
+                  <div className="bg-card rounded-xl p-4 border border-border">
+                    <div className="flex items-center gap-2 text-muted-foreground text-sm mb-1">
                       <ArrowDownRight className="h-4 w-4 text-red-500" />
                       Payment Fees
                     </div>
-                    <p className="text-2xl font-bold text-slate-900">
+                    <p className="text-2xl font-bold text-foreground">
                       -{formatCents(revenueSummary.summary.paymentFees.totalCents)}
                     </p>
-                    <p className="text-xs text-slate-500 mt-1">
+                    <p className="text-xs text-muted-foreground mt-1">
                       Stripe processing fees
                     </p>
                   </div>
 
-                  <div className="bg-white rounded-xl p-4 border border-slate-200">
-                    <div className="flex items-center gap-2 text-slate-600 text-sm mb-1">
+                  <div className="bg-card rounded-xl p-4 border border-border">
+                    <div className="flex items-center gap-2 text-muted-foreground text-sm mb-1">
                       <Building className="h-4 w-4 text-blue-500" />
                       Platform Fees
                     </div>
-                    <p className="text-2xl font-bold text-slate-900">
+                    <p className="text-2xl font-bold text-foreground">
                       -{formatCents(revenueSummary.summary.platformFees.totalCents)}
                     </p>
-                    <p className="text-xs text-slate-500 mt-1">
+                    <p className="text-xs text-muted-foreground mt-1">
                       Per-booking + SMS
                     </p>
                   </div>
@@ -551,21 +551,21 @@ export default function BillingPage() {
                 </div>
 
                 {/* Fee Details */}
-                <div className="p-6 border-t border-slate-100">
-                  <h4 className="text-sm font-semibold text-slate-700 mb-4">
+                <div className="p-6 border-t border-border">
+                  <h4 className="text-sm font-semibold text-foreground mb-4">
                     Fee Breakdown
                   </h4>
                   <div className="space-y-3">
                     <div className="flex justify-between text-sm">
-                      <span className="text-slate-600">Stripe processing fees</span>
-                      <span className="text-slate-900 font-medium">
+                      <span className="text-muted-foreground">Stripe processing fees</span>
+                      <span className="text-foreground font-medium">
                         {formatCents(revenueSummary.summary.paymentFees.stripeFeesCents)}
                       </span>
                     </div>
                     {revenueSummary.summary.paymentFees.refundsCents > 0 && (
                       <div className="flex justify-between text-sm">
-                        <span className="text-slate-600">Refunds processed</span>
-                        <span className="text-slate-900 font-medium">
+                        <span className="text-muted-foreground">Refunds processed</span>
+                        <span className="text-foreground font-medium">
                           {formatCents(revenueSummary.summary.paymentFees.refundsCents)}
                         </span>
                       </div>
@@ -578,18 +578,18 @@ export default function BillingPage() {
                         </span>
                       </div>
                     )}
-                    <div className="border-t border-slate-100 pt-3 flex justify-between text-sm">
-                      <span className="text-slate-600">
+                    <div className="border-t border-border pt-3 flex justify-between text-sm">
+                      <span className="text-muted-foreground">
                         Per-booking fees ({revenueSummary.summary.platformFees.bookingCount} bookings)
                       </span>
-                      <span className="text-slate-900 font-medium">
+                      <span className="text-foreground font-medium">
                         {formatCents(revenueSummary.summary.platformFees.perBookingFeeCents)}
                       </span>
                     </div>
                     {revenueSummary.summary.platformFees.smsOutboundCents > 0 && (
                       <div className="flex justify-between text-sm">
-                        <span className="text-slate-600">SMS messaging</span>
-                        <span className="text-slate-900 font-medium">
+                        <span className="text-muted-foreground">SMS messaging</span>
+                        <span className="text-foreground font-medium">
                           {formatCents(
                             revenueSummary.summary.platformFees.smsOutboundCents +
                               revenueSummary.summary.platformFees.smsInboundCents
@@ -604,17 +604,17 @@ export default function BillingPage() {
 
             {/* Recent Payouts */}
             {payouts && payouts.length > 0 && (
-              <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
-                <div className="p-6 border-b border-slate-100 flex items-center justify-between">
+              <div className="bg-card rounded-2xl border border-border shadow-sm overflow-hidden">
+                <div className="p-6 border-b border-border flex items-center justify-between">
                   <div className="flex items-center gap-3">
                     <div className="w-10 h-10 bg-blue-50 rounded-lg flex items-center justify-center">
                       <Wallet className="h-5 w-5 text-blue-600" />
                     </div>
                     <div>
-                      <h3 className="text-lg font-semibold text-slate-900">
+                      <h3 className="text-lg font-semibold text-foreground">
                         Recent Payouts
                       </h3>
-                      <p className="text-sm text-slate-500">
+                      <p className="text-sm text-muted-foreground">
                         Bank deposits from Stripe
                       </p>
                     </div>
@@ -626,11 +626,11 @@ export default function BillingPage() {
                     </Link>
                   </Button>
                 </div>
-                <div className="divide-y divide-slate-100">
+                <div className="divide-y divide-border">
                   {payouts.map((payout) => (
                     <div
                       key={payout.id}
-                      className="px-6 py-4 flex items-center justify-between hover:bg-slate-50 transition-colors"
+                      className="px-6 py-4 flex items-center justify-between hover:bg-muted transition-colors"
                     >
                       <div className="flex items-center gap-4">
                         <div
@@ -651,10 +651,10 @@ export default function BillingPage() {
                           )}
                         </div>
                         <div>
-                          <p className="font-medium text-slate-900">
+                          <p className="font-medium text-foreground">
                             {formatCents(payout.amountCents)}
                           </p>
-                          <p className="text-sm text-slate-500">
+                          <p className="text-sm text-muted-foreground">
                             {payout.summary.chargeCount} charges
                             {payout.summary.refundCount > 0 &&
                               `, ${payout.summary.refundCount} refunds`}
@@ -662,10 +662,10 @@ export default function BillingPage() {
                         </div>
                       </div>
                       <div className="text-right">
-                        <p className="text-sm text-slate-900 capitalize">
+                        <p className="text-sm text-foreground capitalize">
                           {payout.status === "paid" ? "Deposited" : payout.status}
                         </p>
-                        <p className="text-xs text-slate-500">
+                        <p className="text-xs text-muted-foreground">
                           {payout.paidAt
                             ? formatDate(payout.paidAt)
                             : `Est. ${formatDate(payout.arrivalDate)}`}
@@ -678,14 +678,14 @@ export default function BillingPage() {
             )}
 
             {/* Platform Fees - Current Period Summary */}
-            <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
-              <div className="p-6 border-b border-slate-100">
+            <div className="bg-card rounded-2xl border border-border shadow-sm overflow-hidden">
+              <div className="p-6 border-b border-border">
                 <div className="flex items-center justify-between">
                   <div>
-                    <h3 className="text-lg font-semibold text-slate-900">
+                    <h3 className="text-lg font-semibold text-foreground">
                       Platform Fees - Current Period
                     </h3>
-                    <p className="text-slate-600">
+                    <p className="text-muted-foreground">
                       {formatPeriod(
                         summary.currentPeriod.periodStart,
                         summary.currentPeriod.periodEnd
@@ -693,7 +693,7 @@ export default function BillingPage() {
                     </p>
                   </div>
                   <div
-                    className={`flex items-center gap-2 px-3 py-1.5 rounded-full ${statusStyles[summary.currentPeriod.status]?.bg || "bg-slate-100"} ${statusStyles[summary.currentPeriod.status]?.color || "text-slate-600"}`}
+                    className={`flex items-center gap-2 px-3 py-1.5 rounded-full ${statusStyles[summary.currentPeriod.status]?.bg || "bg-muted"} ${statusStyles[summary.currentPeriod.status]?.color || "text-muted-foreground"}`}
                   >
                     {statusStyles[summary.currentPeriod.status]?.icon}
                     <span className="text-sm font-medium capitalize">
@@ -704,7 +704,7 @@ export default function BillingPage() {
               </div>
 
               {/* Charges Breakdown */}
-              <div className="divide-y divide-slate-100">
+              <div className="divide-y divide-border">
                 {/* Subscription */}
                 <div className="px-6 py-4 flex items-center justify-between">
                   <div className="flex items-center gap-3">
@@ -712,13 +712,13 @@ export default function BillingPage() {
                       <CreditCard className="h-5 w-5 text-blue-600" />
                     </div>
                     <div>
-                      <p className="font-medium text-slate-900">
+                      <p className="font-medium text-foreground">
                         {summary.charges.subscription.description}
                       </p>
-                      <p className="text-sm text-slate-500">Fixed monthly fee</p>
+                      <p className="text-sm text-muted-foreground">Fixed monthly fee</p>
                     </div>
                   </div>
-                  <p className="font-semibold text-slate-900">
+                  <p className="font-semibold text-foreground">
                     {formatCents(summary.charges.subscription.amountCents)}
                   </p>
                 </div>
@@ -730,16 +730,16 @@ export default function BillingPage() {
                       <Calendar className="h-5 w-5 text-emerald-600" />
                     </div>
                     <div>
-                      <p className="font-medium text-slate-900">
+                      <p className="font-medium text-foreground">
                         Per-Booking Fees
                       </p>
-                      <p className="text-sm text-slate-500">
+                      <p className="text-sm text-muted-foreground">
                         {summary.charges.bookingFees.quantity} bookings @{" "}
                         {formatCents(summary.charges.bookingFees.unitCents)} each
                       </p>
                     </div>
                   </div>
-                  <p className="font-semibold text-slate-900">
+                  <p className="font-semibold text-foreground">
                     {formatCents(summary.charges.bookingFees.amountCents)}
                   </p>
                 </div>
@@ -752,17 +752,17 @@ export default function BillingPage() {
                         <MessageSquare className="h-5 w-5 text-violet-600" />
                       </div>
                       <div>
-                        <p className="font-medium text-slate-900">
+                        <p className="font-medium text-foreground">
                           Outbound SMS
                         </p>
-                        <p className="text-sm text-slate-500">
+                        <p className="text-sm text-muted-foreground">
                           {summary.charges.smsOutbound.quantity} messages @{" "}
                           {formatCents(summary.charges.smsOutbound.unitCents)}{" "}
                           each
                         </p>
                       </div>
                     </div>
-                    <p className="font-semibold text-slate-900">
+                    <p className="font-semibold text-foreground">
                       {formatCents(summary.charges.smsOutbound.amountCents)}
                     </p>
                   </div>
@@ -776,15 +776,15 @@ export default function BillingPage() {
                         <MessageSquare className="h-5 w-5 text-indigo-600" />
                       </div>
                       <div>
-                        <p className="font-medium text-slate-900">Inbound SMS</p>
-                        <p className="text-sm text-slate-500">
+                        <p className="font-medium text-foreground">Inbound SMS</p>
+                        <p className="text-sm text-muted-foreground">
                           {summary.charges.smsInbound.quantity} messages @{" "}
                           {formatCents(summary.charges.smsInbound.unitCents)}{" "}
                           each
                         </p>
                       </div>
                     </div>
-                    <p className="font-semibold text-slate-900">
+                    <p className="font-semibold text-foreground">
                       {formatCents(summary.charges.smsInbound.amountCents)}
                     </p>
                   </div>
@@ -798,25 +798,25 @@ export default function BillingPage() {
                         <Cpu className="h-5 w-5 text-amber-600" />
                       </div>
                       <div>
-                        <p className="font-medium text-slate-900">AI Usage</p>
-                        <p className="text-sm text-slate-500">
+                        <p className="font-medium text-foreground">AI Usage</p>
+                        <p className="text-sm text-muted-foreground">
                           {(summary.charges.aiUsage.quantity / 1000).toFixed(1)}K tokens @{" "}
                           {formatCents(summary.charges.aiUsage.unitCents)}/1K
                         </p>
                       </div>
                     </div>
-                    <p className="font-semibold text-slate-900">
+                    <p className="font-semibold text-foreground">
                       {formatCents(summary.charges.aiUsage.amountCents)}
                     </p>
                   </div>
                 )}
 
                 {/* Total */}
-                <div className="px-6 py-4 bg-slate-50 flex items-center justify-between">
-                  <p className="font-semibold text-slate-900">
+                <div className="px-6 py-4 bg-muted flex items-center justify-between">
+                  <p className="font-semibold text-foreground">
                     Estimated Total for Period
                   </p>
-                  <p className="text-2xl font-bold text-slate-900">
+                  <p className="text-2xl font-bold text-foreground">
                     {formatCents(summary.totals.totalCents)}
                   </p>
                 </div>
@@ -825,50 +825,50 @@ export default function BillingPage() {
 
             {/* Usage Stats */}
             <div className="grid md:grid-cols-4 gap-4">
-              <div className="bg-white rounded-xl border border-slate-200 p-4">
+              <div className="bg-card rounded-xl border border-border p-4">
                 <div className="flex items-center gap-3 mb-2">
                   <div className="w-8 h-8 bg-emerald-50 rounded-lg flex items-center justify-center">
                     <Calendar className="h-4 w-4 text-emerald-600" />
                   </div>
-                  <span className="text-sm text-slate-600">Bookings</span>
+                  <span className="text-sm text-muted-foreground">Bookings</span>
                 </div>
-                <p className="text-2xl font-bold text-slate-900">
+                <p className="text-2xl font-bold text-foreground">
                   {summary.usage.bookingCount}
                 </p>
               </div>
 
-              <div className="bg-white rounded-xl border border-slate-200 p-4">
+              <div className="bg-card rounded-xl border border-border p-4">
                 <div className="flex items-center gap-3 mb-2">
                   <div className="w-8 h-8 bg-violet-50 rounded-lg flex items-center justify-center">
                     <MessageSquare className="h-4 w-4 text-violet-600" />
                   </div>
-                  <span className="text-sm text-slate-600">SMS Sent</span>
+                  <span className="text-sm text-muted-foreground">SMS Sent</span>
                 </div>
-                <p className="text-2xl font-bold text-slate-900">
+                <p className="text-2xl font-bold text-foreground">
                   {summary.usage.smsOutbound}
                 </p>
               </div>
 
-              <div className="bg-white rounded-xl border border-slate-200 p-4">
+              <div className="bg-card rounded-xl border border-border p-4">
                 <div className="flex items-center gap-3 mb-2">
                   <div className="w-8 h-8 bg-indigo-50 rounded-lg flex items-center justify-center">
                     <MessageSquare className="h-4 w-4 text-indigo-600" />
                   </div>
-                  <span className="text-sm text-slate-600">SMS Received</span>
+                  <span className="text-sm text-muted-foreground">SMS Received</span>
                 </div>
-                <p className="text-2xl font-bold text-slate-900">
+                <p className="text-2xl font-bold text-foreground">
                   {summary.usage.smsInbound}
                 </p>
               </div>
 
-              <div className="bg-white rounded-xl border border-slate-200 p-4">
+              <div className="bg-card rounded-xl border border-border p-4">
                 <div className="flex items-center gap-3 mb-2">
                   <div className="w-8 h-8 bg-amber-50 rounded-lg flex items-center justify-center">
                     <TrendingUp className="h-4 w-4 text-amber-600" />
                   </div>
-                  <span className="text-sm text-slate-600">AI Tokens</span>
+                  <span className="text-sm text-muted-foreground">AI Tokens</span>
                 </div>
-                <p className="text-2xl font-bold text-slate-900">
+                <p className="text-2xl font-bold text-foreground">
                   {summary.usage.aiTokens.toLocaleString()}
                 </p>
               </div>
@@ -876,18 +876,18 @@ export default function BillingPage() {
 
             {/* Setup Services Section - only show if has active pay-over-time balance OR still in setup phase */}
             {((setupServices && setupServices.some(s => s.balanceRemainingCents > 0)) || summary.usage.bookingCount === 0) && (
-            <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
-              <div className="p-6 border-b border-slate-100">
+            <div className="bg-card rounded-2xl border border-border shadow-sm overflow-hidden">
+              <div className="p-6 border-b border-border">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
                     <div className="w-10 h-10 bg-blue-50 rounded-lg flex items-center justify-center">
                       <Wrench className="h-5 w-5 text-blue-600" />
                     </div>
                     <div>
-                      <h3 className="text-lg font-semibold text-slate-900">
+                      <h3 className="text-lg font-semibold text-foreground">
                         Setup Assistance
                       </h3>
-                      <p className="text-sm text-slate-500">
+                      <p className="text-sm text-muted-foreground">
                         Need help getting set up? We&apos;ve got you covered.
                       </p>
                     </div>
@@ -897,8 +897,8 @@ export default function BillingPage() {
 
               {/* Active Setup Services with Balance */}
               {setupServices && setupServices.filter(s => s.balanceRemainingCents > 0).length > 0 && (
-                <div className="p-6 border-b border-slate-100 bg-blue-50/50">
-                  <h4 className="text-sm font-semibold text-slate-700 mb-4">
+                <div className="p-6 border-b border-border bg-blue-50/50">
+                  <h4 className="text-sm font-semibold text-foreground mb-4">
                     Pay-Over-Time Balance
                   </h4>
                   <div className="space-y-4">
@@ -907,23 +907,23 @@ export default function BillingPage() {
                       .map((service) => (
                         <div
                           key={service.id}
-                          className="bg-white rounded-lg p-4 border border-slate-200"
+                          className="bg-card rounded-lg p-4 border border-border"
                         >
                           <div className="flex items-center justify-between mb-2">
-                            <span className="font-medium text-slate-900">
+                            <span className="font-medium text-foreground">
                               {service.displayName}
                             </span>
-                            <span className="text-sm text-slate-600">
+                            <span className="text-sm text-muted-foreground">
                               {formatCents(service.balanceRemainingCents)} remaining
                             </span>
                           </div>
-                          <div className="h-2 bg-slate-100 rounded-full overflow-hidden">
+                          <div className="h-2 bg-muted rounded-full overflow-hidden">
                             <div
                               className="h-full bg-blue-500 rounded-full transition-all"
                               style={{ width: `${service.progressPercent}%` }}
                             />
                           </div>
-                          <p className="text-xs text-slate-500 mt-2">
+                          <p className="text-xs text-muted-foreground mt-2">
                             {service.bookingsCharged} bookings charged @ $1.00 each
                             {" • "}
                             {Math.ceil(service.balanceRemainingCents / 100)} bookings to go
@@ -939,18 +939,18 @@ export default function BillingPage() {
               <div className="p-6">
                 <div className="grid md:grid-cols-2 gap-4">
                   {/* Quick Start */}
-                  <div className="border border-slate-200 rounded-xl p-5 hover:border-blue-300 transition-colors">
+                  <div className="border border-border rounded-xl p-5 hover:border-blue-300 transition-colors">
                     <div className="flex items-center gap-3 mb-3">
                       <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
                         <Headphones className="h-5 w-5 text-blue-600" />
                       </div>
                       <div>
-                        <h4 className="font-semibold text-slate-900">Quick Start</h4>
-                        <p className="text-sm text-slate-500">We configure, you relax</p>
+                        <h4 className="font-semibold text-foreground">Quick Start</h4>
+                        <p className="text-sm text-muted-foreground">We configure, you relax</p>
                       </div>
                     </div>
-                    <p className="text-2xl font-bold text-slate-900 mb-2">$249</p>
-                    <ul className="text-sm text-slate-600 space-y-1 mb-4">
+                    <p className="text-2xl font-bold text-foreground mb-2">$249</p>
+                    <ul className="text-sm text-muted-foreground space-y-1 mb-4">
                       <li>• Site & rate configuration</li>
                       <li>• Payment gateway setup</li>
                       <li>• 30-minute training call</li>
@@ -981,17 +981,17 @@ export default function BillingPage() {
                   </div>
 
                   {/* Data Import */}
-                  <div className="border border-slate-200 rounded-xl p-5 hover:border-emerald-300 transition-colors">
+                  <div className="border border-border rounded-xl p-5 hover:border-emerald-300 transition-colors">
                     <div className="flex items-center gap-3 mb-3">
                       <div className="w-10 h-10 bg-emerald-100 rounded-lg flex items-center justify-center">
                         <Database className="h-5 w-5 text-emerald-600" />
                       </div>
                       <div>
-                        <h4 className="font-semibold text-slate-900">Data Import</h4>
-                        <p className="text-sm text-slate-500">We import your reservations</p>
+                        <h4 className="font-semibold text-foreground">Data Import</h4>
+                        <p className="text-sm text-muted-foreground">We import your reservations</p>
                       </div>
                     </div>
-                    <div className="text-sm text-slate-600 space-y-1 mb-4">
+                    <div className="text-sm text-muted-foreground space-y-1 mb-4">
                       <div className="flex justify-between">
                         <span>Up to 500</span>
                         <span className="font-medium">$299</span>
@@ -1021,7 +1021,7 @@ export default function BillingPage() {
                   </div>
                 </div>
 
-                <p className="text-xs text-slate-500 text-center mt-4">
+                <p className="text-xs text-muted-foreground text-center mt-4">
                   Pay-over-time: Add $1/booking until paid off. No interest, no pressure.
                 </p>
               </div>
@@ -1032,11 +1032,11 @@ export default function BillingPage() {
             {/* Purchase Confirmation Modal */}
             {purchaseType && (
               <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-                <div className="bg-white rounded-2xl p-6 max-w-md w-full mx-4 shadow-xl">
-                  <h3 className="text-xl font-bold text-slate-900 mb-4">
+                <div className="bg-card rounded-2xl p-6 max-w-md w-full mx-4 shadow-xl">
+                  <h3 className="text-xl font-bold text-foreground mb-4">
                     Confirm Purchase
                   </h3>
-                  <p className="text-slate-600 mb-6">
+                  <p className="text-muted-foreground mb-6">
                     {payUpfront ? (
                       <>You&apos;ll be charged now for this service.</>
                     ) : (
@@ -1082,9 +1082,9 @@ export default function BillingPage() {
 
             {/* Billing History */}
             {history && history.length > 0 && (
-              <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
-                <div className="p-6 border-b border-slate-100 flex items-center justify-between">
-                  <h3 className="text-lg font-semibold text-slate-900">
+              <div className="bg-card rounded-2xl border border-border shadow-sm overflow-hidden">
+                <div className="p-6 border-b border-border flex items-center justify-between">
+                  <h3 className="text-lg font-semibold text-foreground">
                     Billing History
                   </h3>
                   <Button variant="ghost" size="sm">
@@ -1093,32 +1093,32 @@ export default function BillingPage() {
                   </Button>
                 </div>
 
-                <div className="divide-y divide-slate-100">
+                <div className="divide-y divide-border">
                   {history.slice(1).map((period) => (
                     <div
                       key={period.id}
-                      className="px-6 py-4 flex items-center justify-between hover:bg-slate-50 transition-colors"
+                      className="px-6 py-4 flex items-center justify-between hover:bg-muted transition-colors"
                     >
                       <div className="flex items-center gap-4">
                         <div
-                          className={`w-10 h-10 rounded-lg flex items-center justify-center ${statusStyles[period.status]?.bg || "bg-slate-100"}`}
+                          className={`w-10 h-10 rounded-lg flex items-center justify-center ${statusStyles[period.status]?.bg || "bg-muted"}`}
                         >
                           {statusStyles[period.status]?.icon || (
-                            <Receipt className="h-5 w-5 text-slate-400" />
+                            <Receipt className="h-5 w-5 text-muted-foreground" />
                           )}
                         </div>
                         <div>
-                          <p className="font-medium text-slate-900">
+                          <p className="font-medium text-foreground">
                             {formatPeriod(period.periodStart, period.periodEnd)}
                           </p>
-                          <p className="text-sm text-slate-500 capitalize">
+                          <p className="text-sm text-muted-foreground capitalize">
                             {period.status.replace("_", " ")}
                             {period.paidAt && ` on ${formatDate(period.paidAt)}`}
                           </p>
                         </div>
                       </div>
                       <div className="flex items-center gap-4">
-                        <p className="font-semibold text-slate-900">
+                        <p className="font-semibold text-foreground">
                           {formatCents(period.totalCents)}
                         </p>
                         <Button variant="ghost" size="sm">
@@ -1132,13 +1132,13 @@ export default function BillingPage() {
             )}
 
             {/* Payment Method */}
-            <div className="bg-slate-50 rounded-2xl p-6">
+            <div className="bg-muted rounded-2xl p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <h3 className="font-semibold text-slate-900">
+                  <h3 className="font-semibold text-foreground">
                     Payment Method
                   </h3>
-                  <p className="text-slate-600 text-sm mt-1">
+                  <p className="text-muted-foreground text-sm mt-1">
                     Manage how you pay for Camp Everyday
                   </p>
                 </div>
@@ -1151,12 +1151,12 @@ export default function BillingPage() {
             </div>
           </>
         ) : (
-          <div className="bg-white rounded-2xl border border-slate-200 p-12 text-center">
-            <Receipt className="h-12 w-12 text-slate-300 mx-auto mb-4" />
-            <h3 className="text-lg font-semibold text-slate-900 mb-2">
+          <div className="bg-card rounded-2xl border border-border p-12 text-center">
+            <Receipt className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+            <h3 className="text-lg font-semibold text-foreground mb-2">
               No billing data available
             </h3>
-            <p className="text-slate-600">
+            <p className="text-muted-foreground">
               Billing information will appear here once your account is set up.
             </p>
           </div>

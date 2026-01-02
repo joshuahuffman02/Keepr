@@ -171,7 +171,7 @@ export default function TicketsPage() {
       issue: { label: "Issue", className: "bg-rose-50 text-rose-700 border border-rose-100" },
       question: { label: "Question", className: "bg-sky-50 text-sky-700 border border-sky-100" },
       feature: { label: "Feature", className: "bg-amber-50 text-amber-800 border border-amber-100" },
-      other: { label: "Other", className: "bg-slate-100 text-slate-700 border border-slate-200" },
+      other: { label: "Other", className: "bg-muted text-foreground border border-border" },
     };
 
     const areaColors: Record<string, string> = {
@@ -179,7 +179,7 @@ export default function TicketsPage() {
       'Payments': 'bg-emerald-50 text-emerald-700 border-emerald-100',
       'Auth': 'bg-indigo-50 text-indigo-700 border-indigo-100',
       'Reservations': 'bg-blue-50 text-blue-700 border-blue-100',
-      'Admin': 'bg-slate-100 text-slate-700 border-slate-200',
+      'Admin': 'bg-muted text-foreground border-border',
       'General': 'bg-gray-50 text-gray-600 border-gray-100'
     };
 
@@ -354,12 +354,12 @@ export default function TicketsPage() {
             <div className="inline-flex items-center gap-2 rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-700 border border-emerald-100">
               Ticket desk <span className="text-[11px] text-emerald-600">with context capture</span>
             </div>
-            <h1 className="mt-2 text-2xl font-semibold text-slate-900">Tickets</h1>
-            <p className="text-sm text-slate-600">Track issues, questions, and ideas—then respond fast.</p>
+            <h1 className="mt-2 text-2xl font-semibold text-foreground">Tickets</h1>
+            <p className="text-sm text-muted-foreground">Track issues, questions, and ideas—then respond fast.</p>
           </div>
           <div className="flex flex-col gap-2 items-end">
             <div className="flex flex-wrap gap-2 justify-end">
-              <div className="flex items-center gap-1 rounded-full border border-slate-200 bg-white p-1 shadow-sm">
+              <div className="flex items-center gap-1 rounded-full border border-border bg-card p-1 shadow-sm">
                 {(["all", "open", "completed"] as const).map((key) => (
                   <Button
                     key={key}
@@ -371,7 +371,7 @@ export default function TicketsPage() {
                   </Button>
                 ))}
               </div>
-              <div className="flex items-center gap-1 rounded-full border border-slate-200 bg-white p-1 shadow-sm">
+              <div className="flex items-center gap-1 rounded-full border border-border bg-card p-1 shadow-sm">
                 {(["all", "issue", "question", "feature", "other"] as const).map((key) => (
                   <Button
                     key={key}
@@ -393,7 +393,7 @@ export default function TicketsPage() {
               </div>
             </div>
             <div className="flex flex-wrap gap-2 justify-end">
-              <div className="flex items-center gap-1 rounded-full border border-slate-200 bg-white p-1 shadow-sm">
+              <div className="flex items-center gap-1 rounded-full border border-border bg-card p-1 shadow-sm">
                 {areas.map((key) => (
                   <Button
                     key={key}
@@ -406,7 +406,7 @@ export default function TicketsPage() {
                   </Button>
                 ))}
               </div>
-              <div className="flex items-center gap-2 rounded-full border border-slate-200 bg-white px-3 py-1 shadow-sm">
+              <div className="flex items-center gap-2 rounded-full border border-border bg-card px-3 py-1 shadow-sm">
                 <Input
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
@@ -441,15 +441,15 @@ export default function TicketsPage() {
             <div className="text-2xl font-bold text-emerald-900">{openCount}</div>
             <div className="text-xs text-emerald-700/80">In flight</div>
           </div>
-          <div className="rounded-xl border border-slate-200 bg-white px-4 py-3 shadow-sm">
-            <div className="flex items-center gap-2 text-xs font-semibold text-slate-600">
+          <div className="rounded-xl border border-border bg-card px-4 py-3 shadow-sm">
+            <div className="flex items-center gap-2 text-xs font-semibold text-muted-foreground">
               <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                 <path d="M5 13l4 4L19 7" />
               </svg>
               Completed
             </div>
-            <div className="text-2xl font-bold text-slate-900">{completedCount}</div>
-            <div className="text-xs text-slate-500">Shipped & done</div>
+            <div className="text-2xl font-bold text-foreground">{completedCount}</div>
+            <div className="text-xs text-muted-foreground">Shipped & done</div>
           </div>
           <div className="rounded-xl border border-amber-100 bg-amber-50 px-4 py-3 shadow-sm">
             <div className="flex items-center gap-2 text-xs font-semibold text-amber-700">
@@ -478,16 +478,16 @@ export default function TicketsPage() {
         {error && <div className="rounded-md bg-red-50 px-3 py-2 text-sm text-red-700">{error}</div>}
 
         {loading ? (
-          <div className="flex items-center gap-2 text-sm text-slate-600">
+          <div className="flex items-center gap-2 text-sm text-muted-foreground">
             <Loader2 className="h-4 w-4 animate-spin" />
             Loading tickets...
           </div>
         ) : filteredTickets.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-12 text-slate-500">
-            <div className="p-4 rounded-full bg-slate-50 border border-slate-200 mb-4">
-              <Search className="h-6 w-6 text-slate-400" />
+          <div className="flex flex-col items-center justify-center py-12 text-muted-foreground">
+            <div className="p-4 rounded-full bg-muted border border-border mb-4">
+              <Search className="h-6 w-6 text-muted-foreground" />
             </div>
-            <h3 className="text-lg font-medium text-slate-900">No tickets found</h3>
+            <h3 className="text-lg font-medium text-foreground">No tickets found</h3>
             <p className="text-sm mt-1 mb-4">You can create a new ticket to get started.</p>
             <Button onClick={() => setCreateOpen(true)} className="gap-2">
               <Plus className="h-4 w-4" />
@@ -497,25 +497,25 @@ export default function TicketsPage() {
         ) : (
           <>
             {/* Desktop table */}
-            <div className="hidden rounded-lg border border-slate-200 bg-white shadow-sm md:block">
-              <table className="min-w-full divide-y divide-slate-200">
-                <thead className="bg-slate-50 sticky top-0 z-10">
+            <div className="hidden rounded-lg border border-border bg-card shadow-sm md:block">
+              <table className="min-w-full divide-y divide-border">
+                <thead className="bg-muted sticky top-0 z-10">
                   <tr>
-                    <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-600">Votes</th>
-                    <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-600">Status</th>
-                    <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-600">Title</th>
-                    <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-600">Details</th>
-                    <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-600">Submitter</th>
-                    <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-600">Device</th>
-                    <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-600">Page</th>
-                    <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-600">When</th>
-                    <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-600">Actions</th>
+                    <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-muted-foreground">Votes</th>
+                    <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-muted-foreground">Status</th>
+                    <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-muted-foreground">Title</th>
+                    <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-muted-foreground">Details</th>
+                    <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-muted-foreground">Submitter</th>
+                    <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-muted-foreground">Device</th>
+                    <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-muted-foreground">Page</th>
+                    <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-muted-foreground">When</th>
+                    <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-muted-foreground">Actions</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-200">
+                <tbody className="divide-y divide-border">
                   {filteredTickets.map((ticket, idx) => (
-                    <tr key={ticket.id} className={`bg-white hover:bg-slate-50 ${idx % 2 === 1 ? "bg-slate-50/40" : ""}`}>
-                      <td className="px-4 py-4 align-top text-sm text-slate-700">
+                    <tr key={ticket.id} className={`bg-card hover:bg-muted ${idx % 2 === 1 ? "bg-muted/40" : ""}`}>
+                      <td className="px-4 py-4 align-top text-sm text-foreground">
                         <div className="flex items-center gap-2">
                           <Button
                             size="sm"
@@ -525,7 +525,7 @@ export default function TicketsPage() {
                           >
                             {upvotingId === ticket.id ? "…" : "Upvote"}
                           </Button>
-                          <span className="text-sm font-semibold text-slate-900">{ticket.votes ?? 0}</span>
+                          <span className="text-sm font-semibold text-foreground">{ticket.votes ?? 0}</span>
                         </div>
                       </td>
                       <td className="px-4 py-4 align-top text-xs font-semibold">
@@ -538,18 +538,18 @@ export default function TicketsPage() {
                           {ticket.status === "completed" ? "Completed" : "Open"}
                         </span>
                         {ticket.completedAt && (
-                          <div className="text-[11px] text-slate-500">
+                          <div className="text-[11px] text-muted-foreground">
                             {new Date(ticket.completedAt).toLocaleString()}
                           </div>
                         )}
                       </td>
-                      <td className="px-4 py-4 align-top text-sm font-semibold text-slate-900">
+                      <td className="px-4 py-4 align-top text-sm font-semibold text-foreground">
                         <div className="flex items-center gap-2">
                           {categoryBadge(ticket)}
                           <span className="truncate">{ticket.title}</span>
                         </div>
                       </td>
-                      <td className="px-4 py-4 align-top text-sm text-slate-700 whitespace-pre-wrap space-y-2">
+                      <td className="px-4 py-4 align-top text-sm text-foreground whitespace-pre-wrap space-y-2">
                         <div className={expandedNotes[ticket.id] ? "" : "line-clamp-3"}>{ticket.notes ?? "—"}</div>
                         {ticket.notes && ticket.notes.length > 140 && (
                           <button
@@ -567,12 +567,12 @@ export default function TicketsPage() {
                           </Button>
                         )}
                       </td>
-                      <td className="px-4 py-4 align-top text-sm text-slate-700 space-y-1">
-                        {ticket.submitter?.name && <div className="font-semibold text-slate-900">{ticket.submitter.name}</div>}
-                        {ticket.submitter?.email && <div className="text-xs text-slate-500">{ticket.submitter.email}</div>}
-                        {!ticket.submitter?.name && !ticket.submitter?.email && <div className="text-xs text-slate-500">Anonymous</div>}
+                      <td className="px-4 py-4 align-top text-sm text-foreground space-y-1">
+                        {ticket.submitter?.name && <div className="font-semibold text-foreground">{ticket.submitter.name}</div>}
+                        {ticket.submitter?.email && <div className="text-xs text-muted-foreground">{ticket.submitter.email}</div>}
+                        {!ticket.submitter?.name && !ticket.submitter?.email && <div className="text-xs text-muted-foreground">Anonymous</div>}
                         {ticket.upvoters && ticket.upvoters.length > 0 && (
-                          <div className="text-[11px] text-slate-500">
+                          <div className="text-[11px] text-muted-foreground">
                             Upvoted by{" "}
                             {ticket.upvoters
                               .map((u) => u.name || u.email || "Someone")
@@ -582,12 +582,12 @@ export default function TicketsPage() {
                           </div>
                         )}
                       </td>
-                      <td className="px-4 py-4 align-top text-xs text-slate-600 space-y-1">
-                        <div className="font-semibold text-slate-800">{deviceLabel(ticket)}</div>
-                        {ticket.client?.language && <div className="text-xs text-slate-500">{ticket.client.language}</div>}
+                      <td className="px-4 py-4 align-top text-xs text-muted-foreground space-y-1">
+                        <div className="font-semibold text-foreground">{deviceLabel(ticket)}</div>
+                        {ticket.client?.language && <div className="text-xs text-muted-foreground">{ticket.client.language}</div>}
                       </td>
-                      <td className="px-4 py-4 align-top text-xs text-slate-600 space-y-1 max-w-[220px]">
-                        {ticket.pageTitle && <div className="font-semibold text-slate-800 line-clamp-1">{ticket.pageTitle}</div>}
+                      <td className="px-4 py-4 align-top text-xs text-muted-foreground space-y-1 max-w-[220px]">
+                        {ticket.pageTitle && <div className="font-semibold text-foreground line-clamp-1">{ticket.pageTitle}</div>}
                         {ticket.url && (
                           <a
                             href={ticket.url}
@@ -599,13 +599,13 @@ export default function TicketsPage() {
                             {displayUrl(ticket.url)}
                           </a>
                         )}
-                        {ticket.path && <div className="text-slate-500 line-clamp-1" title={ticket.path}>{ticket.path}</div>}
-                        {ticket.selection && <div className="text-slate-500 line-clamp-1" title={ticket.selection}>Selection: “{ticket.selection}”</div>}
+                        {ticket.path && <div className="text-muted-foreground line-clamp-1" title={ticket.path}>{ticket.path}</div>}
+                        {ticket.selection && <div className="text-muted-foreground line-clamp-1" title={ticket.selection}>Selection: “{ticket.selection}”</div>}
                       </td>
-                      <td className="px-4 py-4 align-top text-sm text-slate-600">
+                      <td className="px-4 py-4 align-top text-sm text-muted-foreground">
                         {ticket.createdAt ? new Date(ticket.createdAt).toLocaleString() : "—"}
                       </td>
-                      <td className="px-4 py-4 align-top text-sm text-slate-600 bg-white">
+                      <td className="px-4 py-4 align-top text-sm text-muted-foreground bg-card">
                         <div className="flex flex-col gap-2">
                           <Button size="sm" variant="ghost" className="justify-start px-0 text-emerald-700" onClick={() => setDetailTicket(ticket)}>
                             Details
@@ -618,7 +618,7 @@ export default function TicketsPage() {
                             </Button>
                           )}
                           {ticket.status === "completed" ? (
-                            <span className="text-xs text-slate-500">Done</span>
+                            <span className="text-xs text-muted-foreground">Done</span>
                           ) : (
                             <Button
                               size="sm"
@@ -640,24 +640,24 @@ export default function TicketsPage() {
             {/* Mobile cards */}
             <div className="space-y-3 md:hidden">
               {filteredTickets.map((ticket) => (
-                <div key={ticket.id} className="rounded-lg border border-slate-200 bg-white p-3 shadow-sm">
+                <div key={ticket.id} className="rounded-lg border border-border bg-card p-3 shadow-sm">
                   <div className="flex items-start justify-between gap-2">
                     <div>
-                      <div className="text-xs font-semibold uppercase text-slate-500">{ticket.status === "completed" ? "Completed" : "Open"}</div>
+                      <div className="text-xs font-semibold uppercase text-muted-foreground">{ticket.status === "completed" ? "Completed" : "Open"}</div>
                       <div className="flex items-center gap-2">
                         {categoryBadge(ticket)}
-                        <div className="text-base font-semibold text-slate-900 line-clamp-2">{ticket.title}</div>
+                        <div className="text-base font-semibold text-foreground line-clamp-2">{ticket.title}</div>
                       </div>
-                      <div className="text-xs text-slate-500">{ticket.createdAt ? new Date(ticket.createdAt).toLocaleString() : "—"}</div>
+                      <div className="text-xs text-muted-foreground">{ticket.createdAt ? new Date(ticket.createdAt).toLocaleString() : "—"}</div>
                     </div>
                     <div className="flex items-center gap-2">
                       <Button size="sm" variant="secondary" onClick={() => upvote(ticket)} disabled={upvotingId === ticket.id}>
                         {upvotingId === ticket.id ? "…" : "Upvote"}
                       </Button>
-                      <span className="text-sm font-semibold text-slate-900">{ticket.votes ?? 0}</span>
+                      <span className="text-sm font-semibold text-foreground">{ticket.votes ?? 0}</span>
                     </div>
                   </div>
-                  <div className="mt-2 text-sm text-slate-700 line-clamp-3">{ticket.notes ?? "—"}</div>
+                  <div className="mt-2 text-sm text-foreground line-clamp-3">{ticket.notes ?? "—"}</div>
                   {ticket.notes && ticket.notes.length > 140 && (
                     <button
                       className="text-xs font-semibold text-emerald-700 hover:underline"
@@ -668,7 +668,7 @@ export default function TicketsPage() {
                       {expandedNotes[ticket.id] ? "Show less" : "Show all"}
                     </button>
                   )}
-                  <div className="mt-2 text-xs text-slate-600">
+                  <div className="mt-2 text-xs text-muted-foreground">
                     {ticket.submitter?.name || ticket.submitter?.email ? (
                       <>
                         <span className="font-semibold">{ticket.submitter?.name}</span>
@@ -678,9 +678,9 @@ export default function TicketsPage() {
                       "Anonymous"
                     )}
                   </div>
-                  <div className="mt-1 text-xs text-slate-600">{deviceLabel(ticket)}</div>
+                  <div className="mt-1 text-xs text-muted-foreground">{deviceLabel(ticket)}</div>
                   {ticket.pageTitle && (
-                    <div className="mt-1 text-xs text-slate-600 line-clamp-1">
+                    <div className="mt-1 text-xs text-muted-foreground line-clamp-1">
                       <span className="font-semibold">{ticket.pageTitle}</span>
                     </div>
                   )}
@@ -707,7 +707,7 @@ export default function TicketsPage() {
                       </Button>
                     )}
                     {ticket.status === "completed" ? (
-                      <span className="text-xs text-slate-500 self-center">Done</span>
+                      <span className="text-xs text-muted-foreground self-center">Done</span>
                     ) : (
                       <Button size="sm" variant="secondary" onClick={() => markCompleted(ticket)} disabled={updatingId === ticket.id}>
                         {updatingId === ticket.id ? "Saving..." : "Mark completed"}
@@ -725,26 +725,26 @@ export default function TicketsPage() {
             <DialogHeader>
               <DialogTitle>{detailTicket?.title ?? "Details"}</DialogTitle>
             </DialogHeader>
-            <div className="space-y-3 text-sm text-slate-700">
-              <div className="rounded-md border border-slate-200 bg-slate-50 p-3">
-                <div className="text-xs font-semibold uppercase text-slate-500">Ticket details</div>
+            <div className="space-y-3 text-sm text-foreground">
+              <div className="rounded-md border border-border bg-muted p-3">
+                <div className="text-xs font-semibold uppercase text-muted-foreground">Ticket details</div>
                 <div className="mt-1 whitespace-pre-wrap">{detailTicket?.notes ?? "—"}</div>
               </div>
               <div>
-                <div className="text-xs font-semibold uppercase text-slate-500">Agent notes</div>
-                <div className="whitespace-pre-wrap rounded border border-slate-200 bg-slate-50 p-3">
+                <div className="text-xs font-semibold uppercase text-muted-foreground">Agent notes</div>
+                <div className="whitespace-pre-wrap rounded border border-border bg-muted p-3">
                   {detailTicket?.agentNotes ?? "No agent notes yet."}
                 </div>
               </div>
               <div className="space-y-1">
-                <div className="text-xs font-semibold uppercase text-slate-500">Add response</div>
+                <div className="text-xs font-semibold uppercase text-muted-foreground">Add response</div>
                 <Textarea
                   rows={3}
                   placeholder="Reply or add context. This will append to agent notes."
                   value={response}
                   onChange={(e) => setResponse(e.target.value)}
                 />
-                <div className="text-[11px] text-slate-500">
+                <div className="text-[11px] text-muted-foreground">
                   Saved to agent notes history.
                   {detailTicket?.status === "completed" && response.trim() && (
                     <span className="ml-1 text-amber-600 font-medium">
@@ -779,7 +779,7 @@ export default function TicketsPage() {
                 <Send className="h-5 w-5 text-emerald-600" />
                 Submit a Support Ticket
               </DialogTitle>
-              <p className="text-sm text-slate-600 mt-1">
+              <p className="text-sm text-muted-foreground mt-1">
                 Tell us what you need. We reply fastest to urgent operations issues.
               </p>
             </DialogHeader>
@@ -799,7 +799,7 @@ export default function TicketsPage() {
             <div className="space-y-4 py-2">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <label className="text-sm font-medium text-slate-700">Name</label>
+                  <label className="text-sm font-medium text-foreground">Name</label>
                   <Input
                     placeholder="Your name"
                     value={newTicket.name}
@@ -807,7 +807,7 @@ export default function TicketsPage() {
                   />
                 </div>
                 <div className="space-y-2">
-                  <label className="text-sm font-medium text-slate-700">Email</label>
+                  <label className="text-sm font-medium text-foreground">Email</label>
                   <Input
                     type="email"
                     placeholder="your@email.com"
@@ -819,7 +819,7 @@ export default function TicketsPage() {
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div className="space-y-2">
-                  <label className="text-sm font-medium text-slate-700">Campground</label>
+                  <label className="text-sm font-medium text-foreground">Campground</label>
                   <Input
                     placeholder="North Woods RV"
                     value={newTicket.campground}
@@ -827,7 +827,7 @@ export default function TicketsPage() {
                   />
                 </div>
                 <div className="space-y-2">
-                  <label className="text-sm font-medium text-slate-700">Role</label>
+                  <label className="text-sm font-medium text-foreground">Role</label>
                   <Select
                     value={newTicket.role}
                     onValueChange={(val) => setNewTicket(prev => ({ ...prev, role: val }))}
@@ -845,7 +845,7 @@ export default function TicketsPage() {
                   </Select>
                 </div>
                 <div className="space-y-2">
-                  <label className="text-sm font-medium text-slate-700">Urgency</label>
+                  <label className="text-sm font-medium text-foreground">Urgency</label>
                   <Select
                     value={newTicket.urgency}
                     onValueChange={(val) => setNewTicket(prev => ({ ...prev, urgency: val }))}
@@ -863,7 +863,7 @@ export default function TicketsPage() {
               </div>
 
               <div className="space-y-2">
-                <label className="text-sm font-medium text-slate-700">Title</label>
+                <label className="text-sm font-medium text-foreground">Title</label>
                 <Input
                   placeholder="Brief summary of the issue"
                   value={newTicket.title}
@@ -873,7 +873,7 @@ export default function TicketsPage() {
 
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <label className="text-sm font-medium text-slate-700">Category</label>
+                  <label className="text-sm font-medium text-foreground">Category</label>
                   <Select
                     value={newTicket.category}
                     onValueChange={(val: "issue" | "question" | "feature" | "other") => setNewTicket(prev => ({ ...prev, category: val }))}
@@ -890,7 +890,7 @@ export default function TicketsPage() {
                   </Select>
                 </div>
                 <div className="space-y-2">
-                  <label className="text-sm font-medium text-slate-700">Area</label>
+                  <label className="text-sm font-medium text-foreground">Area</label>
                   <Select
                     value={newTicket.area}
                     onValueChange={(val) => setNewTicket(prev => ({ ...prev, area: val }))}
@@ -911,7 +911,7 @@ export default function TicketsPage() {
               </div>
 
               <div className="space-y-2">
-                <label className="text-sm font-medium text-slate-700">Details</label>
+                <label className="text-sm font-medium text-foreground">Details</label>
                 <Textarea
                   placeholder="What happened? Include reservation IDs, timestamps, or error messages."
                   rows={5}
@@ -920,8 +920,8 @@ export default function TicketsPage() {
                 />
               </div>
 
-              <div className="rounded-lg border border-slate-200 bg-slate-50 p-3 text-xs text-slate-600">
-                <div className="font-semibold text-slate-700 mb-1">Response targets:</div>
+              <div className="rounded-lg border border-border bg-muted p-3 text-xs text-muted-foreground">
+                <div className="font-semibold text-foreground mb-1">Response targets:</div>
                 <ul className="space-y-1">
                   <li>• Critical (system down): under 15 minutes</li>
                   <li>• Urgent (guests waiting): under 30 minutes</li>

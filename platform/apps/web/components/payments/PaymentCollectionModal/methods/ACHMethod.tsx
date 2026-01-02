@@ -107,7 +107,7 @@ function ACHPaymentForm({
       </div>
 
       {/* Stripe PaymentElement configured for ACH */}
-      <div className="border border-slate-200 rounded-lg p-4 bg-white">
+      <div className="border border-border rounded-lg p-4 bg-card">
         <PaymentElement
           options={{
             layout: "tabs",
@@ -180,7 +180,7 @@ export function ACHMethod({ onSuccess, onError, onCancel }: ACHMethodProps) {
     return (
       <div className="py-8 text-center space-y-4">
         <AlertCircle className="h-8 w-8 mx-auto text-red-500" />
-        <p className="text-slate-600">Payment system is not configured</p>
+        <p className="text-muted-foreground">Payment system is not configured</p>
         <Button variant="outline" onClick={handleCancel}>
           Go Back
         </Button>
@@ -193,7 +193,7 @@ export function ACHMethod({ onSuccess, onError, onCancel }: ACHMethodProps) {
     return (
       <div className="py-12 text-center space-y-4">
         <Loader2 className="h-8 w-8 animate-spin mx-auto text-emerald-600" />
-        <p className="text-slate-600">Initializing bank transfer...</p>
+        <p className="text-muted-foreground">Initializing bank transfer...</p>
       </div>
     );
   }
@@ -203,7 +203,7 @@ export function ACHMethod({ onSuccess, onError, onCancel }: ACHMethodProps) {
     return (
       <div className="py-8 text-center space-y-4">
         <AlertCircle className="h-8 w-8 mx-auto text-red-500" />
-        <p className="text-slate-600">{error}</p>
+        <p className="text-muted-foreground">{error}</p>
         <div className="flex gap-2 justify-center">
           <Button variant="outline" onClick={handleCancel}>
             Go Back

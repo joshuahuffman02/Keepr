@@ -101,7 +101,7 @@ function CardPaymentForm({
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       {/* Stripe PaymentElement - includes its own billing ZIP field */}
-      <div className="border border-slate-200 rounded-lg p-4 bg-white">
+      <div className="border border-border rounded-lg p-4 bg-card">
         <PaymentElement
           options={{
             layout: "tabs",
@@ -118,7 +118,7 @@ function CardPaymentForm({
             checked={saveCard}
             onCheckedChange={(checked) => onSaveCardChange(checked === true)}
           />
-          <Label htmlFor="save-card" className="text-sm text-slate-600 cursor-pointer">
+          <Label htmlFor="save-card" className="text-sm text-muted-foreground cursor-pointer">
             Save card for future payments
           </Label>
         </div>
@@ -202,7 +202,7 @@ export function CardMethod({ onSuccess, onError, onCancel }: CardMethodProps) {
     return (
       <div className="py-12 text-center space-y-4">
         <Loader2 className="h-8 w-8 animate-spin mx-auto text-emerald-600" />
-        <p className="text-slate-600">Initializing payment...</p>
+        <p className="text-muted-foreground">Initializing payment...</p>
       </div>
     );
   }

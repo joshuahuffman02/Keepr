@@ -53,8 +53,8 @@ export function HeroBanner({ onSearch }: HeroBannerProps) {
         {!isReducedMotion && <SeasonalParticles />}
 
         {/* Ambient glow spots */}
-        <div className="absolute -top-40 -right-40 w-80 h-80 bg-white/10 rounded-full blur-3xl" />
-        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-white/10 rounded-full blur-3xl" />
+        <div className="absolute -top-40 -right-40 w-80 h-80 bg-card/10 rounded-full blur-3xl" />
+        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-card/10 rounded-full blur-3xl" />
 
         {/* Floating clay decorations - reduced to 4 key elements */}
         <div className="hidden md:block">

@@ -114,15 +114,15 @@ export function RevenueBySiteTypeReport({ campgroundId, dateRange }: RevenueBySi
                             </PieChart>
                         </ResponsiveContainer>
                     ) : (
-                        <div className="flex items-center justify-center h-full text-slate-400">No data available</div>
+                        <div className="flex items-center justify-center h-full text-muted-foreground">No data available</div>
                     )}
                 </div>
 
                 <div className="w-full md:w-1/2 space-y-4">
-                    <h3 className="text-lg font-semibold text-slate-900">Performance by Site Type</h3>
-                    <div className="rounded-xl border border-slate-200 bg-white shadow-sm overflow-hidden">
+                    <h3 className="text-lg font-semibold text-foreground">Performance by Site Type</h3>
+                    <div className="rounded-xl border border-border bg-card shadow-sm overflow-hidden">
                         <table className="min-w-full text-sm text-left">
-                            <thead className="bg-slate-50 text-xs uppercase font-semibold text-slate-500">
+                            <thead className="bg-muted text-xs uppercase font-semibold text-muted-foreground">
                                 <tr>
                                     <th className="px-4 py-3">Category</th>
                                     <th className="px-4 py-3 text-right">Bookings</th>
@@ -130,18 +130,18 @@ export function RevenueBySiteTypeReport({ campgroundId, dateRange }: RevenueBySi
                                     <th className="px-4 py-3 text-right">%</th>
                                 </tr>
                             </thead>
-                            <tbody className="divide-y divide-slate-100">
+                            <tbody className="divide-y divide-border">
                                 {reportData.map((item) => (
-                                    <tr key={item.name} className="hover:bg-slate-50">
-                                        <td className="px-4 py-3 font-medium text-slate-900">{item.name}</td>
-                                        <td className="px-4 py-3 text-right text-slate-600">{item.count}</td>
-                                        <td className="px-4 py-3 text-right font-mono text-slate-900">{formatCurrency(item.revenue)}</td>
-                                        <td className="px-4 py-3 text-right text-slate-500">
+                                    <tr key={item.name} className="hover:bg-muted">
+                                        <td className="px-4 py-3 font-medium text-foreground">{item.name}</td>
+                                        <td className="px-4 py-3 text-right text-muted-foreground">{item.count}</td>
+                                        <td className="px-4 py-3 text-right font-mono text-foreground">{formatCurrency(item.revenue)}</td>
+                                        <td className="px-4 py-3 text-right text-muted-foreground">
                                             {totalRevenue > 0 ? ((item.revenue / totalRevenue) * 100).toFixed(1) : 0}%
                                         </td>
                                     </tr>
                                 ))}
-                                <tr className="bg-slate-50 font-semibold">
+                                <tr className="bg-muted font-semibold">
                                     <td className="px-4 py-3">Total</td>
                                     <td className="px-4 py-3 text-right">{reportData.reduce((sum, i) => sum + i.count, 0)}</td>
                                     <td className="px-4 py-3 text-right">{formatCurrency(totalRevenue)}</td>

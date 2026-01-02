@@ -527,7 +527,11 @@ export function SupportChatWidget() {
       <button
         type="button"
         onClick={() => setIsOpen(true)}
-        className="fixed bottom-6 right-6 w-14 h-14 bg-gradient-to-br from-blue-500 to-indigo-600 text-white rounded-full shadow-xl hover:shadow-2xl hover:scale-105 transition-all flex items-center justify-center z-[9999]"
+        className={`fixed bottom-6 right-6 w-14 h-14 rounded-full shadow-xl hover:shadow-2xl hover:scale-105 transition-all flex items-center justify-center z-[9999] ${
+          isSupportMode
+            ? "bg-status-info text-status-info-foreground"
+            : "bg-action-primary text-action-primary-foreground"
+        }`}
         aria-label="Open Host assistant"
       >
         <LifeBuoy className="w-6 h-6" />
@@ -536,15 +540,17 @@ export function SupportChatWidget() {
   }
 
   return (
-    <div className="fixed bottom-6 right-6 w-96 h-[540px] bg-white rounded-2xl shadow-2xl flex flex-col overflow-hidden z-50 border border-slate-200">
+    <div className="fixed bottom-6 right-6 w-96 h-[540px] bg-card rounded-2xl shadow-2xl flex flex-col overflow-hidden z-50 border border-border">
       {/* Header */}
       <div
-        className={`text-white p-4 flex items-center justify-between ${
-          isSupportMode ? "bg-gradient-to-r from-blue-500 to-indigo-600" : "bg-gradient-to-r from-emerald-500 to-teal-600"
+        className={`p-4 flex items-center justify-between ${
+          isSupportMode
+            ? "bg-status-info text-status-info-foreground"
+            : "bg-action-primary text-action-primary-foreground"
         }`}
       >
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
+          <div className="w-10 h-10 bg-card/20 rounded-full flex items-center justify-center">
             {isSupportMode ? <LifeBuoy className="w-5 h-5" /> : <ShieldCheck className="w-5 h-5" />}
           </div>
           <div>
@@ -555,13 +561,13 @@ export function SupportChatWidget() {
         <button
           type="button"
           onClick={() => setIsOpen(false)}
-          className="p-2 hover:bg-white/10 rounded-lg transition-colors"
+          className="p-2 hover:bg-card/10 rounded-lg transition-colors"
         >
           <X className="w-5 h-5" />
         </button>
       </div>
 
-      <div className="border-b border-slate-200 px-4 py-2 flex items-center gap-2 text-xs">
+      <div className="border-b border-border px-4 py-2 flex items-center gap-2 text-xs">
         <button
           type="button"
           onClick={() => setMode("support")}
@@ -596,7 +602,7 @@ export function SupportChatWidget() {
                 Beta
               </span>
             </div>
-            <span className="rounded-full border border-status-success/30 bg-white px-2 py-0.5 text-status-success">
+            <span className="rounded-full border border-status-success/30 bg-card px-2 py-0.5 text-status-success">
               {campgroundId ? `Campground ${formatId(campgroundId)}` : "Select a campground"}
             </span>
           </div>
@@ -625,19 +631,19 @@ export function SupportChatWidget() {
                 className={`max-w-[75%] p-3 rounded-2xl ${
                   msg.role === "user"
                     ? "bg-status-info text-white rounded-br-md"
-                    : "bg-slate-100 text-slate-900 rounded-bl-md"
+                    : "bg-muted text-foreground rounded-bl-md"
                 }`}
               >
                 <p className="text-sm whitespace-pre-wrap">{msg.content}</p>
 
                 {msg.helpArticles && msg.helpArticles.length > 0 && (
                   <div className="mt-3 space-y-2">
-                    <p className="text-xs font-medium text-slate-500">Related articles:</p>
+                    <p className="text-xs font-medium text-muted-foreground">Related articles:</p>
                     {msg.helpArticles.map((article, idx) => (
                       <Link
                         key={idx}
                         href={article.url}
-                        className="flex items-center gap-2 bg-white rounded-lg p-2 border border-slate-200 text-sm text-status-info hover:bg-status-info/15 transition-colors"
+                        className="flex items-center gap-2 bg-card rounded-lg p-2 border border-border text-sm text-status-info hover:bg-status-info/15 transition-colors"
                       >
                         <ExternalLink className="w-3 h-3" />
                         {article.title}
@@ -647,8 +653,8 @@ export function SupportChatWidget() {
                 )}
 
                 {msg.showTicketPrompt && (
-                  <div className="mt-3 pt-3 border-t border-slate-200">
-                    <p className="text-xs text-slate-500 mb-2">Need more help?</p>
+                  <div className="mt-3 pt-3 border-t border-border">
+                    <p className="text-xs text-muted-foreground mb-2">Need more help?</p>
                     <Link
                       href="/help/contact"
                       className="inline-flex items-center gap-2 bg-status-info text-white px-3 py-2 rounded-lg text-sm font-medium hover:bg-status-info/80 transition-colors"
@@ -660,8 +666,8 @@ export function SupportChatWidget() {
                 )}
               </div>
               {msg.role === "user" && (
-                <div className="w-8 h-8 bg-slate-200 rounded-full flex items-center justify-center flex-shrink-0">
-                  <User className="w-4 h-4 text-slate-600" />
+                <div className="w-8 h-8 bg-muted rounded-full flex items-center justify-center flex-shrink-0">
+                  <User className="w-4 h-4 text-muted-foreground" />
                 </div>
               )}
             </div>
@@ -674,8 +680,8 @@ export function SupportChatWidget() {
               msg.role === "user"
                 ? "bg-status-success text-white rounded-br-md"
                 : hasActionDrafts
-                  ? "bg-slate-50 text-slate-900 rounded-bl-md border border-slate-200"
-                  : "bg-slate-100 text-slate-900 rounded-bl-md";
+                  ? "bg-muted text-foreground rounded-bl-md border border-border"
+                  : "bg-muted text-foreground rounded-bl-md";
             const bubblePadding = hasActionDrafts ? "p-4" : "p-3";
 
             return (
@@ -704,14 +710,14 @@ export function SupportChatWidget() {
 
                 {msg.questions?.length ? (
                   <div className="mt-3 space-y-2">
-                    <div className="text-xs font-semibold uppercase tracking-wide text-slate-500">Needs input</div>
+                    <div className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Needs input</div>
                     <div className="flex flex-wrap gap-2">
                       {msg.questions.map((question, idx) => (
                         <button
                           key={`${question}-${idx}`}
                           type="button"
                           onClick={() => handlePartnerQuickReply(question)}
-                          className="rounded-full border border-slate-200 bg-white px-3 py-1 text-xs text-slate-600 hover:border-status-success hover:text-status-success"
+                          className="rounded-full border border-border bg-card px-3 py-1 text-xs text-muted-foreground hover:border-status-success hover:text-status-success"
                         >
                           {question}
                         </button>
@@ -763,13 +769,13 @@ export function SupportChatWidget() {
                       const detailParams = Object.entries(draft.parameters ?? {}).filter(([key]) => !usedKeys.has(key));
 
                       return (
-                        <div key={draft.id} className="rounded-xl border border-slate-200 bg-white p-3 text-xs text-slate-600">
+                        <div key={draft.id} className="rounded-xl border border-border bg-card p-3 text-xs text-muted-foreground">
                           <div className="flex flex-wrap items-start justify-between gap-2">
                             <div>
-                              <div className="text-sm font-semibold text-slate-900">
+                              <div className="text-sm font-semibold text-foreground">
                                 {ACTION_LABELS[draft.actionType] || draft.actionType}
                               </div>
-                              {summary ? <div className="mt-1 text-xs text-slate-600">{summary}</div> : null}
+                              {summary ? <div className="mt-1 text-xs text-muted-foreground">{summary}</div> : null}
                             </div>
                             <div className="flex flex-wrap items-center gap-2">
                               {draft.requiresConfirmation && (
@@ -784,15 +790,15 @@ export function SupportChatWidget() {
                           </div>
 
                           {highlights.length ? (
-                            <div className="mt-3 rounded-lg border border-slate-100 bg-slate-50 px-3 py-2 text-[11px]">
-                              <div className="text-[10px] font-semibold uppercase tracking-wide text-slate-500">
+                            <div className="mt-3 rounded-lg border border-border bg-muted px-3 py-2 text-[11px]">
+                              <div className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
                                 Key details
                               </div>
                               <div className="mt-2 space-y-1">
                                 {highlights.map((item) => (
                                   <div key={`${draft.id}-${item.key}`} className="flex items-center justify-between gap-4">
-                                    <span className="text-slate-500">{item.label}</span>
-                                    <span className="text-slate-900">{item.value}</span>
+                                    <span className="text-muted-foreground">{item.label}</span>
+                                    <span className="text-foreground">{item.value}</span>
                                   </div>
                                 ))}
                               </div>
@@ -800,14 +806,14 @@ export function SupportChatWidget() {
                           ) : null}
 
                           {draft.impact && (
-                            <div className="mt-2 rounded-lg border border-slate-100 bg-slate-50 px-3 py-2 text-xs">
+                            <div className="mt-2 rounded-lg border border-border bg-muted px-3 py-2 text-xs">
                               <div className="flex items-center justify-between">
-                                <span className="font-semibold text-slate-700">Impact</span>
+                                <span className="font-semibold text-foreground">Impact</span>
                                 <span className={`rounded-full px-2 py-0.5 text-[11px] ${impactClass}`}>
                                   {draft.impact.level}
                                 </span>
                               </div>
-                              <p className="mt-1 text-slate-600">{draft.impact.summary}</p>
+                              <p className="mt-1 text-muted-foreground">{draft.impact.summary}</p>
                               {draft.impact.warnings?.length ? (
                                 <div className="mt-2 space-y-1 text-status-warning">
                                   {draft.impact.warnings.map((warning) => (
@@ -850,30 +856,30 @@ export function SupportChatWidget() {
                                   {confirmingDraftId === draft.id ? "Confirming..." : "Confirm & run"}
                                 </button>
                               ) : (
-                                <span className="text-[11px] text-slate-500">
+                                <span className="text-[11px] text-muted-foreground">
                                   Review this draft in the linked screen to continue.
                                 </span>
                               )}
-                              <span className="text-[11px] text-slate-400">Runs with your permissions.</span>
+                              <span className="text-[11px] text-muted-foreground">Runs with your permissions.</span>
                             </div>
                           )}
 
                           {(draft.sensitivity || detailParams.length > 0) && (
-                            <details className="mt-3 text-[11px] text-slate-500">
+                            <details className="mt-3 text-[11px] text-muted-foreground">
                               <summary className="cursor-pointer select-none">Technical details</summary>
                               <div className="mt-2 space-y-1">
                                 <div className="flex items-center justify-between gap-4">
                                   <span>Action</span>
-                                  <span className="text-slate-900">{draft.action}</span>
+                                  <span className="text-foreground">{draft.action}</span>
                                 </div>
                                 <div className="flex items-center justify-between gap-4">
                                   <span>Resource</span>
-                                  <span className="text-slate-900">{draft.resource}</span>
+                                  <span className="text-foreground">{draft.resource}</span>
                                 </div>
                                 {draft.sensitivity && (
                                   <div className="flex items-center justify-between gap-4">
                                     <span>Sensitivity</span>
-                                    <span className="text-slate-900">{draft.sensitivity}</span>
+                                    <span className="text-foreground">{draft.sensitivity}</span>
                                   </div>
                                 )}
                                 {detailParams.length > 0 && (
@@ -881,7 +887,7 @@ export function SupportChatWidget() {
                                     {detailParams.map(([key, value]) => (
                                       <div key={key} className="flex items-center justify-between gap-4">
                                         <span>{key}</span>
-                                        <span className="text-slate-900">{formatValue(value)}</span>
+                                        <span className="text-foreground">{formatValue(value)}</span>
                                       </div>
                                     ))}
                                   </div>
@@ -909,7 +915,7 @@ export function SupportChatWidget() {
                       <Link
                         key={`${link.label}-${link.url}`}
                         href={link.url}
-                        className="rounded-full border border-slate-200 bg-white px-3 py-1 text-slate-600 hover:border-status-success hover:text-status-success"
+                        className="rounded-full border border-border bg-card px-3 py-1 text-muted-foreground hover:border-status-success hover:text-status-success"
                       >
                         {link.label}
                       </Link>
@@ -918,8 +924,8 @@ export function SupportChatWidget() {
                 ) : null}
                 </div>
                 {msg.role === "user" && (
-                  <div className="w-8 h-8 bg-slate-200 rounded-full flex items-center justify-center flex-shrink-0">
-                    <User className="w-4 h-4 text-slate-600" />
+                  <div className="w-8 h-8 bg-muted rounded-full flex items-center justify-center flex-shrink-0">
+                    <User className="w-4 h-4 text-muted-foreground" />
                   </div>
                 )}
               </div>
@@ -934,11 +940,11 @@ export function SupportChatWidget() {
             }`}>
               <Bot className={`w-4 h-4 ${isSupportMode ? "text-status-info" : "text-status-success"}`} />
             </div>
-            <div className="bg-slate-100 rounded-2xl rounded-bl-md p-3">
+            <div className="bg-muted rounded-2xl rounded-bl-md p-3">
               <div className="flex gap-1">
-                <div className="w-2 h-2 bg-slate-400 rounded-full animate-bounce" />
-                <div className="w-2 h-2 bg-slate-400 rounded-full animate-bounce [animation-delay:0.1s]" />
-                <div className="w-2 h-2 bg-slate-400 rounded-full animate-bounce [animation-delay:0.2s]" />
+                <div className="w-2 h-2 bg-muted rounded-full animate-bounce" />
+                <div className="w-2 h-2 bg-muted rounded-full animate-bounce [animation-delay:0.1s]" />
+                <div className="w-2 h-2 bg-muted rounded-full animate-bounce [animation-delay:0.2s]" />
               </div>
             </div>
           </div>
@@ -948,7 +954,7 @@ export function SupportChatWidget() {
       </div>
 
       {/* Quick Actions */}
-      <div className="px-4 py-2 border-t border-slate-100 flex gap-2 overflow-x-auto">
+      <div className="px-4 py-2 border-t border-border flex gap-2 overflow-x-auto">
         {isSupportMode ? (
           [
             { label: "Help Center", href: "/help" },
@@ -958,7 +964,7 @@ export function SupportChatWidget() {
             <Link
               key={link.href}
               href={link.href}
-              className="flex-shrink-0 px-3 py-1.5 bg-slate-100 text-slate-600 text-xs font-medium rounded-full hover:bg-slate-200 transition-colors"
+              className="flex-shrink-0 px-3 py-1.5 bg-muted text-muted-foreground text-xs font-medium rounded-full hover:bg-muted transition-colors"
             >
               {link.label}
             </Link>
@@ -976,7 +982,7 @@ export function SupportChatWidget() {
               key={prompt}
               type="button"
               onClick={() => setPartnerInput(prompt)}
-              className="flex-shrink-0 px-3 py-1.5 bg-slate-100 text-slate-600 text-xs font-medium rounded-full hover:bg-slate-200 transition-colors"
+              className="flex-shrink-0 px-3 py-1.5 bg-muted text-muted-foreground text-xs font-medium rounded-full hover:bg-muted transition-colors"
             >
               {prompt}
             </button>
@@ -985,7 +991,7 @@ export function SupportChatWidget() {
       </div>
 
       {/* Input */}
-      <div className="p-4 border-t border-slate-200">
+      <div className="p-4 border-t border-border">
         <div className="flex gap-2">
           <input
             type="text"
@@ -999,7 +1005,7 @@ export function SupportChatWidget() {
             }}
             onKeyDown={handleKeyDown}
             placeholder={isSupportMode ? "Ask a question..." : "Ask for actions, maintenance, billing, messaging, or drafts..."}
-            className={`flex-1 px-4 py-2 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 text-sm ${
+            className={`flex-1 px-4 py-2 border border-border rounded-xl focus:outline-none focus:ring-2 text-sm ${
               isSupportMode ? "focus:ring-status-info/20 focus:border-status-info" : "focus:ring-status-success/20 focus:border-status-success"
             }`}
             disabled={isPending}

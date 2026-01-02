@@ -26,7 +26,7 @@ const actionColors: Record<string, string> = {
     UPDATE: "bg-status-info/15 text-status-info",
     DELETE: "bg-status-error/15 text-status-error",
     LOGIN: "bg-purple-500/20 text-purple-400",
-    LOGOUT: "bg-slate-500/20 text-slate-400",
+    LOGOUT: "bg-muted0/20 text-muted-foreground",
     SYNC: "bg-cyan-500/20 text-cyan-400",
     EXPORT: "bg-status-warning/15 text-status-warning",
     IMPORT: "bg-teal-500/20 text-teal-400",
@@ -96,14 +96,14 @@ export default function AuditLogPage() {
             <div className="flex items-center justify-between">
                 <div>
                     <h1 className="text-2xl font-bold text-white">Audit Log</h1>
-                    <p className="text-slate-400 mt-1">
+                    <p className="text-muted-foreground mt-1">
                         Track all admin actions and system events
                     </p>
                 </div>
                 <button
                     onClick={loadAuditLog}
                     disabled={loading}
-                    className="inline-flex items-center gap-2 px-4 py-2 bg-slate-800 text-slate-300 border border-slate-700 rounded-lg hover:bg-slate-700 disabled:opacity-50 transition-colors"
+                    className="inline-flex items-center gap-2 px-4 py-2 bg-muted text-muted-foreground border border-border rounded-lg hover:bg-muted disabled:opacity-50 transition-colors"
                 >
                     <RefreshCw className={`h-4 w-4 ${loading ? "animate-spin" : ""}`} />
                     {loading ? "Loading..." : "Refresh"}
@@ -113,21 +113,21 @@ export default function AuditLogPage() {
             {/* Filters */}
             <div className="flex flex-wrap items-center gap-3">
                 <div className="relative flex-1 max-w-md">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" />
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                     <input
                         type="text"
                         value={search}
                         onChange={(e) => setSearch(e.target.value)}
                         placeholder="Search by user, action, or details..."
-                        className="w-full pl-10 pr-4 py-2 bg-slate-800 border border-slate-700 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="w-full pl-10 pr-4 py-2 bg-muted border border-border rounded-lg text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
                 </div>
                 <div className="flex items-center gap-2">
-                    <Filter className="h-4 w-4 text-slate-500" />
+                    <Filter className="h-4 w-4 text-muted-foreground" />
                     <select
                         value={actionFilter}
                         onChange={(e) => setActionFilter(e.target.value)}
-                        className="px-3 py-2 bg-slate-800 border border-slate-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="px-3 py-2 bg-muted border border-border rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-blue-500"
                     >
                         <option value="all">All Actions</option>
                         {actions.map((a) => (
@@ -137,7 +137,7 @@ export default function AuditLogPage() {
                     <select
                         value={resourceFilter}
                         onChange={(e) => setResourceFilter(e.target.value)}
-                        className="px-3 py-2 bg-slate-800 border border-slate-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="px-3 py-2 bg-muted border border-border rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-blue-500"
                     >
                         <option value="all">All Resources</option>
                         {resources.map((r) => (
@@ -154,38 +154,38 @@ export default function AuditLogPage() {
             )}
 
             {/* Log Entries */}
-            <div className="bg-slate-800 rounded-lg border border-slate-700 overflow-hidden">
-                <div className="divide-y divide-slate-700">
+            <div className="bg-muted rounded-lg border border-border overflow-hidden">
+                <div className="divide-y divide-border">
                     {loading && entries.length === 0 && (
-                        <div className="p-8 text-center text-slate-400">
+                        <div className="p-8 text-center text-muted-foreground">
                             Loading audit log...
                         </div>
                     )}
                     {!loading && filtered.length === 0 && (
-                        <div className="p-8 text-center text-slate-400">
+                        <div className="p-8 text-center text-muted-foreground">
                             No audit entries found
                         </div>
                     )}
                     {filtered.map((entry) => {
                         const Icon = resourceIcons[entry.resource] || History;
                         return (
-                            <div key={entry.id} className="p-4 hover:bg-slate-750 transition-colors">
+                            <div key={entry.id} className="p-4 hover:bg-muted transition-colors">
                                 <div className="flex items-start gap-4">
-                                    <div className="p-2 bg-slate-700 rounded-lg">
-                                        <Icon className="h-4 w-4 text-slate-400" />
+                                    <div className="p-2 bg-muted rounded-lg">
+                                        <Icon className="h-4 w-4 text-muted-foreground" />
                                     </div>
                                     <div className="flex-1 min-w-0">
                                         <div className="flex items-center gap-2 flex-wrap">
-                                            <span className={`px-2 py-0.5 text-xs font-medium rounded ${actionColors[entry.action] || "bg-slate-700 text-slate-300"}`}>
+                                            <span className={`px-2 py-0.5 text-xs font-medium rounded ${actionColors[entry.action] || "bg-muted text-muted-foreground"}`}>
                                                 {entry.action}
                                             </span>
                                             <span className="text-white font-medium">{entry.resource}</span>
                                             {entry.resourceId && (
-                                                <span className="text-slate-500 text-sm font-mono">{entry.resourceId}</span>
+                                                <span className="text-muted-foreground text-sm font-mono">{entry.resourceId}</span>
                                             )}
                                         </div>
-                                        <div className="text-sm text-slate-300 mt-1">{entry.details || "No details"}</div>
-                                        <div className="flex items-center gap-4 text-xs text-slate-500 mt-2">
+                                        <div className="text-sm text-muted-foreground mt-1">{entry.details || "No details"}</div>
+                                        <div className="flex items-center gap-4 text-xs text-muted-foreground mt-2">
                                             <span>by {entry.userEmail || entry.userId || "system"}</span>
                                             <span>{new Date(entry.createdAt).toLocaleString()}</span>
                                             {entry.ipAddress && <span>IP: {entry.ipAddress}</span>}
@@ -198,7 +198,7 @@ export default function AuditLogPage() {
                 </div>
             </div>
 
-            <div className="text-sm text-slate-500 text-center">
+            <div className="text-sm text-muted-foreground text-center">
                 Showing {filtered.length} entries
             </div>
         </div>

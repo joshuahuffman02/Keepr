@@ -79,15 +79,15 @@ export function CheckMethod({ onSuccess, onError, onCancel }: CheckMethodProps) 
   return (
     <div className="space-y-6">
       {/* Amount display */}
-      <div className="text-center p-4 bg-slate-50 rounded-lg">
-        <p className="text-sm text-slate-500">Check Amount</p>
-        <p className="text-3xl font-bold text-slate-900">${amountDue.toFixed(2)}</p>
+      <div className="text-center p-4 bg-muted rounded-lg">
+        <p className="text-sm text-muted-foreground">Check Amount</p>
+        <p className="text-3xl font-bold text-foreground">${amountDue.toFixed(2)}</p>
       </div>
 
       {/* Check details */}
       <div className="space-y-4">
         <div className="space-y-2">
-          <Label htmlFor="check-number" className="text-sm text-slate-600">
+          <Label htmlFor="check-number" className="text-sm text-muted-foreground">
             Check Number <span className="text-red-500">*</span>
           </Label>
           <Input
@@ -100,8 +100,8 @@ export function CheckMethod({ onSuccess, onError, onCancel }: CheckMethodProps) 
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="bank-name" className="text-sm text-slate-600">
-            Bank Name <span className="text-slate-400">(optional)</span>
+          <Label htmlFor="bank-name" className="text-sm text-muted-foreground">
+            Bank Name <span className="text-muted-foreground">(optional)</span>
           </Label>
           <Input
             id="bank-name"

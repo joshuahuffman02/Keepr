@@ -68,14 +68,14 @@ export function RadarChart({
 }: RadarChartProps) {
   if (loading) {
     return (
-      <Card className="border-slate-200 dark:border-slate-700">
+      <Card className="border-border dark:border-border">
         <CardHeader>
-          <CardTitle className="text-lg text-slate-900 dark:text-white">{title}</CardTitle>
-          {description && <p className="text-sm text-slate-500 dark:text-slate-400">{description}</p>}
+          <CardTitle className="text-lg text-foreground dark:text-white">{title}</CardTitle>
+          {description && <p className="text-sm text-muted-foreground dark:text-muted-foreground">{description}</p>}
         </CardHeader>
         <CardContent>
           <div className="animate-pulse flex items-center justify-center" style={{ height }}>
-            <div className="w-64 h-64 rounded-full bg-slate-200 dark:bg-slate-700" />
+            <div className="w-64 h-64 rounded-full bg-muted dark:bg-muted" />
           </div>
         </CardContent>
       </Card>
@@ -93,10 +93,10 @@ export function RadarChart({
   }));
 
   return (
-    <Card className="border-slate-200 dark:border-slate-700">
+    <Card className="border-border dark:border-border">
       <CardHeader>
-        <CardTitle className="text-lg text-slate-900 dark:text-white">{title}</CardTitle>
-        {description && <p className="text-sm text-slate-500 dark:text-slate-400">{description}</p>}
+        <CardTitle className="text-lg text-foreground dark:text-white">{title}</CardTitle>
+        {description && <p className="text-sm text-muted-foreground dark:text-muted-foreground">{description}</p>}
       </CardHeader>
       <CardContent>
         <div style={{ height }}>
@@ -145,14 +145,14 @@ export function RadarChart({
               />
               <Legend
                 wrapperStyle={{ paddingTop: "16px" }}
-                formatter={(value: string) => <span className="text-slate-600 dark:text-slate-400">{value}</span>}
+                formatter={(value: string) => <span className="text-muted-foreground dark:text-muted-foreground">{value}</span>}
               />
             </RadarChartComponent>
           </ResponsiveContainer>
         </div>
 
         {/* Score interpretation legend */}
-        <div className="mt-4 flex flex-wrap items-center justify-center gap-4 text-xs text-slate-500 dark:text-slate-400">
+        <div className="mt-4 flex flex-wrap items-center justify-center gap-4 text-xs text-muted-foreground dark:text-muted-foreground">
           <div className="flex items-center gap-4">
             <span className="flex items-center gap-1.5">
               <span className="w-4 h-0.5 bg-blue-500" />

@@ -225,7 +225,7 @@ export function PortalCheckoutFlow({
                                 className={`p-3 rounded-lg border text-sm font-medium transition ${
                                     fulfillment === "delivery"
                                         ? "border-primary bg-primary/5 text-primary"
-                                        : "border-slate-200 hover:border-slate-300 text-slate-700"
+                                        : "border-border hover:border-border text-foreground"
                                 }`}
                             >
                                 Deliver to my site/cabin
@@ -235,7 +235,7 @@ export function PortalCheckoutFlow({
                                 className={`p-3 rounded-lg border text-sm font-medium transition ${
                                     fulfillment === "pickup"
                                         ? "border-primary bg-primary/5 text-primary"
-                                        : "border-slate-200 hover:border-slate-300 text-slate-700"
+                                        : "border-border hover:border-border text-foreground"
                                 }`}
                             >
                                 I'll pick up
@@ -245,7 +245,7 @@ export function PortalCheckoutFlow({
                                 className={`p-3 rounded-lg border text-sm font-medium transition ${
                                     fulfillment === "curbside"
                                         ? "border-primary bg-primary/5 text-primary"
-                                        : "border-slate-200 hover:border-slate-300 text-slate-700"
+                                        : "border-border hover:border-border text-foreground"
                                 }`}
                             >
                                 Curbside / meet at gate
@@ -255,7 +255,7 @@ export function PortalCheckoutFlow({
                                 className={`p-3 rounded-lg border text-sm font-medium transition ${
                                     fulfillment === "table_service"
                                         ? "border-primary bg-primary/5 text-primary"
-                                        : "border-slate-200 hover:border-slate-300 text-slate-700"
+                                        : "border-border hover:border-border text-foreground"
                                 }`}
                             >
                                 Table/QR service

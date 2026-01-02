@@ -118,7 +118,7 @@ export default function LengthOfStayPage() {
               </Badge>
             )}
           </div>
-          <p className="text-slate-400 mt-1">
+          <p className="text-muted-foreground mt-1">
             Understand how long guests stay at campgrounds
           </p>
         </div>

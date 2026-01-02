@@ -128,8 +128,8 @@ export function NaturalLanguageSearch({
       {/* Search Input */}
       <div className="relative">
         <div className={cn(
-          "flex items-center gap-2 px-4 py-3 bg-white border-2 rounded-xl transition-all duration-200",
-          searchMutation.isPending ? "border-emerald-300 shadow-lg shadow-emerald-100" : "border-slate-200 hover:border-slate-300 focus-within:border-emerald-500 focus-within:shadow-lg focus-within:shadow-emerald-100"
+          "flex items-center gap-2 px-4 py-3 bg-card border-2 rounded-xl transition-all duration-200",
+          searchMutation.isPending ? "border-emerald-300 shadow-lg shadow-emerald-100" : "border-border hover:border-border focus-within:border-emerald-500 focus-within:shadow-lg focus-within:shadow-emerald-100"
         )}>
           {searchMutation.isPending ? (
             <Loader2 className="h-5 w-5 text-emerald-500 animate-spin flex-shrink-0" />
@@ -146,14 +146,14 @@ export function NaturalLanguageSearch({
             onFocus={() => !query && setShowExamples(true)}
             onBlur={() => setTimeout(() => setShowExamples(false), 200)}
             placeholder="Try: 'Pet-friendly RV site next weekend under $50'"
-            className="flex-1 bg-transparent outline-none text-slate-800 placeholder:text-slate-400"
+            className="flex-1 bg-transparent outline-none text-foreground placeholder:text-muted-foreground"
             disabled={searchMutation.isPending}
           />
 
           {query && (
             <button
               onClick={handleClear}
-              className="p-1 rounded-full text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors"
+              className="p-1 rounded-full text-muted-foreground hover:text-muted-foreground hover:bg-muted transition-colors"
             >
               <X className="h-4 w-4" />
             </button>
@@ -166,7 +166,7 @@ export function NaturalLanguageSearch({
               "px-4 py-1.5 rounded-lg font-medium text-sm transition-all duration-200 flex items-center gap-2",
               query.length >= 3
                 ? "bg-emerald-600 text-white hover:bg-emerald-700 active:scale-95"
-                : "bg-slate-100 text-slate-400 cursor-not-allowed"
+                : "bg-muted text-muted-foreground cursor-not-allowed"
             )}
           >
             <Search className="h-4 w-4" />
@@ -189,15 +189,15 @@ export function NaturalLanguageSearch({
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
             transition={{ duration: 0.15 }}
-            className="absolute z-10 w-full mt-2 p-3 bg-white border border-slate-200 rounded-xl shadow-lg"
+            className="absolute z-10 w-full mt-2 p-3 bg-card border border-border rounded-xl shadow-lg"
           >
-            <p className="text-xs font-medium text-slate-500 mb-2">Try these searches:</p>
+            <p className="text-xs font-medium text-muted-foreground mb-2">Try these searches:</p>
             <div className="flex flex-wrap gap-2">
               {EXAMPLE_QUERIES.map((example) => (
                 <button
                   key={example}
                   onClick={() => handleExampleClick(example)}
-                  className="px-3 py-1.5 bg-slate-50 hover:bg-emerald-50 text-slate-600 hover:text-emerald-700 text-sm rounded-lg border border-slate-200 hover:border-emerald-200 transition-colors"
+                  className="px-3 py-1.5 bg-muted hover:bg-emerald-50 text-muted-foreground hover:text-emerald-700 text-sm rounded-lg border border-border hover:border-emerald-200 transition-colors"
                 >
                   {example}
                 </button>
@@ -215,7 +215,7 @@ export function NaturalLanguageSearch({
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: -10, scale: 0.98 }}
             transition={{ duration: 0.2, ease: "easeOut" }}
-            className="absolute z-20 w-full mt-2 bg-white border border-slate-200 rounded-xl shadow-xl overflow-hidden"
+            className="absolute z-20 w-full mt-2 bg-card border border-border rounded-xl shadow-xl overflow-hidden"
           >
             {/* Interpretation Header */}
             <div className="p-4 bg-gradient-to-r from-emerald-50 to-teal-50 border-b border-emerald-100">
@@ -234,7 +234,7 @@ export function NaturalLanguageSearch({
                   </div>
 
                   {searchMutation.data.intent.interpretedQuery && (
-                    <p className="text-sm text-slate-600 italic mb-2">
+                    <p className="text-sm text-muted-foreground italic mb-2">
                       "{searchMutation.data.intent.interpretedQuery}"
                     </p>
                   )}
@@ -242,8 +242,8 @@ export function NaturalLanguageSearch({
                   {/* Intent details */}
                   <div className="flex flex-wrap items-center gap-2 mt-2">
                     {formatIntent(searchMutation.data.intent).map((part, i) => (
-                      <span key={i} className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-white rounded-full text-sm text-slate-700 border border-slate-200">
-                        {i === 0 && <Calendar className="h-3.5 w-3.5 text-slate-400" />}
+                      <span key={i} className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-card rounded-full text-sm text-foreground border border-border">
+                        {i === 0 && <Calendar className="h-3.5 w-3.5 text-muted-foreground" />}
                         {part}
                       </span>
                     ))}
@@ -264,7 +264,7 @@ export function NaturalLanguageSearch({
 
                 <button
                   onClick={() => setShowResults(false)}
-                  className="p-1 rounded-full text-slate-400 hover:text-slate-600 hover:bg-white/50"
+                  className="p-1 rounded-full text-muted-foreground hover:text-muted-foreground hover:bg-card/50"
                 >
                   <X className="h-4 w-4" />
                 </button>
@@ -284,7 +284,7 @@ export function NaturalLanguageSearch({
             <div className="max-h-80 overflow-y-auto">
               {searchMutation.data.results.length > 0 ? (
                 <div className="p-2">
-                  <p className="px-2 py-1 text-xs font-medium text-slate-500">
+                  <p className="px-2 py-1 text-xs font-medium text-muted-foreground">
                     {searchMutation.data.results.length} matching site{searchMutation.data.results.length !== 1 ? "s" : ""}
                   </p>
 
@@ -294,7 +294,7 @@ export function NaturalLanguageSearch({
                       initial={{ opacity: 0, x: -10 }}
                       animate={{ opacity: 1, x: 0 }}
                       transition={{ delay: index * 0.05 }}
-                      className="p-3 rounded-lg hover:bg-slate-50 cursor-pointer transition-colors group"
+                      className="p-3 rounded-lg hover:bg-muted cursor-pointer transition-colors group"
                       onClick={() => {
                         if (onSelectSite && searchMutation.data.intent.arrivalDate && searchMutation.data.intent.departureDate) {
                           onSelectSite(result.site.id, {
@@ -307,10 +307,10 @@ export function NaturalLanguageSearch({
                       <div className="flex items-start justify-between">
                         <div>
                           <div className="flex items-center gap-2">
-                            <span className="font-medium text-slate-800">
+                            <span className="font-medium text-foreground">
                               {result.site.name || result.site.siteNumber}
                             </span>
-                            <span className="text-xs text-slate-500">
+                            <span className="text-xs text-muted-foreground">
                               {result.site.siteClass?.name}
                             </span>
                           </div>
@@ -327,19 +327,19 @@ export function NaturalLanguageSearch({
 
                         <div className="text-right">
                           {result.pricePerNight && (
-                            <span className="font-semibold text-slate-800">
+                            <span className="font-semibold text-foreground">
                               ${(result.pricePerNight / 100).toFixed(0)}
-                              <span className="text-xs text-slate-500 font-normal">/night</span>
+                              <span className="text-xs text-muted-foreground font-normal">/night</span>
                             </span>
                           )}
                           <div className="flex items-center gap-1 mt-1">
-                            <div className="w-16 h-1.5 bg-slate-200 rounded-full overflow-hidden">
+                            <div className="w-16 h-1.5 bg-muted rounded-full overflow-hidden">
                               <div
                                 className="h-full bg-emerald-500 rounded-full transition-all"
                                 style={{ width: `${Math.round(result.matchScore * 100)}%` }}
                               />
                             </div>
-                            <span className="text-xs text-slate-500">
+                            <span className="text-xs text-muted-foreground">
                               {Math.round(result.matchScore * 100)}%
                             </span>
                           </div>
@@ -349,29 +349,29 @@ export function NaturalLanguageSearch({
                   ))}
 
                   {searchMutation.data.results.length > 5 && (
-                    <p className="px-3 py-2 text-xs text-slate-500 text-center">
+                    <p className="px-3 py-2 text-xs text-muted-foreground text-center">
                       +{searchMutation.data.results.length - 5} more results
                     </p>
                   )}
                 </div>
               ) : (
                 <div className="p-6 text-center">
-                  <p className="text-slate-500">No sites match your criteria</p>
-                  <p className="text-sm text-slate-400 mt-1">Try adjusting your search</p>
+                  <p className="text-muted-foreground">No sites match your criteria</p>
+                  <p className="text-sm text-muted-foreground mt-1">Try adjusting your search</p>
                 </div>
               )}
             </div>
 
             {/* Action Footer */}
-            <div className="p-3 bg-slate-50 border-t border-slate-200 flex items-center justify-between">
-              <span className="text-xs text-slate-500">
+            <div className="p-3 bg-muted border-t border-border flex items-center justify-between">
+              <span className="text-xs text-muted-foreground">
                 Search took {searchMutation.data.searchDuration}ms
               </span>
 
               <div className="flex gap-2">
                 <button
                   onClick={() => setShowResults(false)}
-                  className="px-3 py-1.5 text-sm text-slate-600 hover:text-slate-800"
+                  className="px-3 py-1.5 text-sm text-muted-foreground hover:text-foreground"
                 >
                   Cancel
                 </button>

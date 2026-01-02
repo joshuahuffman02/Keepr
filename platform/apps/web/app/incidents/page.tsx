@@ -58,7 +58,7 @@ const incidentTypes = [
   { value: "safety", label: "Safety Issue", icon: <AlertTriangle className="h-5 w-5" />, color: "text-yellow-600 dark:text-yellow-400" },
   { value: "near_miss", label: "Near Miss", icon: <Eye className="h-5 w-5" />, color: "text-blue-600 dark:text-blue-400" },
   { value: "environmental", label: "Environmental", icon: <Leaf className="h-5 w-5" />, color: "text-green-600 dark:text-green-400" },
-  { value: "other", label: "Other", icon: <ClipboardList className="h-5 w-5" />, color: "text-slate-600 dark:text-slate-400" },
+  { value: "other", label: "Other", icon: <ClipboardList className="h-5 w-5" />, color: "text-muted-foreground dark:text-muted-foreground" },
 ];
 
 // Severity configuration
@@ -74,7 +74,7 @@ const statusConfig: Record<string, { color: string; bgColor: string; icon: React
   open: { color: "text-amber-700 dark:text-amber-400", bgColor: "bg-amber-100 dark:bg-amber-900/50", icon: <AlertTriangle className="h-3 w-3" /> },
   investigating: { color: "text-blue-700 dark:text-blue-400", bgColor: "bg-blue-100 dark:bg-blue-900/50", icon: <Search className="h-3 w-3" /> },
   resolved: { color: "text-emerald-700 dark:text-emerald-400", bgColor: "bg-emerald-100 dark:bg-emerald-900/50", icon: <CheckCircle2 className="h-3 w-3" /> },
-  closed: { color: "text-slate-700 dark:text-slate-400", bgColor: "bg-slate-100 dark:bg-slate-800", icon: <CheckCircle2 className="h-3 w-3" /> },
+  closed: { color: "text-foreground dark:text-muted-foreground", bgColor: "bg-muted dark:bg-muted", icon: <CheckCircle2 className="h-3 w-3" /> },
 };
 
 export default function IncidentsPage() {

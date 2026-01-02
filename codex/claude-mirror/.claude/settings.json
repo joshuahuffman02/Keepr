@@ -1,0 +1,25 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(pnpm:*)",
+      "Bash(npx prisma:*)",
+      "Bash(npm:*)",
+      "Bash(git status:*)",
+      "Bash(git diff:*)",
+      "Bash(git log:*)",
+      "Bash(ls:*)",
+      "Bash(find:*)",
+      "Bash(cat:*)",
+      "Bash(head:*)",
+      "Bash(tail:*)",
+      "Bash(wc:*)",
+      "Bash(railway:*)",
+      "Bash(curl:*)"
+    ]
+  },
+  "hooks": {
+    "PreToolUse": [],
+    "PostToolUse": []
+  },
+  "model": "opus"
+}

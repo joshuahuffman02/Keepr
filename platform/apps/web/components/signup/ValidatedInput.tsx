@@ -72,9 +72,9 @@ export function ValidatedInput({
           required={required}
           minLength={minLength}
           className={cn(
-            "bg-slate-800/50 border-slate-700 text-white placeholder:text-slate-500 pr-10",
+            "bg-muted/50 border-border text-foreground placeholder:text-muted-foreground pr-10",
             "transition-all duration-200",
-            "focus:bg-slate-800 focus:shadow-[0_0_20px_-5px_rgba(16,185,129,0.3)]",
+            "focus:bg-muted focus:shadow-[0_0_20px_-5px_rgba(16,185,129,0.3)]",
             isValid && touched && "border-emerald-500/50 focus:border-emerald-500",
             className
           )}

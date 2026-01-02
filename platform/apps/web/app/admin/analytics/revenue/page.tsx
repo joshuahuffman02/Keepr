@@ -59,17 +59,17 @@ export default function RevenueIntelligencePage() {
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold text-slate-900 dark:text-white">Revenue Intelligence</h1>
-            <p className="text-slate-600 dark:text-slate-400 mt-1">
+            <h1 className="text-2xl font-bold text-foreground dark:text-white">Revenue Intelligence</h1>
+            <p className="text-muted-foreground dark:text-muted-foreground mt-1">
               Deep dive into platform revenue metrics and trends
             </p>
           </div>
           <DateRangePicker value={dateRange} onChange={setDateRange} />
         </div>
         <div className="flex flex-col items-center justify-center py-12 text-center">
-          <DollarSign className="h-16 w-16 text-slate-400 dark:text-slate-600 mb-4" />
-          <h3 className="text-lg font-medium text-slate-900 dark:text-white mb-2">No Revenue Data Available</h3>
-          <p className="text-slate-600 dark:text-slate-400 max-w-md">
+          <DollarSign className="h-16 w-16 text-muted-foreground dark:text-muted-foreground mb-4" />
+          <h3 className="text-lg font-medium text-foreground dark:text-white mb-2">No Revenue Data Available</h3>
+          <p className="text-muted-foreground dark:text-muted-foreground max-w-md">
             There is no revenue data for the selected time period. Data will appear here once reservations are made.
           </p>
         </div>
@@ -82,8 +82,8 @@ export default function RevenueIntelligencePage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-slate-900 dark:text-white">Revenue Intelligence</h1>
-          <p className="text-slate-600 dark:text-slate-400 mt-1">
+          <h1 className="text-2xl font-bold text-foreground dark:text-white">Revenue Intelligence</h1>
+          <p className="text-muted-foreground dark:text-muted-foreground mt-1">
             Deep dive into platform revenue metrics and trends
           </p>
         </div>

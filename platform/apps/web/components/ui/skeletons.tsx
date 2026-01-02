@@ -14,9 +14,9 @@ export function TableSkeleton({
   rows?: number;
 }) {
   return (
-    <div className="rounded-lg border border-slate-200 overflow-hidden">
+    <div className="rounded-lg border border-border overflow-hidden">
       {/* Table Header */}
-      <div className="bg-slate-50 border-b border-slate-200 px-4 py-3 flex gap-4">
+      <div className="bg-muted/40 border-b border-border px-4 py-3 flex gap-4">
         {Array.from({ length: columns }).map((_, i) => (
           <Skeleton key={i} className="h-4 flex-1" />
         ))}
@@ -25,7 +25,7 @@ export function TableSkeleton({
       {Array.from({ length: rows }).map((_, rowIdx) => (
         <div
           key={rowIdx}
-          className="px-4 py-3 flex gap-4 border-b border-slate-100 last:border-b-0"
+          className="px-4 py-3 flex gap-4 border-b border-border/60 last:border-b-0"
         >
           {Array.from({ length: columns }).map((_, colIdx) => (
             <Skeleton
@@ -122,7 +122,7 @@ export function ListSkeleton({ items = 5 }: { items?: number }) {
       {Array.from({ length: items }).map((_, i) => (
         <div
           key={i}
-          className="flex items-center gap-4 p-4 rounded-lg border border-slate-200"
+          className="flex items-center gap-4 p-4 rounded-lg border border-border"
         >
           <Skeleton className="h-10 w-10 rounded-full" />
           <div className="flex-1 space-y-2">

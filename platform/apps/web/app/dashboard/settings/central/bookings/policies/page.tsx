@@ -21,8 +21,8 @@ export default function BookingPoliciesPage() {
     <div className="max-w-4xl space-y-6">
       {/* Header */}
       <div>
-        <h2 className="text-2xl font-bold text-slate-900">Booking Policies</h2>
-        <p className="text-slate-500 mt-1">
+        <h2 className="text-2xl font-bold text-foreground">Booking Policies</h2>
+        <p className="text-muted-foreground mt-1">
           Configure check-in times, cancellation rules, and deposit requirements
         </p>
       </div>
@@ -31,7 +31,7 @@ export default function BookingPoliciesPage() {
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-base">
-            <Clock className="h-5 w-5 text-slate-500" />
+            <Clock className="h-5 w-5 text-muted-foreground" />
             Check-in & Check-out
           </CardTitle>
         </CardHeader>
@@ -78,7 +78,7 @@ export default function BookingPoliciesPage() {
           <div className="flex items-center justify-between p-3 rounded-lg border">
             <div>
               <Label className="font-medium">Allow early check-in requests</Label>
-              <p className="text-sm text-slate-500">
+              <p className="text-sm text-muted-foreground">
                 Guests can request early arrival (subject to availability)
               </p>
             </div>
@@ -88,7 +88,7 @@ export default function BookingPoliciesPage() {
           <div className="flex items-center justify-between p-3 rounded-lg border">
             <div>
               <Label className="font-medium">Allow late check-out requests</Label>
-              <p className="text-sm text-slate-500">
+              <p className="text-sm text-muted-foreground">
                 Guests can request late departure (may incur fee)
               </p>
             </div>
@@ -101,7 +101,7 @@ export default function BookingPoliciesPage() {
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-base">
-            <DollarSign className="h-5 w-5 text-slate-500" />
+            <DollarSign className="h-5 w-5 text-muted-foreground" />
             Deposit Requirements
           </CardTitle>
         </CardHeader>
@@ -148,7 +148,7 @@ export default function BookingPoliciesPage() {
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-base">
-            <Calendar className="h-5 w-5 text-slate-500" />
+            <Calendar className="h-5 w-5 text-muted-foreground" />
             Cancellation Policy
           </CardTitle>
         </CardHeader>
@@ -165,28 +165,28 @@ export default function BookingPoliciesPage() {
             <div className="flex items-center gap-4 p-3 rounded-lg border">
               <div className="flex-1">
                 <p className="font-medium">14+ days before arrival</p>
-                <p className="text-sm text-slate-500">Full refund minus processing fee</p>
+                <p className="text-sm text-muted-foreground">Full refund minus processing fee</p>
               </div>
               <Input type="number" defaultValue="100" className="w-20" />
-              <span className="text-slate-500">%</span>
+              <span className="text-muted-foreground">%</span>
             </div>
 
             <div className="flex items-center gap-4 p-3 rounded-lg border">
               <div className="flex-1">
                 <p className="font-medium">7-13 days before arrival</p>
-                <p className="text-sm text-slate-500">Partial refund</p>
+                <p className="text-sm text-muted-foreground">Partial refund</p>
               </div>
               <Input type="number" defaultValue="50" className="w-20" />
-              <span className="text-slate-500">%</span>
+              <span className="text-muted-foreground">%</span>
             </div>
 
             <div className="flex items-center gap-4 p-3 rounded-lg border">
               <div className="flex-1">
                 <p className="font-medium">Less than 7 days</p>
-                <p className="text-sm text-slate-500">No refund</p>
+                <p className="text-sm text-muted-foreground">No refund</p>
               </div>
               <Input type="number" defaultValue="0" className="w-20" />
-              <span className="text-slate-500">%</span>
+              <span className="text-muted-foreground">%</span>
             </div>
           </div>
         </CardContent>
@@ -196,7 +196,7 @@ export default function BookingPoliciesPage() {
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-base">
-            <FileText className="h-5 w-5 text-slate-500" />
+            <FileText className="h-5 w-5 text-muted-foreground" />
             Policy Text
           </CardTitle>
           <CardDescription>

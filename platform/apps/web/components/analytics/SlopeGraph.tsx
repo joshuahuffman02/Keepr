@@ -60,25 +60,25 @@ export function SlopeGraph({
 
   if (loading) {
     return (
-      <Card className="border-slate-200 dark:border-slate-700">
+      <Card className="border-border">
         <CardHeader>
-          <CardTitle className="text-lg text-slate-900 dark:text-white">{title}</CardTitle>
-          {description && <p className="text-sm text-slate-500 dark:text-slate-400">{description}</p>}
+          <CardTitle className="text-lg text-foreground">{title}</CardTitle>
+          {description && <p className="text-sm text-muted-foreground">{description}</p>}
         </CardHeader>
         <CardContent>
           <div className="animate-pulse" style={{ height }}>
             <div className="flex justify-between items-center h-full px-12">
               <div className="space-y-6 w-16">
                 {[...Array(5)].map((_, i) => (
-                  <div key={i} className="h-3 bg-slate-200 dark:bg-slate-700 rounded" />
+                  <div key={i} className="h-3 bg-muted rounded" />
                 ))}
               </div>
               <div className="flex-1 mx-8">
-                <div className="h-full border-l border-r border-slate-200 dark:border-slate-700" />
+                <div className="h-full border-l border-r border-border" />
               </div>
               <div className="space-y-6 w-16">
                 {[...Array(5)].map((_, i) => (
-                  <div key={i} className="h-3 bg-slate-200 dark:bg-slate-700 rounded" />
+                  <div key={i} className="h-3 bg-muted rounded" />
                 ))}
               </div>
             </div>
@@ -106,10 +106,10 @@ export function SlopeGraph({
   const lineSpacing = graphHeight / (data.length + 1);
 
   return (
-    <Card className="border-slate-200 dark:border-slate-700">
+    <Card className="border-border">
       <CardHeader>
-        <CardTitle className="text-lg text-slate-900 dark:text-white">{title}</CardTitle>
-        {description && <p className="text-sm text-slate-500 dark:text-slate-400">{description}</p>}
+        <CardTitle className="text-lg text-foreground">{title}</CardTitle>
+        {description && <p className="text-sm text-muted-foreground">{description}</p>}
       </CardHeader>
       <CardContent>
         <div className="overflow-x-auto">
@@ -123,7 +123,7 @@ export function SlopeGraph({
               x={padding.left}
               y={30}
               textAnchor="middle"
-              className="text-sm font-semibold fill-slate-600 dark:fill-slate-300"
+              className="text-sm font-semibold fill-muted-foreground"
             >
               {leftLabel}
             </text>
@@ -131,7 +131,7 @@ export function SlopeGraph({
               x={width - padding.right}
               y={30}
               textAnchor="middle"
-              className="text-sm font-semibold fill-slate-600 dark:fill-slate-300"
+              className="text-sm font-semibold fill-muted-foreground"
             >
               {rightLabel}
             </text>
@@ -143,7 +143,7 @@ export function SlopeGraph({
               x2={padding.left}
               y2={height - padding.bottom}
               stroke="currentColor"
-              className="text-slate-300 dark:text-slate-600"
+              className="text-muted-foreground"
               strokeWidth={2}
             />
             <line
@@ -152,7 +152,7 @@ export function SlopeGraph({
               x2={width - padding.right}
               y2={height - padding.bottom}
               stroke="currentColor"
-              className="text-slate-300 dark:text-slate-600"
+              className="text-muted-foreground"
               strokeWidth={2}
             />
 
@@ -170,10 +170,10 @@ export function SlopeGraph({
               const isNegative = d.isNegativeGood ? change > 0 : change < 0;
 
               const lineColor = isPositive
-                ? "#22c55e" // green
+                ? "hsl(var(--status-success))"
                 : isNegative
-                ? "#ef4444" // red
-                : "#64748b"; // gray
+                ? "hsl(var(--status-error))"
+                : "hsl(var(--muted-foreground))";
 
               return (
                 <g key={d.label}>
@@ -183,7 +183,7 @@ export function SlopeGraph({
                     y={baseY}
                     textAnchor="end"
                     dominantBaseline="middle"
-                    className="text-xs fill-slate-600 dark:fill-slate-400"
+                    className="text-xs fill-muted-foreground"
                   >
                     {d.label}
                   </text>
@@ -194,7 +194,7 @@ export function SlopeGraph({
                     y={leftY}
                     textAnchor="start"
                     dominantBaseline="middle"
-                    className="text-xs font-medium fill-slate-800 dark:fill-slate-200"
+                    className="text-xs font-medium fill-foreground"
                   >
                     {formatValue(d.leftValue, d.format)}
                   </text>
@@ -230,7 +230,7 @@ export function SlopeGraph({
                     y={rightY}
                     textAnchor="end"
                     dominantBaseline="middle"
-                    className="text-xs font-medium fill-slate-800 dark:fill-slate-200"
+                    className="text-xs font-medium fill-foreground"
                   >
                     {formatValue(d.rightValue, d.format)}
                   </text>
@@ -243,7 +243,7 @@ export function SlopeGraph({
                     dominantBaseline="middle"
                     className={cn(
                       "text-xs font-medium",
-                      isPositive ? "fill-green-500" : isNegative ? "fill-red-500" : "fill-slate-500"
+                      isPositive ? "fill-status-success" : isNegative ? "fill-status-error" : "fill-muted-foreground"
                     )}
                   >
                     {change >= 0 ? "+" : ""}{percentChange}%
@@ -255,15 +255,15 @@ export function SlopeGraph({
         </div>
 
         {/* Legend */}
-        <div className="mt-4 flex flex-wrap items-center justify-center gap-6 text-xs text-slate-500 dark:text-slate-400">
+        <div className="mt-4 flex flex-wrap items-center justify-center gap-6 text-xs text-muted-foreground">
           <span className="flex items-center gap-1.5">
-            <span className="w-4 h-0.5 bg-green-500 rounded" /> Improved
+            <span className="w-4 h-0.5 bg-status-success rounded" /> Improved
           </span>
           <span className="flex items-center gap-1.5">
-            <span className="w-4 h-0.5 bg-red-500 rounded" /> Declined
+            <span className="w-4 h-0.5 bg-status-error rounded" /> Declined
           </span>
           <span className="flex items-center gap-1.5">
-            <span className="w-4 h-0.5 bg-slate-500 rounded" /> Unchanged
+            <span className="w-4 h-0.5 bg-muted rounded" /> Unchanged
           </span>
         </div>
       </CardContent>

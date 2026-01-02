@@ -9,8 +9,8 @@ export default function UpsellsPage() {
   return (
     <div className="max-w-4xl space-y-6">
       <div>
-        <h2 className="text-2xl font-bold text-slate-900">Upsells</h2>
-        <p className="text-slate-500 mt-1">
+        <h2 className="text-2xl font-bold text-foreground">Upsells</h2>
+        <p className="text-muted-foreground mt-1">
           Configure add-ons offered during booking
         </p>
       </div>
@@ -22,8 +22,8 @@ export default function UpsellsPage() {
               <Gift className="h-6 w-6 text-pink-600" />
             </div>
             <div className="flex-1">
-              <h3 className="font-semibold text-slate-900">Add-ons & Extras</h3>
-              <p className="text-sm text-slate-500 mt-1">
+              <h3 className="font-semibold text-foreground">Add-ons & Extras</h3>
+              <p className="text-sm text-muted-foreground mt-1">
                 Create add-on items that guests can purchase during booking.
                 Firewood bundles, equipment rentals, early check-in, and more.
               </p>

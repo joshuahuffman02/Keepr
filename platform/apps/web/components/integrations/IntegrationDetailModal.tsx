@@ -342,8 +342,8 @@ export function IntegrationDetailModal({
                             </div>
 
                             {/* Security note */}
-                            <div className="flex items-start gap-3 rounded-lg bg-slate-50 dark:bg-slate-800/50 p-4">
-                                <Shield className="h-5 w-5 text-slate-600 dark:text-slate-400 shrink-0 mt-0.5" />
+                            <div className="flex items-start gap-3 rounded-lg bg-muted dark:bg-muted/50 p-4">
+                                <Shield className="h-5 w-5 text-muted-foreground dark:text-muted-foreground shrink-0 mt-0.5" />
                                 <div>
                                     <h4 className="font-medium text-foreground">
                                         Secure & Private

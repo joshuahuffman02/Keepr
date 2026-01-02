@@ -101,10 +101,10 @@ export function WaterfallChart({
 
   if (loading) {
     return (
-      <Card className="border-slate-200 dark:border-slate-700">
+      <Card className="border-border dark:border-border">
         <CardHeader>
-          <CardTitle className="text-lg text-slate-900 dark:text-white">{title}</CardTitle>
-          {description && <p className="text-sm text-slate-500 dark:text-slate-400">{description}</p>}
+          <CardTitle className="text-lg text-foreground dark:text-white">{title}</CardTitle>
+          {description && <p className="text-sm text-muted-foreground dark:text-muted-foreground">{description}</p>}
         </CardHeader>
         <CardContent>
           <div className="animate-pulse" style={{ height }}>
@@ -112,7 +112,7 @@ export function WaterfallChart({
               {[...Array(6)].map((_, i) => (
                 <div
                   key={i}
-                  className="flex-1 bg-slate-200 dark:bg-slate-700 rounded-t"
+                  className="flex-1 bg-muted dark:bg-muted rounded-t"
                   style={{ height: `${30 + Math.random() * 60}%` }}
                 />
               ))}
@@ -138,10 +138,10 @@ export function WaterfallChart({
   };
 
   return (
-    <Card className="border-slate-200 dark:border-slate-700">
+    <Card className="border-border dark:border-border">
       <CardHeader>
-        <CardTitle className="text-lg text-slate-900 dark:text-white">{title}</CardTitle>
-        {description && <p className="text-sm text-slate-500 dark:text-slate-400">{description}</p>}
+        <CardTitle className="text-lg text-foreground dark:text-white">{title}</CardTitle>
+        {description && <p className="text-sm text-muted-foreground dark:text-muted-foreground">{description}</p>}
       </CardHeader>
       <CardContent>
         <div style={{ height }}>
@@ -196,7 +196,7 @@ export function WaterfallChart({
         </div>
 
         {/* Legend */}
-        <div className="mt-4 flex flex-wrap items-center justify-center gap-6 text-xs text-slate-500 dark:text-slate-400">
+        <div className="mt-4 flex flex-wrap items-center justify-center gap-6 text-xs text-muted-foreground dark:text-muted-foreground">
           <span className="flex items-center gap-1.5">
             <span className="w-4 h-4 rounded bg-blue-500" /> Start/Total
           </span>

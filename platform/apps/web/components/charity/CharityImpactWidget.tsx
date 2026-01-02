@@ -147,10 +147,10 @@ export function CharityImpactWidget({ campgroundId }: CharityImpactWidgetProps) 
             <Heart className="h-6 w-6 text-rose-500" />
           </div>
           <div className="flex-1">
-            <h3 className="font-semibold text-slate-900 dark:text-white mb-1">
+            <h3 className="font-semibold text-foreground dark:text-white mb-1">
               Give Back with Round-Up
             </h3>
-            <p className="text-sm text-slate-600 dark:text-slate-400 mb-4">
+            <p className="text-sm text-muted-foreground dark:text-muted-foreground mb-4">
               Let your guests round up payments to donate to a charity of your choice.
               It's a small gesture with a big impact!
             </p>
@@ -196,16 +196,16 @@ export function CharityImpactWidget({ campgroundId }: CharityImpactWidgetProps) 
           <Heart className="h-6 w-6 text-white fill-white" />
         </motion.div>
         <div className="flex-1">
-          <h3 className="font-semibold text-slate-900 dark:text-white">
+          <h3 className="font-semibold text-foreground dark:text-white">
             Your Impact
           </h3>
-          <p className="text-sm text-slate-600 dark:text-slate-400">
+          <p className="text-sm text-muted-foreground dark:text-muted-foreground">
             Donations to {charityName}
           </p>
         </div>
         <Link
           href="/dashboard/settings/charity"
-          className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors"
+          className="text-muted-foreground hover:text-muted-foreground dark:hover:text-muted-foreground transition-colors"
           title="Charity settings"
         >
           <Settings className="h-4 w-4" />
@@ -213,7 +213,7 @@ export function CharityImpactWidget({ campgroundId }: CharityImpactWidgetProps) 
       </div>
 
       {/* Main Stat */}
-      <div className="bg-white/60 dark:bg-slate-800/60 rounded-xl p-4 mb-4">
+      <div className="bg-card/60 dark:bg-muted/60 rounded-xl p-4 mb-4">
         {loadingStats && !stats ? (
           <div className="animate-pulse">
             <div className="h-4 w-20 bg-rose-100 dark:bg-rose-900 rounded mb-2" />
@@ -222,7 +222,7 @@ export function CharityImpactWidget({ campgroundId }: CharityImpactWidgetProps) 
         ) : (
           <div className="flex items-end justify-between">
             <div>
-              <p className="text-sm text-slate-500 dark:text-slate-400 mb-1">Total Raised</p>
+              <p className="text-sm text-muted-foreground dark:text-muted-foreground mb-1">Total Raised</p>
               <p className="text-3xl font-bold text-rose-600 dark:text-rose-400">
                 {formatDollars(animatedTotal)}
               </p>
@@ -244,40 +244,40 @@ export function CharityImpactWidget({ campgroundId }: CharityImpactWidgetProps) 
 
       {/* Secondary Stats */}
       <div className="grid grid-cols-2 gap-3">
-        <div className="bg-white/40 dark:bg-slate-800/40 rounded-lg p-3 text-center">
+        <div className="bg-card/40 dark:bg-muted/40 rounded-lg p-3 text-center">
           <div className="flex items-center justify-center gap-1 text-blue-600 dark:text-blue-400 mb-1">
             <Users className="h-4 w-4" />
           </div>
           {loadingStats && !stats ? (
             <div className="animate-pulse">
-              <div className="h-6 w-8 bg-slate-200 dark:bg-slate-700 rounded mx-auto mb-1" />
-              <div className="h-3 w-12 bg-slate-100 dark:bg-slate-800 rounded mx-auto" />
+              <div className="h-6 w-8 bg-muted dark:bg-muted rounded mx-auto mb-1" />
+              <div className="h-3 w-12 bg-muted dark:bg-muted rounded mx-auto" />
             </div>
           ) : (
             <>
-              <p className="text-xl font-bold text-slate-900 dark:text-white">
+              <p className="text-xl font-bold text-foreground dark:text-white">
                 {animatedDonations}
               </p>
-              <p className="text-xs text-slate-500 dark:text-slate-400">donations</p>
+              <p className="text-xs text-muted-foreground dark:text-muted-foreground">donations</p>
             </>
           )}
         </div>
 
-        <div className="bg-white/40 dark:bg-slate-800/40 rounded-lg p-3 text-center">
+        <div className="bg-card/40 dark:bg-muted/40 rounded-lg p-3 text-center">
           <div className="flex items-center justify-center gap-1 text-purple-600 dark:text-purple-400 mb-1">
             <Heart className="h-4 w-4" />
           </div>
           {loadingStats && !stats ? (
             <div className="animate-pulse">
-              <div className="h-6 w-10 bg-slate-200 dark:bg-slate-700 rounded mx-auto mb-1" />
-              <div className="h-3 w-14 bg-slate-100 dark:bg-slate-800 rounded mx-auto" />
+              <div className="h-6 w-10 bg-muted dark:bg-muted rounded mx-auto mb-1" />
+              <div className="h-3 w-14 bg-muted dark:bg-muted rounded mx-auto" />
             </div>
           ) : (
             <>
-              <p className="text-xl font-bold text-slate-900 dark:text-white">
+              <p className="text-xl font-bold text-foreground dark:text-white">
                 {optInRate.toFixed(0)}%
               </p>
-              <p className="text-xs text-slate-500 dark:text-slate-400">opt-in rate</p>
+              <p className="text-xs text-muted-foreground dark:text-muted-foreground">opt-in rate</p>
             </>
           )}
         </div>

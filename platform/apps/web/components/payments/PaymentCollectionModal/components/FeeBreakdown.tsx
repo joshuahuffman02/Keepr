@@ -39,23 +39,23 @@ export function FeeBreakdown({
   const flatFee = config.feeFlatCents / 100;
 
   return (
-    <div className="p-3 bg-slate-50 border border-slate-200 rounded-lg">
+    <div className="p-3 bg-muted border border-border rounded-lg">
       <div className="flex items-start justify-between">
         <div>
-          <p className="text-sm font-medium text-slate-700">Processing Fee</p>
-          <p className="text-xs text-slate-500">
+          <p className="text-sm font-medium text-foreground">Processing Fee</p>
+          <p className="text-xs text-muted-foreground">
             {feePercentage}% + ${flatFee.toFixed(2)} per transaction
           </p>
         </div>
         <div className="text-right">
-          <p className="text-sm font-medium text-slate-900">
+          <p className="text-sm font-medium text-foreground">
             +${(feeCents / 100).toFixed(2)}
           </p>
         </div>
       </div>
 
       {showTooltip && (
-        <div className="mt-2 flex items-start gap-2 text-xs text-slate-500">
+        <div className="mt-2 flex items-start gap-2 text-xs text-muted-foreground">
           <Info className="h-3 w-3 mt-0.5 flex-shrink-0" />
           <span>
             This fee covers payment processing costs and is passed through to you.
@@ -92,7 +92,7 @@ export function FeeBreakdownInline({
   }
 
   return (
-    <span className="text-sm text-slate-500">
+    <span className="text-sm text-muted-foreground">
       + ${(feeCents / 100).toFixed(2)} fee
     </span>
   );
@@ -117,7 +117,7 @@ export function FeeEstimate() {
   }
 
   return (
-    <div className="text-center text-xs text-slate-500">
+    <div className="text-center text-xs text-muted-foreground">
       Processing fees may apply for card payments (~${(estimatedFee / 100).toFixed(2)})
     </div>
   );

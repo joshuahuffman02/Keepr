@@ -674,10 +674,10 @@ export function SiteLayoutEditor({
 
   return (
     <TooltipProvider>
-      <div className={cn("flex flex-col bg-slate-50 rounded-xl overflow-hidden border", className)} style={{ height: heightStyle }}>
+      <div className={cn("flex flex-col bg-muted rounded-xl overflow-hidden border", className)} style={{ height: heightStyle }}>
         {/* Toolbar */}
         {!readOnly && (
-          <div className="flex items-center gap-2 p-2 bg-white border-b">
+          <div className="flex items-center gap-2 p-2 bg-card border-b">
             {/* Tool selection */}
             <div className="flex items-center gap-1 border-r pr-2">
               <Tooltip>
@@ -796,7 +796,7 @@ export function SiteLayoutEditor({
                 <TooltipContent>Zoom In</TooltipContent>
               </Tooltip>
 
-              <span className="text-xs text-slate-500 w-12 text-center">{Math.round(zoom * 100)}%</span>
+              <span className="text-xs text-muted-foreground w-12 text-center">{Math.round(zoom * 100)}%</span>
 
               <Tooltip>
                 <TooltipTrigger asChild>
@@ -861,7 +861,7 @@ export function SiteLayoutEditor({
                   </Tooltip>
 
                   <div className="flex items-center gap-1 ml-1">
-                    <span className="text-xs text-slate-500">Scale:</span>
+                    <span className="text-xs text-muted-foreground">Scale:</span>
                     <input
                       type="range"
                       min="0.5"
@@ -871,11 +871,11 @@ export function SiteLayoutEditor({
                       onChange={(e) => setBackgroundScale(parseFloat(e.target.value))}
                       className="w-16 h-1 accent-emerald-600"
                     />
-                    <span className="text-xs text-slate-500 w-8">{Math.round(backgroundScale * 100)}%</span>
+                    <span className="text-xs text-muted-foreground w-8">{Math.round(backgroundScale * 100)}%</span>
                   </div>
 
                   <div className="flex items-center gap-1 ml-1">
-                    <span className="text-xs text-slate-500">Opacity:</span>
+                    <span className="text-xs text-muted-foreground">Opacity:</span>
                     <input
                       type="range"
                       min="0.1"
@@ -885,7 +885,7 @@ export function SiteLayoutEditor({
                       onChange={(e) => setBackgroundOpacity(parseFloat(e.target.value))}
                       className="w-16 h-1 accent-emerald-600"
                     />
-                    <span className="text-xs text-slate-500 w-8">{Math.round(backgroundOpacity * 100)}%</span>
+                    <span className="text-xs text-muted-foreground w-8">{Math.round(backgroundOpacity * 100)}%</span>
                   </div>
 
                   <Tooltip>
@@ -952,12 +952,12 @@ export function SiteLayoutEditor({
 
           {/* Properties panel */}
           {!readOnly && selectedSite && (
-            <div className="w-64 bg-white border-l p-4 overflow-y-auto">
-              <h3 className="font-bold text-slate-900 mb-4">Site Properties</h3>
+            <div className="w-64 bg-card border-l p-4 overflow-y-auto">
+              <h3 className="font-bold text-foreground mb-4">Site Properties</h3>
 
               <div className="space-y-4">
                 <div>
-                  <label className="text-sm text-slate-600">Site Number</label>
+                  <label className="text-sm text-muted-foreground">Site Number</label>
                   <input
                     type="text"
                     value={selectedSite.siteNumber}
@@ -973,7 +973,7 @@ export function SiteLayoutEditor({
                 </div>
 
                 <div>
-                  <label className="text-sm text-slate-600">Site Type</label>
+                  <label className="text-sm text-muted-foreground">Site Type</label>
                   <Select
                     value={selectedSite.siteType}
                     onValueChange={(value: SiteType) => {
@@ -1001,7 +1001,7 @@ export function SiteLayoutEditor({
 
                 <div className="grid grid-cols-2 gap-2">
                   <div>
-                    <label className="text-sm text-slate-600">Width</label>
+                    <label className="text-sm text-muted-foreground">Width</label>
                     <input
                       type="number"
                       value={selectedSite.width}
@@ -1016,7 +1016,7 @@ export function SiteLayoutEditor({
                     />
                   </div>
                   <div>
-                    <label className="text-sm text-slate-600">Height</label>
+                    <label className="text-sm text-muted-foreground">Height</label>
                     <input
                       type="number"
                       value={selectedSite.height}
@@ -1033,7 +1033,7 @@ export function SiteLayoutEditor({
                 </div>
 
                 <div>
-                  <label className="text-sm text-slate-600">Rotation</label>
+                  <label className="text-sm text-muted-foreground">Rotation</label>
                   <input
                     type="range"
                     min="0"
@@ -1048,7 +1048,7 @@ export function SiteLayoutEditor({
                     }}
                     className="w-full mt-1"
                   />
-                  <span className="text-xs text-slate-500">{selectedSite.rotation} degrees</span>
+                  <span className="text-xs text-muted-foreground">{selectedSite.rotation} degrees</span>
                 </div>
 
                 <div className="flex items-center gap-2">
@@ -1073,7 +1073,7 @@ export function SiteLayoutEditor({
         </div>
 
         {/* Status bar */}
-        <div className="flex items-center justify-between px-4 py-2 bg-white border-t text-xs text-slate-500">
+        <div className="flex items-center justify-between px-4 py-2 bg-card border-t text-xs text-muted-foreground">
           <div className="flex items-center gap-4">
             <span>{sites.length} sites</span>
             <span>{elements.length} elements</span>

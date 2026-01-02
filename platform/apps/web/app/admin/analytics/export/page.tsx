@@ -182,7 +182,7 @@ The platform demonstrates healthy fundamentals with opportunities for optimizati
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-white">Export Analytics</h1>
-          <p className="text-slate-400 mt-1">
+          <p className="text-muted-foreground mt-1">
             Export data for AI analysis, reports, and external tools
           </p>
         </div>
@@ -193,7 +193,7 @@ The platform demonstrates healthy fundamentals with opportunities for optimizati
         {/* Export Configuration */}
         <div className="lg:col-span-2 space-y-6">
           {/* Module Selection */}
-          <Card className="bg-slate-800/50 border-slate-700">
+          <Card className="bg-muted/50 border-border">
             <CardHeader>
               <div className="flex items-center justify-between">
                 <div>
@@ -204,7 +204,7 @@ The platform demonstrates healthy fundamentals with opportunities for optimizati
                   <Button variant="ghost" size="sm" onClick={selectAll} className="text-blue-400">
                     Select All
                   </Button>
-                  <Button variant="ghost" size="sm" onClick={selectNone} className="text-slate-400">
+                  <Button variant="ghost" size="sm" onClick={selectNone} className="text-muted-foreground">
                     Clear
                   </Button>
                 </div>
@@ -218,7 +218,7 @@ The platform demonstrates healthy fundamentals with opportunities for optimizati
                     className={`flex items-start gap-3 p-3 rounded-lg border cursor-pointer transition-colors ${
                       selectedModules.includes(module.id)
                         ? "bg-blue-500/10 border-blue-500/50"
-                        : "bg-slate-700/30 border-slate-700 hover:border-slate-600"
+                        : "bg-muted/30 border-border hover:border-border"
                     }`}
                     onClick={() => toggleModule(module.id)}
                   >
@@ -228,7 +228,7 @@ The platform demonstrates healthy fundamentals with opportunities for optimizati
                     />
                     <div>
                       <p className="text-white font-medium">{module.name}</p>
-                      <p className="text-sm text-slate-400">{module.description}</p>
+                      <p className="text-sm text-muted-foreground">{module.description}</p>
                     </div>
                   </div>
                 ))}
@@ -237,7 +237,7 @@ The platform demonstrates healthy fundamentals with opportunities for optimizati
           </Card>
 
           {/* Format Selection */}
-          <Card className="bg-slate-800/50 border-slate-700">
+          <Card className="bg-muted/50 border-border">
             <CardHeader>
               <CardTitle className="text-lg text-white">Export Format</CardTitle>
             </CardHeader>
@@ -247,7 +247,7 @@ The platform demonstrates healthy fundamentals with opportunities for optimizati
                   className={`p-4 rounded-lg border cursor-pointer transition-colors ${
                     exportFormat === "json"
                       ? "bg-blue-500/10 border-blue-500/50"
-                      : "bg-slate-700/30 border-slate-700 hover:border-slate-600"
+                      : "bg-muted/30 border-border hover:border-border"
                   }`}
                   onClick={() => setExportFormat("json")}
                 >
@@ -256,7 +256,7 @@ The platform demonstrates healthy fundamentals with opportunities for optimizati
                     <span className="text-white font-medium">JSON</span>
                     <Badge className="bg-blue-600/20 text-blue-400 border-0">Recommended</Badge>
                   </div>
-                  <p className="text-sm text-slate-400">
+                  <p className="text-sm text-muted-foreground">
                     Structured data format ideal for AI agents and programmatic analysis
                   </p>
                 </div>
@@ -264,7 +264,7 @@ The platform demonstrates healthy fundamentals with opportunities for optimizati
                   className={`p-4 rounded-lg border cursor-pointer transition-colors ${
                     exportFormat === "markdown"
                       ? "bg-blue-500/10 border-blue-500/50"
-                      : "bg-slate-700/30 border-slate-700 hover:border-slate-600"
+                      : "bg-muted/30 border-border hover:border-border"
                   }`}
                   onClick={() => setExportFormat("markdown")}
                 >
@@ -272,7 +272,7 @@ The platform demonstrates healthy fundamentals with opportunities for optimizati
                     <FileText className="h-6 w-6 text-green-400" />
                     <span className="text-white font-medium">Markdown</span>
                   </div>
-                  <p className="text-sm text-slate-400">
+                  <p className="text-sm text-muted-foreground">
                     Human-readable report format with tables and summaries
                   </p>
                 </div>
@@ -283,7 +283,7 @@ The platform demonstrates healthy fundamentals with opportunities for optimizati
                 className={`mt-4 p-4 rounded-lg border cursor-pointer transition-colors ${
                   includeAiSummary
                     ? "bg-purple-500/10 border-purple-500/50"
-                    : "bg-slate-700/30 border-slate-700 hover:border-slate-600"
+                    : "bg-muted/30 border-border hover:border-border"
                 }`}
                 onClick={() => setIncludeAiSummary(!includeAiSummary)}
               >
@@ -292,7 +292,7 @@ The platform demonstrates healthy fundamentals with opportunities for optimizati
                   <Sparkles className="h-5 w-5 text-purple-400" />
                   <div>
                     <span className="text-white font-medium">Generate AI Summary</span>
-                    <p className="text-sm text-slate-400">
+                    <p className="text-sm text-muted-foreground">
                       Include an AI-generated executive summary and insights
                     </p>
                   </div>
@@ -304,17 +304,17 @@ The platform demonstrates healthy fundamentals with opportunities for optimizati
 
         {/* Export Actions */}
         <div className="space-y-6">
-          <Card className="bg-slate-800/50 border-slate-700">
+          <Card className="bg-muted/50 border-border">
             <CardHeader>
               <CardTitle className="text-lg text-white">Export</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="p-3 bg-slate-700/50 rounded-lg">
-                <p className="text-sm text-slate-400">Selected Modules</p>
+              <div className="p-3 bg-muted/50 rounded-lg">
+                <p className="text-sm text-muted-foreground">Selected Modules</p>
                 <p className="text-2xl font-bold text-white">{selectedModules.length}</p>
               </div>
-              <div className="p-3 bg-slate-700/50 rounded-lg">
-                <p className="text-sm text-slate-400">Format</p>
+              <div className="p-3 bg-muted/50 rounded-lg">
+                <p className="text-sm text-muted-foreground">Format</p>
                 <p className="text-lg font-medium text-white uppercase">{exportFormat}</p>
               </div>
 
@@ -345,7 +345,7 @@ The platform demonstrates healthy fundamentals with opportunities for optimizati
                 <div className="space-y-2">
                   <Button
                     variant="outline"
-                    className="w-full border-slate-600"
+                    className="w-full border-border"
                     onClick={() =>
                       downloadFile(
                         exportData,
@@ -359,7 +359,7 @@ The platform demonstrates healthy fundamentals with opportunities for optimizati
                   </Button>
                   <Button
                     variant="outline"
-                    className="w-full border-slate-600"
+                    className="w-full border-border"
                     onClick={() => copyToClipboard(exportData)}
                   >
                     <Copy className="h-4 w-4 mr-2" />
@@ -372,7 +372,7 @@ The platform demonstrates healthy fundamentals with opportunities for optimizati
 
           {/* AI Summary Generation */}
           {exportComplete && exportData && (
-            <Card className="bg-slate-800/50 border-slate-700">
+            <Card className="bg-muted/50 border-border">
               <CardHeader>
                 <CardTitle className="text-lg text-white flex items-center gap-2">
                   <Sparkles className="h-5 w-5 text-purple-400" />
@@ -397,7 +397,7 @@ The platform demonstrates healthy fundamentals with opportunities for optimizati
                     </>
                   )}
                 </Button>
-                <p className="text-xs text-slate-500 text-center">
+                <p className="text-xs text-muted-foreground text-center">
                   Uses AI to analyze data and create executive insights
                 </p>
               </CardContent>
@@ -408,7 +408,7 @@ The platform demonstrates healthy fundamentals with opportunities for optimizati
 
       {/* AI Summary Display */}
       {aiSummary && (
-        <Card className="bg-slate-800/50 border-slate-700">
+        <Card className="bg-muted/50 border-border">
           <CardHeader>
             <div className="flex items-center justify-between">
               <CardTitle className="text-lg text-white flex items-center gap-2">
@@ -419,7 +419,7 @@ The platform demonstrates healthy fundamentals with opportunities for optimizati
                 <Button
                   variant="outline"
                   size="sm"
-                  className="border-slate-600"
+                  className="border-border"
                   onClick={() => copyToClipboard(aiSummary)}
                 >
                   <Copy className="h-4 w-4 mr-2" />
@@ -428,7 +428,7 @@ The platform demonstrates healthy fundamentals with opportunities for optimizati
                 <Button
                   variant="outline"
                   size="sm"
-                  className="border-slate-600"
+                  className="border-border"
                   onClick={() => downloadFile(aiSummary, "ai-analytics-summary.md", "text/markdown")}
                 >
                   <Download className="h-4 w-4 mr-2" />
@@ -439,7 +439,7 @@ The platform demonstrates healthy fundamentals with opportunities for optimizati
           </CardHeader>
           <CardContent>
             <div className="prose prose-invert max-w-none">
-              <pre className="whitespace-pre-wrap text-sm text-slate-300 bg-slate-900/50 p-4 rounded-lg overflow-auto max-h-[500px]">
+              <pre className="whitespace-pre-wrap text-sm text-muted-foreground bg-muted/50 p-4 rounded-lg overflow-auto max-h-[500px]">
                 {aiSummary}
               </pre>
             </div>
@@ -449,7 +449,7 @@ The platform demonstrates healthy fundamentals with opportunities for optimizati
 
       {/* Export Preview */}
       {exportData && (
-        <Card className="bg-slate-800/50 border-slate-700">
+        <Card className="bg-muted/50 border-border">
           <CardHeader>
             <div className="flex items-center justify-between">
               <CardTitle className="text-lg text-white">Export Preview</CardTitle>
@@ -457,7 +457,7 @@ The platform demonstrates healthy fundamentals with opportunities for optimizati
             </div>
           </CardHeader>
           <CardContent>
-            <pre className="text-xs text-slate-400 bg-slate-900/50 p-4 rounded-lg overflow-auto max-h-[400px]">
+            <pre className="text-xs text-muted-foreground bg-muted/50 p-4 rounded-lg overflow-auto max-h-[400px]">
               {exportData.substring(0, 5000)}
               {exportData.length > 5000 && "\n\n... (truncated preview)"}
             </pre>

@@ -883,7 +883,7 @@ export default function MessagesPage() {
                             <Clock className="h-4 w-4 mr-1.5" />
                             Needs reply
                             {overdueCount > 0 && (
-                                <Badge variant="secondary" className="ml-1.5 bg-white/20 text-[10px] px-1">
+                                <Badge variant="secondary" className="ml-1.5 bg-card/20 text-[10px] px-1">
                                     {overdueCount}
                                 </Badge>
                             )}
@@ -1089,7 +1089,7 @@ export default function MessagesPage() {
                                         >
                                             Needs reply
                                             {overdueCount > 0 && (
-                                                <Badge variant="secondary" className="ml-1.5 bg-white/20">
+                                                <Badge variant="secondary" className="ml-1.5 bg-card/20">
                                                     {overdueCount}
                                                 </Badge>
                                             )}

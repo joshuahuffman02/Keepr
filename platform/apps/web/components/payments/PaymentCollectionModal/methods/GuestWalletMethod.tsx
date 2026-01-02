@@ -104,8 +104,8 @@ export default function GuestWalletMethod({
           <Wallet className="h-5 w-5 text-purple-600" />
         </div>
         <div>
-          <h3 className="font-semibold text-slate-900">Guest Wallet</h3>
-          <p className="text-sm text-slate-500">
+          <h3 className="font-semibold text-foreground">Guest Wallet</h3>
+          <p className="text-sm text-muted-foreground">
             Pay using stored credit balance
           </p>
         </div>
@@ -122,15 +122,15 @@ export default function GuestWalletMethod({
       </div>
 
       {/* Payment Amount */}
-      <div className="p-4 bg-slate-50 border border-slate-200 rounded-lg space-y-3">
+      <div className="p-4 bg-muted border border-border rounded-lg space-y-3">
         <div className="flex items-center justify-between">
-          <span className="text-slate-700">Amount Due</span>
-          <span className="font-medium text-slate-900">
+          <span className="text-foreground">Amount Due</span>
+          <span className="font-medium text-foreground">
             ${(remainingCents / 100).toFixed(2)}
           </span>
         </div>
         <div className="flex items-center justify-between border-t pt-3">
-          <span className="text-slate-700 font-medium">Pay with Wallet</span>
+          <span className="text-foreground font-medium">Pay with Wallet</span>
           <span className="text-lg font-bold text-purple-900">
             ${(paymentAmountCents / 100).toFixed(2)}
           </span>
@@ -169,7 +169,7 @@ export default function GuestWalletMethod({
       )}
 
       {/* Info about wallet */}
-      <div className="text-sm text-slate-600 space-y-2">
+      <div className="text-sm text-muted-foreground space-y-2">
         <p>Guest wallets are useful for:</p>
         <ul className="list-disc list-inside space-y-1 ml-2">
           <li>Storing refunds as credit for future use</li>

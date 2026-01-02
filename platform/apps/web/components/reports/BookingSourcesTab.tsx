@@ -62,7 +62,7 @@ export function BookingSourcesTab({ campgroundId, dateRange }: BookingSourcesTab
     return (
         <div className="space-y-6">
             {/* Sources Overview */}
-            <h3 className="text-lg font-semibold text-slate-900">Booking Channels</h3>
+            <h3 className="text-lg font-semibold text-foreground">Booking Channels</h3>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 {sourceConfig.map((source) => {
                     const stats = typedData.bySource[source.key] || { count: 0, revenue: 0 };
@@ -74,21 +74,21 @@ export function BookingSourcesTab({ campgroundId, dateRange }: BookingSourcesTab
                                         <div className={`p-2 rounded-lg ${source.color} bg-opacity-10 text-${source.color.split('-')[1]}-600`}>
                                             <source.icon className="w-5 h-5" />
                                         </div>
-                                        <span className="font-medium text-slate-700">{source.label}</span>
+                                        <span className="font-medium text-foreground">{source.label}</span>
                                     </div>
                                     <span className="text-2xl font-bold">{stats.count}</span>
                                 </div>
-                                <div className="text-sm text-slate-500 flex justify-between">
+                                <div className="text-sm text-muted-foreground flex justify-between">
                                     <span>Revenue</span>
-                                    <span className="font-medium text-slate-900">${stats.revenue.toLocaleString()}</span>
+                                    <span className="font-medium text-foreground">${stats.revenue.toLocaleString()}</span>
                                 </div>
-                                <div className="mt-3 h-2 w-full bg-slate-100 rounded-full overflow-hidden">
+                                <div className="mt-3 h-2 w-full bg-muted rounded-full overflow-hidden">
                                     <div
                                         className={`h-full ${source.color}`}
                                         style={{ width: `${getPercent(stats.count)}%` }}
                                     />
                                 </div>
-                                <div className="mt-1 text-xs text-right text-slate-400">
+                                <div className="mt-1 text-xs text-right text-muted-foreground">
                                     {getPercent(stats.count).toFixed(1)}% of bookings
                                 </div>
                             </CardContent>
@@ -111,10 +111,10 @@ export function BookingSourcesTab({ campgroundId, dateRange }: BookingSourcesTab
                             return (
                                 <div key={item.key} className="space-y-1">
                                     <div className="flex justify-between text-sm">
-                                        <span className="font-medium text-slate-700">{item.label}</span>
-                                        <span className="text-slate-500">{count} bookings ({percent.toFixed(1)}%)</span>
+                                        <span className="font-medium text-foreground">{item.label}</span>
+                                        <span className="text-muted-foreground">{count} bookings ({percent.toFixed(1)}%)</span>
                                     </div>
-                                    <div className="h-2 w-full bg-slate-100 rounded-full overflow-hidden">
+                                    <div className="h-2 w-full bg-muted rounded-full overflow-hidden">
                                         <div
                                             className="h-full bg-indigo-500"
                                             style={{ width: `${percent}%` }}

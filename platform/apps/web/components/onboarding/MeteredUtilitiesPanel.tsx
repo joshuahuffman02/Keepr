@@ -53,12 +53,12 @@ export function MeteredUtilitiesPanel({
   return (
     <div className={cn("space-y-4", className)}>
       {/* Toggle */}
-      <div className="flex items-center justify-between py-3 px-4 rounded-lg bg-slate-800/30 border border-slate-700">
+      <div className="flex items-center justify-between py-3 px-4 rounded-lg bg-muted/30 border border-border">
         <div className="flex items-center gap-3">
           <Gauge className="w-5 h-5 text-yellow-400" />
           <div>
-            <span className="text-slate-300">Metered Utilities</span>
-            <p className="text-xs text-slate-500">Bill guests based on actual usage</p>
+            <span className="text-muted-foreground">Metered Utilities</span>
+            <p className="text-xs text-muted-foreground">Bill guests based on actual usage</p>
           </div>
         </div>
         <Switch
@@ -78,7 +78,7 @@ export function MeteredUtilitiesPanel({
           >
             {/* Utility Type Selection */}
             <div className="space-y-3">
-              <Label className="text-sm text-slate-300">What utility is metered?</Label>
+              <Label className="text-sm text-muted-foreground">What utility is metered?</Label>
               <div className="grid grid-cols-3 gap-2">
                 {UTILITY_TYPES.map((utilityType) => {
                   const Icon = utilityType.icon;
@@ -91,10 +91,10 @@ export function MeteredUtilitiesPanel({
                         "flex flex-col items-center gap-2 p-3 rounded-lg border transition-all",
                         isSelected
                           ? "bg-emerald-500/20 border-emerald-500 text-emerald-400"
-                          : "bg-slate-800/50 border-slate-700 text-slate-400 hover:border-slate-600"
+                          : "bg-muted/50 border-border text-muted-foreground hover:border-border"
                       )}
                     >
-                      <Icon className={cn("w-5 h-5", isSelected ? "text-emerald-400" : "text-slate-500")} />
+                      <Icon className={cn("w-5 h-5", isSelected ? "text-emerald-400" : "text-muted-foreground")} />
                       <span className="text-xs font-medium">{utilityType.label}</span>
                     </button>
                   );
@@ -104,24 +104,24 @@ export function MeteredUtilitiesPanel({
 
             {/* Billing Mode */}
             <div className="space-y-2">
-              <Label className="text-sm text-slate-300">How do you bill?</Label>
+              <Label className="text-sm text-muted-foreground">How do you bill?</Label>
               <Select
                 value={billingMode || "per_reading"}
                 onValueChange={(value) => onBillingModeChange(value as MeteredBillingMode)}
               >
-                <SelectTrigger className="bg-slate-800/50 border-slate-700 text-white">
+                <SelectTrigger className="bg-muted/50 border-border text-foreground">
                   <SelectValue placeholder="Select billing mode" />
                 </SelectTrigger>
-                <SelectContent className="bg-slate-800 border-slate-700">
+                <SelectContent className="bg-muted border-border">
                   {BILLING_MODES.map((mode) => (
                     <SelectItem
                       key={mode.value}
                       value={mode.value}
-                      className="text-white hover:bg-slate-700"
+                      className="text-foreground hover:bg-muted"
                     >
                       <div className="flex flex-col">
                         <span>{mode.label}</span>
-                        <span className="text-xs text-slate-500">{mode.description}</span>
+                        <span className="text-xs text-muted-foreground">{mode.description}</span>
                       </div>
                     </SelectItem>
                   ))}

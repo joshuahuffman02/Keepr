@@ -108,7 +108,7 @@ export function SiteClassPhotoUpload({
           onClick={() => inputRef.current?.click()}
           className={cn(
             "relative flex flex-col items-center justify-center gap-2 p-6 rounded-lg border-2 border-dashed transition-colors cursor-pointer",
-            "border-slate-700 bg-slate-800/30 hover:border-slate-600 hover:bg-slate-800/50"
+            "border-border bg-muted/30 hover:border-border hover:bg-muted/50"
           )}
         >
           <input
@@ -119,18 +119,18 @@ export function SiteClassPhotoUpload({
             onChange={(e) => handleFiles(e.target.files)}
             className="hidden"
           />
-          <div className="w-10 h-10 rounded-full bg-slate-700/50 flex items-center justify-center">
+          <div className="w-10 h-10 rounded-full bg-muted/50 flex items-center justify-center">
             {photos.length === 0 ? (
-              <ImageIcon className="w-5 h-5 text-slate-500" />
+              <ImageIcon className="w-5 h-5 text-muted-foreground" />
             ) : (
-              <Upload className="w-5 h-5 text-slate-500" />
+              <Upload className="w-5 h-5 text-muted-foreground" />
             )}
           </div>
           <div className="text-center">
-            <p className="text-sm text-slate-400">
+            <p className="text-sm text-muted-foreground">
               {photos.length === 0 ? "Drop photos here or click to upload" : "Add more photos"}
             </p>
-            <p className="text-xs text-slate-600 mt-1">
+            <p className="text-xs text-muted-foreground mt-1">
               {photos.length}/{maxPhotos} photos • Max {maxSizeMB}MB each
             </p>
           </div>

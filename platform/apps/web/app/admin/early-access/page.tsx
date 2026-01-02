@@ -164,7 +164,7 @@ export default function EarlyAccessAdminPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-white">Early Access Management</h1>
-          <p className="text-slate-400 mt-1">
+          <p className="text-muted-foreground mt-1">
             Monitor signups, resend emails, and track conversion
           </p>
         </div>
@@ -181,24 +181,24 @@ export default function EarlyAccessAdminPage() {
 
       {loading && !stats ? (
         <div className="flex items-center justify-center py-12">
-          <RefreshCw className="h-8 w-8 animate-spin text-slate-400" />
+          <RefreshCw className="h-8 w-8 animate-spin text-muted-foreground" />
         </div>
       ) : (
         <>
           {/* Tier Stats */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {stats?.tiers.map((tier) => (
-              <Card key={tier.tier} className="bg-slate-800 border-slate-700">
+              <Card key={tier.tier} className="bg-muted border-border">
                 <CardHeader className="pb-2">
                   <div className="flex items-center gap-3">
-                    <div className={`${TIER_COLORS[tier.tier] || "bg-slate-500"} p-2 rounded-lg`}>
+                    <div className={`${TIER_COLORS[tier.tier] || "bg-muted0"} p-2 rounded-lg`}>
                       <Sparkles className="h-5 w-5 text-white" />
                     </div>
                     <div>
                       <CardTitle className="text-white text-lg">
                         {TIER_LABELS[tier.tier] || tier.tier}
                       </CardTitle>
-                      <CardDescription className="text-slate-400">
+                      <CardDescription className="text-muted-foreground">
                         {tier.remainingSpots} of {tier.totalSpots} spots left
                       </CardDescription>
                     </div>
@@ -206,15 +206,15 @@ export default function EarlyAccessAdminPage() {
                 </CardHeader>
                 <CardContent>
                   <div className="mt-2">
-                    <div className="w-full bg-slate-700 rounded-full h-2">
+                    <div className="w-full bg-muted rounded-full h-2">
                       <div
-                        className={`${TIER_COLORS[tier.tier] || "bg-slate-500"} h-2 rounded-full transition-all`}
+                        className={`${TIER_COLORS[tier.tier] || "bg-muted0"} h-2 rounded-full transition-all`}
                         style={{
                           width: `${((tier.totalSpots - tier.remainingSpots) / tier.totalSpots) * 100}%`
                         }}
                       />
                     </div>
-                    <div className="flex justify-between mt-2 text-xs text-slate-400">
+                    <div className="flex justify-between mt-2 text-xs text-muted-foreground">
                       <span>{tier.claimed} claimed</span>
                       <span>{tier.enrolled} completed</span>
                     </div>
@@ -225,13 +225,13 @@ export default function EarlyAccessAdminPage() {
           </div>
 
           {/* Onboarding Conversion */}
-          <Card className="bg-slate-800 border-slate-700">
+          <Card className="bg-muted border-border">
             <CardHeader>
               <CardTitle className="text-white flex items-center gap-2">
                 <TrendingUp className="h-5 w-5" />
                 Onboarding Conversion
               </CardTitle>
-              <CardDescription className="text-slate-400">
+              <CardDescription className="text-muted-foreground">
                 Signup to completion rate
               </CardDescription>
             </CardHeader>
@@ -243,7 +243,7 @@ export default function EarlyAccessAdminPage() {
                   </div>
                   <div>
                     <p className="text-2xl font-bold text-white">{stats?.onboarding.pending || 0}</p>
-                    <p className="text-sm text-slate-400">Pending Signups</p>
+                    <p className="text-sm text-muted-foreground">Pending Signups</p>
                   </div>
                 </div>
 
@@ -253,7 +253,7 @@ export default function EarlyAccessAdminPage() {
                   </div>
                   <div>
                     <p className="text-2xl font-bold text-white">{stats?.onboarding.completed || 0}</p>
-                    <p className="text-sm text-slate-400">Completed</p>
+                    <p className="text-sm text-muted-foreground">Completed</p>
                   </div>
                 </div>
 
@@ -263,7 +263,7 @@ export default function EarlyAccessAdminPage() {
                   </div>
                   <div>
                     <p className="text-2xl font-bold text-white">{stats?.onboarding.conversionRate || 0}%</p>
-                    <p className="text-sm text-slate-400">Conversion Rate</p>
+                    <p className="text-sm text-muted-foreground">Conversion Rate</p>
                   </div>
                 </div>
               </div>
@@ -271,13 +271,13 @@ export default function EarlyAccessAdminPage() {
           </Card>
 
           {/* Pending Onboardings Table */}
-          <Card className="bg-slate-800 border-slate-700">
+          <Card className="bg-muted border-border">
             <CardHeader>
               <CardTitle className="text-white flex items-center gap-2">
                 <Users className="h-5 w-5" />
                 Pending Signups
               </CardTitle>
-              <CardDescription className="text-slate-400">
+              <CardDescription className="text-muted-foreground">
                 Users who started signup but haven't completed onboarding
               </CardDescription>
             </CardHeader>
@@ -285,7 +285,7 @@ export default function EarlyAccessAdminPage() {
               {pending.length === 0 ? (
                 <div className="text-center py-8">
                   <CheckCircle2 className="h-12 w-12 text-green-400 mx-auto mb-2" />
-                  <p className="text-sm text-slate-400">No pending signups</p>
+                  <p className="text-sm text-muted-foreground">No pending signups</p>
                 </div>
               ) : (
                 <div className="space-y-3">
@@ -295,7 +295,7 @@ export default function EarlyAccessAdminPage() {
                       className={`rounded-lg border p-4 ${
                         item.inviteExpired
                           ? "border-red-500/30 bg-red-500/5"
-                          : "border-slate-700 bg-slate-700/50"
+                          : "border-border bg-muted/50"
                       }`}
                     >
                       <div className="flex items-start justify-between gap-4">
@@ -306,7 +306,7 @@ export default function EarlyAccessAdminPage() {
                             </p>
                             <Badge
                               variant="secondary"
-                              className={`${TIER_COLORS[item.tier] || "bg-slate-500"} text-white text-xs`}
+                              className={`${TIER_COLORS[item.tier] || "bg-muted0"} text-foreground text-xs`}
                             >
                               {TIER_LABELS[item.tier] || item.tier}
                             </Badge>
@@ -316,11 +316,11 @@ export default function EarlyAccessAdminPage() {
                               </Badge>
                             )}
                           </div>
-                          <p className="text-sm text-slate-300">{item.email}</p>
+                          <p className="text-sm text-muted-foreground">{item.email}</p>
                           {item.phone && (
-                            <p className="text-xs text-slate-400">{item.phone}</p>
+                            <p className="text-xs text-muted-foreground">{item.phone}</p>
                           )}
-                          <div className="flex items-center gap-4 mt-2 text-xs text-slate-400">
+                          <div className="flex items-center gap-4 mt-2 text-xs text-muted-foreground">
                             <span className="flex items-center gap-1">
                               <Clock className="h-3 w-3" />
                               Signed up {getTimeSince(item.createdAt)}

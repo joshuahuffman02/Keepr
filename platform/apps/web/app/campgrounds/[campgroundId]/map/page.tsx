@@ -174,8 +174,8 @@ export default function CampgroundMapPage() {
           <div className="flex items-center gap-3">
             <Map className="h-8 w-8 text-emerald-600" />
             <div>
-              <h1 className="text-2xl font-bold text-slate-900">Site Layout Editor</h1>
-              <p className="text-sm text-slate-600">
+              <h1 className="text-2xl font-bold text-foreground">Site Layout Editor</h1>
+              <p className="text-sm text-muted-foreground">
                 Design your campground layout visually - place sites, roads, and amenities.
               </p>
             </div>
@@ -203,35 +203,35 @@ export default function CampgroundMapPage() {
                 <div className="space-y-2 text-sm">
                   <div className="flex justify-between">
                     <span>Select tool</span>
-                    <kbd className="px-2 py-1 bg-slate-100 rounded text-xs">V</kbd>
+                    <kbd className="px-2 py-1 bg-muted rounded text-xs">V</kbd>
                   </div>
                   <div className="flex justify-between">
                     <span>Add site tool</span>
-                    <kbd className="px-2 py-1 bg-slate-100 rounded text-xs">S</kbd>
+                    <kbd className="px-2 py-1 bg-muted rounded text-xs">S</kbd>
                   </div>
                   <div className="flex justify-between">
                     <span>Delete selected</span>
-                    <kbd className="px-2 py-1 bg-slate-100 rounded text-xs">Delete</kbd>
+                    <kbd className="px-2 py-1 bg-muted rounded text-xs">Delete</kbd>
                   </div>
                   <div className="flex justify-between">
                     <span>Duplicate selected</span>
-                    <kbd className="px-2 py-1 bg-slate-100 rounded text-xs">Cmd/Ctrl + D</kbd>
+                    <kbd className="px-2 py-1 bg-muted rounded text-xs">Cmd/Ctrl + D</kbd>
                   </div>
                   <div className="flex justify-between">
                     <span>Undo</span>
-                    <kbd className="px-2 py-1 bg-slate-100 rounded text-xs">Cmd/Ctrl + Z</kbd>
+                    <kbd className="px-2 py-1 bg-muted rounded text-xs">Cmd/Ctrl + Z</kbd>
                   </div>
                   <div className="flex justify-between">
                     <span>Redo</span>
-                    <kbd className="px-2 py-1 bg-slate-100 rounded text-xs">Cmd/Ctrl + Shift + Z</kbd>
+                    <kbd className="px-2 py-1 bg-muted rounded text-xs">Cmd/Ctrl + Shift + Z</kbd>
                   </div>
                   <div className="flex justify-between">
                     <span>Deselect</span>
-                    <kbd className="px-2 py-1 bg-slate-100 rounded text-xs">Escape</kbd>
+                    <kbd className="px-2 py-1 bg-muted rounded text-xs">Escape</kbd>
                   </div>
                   <div className="flex justify-between">
                     <span>Zoom in/out</span>
-                    <kbd className="px-2 py-1 bg-slate-100 rounded text-xs">Scroll wheel</kbd>
+                    <kbd className="px-2 py-1 bg-muted rounded text-xs">Scroll wheel</kbd>
                   </div>
                 </div>
               </DialogContent>
@@ -248,25 +248,25 @@ export default function CampgroundMapPage() {
                 <DialogHeader>
                   <DialogTitle>How to use the Site Layout Editor</DialogTitle>
                 </DialogHeader>
-                <div className="space-y-4 text-sm text-slate-600">
+                <div className="space-y-4 text-sm text-muted-foreground">
                   <div>
-                    <h4 className="font-medium text-slate-900">Import a Background Map</h4>
+                    <h4 className="font-medium text-foreground">Import a Background Map</h4>
                     <p>Click "Map Image" in the toolbar to upload a satellite image or site plan as your background reference.</p>
                   </div>
                   <div>
-                    <h4 className="font-medium text-slate-900">Adding Sites</h4>
+                    <h4 className="font-medium text-foreground">Adding Sites</h4>
                     <p>Select the site tool (tent icon), choose a site type, then click on the canvas to place sites.</p>
                   </div>
                   <div>
-                    <h4 className="font-medium text-slate-900">Moving Sites</h4>
+                    <h4 className="font-medium text-foreground">Moving Sites</h4>
                     <p>Use the select tool (arrow), click a site, and drag to move. Sites snap to the grid.</p>
                   </div>
                   <div>
-                    <h4 className="font-medium text-slate-900">Editing Properties</h4>
+                    <h4 className="font-medium text-foreground">Editing Properties</h4>
                     <p>Select a site to see its properties on the right. Change site number, type, size, and rotation.</p>
                   </div>
                   <div>
-                    <h4 className="font-medium text-slate-900">Saving</h4>
+                    <h4 className="font-medium text-foreground">Saving</h4>
                     <p>Click "Save Layout" to store your changes. Use "Export" to download as JSON for backup.</p>
                   </div>
                 </div>
@@ -276,10 +276,10 @@ export default function CampgroundMapPage() {
         </div>
 
         {/* Quick Map Upload */}
-        <div className="rounded-lg border border-slate-200 bg-white p-4">
+        <div className="rounded-lg border border-border bg-card p-4">
           <div className="mb-3">
-            <h2 className="text-sm font-semibold text-slate-800">Quick Map Upload</h2>
-            <p className="text-xs text-slate-500">
+            <h2 className="text-sm font-semibold text-foreground">Quick Map Upload</h2>
+            <p className="text-xs text-muted-foreground">
               Upload a satellite image or site plan to use as your background reference.
             </p>
           </div>
@@ -295,8 +295,8 @@ export default function CampgroundMapPage() {
 
         {/* Site Layout Editor */}
         {isLoading ? (
-          <div className="flex items-center justify-center h-96 bg-slate-50 rounded-xl border">
-            <div className="flex items-center gap-2 text-slate-600">
+          <div className="flex items-center justify-center h-96 bg-muted rounded-xl border">
+            <div className="flex items-center gap-2 text-muted-foreground">
               <Loader2 className="h-5 w-5 animate-spin" />
               <span>Loading layout...</span>
             </div>

@@ -78,8 +78,8 @@ export default function DisputesPage() {
       <div className="max-w-5xl space-y-4">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-semibold text-slate-900">Dispute Center</h1>
-            <p className="text-sm text-slate-600">Stripe chargebacks with due dates for evidence.</p>
+            <h1 className="text-2xl font-semibold text-foreground">Dispute Center</h1>
+            <p className="text-sm text-muted-foreground">Stripe chargebacks with due dates for evidence.</p>
           </div>
           <div className="flex gap-2">
             {["all", "needs_response", "under_review", "charge_refunded", "won", "lost"].map((s) => (
@@ -155,12 +155,12 @@ export default function DisputesPage() {
               <TableBody>
                 {!data && isLoading && (
                   <TableRow>
-                    <TableCell colSpan={6} className="text-center text-slate-500">Loading...</TableCell>
+                    <TableCell colSpan={6} className="text-center text-muted-foreground">Loading...</TableCell>
                   </TableRow>
                 )}
                 {data?.length === 0 && !isLoading && (
                   <TableRow>
-                    <TableCell colSpan={6} className="text-center text-slate-500">No disputes.</TableCell>
+                    <TableCell colSpan={6} className="text-center text-muted-foreground">No disputes.</TableCell>
                   </TableRow>
                 )}
                 {data?.map((d) => (
@@ -171,20 +171,20 @@ export default function DisputesPage() {
                       </Link>
                     </TableCell>
                     <TableCell>
-                      <Badge className={statusColors[d.status] || "bg-slate-100 text-slate-700"}>
+                      <Badge className={statusColors[d.status] || "bg-muted text-foreground"}>
                         {d.status.replace("_", " ")}
                       </Badge>
                     </TableCell>
                     <TableCell>{formatMoney(d.amountCents, d.currency.toUpperCase())}</TableCell>
-                    <TableCell className="text-xs text-slate-700">{d.reason ?? "—"}</TableCell>
-                    <TableCell className="text-xs text-slate-700">
+                    <TableCell className="text-xs text-foreground">{d.reason ?? "—"}</TableCell>
+                    <TableCell className="text-xs text-foreground">
                       {d.reservationId ? (
                         <Link className="text-indigo-600 hover:underline" href={`/campgrounds/${campgroundId}/reservations/${d.reservationId}`}>
                           {d.reservationId}
                         </Link>
                       ) : "—"}
                     </TableCell>
-                    <TableCell className="text-xs text-slate-700">
+                    <TableCell className="text-xs text-foreground">
                       {d.evidenceDueBy ? format(new Date(d.evidenceDueBy), "yyyy-MM-dd") : "—"}
                     </TableCell>
                     <TableCell className="font-mono text-xs">{d.stripeChargeId ?? "—"}</TableCell>

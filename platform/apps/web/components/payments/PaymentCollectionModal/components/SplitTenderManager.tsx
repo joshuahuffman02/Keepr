@@ -42,8 +42,8 @@ export function SplitTenderManager({
     <div className="space-y-4">
       {/* Header */}
       <div className="flex items-center justify-between">
-        <h3 className="text-sm font-medium text-slate-700">Split Payment</h3>
-        <span className="text-sm text-slate-500">
+        <h3 className="text-sm font-medium text-foreground">Split Payment</h3>
+        <span className="text-sm text-muted-foreground">
           {completedEntries.length} payment{completedEntries.length !== 1 ? "s" : ""}
         </span>
       </div>
@@ -62,14 +62,14 @@ export function SplitTenderManager({
 
       {/* Progress bar */}
       <div className="space-y-2">
-        <div className="h-2 bg-slate-100 rounded-full overflow-hidden">
+        <div className="h-2 bg-muted rounded-full overflow-hidden">
           <div
             className="h-full bg-emerald-500 transition-all duration-300"
             style={{ width: `${(totalPaid / totalDueCents) * 100}%` }}
           />
         </div>
         <div className="flex justify-between text-sm">
-          <span className="text-slate-500">
+          <span className="text-muted-foreground">
             Paid: ${(totalPaid / 100).toFixed(2)}
           </span>
           <span className={cn(
@@ -116,7 +116,7 @@ function TenderEntryRow({ entry, onRemove, disabled }: TenderEntryRowProps) {
           ? "bg-emerald-50 border-emerald-200"
           : entry.status === "failed"
           ? "bg-red-50 border-red-200"
-          : "bg-slate-50 border-slate-200"
+          : "bg-muted border-border"
       )}
     >
       <div className="flex items-center gap-3">
@@ -140,13 +140,13 @@ function TenderEntryRow({ entry, onRemove, disabled }: TenderEntryRowProps) {
                 ? "text-emerald-800"
                 : entry.status === "failed"
                 ? "text-red-800"
-                : "text-slate-800"
+                : "text-foreground"
             )}
           >
             {methodInfo.label}
           </p>
           {entry.reference && (
-            <p className="text-xs text-slate-500 font-mono">
+            <p className="text-xs text-muted-foreground font-mono">
               {formatReference(entry.method, entry.reference)}
             </p>
           )}
@@ -161,7 +161,7 @@ function TenderEntryRow({ entry, onRemove, disabled }: TenderEntryRowProps) {
               ? "text-emerald-700"
               : entry.status === "failed"
               ? "text-red-700"
-              : "text-slate-700"
+              : "text-foreground"
           )}
         >
           ${(entry.amountCents / 100).toFixed(2)}
@@ -171,7 +171,7 @@ function TenderEntryRow({ entry, onRemove, disabled }: TenderEntryRowProps) {
             variant="ghost"
             size="icon"
             onClick={onRemove}
-            className="h-6 w-6 text-slate-400 hover:text-red-500"
+            className="h-6 w-6 text-muted-foreground hover:text-red-500"
           >
             <X className="h-3.5 w-3.5" />
           </Button>
@@ -234,11 +234,11 @@ export function SplitTenderSummary() {
   }
 
   return (
-    <div className="flex items-center gap-2 text-sm text-slate-600">
+    <div className="flex items-center gap-2 text-sm text-muted-foreground">
       <span>
         {completedEntries.length} payment{completedEntries.length !== 1 ? "s" : ""}
       </span>
-      <span className="text-slate-300">•</span>
+      <span className="text-muted-foreground">•</span>
       {remainingCents > 0 ? (
         <span className="text-amber-600 font-medium">
           ${(remainingCents / 100).toFixed(2)} remaining

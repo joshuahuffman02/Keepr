@@ -70,15 +70,15 @@ export function OccupancyReport({ campgroundId, dateRange }: OccupancyReportProp
     }, [data]);
 
     if (isLoadingRes || isLoadingSites) {
-        return <div className="text-sm text-slate-500">Loading occupancy data...</div>;
+        return <div className="text-sm text-muted-foreground">Loading occupancy data...</div>;
     }
 
     if (!reservations || !sites) {
-        return <div className="text-sm text-slate-500">No data found.</div>;
+        return <div className="text-sm text-muted-foreground">No data found.</div>;
     }
 
     if (sites.length === 0) {
-        return <div className="text-sm text-slate-500">No sites configured for this campground. Cannot calculate occupancy.</div>;
+        return <div className="text-sm text-muted-foreground">No sites configured for this campground. Cannot calculate occupancy.</div>;
     }
 
     // Check if there's any data in the selected period
@@ -90,20 +90,20 @@ export function OccupancyReport({ campgroundId, dateRange }: OccupancyReportProp
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <Card>
                         <CardHeader className="pb-2">
-                            <CardTitle className="text-sm font-medium text-slate-500">Avg. Occupancy</CardTitle>
+                            <CardTitle className="text-sm font-medium text-muted-foreground">Avg. Occupancy</CardTitle>
                         </CardHeader>
                         <CardContent>
                             <div className="text-2xl font-bold">0%</div>
-                            <p className="text-xs text-slate-500">for selected period</p>
+                            <p className="text-xs text-muted-foreground">for selected period</p>
                         </CardContent>
                     </Card>
                     <Card>
                         <CardHeader className="pb-2">
-                            <CardTitle className="text-sm font-medium text-slate-500">Total Capacity</CardTitle>
+                            <CardTitle className="text-sm font-medium text-muted-foreground">Total Capacity</CardTitle>
                         </CardHeader>
                         <CardContent>
                             <div className="text-2xl font-bold">{sites.length}</div>
-                            <p className="text-xs text-slate-500">bookable sites</p>
+                            <p className="text-xs text-muted-foreground">bookable sites</p>
                         </CardContent>
                     </Card>
                 </div>
@@ -125,20 +125,20 @@ export function OccupancyReport({ campgroundId, dateRange }: OccupancyReportProp
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <Card>
                     <CardHeader className="pb-2">
-                        <CardTitle className="text-sm font-medium text-slate-500">Avg. Occupancy</CardTitle>
+                        <CardTitle className="text-sm font-medium text-muted-foreground">Avg. Occupancy</CardTitle>
                     </CardHeader>
                     <CardContent>
                         <div className="text-2xl font-bold">{averageOccupancy}%</div>
-                        <p className="text-xs text-slate-500">for selected period</p>
+                        <p className="text-xs text-muted-foreground">for selected period</p>
                     </CardContent>
                 </Card>
                 <Card>
                     <CardHeader className="pb-2">
-                        <CardTitle className="text-sm font-medium text-slate-500">Total Capacity</CardTitle>
+                        <CardTitle className="text-sm font-medium text-muted-foreground">Total Capacity</CardTitle>
                     </CardHeader>
                     <CardContent>
                         <div className="text-2xl font-bold">{sites.length}</div>
-                        <p className="text-xs text-slate-500">bookable sites</p>
+                        <p className="text-xs text-muted-foreground">bookable sites</p>
                     </CardContent>
                 </Card>
             </div>

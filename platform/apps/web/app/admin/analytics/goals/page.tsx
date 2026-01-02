@@ -108,7 +108,7 @@ function getStatusIcon(status: string) {
     case "behind":
       return <XCircle className="h-5 w-5 text-red-400" />;
     default:
-      return <Target className="h-5 w-5 text-slate-400" />;
+      return <Target className="h-5 w-5 text-muted-foreground" />;
   }
 }
 
@@ -122,7 +122,7 @@ function getStatusColor(status: string): string {
     case "behind":
       return "text-red-400";
     default:
-      return "text-slate-400";
+      return "text-muted-foreground";
   }
 }
 
@@ -153,7 +153,7 @@ function getCategoryIcon(category: string) {
     case "satisfaction":
       return <Star className="h-4 w-4 text-amber-400" />;
     default:
-      return <Target className="h-4 w-4 text-slate-400" />;
+      return <Target className="h-4 w-4 text-muted-foreground" />;
   }
 }
 
@@ -167,7 +167,7 @@ function ProgressBar({ current, target, status }: { current: number; target: num
       : "bg-red-500";
 
   return (
-    <div className="w-full bg-slate-700 rounded-full h-2">
+    <div className="w-full bg-muted rounded-full h-2">
       <div
         className={`${color} h-2 rounded-full transition-all duration-500`}
         style={{ width: `${percentage}%` }}
@@ -219,20 +219,20 @@ function CreateGoalModal({
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-      <div className="bg-slate-800 rounded-lg p-6 w-full max-w-lg mx-4 border border-slate-700">
+      <div className="bg-muted rounded-lg p-6 w-full max-w-lg mx-4 border border-border">
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-xl font-semibold text-white">Create New Goal</h2>
           <button
             onClick={onClose}
-            className="p-1 hover:bg-slate-700 rounded-lg transition-colors"
+            className="p-1 hover:bg-muted rounded-lg transition-colors"
           >
-            <X className="h-5 w-5 text-slate-400" />
+            <X className="h-5 w-5 text-muted-foreground" />
           </button>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-slate-300 mb-1">
+            <label className="block text-sm font-medium text-muted-foreground mb-1">
               Goal Name
             </label>
             <input
@@ -240,19 +240,19 @@ function CreateGoalModal({
               required
               value={form.name}
               onChange={(e) => setForm({ ...form, name: e.target.value })}
-              className="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3 py-2 bg-muted border border-border rounded-lg text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-blue-500"
               placeholder="e.g., Q1 Revenue Target"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-slate-300 mb-1">
+            <label className="block text-sm font-medium text-muted-foreground mb-1">
               Description
             </label>
             <textarea
               value={form.description}
               onChange={(e) => setForm({ ...form, description: e.target.value })}
-              className="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3 py-2 bg-muted border border-border rounded-lg text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-blue-500"
               rows={2}
               placeholder="Describe this goal..."
             />
@@ -260,13 +260,13 @@ function CreateGoalModal({
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-slate-300 mb-1">
+              <label className="block text-sm font-medium text-muted-foreground mb-1">
                 Metric
               </label>
               <select
                 value={form.metric}
                 onChange={(e) => handleMetricChange(e.target.value)}
-                className="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 bg-muted border border-border rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
                 {metricOptions.map((m) => (
                   <option key={m.value} value={m.value}>
@@ -277,7 +277,7 @@ function CreateGoalModal({
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-slate-300 mb-1">
+              <label className="block text-sm font-medium text-muted-foreground mb-1">
                 Target Value
               </label>
               <input
@@ -285,7 +285,7 @@ function CreateGoalModal({
                 required
                 value={form.target}
                 onChange={(e) => setForm({ ...form, target: e.target.value })}
-                className="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 bg-muted border border-border rounded-lg text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-blue-500"
                 placeholder={form.unit === "currency" ? "1000000" : "50"}
               />
             </div>
@@ -293,13 +293,13 @@ function CreateGoalModal({
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-slate-300 mb-1">
+              <label className="block text-sm font-medium text-muted-foreground mb-1">
                 Period
               </label>
               <select
                 value={form.period}
                 onChange={(e) => setForm({ ...form, period: e.target.value })}
-                className="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 bg-muted border border-border rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
                 {periodOptions.map((p) => (
                   <option key={p} value={p}>
@@ -310,7 +310,7 @@ function CreateGoalModal({
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-slate-300 mb-1">
+              <label className="block text-sm font-medium text-muted-foreground mb-1">
                 Due Date
               </label>
               <input
@@ -318,18 +318,18 @@ function CreateGoalModal({
                 required
                 value={form.dueDate}
                 onChange={(e) => setForm({ ...form, dueDate: e.target.value })}
-                className="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 bg-muted border border-border rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
           </div>
 
           <div className="flex items-center gap-2 pt-2">
-            <div className="flex items-center gap-2 px-3 py-1 bg-slate-700/50 rounded-lg">
+            <div className="flex items-center gap-2 px-3 py-1 bg-muted/50 rounded-lg">
               {getCategoryIcon(form.category)}
-              <span className="text-sm text-slate-300 capitalize">{form.category}</span>
+              <span className="text-sm text-muted-foreground capitalize">{form.category}</span>
             </div>
-            <div className="text-sm text-slate-400">
-              Unit: <span className="text-slate-300">{form.unit}</span>
+            <div className="text-sm text-muted-foreground">
+              Unit: <span className="text-muted-foreground">{form.unit}</span>
             </div>
           </div>
 
@@ -337,7 +337,7 @@ function CreateGoalModal({
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded-lg transition-colors"
+              className="flex-1 px-4 py-2 bg-muted hover:bg-muted text-foreground rounded-lg transition-colors"
             >
               Cancel
             </button>
@@ -501,7 +501,7 @@ export default function GoalsPage() {
               </Badge>
             )}
           </div>
-          <p className="text-slate-400 mt-1">Track progress toward platform objectives</p>
+          <p className="text-muted-foreground mt-1">Track progress toward platform objectives</p>
           {error && <p className="text-amber-400 text-sm mt-1">{error}</p>}
         </div>
         <button
@@ -523,7 +523,7 @@ export default function GoalsPage() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-2xl font-bold text-green-400">{statusCounts.on_track}</p>
-                <p className="text-sm text-slate-400">On Track</p>
+                <p className="text-sm text-muted-foreground">On Track</p>
               </div>
               <CheckCircle className="h-8 w-8 text-green-400/50" />
             </div>
@@ -537,7 +537,7 @@ export default function GoalsPage() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-2xl font-bold text-amber-400">{statusCounts.at_risk}</p>
-                <p className="text-sm text-slate-400">At Risk</p>
+                <p className="text-sm text-muted-foreground">At Risk</p>
               </div>
               <AlertTriangle className="h-8 w-8 text-amber-400/50" />
             </div>
@@ -551,7 +551,7 @@ export default function GoalsPage() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-2xl font-bold text-red-400">{statusCounts.behind}</p>
-                <p className="text-sm text-slate-400">Behind</p>
+                <p className="text-sm text-muted-foreground">Behind</p>
               </div>
               <XCircle className="h-8 w-8 text-red-400/50" />
             </div>
@@ -565,7 +565,7 @@ export default function GoalsPage() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-2xl font-bold text-blue-400">{statusCounts.achieved}</p>
-                <p className="text-sm text-slate-400">Achieved</p>
+                <p className="text-sm text-muted-foreground">Achieved</p>
               </div>
               <Target className="h-8 w-8 text-blue-400/50" />
             </div>
@@ -576,11 +576,11 @@ export default function GoalsPage() {
       {/* Goals List */}
       <div className="space-y-4">
         {filteredGoals.length === 0 ? (
-          <Card className="bg-slate-800/50 border-slate-700">
+          <Card className="bg-muted/50 border-border">
             <CardContent className="p-8 text-center">
-              <Target className="h-12 w-12 text-slate-600 mx-auto mb-4" />
+              <Target className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
               <h3 className="text-lg font-medium text-white mb-2">No goals yet</h3>
-              <p className="text-slate-400 mb-4">
+              <p className="text-muted-foreground mb-4">
                 Create your first goal to start tracking platform objectives.
               </p>
               <button
@@ -600,11 +600,11 @@ export default function GoalsPage() {
             );
 
             return (
-              <Card key={goal.id} className="bg-slate-800/50 border-slate-700">
+              <Card key={goal.id} className="bg-muted/50 border-border">
                 <CardContent className="p-6">
                   <div className="flex items-start justify-between mb-4">
                     <div className="flex items-start gap-4">
-                      <div className="p-2 bg-slate-700 rounded-lg">
+                      <div className="p-2 bg-muted rounded-lg">
                         {getCategoryIcon(goal.category)}
                       </div>
                       <div>
@@ -613,35 +613,35 @@ export default function GoalsPage() {
                           {getStatusBadge(goal.status)}
                         </div>
                         {goal.description && (
-                          <p className="text-sm text-slate-400">{goal.description}</p>
+                          <p className="text-sm text-muted-foreground">{goal.description}</p>
                         )}
-                        <p className="text-xs text-slate-500 mt-1">
+                        <p className="text-xs text-muted-foreground mt-1">
                           {goal.period} • Due {dueDate.toLocaleDateString()} ({daysRemaining} days remaining)
                         </p>
                       </div>
                     </div>
                     <div className="flex items-center gap-2">
-                      <button className="p-2 hover:bg-slate-700 rounded-lg transition-colors">
-                        <Edit2 className="h-4 w-4 text-slate-400" />
+                      <button className="p-2 hover:bg-muted rounded-lg transition-colors">
+                        <Edit2 className="h-4 w-4 text-muted-foreground" />
                       </button>
                       <button
                         onClick={() => setDeleteConfirmId(goal.id)}
-                        className="p-2 hover:bg-slate-700 rounded-lg transition-colors"
+                        className="p-2 hover:bg-muted rounded-lg transition-colors"
                       >
-                        <Trash2 className="h-4 w-4 text-slate-400" />
+                        <Trash2 className="h-4 w-4 text-muted-foreground" />
                       </button>
                     </div>
                   </div>
 
                   <div className="space-y-3">
                     <div className="flex items-center justify-between text-sm">
-                      <span className="text-slate-400">Progress</span>
+                      <span className="text-muted-foreground">Progress</span>
                       <span className={`font-medium ${getStatusColor(goal.status)}`}>
                         {formatValue(goal.current, goal.unit)} / {formatValue(goal.target, goal.unit)}
                       </span>
                     </div>
                     <ProgressBar current={goal.current} target={goal.target} status={goal.status} />
-                    <div className="flex items-center justify-between text-xs text-slate-500">
+                    <div className="flex items-center justify-between text-xs text-muted-foreground">
                       <span>{goal.progress.toFixed(1)}% complete</span>
                       <span>
                         {goal.unit === "percentage"
@@ -662,42 +662,42 @@ export default function GoalsPage() {
       </div>
 
       {/* Quick Add Goals Suggestions */}
-      <Card className="bg-slate-800/50 border-slate-700">
+      <Card className="bg-muted/50 border-border">
         <CardHeader>
           <CardTitle className="text-lg text-white">Suggested Goals</CardTitle>
-          <p className="text-sm text-slate-400">Based on common industry objectives</p>
+          <p className="text-sm text-muted-foreground">Based on common industry objectives</p>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div
               onClick={() => setIsModalOpen(true)}
-              className="p-4 bg-slate-700/50 rounded-lg border border-slate-600 hover:border-blue-500/50 cursor-pointer transition-colors"
+              className="p-4 bg-muted/50 rounded-lg border border-border hover:border-blue-500/50 cursor-pointer transition-colors"
             >
               <div className="flex items-center gap-2 mb-2">
                 <DollarSign className="h-4 w-4 text-green-400" />
                 <span className="font-medium text-white">Revenue Stretch Goal</span>
               </div>
-              <p className="text-xs text-slate-400">Increase Q1 2025 revenue by 20% YoY</p>
+              <p className="text-xs text-muted-foreground">Increase Q1 2025 revenue by 20% YoY</p>
             </div>
             <div
               onClick={() => setIsModalOpen(true)}
-              className="p-4 bg-slate-700/50 rounded-lg border border-slate-600 hover:border-blue-500/50 cursor-pointer transition-colors"
+              className="p-4 bg-muted/50 rounded-lg border border-border hover:border-blue-500/50 cursor-pointer transition-colors"
             >
               <div className="flex items-center gap-2 mb-2">
                 <Star className="h-4 w-4 text-amber-400" />
                 <span className="font-medium text-white">NPS Improvement</span>
               </div>
-              <p className="text-xs text-slate-400">Get 3 struggling campgrounds above NPS 30</p>
+              <p className="text-xs text-muted-foreground">Get 3 struggling campgrounds above NPS 30</p>
             </div>
             <div
               onClick={() => setIsModalOpen(true)}
-              className="p-4 bg-slate-700/50 rounded-lg border border-slate-600 hover:border-blue-500/50 cursor-pointer transition-colors"
+              className="p-4 bg-muted/50 rounded-lg border border-border hover:border-blue-500/50 cursor-pointer transition-colors"
             >
               <div className="flex items-center gap-2 mb-2">
                 <Users className="h-4 w-4 text-purple-400" />
                 <span className="font-medium text-white">Guest Retention</span>
               </div>
-              <p className="text-xs text-slate-400">Increase first-to-repeat conversion by 15%</p>
+              <p className="text-xs text-muted-foreground">Increase first-to-repeat conversion by 15%</p>
             </div>
           </div>
         </CardContent>
@@ -712,15 +712,15 @@ export default function GoalsPage() {
       />
 
       <AlertDialog open={!!deleteConfirmId} onOpenChange={(open) => !open && setDeleteConfirmId(null)}>
-        <AlertDialogContent className="bg-slate-800 border-slate-700">
+        <AlertDialogContent className="bg-muted border-border">
           <AlertDialogHeader>
             <AlertDialogTitle className="text-white">Delete Goal</AlertDialogTitle>
-            <AlertDialogDescription className="text-slate-400">
+            <AlertDialogDescription className="text-muted-foreground">
               Are you sure you want to delete this goal? This action cannot be undone.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel className="border-slate-600 text-slate-300 hover:bg-slate-700">Cancel</AlertDialogCancel>
+            <AlertDialogCancel className="border-border text-muted-foreground hover:bg-muted">Cancel</AlertDialogCancel>
             <AlertDialogAction
               onClick={confirmDeleteGoal}
               className="bg-red-600 hover:bg-red-700"

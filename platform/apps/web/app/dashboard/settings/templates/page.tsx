@@ -485,7 +485,7 @@ export default function TemplatesPage() {
     return (
       <div>
         <div className="flex items-center justify-center h-64">
-          <p className="text-slate-500">Select a campground to manage templates</p>
+          <p className="text-muted-foreground">Select a campground to manage templates</p>
         </div>
       </div>
     );
@@ -618,21 +618,21 @@ export default function TemplatesPage() {
                 if (catTemplates.length === 0) return null;
                 return (
                   <div key={cat} className="bg-card rounded-xl border border-border overflow-hidden">
-                    <div className="px-4 py-2 bg-slate-50 border-b border-slate-200">
-                      <h3 className="font-medium text-slate-700 capitalize">{cat}</h3>
+                    <div className="px-4 py-2 bg-muted border-b border-border">
+                      <h3 className="font-medium text-foreground capitalize">{cat}</h3>
                     </div>
-                    <div className="divide-y divide-slate-100">
+                    <div className="divide-y divide-border">
                       {catTemplates.map((template: Template) => (
                         <button
                           key={template.id}
                           onClick={() => setSelectedTemplate(template)}
-                          className={`w-full px-4 py-3 text-left hover:bg-slate-50 transition-colors ${selectedTemplate?.id === template.id ? "bg-violet-50 border-l-2 border-violet-500" : ""
+                          className={`w-full px-4 py-3 text-left hover:bg-muted transition-colors ${selectedTemplate?.id === template.id ? "bg-violet-50 border-l-2 border-violet-500" : ""
                             }`}
                         >
                           <div className="flex items-center justify-between">
                             <div>
-                              <div className="font-medium text-slate-900">{template.name}</div>
-                              <div className="text-xs text-slate-500 flex items-center gap-1">
+                              <div className="font-medium text-foreground">{template.name}</div>
+                              <div className="text-xs text-muted-foreground flex items-center gap-1">
                                 {template.channel === "email" ? <Mail className="h-3.5 w-3.5" /> : <Smartphone className="h-3.5 w-3.5" />} {template.channel}
                               </div>
                             </div>
@@ -659,9 +659,9 @@ export default function TemplatesPage() {
                 onTogglePreview={() => setPreviewMode(!previewMode)}
               />
             ) : (
-              <div className="bg-white rounded-xl border border-slate-200 h-[500px] flex items-center justify-center">
-                <div className="text-center text-slate-400">
-                  <FileText className="h-12 w-12 mx-auto mb-3 text-slate-300" />
+              <div className="bg-card rounded-xl border border-border h-[500px] flex items-center justify-center">
+                <div className="text-center text-muted-foreground">
+                  <FileText className="h-12 w-12 mx-auto mb-3 text-muted-foreground" />
                   <p className="font-medium">Select a template to edit</p>
                   <p className="text-sm">Or add one from the prebuilt gallery below</p>
                 </div>
@@ -669,18 +669,18 @@ export default function TemplatesPage() {
             )}
 
             {/* Variables Reference */}
-            <div className="mt-6 bg-white rounded-xl border border-slate-200 p-4">
-              <h4 className="font-medium text-slate-800 mb-3">Available Variables</h4>
+            <div className="mt-6 bg-card rounded-xl border border-border p-4">
+              <h4 className="font-medium text-foreground mb-3">Available Variables</h4>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
                 {TEMPLATE_VARIABLES.map(v => (
                   <div
                     key={v.key}
-                    className="px-2 py-1 bg-slate-50 rounded text-xs cursor-pointer hover:bg-slate-100 transition-colors"
+                    className="px-2 py-1 bg-muted rounded text-xs cursor-pointer hover:bg-muted transition-colors"
                     onClick={() => navigator.clipboard.writeText(v.key)}
                     title={`Click to copy: ${v.key}`}
                   >
                     <code className="text-violet-600">{v.key}</code>
-                    <div className="text-slate-500 text-[10px]">{v.desc}</div>
+                    <div className="text-muted-foreground text-[10px]">{v.desc}</div>
                   </div>
                 ))}
               </div>
@@ -812,22 +812,22 @@ function TemplateEditor({
     .replace(/\{\{site_number\}\}/g, "A-15");
 
   return (
-    <div className="bg-white rounded-xl border border-slate-200 overflow-hidden">
+    <div className="bg-card rounded-xl border border-border overflow-hidden">
       {/* Header */}
-      <div className="px-5 py-4 border-b border-slate-200 flex items-center justify-between">
+      <div className="px-5 py-4 border-b border-border flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <span className="text-slate-600">{template.channel === "email" ? <Mail className="h-5 w-5" /> : <Smartphone className="h-5 w-5" />}</span>
+          <span className="text-muted-foreground">{template.channel === "email" ? <Mail className="h-5 w-5" /> : <Smartphone className="h-5 w-5" />}</span>
           <input
             type="text"
             {...register("name")}
-            className="font-semibold text-slate-900 bg-transparent border-none outline-none focus:ring-0 text-lg"
+            className="font-semibold text-foreground bg-transparent border-none outline-none focus:ring-0 text-lg"
           />
         </div>
         <div className="flex items-center gap-2">
           <button
             type="button"
             onClick={onTogglePreview}
-            className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${previewMode ? "bg-violet-100 text-violet-700" : "bg-slate-100 text-slate-600 hover:bg-slate-200"
+            className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${previewMode ? "bg-violet-100 text-violet-700" : "bg-muted text-muted-foreground hover:bg-muted"
               }`}
           >
             {previewMode ? "Edit" : "Preview"}
@@ -877,17 +877,17 @@ function TemplateEditor({
         )}
 
         {previewMode ? (
-          <div className="border border-slate-200 rounded-lg overflow-hidden">
-            <div className="bg-slate-50 px-4 py-2 border-b border-slate-200 text-sm text-slate-600">
+          <div className="border border-border rounded-lg overflow-hidden">
+            <div className="bg-muted px-4 py-2 border-b border-border text-sm text-muted-foreground">
               Preview (with sample data)
             </div>
             {template.channel === "email" ? (
               <div
-                className="p-4 bg-white"
+                className="p-4 bg-card"
                 dangerouslySetInnerHTML={{ __html: DOMPurify?.sanitize(previewHtml) || previewHtml }}
               />
             ) : (
-              <div className="p-4 bg-slate-900 text-white font-mono text-sm whitespace-pre-wrap">
+              <div className="p-4 bg-muted text-foreground font-mono text-sm whitespace-pre-wrap">
                 {previewText}
               </div>
             )}
@@ -986,13 +986,13 @@ function CreateTemplateModal({
       aria-modal="true"
       aria-labelledby="create-template-title"
     >
-      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md p-6 motion-safe:animate-in motion-safe:zoom-in-95 motion-safe:duration-200">
+      <div className="bg-card rounded-2xl shadow-2xl w-full max-w-md p-6 motion-safe:animate-in motion-safe:zoom-in-95 motion-safe:duration-200">
         <div className="flex items-center justify-between mb-6">
-          <h2 id="create-template-title" className="text-xl font-bold text-slate-900">New Template</h2>
+          <h2 id="create-template-title" className="text-xl font-bold text-foreground">New Template</h2>
           <button
             onClick={onClose}
             aria-label="Close dialog"
-            className="text-slate-400 hover:text-slate-600 p-1 rounded
+            className="text-muted-foreground hover:text-muted-foreground p-1 rounded
               focus-visible:ring-2 focus-visible:ring-violet-500"
           >
             <X className="h-5 w-5" />
@@ -1015,7 +1015,7 @@ function CreateTemplateModal({
           />
 
           <div>
-            <label id="channel-label" className="block text-sm font-medium text-slate-700 mb-1">Channel</label>
+            <label id="channel-label" className="block text-sm font-medium text-foreground mb-1">Channel</label>
             <div className="flex gap-2" role="radiogroup" aria-labelledby="channel-label">
               <button
                 type="button"
@@ -1026,7 +1026,7 @@ function CreateTemplateModal({
                   focus-visible:ring-2 focus-visible:ring-violet-500 flex items-center justify-center gap-1.5
                   ${channel === "email"
                     ? "bg-violet-100 text-violet-700 border-2 border-violet-300"
-                    : "bg-slate-50 text-slate-600 border border-slate-200 hover:border-slate-300"
+                    : "bg-muted text-muted-foreground border border-border hover:border-border"
                   }`}
               >
                 <Mail className="h-4 w-4" /> Email
@@ -1040,7 +1040,7 @@ function CreateTemplateModal({
                   focus-visible:ring-2 focus-visible:ring-violet-500 flex items-center justify-center gap-1.5
                   ${channel === "sms"
                     ? "bg-violet-100 text-violet-700 border-2 border-violet-300"
-                    : "bg-slate-50 text-slate-600 border border-slate-200 hover:border-slate-300"
+                    : "bg-muted text-muted-foreground border border-border hover:border-border"
                   }`}
               >
                 <Smartphone className="h-4 w-4" /> SMS
@@ -1049,10 +1049,10 @@ function CreateTemplateModal({
           </div>
 
           <div>
-            <label htmlFor="category-select" className="block text-sm font-medium text-slate-700 mb-1">Category</label>
+            <label htmlFor="category-select" className="block text-sm font-medium text-foreground mb-1">Category</label>
             <select
               id="category-select"
-              className="w-full px-3 py-2 border border-slate-200 rounded-lg
+              className="w-full px-3 py-2 border border-border rounded-lg
                 focus:ring-2 focus:ring-violet-500 focus:border-violet-500"
               {...register("category")}
             >
@@ -1066,9 +1066,9 @@ function CreateTemplateModal({
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 px-4 py-2 border border-slate-200 text-slate-700 rounded-lg
-                hover:bg-slate-50 transition-colors
-                focus-visible:ring-2 focus-visible:ring-slate-500"
+              className="flex-1 px-4 py-2 border border-border text-foreground rounded-lg
+                hover:bg-muted transition-colors
+                focus-visible:ring-2 focus-visible:ring-ring"
             >
               Cancel
             </button>
@@ -1126,13 +1126,13 @@ function PrebuiltTemplatesGallery({
   const alreadyAdded = (name: string) => existingTemplateNames.includes(name);
 
   return (
-    <div className="mt-8 bg-white rounded-xl border border-slate-200 p-6">
+    <div className="mt-8 bg-card rounded-xl border border-border p-6">
       <div className="flex items-center justify-between mb-4">
         <div>
-          <h3 className="text-lg font-semibold text-slate-900 flex items-center gap-2">
+          <h3 className="text-lg font-semibold text-foreground flex items-center gap-2">
             <FileText className="h-5 w-5" /> Prebuilt Templates
           </h3>
-          <p className="text-sm text-slate-500">Professional templates ready to use - just click to add</p>
+          <p className="text-sm text-muted-foreground">Professional templates ready to use - just click to add</p>
         </div>
       </div>
 
@@ -1149,23 +1149,23 @@ function PrebuiltTemplatesGallery({
                 justAdded
                   ? "bg-emerald-50 border-emerald-300 ring-2 ring-emerald-500 ring-opacity-50"
                   : added
-                    ? "bg-slate-50 border-slate-200"
-                    : "bg-white border-slate-200 hover:border-violet-300 hover:shadow-sm"
+                    ? "bg-muted border-border"
+                    : "bg-card border-border hover:border-violet-300 hover:shadow-sm"
               }`}
             >
               <div className="flex items-start justify-between mb-2">
                 <div className="flex items-center gap-2">
-                  <span className="text-slate-600">
+                  <span className="text-muted-foreground">
                     {template.channel === "email" ? <Mail className="h-5 w-5" /> : <Smartphone className="h-5 w-5" />}
                   </span>
-                  <span className="font-medium text-slate-900 text-sm">{template.name}</span>
+                  <span className="font-medium text-foreground text-sm">{template.name}</span>
                 </div>
-                <span className="text-[10px] uppercase text-slate-500 bg-slate-100 px-2 py-0.5 rounded">
+                <span className="text-[10px] uppercase text-muted-foreground bg-muted px-2 py-0.5 rounded">
                   {template.category}
                 </span>
               </div>
 
-              <p className="text-xs text-slate-500 mb-3 line-clamp-2">
+              <p className="text-xs text-muted-foreground mb-3 line-clamp-2">
                 {template.channel === "email"
                   ? template.subject
                   : template.textBody?.slice(0, 60) + "..."}
@@ -1176,7 +1176,7 @@ function PrebuiltTemplatesGallery({
                   <Check className="h-4 w-4" /> Added! Check your templates above
                 </div>
               ) : added ? (
-                <span className="text-xs text-slate-500 flex items-center gap-1">
+                <span className="text-xs text-muted-foreground flex items-center gap-1">
                   <Check className="h-3.5 w-3.5 text-emerald-600" /> Already in your templates
                 </span>
               ) : (
@@ -1203,8 +1203,8 @@ function PrebuiltTemplatesGallery({
         })}
       </div>
 
-      <div className="mt-6 pt-4 border-t border-slate-100 flex items-center justify-between">
-        <p className="text-sm text-slate-500 flex items-center gap-2">
+      <div className="mt-6 pt-4 border-t border-border flex items-center justify-between">
+        <p className="text-sm text-muted-foreground flex items-center gap-2">
           <Lightbulb className="h-4 w-4" />
           <span>After adding templates, connect them to triggers to automate sending.</span>
         </p>

@@ -28,25 +28,25 @@ export function SocialProofStrip({
   variant = "light"
 }: SocialProofStripProps) {
   const variantStyles = {
-    light: "bg-white border-y border-slate-100",
-    dark: "bg-slate-900 text-white",
+    light: "bg-card border-y border-border",
+    dark: "bg-muted text-foreground",
     gradient: "bg-gradient-to-r from-emerald-50 to-teal-50 border-y border-emerald-100",
   };
 
   const textStyles = {
     light: {
-      value: "text-slate-900",
-      label: "text-slate-600",
+      value: "text-foreground",
+      label: "text-muted-foreground",
       icon: "text-emerald-600",
     },
     dark: {
       value: "text-white",
-      label: "text-slate-400",
+      label: "text-muted-foreground",
       icon: "text-emerald-400",
     },
     gradient: {
-      value: "text-slate-900",
-      label: "text-slate-600",
+      value: "text-foreground",
+      label: "text-muted-foreground",
       icon: "text-emerald-600",
     },
   };

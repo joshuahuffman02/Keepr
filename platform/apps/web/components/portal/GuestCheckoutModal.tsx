@@ -115,7 +115,7 @@ export function GuestCheckoutModal({ isOpen, onClose, cart, campgroundId, guest,
                             onClick={() => setFulfillment("delivery")}
                             className={`p-3 rounded-lg border text-sm font-medium transition ${fulfillment === "delivery"
                                     ? "border-primary bg-primary/5 text-primary"
-                                    : "border-slate-200 hover:border-slate-300 text-slate-700"
+                                    : "border-border hover:border-border text-foreground"
                                 }`}
                         >
                             Deliver to my site/cabin
@@ -124,7 +124,7 @@ export function GuestCheckoutModal({ isOpen, onClose, cart, campgroundId, guest,
                             onClick={() => setFulfillment("pickup")}
                             className={`p-3 rounded-lg border text-sm font-medium transition ${fulfillment === "pickup"
                                     ? "border-primary bg-primary/5 text-primary"
-                                    : "border-slate-200 hover:border-slate-300 text-slate-700"
+                                    : "border-border hover:border-border text-foreground"
                                 }`}
                         >
                             I’ll pick up
@@ -133,7 +133,7 @@ export function GuestCheckoutModal({ isOpen, onClose, cart, campgroundId, guest,
                             onClick={() => setFulfillment("curbside")}
                             className={`p-3 rounded-lg border text-sm font-medium transition ${fulfillment === "curbside"
                                     ? "border-primary bg-primary/5 text-primary"
-                                    : "border-slate-200 hover:border-slate-300 text-slate-700"
+                                    : "border-border hover:border-border text-foreground"
                                 }`}
                         >
                             Curbside / meet at gate
@@ -142,7 +142,7 @@ export function GuestCheckoutModal({ isOpen, onClose, cart, campgroundId, guest,
                             onClick={() => setFulfillment("table_service")}
                             className={`p-3 rounded-lg border text-sm font-medium transition ${fulfillment === "table_service"
                                     ? "border-primary bg-primary/5 text-primary"
-                                    : "border-slate-200 hover:border-slate-300 text-slate-700"
+                                    : "border-border hover:border-border text-foreground"
                                 }`}
                         >
                             Table/QR service
@@ -151,11 +151,11 @@ export function GuestCheckoutModal({ isOpen, onClose, cart, campgroundId, guest,
 
                     {fulfillment !== "pickup" && (
                         <div className="space-y-2">
-                            <p className="text-sm font-medium text-slate-800">
+                            <p className="text-sm font-medium text-foreground">
                                 Where should we bring it?
                             </p>
                             <input
-                                className="w-full rounded-md border border-slate-200 px-3 py-2 text-sm"
+                                className="w-full rounded-md border border-border px-3 py-2 text-sm"
                                 placeholder="e.g. Site A12, Cabin 3, Table 4, Gatehouse"
                                 value={method === "charge_to_site" ? (locationHint || currentReservation?.site?.siteNumber || "") : locationHint}
                                 onChange={(e) => setLocationHint(e.target.value)}
@@ -164,9 +164,9 @@ export function GuestCheckoutModal({ isOpen, onClose, cart, campgroundId, guest,
                     )}
 
                     <div className="space-y-2">
-                        <p className="text-sm font-medium text-slate-800">Notes for staff</p>
+                        <p className="text-sm font-medium text-foreground">Notes for staff</p>
                         <input
-                            className="w-full rounded-md border border-slate-200 px-3 py-2 text-sm"
+                            className="w-full rounded-md border border-border px-3 py-2 text-sm"
                             placeholder="Gate code, vehicle description, allergy note…"
                             value={instructions}
                             onChange={(e) => setInstructions(e.target.value)}
@@ -179,7 +179,7 @@ export function GuestCheckoutModal({ isOpen, onClose, cart, campgroundId, guest,
                             disabled={!canChargeToSite}
                             className={`p-4 rounded-xl border-2 flex flex-col items-center gap-2 transition-all ${method === "charge_to_site"
                                     ? "border-primary bg-primary/5 text-primary"
-                                    : "border-slate-200 hover:border-slate-300 text-slate-600"
+                                    : "border-border hover:border-border text-muted-foreground"
                                 } ${!canChargeToSite ? "opacity-50 cursor-not-allowed" : ""}`}
                         >
                             <Tent className="h-6 w-6" />
@@ -190,7 +190,7 @@ export function GuestCheckoutModal({ isOpen, onClose, cart, campgroundId, guest,
                             onClick={() => setMethod("card")}
                             className={`p-4 rounded-xl border-2 flex flex-col items-center gap-2 transition-all ${method === "card"
                                     ? "border-primary bg-primary/5 text-primary"
-                                    : "border-slate-200 hover:border-slate-300 text-slate-600"
+                                    : "border-border hover:border-border text-muted-foreground"
                                 }`}
                         >
                             <CreditCard className="h-6 w-6" />

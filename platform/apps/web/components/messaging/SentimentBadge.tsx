@@ -26,10 +26,10 @@ const sentimentConfig = {
   neutral: {
     icon: Minus,
     label: "Neutral",
-    bg: "bg-slate-50",
-    border: "border-slate-200",
-    text: "text-slate-600",
-    iconColor: "text-slate-400"
+    bg: "bg-muted",
+    border: "border-border",
+    text: "text-muted-foreground",
+    iconColor: "text-muted-foreground"
   },
   negative: {
     icon: ThumbsDown,
@@ -141,20 +141,17 @@ export function SentimentScore({ score, size = "sm", className }: SentimentScore
   const position = Math.round(((score + 1) / 2) * 100);
 
   // Determine color based on score
-  let bgColor = "bg-slate-400";
-  if (score > 0.3) bgColor = "bg-green-500";
-  else if (score < -0.3) bgColor = "bg-red-500";
-  else if (score > 0) bgColor = "bg-green-300";
-  else if (score < 0) bgColor = "bg-red-300";
+  let bgColor = "bg-muted";
+  if (score > 0.3) bgColor = "bg-status-success";
+  else if (score < -0.3) bgColor = "bg-status-error";
+  else if (score > 0) bgColor = "bg-status-success/60";
+  else if (score < 0) bgColor = "bg-status-error/60";
 
   const height = size === "sm" ? "h-1.5" : "h-2";
   const width = size === "sm" ? "w-16" : "w-24";
 
   return (
-    <div className={cn("relative", width, height, "bg-slate-200 rounded-full", className)}>
-      {/* Gradient background showing the full range */}
-      <div className="absolute inset-0 rounded-full bg-gradient-to-r from-red-200 via-slate-200 to-green-200" />
-
+    <div className={cn("relative", width, height, "bg-muted rounded-full border border-border", className)}>
       {/* Indicator dot */}
       <div
         className={cn(
@@ -185,15 +182,15 @@ export function SentimentSummary({ stats, className }: SentimentSummaryProps) {
     <div className={cn("flex items-center gap-4 text-sm", className)}>
       {/* Sentiment breakdown */}
       <div className="flex items-center gap-2">
-        <span className="flex items-center gap-1 text-green-600">
+        <span className="flex items-center gap-1 text-status-success-text">
           <ThumbsUp className="h-3.5 w-3.5" />
           {stats.percentages.positive}%
         </span>
-        <span className="flex items-center gap-1 text-slate-500">
+        <span className="flex items-center gap-1 text-muted-foreground">
           <Minus className="h-3.5 w-3.5" />
           {stats.percentages.neutral}%
         </span>
-        <span className="flex items-center gap-1 text-red-600">
+        <span className="flex items-center gap-1 text-status-error-text">
           <ThumbsDown className="h-3.5 w-3.5" />
           {stats.percentages.negative}%
         </span>
@@ -201,7 +198,7 @@ export function SentimentSummary({ stats, className }: SentimentSummaryProps) {
 
       {/* Urgency indicators */}
       {(stats.urgency.critical > 0 || stats.urgency.high > 0) && (
-        <div className="flex items-center gap-2 border-l border-slate-200 pl-4">
+        <div className="flex items-center gap-2 border-l border-border pl-4">
           {stats.urgency.critical > 0 && (
             <span className="flex items-center gap-1 text-red-600 font-medium">
               <AlertTriangle className="h-3.5 w-3.5" />

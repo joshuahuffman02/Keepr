@@ -9,8 +9,8 @@ export default function SecurityPage() {
   return (
     <div className="max-w-4xl space-y-6">
       <div>
-        <h2 className="text-2xl font-bold text-slate-900">Security</h2>
-        <p className="text-slate-500 mt-1">
+        <h2 className="text-2xl font-bold text-foreground">Security</h2>
+        <p className="text-muted-foreground mt-1">
           Configure security and privacy settings
         </p>
       </div>
@@ -22,8 +22,8 @@ export default function SecurityPage() {
               <Lock className="h-6 w-6 text-red-600" />
             </div>
             <div className="flex-1">
-              <h3 className="font-semibold text-slate-900">Security Settings</h3>
-              <p className="text-sm text-slate-500 mt-1">
+              <h3 className="font-semibold text-foreground">Security Settings</h3>
+              <p className="text-sm text-muted-foreground mt-1">
                 Configure PCI compliance, data retention, session timeouts,
                 and other security options.
               </p>

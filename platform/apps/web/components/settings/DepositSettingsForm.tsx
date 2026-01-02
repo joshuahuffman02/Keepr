@@ -167,7 +167,7 @@ export function DepositSettingsForm({ campgroundId, initialRule, initialPercenta
             </Button>
           ))}
         </div>
-        <p className="text-xs text-slate-500">Start from a preset, then adjust.</p>
+        <p className="text-xs text-muted-foreground">Start from a preset, then adjust.</p>
       </div>
 
       <div className="grid md:grid-cols-2 gap-4">
@@ -177,7 +177,7 @@ export function DepositSettingsForm({ campgroundId, initialRule, initialPercenta
             id="baseRule"
             value={config.defaultRule.type}
             onChange={(e) => updateDefaultRule({ type: e.target.value as DepositRule["type"] })}
-            className="flex h-10 w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm"
+            className="flex h-10 w-full rounded-md border border-border bg-card px-3 py-2 text-sm"
           >
             <option value="none">No deposit</option>
             <option value="first_night">First night</option>
@@ -222,7 +222,7 @@ export function DepositSettingsForm({ campgroundId, initialRule, initialPercenta
               checked={config.defaultRule.refundable ?? false}
               onChange={(e) => updateDefaultRule({ refundable: e.target.checked })}
             />
-            <label htmlFor="refundable" className="text-sm text-slate-700">
+            <label htmlFor="refundable" className="text-sm text-foreground">
               Allow refunds within a window
             </label>
           </div>
@@ -241,8 +241,8 @@ export function DepositSettingsForm({ campgroundId, initialRule, initialPercenta
         </div>
       </div>
 
-      <div className="rounded-md border border-slate-200 p-4 bg-slate-50">
-        <div className="text-sm text-slate-700">
+      <div className="rounded-md border border-border p-4 bg-muted">
+        <div className="text-sm text-foreground">
           Preview: With a $200, 2-night stay, deposit due now would be <span className="font-semibold">${previewAmount.toFixed(2)}</span>.
         </div>
       </div>
@@ -255,7 +255,7 @@ export function DepositSettingsForm({ campgroundId, initialRule, initialPercenta
           <div className="space-y-6">
             <div className="space-y-3">
               <div className="flex items-center justify-between">
-                <h4 className="text-sm font-semibold text-slate-900">Length of stay tiers</h4>
+                <h4 className="text-sm font-semibold text-foreground">Length of stay tiers</h4>
                 <Button
                   type="button"
                   size="sm"
@@ -270,7 +270,7 @@ export function DepositSettingsForm({ campgroundId, initialRule, initialPercenta
                   Add tier
                 </Button>
               </div>
-              {(config.lengthTiers || []).length === 0 && <p className="text-xs text-slate-500">No tiers yet.</p>}
+              {(config.lengthTiers || []).length === 0 && <p className="text-xs text-muted-foreground">No tiers yet.</p>}
               {(config.lengthTiers || []).map((tier, idx) => (
                 <div key={idx} className="grid md:grid-cols-4 gap-2 items-end">
                   <div>
@@ -296,7 +296,7 @@ export function DepositSettingsForm({ campgroundId, initialRule, initialPercenta
                     <select
                       value={tier.rule.type}
                       onChange={(e) => updateTier(idx, { rule: { ...tier.rule, type: e.target.value as DepositRule["type"] } })}
-                      className="w-full h-10 rounded-md border border-slate-200 px-2 text-sm"
+                      className="w-full h-10 rounded-md border border-border px-2 text-sm"
                     >
                       <option value="first_night">First night</option>
                       <option value="percent_total">% of total</option>
@@ -342,7 +342,7 @@ export function DepositSettingsForm({ campgroundId, initialRule, initialPercenta
 
             <div className="space-y-3">
               <div className="flex items-center justify-between">
-                <h4 className="text-sm font-semibold text-slate-900">Season / holiday overrides</h4>
+                <h4 className="text-sm font-semibold text-foreground">Season / holiday overrides</h4>
                 <Button
                   type="button"
                   size="sm"
@@ -357,7 +357,7 @@ export function DepositSettingsForm({ campgroundId, initialRule, initialPercenta
                   Add season
                 </Button>
               </div>
-              {(config.seasons || []).length === 0 && <p className="text-xs text-slate-500">No seasonal overrides.</p>}
+              {(config.seasons || []).length === 0 && <p className="text-xs text-muted-foreground">No seasonal overrides.</p>}
               {(config.seasons || []).map((season, idx) => (
                 <div key={idx} className="grid md:grid-cols-4 gap-2 items-end">
                   <Input
@@ -379,7 +379,7 @@ export function DepositSettingsForm({ campgroundId, initialRule, initialPercenta
                     <select
                       value={season.rule.type}
                       onChange={(e) => updateSeason(idx, { rule: { ...season.rule, type: e.target.value as DepositRule["type"] } })}
-                      className="w-full h-10 rounded-md border border-slate-200 px-2 text-sm"
+                      className="w-full h-10 rounded-md border border-border px-2 text-sm"
                     >
                       <option value="percent_total">% of total</option>
                       <option value="first_night">First night</option>
@@ -415,7 +415,7 @@ export function DepositSettingsForm({ campgroundId, initialRule, initialPercenta
 
             <div className="space-y-3">
               <div className="flex items-center justify-between">
-                <h4 className="text-sm font-semibold text-slate-900">Channel / rate plan / site type overrides</h4>
+                <h4 className="text-sm font-semibold text-foreground">Channel / rate plan / site type overrides</h4>
                 <Button
                   type="button"
                   size="sm"
@@ -430,9 +430,9 @@ export function DepositSettingsForm({ campgroundId, initialRule, initialPercenta
                   Add override
                 </Button>
               </div>
-              {(config.scopeRules || []).length === 0 && <p className="text-xs text-slate-500">No overrides.</p>}
+              {(config.scopeRules || []).length === 0 && <p className="text-xs text-muted-foreground">No overrides.</p>}
               {(config.scopeRules || []).map((scope, idx) => (
-                <div key={idx} className="space-y-2 border border-slate-200 rounded-md p-3">
+                <div key={idx} className="space-y-2 border border-border rounded-md p-3">
                   <Input
                     placeholder="Label (e.g., OTA, Corporate)"
                     value={scope.label || ""}
@@ -464,7 +464,7 @@ export function DepositSettingsForm({ campgroundId, initialRule, initialPercenta
                     <select
                       value={scope.rule.type}
                       onChange={(e) => updateScope(idx, { rule: { ...scope.rule, type: e.target.value as DepositRule["type"] } })}
-                      className="h-10 rounded-md border border-slate-200 px-2 text-sm"
+                      className="h-10 rounded-md border border-border px-2 text-sm"
                     >
                       <option value="percent_total">% of total</option>
                       <option value="first_night">First night</option>
@@ -508,7 +508,7 @@ export function DepositSettingsForm({ campgroundId, initialRule, initialPercenta
 
             <div className="space-y-3">
               <div className="flex items-center justify-between">
-                <h4 className="text-sm font-semibold text-slate-900">Payment schedule</h4>
+                <h4 className="text-sm font-semibold text-foreground">Payment schedule</h4>
                 <Button
                   type="button"
                   size="sm"
@@ -524,14 +524,14 @@ export function DepositSettingsForm({ campgroundId, initialRule, initialPercenta
                 </Button>
               </div>
               {(config.schedule || []).length === 0 && (
-                <p className="text-xs text-slate-500">Optional: split deposits over time.</p>
+                <p className="text-xs text-muted-foreground">Optional: split deposits over time.</p>
               )}
               {(config.schedule || []).map((entry, idx) => (
                 <div key={idx} className="grid md:grid-cols-4 gap-2 items-end">
                   <select
                     value={entry.dueAt}
                     onChange={(e) => updateSchedule(idx, { dueAt: e.target.value })}
-                    className="h-10 rounded-md border border-slate-200 px-2 text-sm"
+                    className="h-10 rounded-md border border-border px-2 text-sm"
                   >
                     <option value="booking">At booking</option>
                     <option value="before_arrival">Before arrival</option>
@@ -547,7 +547,7 @@ export function DepositSettingsForm({ campgroundId, initialRule, initialPercenta
                   <select
                     value={entry.amountType}
                     onChange={(e) => updateSchedule(idx, { amountType: e.target.value })}
-                    className="h-10 rounded-md border border-slate-200 px-2 text-sm"
+                    className="h-10 rounded-md border border-border px-2 text-sm"
                   >
                     <option value="percent">% of total</option>
                     <option value="fixed_cents">Fixed</option>

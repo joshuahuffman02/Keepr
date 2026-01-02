@@ -106,7 +106,7 @@ export default function BenchmarksPage() {
       case "below":
         return <TrendingDown className="h-4 w-4 text-red-400" />;
       default:
-        return <Minus className="h-4 w-4 text-slate-400" />;
+        return <Minus className="h-4 w-4 text-muted-foreground" />;
     }
   };
 
@@ -117,7 +117,7 @@ export default function BenchmarksPage() {
       case "below":
         return "text-red-400";
       default:
-        return "text-slate-400";
+        return "text-muted-foreground";
     }
   };
 
@@ -134,14 +134,14 @@ export default function BenchmarksPage() {
       <div className="flex items-center justify-between">
         <div>
           <div className="flex items-center gap-3">
-            <h1 className="text-2xl font-bold text-slate-900 dark:text-white">Industry Benchmarks</h1>
+            <h1 className="text-2xl font-bold text-foreground dark:text-white">Industry Benchmarks</h1>
             {isUsingMockData && (
               <Badge className="bg-amber-100 dark:bg-amber-600/20 text-amber-700 dark:text-amber-400 border border-amber-300 dark:border-amber-600/50">
                 Demo Data
               </Badge>
             )}
           </div>
-          <p className="text-slate-600 dark:text-slate-400 mt-1">
+          <p className="text-muted-foreground dark:text-muted-foreground mt-1">
             Platform-wide benchmarks and campground comparisons
           </p>
         </div>
@@ -180,18 +180,18 @@ export default function BenchmarksPage() {
       {/* Benchmark Details */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Revenue Benchmarks */}
-        <Card className="border-slate-200 dark:border-slate-700">
+        <Card className="border-border dark:border-border">
           <CardHeader>
-            <CardTitle className="text-lg text-slate-900 dark:text-white">Revenue Benchmarks</CardTitle>
+            <CardTitle className="text-lg text-foreground dark:text-white">Revenue Benchmarks</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="flex justify-between items-center p-3 bg-slate-50 dark:bg-slate-700/50 rounded-lg">
-              <span className="text-slate-600 dark:text-slate-400">Average per Campground</span>
-              <span className="text-slate-900 dark:text-white font-medium">{formatCurrency(benchmarks.revenue.averagePerCampground)}</span>
+            <div className="flex justify-between items-center p-3 bg-muted dark:bg-muted/50 rounded-lg">
+              <span className="text-muted-foreground dark:text-muted-foreground">Average per Campground</span>
+              <span className="text-foreground dark:text-white font-medium">{formatCurrency(benchmarks.revenue.averagePerCampground)}</span>
             </div>
-            <div className="flex justify-between items-center p-3 bg-slate-50 dark:bg-slate-700/50 rounded-lg">
-              <span className="text-slate-600 dark:text-slate-400">Median per Campground</span>
-              <span className="text-slate-900 dark:text-white font-medium">{formatCurrency(benchmarks.revenue.medianPerCampground)}</span>
+            <div className="flex justify-between items-center p-3 bg-muted dark:bg-muted/50 rounded-lg">
+              <span className="text-muted-foreground dark:text-muted-foreground">Median per Campground</span>
+              <span className="text-foreground dark:text-white font-medium">{formatCurrency(benchmarks.revenue.medianPerCampground)}</span>
             </div>
             <div className="flex justify-between items-center p-3 bg-green-50 dark:bg-green-500/10 border border-green-200 dark:border-green-500/30 rounded-lg">
               <span className="text-green-700 dark:text-green-400">Top 10% Threshold</span>
@@ -205,17 +205,17 @@ export default function BenchmarksPage() {
         </Card>
 
         {/* Seasonal Occupancy */}
-        <Card className="border-slate-200 dark:border-slate-700">
+        <Card className="border-border dark:border-border">
           <CardHeader>
-            <CardTitle className="text-lg text-slate-900 dark:text-white">Seasonal Occupancy</CardTitle>
+            <CardTitle className="text-lg text-foreground dark:text-white">Seasonal Occupancy</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-2 gap-4">
               {Object.entries(benchmarks.occupancy.bySeasonAverage).map(([season, rate]) => (
-                <div key={season} className="p-4 bg-slate-50 dark:bg-slate-700/50 rounded-lg text-center">
-                  <p className="text-sm text-slate-600 dark:text-slate-400 capitalize mb-1">{season}</p>
-                  <p className="text-2xl font-bold text-slate-900 dark:text-white">{rate.toFixed(1)}%</p>
-                  <div className="mt-2 h-2 bg-slate-200 dark:bg-slate-600 rounded-full overflow-hidden">
+                <div key={season} className="p-4 bg-muted dark:bg-muted/50 rounded-lg text-center">
+                  <p className="text-sm text-muted-foreground dark:text-muted-foreground capitalize mb-1">{season}</p>
+                  <p className="text-2xl font-bold text-foreground dark:text-white">{rate.toFixed(1)}%</p>
+                  <div className="mt-2 h-2 bg-muted dark:bg-muted rounded-full overflow-hidden">
                     <div
                       className="h-full bg-blue-500 rounded-full"
                       style={{ width: `${rate}%` }}
@@ -228,16 +228,16 @@ export default function BenchmarksPage() {
         </Card>
 
         {/* ADR by Type */}
-        <Card className="border-slate-200 dark:border-slate-700">
+        <Card className="border-border dark:border-border">
           <CardHeader>
-            <CardTitle className="text-lg text-slate-900 dark:text-white">ADR by Accommodation Type</CardTitle>
+            <CardTitle className="text-lg text-foreground dark:text-white">ADR by Accommodation Type</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-3">
               {Object.entries(benchmarks.adr.byTypeAverage).map(([type, rate]) => (
-                <div key={type} className="flex justify-between items-center p-3 bg-slate-50 dark:bg-slate-700/50 rounded-lg">
-                  <span className="text-slate-700 dark:text-slate-300 capitalize">{type}</span>
-                  <span className="text-slate-900 dark:text-white font-medium">{formatCurrency(rate)}/night</span>
+                <div key={type} className="flex justify-between items-center p-3 bg-muted dark:bg-muted/50 rounded-lg">
+                  <span className="text-foreground dark:text-muted-foreground capitalize">{type}</span>
+                  <span className="text-foreground dark:text-white font-medium">{formatCurrency(rate)}/night</span>
                 </div>
               ))}
             </div>
@@ -245,16 +245,16 @@ export default function BenchmarksPage() {
         </Card>
 
         {/* LOS by Type */}
-        <Card className="border-slate-200 dark:border-slate-700">
+        <Card className="border-border dark:border-border">
           <CardHeader>
-            <CardTitle className="text-lg text-slate-900 dark:text-white">LOS by Accommodation Type</CardTitle>
+            <CardTitle className="text-lg text-foreground dark:text-white">LOS by Accommodation Type</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-3">
               {Object.entries(benchmarks.los.byTypeAverage).map(([type, los]) => (
-                <div key={type} className="flex justify-between items-center p-3 bg-slate-50 dark:bg-slate-700/50 rounded-lg">
-                  <span className="text-slate-700 dark:text-slate-300 capitalize">{type}</span>
-                  <span className="text-slate-900 dark:text-white font-medium">{los.toFixed(1)} nights</span>
+                <div key={type} className="flex justify-between items-center p-3 bg-muted dark:bg-muted/50 rounded-lg">
+                  <span className="text-foreground dark:text-muted-foreground capitalize">{type}</span>
+                  <span className="text-foreground dark:text-white font-medium">{los.toFixed(1)} nights</span>
                 </div>
               ))}
             </div>
@@ -281,12 +281,12 @@ export default function BenchmarksPage() {
         />
 
         {/* Overall Score and Search */}
-        <Card className="border-slate-200 dark:border-slate-700">
+        <Card className="border-border dark:border-border">
           <CardHeader>
             <div className="flex items-center justify-between">
               <div>
-                <CardTitle className="text-lg text-slate-900 dark:text-white">Campground vs Platform</CardTitle>
-                <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
+                <CardTitle className="text-lg text-foreground dark:text-white">Campground vs Platform</CardTitle>
+                <p className="text-sm text-muted-foreground dark:text-muted-foreground mt-1">
                   Compare a specific campground against benchmarks
                 </p>
               </div>
@@ -296,20 +296,20 @@ export default function BenchmarksPage() {
                 placeholder="Search campground..."
                 value={campgroundSearch}
                 onChange={(e) => setCampgroundSearch(e.target.value)}
-                className="flex-1 bg-slate-50 dark:bg-slate-700 border-slate-200 dark:border-slate-600"
+                className="flex-1 bg-muted dark:bg-muted border-border dark:border-border"
               />
-              <Button variant="outline" size="sm" className="border-slate-200 dark:border-slate-600">
+              <Button variant="outline" size="sm" className="border-border dark:border-border">
                 <Search className="h-4 w-4" />
               </Button>
             </div>
           </CardHeader>
           <CardContent>
             {/* Overall Score */}
-            <div className="p-6 bg-slate-50 dark:bg-slate-700/30 rounded-lg text-center">
-              <p className="text-sm text-slate-500 dark:text-slate-400 mb-2">Overall Performance Score</p>
-              <p className="text-5xl font-bold text-slate-900 dark:text-white">{comparison.overallScore}</p>
-              <p className="text-slate-500 dark:text-slate-400 mt-1">out of 100</p>
-              <div className="mt-4 max-w-md mx-auto h-3 bg-slate-200 dark:bg-slate-600 rounded-full overflow-hidden">
+            <div className="p-6 bg-muted dark:bg-muted/30 rounded-lg text-center">
+              <p className="text-sm text-muted-foreground dark:text-muted-foreground mb-2">Overall Performance Score</p>
+              <p className="text-5xl font-bold text-foreground dark:text-white">{comparison.overallScore}</p>
+              <p className="text-muted-foreground dark:text-muted-foreground mt-1">out of 100</p>
+              <div className="mt-4 max-w-md mx-auto h-3 bg-muted dark:bg-muted rounded-full overflow-hidden">
                 <div
                   className={`h-full rounded-full ${getPercentileColor(comparison.overallScore)}`}
                   style={{ width: `${comparison.overallScore}%` }}
@@ -335,21 +335,21 @@ export default function BenchmarksPage() {
       </div>
 
       {/* Metric Comparison Details */}
-      <Card className="border-slate-200 dark:border-slate-700">
+      <Card className="border-border dark:border-border">
         <CardHeader>
-          <CardTitle className="text-lg text-slate-900 dark:text-white">Metric Details</CardTitle>
+          <CardTitle className="text-lg text-foreground dark:text-white">Metric Details</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="space-y-3">
             {comparison.metrics.map((metric, idx) => (
-              <div key={idx} className="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-700/50 rounded-lg">
+              <div key={idx} className="flex items-center justify-between p-4 bg-muted dark:bg-muted/50 rounded-lg">
                 <div className="flex items-center gap-3">
                   {getStatusIcon(metric.status)}
-                  <span className="text-slate-700 dark:text-slate-300">{metric.metric}</span>
+                  <span className="text-foreground dark:text-muted-foreground">{metric.metric}</span>
                 </div>
                 <div className="flex items-center gap-6">
                   <div className="text-right">
-                    <p className="text-sm text-slate-500 dark:text-slate-400">Campground</p>
+                    <p className="text-sm text-muted-foreground dark:text-muted-foreground">Campground</p>
                     <p className={`font-medium ${getStatusColor(metric.status)}`}>
                       {typeof metric.campgroundValue === "number"
                         ? metric.metric.includes("$")
@@ -361,8 +361,8 @@ export default function BenchmarksPage() {
                     </p>
                   </div>
                   <div className="text-right">
-                    <p className="text-sm text-slate-500 dark:text-slate-400">Platform Avg</p>
-                    <p className="text-slate-900 dark:text-white font-medium">
+                    <p className="text-sm text-muted-foreground dark:text-muted-foreground">Platform Avg</p>
+                    <p className="text-foreground dark:text-white font-medium">
                       {typeof metric.platformAverage === "number"
                         ? metric.metric.includes("$")
                           ? formatCurrency(metric.platformAverage)
@@ -373,15 +373,15 @@ export default function BenchmarksPage() {
                     </p>
                   </div>
                   <div className="w-20">
-                    <p className="text-sm text-slate-500 dark:text-slate-400 text-right">Percentile</p>
+                    <p className="text-sm text-muted-foreground dark:text-muted-foreground text-right">Percentile</p>
                     <div className="flex items-center gap-2">
-                      <div className="flex-1 h-2 bg-slate-200 dark:bg-slate-600 rounded-full overflow-hidden">
+                      <div className="flex-1 h-2 bg-muted dark:bg-muted rounded-full overflow-hidden">
                         <div
                           className={`h-full rounded-full ${getPercentileColor(metric.percentile)}`}
                           style={{ width: `${metric.percentile}%` }}
                         />
                       </div>
-                      <span className="text-xs text-slate-500 dark:text-slate-400">{metric.percentile}th</span>
+                      <span className="text-xs text-muted-foreground dark:text-muted-foreground">{metric.percentile}th</span>
                     </div>
                   </div>
                 </div>

@@ -322,11 +322,11 @@ export default function ValueStackPage() {
   if (!campgroundId) {
     return (
       <div className="flex flex-col items-center justify-center py-24 text-center">
-        <div className="w-24 h-24 rounded-full bg-slate-100 flex items-center justify-center mb-6">
-          <Shield className="w-12 h-12 text-slate-400" />
+        <div className="w-24 h-24 rounded-full bg-muted flex items-center justify-center mb-6">
+          <Shield className="w-12 h-12 text-muted-foreground" />
         </div>
-        <h1 className="text-2xl font-bold text-slate-900 mb-2">Select a Campground</h1>
-        <p className="text-slate-500 max-w-md">
+        <h1 className="text-2xl font-bold text-foreground mb-2">Select a Campground</h1>
+        <p className="text-muted-foreground max-w-md">
           Please select a campground to manage value stack settings.
         </p>
       </div>
@@ -336,8 +336,8 @@ export default function ValueStackPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-slate-900">Value Stack & Offers</h1>
-        <p className="text-slate-500 mt-1">
+        <h1 className="text-2xl font-bold text-foreground">Value Stack & Offers</h1>
+        <p className="text-muted-foreground mt-1">
           Configure guarantees, bonuses, and messaging to make your offer irresistible
         </p>
       </div>
@@ -367,7 +367,7 @@ export default function ValueStackPage() {
           <div className="flex items-center justify-between">
             <div>
               <h2 className="text-lg font-semibold">Risk Reversal Guarantees</h2>
-              <p className="text-sm text-slate-500">
+              <p className="text-sm text-muted-foreground">
                 Reduce booking anxiety with guarantees that show you stand behind your experience
               </p>
             </div>
@@ -380,9 +380,9 @@ export default function ValueStackPage() {
           {guarantees.length === 0 ? (
             <Card>
               <CardContent className="py-12 text-center">
-                <Shield className="h-12 w-12 text-slate-300 mx-auto mb-4" />
-                <h3 className="text-lg font-medium text-slate-900 mb-2">No guarantees yet</h3>
-                <p className="text-slate-500 mb-6 max-w-md mx-auto">
+                <Shield className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                <h3 className="text-lg font-medium text-foreground mb-2">No guarantees yet</h3>
+                <p className="text-muted-foreground mb-6 max-w-md mx-auto">
                   Guarantees reduce booking anxiety and increase conversions. Add weather guarantees,
                   satisfaction guarantees, or best price promises.
                 </p>
@@ -402,7 +402,7 @@ export default function ValueStackPage() {
                         <Button variant="ghost" size="sm" className="h-8 w-8 p-0" disabled={idx === 0}>
                           <ChevronUp className="h-4 w-4" />
                         </Button>
-                        <GripVertical className="h-4 w-4 text-slate-400" />
+                        <GripVertical className="h-4 w-4 text-muted-foreground" />
                         <Button variant="ghost" size="sm" className="h-8 w-8 p-0" disabled={idx === guarantees.length - 1}>
                           <ChevronDown className="h-4 w-4" />
                         </Button>
@@ -494,7 +494,7 @@ export default function ValueStackPage() {
           <div className="flex items-center justify-between">
             <div>
               <h2 className="text-lg font-semibold">Included Bonuses</h2>
-              <p className="text-sm text-slate-500">
+              <p className="text-sm text-muted-foreground">
                 Stack value to make guests feel like they're getting an amazing deal
               </p>
             </div>
@@ -514,9 +514,9 @@ export default function ValueStackPage() {
           {bonuses.length === 0 ? (
             <Card>
               <CardContent className="py-12 text-center">
-                <Gift className="h-12 w-12 text-slate-300 mx-auto mb-4" />
-                <h3 className="text-lg font-medium text-slate-900 mb-2">No bonuses yet</h3>
-                <p className="text-slate-500 mb-6 max-w-md mx-auto">
+                <Gift className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                <h3 className="text-lg font-medium text-foreground mb-2">No bonuses yet</h3>
+                <p className="text-muted-foreground mb-6 max-w-md mx-auto">
                   Bonuses add perceived value to your offer. Include firewood, welcome kits,
                   early check-in, or digital guides to stack value.
                 </p>
@@ -536,7 +536,7 @@ export default function ValueStackPage() {
                         <Button variant="ghost" size="sm" className="h-8 w-8 p-0" disabled={idx === 0}>
                           <ChevronUp className="h-4 w-4" />
                         </Button>
-                        <GripVertical className="h-4 w-4 text-slate-400" />
+                        <GripVertical className="h-4 w-4 text-muted-foreground" />
                         <Button variant="ghost" size="sm" className="h-8 w-8 p-0" disabled={idx === bonuses.length - 1}>
                           <ChevronDown className="h-4 w-4" />
                         </Button>
@@ -615,7 +615,7 @@ export default function ValueStackPage() {
           <div className="flex items-center justify-between">
             <div>
               <h2 className="text-lg font-semibold">Lead Capture Settings</h2>
-              <p className="text-sm text-slate-500">
+              <p className="text-sm text-muted-foreground">
                 Capture emails from visitors who aren't ready to book yet
               </p>
             </div>
@@ -745,7 +745,7 @@ export default function ValueStackPage() {
                       className="w-20"
                       disabled={!leadConfig.firstBookingEnabled}
                     />
-                    <span className="text-slate-500">% off first booking</span>
+                    <span className="text-muted-foreground">% off first booking</span>
                   </div>
                 </div>
               </CardContent>
@@ -758,7 +758,7 @@ export default function ValueStackPage() {
           <div className="flex items-center justify-between">
             <div>
               <h2 className="text-lg font-semibold">Booking Page Messaging</h2>
-              <p className="text-sm text-slate-500">
+              <p className="text-sm text-muted-foreground">
                 Customize copy and display settings for your public booking page
               </p>
             </div>
@@ -800,7 +800,7 @@ export default function ValueStackPage() {
                   placeholder="e.g., Wake up to the sound of the river. No emails. No traffic. Just you, nature, and 47 acres of peace."
                   rows={3}
                 />
-                <p className="text-xs text-slate-500 mt-1">
+                <p className="text-xs text-muted-foreground mt-1">
                   Focus on the transformation and feeling, not just the location
                 </p>
               </div>
@@ -819,7 +819,7 @@ export default function ValueStackPage() {
                 <div className="flex items-center justify-between">
                   <div>
                     <Label>Show Review Count</Label>
-                    <p className="text-xs text-slate-500">Display star rating and review count</p>
+                    <p className="text-xs text-muted-foreground">Display star rating and review count</p>
                   </div>
                   <Switch
                     checked={bookingConfig.showReviewCount}
@@ -829,7 +829,7 @@ export default function ValueStackPage() {
                 <div className="flex items-center justify-between">
                   <div>
                     <Label>Show Trust Badges</Label>
-                    <p className="text-xs text-slate-500">Verified photos, secure booking badges</p>
+                    <p className="text-xs text-muted-foreground">Verified photos, secure booking badges</p>
                   </div>
                   <Switch
                     checked={bookingConfig.showTrustBadges}
@@ -839,7 +839,7 @@ export default function ValueStackPage() {
                 <div className="flex items-center justify-between">
                   <div>
                     <Label>Show Scarcity</Label>
-                    <p className="text-xs text-slate-500">"Only 2 spots left" badges</p>
+                    <p className="text-xs text-muted-foreground">"Only 2 spots left" badges</p>
                   </div>
                   <Switch
                     checked={bookingConfig.showScarcity}
@@ -849,7 +849,7 @@ export default function ValueStackPage() {
                 <div className="flex items-center justify-between">
                   <div>
                     <Label>Show Live Viewers</Label>
-                    <p className="text-xs text-slate-500">"3 people viewing" indicator</p>
+                    <p className="text-xs text-muted-foreground">"3 people viewing" indicator</p>
                   </div>
                   <Switch
                     checked={bookingConfig.showLiveViewers}

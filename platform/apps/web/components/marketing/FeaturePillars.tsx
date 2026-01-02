@@ -123,17 +123,17 @@ const colorClasses = {
 
 export function FeaturePillars() {
   return (
-    <section id="features" className="py-24 bg-white">
+    <section id="features" className="py-24 bg-card">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
         <div className="text-center max-w-3xl mx-auto mb-16">
           <h2 className="text-base font-semibold text-emerald-600 tracking-wide uppercase mb-3">
             Complete Platform
           </h2>
-          <p className="text-4xl font-bold text-slate-900 mb-4">
+          <p className="text-4xl font-bold text-foreground mb-4">
             Everything you need to run your campground
           </p>
-          <p className="text-xl text-slate-600">
+          <p className="text-xl text-muted-foreground">
             From AI-powered insights to guest loyalty programs, we've built the
             all-in-one platform for modern campground operations.
           </p>
@@ -148,7 +148,7 @@ export function FeaturePillars() {
             return (
               <div
                 key={feature.name}
-                className={`group relative bg-white rounded-2xl border-2 border-slate-200 p-8 transition-all duration-300 hover:shadow-xl ${colors.hover}`}
+                className={`group relative bg-card rounded-2xl border-2 border-border p-8 transition-all duration-300 hover:shadow-xl ${colors.hover}`}
               >
                 {/* Icon */}
                 <div className={`inline-flex h-14 w-14 items-center justify-center rounded-xl ${colors.bg} mb-6`}>
@@ -156,17 +156,17 @@ export function FeaturePillars() {
                 </div>
 
                 {/* Content */}
-                <h3 className="text-xl font-bold text-slate-900 mb-3">
+                <h3 className="text-xl font-bold text-foreground mb-3">
                   {feature.name}
                 </h3>
-                <p className="text-slate-600 mb-6">
+                <p className="text-muted-foreground mb-6">
                   {feature.description}
                 </p>
 
                 {/* Feature List */}
                 <ul className="space-y-2">
                   {feature.features.map((item) => (
-                    <li key={item} className="flex items-center text-sm text-slate-600">
+                    <li key={item} className="flex items-center text-sm text-muted-foreground">
                       <svg
                         className="h-5 w-5 text-emerald-500 mr-2 flex-shrink-0"
                         fill="currentColor"

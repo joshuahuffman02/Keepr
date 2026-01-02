@@ -249,7 +249,7 @@ export function POSCheckoutFlow({
                                 className={`p-3 rounded-lg border text-sm font-medium transition ${
                                     fulfillment === "pickup"
                                         ? "border-emerald-600 bg-emerald-50 text-emerald-700"
-                                        : "border-slate-200 hover:border-slate-300 text-slate-700"
+                                        : "border-border hover:border-border text-foreground"
                                 }`}
                             >
                                 Pickup
@@ -259,7 +259,7 @@ export function POSCheckoutFlow({
                                 className={`p-3 rounded-lg border text-sm font-medium transition ${
                                     fulfillment === "curbside"
                                         ? "border-emerald-600 bg-emerald-50 text-emerald-700"
-                                        : "border-slate-200 hover:border-slate-300 text-slate-700"
+                                        : "border-border hover:border-border text-foreground"
                                 }`}
                             >
                                 Curbside / Site drop
@@ -269,7 +269,7 @@ export function POSCheckoutFlow({
                                 className={`p-3 rounded-lg border text-sm font-medium transition ${
                                     fulfillment === "delivery"
                                         ? "border-emerald-600 bg-emerald-50 text-emerald-700"
-                                        : "border-slate-200 hover:border-slate-300 text-slate-700"
+                                        : "border-border hover:border-border text-foreground"
                                 }`}
                             >
                                 Delivery to site/cabin
@@ -279,7 +279,7 @@ export function POSCheckoutFlow({
                                 className={`p-3 rounded-lg border text-sm font-medium transition ${
                                     fulfillment === "table_service"
                                         ? "border-emerald-600 bg-emerald-50 text-emerald-700"
-                                        : "border-slate-200 hover:border-slate-300 text-slate-700"
+                                        : "border-border hover:border-border text-foreground"
                                 }`}
                             >
                                 Table/QR service
@@ -314,9 +314,9 @@ export function POSCheckoutFlow({
                         </div>
 
                         {/* Order summary */}
-                        <div className="bg-slate-50 rounded-lg p-4 space-y-2 text-sm">
+                        <div className="bg-muted rounded-lg p-4 space-y-2 text-sm">
                             <div className="flex justify-between">
-                                <span className="text-slate-600">Items ({cart.length})</span>
+                                <span className="text-muted-foreground">Items ({cart.length})</span>
                                 <span className="font-medium">${(subtotalCents / 100).toFixed(2)}</span>
                             </div>
                             {charityDonation.optedIn && charityDonation.amountCents > 0 && (
@@ -325,7 +325,7 @@ export function POSCheckoutFlow({
                                     <span>+${(charityDonation.amountCents / 100).toFixed(2)}</span>
                                 </div>
                             )}
-                            <div className="flex justify-between font-semibold pt-2 border-t border-slate-200">
+                            <div className="flex justify-between font-semibold pt-2 border-t border-border">
                                 <span>Total</span>
                                 <span>${(totalCents / 100).toFixed(2)}</span>
                             </div>

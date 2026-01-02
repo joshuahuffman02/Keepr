@@ -38,9 +38,9 @@ export function PaymentSummary({
 
   if (compact) {
     return (
-      <div className="flex justify-between items-center py-2 border-t border-slate-200">
-        <span className="text-sm text-slate-600">Total Due</span>
-        <span className="text-lg font-semibold text-slate-900">
+      <div className="flex justify-between items-center py-2 border-t border-border">
+        <span className="text-sm text-muted-foreground">Total Due</span>
+        <span className="text-lg font-semibold text-foreground">
           {formatCurrency(remainingCents > 0 ? remainingCents : totalDueCents)}
         </span>
       </div>
@@ -48,11 +48,11 @@ export function PaymentSummary({
   }
 
   return (
-    <div className="space-y-2 py-3 border-t border-slate-200">
+    <div className="space-y-2 py-3 border-t border-border">
       {/* Subtotal */}
       <div className="flex justify-between text-sm">
-        <span className="text-slate-600">Subtotal</span>
-        <span className="text-slate-900">{formatCurrency(originalAmountCents)}</span>
+        <span className="text-muted-foreground">Subtotal</span>
+        <span className="text-foreground">{formatCurrency(originalAmountCents)}</span>
       </div>
 
       {/* Applied discounts */}
@@ -67,7 +67,7 @@ export function PaymentSummary({
                 {discount.code || discount.description}
                 <button
                   onClick={() => discount.promoCodeId && actions.removeDiscount(discount.promoCodeId)}
-                  className="p-0.5 hover:bg-slate-100 rounded"
+                  className="p-0.5 hover:bg-muted rounded"
                   aria-label="Remove discount"
                 >
                   <X className="w-3 h-3" />
@@ -92,18 +92,18 @@ export function PaymentSummary({
       {/* Processing fee (pass-through mode) */}
       {showFees && config?.feeMode === "pass_through" && config.showFeeBreakdown && feeCents > 0 && (
         <div className="flex justify-between text-sm">
-          <span className="text-slate-500">Processing Fee</span>
-          <span className="text-slate-500">+{formatCurrency(feeCents)}</span>
+          <span className="text-muted-foreground">Processing Fee</span>
+          <span className="text-muted-foreground">+{formatCurrency(feeCents)}</span>
         </div>
       )}
 
       {/* Divider */}
-      <div className="border-t border-slate-200 my-2" />
+      <div className="border-t border-border my-2" />
 
       {/* Total */}
       <div className="flex justify-between">
-        <span className="font-medium text-slate-900">Total</span>
-        <span className="font-semibold text-lg text-slate-900">
+        <span className="font-medium text-foreground">Total</span>
+        <span className="font-semibold text-lg text-foreground">
           {formatCurrency(totalDueCents)}
         </span>
       </div>
@@ -112,11 +112,11 @@ export function PaymentSummary({
       {paidCents > 0 && (
         <>
           <div className="flex justify-between text-sm">
-            <span className="text-slate-600">Paid</span>
+            <span className="text-muted-foreground">Paid</span>
             <span className="text-green-600">-{formatCurrency(paidCents)}</span>
           </div>
           <div className="flex justify-between">
-            <span className="font-medium text-slate-900">Remaining</span>
+            <span className="font-medium text-foreground">Remaining</span>
             <span
               className={cn(
                 "font-semibold text-lg",
@@ -144,18 +144,18 @@ export function PaymentSummaryInline() {
   if (paidCents > 0) {
     return (
       <span className="text-sm">
-        <span className="text-slate-500">Remaining: </span>
+        <span className="text-muted-foreground">Remaining: </span>
         <span className="font-medium text-amber-600">{formatCurrency(remainingCents)}</span>
-        <span className="text-slate-400 mx-1">/</span>
-        <span className="text-slate-500">{formatCurrency(totalDueCents)}</span>
+        <span className="text-muted-foreground mx-1">/</span>
+        <span className="text-muted-foreground">{formatCurrency(totalDueCents)}</span>
       </span>
     );
   }
 
   return (
     <span className="text-sm">
-      <span className="text-slate-500">Amount Due: </span>
-      <span className="font-medium text-slate-900">{formatCurrency(totalDueCents)}</span>
+      <span className="text-muted-foreground">Amount Due: </span>
+      <span className="font-medium text-foreground">{formatCurrency(totalDueCents)}</span>
     </span>
   );
 }

@@ -177,15 +177,15 @@ export function FolioMethod({ onSuccess, onError, onCancel }: FolioMethodProps) 
       confirmed: "bg-blue-100 text-blue-700",
       pending: "bg-amber-100 text-amber-700",
     };
-    return styles[status as keyof typeof styles] || "bg-slate-100 text-slate-700";
+    return styles[status as keyof typeof styles] || "bg-muted text-foreground";
   };
 
   return (
     <div className="space-y-6">
       {/* Amount display */}
-      <div className="text-center p-4 bg-slate-50 rounded-lg">
-        <p className="text-sm text-slate-500">Charge to Folio</p>
-        <p className="text-3xl font-bold text-slate-900">${amountDue.toFixed(2)}</p>
+      <div className="text-center p-4 bg-muted rounded-lg">
+        <p className="text-sm text-muted-foreground">Charge to Folio</p>
+        <p className="text-3xl font-bold text-foreground">${amountDue.toFixed(2)}</p>
       </div>
 
       {/* Reservation context info */}
@@ -203,16 +203,16 @@ export function FolioMethod({ onSuccess, onError, onCancel }: FolioMethodProps) 
 
       {/* Site/Guest search */}
       <div className="space-y-2">
-        <Label htmlFor="site-search" className="text-sm text-slate-600">
+        <Label htmlFor="site-search" className="text-sm text-muted-foreground">
           Search by Site, Guest Name, or Confirmation Code
           {!isReservationContext && <span className="text-red-500"> *</span>}
         </Label>
         <div className="relative">
           <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
             {isSearching ? (
-              <Loader2 className="h-4 w-4 text-slate-400 animate-spin" />
+              <Loader2 className="h-4 w-4 text-muted-foreground animate-spin" />
             ) : (
-              <Search className="h-4 w-4 text-slate-400" />
+              <Search className="h-4 w-4 text-muted-foreground" />
             )}
           </div>
           <Input
@@ -228,14 +228,14 @@ export function FolioMethod({ onSuccess, onError, onCancel }: FolioMethodProps) 
 
           {/* Search Results Dropdown */}
           {showResults && searchResults.length > 0 && (
-            <div className="absolute z-50 w-full mt-1 bg-white border border-slate-200 rounded-lg shadow-lg max-h-80 overflow-y-auto">
+            <div className="absolute z-50 w-full mt-1 bg-card border border-border rounded-lg shadow-lg max-h-80 overflow-y-auto">
               {searchResults.map((reservation) => (
                 <button
                   key={reservation.id}
                   type="button"
                   onClick={() => handleSelectReservation(reservation)}
                   className={cn(
-                    "w-full px-4 py-3 text-left hover:bg-slate-50 border-b border-slate-100 last:border-b-0 transition-colors",
+                    "w-full px-4 py-3 text-left hover:bg-muted border-b border-border last:border-b-0 transition-colors",
                     selectedReservation?.id === reservation.id && "bg-emerald-50"
                   )}
                 >
@@ -243,7 +243,7 @@ export function FolioMethod({ onSuccess, onError, onCancel }: FolioMethodProps) 
                     <div className="flex-1 min-w-0">
                       {/* Site + Guest */}
                       <div className="flex items-center gap-2 mb-1">
-                        <span className="font-semibold text-slate-900">
+                        <span className="font-semibold text-foreground">
                           {reservation.site?.number || reservation.site?.name || "No Site"}
                         </span>
                         <span className={cn("px-2 py-0.5 text-xs font-medium rounded-full", getStatusBadge(reservation.status))}>
@@ -253,14 +253,14 @@ export function FolioMethod({ onSuccess, onError, onCancel }: FolioMethodProps) 
 
                       {/* Guest name */}
                       {reservation.guest && (
-                        <div className="flex items-center gap-1.5 text-sm text-slate-600">
+                        <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
                           <User className="h-3.5 w-3.5" />
                           <span>{reservation.guest.firstName} {reservation.guest.lastName}</span>
                         </div>
                       )}
 
                       {/* Dates */}
-                      <div className="flex items-center gap-1.5 text-xs text-slate-500 mt-1">
+                      <div className="flex items-center gap-1.5 text-xs text-muted-foreground mt-1">
                         <Calendar className="h-3 w-3" />
                         <span>
                           {formatDate(reservation.arrivalDate)} - {formatDate(reservation.departureDate)}
@@ -280,7 +280,7 @@ export function FolioMethod({ onSuccess, onError, onCancel }: FolioMethodProps) 
                           Paid
                         </div>
                       )}
-                      <div className="text-xs text-slate-400">
+                      <div className="text-xs text-muted-foreground">
                         {reservation.confirmationCode}
                       </div>
                     </div>
@@ -292,7 +292,7 @@ export function FolioMethod({ onSuccess, onError, onCancel }: FolioMethodProps) 
 
           {/* No results message */}
           {showResults && searchQuery.length >= 1 && searchResults.length === 0 && !isSearching && (
-            <div className="absolute z-50 w-full mt-1 bg-white border border-slate-200 rounded-lg shadow-lg p-4 text-center text-sm text-slate-500">
+            <div className="absolute z-50 w-full mt-1 bg-card border border-border rounded-lg shadow-lg p-4 text-center text-sm text-muted-foreground">
               No active reservations found
             </div>
           )}
@@ -307,15 +307,15 @@ export function FolioMethod({ onSuccess, onError, onCancel }: FolioMethodProps) 
               <MapPin className="h-5 w-5 text-emerald-600" />
             </div>
             <div className="flex-1">
-              <div className="font-semibold text-slate-900">
+              <div className="font-semibold text-foreground">
                 {selectedReservation.site?.number || selectedReservation.site?.name || "No Site"}
               </div>
               {selectedReservation.guest && (
-                <div className="text-sm text-slate-600">
+                <div className="text-sm text-muted-foreground">
                   {selectedReservation.guest.firstName} {selectedReservation.guest.lastName}
                 </div>
               )}
-              <div className="text-xs text-slate-500 mt-1">
+              <div className="text-xs text-muted-foreground mt-1">
                 {formatDate(selectedReservation.arrivalDate)} - {formatDate(selectedReservation.departureDate)}
                 {" | "}
                 {selectedReservation.confirmationCode}

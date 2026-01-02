@@ -35,7 +35,7 @@ type IssueCounts = {
 };
 
 const STATUS_COLUMNS = [
-  { key: "backlog", label: "Backlog", icon: Circle, color: "text-slate-400" },
+  { key: "backlog", label: "Backlog", icon: Circle, color: "text-muted-foreground" },
   { key: "todo", label: "To Do", icon: Clock, color: "text-blue-400" },
   { key: "in_progress", label: "In Progress", icon: RefreshCw, color: "text-yellow-400" },
   { key: "review", label: "Review", icon: Eye, color: "text-purple-400" },
@@ -46,7 +46,7 @@ const PRIORITY_STYLES: Record<string, { bg: string; text: string; label: string 
   critical: { bg: "bg-red-500/20", text: "text-red-400", label: "Critical" },
   high: { bg: "bg-orange-500/20", text: "text-orange-400", label: "High" },
   medium: { bg: "bg-yellow-500/20", text: "text-yellow-400", label: "Medium" },
-  low: { bg: "bg-slate-500/20", text: "text-slate-400", label: "Low" },
+  low: { bg: "bg-muted0/20", text: "text-muted-foreground", label: "Low" },
 };
 
 const CATEGORY_STYLES: Record<string, { bg: string; text: string }> = {
@@ -57,7 +57,7 @@ const CATEGORY_STYLES: Record<string, { bg: string; text: string }> = {
   api: { bg: "bg-cyan-500/20", text: "text-cyan-400" },
   infrastructure: { bg: "bg-amber-500/20", text: "text-amber-400" },
   documentation: { bg: "bg-emerald-500/20", text: "text-emerald-400" },
-  other: { bg: "bg-slate-500/20", text: "text-slate-400" },
+  other: { bg: "bg-muted0/20", text: "text-muted-foreground" },
 };
 
 function getAuthHeaders(): Record<string, string> {
@@ -75,11 +75,11 @@ function IssueCard({
 }) {
   const [expanded, setExpanded] = useState(false);
   const priority = PRIORITY_STYLES[issue.priority] || PRIORITY_STYLES.medium;
-  const category = CATEGORY_STYLES[issue.category] || { bg: "bg-slate-500/20", text: "text-slate-400" };
+  const category = CATEGORY_STYLES[issue.category] || { bg: "bg-muted0/20", text: "text-muted-foreground" };
 
   return (
     <div
-      className="bg-slate-800 rounded-lg border border-slate-700 p-3 hover:border-slate-600 transition-colors cursor-pointer"
+      className="bg-muted rounded-lg border border-border p-3 hover:border-border transition-colors cursor-pointer"
       onClick={() => setExpanded(!expanded)}
     >
       <div className="flex items-start gap-2">
@@ -98,9 +98,9 @@ function IssueCard({
       </div>
 
       {expanded && (
-        <div className="mt-3 pt-3 border-t border-slate-700 space-y-2">
+        <div className="mt-3 pt-3 border-t border-border space-y-2">
           {issue.description && (
-            <p className="text-xs text-slate-400">{issue.description}</p>
+            <p className="text-xs text-muted-foreground">{issue.description}</p>
           )}
           <div className="flex gap-1 flex-wrap">
             {STATUS_COLUMNS.filter((s) => s.key !== issue.status).map((status) => (
@@ -110,7 +110,7 @@ function IssueCard({
                   e.stopPropagation();
                   onStatusChange(issue.id, status.key);
                 }}
-                className="text-xs px-2 py-1 bg-slate-700 hover:bg-slate-600 rounded text-slate-300 transition-colors"
+                className="text-xs px-2 py-1 bg-muted hover:bg-muted rounded text-muted-foreground transition-colors"
               >
                 Move to {status.label}
               </button>
@@ -134,19 +134,19 @@ function KanbanColumn({
   const StatusIcon = status.icon;
 
   return (
-    <div className="flex-1 min-w-[280px] max-w-[320px] bg-slate-900 rounded-lg border border-slate-800">
-      <div className="p-3 border-b border-slate-800 flex items-center justify-between">
+    <div className="flex-1 min-w-[280px] max-w-[320px] bg-muted rounded-lg border border-border">
+      <div className="p-3 border-b border-border flex items-center justify-between">
         <div className="flex items-center gap-2">
           <StatusIcon className={`h-4 w-4 ${status.color}`} />
           <span className="font-medium text-white">{status.label}</span>
         </div>
-        <span className="text-xs px-2 py-0.5 bg-slate-800 text-slate-400 rounded-full">
+        <span className="text-xs px-2 py-0.5 bg-muted text-muted-foreground rounded-full">
           {issues.length}
         </span>
       </div>
       <div className="p-2 space-y-2 max-h-[calc(100vh-300px)] overflow-y-auto">
         {issues.length === 0 ? (
-          <p className="text-xs text-slate-500 text-center py-4">No issues</p>
+          <p className="text-xs text-muted-foreground text-center py-4">No issues</p>
         ) : (
           issues.map((issue) => (
             <IssueCard key={issue.id} issue={issue} onStatusChange={onStatusChange} />
@@ -251,7 +251,7 @@ export default function IssuesPage() {
             <Bug className="h-6 w-6 text-blue-400" />
             Issue Tracking
           </h1>
-          <p className="text-slate-400 mt-1">
+          <p className="text-muted-foreground mt-1">
             Track and manage platform issues and tech debt
           </p>
         </div>
@@ -259,7 +259,7 @@ export default function IssuesPage() {
           <button
             onClick={loadData}
             disabled={loading}
-            className="inline-flex items-center gap-2 px-4 py-2 bg-slate-800 text-slate-300 border border-slate-700 rounded-lg hover:bg-slate-700 disabled:opacity-50 transition-colors"
+            className="inline-flex items-center gap-2 px-4 py-2 bg-muted text-muted-foreground border border-border rounded-lg hover:bg-muted disabled:opacity-50 transition-colors"
           >
             <RefreshCw className={`h-4 w-4 ${loading ? "animate-spin" : ""}`} />
           </button>
@@ -267,7 +267,7 @@ export default function IssuesPage() {
             <div className="text-2xl font-bold text-white">
               {doneIssues}/{totalIssues}
             </div>
-            <div className="text-sm text-slate-400">Resolved</div>
+            <div className="text-sm text-muted-foreground">Resolved</div>
           </div>
         </div>
       </div>
@@ -276,14 +276,14 @@ export default function IssuesPage() {
       {counts && (
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           {Object.entries(counts.categoryCounts).map(([category, count]) => {
-            const style = CATEGORY_STYLES[category] || { bg: "bg-slate-500/20", text: "text-slate-400" };
+            const style = CATEGORY_STYLES[category] || { bg: "bg-muted0/20", text: "text-muted-foreground" };
             return (
               <div
                 key={category}
-                className={`${style.bg} rounded-lg p-4 border border-slate-700`}
+                className={`${style.bg} rounded-lg p-4 border border-border`}
               >
                 <div className={`text-2xl font-bold ${style.text}`}>{count}</div>
-                <div className="text-sm text-slate-400 capitalize">{category}</div>
+                <div className="text-sm text-muted-foreground capitalize">{category}</div>
               </div>
             );
           })}
@@ -293,19 +293,19 @@ export default function IssuesPage() {
       {/* Filters */}
       <div className="flex flex-wrap items-center gap-3">
         <div className="relative flex-1 max-w-md">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <input
             type="text"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search issues..."
-            className="w-full pl-10 pr-4 py-2 bg-slate-800 border border-slate-700 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full pl-10 pr-4 py-2 bg-muted border border-border rounded-lg text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
         </div>
         <select
           value={categoryFilter}
           onChange={(e) => setCategoryFilter(e.target.value)}
-          className="px-3 py-2 bg-slate-800 border border-slate-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="px-3 py-2 bg-muted border border-border rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-blue-500"
         >
           <option value="all">All Categories</option>
           {categories.map((cat) => (
@@ -317,7 +317,7 @@ export default function IssuesPage() {
         <select
           value={priorityFilter}
           onChange={(e) => setPriorityFilter(e.target.value)}
-          className="px-3 py-2 bg-slate-800 border border-slate-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="px-3 py-2 bg-muted border border-border rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-blue-500"
         >
           <option value="all">All Priorities</option>
           <option value="critical">Critical</option>
@@ -339,7 +339,7 @@ export default function IssuesPage() {
       {/* Kanban Board */}
       {loading && issues.length === 0 ? (
         <div className="flex items-center justify-center py-16">
-          <RefreshCw className="h-8 w-8 text-slate-400 animate-spin" />
+          <RefreshCw className="h-8 w-8 text-muted-foreground animate-spin" />
         </div>
       ) : (
         <div className="flex gap-4 overflow-x-auto pb-4">
@@ -354,7 +354,7 @@ export default function IssuesPage() {
         </div>
       )}
 
-      <div className="text-sm text-slate-500 text-center">
+      <div className="text-sm text-muted-foreground text-center">
         Click an issue to expand and change its status
       </div>
     </div>

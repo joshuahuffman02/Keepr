@@ -237,20 +237,20 @@ export default function CheckInOutV2() {
         {/* Header */}
         <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
           <div>
-            <div className="text-xs font-semibold uppercase tracking-wide text-slate-500">Operations · {date}</div>
-            <h1 className="text-3xl font-bold text-slate-900">Arrivals & Departures</h1>
-            <p className="text-sm text-slate-600">
+            <div className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Operations · {date}</div>
+            <h1 className="text-3xl font-bold text-foreground">Arrivals & Departures</h1>
+            <p className="text-sm text-muted-foreground">
               Move guests smoothly with balances, site status, and quick actions.
             </p>
           </div>
           <div className="flex flex-wrap gap-2">
             <div className="relative">
-              <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+              <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <input
                 type="date"
                 value={date}
                 onChange={(e) => setDate(e.target.value)}
-                className="pl-9 pr-4 py-2 border border-slate-200 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                className="pl-9 pr-4 py-2 border border-border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
               />
             </div>
             <Button variant="outline" onClick={() => {
@@ -292,8 +292,8 @@ export default function CheckInOutV2() {
 
         {/* Controls */}
         <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
-          <div className="flex items-center gap-3 bg-white p-3 rounded-lg border border-slate-200 shadow-sm w-full lg:max-w-md">
-            <Search className="h-5 w-5 text-slate-400" />
+          <div className="flex items-center gap-3 bg-card p-3 rounded-lg border border-border shadow-sm w-full lg:max-w-md">
+            <Search className="h-5 w-5 text-muted-foreground" />
             <input
               type="text"
               placeholder="Search guest, site, or notes"
@@ -334,7 +334,7 @@ export default function CheckInOutV2() {
 
         {/* Bulk actions bar */}
         {tab === "arrivals" && eligibleForBulkCheckIn.length > 0 && (
-          <div className="flex items-center justify-between p-4 bg-white border border-slate-200 rounded-lg shadow-sm">
+          <div className="flex items-center justify-between p-4 bg-card border border-border rounded-lg shadow-sm">
             <div className="flex items-center gap-3">
               <Checkbox
                 checked={isAllSelected}
@@ -362,8 +362,8 @@ export default function CheckInOutV2() {
         {/* List */}
         <div className="space-y-3">
           {filteredList.length === 0 ? (
-            <div className="text-center py-12 bg-slate-50 rounded-lg border border-dashed border-slate-300">
-              <p className="text-slate-500">Nothing for this filter and date.</p>
+            <div className="text-center py-12 bg-muted rounded-lg border border-dashed border-border">
+              <p className="text-muted-foreground">Nothing for this filter and date.</p>
             </div>
           ) : (
             filteredList.map((res) => {
@@ -378,7 +378,7 @@ export default function CheckInOutV2() {
                     ? "border-emerald-300 bg-emerald-50/40"
                     : res.balanceAmount > 0
                     ? "border-amber-200 bg-amber-50/40"
-                    : "border-slate-200"
+                    : "border-border"
                 } shadow-sm`}
               >
                 <div className="p-4 flex flex-col lg:flex-row lg:items-center justify-between gap-4">
@@ -399,7 +399,7 @@ export default function CheckInOutV2() {
                             ? "bg-status-success/15 text-status-success"
                             : "bg-status-info/15 text-status-info"
                           : res.status === "checked_out"
-                          ? "bg-slate-100 text-slate-600"
+                          ? "bg-muted text-muted-foreground"
                           : "bg-status-warning/15 text-status-warning"
                       }`}
                     >
@@ -411,7 +411,7 @@ export default function CheckInOutV2() {
                     </div>
                     <div>
                       <div className="flex flex-wrap items-center gap-2">
-                        <h3 className="font-semibold text-lg text-slate-900">
+                        <h3 className="font-semibold text-lg text-foreground">
                           {res.guest.primaryFirstName} {res.guest.primaryLastName}
                         </h3>
                         {res.balanceAmount > 0 && (
@@ -425,7 +425,7 @@ export default function CheckInOutV2() {
                           </Badge>
                         )}
                       </div>
-                      <div className="flex flex-wrap items-center gap-2 text-sm text-slate-500 mt-1">
+                      <div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground mt-1">
                         <Badge variant="outline">{res.site?.name || "Unassigned"}</Badge>
                         <span>•</span>
                         <span>
@@ -454,7 +454,7 @@ export default function CheckInOutV2() {
 
                   <div className="flex flex-col items-end gap-3 min-w-[200px]">
                     <div className="text-right">
-                      <div className="text-xs text-slate-500">Balance</div>
+                      <div className="text-xs text-muted-foreground">Balance</div>
                       <div className={`font-bold ${res.balanceAmount > 0 ? "text-status-warning" : "text-status-success"}`}>
                         {formatMoney(res.balanceAmount)}
                       </div>
@@ -483,7 +483,7 @@ export default function CheckInOutV2() {
                         </div>
                       )
                     ) : res.status === "checked_out" ? (
-                      <Button disabled variant="outline" className="bg-slate-50">
+                      <Button disabled variant="outline" className="bg-muted">
                         Checked Out
                       </Button>
                     ) : (
@@ -547,7 +547,7 @@ export default function CheckInOutV2() {
             <div className="grid gap-2">
               <Label>Payment Amount</Label>
               <div className="relative">
-                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500">$</span>
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">$</span>
                 <Input
                   type="number"
                   value={(paymentAmount ?? 0) / 100}
@@ -598,15 +598,15 @@ function SummaryCard({
   href?: string;
 }) {
   const content = (
-    <div className="card border border-slate-200 bg-white p-4 shadow-sm flex items-center justify-between">
+    <div className="card border border-border bg-card p-4 shadow-sm flex items-center justify-between">
       <div className="flex items-center gap-3">
-        <span className="rounded-md bg-slate-50 p-2 text-slate-500">{icon}</span>
+        <span className="rounded-md bg-muted p-2 text-muted-foreground">{icon}</span>
         <div>
-          <div className="text-xs font-semibold uppercase tracking-wide text-slate-500">{label}</div>
-          <div className="text-xl font-bold text-slate-900">{value}</div>
+          <div className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">{label}</div>
+          <div className="text-xl font-bold text-foreground">{value}</div>
         </div>
       </div>
-      <ArrowRight className="h-4 w-4 text-slate-300" />
+      <ArrowRight className="h-4 w-4 text-muted-foreground" />
     </div>
   );
   if (href) {
@@ -633,12 +633,12 @@ function HintCard({
   return (
     <Link
       href={href}
-      className="flex items-start gap-3 rounded-lg border border-slate-200 bg-white p-4 shadow-sm hover:border-emerald-200 hover:shadow-md transition"
+      className="flex items-start gap-3 rounded-lg border border-border bg-card p-4 shadow-sm hover:border-emerald-200 hover:shadow-md transition"
     >
       <span className="rounded-md bg-emerald-50 p-2 text-emerald-600">{icon}</span>
       <div>
-        <div className="text-sm font-semibold text-slate-900">{title}</div>
-        <div className="text-xs text-slate-600">{description}</div>
+        <div className="text-sm font-semibold text-foreground">{title}</div>
+        <div className="text-xs text-muted-foreground">{description}</div>
       </div>
     </Link>
   );

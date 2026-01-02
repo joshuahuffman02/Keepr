@@ -87,7 +87,7 @@ export default function FeatureFlagsPage() {
             <div className="flex items-center justify-between">
                 <div>
                     <h1 className="text-2xl font-bold text-white">Feature Flags</h1>
-                    <p className="text-slate-400 mt-1">
+                    <p className="text-muted-foreground mt-1">
                         Enable or disable features across the platform
                     </p>
                 </div>
@@ -95,13 +95,13 @@ export default function FeatureFlagsPage() {
                     <button
                         onClick={loadFlags}
                         disabled={loading}
-                        className="inline-flex items-center gap-2 px-4 py-2 bg-slate-800 text-slate-300 border border-slate-700 rounded-lg hover:bg-slate-700 disabled:opacity-50 transition-colors"
+                        className="inline-flex items-center gap-2 px-4 py-2 bg-muted text-muted-foreground border border-border rounded-lg hover:bg-muted disabled:opacity-50 transition-colors"
                     >
                         <RefreshCw className={`h-4 w-4 ${loading ? "animate-spin" : ""}`} />
                     </button>
                     <div className="text-right">
                         <div className="text-2xl font-bold text-white">{enabledCount}/{flags.length}</div>
-                        <div className="text-sm text-slate-400">Features enabled</div>
+                        <div className="text-sm text-muted-foreground">Features enabled</div>
                     </div>
                 </div>
             </div>
@@ -109,19 +109,19 @@ export default function FeatureFlagsPage() {
             {/* Filters */}
             <div className="flex flex-wrap items-center gap-3">
                 <div className="relative flex-1 max-w-md">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" />
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                     <input
                         type="text"
                         value={search}
                         onChange={(e) => setSearch(e.target.value)}
                         placeholder="Search features..."
-                        className="w-full pl-10 pr-4 py-2 bg-slate-800 border border-slate-700 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="w-full pl-10 pr-4 py-2 bg-muted border border-border rounded-lg text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
                 </div>
                 <select
                     value={scopeFilter}
                     onChange={(e) => setScopeFilter(e.target.value)}
-                    className="px-3 py-2 bg-slate-800 border border-slate-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="px-3 py-2 bg-muted border border-border rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-blue-500"
                 >
                     <option value="all">All Scopes</option>
                     <option value="global">Global</option>
@@ -138,44 +138,44 @@ export default function FeatureFlagsPage() {
             {/* Flags Grid */}
             <div className="grid gap-4 md:grid-cols-2">
                 {loading && flags.length === 0 && (
-                    <div className="col-span-2 p-8 text-center text-slate-400">
+                    <div className="col-span-2 p-8 text-center text-muted-foreground">
                         Loading feature flags...
                     </div>
                 )}
                 {!loading && filtered.length === 0 && (
-                    <div className="col-span-2 p-8 text-center text-slate-400">
+                    <div className="col-span-2 p-8 text-center text-muted-foreground">
                         No feature flags found. Create one to get started.
                     </div>
                 )}
                 {filtered.map((flag) => (
                     <div
                         key={flag.id}
-                        className={`bg-slate-800 rounded-lg border p-4 transition-colors ${flag.enabled ? "border-status-success/30" : "border-slate-700"
+                        className={`bg-muted rounded-lg border p-4 transition-colors ${flag.enabled ? "border-status-success/30" : "border-border"
                             }`}
                     >
                         <div className="flex items-start justify-between gap-4">
                             <div className="flex items-start gap-3">
-                                <div className={`p-2 rounded-lg ${flag.enabled ? "bg-status-success/15" : "bg-slate-700"}`}>
-                                    <Flag className={`h-4 w-4 ${flag.enabled ? "text-status-success" : "text-slate-400"}`} />
+                                <div className={`p-2 rounded-lg ${flag.enabled ? "bg-status-success/15" : "bg-muted"}`}>
+                                    <Flag className={`h-4 w-4 ${flag.enabled ? "text-status-success" : "text-muted-foreground"}`} />
                                 </div>
                                 <div>
                                     <div className="flex items-center gap-2">
                                         <span className="font-medium text-white">{flag.name}</span>
-                                        <span className="text-xs font-mono text-slate-500">{flag.key}</span>
+                                        <span className="text-xs font-mono text-muted-foreground">{flag.key}</span>
                                     </div>
-                                    <p className="text-sm text-slate-400 mt-1">{flag.description || "No description"}</p>
+                                    <p className="text-sm text-muted-foreground mt-1">{flag.description || "No description"}</p>
                                     <div className="flex items-center gap-2 mt-2">
                                         {flag.scope === "global" ? (
-                                            <span className="inline-flex items-center gap-1 text-xs text-slate-500">
+                                            <span className="inline-flex items-center gap-1 text-xs text-muted-foreground">
                                                 <Globe className="h-3 w-3" /> Global
                                             </span>
                                         ) : (
-                                            <span className="inline-flex items-center gap-1 text-xs text-slate-500">
+                                            <span className="inline-flex items-center gap-1 text-xs text-muted-foreground">
                                                 <Building2 className="h-3 w-3" /> Per Campground
                                             </span>
                                         )}
                                         {flag.campgrounds && flag.campgrounds.length > 0 && (
-                                            <span className="text-xs text-slate-500">
+                                            <span className="text-xs text-muted-foreground">
                                                 ({flag.campgrounds.length} enabled)
                                             </span>
                                         )}
@@ -184,12 +184,12 @@ export default function FeatureFlagsPage() {
                             </div>
                             <button
                                 onClick={() => toggleFlag(flag.id)}
-                                className="flex-shrink-0 p-1 hover:bg-slate-700 rounded transition-colors"
+                                className="flex-shrink-0 p-1 hover:bg-muted rounded transition-colors"
                             >
                                 {flag.enabled ? (
                                     <ToggleRight className="h-8 w-8 text-status-success" />
                                 ) : (
-                                    <ToggleLeft className="h-8 w-8 text-slate-500" />
+                                    <ToggleLeft className="h-8 w-8 text-muted-foreground" />
                                 )}
                             </button>
                         </div>
@@ -197,7 +197,7 @@ export default function FeatureFlagsPage() {
                 ))}
             </div>
 
-            <div className="text-sm text-slate-500 text-center">
+            <div className="text-sm text-muted-foreground text-center">
                 Changes are saved automatically
             </div>
         </div>

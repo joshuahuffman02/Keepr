@@ -50,13 +50,13 @@ export function OptimizedImage({
     return (
       <div
         className={cn(
-          "flex items-center justify-center bg-slate-100",
+          "flex items-center justify-center bg-muted",
           aspectClass,
           className
         )}
       >
         {fallback || (
-          <div className="text-slate-400 text-sm">Image unavailable</div>
+          <div className="text-muted-foreground text-sm">Image unavailable</div>
         )}
       </div>
     );
@@ -66,7 +66,7 @@ export function OptimizedImage({
     <div className={cn("relative overflow-hidden", aspectClass, className)}>
       {/* Loading skeleton */}
       {showSkeleton && isLoading && (
-        <div className="absolute inset-0 bg-slate-200 animate-pulse" />
+        <div className="absolute inset-0 bg-muted animate-pulse" />
       )}
 
       <Image

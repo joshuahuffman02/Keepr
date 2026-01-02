@@ -144,15 +144,15 @@ export function TerminalManagement({ campgroundId }: TerminalManagementProps) {
         <CardContent>
           {isLoading ? (
             <div className="flex items-center justify-center py-8">
-              <Loader2 className="w-6 h-6 animate-spin text-slate-400" />
+              <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
             </div>
           ) : (
             <div className="space-y-6">
               {/* Locations */}
               <div>
-                <h4 className="text-sm font-medium text-slate-700 mb-3">Locations</h4>
+                <h4 className="text-sm font-medium text-foreground mb-3">Locations</h4>
                 {!locations?.length ? (
-                  <p className="text-sm text-slate-500">
+                  <p className="text-sm text-muted-foreground">
                     No terminal locations. Add a location first to register readers.
                   </p>
                 ) : (
@@ -160,14 +160,14 @@ export function TerminalManagement({ campgroundId }: TerminalManagementProps) {
                     {locations.map((location) => (
                       <div
                         key={location.id}
-                        className="flex items-center justify-between p-3 bg-slate-50 rounded-lg border"
+                        className="flex items-center justify-between p-3 bg-muted rounded-lg border"
                       >
                         <div className="flex items-center gap-3">
-                          <MapPin className="w-4 h-4 text-slate-400" />
+                          <MapPin className="w-4 h-4 text-muted-foreground" />
                           <div>
                             <p className="font-medium text-sm">{location.displayName}</p>
                             {location.address && (
-                              <p className="text-xs text-slate-500">
+                              <p className="text-xs text-muted-foreground">
                                 {location.address.line1}, {location.address.city}, {location.address.state}
                               </p>
                             )}
@@ -183,7 +183,7 @@ export function TerminalManagement({ campgroundId }: TerminalManagementProps) {
                             onClick={() => deleteLocationMutation.mutate(location.id)}
                             disabled={deleteLocationMutation.isPending}
                           >
-                            <Trash2 className="w-4 h-4 text-slate-400" />
+                            <Trash2 className="w-4 h-4 text-muted-foreground" />
                           </Button>
                         </div>
                       </div>
@@ -194,9 +194,9 @@ export function TerminalManagement({ campgroundId }: TerminalManagementProps) {
 
               {/* Readers */}
               <div>
-                <h4 className="text-sm font-medium text-slate-700 mb-3">Card Readers</h4>
+                <h4 className="text-sm font-medium text-foreground mb-3">Card Readers</h4>
                 {!readers?.length ? (
-                  <p className="text-sm text-slate-500">
+                  <p className="text-sm text-muted-foreground">
                     No card readers registered. Add a reader to start accepting in-person payments.
                   </p>
                 ) : (
@@ -204,17 +204,17 @@ export function TerminalManagement({ campgroundId }: TerminalManagementProps) {
                     {readers.map((reader) => (
                       <div
                         key={reader.id}
-                        className="flex items-center justify-between p-3 bg-slate-50 rounded-lg border"
+                        className="flex items-center justify-between p-3 bg-muted rounded-lg border"
                       >
                         <div className="flex items-center gap-3">
                           {reader.status === "online" ? (
                             <Wifi className="w-4 h-4 text-emerald-500" />
                           ) : (
-                            <WifiOff className="w-4 h-4 text-slate-400" />
+                            <WifiOff className="w-4 h-4 text-muted-foreground" />
                           )}
                           <div>
                             <p className="font-medium text-sm">{reader.label}</p>
-                            <p className="text-xs text-slate-500">
+                            <p className="text-xs text-muted-foreground">
                               {reader.deviceType} · {reader.location?.displayName || "No location"}
                             </p>
                           </div>
@@ -235,7 +235,7 @@ export function TerminalManagement({ campgroundId }: TerminalManagementProps) {
                             onClick={() => deleteReaderMutation.mutate(reader.id)}
                             disabled={deleteReaderMutation.isPending}
                           >
-                            <Trash2 className="w-4 h-4 text-slate-400" />
+                            <Trash2 className="w-4 h-4 text-muted-foreground" />
                           </Button>
                         </div>
                       </div>
@@ -244,7 +244,7 @@ export function TerminalManagement({ campgroundId }: TerminalManagementProps) {
                 )}
               </div>
 
-              <p className="text-xs text-slate-500">
+              <p className="text-xs text-muted-foreground">
                 Terminal readers process card-present payments. Each campground uses its own connected Stripe account.
               </p>
             </div>
@@ -345,7 +345,7 @@ export function TerminalManagement({ campgroundId }: TerminalManagementProps) {
                 onChange={(e) => setNewReader({ ...newReader, registrationCode: e.target.value })}
                 placeholder="Enter code from reader display"
               />
-              <p className="text-xs text-slate-500">
+              <p className="text-xs text-muted-foreground">
                 Find this on your Stripe Terminal device screen or in the device settings.
               </p>
             </div>

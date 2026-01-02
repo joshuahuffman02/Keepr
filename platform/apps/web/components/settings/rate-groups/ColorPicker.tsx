@@ -71,9 +71,9 @@ export function ColorPicker({ value, onChange, className }: ColorPickerProps) {
           type="button"
           className={cn(
             "h-8 w-8 rounded-lg shadow-sm border-2 border-white",
-            "ring-1 ring-slate-200 transition-all duration-150",
-            "hover:scale-110 hover:ring-2 hover:ring-slate-300",
-            "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500",
+            "ring-1 ring-border transition-all duration-150",
+            "hover:scale-110 hover:ring-2 hover:ring-ring/40",
+            "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
             className
           )}
           style={{ backgroundColor: value }}
@@ -84,7 +84,7 @@ export function ColorPicker({ value, onChange, className }: ColorPickerProps) {
         <div className="space-y-4">
           {/* Preset Colors Grid */}
           <div>
-            <Label className="text-xs text-slate-500 uppercase tracking-wider">
+            <Label className="text-xs text-muted-foreground uppercase tracking-wider">
               Preset Colors
             </Label>
             <div className="grid grid-cols-5 gap-2 mt-2">
@@ -97,8 +97,8 @@ export function ColorPicker({ value, onChange, className }: ColorPickerProps) {
                     onClick={() => handlePresetSelect(color)}
                     className={cn(
                       "h-8 w-8 rounded-lg transition-all duration-150",
-                      "hover:scale-110 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-slate-900",
-                      isSelected && "ring-2 ring-offset-2 ring-slate-900"
+                      "hover:scale-110 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-ring",
+                      isSelected && "ring-2 ring-offset-2 ring-ring"
                     )}
                     style={{ backgroundColor: color }}
                     aria-label={`Select color ${color}`}
@@ -115,7 +115,7 @@ export function ColorPicker({ value, onChange, className }: ColorPickerProps) {
 
           {/* Custom Color Input */}
           <div>
-            <Label htmlFor="custom-color" className="text-xs text-slate-500 uppercase tracking-wider">
+            <Label htmlFor="custom-color" className="text-xs text-muted-foreground uppercase tracking-wider">
               Custom Color
             </Label>
             <div className="flex items-center gap-2 mt-2">

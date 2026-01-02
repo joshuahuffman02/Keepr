@@ -201,26 +201,26 @@ export function ActivityFeed({
 
             {/* Content */}
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium text-slate-900">
+              <p className="text-sm font-medium text-foreground">
                 {currentActivity.message}
               </p>
-              <p className="text-xs text-slate-500 mt-0.5">Just now</p>
+              <p className="text-xs text-muted-foreground mt-0.5">Just now</p>
             </div>
 
             {/* Close button */}
             <button
               onClick={handleDismiss}
-              className="flex-shrink-0 p-1 rounded-full hover:bg-slate-200/50 transition-colors"
+              className="flex-shrink-0 p-1 rounded-full hover:bg-muted/50 transition-colors"
               aria-label="Dismiss notification"
             >
-              <X className="w-4 h-4 text-slate-400" />
+              <X className="w-4 h-4 text-muted-foreground" />
             </button>
           </div>
 
           {/* Don't show again link */}
           <button
             onClick={handleDismissPermanently}
-            className="mt-2 text-xs text-slate-400 hover:text-slate-600 transition-colors"
+            className="mt-2 text-xs text-muted-foreground hover:text-muted-foreground transition-colors"
           >
             Don't show these
           </button>

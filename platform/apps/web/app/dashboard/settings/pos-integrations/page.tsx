@@ -204,7 +204,7 @@ export default function PosIntegrationsPage() {
       case "pending":
         return <Clock className="h-5 w-5 text-amber-500" />;
       default:
-        return <AlertTriangle className="h-5 w-5 text-slate-400" />;
+        return <AlertTriangle className="h-5 w-5 text-muted-foreground" />;
     }
   };
 
@@ -215,8 +215,8 @@ export default function PosIntegrationsPage() {
         {/* Header */}
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold text-slate-900">POS Integrations</h1>
-            <p className="text-slate-600">
+            <h1 className="text-2xl font-bold text-foreground">POS Integrations</h1>
+            <p className="text-muted-foreground">
               Connect external POS systems to sync inventory, products, and sales.
             </p>
           </div>
@@ -252,7 +252,7 @@ export default function PosIntegrationsPage() {
                     </SelectContent>
                   </Select>
                   {selectedProvider && (
-                    <p className="text-sm text-slate-500">
+                    <p className="text-sm text-muted-foreground">
                       {providerInfo(selectedProvider)?.description}
                     </p>
                   )}
@@ -318,7 +318,7 @@ export default function PosIntegrationsPage() {
           <TabsContent value="connections" className="space-y-4">
             {integrationsQuery.isLoading ? (
               <Card>
-                <CardContent className="py-8 text-center text-slate-500">
+                <CardContent className="py-8 text-center text-muted-foreground">
                   <Loader2 className="h-6 w-6 animate-spin mx-auto mb-2" />
                   Loading integrations...
                 </CardContent>
@@ -326,11 +326,11 @@ export default function PosIntegrationsPage() {
             ) : integrationsQuery.data?.length === 0 ? (
               <Card>
                 <CardContent className="py-12 text-center">
-                  <div className="text-slate-400 mb-4">
+                  <div className="text-muted-foreground mb-4">
                     <Link2 className="h-12 w-12 mx-auto" />
                   </div>
-                  <h3 className="text-lg font-medium text-slate-900 mb-2">No POS Connections</h3>
-                  <p className="text-slate-600 mb-4">
+                  <h3 className="text-lg font-medium text-foreground mb-2">No POS Connections</h3>
+                  <p className="text-muted-foreground mb-4">
                     Connect an external POS system to sync inventory and sales.
                   </p>
                   <Button onClick={() => setIsCreateOpen(true)}>
@@ -349,17 +349,17 @@ export default function PosIntegrationsPage() {
                           <div className="mt-1">{getStatusIcon(integration.status)}</div>
                           <div>
                             <div className="flex items-center gap-2">
-                              <h3 className="font-semibold text-slate-900">
+                              <h3 className="font-semibold text-foreground">
                                 {integration.displayName ||
                                   providerInfo(integration.provider)?.name ||
                                   integration.provider}
                               </h3>
                               {getStatusBadge(integration.status)}
                             </div>
-                            <p className="text-sm text-slate-500 mt-1">
+                            <p className="text-sm text-muted-foreground mt-1">
                               {providerInfo(integration.provider)?.description}
                             </p>
-                            <div className="flex items-center gap-4 mt-2 text-sm text-slate-500">
+                            <div className="flex items-center gap-4 mt-2 text-sm text-muted-foreground">
                               {integration.lastSyncAt && (
                                 <span>
                                   Last sync:{" "}
@@ -443,11 +443,11 @@ export default function PosIntegrationsPage() {
                       <div
                         key={provider.id}
                         className={`p-4 rounded-lg border ${
-                          isConnected ? "bg-slate-50 border-slate-200" : "border-dashed"
+                          isConnected ? "bg-muted border-border" : "border-dashed"
                         }`}
                       >
-                        <h4 className="font-medium text-slate-900">{provider.name}</h4>
-                        <p className="text-sm text-slate-500 mt-1">{provider.description}</p>
+                        <h4 className="font-medium text-foreground">{provider.name}</h4>
+                        <p className="text-sm text-muted-foreground mt-1">{provider.description}</p>
                         {isConnected ? (
                           <Badge variant="outline" className="mt-3">
                             <CheckCircle className="h-3 w-3 mr-1" />
@@ -551,8 +551,8 @@ function WebhooksTab({ campgroundId }: { campgroundId: string }) {
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <div>
-          <h3 className="text-lg font-medium text-slate-900">Webhook Endpoints</h3>
-          <p className="text-sm text-slate-500">
+          <h3 className="text-lg font-medium text-foreground">Webhook Endpoints</h3>
+          <p className="text-sm text-muted-foreground">
             Receive real-time notifications for inventory events.
           </p>
         </div>
@@ -578,7 +578,7 @@ function WebhooksTab({ campgroundId }: { campgroundId: string }) {
                   <p className="text-sm text-emerald-700 mb-3">
                     Save this signing secret - it won't be shown again.
                   </p>
-                  <code className="block bg-white p-3 rounded border text-sm font-mono break-all">
+                  <code className="block bg-card p-3 rounded border text-sm font-mono break-all">
                     {createdSecret}
                   </code>
                 </div>
@@ -617,7 +617,7 @@ function WebhooksTab({ campgroundId }: { campgroundId: string }) {
                           className={`flex items-start gap-3 p-3 rounded-lg border cursor-pointer transition-colors ${
                             selectedEvents.includes(event.id)
                               ? "border-blue-500 bg-blue-50"
-                              : "border-slate-200 hover:bg-slate-50"
+                              : "border-border hover:bg-muted"
                           }`}
                         >
                           <input
@@ -628,7 +628,7 @@ function WebhooksTab({ campgroundId }: { campgroundId: string }) {
                           />
                           <div>
                             <div className="font-medium text-sm">{event.label}</div>
-                            <div className="text-xs text-slate-500">{event.description}</div>
+                            <div className="text-xs text-muted-foreground">{event.description}</div>
                           </div>
                         </label>
                       ))}
@@ -656,7 +656,7 @@ function WebhooksTab({ campgroundId }: { campgroundId: string }) {
 
       {webhooksQuery.isLoading ? (
         <Card>
-          <CardContent className="py-8 text-center text-slate-500">
+          <CardContent className="py-8 text-center text-muted-foreground">
             <Loader2 className="h-6 w-6 animate-spin mx-auto mb-2" />
             Loading webhooks...
           </CardContent>
@@ -664,11 +664,11 @@ function WebhooksTab({ campgroundId }: { campgroundId: string }) {
       ) : webhooksQuery.data?.length === 0 ? (
         <Card>
           <CardContent className="py-12 text-center">
-            <div className="text-slate-400 mb-4">
+            <div className="text-muted-foreground mb-4">
               <ExternalLink className="h-12 w-12 mx-auto" />
             </div>
-            <h3 className="text-lg font-medium text-slate-900 mb-2">No Webhook Endpoints</h3>
-            <p className="text-slate-600">
+            <h3 className="text-lg font-medium text-foreground mb-2">No Webhook Endpoints</h3>
+            <p className="text-muted-foreground">
               Create a webhook endpoint to receive real-time inventory notifications.
             </p>
           </CardContent>
@@ -690,7 +690,7 @@ function WebhooksTab({ campgroundId }: { campgroundId: string }) {
                   <TableCell>
                     <div className="font-mono text-sm truncate max-w-xs">{webhook.url}</div>
                     {webhook.description && (
-                      <div className="text-xs text-slate-500">{webhook.description}</div>
+                      <div className="text-xs text-muted-foreground">{webhook.description}</div>
                     )}
                   </TableCell>
                   <TableCell>
@@ -781,20 +781,20 @@ function SyncLogsTab({ integrations }: { integrations: Integration[] }) {
 
       {!selectedIntegration ? (
         <Card>
-          <CardContent className="py-12 text-center text-slate-500">
+          <CardContent className="py-12 text-center text-muted-foreground">
             Select an integration to view sync logs.
           </CardContent>
         </Card>
       ) : logsQuery.isLoading ? (
         <Card>
-          <CardContent className="py-8 text-center text-slate-500">
+          <CardContent className="py-8 text-center text-muted-foreground">
             <Loader2 className="h-6 w-6 animate-spin mx-auto mb-2" />
             Loading logs...
           </CardContent>
         </Card>
       ) : logsQuery.data?.length === 0 ? (
         <Card>
-          <CardContent className="py-12 text-center text-slate-500">
+          <CardContent className="py-12 text-center text-muted-foreground">
             No sync logs found for this integration.
           </CardContent>
         </Card>
@@ -827,7 +827,7 @@ function SyncLogsTab({ integrations }: { integrations: Integration[] }) {
                       <span className="text-red-600 ml-1">({log.itemsFailed} failed)</span>
                     )}
                   </TableCell>
-                  <TableCell className="text-sm text-slate-500">
+                  <TableCell className="text-sm text-muted-foreground">
                     {formatDistanceToNow(new Date(log.startedAt), { addSuffix: true })}
                   </TableCell>
                   <TableCell>

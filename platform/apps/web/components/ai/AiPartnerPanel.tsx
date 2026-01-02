@@ -157,7 +157,7 @@ export function AiPartnerPanel({ campgroundId, enabled = true }: { campgroundId:
           <Link
             key={`${link.label}-${link.url}`}
             href={link.url}
-            className="rounded-full border border-slate-200 bg-white px-3 py-1 text-slate-600 hover:border-emerald-400 hover:text-emerald-600"
+            className="rounded-full border border-border bg-card px-3 py-1 text-muted-foreground hover:border-emerald-400 hover:text-emerald-600"
           >
             {link.label}
           </Link>
@@ -186,10 +186,10 @@ export function AiPartnerPanel({ campgroundId, enabled = true }: { campgroundId:
         </div>
       )}
 
-        <div className="h-[420px] overflow-y-auto rounded-xl border border-slate-200 bg-white p-4">
+        <div className="h-[420px] overflow-y-auto rounded-xl border border-border bg-card p-4">
           <div className="space-y-4">
             {messages.length === 0 && (
-              <div className="rounded-lg border border-dashed border-slate-200 bg-slate-50 px-4 py-6 text-center text-sm text-slate-500">
+              <div className="rounded-lg border border-dashed border-border bg-muted px-4 py-6 text-center text-sm text-muted-foreground">
                 Try: "Hold site 12 for June 10-12" or "What is availability for July 4 weekend?"
               </div>
             )}
@@ -201,7 +201,7 @@ export function AiPartnerPanel({ campgroundId, enabled = true }: { campgroundId:
                     <Bot className="h-4 w-4 text-emerald-600" />
                   </div>
                 )}
-                <div className={cn("max-w-[75%] rounded-2xl px-3 py-2 text-sm", msg.role === "user" ? "bg-emerald-500 text-white" : "bg-slate-100 text-slate-900")}>
+                <div className={cn("max-w-[75%] rounded-2xl px-3 py-2 text-sm", msg.role === "user" ? "bg-emerald-500 text-foreground" : "bg-muted text-foreground")}>
                   <p className="whitespace-pre-wrap">{msg.content}</p>
 
                   {msg.denials?.length ? (
@@ -218,14 +218,14 @@ export function AiPartnerPanel({ campgroundId, enabled = true }: { campgroundId:
 
                   {msg.questions?.length ? (
                     <div className="mt-3 space-y-2">
-                      <div className="text-xs font-semibold uppercase tracking-wide text-slate-500">Needs input</div>
+                      <div className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Needs input</div>
                       <div className="flex flex-wrap gap-2">
                         {msg.questions.map((question, idx) => (
                           <button
                             key={`${question}-${idx}`}
                             type="button"
                             onClick={() => setInput(question)}
-                            className="rounded-full border border-slate-200 bg-white px-3 py-1 text-xs text-slate-600 hover:border-emerald-400 hover:text-emerald-600"
+                            className="rounded-full border border-border bg-card px-3 py-1 text-xs text-muted-foreground hover:border-emerald-400 hover:text-emerald-600"
                           >
                             {question}
                           </button>
@@ -237,9 +237,9 @@ export function AiPartnerPanel({ campgroundId, enabled = true }: { campgroundId:
                   {msg.actionDrafts?.length ? (
                     <div className="mt-3 space-y-3">
                       {msg.actionDrafts.map((draft) => (
-                        <div key={draft.id} className="rounded-lg border border-slate-200 bg-white p-3 text-xs text-slate-600">
+                        <div key={draft.id} className="rounded-lg border border-border bg-card p-3 text-xs text-muted-foreground">
                           <div className="flex items-center justify-between">
-                            <div className="text-sm font-semibold text-slate-900">
+                            <div className="text-sm font-semibold text-foreground">
                               {ACTION_LABELS[draft.actionType] || draft.actionType}
                             </div>
                             <div className="flex items-center gap-2">
@@ -264,22 +264,22 @@ export function AiPartnerPanel({ campgroundId, enabled = true }: { campgroundId:
                             <div className="mt-2 space-y-1">
                               {Object.entries(draft.parameters).map(([key, value]) => (
                                 <div key={key} className="flex items-center justify-between gap-4">
-                                  <span className="text-slate-500">{key}</span>
-                                  <span className="text-slate-900">{formatValue(value)}</span>
+                                  <span className="text-muted-foreground">{key}</span>
+                                  <span className="text-foreground">{formatValue(value)}</span>
                                 </div>
                               ))}
                             </div>
                           )}
 
                           {draft.impact && (
-                            <div className="mt-3 rounded-lg border border-slate-100 bg-slate-50 px-3 py-2 text-xs">
+                            <div className="mt-3 rounded-lg border border-border bg-muted px-3 py-2 text-xs">
                               <div className="flex items-center justify-between">
-                                <span className="font-semibold text-slate-700">Impact</span>
+                                <span className="font-semibold text-foreground">Impact</span>
                                 <Badge variant={IMPACT_VARIANTS[draft.impact.level]} className="capitalize">
                                   {draft.impact.level}
                                 </Badge>
                               </div>
-                              <p className="mt-1 text-slate-600">{draft.impact.summary}</p>
+                              <p className="mt-1 text-muted-foreground">{draft.impact.summary}</p>
                               {draft.impact.warnings?.length ? (
                                 <div className="mt-2 space-y-1 text-amber-700">
                                   {draft.impact.warnings.map((warning) => (
@@ -296,7 +296,7 @@ export function AiPartnerPanel({ campgroundId, enabled = true }: { campgroundId:
                           )}
 
                           {draft.result && (
-                            <div className="mt-2 text-slate-600">
+                            <div className="mt-2 text-muted-foreground">
                               Result: {formatValue(draft.result)}
                             </div>
                           )}
@@ -318,8 +318,8 @@ export function AiPartnerPanel({ campgroundId, enabled = true }: { campgroundId:
                   {renderEvidenceLinks(msg.evidenceLinks)}
                 </div>
                 {msg.role === "user" && (
-                  <div className="flex h-8 w-8 items-center justify-center rounded-full bg-slate-200">
-                    <User className="h-4 w-4 text-slate-600" />
+                  <div className="flex h-8 w-8 items-center justify-center rounded-full bg-muted">
+                    <User className="h-4 w-4 text-muted-foreground" />
                   </div>
                 )}
               </div>
@@ -330,7 +330,7 @@ export function AiPartnerPanel({ campgroundId, enabled = true }: { campgroundId:
                 <div className="flex h-8 w-8 items-center justify-center rounded-full bg-emerald-100">
                   <Bot className="h-4 w-4 text-emerald-600" />
                 </div>
-                <div className="rounded-2xl bg-slate-100 px-3 py-2 text-xs text-slate-500">
+                <div className="rounded-2xl bg-muted px-3 py-2 text-xs text-muted-foreground">
                   Thinking...
                 </div>
               </div>
@@ -339,16 +339,16 @@ export function AiPartnerPanel({ campgroundId, enabled = true }: { campgroundId:
           <div ref={endRef} />
         </div>
 
-        <div className="rounded-xl border border-slate-200 bg-slate-50 p-3">
+        <div className="rounded-xl border border-border bg-muted p-3">
           <Textarea
             value={input}
             onChange={(event) => setInput(event.target.value)}
             onKeyDown={handleKeyDown}
             placeholder="Ask Host to check availability, block a site, refund, log a guest note, or adjust rates..."
-            className="min-h-[84px] bg-white"
+            className="min-h-[84px] bg-card"
             disabled={chatMutation.isPending || !enabled}
           />
-          <div className="mt-3 flex items-center justify-between text-xs text-slate-500">
+          <div className="mt-3 flex items-center justify-between text-xs text-muted-foreground">
             <span>Press Enter to send, Shift+Enter for a new line.</span>
             <Button
               size="sm"

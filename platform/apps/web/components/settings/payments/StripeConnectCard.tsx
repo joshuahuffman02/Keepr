@@ -111,7 +111,7 @@ export function StripeConnectCard({
         {/* Payment capabilities */}
         {isConnected && (
           <div className="space-y-3">
-            <h4 className="text-sm font-medium text-slate-700">Payment methods</h4>
+            <h4 className="text-sm font-medium text-foreground">Payment methods</h4>
             <div className="grid grid-cols-2 gap-2">
               <CapabilityBadge
                 label="Cards"
@@ -135,7 +135,7 @@ export function StripeConnectCard({
               />
             </div>
 
-            <div className="flex items-center gap-2 text-xs text-slate-500">
+            <div className="flex items-center gap-2 text-xs text-muted-foreground">
               <span>Last checked: {lastRefreshedLabel}</span>
               {capabilitiesStale && (
                 <span className="text-amber-600">(may be outdated)</span>
@@ -212,7 +212,7 @@ export function StripeConnectCard({
 
         {/* Not connected helper */}
         {!isConnected && (
-          <p className="text-sm text-slate-600 flex items-start gap-2">
+          <p className="text-sm text-muted-foreground flex items-start gap-2">
             <Lightbulb className="w-4 h-4 text-amber-500 mt-0.5 flex-shrink-0" aria-hidden="true" />
             You'll be redirected to Stripe to complete setup. This usually takes 5-10 minutes.
           </p>
@@ -235,24 +235,24 @@ function CapabilityBadge({ label, active, description }: CapabilityBadgeProps) {
         "flex items-center gap-2 p-2.5 rounded-lg border transition-colors",
         active
           ? "bg-emerald-50 border-emerald-200"
-          : "bg-slate-50 border-slate-200"
+          : "bg-muted border-border"
       )}
     >
       <div
         className={cn(
           "w-2 h-2 rounded-full flex-shrink-0",
-          active ? "bg-emerald-500" : "bg-slate-300"
+          active ? "bg-emerald-500" : "bg-muted"
         )}
         aria-hidden="true"
       />
       <div className="min-w-0">
         <p className={cn(
           "text-sm font-medium",
-          active ? "text-emerald-900" : "text-slate-600"
+          active ? "text-emerald-900" : "text-muted-foreground"
         )}>
           {label}
         </p>
-        <p className="text-xs text-slate-500 truncate">{description}</p>
+        <p className="text-xs text-muted-foreground truncate">{description}</p>
       </div>
       <span className="sr-only">
         {label}: {active ? "Enabled" : "Disabled"}

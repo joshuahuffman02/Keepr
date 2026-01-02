@@ -47,21 +47,21 @@ export function ReservationHeader({ reservation, onCheckIn, onCheckOut, onCancel
     };
 
     return (
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 p-6 bg-white border-b border-slate-200">
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 p-6 bg-card border-b border-border">
             <div>
                 <div className="flex items-center gap-3 mb-1">
                     <div className="flex items-center gap-2">
-                        <h1 className="text-2xl font-bold text-slate-900">Reservation #{reservation.id.slice(0, 8)}</h1>
+                        <h1 className="text-2xl font-bold text-foreground">Reservation #{reservation.id.slice(0, 8)}</h1>
                         <TooltipProvider>
                             <Tooltip>
                                 <TooltipTrigger asChild>
                                     <button
                                         onClick={copyReservationId}
-                                        className="p-1 rounded hover:bg-slate-100 text-slate-400 hover:text-slate-600 transition-colors"
+                                        className="p-1 rounded hover:bg-muted text-muted-foreground hover:text-muted-foreground transition-colors"
                                         aria-label="Copy full reservation ID"
                                     >
                                         {copied ? (
-                                            <Check className="h-4 w-4 text-green-600" />
+                                            <Check className="h-4 w-4 text-status-success" />
                                         ) : (
                                             <Copy className="h-4 w-4" />
                                         )}
@@ -69,7 +69,7 @@ export function ReservationHeader({ reservation, onCheckIn, onCheckOut, onCancel
                                 </TooltipTrigger>
                                 <TooltipContent>
                                     <p className="font-mono text-xs">{reservation.id}</p>
-                                    <p className="text-xs text-slate-400 mt-1">{copied ? "Copied!" : "Click to copy"}</p>
+                                    <p className="text-xs text-muted-foreground mt-1">{copied ? "Copied!" : "Click to copy"}</p>
                                 </TooltipContent>
                             </Tooltip>
                         </TooltipProvider>
@@ -78,7 +78,7 @@ export function ReservationHeader({ reservation, onCheckIn, onCheckOut, onCancel
                         {reservation.status.replace("_", " ").toUpperCase()}
                     </Badge>
                 </div>
-                <p className="text-slate-500">
+                <p className="text-muted-foreground">
                     Created on {format(new Date(reservation.createdAt ?? Date.now()), "MMM d, yyyy")}
                 </p>
             </div>
@@ -93,19 +93,23 @@ export function ReservationHeader({ reservation, onCheckIn, onCheckOut, onCancel
                     </Link>
                 )}
                 {canCheckIn && (
-                    <Button onClick={onCheckIn} disabled={isProcessing} className="bg-action-primary hover:bg-action-primary-hover">
+                    <Button onClick={onCheckIn} disabled={isProcessing}>
                         Check In Guest
                     </Button>
                 )}
                 {canCheckOut && (
-                    <Button onClick={onCheckOut} disabled={isProcessing} className="bg-blue-600 hover:bg-blue-700">
+                    <Button variant="secondary" onClick={onCheckOut} disabled={isProcessing}>
                         Check Out Guest
                     </Button>
                 )}
                 {canCancel && (
                     <ConfirmDialog
                         trigger={
-                            <Button variant="outline" disabled={isProcessing} className="text-red-600 hover:text-red-700 hover:bg-red-50 border-red-200">
+                            <Button
+                                variant="outline"
+                                disabled={isProcessing}
+                                className="text-status-error hover:text-status-error hover:bg-status-error/10 border-status-error/30"
+                            >
                                 Cancel Reservation
                             </Button>
                         }

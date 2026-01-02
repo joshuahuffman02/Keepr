@@ -98,7 +98,7 @@ export default function PortfolioPage() {
   if (portfoliosQuery.isLoading) {
     return (
       <DashboardShell>
-        <div className="rounded border border-slate-200 bg-slate-50 p-4" role="status" aria-live="polite">
+        <div className="rounded border border-border bg-muted p-4" role="status" aria-live="polite">
           Loading portfolio context…
         </div>
       </DashboardShell>
@@ -130,8 +130,8 @@ export default function PortfolioPage() {
       />
 
       <div className="mb-2" data-testid="portfolio-header">
-        <h1 className="text-2xl font-semibold text-slate-900">Portfolio</h1>
-        <p className="text-sm text-slate-600">Multi-property view, routing, and cross-park reporting.</p>
+        <h1 className="text-2xl font-semibold text-foreground">Portfolio</h1>
+        <p className="text-sm text-muted-foreground">Multi-property view, routing, and cross-park reporting.</p>
       </div>
 
       <div className="grid gap-4 md:grid-cols-3">
@@ -141,9 +141,9 @@ export default function PortfolioPage() {
             <CardDescription>Select a portfolio and park to scope the admin</CardDescription>
           </CardHeader>
           <CardContent className="space-y-3">
-            <label className="text-sm font-semibold text-slate-600">Portfolio</label>
+            <label className="text-sm font-semibold text-muted-foreground">Portfolio</label>
             <select
-              className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm"
+              className="w-full rounded-md border border-border px-3 py-2 text-sm"
               value={portfolioId ?? ""}
               onChange={(e) => onPortfolioChange(e.target.value)}
               data-testid="portfolio-select"
@@ -155,9 +155,9 @@ export default function PortfolioPage() {
                 </option>
               ))}
             </select>
-            <label className="text-sm font-semibold text-slate-600">Park (routes ops)</label>
+            <label className="text-sm font-semibold text-muted-foreground">Park (routes ops)</label>
             <select
-              className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm"
+              className="w-full rounded-md border border-border px-3 py-2 text-sm"
               value={parkId ?? ""}
               onChange={(e) => onParkChange(e.target.value)}
               disabled={!activePortfolio}
@@ -169,7 +169,7 @@ export default function PortfolioPage() {
                 </option>
               ))}
             </select>
-            <div className="text-xs text-slate-500">
+            <div className="text-xs text-muted-foreground">
               Headers: x-portfolio-id + x-park-id now flow through to API calls for routing.
             </div>
           </CardContent>
@@ -182,26 +182,26 @@ export default function PortfolioPage() {
           </CardHeader>
           <CardContent className="grid grid-cols-2 gap-4">
             {reportQuery.isLoading && (
-              <div className="col-span-2 space-y-2 rounded border border-slate-200 bg-slate-50 p-3 text-sm text-slate-600" role="status">
+              <div className="col-span-2 space-y-2 rounded border border-border bg-muted p-3 text-sm text-muted-foreground" role="status">
                 Loading portfolio report…
               </div>
             )}
             <div>
-              <div className="text-xs uppercase text-slate-500">Revenue</div>
+              <div className="text-xs uppercase text-muted-foreground">Revenue</div>
               <div className="text-xl font-semibold">
                 {rollup ? formatCurrency(rollup.revenueHome, rollup.currency, locale) : "—"}
               </div>
             </div>
             <div>
-              <div className="text-xs uppercase text-slate-500">Occupancy</div>
+              <div className="text-xs uppercase text-muted-foreground">Occupancy</div>
               <div className="text-xl font-semibold">{rollup ? formatPercent(rollup.occupancy) : "—"}</div>
             </div>
             <div>
-              <div className="text-xs uppercase text-slate-500">ADR</div>
+              <div className="text-xs uppercase text-muted-foreground">ADR</div>
               <div className="text-lg font-semibold">{rollup ? formatCurrency(rollup.adr, rollup.currency, locale) : "—"}</div>
             </div>
             <div>
-              <div className="text-xs uppercase text-slate-500">RevPAR</div>
+              <div className="text-xs uppercase text-muted-foreground">RevPAR</div>
               <div className="text-lg font-semibold">{rollup ? formatCurrency(rollup.revpar, rollup.currency, locale) : "—"}</div>
             </div>
           </CardContent>
@@ -215,15 +215,15 @@ export default function PortfolioPage() {
           <CardContent className="space-y-2">
             {routing?.length ? (
               routing.map((r) => (
-                <div key={r.parkId} className="rounded-lg border border-slate-200 px-3 py-2">
+                <div key={r.parkId} className="rounded-lg border border-border px-3 py-2">
                   <div className="text-sm font-semibold">{r.parkId}</div>
-                  <div className="text-xs text-slate-500">Admin: {r.adminHost || "Not configured"}</div>
-                  <div className="text-xs text-slate-500">Guest: {r.guestHost || "Not configured"}</div>
-                  <div className="text-xs text-slate-500">Path: {r.path || "/campgrounds/:id"}</div>
+                  <div className="text-xs text-muted-foreground">Admin: {r.adminHost || "Not configured"}</div>
+                  <div className="text-xs text-muted-foreground">Guest: {r.guestHost || "Not configured"}</div>
+                  <div className="text-xs text-muted-foreground">Path: {r.path || "/campgrounds/:id"}</div>
                 </div>
               ))
             ) : (
-              <div className="text-sm text-slate-500">No routing configured for this portfolio.</div>
+              <div className="text-sm text-muted-foreground">No routing configured for this portfolio.</div>
             )}
           </CardContent>
         </Card>
@@ -286,16 +286,16 @@ export default function PortfolioPage() {
         </CardHeader>
         <CardContent className="space-y-3">
           {(reportQuery.data?.recommendations ?? []).map((rec) => (
-            <div key={rec.id} className="rounded-lg border border-slate-200 px-4 py-3">
+            <div key={rec.id} className="rounded-lg border border-border px-4 py-3">
               <div className="flex items-center justify-between">
                 <div className="text-sm font-semibold">{rec.title}</div>
                 <Badge variant="secondary">{rec.area}</Badge>
               </div>
-              <div className="text-sm text-slate-600">{rec.impact}</div>
+              <div className="text-sm text-muted-foreground">{rec.impact}</div>
             </div>
           ))}
           {!reportQuery.data?.recommendations?.length && (
-            <div className="text-sm text-slate-500">No recommendations yet — data stubs are live.</div>
+            <div className="text-sm text-muted-foreground">No recommendations yet — data stubs are live.</div>
           )}
         </CardContent>
       </Card>
@@ -306,7 +306,7 @@ export default function PortfolioPage() {
         <Button variant="outline" size="sm" onClick={() => qc.invalidateQueries({ queryKey: ["portfolio-report"] })}>
           Refresh report
         </Button>
-        <div className="text-xs text-slate-500">
+        <div className="text-xs text-muted-foreground">
           Minimal functional slice: portfolio listing, selection, routing headers, and cross-park reporting stubs.
         </div>
       </div>

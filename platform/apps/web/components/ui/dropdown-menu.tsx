@@ -166,7 +166,7 @@ export const DropdownMenuContent = React.forwardRef<HTMLDivElement, DropdownMenu
         ref={mergeRefs(ref, contentRef)}
         role="menu"
         className={cn(
-          "absolute z-50 mt-2 min-w-[10rem] rounded-md border border-slate-200 bg-white p-1 shadow-lg",
+          "absolute z-50 mt-2 min-w-[10rem] rounded-md border border-border bg-popover p-1 text-popover-foreground shadow-lg",
           align === "end" ? "right-0" : "left-0",
           className
         )}
@@ -194,7 +194,7 @@ export const DropdownMenuItem = React.forwardRef<HTMLButtonElement, DropdownMenu
     };
 
     const itemClassName = cn(
-      "flex w-full items-center gap-2 rounded-sm px-3 py-2 text-left text-sm text-slate-700 hover:bg-slate-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-950 focus-visible:ring-offset-1 transition-colors",
+      "flex w-full items-center gap-2 rounded-sm px-3 py-2 text-left text-sm text-foreground hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/40 focus-visible:ring-offset-1 transition-colors",
       disabled && "cursor-not-allowed opacity-50",
       className
     );
@@ -238,7 +238,7 @@ export const DropdownMenuSeparator = React.forwardRef<HTMLDivElement, DropdownMe
       <div
         ref={ref}
         role="separator"
-        className={cn("-mx-1 my-1 h-px bg-slate-200", className)}
+        className={cn("-mx-1 my-1 h-px bg-border", className)}
         {...props}
       />
     );

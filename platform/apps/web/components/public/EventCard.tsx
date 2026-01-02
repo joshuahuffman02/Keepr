@@ -115,7 +115,7 @@ export function EventCard({
 
   return (
     <motion.article
-      className="group relative bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 border border-slate-100"
+      className="group relative bg-card rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 border border-border"
       whileHover={{ y: -4 }}
       transition={{ duration: 0.2 }}
     >
@@ -152,7 +152,7 @@ export function EventCard({
             className={`px-2.5 py-1 rounded-full text-xs font-bold ${
               priceCents === 0
                 ? "bg-green-500 text-white"
-                : "bg-white/90 text-slate-900"
+                : "bg-card/90 text-foreground"
             }`}
           >
             {formatPrice(priceCents)}
@@ -166,7 +166,7 @@ export function EventCard({
             e.stopPropagation();
             setIsWishlisted(!isWishlisted);
           }}
-          className="absolute top-3 right-3 p-2 rounded-full bg-white/80 backdrop-blur-sm hover:bg-white transition-colors"
+          className="absolute top-3 right-3 p-2 rounded-full bg-card/80 backdrop-blur-sm hover:bg-card transition-colors"
           aria-label={isWishlisted ? "Remove from wishlist" : "Add to wishlist"}
         >
           <AnimatePresence mode="wait">
@@ -181,7 +181,7 @@ export function EventCard({
                 className={`w-5 h-5 transition-colors ${
                   isWishlisted
                     ? "fill-red-500 text-red-500"
-                    : "text-slate-600 hover:text-red-500"
+                    : "text-muted-foreground hover:text-red-500"
                 }`}
               />
             </motion.div>
@@ -207,7 +207,7 @@ export function EventCard({
       {/* Content */}
       <div className="p-4 space-y-3">
         {/* Date & Time */}
-        <div className="flex items-center gap-2 text-sm text-slate-600">
+        <div className="flex items-center gap-2 text-sm text-muted-foreground">
           <Calendar className="w-4 h-4 text-orange-500" />
           <span className="font-medium">{formatDate(startDate)}</span>
           {endDate && startDate !== endDate && (
@@ -217,34 +217,34 @@ export function EventCard({
             </>
           )}
           {!isAllDay && startTime && (
-            <span className="text-slate-400">
+            <span className="text-muted-foreground">
               {formatTime(startTime)}
               {endTime && ` - ${formatTime(endTime)}`}
             </span>
           )}
-          {isAllDay && <span className="text-slate-400">All Day</span>}
+          {isAllDay && <span className="text-muted-foreground">All Day</span>}
         </div>
 
         {/* Title */}
-        <h3 className="font-bold text-lg text-slate-900 line-clamp-2 group-hover:text-orange-600 transition-colors">
+        <h3 className="font-bold text-lg text-foreground line-clamp-2 group-hover:text-orange-600 transition-colors">
           {title}
         </h3>
 
         {/* Description */}
         {description && (
-          <p className="text-sm text-slate-600 line-clamp-2">{description}</p>
+          <p className="text-sm text-muted-foreground line-clamp-2">{description}</p>
         )}
 
         {/* Campground Info */}
         <Link
           href={campgroundLink}
-          className="flex items-center gap-2 text-sm text-slate-500 hover:text-orange-600 transition-colors"
+          className="flex items-center gap-2 text-sm text-muted-foreground hover:text-orange-600 transition-colors"
         >
           <MapPin className="w-4 h-4" />
           <span className="truncate">
             {campground.name}
             {campground.city && campground.state && (
-              <span className="text-slate-400">
+              <span className="text-muted-foreground">
                 {" "}
                 - {campground.city}, {campground.state}
               </span>
@@ -254,13 +254,13 @@ export function EventCard({
 
         {/* Capacity indicator */}
         {capacity && !isSoldOut && (
-          <div className="flex items-center gap-2 text-sm text-slate-500">
+          <div className="flex items-center gap-2 text-sm text-muted-foreground">
             <Users className="w-4 h-4" />
             <span>
               {currentSignups} / {capacity} registered
             </span>
             {/* Progress bar */}
-            <div className="flex-1 h-1.5 bg-slate-100 rounded-full overflow-hidden">
+            <div className="flex-1 h-1.5 bg-muted rounded-full overflow-hidden">
               <div
                 className={`h-full rounded-full transition-all ${
                   isAlmostFull ? "bg-amber-500" : "bg-orange-500"

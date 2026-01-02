@@ -68,28 +68,28 @@ export function CategoryList({ campgroundId }: CategoryListProps) {
 
     const categories = categoriesQuery.data || [];
 
-    if (categoriesQuery.isLoading) return <div className="text-slate-500">Loading categories...</div>;
+    if (categoriesQuery.isLoading) return <div className="text-muted-foreground">Loading categories...</div>;
 
     return (
         <div className="space-y-4">
             <div className="flex justify-between items-center">
-                <h3 className="text-lg font-medium text-slate-900">Categories</h3>
+                <h3 className="text-lg font-medium text-foreground">Categories</h3>
                 <Button onClick={handleCreate}>Add Category</Button>
             </div>
 
             <div className="space-y-2">
                 {categories.map((category) => (
-                    <div key={category.id} className="flex items-center justify-between rounded-lg border border-slate-200 bg-white p-4">
+                    <div key={category.id} className="flex items-center justify-between rounded-lg border border-border bg-card p-4">
                         <div className="space-y-1">
-                            <div className="font-medium text-slate-900 flex items-center gap-2">
+                            <div className="font-medium text-foreground flex items-center gap-2">
                                 {category.name}
                                 {!category.isActive && (
-                                    <span className="rounded-full bg-slate-100 px-2 py-0.5 text-xs font-medium text-slate-600">
+                                    <span className="rounded-full bg-muted px-2 py-0.5 text-xs font-medium text-muted-foreground">
                                         Inactive
                                     </span>
                                 )}
                             </div>
-                            {category.description && <div className="text-sm text-slate-500">{category.description}</div>}
+                            {category.description && <div className="text-sm text-muted-foreground">{category.description}</div>}
                         </div>
                         <div className="flex gap-2">
                             <Button variant="secondary" size="sm" onClick={() => handleEdit(category)}>

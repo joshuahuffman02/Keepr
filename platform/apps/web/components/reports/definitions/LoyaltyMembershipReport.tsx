@@ -84,7 +84,7 @@ export function LoyaltyMembershipReport({ campgroundId }: LoyaltyMembershipRepor
     }, [guests]);
 
     if (isLoading) {
-        return <div className="text-sm text-slate-500">Loading loyalty data...</div>;
+        return <div className="text-sm text-muted-foreground">Loading loyalty data...</div>;
     }
 
     if (error) {
@@ -93,8 +93,8 @@ export function LoyaltyMembershipReport({ campgroundId }: LoyaltyMembershipRepor
 
     if (!reportData) {
         return (
-            <div className="flex flex-col items-center justify-center p-12 bg-slate-50 rounded-lg border border-slate-200">
-                <div className="text-slate-400 mb-2">No guest data found</div>
+            <div className="flex flex-col items-center justify-center p-12 bg-muted rounded-lg border border-border">
+                <div className="text-muted-foreground mb-2">No guest data found</div>
             </div>
         );
     }
@@ -105,16 +105,16 @@ export function LoyaltyMembershipReport({ campgroundId }: LoyaltyMembershipRepor
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                 <Card>
                     <CardHeader className="pb-2">
-                        <CardTitle className="text-sm font-medium text-slate-500">Loyalty Members</CardTitle>
+                        <CardTitle className="text-sm font-medium text-muted-foreground">Loyalty Members</CardTitle>
                     </CardHeader>
                     <CardContent>
                         <div className="text-2xl font-bold">{reportData.membersCount}</div>
-                        <p className="text-xs text-slate-500">{reportData.adoptionRate}% adoption</p>
+                        <p className="text-xs text-muted-foreground">{reportData.adoptionRate}% adoption</p>
                     </CardContent>
                 </Card>
                 <Card>
                     <CardHeader className="pb-2">
-                        <CardTitle className="text-sm font-medium text-slate-500">Avg Points Balance</CardTitle>
+                        <CardTitle className="text-sm font-medium text-muted-foreground">Avg Points Balance</CardTitle>
                     </CardHeader>
                     <CardContent>
                         <div className="text-2xl font-bold">{reportData.avgPoints.toLocaleString()}</div>
@@ -122,7 +122,7 @@ export function LoyaltyMembershipReport({ campgroundId }: LoyaltyMembershipRepor
                 </Card>
                 <Card>
                     <CardHeader className="pb-2">
-                        <CardTitle className="text-sm font-medium text-slate-500">Total Points Outstanding</CardTitle>
+                        <CardTitle className="text-sm font-medium text-muted-foreground">Total Points Outstanding</CardTitle>
                     </CardHeader>
                     <CardContent>
                         <div className="text-2xl font-bold">{reportData.totalPoints.toLocaleString()}</div>
@@ -130,13 +130,13 @@ export function LoyaltyMembershipReport({ campgroundId }: LoyaltyMembershipRepor
                 </Card>
                 <Card>
                     <CardHeader className="pb-2">
-                        <CardTitle className="text-sm font-medium text-slate-500">Top Tier Members</CardTitle>
+                        <CardTitle className="text-sm font-medium text-muted-foreground">Top Tier Members</CardTitle>
                     </CardHeader>
                     <CardContent>
                         <div className="text-2xl font-bold">
                             {reportData.tierData.find(t => t.name === 'Platinum' || t.name === 'Gold')?.value || 0}
                         </div>
-                        <p className="text-xs text-slate-500">Gold/Platinum status</p>
+                        <p className="text-xs text-muted-foreground">Gold/Platinum status</p>
                     </CardContent>
                 </Card>
             </div>

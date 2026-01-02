@@ -60,7 +60,7 @@ export function VoiceCommandIndicator({
               initial={{ opacity: 0, x: 20, scale: 0.9 }}
               animate={{ opacity: 1, x: 0, scale: 1 }}
               exit={{ opacity: 0, x: 20, scale: 0.9 }}
-              className="bg-emerald-500 text-white px-3 py-1.5 rounded-full text-sm font-medium shadow-lg"
+              className="bg-action-primary text-action-primary-foreground px-3 py-1.5 rounded-full text-sm font-medium shadow-lg"
             >
               {lastCommand}
             </motion.div>
@@ -70,11 +70,11 @@ export function VoiceCommandIndicator({
         {/* Main mic button */}
         <motion.button
           onClick={onToggle}
-          className={cn(
-            "relative p-3 rounded-full shadow-lg transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2",
+            className={cn(
+              "relative p-3 rounded-full shadow-lg transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2",
             isListening
-              ? "bg-emerald-500 text-white focus:ring-emerald-500"
-              : "bg-white text-slate-700 hover:bg-slate-50 focus:ring-slate-300"
+              ? "bg-action-primary text-action-primary-foreground focus:ring-action-primary/60"
+              : "bg-card text-foreground hover:bg-muted focus:ring-ring/40"
           )}
           whileTap={{ scale: 0.95 }}
           aria-label={isListening ? "Stop voice commands" : "Start voice commands"}
@@ -84,7 +84,7 @@ export function VoiceCommandIndicator({
               <Mic className="h-5 w-5" />
               {/* Pulsing ring animation */}
               <motion.div
-                className="absolute inset-0 rounded-full border-2 border-emerald-400"
+                className="absolute inset-0 rounded-full border-2 border-action-primary/40"
                 initial={{ scale: 1, opacity: 0.8 }}
                 animate={{
                   scale: [1, 1.5, 1],
@@ -107,11 +107,11 @@ export function VoiceCommandIndicator({
           <Button
             variant="ghost"
             size="icon"
-            className="bg-white/80 backdrop-blur-sm shadow-lg rounded-full"
+            className="bg-card/80 backdrop-blur-sm shadow-lg rounded-full"
             onClick={() => setShowHelp(true)}
             aria-label="Voice command help"
           >
-            <HelpCircle className="h-5 w-5 text-slate-500" />
+            <HelpCircle className="h-5 w-5 text-muted-foreground" />
           </Button>
         )}
       </div>
@@ -130,21 +130,21 @@ export function VoiceCommandIndicator({
               initial={{ scale: 0.9, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.9, opacity: 0 }}
-              className="bg-white rounded-xl shadow-xl max-w-md w-full max-h-[80vh] overflow-hidden"
+              className="bg-card rounded-xl shadow-xl max-w-md w-full max-h-[80vh] overflow-hidden"
               onClick={(e) => e.stopPropagation()}
             >
               <div className="flex items-center justify-between p-4 border-b">
-                <div className="flex items-center gap-2">
-                  <Mic className="h-5 w-5 text-emerald-500" />
-                  <h2 className="font-semibold text-slate-900">Voice Commands</h2>
-                </div>
+              <div className="flex items-center gap-2">
+                <Mic className="h-5 w-5 text-action-primary" />
+                <h2 className="font-semibold text-foreground">Voice Commands</h2>
+              </div>
                 <Button variant="ghost" size="icon" onClick={() => setShowHelp(false)}>
                   <X className="h-4 w-4" />
                 </Button>
               </div>
 
               <div className="p-4 space-y-4 overflow-y-auto max-h-[60vh]">
-                <p className="text-sm text-slate-600">
+                <p className="text-sm text-muted-foreground">
                   Say any of these phrases to control the POS:
                 </p>
 
@@ -152,17 +152,17 @@ export function VoiceCommandIndicator({
                   {commands.map((cmd, i) => (
                     <div
                       key={i}
-                      className="flex items-start gap-3 p-3 bg-slate-50 rounded-lg"
+                      className="flex items-start gap-3 p-3 bg-muted rounded-lg"
                     >
-                      <span className="text-emerald-600 font-medium text-sm whitespace-nowrap">
+                      <span className="text-action-primary font-medium text-sm whitespace-nowrap">
                         &quot;{cmd.phrase}&quot;
                       </span>
-                      <span className="text-slate-600 text-sm">{cmd.description}</span>
+                      <span className="text-muted-foreground text-sm">{cmd.description}</span>
                     </div>
                   ))}
                 </div>
 
-                <div className="text-xs text-slate-500 pt-2 border-t">
+                <div className="text-xs text-muted-foreground pt-2 border-t">
                   Tip: Speak clearly and wait for the feedback before the next command.
                 </div>
               </div>
@@ -173,7 +173,7 @@ export function VoiceCommandIndicator({
 
       {/* Debug transcript (dev only) */}
       {process.env.NODE_ENV === "development" && lastTranscript && (
-        <div className="fixed bottom-20 right-4 bg-slate-800 text-white text-xs px-2 py-1 rounded max-w-xs truncate">
+        <div className="fixed bottom-20 right-4 bg-muted text-foreground text-xs px-2 py-1 rounded max-w-xs truncate">
           {lastTranscript}
         </div>
       )}

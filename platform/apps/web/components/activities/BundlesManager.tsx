@@ -184,16 +184,16 @@ export function BundlesManager({ campgroundId, activities }: BundlesManagerProps
                 <div className="flex items-center justify-between">
                     <div>
                         <h3 className="text-lg font-semibold flex items-center gap-2">
-                            <Package className="h-5 w-5 text-purple-600" />
+                            <Package className="h-5 w-5 text-action-primary" />
                             Activity Bundles
                         </h3>
-                        <p className="text-sm text-slate-500">
+                        <p className="text-sm text-muted-foreground">
                             Create package deals to increase sales
                         </p>
                     </div>
                     <Button
                         onClick={() => setIsCreateOpen(true)}
-                        className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600"
+                        className="bg-action-primary text-action-primary-foreground hover:bg-action-primary-hover"
                     >
                         <Plus className="h-4 w-4 mr-2" />
                         New Bundle
@@ -202,21 +202,21 @@ export function BundlesManager({ campgroundId, activities }: BundlesManagerProps
 
                 {isLoading ? (
                     <div className="flex items-center justify-center py-12">
-                        <Loader2 className="h-8 w-8 animate-spin text-purple-500" />
+                        <Loader2 className="h-8 w-8 animate-spin text-action-primary" />
                     </div>
                 ) : bundles?.length === 0 ? (
                     <Card className="border-dashed">
                         <CardContent className="flex flex-col items-center justify-center py-12">
-                            <div className="w-16 h-16 rounded-full bg-gradient-to-br from-purple-100 to-pink-100 flex items-center justify-center mb-4">
-                                <Gift className="h-8 w-8 text-purple-600" />
+                            <div className="w-16 h-16 rounded-full bg-status-info-bg flex items-center justify-center mb-4">
+                                <Gift className="h-8 w-8 text-action-primary" />
                             </div>
-                            <h4 className="font-semibold text-slate-900 mb-1">No Bundles Yet</h4>
-                            <p className="text-sm text-slate-500 text-center max-w-sm mb-4">
+                            <h4 className="font-semibold text-foreground mb-1">No Bundles Yet</h4>
+                            <p className="text-sm text-muted-foreground text-center max-w-sm mb-4">
                                 Create activity bundles to offer package deals and increase average order value.
                             </p>
                             <Button
                                 onClick={() => setIsCreateOpen(true)}
-                                className="bg-gradient-to-r from-purple-500 to-pink-500"
+                                className="bg-action-primary text-action-primary-foreground hover:bg-action-primary-hover"
                             >
                                 <Plus className="h-4 w-4 mr-2" />
                                 Create Your First Bundle
@@ -233,12 +233,12 @@ export function BundlesManager({ campgroundId, activities }: BundlesManagerProps
                                     !bundle.isActive && "opacity-60"
                                 )}
                             >
-                                <div className="h-2 bg-gradient-to-r from-purple-500 to-pink-500" />
+                                <div className="h-2 bg-action-primary" />
                                 <CardHeader className="pb-2">
                                     <div className="flex items-start justify-between">
                                         <div>
                                             <CardTitle className="text-base flex items-center gap-2">
-                                                <Package className="h-4 w-4 text-purple-600" />
+                                                <Package className="h-4 w-4 text-action-primary" />
                                                 {bundle.name}
                                             </CardTitle>
                                             {bundle.description && (
@@ -249,7 +249,7 @@ export function BundlesManager({ campgroundId, activities }: BundlesManagerProps
                                         </div>
                                         <Badge
                                             variant={bundle.isActive ? "default" : "secondary"}
-                                            className={bundle.isActive ? "bg-emerald-500" : ""}
+                                            className={bundle.isActive ? "bg-status-success text-status-success-foreground" : ""}
                                         >
                                             {bundle.isActive ? "Active" : "Inactive"}
                                         </Badge>
@@ -258,7 +258,7 @@ export function BundlesManager({ campgroundId, activities }: BundlesManagerProps
                                 <CardContent className="space-y-3">
                                     {/* Included activities */}
                                     <div className="space-y-1">
-                                        <p className="text-xs font-medium text-slate-500 uppercase tracking-wide">
+                                        <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
                                             Includes
                                         </p>
                                         <div className="flex flex-wrap gap-1">
@@ -277,11 +277,11 @@ export function BundlesManager({ campgroundId, activities }: BundlesManagerProps
                                     {/* Pricing */}
                                     <div className="flex items-center justify-between pt-2 border-t">
                                         <div>
-                                            <div className="text-xl font-bold text-slate-900">
+                                            <div className="text-xl font-bold text-foreground">
                                                 ${(bundle.price / 100).toFixed(2)}
                                             </div>
                                             {bundle.discountValue && (
-                                                <div className="flex items-center gap-1 text-xs text-emerald-600">
+                                                <div className="flex items-center gap-1 text-xs text-status-success">
                                                     <Tag className="h-3 w-3" />
                                                     Save {bundle.discountType === "percent"
                                                         ? `${bundle.discountValue}%`
@@ -292,7 +292,7 @@ export function BundlesManager({ campgroundId, activities }: BundlesManagerProps
                                         <Button
                                             variant="ghost"
                                             size="icon"
-                                            className="text-slate-400 hover:text-red-500"
+                                            className="text-muted-foreground hover:text-red-500"
                                             onClick={() => setDeleteConfirmId(bundle.id)}
                                         >
                                             <Trash2 className="h-4 w-4" />
@@ -310,7 +310,7 @@ export function BundlesManager({ campgroundId, activities }: BundlesManagerProps
                 <DialogContent className="sm:max-w-[550px] max-h-[90vh] overflow-y-auto">
                     <DialogHeader>
                         <DialogTitle className="flex items-center gap-2">
-                            <Gift className="h-5 w-5 text-purple-600" />
+                            <Gift className="h-5 w-5 text-action-primary" />
                             Create Activity Bundle
                         </DialogTitle>
                         <DialogDescription>
@@ -352,8 +352,8 @@ export function BundlesManager({ campgroundId, activities }: BundlesManagerProps
                                         className={cn(
                                             "flex items-center gap-3 p-3 cursor-pointer transition-colors",
                                             newBundle.selectedActivities.includes(activity.id)
-                                                ? "bg-purple-50"
-                                                : "hover:bg-slate-50"
+                                                ? "bg-status-info-bg"
+                                                : "hover:bg-muted"
                                         )}
                                     >
                                         <Checkbox
@@ -362,18 +362,18 @@ export function BundlesManager({ campgroundId, activities }: BundlesManagerProps
                                         />
                                         <div className="flex-1">
                                             <p className="font-medium text-sm">{activity.name}</p>
-                                            <p className="text-xs text-slate-500">
+                                            <p className="text-xs text-muted-foreground">
                                                 ${(activity.price / 100).toFixed(2)}{activity.duration ? ` · ${activity.duration} mins` : ''}
                                             </p>
                                         </div>
                                         {newBundle.selectedActivities.includes(activity.id) && (
-                                            <Check className="h-4 w-4 text-purple-600" />
+                                            <Check className="h-4 w-4 text-action-primary" />
                                         )}
                                     </label>
                                 ))}
                             </div>
                             {activities.length === 0 && (
-                                <p className="text-sm text-slate-500 text-center py-4">
+                                <p className="text-sm text-muted-foreground text-center py-4">
                                     Create some activities first to add them to a bundle.
                                 </p>
                             )}
@@ -412,7 +412,7 @@ export function BundlesManager({ campgroundId, activities }: BundlesManagerProps
                                         onChange={(e) => setNewBundle({ ...newBundle, discountValue: e.target.value })}
                                         className="pl-8"
                                     />
-                                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">
+                                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">
                                         {newBundle.discountType === "percent" ? "%" : "$"}
                                     </span>
                                 </div>
@@ -421,22 +421,22 @@ export function BundlesManager({ campgroundId, activities }: BundlesManagerProps
 
                         {/* Price Preview */}
                         {newBundle.selectedActivities.length > 0 && (
-                            <div className="rounded-lg bg-gradient-to-br from-purple-50 to-pink-50 border border-purple-200 p-4">
+                            <div className="rounded-lg bg-muted border border-border p-4">
                                 <div className="flex items-center justify-between mb-2">
-                                    <span className="text-sm text-slate-600">Original Price</span>
-                                    <span className="text-slate-500 line-through">
+                                    <span className="text-sm text-muted-foreground">Original Price</span>
+                                    <span className="text-muted-foreground line-through">
                                         ${(savings.originalPrice / 100).toFixed(2)}
                                     </span>
                                 </div>
                                 <div className="flex items-center justify-between mb-2">
-                                    <span className="text-sm text-slate-600">Discount</span>
-                                    <span className="text-emerald-600 font-medium">
+                                    <span className="text-sm text-muted-foreground">Discount</span>
+                                    <span className="text-status-success font-medium">
                                         -${(savings.savings / 100).toFixed(2)}
                                     </span>
                                 </div>
-                                <div className="flex items-center justify-between pt-2 border-t border-purple-200">
+                                <div className="flex items-center justify-between pt-2 border-t border-border">
                                     <span className="font-medium">Bundle Price</span>
-                                    <span className="text-xl font-bold text-purple-700">
+                                    <span className="text-xl font-bold text-action-primary">
                                         ${(savings.bundlePrice / 100).toFixed(2)}
                                     </span>
                                 </div>
@@ -455,7 +455,7 @@ export function BundlesManager({ campgroundId, activities }: BundlesManagerProps
                                 !newBundle.name ||
                                 newBundle.selectedActivities.length < 2
                             }
-                            className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600"
+                            className="bg-action-primary text-action-primary-foreground hover:bg-action-primary-hover"
                         >
                             {createMutation.isPending ? (
                                 <>
@@ -490,7 +490,7 @@ export function BundlesManager({ campgroundId, activities }: BundlesManagerProps
                                     setDeleteConfirmId(null);
                                 }
                             }}
-                            className="bg-red-600 hover:bg-red-700"
+                            className="bg-status-error text-status-error-foreground hover:bg-status-error/90"
                         >
                             Delete
                         </AlertDialogAction>

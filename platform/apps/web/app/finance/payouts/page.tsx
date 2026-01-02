@@ -68,8 +68,8 @@ export default function PayoutsPage() {
       <div className="max-w-5xl space-y-4">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-semibold text-slate-900">Payouts</h1>
-            <p className="text-sm text-slate-600">Stripe Connect payouts with balance transaction lines.</p>
+            <h1 className="text-2xl font-semibold text-foreground">Payouts</h1>
+            <p className="text-sm text-muted-foreground">Stripe Connect payouts with balance transaction lines.</p>
           </div>
           <div className="flex gap-2">
             {["all", "pending", "in_transit", "paid", "failed", "canceled"].map((s) => (
@@ -92,7 +92,7 @@ export default function PayoutsPage() {
           <CardHeader>
             <CardTitle className="flex items-center justify-between">
               <span>Payouts</span>
-              <span className="text-sm text-slate-600">Net: {formatMoney(totalNet)}</span>
+              <span className="text-sm text-muted-foreground">Net: {formatMoney(totalNet)}</span>
             </CardTitle>
           </CardHeader>
           <CardContent className="overflow-x-auto">
@@ -115,10 +115,10 @@ export default function PayoutsPage() {
                       <div className="space-y-3">
                         {[...Array(4)].map((_, i) => (
                           <div key={i} className="animate-pulse flex items-center gap-4 p-2">
-                            <div className="h-4 bg-slate-200 dark:bg-slate-700 rounded w-32" />
-                            <div className="h-6 w-20 bg-slate-200 dark:bg-slate-700 rounded" />
-                            <div className="h-4 bg-slate-200 dark:bg-slate-700 rounded w-24" />
-                            <div className="flex-1 h-4 bg-slate-200 dark:bg-slate-700 rounded" />
+                            <div className="h-4 bg-muted dark:bg-muted rounded w-32" />
+                            <div className="h-6 w-20 bg-muted dark:bg-muted rounded" />
+                            <div className="h-4 bg-muted dark:bg-muted rounded w-24" />
+                            <div className="flex-1 h-4 bg-muted dark:bg-muted rounded" />
                           </div>
                         ))}
                       </div>
@@ -129,13 +129,13 @@ export default function PayoutsPage() {
                   <TableRow>
                     <TableCell colSpan={7} className="h-32 text-center">
                       <div className="flex flex-col items-center gap-2">
-                        <div className="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center">
-                          <svg className="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center">
+                          <svg className="w-5 h-5 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                           </svg>
                         </div>
-                        <p className="text-sm font-medium text-slate-900">No payouts yet</p>
-                        <p className="text-xs text-slate-500">Payouts will appear here once processed</p>
+                        <p className="text-sm font-medium text-foreground">No payouts yet</p>
+                        <p className="text-xs text-muted-foreground">Payouts will appear here once processed</p>
                       </div>
                     </TableCell>
                   </TableRow>
@@ -148,17 +148,17 @@ export default function PayoutsPage() {
                       </Link>
                     </TableCell>
                     <TableCell>
-                      <Badge className={statusColors[payout.status] || "bg-slate-100 text-slate-700"}>
+                      <Badge className={statusColors[payout.status] || "bg-muted text-foreground"}>
                         {payout.status.replace("_", " ")}
                       </Badge>
                     </TableCell>
                     <TableCell>{formatMoney(payout.amountCents, payout.currency.toUpperCase())}</TableCell>
                     <TableCell>{formatMoney(payout.feeCents ?? 0, payout.currency.toUpperCase())}</TableCell>
                     <TableCell>{formatMoney(payout.amountCents - (payout.feeCents ?? 0), payout.currency.toUpperCase())}</TableCell>
-                    <TableCell className="text-xs text-slate-600">
+                    <TableCell className="text-xs text-muted-foreground">
                       {payout.arrivalDate ? format(new Date(payout.arrivalDate), "yyyy-MM-dd") : "—"}
                     </TableCell>
-                    <TableCell className="text-xs text-slate-600 flex flex-col gap-1">
+                    <TableCell className="text-xs text-muted-foreground flex flex-col gap-1">
                       <span>{payout.lines?.length ?? 0}</span>
                       {reconMap[payout.id] && Math.abs(reconMap[payout.id].driftVsLedgerCents) > DRIFT_THRESHOLD_CENTS && (
                         <Badge className="bg-status-warning-bg text-status-warning-text w-fit">Drift: {formatMoney(reconMap[payout.id].driftVsLedgerCents)}</Badge>
@@ -188,7 +188,7 @@ export default function PayoutsPage() {
                         Recon
                       </Button>
                       {reconMap[payout.id] && (
-                        <div className="text-xs text-slate-600 mt-1">
+                        <div className="text-xs text-muted-foreground mt-1">
                           Drift (lines): {formatMoney(reconMap[payout.id].driftVsLinesCents)} · Drift (ledger): {formatMoney(reconMap[payout.id].driftVsLedgerCents)}
                         </div>
                       )}

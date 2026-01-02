@@ -99,8 +99,8 @@ export function SystemCheckCard({
           <div className="inline-flex items-center justify-center h-12 w-12 rounded-full bg-status-success-bg mb-3">
             <CheckCircle2 className="h-6 w-6 text-status-success" />
           </div>
-          <h3 className="font-medium text-slate-900">All systems go!</h3>
-          <p className="text-sm text-slate-500 mt-1">
+          <h3 className="font-medium text-foreground">All systems go!</h3>
+          <p className="text-sm text-muted-foreground mt-1">
             No configuration issues detected
           </p>
           {onRefresh && (
@@ -182,7 +182,7 @@ export function SystemCheckCard({
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2">
-                    <span className="text-sm font-medium text-slate-900">
+                    <span className="text-sm font-medium text-foreground">
                       {issue.message}
                     </span>
                     <Badge
@@ -193,7 +193,7 @@ export function SystemCheckCard({
                     </Badge>
                   </div>
                   {issue.description && !compact && (
-                    <p className="text-sm text-slate-500 mt-0.5">
+                    <p className="text-sm text-muted-foreground mt-0.5">
                       {issue.description}
                     </p>
                   )}

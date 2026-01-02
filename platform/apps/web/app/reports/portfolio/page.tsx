@@ -157,8 +157,8 @@ export default function PortfolioFxReportPage() {
 
       <div className="flex flex-col gap-4">
         <div className="flex flex-col gap-1">
-          <h1 className="text-2xl font-semibold text-slate-900">Cross-park reporting</h1>
-          <p className="text-sm text-slate-600">Occupancy, ADR, and RevPAR per portfolio with currency conversion helpers.</p>
+          <h1 className="text-2xl font-semibold text-foreground">Cross-park reporting</h1>
+          <p className="text-sm text-muted-foreground">Occupancy, ADR, and RevPAR per portfolio with currency conversion helpers.</p>
         </div>
 
         <Card>
@@ -169,9 +169,9 @@ export default function PortfolioFxReportPage() {
             </div>
             <div className="flex flex-wrap gap-3">
               <div className="flex flex-col gap-1">
-                <span className="text-xs font-semibold text-slate-600">Portfolio</span>
+                <span className="text-xs font-semibold text-muted-foreground">Portfolio</span>
                 <select
-                  className="w-60 rounded-md border border-slate-300 px-3 py-2 text-sm"
+                  className="w-60 rounded-md border border-border px-3 py-2 text-sm"
                   value={portfolioId ?? ""}
                   onChange={(e) => {
                     setPortfolioId(e.target.value);
@@ -188,7 +188,7 @@ export default function PortfolioFxReportPage() {
               </div>
 
               <div className="flex flex-col gap-1">
-                <span className="text-xs font-semibold text-slate-600">Reporting currency</span>
+                <span className="text-xs font-semibold text-muted-foreground">Reporting currency</span>
                 <Select
                   value={resolvedReportingCurrency}
                   onValueChange={(val) => {
@@ -209,11 +209,11 @@ export default function PortfolioFxReportPage() {
                 </Select>
               </div>
 
-              <div className="flex items-center gap-2 rounded-md border border-slate-200 px-3 py-2">
+              <div className="flex items-center gap-2 rounded-md border border-border px-3 py-2">
                 <Switch checked={fxEnabled} onCheckedChange={setFxEnabled} />
                 <div className="flex flex-col">
-                  <span className="text-xs font-semibold text-slate-700">FX toggle</span>
-                  <span className="text-[11px] text-slate-500">Convert to {resolvedReportingCurrency}</span>
+                  <span className="text-xs font-semibold text-foreground">FX toggle</span>
+                  <span className="text-[11px] text-muted-foreground">Convert to {resolvedReportingCurrency}</span>
                 </div>
               </div>
 
@@ -234,21 +234,21 @@ export default function PortfolioFxReportPage() {
             </CardHeader>
             <CardContent className="grid grid-cols-2 gap-4">
               <div>
-                <div className="text-xs uppercase text-slate-500">Revenue</div>
+                <div className="text-xs uppercase text-muted-foreground">Revenue</div>
                 <div className="text-xl font-semibold">{formatCurrency(rollup?.revenueHome ?? null, rollup?.currency ?? resolvedReportingCurrency, locale)}</div>
               </div>
               <div>
-                <div className="text-xs uppercase text-slate-500">Occupancy</div>
+                <div className="text-xs uppercase text-muted-foreground">Occupancy</div>
                 <div className="text-xl font-semibold">{formatPercent(rollup?.occupancy ?? null)}</div>
               </div>
               <div>
-                <div className="text-xs uppercase text-slate-500">ADR</div>
+                <div className="text-xs uppercase text-muted-foreground">ADR</div>
                 <div className="text-lg font-semibold">
                   {formatCurrency(rollup?.adr ?? null, rollup?.currency ?? resolvedReportingCurrency, locale)}
                 </div>
               </div>
               <div>
-                <div className="text-xs uppercase text-slate-500">RevPAR</div>
+                <div className="text-xs uppercase text-muted-foreground">RevPAR</div>
                 <div className="text-lg font-semibold">
                   {formatCurrency(rollup?.revpar ?? null, rollup?.currency ?? resolvedReportingCurrency, locale)}
                 </div>
@@ -264,19 +264,19 @@ export default function PortfolioFxReportPage() {
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-2">
-              <div className="text-sm text-slate-700">
+              <div className="text-sm text-foreground">
                 Base: {currencyTaxQuery.data?.baseCurrency ?? "USD"} · Reporting: {resolvedReportingCurrency}
               </div>
               <div className="space-y-1">
                 {(currencyTaxQuery.data?.fxRates ?? []).map((r) => (
-                  <div key={`${r.base}-${r.quote}`} className="flex items-center justify-between rounded border border-slate-200 px-3 py-2">
+                  <div key={`${r.base}-${r.quote}`} className="flex items-center justify-between rounded border border-border px-3 py-2">
                     <span className="text-sm font-semibold">
                       {r.base} → {r.quote}
                     </span>
-                    <span className="text-sm text-slate-700">{r.rate}</span>
+                    <span className="text-sm text-foreground">{r.rate}</span>
                   </div>
                 ))}
-                {!currencyTaxQuery.data?.fxRates?.length && <div className="text-sm text-slate-500">No exchange rates configured.</div>}
+                {!currencyTaxQuery.data?.fxRates?.length && <div className="text-sm text-muted-foreground">No exchange rates configured.</div>}
               </div>
             </CardContent>
           </Card>
@@ -288,14 +288,14 @@ export default function PortfolioFxReportPage() {
             </CardHeader>
             <CardContent className="space-y-2">
               {(reportQuery.data?.routing ?? []).map((route) => (
-                <div key={route.parkId} className="rounded-lg border border-slate-200 px-3 py-2">
+                <div key={route.parkId} className="rounded-lg border border-border px-3 py-2">
                   <div className="text-sm font-semibold">{route.parkId}</div>
-                  <div className="text-xs text-slate-500">Admin: {route.adminHost || "Not configured"}</div>
-                  <div className="text-xs text-slate-500">Guest: {route.guestHost || "Not configured"}</div>
-                  <div className="text-xs text-slate-500">Path: {route.path || "/campgrounds/:id"}</div>
+                  <div className="text-xs text-muted-foreground">Admin: {route.adminHost || "Not configured"}</div>
+                  <div className="text-xs text-muted-foreground">Guest: {route.guestHost || "Not configured"}</div>
+                  <div className="text-xs text-muted-foreground">Path: {route.path || "/campgrounds/:id"}</div>
                 </div>
               ))}
-              {!reportQuery.data?.routing?.length && <div className="text-sm text-slate-500">No routing configuration found.</div>}
+              {!reportQuery.data?.routing?.length && <div className="text-sm text-muted-foreground">No routing configuration found.</div>}
             </CardContent>
           </Card>
         </div>
@@ -324,7 +324,7 @@ export default function PortfolioFxReportPage() {
                 <TableBody>
                   {isLoading && (
                     <TableRow>
-                      <TableCell colSpan={7} className="text-sm text-slate-500">
+                      <TableCell colSpan={7} className="text-sm text-muted-foreground">
                         Loading…
                       </TableCell>
                     </TableRow>
@@ -342,7 +342,7 @@ export default function PortfolioFxReportPage() {
                           <div className="flex items-center gap-2">
                             <Badge variant="outline">{m.displayCurrency}</Badge>
                             {fxEnabled && m.currency !== resolvedReportingCurrency && (
-                              <span className="text-xs text-slate-600">
+                              <span className="text-xs text-muted-foreground">
                                 {m.currency} → {resolvedReportingCurrency} @ {m.fxRate}
                               </span>
                             )}
@@ -352,7 +352,7 @@ export default function PortfolioFxReportPage() {
                     ))}
                   {!isLoading && rows.length === 0 && (
                     <TableRow>
-                      <TableCell colSpan={7} className="text-sm text-slate-500">
+                      <TableCell colSpan={7} className="text-sm text-muted-foreground">
                         No metrics available for this portfolio.
                       </TableCell>
                     </TableRow>
@@ -365,7 +365,7 @@ export default function PortfolioFxReportPage() {
 
         <Separator />
 
-        <div className="flex items-center gap-3 text-xs text-slate-500">
+        <div className="flex items-center gap-3 text-xs text-muted-foreground">
           <Badge variant="secondary">Beta</Badge>
           <span>
             Cross-park FX uses the existing portfolio and localization endpoints. Toggle currencies to preview conversions per park.

@@ -297,7 +297,7 @@ export function CheckoutModal({ isOpen, onClose, cart, campgroundId, locationId,
                             onClick={() => setFulfillment("pickup")}
                             className={`p-3 rounded-lg border text-sm font-medium transition ${fulfillment === "pickup"
                                     ? "border-emerald-600 bg-emerald-50 text-emerald-700"
-                                    : "border-slate-200 hover:border-slate-300 text-slate-700"
+                                    : "border-border hover:border-border text-foreground"
                                 }`}
                         >
                             Pickup
@@ -306,7 +306,7 @@ export function CheckoutModal({ isOpen, onClose, cart, campgroundId, locationId,
                             onClick={() => setFulfillment("curbside")}
                             className={`p-3 rounded-lg border text-sm font-medium transition ${fulfillment === "curbside"
                                     ? "border-emerald-600 bg-emerald-50 text-emerald-700"
-                                    : "border-slate-200 hover:border-slate-300 text-slate-700"
+                                    : "border-border hover:border-border text-foreground"
                                 }`}
                         >
                             Curbside / Site drop
@@ -315,7 +315,7 @@ export function CheckoutModal({ isOpen, onClose, cart, campgroundId, locationId,
                             onClick={() => setFulfillment("delivery")}
                             className={`p-3 rounded-lg border text-sm font-medium transition ${fulfillment === "delivery"
                                     ? "border-emerald-600 bg-emerald-50 text-emerald-700"
-                                    : "border-slate-200 hover:border-slate-300 text-slate-700"
+                                    : "border-border hover:border-border text-foreground"
                                 }`}
                         >
                             Delivery to site/cabin
@@ -324,7 +324,7 @@ export function CheckoutModal({ isOpen, onClose, cart, campgroundId, locationId,
                             onClick={() => setFulfillment("table_service")}
                             className={`p-3 rounded-lg border text-sm font-medium transition ${fulfillment === "table_service"
                                     ? "border-emerald-600 bg-emerald-50 text-emerald-700"
-                                    : "border-slate-200 hover:border-slate-300 text-slate-700"
+                                    : "border-border hover:border-border text-foreground"
                                 }`}
                         >
                             Table/QR service
@@ -340,7 +340,7 @@ export function CheckoutModal({ isOpen, onClose, cart, campgroundId, locationId,
                                 value={method === "charge_to_site" ? siteSearch : locationHint}
                                 onChange={(e) => method === "charge_to_site" ? setSiteSearch(e.target.value) : setLocationHint(e.target.value)}
                             />
-                            <p className="text-xs text-slate-500">
+                            <p className="text-xs text-muted-foreground">
                                 Required for delivery, curbside, or table service. Charge-to-site also accepts guest name.
                             </p>
                         </div>
@@ -364,8 +364,8 @@ export function CheckoutModal({ isOpen, onClose, cart, campgroundId, locationId,
                                 className={`p-4 rounded-xl border-2 flex flex-col items-center gap-2 transition-all ${method === "terminal"
                                         ? "border-emerald-600 bg-emerald-50 text-emerald-700"
                                         : hasTerminal
-                                            ? "border-slate-200 hover:border-slate-300 text-slate-600"
-                                            : "border-slate-100 text-slate-400 cursor-not-allowed"
+                                            ? "border-border hover:border-border text-muted-foreground"
+                                            : "border-border text-muted-foreground cursor-not-allowed"
                                     }`}
                                 disabled={!hasTerminal}
                             >
@@ -379,7 +379,7 @@ export function CheckoutModal({ isOpen, onClose, cart, campgroundId, locationId,
                                 {hasTerminal ? (
                                     <span className="text-xs text-emerald-600">Ready</span>
                                 ) : (
-                                    <span className="text-xs text-slate-400">Offline</span>
+                                    <span className="text-xs text-muted-foreground">Offline</span>
                                 )}
                             </button>
                         )}
@@ -390,7 +390,7 @@ export function CheckoutModal({ isOpen, onClose, cart, campgroundId, locationId,
                                 onClick={() => setMethod("saved_card")}
                                 className={`p-4 rounded-xl border-2 flex flex-col items-center gap-2 transition-all ${method === "saved_card"
                                         ? "border-emerald-600 bg-emerald-50 text-emerald-700"
-                                        : "border-slate-200 hover:border-slate-300 text-slate-600"
+                                        : "border-border hover:border-border text-muted-foreground"
                                     }`}
                             >
                                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -399,7 +399,7 @@ export function CheckoutModal({ isOpen, onClose, cart, campgroundId, locationId,
                                     <path d="m9 15 2 2 4-4" />
                                 </svg>
                                 <span className="font-medium text-sm">Card on File</span>
-                                <span className="text-xs text-slate-500">{savedCards.length} saved</span>
+                                <span className="text-xs text-muted-foreground">{savedCards.length} saved</span>
                             </button>
                         )}
 
@@ -407,7 +407,7 @@ export function CheckoutModal({ isOpen, onClose, cart, campgroundId, locationId,
                             onClick={() => setMethod("card")}
                             className={`p-4 rounded-xl border-2 flex flex-col items-center gap-2 transition-all ${method === "card"
                                     ? "border-emerald-600 bg-emerald-50 text-emerald-700"
-                                    : "border-slate-200 hover:border-slate-300 text-slate-600"
+                                    : "border-border hover:border-border text-muted-foreground"
                                 }`}
                         >
                             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -420,7 +420,7 @@ export function CheckoutModal({ isOpen, onClose, cart, campgroundId, locationId,
                             onClick={() => setMethod("cash")}
                             className={`p-4 rounded-xl border-2 flex flex-col items-center gap-2 transition-all ${method === "cash"
                                     ? "border-emerald-600 bg-emerald-50 text-emerald-700"
-                                    : "border-slate-200 hover:border-slate-300 text-slate-600"
+                                    : "border-border hover:border-border text-muted-foreground"
                                 }`}
                         >
                             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -433,7 +433,7 @@ export function CheckoutModal({ isOpen, onClose, cart, campgroundId, locationId,
                             onClick={() => setMethod("charge_to_site")}
                             className={`p-4 rounded-xl border-2 flex flex-col items-center gap-2 transition-all ${method === "charge_to_site"
                                     ? "border-emerald-600 bg-emerald-50 text-emerald-700"
-                                    : "border-slate-200 hover:border-slate-300 text-slate-600"
+                                    : "border-border hover:border-border text-muted-foreground"
                                 }`}
                         >
                             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -447,7 +447,7 @@ export function CheckoutModal({ isOpen, onClose, cart, campgroundId, locationId,
                                 onClick={() => setMethod("guest_wallet")}
                                 className={`p-4 rounded-xl border-2 flex flex-col items-center gap-2 transition-all ${method === "guest_wallet"
                                         ? "border-emerald-600 bg-emerald-50 text-emerald-700"
-                                        : "border-slate-200 hover:border-slate-300 text-slate-600"
+                                        : "border-border hover:border-border text-muted-foreground"
                                     }`}
                             >
                                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -455,7 +455,7 @@ export function CheckoutModal({ isOpen, onClose, cart, campgroundId, locationId,
                                     <path d="M21 12a2 2 0 0 0-2-2h-4a2 2 0 0 0 0 4h4a2 2 0 0 0 2-2v0Z" />
                                 </svg>
                                 <span className="font-medium text-sm">Wallet</span>
-                                <span className="text-xs text-slate-500">${(walletBalanceCents / 100).toFixed(2)}</span>
+                                <span className="text-xs text-muted-foreground">${(walletBalanceCents / 100).toFixed(2)}</span>
                             </button>
                         )}
                     </div>

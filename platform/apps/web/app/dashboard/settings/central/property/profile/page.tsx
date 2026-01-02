@@ -94,13 +94,13 @@ export default function ProfilePage() {
     return (
       <div className="max-w-4xl space-y-6">
         <div>
-          <h2 className="text-2xl font-bold text-slate-900">Campground Profile</h2>
-          <p className="text-slate-500 mt-1">
+          <h2 className="text-2xl font-bold text-foreground">Campground Profile</h2>
+          <p className="text-muted-foreground mt-1">
             Basic information about your campground
           </p>
         </div>
         <div className="flex items-center justify-center py-12">
-          <Loader2 className="h-8 w-8 animate-spin text-slate-400" />
+          <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
         </div>
       </div>
     );
@@ -110,15 +110,15 @@ export default function ProfilePage() {
     return (
       <div className="max-w-4xl space-y-6">
         <div>
-          <h2 className="text-2xl font-bold text-slate-900">Campground Profile</h2>
-          <p className="text-slate-500 mt-1">
+          <h2 className="text-2xl font-bold text-foreground">Campground Profile</h2>
+          <p className="text-muted-foreground mt-1">
             Basic information about your campground
           </p>
         </div>
         <Card>
           <CardContent className="py-8 text-center">
             <AlertCircle className="h-8 w-8 text-amber-500 mx-auto mb-3" />
-            <p className="text-slate-600">Please select a campground first.</p>
+            <p className="text-muted-foreground">Please select a campground first.</p>
           </CardContent>
         </Card>
       </div>
@@ -128,8 +128,8 @@ export default function ProfilePage() {
   return (
     <div className="max-w-4xl space-y-6">
       <div>
-        <h2 className="text-2xl font-bold text-slate-900">Campground Profile</h2>
-        <p className="text-slate-500 mt-1">
+        <h2 className="text-2xl font-bold text-foreground">Campground Profile</h2>
+        <p className="text-muted-foreground mt-1">
           Basic information about your campground
         </p>
       </div>
@@ -138,7 +138,7 @@ export default function ProfilePage() {
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <Building2 className="h-5 w-5 text-slate-500" />
+            <Building2 className="h-5 w-5 text-muted-foreground" />
             Basic Information
           </CardTitle>
           <CardDescription>
@@ -183,7 +183,7 @@ export default function ProfilePage() {
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <Phone className="h-5 w-5 text-slate-500" />
+            <Phone className="h-5 w-5 text-muted-foreground" />
             Contact Information
           </CardTitle>
         </CardHeader>
@@ -227,7 +227,7 @@ export default function ProfilePage() {
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <MapPin className="h-5 w-5 text-slate-500" />
+            <MapPin className="h-5 w-5 text-muted-foreground" />
             Location
           </CardTitle>
         </CardHeader>

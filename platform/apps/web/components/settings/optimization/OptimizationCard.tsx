@@ -75,7 +75,7 @@ export function OptimizationCard({
       className={cn(
         "transition-all duration-300",
         settings.enabled
-          ? "border-purple-200 bg-gradient-to-br from-purple-50/50 to-white"
+          ? "border-status-info-border bg-status-info-bg"
           : "border-dashed",
         className
       )}
@@ -86,13 +86,13 @@ export function OptimizationCard({
             <div
               className={cn(
                 "p-2 rounded-lg",
-                settings.enabled ? "bg-purple-100" : "bg-slate-100"
+                settings.enabled ? "bg-status-info-bg" : "bg-muted"
               )}
             >
               <Sparkles
                 className={cn(
                   "h-5 w-5",
-                  settings.enabled ? "text-purple-600" : "text-slate-500"
+                  settings.enabled ? "text-status-info" : "text-muted-foreground"
                 )}
               />
             </div>
@@ -101,7 +101,7 @@ export function OptimizationCard({
                 Grid Optimization
                 <Badge
                   variant="secondary"
-                  className="text-xs bg-purple-100 text-purple-700"
+                  className="text-xs bg-status-info-bg text-status-info-text"
                 >
                   Smart
                 </Badge>
@@ -123,24 +123,24 @@ export function OptimizationCard({
       {(isExpanded || settings.enabled) && (
         <CardContent className="space-y-6 pt-0">
           {/* Trust-building message */}
-          <Alert className="bg-purple-50 border-purple-200">
-            <Shield className="h-4 w-4 text-purple-600" />
-            <AlertTitle className="text-purple-900">You're always in control</AlertTitle>
-            <AlertDescription className="text-purple-800">
+          <Alert className="bg-status-info-bg border-status-info-border">
+            <Shield className="h-4 w-4 text-status-info" />
+            <AlertTitle className="text-foreground">You're always in control</AlertTitle>
+            <AlertDescription className="text-status-info-text">
               Optimization respects guest preferences, accessibility requirements,
               and locked sites. Enable preview mode to review changes before they're applied.
             </AlertDescription>
           </Alert>
 
           {/* Preview Mode Toggle */}
-          <div className="flex items-center justify-between p-4 rounded-lg border bg-white">
+          <div className="flex items-center justify-between p-4 rounded-lg border bg-card">
             <div className="flex items-center gap-3">
-              <div className="p-2 rounded-lg bg-slate-100">
-                <Settings className="h-4 w-4 text-slate-600" />
+              <div className="p-2 rounded-lg bg-muted">
+                <Settings className="h-4 w-4 text-muted-foreground" />
               </div>
               <div>
-                <p className="font-medium text-slate-900">Preview Mode</p>
-                <p className="text-sm text-slate-500">
+                <p className="font-medium text-foreground">Preview Mode</p>
+                <p className="text-sm text-muted-foreground">
                   See suggested changes without applying them
                 </p>
               </div>
@@ -153,7 +153,7 @@ export function OptimizationCard({
 
           {/* Configuration */}
           <div className="space-y-4">
-            <h4 className="text-sm font-medium text-slate-900">Configuration</h4>
+            <h4 className="text-sm font-medium text-foreground">Configuration</h4>
 
             {/* Days Buffer */}
             <div className="space-y-2">
@@ -170,9 +170,9 @@ export function OptimizationCard({
                   }
                   className="w-20"
                 />
-                <span className="text-sm text-slate-500">days before arrival</span>
+                <span className="text-sm text-muted-foreground">days before arrival</span>
               </div>
-              <p className="text-xs text-slate-500">
+              <p className="text-xs text-muted-foreground">
                 Reservations within this window won't be moved
               </p>
             </div>
@@ -191,8 +191,8 @@ export function OptimizationCard({
                       className={cn(
                         "px-3 py-1.5 rounded-full text-sm font-medium border transition-all",
                         isSelected
-                          ? "bg-purple-100 border-purple-300 text-purple-800"
-                          : "bg-white border-slate-200 text-slate-600 hover:border-slate-300"
+                          ? "bg-status-info-bg border-status-info-border text-status-info-text"
+                          : "bg-card border-border text-muted-foreground hover:border-border"
                       )}
                     >
                       {sc.name}
@@ -207,30 +207,30 @@ export function OptimizationCard({
             <div className="space-y-3">
               <Label>Optimization goals</Label>
               <div className="space-y-2">
-                <label className="flex items-center gap-3 p-3 rounded-lg border bg-white cursor-pointer hover:bg-slate-50">
+                <label className="flex items-center gap-3 p-3 rounded-lg border bg-card cursor-pointer hover:bg-muted">
                   <input
                     type="checkbox"
                     checked={settings.optimizeForRevenue}
                     onChange={(e) => onSettingsChange({ optimizeForRevenue: e.target.checked })}
-                    className="h-4 w-4 rounded border-slate-300 text-purple-600 focus:ring-purple-500"
+                    className="h-4 w-4 rounded border-border text-action-primary focus:ring-action-primary/60"
                   />
                   <div>
-                    <p className="font-medium text-slate-900">Maximize revenue</p>
-                    <p className="text-sm text-slate-500">
+                    <p className="font-medium text-foreground">Maximize revenue</p>
+                    <p className="text-sm text-muted-foreground">
                       Move reservations to premium sites when possible
                     </p>
                   </div>
                 </label>
-                <label className="flex items-center gap-3 p-3 rounded-lg border bg-white cursor-pointer hover:bg-slate-50">
+                <label className="flex items-center gap-3 p-3 rounded-lg border bg-card cursor-pointer hover:bg-muted">
                   <input
                     type="checkbox"
                     checked={settings.fillGaps}
                     onChange={(e) => onSettingsChange({ fillGaps: e.target.checked })}
-                    className="h-4 w-4 rounded border-slate-300 text-purple-600 focus:ring-purple-500"
+                    className="h-4 w-4 rounded border-border text-action-primary focus:ring-action-primary/60"
                   />
                   <div>
-                    <p className="font-medium text-slate-900">Fill gaps</p>
-                    <p className="text-sm text-slate-500">
+                    <p className="font-medium text-foreground">Fill gaps</p>
+                    <p className="text-sm text-muted-foreground">
                       Consolidate reservations to eliminate 1-night gaps
                     </p>
                   </div>
@@ -242,17 +242,17 @@ export function OptimizationCard({
             <div className="space-y-3">
               <Label>Always respect (cannot be changed)</Label>
               <div className="space-y-2">
-                <div className="flex items-center gap-3 p-3 rounded-lg bg-slate-50 border border-slate-200">
-                  <CheckCircle2 className="h-4 w-4 text-emerald-500" />
-                  <span className="text-sm text-slate-700">Accessibility requirements</span>
+                <div className="flex items-center gap-3 p-3 rounded-lg bg-muted border border-border">
+                  <CheckCircle2 className="h-4 w-4 text-status-success" />
+                  <span className="text-sm text-foreground">Accessibility requirements</span>
                 </div>
-                <div className="flex items-center gap-3 p-3 rounded-lg bg-slate-50 border border-slate-200">
-                  <CheckCircle2 className="h-4 w-4 text-emerald-500" />
-                  <span className="text-sm text-slate-700">Guest-locked sites</span>
+                <div className="flex items-center gap-3 p-3 rounded-lg bg-muted border border-border">
+                  <CheckCircle2 className="h-4 w-4 text-status-success" />
+                  <span className="text-sm text-foreground">Guest-locked sites</span>
                 </div>
-                <div className="flex items-center gap-3 p-3 rounded-lg bg-slate-50 border border-slate-200">
-                  <CheckCircle2 className="h-4 w-4 text-emerald-500" />
-                  <span className="text-sm text-slate-700">RV length requirements</span>
+                <div className="flex items-center gap-3 p-3 rounded-lg bg-muted border border-border">
+                  <CheckCircle2 className="h-4 w-4 text-status-success" />
+                  <span className="text-sm text-foreground">RV length requirements</span>
                 </div>
               </div>
             </div>
@@ -260,7 +260,7 @@ export function OptimizationCard({
 
           {/* Activity Log Link */}
           <div className="flex items-center justify-between pt-4 border-t">
-            <div className="flex items-center gap-2 text-sm text-slate-500">
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
               <Clock className="h-4 w-4" />
               {lastRunAt ? (
                 <span>Last run: {lastRunAt.toLocaleDateString()} at {lastRunAt.toLocaleTimeString()}</span>
@@ -272,7 +272,7 @@ export function OptimizationCard({
               variant="ghost"
               size="sm"
               onClick={onViewLog}
-              className="text-purple-600 hover:text-purple-700 hover:bg-purple-50"
+              className="text-action-primary hover:text-action-primary-hover hover:bg-action-primary/10"
             >
               <Activity className="h-4 w-4 mr-2" />
               View optimization log

@@ -115,7 +115,7 @@ export default function AnalyticsPage() {
     return (
       <DashboardShell>
         <div className="flex items-center justify-center h-64">
-          <p className="text-slate-500">Select a campground to view analytics</p>
+          <p className="text-muted-foreground">Select a campground to view analytics</p>
         </div>
       </DashboardShell>
     );
@@ -127,8 +127,8 @@ export default function AnalyticsPage() {
         {/* Header */}
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold text-slate-900">Analytics Dashboard</h1>
-            <p className="text-slate-500 mt-1">
+            <h1 className="text-2xl font-bold text-foreground">Analytics Dashboard</h1>
+            <p className="text-muted-foreground mt-1">
               Real-time performance metrics for {selectedCampgroundName ?? "your selected campground"}
             </p>
           </div>
@@ -139,7 +139,7 @@ export default function AnalyticsPage() {
                 onClick={() => setPeriod(d as 7 | 30 | 90)}
                 className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${period === d
                   ? "bg-emerald-600 text-white"
-                  : "bg-white border border-slate-200 text-slate-700 hover:border-emerald-300"
+                  : "bg-card border border-border text-foreground hover:border-emerald-300"
                   }`}
               >
                 {d}d
@@ -148,7 +148,7 @@ export default function AnalyticsPage() {
             <select
               value={exportFormat}
               onChange={(e) => setExportFormat(e.target.value as "csv" | "xlsx")}
-              className="px-2 py-1.5 rounded-lg border border-slate-200 text-sm text-slate-700 bg-white hover:border-emerald-300 focus:border-emerald-400 focus:outline-none"
+              className="px-2 py-1.5 rounded-lg border border-border text-sm text-foreground bg-card hover:border-emerald-300 focus:border-emerald-400 focus:outline-none"
             >
               <option value="csv">CSV</option>
               <option value="xlsx">Excel</option>
@@ -158,7 +158,7 @@ export default function AnalyticsPage() {
               placeholder="Email (optional)"
               value={exportEmail}
               onChange={(e) => setExportEmail(e.target.value)}
-              className="px-3 py-1.5 rounded-lg border border-slate-200 text-sm text-slate-700 bg-white w-52 focus:border-emerald-400 focus:outline-none"
+              className="px-3 py-1.5 rounded-lg border border-border text-sm text-foreground bg-card w-52 focus:border-emerald-400 focus:outline-none"
             />
             <button
               onClick={async () => {
@@ -193,7 +193,7 @@ export default function AnalyticsPage() {
         </div>
 
         {exportStatus !== "idle" && (
-          <div className="text-sm text-slate-600 flex items-center gap-3">
+          <div className="text-sm text-muted-foreground flex items-center gap-3">
             {exportStatus === "ready" && exportUrl && (
               <a
                 href={exportUrl}
@@ -250,9 +250,9 @@ export default function AnalyticsPage() {
 
         {/* Tasks Widget */}
         {tasks && (
-          <div className="bg-white rounded-xl border border-slate-200 p-5">
+          <div className="bg-card rounded-xl border border-border p-5">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="font-semibold text-slate-900">Operations Tasks</h3>
+              <h3 className="font-semibold text-foreground">Operations Tasks</h3>
               <Link href="/operations" className="text-sm text-emerald-600 hover:text-emerald-700">
                 View all →
               </Link>
@@ -260,23 +260,23 @@ export default function AnalyticsPage() {
             <div className="grid grid-cols-5 gap-4 text-center">
               <div>
                 <div className="text-2xl font-bold text-amber-600">{tasks.pending}</div>
-                <div className="text-xs text-slate-500">Pending</div>
+                <div className="text-xs text-muted-foreground">Pending</div>
               </div>
               <div>
                 <div className="text-2xl font-bold text-blue-600">{tasks.inProgress}</div>
-                <div className="text-xs text-slate-500">In Progress</div>
+                <div className="text-xs text-muted-foreground">In Progress</div>
               </div>
               <div>
                 <div className="text-2xl font-bold text-emerald-600">{tasks.completedToday}</div>
-                <div className="text-xs text-slate-500">Done Today</div>
+                <div className="text-xs text-muted-foreground">Done Today</div>
               </div>
               <div>
                 <div className="text-2xl font-bold text-orange-600">{tasks.atRisk}</div>
-                <div className="text-xs text-slate-500">At Risk</div>
+                <div className="text-xs text-muted-foreground">At Risk</div>
               </div>
               <div>
                 <div className="text-2xl font-bold text-red-600">{tasks.breached}</div>
-                <div className="text-xs text-slate-500">SLA Breached</div>
+                <div className="text-xs text-muted-foreground">SLA Breached</div>
               </div>
             </div>
           </div>
@@ -285,8 +285,8 @@ export default function AnalyticsPage() {
         {/* Charts Row */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Revenue Trend */}
-          <div className="bg-white rounded-xl border border-slate-200 p-5">
-            <h3 className="font-semibold text-slate-900 mb-4">Revenue Trend (12 months)</h3>
+          <div className="bg-card rounded-xl border border-border p-5">
+            <h3 className="font-semibold text-foreground mb-4">Revenue Trend (12 months)</h3>
             {trendQuery.isLoading ? (
               <div className="h-48 flex items-center justify-center">
                 <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-emerald-600" />
@@ -302,25 +302,25 @@ export default function AnalyticsPage() {
                           className="w-full max-w-8 bg-emerald-500 rounded-t transition-all hover:bg-emerald-600"
                           style={{ height: `${Math.max(height, 2)}%` }}
                         />
-                        <div className="absolute bottom-full mb-1 hidden group-hover:block bg-slate-900 text-white text-xs px-2 py-1 rounded whitespace-nowrap z-10">
+                        <div className="absolute bottom-full mb-1 hidden group-hover:block bg-muted text-foreground text-xs px-2 py-1 rounded whitespace-nowrap z-10">
                           {formatCurrency(t.revenueCents)} • {t.bookings} bookings
                         </div>
                       </div>
-                      <div className="text-[10px] text-slate-500 mt-1">{t.month}</div>
+                      <div className="text-[10px] text-muted-foreground mt-1">{t.month}</div>
                     </div>
                   );
                 })}
               </div>
             ) : (
-              <div className="h-48 flex items-center justify-center text-slate-400">
+              <div className="h-48 flex items-center justify-center text-muted-foreground">
                 No revenue data available
               </div>
             )}
           </div>
 
           {/* Occupancy Forecast */}
-          <div className="bg-white rounded-xl border border-slate-200 p-5">
-            <h3 className="font-semibold text-slate-900 mb-4">Occupancy Forecast (30 days)</h3>
+          <div className="bg-card rounded-xl border border-border p-5">
+            <h3 className="font-semibold text-foreground mb-4">Occupancy Forecast (30 days)</h3>
             {forecastQuery.isLoading ? (
               <div className="h-48 flex items-center justify-center">
                 <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-emerald-600" />
@@ -337,11 +337,11 @@ export default function AnalyticsPage() {
                           className={`w-full rounded-t transition-all ${f.pct >= 90 ? "bg-red-500" :
                             f.pct >= 70 ? "bg-amber-500" :
                               f.pct >= 50 ? "bg-emerald-500" :
-                                "bg-slate-300"
+                                "bg-muted"
                             } ${isWeekend ? "opacity-80" : ""}`}
                           style={{ height: `${Math.max(f.pct, 2)}%` }}
                         />
-                        <div className="absolute bottom-full mb-1 hidden group-hover:block bg-slate-900 text-white text-xs px-2 py-1 rounded whitespace-nowrap z-10">
+                        <div className="absolute bottom-full mb-1 hidden group-hover:block bg-muted text-foreground text-xs px-2 py-1 rounded whitespace-nowrap z-10">
                           {new Date(f.date).toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" })}
                           <br />{f.pct}% ({f.occupiedSites}/{f.totalSites})
                         </div>
@@ -351,7 +351,7 @@ export default function AnalyticsPage() {
                 })}
               </div>
             ) : (
-              <div className="h-48 flex items-center justify-center text-slate-400">
+              <div className="h-48 flex items-center justify-center text-muted-foreground">
                 No forecast data available
               </div>
             )}
@@ -359,7 +359,7 @@ export default function AnalyticsPage() {
               <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-red-500" /> 90%+</span>
               <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-amber-500" /> 70-89%</span>
               <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-emerald-500" /> 50-69%</span>
-              <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-slate-300" /> &lt;50%</span>
+              <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-muted" /> &lt;50%</span>
             </div>
           </div>
         </div>
@@ -402,21 +402,21 @@ function KpiCard({
     <div className={`rounded-xl border ${colorClasses[color]} p-4`}>
       {loading ? (
         <div className="animate-pulse space-y-2">
-          <div className="h-3 w-20 bg-slate-200 rounded" />
-          <div className="h-8 w-24 bg-slate-200 rounded" />
+          <div className="h-3 w-20 bg-muted rounded" />
+          <div className="h-8 w-24 bg-muted rounded" />
         </div>
       ) : (
         <>
-          <div className="text-xs font-medium text-slate-600 mb-1">{label}</div>
+          <div className="text-xs font-medium text-muted-foreground mb-1">{label}</div>
           <div className="flex items-baseline gap-2">
-            <div className="text-2xl font-bold text-slate-900">{value}</div>
+            <div className="text-2xl font-bold text-foreground">{value}</div>
             {change !== undefined && (
               <span className={`text-xs font-medium ${change >= 0 ? "text-emerald-600" : "text-red-600"}`}>
                 {change >= 0 ? "↑" : "↓"} {Math.abs(change)}%
               </span>
             )}
           </div>
-          {subtitle && <div className="text-xs text-slate-500 mt-1">{subtitle}</div>}
+          {subtitle && <div className="text-xs text-muted-foreground mt-1">{subtitle}</div>}
         </>
       )}
     </div>
@@ -437,13 +437,13 @@ function QuickStat({
   return (
     <Link
       href={href}
-      className="bg-white rounded-xl border border-slate-200 p-4 hover:border-emerald-300 hover:shadow-sm transition-all"
+      className="bg-card rounded-xl border border-border p-4 hover:border-emerald-300 hover:shadow-sm transition-all"
     >
       <div className="flex items-center gap-3">
         <span className="text-emerald-600">{icon}</span>
         <div>
-          <div className="text-lg font-bold text-slate-900">{value}</div>
-          <div className="text-xs text-slate-500">{label}</div>
+          <div className="text-lg font-bold text-foreground">{value}</div>
+          <div className="text-xs text-muted-foreground">{label}</div>
         </div>
       </div>
     </Link>
@@ -462,10 +462,10 @@ function QuickLink({
   return (
     <Link
       href={href}
-      className="flex items-center gap-3 p-4 bg-white rounded-xl border border-slate-200 hover:border-emerald-300 hover:shadow-sm transition-all"
+      className="flex items-center gap-3 p-4 bg-card rounded-xl border border-border hover:border-emerald-300 hover:shadow-sm transition-all"
     >
-      <span className="text-slate-600">{icon}</span>
-      <span className="font-medium text-slate-700">{label}</span>
+      <span className="text-muted-foreground">{icon}</span>
+      <span className="font-medium text-foreground">{label}</span>
     </Link>
   );
 }

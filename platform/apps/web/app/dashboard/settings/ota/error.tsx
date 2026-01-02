@@ -26,10 +26,10 @@ export default function OtaError({
         </div>
 
         <div className="space-y-2">
-          <h1 className="text-xl font-bold text-slate-900">
+          <h1 className="text-xl font-bold text-foreground">
             OTA Channels Error
           </h1>
-          <p className="text-slate-600">
+          <p className="text-muted-foreground">
             There was an error loading the OTA Channels page. This might be a
             temporary issue.
           </p>
@@ -37,11 +37,11 @@ export default function OtaError({
           {/* Show error details in development */}
           {process.env.NODE_ENV === "development" && (
             <details className="mt-4 text-left">
-              <summary className="cursor-pointer text-sm text-slate-500 hover:text-slate-700">
+              <summary className="cursor-pointer text-sm text-muted-foreground hover:text-foreground">
                 <Bug className="inline h-4 w-4 mr-1" />
                 Error details
               </summary>
-              <pre className="mt-2 p-3 bg-slate-100 rounded text-xs overflow-auto max-h-48">
+              <pre className="mt-2 p-3 bg-muted rounded text-xs overflow-auto max-h-48">
                 {error.message}
                 {"\n\n"}
                 {error.stack}
@@ -50,7 +50,7 @@ export default function OtaError({
           )}
 
           {error.digest && (
-            <p className="text-xs text-slate-400 font-mono">
+            <p className="text-xs text-muted-foreground font-mono">
               Error ID: {error.digest}
             </p>
           )}

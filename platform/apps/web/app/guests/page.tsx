@@ -19,10 +19,10 @@ import { useToast } from "../../components/ui/use-toast";
 import { ConfirmDialog } from "../../components/ui/confirm-dialog";
 
 const TIER_COLORS: Record<string, string> = {
-  Bronze: "bg-amber-600",
-  Silver: "bg-slate-400",
-  Gold: "bg-yellow-500",
-  Platinum: "bg-slate-600"
+  Bronze: "bg-status-warning/80",
+  Silver: "bg-muted-foreground",
+  Gold: "bg-status-warning",
+  Platinum: "bg-foreground"
 };
 
 function GuestLoyaltyBadge({ guestId }: { guestId: string }) {
@@ -37,7 +37,7 @@ function GuestLoyaltyBadge({ guestId }: { guestId: string }) {
 
   return (
     <div className="flex items-center gap-2 mt-1">
-      <Badge className={cn("text-white text-xs", TIER_COLORS[loyalty.tier] || "bg-amber-600")}>
+      <Badge className={cn("text-white text-xs", TIER_COLORS[loyalty.tier] || "bg-status-warning")}>
         <Trophy className="h-3 w-3 mr-1" />
         {loyalty.tier}
       </Badge>
@@ -78,7 +78,7 @@ function GuestRewardsSection({ guestId, expanded, onToggle }: { guestId: string;
               {/* Tier and Points */}
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <div className={cn("w-12 h-12 rounded-full flex items-center justify-center text-white", TIER_COLORS[loyalty.tier] || "bg-amber-600")}>
+                  <div className={cn("w-12 h-12 rounded-full flex items-center justify-center text-white", TIER_COLORS[loyalty.tier] || "bg-status-warning")}>
                     <Trophy className="h-6 w-6" />
                   </div>
                   <div>
@@ -129,7 +129,7 @@ function GuestRewardsSection({ guestId, expanded, onToggle }: { guestId: string;
                           <div className="font-medium text-foreground">{tx.reason}</div>
                           <div className="text-xs text-muted-foreground">{new Date(tx.createdAt).toLocaleDateString()}</div>
                         </div>
-                        <div className={cn("font-bold", tx.amount >= 0 ? "text-status-success" : "text-red-600")}>
+                        <div className={cn("font-bold", tx.amount >= 0 ? "text-status-success" : "text-status-error")}>
                           {tx.amount >= 0 ? "+" : ""}{tx.amount.toLocaleString()} pts
                         </div>
                       </div>
@@ -236,7 +236,7 @@ function GuestEquipmentSection({ guestId, expanded, onToggle }: { guestId: strin
                     onClick={() => deleteMutation.mutate(eq.id)}
                     disabled={deleteMutation.isPending}
                   >
-                    <Trash2 className="h-4 w-4 text-red-500" />
+                    <Trash2 className="h-4 w-4 text-status-error" />
                   </Button>
                 </div>
               ))}
@@ -642,7 +642,7 @@ export default function GuestsPage() {
               flash.type === "success"
                 ? "border-status-success/30 bg-status-success/10 text-status-success-text"
                 : flash.type === "error"
-                  ? "border-rose-200 bg-rose-50 text-rose-700"
+                  ? "border-status-error/30 bg-status-error/10 text-status-error"
                   : "border-border bg-muted text-muted-foreground"
             }`}
           >
@@ -670,7 +670,7 @@ export default function GuestsPage() {
             </CardHeader>
             <CardContent className="pt-0 space-y-1">
               <div className="text-2xl font-semibold text-foreground flex items-center gap-2">
-                <Crown className="h-5 w-5 text-amber-500" />
+                <Crown className="h-5 w-5 text-status-warning" />
                 {vipGuests}
               </div>
               <div className="text-xs text-muted-foreground">{totalGuests > 0 ? Math.round((vipGuests / totalGuests) * 100) : 0}% of total</div>
@@ -982,7 +982,7 @@ export default function GuestsPage() {
             <Button variant="ghost" onClick={() => setShowAddForm(false)}>
               Cancel
             </Button>
-            {createGuest.isError && <span className="ml-3 text-sm text-red-600">Failed to save guest</span>}
+            {createGuest.isError && <span className="ml-3 text-sm text-status-error">Failed to save guest</span>}
           </div>
           </div>
         )}
@@ -1083,7 +1083,7 @@ export default function GuestsPage() {
                           <Button
                             size="sm"
                             variant="ghost"
-                            className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                            className="text-status-error hover:text-status-error hover:bg-status-error/10"
                             disabled={deleteGuest.isPending}
                           >
                             <Trash2 className="h-4 w-4" />

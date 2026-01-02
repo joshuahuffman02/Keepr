@@ -122,9 +122,9 @@ export function TerminalMethod({ onSuccess, onError, onCancel }: TerminalMethodP
   if (terminalReaders.length === 0) {
     return (
       <div className="py-8 text-center space-y-4">
-        <SmartphoneNfc className="h-12 w-12 mx-auto text-slate-300" />
-        <p className="text-slate-600">No card readers configured</p>
-        <p className="text-sm text-slate-500">
+        <SmartphoneNfc className="h-12 w-12 mx-auto text-muted-foreground" />
+        <p className="text-muted-foreground">No card readers configured</p>
+        <p className="text-sm text-muted-foreground">
           Contact your administrator to set up a Stripe Terminal
         </p>
         <Button variant="outline" onClick={handleCancel}>
@@ -145,9 +145,9 @@ export function TerminalMethod({ onSuccess, onError, onCancel }: TerminalMethodP
         ) : (
           <Loader2 className="h-12 w-12 animate-spin mx-auto text-status-success" />
         )}
-        <p className="text-slate-600 font-medium">{statusMessage}</p>
+        <p className="text-muted-foreground font-medium">{statusMessage}</p>
         {status === "waiting_for_card" && (
-          <p className="text-sm text-slate-500">
+          <p className="text-sm text-muted-foreground">
             Tap, insert, or swipe the card on the reader
           </p>
         )}
@@ -191,7 +191,7 @@ export function TerminalMethod({ onSuccess, onError, onCancel }: TerminalMethodP
                 isOnline ? "cursor-pointer" : "cursor-not-allowed opacity-60",
                 isSelected && isOnline
                   ? "border-status-success bg-status-success/15"
-                  : "border-slate-200 hover:border-slate-300"
+                  : "border-border hover:border-border"
               )}
               onClick={() => isOnline && setSelectedReaderId(reader.id)}
             >
@@ -204,11 +204,11 @@ export function TerminalMethod({ onSuccess, onError, onCancel }: TerminalMethodP
 
               {/* Reader icon with status */}
               <div className="flex-shrink-0 relative">
-                <SmartphoneNfc className="h-8 w-8 text-slate-600" />
+                <SmartphoneNfc className="h-8 w-8 text-muted-foreground" />
                 <div
                   className={cn(
                     "absolute -bottom-1 -right-1 h-3 w-3 rounded-full border-2 border-white",
-                    isOnline ? "bg-status-success" : "bg-slate-400"
+                    isOnline ? "bg-status-success" : "bg-muted"
                   )}
                 />
               </div>
@@ -216,13 +216,13 @@ export function TerminalMethod({ onSuccess, onError, onCancel }: TerminalMethodP
               {/* Reader details */}
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2">
-                  <span className="font-medium text-slate-900">{reader.label}</span>
+                  <span className="font-medium text-foreground">{reader.label}</span>
                   <span
                     className={cn(
                       "text-xs px-2 py-0.5 rounded",
                       isOnline
                         ? "bg-status-success/15 text-status-success"
-                        : "bg-slate-100 text-slate-500"
+                        : "bg-muted text-muted-foreground"
                     )}
                   >
                     {isOnline ? "Online" : "Offline"}
@@ -251,7 +251,7 @@ export function TerminalMethod({ onSuccess, onError, onCancel }: TerminalMethodP
             checked={saveCard}
             onCheckedChange={(checked) => setSaveCard(checked === true)}
           />
-          <Label htmlFor="save-card-terminal" className="text-sm text-slate-600 cursor-pointer">
+          <Label htmlFor="save-card-terminal" className="text-sm text-muted-foreground cursor-pointer">
             Save card for future payments
           </Label>
         </div>

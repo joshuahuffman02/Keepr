@@ -63,7 +63,7 @@ export default function WorkflowsPage({ params }: { params: { campgroundId: stri
     <div className="space-y-6 p-6">
       <div data-testid="workflows-header">
         <h1 className="text-2xl font-semibold">Communication Workflows</h1>
-        <p className="text-slate-500">Automations for reservation and payment events.</p>
+        <p className="text-muted-foreground">Automations for reservation and payment events.</p>
       </div>
 
       <div className="grid gap-4 md:grid-cols-2">
@@ -109,7 +109,7 @@ export default function WorkflowsPage({ params }: { params: { campgroundId: stri
         <div className="rounded-lg border p-4" data-testid="workflow-list-card">
           <div className="flex items-center justify-between mb-3">
             <h2 className="text-lg font-medium">Workflows</h2>
-            {loading && <span className="text-sm text-slate-500" data-testid="workflow-loading">Loading…</span>}
+            {loading && <span className="text-sm text-muted-foreground" data-testid="workflow-loading">Loading…</span>}
           </div>
           {error && (
             <div className="rounded border border-red-200 bg-red-50 p-2 text-sm text-red-700" role="alert" aria-live="polite">
@@ -119,9 +119,9 @@ export default function WorkflowsPage({ params }: { params: { campgroundId: stri
           <div className="space-y-2" aria-busy={loading}>
             {loading && (
               <div className="space-y-2 animate-pulse" data-testid="workflow-skeleton">
-                <div className="h-4 rounded bg-slate-200" />
-                <div className="h-4 w-2/3 rounded bg-slate-200" />
-                <div className="h-4 w-1/2 rounded bg-slate-200" />
+                <div className="h-4 rounded bg-muted" />
+                <div className="h-4 w-2/3 rounded bg-muted" />
+                <div className="h-4 w-1/2 rounded bg-muted" />
               </div>
             )}
             {!loading &&
@@ -129,14 +129,14 @@ export default function WorkflowsPage({ params }: { params: { campgroundId: stri
                 <div key={wf.id} className="rounded border px-3 py-2 flex justify-between" data-testid="workflow-step-row">
                   <div>
                     <div className="font-semibold">{wf.name}</div>
-                    <div className="text-xs text-slate-500">
+                    <div className="text-xs text-muted-foreground">
                       {wf.trigger} · priority {wf.priority}
                     </div>
                   </div>
                   <div className="text-xs text-emerald-700" data-testid="workflow-run-status">{wf.status}</div>
                 </div>
               ))}
-            {!loading && !workflows.length && <div className="text-sm text-slate-500" data-testid="workflow-empty">No workflows yet.</div>}
+            {!loading && !workflows.length && <div className="text-sm text-muted-foreground" data-testid="workflow-empty">No workflows yet.</div>}
           </div>
         </div>
       </div>

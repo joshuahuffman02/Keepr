@@ -71,8 +71,8 @@ const statusColor: Record<string, string> = {
   new: "bg-status-success/15 text-status-success border-status-success/30",
   triage: "bg-status-warning/15 text-status-warning border-status-warning/30",
   in_progress: "bg-status-info/15 text-status-info border-status-info/30",
-  resolved: "bg-slate-50 text-slate-600 border-slate-200",
-  closed: "bg-slate-100 text-slate-600 border-slate-200"
+  resolved: "bg-muted text-muted-foreground border-border",
+  closed: "bg-muted text-muted-foreground border-border"
 };
 
 export default function SupportAdminPage() {
@@ -311,14 +311,14 @@ export default function SupportAdminPage() {
             <div className="inline-flex items-center gap-2 rounded-full bg-indigo-50 px-3 py-1 text-xs font-semibold text-indigo-700 border border-indigo-100">
               Support Desk <span className="text-[11px] text-indigo-600">Internal & Public</span>
             </div>
-            <h1 className="mt-2 text-2xl font-semibold text-slate-900">Support Reports</h1>
-            <p className="text-sm text-slate-600">Manage internal issues and public tickets in one place.</p>
+            <h1 className="mt-2 text-2xl font-semibold text-foreground">Support Reports</h1>
+            <p className="text-sm text-muted-foreground">Manage internal issues and public tickets in one place.</p>
           </div>
 
           <div className="flex flex-col gap-2 items-end">
             <div className="flex flex-wrap gap-2 justify-end">
               {/* Status Filter Pills */}
-              <div className="flex items-center gap-1 rounded-full border border-slate-200 bg-white p-1 shadow-sm">
+              <div className="flex items-center gap-1 rounded-full border border-border bg-card p-1 shadow-sm">
                 {(["all", "new", "triage", "in_progress", "resolved", "closed"] as const).map((key) => (
                   <Button
                     key={key}
@@ -333,7 +333,7 @@ export default function SupportAdminPage() {
               </div>
 
               {/* Region Filter Pills */}
-              <div className="flex items-center gap-1 rounded-full border border-slate-200 bg-white p-1 shadow-sm">
+              <div className="flex items-center gap-1 rounded-full border border-border bg-card p-1 shadow-sm">
                 <Button
                   size="sm"
                   variant={regionFilter === "all" ? "default" : "ghost"}
@@ -359,7 +359,7 @@ export default function SupportAdminPage() {
                 Refresh
               </Button>
             </div>
-            <div className="text-xs text-slate-500">
+            <div className="text-xs text-muted-foreground">
               Scope: {whoamiLoading ? "Loading..." : user ? `Region ${user.region ?? "Any"} • Campgrounds ${user.memberships?.length || 0}` : "Unavailable"}
             </div>
           </div>
@@ -399,11 +399,11 @@ export default function SupportAdminPage() {
 
         {/* Permissions / Loading Errors */}
         {whoamiError && <div className="p-4 text-rose-600 bg-rose-50 rounded border border-rose-100">Scope fetch failed: {(whoamiError as Error)?.message}</div>}
-        {loading && <div className="p-12 text-center text-slate-500">Loading reports...</div>}
+        {loading && <div className="p-12 text-center text-muted-foreground">Loading reports...</div>}
         {error && <div className="p-4 text-rose-600 bg-rose-50 rounded border border-rose-100">{error}</div>}
 
         {!loading && !error && filtered.length === 0 && (
-          <div className="p-12 text-center text-slate-500 bg-white rounded-lg border border-slate-200 border-dashed">
+          <div className="p-12 text-center text-muted-foreground bg-card rounded-lg border border-border border-dashed">
             No reports found for this filter.
           </div>
         )}
@@ -411,24 +411,24 @@ export default function SupportAdminPage() {
         {/* Data Table */}
         {!loading && !error && filtered.length > 0 && (
           <>
-            <div className="hidden rounded-lg border border-slate-200 bg-white shadow-sm md:block overflow-hidden">
-              <table className="min-w-full divide-y divide-slate-200">
-                <thead className="bg-slate-50">
+            <div className="hidden rounded-lg border border-border bg-card shadow-sm md:block overflow-hidden">
+              <table className="min-w-full divide-y divide-border">
+                <thead className="bg-muted">
                   <tr>
-                    <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-600">Status</th>
-                    <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-600">Source</th>
-                    <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-600 w-1/3">Description</th>
-                    <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-600">Author</th>
-                    <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-600">Assignee</th>
-                    <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-600">Created</th>
-                    <th className="px-4 py-3 text-end text-xs font-semibold uppercase tracking-wide text-slate-600">Actions</th>
+                    <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-muted-foreground">Status</th>
+                    <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-muted-foreground">Source</th>
+                    <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-muted-foreground w-1/3">Description</th>
+                    <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-muted-foreground">Author</th>
+                    <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-muted-foreground">Assignee</th>
+                    <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-muted-foreground">Created</th>
+                    <th className="px-4 py-3 text-end text-xs font-semibold uppercase tracking-wide text-muted-foreground">Actions</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-200">
+                <tbody className="divide-y divide-border">
                   {filtered.map((r) => (
-                    <tr key={r.id} className="bg-white hover:bg-slate-50 transition-colors">
+                    <tr key={r.id} className="bg-card hover:bg-muted transition-colors">
                       <td className="px-4 py-3 align-top">
-                        <Badge className={`${statusColor[r.status] || "bg-slate-100 text-slate-600"} border shadow-none font-medium capitalize`}>
+                        <Badge className={`${statusColor[r.status] || "bg-muted text-muted-foreground"} border shadow-none font-medium capitalize`}>
                           {r.status.replace("_", " ")}
                         </Badge>
                       </td>
@@ -437,45 +437,45 @@ export default function SupportAdminPage() {
                           {r.campground?.id === "global" ? (
                             <Badge variant="outline" className="w-fit border-indigo-200 bg-indigo-50 text-indigo-700">Ticket</Badge>
                           ) : (
-                            <Badge variant="outline" className="w-fit border-slate-200 text-slate-600">Report</Badge>
+                            <Badge variant="outline" className="w-fit border-border text-muted-foreground">Report</Badge>
                           )}
-                          <span className="text-[10px] text-slate-500 font-medium truncate max-w-[120px]">
+                          <span className="text-[10px] text-muted-foreground font-medium truncate max-w-[120px]">
                             {r.campground?.id === "global" ? "Global Feedback" : r.campground?.name || "Unknown"}
                           </span>
                         </div>
                       </td>
                       <td className="px-4 py-3 align-top">
                         <div className="space-y-1">
-                          <div className="text-sm font-medium text-slate-900 line-clamp-2" title={r.description}>{r.description}</div>
-                          {r.steps && <div className="text-xs text-slate-500 line-clamp-1">Steps: {r.steps}</div>}
-                          {r.path && <code className="text-[10px] text-slate-500 bg-slate-100 px-1 py-0.5 rounded">{r.path}</code>}
+                          <div className="text-sm font-medium text-foreground line-clamp-2" title={r.description}>{r.description}</div>
+                          {r.steps && <div className="text-xs text-muted-foreground line-clamp-1">Steps: {r.steps}</div>}
+                          {r.path && <code className="text-[10px] text-muted-foreground bg-muted px-1 py-0.5 rounded">{r.path}</code>}
                         </div>
                       </td>
                       <td className="px-4 py-3 align-top">
                         <div className="flex flex-col">
-                          <span className="text-sm text-slate-700 font-medium">
+                          <span className="text-sm text-foreground font-medium">
                             {r.author?.firstName ? `${r.author.firstName} ${r.author.lastName || ""}` : "Guest/Anon"}
                           </span>
-                          <span className="text-xs text-slate-500">{r.author?.email || r.contactEmail || "—"}</span>
+                          <span className="text-xs text-muted-foreground">{r.author?.email || r.contactEmail || "—"}</span>
                         </div>
                       </td>
                       <td className="px-4 py-3 align-top">
                         {r.assignee ? (
                           <div className="flex items-center gap-2">
-                            <div className="h-6 w-6 rounded-full bg-slate-200 flex items-center justify-center text-[10px] font-bold text-slate-600">
+                            <div className="h-6 w-6 rounded-full bg-muted flex items-center justify-center text-[10px] font-bold text-muted-foreground">
                               {(r.assignee.firstName?.[0] || r.assignee.email?.[0] || "?").toUpperCase()}
                             </div>
                             <div className="flex flex-col">
-                              <span className="text-xs font-medium text-slate-900">
+                              <span className="text-xs font-medium text-foreground">
                                 {r.assignee.firstName || r.assignee.email.split("@")[0]}
                               </span>
                             </div>
                           </div>
                         ) : (
-                          <span className="text-xs text-slate-400 italic">Unassigned</span>
+                          <span className="text-xs text-muted-foreground italic">Unassigned</span>
                         )}
                       </td>
-                      <td className="px-4 py-3 align-top text-xs text-slate-500 whitespace-nowrap">
+                      <td className="px-4 py-3 align-top text-xs text-muted-foreground whitespace-nowrap">
                         {new Date(r.createdAt).toLocaleDateString()}
                         <div className="text-[10px]">{new Date(r.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</div>
                       </td>
@@ -500,25 +500,25 @@ export default function SupportAdminPage() {
                         <Badge className={`${statusColor[r.status] || "bg-gray-100 text-gray-700"} text-[10px] uppercase`}>
                           {r.status.replace("_", " ")}
                         </Badge>
-                        <span className="text-xs text-slate-400">{new Date(r.createdAt).toLocaleDateString()}</span>
+                        <span className="text-xs text-muted-foreground">{new Date(r.createdAt).toLocaleDateString()}</span>
                       </div>
-                      <span className="text-sm font-semibold text-slate-900 line-clamp-2">{r.description}</span>
+                      <span className="text-sm font-semibold text-foreground line-clamp-2">{r.description}</span>
                     </div>
                   </div>
 
-                  <div className="text-xs text-slate-600 grid grid-cols-2 gap-2 border-t border-b border-slate-100 py-2">
+                  <div className="text-xs text-muted-foreground grid grid-cols-2 gap-2 border-t border-b border-border py-2">
                     <div>
-                      <span className="text-slate-400 block text-[10px] uppercase font-bold">Source</span>
+                      <span className="text-muted-foreground block text-[10px] uppercase font-bold">Source</span>
                       {r.campground?.name || "Global"}
                     </div>
                     <div>
-                      <span className="text-slate-400 block text-[10px] uppercase font-bold">Author</span>
+                      <span className="text-muted-foreground block text-[10px] uppercase font-bold">Author</span>
                       {r.author?.email || r.contactEmail || "Anon"}
                     </div>
                   </div>
 
                   <div className="flex items-center justify-between pt-1">
-                    <span className="text-xs text-slate-500">
+                    <span className="text-xs text-muted-foreground">
                       {r.assignee ? `Assigned to ${r.assignee.firstName || r.assignee.email}` : "Unassigned"}
                     </span>
                     <Button size="sm" variant="outline" className="h-8" onClick={() => setSelectedId(r.id)}>Details</Button>
@@ -545,27 +545,27 @@ export default function SupportAdminPage() {
       {selected && (
         <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex justify-end z-50" onClick={() => setSelectedId(null)}>
           <div
-            className="w-full max-w-lg bg-white h-full shadow-2xl border-l border-slate-200 overflow-y-auto animate-in slide-in-from-right duration-200"
+            className="w-full max-w-lg bg-card h-full shadow-2xl border-l border-border overflow-y-auto animate-in slide-in-from-right duration-200"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="p-5 border-b border-slate-200 flex items-center justify-between sticky top-0 bg-white z-10">
+            <div className="p-5 border-b border-border flex items-center justify-between sticky top-0 bg-card z-10">
               <div>
                 <div className="flex items-center gap-2 mb-1">
                   <Badge className={`${statusColor[selected.status]} shadow-none`}>{selected.status}</Badge>
-                  <span className="text-xs text-slate-500">#{selected.id.slice(0, 8)}</span>
+                  <span className="text-xs text-muted-foreground">#{selected.id.slice(0, 8)}</span>
                 </div>
-                <div className="text-base font-bold text-slate-900 line-clamp-2">{selected.description}</div>
+                <div className="text-base font-bold text-foreground line-clamp-2">{selected.description}</div>
               </div>
               <Button size="sm" variant="ghost" onClick={() => setSelectedId(null)}>Close</Button>
             </div>
 
             <div className="p-5 space-y-6">
               {/* Actions */}
-              <div className="flex flex-col gap-4 p-4 bg-slate-50 rounded-lg border border-slate-100">
+              <div className="flex flex-col gap-4 p-4 bg-muted rounded-lg border border-border">
                 <div className="space-y-1">
-                  <label className="text-xs font-semibold text-slate-500 uppercase">Status</label>
+                  <label className="text-xs font-semibold text-muted-foreground uppercase">Status</label>
                   <Select value={selected.status} onValueChange={(v) => updateStatus(selected.id, v)} disabled={!canMutate}>
-                    <SelectTrigger className="bg-white">
+                    <SelectTrigger className="bg-card">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
@@ -579,14 +579,14 @@ export default function SupportAdminPage() {
                 </div>
 
                 <div className="space-y-1">
-                  <label className="text-xs font-semibold text-slate-500 uppercase">Assignee</label>
+                  <label className="text-xs font-semibold text-muted-foreground uppercase">Assignee</label>
                   <div className="flex gap-2">
                     <Select
                       value={selected.assignee?.id || "unassigned"}
                       onValueChange={(v) => updateAssignee(selected.id, v === "unassigned" ? null : v)}
                       disabled={!canMutate}
                     >
-                      <SelectTrigger className="bg-white flex-1">
+                      <SelectTrigger className="bg-card flex-1">
                         <SelectValue placeholder="Unassigned" />
                       </SelectTrigger>
                       <SelectContent>
@@ -615,8 +615,8 @@ export default function SupportAdminPage() {
               <div className="space-y-4">
                 {selected.steps && (
                   <div>
-                    <h3 className="text-sm font-semibold text-slate-900 mb-2">Steps / Details</h3>
-                    <div className="text-sm text-slate-700 whitespace-pre-wrap bg-slate-50 p-3 rounded border border-slate-100">
+                    <h3 className="text-sm font-semibold text-foreground mb-2">Steps / Details</h3>
+                    <div className="text-sm text-foreground whitespace-pre-wrap bg-muted p-3 rounded border border-border">
                       {selected.steps}
                     </div>
                   </div>
@@ -624,24 +624,24 @@ export default function SupportAdminPage() {
 
                 <div className="grid grid-cols-2 gap-4 text-sm">
                   <div>
-                    <span className="block text-xs text-slate-500 font-medium uppercase mb-1">Author</span>
-                    <div className="text-slate-900">{selected.author?.email || "Anonymous"}</div>
-                    {selected.contactEmail && <div className="text-slate-500 text-xs">{selected.contactEmail}</div>}
+                    <span className="block text-xs text-muted-foreground font-medium uppercase mb-1">Author</span>
+                    <div className="text-foreground">{selected.author?.email || "Anonymous"}</div>
+                    {selected.contactEmail && <div className="text-muted-foreground text-xs">{selected.contactEmail}</div>}
                   </div>
                   <div>
-                    <span className="block text-xs text-slate-500 font-medium uppercase mb-1">Source</span>
-                    <div className="text-slate-900">{selected.campground?.name || "Global"}</div>
-                    {selected.path && <div className="text-slate-500 text-xs truncate" title={selected.path}>{selected.path}</div>}
+                    <span className="block text-xs text-muted-foreground font-medium uppercase mb-1">Source</span>
+                    <div className="text-foreground">{selected.campground?.name || "Global"}</div>
+                    {selected.path && <div className="text-muted-foreground text-xs truncate" title={selected.path}>{selected.path}</div>}
                   </div>
                 </div>
 
-                <div className="border-t border-slate-100 pt-4">
-                  <h3 className="text-xs font-semibold text-slate-500 uppercase mb-2">Technical Context</h3>
-                  <dl className="grid grid-cols-2 gap-x-4 gap-y-2 text-xs text-slate-600">
-                    {selected.userAgent && <><dt className="font-medium text-slate-900">Browser:</dt><dd className="truncate" title={selected.userAgent}>{selected.userAgent}</dd></>}
-                    {selected.language && <><dt className="font-medium text-slate-900">Language:</dt><dd>{selected.language}</dd></>}
-                    {selected.timezone && <><dt className="font-medium text-slate-900">Timezone:</dt><dd>{selected.timezone}</dd></>}
-                    {selected.roleFilter && <><dt className="font-medium text-slate-900">Role:</dt><dd>{selected.roleFilter}</dd></>}
+                <div className="border-t border-border pt-4">
+                  <h3 className="text-xs font-semibold text-muted-foreground uppercase mb-2">Technical Context</h3>
+                  <dl className="grid grid-cols-2 gap-x-4 gap-y-2 text-xs text-muted-foreground">
+                    {selected.userAgent && <><dt className="font-medium text-foreground">Browser:</dt><dd className="truncate" title={selected.userAgent}>{selected.userAgent}</dd></>}
+                    {selected.language && <><dt className="font-medium text-foreground">Language:</dt><dd>{selected.language}</dd></>}
+                    {selected.timezone && <><dt className="font-medium text-foreground">Timezone:</dt><dd>{selected.timezone}</dd></>}
+                    {selected.roleFilter && <><dt className="font-medium text-foreground">Role:</dt><dd>{selected.roleFilter}</dd></>}
                   </dl>
                 </div>
               </div>

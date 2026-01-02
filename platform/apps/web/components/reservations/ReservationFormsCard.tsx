@@ -236,12 +236,12 @@ export function ReservationFormsCard({
       <Card>
         <CardHeader className="flex flex-row items-center justify-between pb-2">
           <CardTitle className="flex items-center gap-2">
-            <FileText className="h-4 w-4 text-blue-600" />
+            <FileText className="h-4 w-4 text-action-primary" />
             Forms & Documents
           </CardTitle>
           <div className="flex items-center gap-2">
             {submissionsQuery.isLoading ? (
-              <span className="text-xs text-slate-500">Loading…</span>
+              <span className="text-xs text-muted-foreground">Loading…</span>
             ) : (
               <Badge
                 variant={requiredPendingCount > 0 ? "destructive" : "secondary"}
@@ -265,17 +265,17 @@ export function ReservationFormsCard({
         </CardHeader>
         <CardContent className="space-y-3">
           {submissionsQuery.isError && (
-            <div className="text-red-600 text-xs">Failed to load forms.</div>
+            <div className="text-status-error text-xs">Failed to load forms.</div>
           )}
 
           {!submissionsQuery.isLoading && submissions.length === 0 && (
-            <div className="text-center py-6 text-slate-500">
-              <FileText className="h-8 w-8 mx-auto mb-2 text-slate-300" />
+            <div className="text-center py-6 text-muted-foreground">
+              <FileText className="h-8 w-8 mx-auto mb-2 text-muted-foreground" />
               <p className="text-sm">No forms attached yet</p>
               <Button
                 size="sm"
                 variant="ghost"
-                className="mt-1 text-emerald-600 hover:text-emerald-700"
+                className="mt-1 text-action-primary hover:text-action-primary-hover"
                 onClick={() => setAttachModalOpen(true)}
               >
                 Attach a form
@@ -287,21 +287,21 @@ export function ReservationFormsCard({
             {submissions.map((submission: any) => (
               <div
                 key={submission.id}
-                className="flex items-center justify-between rounded-lg border border-slate-200 p-3 hover:bg-slate-50/50 transition-colors"
+                className="flex items-center justify-between rounded-lg border border-border p-3 hover:bg-muted/40 transition-colors"
               >
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 flex-wrap">
-                    <span className="font-medium text-slate-900 text-sm">
+                    <span className="font-medium text-foreground text-sm">
                       {submission.formTemplate?.title || "Form"}
                     </span>
                     {getStatusBadge(submission)}
                     {!submission.formTemplate?.isRequired && (
-                      <span className="text-[10px] text-slate-400 uppercase">
+                      <span className="text-[10px] text-muted-foreground uppercase">
                         Optional
                       </span>
                     )}
                   </div>
-                  <div className="flex items-center gap-3 mt-1 text-xs text-slate-500">
+                  <div className="flex items-center gap-3 mt-1 text-xs text-muted-foreground">
                     <span className="capitalize">
                       {submission.formTemplate?.type || "custom"}
                     </span>
@@ -340,14 +340,14 @@ export function ReservationFormsCard({
 
                   {submission.status === "pending" && (
                     <>
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        onClick={() => handleMarkComplete(submission)}
-                        title="Mark as complete"
-                      >
-                        <Check className="h-4 w-4 text-emerald-600" />
-                      </Button>
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          onClick={() => handleMarkComplete(submission)}
+                          title="Mark as complete"
+                        >
+                        <Check className="h-4 w-4 text-status-success" />
+                        </Button>
                       {submission.formTemplate?.allowSkipWithNote && (
                         <Button
                           size="sm"
@@ -358,7 +358,7 @@ export function ReservationFormsCard({
                           }}
                           title="Skip with note"
                         >
-                          <SkipForward className="h-4 w-4 text-slate-500" />
+                          <SkipForward className="h-4 w-4 text-muted-foreground" />
                         </Button>
                       )}
                     </>
@@ -403,7 +403,7 @@ export function ReservationFormsCard({
                       )}
                       <DropdownMenuItem
                         onClick={() => setDeleteConfirmId(submission.id)}
-                        className="text-red-600"
+                        className="text-status-error"
                       >
                         <X className="h-4 w-4 mr-2" />
                         Remove
@@ -432,11 +432,11 @@ export function ReservationFormsCard({
             />
 
             {templatesQuery.isLoading ? (
-              <div className="text-center py-4 text-slate-500 text-sm">
+              <div className="text-center py-4 text-muted-foreground text-sm">
                 Loading forms...
               </div>
             ) : availableTemplates.length === 0 ? (
-              <div className="text-center py-4 text-slate-500 text-sm">
+              <div className="text-center py-4 text-muted-foreground text-sm">
                 {templates.length === 0
                   ? "No forms created yet. Create forms in Settings → Forms."
                   : searchQuery
@@ -450,14 +450,14 @@ export function ReservationFormsCard({
                     key={template.id}
                     onClick={() => attachMutation.mutate(template.id)}
                     disabled={attachMutation.isPending}
-                    className="w-full text-left p-3 rounded-lg border border-slate-200 hover:bg-slate-50 hover:border-slate-300 transition-colors disabled:opacity-50"
+                    className="w-full text-left p-3 rounded-lg border border-border hover:bg-muted hover:border-border transition-colors disabled:opacity-50"
                   >
                     <div className="flex items-center justify-between">
                       <div>
                         <div className="font-medium text-sm">
                           {template.title}
                         </div>
-                        <div className="text-xs text-slate-500 flex items-center gap-2">
+                        <div className="text-xs text-muted-foreground flex items-center gap-2">
                           <span className="capitalize">{template.type}</span>
                           {template.isRequired !== false && (
                             <Badge
@@ -470,14 +470,14 @@ export function ReservationFormsCard({
                           {template.autoAttachMode !== "manual" && (
                             <Badge
                               variant="outline"
-                              className="text-[10px] h-4 bg-blue-50"
+                              className="text-[10px] h-4 bg-status-info/10"
                             >
                               Auto-attach
                             </Badge>
                           )}
                         </div>
                       </div>
-                      <Plus className="h-4 w-4 text-slate-400" />
+                      <Plus className="h-4 w-4 text-muted-foreground" />
                     </div>
                   </button>
                 ))}
@@ -498,20 +498,20 @@ export function ReservationFormsCard({
 
           <div className="space-y-4">
             <div className="flex items-center gap-2 text-sm">
-              <span className="text-slate-500">Status:</span>
+              <span className="text-muted-foreground">Status:</span>
               {selectedSubmission && getStatusBadge(selectedSubmission)}
             </div>
 
             {selectedSubmission?.signedAt && (
               <div className="text-sm">
-                <span className="text-slate-500">Signed at:</span>{" "}
+                <span className="text-muted-foreground">Signed at:</span>{" "}
                 {formatDateTime(selectedSubmission.signedAt)}
               </div>
             )}
 
             {selectedSubmission?.responses?._skipNote && (
-              <div className="p-3 bg-slate-50 rounded-lg">
-                <div className="text-xs text-slate-500 mb-1">Skip reason:</div>
+              <div className="p-3 bg-muted rounded-lg">
+                <div className="text-xs text-muted-foreground mb-1">Skip reason:</div>
                 <div className="text-sm">
                   {selectedSubmission.responses._skipNote}
                 </div>
@@ -523,7 +523,7 @@ export function ReservationFormsCard({
                 (k) => !k.startsWith("_")
               ).length > 0 && (
                 <div className="space-y-3">
-                  <div className="text-xs font-medium text-slate-500 uppercase">
+                  <div className="text-xs font-medium text-muted-foreground uppercase">
                     Responses
                   </div>
                   <div className="space-y-2">
@@ -532,9 +532,9 @@ export function ReservationFormsCard({
                       .map(([key, value]) => (
                         <div
                           key={key}
-                          className="p-3 bg-slate-50 rounded-lg"
+                          className="p-3 bg-muted rounded-lg"
                         >
-                          <div className="text-xs text-slate-500 mb-1">
+                          <div className="text-xs text-muted-foreground mb-1">
                             {key}
                           </div>
                           <div className="text-sm">
@@ -555,7 +555,7 @@ export function ReservationFormsCard({
                 (k) => !k.startsWith("_")
               ).length === 0) &&
               !selectedSubmission?.responses?._skipNote && (
-                <div className="text-center py-6 text-slate-500 text-sm">
+                <div className="text-center py-6 text-muted-foreground text-sm">
                   No responses recorded yet.
                 </div>
               )}
@@ -577,7 +577,7 @@ export function ReservationFormsCard({
           </DialogHeader>
 
           <div className="space-y-4">
-            <p className="text-sm text-slate-600">
+            <p className="text-sm text-muted-foreground">
               Skipping "{selectedSubmission?.formTemplate?.title}". Please
               provide a reason for skipping this form.
             </p>
@@ -623,7 +623,7 @@ export function ReservationFormsCard({
             <AlertDialogCancel>Cancel</AlertDialogCancel>
             <AlertDialogAction
               onClick={handleDeleteConfirm}
-              className="bg-red-600 hover:bg-red-700"
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
             >
               Remove
             </AlertDialogAction>

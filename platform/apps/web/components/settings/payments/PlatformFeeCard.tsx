@@ -110,7 +110,7 @@ export function PlatformFeeCard({
     <Card>
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
-          <DollarSign className="w-5 h-5 text-slate-400" aria-hidden="true" />
+          <DollarSign className="w-5 h-5 text-muted-foreground" aria-hidden="true" />
           Platform Fee
         </CardTitle>
         <CardDescription>
@@ -131,7 +131,7 @@ export function PlatformFeeCard({
                 <SelectItem key={key} value={key}>
                   <div className="flex items-center gap-2">
                     <span className="font-medium">{value.label}</span>
-                    <span className="text-slate-500 text-xs">
+                    <span className="text-muted-foreground text-xs">
                       (default ${value.fee.toFixed(2)})
                     </span>
                   </div>
@@ -139,14 +139,14 @@ export function PlatformFeeCard({
               ))}
             </SelectContent>
           </Select>
-          <p className="text-xs text-slate-500">{planDefault.description}</p>
+          <p className="text-xs text-muted-foreground">{planDefault.description}</p>
         </div>
 
         {/* Fee input */}
         <div className="space-y-2">
           <Label htmlFor="booking-fee">Fee per booking (USD)</Label>
           <div className="relative">
-            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">$</span>
+            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">$</span>
             <Input
               id="booking-fee"
               type="number"
@@ -159,7 +159,7 @@ export function PlatformFeeCard({
               aria-describedby="fee-help"
             />
           </div>
-          <p id="fee-help" className="text-xs text-slate-500">
+          <p id="fee-help" className="text-xs text-muted-foreground">
             Leave blank to use plan default (${planDefault.fee.toFixed(2)})
           </p>
         </div>
@@ -174,19 +174,19 @@ export function PlatformFeeCard({
             <SelectContent>
               <SelectItem value="absorb">
                 <div className="flex items-center gap-2">
-                  <Building2 className="w-4 h-4 text-slate-400" aria-hidden="true" />
+                  <Building2 className="w-4 h-4 text-muted-foreground" aria-hidden="true" />
                   <span>Campground absorbs</span>
                 </div>
               </SelectItem>
               <SelectItem value="pass_through">
                 <div className="flex items-center gap-2">
-                  <Users className="w-4 h-4 text-slate-400" aria-hidden="true" />
+                  <Users className="w-4 h-4 text-muted-foreground" aria-hidden="true" />
                   <span>Guest pays</span>
                 </div>
               </SelectItem>
             </SelectContent>
           </Select>
-          <p className="text-xs text-slate-500">
+          <p className="text-xs text-muted-foreground">
             {feeMode === "absorb"
               ? "Fee is deducted from the campground's payout."
               : "Fee is added to the guest's total at checkout."}
@@ -195,10 +195,10 @@ export function PlatformFeeCard({
 
         {/* Monthly fee for enterprise */}
         {plan === "enterprise" && (
-          <div className="space-y-2 pt-4 border-t border-slate-100">
+          <div className="space-y-2 pt-4 border-t border-border">
             <Label htmlFor="monthly-fee">Monthly subscription (USD)</Label>
             <div className="relative">
-              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">$</span>
+              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">$</span>
               <Input
                 id="monthly-fee"
                 type="number"
@@ -210,34 +210,34 @@ export function PlatformFeeCard({
                 className="pl-7"
               />
             </div>
-            <p className="text-xs text-slate-500">
+            <p className="text-xs text-muted-foreground">
               Monthly subscription fee in addition to per-booking fees.
             </p>
           </div>
         )}
 
         {/* Preview card */}
-        <div className="p-4 bg-slate-50 rounded-xl border border-slate-200">
-          <h4 className="text-sm font-medium text-slate-700 mb-3">Guest checkout preview</h4>
+        <div className="p-4 bg-muted rounded-xl border border-border">
+          <h4 className="text-sm font-medium text-foreground mb-3">Guest checkout preview</h4>
           <div className="space-y-2 text-sm">
             <div className="flex justify-between">
-              <span className="text-slate-600">Campsite rental (example)</span>
-              <span className="text-slate-900">$75.00</span>
+              <span className="text-muted-foreground">Campsite rental (example)</span>
+              <span className="text-foreground">$75.00</span>
             </div>
             {feeMode === "pass_through" && (
-              <div className="flex justify-between text-slate-600">
+              <div className="flex justify-between text-muted-foreground">
                 <span>Booking fee</span>
                 <span>${effectiveFee.toFixed(2)}</span>
               </div>
             )}
-            <div className="flex justify-between font-medium pt-2 border-t border-slate-200">
-              <span className="text-slate-900">Guest pays</span>
-              <span className="text-slate-900">
+            <div className="flex justify-between font-medium pt-2 border-t border-border">
+              <span className="text-foreground">Guest pays</span>
+              <span className="text-foreground">
                 ${(75 + (feeMode === "pass_through" ? effectiveFee : 0)).toFixed(2)}
               </span>
             </div>
             {feeMode === "absorb" && (
-              <div className="flex justify-between text-xs text-slate-500 pt-1">
+              <div className="flex justify-between text-xs text-muted-foreground pt-1">
                 <span>Your payout (after fee)</span>
                 <span>${(75 - effectiveFee).toFixed(2)}</span>
               </div>

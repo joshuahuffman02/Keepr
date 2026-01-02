@@ -73,7 +73,7 @@ function MethodToggle({
   return (
     <div className={cn(
       "flex items-center justify-between p-3 rounded-lg transition-colors",
-      checked && !disabled ? "bg-emerald-50/50" : "hover:bg-slate-50",
+      checked && !disabled ? "bg-status-success-bg/60" : "hover:bg-muted",
       disabled && "opacity-60"
     )}>
       <div className="flex-1 min-w-0">
@@ -86,11 +86,11 @@ function MethodToggle({
         >
           {label}
           {comingSoon && (
-            <span className="ml-2 text-xs text-slate-500 font-normal">Coming soon</span>
+            <span className="ml-2 text-xs text-muted-foreground font-normal">Coming soon</span>
           )}
         </Label>
         {description && (
-          <p className="text-xs text-slate-500 mt-0.5">{description}</p>
+          <p className="text-xs text-muted-foreground mt-0.5">{description}</p>
         )}
       </div>
       <Switch
@@ -170,17 +170,17 @@ export function PaymentMethodsConfig({ campgroundId }: PaymentMethodsConfigProps
       <TabsContent value="settings" className="space-y-6 motion-safe:animate-in motion-safe:fade-in">
         {/* Info Banner - Warmer design */}
         <div
-          className="p-4 bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-100 rounded-xl"
+          className="p-4 bg-status-info-bg border border-status-info-border rounded-xl"
           role="status"
           aria-live="polite"
         >
           <div className="flex items-start gap-3">
-            <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0">
-              <Info className="h-4 w-4 text-blue-600" aria-hidden="true" />
+            <div className="w-8 h-8 rounded-full bg-status-info/10 flex items-center justify-center flex-shrink-0">
+              <Info className="h-4 w-4 text-status-info" aria-hidden="true" />
             </div>
             <div>
-              <p className="font-medium text-blue-900">Payment Method Settings</p>
-              <p className="text-sm text-blue-700 mt-1">
+              <p className="font-medium text-foreground">Payment Method Settings</p>
+              <p className="text-sm text-status-info-text mt-1">
                 Configure which payment methods to accept at checkout.
               </p>
             </div>
@@ -188,16 +188,16 @@ export function PaymentMethodsConfig({ campgroundId }: PaymentMethodsConfigProps
         </div>
 
         {/* Summary badge */}
-        <div className="flex items-center gap-2 text-sm text-slate-600">
-          <Check className="w-4 h-4 text-emerald-500" aria-hidden="true" />
+        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+          <Check className="w-4 h-4 text-status-success" aria-hidden="true" />
           <span>{enabledCount} payment methods enabled</span>
         </div>
 
       {/* Card Payments */}
       <Card className="overflow-hidden">
-        <CardHeader className="bg-gradient-to-r from-slate-50 to-white">
+        <CardHeader className="bg-muted/40">
           <CardTitle className="flex items-center gap-2">
-            <CreditCard className="h-5 w-5 text-slate-600" aria-hidden="true" />
+            <CreditCard className="h-5 w-5 text-muted-foreground" aria-hidden="true" />
             Card Payments
           </CardTitle>
           <CardDescription>
@@ -215,9 +215,9 @@ export function PaymentMethodsConfig({ campgroundId }: PaymentMethodsConfigProps
 
           {settings.enableCardPayments && (
             <div
-              className="ml-4 pl-4 border-l-2 border-emerald-200 space-y-3 motion-safe:animate-in motion-safe:fade-in motion-safe:slide-in-from-left-2"
+              className="ml-4 pl-4 border-l-2 border-status-success-border space-y-3 motion-safe:animate-in motion-safe:fade-in motion-safe:slide-in-from-left-2"
             >
-              <p className="text-sm font-medium text-slate-700">Accepted Card Brands</p>
+              <p className="text-sm font-medium text-foreground">Accepted Card Brands</p>
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
                 {CARD_BRANDS.map((brand) => {
                   const isChecked = settings.allowedCardBrands.includes(brand.id);
@@ -227,8 +227,8 @@ export function PaymentMethodsConfig({ campgroundId }: PaymentMethodsConfigProps
                       className={cn(
                         "flex items-center gap-2 p-2 rounded-lg cursor-pointer transition-colors border",
                         isChecked
-                          ? "bg-emerald-50 border-emerald-200"
-                          : "bg-white border-slate-200 hover:border-slate-300"
+                          ? "bg-status-success-bg border-status-success-border"
+                          : "bg-card border-border hover:border-border"
                       )}
                     >
                       <Checkbox
@@ -249,16 +249,16 @@ export function PaymentMethodsConfig({ campgroundId }: PaymentMethodsConfigProps
 
       {/* Digital Wallets */}
       <Card className="overflow-hidden">
-        <CardHeader className="bg-gradient-to-r from-slate-50 to-white">
+        <CardHeader className="bg-muted/40">
           <CardTitle className="flex items-center gap-2">
-            <Smartphone className="h-5 w-5 text-slate-600" aria-hidden="true" />
+            <Smartphone className="h-5 w-5 text-muted-foreground" aria-hidden="true" />
             Digital Wallets
           </CardTitle>
           <CardDescription>
             Fast checkout with Apple Pay, Google Pay, and Stripe Link
           </CardDescription>
         </CardHeader>
-        <CardContent className="divide-y divide-slate-100">
+        <CardContent className="divide-y divide-border">
           <MethodToggle
             id="enable-apple-pay"
             label="Apple Pay"
@@ -278,9 +278,9 @@ export function PaymentMethodsConfig({ campgroundId }: PaymentMethodsConfigProps
 
       {/* Bank Payments */}
       <Card className="overflow-hidden">
-        <CardHeader className="bg-gradient-to-r from-slate-50 to-white">
+        <CardHeader className="bg-muted/40">
           <CardTitle className="flex items-center gap-2">
-            <Building2 className="h-5 w-5 text-slate-600" aria-hidden="true" />
+            <Building2 className="h-5 w-5 text-muted-foreground" aria-hidden="true" />
             Bank Payments
           </CardTitle>
           <CardDescription>
@@ -300,16 +300,16 @@ export function PaymentMethodsConfig({ campgroundId }: PaymentMethodsConfigProps
 
       {/* Manual Payments */}
       <Card className="overflow-hidden">
-        <CardHeader className="bg-gradient-to-r from-slate-50 to-white">
+        <CardHeader className="bg-muted/40">
           <CardTitle className="flex items-center gap-2">
-            <Banknote className="h-5 w-5 text-slate-600" aria-hidden="true" />
+            <Banknote className="h-5 w-5 text-muted-foreground" aria-hidden="true" />
             In-Person Payments
           </CardTitle>
           <CardDescription>
             Cash, check, and charge-to-site options for staff
           </CardDescription>
         </CardHeader>
-        <CardContent className="divide-y divide-slate-100">
+        <CardContent className="divide-y divide-border">
           <MethodToggle
             id="enable-cash"
             label="Cash payments"
@@ -336,9 +336,9 @@ export function PaymentMethodsConfig({ campgroundId }: PaymentMethodsConfigProps
 
       {/* Fee Display */}
       <Card className="overflow-hidden">
-        <CardHeader className="bg-gradient-to-r from-slate-50 to-white">
+        <CardHeader className="bg-muted/40">
           <CardTitle className="flex items-center gap-2">
-            <Receipt className="h-5 w-5 text-slate-600" aria-hidden="true" />
+            <Receipt className="h-5 w-5 text-muted-foreground" aria-hidden="true" />
             Fee Transparency
           </CardTitle>
           <CardDescription>
@@ -366,7 +366,7 @@ export function PaymentMethodsConfig({ campgroundId }: PaymentMethodsConfigProps
             Save Changes
           </Button>
         </div>
-        <p id="save-note" className="text-xs text-slate-500 text-right">
+        <p id="save-note" className="text-xs text-muted-foreground text-right">
           Saving will be available when API integration is complete.
         </p>
       </TabsContent>

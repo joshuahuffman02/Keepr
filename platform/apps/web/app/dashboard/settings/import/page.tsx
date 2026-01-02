@@ -230,8 +230,8 @@ export default function DataImportPage() {
       <div className="max-w-5xl mx-auto space-y-6 p-6">
         {/* Header */}
         <div>
-          <h1 className="text-2xl font-bold text-slate-900">Data Import</h1>
-          <p className="text-slate-600">
+          <h1 className="text-2xl font-bold text-foreground">Data Import</h1>
+          <p className="text-muted-foreground">
             Import sites, guests, and reservations from CSV files or migrate from other systems
           </p>
         </div>
@@ -258,14 +258,14 @@ export default function DataImportPage() {
               </TabsList>
 
               <TabsContent value="sites" className="mt-4">
-                <p className="text-sm text-slate-600">
+                <p className="text-sm text-muted-foreground">
                   Import campsite information including site numbers, types, hookups, and amenities.
                   This is useful when migrating from another reservation system.
                 </p>
               </TabsContent>
 
               <TabsContent value="guests" className="mt-4">
-                <p className="text-sm text-slate-600">
+                <p className="text-sm text-muted-foreground">
                   Import guest records including names, contact information, and vehicle details.
                   Existing guests will be matched by email address.
                 </p>
@@ -288,10 +288,10 @@ export default function DataImportPage() {
             </CardHeader>
             <CardContent className="space-y-4">
               {/* Template Download */}
-              <div className="flex items-center justify-between p-4 bg-slate-50 rounded-lg">
+              <div className="flex items-center justify-between p-4 bg-muted rounded-lg">
                 <div>
-                  <p className="font-medium text-slate-900">Need a template?</p>
-                  <p className="text-sm text-slate-600">
+                  <p className="font-medium text-foreground">Need a template?</p>
+                  <p className="text-sm text-muted-foreground">
                     Download our CSV template with all supported fields
                   </p>
                 </div>
@@ -310,7 +310,7 @@ export default function DataImportPage() {
                     type="file"
                     accept=".csv,text/csv"
                     onChange={handleFileUpload}
-                    className="block w-full text-sm text-slate-500
+                    className="block w-full text-sm text-muted-foreground
                       file:mr-4 file:py-2 file:px-4
                       file:rounded-md file:border-0
                       file:text-sm file:font-semibold
@@ -327,7 +327,7 @@ export default function DataImportPage() {
                   <span className="w-full border-t" />
                 </div>
                 <div className="relative flex justify-center text-xs uppercase">
-                  <span className="bg-white px-2 text-slate-500">Or paste CSV content</span>
+                  <span className="bg-card px-2 text-muted-foreground">Or paste CSV content</span>
                 </div>
               </div>
 
@@ -439,7 +439,7 @@ export default function DataImportPage() {
                               size="sm"
                               onClick={() => removeMapping(header)}
                             >
-                              <XCircle className="h-4 w-4 text-slate-400" />
+                              <XCircle className="h-4 w-4 text-muted-foreground" />
                             </Button>
                           )}
                         </TableCell>
@@ -451,7 +451,7 @@ export default function DataImportPage() {
 
               {/* Required fields check */}
               {schemaQuery.data && (
-                <div className="text-sm text-slate-600">
+                <div className="text-sm text-muted-foreground">
                   <strong>Required fields:</strong>{" "}
                   {schemaQuery.data.requiredFields.map((field, i) => {
                     const isMapped = fieldMappings.some((m) => m.targetField === field);
@@ -504,9 +504,9 @@ export default function DataImportPage() {
             <CardContent className="space-y-6">
               {/* Summary Stats */}
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <div className="p-4 bg-slate-50 rounded-lg text-center">
-                  <p className="text-2xl font-bold text-slate-900">{preview.totalRows}</p>
-                  <p className="text-sm text-slate-600">Total Rows</p>
+                <div className="p-4 bg-muted rounded-lg text-center">
+                  <p className="text-2xl font-bold text-foreground">{preview.totalRows}</p>
+                  <p className="text-sm text-muted-foreground">Total Rows</p>
                 </div>
                 <div className="p-4 bg-emerald-50 rounded-lg text-center">
                   <p className="text-2xl font-bold text-emerald-700">
@@ -568,7 +568,7 @@ export default function DataImportPage() {
 
               {/* Preview Table */}
               <div>
-                <h3 className="font-medium text-slate-900 mb-2">Preview (first 10 rows)</h3>
+                <h3 className="font-medium text-foreground mb-2">Preview (first 10 rows)</h3>
                 <div className="border rounded-lg overflow-auto max-h-64">
                   <Table>
                     <TableHeader>
@@ -610,7 +610,7 @@ export default function DataImportPage() {
               </div>
 
               {/* Update Existing Option */}
-              <div className="flex items-center space-x-2 p-4 bg-slate-50 rounded-lg">
+              <div className="flex items-center space-x-2 p-4 bg-muted rounded-lg">
                 <Checkbox
                   id="update-existing"
                   checked={updateExisting}
@@ -620,7 +620,7 @@ export default function DataImportPage() {
                   <Label htmlFor="update-existing" className="font-medium">
                     Update existing records
                   </Label>
-                  <p className="text-sm text-slate-600">
+                  <p className="text-sm text-muted-foreground">
                     If checked, existing {entityType} will be updated with the imported data.
                     Otherwise, they will be skipped.
                   </p>
@@ -672,9 +672,9 @@ export default function DataImportPage() {
                   <p className="text-2xl font-bold text-blue-700">{importResult.updated}</p>
                   <p className="text-sm text-blue-600">Updated</p>
                 </div>
-                <div className="p-4 bg-slate-50 rounded-lg text-center">
-                  <p className="text-2xl font-bold text-slate-700">{importResult.skipped}</p>
-                  <p className="text-sm text-slate-600">Skipped</p>
+                <div className="p-4 bg-muted rounded-lg text-center">
+                  <p className="text-2xl font-bold text-foreground">{importResult.skipped}</p>
+                  <p className="text-sm text-muted-foreground">Skipped</p>
                 </div>
               </div>
 

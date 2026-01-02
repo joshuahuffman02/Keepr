@@ -162,7 +162,7 @@ export default function SupportAnalyticsPage() {
   if (!ready) {
     return (
       <div>
-        <div className="p-4 text-sm text-slate-400">Loading…</div>
+        <div className="p-4 text-sm text-muted-foreground">Loading…</div>
       </div>
     );
   }
@@ -171,7 +171,7 @@ export default function SupportAnalyticsPage() {
     return (
       <div>
         <div className="space-y-3">
-          <div className="text-xs uppercase font-semibold text-slate-500">Support</div>
+          <div className="text-xs uppercase font-semibold text-muted-foreground">Support</div>
           <h1 className="text-2xl font-bold text-white">Support analytics</h1>
           <div className="rounded-lg border border-status-warning/30 bg-status-warning/15 text-status-warning p-4">
             You do not have permission to view support analytics.
@@ -186,12 +186,12 @@ export default function SupportAnalyticsPage() {
       <div className="space-y-4">
         <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
           <div>
-            <div className="text-xs uppercase font-semibold text-slate-500">Support</div>
-            <h1 className="text-2xl font-bold text-slate-900">Support analytics</h1>
-            <p className="text-sm text-slate-600">
+            <div className="text-xs uppercase font-semibold text-muted-foreground">Support</div>
+            <h1 className="text-2xl font-bold text-foreground">Support analytics</h1>
+            <p className="text-sm text-muted-foreground">
               SLA compliance by region/campground, category volume, and a list of tickets that need attention.
             </p>
-            <div className="text-xs text-slate-500 mt-1">
+            <div className="text-xs text-muted-foreground mt-1">
               Scope: {regionAllowed ? regionFilter : "out-of-scope region"} •{" "}
               {campgroundAllowed ? campgroundId || "all campgrounds" : "out-of-scope campground"}
             </div>
@@ -228,7 +228,7 @@ export default function SupportAnalyticsPage() {
           </div>
         ) : null}
 
-        {loading && <div className="p-4 text-sm text-slate-500">Loading analytics…</div>}
+        {loading && <div className="p-4 text-sm text-muted-foreground">Loading analytics…</div>}
         {error && <div className="p-4 text-sm text-rose-600">{error}</div>}
 
         {inScope && payload && !loading && (
@@ -236,23 +236,23 @@ export default function SupportAnalyticsPage() {
             <Card>
               <CardHeader className="flex items-center justify-between">
                 <CardTitle>SLA compliance</CardTitle>
-                <div className="text-xs text-slate-500">Updated {new Date(payload.generatedAt).toLocaleString()}</div>
+                <div className="text-xs text-muted-foreground">Updated {new Date(payload.generatedAt).toLocaleString()}</div>
               </CardHeader>
               <CardContent className="grid gap-3 md:grid-cols-3">
-                <div className="rounded border border-slate-200 p-3">
-                  <div className="text-xs uppercase text-slate-500">Compliance</div>
-                  <div className="text-2xl font-bold text-slate-900">{percent(totals.compliance)}%</div>
+                <div className="rounded border border-border p-3">
+                  <div className="text-xs uppercase text-muted-foreground">Compliance</div>
+                  <div className="text-2xl font-bold text-foreground">{percent(totals.compliance)}%</div>
                   <Progress value={totals.compliance * 100} className="mt-2" />
                 </div>
-                <div className="rounded border border-slate-200 p-3">
-                  <div className="text-xs uppercase text-slate-500">On-time</div>
+                <div className="rounded border border-border p-3">
+                  <div className="text-xs uppercase text-muted-foreground">On-time</div>
                   <div className="text-2xl font-bold text-status-success">{totals.onTime}</div>
-                  <div className="text-xs text-slate-500">Resolved within SLA</div>
+                  <div className="text-xs text-muted-foreground">Resolved within SLA</div>
                 </div>
-                <div className="rounded border border-slate-200 p-3">
-                  <div className="text-xs uppercase text-slate-500">Overdue</div>
+                <div className="rounded border border-border p-3">
+                  <div className="text-xs uppercase text-muted-foreground">Overdue</div>
                   <div className="text-2xl font-bold text-status-error">{totals.overdue}</div>
-                  <div className="text-xs text-slate-500">Past SLA target</div>
+                  <div className="text-xs text-muted-foreground">Past SLA target</div>
                 </div>
               </CardContent>
             </Card>
@@ -285,7 +285,7 @@ export default function SupportAnalyticsPage() {
                           <TableCell className="text-right w-48">
                             <div className="flex items-center gap-2 justify-end">
                               <Progress value={compliance * 100} className="w-28" />
-                              <span className="text-xs text-slate-600">{percent(compliance)}%</span>
+                              <span className="text-xs text-muted-foreground">{percent(compliance)}%</span>
                             </div>
                           </TableCell>
                         </TableRow>
@@ -293,7 +293,7 @@ export default function SupportAnalyticsPage() {
                     })}
                     {payload.slaSummary.length === 0 && (
                       <TableRow>
-                        <TableCell colSpan={5} className="text-sm text-slate-500">
+                        <TableCell colSpan={5} className="text-sm text-muted-foreground">
                           No SLA data for this scope.
                         </TableCell>
                       </TableRow>
@@ -324,7 +324,7 @@ export default function SupportAnalyticsPage() {
                     ))}
                     {payload.volumesByCategory.length === 0 && (
                       <TableRow>
-                        <TableCell colSpan={2} className="text-sm text-slate-500">
+                        <TableCell colSpan={2} className="text-sm text-muted-foreground">
                           No category volume yet.
                         </TableCell>
                       </TableRow>
@@ -340,17 +340,17 @@ export default function SupportAnalyticsPage() {
               </CardHeader>
               <CardContent className="space-y-3">
                 {needsAttention.length === 0 && (
-                  <div className="text-sm text-slate-500">Nothing flagged right now.</div>
+                  <div className="text-sm text-muted-foreground">Nothing flagged right now.</div>
                 )}
                 {needsAttention.map((item) => (
-                  <div key={item.id} className="rounded border border-slate-200 p-3 space-y-2">
+                  <div key={item.id} className="rounded border border-border p-3 space-y-2">
                     <div className="flex items-center justify-between gap-2">
-                      <div className="text-sm font-semibold text-slate-900">{item.title}</div>
+                      <div className="text-sm font-semibold text-foreground">{item.title}</div>
                       <Badge variant={item.status === "overdue" ? "destructive" : "secondary"}>
                         {item.status === "overdue" ? "Overdue" : "At risk"}
                       </Badge>
                     </div>
-                    <div className="flex flex-wrap gap-2 text-xs text-slate-600">
+                    <div className="flex flex-wrap gap-2 text-xs text-muted-foreground">
                       <span>Region: {item.region}</span>
                       {item.campgroundName || item.campgroundId ? (
                         <span>Campground: {item.campgroundName || item.campgroundId}</span>

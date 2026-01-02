@@ -36,10 +36,10 @@ import { useCampground } from "../../../contexts/CampgroundContext";
 import { Guest } from "@campreserv/shared";
 
 const TIER_COLORS: Record<string, string> = {
-    Bronze: "bg-amber-600",
-    Silver: "bg-slate-400",
-    Gold: "bg-yellow-500",
-    Platinum: "bg-slate-500"
+    Bronze: "bg-status-warning/80",
+    Silver: "bg-muted-foreground",
+    Gold: "bg-status-warning",
+    Platinum: "bg-foreground"
 };
 
 type GuestWithReservations = Guest & {
@@ -324,7 +324,7 @@ export default function GuestDetailPage() {
         return (
             <DashboardShell>
                 <div className="flex flex-col items-center justify-center h-96 gap-4">
-                    <div className="text-lg text-slate-500">Guest not found</div>
+                    <div className="text-lg text-muted-foreground">Guest not found</div>
                     <Button onClick={() => router.push("/guests")}>Back to Guests</Button>
                 </div>
             </DashboardShell>
@@ -342,8 +342,8 @@ export default function GuestDetailPage() {
                             <ArrowLeft className="h-4 w-4" />
                         </Button>
                         <div>
-                            <h1 className="text-2xl font-bold text-slate-900">{guest.primaryFirstName} {guest.primaryLastName}</h1>
-                            <div className="text-sm text-slate-500">{guest.email} • {guest.phone}</div>
+                            <h1 className="text-2xl font-bold text-foreground">{guest.primaryFirstName} {guest.primaryLastName}</h1>
+                            <div className="text-sm text-muted-foreground">{guest.email} • {guest.phone}</div>
                         </div>
                     </div>
                     {guest.reservations?.[0] && (
@@ -386,19 +386,19 @@ export default function GuestDetailPage() {
                             </CardHeader>
                             <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div>
-                                    <Label className="text-xs text-slate-500">Full Name</Label>
+                                    <Label className="text-xs text-muted-foreground">Full Name</Label>
                                     <div className="font-medium">{guest.primaryFirstName} {guest.primaryLastName}</div>
                                 </div>
                                 <div>
-                                    <Label className="text-xs text-slate-500">Email</Label>
+                                    <Label className="text-xs text-muted-foreground">Email</Label>
                                     <div className="font-medium">{guest.email}</div>
                                 </div>
                                 <div>
-                                    <Label className="text-xs text-slate-500">Phone</Label>
+                                    <Label className="text-xs text-muted-foreground">Phone</Label>
                                     <div className="font-medium">{guest.phone}</div>
                                 </div>
                                 <div>
-                                    <Label className="text-xs text-slate-500">Address</Label>
+                                    <Label className="text-xs text-muted-foreground">Address</Label>
                                     <div className="font-medium">
                                         {guest.address1}
                                         {guest.address2 && <>, {guest.address2}</>}
@@ -412,7 +412,7 @@ export default function GuestDetailPage() {
                             <CardHeader className="flex items-center justify-between">
                                 <CardTitle>Forms</CardTitle>
                                 {formsQuery.isLoading ? (
-                                    <span className="text-xs text-slate-500">Loading…</span>
+                                    <span className="text-xs text-muted-foreground">Loading…</span>
                                 ) : (
                                     <Badge variant={(formsQuery.data || []).some((f: any) => f.status === "pending") ? "destructive" : "secondary"}>
                                         {(formsQuery.data || []).filter((f: any) => f.status === "pending").length} pending
@@ -420,16 +420,16 @@ export default function GuestDetailPage() {
                                 )}
                             </CardHeader>
                             <CardContent className="space-y-2 text-sm">
-                                {formsQuery.isError && <div className="text-xs text-red-600">Failed to load forms.</div>}
+                                {formsQuery.isError && <div className="text-xs text-status-error">Failed to load forms.</div>}
                                 {!formsQuery.isLoading && (formsQuery.data || []).length === 0 && (
-                                    <div className="text-xs text-slate-500">No forms for this guest.</div>
+                                    <div className="text-xs text-muted-foreground">No forms for this guest.</div>
                                 )}
                                 <div className="space-y-1">
                                     {(formsQuery.data || []).map((f: any) => (
-                                        <div key={f.id} className="flex items-center justify-between rounded border border-slate-200 px-2 py-1">
+                                        <div key={f.id} className="flex items-center justify-between rounded border border-border px-2 py-1">
                                             <div>
-                                                <div className="font-medium text-slate-900 text-sm">{f.formTemplate?.title || "Form"}</div>
-                                                <div className="text-xs text-slate-500">{f.formTemplate?.type}</div>
+                                                <div className="font-medium text-foreground text-sm">{f.formTemplate?.title || "Form"}</div>
+                                                <div className="text-xs text-muted-foreground">{f.formTemplate?.type}</div>
                                             </div>
                                             <Badge variant={f.status === "completed" ? "default" : f.status === "pending" ? "destructive" : "secondary"}>
                                                 {f.status}
@@ -531,7 +531,7 @@ export default function GuestDetailPage() {
                             />
                         ) : (
                             <Card>
-                                <CardContent className="py-8 text-center text-slate-500">
+                                <CardContent className="py-8 text-center text-muted-foreground">
                                     No saved payment methods. Cards are saved when the guest makes a reservation.
                                 </CardContent>
                             </Card>
@@ -539,7 +539,7 @@ export default function GuestDetailPage() {
                     </TabsContent>
 
                     <TabsContent value="wallet" className="space-y-4">
-                        <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-slate-200 bg-white p-3">
+                        <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-border bg-card p-3">
                             <div>
                                 <div className="text-sm font-medium">Wallet scope</div>
                                 <div className="text-xs text-muted-foreground">Choose which wallet to view or apply.</div>
@@ -728,7 +728,7 @@ export default function GuestDetailPage() {
                                                     <TableCell>{tx.reason || tx.referenceType}</TableCell>
                                                     <TableCell className={cn(
                                                         "text-right font-medium",
-                                                        tx.direction === "issue" || tx.direction === "refund" ? "text-green-600" : "text-red-600"
+                                                        tx.direction === "issue" || tx.direction === "refund" ? "text-status-success" : "text-status-error"
                                                     )}>
                                                         {tx.direction === "issue" || tx.direction === "refund" ? "+" : "-"}
                                                         ${(tx.amountCents / 100).toFixed(2)}
@@ -806,7 +806,7 @@ export default function GuestDetailPage() {
                                                         type="button"
                                                         variant={adjustType === "deduct" ? "default" : "outline"}
                                                         onClick={() => setAdjustType("deduct")}
-                                                        className={cn("flex-1", adjustType === "deduct" && "bg-red-600 hover:bg-red-700")}
+                                                        className={cn("flex-1", adjustType === "deduct" && "bg-destructive hover:bg-destructive/90")}
                                                     >
                                                         Deduct
                                                     </Button>
@@ -861,7 +861,7 @@ export default function GuestDetailPage() {
                                             <TableRow key={tx.id}>
                                                 <TableCell>{new Date(tx.createdAt).toLocaleDateString()}</TableCell>
                                                 <TableCell>{tx.reason}</TableCell>
-                                                <TableCell className={cn("text-right font-medium", tx.amount > 0 ? "text-emerald-600" : "text-red-600")}>
+                                                <TableCell className={cn("text-right font-medium", tx.amount > 0 ? "text-status-success" : "text-status-error")}>
                                                     {tx.amount > 0 ? "+" : ""}{tx.amount.toLocaleString()}
                                                 </TableCell>
                                             </TableRow>
@@ -926,7 +926,7 @@ export default function GuestDetailPage() {
                                     <div className="space-y-1">
                                         <Label className="text-xs">Type</Label>
                                         <select
-                                            className="h-9 rounded border border-slate-200 bg-white px-2 text-sm"
+                                            className="h-9 rounded border border-border bg-background px-2 text-sm"
                                             value={commTypeFilter}
                                             onChange={(e) => {
                                                 const value = e.target.value;
@@ -946,7 +946,7 @@ export default function GuestDetailPage() {
                                     <div className="space-y-1">
                                         <Label className="text-xs">Status</Label>
                                         <select
-                                            className="h-9 rounded border border-slate-200 bg-white px-2 text-sm"
+                                            className="h-9 rounded border border-border bg-background px-2 text-sm"
                                             value={commStatusFilter}
                                             onChange={(e) => setCommStatusFilter(e.target.value)}
                                         >
@@ -962,7 +962,7 @@ export default function GuestDetailPage() {
                                     <div className="space-y-1">
                                         <Label className="text-xs">Direction</Label>
                                         <select
-                                            className="h-9 rounded border border-slate-200 bg-white px-2 text-sm"
+                                            className="h-9 rounded border border-border bg-background px-2 text-sm"
                                             value={commDirectionFilter}
                                             onChange={(e) => {
                                                 const value = e.target.value;
@@ -982,16 +982,16 @@ export default function GuestDetailPage() {
 
                                 {/* Collapsible Log Communication Form */}
                                 <details className="group">
-                                    <summary className="flex items-center gap-2 cursor-pointer text-sm text-slate-600 hover:text-slate-800 py-2 border-t border-slate-100 mt-2">
+                                    <summary className="flex items-center gap-2 cursor-pointer text-sm text-muted-foreground hover:text-foreground py-2 border-t border-border mt-2">
                                         <PlusCircle className="h-4 w-4" />
                                         <span>Log Communication</span>
                                     </summary>
-                                    <div className="mt-3 p-3 bg-slate-50 rounded-lg border border-slate-200 space-y-3">
+                                    <div className="mt-3 p-3 bg-muted rounded-lg border border-border space-y-3">
                                         <div className="grid grid-cols-2 gap-3">
                                             <div className="space-y-1">
                                                 <Label className="text-xs">Type</Label>
                                                 <select
-                                                    className="w-full h-9 rounded border border-slate-200 bg-white px-2 text-sm"
+                                                    className="w-full h-9 rounded border border-border bg-background px-2 text-sm"
                                                     value={composeType}
                                                     onChange={(e) => setComposeType(e.target.value as "email" | "sms" | "note" | "call")}
                                                 >
@@ -1004,7 +1004,7 @@ export default function GuestDetailPage() {
                                             <div className="space-y-1">
                                                 <Label className="text-xs">Direction</Label>
                                                 <select
-                                                    className="w-full h-9 rounded border border-slate-200 bg-white px-2 text-sm"
+                                                    className="w-full h-9 rounded border border-border bg-background px-2 text-sm"
                                                     value={composeDirection}
                                                     onChange={(e) => setComposeDirection(e.target.value as "inbound" | "outbound")}
                                                 >
@@ -1024,7 +1024,7 @@ export default function GuestDetailPage() {
                                         <div className="space-y-1">
                                             <Label className="text-xs">Body</Label>
                                             <textarea
-                                                className="w-full rounded border border-slate-200 bg-white px-3 py-2 text-sm min-h-[80px]"
+                                                className="w-full rounded border border-border bg-background px-3 py-2 text-sm min-h-[80px]"
                                                 value={composeBody}
                                                 onChange={(e) => setComposeBody(e.target.value)}
                                                 placeholder="Log the message content"
@@ -1073,9 +1073,9 @@ export default function GuestDetailPage() {
 
                                 <div className="space-y-2 max-h-96 overflow-auto pr-1">
                                     {!timelineItems.length && (
-                                        <div className="text-sm text-slate-500">No communications yet.</div>
+                                        <div className="text-sm text-muted-foreground">No communications yet.</div>
                                     )}
-                                    <div className="relative pl-3 border-l border-slate-200 space-y-4">
+                                    <div className="relative pl-3 border-l border-border space-y-4">
                                         {timelineItems.map((item: any) => {
                                             const createdDate = item.date ? new Date(item.date) : null;
                                             const getCommIcon = () => {
@@ -1090,11 +1090,11 @@ export default function GuestDetailPage() {
                                             const Icon = getCommIcon();
                                             return (
                                                 <div key={`${item.kind}-${item.id}`} className="relative pl-4">
-                                                    <span className="absolute -left-[9px] top-2 h-4 w-4 rounded-full bg-white border border-slate-300 flex items-center justify-center">
-                                                        <Icon className="h-3 w-3 text-slate-500" />
+                                                    <span className="absolute -left-[9px] top-2 h-4 w-4 rounded-full bg-card border border-border flex items-center justify-center">
+                                                        <Icon className="h-3 w-3 text-muted-foreground" />
                                                     </span>
                                                     <div className="flex items-start justify-between gap-2">
-                                                        <div className="flex items-center gap-2 text-xs text-slate-500">
+                                                        <div className="flex items-center gap-2 text-xs text-muted-foreground">
                                                             <span>{createdDate ? formatDistanceToNow(createdDate, { addSuffix: true }) : ""}</span>
                                                             {item.kind === "communication" && (
                                                                 <span
@@ -1131,12 +1131,12 @@ export default function GuestDetailPage() {
                                                             <Badge variant="outline" className="text-[10px] font-semibold">
                                                                 {item.kind === "playbook" ? "Playbook" : item.type}
                                                             </Badge>
-                                                            {item.kind === "playbook" && <span className="text-xs text-slate-600">{item.name}</span>}
+                                                            {item.kind === "playbook" && <span className="text-xs text-muted-foreground">{item.name}</span>}
                                                             {item.kind === "communication" && item.subject && (
-                                                                <span className="text-sm font-medium text-slate-900">{item.subject}</span>
+                                                                <span className="text-sm font-medium text-foreground">{item.subject}</span>
                                                             )}
                                                         </div>
-                                                        <div className="text-sm text-slate-700 line-clamp-2">
+                                                        <div className="text-sm text-foreground line-clamp-2">
                                                             {item.kind === "playbook"
                                                                 ? item.lastError
                                                                     ? `Attempts: ${item.attempts ?? 0} • Last error: ${item.lastError}`
@@ -1144,7 +1144,7 @@ export default function GuestDetailPage() {
                                                                 : item.body}
                                                         </div>
                                                         {item.kind === "communication" && (
-                                                            <div className="text-xs text-slate-500">
+                                                            <div className="text-xs text-muted-foreground">
                                                                 {item.provider ? `Provider: ${item.provider}` : ""}
                                                                 {item.toAddress ? ` • To: ${item.toAddress}` : ""}
                                                                 {item.fromAddress ? ` • From: ${item.fromAddress}` : ""}
@@ -1192,7 +1192,7 @@ export default function GuestDetailPage() {
                                         limit={50}
                                     />
                                 ) : (
-                                    <div className="text-center py-8 text-slate-500">
+                                    <div className="text-center py-8 text-muted-foreground">
                                         <p>Unable to load activity log</p>
                                         <p className="text-sm">Guest is not associated with a campground</p>
                                     </div>
@@ -1281,7 +1281,7 @@ function GuestEquipmentTab({ guestId }: { guestId: string }) {
                             <div className="grid grid-cols-4 items-center gap-4">
                                 <Label className="text-right">Type</Label>
                                 <select
-                                    className="col-span-3 flex h-10 w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm ring-offset-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-950 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                                    className="col-span-3 flex h-10 w-full rounded-md border border-border bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/40 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
                                     value={newEquipment.type}
                                     onChange={(e) => setNewEquipment({ ...newEquipment, type: e.target.value })}
                                 >
@@ -1375,7 +1375,7 @@ function GuestEquipmentTab({ guestId }: { guestId: string }) {
                                         variant="ghost"
                                         size="icon"
                                         onClick={() => setDeleteConfirmId(item.id)}
-                                        className="text-red-500 hover:text-red-600 hover:bg-red-50"
+                                        className="text-status-error hover:text-status-error hover:bg-status-error/10"
                                     >
                                         <Trash2 className="w-4 h-4" />
                                     </Button>
@@ -1410,7 +1410,7 @@ function GuestEquipmentTab({ guestId }: { guestId: string }) {
                                     setDeleteConfirmId(null);
                                 }
                             }}
-                            className="bg-red-600 hover:bg-red-700"
+                            className="bg-destructive hover:bg-destructive/90"
                         >
                             Remove
                         </AlertDialogAction>

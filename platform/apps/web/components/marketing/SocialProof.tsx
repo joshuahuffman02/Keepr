@@ -31,7 +31,7 @@ const stats = [
 
 export function SocialProof() {
   return (
-    <section className="py-12 bg-white border-y border-slate-200">
+    <section className="py-12 bg-card border-y border-border">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
           {stats.map((stat) => {
@@ -43,9 +43,9 @@ export function SocialProof() {
                     <Icon className="h-6 w-6 text-emerald-600" />
                   </div>
                 </div>
-                <div className="text-3xl font-bold text-slate-900 mb-1">{stat.value}</div>
-                <div className="text-sm font-semibold text-slate-700 mb-1">{stat.label}</div>
-                <div className="text-xs text-slate-500">{stat.description}</div>
+                <div className="text-3xl font-bold text-foreground mb-1">{stat.value}</div>
+                <div className="text-sm font-semibold text-foreground mb-1">{stat.label}</div>
+                <div className="text-xs text-muted-foreground">{stat.description}</div>
               </div>
             );
           })}

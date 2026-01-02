@@ -111,11 +111,11 @@ export default function FAQsPage() {
     if (!campgroundId) {
         return (
             <div className="flex flex-col items-center justify-center py-24 text-center">
-                <div className="w-24 h-24 rounded-full bg-slate-100 flex items-center justify-center mb-6">
-                    <HelpCircle className="w-12 h-12 text-slate-400" />
+                <div className="w-24 h-24 rounded-full bg-muted flex items-center justify-center mb-6">
+                    <HelpCircle className="w-12 h-12 text-muted-foreground" />
                 </div>
-                <h1 className="text-2xl font-bold text-slate-900 mb-2">Select a Campground</h1>
-                <p className="text-slate-500 max-w-md">
+                <h1 className="text-2xl font-bold text-foreground mb-2">Select a Campground</h1>
+                <p className="text-muted-foreground max-w-md">
                     Please select a campground to manage FAQs.
                 </p>
             </div>
@@ -127,8 +127,8 @@ export default function FAQsPage() {
             <div className="space-y-6">
                 <div className="flex items-center justify-between">
                     <div>
-                        <h1 className="text-2xl font-bold text-slate-900">FAQs</h1>
-                        <p className="text-slate-500 mt-1">
+                        <h1 className="text-2xl font-bold text-foreground">FAQs</h1>
+                        <p className="text-muted-foreground mt-1">
                             Frequently asked questions displayed on your public booking page
                         </p>
                     </div>
@@ -159,9 +159,9 @@ export default function FAQsPage() {
                 {faqs.length === 0 ? (
                     <Card>
                         <CardContent className="py-12 text-center">
-                            <HelpCircle className="w-12 h-12 text-slate-300 mx-auto mb-4" />
-                            <h3 className="text-lg font-medium text-slate-900 mb-2">No FAQs yet</h3>
-                            <p className="text-slate-500 mb-6">
+                            <HelpCircle className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
+                            <h3 className="text-lg font-medium text-foreground mb-2">No FAQs yet</h3>
+                            <p className="text-muted-foreground mb-6">
                                 Add frequently asked questions to help guests before they book.
                             </p>
                             <Button onClick={addFaq}>
@@ -187,7 +187,7 @@ export default function FAQsPage() {
                                             >
                                                 <ChevronUp className="w-4 h-4" />
                                             </Button>
-                                            <GripVertical className="w-4 h-4 text-slate-400" />
+                                            <GripVertical className="w-4 h-4 text-muted-foreground" />
                                             <Button
                                                 variant="ghost"
                                                 size="sm"
@@ -202,7 +202,7 @@ export default function FAQsPage() {
                                         {/* FAQ Content */}
                                         <div className="flex-1 space-y-4">
                                             <div>
-                                                <label className="block text-sm font-medium text-slate-700 mb-1">
+                                                <label className="block text-sm font-medium text-foreground mb-1">
                                                     Question
                                                 </label>
                                                 <Input
@@ -212,7 +212,7 @@ export default function FAQsPage() {
                                                 />
                                             </div>
                                             <div>
-                                                <label className="block text-sm font-medium text-slate-700 mb-1">
+                                                <label className="block text-sm font-medium text-foreground mb-1">
                                                     Answer
                                                 </label>
                                                 <Textarea
@@ -248,11 +248,11 @@ export default function FAQsPage() {
                             <CardDescription>How FAQs will appear on your booking page</CardDescription>
                         </CardHeader>
                         <CardContent>
-                            <div className="space-y-4 bg-slate-50 rounded-lg p-4">
+                            <div className="space-y-4 bg-muted rounded-lg p-4">
                                 {faqs.filter(f => f.question && f.answer).map((faq) => (
-                                    <div key={faq.id} className="border-b border-slate-200 last:border-0 pb-4 last:pb-0">
-                                        <h4 className="font-medium text-slate-900 mb-1">{faq.question}</h4>
-                                        <p className="text-sm text-slate-600">{faq.answer}</p>
+                                    <div key={faq.id} className="border-b border-border last:border-0 pb-4 last:pb-0">
+                                        <h4 className="font-medium text-foreground mb-1">{faq.question}</h4>
+                                        <p className="text-sm text-muted-foreground">{faq.answer}</p>
                                     </div>
                                 ))}
                             </div>

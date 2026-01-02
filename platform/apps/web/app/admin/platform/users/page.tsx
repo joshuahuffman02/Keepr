@@ -119,9 +119,9 @@ export default function PlatformUsersPage() {
       <div className="space-y-4">
         <div className="flex items-center justify-between gap-3">
           <div>
-            <div className="text-xs uppercase font-semibold text-slate-500">Platform</div>
-            <h1 className="text-2xl font-bold text-slate-900">Platform users</h1>
-            <p className="text-sm text-slate-600">Internal staff for support and operations. Hidden from campground staff.</p>
+            <div className="text-xs uppercase font-semibold text-muted-foreground">Platform</div>
+            <h1 className="text-2xl font-bold text-foreground">Platform users</h1>
+            <p className="text-sm text-muted-foreground">Internal staff for support and operations. Hidden from campground staff.</p>
             {whoamiError && <p className="text-xs text-rose-600 mt-1">Failed to load identity: {(whoamiError as Error)?.message}</p>}
           </div>
           <div className="flex items-center gap-2">
@@ -152,22 +152,22 @@ export default function PlatformUsersPage() {
         <Card className="p-4 space-y-3">
           <div className="flex items-center justify-between">
             <div>
-              <div className="text-xs uppercase font-semibold text-slate-500">Directory</div>
-              <p className="text-sm text-slate-600">Assign platform role, region, and active status.</p>
+              <div className="text-xs uppercase font-semibold text-muted-foreground">Directory</div>
+              <p className="text-sm text-muted-foreground">Assign platform role, region, and active status.</p>
             </div>
-            {loading && <div className="text-xs text-slate-500">Loading…</div>}
+            {loading && <div className="text-xs text-muted-foreground">Loading…</div>}
           </div>
 
           <div className="grid gap-3">
             {filteredStaff.map((s) => (
-              <div key={s.id} className="rounded border border-slate-200 p-3 space-y-2">
+              <div key={s.id} className="rounded border border-border p-3 space-y-2">
                 <div className="flex items-center justify-between gap-3">
                   <div>
-                    <div className="text-sm font-semibold text-slate-900">{s.email}</div>
-                    <div className="text-xs text-slate-600">
+                    <div className="text-sm font-semibold text-foreground">{s.email}</div>
+                    <div className="text-xs text-muted-foreground">
                       {(s.firstName || s.lastName) ? `${s.firstName ?? ""} ${s.lastName ?? ""}`.trim() : "—"}
                     </div>
-                    <div className="text-[11px] text-slate-500 space-x-2">
+                    <div className="text-[11px] text-muted-foreground space-x-2">
                       <span>Region: {s.platformRegion ?? s.region ?? "n/a"}</span>
                       <span>Role: {s.platformRole ?? "unassigned"}</span>
                     </div>
@@ -217,7 +217,7 @@ export default function PlatformUsersPage() {
             ))}
 
             {!loading && filteredStaff.length === 0 && (
-              <div className="rounded border border-slate-200 bg-slate-50 p-3 text-sm text-slate-600">
+              <div className="rounded border border-border bg-muted p-3 text-sm text-muted-foreground">
                 No platform staff found{regionFilter !== "all" ? " for this region" : ""}.
               </div>
             )}

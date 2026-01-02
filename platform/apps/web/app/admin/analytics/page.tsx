@@ -276,12 +276,12 @@ export default function AnalyticsOverviewPage() {
           <div className="flex items-center gap-3">
             <h1 className="text-2xl font-bold text-white">Analytics Hub</h1>
             {!hasData && !loading && (
-              <Badge className="bg-slate-600/20 text-slate-400 border border-slate-600/50">
+              <Badge className="bg-muted/20 text-muted-foreground border border-border/50">
                 No Data Yet
               </Badge>
             )}
           </div>
-          <p className="text-slate-400 mt-1">
+          <p className="text-muted-foreground mt-1">
             Platform-wide analytics and insights
           </p>
         </div>
@@ -291,7 +291,7 @@ export default function AnalyticsOverviewPage() {
             variant="outline"
             size="sm"
             onClick={fetchData}
-            className="border-slate-700 text-slate-300 hover:bg-slate-800"
+            className="border-border text-muted-foreground hover:bg-muted"
           >
             <RefreshCw className="h-4 w-4 mr-2" />
             Refresh
@@ -450,11 +450,11 @@ export default function AnalyticsOverviewPage() {
               loading={loading}
             />
           ) : (
-            <div className="bg-slate-800/50 border border-slate-700 rounded-lg p-8 h-[300px] flex items-center justify-center">
+            <div className="bg-muted/50 border border-border rounded-lg p-8 h-[300px] flex items-center justify-center">
               <div className="text-center">
-                <TrendingUp className="h-12 w-12 text-slate-600 mx-auto mb-3" />
-                <p className="text-slate-400">No revenue data available yet</p>
-                <p className="text-sm text-slate-500 mt-1">Revenue trends will appear once you have bookings</p>
+                <TrendingUp className="h-12 w-12 text-muted-foreground mx-auto mb-3" />
+                <p className="text-muted-foreground">No revenue data available yet</p>
+                <p className="text-sm text-muted-foreground mt-1">Revenue trends will appear once you have bookings</p>
               </div>
             </div>
           )}
@@ -469,11 +469,11 @@ export default function AnalyticsOverviewPage() {
             loading={loading}
           />
         ) : (
-          <div className="bg-slate-800/50 border border-slate-700 rounded-lg p-8 h-[300px] flex items-center justify-center">
+          <div className="bg-muted/50 border border-border rounded-lg p-8 h-[300px] flex items-center justify-center">
             <div className="text-center">
-              <Building2 className="h-12 w-12 text-slate-600 mx-auto mb-3" />
-              <p className="text-slate-400">No accommodation data yet</p>
-              <p className="text-sm text-slate-500 mt-1">Distribution will appear with bookings</p>
+              <Building2 className="h-12 w-12 text-muted-foreground mx-auto mb-3" />
+              <p className="text-muted-foreground">No accommodation data yet</p>
+              <p className="text-sm text-muted-foreground mt-1">Distribution will appear with bookings</p>
             </div>
           </div>
         )}
@@ -505,37 +505,37 @@ export default function AnalyticsOverviewPage() {
           maxRows={5}
         />
       ) : (
-        <div className="bg-slate-800/50 border border-slate-700 rounded-lg p-6">
+        <div className="bg-muted/50 border border-border rounded-lg p-6">
           <h3 className="text-lg font-semibold text-white mb-2">Top Performing Campgrounds</h3>
-          <p className="text-slate-400">No campground performance data available yet. Rankings will appear once you have active campgrounds with bookings.</p>
+          <p className="text-muted-foreground">No campground performance data available yet. Rankings will appear once you have active campgrounds with bookings.</p>
         </div>
       )}
 
       {/* Quick Stats Footer */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 pt-4 border-t border-slate-700">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 pt-4 border-t border-border">
         <div className="text-center">
           <p className="text-2xl font-bold text-white">
             {data?.accommodations.totalSites?.toLocaleString() || "—"}
           </p>
-          <p className="text-sm text-slate-400">Total Sites</p>
+          <p className="text-sm text-muted-foreground">Total Sites</p>
         </div>
         <div className="text-center">
           <p className="text-2xl font-bold text-white">
             {data?.los.weeklyStayPercentage?.toFixed(1) || "—"}%
           </p>
-          <p className="text-sm text-slate-400">Weekly Stays</p>
+          <p className="text-sm text-muted-foreground">Weekly Stays</p>
         </div>
         <div className="text-center">
           <p className="text-2xl font-bold text-white">
             {data?.booking.lastMinutePercentage?.toFixed(1) || "—"}%
           </p>
-          <p className="text-sm text-slate-400">Last-Minute Bookings</p>
+          <p className="text-sm text-muted-foreground">Last-Minute Bookings</p>
         </div>
         <div className="text-center">
           <p className="text-2xl font-bold text-white capitalize">
             {data?.accommodations.topPerformingType || "—"}
           </p>
-          <p className="text-sm text-slate-400">Top Site Type</p>
+          <p className="text-sm text-muted-foreground">Top Site Type</p>
         </div>
       </div>
     </div>

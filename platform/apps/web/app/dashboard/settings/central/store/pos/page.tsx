@@ -9,8 +9,8 @@ export default function POSPage() {
   return (
     <div className="max-w-4xl space-y-6">
       <div>
-        <h2 className="text-2xl font-bold text-slate-900">POS Settings</h2>
-        <p className="text-slate-500 mt-1">
+        <h2 className="text-2xl font-bold text-foreground">POS Settings</h2>
+        <p className="text-muted-foreground mt-1">
           Configure point-of-sale system settings
         </p>
       </div>
@@ -23,8 +23,8 @@ export default function POSPage() {
                 <ShoppingCart className="h-6 w-6 text-blue-600" />
               </div>
               <div className="flex-1">
-                <h3 className="font-semibold text-slate-900">Open POS</h3>
-                <p className="text-sm text-slate-500 mt-1">
+                <h3 className="font-semibold text-foreground">Open POS</h3>
+                <p className="text-sm text-muted-foreground mt-1">
                   Launch the point-of-sale system to process sales and manage transactions.
                 </p>
                 <div className="mt-4">
@@ -43,12 +43,12 @@ export default function POSPage() {
         <Card>
           <CardContent className="pt-6">
             <div className="flex items-start gap-4">
-              <div className="p-3 rounded-lg bg-slate-100">
-                <Monitor className="h-6 w-6 text-slate-600" />
+              <div className="p-3 rounded-lg bg-muted">
+                <Monitor className="h-6 w-6 text-muted-foreground" />
               </div>
               <div className="flex-1">
-                <h3 className="font-semibold text-slate-900">POS Terminals</h3>
-                <p className="text-sm text-slate-500 mt-1">
+                <h3 className="font-semibold text-foreground">POS Terminals</h3>
+                <p className="text-sm text-muted-foreground mt-1">
                   Manage POS terminals, payment readers, and receipt printers.
                 </p>
                 <div className="mt-4">

@@ -71,7 +71,7 @@ export default function SocialPlannerTemplates() {
           <Link href="/social-planner" className="text-sm text-emerald-700 hover:text-emerald-600">
             ← Back to Social Planner
           </Link>
-          <p className="text-slate-600">Select a campground to manage templates.</p>
+          <p className="text-muted-foreground">Select a campground to manage templates.</p>
         </div>
       </DashboardShell>
     );
@@ -85,13 +85,13 @@ export default function SocialPlannerTemplates() {
       <div className="flex items-center justify-between mb-4">
         <div>
           <p className="text-xs uppercase tracking-wide text-emerald-600 font-semibold">Template library</p>
-          <h1 className="text-2xl font-bold text-slate-900">Reusable fills & styles</h1>
-          <p className="text-slate-600">Deals, spotlights, events, weather, reviews, countdowns, and more.</p>
+          <h1 className="text-2xl font-bold text-foreground">Reusable fills & styles</h1>
+          <p className="text-muted-foreground">Deals, spotlights, events, weather, reviews, countdowns, and more.</p>
         </div>
       </div>
 
       <div className="card p-4 mb-4">
-        <h3 className="text-lg font-semibold text-slate-900 mb-2">Create template</h3>
+        <h3 className="text-lg font-semibold text-foreground mb-2">Create template</h3>
         <div className="grid md:grid-cols-5 gap-3">
           <input className="input" placeholder="Name" value={name} onChange={e => setName(e.target.value)} />
           <select className="input" value={category} onChange={e => setCategory(e.target.value)}>
@@ -128,15 +128,15 @@ export default function SocialPlannerTemplates() {
               <div className="flex items-center gap-2">
                 <FileText className="h-4 w-4 text-emerald-600" />
                 <div>
-                  <div className="text-sm font-semibold text-slate-900">{tpl.name}</div>
-                  <div className="text-xs text-slate-500">{tpl.style || "style"}</div>
+                  <div className="text-sm font-semibold text-foreground">{tpl.name}</div>
+                  <div className="text-xs text-muted-foreground">{tpl.style || "style"}</div>
                 </div>
               </div>
               {tpl.category && <span className="badge">{tpl.category}</span>}
             </div>
-            <p className="text-sm text-slate-600 line-clamp-2">{tpl.defaultCaption || "Caption fill-ins TBD."}</p>
+            <p className="text-sm text-muted-foreground line-clamp-2">{tpl.defaultCaption || "Caption fill-ins TBD."}</p>
             {tpl.hashtagSet?.length ? (
-              <div className="mt-2 text-xs text-slate-500">Hashtags: {tpl.hashtagSet.join(", ")}</div>
+              <div className="mt-2 text-xs text-muted-foreground">Hashtags: {tpl.hashtagSet.join(", ")}</div>
             ) : null}
             <button
               className="btn-secondary mt-3 w-full flex items-center justify-center text-emerald-700"
@@ -147,7 +147,7 @@ export default function SocialPlannerTemplates() {
             </button>
           </div>
         ))}
-        {!templatesQuery.data?.length && <div className="text-sm text-slate-500">No templates yet.</div>}
+        {!templatesQuery.data?.length && <div className="text-sm text-muted-foreground">No templates yet.</div>}
       </div>
     </DashboardShell>
   );

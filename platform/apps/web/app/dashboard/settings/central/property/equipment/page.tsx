@@ -138,8 +138,8 @@ export default function EquipmentTypesPage() {
       label: "Equipment Type",
       render: (item: EquipmentType) => (
         <div className="flex items-center gap-3">
-          <div className="p-2 rounded-lg bg-slate-100">
-            <Truck className="h-4 w-4 text-slate-600" />
+          <div className="p-2 rounded-lg bg-muted">
+            <Truck className="h-4 w-4 text-muted-foreground" />
           </div>
           <span className="font-medium">{item.name}</span>
         </div>
@@ -168,7 +168,7 @@ export default function EquipmentTypesPage() {
             </Badge>
           )}
           {!item.requiresLength && !item.requiresTow && (
-            <span className="text-slate-400 text-sm">None</span>
+            <span className="text-muted-foreground text-sm">None</span>
           )}
         </div>
       ),
@@ -182,7 +182,7 @@ export default function EquipmentTypesPage() {
           className={cn(
             item.isActive
               ? "bg-status-success/15 text-status-success"
-              : "bg-slate-100 text-slate-600"
+              : "bg-muted text-muted-foreground"
           )}
         >
           {item.isActive ? "Active" : "Inactive"}
@@ -196,8 +196,8 @@ export default function EquipmentTypesPage() {
       {/* Header */}
       <div className="flex items-start justify-between">
         <div>
-          <h2 className="text-2xl font-bold text-slate-900">Equipment Types</h2>
-          <p className="text-slate-500 mt-1">
+          <h2 className="text-2xl font-bold text-foreground">Equipment Types</h2>
+          <p className="text-muted-foreground mt-1">
             Define RV and camping equipment types for site matching
           </p>
         </div>
@@ -288,7 +288,7 @@ export default function EquipmentTypesPage() {
                 <Label htmlFor="requires-length" className="font-medium">
                   Requires length
                 </Label>
-                <p className="text-sm text-slate-500">
+                <p className="text-sm text-muted-foreground">
                   Guest must provide RV/equipment length
                 </p>
               </div>
@@ -304,7 +304,7 @@ export default function EquipmentTypesPage() {
                 <Label htmlFor="requires-tow" className="font-medium">
                   Has tow vehicle
                 </Label>
-                <p className="text-sm text-slate-500">
+                <p className="text-sm text-muted-foreground">
                   Guest is towing this with another vehicle
                 </p>
               </div>
@@ -316,7 +316,7 @@ export default function EquipmentTypesPage() {
             </div>
 
             {formRequiresTow && (
-              <div className="space-y-2 p-3 rounded-lg bg-slate-50">
+              <div className="space-y-2 p-3 rounded-lg bg-muted">
                 <Label htmlFor="buffer-length">Buffer length (feet)</Label>
                 <div className="flex items-center gap-2">
                   <Input
@@ -328,7 +328,7 @@ export default function EquipmentTypesPage() {
                     onChange={(e) => setFormBufferLength(parseInt(e.target.value) || 0)}
                     className="w-24"
                   />
-                  <span className="text-sm text-slate-500">
+                  <span className="text-sm text-muted-foreground">
                     Added to total length for site matching
                   </span>
                 </div>

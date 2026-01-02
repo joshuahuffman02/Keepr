@@ -154,7 +154,7 @@ export function QuickDateSelector({
 
   return (
     <div className={cn("space-y-3", className)}>
-      <p className="text-sm font-medium text-slate-700">Quick Select</p>
+      <p className="text-sm font-medium text-foreground">Quick Select</p>
 
       <div className="flex flex-wrap gap-2">
         {options.map((option, idx) => (
@@ -168,7 +168,7 @@ export function QuickDateSelector({
                 ? "bg-emerald-50 border-emerald-500 text-emerald-700 shadow-sm"
                 : option.highlight
                 ? "bg-amber-50 border-amber-200 text-amber-700 hover:border-amber-400"
-                : "bg-white border-slate-200 text-slate-700 hover:border-slate-400 hover:bg-slate-50"
+                : "bg-card border-border text-foreground hover:border-border hover:bg-muted"
             )}
             initial={prefersReducedMotion ? {} : { opacity: 0, y: 10 }}
             animate={prefersReducedMotion ? {} : { opacity: 1, y: 0 }}
@@ -181,7 +181,7 @@ export function QuickDateSelector({
                   ? "text-emerald-600"
                   : option.highlight
                   ? "text-amber-600"
-                  : "text-slate-400"
+                  : "text-muted-foreground"
               )}
             >
               {option.icon}
@@ -194,7 +194,7 @@ export function QuickDateSelector({
       {/* Show selected dates preview */}
       {selectedArrival && selectedDeparture && (
         <motion.div
-          className="flex items-center gap-2 text-sm text-slate-600 bg-slate-50 px-3 py-2 rounded-lg"
+          className="flex items-center gap-2 text-sm text-muted-foreground bg-muted px-3 py-2 rounded-lg"
           initial={prefersReducedMotion ? {} : { opacity: 0 }}
           animate={prefersReducedMotion ? {} : { opacity: 1 }}
         >
@@ -212,7 +212,7 @@ export function QuickDateSelector({
               day: "numeric",
             })}
           </span>
-          <span className="text-slate-400">
+          <span className="text-muted-foreground">
             ({Math.ceil((new Date(selectedDeparture).getTime() - new Date(selectedArrival).getTime()) / (1000 * 60 * 60 * 24))} nights)
           </span>
         </motion.div>

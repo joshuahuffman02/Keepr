@@ -64,7 +64,7 @@ export function EmailCaptureReport({ campgroundId, dateRange }: EmailCaptureRepo
     }, [reservations]);
 
     if (isLoading) {
-        return <div className="text-sm text-slate-500">Loading guest data...</div>;
+        return <div className="text-sm text-muted-foreground">Loading guest data...</div>;
     }
 
     if (error) {
@@ -73,9 +73,9 @@ export function EmailCaptureReport({ campgroundId, dateRange }: EmailCaptureRepo
 
     if (!reportData || reportData.totalGuests === 0) {
         return (
-            <div className="flex flex-col items-center justify-center p-12 bg-slate-50 rounded-lg border border-slate-200">
-                <div className="text-slate-400 mb-2">No guest data found</div>
-                <p className="text-xs text-slate-500">Guests will appear after reservations are made.</p>
+            <div className="flex flex-col items-center justify-center p-12 bg-muted rounded-lg border border-border">
+                <div className="text-muted-foreground mb-2">No guest data found</div>
+                <p className="text-xs text-muted-foreground">Guests will appear after reservations are made.</p>
             </div>
         );
     }
@@ -86,7 +86,7 @@ export function EmailCaptureReport({ campgroundId, dateRange }: EmailCaptureRepo
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                 <Card>
                     <CardHeader className="pb-2">
-                        <CardTitle className="text-sm font-medium text-slate-500">Total Guests</CardTitle>
+                        <CardTitle className="text-sm font-medium text-muted-foreground">Total Guests</CardTitle>
                     </CardHeader>
                     <CardContent>
                         <div className="text-2xl font-bold">{reportData.totalGuests}</div>
@@ -176,9 +176,9 @@ export function EmailCaptureReport({ campgroundId, dateRange }: EmailCaptureRepo
                                 </div>
                             )}
 
-                            <div className="p-4 bg-slate-50 rounded-xl border border-slate-200">
-                                <div className="text-sm font-medium text-slate-700">Tips to improve capture rate:</div>
-                                <ul className="text-xs text-slate-600 mt-2 space-y-1">
+                            <div className="p-4 bg-muted rounded-xl border border-border">
+                                <div className="text-sm font-medium text-foreground">Tips to improve capture rate:</div>
+                                <ul className="text-xs text-muted-foreground mt-2 space-y-1">
                                     <li>• Require email during online booking</li>
                                     <li>• Collect during kiosk check-in</li>
                                     <li>• Offer discounts for newsletter signup</li>

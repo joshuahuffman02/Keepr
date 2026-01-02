@@ -29,7 +29,7 @@ export function HeroSection() {
             </div>
 
             {/* Headline */}
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight text-slate-900">
+            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight text-foreground">
               Run your campground{' '}
               <span className="bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent">
                 smarter, not harder
@@ -37,35 +37,35 @@ export function HeroSection() {
             </h1>
 
             {/* Subheadline - Value Proposition */}
-            <p className="text-xl text-slate-600 leading-relaxed">
+            <p className="text-xl text-muted-foreground leading-relaxed">
               The modern reservation system with AI-powered insights, guest loyalty programs,
               and integrated staff scheduling.
-              <span className="font-semibold text-slate-900"> $100/month flat</span> + $2.30/booking.
+              <span className="font-semibold text-foreground"> $100/month flat</span> + $2.30/booking.
               No contracts. Go live in 48 hours.
             </p>
 
             {/* Key Features */}
             <div className="grid grid-cols-3 gap-4">
-              <div className="flex flex-col items-center text-center p-3 rounded-xl bg-white border border-slate-200 shadow-sm">
+              <div className="flex flex-col items-center text-center p-3 rounded-xl bg-card border border-border shadow-sm">
                 <div className="h-10 w-10 rounded-lg bg-purple-100 flex items-center justify-center mb-2">
                   <Sparkles className="h-5 w-5 text-purple-600" />
                 </div>
-                <span className="text-xs font-semibold text-slate-900">Loyalty & XP</span>
-                <span className="text-xs text-slate-500">Keep guests coming back</span>
+                <span className="text-xs font-semibold text-foreground">Loyalty & XP</span>
+                <span className="text-xs text-muted-foreground">Keep guests coming back</span>
               </div>
-              <div className="flex flex-col items-center text-center p-3 rounded-xl bg-white border border-slate-200 shadow-sm">
+              <div className="flex flex-col items-center text-center p-3 rounded-xl bg-card border border-border shadow-sm">
                 <div className="h-10 w-10 rounded-lg bg-blue-100 flex items-center justify-center mb-2">
                   <Brain className="h-5 w-5 text-blue-600" />
                 </div>
-                <span className="text-xs font-semibold text-slate-900">AI Forecasting</span>
-                <span className="text-xs text-slate-500">Predict demand & pricing</span>
+                <span className="text-xs font-semibold text-foreground">AI Forecasting</span>
+                <span className="text-xs text-muted-foreground">Predict demand & pricing</span>
               </div>
-              <div className="flex flex-col items-center text-center p-3 rounded-xl bg-white border border-slate-200 shadow-sm">
+              <div className="flex flex-col items-center text-center p-3 rounded-xl bg-card border border-border shadow-sm">
                 <div className="h-10 w-10 rounded-lg bg-emerald-100 flex items-center justify-center mb-2">
                   <Calendar className="h-5 w-5 text-emerald-600" />
                 </div>
-                <span className="text-xs font-semibold text-slate-900">Staff Scheduling</span>
-                <span className="text-xs text-slate-500">Synced with occupancy</span>
+                <span className="text-xs font-semibold text-foreground">Staff Scheduling</span>
+                <span className="text-xs text-muted-foreground">Synced with occupancy</span>
               </div>
             </div>
 
@@ -100,7 +100,7 @@ export function HeroSection() {
               <Button
                 size="lg"
                 variant="ghost"
-                className="text-base px-6 py-5 text-slate-600 hover:text-emerald-600 hover:bg-emerald-50 group"
+                className="text-base px-6 py-5 text-muted-foreground hover:text-emerald-600 hover:bg-emerald-50 group"
                 asChild
               >
                 <Link href="/demo">
@@ -112,7 +112,7 @@ export function HeroSection() {
 
             {/* Migration CTA */}
             <div className="flex items-center gap-4 pt-2">
-              <div className="text-sm text-slate-600">
+              <div className="text-sm text-muted-foreground">
                 Switching from another system? <Link href="/pricing#add-ons" className="font-semibold text-emerald-600 hover:text-emerald-700">Data import services available.</Link>
               </div>
             </div>
@@ -121,7 +121,7 @@ export function HeroSection() {
           {/* Right Column - Visual/Screenshot */}
           <div className="relative lg:pl-8">
             <div className="relative rounded-2xl overflow-hidden shadow-2xl border-8 border-white">
-              <div className="aspect-[4/3] relative bg-slate-100">
+              <div className="aspect-[4/3] relative bg-muted">
                 <Image
                   src="/images/owners/dashboard-preview.png"
                   alt="Camp Everyday Host Dashboard"
@@ -133,7 +133,7 @@ export function HeroSection() {
             </div>
 
             {/* Floating Feature Cards */}
-            <div className="absolute -bottom-4 -left-4 bg-white rounded-xl shadow-lg p-4 border border-slate-100">
+            <div className="absolute -bottom-4 -left-4 bg-card rounded-xl shadow-lg p-4 border border-border">
               <div className="flex items-center gap-3">
                 <div className="h-12 w-12 rounded-lg bg-status-success/15 flex items-center justify-center">
                   <svg className="h-6 w-6 text-status-success" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -141,13 +141,13 @@ export function HeroSection() {
                   </svg>
                 </div>
                 <div>
-                  <div className="text-2xl font-bold text-slate-900">48 hours</div>
-                  <div className="text-xs text-slate-600">to go live</div>
+                  <div className="text-2xl font-bold text-foreground">48 hours</div>
+                  <div className="text-xs text-muted-foreground">to go live</div>
                 </div>
               </div>
             </div>
 
-            <div className="absolute -top-4 -right-4 bg-white rounded-xl shadow-lg p-4 border border-slate-100">
+            <div className="absolute -top-4 -right-4 bg-card rounded-xl shadow-lg p-4 border border-border">
               <div className="flex items-center gap-3">
                 <div className="h-12 w-12 rounded-lg bg-teal-100 flex items-center justify-center">
                   <svg className="h-6 w-6 text-teal-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -155,8 +155,8 @@ export function HeroSection() {
                   </svg>
                 </div>
                 <div>
-                  <div className="text-2xl font-bold text-slate-900">$100/mo</div>
-                  <div className="text-xs text-slate-600">transparent pricing</div>
+                  <div className="text-2xl font-bold text-foreground">$100/mo</div>
+                  <div className="text-xs text-muted-foreground">transparent pricing</div>
                 </div>
               </div>
             </div>

@@ -120,14 +120,14 @@ export function DemoCTA() {
           </div>
 
           {/* Right Column - Demo Form */}
-          <div className="bg-white rounded-2xl shadow-2xl p-8 lg:p-10">
+          <div className="bg-card rounded-2xl shadow-2xl p-8 lg:p-10">
             {submitted ? (
               <div className="text-center py-12">
                 <div className="h-16 w-16 rounded-full bg-emerald-100 flex items-center justify-center mx-auto mb-4">
                   <CheckCircle2 className="h-8 w-8 text-emerald-600" />
                 </div>
-                <h3 className="text-2xl font-bold text-slate-900 mb-2">Request Received!</h3>
-                <p className="text-slate-600 mb-4">
+                <h3 className="text-2xl font-bold text-foreground mb-2">Request Received!</h3>
+                <p className="text-muted-foreground mb-4">
                   We'll be in touch within 24 hours to schedule your personalized demo.
                 </p>
                 <div className="bg-emerald-50 border border-emerald-200 rounded-lg p-3 text-sm text-emerald-800">
@@ -138,15 +138,15 @@ export function DemoCTA() {
               </div>
             ) : (
               <>
-                <h3 className="text-2xl font-bold text-slate-900 mb-2">Get a Free Demo</h3>
-                <p className="text-slate-600 mb-6">
+                <h3 className="text-2xl font-bold text-foreground mb-2">Get a Free Demo</h3>
+                <p className="text-muted-foreground mb-6">
                   See how Camp Everyday Host can work for your campground.
                 </p>
 
                 <form onSubmit={handleSubmit} className="space-y-4">
                   <div className="grid sm:grid-cols-2 gap-4">
                     <div>
-                      <label htmlFor="name" className="block text-sm font-medium text-slate-700 mb-1">
+                      <label htmlFor="name" className="block text-sm font-medium text-foreground mb-1">
                         Full Name *
                       </label>
                       <input
@@ -156,13 +156,13 @@ export function DemoCTA() {
                         required
                         value={formData.name}
                         onChange={handleChange}
-                        className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition"
+                        className="w-full px-4 py-2 border border-border rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition"
                         placeholder="John Smith"
                       />
                     </div>
 
                     <div>
-                      <label htmlFor="email" className="block text-sm font-medium text-slate-700 mb-1">
+                      <label htmlFor="email" className="block text-sm font-medium text-foreground mb-1">
                         Email *
                       </label>
                       <input
@@ -172,14 +172,14 @@ export function DemoCTA() {
                         required
                         value={formData.email}
                         onChange={handleChange}
-                        className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition"
+                        className="w-full px-4 py-2 border border-border rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition"
                         placeholder="john@example.com"
                       />
                     </div>
                   </div>
 
                   <div>
-                    <label htmlFor="phone" className="block text-sm font-medium text-slate-700 mb-1">
+                    <label htmlFor="phone" className="block text-sm font-medium text-foreground mb-1">
                       Phone Number
                     </label>
                     <input
@@ -188,13 +188,13 @@ export function DemoCTA() {
                       name="phone"
                       value={formData.phone}
                       onChange={handleChange}
-                      className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition"
+                      className="w-full px-4 py-2 border border-border rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition"
                       placeholder="(555) 123-4567"
                     />
                   </div>
 
                   <div>
-                    <label htmlFor="campgroundName" className="block text-sm font-medium text-slate-700 mb-1">
+                    <label htmlFor="campgroundName" className="block text-sm font-medium text-foreground mb-1">
                       Campground Name *
                     </label>
                     <input
@@ -204,13 +204,13 @@ export function DemoCTA() {
                       required
                       value={formData.campgroundName}
                       onChange={handleChange}
-                      className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition"
+                      className="w-full px-4 py-2 border border-border rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition"
                       placeholder="Pine Valley Campground"
                     />
                   </div>
 
                   <div>
-                    <label htmlFor="sites" className="block text-sm font-medium text-slate-700 mb-1">
+                    <label htmlFor="sites" className="block text-sm font-medium text-foreground mb-1">
                       Number of Sites *
                     </label>
                     <select
@@ -219,7 +219,7 @@ export function DemoCTA() {
                       required
                       value={formData.sites}
                       onChange={handleChange}
-                      className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition"
+                      className="w-full px-4 py-2 border border-border rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition"
                     >
                       <option value="">Select range</option>
                       <option value="1-25">1-25 sites</option>
@@ -231,7 +231,7 @@ export function DemoCTA() {
                   </div>
 
                   <div>
-                    <label htmlFor="message" className="block text-sm font-medium text-slate-700 mb-1">
+                    <label htmlFor="message" className="block text-sm font-medium text-foreground mb-1">
                       Additional Information
                     </label>
                     <textarea
@@ -240,7 +240,7 @@ export function DemoCTA() {
                       rows={3}
                       value={formData.message}
                       onChange={handleChange}
-                      className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition resize-none"
+                      className="w-full px-4 py-2 border border-border rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition resize-none"
                       placeholder="Tell us about your needs..."
                     />
                   </div>
@@ -269,7 +269,7 @@ export function DemoCTA() {
                     )}
                   </Button>
 
-                  <p className="text-xs text-slate-500 text-center">
+                  <p className="text-xs text-muted-foreground text-center">
                     By submitting this form, you agree to receive communications from Camp Everyday Host.
                   </p>
                 </form>

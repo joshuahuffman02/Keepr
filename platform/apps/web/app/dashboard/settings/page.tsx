@@ -309,14 +309,14 @@ export default function SettingsLandingPage() {
     <div className="max-w-[1400px] mx-auto">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-slate-900">Settings</h1>
-          <p className="text-slate-500 mt-2">
+          <h1 className="text-3xl font-bold text-foreground">Settings</h1>
+          <p className="text-muted-foreground mt-2">
             Manage your campground configuration, pricing, communications, and security
           </p>
         </div>
 
         {/* Theme Preferences Card */}
-        <Card className="mb-8 border border-slate-200 bg-white">
+        <Card className="mb-8 border border-border bg-card">
           <CardHeader>
             <div className="flex items-center gap-3">
               <div className="p-2.5 rounded-lg bg-status-success/15 text-status-success">
@@ -344,7 +344,7 @@ export default function SettingsLandingPage() {
                         "relative h-10 w-10 rounded-full transition-all",
                         option.color,
                         isSelected
-                          ? "ring-2 ring-offset-2 ring-slate-900 scale-110"
+                          ? "ring-2 ring-offset-2 ring-ring scale-110"
                           : "hover:scale-105"
                       )}
                     >
@@ -358,12 +358,12 @@ export default function SettingsLandingPage() {
             </div>
 
             {/* Accessibility Options */}
-            <div className="space-y-4 pt-4 border-t border-slate-200">
+            <div className="space-y-4 pt-4 border-t border-border">
               <Label className="text-sm font-medium">Accessibility</Label>
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm font-medium">Reduced Motion</p>
-                  <p className="text-xs text-slate-500">
+                  <p className="text-xs text-muted-foreground">
                     Minimize animations for motion sensitivity
                   </p>
                 </div>
@@ -375,7 +375,7 @@ export default function SettingsLandingPage() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm font-medium">High Contrast</p>
-                  <p className="text-xs text-slate-500">
+                  <p className="text-xs text-muted-foreground">
                     Increase contrast for better visibility
                   </p>
                 </div>
@@ -391,7 +391,7 @@ export default function SettingsLandingPage() {
         {/* Search Bar */}
         <div className="mb-8">
           <div className="relative max-w-md">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-slate-400" />
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
               type="text"
               placeholder="Search settings..."
@@ -429,8 +429,8 @@ export default function SettingsLandingPage() {
                     <IconComponent className="h-5 w-5" />
                   </div>
                   <div>
-                    <h2 className="text-xl font-bold text-slate-900">{category.title}</h2>
-                    <p className="text-sm text-slate-500 mt-0.5">{category.description}</p>
+                    <h2 className="text-xl font-bold text-foreground">{category.title}</h2>
+                    <p className="text-sm text-muted-foreground mt-0.5">{category.description}</p>
                   </div>
                 </div>
 
@@ -441,13 +441,13 @@ export default function SettingsLandingPage() {
                     return (
                       <div key={link.href} className="relative group">
                         <Link href={link.href} className="block">
-                          <Card className="h-full transition-all hover:shadow-md hover:border-emerald-300 cursor-pointer group-hover:bg-slate-50">
+                          <Card className="h-full transition-all hover:shadow-md hover:border-emerald-300 cursor-pointer group-hover:bg-muted">
                             <CardHeader className="pb-3">
                               <div className="flex items-center justify-between">
-                                <CardTitle className="text-base font-semibold text-slate-900">
+                                <CardTitle className="text-base font-semibold text-foreground">
                                   {link.name}
                                 </CardTitle>
-                                <ChevronRight className="h-4 w-4 text-slate-400 group-hover:text-emerald-600 group-hover:translate-x-0.5 transition-all" />
+                                <ChevronRight className="h-4 w-4 text-muted-foreground group-hover:text-emerald-600 group-hover:translate-x-0.5 transition-all" />
                               </div>
                               <CardDescription className="text-sm line-clamp-2">
                                 {link.description}
@@ -465,7 +465,7 @@ export default function SettingsLandingPage() {
                           className={`absolute top-3 right-10 p-1.5 rounded-md transition-all ${
                             isFavorite
                               ? "text-amber-500 bg-amber-50"
-                              : "text-slate-300 hover:text-amber-500 hover:bg-amber-50 opacity-0 group-hover:opacity-100"
+                              : "text-muted-foreground hover:text-amber-500 hover:bg-amber-50 opacity-0 group-hover:opacity-100"
                           }`}
                           title={isFavorite ? "Remove from favorites" : "Add to favorites"}
                         >
@@ -486,11 +486,11 @@ export default function SettingsLandingPage() {
         {/* No Results */}
         {filteredCategories.length === 0 && searchQuery && (
           <div className="text-center py-12">
-            <div className="text-slate-400 mb-2">
+            <div className="text-muted-foreground mb-2">
               <Search className="h-12 w-12 mx-auto" />
             </div>
-            <h3 className="text-lg font-semibold text-slate-900 mb-1">No settings found</h3>
-            <p className="text-slate-500">
+            <h3 className="text-lg font-semibold text-foreground mb-1">No settings found</h3>
+            <p className="text-muted-foreground">
               Try adjusting your search term or browse the categories above
             </p>
           </div>

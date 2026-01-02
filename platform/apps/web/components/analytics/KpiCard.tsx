@@ -46,10 +46,10 @@ export function KpiCard({
   };
 
   const getChangeColor = (val: number | null | undefined) => {
-    if (val === null || val === undefined) return "text-slate-400";
+    if (val === null || val === undefined) return "text-muted-foreground";
     if (val > 0) return "text-green-400";
     if (val < 0) return "text-red-400";
-    return "text-slate-400";
+    return "text-muted-foreground";
   };
 
   const getChangeIcon = (val: number | null | undefined) => {
@@ -61,12 +61,12 @@ export function KpiCard({
 
   if (loading) {
     return (
-      <Card className="bg-slate-800/50 border-slate-700">
+      <Card className="bg-muted/50 border-border">
         <CardContent className="p-6">
           <div className="animate-pulse space-y-3">
-            <div className="h-4 w-24 bg-slate-700 rounded" />
-            <div className="h-8 w-32 bg-slate-700 rounded" />
-            <div className="h-3 w-20 bg-slate-700 rounded" />
+            <div className="h-4 w-24 bg-muted rounded" />
+            <div className="h-8 w-32 bg-muted rounded" />
+            <div className="h-3 w-20 bg-muted rounded" />
           </div>
         </CardContent>
       </Card>
@@ -74,20 +74,20 @@ export function KpiCard({
   }
 
   return (
-    <Card className="bg-slate-800/50 border-slate-700 hover:bg-slate-800/70 transition-colors">
+    <Card className="bg-muted/50 border-border hover:bg-muted/70 transition-colors">
       <CardContent className="p-6">
         <div className="flex items-start justify-between">
           <div>
-            <p className="text-sm text-slate-400 font-medium">{title}</p>
+            <p className="text-sm text-muted-foreground font-medium">{title}</p>
             <p className="text-2xl font-bold text-white mt-1">
               {formatValue(value)}
             </p>
             {subtitle && (
-              <p className="text-xs text-slate-500 mt-1">{subtitle}</p>
+              <p className="text-xs text-muted-foreground mt-1">{subtitle}</p>
             )}
           </div>
           {icon && (
-            <div className="p-2 bg-slate-700/50 rounded-lg">
+            <div className="p-2 bg-muted/50 rounded-lg">
               {icon}
             </div>
           )}
@@ -97,7 +97,7 @@ export function KpiCard({
           <div className={cn("flex items-center gap-1 mt-3 text-sm", getChangeColor(change))}>
             {getChangeIcon(change)}
             <span>{change !== null ? `${Math.abs(change).toFixed(1)}%` : "N/A"}</span>
-            <span className="text-slate-500 ml-1">{changeLabel}</span>
+            <span className="text-muted-foreground ml-1">{changeLabel}</span>
           </div>
         )}
       </CardContent>

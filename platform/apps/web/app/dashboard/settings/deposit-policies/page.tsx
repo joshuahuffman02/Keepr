@@ -240,7 +240,7 @@ export default function DepositPoliciesPage() {
     <div className="space-y-6">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold text-slate-900">Deposit Policies</h1>
+            <h1 className="text-2xl font-bold text-foreground">Deposit Policies</h1>
             <p className="text-muted-foreground">
               Configure deposit requirements for reservations.
             </p>
@@ -254,9 +254,9 @@ export default function DepositPoliciesPage() {
         {policiesQuery.isLoading ? (
           <div className="text-center py-12 text-muted-foreground">Loading...</div>
         ) : policiesQuery.data?.length === 0 ? (
-          <div className="text-center py-12 border-2 border-dashed border-slate-200 rounded-lg">
-            <Banknote className="mx-auto h-12 w-12 text-slate-400" />
-            <h3 className="mt-4 text-lg font-semibold text-slate-900">No deposit policies yet</h3>
+          <div className="text-center py-12 border-2 border-dashed border-border rounded-lg">
+            <Banknote className="mx-auto h-12 w-12 text-muted-foreground" />
+            <h3 className="mt-4 text-lg font-semibold text-foreground">No deposit policies yet</h3>
             <p className="mt-2 text-muted-foreground">
               Create policies to require deposits at booking or before arrival.
             </p>
@@ -272,16 +272,16 @@ export default function DepositPoliciesPage() {
               return (
                 <div
                   key={policy.id}
-                  className={`border rounded-lg p-4 ${policy.active ? "bg-white" : "bg-slate-50 opacity-60"}`}
+                  className={`border rounded-lg p-4 ${policy.active ? "bg-card" : "bg-muted opacity-60"}`}
                 >
                   <div className="flex items-start justify-between">
                     <div className="flex items-start gap-3">
-                      <div className={`p-2 rounded-lg ${policy.active ? "bg-status-info/15 text-status-info" : "bg-slate-200 text-slate-500"}`}>
+                      <div className={`p-2 rounded-lg ${policy.active ? "bg-status-info/15 text-status-info" : "bg-muted text-muted-foreground"}`}>
                         <StrategyIcon className="h-5 w-5" />
                       </div>
                       <div>
                         <div className="flex items-center gap-2">
-                          <h3 className="font-semibold text-slate-900">{policy.name}</h3>
+                          <h3 className="font-semibold text-foreground">{policy.name}</h3>
                           {!policy.active && (
                             <span className="text-xs px-2 py-0.5 rounded-full bg-status-warning/15 text-status-warning">
                               Inactive
@@ -289,7 +289,7 @@ export default function DepositPoliciesPage() {
                           )}
                         </div>
                         <div className="mt-1 text-sm text-muted-foreground">
-                          <span className="font-medium text-slate-700">{formatValue(policy)}</span>
+                          <span className="font-medium text-foreground">{formatValue(policy)}</span>
                           {" • "}
                           {applyToLabels[policy.applyTo]}
                           {" • "}
@@ -298,7 +298,7 @@ export default function DepositPoliciesPage() {
                             <> ({policy.dueHoursBeforeArrival}h before)</>
                           )}
                         </div>
-                        <div className="mt-1 text-xs text-slate-500">
+                        <div className="mt-1 text-xs text-muted-foreground">
                           {getSiteClassName(policy.siteClassId)}
                           {policy.minCap && <> • Min: ${(policy.minCap / 100).toFixed(2)}</>}
                           {policy.maxCap && <> • Max: ${(policy.maxCap / 100).toFixed(2)}</>}
@@ -328,8 +328,8 @@ export default function DepositPoliciesPage() {
       {/* Modal */}
       {isModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-          <div className="bg-white rounded-xl shadow-xl w-full max-w-lg max-h-[90vh] overflow-y-auto p-6">
-            <h2 className="text-xl font-bold text-slate-900 mb-4">
+          <div className="bg-card rounded-xl shadow-xl w-full max-w-lg max-h-[90vh] overflow-y-auto p-6">
+            <h2 className="text-xl font-bold text-foreground mb-4">
               {editingPolicy ? "Edit Deposit Policy" : "Create Deposit Policy"}
             </h2>
 
@@ -341,10 +341,10 @@ export default function DepositPoliciesPage() {
 
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">Name *</label>
+                <label className="block text-sm font-medium text-foreground mb-1">Name *</label>
                 <input
                   type="text"
-                  className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm"
+                  className="w-full rounded-lg border border-border px-3 py-2 text-sm"
                   placeholder="e.g., Standard Deposit"
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
@@ -352,7 +352,7 @@ export default function DepositPoliciesPage() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-slate-700 mb-2">Strategy</label>
+                <label className="block text-sm font-medium text-foreground mb-2">Strategy</label>
                 <div className="grid grid-cols-3 gap-2">
                   {Object.entries(strategyLabels).map(([key, val]) => {
                     const Icon = val.icon;
@@ -364,7 +364,7 @@ export default function DepositPoliciesPage() {
                         className={`p-3 rounded-lg border text-left transition-colors ${
                           formData.strategy === key
                             ? "border-blue-500 bg-blue-50 text-blue-700"
-                            : "border-slate-200 hover:border-slate-300"
+                            : "border-border hover:border-border"
                         }`}
                       >
                         <Icon className="h-5 w-5 mb-1" />
@@ -377,14 +377,14 @@ export default function DepositPoliciesPage() {
 
               {formData.strategy !== "first_night" && (
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-1">
+                  <label className="block text-sm font-medium text-foreground mb-1">
                     {formData.strategy === "percent" ? "Percentage (%)" : "Amount ($)"}
                   </label>
                   <input
                     type="number"
                     step={formData.strategy === "percent" ? "1" : "0.01"}
                     min="0"
-                    className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm"
+                    className="w-full rounded-lg border border-border px-3 py-2 text-sm"
                     placeholder={formData.strategy === "percent" ? "e.g., 50" : "e.g., 100.00"}
                     value={formData.value}
                     onChange={(e) => setFormData({ ...formData, value: e.target.value })}
@@ -394,9 +394,9 @@ export default function DepositPoliciesPage() {
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-1">Apply To</label>
+                  <label className="block text-sm font-medium text-foreground mb-1">Apply To</label>
                   <select
-                    className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm"
+                    className="w-full rounded-lg border border-border px-3 py-2 text-sm"
                     value={formData.applyTo}
                     onChange={(e) => setFormData({ ...formData, applyTo: e.target.value as FormData["applyTo"] })}
                   >
@@ -407,11 +407,11 @@ export default function DepositPoliciesPage() {
                 </div>
                 <div>
                   <div className="flex items-center gap-1.5 mb-1">
-                    <label className="block text-sm font-medium text-slate-700">Due Timing</label>
+                    <label className="block text-sm font-medium text-foreground">Due Timing</label>
                     <HelpTooltip content="When the deposit should be collected from the guest" />
                   </div>
                   <select
-                    className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm"
+                    className="w-full rounded-lg border border-border px-3 py-2 text-sm"
                     value={formData.dueTiming}
                     onChange={(e) => setFormData({ ...formData, dueTiming: e.target.value as FormData["dueTiming"] })}
                   >
@@ -424,11 +424,11 @@ export default function DepositPoliciesPage() {
 
               {formData.dueTiming === "before_arrival" && (
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-1">Hours Before Arrival</label>
+                  <label className="block text-sm font-medium text-foreground mb-1">Hours Before Arrival</label>
                   <input
                     type="number"
                     min="1"
-                    className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm"
+                    className="w-full rounded-lg border border-border px-3 py-2 text-sm"
                     value={formData.dueHoursBeforeArrival}
                     onChange={(e) => setFormData({ ...formData, dueHoursBeforeArrival: e.target.value })}
                   />
@@ -436,9 +436,9 @@ export default function DepositPoliciesPage() {
               )}
 
               <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">Site Class</label>
+                <label className="block text-sm font-medium text-foreground mb-1">Site Class</label>
                 <select
-                  className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm"
+                  className="w-full rounded-lg border border-border px-3 py-2 text-sm"
                   value={formData.siteClassId}
                   onChange={(e) => setFormData({ ...formData, siteClassId: e.target.value })}
                 >
@@ -452,14 +452,14 @@ export default function DepositPoliciesPage() {
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <div className="flex items-center gap-1.5 mb-1">
-                    <label className="block text-sm font-medium text-slate-700">Min Cap ($)</label>
+                    <label className="block text-sm font-medium text-foreground">Min Cap ($)</label>
                     <HelpTooltip content="Minimum deposit amount regardless of calculation (e.g., always collect at least $25)" />
                   </div>
                   <input
                     type="number"
                     step="0.01"
                     min="0"
-                    className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm"
+                    className="w-full rounded-lg border border-border px-3 py-2 text-sm"
                     placeholder="e.g., 25.00"
                     value={formData.minCap}
                     onChange={(e) => setFormData({ ...formData, minCap: e.target.value })}
@@ -467,14 +467,14 @@ export default function DepositPoliciesPage() {
                 </div>
                 <div>
                   <div className="flex items-center gap-1.5 mb-1">
-                    <label className="block text-sm font-medium text-slate-700">Max Cap ($)</label>
+                    <label className="block text-sm font-medium text-foreground">Max Cap ($)</label>
                     <HelpTooltip content="Maximum deposit amount regardless of calculation (e.g., never collect more than $500)" />
                   </div>
                   <input
                     type="number"
                     step="0.01"
                     min="0"
-                    className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm"
+                    className="w-full rounded-lg border border-border px-3 py-2 text-sm"
                     placeholder="e.g., 500.00"
                     value={formData.maxCap}
                     onChange={(e) => setFormData({ ...formData, maxCap: e.target.value })}
@@ -488,9 +488,9 @@ export default function DepositPoliciesPage() {
                   id="active"
                   checked={formData.active}
                   onChange={(e) => setFormData({ ...formData, active: e.target.checked })}
-                  className="rounded border-slate-300"
+                  className="rounded border-border"
                 />
-                <label htmlFor="active" className="text-sm text-slate-700">Active</label>
+                <label htmlFor="active" className="text-sm text-foreground">Active</label>
               </div>
             </div>
 

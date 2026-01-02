@@ -165,11 +165,11 @@ export default function ReferralsPage() {
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div>
-            <h1 className="text-2xl font-bold text-slate-900 flex items-center gap-2">
+            <h1 className="text-2xl font-bold text-foreground flex items-center gap-2">
               <Gift className="h-6 w-6 text-emerald-600" />
               Referral Program
             </h1>
-            <p className="text-slate-600 mt-1">
+            <p className="text-muted-foreground mt-1">
               Earn $50 in credits for each campground you refer that gets their first booking
             </p>
           </div>
@@ -183,8 +183,8 @@ export default function ReferralsPage() {
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           <Card>
             <CardContent className="p-4 text-center">
-              <div className="text-2xl font-bold text-slate-900">{displayData.stats.totalClicks}</div>
-              <p className="text-sm text-slate-600 flex items-center justify-center gap-1">
+              <div className="text-2xl font-bold text-foreground">{displayData.stats.totalClicks}</div>
+              <p className="text-sm text-muted-foreground flex items-center justify-center gap-1">
                 <TrendingUp className="h-3 w-3" />
                 Link Clicks
               </p>
@@ -194,7 +194,7 @@ export default function ReferralsPage() {
           <Card>
             <CardContent className="p-4 text-center">
               <div className="text-2xl font-bold text-blue-600">{displayData.stats.totalSignups}</div>
-              <p className="text-sm text-slate-600 flex items-center justify-center gap-1">
+              <p className="text-sm text-muted-foreground flex items-center justify-center gap-1">
                 <Users className="h-3 w-3" />
                 Sign Ups
               </p>
@@ -204,7 +204,7 @@ export default function ReferralsPage() {
           <Card>
             <CardContent className="p-4 text-center">
               <div className="text-2xl font-bold text-emerald-600">{displayData.stats.totalConversions}</div>
-              <p className="text-sm text-slate-600 flex items-center justify-center gap-1">
+              <p className="text-sm text-muted-foreground flex items-center justify-center gap-1">
                 <Check className="h-3 w-3" />
                 Conversions
               </p>
@@ -214,7 +214,7 @@ export default function ReferralsPage() {
           <Card>
             <CardContent className="p-4 text-center">
               <div className="text-2xl font-bold text-amber-600">${displayData.stats.pendingCredits}</div>
-              <p className="text-sm text-slate-600 flex items-center justify-center gap-1">
+              <p className="text-sm text-muted-foreground flex items-center justify-center gap-1">
                 <Clock className="h-3 w-3" />
                 Pending
               </p>
@@ -240,7 +240,7 @@ export default function ReferralsPage() {
                 <Input
                   readOnly
                   value={displayData.referralLink}
-                  className="pr-24 font-mono text-sm bg-slate-50"
+                  className="pr-24 font-mono text-sm bg-muted"
                 />
                 <div className="absolute right-2 top-1/2 -translate-y-1/2">
                   <Badge variant="outline" className="text-xs">
@@ -283,8 +283,8 @@ export default function ReferralsPage() {
                 <div className="w-12 h-12 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-3">
                   <Share2 className="h-6 w-6 text-emerald-600" />
                 </div>
-                <h3 className="font-semibold text-slate-900 mb-1">1. Share Your Link</h3>
-                <p className="text-sm text-slate-600">
+                <h3 className="font-semibold text-foreground mb-1">1. Share Your Link</h3>
+                <p className="text-sm text-muted-foreground">
                   Send your unique referral link to fellow campground owners
                 </p>
               </div>
@@ -293,8 +293,8 @@ export default function ReferralsPage() {
                 <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-3">
                   <Users className="h-6 w-6 text-blue-600" />
                 </div>
-                <h3 className="font-semibold text-slate-900 mb-1">2. They Sign Up</h3>
-                <p className="text-sm text-slate-600">
+                <h3 className="font-semibold text-foreground mb-1">2. They Sign Up</h3>
+                <p className="text-sm text-muted-foreground">
                   Your friend joins Camp Everyday and sets up their campground
                 </p>
               </div>
@@ -303,8 +303,8 @@ export default function ReferralsPage() {
                 <div className="w-12 h-12 bg-amber-100 rounded-full flex items-center justify-center mx-auto mb-3">
                   <DollarSign className="h-6 w-6 text-amber-600" />
                 </div>
-                <h3 className="font-semibold text-slate-900 mb-1">3. You Both Earn</h3>
-                <p className="text-sm text-slate-600">
+                <h3 className="font-semibold text-foreground mb-1">3. You Both Earn</h3>
+                <p className="text-sm text-muted-foreground">
                   When they get their first booking, you both receive $50 in credits
                 </p>
               </div>
@@ -326,11 +326,11 @@ export default function ReferralsPage() {
           <CardContent>
             {displayData.referrals.length === 0 ? (
               <div className="text-center py-12">
-                <div className="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <Users className="h-8 w-8 text-slate-400" />
+                <div className="w-16 h-16 bg-muted rounded-full flex items-center justify-center mx-auto mb-4">
+                  <Users className="h-8 w-8 text-muted-foreground" />
                 </div>
-                <h3 className="font-medium text-slate-900 mb-1">No referrals yet</h3>
-                <p className="text-sm text-slate-600 mb-4">
+                <h3 className="font-medium text-foreground mb-1">No referrals yet</h3>
+                <p className="text-sm text-muted-foreground mb-4">
                   Share your link to start earning credits
                 </p>
                 <Button onClick={handleCopyLink} variant="outline">
@@ -339,18 +339,18 @@ export default function ReferralsPage() {
                 </Button>
               </div>
             ) : (
-              <div className="divide-y divide-slate-100">
+              <div className="divide-y divide-border">
                 {displayData.referrals.map((referral) => (
                   <div key={referral.id} className="py-4 flex items-center justify-between">
                     <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 bg-slate-100 rounded-full flex items-center justify-center">
-                        <Users className="h-5 w-5 text-slate-500" />
+                      <div className="w-10 h-10 bg-muted rounded-full flex items-center justify-center">
+                        <Users className="h-5 w-5 text-muted-foreground" />
                       </div>
                       <div>
-                        <p className="font-medium text-slate-900">
+                        <p className="font-medium text-foreground">
                           {referral.referredEmail || "Anonymous"}
                         </p>
-                        <p className="text-sm text-slate-500">
+                        <p className="text-sm text-muted-foreground">
                           {formatDate(referral.createdAt)}
                         </p>
                       </div>
@@ -377,7 +377,7 @@ export default function ReferralsPage() {
         </Card>
 
         {/* Terms Note */}
-        <p className="text-center text-sm text-slate-500">
+        <p className="text-center text-sm text-muted-foreground">
           Credits are applied to your account after your referral receives their first booking.
           Credits can be used toward monthly fees or booking fees.{" "}
           <a href="/help/referrals" className="text-emerald-600 hover:underline">

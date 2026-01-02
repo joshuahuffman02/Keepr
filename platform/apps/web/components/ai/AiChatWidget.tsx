@@ -169,7 +169,7 @@ export function AiChatWidget({ campgroundId, campgroundName }: AiChatWidgetProps
             <button
                 type="button"
                 onClick={() => setIsOpen(true)}
-                className="fixed bottom-6 right-6 w-14 h-14 bg-gradient-to-br from-emerald-500 to-teal-600 text-white rounded-full shadow-xl hover:shadow-2xl hover:scale-105 transition-all flex items-center justify-center z-[9999]"
+                className="fixed bottom-6 right-6 w-14 h-14 bg-action-primary text-action-primary-foreground rounded-full shadow-xl hover:shadow-2xl hover:scale-105 transition-all flex items-center justify-center z-[9999]"
                 aria-label="Open Host booking assistant"
             >
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -180,11 +180,11 @@ export function AiChatWidget({ campgroundId, campgroundName }: AiChatWidgetProps
     }
 
     return (
-        <div className="fixed bottom-6 right-6 w-96 h-[500px] bg-white rounded-2xl shadow-2xl flex flex-col overflow-hidden z-50 border border-slate-200">
+        <div className="fixed bottom-6 right-6 w-96 h-[500px] bg-card rounded-2xl shadow-2xl flex flex-col overflow-hidden z-50 border border-border">
             {/* Header */}
-            <div className="bg-gradient-to-r from-emerald-500 to-teal-600 text-white p-4 flex items-center justify-between">
+            <div className="bg-action-primary text-action-primary-foreground p-4 flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
+                    <div className="w-10 h-10 bg-card/20 rounded-full flex items-center justify-center">
                         <Bot className="w-5 h-5" />
                     </div>
                     <div>
@@ -195,7 +195,7 @@ export function AiChatWidget({ campgroundId, campgroundName }: AiChatWidgetProps
                 <button
                     type="button"
                     onClick={() => setIsOpen(false)}
-                    className="p-2 hover:bg-white/10 rounded-lg transition-colors"
+                    className="p-2 hover:bg-card/10 rounded-lg transition-colors"
                 >
                     <X className="w-5 h-5" />
                 </button>
@@ -204,22 +204,22 @@ export function AiChatWidget({ campgroundId, campgroundName }: AiChatWidgetProps
             {/* Consent Screen */}
             {!hasConsented && (
                 <div className="flex-1 flex flex-col items-center justify-center p-6 text-center">
-                    <div className="w-16 h-16 bg-emerald-100 rounded-full flex items-center justify-center mb-4">
-                        <Sparkles className="w-8 h-8 text-emerald-600" />
+                    <div className="w-16 h-16 bg-status-success-bg rounded-full flex items-center justify-center mb-4">
+                        <Sparkles className="w-8 h-8 text-status-success-text" />
                     </div>
-                    <h3 className="text-lg font-semibold text-slate-900 mb-2">Host</h3>
-                    <p className="text-sm text-slate-600 mb-4">
+                    <h3 className="text-lg font-semibold text-foreground mb-2">Host</h3>
+                    <p className="text-sm text-muted-foreground mb-4">
                         I can help you find the perfect campsite. Just describe what you're looking for.
                     </p>
-                    <div className="text-xs text-slate-500 mb-6 p-3 bg-slate-50 rounded-lg">
+                    <div className="text-xs text-muted-foreground mb-6 p-3 bg-muted rounded-lg">
                         <div className="flex items-center gap-2 mb-1">
-                            <span className="w-4 h-4 bg-emerald-500 rounded-full flex items-center justify-center">
+                            <span className="w-4 h-4 bg-status-success rounded-full flex items-center justify-center">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
                             </span>
                             <span>Your data stays private</span>
                         </div>
                         <div className="flex items-center gap-2">
-                            <span className="w-4 h-4 bg-emerald-500 rounded-full flex items-center justify-center">
+                            <span className="w-4 h-4 bg-status-success rounded-full flex items-center justify-center">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
                             </span>
                             <span>No personal info shared with Host</span>
@@ -228,7 +228,7 @@ export function AiChatWidget({ campgroundId, campgroundName }: AiChatWidgetProps
                     <button
                         type="button"
                         onClick={handleConsent}
-                        className="px-6 py-3 bg-gradient-to-r from-emerald-500 to-teal-600 text-white font-medium rounded-xl hover:from-emerald-600 hover:to-teal-700 transition-all"
+                        className="px-6 py-3 bg-action-primary text-action-primary-foreground font-medium rounded-xl hover:bg-action-primary-hover transition-all"
                     >
                         Chat with Host
                     </button>
@@ -245,28 +245,28 @@ export function AiChatWidget({ campgroundId, campgroundName }: AiChatWidgetProps
                                 className={`flex gap-3 ${msg.role === "user" ? "justify-end" : "justify-start"}`}
                             >
                                 {msg.role === "assistant" && (
-                                    <div className="w-8 h-8 bg-emerald-100 rounded-full flex items-center justify-center flex-shrink-0">
-                                        <Bot className="w-4 h-4 text-emerald-600" />
+                                    <div className="w-8 h-8 bg-status-success-bg rounded-full flex items-center justify-center flex-shrink-0">
+                                        <Bot className="w-4 h-4 text-status-success-text" />
                                     </div>
                                 )}
                                 <div
                                     className={`max-w-[75%] p-3 rounded-2xl ${msg.role === "user"
-                                        ? "bg-emerald-500 text-white rounded-br-md"
-                                        : "bg-slate-100 text-slate-900 rounded-bl-md"
+                                        ? "bg-action-primary text-action-primary-foreground rounded-br-md"
+                                        : "bg-muted text-foreground rounded-bl-md"
                                         }`}
                                 >
                                     <p className="text-sm whitespace-pre-wrap">{msg.content}</p>
 
                                     {msg.clarifyingQuestions && msg.clarifyingQuestions.length > 0 && (
                                         <div className="mt-3 space-y-2">
-                                            <div className="text-xs font-semibold uppercase tracking-wide text-slate-500">Quick answers</div>
+                                            <div className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Quick answers</div>
                                             <div className="flex flex-wrap gap-2">
                                                 {msg.clarifyingQuestions.map((question, idx) => (
                                                     <button
                                                         key={`${question}-${idx}`}
                                                         type="button"
                                                         onClick={() => handleQuickReply(question)}
-                                                        className="rounded-full border border-slate-200 bg-white px-3 py-1 text-xs text-slate-600 hover:border-emerald-400 hover:text-emerald-600"
+                                                        className="rounded-full border border-border bg-card px-3 py-1 text-xs text-muted-foreground hover:border-action-primary/40 hover:text-action-primary"
                                                     >
                                                         {question}
                                                     </button>
@@ -277,22 +277,22 @@ export function AiChatWidget({ campgroundId, campgroundName }: AiChatWidgetProps
 
                                     {msg.recommendations && msg.recommendations.length > 0 && (
                                         <div className="mt-3 space-y-2">
-                                            <div className="text-xs font-semibold uppercase tracking-wide text-slate-500">Recommended site classes</div>
+                                            <div className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Recommended site classes</div>
                                             {msg.recommendations.map((rec, idx) => (
                                                 <div
                                                     key={idx}
-                                                    className="bg-white rounded-lg p-2 border border-slate-200"
+                                                    className="bg-card rounded-lg p-2 border border-border"
                                                 >
-                                                    <div className="font-medium text-sm text-slate-900">{rec.siteClassName}</div>
-                                                    <div className="text-xs text-slate-500">{rec.reasons.join(" • ")}</div>
+                                                    <div className="font-medium text-sm text-foreground">{rec.siteClassName}</div>
+                                                    <div className="text-xs text-muted-foreground">{rec.reasons.join(" • ")}</div>
                                                 </div>
                                             ))}
                                         </div>
                                     )}
                                 </div>
                                 {msg.role === "user" && (
-                                    <div className="w-8 h-8 bg-slate-200 rounded-full flex items-center justify-center flex-shrink-0">
-                                        <User className="w-4 h-4 text-slate-600" />
+                                    <div className="w-8 h-8 bg-muted rounded-full flex items-center justify-center flex-shrink-0">
+                                        <User className="w-4 h-4 text-muted-foreground" />
                                     </div>
                                 )}
                             </div>
@@ -300,14 +300,14 @@ export function AiChatWidget({ campgroundId, campgroundName }: AiChatWidgetProps
 
                         {chatMutation.isPending && (
                             <div className="flex gap-3 justify-start">
-                                <div className="w-8 h-8 bg-emerald-100 rounded-full flex items-center justify-center">
-                                    <Bot className="w-4 h-4 text-emerald-600" />
+                                <div className="w-8 h-8 bg-status-success-bg rounded-full flex items-center justify-center">
+                                    <Bot className="w-4 h-4 text-status-success-text" />
                                 </div>
-                                <div className="bg-slate-100 rounded-2xl rounded-bl-md p-3">
+                                <div className="bg-muted rounded-2xl rounded-bl-md p-3">
                                     <div className="flex gap-1">
-                                        <div className="w-2 h-2 bg-slate-400 rounded-full animate-bounce" />
-                                        <div className="w-2 h-2 bg-slate-400 rounded-full animate-bounce [animation-delay:0.1s]" />
-                                        <div className="w-2 h-2 bg-slate-400 rounded-full animate-bounce [animation-delay:0.2s]" />
+                                        <div className="w-2 h-2 bg-muted rounded-full animate-bounce" />
+                                        <div className="w-2 h-2 bg-muted rounded-full animate-bounce [animation-delay:0.1s]" />
+                                        <div className="w-2 h-2 bg-muted rounded-full animate-bounce [animation-delay:0.2s]" />
                                     </div>
                                 </div>
                             </div>
@@ -317,7 +317,7 @@ export function AiChatWidget({ campgroundId, campgroundName }: AiChatWidgetProps
                     </div>
 
                     {/* Input */}
-                    <div className="p-4 border-t border-slate-200">
+                    <div className="p-4 border-t border-border">
                         <div className="flex gap-2">
                             <input
                                 type="text"
@@ -325,7 +325,7 @@ export function AiChatWidget({ campgroundId, campgroundName }: AiChatWidgetProps
                                 onChange={(e) => setInput(e.target.value)}
                                 onKeyDown={handleKeyDown}
                                 placeholder="Describe what you're looking for..."
-                                className="flex-1 px-4 py-2 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 text-sm"
+                                className="flex-1 px-4 py-2 border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-action-primary/20 focus:border-action-primary text-sm"
                                 disabled={chatMutation.isPending}
                                 ref={inputRef}
                             />
@@ -333,7 +333,7 @@ export function AiChatWidget({ campgroundId, campgroundName }: AiChatWidgetProps
                                 type="button"
                                 onClick={handleSend}
                                 disabled={!input.trim() || chatMutation.isPending}
-                                className="p-2 bg-emerald-500 text-white rounded-xl hover:bg-emerald-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                className="p-2 bg-action-primary text-action-primary-foreground rounded-xl hover:bg-action-primary-hover transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                             >
                                 <Send className="w-5 h-5" />
                             </button>

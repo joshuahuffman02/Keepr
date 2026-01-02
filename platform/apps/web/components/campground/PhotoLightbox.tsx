@@ -138,7 +138,7 @@ export function PhotoLightbox({
                 variant="ghost"
                 size="icon"
                 onClick={onClose}
-                className="text-white hover:bg-white/20"
+                className="text-foreground hover:bg-card/20"
                 aria-label="Close gallery"
               >
                 <X className="h-6 w-6" />
@@ -153,7 +153,7 @@ export function PhotoLightbox({
                   variant="ghost"
                   size="icon"
                   onClick={handleShare}
-                  className="text-white hover:bg-white/20"
+                  className="text-foreground hover:bg-card/20"
                   aria-label="Share"
                 >
                   <Share2 className="h-5 w-5" />
@@ -208,7 +208,7 @@ export function PhotoLightbox({
                   variant="ghost"
                   size="icon"
                   onClick={goToPrev}
-                  className="absolute left-4 top-1/2 -translate-y-1/2 h-12 w-12 rounded-full bg-white/10 hover:bg-white/20 text-white backdrop-blur-sm hidden md:flex"
+                  className="absolute left-4 top-1/2 -translate-y-1/2 h-12 w-12 rounded-full bg-card/10 hover:bg-card/20 text-foreground backdrop-blur-sm hidden md:flex"
                   aria-label="Previous photo"
                 >
                   <ChevronLeft className="h-8 w-8" />
@@ -217,7 +217,7 @@ export function PhotoLightbox({
                   variant="ghost"
                   size="icon"
                   onClick={goToNext}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 h-12 w-12 rounded-full bg-white/10 hover:bg-white/20 text-white backdrop-blur-sm hidden md:flex"
+                  className="absolute right-4 top-1/2 -translate-y-1/2 h-12 w-12 rounded-full bg-card/10 hover:bg-card/20 text-foreground backdrop-blur-sm hidden md:flex"
                   aria-label="Next photo"
                 >
                   <ChevronRight className="h-8 w-8" />

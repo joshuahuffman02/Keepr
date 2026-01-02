@@ -230,14 +230,14 @@ export function AdvancedExportDialog({
                     {savedPresets.map((preset) => (
                       <div
                         key={preset.id}
-                        className="flex items-center justify-between rounded-lg border border-slate-200 bg-slate-50 p-3 hover:bg-slate-100 transition-colors"
+                        className="flex items-center justify-between rounded-lg border border-border bg-muted p-3 hover:bg-muted transition-colors"
                       >
                         <button
                           onClick={() => handleLoadPreset(preset)}
                           className="flex-1 text-left"
                         >
-                          <div className="font-medium text-sm text-slate-900">{preset.name}</div>
-                          <div className="text-xs text-slate-500 mt-1">
+                          <div className="font-medium text-sm text-foreground">{preset.name}</div>
+                          <div className="text-xs text-muted-foreground mt-1">
                             {preset.columns.length} columns • {preset.format.toUpperCase()} • {preset.dateRangeType}
                           </div>
                         </button>
@@ -245,7 +245,7 @@ export function AdvancedExportDialog({
                           variant="ghost"
                           size="icon"
                           onClick={() => handleDeletePreset(preset.id)}
-                          className="h-8 w-8 text-slate-400 hover:text-red-600"
+                          className="h-8 w-8 text-muted-foreground hover:text-red-600"
                         >
                           <Trash2 className="h-4 w-4" />
                         </Button>
@@ -273,7 +273,7 @@ export function AdvancedExportDialog({
                   </div>
                 </div>
 
-                <div className="grid grid-cols-2 gap-3 rounded-lg border border-slate-200 bg-slate-50 p-4">
+                <div className="grid grid-cols-2 gap-3 rounded-lg border border-border bg-muted p-4">
                   {availableColumns.map((column) => (
                     <div key={column.key} className="flex items-center gap-2">
                       <Checkbox
@@ -335,7 +335,7 @@ export function AdvancedExportDialog({
                   </div>
                 )}
 
-                <div className="text-xs text-slate-500 bg-blue-50 border border-blue-100 rounded-lg p-2">
+                <div className="text-xs text-muted-foreground bg-blue-50 border border-blue-100 rounded-lg p-2">
                   Selected range: {currentDateRange.start.toLocaleDateString()} to {currentDateRange.end.toLocaleDateString()}
                 </div>
               </div>
@@ -347,7 +347,7 @@ export function AdvancedExportDialog({
                 <div className="grid grid-cols-2 gap-3">
                   <button
                     onClick={() => setFormat('csv')}
-                    className={'flex items-center justify-center gap-2 px-4 py-3 rounded-lg border-2 transition-all ' + (format === 'csv' ? 'border-emerald-500 bg-emerald-50 text-emerald-900' : 'border-slate-200 bg-white text-slate-700 hover:border-slate-300')}
+                    className={'flex items-center justify-center gap-2 px-4 py-3 rounded-lg border-2 transition-all ' + (format === 'csv' ? 'border-emerald-500 bg-emerald-50 text-emerald-900' : 'border-border bg-card text-foreground hover:border-border')}
                   >
                     <FileSpreadsheet className="h-4 w-4" />
                     <div className="text-left">
@@ -357,7 +357,7 @@ export function AdvancedExportDialog({
                   </button>
                   <button
                     onClick={() => setFormat('xlsx')}
-                    className={'flex items-center justify-center gap-2 px-4 py-3 rounded-lg border-2 transition-all ' + (format === 'xlsx' ? 'border-emerald-500 bg-emerald-50 text-emerald-900' : 'border-slate-200 bg-white text-slate-700 hover:border-slate-300')}
+                    className={'flex items-center justify-center gap-2 px-4 py-3 rounded-lg border-2 transition-all ' + (format === 'xlsx' ? 'border-emerald-500 bg-emerald-50 text-emerald-900' : 'border-border bg-card text-foreground hover:border-border')}
                   >
                     <FileSpreadsheet className="h-4 w-4" />
                     <div className="text-left">
@@ -370,18 +370,18 @@ export function AdvancedExportDialog({
 
               <Separator />
 
-              <div className="rounded-lg border border-slate-200 bg-slate-50 p-4 space-y-2">
+              <div className="rounded-lg border border-border bg-muted p-4 space-y-2">
                 <div className="flex items-center gap-2">
-                  <Database className="h-4 w-4 text-slate-600" />
-                  <span className="text-sm font-medium text-slate-900">Export Summary</span>
+                  <Database className="h-4 w-4 text-muted-foreground" />
+                  <span className="text-sm font-medium text-foreground">Export Summary</span>
                 </div>
                 <div className="grid grid-cols-2 gap-3 text-sm">
                   <div className="flex justify-between">
-                    <span className="text-slate-600">Rows:</span>
+                    <span className="text-muted-foreground">Rows:</span>
                     <Badge variant="outline">{data.length.toLocaleString()}</Badge>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-slate-600">Columns:</span>
+                    <span className="text-muted-foreground">Columns:</span>
                     <Badge variant="outline">{selectedColumns.size} of {availableColumns.length}</Badge>
                   </div>
                 </div>

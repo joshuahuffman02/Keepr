@@ -34,7 +34,7 @@ export function TrailProgress({
     <div className={cn("w-full", className)}>
       <div
         className={cn(
-          "relative w-full overflow-hidden rounded-full bg-slate-200",
+          "relative w-full overflow-hidden rounded-full bg-muted",
           sizeClasses[size]
         )}
       >
@@ -43,7 +43,7 @@ export function TrailProgress({
           {[25, 50, 75].map((marker) => (
             <div
               key={marker}
-              className="w-0.5 h-full bg-slate-300"
+              className="w-0.5 h-full bg-muted"
               style={{ marginLeft: `${marker - 1}%` }}
             />
           ))}
@@ -52,25 +52,19 @@ export function TrailProgress({
         {/* Progress fill */}
         {indeterminate ? (
           <div
-            className="absolute inset-0 bg-gradient-to-r from-emerald-400 via-emerald-500 to-teal-500 animate-shimmer"
-            style={{
-              backgroundSize: "200% 100%",
-            }}
+            className="absolute inset-0 bg-action-primary/30 animate-pulse"
           />
         ) : (
           <div
-            className="h-full bg-gradient-to-r from-emerald-400 via-emerald-500 to-teal-500 transition-all duration-300 ease-out rounded-full"
+            className="h-full bg-action-primary transition-all duration-300 ease-out rounded-full"
             style={{ width: `${clampedValue}%` }}
-          >
-            {/* Shimmer overlay on progress */}
-            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent animate-shimmer" />
-          </div>
+          />
         )}
 
         {/* Hiker/tent marker at current position */}
         {!indeterminate && clampedValue > 0 && (
           <div
-            className="absolute top-1/2 -translate-y-1/2 w-3 h-3 bg-white rounded-full border-2 border-emerald-500 shadow-sm transition-all duration-300"
+            className="absolute top-1/2 -translate-y-1/2 w-3 h-3 bg-card rounded-full border-2 border-action-primary shadow-sm transition-all duration-300"
             style={{ left: `calc(${clampedValue}% - 6px)` }}
           />
         )}
@@ -108,9 +102,9 @@ export function TrailProgressSteps({
     <div className={cn("w-full", className)}>
       <div className="relative flex justify-between">
         {/* Connecting line */}
-        <div className="absolute top-3 left-0 right-0 h-0.5 bg-slate-200" />
+        <div className="absolute top-3 left-0 right-0 h-0.5 bg-muted" />
         <div
-          className="absolute top-3 left-0 h-0.5 bg-emerald-500 transition-all duration-500"
+          className="absolute top-3 left-0 h-0.5 bg-action-primary transition-all duration-500"
           style={{
             width: `${(currentStep / (checkpoints.length - 1)) * 100}%`,
           }}
@@ -130,10 +124,10 @@ export function TrailProgressSteps({
                 className={cn(
                   "w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all duration-300 z-10",
                   isComplete
-                    ? "bg-emerald-500 border-emerald-500 text-white"
+                    ? "bg-action-primary border-action-primary text-action-primary-foreground"
                     : isCurrent
-                    ? "bg-white border-emerald-500 text-emerald-500"
-                    : "bg-white border-slate-300 text-slate-400"
+                    ? "bg-card border-action-primary text-action-primary"
+                    : "bg-card border-border text-muted-foreground"
                 )}
               >
                 {isComplete ? (
@@ -152,8 +146,8 @@ export function TrailProgressSteps({
                 className={cn(
                   "mt-2 text-xs font-medium text-center max-w-[80px]",
                   isComplete || isCurrent
-                    ? "text-slate-900"
-                    : "text-slate-400"
+                    ? "text-foreground"
+                    : "text-muted-foreground"
                 )}
               >
                 {checkpoint.label}

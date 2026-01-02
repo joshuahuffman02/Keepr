@@ -128,7 +128,7 @@ export default function ReviewsPage() {
             {[1, 2, 3, 4, 5].map((star) => (
                 <Star
                     key={star}
-                    className={`w-4 h-4 ${star <= rating ? "fill-amber-400 text-amber-400" : "text-slate-300"}`}
+                    className={`w-4 h-4 ${star <= rating ? "fill-amber-400 text-amber-400" : "text-muted-foreground"}`}
                 />
             ))}
         </div>
@@ -150,11 +150,11 @@ export default function ReviewsPage() {
         return (
             <DashboardShell>
                 <div className="flex flex-col items-center justify-center py-24 text-center">
-                    <div className="w-24 h-24 rounded-full bg-slate-100 flex items-center justify-center mb-6">
-                        <MessageSquare className="w-12 h-12 text-slate-400" />
+                    <div className="w-24 h-24 rounded-full bg-muted flex items-center justify-center mb-6">
+                        <MessageSquare className="w-12 h-12 text-muted-foreground" />
                     </div>
-                    <h1 className="text-2xl font-bold text-slate-900 mb-2">Select a Campground</h1>
-                    <p className="text-slate-500 max-w-md">
+                    <h1 className="text-2xl font-bold text-foreground mb-2">Select a Campground</h1>
+                    <p className="text-muted-foreground max-w-md">
                         Please select a campground to manage reviews.
                     </p>
                 </div>
@@ -166,42 +166,42 @@ export default function ReviewsPage() {
         <DashboardShell>
             <div className="space-y-6">
                 <div>
-                    <h1 className="text-2xl font-bold text-slate-900">Reviews</h1>
-                    <p className="text-slate-500 mt-1">Manage and respond to guest reviews</p>
+                    <h1 className="text-2xl font-bold text-foreground">Reviews</h1>
+                    <p className="text-muted-foreground mt-1">Manage and respond to guest reviews</p>
                 </div>
 
                 {/* Stats Cards */}
                 <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
                     <Card>
                         <CardContent className="pt-6">
-                            <div className="text-2xl font-bold text-slate-900">{stats.avgRating}</div>
-                            <div className="text-sm text-slate-500 flex items-center gap-1">
+                            <div className="text-2xl font-bold text-foreground">{stats.avgRating}</div>
+                            <div className="text-sm text-muted-foreground flex items-center gap-1">
                                 <Star className="w-4 h-4 fill-amber-400 text-amber-400" /> Avg Rating
                             </div>
                         </CardContent>
                     </Card>
                     <Card>
                         <CardContent className="pt-6">
-                            <div className="text-2xl font-bold text-slate-900">{stats.total}</div>
-                            <div className="text-sm text-slate-500">Total Reviews</div>
+                            <div className="text-2xl font-bold text-foreground">{stats.total}</div>
+                            <div className="text-sm text-muted-foreground">Total Reviews</div>
                         </CardContent>
                     </Card>
                     <Card className={stats.pending > 0 ? "border-amber-200 bg-amber-50" : ""}>
                         <CardContent className="pt-6">
                             <div className="text-2xl font-bold text-amber-600">{stats.pending}</div>
-                            <div className="text-sm text-slate-500">Pending</div>
+                            <div className="text-sm text-muted-foreground">Pending</div>
                         </CardContent>
                     </Card>
                     <Card>
                         <CardContent className="pt-6">
                             <div className="text-2xl font-bold text-emerald-600">{stats.approved}</div>
-                            <div className="text-sm text-slate-500">Approved</div>
+                            <div className="text-sm text-muted-foreground">Approved</div>
                         </CardContent>
                     </Card>
                     <Card>
                         <CardContent className="pt-6">
-                            <div className="text-2xl font-bold text-slate-400">{stats.rejected}</div>
-                            <div className="text-sm text-slate-500">Rejected</div>
+                            <div className="text-2xl font-bold text-muted-foreground">{stats.rejected}</div>
+                            <div className="text-sm text-muted-foreground">Rejected</div>
                         </CardContent>
                     </Card>
                 </div>
@@ -209,7 +209,7 @@ export default function ReviewsPage() {
                 {/* Filters */}
                 <div className="flex flex-col sm:flex-row gap-4">
                     <div className="relative flex-1">
-                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                         <Input
                             placeholder="Search reviews..."
                             value={searchQuery}
@@ -240,15 +240,15 @@ export default function ReviewsPage() {
                 ) : error ? (
                     <Card>
                         <CardContent className="py-12 text-center">
-                            <AlertCircle className="w-12 h-12 text-slate-300 mx-auto mb-4" />
-                            <p className="text-slate-500">Failed to load reviews</p>
+                            <AlertCircle className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
+                            <p className="text-muted-foreground">Failed to load reviews</p>
                         </CardContent>
                     </Card>
                 ) : filteredReviews.length === 0 ? (
                     <Card>
                         <CardContent className="py-12 text-center">
-                            <MessageSquare className="w-12 h-12 text-slate-300 mx-auto mb-4" />
-                            <p className="text-slate-500">
+                            <MessageSquare className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
+                            <p className="text-muted-foreground">
                                 {reviews.length === 0 ? "No reviews yet" : "No reviews match your filters"}
                             </p>
                         </CardContent>
@@ -264,31 +264,31 @@ export default function ReviewsPage() {
                                             <div className="flex items-center gap-3 flex-wrap">
                                                 {renderStars(review.rating)}
                                                 {getStatusBadge(review.status)}
-                                                <span className="text-sm text-slate-500">
+                                                <span className="text-sm text-muted-foreground">
                                                     {new Date(review.createdAt).toLocaleDateString()}
                                                 </span>
                                             </div>
 
                                             {/* Guest Info */}
-                                            <div className="text-sm text-slate-600">
+                                            <div className="text-sm text-muted-foreground">
                                                 <span className="font-medium">
                                                     {review.guest?.primaryFirstName} {review.guest?.primaryLastName}
                                                 </span>
                                                 {review.reservation?.site && (
-                                                    <span className="text-slate-400"> &middot; {review.reservation.site.name}</span>
+                                                    <span className="text-muted-foreground"> &middot; {review.reservation.site.name}</span>
                                                 )}
                                             </div>
 
                                             {/* Review Content */}
                                             {review.title && (
-                                                <h3 className="font-semibold text-slate-900">{review.title}</h3>
+                                                <h3 className="font-semibold text-foreground">{review.title}</h3>
                                             )}
                                             {review.body && (
-                                                <p className="text-slate-600">{review.body}</p>
+                                                <p className="text-muted-foreground">{review.body}</p>
                                             )}
 
                                             {/* Votes */}
-                                            <div className="flex items-center gap-4 text-sm text-slate-500">
+                                            <div className="flex items-center gap-4 text-sm text-muted-foreground">
                                                 <span className="flex items-center gap-1">
                                                     <ThumbsUp className="w-4 h-4" /> {review.helpfulCount}
                                                 </span>
@@ -299,15 +299,15 @@ export default function ReviewsPage() {
 
                                             {/* Owner Reply */}
                                             {review.ownerReply && (
-                                                <div className="bg-slate-50 rounded-lg p-4 mt-3">
-                                                    <div className="text-xs font-medium text-slate-500 mb-1">Owner Response</div>
-                                                    <p className="text-sm text-slate-700">{review.ownerReply}</p>
+                                                <div className="bg-muted rounded-lg p-4 mt-3">
+                                                    <div className="text-xs font-medium text-muted-foreground mb-1">Owner Response</div>
+                                                    <p className="text-sm text-foreground">{review.ownerReply}</p>
                                                 </div>
                                             )}
 
                                             {/* Reply Form */}
                                             {replyingTo === review.id && (
-                                                <div className="bg-slate-50 rounded-lg p-4 mt-3 space-y-3">
+                                                <div className="bg-muted rounded-lg p-4 mt-3 space-y-3">
                                                     <Textarea
                                                         placeholder="Write your response..."
                                                         value={replyText}

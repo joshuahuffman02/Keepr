@@ -103,19 +103,19 @@ export function FieldTypeSelector({
                 "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500",
                 isSelected
                   ? "border-emerald-500 bg-emerald-50 ring-1 ring-emerald-500"
-                  : "border-slate-200 hover:border-slate-300 hover:bg-slate-50"
+                  : "border-border hover:border-border hover:bg-muted"
               )}
             >
               <div
                 className={cn(
                   "p-2 rounded-lg",
-                  isSelected ? "bg-emerald-100" : "bg-slate-100"
+                  isSelected ? "bg-emerald-100" : "bg-muted"
                 )}
               >
                 <Icon
                   className={cn(
                     "h-4 w-4",
-                    isSelected ? "text-emerald-600" : "text-slate-500"
+                    isSelected ? "text-emerald-600" : "text-muted-foreground"
                   )}
                 />
               </div>
@@ -123,12 +123,12 @@ export function FieldTypeSelector({
                 <p
                   className={cn(
                     "font-medium text-sm",
-                    isSelected ? "text-emerald-900" : "text-slate-900"
+                    isSelected ? "text-emerald-900" : "text-foreground"
                   )}
                 >
                   {type.label}
                 </p>
-                <p className="text-xs text-slate-500 truncate">
+                <p className="text-xs text-muted-foreground truncate">
                   {type.description}
                 </p>
               </div>

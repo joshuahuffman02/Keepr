@@ -162,7 +162,7 @@ export default function CharityReportsPage() {
         );
       case "pending":
         return (
-          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-slate-100 text-slate-700">
+          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-muted text-foreground">
             <Clock className="h-3 w-3" /> Pending
           </span>
         );
@@ -174,7 +174,7 @@ export default function CharityReportsPage() {
         );
       default:
         return (
-          <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-slate-100 text-slate-600">
+          <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-muted text-muted-foreground">
             {status}
           </span>
         );
@@ -182,50 +182,50 @@ export default function CharityReportsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-muted">
       {/* Header */}
-      <div className="bg-white border-b border-slate-200">
+      <div className="bg-card border-b border-border">
         <div className="max-w-7xl mx-auto px-6 py-6">
           <div className="flex items-center gap-4 mb-4">
             <Link
               href="/admin/charity"
-              className="p-2 rounded-lg hover:bg-slate-100 text-slate-600"
+              className="p-2 rounded-lg hover:bg-muted text-muted-foreground"
             >
               <ArrowLeft className="h-5 w-5" />
             </Link>
             <div>
-              <h1 className="text-2xl font-bold text-slate-900">Charity Reports</h1>
-              <p className="text-slate-600">Detailed donation analytics and payout tracking</p>
+              <h1 className="text-2xl font-bold text-foreground">Charity Reports</h1>
+              <p className="text-muted-foreground">Detailed donation analytics and payout tracking</p>
             </div>
           </div>
 
           {/* Date Range Picker */}
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-2">
-              <Calendar className="h-4 w-4 text-slate-500" />
+              <Calendar className="h-4 w-4 text-muted-foreground" />
               <input
                 type="date"
                 value={dateRange.start}
                 onChange={(e) => setDateRange((prev) => ({ ...prev, start: e.target.value }))}
-                className="px-3 py-1.5 border border-slate-300 rounded-lg text-sm"
+                className="px-3 py-1.5 border border-border rounded-lg text-sm"
               />
-              <span className="text-slate-500">to</span>
+              <span className="text-muted-foreground">to</span>
               <input
                 type="date"
                 value={dateRange.end}
                 onChange={(e) => setDateRange((prev) => ({ ...prev, end: e.target.value }))}
-                className="px-3 py-1.5 border border-slate-300 rounded-lg text-sm"
+                className="px-3 py-1.5 border border-border rounded-lg text-sm"
               />
             </div>
             <button
               onClick={fetchData}
-              className="p-2 rounded-lg hover:bg-slate-100 text-slate-600"
+              className="p-2 rounded-lg hover:bg-muted text-muted-foreground"
             >
               <RefreshCw className="h-4 w-4" />
             </button>
             <button
               onClick={exportToCSV}
-              className="flex items-center gap-2 px-4 py-2 bg-slate-900 text-white rounded-lg text-sm font-medium hover:bg-slate-800"
+              className="flex items-center gap-2 px-4 py-2 bg-muted text-foreground rounded-lg text-sm font-medium hover:bg-muted"
             >
               <Download className="h-4 w-4" />
               Export CSV
@@ -235,7 +235,7 @@ export default function CharityReportsPage() {
       </div>
 
       {/* Tabs */}
-      <div className="bg-white border-b border-slate-200">
+      <div className="bg-card border-b border-border">
         <div className="max-w-7xl mx-auto px-6">
           <div className="flex gap-6">
             {([
@@ -249,7 +249,7 @@ export default function CharityReportsPage() {
                 className={`flex items-center gap-2 px-4 py-3 border-b-2 transition-colors ${
                   activeTab === tab.id
                     ? "border-pink-500 text-pink-600"
-                    : "border-transparent text-slate-600 hover:text-slate-900"
+                    : "border-transparent text-muted-foreground hover:text-foreground"
                 }`}
               >
                 <tab.icon className="h-4 w-4" />
@@ -273,61 +273,61 @@ export default function CharityReportsPage() {
               <div className="space-y-8">
                 {/* Stats Cards */}
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-                  <div className="bg-white rounded-xl border border-slate-200 p-6">
+                  <div className="bg-card rounded-xl border border-border p-6">
                     <div className="flex items-center gap-3 mb-2">
                       <div className="p-2 rounded-lg bg-pink-100 text-pink-600">
                         <DollarSign className="h-5 w-5" />
                       </div>
-                      <span className="text-sm text-slate-600">Total Raised</span>
+                      <span className="text-sm text-muted-foreground">Total Raised</span>
                     </div>
-                    <p className="text-3xl font-bold text-slate-900">
+                    <p className="text-3xl font-bold text-foreground">
                       ${(stats.totalAmountCents / 100).toLocaleString("en-US", { minimumFractionDigits: 2 })}
                     </p>
                   </div>
 
-                  <div className="bg-white rounded-xl border border-slate-200 p-6">
+                  <div className="bg-card rounded-xl border border-border p-6">
                     <div className="flex items-center gap-3 mb-2">
                       <div className="p-2 rounded-lg bg-status-success/15 text-status-success">
                         <Heart className="h-5 w-5" />
                       </div>
-                      <span className="text-sm text-slate-600">Total Donations</span>
+                      <span className="text-sm text-muted-foreground">Total Donations</span>
                     </div>
-                    <p className="text-3xl font-bold text-slate-900">
+                    <p className="text-3xl font-bold text-foreground">
                       {stats.totalDonations.toLocaleString()}
                     </p>
                   </div>
 
-                  <div className="bg-white rounded-xl border border-slate-200 p-6">
+                  <div className="bg-card rounded-xl border border-border p-6">
                     <div className="flex items-center gap-3 mb-2">
                       <div className="p-2 rounded-lg bg-status-info/15 text-status-info">
                         <Users className="h-5 w-5" />
                       </div>
-                      <span className="text-sm text-slate-600">Unique Donors</span>
+                      <span className="text-sm text-muted-foreground">Unique Donors</span>
                     </div>
-                    <p className="text-3xl font-bold text-slate-900">
+                    <p className="text-3xl font-bold text-foreground">
                       {stats.donorCount.toLocaleString()}
                     </p>
                   </div>
 
-                  <div className="bg-white rounded-xl border border-slate-200 p-6">
+                  <div className="bg-card rounded-xl border border-border p-6">
                     <div className="flex items-center gap-3 mb-2">
                       <div className="p-2 rounded-lg bg-status-warning/15 text-status-warning">
                         <TrendingUp className="h-5 w-5" />
                       </div>
-                      <span className="text-sm text-slate-600">Opt-in Rate</span>
+                      <span className="text-sm text-muted-foreground">Opt-in Rate</span>
                     </div>
-                    <p className="text-3xl font-bold text-slate-900">
+                    <p className="text-3xl font-bold text-foreground">
                       {stats.optInRate.toFixed(1)}%
                     </p>
                   </div>
                 </div>
 
                 {/* By Charity */}
-                <div className="bg-white rounded-xl border border-slate-200">
-                  <div className="p-6 border-b border-slate-200">
-                    <h2 className="text-lg font-semibold text-slate-900">Donations by Charity</h2>
+                <div className="bg-card rounded-xl border border-border">
+                  <div className="p-6 border-b border-border">
+                    <h2 className="text-lg font-semibold text-foreground">Donations by Charity</h2>
                   </div>
-                  <div className="divide-y divide-slate-100">
+                  <div className="divide-y divide-border">
                     {stats.byCharity.map((item, idx) => (
                       <div key={idx} className="p-4 flex items-center justify-between">
                         <div className="flex items-center gap-3">
@@ -342,20 +342,20 @@ export default function CharityReportsPage() {
                               <Heart className="h-5 w-5 text-pink-500" />
                             </div>
                           )}
-                          <span className="font-medium text-slate-900">
+                          <span className="font-medium text-foreground">
                             {item.charity?.name || "Unknown Charity"}
                           </span>
                         </div>
                         <div className="text-right">
-                          <p className="font-semibold text-slate-900">
+                          <p className="font-semibold text-foreground">
                             ${(item.amountCents / 100).toLocaleString("en-US", { minimumFractionDigits: 2 })}
                           </p>
-                          <p className="text-sm text-slate-500">{item.count} donations</p>
+                          <p className="text-sm text-muted-foreground">{item.count} donations</p>
                         </div>
                       </div>
                     ))}
                     {stats.byCharity.length === 0 && (
-                      <div className="p-8 text-center text-slate-500">
+                      <div className="p-8 text-center text-muted-foreground">
                         No donations in this period
                       </div>
                     )}
@@ -363,17 +363,17 @@ export default function CharityReportsPage() {
                 </div>
 
                 {/* By Status */}
-                <div className="bg-white rounded-xl border border-slate-200">
-                  <div className="p-6 border-b border-slate-200">
-                    <h2 className="text-lg font-semibold text-slate-900">Donations by Status</h2>
+                <div className="bg-card rounded-xl border border-border">
+                  <div className="p-6 border-b border-border">
+                    <h2 className="text-lg font-semibold text-foreground">Donations by Status</h2>
                   </div>
                   <div className="p-6">
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                       {stats.byStatus.map((item) => (
-                        <div key={item.status} className="p-4 bg-slate-50 rounded-lg">
+                        <div key={item.status} className="p-4 bg-muted rounded-lg">
                           <div className="mb-2">{getStatusBadge(item.status)}</div>
-                          <p className="text-2xl font-bold text-slate-900">{item.count}</p>
-                          <p className="text-sm text-slate-500">
+                          <p className="text-2xl font-bold text-foreground">{item.count}</p>
+                          <p className="text-sm text-muted-foreground">
                             ${(item.amountCents / 100).toLocaleString("en-US", { minimumFractionDigits: 2 })}
                           </p>
                         </div>
@@ -386,49 +386,49 @@ export default function CharityReportsPage() {
 
             {/* Donations Tab */}
             {activeTab === "donations" && donations && (
-              <div className="bg-white rounded-xl border border-slate-200 overflow-hidden">
-                <div className="p-6 border-b border-slate-200 flex items-center justify-between">
-                  <h2 className="text-lg font-semibold text-slate-900">
+              <div className="bg-card rounded-xl border border-border overflow-hidden">
+                <div className="p-6 border-b border-border flex items-center justify-between">
+                  <h2 className="text-lg font-semibold text-foreground">
                     Donation History ({donations.total} total)
                   </h2>
                 </div>
                 <div className="overflow-x-auto">
                   <table className="w-full">
-                    <thead className="bg-slate-50 border-b border-slate-200">
+                    <thead className="bg-muted border-b border-border">
                       <tr>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">
+                        <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
                           Date
                         </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">
+                        <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
                           Guest
                         </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">
+                        <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
                           Charity
                         </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">
+                        <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
                           Amount
                         </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">
+                        <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
                           Status
                         </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">
+                        <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
                           Reservation
                         </th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-slate-100">
+                    <tbody className="divide-y divide-border">
                       {donations.donations.map((donation) => (
-                        <tr key={donation.id} className="hover:bg-slate-50">
-                          <td className="px-6 py-4 text-sm text-slate-900">
+                        <tr key={donation.id} className="hover:bg-muted">
+                          <td className="px-6 py-4 text-sm text-foreground">
                             {new Date(donation.createdAt).toLocaleDateString()}
                           </td>
                           <td className="px-6 py-4">
-                            <p className="text-sm font-medium text-slate-900">
+                            <p className="text-sm font-medium text-foreground">
                               {donation.reservation.guest.firstName} {donation.reservation.guest.lastName}
                             </p>
-                            <p className="text-xs text-slate-500">{donation.reservation.guest.email}</p>
+                            <p className="text-xs text-muted-foreground">{donation.reservation.guest.email}</p>
                           </td>
-                          <td className="px-6 py-4 text-sm text-slate-900">
+                          <td className="px-6 py-4 text-sm text-foreground">
                             {donation.charity.name}
                           </td>
                           <td className="px-6 py-4 text-sm font-medium text-pink-600">
@@ -448,7 +448,7 @@ export default function CharityReportsPage() {
                     </tbody>
                   </table>
                   {donations.donations.length === 0 && (
-                    <div className="p-12 text-center text-slate-500">
+                    <div className="p-12 text-center text-muted-foreground">
                       No donations found in this period
                     </div>
                   )}
@@ -458,61 +458,61 @@ export default function CharityReportsPage() {
 
             {/* Payouts Tab */}
             {activeTab === "payouts" && payouts && (
-              <div className="bg-white rounded-xl border border-slate-200 overflow-hidden">
-                <div className="p-6 border-b border-slate-200 flex items-center justify-between">
-                  <h2 className="text-lg font-semibold text-slate-900">
+              <div className="bg-card rounded-xl border border-border overflow-hidden">
+                <div className="p-6 border-b border-border flex items-center justify-between">
+                  <h2 className="text-lg font-semibold text-foreground">
                     Payout History ({payouts.total} total)
                   </h2>
                 </div>
                 <div className="overflow-x-auto">
                   <table className="w-full">
-                    <thead className="bg-slate-50 border-b border-slate-200">
+                    <thead className="bg-muted border-b border-border">
                       <tr>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">
+                        <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
                           Created
                         </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">
+                        <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
                           Charity
                         </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">
+                        <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
                           Amount
                         </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">
+                        <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
                           Donations
                         </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">
+                        <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
                           Status
                         </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">
+                        <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
                           Paid Date
                         </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">
+                        <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
                           Reference
                         </th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-slate-100">
+                    <tbody className="divide-y divide-border">
                       {payouts.payouts.map((payout) => (
-                        <tr key={payout.id} className="hover:bg-slate-50">
-                          <td className="px-6 py-4 text-sm text-slate-900">
+                        <tr key={payout.id} className="hover:bg-muted">
+                          <td className="px-6 py-4 text-sm text-foreground">
                             {new Date(payout.createdAt).toLocaleDateString()}
                           </td>
-                          <td className="px-6 py-4 text-sm text-slate-900">
+                          <td className="px-6 py-4 text-sm text-foreground">
                             {payout.charity.name}
                           </td>
                           <td className="px-6 py-4 text-sm font-medium text-status-success">
                             ${(payout.amountCents / 100).toFixed(2)}
                           </td>
-                          <td className="px-6 py-4 text-sm text-slate-600">
+                          <td className="px-6 py-4 text-sm text-muted-foreground">
                             {payout._count.donations}
                           </td>
                           <td className="px-6 py-4">{getStatusBadge(payout.status)}</td>
-                          <td className="px-6 py-4 text-sm text-slate-600">
+                          <td className="px-6 py-4 text-sm text-muted-foreground">
                             {payout.payoutDate
                               ? new Date(payout.payoutDate).toLocaleDateString()
                               : "—"}
                           </td>
-                          <td className="px-6 py-4 text-sm text-slate-600 font-mono">
+                          <td className="px-6 py-4 text-sm text-muted-foreground font-mono">
                             {payout.reference || "—"}
                           </td>
                         </tr>
@@ -520,7 +520,7 @@ export default function CharityReportsPage() {
                     </tbody>
                   </table>
                   {payouts.payouts.length === 0 && (
-                    <div className="p-12 text-center text-slate-500">
+                    <div className="p-12 text-center text-muted-foreground">
                       No payouts found
                     </div>
                   )}

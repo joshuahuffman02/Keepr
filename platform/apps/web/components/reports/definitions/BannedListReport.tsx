@@ -46,7 +46,7 @@ export function BannedListReport({ campgroundId }: BannedListReportProps) {
     }, [guests]);
 
     if (isLoading) {
-        return <div className="text-sm text-slate-500">Loading restricted guest list...</div>;
+        return <div className="text-sm text-muted-foreground">Loading restricted guest list...</div>;
     }
 
     if (error) {
@@ -55,8 +55,8 @@ export function BannedListReport({ campgroundId }: BannedListReportProps) {
 
     if (!reportData) {
         return (
-            <div className="flex flex-col items-center justify-center p-12 bg-slate-50 rounded-lg border border-slate-200">
-                <div className="text-slate-400 mb-2">No guest data found</div>
+            <div className="flex flex-col items-center justify-center p-12 bg-muted rounded-lg border border-border">
+                <div className="text-muted-foreground mb-2">No guest data found</div>
             </div>
         );
     }
@@ -86,7 +86,7 @@ export function BannedListReport({ campgroundId }: BannedListReportProps) {
                 <CardContent>
                     {reportData.bannedGuests.length > 0 ? (
                         <div className="rounded-md border">
-                            <div className="grid grid-cols-4 gap-4 p-3 bg-slate-50 border-b text-xs font-medium text-slate-500 uppercase">
+                            <div className="grid grid-cols-4 gap-4 p-3 bg-muted border-b text-xs font-medium text-muted-foreground uppercase">
                                 <div className="col-span-1">Name</div>
                                 <div className="col-span-1">Email</div>
                                 <div className="col-span-1">Phone</div>
@@ -94,10 +94,10 @@ export function BannedListReport({ campgroundId }: BannedListReportProps) {
                             </div>
                             <div className="divide-y">
                                 {reportData.bannedGuests.map((guest) => (
-                                    <div key={guest.id} className="grid grid-cols-4 gap-4 p-3 text-sm hover:bg-slate-50">
+                                    <div key={guest.id} className="grid grid-cols-4 gap-4 p-3 text-sm hover:bg-muted">
                                         <div className="font-medium">{guest.primaryFirstName} {guest.primaryLastName}</div>
-                                        <div className="text-slate-500 truncate">{guest.email}</div>
-                                        <div className="text-slate-500">{guest.phone || '-'}</div>
+                                        <div className="text-muted-foreground truncate">{guest.email}</div>
+                                        <div className="text-muted-foreground">{guest.phone || '-'}</div>
                                         <div>
                                             {guest.tags?.filter(t => ['banned', 'dnr', 'restricted'].includes(t.toLowerCase())).map(tag => (
                                                 <span key={tag} className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-status-error-bg text-status-error-text uppercase">
@@ -110,7 +110,7 @@ export function BannedListReport({ campgroundId }: BannedListReportProps) {
                             </div>
                         </div>
                     ) : (
-                        <div className="flex flex-col items-center justify-center py-12 text-center text-slate-500">
+                        <div className="flex flex-col items-center justify-center py-12 text-center text-muted-foreground">
                             <p>No guests currently flagged as Do Not Rent.</p>
                             <p className="text-xs mt-1">To ban a guest, add the "banned" or "dnr" tag to their profile.</p>
                         </div>

@@ -26,8 +26,8 @@ export default function DepositHoldMethod({
           <Shield className="h-5 w-5 text-amber-600" />
         </div>
         <div>
-          <h3 className="font-semibold text-slate-900">Authorization Hold</h3>
-          <p className="text-sm text-slate-500">
+          <h3 className="font-semibold text-foreground">Authorization Hold</h3>
+          <p className="text-sm text-muted-foreground">
             Place a temporary hold on the guest's card
           </p>
         </div>
@@ -49,7 +49,7 @@ export default function DepositHoldMethod({
       </div>
 
       {/* Info about auth holds */}
-      <div className="text-sm text-slate-600 space-y-2">
+      <div className="text-sm text-muted-foreground space-y-2">
         <p>Authorization holds are useful for:</p>
         <ul className="list-disc list-inside space-y-1 ml-2">
           <li>Security deposits for potential damages</li>

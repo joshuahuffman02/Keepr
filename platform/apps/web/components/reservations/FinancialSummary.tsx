@@ -152,23 +152,23 @@ export function FinancialSummary({ reservation }: FinancialSummaryProps) {
             <Card>
                 <CardHeader>
                     <CardTitle className="flex items-center gap-2 text-lg">
-                        <DollarSign className="w-5 h-5 text-slate-500" />
+                        <DollarSign className="w-5 h-5 text-muted-foreground" />
                         Financial Summary
                     </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                    <div className="p-4 bg-slate-50 rounded-lg border border-slate-100 space-y-3">
+                    <div className="p-4 bg-muted rounded-lg border border-border space-y-3">
                         <div className="flex justify-between items-center">
-                            <span className="text-slate-600">Total Amount</span>
-                            <span className="font-semibold text-slate-900">{formatCurrency(totalCents)}</span>
+                            <span className="text-muted-foreground">Total Amount</span>
+                            <span className="font-semibold text-foreground">{formatCurrency(totalCents)}</span>
                         </div>
                         <div className="flex justify-between items-center">
-                            <span className="text-slate-600">Paid to Date</span>
-                            <span className="font-medium text-emerald-600">{formatCurrency(paidCents)}</span>
+                            <span className="text-muted-foreground">Paid to Date</span>
+                            <span className="font-medium text-status-success">{formatCurrency(paidCents)}</span>
                         </div>
-                        <div className="pt-3 border-t border-slate-200 flex justify-between items-center">
-                            <span className="font-medium text-slate-900">Balance Due</span>
-                            <span className={`text-lg font-bold ${isPaid ? "text-slate-400" : "text-red-600"}`}>
+                        <div className="pt-3 border-t border-border flex justify-between items-center">
+                            <span className="font-medium text-foreground">Balance Due</span>
+                            <span className={`text-lg font-bold ${isPaid ? "text-muted-foreground" : "text-status-error"}`}>
                                 {formatCurrency(balanceCents)}
                             </span>
                         </div>
@@ -186,7 +186,7 @@ export function FinancialSummary({ reservation }: FinancialSummaryProps) {
                     {/* Detailed Pricing Breakdown */}
                     <Collapsible open={isBreakdownOpen} onOpenChange={setIsBreakdownOpen}>
                         <CollapsibleTrigger asChild>
-                            <button className="flex items-center justify-between w-full py-2 text-sm font-medium text-slate-700 hover:text-slate-900 transition-colors">
+                            <button className="flex items-center justify-between w-full py-2 text-sm font-medium text-foreground hover:text-foreground transition-colors">
                                 <span className="flex items-center gap-2">
                                     <Info className="w-4 h-4" />
                                     Pricing Breakdown
@@ -199,15 +199,15 @@ export function FinancialSummary({ reservation }: FinancialSummaryProps) {
                             </button>
                         </CollapsibleTrigger>
                         <CollapsibleContent>
-                            <div className="space-y-3 pt-2 pb-3 border-t border-slate-100">
+                            <div className="space-y-3 pt-2 pb-3 border-t border-border">
                                 {/* Base Rate */}
                                 <div className="space-y-1">
                                     <div className="flex justify-between text-sm">
-                                        <span className="text-slate-600">Base Lodging ({quote?.nights ?? '?'} nights)</span>
-                                        <span className="text-slate-900">{formatCurrency(quote?.baseSubtotalCents ?? baseCents)}</span>
+                                        <span className="text-muted-foreground">Base Lodging ({quote?.nights ?? '?'} nights)</span>
+                                        <span className="text-foreground">{formatCurrency(quote?.baseSubtotalCents ?? baseCents)}</span>
                                     </div>
                                     {quote?.perNightCents && (
-                                        <div className="flex justify-between text-xs text-slate-400 pl-4">
+                                        <div className="flex justify-between text-xs text-muted-foreground pl-4">
                                             <span>Average per night</span>
                                             <span>{formatCurrency(quote.perNightCents)}/night</span>
                                         </div>
@@ -217,12 +217,12 @@ export function FinancialSummary({ reservation }: FinancialSummaryProps) {
                                 {/* Applied Pricing Rules */}
                                 {quote?.appliedRules && quote.appliedRules.length > 0 && (
                                     <div className="space-y-1">
-                                        <div className="text-xs font-medium text-slate-500 uppercase tracking-wide">
+                                        <div className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
                                             Pricing Rules Applied
                                         </div>
                                         {quote.appliedRules.map((rule, idx) => (
                                             <div key={rule.id + idx} className="flex justify-between text-sm pl-2">
-                                                <span className="flex items-center gap-2 text-slate-600">
+                                                <span className="flex items-center gap-2 text-muted-foreground">
                                                     {getRuleIcon(rule.type)}
                                                     <TooltipProvider>
                                                         <Tooltip>
@@ -235,15 +235,15 @@ export function FinancialSummary({ reservation }: FinancialSummaryProps) {
                                                         </Tooltip>
                                                     </TooltipProvider>
                                                 </span>
-                                                <span className={rule.adjustmentCents >= 0 ? "text-amber-600" : "text-emerald-600"}>
+                                                <span className={rule.adjustmentCents >= 0 ? "text-status-warning" : "text-status-success"}>
                                                     {rule.adjustmentCents >= 0 ? '+' : ''}{formatCurrency(rule.adjustmentCents)}
                                                 </span>
                                             </div>
                                         ))}
                                         {quote.rulesDeltaCents !== 0 && (
-                                            <div className="flex justify-between text-xs text-slate-500 pl-4 pt-1 border-t border-slate-100">
+                                            <div className="flex justify-between text-xs text-muted-foreground pl-4 pt-1 border-t border-border">
                                                 <span>Net pricing adjustment</span>
-                                                <span className={quote.rulesDeltaCents >= 0 ? "text-amber-600" : "text-emerald-600"}>
+                                                <span className={quote.rulesDeltaCents >= 0 ? "text-status-warning" : "text-status-success"}>
                                                     {quote.rulesDeltaCents >= 0 ? '+' : ''}{formatCurrency(quote.rulesDeltaCents)}
                                                 </span>
                                             </div>
@@ -254,11 +254,11 @@ export function FinancialSummary({ reservation }: FinancialSummaryProps) {
                                 {/* Dynamic Pricing Indicator */}
                                 {quote?.rulesDeltaCents !== undefined && quote.rulesDeltaCents !== 0 && !quote.appliedRules?.length && (
                                     <div className="flex justify-between text-sm">
-                                        <span className="flex items-center gap-2 text-slate-600">
+                                        <span className="flex items-center gap-2 text-muted-foreground">
                                             <TrendingUp className="w-3 h-3" />
                                             Dynamic Pricing Adjustment
                                         </span>
-                                        <span className={quote.rulesDeltaCents >= 0 ? "text-amber-600" : "text-emerald-600"}>
+                                        <span className={quote.rulesDeltaCents >= 0 ? "text-status-warning" : "text-status-success"}>
                                             {quote.rulesDeltaCents >= 0 ? '+' : ''}{formatCurrency(quote.rulesDeltaCents)}
                                         </span>
                                     </div>
@@ -267,40 +267,40 @@ export function FinancialSummary({ reservation }: FinancialSummaryProps) {
                                 {/* Early Check-in / Late Checkout */}
                                 {earlyCheckInCharge > 0 && (
                                     <div className="flex justify-between text-sm">
-                                        <span className="flex items-center gap-2 text-slate-600">
+                                        <span className="flex items-center gap-2 text-muted-foreground">
                                             <Clock className="w-3 h-3" />
                                             Early Check-in Charge
                                         </span>
-                                        <span className="text-slate-900">+{formatCurrency(earlyCheckInCharge)}</span>
+                                        <span className="text-foreground">+{formatCurrency(earlyCheckInCharge)}</span>
                                     </div>
                                 )}
                                 {lateCheckoutCharge > 0 && (
                                     <div className="flex justify-between text-sm">
-                                        <span className="flex items-center gap-2 text-slate-600">
+                                        <span className="flex items-center gap-2 text-muted-foreground">
                                             <Clock className="w-3 h-3" />
                                             Late Checkout Charge
                                         </span>
-                                        <span className="text-slate-900">+{formatCurrency(lateCheckoutCharge)}</span>
+                                        <span className="text-foreground">+{formatCurrency(lateCheckoutCharge)}</span>
                                     </div>
                                 )}
 
                                 {/* Subtotal before fees */}
-                                <div className="flex justify-between text-sm pt-2 border-t border-slate-100">
-                                    <span className="text-slate-600">Subtotal (before fees/taxes)</span>
-                                    <span className="text-slate-900">{formatCurrency(quote?.totalCents ?? baseCents)}</span>
+                                <div className="flex justify-between text-sm pt-2 border-t border-border">
+                                    <span className="text-muted-foreground">Subtotal (before fees/taxes)</span>
+                                    <span className="text-foreground">{formatCurrency(quote?.totalCents ?? baseCents)}</span>
                                 </div>
 
                                 {/* Fees Section - Platform Fee + CC Processing Fee */}
                                 {(feesCents > 0 || platformFeeCents > 0) && (
-                                    <div className="space-y-2 pt-2 border-t border-slate-100">
-                                        <div className="text-xs font-medium text-slate-500 uppercase tracking-wide">
+                                    <div className="space-y-2 pt-2 border-t border-border">
+                                        <div className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
                                             Fees & Processing
                                         </div>
 
                                         {/* Platform Fee (goes to Campreserv) */}
                                         {platformFeeCents > 0 && (
                                             <div className="flex justify-between text-sm pl-2">
-                                                <span className="flex items-center gap-2 text-slate-600">
+                                                <span className="flex items-center gap-2 text-muted-foreground">
                                                     <Building2 className="w-3 h-3" />
                                                     <TooltipProvider>
                                                         <Tooltip>
@@ -309,12 +309,12 @@ export function FinancialSummary({ reservation }: FinancialSummaryProps) {
                                                             </TooltipTrigger>
                                                             <TooltipContent>
                                                                 <p className="text-xs">Per-booking fee ({billingPlanLabel} plan)</p>
-                                                                <p className="text-xs text-slate-400">Goes to Campreserv</p>
+                                                                <p className="text-xs text-muted-foreground">Goes to Campreserv</p>
                                                             </TooltipContent>
                                                         </Tooltip>
                                                     </TooltipProvider>
                                                 </span>
-                                                <span className="text-slate-900">
+                                                <span className="text-foreground">
                                                     {formatCurrency(platformFeeCents)}
                                                 </span>
                                             </div>
@@ -322,7 +322,7 @@ export function FinancialSummary({ reservation }: FinancialSummaryProps) {
 
                                         {/* CC Processing Fee (goes to Stripe) */}
                                         <div className="flex justify-between text-sm pl-2">
-                                            <span className="flex items-center gap-2 text-slate-600">
+                                            <span className="flex items-center gap-2 text-muted-foreground">
                                                 <CreditCard className="w-3 h-3" />
                                                 <TooltipProvider>
                                                     <Tooltip>
@@ -331,26 +331,26 @@ export function FinancialSummary({ reservation }: FinancialSummaryProps) {
                                                         </TooltipTrigger>
                                                         <TooltipContent>
                                                             <p className="text-xs">{estimatedCCFeePercent}% + ${(estimatedCCFeeFlatCents / 100).toFixed(2)} per transaction</p>
-                                                            <p className="text-xs text-slate-400">Goes to Stripe</p>
+                                                            <p className="text-xs text-muted-foreground">Goes to Stripe</p>
                                                         </TooltipContent>
                                                     </Tooltip>
                                                 </TooltipProvider>
                                             </span>
                                             <span className="flex items-center gap-1">
-                                                <span className={ccFeeMode === "absorb" ? "line-through text-slate-400" : "text-slate-900"}>
+                                                <span className={ccFeeMode === "absorb" ? "line-through text-muted-foreground" : "text-foreground"}>
                                                     ~{formatCurrency(estimatedCCFeeCents)}
                                                 </span>
                                                 {ccFeeMode === "absorb" && (
-                                                    <span className="text-emerald-600 text-xs">(absorbed)</span>
+                                                    <span className="text-status-success text-xs">(absorbed)</span>
                                                 )}
                                             </span>
                                         </div>
 
                                         {/* Total fees if guest pays any */}
                                         {feesCents > 0 && (
-                                            <div className="flex justify-between text-xs text-slate-500 pl-4 pt-1 border-t border-slate-50">
+                                            <div className="flex justify-between text-xs text-muted-foreground pl-4 pt-1 border-t border-border">
                                                 <span>Fees charged to guest</span>
-                                                <span className="text-slate-900">+{formatCurrency(feesCents)}</span>
+                                                <span className="text-foreground">+{formatCurrency(feesCents)}</span>
                                             </div>
                                         )}
                                     </div>
@@ -359,8 +359,8 @@ export function FinancialSummary({ reservation }: FinancialSummaryProps) {
                                 {/* Taxes */}
                                 {taxCents > 0 && (
                                     <div className="flex justify-between text-sm">
-                                        <span className="text-slate-600">Taxes</span>
-                                        <span className="text-slate-900">+{formatCurrency(taxCents)}</span>
+                                        <span className="text-muted-foreground">Taxes</span>
+                                        <span className="text-foreground">+{formatCurrency(taxCents)}</span>
                                     </div>
                                 )}
 
@@ -368,14 +368,14 @@ export function FinancialSummary({ reservation }: FinancialSummaryProps) {
                                 {discountsCents > 0 && (
                                     <div className="space-y-1">
                                         <div className="flex justify-between text-sm">
-                                            <span className="flex items-center gap-2 text-emerald-600">
+                                            <span className="flex items-center gap-2 text-status-success">
                                                 <Tag className="w-3 h-3" />
                                                 Discounts Applied
                                             </span>
-                                            <span className="text-emerald-600">-{formatCurrency(discountsCents)}</span>
+                                            <span className="text-status-success">-{formatCurrency(discountsCents)}</span>
                                         </div>
                                         {reservation.promoCode && (
-                                            <div className="text-xs text-slate-400 pl-4">
+                                            <div className="text-xs text-muted-foreground pl-4">
                                                 Promo code: {reservation.promoCode}
                                             </div>
                                         )}
@@ -384,7 +384,7 @@ export function FinancialSummary({ reservation }: FinancialSummaryProps) {
 
                                 {/* Pricing Rule Version */}
                                 {(quote?.pricingRuleVersion || reservation.pricingRuleVersion) && (
-                                    <div className="text-xs text-slate-400 pt-2">
+                                    <div className="text-xs text-muted-foreground pt-2">
                                         Pricing version: {quote?.pricingRuleVersion || reservation.pricingRuleVersion}
                                     </div>
                                 )}

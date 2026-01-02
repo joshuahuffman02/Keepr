@@ -94,15 +94,15 @@ export function BulkMessageModal({ open, onClose, campgroundId, reservations, on
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50" onClick={handleClose}>
       <div
-        className="w-full max-w-lg rounded-lg bg-white p-6 shadow-xl"
+        className="w-full max-w-lg rounded-lg bg-card p-6 shadow-xl"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="mb-4 flex items-center justify-between">
-          <h2 className="text-lg font-semibold text-slate-900">
+          <h2 className="text-lg font-semibold text-foreground">
             Message {reservations.length} guest{reservations.length !== 1 ? "s" : ""}
           </h2>
           <button
-            className="text-slate-400 hover:text-slate-600"
+            className="text-muted-foreground hover:text-muted-foreground"
             onClick={handleClose}
             disabled={sending}
           >
@@ -113,12 +113,12 @@ export function BulkMessageModal({ open, onClose, campgroundId, reservations, on
         </div>
 
         <div className="mb-4">
-          <div className="flex gap-2 rounded-lg bg-slate-100 p-1">
+          <div className="flex gap-2 rounded-lg bg-muted p-1">
             <button
               className={`flex-1 rounded-md px-3 py-1.5 text-sm font-medium transition-colors ${
                 messageType === "email"
-                  ? "bg-white text-slate-900 shadow-sm"
-                  : "text-slate-600 hover:text-slate-900"
+                  ? "bg-card text-foreground shadow-sm"
+                  : "text-muted-foreground hover:text-foreground"
               }`}
               onClick={() => setMessageType("email")}
               disabled={sending}
@@ -128,8 +128,8 @@ export function BulkMessageModal({ open, onClose, campgroundId, reservations, on
             <button
               className={`flex-1 rounded-md px-3 py-1.5 text-sm font-medium transition-colors ${
                 messageType === "note"
-                  ? "bg-white text-slate-900 shadow-sm"
-                  : "text-slate-600 hover:text-slate-900"
+                  ? "bg-card text-foreground shadow-sm"
+                  : "text-muted-foreground hover:text-foreground"
               }`}
               onClick={() => setMessageType("note")}
               disabled={sending}
@@ -140,25 +140,25 @@ export function BulkMessageModal({ open, onClose, campgroundId, reservations, on
         </div>
 
         {messageType === "email" && recipientsWithEmail.length < reservations.length && (
-          <div className="mb-4 rounded-md border border-amber-200 bg-amber-50 p-3 text-sm text-amber-800">
+          <div className="mb-4 rounded-md border border-status-warning/30 bg-status-warning/10 p-3 text-sm text-status-warning">
             {reservations.length - recipientsWithEmail.length} guest{reservations.length - recipientsWithEmail.length !== 1 ? "s" : ""} without
             email address will be skipped.
           </div>
         )}
 
         {recipientsCount === 0 ? (
-          <div className="mb-4 rounded-md border border-rose-200 bg-rose-50 p-3 text-sm text-rose-800">
+          <div className="mb-4 rounded-md border border-status-error/30 bg-status-error/10 p-3 text-sm text-status-error">
             No valid recipients for {messageType === "email" ? "email" : "notes"}. Please check your selection.
           </div>
         ) : (
           <>
             <div className="mb-3">
-              <label className="mb-1 block text-sm font-medium text-slate-700">
+              <label className="mb-1 block text-sm font-medium text-foreground">
                 {messageType === "email" ? "Subject" : "Title (optional)"}
               </label>
               <input
                 type="text"
-                className="w-full rounded-md border border-slate-200 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm focus:border-action-primary focus:outline-none focus:ring-1 focus:ring-action-primary/40"
                 placeholder={messageType === "email" ? "Subject line" : "Note title"}
                 value={subject}
                 onChange={(e) => setSubject(e.target.value)}
@@ -167,9 +167,9 @@ export function BulkMessageModal({ open, onClose, campgroundId, reservations, on
             </div>
 
             <div className="mb-4">
-              <label className="mb-1 block text-sm font-medium text-slate-700">Message</label>
+              <label className="mb-1 block text-sm font-medium text-foreground">Message</label>
               <textarea
-                className="h-32 w-full resize-none rounded-md border border-slate-200 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                className="h-32 w-full resize-none rounded-md border border-border bg-background px-3 py-2 text-sm focus:border-action-primary focus:outline-none focus:ring-1 focus:ring-action-primary/40"
                 placeholder={`Type your ${messageType === "email" ? "email" : "note"} here...`}
                 value={body}
                 onChange={(e) => setBody(e.target.value)}
@@ -179,20 +179,20 @@ export function BulkMessageModal({ open, onClose, campgroundId, reservations, on
 
             {sending && (
               <div className="mb-4">
-                <div className="mb-2 flex justify-between text-sm text-slate-600">
+                <div className="mb-2 flex justify-between text-sm text-muted-foreground">
                   <span>Sending...</span>
                   <span>
                     {progress.sent + progress.failed} / {progress.total}
                   </span>
                 </div>
-                <div className="h-2 w-full overflow-hidden rounded-full bg-slate-200">
+                <div className="h-2 w-full overflow-hidden rounded-full bg-muted">
                   <div
-                    className="h-full bg-blue-500 transition-all"
+                    className="h-full bg-action-primary transition-all"
                     style={{ width: `${((progress.sent + progress.failed) / progress.total) * 100}%` }}
                   />
                 </div>
                 {progress.failed > 0 && (
-                  <div className="mt-1 text-xs text-rose-600">{progress.failed} failed</div>
+                  <div className="mt-1 text-xs text-status-error">{progress.failed} failed</div>
                 )}
               </div>
             )}

@@ -93,26 +93,26 @@ export default function MarketingPage() {
     <DashboardShell>
       <div className="grid gap-4">
         <div className="card p-6 space-y-3">
-          <h1 className="text-xl font-semibold text-slate-900">Marketing & web</h1>
-          <p className="text-slate-600 text-sm">
+          <h1 className="text-xl font-semibold text-foreground">Marketing & web</h1>
+          <p className="text-muted-foreground text-sm">
             Public campground pages are live with SEO/meta, sitemap, and lead capture hooks. Keep promos and campaigns aligned.
           </p>
           <div className="grid md:grid-cols-2 gap-3">
-            <div className="rounded-lg border border-slate-200 bg-slate-50 p-3">
-              <div className="text-sm font-semibold text-slate-900">Public site</div>
-              <div className="text-xs text-slate-600 mt-1">
+            <div className="rounded-lg border border-border bg-muted p-3">
+              <div className="text-sm font-semibold text-foreground">Public site</div>
+              <div className="text-xs text-muted-foreground mt-1">
                 Campground detail pages include photos, amenities, events, SEO/meta tags, sitemap, and robots coverage.
               </div>
-              <div className="text-xs text-slate-600 mt-2">
+              <div className="text-xs text-muted-foreground mt-2">
                 Configure analytics (GA4, Meta Pixel) in Settings → Analytics & Tracking; pages honor canonical base URL.
               </div>
             </div>
-            <div className="rounded-lg border border-slate-200 bg-slate-50 p-3">
-              <div className="text-sm font-semibold text-slate-900">Promotions & campaigns</div>
-              <div className="text-xs text-slate-600 mt-1">
+            <div className="rounded-lg border border-border bg-muted p-3">
+              <div className="text-sm font-semibold text-foreground">Promotions & campaigns</div>
+              <div className="text-xs text-muted-foreground mt-1">
                 Create promo codes, set usage windows/limits, and keep them in sync with booking flows.
               </div>
-              <div className="text-xs text-slate-600 mt-2">
+              <div className="text-xs text-muted-foreground mt-2">
                 Email campaigns live in Settings → Campaigns; promos integrate with admin/public booking and OTA-safe pricing.
               </div>
             </div>
@@ -130,14 +130,14 @@ export default function MarketingPage() {
         <div className="card p-6 space-y-4">
           <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
             <div className="space-y-1">
-              <h2 className="text-lg font-semibold text-slate-900">Leads (internal only)</h2>
-              <p className="text-sm text-slate-600">
+              <h2 className="text-lg font-semibold text-foreground">Leads (internal only)</h2>
+              <p className="text-sm text-muted-foreground">
                 Captured from landing pages and admin forms. Stored per campground with a stubbed “sync to CRM” path.
               </p>
             </div>
             <div className="flex items-center gap-2">
               <select
-                className="px-3 py-2 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500/30"
+                className="px-3 py-2 text-sm border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500/30"
                 value={selectedCampground}
                 onChange={(e) => setSelectedCampground(e.target.value)}
               >
@@ -157,14 +157,14 @@ export default function MarketingPage() {
             </div>
           </div>
 
-          <div className="text-xs text-slate-500">
+          <div className="text-xs text-muted-foreground">
             No external CRM calls. “Sync now” simply marks the lead as synced and timestamps it.
           </div>
 
-          <div className="overflow-hidden rounded-xl border border-slate-200">
+          <div className="overflow-hidden rounded-xl border border-border">
             <Table>
               <TableHeader>
-                <TableRow className="bg-slate-50">
+                <TableRow className="bg-muted">
                   <TableHead>Name</TableHead>
                   <TableHead>Email</TableHead>
                   <TableHead>Interest</TableHead>
@@ -178,9 +178,9 @@ export default function MarketingPage() {
               <TableBody>
                 {leads.map((lead) => (
                   <TableRow key={lead.id}>
-                    <TableCell className="font-medium text-slate-900">{lead.name}</TableCell>
-                    <TableCell className="text-slate-700">{lead.email}</TableCell>
-                    <TableCell className="text-slate-700">{lead.interest}</TableCell>
+                    <TableCell className="font-medium text-foreground">{lead.name}</TableCell>
+                    <TableCell className="text-foreground">{lead.email}</TableCell>
+                    <TableCell className="text-foreground">{lead.interest}</TableCell>
                     <TableCell>
                       <Select
                         value={lead.status}
@@ -199,9 +199,9 @@ export default function MarketingPage() {
                         </SelectContent>
                       </Select>
                     </TableCell>
-                    <TableCell className="text-slate-600">{lead.source || "—"}</TableCell>
-                    <TableCell className="text-slate-600">{formatDate(lead.createdAt)}</TableCell>
-                    <TableCell className="text-slate-600">{formatDate(lead.lastSyncedAt)}</TableCell>
+                    <TableCell className="text-muted-foreground">{lead.source || "—"}</TableCell>
+                    <TableCell className="text-muted-foreground">{formatDate(lead.createdAt)}</TableCell>
+                    <TableCell className="text-muted-foreground">{formatDate(lead.lastSyncedAt)}</TableCell>
                     <TableCell className="text-right">
                       <Button
                         size="sm"
@@ -217,10 +217,10 @@ export default function MarketingPage() {
               </TableBody>
             </Table>
             {leadsQuery.isLoading && (
-              <div className="text-center text-sm text-slate-600 py-8">Loading leads…</div>
+              <div className="text-center text-sm text-muted-foreground py-8">Loading leads…</div>
             )}
             {!leadsQuery.isLoading && leads.length === 0 && (
-              <div className="text-center text-sm text-slate-600 py-8">No leads yet for this campground.</div>
+              <div className="text-center text-sm text-muted-foreground py-8">No leads yet for this campground.</div>
             )}
           </div>
         </div>

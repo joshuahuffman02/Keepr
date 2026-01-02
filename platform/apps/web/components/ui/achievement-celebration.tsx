@@ -265,7 +265,7 @@ export function AchievementCelebration({
             transition={SPRING_CONFIG}
             className="fixed top-4 right-4 z-50 max-w-sm"
           >
-            <div className="bg-white dark:bg-slate-800 rounded-xl shadow-2xl border border-slate-200 dark:border-slate-700 overflow-hidden">
+            <div className="bg-card dark:bg-muted rounded-xl shadow-2xl border border-border dark:border-border overflow-hidden">
               <div className="flex items-start gap-3 p-4">
                 <motion.div
                   initial={prefersReducedMotion ? {} : { scale: 0, rotate: -180 }}
@@ -277,7 +277,7 @@ export function AchievementCelebration({
                 </motion.div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2">
-                    <h4 className="font-semibold text-slate-900 dark:text-white truncate">
+                    <h4 className="font-semibold text-foreground dark:text-white truncate">
                       {title}
                     </h4>
                     {badge && (
@@ -287,7 +287,7 @@ export function AchievementCelebration({
                     )}
                   </div>
                   {subtitle && (
-                    <p className="text-sm text-slate-500 dark:text-slate-400 mt-0.5">
+                    <p className="text-sm text-muted-foreground dark:text-muted-foreground mt-0.5">
                       {subtitle}
                     </p>
                   )}
@@ -325,7 +325,7 @@ export function AchievementCelebration({
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.2 }}
-          className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/95 backdrop-blur-sm"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-muted/95 backdrop-blur-sm"
           onClick={onComplete}
         >
           {/* Content */}
@@ -431,7 +431,7 @@ export function AchievementCelebration({
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: prefersReducedMotion ? 0 : 0.3 }}
-                className="text-slate-300 text-lg max-w-md mx-auto"
+                className="text-muted-foreground text-lg max-w-md mx-auto"
               >
                 {subtitle}
               </motion.p>
@@ -442,7 +442,7 @@ export function AchievementCelebration({
               initial={{ opacity: 0 }}
               animate={{ opacity: 0.5 }}
               transition={{ delay: prefersReducedMotion ? 0 : 1.5 }}
-              className="text-slate-500 text-sm mt-8"
+              className="text-muted-foreground text-sm mt-8"
             >
               Click anywhere to continue
             </motion.p>

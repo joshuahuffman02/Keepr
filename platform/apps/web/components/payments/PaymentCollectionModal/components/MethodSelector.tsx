@@ -66,7 +66,7 @@ export function MethodSelector({ onSelect, disabled = false }: MethodSelectorPro
         {[1, 2, 3, 4, 5, 6].map((i) => (
           <div
             key={i}
-            className="h-20 bg-slate-100 animate-pulse rounded-lg"
+            className="h-20 bg-muted animate-pulse rounded-lg"
           />
         ))}
       </div>
@@ -75,7 +75,7 @@ export function MethodSelector({ onSelect, disabled = false }: MethodSelectorPro
 
   if (sortedMethods.length === 0) {
     return (
-      <div className="text-center py-8 text-slate-500">
+      <div className="text-center py-8 text-muted-foreground">
         No payment methods available
       </div>
     );
@@ -104,8 +104,8 @@ export function MethodSelector({ onSelect, disabled = false }: MethodSelectorPro
               "focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2",
               isSelected
                 ? "border-emerald-600 bg-emerald-50 text-emerald-700"
-                : "border-slate-200 bg-white text-slate-700",
-              disabled && "opacity-50 cursor-not-allowed hover:border-slate-200 hover:bg-white"
+                : "border-border bg-card text-foreground",
+              disabled && "opacity-50 cursor-not-allowed hover:border-border hover:bg-card"
             )}
           >
             <IconComponent className="w-6 h-6 mb-2" />

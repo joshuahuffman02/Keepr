@@ -96,17 +96,17 @@ export default function CalendarSettingsPage() {
         <div className="flex items-center justify-between mb-8">
           <div>
             <div className="flex items-center gap-3 mb-1">
-              <Link href="/calendar" className="text-slate-500 hover:text-slate-700 flex items-center gap-1">
+              <Link href="/calendar" className="text-muted-foreground hover:text-foreground flex items-center gap-1">
                 <ArrowLeft className="h-4 w-4" /> Back to Calendar
               </Link>
             </div>
-            <h1 className="text-2xl font-bold text-slate-900">Calendar Settings</h1>
-            <p className="text-slate-500 mt-1">Customize your calendar view and behavior</p>
+            <h1 className="text-2xl font-bold text-foreground">Calendar Settings</h1>
+            <p className="text-muted-foreground mt-1">Customize your calendar view and behavior</p>
           </div>
           <div className="flex items-center gap-2">
             <button
               onClick={handleReset}
-              className="px-4 py-2 text-slate-600 hover:bg-slate-100 rounded-lg"
+              className="px-4 py-2 text-muted-foreground hover:bg-muted rounded-lg"
             >
               Reset
             </button>
@@ -122,12 +122,12 @@ export default function CalendarSettingsPage() {
 
         <div className="space-y-8">
           {/* Display Settings */}
-          <section className="bg-white rounded-xl border border-slate-200 p-6">
-            <h2 className="text-lg font-semibold text-slate-900 mb-4">Display Settings</h2>
+          <section className="bg-card rounded-xl border border-border p-6">
+            <h2 className="text-lg font-semibold text-foreground mb-4">Display Settings</h2>
             <div className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-1">
+                  <label className="block text-sm font-medium text-foreground mb-1">
                     Default Day Range
                   </label>
                   <select
@@ -135,7 +135,7 @@ export default function CalendarSettingsPage() {
                     onChange={(e) =>
                       setSettings({ ...settings, defaultDayCount: parseInt(e.target.value) })
                     }
-                    className="w-full px-3 py-2 border border-slate-200 rounded-lg"
+                    className="w-full px-3 py-2 border border-border rounded-lg"
                   >
                     {DAY_COUNTS.map((n) => (
                       <option key={n} value={n}>
@@ -145,7 +145,7 @@ export default function CalendarSettingsPage() {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-1">
+                  <label className="block text-sm font-medium text-foreground mb-1">
                     Week Starts On
                   </label>
                   <select
@@ -156,7 +156,7 @@ export default function CalendarSettingsPage() {
                         startOfWeek: e.target.value as "sunday" | "monday",
                       })
                     }
-                    className="w-full px-3 py-2 border border-slate-200 rounded-lg"
+                    className="w-full px-3 py-2 border border-border rounded-lg"
                   >
                     <option value="sunday">Sunday</option>
                     <option value="monday">Monday</option>
@@ -205,8 +205,8 @@ export default function CalendarSettingsPage() {
           </section>
 
           {/* Color Scheme */}
-          <section className="bg-white rounded-xl border border-slate-200 p-6">
-            <h2 className="text-lg font-semibold text-slate-900 mb-4">Color Scheme</h2>
+          <section className="bg-card rounded-xl border border-border p-6">
+            <h2 className="text-lg font-semibold text-foreground mb-4">Color Scheme</h2>
             <div className="grid grid-cols-2 gap-3">
               {COLOR_SCHEMES.map((scheme) => (
                 <button
@@ -216,25 +216,25 @@ export default function CalendarSettingsPage() {
                   }
                   className={`p-4 rounded-xl border text-left transition-all ${settings.colorScheme === scheme.value
                     ? "border-status-success bg-status-success/15 ring-2 ring-status-success/30"
-                    : "border-slate-200 hover:border-slate-300"
+                    : "border-border hover:border-border"
                     }`}
                 >
-                  <div className="font-medium text-slate-900">{scheme.label}</div>
-                  <div className="text-sm text-slate-500">{scheme.desc}</div>
+                  <div className="font-medium text-foreground">{scheme.label}</div>
+                  <div className="text-sm text-muted-foreground">{scheme.desc}</div>
                 </button>
               ))}
             </div>
 
             {/* Color Legend */}
-            <div className="mt-6 pt-4 border-t border-slate-100">
-              <h3 className="text-sm font-medium text-slate-700 mb-3">Color Legend</h3>
+            <div className="mt-6 pt-4 border-t border-border">
+              <h3 className="text-sm font-medium text-foreground mb-3">Color Legend</h3>
               <div className="flex flex-wrap gap-3">
                 {settings.colorScheme === "status" && (
                   <>
                     <ColorChip color="bg-emerald-500" label="Confirmed" />
                     <ColorChip color="bg-blue-500" label="Checked In" />
                     <ColorChip color="bg-amber-500" label="Pending" />
-                    <ColorChip color="bg-slate-400" label="Cancelled" />
+                    <ColorChip color="bg-muted" label="Cancelled" />
                     <ColorChip color="bg-purple-500" label="Checked Out" />
                   </>
                 )}
@@ -243,7 +243,7 @@ export default function CalendarSettingsPage() {
                     <ColorChip color="bg-blue-500" label="Online" />
                     <ColorChip color="bg-emerald-500" label="Phone" />
                     <ColorChip color="bg-orange-500" label="OTA" />
-                    <ColorChip color="bg-slate-500" label="Walk-in" />
+                    <ColorChip color="bg-muted0" label="Walk-in" />
                   </>
                 )}
                 {settings.colorScheme === "siteType" && (
@@ -259,10 +259,10 @@ export default function CalendarSettingsPage() {
           </section>
 
           {/* Auto-Refresh */}
-          <section className="bg-white rounded-xl border border-slate-200 p-6">
-            <h2 className="text-lg font-semibold text-slate-900 mb-4">Auto-Refresh</h2>
+          <section className="bg-card rounded-xl border border-border p-6">
+            <h2 className="text-lg font-semibold text-foreground mb-4">Auto-Refresh</h2>
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1">
+              <label className="block text-sm font-medium text-foreground mb-1">
                 Refresh Interval
               </label>
               <select
@@ -270,7 +270,7 @@ export default function CalendarSettingsPage() {
                 onChange={(e) =>
                   setSettings({ ...settings, autoRefreshInterval: parseInt(e.target.value) })
                 }
-                className="w-full px-3 py-2 border border-slate-200 rounded-lg"
+                className="w-full px-3 py-2 border border-border rounded-lg"
               >
                 {REFRESH_INTERVALS.map((opt) => (
                   <option key={opt.value} value={opt.value}>
@@ -278,15 +278,15 @@ export default function CalendarSettingsPage() {
                   </option>
                 ))}
               </select>
-              <p className="text-sm text-slate-500 mt-2">
+              <p className="text-sm text-muted-foreground mt-2">
                 Calendar will automatically refresh to show new reservations and changes.
               </p>
             </div>
           </section>
 
           {/* Keyboard Shortcuts */}
-          <section className="bg-white rounded-xl border border-slate-200 p-6">
-            <h2 className="text-lg font-semibold text-slate-900 mb-4">Keyboard Shortcuts</h2>
+          <section className="bg-card rounded-xl border border-border p-6">
+            <h2 className="text-lg font-semibold text-foreground mb-4">Keyboard Shortcuts</h2>
             <div className="grid grid-cols-2 gap-4 text-sm">
               <ShortcutRow keys={["←", "→"]} desc="Navigate days" />
               <ShortcutRow keys={["T"]} desc="Jump to today" />
@@ -300,15 +300,15 @@ export default function CalendarSettingsPage() {
           </section>
 
           {/* Export Options */}
-          <section className="bg-white rounded-xl border border-slate-200 p-6">
-            <h2 className="text-lg font-semibold text-slate-900 mb-4">Export</h2>
+          <section className="bg-card rounded-xl border border-border p-6">
+            <h2 className="text-lg font-semibold text-foreground mb-4">Export</h2>
             <div className="flex gap-3">
               <button
                 onClick={() => {
                   // Export current view as CSV
                   alert("Export functionality - would download CSV of current view");
                 }}
-                className="px-4 py-2 border border-slate-200 rounded-lg hover:bg-slate-50"
+                className="px-4 py-2 border border-border rounded-lg hover:bg-muted"
               >
                 <div className="flex items-center gap-2"><BarChart3 className="h-4 w-4" /> Export CSV</div>
               </button>
@@ -317,7 +317,7 @@ export default function CalendarSettingsPage() {
                   // Export as iCal
                   alert("Export functionality - would download iCal file");
                 }}
-                className="px-4 py-2 border border-slate-200 rounded-lg hover:bg-slate-50"
+                className="px-4 py-2 border border-border rounded-lg hover:bg-muted"
               >
                 <div className="flex items-center gap-2"><CalendarDays className="h-4 w-4" /> Export iCal</div>
               </button>
@@ -326,7 +326,7 @@ export default function CalendarSettingsPage() {
                   // Print view
                   window.print();
                 }}
-                className="px-4 py-2 border border-slate-200 rounded-lg hover:bg-slate-50"
+                className="px-4 py-2 border border-border rounded-lg hover:bg-muted"
               >
                 <div className="flex items-center gap-2"><Printer className="h-4 w-4" /> Print</div>
               </button>
@@ -353,9 +353,9 @@ function ToggleOption({
         type="checkbox"
         checked={checked}
         onChange={(e) => onChange(e.target.checked)}
-        className="rounded border-slate-300 text-emerald-600"
+        className="rounded border-border text-emerald-600"
       />
-      <span className="text-sm text-slate-700">{label}</span>
+      <span className="text-sm text-foreground">{label}</span>
     </label>
   );
 }
@@ -364,7 +364,7 @@ function ColorChip({ color, label }: { color: string; label: string }) {
   return (
     <div className="flex items-center gap-2">
       <div className={`w-3 h-3 rounded-full ${color}`} />
-      <span className="text-sm text-slate-600">{label}</span>
+      <span className="text-sm text-muted-foreground">{label}</span>
     </div>
   );
 }
@@ -372,12 +372,12 @@ function ColorChip({ color, label }: { color: string; label: string }) {
 function ShortcutRow({ keys, desc }: { keys: string[]; desc: string }) {
   return (
     <div className="flex items-center justify-between">
-      <span className="text-slate-600">{desc}</span>
+      <span className="text-muted-foreground">{desc}</span>
       <div className="flex gap-1">
         {keys.map((k, i) => (
           <kbd
             key={i}
-            className="px-2 py-0.5 bg-slate-100 border border-slate-200 rounded text-xs font-mono"
+            className="px-2 py-0.5 bg-muted border border-border rounded text-xs font-mono"
           >
             {k}
           </kbd>

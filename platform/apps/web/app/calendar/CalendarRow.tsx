@@ -51,19 +51,19 @@ export const CalendarRow = memo(function CalendarRow({
 
     return (
         <div
-            className="grid relative group hover:bg-slate-50/50 transition-colors"
+            className="grid relative group hover:bg-muted/50 transition-colors"
             style={{ gridTemplateColumns: gridTemplate }}
             data-site-id={site.id}
             onDragStart={(e) => e.preventDefault()}
         >
             {/* Site Info Column */}
-            <div className={cn("px-4 py-3 sticky left-0 z-20 border-r border-slate-200 flex flex-col justify-center", zebra)}>
+            <div className={cn("px-4 py-3 sticky left-0 z-20 border-r border-border flex flex-col justify-center", zebra)}>
                 <div className="flex items-center justify-between gap-2">
                     <div className="min-w-0">
-                        <div className="text-sm font-bold text-slate-900 truncate" title={site.name}>{site.name}</div>
-                        <div className="text-[10px] font-medium text-slate-500 flex items-center gap-1.5 uppercase tracking-wider">
+                        <div className="text-sm font-bold text-foreground truncate" title={site.name}>{site.name}</div>
+                        <div className="text-[10px] font-medium text-muted-foreground flex items-center gap-1.5 uppercase tracking-wider">
                             <span>{site.siteType}</span>
-                            <span className="w-1 h-1 rounded-full bg-slate-300" />
+                            <span className="w-1 h-1 rounded-full bg-muted" />
                             <span>Site {site.siteNumber}</span>
                         </div>
                     </div>
@@ -79,7 +79,7 @@ export const CalendarRow = memo(function CalendarRow({
                             key={i}
                             data-day-idx={i}
                             className={cn(
-                                "border-r border-slate-100 cursor-crosshair transition-colors h-16 touch-none",
+                                "border-r border-border cursor-crosshair transition-colors h-16 touch-none",
                                 zebra,
                                 d.isToday && "bg-status-info/5",
                                 d.weekend && "bg-muted/50",
@@ -126,7 +126,7 @@ export const CalendarRow = memo(function CalendarRow({
                                         gridColumn: `${selStartIdx + 1} / span ${span}`,
                                     }}
                                 >
-                                    <span className="text-[10px] font-bold text-purple-700 bg-white/90 px-2 py-0.5 rounded shadow-sm">
+                                    <span className="text-[10px] font-bold text-purple-700 bg-card/90 px-2 py-0.5 rounded shadow-sm">
                                         Selected Stays
                                     </span>
                                 </div>

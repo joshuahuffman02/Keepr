@@ -279,13 +279,13 @@ export default function RateGroupsPage() {
     return (
       <div className="max-w-4xl space-y-6">
         <div>
-          <h2 className="text-2xl font-bold text-slate-900">Rate Groups</h2>
-          <p className="text-slate-500 mt-1">
+          <h2 className="text-2xl font-bold text-foreground">Rate Groups</h2>
+          <p className="text-muted-foreground mt-1">
             Define rate periods with colors for your calendar
           </p>
         </div>
         <div className="flex items-center justify-center py-12">
-          <Loader2 className="h-8 w-8 animate-spin text-slate-400" />
+          <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
         </div>
       </div>
     );
@@ -295,15 +295,15 @@ export default function RateGroupsPage() {
     return (
       <div className="max-w-4xl space-y-6">
         <div>
-          <h2 className="text-2xl font-bold text-slate-900">Rate Groups</h2>
-          <p className="text-slate-500 mt-1">
+          <h2 className="text-2xl font-bold text-foreground">Rate Groups</h2>
+          <p className="text-muted-foreground mt-1">
             Define rate periods with colors for your calendar
           </p>
         </div>
         <Card>
           <CardContent className="py-8 text-center">
             <Info className="h-8 w-8 text-amber-500 mx-auto mb-3" />
-            <p className="text-slate-600">Please select a campground first.</p>
+            <p className="text-muted-foreground">Please select a campground first.</p>
           </CardContent>
         </Card>
       </div>
@@ -315,8 +315,8 @@ export default function RateGroupsPage() {
       {/* Header */}
       <div className="flex items-start justify-between">
         <div>
-          <h2 className="text-2xl font-bold text-slate-900">Rate Groups</h2>
-          <p className="text-slate-500 mt-1">
+          <h2 className="text-2xl font-bold text-foreground">Rate Groups</h2>
+          <p className="text-muted-foreground mt-1">
             Define rate periods with colors for your calendar
           </p>
         </div>
@@ -340,7 +340,7 @@ export default function RateGroupsPage() {
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-base">
-            <Calendar className="h-5 w-5 text-slate-500" />
+            <Calendar className="h-5 w-5 text-muted-foreground" />
             Calendar Preview
           </CardTitle>
           <CardDescription>
@@ -360,7 +360,7 @@ export default function RateGroupsPage() {
               </div>
             ))}
             {activeGroups.length === 0 && (
-              <p className="text-slate-500 text-sm">
+              <p className="text-muted-foreground text-sm">
                 No active rate groups. Add one to get started.
               </p>
             )}
@@ -370,8 +370,8 @@ export default function RateGroupsPage() {
 
       {/* Active Rate Groups */}
       <div className="space-y-3">
-        <h3 className="text-sm font-medium text-slate-900 flex items-center gap-2">
-          <Palette className="h-4 w-4 text-slate-500" />
+        <h3 className="text-sm font-medium text-foreground flex items-center gap-2">
+          <Palette className="h-4 w-4 text-muted-foreground" />
           Active Rate Groups ({activeGroups.length})
         </h3>
         {activeGroups.length > 0 ? (
@@ -390,9 +390,9 @@ export default function RateGroupsPage() {
         ) : (
           <Card className="border-dashed">
             <CardContent className="py-8 text-center">
-              <Palette className="h-10 w-10 mx-auto text-slate-400" />
-              <h4 className="mt-3 font-medium text-slate-900">No active rate groups</h4>
-              <p className="text-sm text-slate-500 mt-1">
+              <Palette className="h-10 w-10 mx-auto text-muted-foreground" />
+              <h4 className="mt-3 font-medium text-foreground">No active rate groups</h4>
+              <p className="text-sm text-muted-foreground mt-1">
                 Create rate groups to organize your seasonal pricing
               </p>
               <Button className="mt-4" onClick={() => setIsAddDialogOpen(true)}>
@@ -407,7 +407,7 @@ export default function RateGroupsPage() {
       {/* Inactive Rate Groups */}
       {inactiveGroups.length > 0 && (
         <div className="space-y-3">
-          <h3 className="text-sm font-medium text-slate-500">
+          <h3 className="text-sm font-medium text-muted-foreground">
             Inactive ({inactiveGroups.length})
           </h3>
           <div className="space-y-2">
@@ -538,16 +538,16 @@ export default function RateGroupsPage() {
             </div>
 
             {editStartDate && editEndDate && (
-              <div className="p-4 rounded-lg bg-slate-50 border">
+              <div className="p-4 rounded-lg bg-muted border">
                 <div className="flex items-center justify-between">
-                  <span className="text-sm text-slate-600">Duration:</span>
-                  <span className="font-semibold text-slate-900">
+                  <span className="text-sm text-muted-foreground">Duration:</span>
+                  <span className="font-semibold text-foreground">
                     {calculateDays(editStartDate, editEndDate)} days
                   </span>
                 </div>
                 <div className="flex items-center justify-between mt-1">
-                  <span className="text-sm text-slate-600">Period:</span>
-                  <span className="text-sm text-slate-700">
+                  <span className="text-sm text-muted-foreground">Period:</span>
+                  <span className="text-sm text-foreground">
                     {new Date(editStartDate).toLocaleDateString()} - {new Date(editEndDate).toLocaleDateString()}
                   </span>
                 </div>

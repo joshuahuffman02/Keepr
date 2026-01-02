@@ -80,8 +80,8 @@ export default function AiSettingsPage() {
             <DashboardShell>
                 <div className="p-8">
                     <div className="animate-pulse space-y-4">
-                        <div className="h-8 bg-slate-200 rounded w-1/3" />
-                        <div className="h-64 bg-slate-200 rounded" />
+                        <div className="h-8 bg-muted rounded w-1/3" />
+                        <div className="h-64 bg-muted rounded" />
                     </div>
                 </div>
             </DashboardShell>
@@ -123,14 +123,14 @@ export default function AiSettingsPage() {
 
                 <div className="flex items-center justify-between">
                     <div>
-                        <h1 className="text-2xl font-bold text-slate-900 flex items-center gap-2">
+                        <h1 className="text-2xl font-bold text-foreground flex items-center gap-2">
                             <Brain className="w-7 h-7 text-violet-600" />
                             AI Settings
                         </h1>
-                        <p className="text-slate-600 mt-1">Configure AI features for {campground?.name || "this campground"}</p>
+                        <p className="text-muted-foreground mt-1">Configure AI features for {campground?.name || "this campground"}</p>
                     </div>
                     <div className="flex items-center gap-3">
-                        <span className="text-sm text-slate-600">AI Features</span>
+                        <span className="text-sm text-muted-foreground">AI Features</span>
                         <Switch
                             checked={settings?.aiEnabled ?? false}
                             onCheckedChange={() => handleToggle("aiEnabled")}
@@ -169,8 +169,8 @@ export default function AiSettingsPage() {
                             </CardHeader>
                             <CardContent className="space-y-4">
                                 <div>
-                                    <label className="text-sm font-medium text-slate-700">Anonymization Level</label>
-                                    <p className="text-xs text-slate-500 mb-2">Controls how much data is stripped before AI sees it</p>
+                                    <label className="text-sm font-medium text-foreground">Anonymization Level</label>
+                                    <p className="text-xs text-muted-foreground mb-2">Controls how much data is stripped before AI sees it</p>
                                     <div className="grid grid-cols-3 gap-2">
                                         {[
                                             { value: "strict", label: "Strict", desc: "Maximum privacy" },
@@ -182,17 +182,17 @@ export default function AiSettingsPage() {
                                                 onClick={() => handleAnonymizationChange(option.value)}
                                                 className={`p-3 rounded-lg border text-left transition-all ${settings.aiAnonymizationLevel === option.value
                                                     ? "border-emerald-500 bg-emerald-50 ring-1 ring-emerald-500"
-                                                    : "border-slate-200 hover:border-slate-300"
+                                                    : "border-border hover:border-border"
                                                     }`}
                                             >
                                                 <div className="font-medium text-sm">{option.label}</div>
-                                                <div className="text-xs text-slate-500">{option.desc}</div>
+                                                <div className="text-xs text-muted-foreground">{option.desc}</div>
                                             </button>
                                         ))}
                                     </div>
                                 </div>
 
-                                <div className="p-3 rounded-lg bg-slate-50 text-sm text-slate-600">
+                                <div className="p-3 rounded-lg bg-muted text-sm text-muted-foreground">
                                     <strong>AI powered by Camp Everyday.</strong> We use OpenAI's GPT-4 to provide AI features.
                                     Your data is anonymized before processing and never used to train models.
                                 </div>
@@ -205,14 +205,14 @@ export default function AiSettingsPage() {
                                 <CardTitle className="text-lg">AI Features</CardTitle>
                             </CardHeader>
                             <CardContent className="space-y-4">
-                                <div className="flex items-center justify-between p-4 rounded-lg border border-slate-200">
+                                <div className="flex items-center justify-between p-4 rounded-lg border border-border">
                                     <div className="flex items-center gap-3">
                                         <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
                                             <MessageSquare className="w-5 h-5 text-blue-600" />
                                         </div>
                                         <div>
                                             <div className="font-medium">Reply Assist</div>
-                                            <div className="text-sm text-slate-500">AI-generated reply suggestions for staff</div>
+                                            <div className="text-sm text-muted-foreground">AI-generated reply suggestions for staff</div>
                                         </div>
                                     </div>
                                     <Switch
@@ -221,14 +221,14 @@ export default function AiSettingsPage() {
                                     />
                                 </div>
 
-                                <div className="flex items-center justify-between p-4 rounded-lg border border-slate-200">
+                                <div className="flex items-center justify-between p-4 rounded-lg border border-border">
                                     <div className="flex items-center gap-3">
                                         <div className="w-10 h-10 bg-emerald-100 rounded-lg flex items-center justify-center">
                                             <Zap className="w-5 h-5 text-emerald-600" />
                                         </div>
                                         <div>
                                             <div className="font-medium">Booking Assistant</div>
-                                            <div className="text-sm text-slate-500">Help guests find the right site</div>
+                                            <div className="text-sm text-muted-foreground">Help guests find the right site</div>
                                         </div>
                                     </div>
                                     <Switch
@@ -237,14 +237,14 @@ export default function AiSettingsPage() {
                                     />
                                 </div>
 
-                                <div className="flex items-center justify-between p-4 rounded-lg border border-slate-200">
+                                <div className="flex items-center justify-between p-4 rounded-lg border border-border">
                                     <div className="flex items-center gap-3">
                                         <div className="w-10 h-10 bg-violet-100 rounded-lg flex items-center justify-center">
                                             <BarChart3 className="w-5 h-5 text-violet-600" />
                                         </div>
                                         <div>
                                             <div className="font-medium">AI Analytics</div>
-                                            <div className="text-sm text-slate-500">Natural language queries and insights</div>
+                                            <div className="text-sm text-muted-foreground">Natural language queries and insights</div>
                                         </div>
                                     </div>
                                     <Switch
@@ -253,14 +253,14 @@ export default function AiSettingsPage() {
                                     />
                                 </div>
 
-                                <div className="flex items-center justify-between p-4 rounded-lg border border-slate-200">
+                                <div className="flex items-center justify-between p-4 rounded-lg border border-border">
                                     <div className="flex items-center gap-3">
                                         <div className="w-10 h-10 bg-amber-100 rounded-lg flex items-center justify-center">
                                             <TrendingUp className="w-5 h-5 text-amber-600" />
                                         </div>
                                         <div>
                                             <div className="font-medium">Demand Forecasting</div>
-                                            <div className="text-sm text-slate-500">Predict occupancy and optimize pricing</div>
+                                            <div className="text-sm text-muted-foreground">Predict occupancy and optimize pricing</div>
                                         </div>
                                     </div>
                                     <Switch
@@ -279,32 +279,32 @@ export default function AiSettingsPage() {
                                 </CardHeader>
                                 <CardContent>
                                     <div className="grid grid-cols-3 gap-4 mb-6">
-                                        <div className="p-4 rounded-lg bg-slate-50">
-                                            <div className="text-2xl font-bold text-slate-900">
+                                        <div className="p-4 rounded-lg bg-muted">
+                                            <div className="text-2xl font-bold text-foreground">
                                                 {usage.totals.interactions.toLocaleString()}
                                             </div>
-                                            <div className="text-sm text-slate-500">Total Interactions</div>
+                                            <div className="text-sm text-muted-foreground">Total Interactions</div>
                                         </div>
-                                        <div className="p-4 rounded-lg bg-slate-50">
-                                            <div className="text-2xl font-bold text-slate-900">
+                                        <div className="p-4 rounded-lg bg-muted">
+                                            <div className="text-2xl font-bold text-foreground">
                                                 {(usage.totals.tokensUsed / 1000).toFixed(1)}K
                                             </div>
-                                            <div className="text-sm text-slate-500">Tokens Used</div>
+                                            <div className="text-sm text-muted-foreground">Tokens Used</div>
                                         </div>
-                                        <div className="p-4 rounded-lg bg-slate-50">
-                                            <div className="text-2xl font-bold text-slate-900">
+                                        <div className="p-4 rounded-lg bg-muted">
+                                            <div className="text-2xl font-bold text-foreground">
                                                 ${((usage.totals.costCents || 0) / 100).toFixed(2)}
                                             </div>
-                                            <div className="text-sm text-slate-500">Estimated Cost</div>
+                                            <div className="text-sm text-muted-foreground">Estimated Cost</div>
                                         </div>
                                     </div>
 
                                     {usage.byFeature.length > 0 && (
                                         <div className="space-y-2">
-                                            <div className="text-sm font-medium text-slate-700">By Feature</div>
+                                            <div className="text-sm font-medium text-foreground">By Feature</div>
                                             {usage.byFeature.map((feat) => (
-                                                <div key={feat.feature} className="flex items-center justify-between py-2 border-b border-slate-100 last:border-0">
-                                                    <span className="text-sm text-slate-600 capitalize">{feat.feature.replace(/_/g, " ")}</span>
+                                                <div key={feat.feature} className="flex items-center justify-between py-2 border-b border-border last:border-0">
+                                                    <span className="text-sm text-muted-foreground capitalize">{feat.feature.replace(/_/g, " ")}</span>
                                                     <span className="text-sm font-medium">{feat.interactions} requests</span>
                                                 </div>
                                             ))}

@@ -20,7 +20,7 @@ interface ProductGridProps<T extends Product> {
 export function ProductGrid<T extends Product>({ products, onAdd }: ProductGridProps<T>) {
     if (products.length === 0) {
         return (
-            <div className="h-full flex flex-col items-center justify-center text-slate-400">
+            <div className="h-full flex flex-col items-center justify-center text-muted-foreground">
                 <p>No products found in this category.</p>
             </div>
         );

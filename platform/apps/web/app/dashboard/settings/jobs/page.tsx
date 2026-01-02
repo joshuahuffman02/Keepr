@@ -79,8 +79,8 @@ export default function JobsPage() {
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold text-slate-900">Playbook Jobs</h1>
-            <p className="text-sm text-slate-600">
+            <h1 className="text-2xl font-bold text-foreground">Playbook Jobs</h1>
+            <p className="text-sm text-muted-foreground">
               Campground: {campground?.name || "Use the global selector in the header"}
             </p>
           </div>
@@ -91,13 +91,13 @@ export default function JobsPage() {
             <CardTitle>Jobs</CardTitle>
           </CardHeader>
           <CardContent className="space-y-2">
-            {jobsQuery.isLoading && <div className="text-sm text-slate-500">Loading…</div>}
-            {!jobsQuery.isLoading && jobs.length === 0 && <div className="text-sm text-slate-500">No jobs found.</div>}
+            {jobsQuery.isLoading && <div className="text-sm text-muted-foreground">Loading…</div>}
+            {!jobsQuery.isLoading && jobs.length === 0 && <div className="text-sm text-muted-foreground">No jobs found.</div>}
             {jobs.map((j) => (
-              <div key={j.id} className="border border-slate-200 rounded p-3 flex items-center justify-between gap-3">
+              <div key={j.id} className="border border-border rounded p-3 flex items-center justify-between gap-3">
                 <div className="flex-1">
-                  <div className="text-sm font-semibold text-slate-900">{j.playbookId}</div>
-                  <div className="text-xs text-slate-500">
+                  <div className="text-sm font-semibold text-foreground">{j.playbookId}</div>
+                  <div className="text-xs text-muted-foreground">
                     Scheduled {formatDistanceToNow(new Date(j.scheduledAt), { addSuffix: true })} • Attempts {j.attempts}
                     {j.lastError ? ` • Error: ${j.lastError}` : ""}
                   </div>

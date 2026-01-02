@@ -132,7 +132,7 @@ export default function GroupsPage() {
     return (
       <DashboardShell>
         <div className="flex items-center justify-center h-64">
-          <p className="text-slate-500">Select a campground to view groups</p>
+          <p className="text-muted-foreground">Select a campground to view groups</p>
         </div>
       </DashboardShell>
     );
@@ -144,8 +144,8 @@ export default function GroupsPage() {
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
           <div>
-            <h1 className="text-2xl font-bold text-slate-900">Group Bookings</h1>
-            <p className="text-slate-500 mt-1">Manage linked reservations for families, events, and group stays</p>
+            <h1 className="text-2xl font-bold text-foreground">Group Bookings</h1>
+            <p className="text-muted-foreground mt-1">Manage linked reservations for families, events, and group stays</p>
           </div>
           <button
             onClick={() => setShowCreateModal(true)}
@@ -158,11 +158,11 @@ export default function GroupsPage() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Groups List */}
           <div className="lg:col-span-1">
-            <div className="bg-white rounded-xl border border-slate-200 overflow-hidden">
-              <div className="px-4 py-3 bg-slate-50 border-b border-slate-200">
-                <h3 className="font-semibold text-slate-800">All Groups ({groups.length})</h3>
+            <div className="bg-card rounded-xl border border-border overflow-hidden">
+              <div className="px-4 py-3 bg-muted border-b border-border">
+                <h3 className="font-semibold text-foreground">All Groups ({groups.length})</h3>
               </div>
-              <div className="divide-y divide-slate-100 max-h-[600px] overflow-y-auto">
+              <div className="divide-y divide-border max-h-[600px] overflow-y-auto">
                 {loading ? (
                   <div className="flex items-center justify-center py-8">
                     <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-indigo-600" />
@@ -176,16 +176,16 @@ export default function GroupsPage() {
                     <button
                       key={group.id}
                       onClick={() => loadGroupDetail(group.id)}
-                      className={`w-full px-4 py-3 text-left hover:bg-slate-50 transition-colors ${
+                      className={`w-full px-4 py-3 text-left hover:bg-muted transition-colors ${
                         selectedGroup?.id === group.id ? "bg-indigo-50 border-l-2 border-indigo-500" : ""
                       }`}
                     >
                       <div className="flex items-center justify-between">
                         <div>
-                          <div className="font-medium text-slate-900">
+                          <div className="font-medium text-foreground">
                             Group #{group.id.slice(0, 8)}
                           </div>
-                          <div className="text-sm text-slate-500">
+                          <div className="text-sm text-muted-foreground">
                             {group.reservationCount} reservation{group.reservationCount !== 1 ? "s" : ""}
                           </div>
                         </div>
@@ -208,11 +208,11 @@ export default function GroupsPage() {
           {/* Group Detail */}
           <div className="lg:col-span-2">
             {selectedGroup ? (
-              <div className="bg-white rounded-xl border border-slate-200">
-                <div className="px-6 py-4 border-b border-slate-200 flex items-center justify-between">
+              <div className="bg-card rounded-xl border border-border">
+                <div className="px-6 py-4 border-b border-border flex items-center justify-between">
                   <div>
-                    <h3 className="font-semibold text-slate-900">Group #{selectedGroup.id.slice(0, 8)}</h3>
-                    <p className="text-sm text-slate-500">Created {formatDate(selectedGroup.createdAt)}</p>
+                    <h3 className="font-semibold text-foreground">Group #{selectedGroup.id.slice(0, 8)}</h3>
+                    <p className="text-sm text-muted-foreground">Created {formatDate(selectedGroup.createdAt)}</p>
                   </div>
                   <div className="flex items-center gap-2">
                     <button
@@ -225,7 +225,7 @@ export default function GroupsPage() {
                 </div>
 
                 {/* Settings */}
-                <div className="px-6 py-4 border-b border-slate-100 flex gap-6">
+                <div className="px-6 py-4 border-b border-border flex gap-6">
                   <label className="flex items-center gap-2 cursor-pointer">
                     <input
                       type="checkbox"
@@ -234,10 +234,10 @@ export default function GroupsPage() {
                         await apiClient.updateGroup(selectedGroup.id, { sharedPayment: e.target.checked });
                         loadGroupDetail(selectedGroup.id);
                       }}
-                      className="rounded border-slate-300"
+                      className="rounded border-border"
                     />
-                    <span className="text-sm text-slate-700">Shared Payment</span>
-                    <span className="text-xs text-slate-400">(One invoice for all)</span>
+                    <span className="text-sm text-foreground">Shared Payment</span>
+                    <span className="text-xs text-muted-foreground">(One invoice for all)</span>
                   </label>
                   <label className="flex items-center gap-2 cursor-pointer">
                     <input
@@ -247,16 +247,16 @@ export default function GroupsPage() {
                         await apiClient.updateGroup(selectedGroup.id, { sharedComm: e.target.checked });
                         loadGroupDetail(selectedGroup.id);
                       }}
-                      className="rounded border-slate-300"
+                      className="rounded border-border"
                     />
-                    <span className="text-sm text-slate-700">Shared Communications</span>
-                    <span className="text-xs text-slate-400">(Primary contact only)</span>
+                    <span className="text-sm text-foreground">Shared Communications</span>
+                    <span className="text-xs text-muted-foreground">(Primary contact only)</span>
                   </label>
                 </div>
 
                 {/* Reservations */}
                 <div className="p-6">
-                  <h4 className="font-medium text-slate-800 mb-4">Linked Reservations</h4>
+                  <h4 className="font-medium text-foreground mb-4">Linked Reservations</h4>
                   {selectedGroup.reservations.length === 0 ? (
                     <InlineEmpty className="py-8 bg-muted rounded-lg">
                       No reservations linked to this group yet.
@@ -269,13 +269,13 @@ export default function GroupsPage() {
                           className={`p-4 rounded-lg border ${
                             res.groupRole === "primary"
                               ? "bg-status-info/15 border-status-info/30"
-                              : "bg-white border-slate-200"
+                              : "bg-card border-border"
                           }`}
                         >
                           <div className="flex items-start justify-between">
                             <div>
                               <div className="flex items-center gap-2">
-                                <span className="font-medium text-slate-900">
+                                <span className="font-medium text-foreground">
                                   {res.guest?.primaryFirstName} {res.guest?.primaryLastName || "Guest"}
                                 </span>
                                 {res.groupRole === "primary" && (
@@ -284,18 +284,18 @@ export default function GroupsPage() {
                                   </span>
                                 )}
                               </div>
-                              <div className="text-sm text-slate-500 mt-1">
+                              <div className="text-sm text-muted-foreground mt-1">
                                 Site {res.site?.siteNumber} • {formatDate(res.arrivalDate)} → {formatDate(res.departureDate)}
                               </div>
                               {res.guest?.email && (
-                                <div className="text-xs text-slate-400 mt-1">{res.guest.email}</div>
+                                <div className="text-xs text-muted-foreground mt-1">{res.guest.email}</div>
                               )}
                             </div>
                             <div className="flex items-center gap-2">
                               <span className={`px-2 py-0.5 rounded text-xs border ${
                                 res.status === "confirmed" ? "bg-status-success/15 text-status-success border-status-success/30" :
                                 res.status === "checked_in" ? "bg-status-info/15 text-status-info border-status-info/30" :
-                                "bg-slate-100 text-slate-600 border-slate-200"
+                                "bg-muted text-muted-foreground border-border"
                               }`}>
                                 {res.status}
                               </span>
@@ -314,9 +314,9 @@ export default function GroupsPage() {
                 </div>
               </div>
             ) : (
-              <div className="bg-white rounded-xl border border-slate-200 flex items-center justify-center h-[400px]">
-                <div className="text-center text-slate-400">
-                  <div className="text-4xl mb-3 text-slate-300">Groups</div>
+              <div className="bg-card rounded-xl border border-border flex items-center justify-center h-[400px]">
+                <div className="text-center text-muted-foreground">
+                  <div className="text-4xl mb-3 text-muted-foreground">Groups</div>
                   <p>Select a group to view details</p>
                 </div>
               </div>
@@ -391,42 +391,42 @@ function CreateGroupModal({
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md p-6">
+      <div className="bg-card rounded-2xl shadow-2xl w-full max-w-md p-6">
         <div className="flex items-center justify-between mb-6">
-          <h2 className="text-xl font-bold text-slate-900">Create Group</h2>
-          <button onClick={onClose} className="text-slate-400 hover:text-slate-600">✕</button>
+          <h2 className="text-xl font-bold text-foreground">Create Group</h2>
+          <button onClick={onClose} className="text-muted-foreground hover:text-muted-foreground">✕</button>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-3">
-            <label className="flex items-center gap-3 p-3 border border-slate-200 rounded-lg cursor-pointer hover:bg-slate-50">
+            <label className="flex items-center gap-3 p-3 border border-border rounded-lg cursor-pointer hover:bg-muted">
               <input
                 type="checkbox"
                 checked={sharedPayment}
                 onChange={e => setSharedPayment(e.target.checked)}
-                className="rounded border-slate-300"
+                className="rounded border-border"
               />
               <div>
-                <div className="font-medium text-slate-900">Shared Payment</div>
-                <div className="text-sm text-slate-500">Primary guest pays for all reservations</div>
+                <div className="font-medium text-foreground">Shared Payment</div>
+                <div className="text-sm text-muted-foreground">Primary guest pays for all reservations</div>
               </div>
             </label>
 
-            <label className="flex items-center gap-3 p-3 border border-slate-200 rounded-lg cursor-pointer hover:bg-slate-50">
+            <label className="flex items-center gap-3 p-3 border border-border rounded-lg cursor-pointer hover:bg-muted">
               <input
                 type="checkbox"
                 checked={sharedComm}
                 onChange={e => setSharedComm(e.target.checked)}
-                className="rounded border-slate-300"
+                className="rounded border-border"
               />
               <div>
-                <div className="font-medium text-slate-900">Shared Communications</div>
-                <div className="text-sm text-slate-500">Only primary guest receives emails/texts</div>
+                <div className="font-medium text-foreground">Shared Communications</div>
+                <div className="text-sm text-muted-foreground">Only primary guest receives emails/texts</div>
               </div>
             </label>
           </div>
 
-          <p className="text-sm text-slate-500 bg-slate-50 p-3 rounded-lg">
+          <p className="text-sm text-muted-foreground bg-muted p-3 rounded-lg">
             Tip: After creating, you can link existing reservations to this group from the reservation detail page.
           </p>
 
@@ -434,7 +434,7 @@ function CreateGroupModal({
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 px-4 py-2 border border-slate-200 text-slate-700 rounded-lg hover:bg-slate-50"
+              className="flex-1 px-4 py-2 border border-border text-foreground rounded-lg hover:bg-muted"
             >
               Cancel
             </button>

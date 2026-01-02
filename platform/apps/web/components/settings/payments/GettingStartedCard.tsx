@@ -17,23 +17,23 @@ export function GettingStartedCard({ onConnect, isConnecting }: GettingStartedCa
   ];
 
   return (
-    <Card className="border-2 border-dashed border-emerald-200 bg-gradient-to-br from-emerald-50/50 to-teal-50/30 overflow-hidden">
+    <Card className="border-2 border-dashed border-status-info-border bg-status-info-bg overflow-hidden">
       <CardContent className="py-12 text-center relative">
         {/* Decorative background elements */}
-        <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-100/50 rounded-full -translate-y-1/2 translate-x-1/2" aria-hidden="true" />
-        <div className="absolute bottom-0 left-0 w-24 h-24 bg-teal-100/50 rounded-full translate-y-1/2 -translate-x-1/2" aria-hidden="true" />
+        <div className="absolute top-0 right-0 w-32 h-32 bg-status-info/15 rounded-full -translate-y-1/2 translate-x-1/2" aria-hidden="true" />
+        <div className="absolute bottom-0 left-0 w-24 h-24 bg-status-info/10 rounded-full translate-y-1/2 -translate-x-1/2" aria-hidden="true" />
 
         <div className="relative">
           {/* Icon */}
-          <div className="w-16 h-16 mx-auto mb-6 rounded-full bg-emerald-100 flex items-center justify-center motion-safe:animate-in motion-safe:fade-in motion-safe:zoom-in motion-safe:duration-500">
-            <CreditCard className="w-8 h-8 text-emerald-600" aria-hidden="true" />
+          <div className="w-16 h-16 mx-auto mb-6 rounded-full bg-status-info-bg border border-status-info-border flex items-center justify-center motion-safe:animate-in motion-safe:fade-in motion-safe:zoom-in motion-safe:duration-500">
+            <CreditCard className="w-8 h-8 text-status-info-text" aria-hidden="true" />
           </div>
 
           {/* Heading */}
-          <h3 className="text-xl font-semibold text-slate-900 mb-2">
+          <h3 className="text-xl font-semibold text-foreground mb-2">
             Start accepting payments
           </h3>
-          <p className="text-slate-600 mb-6 max-w-md mx-auto">
+          <p className="text-muted-foreground mb-6 max-w-md mx-auto">
             Connect your Stripe account to accept payments from guests securely and get paid directly to your bank account.
           </p>
 
@@ -42,10 +42,10 @@ export function GettingStartedCard({ onConnect, isConnecting }: GettingStartedCa
             {benefits.map((benefit, index) => (
               <div
                 key={index}
-                className="flex items-center gap-2 px-3 py-1.5 bg-white rounded-full shadow-sm border border-emerald-100"
+                className="flex items-center gap-2 px-3 py-1.5 bg-card rounded-full shadow-sm border border-status-info-border"
               >
-                <benefit.icon className="w-4 h-4 text-emerald-600" aria-hidden="true" />
-                <span className="text-sm text-slate-700">{benefit.text}</span>
+                <benefit.icon className="w-4 h-4 text-status-info-text" aria-hidden="true" />
+                <span className="text-sm text-foreground">{benefit.text}</span>
               </div>
             ))}
           </div>
@@ -55,7 +55,7 @@ export function GettingStartedCard({ onConnect, isConnecting }: GettingStartedCa
             size="lg"
             onClick={onConnect}
             disabled={isConnecting}
-            className="bg-emerald-600 hover:bg-emerald-700 transition-all duration-150 hover:scale-[1.02] active:scale-[0.98] hover:shadow-lg motion-reduce:transform-none"
+            className="bg-action-primary text-action-primary-foreground hover:bg-action-primary-hover transition-all duration-150 hover:scale-[1.02] active:scale-[0.98] hover:shadow-lg motion-reduce:transform-none"
           >
             {isConnecting ? (
               <>
@@ -71,8 +71,8 @@ export function GettingStartedCard({ onConnect, isConnecting }: GettingStartedCa
           </Button>
 
           {/* Helper text */}
-          <p className="text-xs text-slate-500 mt-4 flex items-center justify-center gap-1">
-            <CheckCircle2 className="w-3 h-3 text-emerald-500" aria-hidden="true" />
+          <p className="text-xs text-muted-foreground mt-4 flex items-center justify-center gap-1">
+            <CheckCircle2 className="w-3 h-3 text-status-info" aria-hidden="true" />
             Takes about 5 minutes. You'll need your bank account info.
           </p>
         </div>

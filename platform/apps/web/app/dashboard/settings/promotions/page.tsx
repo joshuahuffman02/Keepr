@@ -191,7 +191,7 @@ export default function PromotionsSettingsPage() {
             <div className="space-y-6">
                 <div className="flex items-center justify-between">
                     <div>
-                        <h1 className="text-2xl font-bold text-slate-900">Promotions & Discounts</h1>
+                        <h1 className="text-2xl font-bold text-foreground">Promotions & Discounts</h1>
                         <p className="text-muted-foreground">Create and manage promo codes for your campground.</p>
                     </div>
                     <Button onClick={openCreateModal}>

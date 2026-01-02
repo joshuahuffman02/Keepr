@@ -244,7 +244,7 @@ export function OverviewReport({ campgroundId }: OverviewReportProps) {
                     value={summaryQuery.data?.sites ?? 0}
                     format="number"
                     loading={isLoading}
-                    icon={<Home className="h-5 w-5 text-slate-400" />}
+                    icon={<Home className="h-5 w-5 text-muted-foreground" />}
                 />
                 <KpiCard
                     title="Overdue Balance"
@@ -326,14 +326,14 @@ export function OverviewReport({ campgroundId }: OverviewReportProps) {
 
             {/* Year-over-Year Comparison - Dark Theme */}
             {yearOverYearStats && (
-                <div className="rounded-xl border border-slate-700 bg-slate-800/50 shadow-sm p-4 space-y-3">
+                <div className="rounded-xl border border-border bg-muted/50 shadow-sm p-4 space-y-3">
                     <div>
                         <div className="text-lg font-semibold text-white">Year-over-Year Comparison</div>
-                        <div className="text-sm text-slate-400">{new Date().getFullYear()} vs {new Date().getFullYear() - 1}</div>
+                        <div className="text-sm text-muted-foreground">{new Date().getFullYear()} vs {new Date().getFullYear() - 1}</div>
                     </div>
                     <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
                         <div className="space-y-2">
-                            <div className="text-xs font-semibold text-slate-400 uppercase">This Year</div>
+                            <div className="text-xs font-semibold text-muted-foreground uppercase">This Year</div>
                             <div className="rounded-lg border border-blue-600/30 bg-blue-900/20 p-3">
                                 <div className="text-xs text-blue-400 mb-1">Bookings</div>
                                 <div className="text-2xl font-bold text-white">{yearOverYearStats.thisYear.bookings}</div>
@@ -344,18 +344,18 @@ export function OverviewReport({ campgroundId }: OverviewReportProps) {
                             </div>
                         </div>
                         <div className="space-y-2">
-                            <div className="text-xs font-semibold text-slate-400 uppercase">Last Year</div>
-                            <div className="rounded-lg border border-slate-600/30 bg-slate-700/30 p-3">
-                                <div className="text-xs text-slate-400 mb-1">Bookings</div>
-                                <div className="text-2xl font-bold text-slate-200">{yearOverYearStats.lastYear.bookings}</div>
+                            <div className="text-xs font-semibold text-muted-foreground uppercase">Last Year</div>
+                            <div className="rounded-lg border border-border/30 bg-muted/30 p-3">
+                                <div className="text-xs text-muted-foreground mb-1">Bookings</div>
+                                <div className="text-2xl font-bold text-muted-foreground">{yearOverYearStats.lastYear.bookings}</div>
                             </div>
-                            <div className="rounded-lg border border-slate-600/30 bg-slate-700/30 p-3">
-                                <div className="text-xs text-slate-400 mb-1">Revenue</div>
-                                <div className="text-2xl font-bold text-slate-200">{formatCurrencyLocal(yearOverYearStats.lastYear.revenue, 0)}</div>
+                            <div className="rounded-lg border border-border/30 bg-muted/30 p-3">
+                                <div className="text-xs text-muted-foreground mb-1">Revenue</div>
+                                <div className="text-2xl font-bold text-muted-foreground">{formatCurrencyLocal(yearOverYearStats.lastYear.revenue, 0)}</div>
                             </div>
                         </div>
                         <div className="space-y-2">
-                            <div className="text-xs font-semibold text-slate-400 uppercase">Growth</div>
+                            <div className="text-xs font-semibold text-muted-foreground uppercase">Growth</div>
                             <div className={`rounded-lg border p-3 ${yearOverYearStats.change.bookings >= 0 ? 'bg-green-900/20 border-green-600/30' : 'bg-red-900/20 border-red-600/30'}`}>
                                 <div className={`text-xs mb-1 ${yearOverYearStats.change.bookings >= 0 ? 'text-green-400' : 'text-red-400'}`}>Bookings</div>
                                 <div className={`text-2xl font-bold ${yearOverYearStats.change.bookings >= 0 ? 'text-green-400' : 'text-red-400'}`}>
@@ -375,10 +375,10 @@ export function OverviewReport({ campgroundId }: OverviewReportProps) {
 
             {/* Seasonal Performance - Dark Theme */}
             {seasonalStats && (
-                <div className="rounded-xl border border-slate-700 bg-slate-800/50 shadow-sm p-4 space-y-3">
+                <div className="rounded-xl border border-border bg-muted/50 shadow-sm p-4 space-y-3">
                     <div>
                         <div className="text-lg font-semibold text-white">Seasonal Performance</div>
-                        <div className="text-sm text-slate-400">Revenue and bookings by season</div>
+                        <div className="text-sm text-muted-foreground">Revenue and bookings by season</div>
                     </div>
                     <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
                         {seasonalStats.map(({ season, revenue, bookings, avgNights }) => {
@@ -398,17 +398,17 @@ export function OverviewReport({ campgroundId }: OverviewReportProps) {
                                 <div key={season} className={`rounded-xl border shadow-sm ${colorMap[season]} p-3 space-y-2`}>
                                     <div className={`text-sm font-bold ${textColorMap[season]}`}>{season}</div>
                                     <div className="space-y-1">
-                                        <div className="text-xs text-slate-400">Revenue</div>
+                                        <div className="text-xs text-muted-foreground">Revenue</div>
                                         <div className="text-lg font-bold text-white">{formatCurrencyLocal(revenue, 0)}</div>
                                     </div>
                                     <div className="grid grid-cols-2 gap-2 text-xs">
                                         <div>
-                                            <div className="text-slate-400">Bookings</div>
-                                            <div className="font-semibold text-slate-200">{bookings}</div>
+                                            <div className="text-muted-foreground">Bookings</div>
+                                            <div className="font-semibold text-muted-foreground">{bookings}</div>
                                         </div>
                                         <div>
-                                            <div className="text-slate-400">Avg Nights</div>
-                                            <div className="font-semibold text-slate-200">{avgNights}</div>
+                                            <div className="text-muted-foreground">Avg Nights</div>
+                                            <div className="font-semibold text-muted-foreground">{avgNights}</div>
                                         </div>
                                     </div>
                                 </div>

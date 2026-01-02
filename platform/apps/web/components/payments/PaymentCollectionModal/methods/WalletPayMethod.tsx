@@ -147,7 +147,7 @@ function WalletPaymentButton({
     return (
       <div className="py-8 text-center space-y-4">
         <Loader2 className="h-8 w-8 animate-spin mx-auto text-emerald-600" />
-        <p className="text-slate-600">Checking wallet availability...</p>
+        <p className="text-muted-foreground">Checking wallet availability...</p>
       </div>
     );
   }
@@ -155,11 +155,11 @@ function WalletPaymentButton({
   if (!isWalletAvailable) {
     return (
       <div className="py-8 text-center space-y-4">
-        <Smartphone className="h-12 w-12 mx-auto text-slate-300" />
-        <p className="text-slate-600">
+        <Smartphone className="h-12 w-12 mx-auto text-muted-foreground" />
+        <p className="text-muted-foreground">
           {walletType === "apple_pay" ? "Apple Pay" : "Google Pay"} is not available
         </p>
-        <p className="text-sm text-slate-500">
+        <p className="text-sm text-muted-foreground">
           {walletType === "apple_pay"
             ? "Apple Pay requires Safari on iOS/macOS with a saved card"
             : "Google Pay requires Chrome with a saved card in Google Pay"}
@@ -183,11 +183,11 @@ function WalletPaymentButton({
       {processing ? (
         <div className="py-8 text-center space-y-4">
           <Loader2 className="h-8 w-8 animate-spin mx-auto text-emerald-600" />
-          <p className="text-slate-600">Processing payment...</p>
+          <p className="text-muted-foreground">Processing payment...</p>
         </div>
       ) : (
         <div className="space-y-4">
-          <p className="text-sm text-center text-slate-600">
+          <p className="text-sm text-center text-muted-foreground">
             Click the button below to pay with {walletType === "apple_pay" ? "Apple Pay" : "Google Pay"}
           </p>
 
@@ -207,7 +207,7 @@ function WalletPaymentButton({
           </div>
 
           <div className="text-center pt-4">
-            <Button variant="ghost" onClick={onCancel} className="text-slate-500">
+            <Button variant="ghost" onClick={onCancel} className="text-muted-foreground">
               Cancel
             </Button>
           </div>
@@ -242,7 +242,7 @@ export function WalletPayMethod({
     return (
       <div className="py-8 text-center space-y-4">
         <AlertCircle className="h-8 w-8 mx-auto text-red-500" />
-        <p className="text-slate-600">Payment system is not configured</p>
+        <p className="text-muted-foreground">Payment system is not configured</p>
         <Button variant="outline" onClick={handleCancel}>
           Go Back
         </Button>
@@ -255,7 +255,7 @@ export function WalletPayMethod({
     return (
       <div className="py-12 text-center space-y-4">
         <Loader2 className="h-8 w-8 animate-spin mx-auto text-emerald-600" />
-        <p className="text-slate-600">Initializing {walletName}...</p>
+        <p className="text-muted-foreground">Initializing {walletName}...</p>
       </div>
     );
   }
@@ -265,7 +265,7 @@ export function WalletPayMethod({
     return (
       <div className="py-8 text-center space-y-4">
         <AlertCircle className="h-8 w-8 mx-auto text-red-500" />
-        <p className="text-slate-600">{error}</p>
+        <p className="text-muted-foreground">{error}</p>
         <div className="flex gap-2 justify-center">
           <Button variant="outline" onClick={handleCancel}>
             Go Back

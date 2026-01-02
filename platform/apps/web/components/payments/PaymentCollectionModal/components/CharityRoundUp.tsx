@@ -78,7 +78,7 @@ export function CharityRoundUp({ disabled = false }: CharityRoundUpProps) {
         "flex items-center gap-3 p-3 rounded-lg border transition-colors",
         charityDonation.optedIn
           ? "border-pink-300 bg-pink-50"
-          : "border-slate-200 bg-slate-50 hover:border-slate-300"
+          : "border-border bg-muted hover:border-border"
       )}
     >
       <Checkbox
@@ -95,13 +95,13 @@ export function CharityRoundUp({ disabled = false }: CharityRoundUpProps) {
           htmlFor="charity-roundup"
           className={cn(
             "text-sm cursor-pointer flex items-center gap-2",
-            charityDonation.optedIn ? "text-pink-700" : "text-slate-700"
+            charityDonation.optedIn ? "text-pink-700" : "text-foreground"
           )}
         >
           <Heart
             className={cn(
               "h-4 w-4",
-              charityDonation.optedIn ? "fill-pink-500 text-pink-500" : "text-slate-400"
+              charityDonation.optedIn ? "fill-pink-500 text-pink-500" : "text-muted-foreground"
             )}
           />
           Round up ${(roundUpAmount / 100).toFixed(2)} for{" "}
@@ -172,7 +172,7 @@ export function CharityRoundUpInline({ disabled = false }: CharityRoundUpProps) 
         "flex items-center gap-2 px-3 py-2 rounded-full text-sm transition-colors",
         charityDonation.optedIn
           ? "bg-pink-100 text-pink-700 hover:bg-pink-200"
-          : "bg-slate-100 text-slate-600 hover:bg-slate-200",
+          : "bg-muted text-muted-foreground hover:bg-muted",
         disabled && "opacity-50 cursor-not-allowed"
       )}
     >

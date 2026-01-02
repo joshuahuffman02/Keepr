@@ -215,7 +215,7 @@ export function SiteMapCanvas({
   if (isLoading) {
     return (
       <div
-        className={cn("w-full animate-pulse rounded-xl border border-slate-200 bg-slate-100", height ? "h-full" : "h-[420px]", className)}
+        className={cn("w-full animate-pulse rounded-xl border border-border bg-muted", height ? "h-full" : "h-[420px]", className)}
         style={heightStyle}
       />
     );
@@ -223,7 +223,7 @@ export function SiteMapCanvas({
 
   if (!map) {
     return (
-      <div className={cn("rounded-xl border border-slate-200 bg-slate-50 p-4 text-sm text-slate-500", className)}>
+      <div className={cn("rounded-xl border border-border bg-muted p-4 text-sm text-muted-foreground", className)}>
         Map data unavailable.
       </div>
     );
@@ -232,7 +232,7 @@ export function SiteMapCanvas({
   const hasShapes = shapes.some((entry) => entry.shape);
   if (!hasShapes && !baseImageUrl) {
     return (
-      <div className={cn("rounded-xl border border-dashed border-slate-300 bg-slate-50 p-6 text-center text-sm text-slate-500", className)}>
+      <div className={cn("rounded-xl border border-dashed border-border bg-muted p-6 text-center text-sm text-muted-foreground", className)}>
         Upload a map or add site layout geometry to preview the park map.
       </div>
     );
@@ -254,7 +254,7 @@ export function SiteMapCanvas({
 
   return (
     <div
-      className={cn("rounded-xl border border-slate-200 bg-slate-50 p-3", className)}
+      className={cn("rounded-xl border border-border bg-muted p-3", className)}
       style={heightStyle}
     >
       <svg
@@ -335,7 +335,7 @@ export function SiteMapCanvas({
         })}
       </svg>
 
-      <div className="mt-3 flex flex-wrap items-center gap-3 text-xs text-slate-500">
+      <div className="mt-3 flex flex-wrap items-center gap-3 text-xs text-muted-foreground">
         {Object.entries(STATUS_THEME)
           .filter(([key]) => key !== "default")
           .map(([key, theme]) => (
@@ -345,7 +345,7 @@ export function SiteMapCanvas({
             </span>
           ))}
         <span className="flex items-center gap-1.5">
-          <span className="h-2.5 w-2.5 rounded-full border border-slate-400 border-dashed" />
+          <span className="h-2.5 w-2.5 rounded-full border border-border border-dashed" />
           conflicts
         </span>
       </div>

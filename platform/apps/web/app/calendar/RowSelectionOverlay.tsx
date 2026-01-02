@@ -31,7 +31,7 @@ export const RowSelectionOverlay = ({ siteId, siteName, dayCount }: RowSelection
         >
             <div className="bg-status-info/95 backdrop-blur-md text-[10px] sm:text-[11px] font-black text-white px-3 py-1 rounded-full shadow-xl animate-in fade-in zoom-in duration-200 border border-status-info/50 flex items-center gap-2 whitespace-nowrap">
                 <span className="opacity-70">{siteName}</span>
-                <span className="w-1.5 h-1.5 rounded-full bg-white/60 animate-pulse" />
+                <span className="w-1.5 h-1.5 rounded-full bg-card/60 animate-pulse" />
                 <span>Selected Dates</span>
             </div>
 

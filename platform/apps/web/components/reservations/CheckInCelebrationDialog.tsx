@@ -105,7 +105,7 @@ export function CheckInCelebrationDialog({
                   animate={{ opacity: 1, scale: 1, rotate: 0 }}
                   transition={{ delay: 0.3, ...SPRING_CONFIG }}
                 >
-                  <PartyPopper className="h-6 w-6 text-amber-500" />
+                  <PartyPopper className="h-6 w-6 text-status-warning" />
                 </motion.div>
                 <motion.div
                   className="absolute -top-1 -left-4"
@@ -113,7 +113,7 @@ export function CheckInCelebrationDialog({
                   animate={{ opacity: 1, scale: 1 }}
                   transition={{ delay: 0.4, ...SPRING_CONFIG }}
                 >
-                  <Sparkles className="h-5 w-5 text-emerald-400" />
+                  <Sparkles className="h-5 w-5 text-status-success" />
                 </motion.div>
                 <motion.div
                   className="absolute -bottom-2 -right-2"
@@ -121,13 +121,13 @@ export function CheckInCelebrationDialog({
                   animate={{ opacity: 1, scale: 1 }}
                   transition={{ delay: 0.5, ...SPRING_CONFIG }}
                 >
-                  <Sparkles className="h-4 w-4 text-sky-400" />
+                  <Sparkles className="h-4 w-4 text-status-info" />
                 </motion.div>
               </>
             )}
             {/* Main icon */}
             <motion.div
-              className="h-20 w-20 rounded-full bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center shadow-lg shadow-emerald-200"
+              className="h-20 w-20 rounded-full bg-status-success flex items-center justify-center shadow-lg"
               initial={
                 prefersReducedMotion
                   ? {}
@@ -155,10 +155,10 @@ export function CheckInCelebrationDialog({
             }
             transition={{ delay: 0.2, ...SPRING_CONFIG }}
           >
-            <h2 className="text-2xl font-bold text-slate-900">
+            <h2 className="text-2xl font-bold text-foreground">
               Welcome to Camp!
             </h2>
-            <p className="mt-1 text-slate-500">Guest has been checked in</p>
+            <p className="mt-1 text-muted-foreground">Guest has been checked in</p>
           </motion.div>
 
           {/* Guest Details */}
@@ -172,17 +172,17 @@ export function CheckInCelebrationDialog({
             }
             transition={{ delay: 0.3, ...SPRING_CONFIG }}
           >
-            <div className="rounded-xl border border-emerald-200 bg-emerald-50 p-4 space-y-3">
+            <div className="rounded-xl border border-status-success/30 bg-status-success/10 p-4 space-y-3">
               {/* Guest Name */}
               <div className="flex items-center gap-3">
-                <div className="h-10 w-10 rounded-full bg-emerald-100 flex items-center justify-center">
-                  <User className="h-5 w-5 text-emerald-600" />
+                <div className="h-10 w-10 rounded-full bg-status-success/15 flex items-center justify-center">
+                  <User className="h-5 w-5 text-status-success" />
                 </div>
                 <div>
-                  <div className="text-xs text-emerald-600 font-medium">
+                  <div className="text-xs text-status-success font-medium">
                     Guest
                   </div>
-                  <div className="text-lg font-bold text-emerald-800">
+                  <div className="text-lg font-bold text-foreground">
                     {guestName}
                   </div>
                 </div>
@@ -190,14 +190,14 @@ export function CheckInCelebrationDialog({
 
               {/* Site */}
               <div className="flex items-center gap-3">
-                <div className="h-10 w-10 rounded-full bg-emerald-100 flex items-center justify-center">
-                  <MapPin className="h-5 w-5 text-emerald-600" />
+                <div className="h-10 w-10 rounded-full bg-status-success/15 flex items-center justify-center">
+                  <MapPin className="h-5 w-5 text-status-success" />
                 </div>
                 <div>
-                  <div className="text-xs text-emerald-600 font-medium">
+                  <div className="text-xs text-status-success font-medium">
                     Assigned Site
                   </div>
-                  <div className="text-lg font-bold text-emerald-800">
+                  <div className="text-lg font-bold text-foreground">
                     {siteName}
                   </div>
                 </div>
@@ -205,14 +205,14 @@ export function CheckInCelebrationDialog({
 
               {/* Dates */}
               <div className="flex items-center gap-3">
-                <div className="h-10 w-10 rounded-full bg-emerald-100 flex items-center justify-center">
-                  <Calendar className="h-5 w-5 text-emerald-600" />
+                <div className="h-10 w-10 rounded-full bg-status-success/15 flex items-center justify-center">
+                  <Calendar className="h-5 w-5 text-status-success" />
                 </div>
                 <div>
-                  <div className="text-xs text-emerald-600 font-medium">
+                  <div className="text-xs text-status-success font-medium">
                     Stay Dates
                   </div>
-                  <div className="text-sm font-semibold text-emerald-800">
+                  <div className="text-sm font-semibold text-foreground">
                     {arrivalDate} - {departureDate}
                   </div>
                 </div>
@@ -233,7 +233,7 @@ export function CheckInCelebrationDialog({
           >
             <Button
               onClick={onClose}
-              className="w-full bg-emerald-600 hover:bg-emerald-700"
+              className="w-full"
             >
               Done
             </Button>

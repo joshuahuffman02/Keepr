@@ -248,13 +248,13 @@ export default function PromotionsPage() {
     return (
       <div className="max-w-5xl space-y-6">
         <div>
-          <h2 className="text-2xl font-bold text-slate-900">Promotions</h2>
-          <p className="text-slate-500 mt-1">
+          <h2 className="text-2xl font-bold text-foreground">Promotions</h2>
+          <p className="text-muted-foreground mt-1">
             Create promo codes and special offers
           </p>
         </div>
         <div className="flex items-center justify-center py-12">
-          <Loader2 className="h-8 w-8 animate-spin text-slate-400" />
+          <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
         </div>
       </div>
     );
@@ -264,15 +264,15 @@ export default function PromotionsPage() {
     return (
       <div className="max-w-5xl space-y-6">
         <div>
-          <h2 className="text-2xl font-bold text-slate-900">Promotions</h2>
-          <p className="text-slate-500 mt-1">
+          <h2 className="text-2xl font-bold text-foreground">Promotions</h2>
+          <p className="text-muted-foreground mt-1">
             Create promo codes and special offers
           </p>
         </div>
         <Card>
           <CardContent className="py-8 text-center">
             <Info className="h-8 w-8 text-amber-500 mx-auto mb-3" />
-            <p className="text-slate-600">Please select a campground first.</p>
+            <p className="text-muted-foreground">Please select a campground first.</p>
           </CardContent>
         </Card>
       </div>
@@ -284,8 +284,8 @@ export default function PromotionsPage() {
       {/* Header */}
       <div className="flex items-start justify-between">
         <div>
-          <h2 className="text-2xl font-bold text-slate-900">Promotions</h2>
-          <p className="text-slate-500 mt-1">
+          <h2 className="text-2xl font-bold text-foreground">Promotions</h2>
+          <p className="text-muted-foreground mt-1">
             Create promo codes and special offers
           </p>
         </div>
@@ -313,8 +313,8 @@ export default function PromotionsPage() {
                 <Tag className="h-5 w-5 text-amber-600" />
               </div>
               <div>
-                <p className="text-2xl font-bold text-slate-900">{promotions.length}</p>
-                <p className="text-sm text-slate-500">Total Promotions</p>
+                <p className="text-2xl font-bold text-foreground">{promotions.length}</p>
+                <p className="text-sm text-muted-foreground">Total Promotions</p>
               </div>
             </div>
           </CardContent>
@@ -326,8 +326,8 @@ export default function PromotionsPage() {
                 <Tag className="h-5 w-5 text-status-success" />
               </div>
               <div>
-                <p className="text-2xl font-bold text-slate-900">{activeCount}</p>
-                <p className="text-sm text-slate-500">Active</p>
+                <p className="text-2xl font-bold text-foreground">{activeCount}</p>
+                <p className="text-sm text-muted-foreground">Active</p>
               </div>
             </div>
           </CardContent>
@@ -339,10 +339,10 @@ export default function PromotionsPage() {
                 <DollarSign className="h-5 w-5 text-status-info" />
               </div>
               <div>
-                <p className="text-2xl font-bold text-slate-900">
+                <p className="text-2xl font-bold text-foreground">
                   {promotions.reduce((sum, p) => sum + p.usageCount, 0)}
                 </p>
-                <p className="text-sm text-slate-500">Total Uses</p>
+                <p className="text-sm text-muted-foreground">Total Uses</p>
               </div>
             </div>
           </CardContent>
@@ -353,11 +353,11 @@ export default function PromotionsPage() {
       {promotions.length === 0 ? (
         <Card className="border-dashed">
           <CardContent className="py-12 text-center">
-            <Tag className="h-12 w-12 mx-auto text-slate-300 mb-4" />
-            <h3 className="text-lg font-semibold text-slate-900 mb-2">
+            <Tag className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+            <h3 className="text-lg font-semibold text-foreground mb-2">
               No promotions yet
             </h3>
-            <p className="text-slate-500 mb-4 max-w-md mx-auto">
+            <p className="text-muted-foreground mb-4 max-w-md mx-auto">
               Create promo codes to offer discounts to your guests.
               Perfect for seasonal specials, returning customers, or marketing campaigns.
             </p>
@@ -396,15 +396,15 @@ export default function PromotionsPage() {
                           {promo.isActive ? "Active" : "Inactive"}
                         </Badge>
                       </div>
-                      <div className="text-sm text-slate-500 mt-1">
-                        <span className="font-semibold text-slate-900">{formatValue(promo)}</span> off
+                      <div className="text-sm text-muted-foreground mt-1">
+                        <span className="font-semibold text-foreground">{formatValue(promo)}</span> off
                         {promo.description && ` • ${promo.description}`}
                       </div>
                     </div>
                   </div>
                   <div className="flex items-center gap-6">
                     <div className="text-sm text-right">
-                      <div className="text-slate-600">
+                      <div className="text-muted-foreground">
                         {promo.usageLimit ? (
                           <span>{promo.usageCount} / {promo.usageLimit} used</span>
                         ) : (
@@ -412,7 +412,7 @@ export default function PromotionsPage() {
                         )}
                       </div>
                       {(promo.validFrom || promo.validTo) && (
-                        <div className="text-xs text-slate-400 mt-1">
+                        <div className="text-xs text-muted-foreground mt-1">
                           {promo.validFrom && format(new Date(promo.validFrom), "MMM d, yyyy")}
                           {promo.validFrom && promo.validTo && " - "}
                           {promo.validTo && format(new Date(promo.validTo), "MMM d, yyyy")}

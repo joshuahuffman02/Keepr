@@ -127,7 +127,7 @@ export default function AdminDashboardPage() {
         <div className="space-y-6">
             <div>
                 <h1 className="text-2xl font-bold text-white">Platform Admin</h1>
-                <p className="text-slate-400 mt-1">
+                <p className="text-muted-foreground mt-1">
                     Manage platform-wide settings and support operations
                 </p>
             </div>
@@ -135,70 +135,70 @@ export default function AdminDashboardPage() {
             {/* KPI Section */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                 {/* Total Campgrounds */}
-                <Card className="bg-slate-800 border-slate-700">
+                <Card className="bg-muted border-border">
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-medium text-slate-300">
+                        <CardTitle className="text-sm font-medium text-muted-foreground">
                             Total Campgrounds
                         </CardTitle>
-                        <Building2 className="h-4 w-4 text-slate-400" />
+                        <Building2 className="h-4 w-4 text-muted-foreground" />
                     </CardHeader>
                     <CardContent>
                         <div className="text-2xl font-bold text-white">{kpiData.totalCampgrounds}</div>
-                        <p className="text-xs text-slate-400 mt-1">
+                        <p className="text-xs text-muted-foreground mt-1">
                             <span className="text-green-400">{kpiData.campgroundsGrowth}</span> from last month
                         </p>
                     </CardContent>
                 </Card>
 
                 {/* Reservations */}
-                <Card className="bg-slate-800 border-slate-700">
+                <Card className="bg-muted border-border">
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-medium text-slate-300">
+                        <CardTitle className="text-sm font-medium text-muted-foreground">
                             Reservations
                         </CardTitle>
-                        <Calendar className="h-4 w-4 text-slate-400" />
+                        <Calendar className="h-4 w-4 text-muted-foreground" />
                     </CardHeader>
                     <CardContent>
                         <div className="text-2xl font-bold text-white">{kpiData.reservationsMonth}</div>
-                        <p className="text-xs text-slate-400 mt-1">
+                        <p className="text-xs text-muted-foreground mt-1">
                             This month • <span className="text-green-400">{kpiData.reservationsGrowth}</span> growth
                         </p>
                         <div className="flex gap-3 mt-2 text-xs">
-                            <span className="text-slate-400">Today: <span className="text-white font-medium">{kpiData.reservationsToday}</span></span>
-                            <span className="text-slate-400">Week: <span className="text-white font-medium">{kpiData.reservationsWeek}</span></span>
+                            <span className="text-muted-foreground">Today: <span className="text-white font-medium">{kpiData.reservationsToday}</span></span>
+                            <span className="text-muted-foreground">Week: <span className="text-white font-medium">{kpiData.reservationsWeek}</span></span>
                         </div>
                     </CardContent>
                 </Card>
 
                 {/* Total Revenue */}
-                <Card className="bg-slate-800 border-slate-700">
+                <Card className="bg-muted border-border">
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-medium text-slate-300">
+                        <CardTitle className="text-sm font-medium text-muted-foreground">
                             Total Revenue
                         </CardTitle>
-                        <DollarSign className="h-4 w-4 text-slate-400" />
+                        <DollarSign className="h-4 w-4 text-muted-foreground" />
                     </CardHeader>
                     <CardContent>
                         <div className="text-2xl font-bold text-white">
                             ${kpiData.totalRevenue.toLocaleString()}
                         </div>
-                        <p className="text-xs text-slate-400 mt-1">
+                        <p className="text-xs text-muted-foreground mt-1">
                             <span className="text-green-400">{kpiData.revenueGrowth}</span> from last month
                         </p>
                     </CardContent>
                 </Card>
 
                 {/* Active Users */}
-                <Card className="bg-slate-800 border-slate-700">
+                <Card className="bg-muted border-border">
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-medium text-slate-300">
+                        <CardTitle className="text-sm font-medium text-muted-foreground">
                             Active Users
                         </CardTitle>
-                        <Users className="h-4 w-4 text-slate-400" />
+                        <Users className="h-4 w-4 text-muted-foreground" />
                     </CardHeader>
                     <CardContent>
                         <div className="text-2xl font-bold text-white">{kpiData.activeUsers.toLocaleString()}</div>
-                        <p className="text-xs text-slate-400 mt-1">
+                        <p className="text-xs text-muted-foreground mt-1">
                             <span className="text-green-400">{kpiData.usersGrowth}</span> from last month
                         </p>
                     </CardContent>
@@ -206,13 +206,13 @@ export default function AdminDashboardPage() {
             </div>
 
             {/* System Health */}
-            <Card className="bg-slate-800 border-slate-700">
+            <Card className="bg-muted border-border">
                 <CardHeader>
                     <CardTitle className="text-white flex items-center gap-2">
                         <Activity className="h-5 w-5" />
                         System Health
                     </CardTitle>
-                    <CardDescription className="text-slate-400">
+                    <CardDescription className="text-muted-foreground">
                         Current platform status and monitoring
                     </CardDescription>
                 </CardHeader>
@@ -224,7 +224,7 @@ export default function AdminDashboardPage() {
                             </div>
                             <div>
                                 <p className="text-sm font-medium text-white">API Status</p>
-                                <p className="text-xs text-slate-400 capitalize">{systemHealth.apiStatus}</p>
+                                <p className="text-xs text-muted-foreground capitalize">{systemHealth.apiStatus}</p>
                             </div>
                         </div>
 
@@ -234,7 +234,7 @@ export default function AdminDashboardPage() {
                             </div>
                             <div>
                                 <p className="text-sm font-medium text-white">Database</p>
-                                <p className="text-xs text-slate-400 capitalize">{systemHealth.databaseStatus}</p>
+                                <p className="text-xs text-muted-foreground capitalize">{systemHealth.databaseStatus}</p>
                             </div>
                         </div>
 
@@ -244,7 +244,7 @@ export default function AdminDashboardPage() {
                             </div>
                             <div>
                                 <p className="text-sm font-medium text-white">Last Sync</p>
-                                <p className="text-xs text-slate-400">{systemHealth.lastSync}</p>
+                                <p className="text-xs text-muted-foreground">{systemHealth.lastSync}</p>
                             </div>
                         </div>
 
@@ -260,7 +260,7 @@ export default function AdminDashboardPage() {
                             </div>
                             <div>
                                 <p className="text-sm font-medium text-white">Active Alerts</p>
-                                <p className="text-xs text-slate-400">
+                                <p className="text-xs text-muted-foreground">
                                     {systemHealth.activeAlerts === 0 ? 'No alerts' : `${systemHealth.activeAlerts} alert(s)`}
                                 </p>
                             </div>
@@ -272,10 +272,10 @@ export default function AdminDashboardPage() {
             {/* Recent Activity and Campgrounds Needing Attention */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                 {/* Recent Activity */}
-                <Card className="bg-slate-800 border-slate-700">
+                <Card className="bg-muted border-border">
                     <CardHeader>
                         <CardTitle className="text-white">Recent Activity</CardTitle>
-                        <CardDescription className="text-slate-400">
+                        <CardDescription className="text-muted-foreground">
                             Latest platform events and actions
                         </CardDescription>
                     </CardHeader>
@@ -288,10 +288,10 @@ export default function AdminDashboardPage() {
                             </div>
                             <div className="space-y-2">
                                 {recentActivity.campgroundSignups.map((signup) => (
-                                    <div key={signup.id} className="flex items-center justify-between p-2 rounded-lg bg-slate-700/50">
+                                    <div key={signup.id} className="flex items-center justify-between p-2 rounded-lg bg-muted/50">
                                         <div className="flex-1 min-w-0">
                                             <p className="text-sm font-medium text-white truncate">{signup.name}</p>
-                                            <p className="text-xs text-slate-400">{signup.signedUpAt}</p>
+                                            <p className="text-xs text-muted-foreground">{signup.signedUpAt}</p>
                                         </div>
                                         <Badge
                                             variant={signup.status === 'approved' ? 'success' : 'warning'}
@@ -312,10 +312,10 @@ export default function AdminDashboardPage() {
                             </div>
                             <div className="space-y-2">
                                 {recentActivity.supportTickets.map((ticket) => (
-                                    <div key={ticket.id} className="flex items-center justify-between p-2 rounded-lg bg-slate-700/50">
+                                    <div key={ticket.id} className="flex items-center justify-between p-2 rounded-lg bg-muted/50">
                                         <div className="flex-1 min-w-0">
                                             <p className="text-sm font-medium text-white truncate">{ticket.title}</p>
-                                            <p className="text-xs text-slate-400">{ticket.createdAt}</p>
+                                            <p className="text-xs text-muted-foreground">{ticket.createdAt}</p>
                                         </div>
                                         <Badge
                                             variant={ticket.priority === 'high' ? 'error' : 'info'}
@@ -336,9 +336,9 @@ export default function AdminDashboardPage() {
                             </div>
                             <div className="space-y-2">
                                 {recentActivity.userLogins.map((login) => (
-                                    <div key={login.id} className="flex items-center justify-between p-2 rounded-lg bg-slate-700/50">
+                                    <div key={login.id} className="flex items-center justify-between p-2 rounded-lg bg-muted/50">
                                         <p className="text-sm text-white truncate">{login.email}</p>
-                                        <p className="text-xs text-slate-400 ml-2">{login.loginAt}</p>
+                                        <p className="text-xs text-muted-foreground ml-2">{login.loginAt}</p>
                                     </div>
                                 ))}
                             </div>
@@ -347,10 +347,10 @@ export default function AdminDashboardPage() {
                 </Card>
 
                 {/* Campgrounds Needing Attention */}
-                <Card className="bg-slate-800 border-slate-700">
+                <Card className="bg-muted border-border">
                     <CardHeader>
                         <CardTitle className="text-white">Campgrounds Needing Attention</CardTitle>
-                        <CardDescription className="text-slate-400">
+                        <CardDescription className="text-muted-foreground">
                             Issues and low-activity campgrounds
                         </CardDescription>
                     </CardHeader>
@@ -359,7 +359,7 @@ export default function AdminDashboardPage() {
                             {campgroundsNeedingAttention.map((campground) => (
                                 <div
                                     key={campground.id}
-                                    className="p-3 rounded-lg bg-slate-700/50 border-l-4"
+                                    className="p-3 rounded-lg bg-muted/50 border-l-4"
                                     style={{
                                         borderLeftColor:
                                             campground.severity === 'error' ? '#ef4444' :
@@ -383,7 +383,7 @@ export default function AdminDashboardPage() {
                                         </div>
                                         <div className="flex-1 min-w-0">
                                             <p className="text-sm font-medium text-white">{campground.name}</p>
-                                            <p className="text-xs text-slate-400 mt-1">{campground.issue}</p>
+                                            <p className="text-xs text-muted-foreground mt-1">{campground.issue}</p>
                                         </div>
                                         <Link
                                             href={`/admin/campgrounds/${campground.id}`}
@@ -397,7 +397,7 @@ export default function AdminDashboardPage() {
                             {campgroundsNeedingAttention.length === 0 && (
                                 <div className="text-center py-8">
                                     <CheckCircle2 className="h-12 w-12 text-green-400 mx-auto mb-2" />
-                                    <p className="text-sm text-slate-400">All campgrounds are in good standing</p>
+                                    <p className="text-sm text-muted-foreground">All campgrounds are in good standing</p>
                                 </div>
                             )}
                         </div>
@@ -413,7 +413,7 @@ export default function AdminDashboardPage() {
                         <Link
                             key={section.href}
                             href={section.href}
-                            className="bg-slate-800 rounded-lg border border-slate-700 p-5 hover:border-slate-600 hover:bg-slate-750 transition-all group"
+                            className="bg-muted rounded-lg border border-border p-5 hover:border-border hover:bg-muted transition-all group"
                         >
                             <div className="flex items-start gap-4">
                                 <div className={`${section.color} p-3 rounded-lg`}>
@@ -423,11 +423,11 @@ export default function AdminDashboardPage() {
                                     <h2 className="text-base font-semibold text-white group-hover:text-blue-400 transition-colors">
                                         {section.title}
                                     </h2>
-                                    <p className="text-slate-400 text-sm mt-1">
+                                    <p className="text-muted-foreground text-sm mt-1">
                                         {section.description}
                                     </p>
                                 </div>
-                                <ArrowRight className="h-5 w-5 text-slate-500 group-hover:text-blue-400 transition-colors flex-shrink-0" />
+                                <ArrowRight className="h-5 w-5 text-muted-foreground group-hover:text-blue-400 transition-colors flex-shrink-0" />
                             </div>
                         </Link>
                     ))}

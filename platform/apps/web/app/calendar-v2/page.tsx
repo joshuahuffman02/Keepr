@@ -34,6 +34,7 @@ import {
 } from "lucide-react";
 
 import { DashboardShell } from "../../components/ui/layout/DashboardShell";
+import { PageHeader } from "../../components/ui/layout/PageHeader";
 import { Breadcrumbs } from "@/components/breadcrumbs";
 import { Button } from "../../components/ui/button";
 import { Card } from "../../components/ui/card";
@@ -59,7 +60,7 @@ const SITE_TYPE_STYLES: Record<string, { label: string; badge: string; border: s
   cabin: { label: "Cabin", badge: "bg-rose-100 text-rose-700", border: "border-l-rose-400" },
   group: { label: "Group", badge: "bg-indigo-100 text-indigo-700", border: "border-l-indigo-400" },
   glamping: { label: "Glamp", badge: "bg-cyan-100 text-cyan-700", border: "border-l-cyan-400" },
-  default: { label: "Site", badge: "bg-slate-100 text-slate-600", border: "border-l-slate-300" }
+  default: { label: "Site", badge: "bg-muted text-muted-foreground", border: "border-l-border" }
 };
 
 // Density configuration for calendar grid
@@ -419,24 +420,17 @@ export default function CalendarPage() {
           ]}
         />
 
-        <div className="flex flex-col gap-4">
-          <div className="flex flex-col xl:flex-row xl:items-end xl:justify-between gap-4">
-            <div className="space-y-2">
-              <div className="flex items-center gap-3">
-                <div className="h-11 w-11 rounded-2xl bg-status-success/15 text-status-success flex items-center justify-center">
-                  <CalendarDays className="h-5 w-5" />
-                </div>
-                <div>
-                  <div className="flex items-center gap-2">
-                    <h1 className="text-2xl font-semibold tracking-tight text-foreground">Booking Calendar</h1>
-                  </div>
-                  <p className="text-sm text-muted-foreground">
-                    Drag across dates to build a stay. Release to preview pricing and availability.
-                  </p>
-                </div>
-              </div>
-            </div>
-
+        <PageHeader
+          title={(
+            <span className="flex items-center gap-3">
+              <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-status-success/15 text-status-success">
+                <CalendarDays className="h-5 w-5" />
+              </span>
+              <span>Booking Calendar</span>
+            </span>
+          )}
+          subtitle="Drag across dates to build a stay. Release to preview pricing and availability."
+          actions={(
             <div className="flex flex-wrap items-center gap-3">
               <div className="flex items-center bg-card rounded-xl border border-border shadow-sm p-1">
                 {DAY_RANGES.map((range) => (
@@ -529,100 +523,100 @@ export default function CalendarPage() {
                 </div>
               )}
             </div>
+          )}
+        />
+
+        <Card className="p-4 border-border shadow-sm">
+          <div className="grid gap-4 md:grid-cols-3">
+            <div className="space-y-2">
+              <Label className="text-xs font-medium text-muted-foreground">Search guests</Label>
+              <div className="relative">
+                <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground/70" />
+                <Input
+                  ref={searchInputRef}
+                  className="h-10 pl-9"
+                  placeholder="Name, phone, email... (Press / to search)"
+                  value={state.guestSearch}
+                  onChange={(e) => actions.setGuestSearch(e.target.value)}
+                />
+              </div>
+              {state.guestSearch && (
+                <div className="text-[11px] text-muted-foreground">
+                  {queries.guests.isLoading
+                    ? "Searching guests..."
+                    : guestSearchStats.count > 0
+                      ? `Matches ${guestSearchStats.count} guests`
+                      : "No guests found"}
+                </div>
+              )}
+            </div>
+
+            <div className="space-y-2">
+              <Label className="text-xs font-medium text-muted-foreground">Status</Label>
+              <Select value={state.statusFilter} onValueChange={actions.setStatusFilter}>
+                <SelectTrigger className="h-10">
+                  <SelectValue placeholder="All statuses" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All</SelectItem>
+                  <SelectItem value="confirmed">Confirmed</SelectItem>
+                  <SelectItem value="checked_in">Checked In</SelectItem>
+                  <SelectItem value="pending">Pending / Hold</SelectItem>
+                  <SelectItem value="cancelled">Cancelled</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-2">
+              <Label className="text-xs font-medium text-muted-foreground">Site type</Label>
+              <Select value={state.siteTypeFilter} onValueChange={actions.setSiteTypeFilter}>
+                <SelectTrigger className="h-10">
+                  <SelectValue placeholder="All types" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All</SelectItem>
+                  <SelectItem value="rv">RV</SelectItem>
+                  <SelectItem value="tent">Tent</SelectItem>
+                  <SelectItem value="cabin">Cabin</SelectItem>
+                  <SelectItem value="group">Group</SelectItem>
+                  <SelectItem value="glamping">Glamping</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
           </div>
 
-          <Card className="p-4 border-slate-200 shadow-sm">
-            <div className="grid gap-4 md:grid-cols-3">
-              <div className="space-y-2">
-                <Label className="text-xs font-medium text-muted-foreground">Search guests</Label>
-                <div className="relative">
-                  <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-                  <Input
-                    ref={searchInputRef}
-                    className="h-10 pl-9"
-                    placeholder="Name, phone, email... (Press / to search)"
-                    value={state.guestSearch}
-                    onChange={(e) => actions.setGuestSearch(e.target.value)}
-                  />
-                </div>
-                {state.guestSearch && (
-                  <div className="text-[11px] text-slate-500">
-                    {queries.guests.isLoading
-                      ? "Searching guests..."
-                      : guestSearchStats.count > 0
-                        ? `Matches ${guestSearchStats.count} guests`
-                        : "No guests found"}
-                  </div>
-                )}
+          <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
+            <div className="flex items-center gap-3 text-xs font-semibold text-muted-foreground">
+              <div className="flex items-center gap-2">
+                <Switch checked={state.arrivalsNowOnly} onCheckedChange={actions.setArrivalsNowOnly} />
+                <span>Arrivals today only</span>
               </div>
-
-              <div className="space-y-2">
-                <Label className="text-xs font-medium text-muted-foreground">Status</Label>
-                <Select value={state.statusFilter} onValueChange={actions.setStatusFilter}>
-                  <SelectTrigger className="h-10">
-                    <SelectValue placeholder="All statuses" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">All</SelectItem>
-                    <SelectItem value="confirmed">Confirmed</SelectItem>
-                    <SelectItem value="checked_in">Checked In</SelectItem>
-                    <SelectItem value="pending">Pending / Hold</SelectItem>
-                    <SelectItem value="cancelled">Cancelled</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div className="space-y-2">
-                <Label className="text-xs font-medium text-muted-foreground">Site type</Label>
-                <Select value={state.siteTypeFilter} onValueChange={actions.setSiteTypeFilter}>
-                  <SelectTrigger className="h-10">
-                    <SelectValue placeholder="All types" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">All</SelectItem>
-                    <SelectItem value="rv">RV</SelectItem>
-                    <SelectItem value="tent">Tent</SelectItem>
-                    <SelectItem value="cabin">Cabin</SelectItem>
-                    <SelectItem value="group">Group</SelectItem>
-                    <SelectItem value="glamping">Glamping</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
+              {(state.guestSearch || state.statusFilter !== "all" || state.siteTypeFilter !== "all" || state.arrivalsNowOnly) && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-8 text-xs"
+                  onClick={() => {
+                    actions.setGuestSearch("");
+                    actions.setStatusFilter("all");
+                    actions.setSiteTypeFilter("all");
+                    actions.setArrivalsNowOnly(false);
+                  }}
+                >
+                  Clear filters
+                </Button>
+              )}
             </div>
-
-            <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
-              <div className="flex items-center gap-3 text-xs font-semibold text-slate-600">
-                <div className="flex items-center gap-2">
-                  <Switch checked={state.arrivalsNowOnly} onCheckedChange={actions.setArrivalsNowOnly} />
-                  <span>Arrivals today only</span>
-                </div>
-                {(state.guestSearch || state.statusFilter !== "all" || state.siteTypeFilter !== "all" || state.arrivalsNowOnly) && (
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="h-8 text-xs"
-                    onClick={() => {
-                      actions.setGuestSearch("");
-                      actions.setStatusFilter("all");
-                      actions.setSiteTypeFilter("all");
-                      actions.setArrivalsNowOnly(false);
-                    }}
-                  >
-                    Clear filters
-                  </Button>
-                )}
-              </div>
-              <div className="text-xs text-slate-500 font-medium">
-                {state.guestSearch || state.statusFilter !== "all" || state.siteTypeFilter !== "all" || state.arrivalsNowOnly
-                  ? `${visibleReservations.length} stays match filters`
-                  : `${visibleReservations.length} stays in view`}
-              </div>
+            <div className="text-xs text-muted-foreground font-medium">
+              {state.guestSearch || state.statusFilter !== "all" || state.siteTypeFilter !== "all" || state.arrivalsNowOnly
+                ? `${visibleReservations.length} stays match filters`
+                : `${visibleReservations.length} stays in view`}
             </div>
-          </Card>
-        </div>
+          </div>
+        </Card>
 
         {!state.selectedCampground && (
-          <Card className="p-6 border-dashed border-slate-200 text-center text-slate-500">
+          <Card className="p-6 border-dashed border-border text-center text-muted-foreground">
             Choose a campground from the global selector to load the booking grid.
           </Card>
         )}
@@ -634,13 +628,13 @@ export default function CalendarPage() {
                 <div className="flex flex-wrap items-center justify-between gap-3">
                   <div className="space-y-1">
                     <div className="text-xs font-medium text-emerald-700">Draft booking</div>
-                    <div className="text-sm font-semibold text-slate-900">{bookingDraft.siteName}</div>
-                    <div className="text-xs text-slate-500">
+                    <div className="text-sm font-semibold text-foreground">{bookingDraft.siteName}</div>
+                    <div className="text-xs text-muted-foreground">
                       {bookingDraft.arrival} → {bookingDraft.departure} · {bookingDraft.nights} nights
                     </div>
                   </div>
                   <div className="flex items-center gap-3">
-                    <div className="text-xl font-black text-slate-900">${(bookingDraft.total / 100).toFixed(2)}</div>
+                    <div className="text-xl font-black text-foreground">${(bookingDraft.total / 100).toFixed(2)}</div>
                     <Button className="gap-2" onClick={handleBookNow}>
                       Continue booking
                       <ArrowRight className="h-4 w-4" />
@@ -652,7 +646,7 @@ export default function CalendarPage() {
                 </div>
               </Card>
             ) : (
-              <Card className="p-4 border-dashed border-slate-200 text-sm text-slate-500">
+              <Card className="p-4 border-dashed border-border text-sm text-muted-foreground">
                 Drag across dates to create a selection and see a booking draft here.
               </Card>
             )}
@@ -668,7 +662,7 @@ export default function CalendarPage() {
             <StatusLegend />
 
             {/* Status Filter Chips */}
-            <Card className="p-4 border-slate-200 shadow-sm">
+            <Card className="p-4 border-border shadow-sm">
               <StatusFilterChips
                 activeFilter={state.statusFilter}
                 onFilterChange={actions.setStatusFilter}
@@ -677,7 +671,7 @@ export default function CalendarPage() {
             </Card>
 
             {visibleSiteTypes.length > 0 && (
-              <div className="flex flex-wrap items-center gap-2 text-xs font-semibold text-slate-500">
+              <div className="flex flex-wrap items-center gap-2 text-xs font-semibold text-muted-foreground">
                 <span className="text-xs font-medium text-muted-foreground">Site types</span>
                 {visibleSiteTypes.map((type) => {
                   const meta = SITE_TYPE_STYLES[type] || SITE_TYPE_STYLES.default;
@@ -691,7 +685,7 @@ export default function CalendarPage() {
             )}
 
             {state.guestSearch && visibleSites.length === 0 ? (
-              <Card className="p-6 border-dashed border-slate-200 text-center text-slate-500">
+              <Card className="p-6 border-dashed border-border text-center text-muted-foreground">
                 No sites match that guest search in this view.
               </Card>
             ) : (
@@ -741,7 +735,7 @@ export default function CalendarPage() {
                 <DialogHeader>
                   <DialogTitle className="flex items-center justify-between gap-3">
                     <div className="flex items-center gap-2">
-                      <User className="h-5 w-5 text-slate-400" />
+                      <User className="h-5 w-5 text-muted-foreground/70" />
                       <span>{guestName}</span>
                     </div>
                     <div className={cn("flex items-center gap-1.5 px-2.5 py-1 rounded-full border text-xs font-medium", statusColors[res.status] || statusColors.pending)}>
@@ -754,12 +748,12 @@ export default function CalendarPage() {
                 <div className="space-y-4 py-4">
                   {/* Site & Dates */}
                   <div className="flex items-start gap-3">
-                    <Tent className="h-4 w-4 text-slate-400 mt-0.5" />
+                    <Tent className="h-4 w-4 text-muted-foreground/70 mt-0.5" />
                     <div className="flex-1">
-                      <div className="font-medium text-slate-900">
+                      <div className="font-medium text-foreground">
                         {res.site?.name || res.site?.siteNumber || "Unassigned"}
                       </div>
-                      <div className="text-sm text-slate-500">
+                      <div className="text-sm text-muted-foreground">
                         {format(new Date(res.arrivalDate), "MMM d")} → {format(new Date(res.departureDate), "MMM d, yyyy")} • {nights} night{nights !== 1 ? "s" : ""}
                       </div>
                     </div>
@@ -770,14 +764,14 @@ export default function CalendarPage() {
                     <div className="space-y-2">
                       {res.guest?.email && (
                         <div className="flex items-center gap-3 text-sm">
-                          <Mail className="h-4 w-4 text-slate-400" />
-                          <span className="text-slate-600">{res.guest.email}</span>
+                          <Mail className="h-4 w-4 text-muted-foreground/70" />
+                          <span className="text-muted-foreground">{res.guest.email}</span>
                         </div>
                       )}
                       {res.guest?.phone && (
                         <div className="flex items-center gap-3 text-sm">
-                          <Phone className="h-4 w-4 text-slate-400" />
-                          <span className="text-slate-600">{res.guest.phone}</span>
+                          <Phone className="h-4 w-4 text-muted-foreground/70" />
+                          <span className="text-muted-foreground">{res.guest.phone}</span>
                         </div>
                       )}
                     </div>
@@ -785,10 +779,10 @@ export default function CalendarPage() {
 
                   {/* Payment Summary */}
                   <div className="flex items-start gap-3">
-                    <CreditCard className="h-4 w-4 text-slate-400 mt-0.5" />
+                    <CreditCard className="h-4 w-4 text-muted-foreground/70 mt-0.5" />
                     <div className="flex-1">
                       <div className="flex items-center justify-between">
-                        <span className="font-medium text-slate-900">${(total / 100).toFixed(2)}</span>
+                        <span className="font-medium text-foreground">${(total / 100).toFixed(2)}</span>
                         {balance > 0 ? (
                           <span className="text-xs font-medium text-amber-600">${(balance / 100).toFixed(2)} due</span>
                         ) : paid > 0 ? (
@@ -796,7 +790,7 @@ export default function CalendarPage() {
                         ) : null}
                       </div>
                       {paid > 0 && paid < total && (
-                        <div className="mt-2 h-1.5 bg-slate-100 rounded-full overflow-hidden">
+                        <div className="mt-2 h-1.5 bg-muted rounded-full overflow-hidden">
                           <div
                             className="h-full bg-emerald-500 rounded-full"
                             style={{ width: `${Math.min(100, (paid / total) * 100)}%` }}
@@ -899,8 +893,8 @@ export default function CalendarPage() {
             <ShortcutItem keys={["1-4"]} desc="Set day range (7/14/21/30)" />
             <ShortcutItem keys={["?"]} desc="Show this help" />
           </div>
-          <div className="text-xs text-slate-500 border-t pt-3">
-            Press <kbd className="px-1.5 py-0.5 bg-slate-100 rounded text-xs font-mono">Esc</kbd> to close
+          <div className="text-xs text-muted-foreground border-t pt-3">
+            Press <kbd className="px-1.5 py-0.5 bg-muted rounded text-xs font-mono">Esc</kbd> to close
           </div>
         </DialogContent>
       </Dialog>
@@ -911,10 +905,10 @@ export default function CalendarPage() {
 function ShortcutItem({ keys, desc }: { keys: string[]; desc: string }) {
   return (
     <div className="flex items-center justify-between gap-2 py-1">
-      <span className="text-slate-600">{desc}</span>
+      <span className="text-muted-foreground">{desc}</span>
       <div className="flex gap-1">
         {keys.map((k) => (
-          <kbd key={k} className="px-2 py-1 bg-slate-100 rounded text-xs font-mono text-slate-700 shadow-sm border border-slate-200">
+          <kbd key={k} className="px-2 py-1 bg-muted rounded text-xs font-mono text-foreground shadow-sm border border-border">
             {k}
           </kbd>
         ))}
@@ -925,14 +919,14 @@ function ShortcutItem({ keys, desc }: { keys: string[]; desc: string }) {
 
 function StatCard({ label, value, sub, icon }: { label: string; value: string; sub: string; icon: React.ReactNode }) {
   return (
-    <Card className="p-4 border-slate-200 shadow-sm flex items-center gap-3">
-      <div className="h-10 w-10 rounded-xl bg-slate-100 text-slate-700 flex items-center justify-center">
+    <Card className="p-4 border-border shadow-sm flex items-center gap-3">
+      <div className="h-10 w-10 rounded-xl bg-muted text-foreground flex items-center justify-center">
         {icon}
       </div>
       <div>
         <div className="text-xs font-medium text-muted-foreground">{label}</div>
-        <div className="text-lg font-black text-slate-900">{value}</div>
-        <div className="text-xs text-slate-500">{sub}</div>
+        <div className="text-lg font-black text-foreground">{value}</div>
+        <div className="text-xs text-muted-foreground">{sub}</div>
       </div>
     </Card>
   );
@@ -944,10 +938,10 @@ interface StatusLegendProps {
 
 function StatusLegend({ className }: StatusLegendProps) {
   return (
-    <Card className={cn("p-4 border-slate-200 shadow-sm", className)}>
+    <Card className={cn("p-4 border-border shadow-sm", className)}>
       <div className="flex items-center gap-2 mb-3">
-        <div className="h-5 w-5 rounded-md bg-slate-100 flex items-center justify-center">
-          <CalendarDays className="h-3 w-3 text-slate-600" />
+        <div className="h-5 w-5 rounded-md bg-muted flex items-center justify-center">
+          <CalendarDays className="h-3 w-3 text-muted-foreground" />
         </div>
         <span className="text-xs font-medium text-muted-foreground">Status Legend</span>
       </div>
@@ -967,10 +961,10 @@ function StatusLegend({ className }: StatusLegendProps) {
                 <Icon className="h-3.5 w-3.5" />
               </div>
               <div className="min-w-0">
-                <div className="text-xs font-semibold text-slate-700 truncate">
+                <div className="text-xs font-semibold text-foreground truncate">
                   {config.label}
                 </div>
-                <div className="text-[10px] text-slate-400 truncate hidden sm:block">
+                <div className="text-[10px] text-muted-foreground/70 truncate hidden sm:block">
                   {config.description}
                 </div>
               </div>
@@ -1015,10 +1009,10 @@ function StatusFilterChips({ activeFilter, onFilterChange, reservationCounts = {
               isActive
                 ? config
                   ? cn("text-white border-transparent", config.bgColor)
-                  : "bg-slate-800 text-white border-slate-800"
+                  : "bg-foreground text-background border-transparent"
                 : config
-                  ? cn("bg-white border-slate-200 hover:border-slate-300", config.color)
-                  : "bg-white text-slate-600 border-slate-200 hover:border-slate-300"
+                  ? cn("bg-card border-border hover:border-border", config.color)
+                  : "bg-card text-muted-foreground border-border hover:border-border"
             )}
           >
             {config && (() => {
@@ -1030,8 +1024,8 @@ function StatusFilterChips({ activeFilter, onFilterChange, reservationCounts = {
               <span className={cn(
                 "px-1.5 py-0.5 rounded-full text-[10px] font-bold",
                 isActive
-                  ? "bg-white/20"
-                  : "bg-slate-100"
+                  ? "bg-card/20"
+                  : "bg-muted"
               )}>
                 {count}
               </span>
@@ -1182,7 +1176,7 @@ function CalendarGrid({
     return (
       <div className="space-y-3">
         {[1, 2, 3, 4].map((row) => (
-          <div key={row} className="h-16 rounded-xl bg-slate-100 animate-pulse" />
+          <div key={row} className="h-16 rounded-xl bg-muted animate-pulse" />
         ))}
       </div>
     );
@@ -1190,7 +1184,7 @@ function CalendarGrid({
 
   if (!sites.length) {
     return (
-      <Card className="p-6 border-dashed border-slate-200 text-center text-slate-500">
+      <Card className="p-6 border-dashed border-border text-center text-muted-foreground">
         No sites match the current filters.
       </Card>
     );
@@ -1199,20 +1193,20 @@ function CalendarGrid({
   const gridTemplate = `${SITE_COL_WIDTH}px repeat(${dayCount}, minmax(${DAY_MIN_WIDTH}px, 1fr))`;
 
   return (
-    <div className="rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden">
+    <div className="rounded-2xl border border-border bg-card shadow-sm overflow-hidden">
       <div className="overflow-x-auto">
         <div
-          className="grid text-xs font-medium text-muted-foreground border-b border-slate-200 bg-slate-50/70"
+          className="grid text-xs font-medium text-muted-foreground border-b border-border bg-muted/50"
           style={{ gridTemplateColumns: gridTemplate }}
         >
-          <div className="px-4 py-3 sticky left-0 z-20 bg-slate-50 border-r border-slate-200">
+          <div className="px-4 py-3 sticky left-0 z-20 bg-muted/40 border-r border-border">
             Sites
           </div>
           {days.map((d, idx) => (
             <div
               key={idx}
               className={cn(
-                "px-2 py-3 text-center border-r border-slate-100 last:border-r-0",
+                "px-2 py-3 text-center border-r border-border/60 last:border-r-0",
                 d.isToday && "bg-emerald-50 text-emerald-700"
               )}
             >
@@ -1223,7 +1217,7 @@ function CalendarGrid({
 
         <div
           ref={gridRef}
-          className="divide-y divide-slate-100"
+          className="divide-y divide-border/60"
           onPointerMove={handleGridPointerMove}
           onPointerUp={finishDrag}
           onPointerCancel={finishDrag}
@@ -1236,7 +1230,7 @@ function CalendarGrid({
               dayCount={dayCount}
               reservations={reservationsBySite[site.id] || []}
               gridTemplate={gridTemplate}
-              zebra={idx % 2 === 0 ? "bg-white" : "bg-slate-50/40"}
+              zebra={idx % 2 === 0 ? "bg-card" : "bg-muted/30"}
               activeSelection={activeSelection}
               draftSelection={selectionDraft}
               onCellPointerDown={handleCellPointerDown}
@@ -1296,12 +1290,12 @@ function CalendarRow({
       style={{ gridTemplateColumns: gridTemplate }}
       data-site-id={site.id}
     >
-      <div className={cn("px-4 sticky left-0 z-10 border-r border-l-4 border-slate-200", zebra, typeMeta.border, densityConfig.padding)}>
-        <div className={cn("font-bold text-slate-900 truncate", densityConfig.rowHeight === 40 ? "text-xs" : "text-sm")} title={site.name}>{site.name}</div>
+      <div className={cn("px-4 sticky left-0 z-10 border-r border-l-4 border-border", zebra, typeMeta.border, densityConfig.padding)}>
+        <div className={cn("font-bold text-foreground truncate", densityConfig.rowHeight === 40 ? "text-xs" : "text-sm")} title={site.name}>{site.name}</div>
         {densityConfig.showDetails && (
           <div className="mt-1 flex flex-wrap items-center gap-2 text-[10px] font-semibold uppercase tracking-wider">
             <span className={cn("px-2 py-0.5 rounded-full font-bold", typeMeta.badge)}>{typeMeta.label}</span>
-            {site.siteNumber && <span className="text-slate-400">#{site.siteNumber}</span>}
+            {site.siteNumber && <span className="text-muted-foreground/70">#{site.siteNumber}</span>}
           </div>
         )}
       </div>
@@ -1313,9 +1307,9 @@ function CalendarRow({
               key={i}
               data-day-idx={i}
               className={cn(
-                "border-r border-slate-100 cursor-crosshair transition-colors select-none touch-none",
+                "border-r border-border/60 cursor-crosshair transition-colors select-none touch-none",
                 zebra,
-                d.weekend && "bg-slate-50/60",
+                d.weekend && "bg-muted/50",
                 d.isToday && "bg-emerald-50/50",
                 "hover:bg-emerald-50/40"
               )}
@@ -1355,7 +1349,7 @@ function CalendarRow({
                 className={cn("mx-1 rounded-lg bg-purple-500/10 border-2 border-purple-500 border-dashed flex items-center justify-center z-10", selectionHeightClass)}
                 style={{ gridColumn: `${startIdx + 1} / span ${span}` }}
               >
-                <span className={cn("font-bold text-purple-700 bg-white/90 px-2 py-0.5 rounded", densityConfig.fontSize)}>
+                <span className={cn("font-bold text-purple-700 bg-card/90 px-2 py-0.5 rounded", densityConfig.fontSize)}>
                   Draft
                 </span>
               </div>

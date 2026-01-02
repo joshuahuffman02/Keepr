@@ -102,14 +102,14 @@ export function SettingsTable<T extends { id: string }>({
     return (
       <div className={cn("space-y-4", className)}>
         <div className="flex justify-between">
-          <div className="h-10 w-64 bg-slate-200 rounded-md animate-pulse" />
-          <div className="h-10 w-48 bg-slate-200 rounded-md animate-pulse" />
+          <div className="h-10 w-64 bg-muted rounded-md animate-pulse" />
+          <div className="h-10 w-48 bg-muted rounded-md animate-pulse" />
         </div>
         <div className="border rounded-lg">
-          <div className="h-12 bg-slate-100 border-b" />
+          <div className="h-12 bg-muted border-b" />
           {[...Array(5)].map((_, i) => (
             <div key={i} className="h-14 border-b last:border-0 flex items-center px-4">
-              <div className="h-4 bg-slate-200 rounded w-full animate-pulse" />
+              <div className="h-4 bg-muted rounded w-full animate-pulse" />
             </div>
           ))}
         </div>
@@ -126,7 +126,7 @@ export function SettingsTable<T extends { id: string }>({
         <div className="flex items-center gap-2">
           <div className="relative">
             <Search
-              className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400"
+              className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground"
               aria-hidden="true"
             />
             <Input
@@ -153,16 +153,16 @@ export function SettingsTable<T extends { id: string }>({
 
       {/* Table or Empty State */}
       {paginatedData.length > 0 ? (
-        <div className="border rounded-lg overflow-hidden bg-white">
+        <div className="border rounded-lg overflow-hidden bg-card">
           <table className="w-full">
             <thead>
-              <tr className="bg-slate-50 border-b">
+              <tr className="bg-muted border-b">
                 {columns.map((column) => (
                   <th
                     key={String(column.key)}
                     scope="col"
                     className={cn(
-                      "px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider",
+                      "px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider",
                       column.className
                     )}
                   >
@@ -172,27 +172,27 @@ export function SettingsTable<T extends { id: string }>({
                 {getRowActions && (
                   <th
                     scope="col"
-                    className="px-4 py-3 text-right text-xs font-medium text-slate-500 uppercase tracking-wider"
+                    className="px-4 py-3 text-right text-xs font-medium text-muted-foreground uppercase tracking-wider"
                   >
                     Actions
                   </th>
                 )}
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100">
+            <tbody className="divide-y divide-border">
               {paginatedData.map((item) => (
                 <tr
                   key={item.id}
                   onClick={() => onRowClick?.(item)}
                   className={cn(
-                    "hover:bg-slate-50 transition-colors",
+                    "hover:bg-muted transition-colors",
                     onRowClick && "cursor-pointer"
                   )}
                 >
                   {columns.map((column) => (
                     <td
                       key={String(column.key)}
-                      className={cn("px-4 py-3 text-sm text-slate-900", column.className)}
+                      className={cn("px-4 py-3 text-sm text-foreground", column.className)}
                     >
                       {column.render
                         ? column.render(item)
@@ -212,10 +212,10 @@ export function SettingsTable<T extends { id: string }>({
       ) : (
         // Empty state
         emptyState && EmptyIcon && (
-          <div className="text-center py-12 border-2 border-dashed rounded-lg bg-white">
-            <EmptyIcon className="h-10 w-10 mx-auto text-slate-400" aria-hidden="true" />
-            <h3 className="mt-3 font-medium text-slate-900">{emptyState.title}</h3>
-            <p className="text-sm text-slate-500 mt-1 max-w-sm mx-auto">
+          <div className="text-center py-12 border-2 border-dashed rounded-lg bg-card">
+            <EmptyIcon className="h-10 w-10 mx-auto text-muted-foreground" aria-hidden="true" />
+            <h3 className="mt-3 font-medium text-foreground">{emptyState.title}</h3>
+            <p className="text-sm text-muted-foreground mt-1 max-w-sm mx-auto">
               {emptyState.description}
             </p>
             {onAdd && (

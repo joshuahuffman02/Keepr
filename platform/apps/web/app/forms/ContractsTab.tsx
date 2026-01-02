@@ -89,14 +89,14 @@ interface Contract {
 
 const statusConfig: Record<string, { label: string; color: string; icon: React.ReactNode }> = {
   preview: { label: "Preview", color: "bg-purple-100 text-purple-700", icon: <Eye className="h-3 w-3" /> },
-  draft: { label: "Draft", color: "bg-slate-100 text-slate-600", icon: <FileText className="h-3 w-3" /> },
+  draft: { label: "Draft", color: "bg-muted text-muted-foreground", icon: <FileText className="h-3 w-3" /> },
   sent: { label: "Sent", color: "bg-status-info/15 text-status-info border-status-info/30", icon: <Send className="h-3 w-3" /> },
   viewed: { label: "Viewed", color: "bg-status-warning/15 text-status-warning border-status-warning/30", icon: <Eye className="h-3 w-3" /> },
   signed: { label: "Signed", color: "bg-status-success/15 text-status-success border-status-success/30", icon: <CheckCircle2 className="h-3 w-3" /> },
   signed_paper: { label: "Paper Signed", color: "bg-status-success/15 text-status-success border-status-success/30", icon: <PenLine className="h-3 w-3" /> },
   waived: { label: "Waived", color: "bg-teal-100 text-teal-700", icon: <UserCheck className="h-3 w-3" /> },
   declined: { label: "Declined", color: "bg-status-error/15 text-status-error border-status-error/30", icon: <X className="h-3 w-3" /> },
-  voided: { label: "Voided", color: "bg-slate-200 text-slate-600", icon: <Ban className="h-3 w-3" /> },
+  voided: { label: "Voided", color: "bg-muted text-muted-foreground", icon: <Ban className="h-3 w-3" /> },
   expired: { label: "Expired", color: "bg-status-warning/15 text-status-warning border-status-warning/30", icon: <Clock className="h-3 w-3" /> },
 };
 
@@ -142,8 +142,8 @@ function ContractStatsDashboard({ stats, isLoading }: { stats: ContractStats | n
       <div className="bg-status-success/10 rounded-xl p-6 border border-status-success/20">
         <div className="flex items-center justify-between mb-3">
           <div>
-            <h3 className="text-lg font-semibold text-slate-900">Contract Completion</h3>
-            <p className="text-sm text-slate-600">
+            <h3 className="text-lg font-semibold text-foreground">Contract Completion</h3>
+            <p className="text-sm text-muted-foreground">
               {completed} of {stats.total} contracts completed
             </p>
           </div>
@@ -151,7 +151,7 @@ function ContractStatsDashboard({ stats, isLoading }: { stats: ContractStats | n
         </div>
         <Progress value={stats.completionRate} className="h-3" />
         {stats.daysUntilDeadline !== undefined && stats.daysUntilDeadline > 0 && (
-          <p className="text-xs text-slate-500 mt-2">
+          <p className="text-xs text-muted-foreground mt-2">
             {stats.daysUntilDeadline} days until earliest deadline
           </p>
         )}
@@ -367,11 +367,11 @@ function ContractRow({
   const canModify = !["voided", "expired", "signed", "signed_paper", "waived", "declined"].includes(contract.status);
 
   return (
-    <div className="flex items-center justify-between p-4 border rounded-lg bg-white hover:shadow-sm transition-shadow">
+    <div className="flex items-center justify-between p-4 border rounded-lg bg-card hover:shadow-sm transition-shadow">
       <div className="flex items-center gap-4">
         <div className="space-y-1">
           <div className="flex items-center gap-2">
-            <span className="font-medium text-slate-900">{guestName}</span>
+            <span className="font-medium text-foreground">{guestName}</span>
             <Badge className={cn("text-xs flex items-center gap-1", status.color)}>
               {status.icon}
               {status.label}
@@ -380,7 +380,7 @@ function ContractRow({
               <Badge variant="outline" className="text-xs">{contract.seasonYear}</Badge>
             )}
           </div>
-          <div className="flex items-center gap-3 text-xs text-slate-500">
+          <div className="flex items-center gap-3 text-xs text-muted-foreground">
             <span>{documentTypeLabels[contract.documentType] || contract.documentType}</span>
             {contract.template && (
               <>
@@ -776,7 +776,7 @@ export function ContractsTab({ campgroundId }: { campgroundId: string | null }) 
           {/* Filters */}
           <div className="flex flex-col sm:flex-row gap-3">
             <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
                 placeholder="Search by name, email, or template..."
                 value={searchQuery}
@@ -819,7 +819,7 @@ export function ContractsTab({ campgroundId }: { campgroundId: string | null }) 
               {[1, 2, 3].map(i => <Skeleton key={i} className="h-20 rounded-lg" />)}
             </div>
           ) : filteredContracts.length === 0 ? (
-            <div className="text-center py-12 text-slate-500">
+            <div className="text-center py-12 text-muted-foreground">
               <FileX className="h-12 w-12 mx-auto mb-3 opacity-50" />
               <p className="font-medium">No contracts found</p>
               <p className="text-sm">Try adjusting your filters or send a renewal campaign to get started.</p>

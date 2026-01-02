@@ -182,9 +182,9 @@ export function InlineActivityFeed({ className }: InlineActivityFeedProps) {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
               transition={{ duration: 0.3 }}
-              className="text-sm text-slate-600"
+              className="text-sm text-muted-foreground"
             >
-              <span className="font-semibold text-slate-800">{message.highlight}</span>
+              <span className="font-semibold text-foreground">{message.highlight}</span>
               {" "}{message.rest}
             </motion.p>
           </AnimatePresence>

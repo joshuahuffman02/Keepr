@@ -67,11 +67,11 @@ export function MaintenanceDailyReport({ campgroundId, dateRange }: MaintenanceD
     };
 
     if (isLoading) {
-        return <div className="text-sm text-slate-500">Loading maintenance requests...</div>;
+        return <div className="text-sm text-muted-foreground">Loading maintenance requests...</div>;
     }
 
     if (!tickets) {
-        return <div className="text-sm text-slate-500">No maintenance tickets found.</div>;
+        return <div className="text-sm text-muted-foreground">No maintenance tickets found.</div>;
     }
 
     return (
@@ -80,17 +80,17 @@ export function MaintenanceDailyReport({ campgroundId, dateRange }: MaintenanceD
             <div className="space-y-4">
                 <div className="flex items-center justify-between">
                     <div>
-                        <h2 className="text-lg font-semibold text-slate-900">Open Tickets (Backlog)</h2>
-                        <p className="text-sm text-slate-500">
+                        <h2 className="text-lg font-semibold text-foreground">Open Tickets (Backlog)</h2>
+                        <p className="text-sm text-muted-foreground">
                             {reportData.active.length} active issues requiring attention
                         </p>
                     </div>
                 </div>
 
-                <div className="rounded-xl border border-slate-200 bg-white shadow-sm overflow-hidden">
+                <div className="rounded-xl border border-border bg-card shadow-sm overflow-hidden">
                     <div className="overflow-x-auto">
                         <table className="min-w-full text-sm text-left">
-                            <thead className="bg-slate-50 text-xs uppercase font-semibold text-slate-500">
+                            <thead className="bg-muted text-xs uppercase font-semibold text-muted-foreground">
                                 <tr>
                                     <th className="px-4 py-3">Issue</th>
                                     <th className="px-4 py-3">Location</th>
@@ -100,32 +100,32 @@ export function MaintenanceDailyReport({ campgroundId, dateRange }: MaintenanceD
                                     <th className="px-4 py-3 text-right">Actions</th>
                                 </tr>
                             </thead>
-                            <tbody className="divide-y divide-slate-100">
+                            <tbody className="divide-y divide-border">
                                 {reportData.active.length === 0 ? (
                                     <tr>
-                                        <td colSpan={6} className="px-4 py-8 text-center text-slate-500">
+                                        <td colSpan={6} className="px-4 py-8 text-center text-muted-foreground">
                                             No open tickets. Good job!
                                         </td>
                                     </tr>
                                 ) : (
                                     reportData.active.map((t: any) => (
-                                        <tr key={t.id} className="hover:bg-slate-50 group transition-colors">
-                                            <td className="px-4 py-3 font-medium text-slate-900">
+                                        <tr key={t.id} className="hover:bg-muted group transition-colors">
+                                            <td className="px-4 py-3 font-medium text-foreground">
                                                 <div className="flex items-center gap-2">
-                                                    <Wrench className="w-4 h-4 text-slate-400" />
+                                                    <Wrench className="w-4 h-4 text-muted-foreground" />
                                                     {t.title}
                                                 </div>
                                             </td>
-                                            <td className="px-4 py-3 text-slate-600 font-mono text-xs">{getSiteName(t.siteId)}</td>
+                                            <td className="px-4 py-3 text-muted-foreground font-mono text-xs">{getSiteName(t.siteId)}</td>
                                             <td className="px-4 py-3">
                                                 <Badge variant={t.priority === 'high' || t.priority === 'critical' ? 'destructive' : t.priority === 'medium' ? 'secondary' : 'outline'} className="capitalize">
                                                     {t.priority}
                                                 </Badge>
                                             </td>
-                                            <td className="px-4 py-3 text-slate-600">
-                                                {t.assignee?.name || <span className="text-slate-400 italic">Unassigned</span>}
+                                            <td className="px-4 py-3 text-muted-foreground">
+                                                {t.assignee?.name || <span className="text-muted-foreground italic">Unassigned</span>}
                                             </td>
-                                            <td className="px-4 py-3 text-slate-600">{format(new Date(t.createdAt), "MMM d")}</td>
+                                            <td className="px-4 py-3 text-muted-foreground">{format(new Date(t.createdAt), "MMM d")}</td>
                                             <td className="px-4 py-3 text-right">
                                                 <Link href={`/admin/maintenance/${t.id}`} className="text-emerald-600 hover:text-emerald-700 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-end gap-1">
                                                     View <ExternalLink className="w-3 h-3" />
@@ -144,17 +144,17 @@ export function MaintenanceDailyReport({ campgroundId, dateRange }: MaintenanceD
             <div className="space-y-4">
                 <div className="flex items-center justify-between">
                     <div>
-                        <h2 className="text-lg font-semibold text-slate-900">Completed (Selected Period)</h2>
-                        <p className="text-sm text-slate-500">
+                        <h2 className="text-lg font-semibold text-foreground">Completed (Selected Period)</h2>
+                        <p className="text-sm text-muted-foreground">
                             {reportData.completed.length} issues resolved between {dateRange.start} and {dateRange.end}
                         </p>
                     </div>
                 </div>
 
-                <div className="rounded-xl border border-slate-200 bg-slate-50/50 shadow-sm overflow-hidden">
+                <div className="rounded-xl border border-border bg-muted/50 shadow-sm overflow-hidden">
                     <div className="overflow-x-auto">
                         <table className="min-w-full text-sm text-left">
-                            <thead className="bg-slate-50 text-xs uppercase font-semibold text-slate-500">
+                            <thead className="bg-muted text-xs uppercase font-semibold text-muted-foreground">
                                 <tr>
                                     <th className="px-4 py-3">Issue</th>
                                     <th className="px-4 py-3">Location</th>
@@ -162,24 +162,24 @@ export function MaintenanceDailyReport({ campgroundId, dateRange }: MaintenanceD
                                     <th className="px-4 py-3">Date</th>
                                 </tr>
                             </thead>
-                            <tbody className="divide-y divide-slate-100">
+                            <tbody className="divide-y divide-border">
                                 {reportData.completed.length === 0 ? (
                                     <tr>
-                                        <td colSpan={4} className="px-4 py-8 text-center text-slate-500">
+                                        <td colSpan={4} className="px-4 py-8 text-center text-muted-foreground">
                                             No resolved tickets in this period.
                                         </td>
                                     </tr>
                                 ) : (
                                     reportData.completed.map((t: any) => (
-                                        <tr key={t.id} className="hover:bg-slate-50">
-                                            <td className="px-4 py-3 font-medium text-slate-700 line-through decoration-slate-400">
+                                        <tr key={t.id} className="hover:bg-muted">
+                                            <td className="px-4 py-3 font-medium text-foreground line-through decoration-slate-400">
                                                 {t.title}
                                             </td>
-                                            <td className="px-4 py-3 text-slate-500 font-mono text-xs">{getSiteName(t.siteId)}</td>
-                                            <td className="px-4 py-3 text-slate-600">
+                                            <td className="px-4 py-3 text-muted-foreground font-mono text-xs">{getSiteName(t.siteId)}</td>
+                                            <td className="px-4 py-3 text-muted-foreground">
                                                 {t.assignee?.name || "—"}
                                             </td>
-                                            <td className="px-4 py-3 text-slate-600">{format(new Date(t.resolvedAt || t.updatedAt), "MMM d")}</td>
+                                            <td className="px-4 py-3 text-muted-foreground">{format(new Date(t.resolvedAt || t.updatedAt), "MMM d")}</td>
                                         </tr>
                                     ))
                                 )}

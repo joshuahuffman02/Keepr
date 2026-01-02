@@ -141,16 +141,16 @@ export function PortfolioParkPicker({ onContextChange, tone = "dark", compact = 
     selectMutation.mutate({ portfolioId, parkId: nextParkId });
   };
 
-  const labelClass = tone === "dark" ? "text-[11px] uppercase tracking-wide text-slate-400" : "text-[11px] uppercase tracking-wide text-slate-600";
+  const labelClass = tone === "dark" ? "text-[11px] uppercase tracking-wide text-muted-foreground" : "text-[11px] uppercase tracking-wide text-muted-foreground";
   const selectClass =
     tone === "dark"
-      ? "w-full rounded-md border border-slate-700 bg-slate-800 px-2 py-2 text-sm text-slate-100 focus:outline-none focus:ring-1 focus:ring-emerald-400"
-      : "w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-emerald-500";
+      ? "w-full rounded-md border border-border bg-muted px-2 py-2 text-sm text-foreground focus:outline-none focus:ring-1 focus:ring-emerald-400"
+      : "w-full rounded-md border border-border bg-card px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-emerald-500";
   const cardClass =
     tone === "dark"
-      ? "rounded-lg border border-slate-800 bg-slate-900/70"
-      : "rounded-lg border border-slate-200 bg-white";
-  const headingClass = tone === "dark" ? "text-slate-300" : "text-slate-700";
+      ? "rounded-lg border border-border bg-muted/70"
+      : "rounded-lg border border-border bg-card";
+  const headingClass = tone === "dark" ? "text-muted-foreground" : "text-foreground";
 
   const isLoading = portfoliosQuery.isLoading;
   const portfolios = portfoliosQuery.data?.portfolios ?? [];

@@ -101,7 +101,7 @@ export default function AmenitiesPage() {
               </Badge>
             )}
           </div>
-          <p className="text-slate-400 mt-1">
+          <p className="text-muted-foreground mt-1">
             Site and campground amenity performance analysis
           </p>
         </div>
@@ -139,26 +139,26 @@ export default function AmenitiesPage() {
       </div>
 
       {/* Hookup Analysis */}
-      <Card className="bg-slate-800/50 border-slate-700">
+      <Card className="bg-muted/50 border-border">
         <CardHeader>
           <CardTitle className="text-lg text-white flex items-center gap-2">
             <Droplets className="h-5 w-5 text-cyan-400" />
             Hookup Analysis
           </CardTitle>
-          <p className="text-sm text-slate-400">
+          <p className="text-sm text-muted-foreground">
             Performance by hookup configuration
           </p>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {data.hookupAnalysis.map((hookup, idx) => (
-              <div key={idx} className="p-4 bg-slate-700/50 rounded-lg">
-                <p className="text-sm text-slate-400 mb-1">{hookup.hookupType}</p>
+              <div key={idx} className="p-4 bg-muted/50 rounded-lg">
+                <p className="text-sm text-muted-foreground mb-1">{hookup.hookupType}</p>
                 <p className="text-2xl font-bold text-white">{formatCurrency(hookup.averageNightlyRate)}</p>
-                <p className="text-xs text-slate-500">/night avg</p>
-                <div className="mt-2 pt-2 border-t border-slate-600">
-                  <p className="text-xs text-slate-400">{hookup.siteCount} sites</p>
-                  <p className="text-xs text-slate-400">{hookup.reservations.toLocaleString()} reservations</p>
+                <p className="text-xs text-muted-foreground">/night avg</p>
+                <div className="mt-2 pt-2 border-t border-border">
+                  <p className="text-xs text-muted-foreground">{hookup.siteCount} sites</p>
+                  <p className="text-xs text-muted-foreground">{hookup.reservations.toLocaleString()} reservations</p>
                 </div>
               </div>
             ))}
@@ -167,10 +167,10 @@ export default function AmenitiesPage() {
       </Card>
 
       {/* Revenue Correlation */}
-      <Card className="bg-slate-800/50 border-slate-700">
+      <Card className="bg-muted/50 border-border">
         <CardHeader>
           <CardTitle className="text-lg text-white">Amenity Revenue Impact</CardTitle>
-          <p className="text-sm text-slate-400">
+          <p className="text-sm text-muted-foreground">
             How amenities affect nightly rates (sorted by impact)
           </p>
         </CardHeader>

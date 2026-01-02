@@ -76,12 +76,12 @@ export function CampgroundMapUpload({
       <div className="space-y-1">
         <Label htmlFor="map-upload">Campground map (image or PDF)</Label>
         <Input id="map-upload" type="file" accept="image/*,application/pdf" onChange={(e) => setFile(e.target.files?.[0] || null)} />
-        <p className="text-xs text-slate-500">Used on the public page map section.</p>
+        <p className="text-xs text-muted-foreground">Used on the public page map section.</p>
       </div>
       {preview && (
-        <div className="relative h-48 w-full overflow-hidden rounded-lg border border-slate-200 bg-slate-50">
+        <div className="relative h-48 w-full overflow-hidden rounded-lg border border-border bg-muted">
           {isPdf ? (
-            <div className="flex h-full items-center justify-center text-sm text-slate-600">PDF uploaded</div>
+            <div className="flex h-full items-center justify-center text-sm text-muted-foreground">PDF uploaded</div>
           ) : (
             <Image src={preview} alt="Campground map preview" fill className="object-contain" unoptimized />
           )}
@@ -91,7 +91,7 @@ export function CampgroundMapUpload({
         <Button onClick={handleUpload} disabled={!file || isUploading}>
           {isUploading ? "Uploading..." : "Upload"}
         </Button>
-        {preview && !isUploading && <span className="text-xs text-slate-500">Saved preview shown above.</span>}
+        {preview && !isUploading && <span className="text-xs text-muted-foreground">Saved preview shown above.</span>}
       </div>
     </div>
   );

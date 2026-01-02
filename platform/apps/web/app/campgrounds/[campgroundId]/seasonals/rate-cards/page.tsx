@@ -191,11 +191,11 @@ function PricingPreview({
     }));
 
   return (
-    <div className="bg-slate-50 rounded-lg p-4 space-y-3">
-      <div className="text-sm font-medium text-slate-700">Pricing Preview</div>
+    <div className="bg-muted rounded-lg p-4 space-y-3">
+      <div className="text-sm font-medium text-foreground">Pricing Preview</div>
       <div className="space-y-2 text-sm">
         <div className="flex justify-between">
-          <span className="text-slate-600">Base Rate</span>
+          <span className="text-muted-foreground">Base Rate</span>
           <span className="font-medium">${rateCard.baseRate.toLocaleString()}</span>
         </div>
         {appliedDiscounts.map((d, i) => (
@@ -393,8 +393,8 @@ export default function RateCardsPage() {
 
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
-            <h1 className="text-2xl font-bold text-slate-900">Seasonal Rate Cards</h1>
-            <p className="text-sm text-slate-500">
+            <h1 className="text-2xl font-bold text-foreground">Seasonal Rate Cards</h1>
+            <p className="text-sm text-muted-foreground">
               Configure pricing, discounts, and incentives for seasonal guests
             </p>
           </div>
@@ -402,7 +402,7 @@ export default function RateCardsPage() {
             <select
               value={selectedYear}
               onChange={(e) => setSelectedYear(parseInt(e.target.value))}
-              className="text-sm border border-slate-200 rounded px-3 py-2"
+              className="text-sm border border-border rounded px-3 py-2"
             >
               {[currentYear - 1, currentYear, currentYear + 1, currentYear + 2].map((year) => (
                 <option key={year} value={year}>
@@ -419,12 +419,12 @@ export default function RateCardsPage() {
 
         {/* Rate Cards Grid */}
         {rateCardsQuery.isLoading ? (
-          <div className="text-center py-12 text-slate-500">Loading rate cards...</div>
+          <div className="text-center py-12 text-muted-foreground">Loading rate cards...</div>
         ) : rateCards.length === 0 ? (
           <Card className="p-12 text-center">
-            <DollarSign className="h-12 w-12 text-slate-300 mx-auto mb-3" />
-            <h3 className="text-lg font-medium text-slate-700">No rate cards for {selectedYear}</h3>
-            <p className="text-sm text-slate-500 mt-1 mb-4">
+            <DollarSign className="h-12 w-12 text-muted-foreground mx-auto mb-3" />
+            <h3 className="text-lg font-medium text-foreground">No rate cards for {selectedYear}</h3>
+            <p className="text-sm text-muted-foreground mt-1 mb-4">
               Create a rate card to define pricing for seasonal guests
             </p>
             <Button onClick={() => {
@@ -448,7 +448,7 @@ export default function RateCardsPage() {
                           <Badge className="bg-blue-500">Default</Badge>
                         )}
                         {!rateCard.isActive && (
-                          <Badge variant="outline" className="text-slate-500">
+                          <Badge variant="outline" className="text-muted-foreground">
                             Inactive
                           </Badge>
                         )}
@@ -459,10 +459,10 @@ export default function RateCardsPage() {
                       </CardDescription>
                     </div>
                     <div className="text-right">
-                      <div className="text-2xl font-bold text-slate-900">
+                      <div className="text-2xl font-bold text-foreground">
                         ${rateCard.baseRate.toLocaleString()}
                       </div>
-                      <div className="text-sm text-slate-500">
+                      <div className="text-sm text-muted-foreground">
                         {billingFrequencyLabels[rateCard.billingFrequency]}
                       </div>
                     </div>
@@ -470,7 +470,7 @@ export default function RateCardsPage() {
                 </CardHeader>
                 <CardContent className="space-y-4">
                   {rateCard.description && (
-                    <p className="text-sm text-slate-600">{rateCard.description}</p>
+                    <p className="text-sm text-muted-foreground">{rateCard.description}</p>
                   )}
 
                   {rateCard.includedUtilities.length > 0 && (
@@ -486,7 +486,7 @@ export default function RateCardsPage() {
                   {/* Discounts */}
                   <div>
                     <div className="flex items-center justify-between mb-2">
-                      <h4 className="text-sm font-medium text-slate-700 flex items-center gap-1">
+                      <h4 className="text-sm font-medium text-foreground flex items-center gap-1">
                         <Tag className="h-4 w-4" />
                         Discounts ({rateCard.discounts.filter((d) => d.isActive).length})
                       </h4>
@@ -525,7 +525,7 @@ export default function RateCardsPage() {
                         </div>
                       ))}
                       {rateCard.discounts.filter((d) => d.isActive).length === 0 && (
-                        <p className="text-sm text-slate-400 italic">No discounts configured</p>
+                        <p className="text-sm text-muted-foreground italic">No discounts configured</p>
                       )}
                     </div>
                   </div>
@@ -533,7 +533,7 @@ export default function RateCardsPage() {
                   {/* Incentives */}
                   <div>
                     <div className="flex items-center justify-between mb-2">
-                      <h4 className="text-sm font-medium text-slate-700 flex items-center gap-1">
+                      <h4 className="text-sm font-medium text-foreground flex items-center gap-1">
                         <Gift className="h-4 w-4" />
                         Incentives ({rateCard.incentives.filter((i) => i.isActive).length})
                       </h4>
@@ -568,7 +568,7 @@ export default function RateCardsPage() {
                         </div>
                       ))}
                       {rateCard.incentives.filter((i) => i.isActive).length === 0 && (
-                        <p className="text-sm text-slate-400 italic">No incentives configured</p>
+                        <p className="text-sm text-muted-foreground italic">No incentives configured</p>
                       )}
                     </div>
                   </div>

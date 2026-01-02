@@ -50,8 +50,8 @@ export default function PayoutDetailPage() {
       <div className="max-w-5xl space-y-4">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-semibold text-slate-900">Payout Detail</h1>
-            <p className="text-sm text-slate-600">Stripe payout lines and recon.</p>
+            <h1 className="text-2xl font-semibold text-foreground">Payout Detail</h1>
+            <p className="text-sm text-muted-foreground">Stripe payout lines and recon.</p>
           </div>
           <div className="flex gap-2">
             <Button
@@ -82,17 +82,17 @@ export default function PayoutDetailPage() {
               )}
             </CardTitle>
           </CardHeader>
-          <CardContent className="space-y-2 text-sm text-slate-700">
+          <CardContent className="space-y-2 text-sm text-foreground">
             <div className="flex gap-4">
               <div>Amount: {formatMoney(data?.amountCents, data?.currency?.toUpperCase())}</div>
               <div>Fee: {formatMoney(data?.feeCents ?? 0, data?.currency?.toUpperCase())}</div>
               <div>Net: {formatMoney((data?.amountCents ?? 0) - (data?.feeCents ?? 0), data?.currency?.toUpperCase())}</div>
             </div>
-            <div className="text-xs text-slate-600">
+            <div className="text-xs text-muted-foreground">
               Arrival: {data?.arrivalDate ? format(new Date(data.arrivalDate), "yyyy-MM-dd") : "—"}
             </div>
             {recon && (
-              <div className="text-xs text-slate-700 flex flex-col gap-1">
+              <div className="text-xs text-foreground flex flex-col gap-1">
                 <div>
                   Recon — Net: {formatMoney(recon.payoutNetCents)} | Lines: {formatMoney(recon.lineSumCents)} | Ledger: {formatMoney(recon.ledgerNetCents)} | Drift vs Ledger: {formatMoney(recon.driftVsLedgerCents)}
                 </div>
@@ -125,12 +125,12 @@ export default function PayoutDetailPage() {
               <TableBody>
                 {isLoading && (
                   <TableRow>
-                    <TableCell colSpan={6} className="text-center text-slate-500">Loading...</TableCell>
+                    <TableCell colSpan={6} className="text-center text-muted-foreground">Loading...</TableCell>
                   </TableRow>
                 )}
                 {!isLoading && data?.lines?.length === 0 && (
                   <TableRow>
-                    <TableCell colSpan={6} className="text-center text-slate-500">No lines.</TableCell>
+                    <TableCell colSpan={6} className="text-center text-muted-foreground">No lines.</TableCell>
                   </TableRow>
                 )}
                 {data?.lines?.map((l: any) => (

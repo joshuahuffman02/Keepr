@@ -47,7 +47,7 @@ const roleColors: Record<string, string> = {
   maintenance: "bg-status-warning/15 text-status-warning",
   finance: "bg-cyan-100 text-cyan-800",
   marketing: "bg-pink-100 text-pink-800",
-  readonly: "bg-slate-100 text-slate-800",
+  readonly: "bg-muted text-foreground",
 };
 
 const roleLabels: Record<string, string> = {
@@ -126,13 +126,13 @@ export default function UsersPage() {
         <div className="flex items-center gap-3">
           <Avatar className="h-9 w-9">
             <AvatarImage src={item.avatar} />
-            <AvatarFallback className="bg-slate-100 text-slate-600 text-sm">
+            <AvatarFallback className="bg-muted text-muted-foreground text-sm">
               {getInitials(item.name)}
             </AvatarFallback>
           </Avatar>
           <div>
-            <p className="font-medium text-slate-900">{item.name}</p>
-            <p className="text-sm text-slate-500">{item.email}</p>
+            <p className="font-medium text-foreground">{item.name}</p>
+            <p className="text-sm text-muted-foreground">{item.email}</p>
           </div>
         </div>
       ),
@@ -141,7 +141,7 @@ export default function UsersPage() {
       key: "role",
       label: "Role",
       render: (item: User) => (
-        <Badge className={roleColors[item.role] || "bg-slate-100 text-slate-800"}>
+        <Badge className={roleColors[item.role] || "bg-muted text-foreground"}>
           {roleLabels[item.role] || item.role}
         </Badge>
       ),
@@ -150,7 +150,7 @@ export default function UsersPage() {
       key: "lastActive",
       label: "Last Active",
       render: (item: User) => (
-        <span className="text-sm text-slate-500">
+        <span className="text-sm text-muted-foreground">
           {item.isPending ? "Invite pending" : formatLastActive(item.lastActive)}
         </span>
       ),
@@ -166,7 +166,7 @@ export default function UsersPage() {
               ? "bg-status-warning/15 text-status-warning"
               : item.isActive
               ? "bg-status-success/15 text-status-success"
-              : "bg-slate-100 text-slate-600"
+              : "bg-muted text-muted-foreground"
           )}
         >
           {item.isPending ? "Pending" : item.isActive ? "Active" : "Inactive"}
@@ -179,13 +179,13 @@ export default function UsersPage() {
     return (
       <div className="max-w-5xl space-y-6">
         <div>
-          <h2 className="text-2xl font-bold text-slate-900">Users</h2>
-          <p className="text-slate-500 mt-1">
+          <h2 className="text-2xl font-bold text-foreground">Users</h2>
+          <p className="text-muted-foreground mt-1">
             Manage staff accounts and access permissions
           </p>
         </div>
         <div className="flex items-center justify-center py-12">
-          <Loader2 className="h-8 w-8 animate-spin text-slate-400" />
+          <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
         </div>
       </div>
     );
@@ -195,15 +195,15 @@ export default function UsersPage() {
     return (
       <div className="max-w-5xl space-y-6">
         <div>
-          <h2 className="text-2xl font-bold text-slate-900">Users</h2>
-          <p className="text-slate-500 mt-1">
+          <h2 className="text-2xl font-bold text-foreground">Users</h2>
+          <p className="text-muted-foreground mt-1">
             Manage staff accounts and access permissions
           </p>
         </div>
         <Card>
           <CardContent className="py-8 text-center">
             <AlertCircle className="h-8 w-8 text-amber-500 mx-auto mb-3" />
-            <p className="text-slate-600">Please select a campground first.</p>
+            <p className="text-muted-foreground">Please select a campground first.</p>
           </CardContent>
         </Card>
       </div>
@@ -214,8 +214,8 @@ export default function UsersPage() {
     <div className="max-w-5xl space-y-6">
       <div className="flex items-start justify-between">
         <div>
-          <h2 className="text-2xl font-bold text-slate-900">Users</h2>
-          <p className="text-slate-500 mt-1">
+          <h2 className="text-2xl font-bold text-foreground">Users</h2>
+          <p className="text-muted-foreground mt-1">
             Manage staff accounts and access permissions
           </p>
         </div>

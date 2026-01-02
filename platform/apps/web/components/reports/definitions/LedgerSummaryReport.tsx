@@ -86,11 +86,11 @@ export function LedgerSummaryReport({ campgroundId, dateRange }: LedgerSummaryRe
     }, [ledgerEntries, dateRange]);
 
     if (isLoading) {
-        return <div className="text-sm text-slate-500">Loading ledger data...</div>;
+        return <div className="text-sm text-muted-foreground">Loading ledger data...</div>;
     }
 
     if (!ledgerEntries) {
-        return <div className="text-sm text-slate-500">No ledger data found.</div>;
+        return <div className="text-sm text-muted-foreground">No ledger data found.</div>;
     }
 
     return (
@@ -98,49 +98,49 @@ export function LedgerSummaryReport({ campgroundId, dateRange }: LedgerSummaryRe
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                 <Card>
                     <CardHeader className="pb-2">
-                        <CardTitle className="text-sm font-medium text-slate-500">Total Charges</CardTitle>
+                        <CardTitle className="text-sm font-medium text-muted-foreground">Total Charges</CardTitle>
                     </CardHeader>
                     <CardContent>
                         <div className="text-2xl font-bold">{formatCurrencyLocal(summary.revenue)}</div>
-                        <p className="text-xs text-slate-500">Posted revenue</p>
+                        <p className="text-xs text-muted-foreground">Posted revenue</p>
                     </CardContent>
                 </Card>
                 <Card>
                     <CardHeader className="pb-2">
-                        <CardTitle className="text-sm font-medium text-slate-500">Payments</CardTitle>
+                        <CardTitle className="text-sm font-medium text-muted-foreground">Payments</CardTitle>
                     </CardHeader>
                     <CardContent>
                         <div className="text-2xl font-bold text-emerald-600">{formatCurrencyLocal(summary.payments)}</div>
-                        <p className="text-xs text-slate-500">Cash collected</p>
+                        <p className="text-xs text-muted-foreground">Cash collected</p>
                     </CardContent>
                 </Card>
                 <Card>
                     <CardHeader className="pb-2">
-                        <CardTitle className="text-sm font-medium text-slate-500">Refunds</CardTitle>
+                        <CardTitle className="text-sm font-medium text-muted-foreground">Refunds</CardTitle>
                     </CardHeader>
                     <CardContent>
                         <div className="text-2xl font-bold text-rose-600">{formatCurrencyLocal(summary.refunds)}</div>
-                        <p className="text-xs text-slate-500">Returned to guests</p>
+                        <p className="text-xs text-muted-foreground">Returned to guests</p>
                     </CardContent>
                 </Card>
                 <Card>
                     <CardHeader className="pb-2">
-                        <CardTitle className="text-sm font-medium text-slate-500">Net Transactions</CardTitle>
+                        <CardTitle className="text-sm font-medium text-muted-foreground">Net Transactions</CardTitle>
                     </CardHeader>
                     <CardContent>
                         <div className="text-2xl font-bold">{formatCurrencyLocal(summary.net)}</div>
-                        <p className="text-xs text-slate-500">Payments - Refunds</p>
+                        <p className="text-xs text-muted-foreground">Payments - Refunds</p>
                     </CardContent>
                 </Card>
             </div>
 
-            <div className="rounded-xl border border-slate-200 bg-white shadow-sm overflow-hidden">
-                <div className="p-4 border-b border-slate-100">
-                    <h3 className="font-semibold text-slate-900">Ledger Detail</h3>
+            <div className="rounded-xl border border-border bg-card shadow-sm overflow-hidden">
+                <div className="p-4 border-b border-border">
+                    <h3 className="font-semibold text-foreground">Ledger Detail</h3>
                 </div>
                 <div className="overflow-x-auto max-h-[500px]">
                     <table className="min-w-full text-sm text-left">
-                        <thead className="bg-slate-50 text-xs uppercase font-semibold text-slate-500 sticky top-0">
+                        <thead className="bg-muted text-xs uppercase font-semibold text-muted-foreground sticky top-0">
                             <tr>
                                 <th className="px-4 py-3">Date</th>
                                 <th className="px-4 py-3">Description</th>
@@ -149,26 +149,26 @@ export function LedgerSummaryReport({ campgroundId, dateRange }: LedgerSummaryRe
                                 <th className="px-4 py-3 text-right">Amount</th>
                             </tr>
                         </thead>
-                        <tbody className="divide-y divide-slate-100">
+                        <tbody className="divide-y divide-border">
                             {summary.items.length === 0 ? (
                                 <tr>
-                                    <td colSpan={5} className="px-4 py-8 text-center text-slate-500">
+                                    <td colSpan={5} className="px-4 py-8 text-center text-muted-foreground">
                                         No entries found for this period.
                                     </td>
                                 </tr>
                             ) : (
                                 summary.items.map((entry: any) => (
-                                    <tr key={entry.id} className="hover:bg-slate-50">
-                                        <td className="px-4 py-3 text-slate-600 whitespace-nowrap">
+                                    <tr key={entry.id} className="hover:bg-muted">
+                                        <td className="px-4 py-3 text-muted-foreground whitespace-nowrap">
                                             {format(new Date(entry.occurredAt), "MMM d, yyyy HH:mm")}
                                         </td>
-                                        <td className="px-4 py-3 font-medium text-slate-900">
+                                        <td className="px-4 py-3 font-medium text-foreground">
                                             {entry.description}
                                         </td>
-                                        <td className="px-4 py-3 text-slate-500 font-mono text-xs">
+                                        <td className="px-4 py-3 text-muted-foreground font-mono text-xs">
                                             {entry.externalRef || "—"}
                                         </td>
-                                        <td className="px-4 py-3 text-slate-500 text-xs">
+                                        <td className="px-4 py-3 text-muted-foreground text-xs">
                                             {entry.glCode || "—"}
                                         </td>
                                         <td className={`px-4 py-3 text-right font-medium`}>

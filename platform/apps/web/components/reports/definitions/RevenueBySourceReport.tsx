@@ -65,14 +65,14 @@ export function RevenueBySourceReport({ campgroundId, dateRange }: RevenueBySour
     const totalBookings = data.reduce((acc, curr) => acc + curr.bookings, 0);
 
     if (isLoading) {
-        return <div className="text-sm text-slate-500">Loading revenue data...</div>;
+        return <div className="text-sm text-muted-foreground">Loading revenue data...</div>;
     }
 
     if (data.length === 0) {
         return (
-            <div className="flex flex-col items-center justify-center p-12 bg-slate-50 rounded-lg border border-slate-200">
-                <div className="text-slate-400 mb-2">No bookings found for this period</div>
-                <p className="text-xs text-slate-500">Try adjusting the date range to see attribution data.</p>
+            <div className="flex flex-col items-center justify-center p-12 bg-muted rounded-lg border border-border">
+                <div className="text-muted-foreground mb-2">No bookings found for this period</div>
+                <p className="text-xs text-muted-foreground">Try adjusting the date range to see attribution data.</p>
             </div>
         );
     }
@@ -84,20 +84,20 @@ export function RevenueBySourceReport({ campgroundId, dateRange }: RevenueBySour
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <Card>
                     <CardHeader className="pb-2">
-                        <CardTitle className="text-sm font-medium text-slate-500">Total Revenue</CardTitle>
+                        <CardTitle className="text-sm font-medium text-muted-foreground">Total Revenue</CardTitle>
                     </CardHeader>
                     <CardContent>
                         <div className="text-2xl font-bold">{formatCurrencyLocal(totalRevenue)}</div>
-                        <p className="text-xs text-slate-500">From {totalBookings} bookings</p>
+                        <p className="text-xs text-muted-foreground">From {totalBookings} bookings</p>
                     </CardContent>
                 </Card>
                 <Card>
                     <CardHeader className="pb-2">
-                        <CardTitle className="text-sm font-medium text-slate-500">Top Source</CardTitle>
+                        <CardTitle className="text-sm font-medium text-muted-foreground">Top Source</CardTitle>
                     </CardHeader>
                     <CardContent>
                         <div className="text-2xl font-bold">{data[0]?.source || "—"}</div>
-                        <p className="text-xs text-slate-500">
+                        <p className="text-xs text-muted-foreground">
                             {data[0] ? `${formatCurrencyLocal(data[0].revenue)} (${Math.round((data[0].revenue / totalRevenue) * 100)}%)` : "—"}
                         </p>
                     </CardContent>
@@ -142,7 +142,7 @@ export function RevenueBySourceReport({ campgroundId, dateRange }: RevenueBySour
                     </CardHeader>
                     <div className="overflow-x-auto">
                         <table className="w-full text-sm text-left">
-                            <thead className="bg-slate-50 text-xs uppercase text-slate-500">
+                            <thead className="bg-muted text-xs uppercase text-muted-foreground">
                                 <tr>
                                     <th className="px-4 py-3 font-medium">Source</th>
                                     <th className="px-4 py-3 font-medium text-right">Bookings</th>
@@ -150,13 +150,13 @@ export function RevenueBySourceReport({ campgroundId, dateRange }: RevenueBySour
                                     <th className="px-4 py-3 font-medium text-right">% of Total</th>
                                 </tr>
                             </thead>
-                            <tbody className="divide-y divide-slate-100">
+                            <tbody className="divide-y divide-border">
                                 {data.map((row) => (
-                                    <tr key={row.source} className="hover:bg-slate-50">
-                                        <td className="px-4 py-3 font-medium text-slate-900">{row.source}</td>
-                                        <td className="px-4 py-3 text-right text-slate-600">{row.bookings}</td>
-                                        <td className="px-4 py-3 text-right font-medium text-slate-900">{formatCurrencyLocal(row.revenue)}</td>
-                                        <td className="px-4 py-3 text-right text-slate-500">
+                                    <tr key={row.source} className="hover:bg-muted">
+                                        <td className="px-4 py-3 font-medium text-foreground">{row.source}</td>
+                                        <td className="px-4 py-3 text-right text-muted-foreground">{row.bookings}</td>
+                                        <td className="px-4 py-3 text-right font-medium text-foreground">{formatCurrencyLocal(row.revenue)}</td>
+                                        <td className="px-4 py-3 text-right text-muted-foreground">
                                             {Math.round((row.revenue / totalRevenue) * 100)}%
                                         </td>
                                     </tr>

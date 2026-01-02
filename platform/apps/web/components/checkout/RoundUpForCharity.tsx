@@ -135,8 +135,8 @@ export function RoundUpForCharity({ campgroundId, totalCents, onChange }: RoundU
   // Don't render if charity is not enabled
   if (loading) {
     return (
-      <div className="rounded-lg border border-slate-200 p-4 animate-pulse">
-        <div className="h-4 bg-slate-200 rounded w-3/4"></div>
+      <div className="rounded-lg border border-border p-4 animate-pulse">
+        <div className="h-4 bg-muted rounded w-3/4"></div>
       </div>
     );
   }
@@ -153,15 +153,15 @@ export function RoundUpForCharity({ campgroundId, totalCents, onChange }: RoundU
   const newTotal = ((totalCents + currentDonationCents) / 100).toFixed(2);
 
   return (
-    <div className="rounded-xl border-2 border-slate-200 bg-white overflow-hidden">
+    <div className="rounded-xl border-2 border-border bg-card overflow-hidden">
       {/* Header */}
-      <div className="p-4 bg-gradient-to-r from-pink-50 to-rose-50 border-b border-slate-200">
+      <div className="p-4 bg-gradient-to-r from-pink-50 to-rose-50 border-b border-border">
         <div className="flex items-center gap-3">
           <div className="p-2 rounded-full bg-pink-500 text-white">
             <Heart className="h-5 w-5 fill-current" />
           </div>
           <div>
-            <h4 className="font-semibold text-slate-900 flex items-center gap-2">
+            <h4 className="font-semibold text-foreground flex items-center gap-2">
               Support {charityConfig.charity.name}
               {charityConfig.charity.isVerified && (
                 <span className="inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium bg-status-success-bg text-status-success-text">
@@ -171,7 +171,7 @@ export function RoundUpForCharity({ campgroundId, totalCents, onChange }: RoundU
               )}
             </h4>
             {charityConfig.charity.description && (
-              <p className="text-xs text-slate-500 mt-0.5 line-clamp-1">
+              <p className="text-xs text-muted-foreground mt-0.5 line-clamp-1">
                 {charityConfig.charity.description}
               </p>
             )}
@@ -182,15 +182,15 @@ export function RoundUpForCharity({ campgroundId, totalCents, onChange }: RoundU
       {/* Donation Options */}
       <div className="p-4 space-y-3">
         {charityConfig.customMessage && (
-          <p className="text-sm text-slate-600 mb-3">{charityConfig.customMessage}</p>
+          <p className="text-sm text-muted-foreground mb-3">{charityConfig.customMessage}</p>
         )}
 
         {/* No Donation Option */}
         <label
           className={`flex items-center gap-3 p-3 rounded-lg border-2 cursor-pointer transition-all ${
             donationType === "none"
-              ? "border-slate-400 bg-slate-50"
-              : "border-slate-200 hover:border-slate-300"
+              ? "border-border bg-muted"
+              : "border-border hover:border-border"
           }`}
         >
           <input
@@ -198,9 +198,9 @@ export function RoundUpForCharity({ campgroundId, totalCents, onChange }: RoundU
             name="donationType"
             checked={donationType === "none"}
             onChange={() => handleDonationTypeChange("none")}
-            className="w-4 h-4 text-slate-600 focus:ring-slate-500"
+            className="w-4 h-4 text-muted-foreground focus:ring-ring"
           />
-          <span className="text-sm text-slate-600">No donation this time</span>
+          <span className="text-sm text-muted-foreground">No donation this time</span>
         </label>
 
         {/* Round Up Option */}
@@ -209,7 +209,7 @@ export function RoundUpForCharity({ campgroundId, totalCents, onChange }: RoundU
             className={`flex items-center gap-3 p-3 rounded-lg border-2 cursor-pointer transition-all ${
               donationType === "roundup"
                 ? "border-pink-500 bg-pink-50"
-                : "border-slate-200 hover:border-pink-300"
+                : "border-border hover:border-pink-300"
             }`}
           >
             <input
@@ -220,7 +220,7 @@ export function RoundUpForCharity({ campgroundId, totalCents, onChange }: RoundU
               className="w-4 h-4 text-pink-600 focus:ring-pink-500"
             />
             <div className="flex-1">
-              <span className="text-sm text-slate-900">
+              <span className="text-sm text-foreground">
                 Round up to <span className="font-semibold">${(roundUp.roundedAmountCents / 100).toFixed(2)}</span>
               </span>
               <span className="ml-2 text-sm text-pink-600 font-medium">
@@ -235,7 +235,7 @@ export function RoundUpForCharity({ campgroundId, totalCents, onChange }: RoundU
           className={`rounded-lg border-2 transition-all ${
             donationType === "custom"
               ? "border-pink-500 bg-pink-50"
-              : "border-slate-200"
+              : "border-border"
           }`}
         >
           <label
@@ -249,7 +249,7 @@ export function RoundUpForCharity({ campgroundId, totalCents, onChange }: RoundU
               onChange={() => handleDonationTypeChange("custom")}
               className="w-4 h-4 text-pink-600 focus:ring-pink-500"
             />
-            <span className="text-sm text-slate-900">Custom donation amount</span>
+            <span className="text-sm text-foreground">Custom donation amount</span>
           </label>
 
           {donationType === "custom" && (
@@ -264,7 +264,7 @@ export function RoundUpForCharity({ campgroundId, totalCents, onChange }: RoundU
                     className={`px-3 py-1.5 rounded-full text-sm font-medium transition-all ${
                       customAmountCents === cents
                         ? "bg-pink-500 text-white"
-                        : "bg-white border border-slate-300 text-slate-700 hover:border-pink-400"
+                        : "bg-card border border-border text-foreground hover:border-pink-400"
                     }`}
                   >
                     ${(cents / 100).toFixed(0)}
@@ -275,7 +275,7 @@ export function RoundUpForCharity({ campgroundId, totalCents, onChange }: RoundU
               {/* Custom Input */}
               <div className="flex items-center gap-2">
                 <div className="relative flex-1">
-                  <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                  <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                   <input
                     type="number"
                     min="0"
@@ -283,7 +283,7 @@ export function RoundUpForCharity({ campgroundId, totalCents, onChange }: RoundU
                     value={customInput}
                     onChange={(e) => handleCustomInputChange(e.target.value)}
                     onFocus={() => handleDonationTypeChange("custom")}
-                    className="w-full pl-8 pr-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-pink-500 focus:border-pink-500"
+                    className="w-full pl-8 pr-3 py-2 border border-border rounded-lg text-sm focus:ring-2 focus:ring-pink-500 focus:border-pink-500"
                     placeholder="Enter amount"
                   />
                 </div>
@@ -294,12 +294,12 @@ export function RoundUpForCharity({ campgroundId, totalCents, onChange }: RoundU
 
         {/* Summary */}
         {donationType !== "none" && currentDonationCents > 0 && (
-          <div className="flex items-center justify-between pt-3 border-t border-slate-200">
-            <span className="text-sm text-slate-600">
+          <div className="flex items-center justify-between pt-3 border-t border-border">
+            <span className="text-sm text-muted-foreground">
               Donation: <span className="font-semibold text-pink-600">${(currentDonationCents / 100).toFixed(2)}</span>
             </span>
-            <span className="text-sm text-slate-500">
-              New total: <span className="font-medium text-slate-900">${newTotal}</span>
+            <span className="text-sm text-muted-foreground">
+              New total: <span className="font-medium text-foreground">${newTotal}</span>
             </span>
           </div>
         )}
@@ -307,13 +307,13 @@ export function RoundUpForCharity({ campgroundId, totalCents, onChange }: RoundU
 
       {/* Footer with charity logo */}
       {charityConfig.charity.logoUrl && (
-        <div className="px-4 py-3 bg-slate-50 border-t border-slate-200 flex items-center gap-2">
+        <div className="px-4 py-3 bg-muted border-t border-border flex items-center gap-2">
           <img
             src={charityConfig.charity.logoUrl}
             alt={charityConfig.charity.name}
             className="h-5 w-auto object-contain"
           />
-          <span className="text-xs text-slate-500">
+          <span className="text-xs text-muted-foreground">
             100% of your donation goes to {charityConfig.charity.name}
           </span>
         </div>
@@ -410,11 +410,11 @@ export function RoundUpInline({ campgroundId, totalCents, onChange }: RoundUpFor
             type="checkbox"
             checked={donationType !== "none"}
             onChange={handleRoundUpToggle}
-            className="w-4 h-4 rounded border-slate-300 text-pink-600 focus:ring-pink-500"
+            className="w-4 h-4 rounded border-border text-pink-600 focus:ring-pink-500"
           />
           <div className="flex items-center gap-2 text-sm">
-            <Heart className={`h-4 w-4 ${donationType !== "none" ? "text-pink-500 fill-current" : "text-slate-400"}`} />
-            <span className="text-slate-700">
+            <Heart className={`h-4 w-4 ${donationType !== "none" ? "text-pink-500 fill-current" : "text-muted-foreground"}`} />
+            <span className="text-foreground">
               {roundUp && roundUp.donationAmountCents > 0 ? (
                 <>
                   Round up <span className="font-medium text-pink-600">${(roundUp.donationAmountCents / 100).toFixed(2)}</span> for{" "}
@@ -448,14 +448,14 @@ export function RoundUpInline({ campgroundId, totalCents, onChange }: RoundUpFor
               className={`px-2 py-1 rounded text-xs font-medium transition-all ${
                 donationType === "custom" && customAmountCents === cents
                   ? "bg-pink-500 text-white"
-                  : "bg-slate-100 text-slate-600 hover:bg-pink-100"
+                  : "bg-muted text-muted-foreground hover:bg-pink-100"
               }`}
             >
               ${(cents / 100).toFixed(0)}
             </button>
           ))}
           <div className="relative">
-            <span className="absolute left-2 top-1/2 -translate-y-1/2 text-xs text-slate-400">$</span>
+            <span className="absolute left-2 top-1/2 -translate-y-1/2 text-xs text-muted-foreground">$</span>
             <input
               type="number"
               min="0"
@@ -465,7 +465,7 @@ export function RoundUpInline({ campgroundId, totalCents, onChange }: RoundUpFor
                 const val = parseInt(e.target.value) || 0;
                 handleCustomAmount(val * 100);
               }}
-              className="w-16 pl-5 pr-2 py-1 text-xs border border-slate-300 rounded focus:ring-1 focus:ring-pink-500"
+              className="w-16 pl-5 pr-2 py-1 text-xs border border-border rounded focus:ring-1 focus:ring-pink-500"
               placeholder="Other"
             />
           </div>
@@ -473,7 +473,7 @@ export function RoundUpInline({ campgroundId, totalCents, onChange }: RoundUpFor
       )}
 
       {donationType !== "none" && currentAmount > 0 && (
-        <p className="text-xs text-slate-500 pl-7">
+        <p className="text-xs text-muted-foreground pl-7">
           Adding <span className="font-medium text-pink-600">${(currentAmount / 100).toFixed(2)}</span> donation
         </p>
       )}

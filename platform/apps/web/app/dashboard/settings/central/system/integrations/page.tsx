@@ -110,7 +110,7 @@ const statusConfig = {
   disconnected: {
     label: "Not Connected",
     icon: XCircle,
-    className: "bg-slate-100 text-slate-600",
+    className: "bg-muted text-muted-foreground",
   },
   error: {
     label: "Error",
@@ -125,8 +125,8 @@ export default function IntegrationsPage() {
   return (
     <div className="max-w-4xl space-y-6">
       <div>
-        <h2 className="text-2xl font-bold text-slate-900">Integrations</h2>
-        <p className="text-slate-500 mt-1">
+        <h2 className="text-2xl font-bold text-foreground">Integrations</h2>
+        <p className="text-muted-foreground mt-1">
           Connect third-party services to extend functionality
         </p>
       </div>
@@ -148,10 +148,10 @@ export default function IntegrationsPage() {
                 <CheckCircle2 className="h-5 w-5 text-status-success" />
               </div>
               <div>
-                <p className="text-2xl font-bold text-slate-900">
+                <p className="text-2xl font-bold text-foreground">
                   {integrations.filter((i) => i.status === "connected").length}
                 </p>
-                <p className="text-sm text-slate-500">Connected</p>
+                <p className="text-sm text-muted-foreground">Connected</p>
               </div>
             </div>
           </CardContent>
@@ -159,14 +159,14 @@ export default function IntegrationsPage() {
         <Card>
           <CardContent className="pt-6">
             <div className="flex items-center gap-3">
-              <div className="p-2 rounded-lg bg-slate-100">
-                <XCircle className="h-5 w-5 text-slate-600" />
+              <div className="p-2 rounded-lg bg-muted">
+                <XCircle className="h-5 w-5 text-muted-foreground" />
               </div>
               <div>
-                <p className="text-2xl font-bold text-slate-900">
+                <p className="text-2xl font-bold text-foreground">
                   {integrations.filter((i) => i.status === "disconnected").length}
                 </p>
-                <p className="text-sm text-slate-500">Available</p>
+                <p className="text-sm text-muted-foreground">Available</p>
               </div>
             </div>
           </CardContent>
@@ -178,10 +178,10 @@ export default function IntegrationsPage() {
                 <XCircle className="h-5 w-5 text-status-error" />
               </div>
               <div>
-                <p className="text-2xl font-bold text-slate-900">
+                <p className="text-2xl font-bold text-foreground">
                   {integrations.filter((i) => i.status === "error").length}
                 </p>
-                <p className="text-sm text-slate-500">Needs Attention</p>
+                <p className="text-sm text-muted-foreground">Needs Attention</p>
               </div>
             </div>
           </CardContent>
@@ -191,7 +191,7 @@ export default function IntegrationsPage() {
       {/* Integrations by Category */}
       {categories.map((category) => (
         <div key={category} className="space-y-3">
-          <h3 className="text-sm font-medium text-slate-900">{category}</h3>
+          <h3 className="text-sm font-medium text-foreground">{category}</h3>
           <div className="grid gap-3">
             {integrations
               .filter((i) => i.category === category)
@@ -205,12 +205,12 @@ export default function IntegrationsPage() {
                     <CardContent className="py-4">
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-4">
-                          <div className="p-2 rounded-lg bg-slate-100">
-                            <Icon className="h-5 w-5 text-slate-600" />
+                          <div className="p-2 rounded-lg bg-muted">
+                            <Icon className="h-5 w-5 text-muted-foreground" />
                           </div>
                           <div>
                             <div className="flex items-center gap-2">
-                              <h4 className="font-medium text-slate-900">
+                              <h4 className="font-medium text-foreground">
                                 {integration.name}
                               </h4>
                               <Badge className={status.className}>
@@ -218,7 +218,7 @@ export default function IntegrationsPage() {
                                 {status.label}
                               </Badge>
                             </div>
-                            <p className="text-sm text-slate-500">
+                            <p className="text-sm text-muted-foreground">
                               {integration.description}
                             </p>
                           </div>

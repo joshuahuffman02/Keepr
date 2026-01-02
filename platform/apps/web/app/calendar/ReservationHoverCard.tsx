@@ -81,13 +81,13 @@ export function ReservationHoverCard({
       <HoverCardHeader className="flex items-start justify-between gap-3">
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2">
-            <User className="h-4 w-4 text-slate-400 flex-shrink-0" />
-            <span className="font-semibold text-slate-900 truncate">{guestName}</span>
+            <User className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+            <span className="font-semibold text-foreground truncate">{guestName}</span>
           </div>
           {reservation.guest?.email && (
             <div className="flex items-center gap-2 mt-1">
-              <Mail className="h-3 w-3 text-slate-400 flex-shrink-0" />
-              <span className="text-xs text-slate-500 truncate">{reservation.guest.email}</span>
+              <Mail className="h-3 w-3 text-muted-foreground flex-shrink-0" />
+              <span className="text-xs text-muted-foreground truncate">{reservation.guest.email}</span>
             </div>
           )}
         </div>
@@ -108,12 +108,12 @@ export function ReservationHoverCard({
       <HoverCardContent className="space-y-3">
         {/* Dates */}
         <div className="flex items-start gap-3">
-          <Calendar className="h-4 w-4 text-slate-400 mt-0.5 flex-shrink-0" />
+          <Calendar className="h-4 w-4 text-muted-foreground mt-0.5 flex-shrink-0" />
           <div className="flex-1">
-            <div className="text-sm font-medium text-slate-900">
+            <div className="text-sm font-medium text-foreground">
               {formatDate(reservation.arrivalDate)} — {formatDate(reservation.departureDate)}
             </div>
-            <div className="text-xs text-slate-500 mt-0.5">
+            <div className="text-xs text-muted-foreground mt-0.5">
               {nights} night{nights !== 1 ? "s" : ""} • Arrives {arrivalRelative}
             </div>
           </div>
@@ -122,13 +122,13 @@ export function ReservationHoverCard({
         {/* Site */}
         {reservation.site && (
           <div className="flex items-start gap-3">
-            <Tent className="h-4 w-4 text-slate-400 mt-0.5 flex-shrink-0" />
+            <Tent className="h-4 w-4 text-muted-foreground mt-0.5 flex-shrink-0" />
             <div className="flex-1">
-              <div className="text-sm font-medium text-slate-900">
+              <div className="text-sm font-medium text-foreground">
                 {reservation.site.name || `Site ${reservation.site.siteNumber}`}
               </div>
               {reservation.site.siteType && (
-                <div className="text-xs text-slate-500 mt-0.5 capitalize">
+                <div className="text-xs text-muted-foreground mt-0.5 capitalize">
                   {reservation.site.siteType.replace(/_/g, " ")}
                 </div>
               )}
@@ -138,10 +138,10 @@ export function ReservationHoverCard({
 
         {/* Payment */}
         <div className="flex items-start gap-3">
-          <CreditCard className="h-4 w-4 text-slate-400 mt-0.5 flex-shrink-0" />
+          <CreditCard className="h-4 w-4 text-muted-foreground mt-0.5 flex-shrink-0" />
           <div className="flex-1">
             <div className="flex items-center justify-between">
-              <span className="text-sm font-medium text-slate-900">
+              <span className="text-sm font-medium text-foreground">
                 {formatCurrency(total)}
               </span>
               {balance > 0 && (

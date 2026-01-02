@@ -122,13 +122,13 @@ export default function ProductsPage() {
     return (
       <div className="max-w-5xl space-y-6">
         <div>
-          <h2 className="text-2xl font-bold text-slate-900">Products</h2>
-          <p className="text-slate-500 mt-1">
+          <h2 className="text-2xl font-bold text-foreground">Products</h2>
+          <p className="text-muted-foreground mt-1">
             Manage your store inventory and products
           </p>
         </div>
         <div className="flex items-center justify-center py-12">
-          <Loader2 className="h-8 w-8 animate-spin text-slate-400" />
+          <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
         </div>
       </div>
     );
@@ -138,15 +138,15 @@ export default function ProductsPage() {
     return (
       <div className="max-w-5xl space-y-6">
         <div>
-          <h2 className="text-2xl font-bold text-slate-900">Products</h2>
-          <p className="text-slate-500 mt-1">
+          <h2 className="text-2xl font-bold text-foreground">Products</h2>
+          <p className="text-muted-foreground mt-1">
             Manage your store inventory and products
           </p>
         </div>
         <Card>
           <CardContent className="py-8 text-center">
             <AlertCircle className="h-8 w-8 text-amber-500 mx-auto mb-3" />
-            <p className="text-slate-600">Please select a campground first.</p>
+            <p className="text-muted-foreground">Please select a campground first.</p>
           </CardContent>
         </Card>
       </div>
@@ -158,8 +158,8 @@ export default function ProductsPage() {
       {/* Header */}
       <div className="flex items-start justify-between">
         <div>
-          <h2 className="text-2xl font-bold text-slate-900">Products</h2>
-          <p className="text-slate-500 mt-1">
+          <h2 className="text-2xl font-bold text-foreground">Products</h2>
+          <p className="text-muted-foreground mt-1">
             Manage your store inventory and products
           </p>
         </div>
@@ -197,8 +197,8 @@ export default function ProductsPage() {
                 <Package className="h-5 w-5 text-blue-600" />
               </div>
               <div>
-                <p className="text-2xl font-bold text-slate-900">{products.length}</p>
-                <p className="text-sm text-slate-500">Total Products</p>
+                <p className="text-2xl font-bold text-foreground">{products.length}</p>
+                <p className="text-sm text-muted-foreground">Total Products</p>
               </div>
             </div>
           </CardContent>
@@ -210,8 +210,8 @@ export default function ProductsPage() {
                 <ShoppingCart className="h-5 w-5 text-emerald-600" />
               </div>
               <div>
-                <p className="text-2xl font-bold text-slate-900">{activeProducts.length}</p>
-                <p className="text-sm text-slate-500">Active</p>
+                <p className="text-2xl font-bold text-foreground">{activeProducts.length}</p>
+                <p className="text-sm text-muted-foreground">Active</p>
               </div>
             </div>
           </CardContent>
@@ -223,8 +223,8 @@ export default function ProductsPage() {
                 <Tags className="h-5 w-5 text-purple-600" />
               </div>
               <div>
-                <p className="text-2xl font-bold text-slate-900">{categories.length}</p>
-                <p className="text-sm text-slate-500">Categories</p>
+                <p className="text-2xl font-bold text-foreground">{categories.length}</p>
+                <p className="text-sm text-muted-foreground">Categories</p>
               </div>
             </div>
           </CardContent>
@@ -232,12 +232,12 @@ export default function ProductsPage() {
         <Card>
           <CardContent className="pt-6">
             <div className="flex items-center gap-3">
-              <div className={`p-2 rounded-lg ${lowStockProducts.length > 0 ? "bg-amber-100" : "bg-slate-100"}`}>
-                <AlertCircle className={`h-5 w-5 ${lowStockProducts.length > 0 ? "text-amber-600" : "text-slate-600"}`} />
+              <div className={`p-2 rounded-lg ${lowStockProducts.length > 0 ? "bg-amber-100" : "bg-muted"}`}>
+                <AlertCircle className={`h-5 w-5 ${lowStockProducts.length > 0 ? "text-amber-600" : "text-muted-foreground"}`} />
               </div>
               <div>
-                <p className="text-2xl font-bold text-slate-900">{lowStockProducts.length}</p>
-                <p className="text-sm text-slate-500">Low Stock</p>
+                <p className="text-2xl font-bold text-foreground">{lowStockProducts.length}</p>
+                <p className="text-sm text-muted-foreground">Low Stock</p>
               </div>
             </div>
           </CardContent>
@@ -246,9 +246,9 @@ export default function ProductsPage() {
 
       {/* Filters */}
       {products.length > 0 && (
-        <div className="rounded-lg border border-slate-200 bg-white p-3 space-y-2">
+        <div className="rounded-lg border border-border bg-card p-3 space-y-2">
           <div className="flex items-center justify-between">
-            <div className="text-xs font-semibold uppercase tracking-wide text-slate-500 flex items-center gap-2">
+            <div className="text-xs font-semibold uppercase tracking-wide text-muted-foreground flex items-center gap-2">
               <Filter className="h-3.5 w-3.5" />
               Filters
               {activeFilterCount > 0 && (
@@ -272,9 +272,9 @@ export default function ProductsPage() {
           <div className="flex flex-wrap items-center gap-3">
             {/* Category filter dropdown */}
             <div className="flex items-center gap-2">
-              <label className="text-xs text-slate-500">Category:</label>
+              <label className="text-xs text-muted-foreground">Category:</label>
               <select
-                className="text-sm border border-slate-200 rounded-md px-2 py-1 bg-white"
+                className="text-sm border border-border rounded-md px-2 py-1 bg-card"
                 value={categoryFilter}
                 onChange={(e) => setCategoryFilter(e.target.value)}
               >
@@ -289,9 +289,9 @@ export default function ProductsPage() {
             </div>
             {/* Status filter dropdown */}
             <div className="flex items-center gap-2">
-              <label className="text-xs text-slate-500">Status:</label>
+              <label className="text-xs text-muted-foreground">Status:</label>
               <select
-                className="text-sm border border-slate-200 rounded-md px-2 py-1 bg-white"
+                className="text-sm border border-border rounded-md px-2 py-1 bg-card"
                 value={statusFilter}
                 onChange={(e) => setStatusFilter(e.target.value)}
               >
@@ -303,8 +303,8 @@ export default function ProductsPage() {
           </div>
           {/* Active filter pills */}
           {activeFilterCount > 0 && (
-            <div className="flex flex-wrap items-center gap-2 pt-2 border-t border-slate-100">
-              <span className="text-xs text-slate-500 font-medium">Active:</span>
+            <div className="flex flex-wrap items-center gap-2 pt-2 border-t border-border">
+              <span className="text-xs text-muted-foreground font-medium">Active:</span>
               {categoryFilter !== "all" && (
                 <FilterChip
                   label={`Category: ${getCategoryName(categoryFilter)}`}
@@ -342,11 +342,11 @@ export default function ProductsPage() {
       {products.length === 0 ? (
         <Card className="border-dashed">
           <CardContent className="py-12 text-center">
-            <Package className="h-12 w-12 mx-auto text-slate-300 mb-4" />
-            <h3 className="text-lg font-semibold text-slate-900 mb-2">
+            <Package className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+            <h3 className="text-lg font-semibold text-foreground mb-2">
               No products yet
             </h3>
-            <p className="text-slate-500 mb-4 max-w-md mx-auto">
+            <p className="text-muted-foreground mb-4 max-w-md mx-auto">
               Add products to your store to start selling through the POS system.
             </p>
             <Button asChild>
@@ -359,7 +359,7 @@ export default function ProductsPage() {
         </Card>
       ) : (
         <Card>
-          <CardHeader className="py-3 px-4 bg-slate-50 border-b flex flex-row items-center justify-between">
+          <CardHeader className="py-3 px-4 bg-muted border-b flex flex-row items-center justify-between">
             <CardTitle className="text-sm font-medium">
               Products ({filteredProducts.length}{activeFilterCount > 0 ? ` of ${products.length}` : ""})
             </CardTitle>
@@ -374,17 +374,17 @@ export default function ProductsPage() {
             {filteredProducts.slice(0, 10).map((product, index) => (
               <StaggeredItem key={product.id} delay={0.1 + index * 0.04} variant="slideRight">
               <div
-                className="flex items-center justify-between px-4 py-3 hover:bg-slate-50 transition-colors group"
+                className="flex items-center justify-between px-4 py-3 hover:bg-muted transition-colors group"
               >
                 <div className="flex items-center gap-3">
-                  <div className={`p-2 rounded-lg ${product.isActive !== false ? "bg-blue-100" : "bg-slate-100"}`}>
-                    <Package className={`h-5 w-5 ${product.isActive !== false ? "text-blue-600" : "text-slate-400"}`} />
+                  <div className={`p-2 rounded-lg ${product.isActive !== false ? "bg-blue-100" : "bg-muted"}`}>
+                    <Package className={`h-5 w-5 ${product.isActive !== false ? "text-blue-600" : "text-muted-foreground"}`} />
                   </div>
                   <div>
-                    <p className={`font-medium ${product.isActive !== false ? "text-slate-900" : "text-slate-500"}`}>
+                    <p className={`font-medium ${product.isActive !== false ? "text-foreground" : "text-muted-foreground"}`}>
                       {product.name}
                     </p>
-                    <div className="flex items-center gap-2 text-sm text-slate-500">
+                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
                       {product.sku && <span>SKU: {product.sku}</span>}
                       {product.category && (
                         <Badge variant="outline" className="text-xs">
@@ -396,11 +396,11 @@ export default function ProductsPage() {
                 </div>
                 <div className="flex items-center gap-3">
                   <div className="text-right">
-                    <p className="font-medium text-slate-900">
+                    <p className="font-medium text-foreground">
                       {formatPrice(product.price)}
                     </p>
                     {product.trackInventory && product.inventoryCount !== null && (
-                      <p className={`text-xs ${product.inventoryCount <= 5 ? "text-amber-600" : "text-slate-500"}`}>
+                      <p className={`text-xs ${product.inventoryCount <= 5 ? "text-amber-600" : "text-muted-foreground"}`}>
                         {product.inventoryCount} in stock
                       </p>
                     )}
@@ -443,8 +443,8 @@ export default function ProductsPage() {
             )}
             {filteredProducts.length === 0 && activeFilterCount > 0 && (
               <div className="px-4 py-8 text-center">
-                <Package className="h-10 w-10 mx-auto text-slate-300 mb-3" />
-                <p className="text-slate-500 text-sm">No products match your filters</p>
+                <Package className="h-10 w-10 mx-auto text-muted-foreground mb-3" />
+                <p className="text-muted-foreground text-sm">No products match your filters</p>
                 <Button
                   variant="ghost"
                   size="sm"
@@ -469,13 +469,13 @@ export default function ProductsPage() {
                   <ShoppingCart className="h-6 w-6 text-emerald-600" />
                 </div>
                 <div>
-                  <h3 className="font-semibold text-slate-900">Inventory</h3>
-                  <p className="text-sm text-slate-500 mt-1">
+                  <h3 className="font-semibold text-foreground">Inventory</h3>
+                  <p className="text-sm text-muted-foreground mt-1">
                     Track stock levels and manage reorders
                   </p>
                 </div>
               </div>
-              <ArrowRight className="h-5 w-5 text-slate-400" />
+              <ArrowRight className="h-5 w-5 text-muted-foreground" />
             </Link>
           </CardContent>
         </Card>
@@ -491,8 +491,8 @@ export default function ProductsPage() {
                   <Tags className="h-6 w-6 text-purple-600" />
                 </div>
                 <div>
-                  <h3 className="font-semibold text-slate-900">Categories</h3>
-                  <p className="text-sm text-slate-500 mt-1">
+                  <h3 className="font-semibold text-foreground">Categories</h3>
+                  <p className="text-sm text-muted-foreground mt-1">
                     Organize products into departments
                   </p>
                   <Badge variant="outline" className="mt-2">
@@ -500,7 +500,7 @@ export default function ProductsPage() {
                   </Badge>
                 </div>
               </div>
-              <ArrowRight className="h-5 w-5 text-slate-400" />
+              <ArrowRight className="h-5 w-5 text-muted-foreground" />
             </Link>
           </CardContent>
         </Card>

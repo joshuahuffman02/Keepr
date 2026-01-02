@@ -145,7 +145,7 @@ export function CancellationPolicyCard({
               : `${policyDetails.currentRule.refundPercent}% refund if cancelled now`}
           </p>
           {policyDetails.freeCancellationDeadline && policyDetails.daysUntilDeadline > 0 && (
-            <p className="text-xs text-slate-600">
+            <p className="text-xs text-muted-foreground">
               Until {formatDate(policyDetails.freeCancellationDeadline)}
             </p>
           )}
@@ -157,7 +157,7 @@ export function CancellationPolicyCard({
   return (
     <motion.div
       className={cn(
-        "rounded-xl border bg-white overflow-hidden",
+        "rounded-xl border bg-card overflow-hidden",
         className
       )}
       initial={prefersReducedMotion ? {} : { opacity: 0, y: 10 }}
@@ -165,13 +165,13 @@ export function CancellationPolicyCard({
       transition={{ type: "spring", stiffness: 200, damping: 20 }}
     >
       {/* Header */}
-      <div className="flex items-center gap-3 p-4 bg-slate-50 border-b border-slate-100">
+      <div className="flex items-center gap-3 p-4 bg-muted border-b border-border">
         <div className="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center">
           <Shield className="h-5 w-5 text-blue-600" />
         </div>
         <div>
-          <h3 className="font-semibold text-slate-900">{activePolicy.name}</h3>
-          <p className="text-sm text-slate-500">Review before booking</p>
+          <h3 className="font-semibold text-foreground">{activePolicy.name}</h3>
+          <p className="text-sm text-muted-foreground">Review before booking</p>
         </div>
       </div>
 
@@ -224,7 +224,7 @@ export function CancellationPolicyCard({
                   <div
                     className={cn(
                       "absolute left-[11px] top-6 w-0.5 h-8",
-                      isPast ? "bg-slate-300" : "bg-slate-200"
+                      isPast ? "bg-muted" : "bg-muted"
                     )}
                   />
                 )}
@@ -240,13 +240,13 @@ export function CancellationPolicyCard({
                           : rule.refundPercent > 0
                           ? "bg-amber-500"
                           : "bg-red-500"
-                        : "bg-slate-200"
+                        : "bg-muted"
                     )}
                   >
                     {rule.refundPercent === 100 ? (
-                      <Check className={cn("h-3 w-3", isActive ? "text-white" : "text-slate-400")} />
+                      <Check className={cn("h-3 w-3", isActive ? "text-white" : "text-muted-foreground")} />
                     ) : (
-                      <span className={cn("text-xs font-medium", isActive ? "text-white" : "text-slate-500")}>
+                      <span className={cn("text-xs font-medium", isActive ? "text-white" : "text-muted-foreground")}>
                         {rule.refundPercent}%
                       </span>
                     )}
@@ -255,7 +255,7 @@ export function CancellationPolicyCard({
                   {/* Rule content */}
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2">
-                      <span className={cn("text-sm font-medium", isActive ? "text-slate-900" : "text-slate-600")}>
+                      <span className={cn("text-sm font-medium", isActive ? "text-foreground" : "text-muted-foreground")}>
                         {rule.daysBeforeArrival === 0
                           ? "Day of arrival"
                           : rule.daysBeforeArrival === 1
@@ -268,7 +268,7 @@ export function CancellationPolicyCard({
                         </span>
                       )}
                     </div>
-                    <p className="text-sm text-slate-500">
+                    <p className="text-sm text-muted-foreground">
                       {rule.refundPercent === 100
                         ? "Full refund"
                         : rule.refundPercent === 0
@@ -276,12 +276,12 @@ export function CancellationPolicyCard({
                         : `${rule.refundPercent}% refund (${formatCurrency(Math.round((totalCents * rule.refundPercent) / 100))})`}
                     </p>
                     {rule.description && (
-                      <p className="text-xs text-slate-400 mt-0.5">{rule.description}</p>
+                      <p className="text-xs text-muted-foreground mt-0.5">{rule.description}</p>
                     )}
                   </div>
 
                   {/* Date */}
-                  <div className="text-right text-sm text-slate-400">
+                  <div className="text-right text-sm text-muted-foreground">
                     {formatDate(ruleDate)}
                   </div>
                 </div>
@@ -292,10 +292,10 @@ export function CancellationPolicyCard({
 
         {/* No-show penalty */}
         {activePolicy.noShowPenaltyPercent && (
-          <div className="mt-4 pt-4 border-t border-slate-100">
+          <div className="mt-4 pt-4 border-t border-border">
             <div className="flex items-start gap-2 text-sm">
-              <Info className="h-4 w-4 text-slate-400 flex-shrink-0 mt-0.5" />
-              <p className="text-slate-500">
+              <Info className="h-4 w-4 text-muted-foreground flex-shrink-0 mt-0.5" />
+              <p className="text-muted-foreground">
                 No-shows are charged {activePolicy.noShowPenaltyPercent}% of the reservation total.
               </p>
             </div>

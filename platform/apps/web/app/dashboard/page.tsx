@@ -138,10 +138,10 @@ function SkeletonCard() {
       "bg-muted border-border"
     )}>
       <div className="flex items-center gap-3">
-        <div className="h-10 w-10 rounded-lg bg-slate-200 dark:bg-slate-700" />
+        <div className="h-10 w-10 rounded-lg bg-muted dark:bg-muted" />
         <div className="space-y-2 flex-1">
-          <div className="h-3 w-16 bg-slate-200 dark:bg-slate-700 rounded" />
-          <div className="h-6 w-12 bg-slate-200 dark:bg-slate-700 rounded" />
+          <div className="h-3 w-16 bg-muted dark:bg-muted rounded" />
+          <div className="h-6 w-12 bg-muted dark:bg-muted rounded" />
         </div>
       </div>
     </div>
@@ -281,7 +281,7 @@ function TodaysWins({
             transition={{ ...SPRING_CONFIG, delay: 0.2 + (i * 0.1) }}
             className={cn(
               "inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-sm",
-              "bg-white dark:bg-slate-800",
+              "bg-card dark:bg-muted",
               "border border-emerald-200 dark:border-emerald-700",
               "shadow-sm"
             )}
@@ -995,7 +995,7 @@ export default function Dashboard() {
                   href="/finance/overview"
                   className={cn(
                     "inline-flex items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-semibold whitespace-nowrap",
-                    "border border-emerald-300 bg-white text-emerald-700 hover:bg-emerald-100",
+                    "border border-emerald-300 bg-card text-emerald-700 hover:bg-emerald-100",
                     "dark:border-emerald-600 dark:bg-emerald-900/50 dark:text-emerald-300 dark:hover:bg-emerald-800/50",
                     "shadow-sm transition-colors",
                     "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2"
@@ -1180,7 +1180,7 @@ export default function Dashboard() {
           <div className={cn(
             "rounded-xl p-5 space-y-3 backdrop-blur-sm transition-colors",
             "bg-card border border-border",
-            "dark:bg-slate-800/50"
+            "dark:bg-muted/50"
           )}>
             <div className="flex items-center justify-between">
               <h3 className="text-lg font-semibold text-foreground">Alerts</h3>
@@ -1289,7 +1289,7 @@ export default function Dashboard() {
           <div className={cn(
             "rounded-xl p-5 space-y-3 xl:col-span-2 backdrop-blur-sm transition-colors",
             "bg-card border border-border",
-            "dark:bg-slate-800/50"
+            "dark:bg-muted/50"
           )}>
             <div className="flex items-center justify-between">
               <h3 className="text-lg font-semibold text-foreground">14-day occupancy</h3>
@@ -1378,7 +1378,7 @@ export default function Dashboard() {
           className={cn(
             "rounded-xl p-5 space-y-3 backdrop-blur-sm transition-colors",
             "bg-card border border-border",
-            "dark:bg-slate-800/50"
+            "dark:bg-muted/50"
           )}
           {...motionProps}
           transition={{ ...SPRING_CONFIG, delay: 0.35 }}
@@ -1444,7 +1444,7 @@ export default function Dashboard() {
           className={cn(
             "rounded-xl p-5 space-y-3 backdrop-blur-sm transition-colors",
             "bg-card border border-border",
-            "dark:bg-slate-800/50"
+            "dark:bg-muted/50"
           )}
           {...motionProps}
           transition={{ ...SPRING_CONFIG, delay: 0.4 }}
@@ -1537,7 +1537,7 @@ function OpsCard({
           "flex items-center justify-between gap-3 rounded-xl border p-4 transition-all hover:shadow-lg hover:shadow-emerald-500/10",
           toneMap[tone].light,
           toneMap[tone].dark,
-          celebrate && "ring-2 ring-emerald-500 ring-offset-2 dark:ring-offset-slate-900",
+          celebrate && "ring-2 ring-emerald-500 ring-offset-2 dark:ring-offset-background",
           "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2"
         )}
       >
@@ -1545,8 +1545,8 @@ function OpsCard({
           <motion.span
             className={cn(
               "rounded-lg p-2",
-              "bg-white/70 text-slate-700",
-              "dark:bg-white/10 dark:text-slate-300"
+              "bg-card/70 text-foreground",
+              "dark:bg-card/10 dark:text-muted-foreground"
             )}
             animate={isHovered && !prefersReducedMotion ? {
               rotate: [0, -10, 10, -10, 0],
@@ -1569,7 +1569,7 @@ function OpsCard({
                       item.tone === "danger" && "bg-red-100 text-red-700 dark:bg-red-950/50 dark:text-red-400",
                       item.tone === "warning" && "bg-amber-100 text-amber-700 dark:bg-amber-950/50 dark:text-amber-400",
                       item.tone === "success" && "bg-emerald-100 text-emerald-700 dark:bg-emerald-950/50 dark:text-emerald-400",
-                      !item.tone && "bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-400"
+                      !item.tone && "bg-muted text-foreground dark:bg-muted dark:text-muted-foreground"
                     )}
                   >
                     <span className="font-semibold">{item.value}</span>
@@ -1628,7 +1628,7 @@ function BoardCard({
       className={cn(
         "rounded-xl p-5 space-y-3 backdrop-blur-sm transition-colors",
         "bg-card border border-border",
-        "dark:bg-slate-800/50"
+        "dark:bg-muted/50"
       )}
     >
       <div className="flex items-center justify-between">
@@ -1791,9 +1791,9 @@ function QuickActionButton({
       icon: "text-amber-600 dark:text-amber-400"
     },
     slate: {
-      light: "bg-slate-50 border-slate-200 hover:bg-slate-100 hover:border-slate-300",
-      dark: "dark:bg-slate-800/30 dark:border-slate-700 dark:hover:bg-slate-700/40 dark:hover:border-slate-600",
-      icon: "text-slate-600 dark:text-slate-400"
+      light: "bg-muted border-border hover:bg-muted hover:border-border",
+      dark: "dark:bg-muted/30 dark:border-border dark:hover:bg-muted/40 dark:hover:border-border",
+      icon: "text-muted-foreground dark:text-muted-foreground"
     }
   };
 

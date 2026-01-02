@@ -19,9 +19,9 @@ export function SettingsShell({ children, className }: SettingsShellProps) {
   const { systemCheckCount, isSearchOpen, openSearch, closeSearch } = useSettings();
 
   return (
-    <div className={cn("min-h-screen bg-slate-50", className)}>
+    <div className={cn("min-h-screen bg-muted", className)}>
       {/* Header */}
-      <header className="sticky top-0 z-40 bg-white border-b shadow-sm">
+      <header className="sticky top-0 z-40 bg-card border-b shadow-sm">
         {/* Top bar */}
         <div className="flex items-center justify-between px-4 py-3">
           <div className="flex items-center gap-3">
@@ -31,8 +31,8 @@ export function SettingsShell({ children, className }: SettingsShellProps) {
                 <span className="hidden sm:inline">Back to Settings</span>
               </Button>
             </Link>
-            <div className="hidden sm:block h-6 w-px bg-slate-200" />
-            <h1 className="text-lg font-semibold text-slate-900">
+            <div className="hidden sm:block h-6 w-px bg-muted" />
+            <h1 className="text-lg font-semibold text-foreground">
               Central Settings
             </h1>
           </div>
@@ -67,7 +67,7 @@ export function SettingsShell({ children, className }: SettingsShellProps) {
             >
               <Search className="h-4 w-4" />
               <span className="hidden sm:inline">Search</span>
-              <kbd className="hidden md:inline-flex px-1.5 py-0.5 text-[10px] font-medium bg-slate-100 rounded">
+              <kbd className="hidden md:inline-flex px-1.5 py-0.5 text-[10px] font-medium bg-muted rounded">
                 ⌘K
               </kbd>
             </Button>

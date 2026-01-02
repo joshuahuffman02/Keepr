@@ -269,7 +269,7 @@ export function AdminAiAssistant({
         whileTap={{ scale: 0.95 }}
         onClick={() => setIsOpen(true)}
         className={cn(
-          "fixed z-50 w-14 h-14 bg-gradient-to-br from-indigo-500 to-purple-600 text-white rounded-full shadow-xl hover:shadow-2xl transition-shadow flex items-center justify-center",
+          "fixed z-50 w-14 h-14 bg-action-primary text-action-primary-foreground rounded-full shadow-xl hover:shadow-2xl transition-shadow flex items-center justify-center",
           positionClasses[position],
           className
         )}
@@ -287,21 +287,21 @@ export function AdminAiAssistant({
       animate={{ opacity: 1, scale: 1, y: 0 }}
       exit={{ opacity: 0, scale: 0.9, y: 20 }}
       className={cn(
-        "fixed z-50 bg-white dark:bg-slate-900 rounded-2xl shadow-2xl flex flex-col overflow-hidden border border-slate-200 dark:border-slate-700",
+        "fixed z-50 bg-card rounded-2xl shadow-2xl flex flex-col overflow-hidden border border-border",
         positionClasses[position],
         isExpanded ? "w-[600px] h-[80vh]" : "w-96 h-[500px]",
         className
       )}
     >
       {/* Header */}
-      <div className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white p-4 flex items-center justify-between">
+      <div className="bg-action-primary text-action-primary-foreground p-4 flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
+          <div className="w-10 h-10 bg-card/20 rounded-full flex items-center justify-center">
             <Bot className="w-5 h-5" />
           </div>
           <div>
             <div className="font-semibold">AI Assistant</div>
-            <div className="text-xs text-white/80">
+            <div className="text-xs text-action-primary-foreground/80">
               {campgroundName || "Campground Operations"}
             </div>
           </div>
@@ -310,7 +310,7 @@ export function AdminAiAssistant({
           <Button
             variant="ghost"
             size="icon"
-            className="text-white/80 hover:text-white hover:bg-white/10"
+            className="text-action-primary-foreground/80 hover:text-action-primary-foreground hover:bg-card/10"
             onClick={handleClearChat}
             title="Clear chat"
           >
@@ -319,7 +319,7 @@ export function AdminAiAssistant({
           <Button
             variant="ghost"
             size="icon"
-            className="text-white/80 hover:text-white hover:bg-white/10"
+            className="text-action-primary-foreground/80 hover:text-action-primary-foreground hover:bg-card/10"
             onClick={() => setIsExpanded(!isExpanded)}
             title={isExpanded ? "Minimize" : "Expand"}
           >
@@ -332,7 +332,7 @@ export function AdminAiAssistant({
           <Button
             variant="ghost"
             size="icon"
-            className="text-white/80 hover:text-white hover:bg-white/10"
+            className="text-action-primary-foreground/80 hover:text-action-primary-foreground hover:bg-card/10"
             onClick={() => setIsOpen(false)}
           >
             <X className="w-4 h-4" />
@@ -341,12 +341,12 @@ export function AdminAiAssistant({
       </div>
 
       {/* Quick prompts */}
-      <div className="flex gap-2 p-3 bg-slate-50 dark:bg-slate-800/50 border-b border-slate-100 dark:border-slate-700 overflow-x-auto">
+      <div className="flex gap-2 p-3 bg-muted border-b border-border overflow-x-auto">
         {QUICK_PROMPTS.map((prompt) => (
           <button
             key={prompt.label}
             onClick={() => handleQuickPrompt(prompt.prompt)}
-            className="flex items-center gap-1.5 px-3 py-1.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-600 rounded-full text-xs font-medium text-slate-600 dark:text-slate-300 hover:border-indigo-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors whitespace-nowrap"
+            className="flex items-center gap-1.5 px-3 py-1.5 bg-card border border-border rounded-full text-xs font-medium text-muted-foreground hover:border-action-primary/40 hover:text-action-primary transition-colors whitespace-nowrap"
           >
             <prompt.icon className="w-3 h-3" />
             {prompt.label}
@@ -368,16 +368,16 @@ export function AdminAiAssistant({
               )}
             >
               {msg.role === "assistant" && (
-                <div className="w-8 h-8 bg-indigo-100 dark:bg-indigo-900/30 rounded-full flex items-center justify-center flex-shrink-0">
-                  <Bot className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
+                <div className="w-8 h-8 bg-status-info-bg rounded-full flex items-center justify-center flex-shrink-0">
+                  <Bot className="w-4 h-4 text-status-info-text" />
                 </div>
               )}
               <div
                 className={cn(
                   "max-w-[80%] p-3 rounded-2xl",
                   msg.role === "user"
-                    ? "bg-indigo-500 text-white rounded-br-md"
-                    : "bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-slate-100 rounded-bl-md"
+                    ? "bg-action-primary text-action-primary-foreground rounded-br-md"
+                    : "bg-muted text-foreground rounded-bl-md"
                 )}
               >
                 <p className="text-sm whitespace-pre-wrap">{msg.content}</p>
@@ -389,7 +389,7 @@ export function AdminAiAssistant({
                       <button
                         key={idx}
                         onClick={() => handleSuggestionClick(suggestion)}
-                        className="px-2 py-1 text-xs bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-full text-slate-600 dark:text-slate-300 hover:border-indigo-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors"
+                        className="px-2 py-1 text-xs bg-card border border-border rounded-full text-muted-foreground hover:border-action-primary/40 hover:text-action-primary transition-colors"
                       >
                         {suggestion}
                       </button>
@@ -398,8 +398,8 @@ export function AdminAiAssistant({
                 )}
               </div>
               {msg.role === "user" && (
-                <div className="w-8 h-8 bg-slate-200 dark:bg-slate-700 rounded-full flex items-center justify-center flex-shrink-0">
-                  <User className="w-4 h-4 text-slate-600 dark:text-slate-300" />
+                <div className="w-8 h-8 bg-muted rounded-full flex items-center justify-center flex-shrink-0">
+                  <User className="w-4 h-4 text-muted-foreground" />
                 </div>
               )}
             </motion.div>
@@ -409,23 +409,23 @@ export function AdminAiAssistant({
         {/* Loading indicator */}
         {isLoading && (
           <div className="flex gap-3 justify-start">
-            <div className="w-8 h-8 bg-indigo-100 dark:bg-indigo-900/30 rounded-full flex items-center justify-center">
-              <Bot className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
+            <div className="w-8 h-8 bg-status-info-bg rounded-full flex items-center justify-center">
+              <Bot className="w-4 h-4 text-status-info-text" />
             </div>
-            <div className="bg-slate-100 dark:bg-slate-800 rounded-2xl rounded-bl-md p-3">
+            <div className="bg-muted rounded-2xl rounded-bl-md p-3">
               <div className="flex gap-1">
                 <motion.div
-                  className="w-2 h-2 bg-indigo-400 rounded-full"
+                  className="w-2 h-2 bg-status-info rounded-full"
                   animate={{ scale: [1, 1.2, 1] }}
                   transition={{ duration: 0.6, repeat: Infinity, delay: 0 }}
                 />
                 <motion.div
-                  className="w-2 h-2 bg-indigo-400 rounded-full"
+                  className="w-2 h-2 bg-status-info rounded-full"
                   animate={{ scale: [1, 1.2, 1] }}
                   transition={{ duration: 0.6, repeat: Infinity, delay: 0.2 }}
                 />
                 <motion.div
-                  className="w-2 h-2 bg-indigo-400 rounded-full"
+                  className="w-2 h-2 bg-status-info rounded-full"
                   animate={{ scale: [1, 1.2, 1] }}
                   transition={{ duration: 0.6, repeat: Infinity, delay: 0.4 }}
                 />
@@ -438,7 +438,7 @@ export function AdminAiAssistant({
       </div>
 
       {/* Input */}
-      <div className="p-4 border-t border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900">
+      <div className="p-4 border-t border-border bg-card">
         <div className="flex gap-2">
           <input
             ref={inputRef}
@@ -447,13 +447,13 @@ export function AdminAiAssistant({
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={handleKeyDown}
             placeholder="Ask about operations, guests, revenue..."
-            className="flex-1 px-4 py-2 border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 text-sm text-slate-900 dark:text-slate-100 placeholder:text-slate-400"
+            className="flex-1 px-4 py-2 border border-border bg-card rounded-xl focus:outline-none focus:ring-2 focus:ring-action-primary/20 focus:border-action-primary text-sm text-foreground placeholder:text-muted-foreground"
             disabled={isLoading}
           />
           <Button
             onClick={handleSend}
             disabled={!input.trim() || isLoading}
-            className="bg-indigo-500 hover:bg-indigo-600 text-white rounded-xl"
+            className="bg-action-primary text-action-primary-foreground hover:bg-action-primary-hover rounded-xl"
           >
             {isLoading ? (
               <Loader2 className="w-5 h-5 animate-spin" />

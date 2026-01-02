@@ -345,7 +345,7 @@ const SuccessCelebration = ({ show }: { show: boolean }) => {
         initial={{ scale: 0, rotate: -180 }}
         animate={{ scale: 1, rotate: 0 }}
         transition={{ type: "spring", stiffness: 200, damping: 15 }}
-        className="bg-emerald-500 text-white rounded-full p-6 shadow-2xl"
+        className="bg-status-success text-status-success-foreground rounded-full p-6 shadow-2xl"
       >
         <PartyPopper className="h-12 w-12" />
       </motion.div>
@@ -384,32 +384,32 @@ const KeyboardShortcutsHelp = ({ open, onClose }: { open: boolean; onClose: () =
         initial={{ scale: 0.9, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         exit={{ scale: 0.9, opacity: 0 }}
-        className="bg-white dark:bg-slate-900 rounded-xl shadow-2xl p-6 max-w-md w-full mx-4"
+        className="bg-card rounded-xl shadow-2xl p-6 max-w-md w-full mx-4"
         onClick={(e) => e.stopPropagation()}
         role="dialog"
         aria-labelledby="shortcuts-title"
         aria-modal="true"
       >
         <div className="flex items-center justify-between mb-4">
-          <h2 id="shortcuts-title" className="text-lg font-semibold text-slate-900 dark:text-white flex items-center gap-2">
+          <h2 id="shortcuts-title" className="text-lg font-semibold text-foreground flex items-center gap-2">
             <Keyboard className="h-5 w-5" />
             Keyboard Shortcuts
           </h2>
           <button
             onClick={onClose}
-            className="p-1 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+            className="p-1 rounded-lg hover:bg-muted transition-colors"
             aria-label="Close shortcuts"
           >
-            <X className="h-5 w-5 text-slate-500" />
+            <X className="h-5 w-5 text-muted-foreground" />
           </button>
         </div>
         <div className="space-y-2">
           {shortcuts.map((s) => (
-            <div key={s.key} className="flex items-center justify-between py-2 border-b border-slate-100 dark:border-slate-800 last:border-0">
-              <kbd className="px-2 py-1 bg-slate-100 dark:bg-slate-800 rounded text-sm font-mono text-slate-700 dark:text-slate-300">
+            <div key={s.key} className="flex items-center justify-between py-2 border-b border-border last:border-0">
+              <kbd className="px-2 py-1 bg-muted rounded text-sm font-mono text-foreground">
                 {s.key}
               </kbd>
-              <span className="text-sm text-slate-600 dark:text-slate-400">{s.desc}</span>
+              <span className="text-sm text-muted-foreground">{s.desc}</span>
             </div>
           ))}
         </div>
@@ -1458,9 +1458,9 @@ export function SiteMapEditor({
 
   if (isLoading) {
     return (
-      <div className={cn("rounded-xl border border-slate-200 bg-slate-50 p-8 text-center", className)}>
-        <Loader2 className="h-8 w-8 animate-spin text-slate-400 mx-auto mb-3" />
-        <p className="text-sm text-slate-500">Loading map editor...</p>
+      <div className={cn("rounded-xl border border-border bg-muted p-8 text-center", className)}>
+        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground mx-auto mb-3" />
+        <p className="text-sm text-muted-foreground">Loading map editor...</p>
       </div>
     );
   }
@@ -1470,13 +1470,13 @@ export function SiteMapEditor({
       <motion.div
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
-        className={cn("rounded-xl border-2 border-dashed border-slate-300 bg-gradient-to-br from-slate-50 to-slate-100 p-8 text-center", className)}
+        className={cn("rounded-xl border-2 border-dashed border-border bg-muted p-8 text-center", className)}
       >
         <div className="mx-auto w-16 h-16 rounded-full bg-status-success/15 flex items-center justify-center mb-4">
           <Sparkles className="h-8 w-8 text-status-success" />
         </div>
-        <h3 className="font-semibold text-slate-800 mb-2">Ready to map your campground?</h3>
-        <p className="text-sm text-slate-600 max-w-md mx-auto">
+        <h3 className="font-semibold text-foreground mb-2">Ready to map your campground?</h3>
+        <p className="text-sm text-muted-foreground max-w-md mx-auto">
           Upload a map image above to get started. You'll be able to draw site boundaries and assign them to your sites.
         </p>
       </motion.div>
@@ -1485,8 +1485,8 @@ export function SiteMapEditor({
 
   const containerClasses = cn(
     isFullscreen
-      ? "fixed inset-0 z-50 bg-white dark:bg-slate-950 p-4 shadow-2xl"
-      : "rounded-xl border border-slate-200 bg-white dark:bg-slate-950 p-4",
+      ? "fixed inset-0 z-50 bg-card p-4 shadow-2xl"
+      : "rounded-xl border border-border bg-card p-4",
     className
   );
 
@@ -1518,8 +1518,8 @@ export function SiteMapEditor({
         {/* Header */}
         <div className="flex flex-wrap items-start justify-between gap-3 mb-4">
           <div>
-            <div className="text-base font-semibold text-slate-800 dark:text-white">Site Map Editor</div>
-            <p className="text-sm text-slate-500 dark:text-slate-400">
+            <div className="text-base font-semibold text-foreground">Site Map Editor</div>
+            <p className="text-sm text-muted-foreground">
               {isDrawing
                 ? "Click to add points, Enter to finish, Esc to cancel"
                 : selectedPreset !== "freeform"
@@ -1563,8 +1563,8 @@ export function SiteMapEditor({
         </div>
 
         {/* Preset Shape Toolbar */}
-        <div className="flex flex-wrap items-center gap-2 mb-4 p-3 bg-slate-50 dark:bg-slate-900 rounded-lg border border-slate-200 dark:border-slate-800">
-          <span className="text-xs font-medium text-slate-500 dark:text-slate-400 mr-2">Quick Shapes:</span>
+        <div className="flex flex-wrap items-center gap-2 mb-4 p-3 bg-muted rounded-lg border border-border">
+          <span className="text-xs font-medium text-muted-foreground mr-2">Quick Shapes:</span>
           {presetButtons.map(({ type, icon: Icon, label, key }) => (
             <Tooltip key={type}>
               <TooltipTrigger asChild>
@@ -1579,7 +1579,7 @@ export function SiteMapEditor({
                   className={cn(
                     "transition-all",
                     selectedPreset === type
-                      ? "bg-status-success hover:bg-status-success/90 text-white shadow-md scale-105"
+                      ? "bg-status-success hover:bg-status-success/90 text-status-success-foreground shadow-md scale-105"
                       : "hover:border-status-success/50"
                   )}
                 >
@@ -1591,7 +1591,7 @@ export function SiteMapEditor({
             </Tooltip>
           ))}
 
-          <div className="h-6 w-px bg-slate-300 dark:bg-slate-700 mx-2" />
+          <div className="h-6 w-px bg-muted mx-2" />
 
           <Tooltip>
             <TooltipTrigger asChild>
@@ -1602,7 +1602,7 @@ export function SiteMapEditor({
                 disabled={isDrawing}
                 className={cn(
                   "transition-all",
-                  isDrawing && "bg-status-info hover:bg-status-info/90 text-white"
+                  isDrawing && "bg-status-info hover:bg-status-info/90 text-status-info-foreground"
                 )}
               >
                 <Pencil className="h-4 w-4 mr-1.5" />
@@ -1612,7 +1612,7 @@ export function SiteMapEditor({
             <TooltipContent>Draw custom polygon shapes</TooltipContent>
           </Tooltip>
 
-          <div className="h-6 w-px bg-slate-300 dark:bg-slate-700 mx-2" />
+          <div className="h-6 w-px bg-muted mx-2" />
 
           <Tooltip>
             <TooltipTrigger asChild>
@@ -1643,12 +1643,12 @@ export function SiteMapEditor({
 
           {isDrawing && (
             <>
-              <div className="h-6 w-px bg-slate-300 dark:bg-slate-700 mx-2" />
+              <div className="h-6 w-px bg-muted mx-2" />
               <Button size="sm" variant="outline" onClick={handleUndo} disabled={draftPoints.length === 0}>
                 <RotateCcw className="h-4 w-4 mr-1.5" />
                 Undo
               </Button>
-              <Button size="sm" onClick={handleFinish} disabled={draftPoints.length < 3} className="bg-status-success hover:bg-status-success/90 text-white">
+              <Button size="sm" onClick={handleFinish} disabled={draftPoints.length < 3} className="bg-status-success hover:bg-status-success/90 text-status-success-foreground">
                 <CheckCircle2 className="h-4 w-4 mr-1.5" />
                 Finish ({draftPoints.length} pts)
               </Button>
@@ -1669,10 +1669,10 @@ export function SiteMapEditor({
             <motion.div
               initial={{ opacity: 0, x: -10 }}
               animate={{ opacity: 1, x: 0 }}
-              className="rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-3"
+              className="rounded-lg border border-border bg-card p-3"
             >
               <div className="flex items-center justify-between mb-3">
-                <div className="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">Shapes</div>
+                <div className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Shapes</div>
                 <div className="flex items-center gap-2">
                   <Badge variant="secondary" className="text-xs">{assignedShapeCount} assigned</Badge>
                   <Badge variant="outline" className="text-xs">{unassignedShapeCount} free</Badge>
@@ -1701,13 +1701,13 @@ export function SiteMapEditor({
                       className={cn(
                         "flex w-full items-center justify-between rounded-lg border px-3 py-2 text-left text-sm transition-all",
                         isActive
-                          ? "border-blue-400 bg-blue-50 dark:bg-blue-900/30 shadow-sm"
-                          : "border-slate-200 dark:border-slate-700 hover:border-blue-300 hover:bg-slate-50 dark:hover:bg-slate-800"
+                          ? "border-blue-400 bg-blue-50 shadow-sm"
+                          : "border-border hover:border-blue-300 hover:bg-muted"
                       )}
                     >
                       <div className="flex flex-col">
-                        <span className="font-medium text-slate-800 dark:text-white">{label}</span>
-                        <span className="text-xs text-slate-500 dark:text-slate-400">
+                        <span className="font-medium text-foreground">{label}</span>
+                        <span className="text-xs text-muted-foreground">
                           {assignedSiteId ? `→ ${assignedLabel}` : "Unassigned"}
                         </span>
                       </div>
@@ -1718,13 +1718,13 @@ export function SiteMapEditor({
                   );
                 })}
                 {!filteredShapes.length && (
-                  <div className="rounded-lg border border-dashed border-slate-200 dark:border-slate-700 p-4 text-center">
-                    <p className="text-xs text-slate-500 dark:text-slate-400">No shapes yet</p>
-                    <p className="text-xs text-slate-400 mt-1">Use the toolbar above to create shapes</p>
+                  <div className="rounded-lg border border-dashed border-border p-4 text-center">
+                    <p className="text-xs text-muted-foreground">No shapes yet</p>
+                    <p className="text-xs text-muted-foreground mt-1">Use the toolbar above to create shapes</p>
                   </div>
                 )}
               </div>
-              <div className="mt-3 flex flex-wrap items-center gap-2 pt-3 border-t border-slate-100 dark:border-slate-800">
+              <div className="mt-3 flex flex-wrap items-center gap-2 pt-3 border-t border-border">
                 <Tooltip>
                   <TooltipTrigger asChild>
                     <Button size="sm" variant="outline" onClick={handleDuplicateShape} disabled={!selectedGeometry || assigning}>
@@ -1758,10 +1758,10 @@ export function SiteMapEditor({
               initial={{ opacity: 0, x: -10 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: 0.05 }}
-              className="rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-3"
+              className="rounded-lg border border-border bg-card p-3"
             >
               <div className="flex items-center justify-between mb-3">
-                <div className="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">Site Assignments</div>
+                <div className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Site Assignments</div>
                 <Badge variant="secondary" className="text-xs">
                   {assignedSiteIds.size}/{sites.length} mapped
                 </Badge>
@@ -1789,13 +1789,13 @@ export function SiteMapEditor({
                       className={cn(
                         "flex w-full items-center justify-between rounded-lg border px-3 py-2 text-left text-sm transition-all",
                         isActive
-                          ? "border-emerald-400 bg-emerald-50 dark:bg-emerald-900/30 shadow-sm"
-                          : "border-slate-200 dark:border-slate-700 hover:border-status-success/50 hover:bg-slate-50 dark:hover:bg-slate-800"
+                          ? "border-emerald-400 bg-emerald-50 shadow-sm"
+                          : "border-border hover:border-status-success/50 hover:bg-muted"
                       )}
                     >
                       <div className="flex flex-col">
-                        <span className="font-medium text-slate-800 dark:text-white">{label}</span>
-                        <span className="text-xs text-slate-500 dark:text-slate-400">
+                        <span className="font-medium text-foreground">{label}</span>
+                        <span className="text-xs text-muted-foreground">
                           {shapeLabel ? `← ${shapeLabel}` : "No shape assigned"}
                         </span>
                       </div>
@@ -1803,7 +1803,7 @@ export function SiteMapEditor({
                         variant={isMapped ? "default" : "secondary"}
                         className={cn(
                           "text-[10px]",
-                          isMapped && "bg-status-success/15 text-status-success dark:bg-emerald-900/50 dark:text-emerald-400"
+                          isMapped && "bg-status-success/15 text-status-success"
                         )}
                       >
                         {isMapped ? "Mapped" : "Unmapped"}
@@ -1812,17 +1812,17 @@ export function SiteMapEditor({
                   );
                 })}
                 {!filteredSites.length && (
-                  <div className="rounded-lg border border-dashed border-slate-200 dark:border-slate-700 p-3 text-xs text-slate-500 dark:text-slate-400 text-center">
+                  <div className="rounded-lg border border-dashed border-border p-3 text-xs text-muted-foreground text-center">
                     No matching sites
                   </div>
                 )}
               </div>
-              <div className="mt-3 flex flex-wrap items-center gap-2 pt-3 border-t border-slate-100 dark:border-slate-800">
+              <div className="mt-3 flex flex-wrap items-center gap-2 pt-3 border-t border-border">
                 <Button
                   size="sm"
                   onClick={handleAssignShape}
                   disabled={!selectedSiteId || !selectedShapeId || assigning}
-                  className="bg-status-success hover:bg-status-success/90 text-white transition-transform active:scale-95"
+                  className="bg-status-success hover:bg-status-success/90 text-status-success-foreground transition-transform active:scale-95"
                 >
                   {assigning ? <Loader2 className="h-3.5 w-3.5 animate-spin mr-1.5" /> : <Link2 className="h-3.5 w-3.5 mr-1.5" />}
                   Assign
@@ -1837,7 +1837,7 @@ export function SiteMapEditor({
                   Unassign
                 </Button>
               </div>
-              <p className="mt-2 text-[11px] text-slate-400 dark:text-slate-500">
+              <p className="mt-2 text-[11px] text-muted-foreground">
                 Select a shape and site, then click Assign to link them.
               </p>
             </motion.div>
@@ -1845,7 +1845,7 @@ export function SiteMapEditor({
           )}
 
           {/* Canvas */}
-          <div className={cn("relative rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900 p-2", isFullscreen && "h-full")}>
+          <div className={cn("relative rounded-xl border border-border bg-muted p-2", isFullscreen && "h-full")}>
             <svg
               ref={svgRef}
               viewBox={`${viewBox.minX} ${viewBox.minY} ${viewBox.width} ${viewBox.height}`}
@@ -1911,7 +1911,7 @@ export function SiteMapEditor({
                           y={centroid.y}
                           textAnchor="middle"
                           dominantBaseline="middle"
-                          className="fill-emerald-800 dark:fill-emerald-300 text-[12px] font-semibold pointer-events-none"
+                        className="fill-status-success text-[12px] font-semibold pointer-events-none"
                           style={{ textShadow: "0 1px 2px rgba(255,255,255,0.8)" }}
                         >
                           {siteLabel}
@@ -2173,7 +2173,7 @@ export function SiteMapEditor({
                   animate={{ opacity: 1, scale: 1, y: 0 }}
                   exit={{ opacity: 0, scale: 0.9, y: -10 }}
                   transition={{ type: "spring", stiffness: 300, damping: 25 }}
-                  className="absolute z-50 bg-white dark:bg-slate-900 rounded-xl shadow-2xl border border-slate-200 dark:border-slate-700 p-3 w-64"
+                  className="absolute z-50 bg-card rounded-xl shadow-2xl border border-border p-3 w-64"
                   style={{
                     left: Math.min(quickAssignPosition.x, (svgRef.current?.getBoundingClientRect()?.width ?? 300) - 280),
                     top: Math.min(quickAssignPosition.y + 10, (svgRef.current?.getBoundingClientRect()?.height ?? 400) - 300),
@@ -2181,16 +2181,16 @@ export function SiteMapEditor({
                   onClick={(e) => e.stopPropagation()}
                 >
                   <div className="flex items-center justify-between mb-2">
-                    <span className="text-sm font-semibold text-slate-800 dark:text-white flex items-center gap-2">
+                    <span className="text-sm font-semibold text-foreground flex items-center gap-2">
                       <Link2 className="h-4 w-4 text-status-success" />
                       Assign to Site
                     </span>
                     <button
                       onClick={closeQuickAssign}
-                      className="p-1 rounded hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+                      className="p-1 rounded hover:bg-muted transition-colors"
                       aria-label="Close"
                     >
-                      <X className="h-4 w-4 text-slate-400" />
+                      <X className="h-4 w-4 text-muted-foreground" />
                     </button>
                   </div>
                   <Input
@@ -2211,12 +2211,12 @@ export function SiteMapEditor({
                           disabled={assigning}
                           className={cn(
                             "w-full flex items-center justify-between px-2 py-1.5 rounded-lg text-sm text-left transition-all",
-                            "hover:bg-emerald-50 dark:hover:bg-emerald-900/30 hover:border-status-success/50",
+                            "hover:bg-status-success/10 hover:border-status-success/50",
                             "border border-transparent",
                             isMapped && "opacity-60"
                           )}
                         >
-                          <span className="font-medium text-slate-700 dark:text-slate-200 truncate">
+                          <span className="font-medium text-foreground truncate">
                             {label}
                           </span>
                           {isMapped ? (
@@ -2232,12 +2232,12 @@ export function SiteMapEditor({
                       );
                     })}
                     {quickAssignSites.length === 0 && (
-                      <div className="text-center py-3 text-sm text-slate-400">
+                      <div className="text-center py-3 text-sm text-muted-foreground">
                         No matching sites
                       </div>
                     )}
                     {quickAssignSites.length > 20 && (
-                      <div className="text-center py-2 text-xs text-slate-400">
+                      <div className="text-center py-2 text-xs text-muted-foreground">
                         +{quickAssignSites.length - 20} more (search to filter)
                       </div>
                     )}

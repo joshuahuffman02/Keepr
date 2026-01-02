@@ -91,13 +91,13 @@ export function ReviewsSection({
   if (reviews.length === 0) {
     return (
       <section className={cn("space-y-4", className)}>
-        <h2 className="text-xl font-semibold text-slate-900">Reviews</h2>
-        <div className="text-center py-12 bg-slate-50 rounded-xl border border-slate-200 border-dashed">
+        <h2 className="text-xl font-semibold text-foreground">Reviews</h2>
+        <div className="text-center py-12 bg-muted rounded-xl border border-border border-dashed">
           <div className="w-12 h-12 bg-amber-100 rounded-full flex items-center justify-center mx-auto mb-3">
             <Star className="h-6 w-6 text-amber-500" />
           </div>
-          <p className="text-slate-600 font-medium">No reviews yet</p>
-          <p className="text-sm text-slate-500 mt-1">
+          <p className="text-muted-foreground font-medium">No reviews yet</p>
+          <p className="text-sm text-muted-foreground mt-1">
             Be the first to share your experience!
           </p>
         </div>
@@ -115,11 +115,11 @@ export function ReviewsSection({
         <div className="flex items-center gap-4">
           <div className="flex items-center gap-2">
             <Star className="h-6 w-6 fill-amber-400 text-amber-400" />
-            <span className="text-2xl font-bold text-slate-900">
+            <span className="text-2xl font-bold text-foreground">
               {avgRating.toFixed(1)}
             </span>
           </div>
-          <span className="text-slate-500">
+          <span className="text-muted-foreground">
             {count} review{count === 1 ? "" : "s"}
           </span>
         </div>
@@ -134,8 +134,8 @@ export function ReviewsSection({
               onClick={() => setFilter(f)}
               className={cn(
                 filter === f
-                  ? "bg-slate-900 text-white"
-                  : "text-slate-600 hover:text-slate-900"
+                  ? "bg-muted text-foreground"
+                  : "text-muted-foreground hover:text-foreground"
               )}
             >
               {f === "all" && "All"}
@@ -156,8 +156,8 @@ export function ReviewsSection({
       <div className="grid gap-2 max-w-sm">
         {distribution.map(({ stars, percentage }) => (
           <div key={stars} className="flex items-center gap-2 text-sm">
-            <span className="w-16 text-slate-600">{stars} stars</span>
-            <div className="flex-1 h-2 bg-slate-100 rounded-full overflow-hidden">
+            <span className="w-16 text-muted-foreground">{stars} stars</span>
+            <div className="flex-1 h-2 bg-muted rounded-full overflow-hidden">
               <motion.div
                 className="h-full bg-amber-400 rounded-full"
                 initial={prefersReducedMotion ? { width: `${percentage}%` } : { width: 0 }}
@@ -165,7 +165,7 @@ export function ReviewsSection({
                 transition={{ duration: 0.5, delay: 0.1 * (5 - stars) }}
               />
             </div>
-            <span className="w-10 text-right text-slate-500">{percentage}%</span>
+            <span className="w-10 text-right text-muted-foreground">{percentage}%</span>
           </div>
         ))}
       </div>
@@ -175,7 +175,7 @@ export function ReviewsSection({
         {displayedReviews.map((review, idx) => (
           <motion.div
             key={review.id}
-            className="pb-6 border-b border-slate-200 last:border-0 last:pb-0"
+            className="pb-6 border-b border-border last:border-0 last:pb-0"
             initial={prefersReducedMotion ? {} : { opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: idx * 0.05 }}
@@ -183,12 +183,12 @@ export function ReviewsSection({
             {/* Review header */}
             <div className="flex items-start justify-between mb-3">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full bg-slate-200 flex items-center justify-center">
-                  <User className="h-5 w-5 text-slate-400" />
+                <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center">
+                  <User className="h-5 w-5 text-muted-foreground" />
                 </div>
                 <div>
                   <div className="flex items-center gap-2">
-                    <span className="font-medium text-slate-900">
+                    <span className="font-medium text-foreground">
                       {review.reviewerName || "Guest"}
                     </span>
                     {review.verified && (
@@ -200,7 +200,7 @@ export function ReviewsSection({
                       </Badge>
                     )}
                   </div>
-                  <div className="text-sm text-slate-500">
+                  <div className="text-sm text-muted-foreground">
                     {formatStayDate(review.stayDate)}
                     {review.siteNumber && ` - Site ${review.siteNumber}`}
                   </div>
@@ -216,7 +216,7 @@ export function ReviewsSection({
                       "h-4 w-4",
                       i < review.rating
                         ? "fill-amber-400 text-amber-400"
-                        : "text-slate-200"
+                        : "text-muted-foreground"
                     )}
                   />
                 ))}
@@ -225,8 +225,8 @@ export function ReviewsSection({
 
             {/* Review content */}
             <div className="relative">
-              <Quote className="absolute -left-2 -top-2 h-6 w-6 text-slate-200" />
-              <p className="text-slate-700 leading-relaxed pl-4">
+              <Quote className="absolute -left-2 -top-2 h-6 w-6 text-muted-foreground" />
+              <p className="text-foreground leading-relaxed pl-4">
                 {review.comment}
               </p>
             </div>
@@ -254,7 +254,7 @@ export function ReviewsSection({
             {/* Helpful button */}
             {review.helpful !== undefined && (
               <div className="flex items-center gap-2 mt-4">
-                <Button variant="ghost" size="sm" className="text-slate-500 hover:text-slate-700">
+                <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground">
                   <ThumbsUp className="h-3.5 w-3.5 mr-1.5" />
                   Helpful{review.helpful > 0 && ` (${review.helpful})`}
                 </Button>

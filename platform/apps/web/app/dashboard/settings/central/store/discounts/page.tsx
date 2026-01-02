@@ -92,7 +92,7 @@ export default function DiscountsPage() {
   if (!isHydrated || !selectedCampground) {
     return (
       <div className="flex items-center justify-center py-12">
-        <Loader2 className="h-8 w-8 animate-spin text-slate-400" />
+        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
       </div>
     );
   }
@@ -100,7 +100,7 @@ export default function DiscountsPage() {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-12">
-        <Loader2 className="h-8 w-8 animate-spin text-slate-400" />
+        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
       </div>
     );
   }
@@ -115,8 +115,8 @@ export default function DiscountsPage() {
             <Tag className="h-4 w-4 text-purple-600" />
           </div>
           <div>
-            <p className="font-medium text-slate-900">{item.name}</p>
-            <code className="text-xs px-1.5 py-0.5 rounded bg-slate-100">
+            <p className="font-medium text-foreground">{item.name}</p>
+            <code className="text-xs px-1.5 py-0.5 rounded bg-muted">
               {item.code}
             </code>
           </div>
@@ -146,11 +146,11 @@ export default function DiscountsPage() {
         <div className="flex items-center gap-2 text-sm">
           {item.validUntil ? (
             <>
-              <Calendar className="h-4 w-4 text-slate-400" />
+              <Calendar className="h-4 w-4 text-muted-foreground" />
               {new Date(item.validUntil).toLocaleDateString()}
             </>
           ) : (
-            <span className="text-slate-400">No expiration</span>
+            <span className="text-muted-foreground">No expiration</span>
           )}
         </div>
       ),
@@ -159,7 +159,7 @@ export default function DiscountsPage() {
       key: "usage",
       label: "Uses",
       render: (item: Discount) => (
-        <span className="text-slate-600">{item.usageCount}</span>
+        <span className="text-muted-foreground">{item.usageCount}</span>
       ),
     },
     {
@@ -171,7 +171,7 @@ export default function DiscountsPage() {
           className={cn(
             item.isActive
               ? "bg-status-success/15 text-status-success"
-              : "bg-slate-100 text-slate-600"
+              : "bg-muted text-muted-foreground"
           )}
         >
           {item.isActive ? "Active" : "Inactive"}
@@ -184,8 +184,8 @@ export default function DiscountsPage() {
     <div className="max-w-5xl space-y-6">
       <div className="flex items-start justify-between">
         <div>
-          <h2 className="text-2xl font-bold text-slate-900">Discounts</h2>
-          <p className="text-slate-500 mt-1">
+          <h2 className="text-2xl font-bold text-foreground">Discounts</h2>
+          <p className="text-muted-foreground mt-1">
             Create discount codes for your store and POS
           </p>
         </div>

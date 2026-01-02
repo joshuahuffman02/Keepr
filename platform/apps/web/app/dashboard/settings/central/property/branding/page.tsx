@@ -9,8 +9,8 @@ export default function BrandingPage() {
   return (
     <div className="max-w-4xl space-y-6">
       <div>
-        <h2 className="text-2xl font-bold text-slate-900">Branding</h2>
-        <p className="text-slate-500 mt-1">
+        <h2 className="text-2xl font-bold text-foreground">Branding</h2>
+        <p className="text-muted-foreground mt-1">
           Customize your campground's visual identity
         </p>
       </div>
@@ -22,8 +22,8 @@ export default function BrandingPage() {
               <Palette className="h-6 w-6 text-purple-600" />
             </div>
             <div className="flex-1">
-              <h3 className="font-semibold text-slate-900">Brand Settings</h3>
-              <p className="text-sm text-slate-500 mt-1">
+              <h3 className="font-semibold text-foreground">Brand Settings</h3>
+              <p className="text-sm text-muted-foreground mt-1">
                 Customize your logo, colors, email headers, and receipt footers.
                 Make your booking experience match your brand.
               </p>

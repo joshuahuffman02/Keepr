@@ -115,8 +115,8 @@ export function ScrollProgressIndicator({
             className={cn(
               "absolute -top-12 right-0 px-3 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap shadow-lg",
               milestone === 100
-                ? "bg-gradient-to-r from-amber-400 to-orange-500 text-white"
-                : "bg-emerald-500 text-white"
+                ? "bg-status-warning text-status-warning-foreground"
+                : "bg-action-primary text-action-primary-foreground"
             )}
           >
             {getMilestoneMessage(milestone)}
@@ -140,17 +140,17 @@ export function ScrollProgressIndicator({
             initial={{ opacity: 0, x: 10 }}
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: 10 }}
-            className="absolute right-20 top-1/2 -translate-y-1/2 px-3 py-1.5 bg-slate-800 text-white text-xs font-medium rounded-lg whitespace-nowrap shadow-lg"
+            className="absolute right-20 top-1/2 -translate-y-1/2 px-3 py-1.5 bg-muted text-foreground text-xs font-medium rounded-lg whitespace-nowrap shadow-lg"
           >
             {getHoverMessage()}
-            <div className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-1 w-2 h-2 bg-slate-800 rotate-45" />
+            <div className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-1 w-2 h-2 bg-muted rotate-45" />
           </motion.div>
         )}
       </AnimatePresence>
 
       {/* Summit flag - appears at 95%+ */}
       <motion.div
-        className="text-amber-500"
+        className="text-status-warning"
         initial={{ opacity: 0, y: 5 }}
         animate={{
           opacity: isAtSummit ? 1 : 0,
@@ -168,14 +168,18 @@ export function ScrollProgressIndicator({
       <motion.div
         className="relative w-16 h-20"
         animate={isAtSummit ? {
-          filter: ["drop-shadow(0 0 0px rgba(16,185,129,0))", "drop-shadow(0 0 12px rgba(16,185,129,0.6))", "drop-shadow(0 0 0px rgba(16,185,129,0))"]
+          filter: [
+            "drop-shadow(0 0 0px hsl(var(--status-success) / 0))",
+            "drop-shadow(0 0 12px hsl(var(--status-success) / 0.6))",
+            "drop-shadow(0 0 0px hsl(var(--status-success) / 0))",
+          ]
         } : {}}
         transition={{ duration: 2, repeat: isAtSummit ? Infinity : 0 }}
       >
         {/* Glow effect at summit */}
         {isAtSummit && (
           <motion.div
-            className="absolute inset-0 bg-emerald-400/30 rounded-full blur-xl"
+            className="absolute inset-0 bg-status-success/20 rounded-full blur-xl"
             animate={{ opacity: [0.3, 0.6, 0.3], scale: [1, 1.1, 1] }}
             transition={{ duration: 2, repeat: Infinity }}
           />
@@ -183,7 +187,7 @@ export function ScrollProgressIndicator({
 
         {/* Mountain background (unfilled) */}
         <svg
-          className="absolute inset-0 w-full h-full text-slate-200"
+          className="absolute inset-0 w-full h-full text-muted-foreground"
           viewBox="0 0 64 80"
           fill="currentColor"
         >
@@ -196,17 +200,11 @@ export function ScrollProgressIndicator({
           style={{ height: `${scrollProgress * 100}%` }}
         >
           <svg
-            className="absolute bottom-0 w-full"
+            className="absolute bottom-0 w-full text-status-success"
             viewBox="0 0 64 80"
             style={{ height: "80px" }}
           >
-            <defs>
-              <linearGradient id="mountainGradient" x1="0%" y1="0%" x2="0%" y2="100%">
-                <stop offset="0%" stopColor="#10b981" />
-                <stop offset="100%" stopColor="#059669" />
-              </linearGradient>
-            </defs>
-            <path d="M32 4L4 76H60L32 4Z" fill="url(#mountainGradient)" />
+            <path d="M32 4L4 76H60L32 4Z" fill="currentColor" />
           </svg>
         </div>
 
@@ -228,15 +226,22 @@ export function ScrollProgressIndicator({
           animate={milestone === 50 ? { rotate: [0, -10, 10, 0] } : {}}
           transition={{ duration: 0.5 }}
         >
-          <svg viewBox="0 0 24 24" fill="none" className="w-full h-full drop-shadow-md">
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            className={cn(
+              "w-full h-full drop-shadow-md",
+              isAtSummit ? "text-status-warning" : "text-status-success"
+            )}
+          >
             {/* Tent shape with glow at milestones */}
             <path
               d="M12 6L4 18H20L12 6Z"
-              fill={isAtSummit ? "#fbbf24" : "#10b981"}
-              stroke={isAtSummit ? "#b45309" : "#065f46"}
+              fill="currentColor"
+              stroke="currentColor"
               strokeWidth="1"
             />
-            <rect x="10" y="14" width="4" height="4" fill={isAtSummit ? "#b45309" : "#065f46"} />
+            <rect x="10" y="14" width="4" height="4" fill="currentColor" opacity="0.85" />
           </svg>
         </motion.div>
       </motion.div>
@@ -245,7 +250,7 @@ export function ScrollProgressIndicator({
       <motion.span
         className={cn(
           "text-sm font-semibold tabular-nums transition-colors duration-300",
-          isAtSummit ? "text-emerald-600" : "text-slate-500"
+          isAtSummit ? "text-status-success" : "text-muted-foreground"
         )}
         animate={isAtSummit ? { scale: [1, 1.1, 1] } : {}}
         transition={{ duration: 0.5 }}

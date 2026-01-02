@@ -62,8 +62,8 @@ export default function LocalizationSettingsPage() {
       />
 
       <div className="mb-2">
-        <h1 className="text-2xl font-semibold text-slate-900">Localization & language</h1>
-        <p className="text-sm text-slate-600">Choose language, locale-aware formatting, and currency defaults.</p>
+        <h1 className="text-2xl font-semibold text-foreground">Localization & language</h1>
+        <p className="text-sm text-muted-foreground">Choose language, locale-aware formatting, and currency defaults.</p>
       </div>
 
       <div className="grid gap-4 md:grid-cols-2">
@@ -74,9 +74,9 @@ export default function LocalizationSettingsPage() {
           </CardHeader>
           <CardContent className="space-y-3">
             <div>
-              <div className="text-sm font-semibold text-slate-700">Language</div>
+              <div className="text-sm font-semibold text-foreground">Language</div>
               <select
-                className="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-sm"
+                className="mt-1 w-full rounded-md border border-border px-3 py-2 text-sm"
                 value={locale}
                 onChange={(e) => setLocale(e.target.value)}
               >
@@ -86,12 +86,12 @@ export default function LocalizationSettingsPage() {
                   </option>
                 ))}
               </select>
-              <div className="text-xs text-slate-500 mt-1">Includes date/number formats.</div>
+              <div className="text-xs text-muted-foreground mt-1">Includes date/number formats.</div>
             </div>
             <div>
-              <div className="text-sm font-semibold text-slate-700">Currency</div>
+              <div className="text-sm font-semibold text-foreground">Currency</div>
               <select
-                className="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-sm"
+                className="mt-1 w-full rounded-md border border-border px-3 py-2 text-sm"
                 value={currency}
                 onChange={(e) => setCurrency(e.target.value)}
               >
@@ -103,9 +103,9 @@ export default function LocalizationSettingsPage() {
               </select>
             </div>
             <div>
-              <div className="text-sm font-semibold text-slate-700">Time zone</div>
+              <div className="text-sm font-semibold text-foreground">Time zone</div>
               <select
-                className="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-sm"
+                className="mt-1 w-full rounded-md border border-border px-3 py-2 text-sm"
                 value={timezone}
                 onChange={(e) => setTimezone(e.target.value)}
               >
@@ -119,7 +119,7 @@ export default function LocalizationSettingsPage() {
             <Button onClick={handleSave} disabled={updateMutation.isPending}>
               Save
             </Button>
-            <div className="text-xs text-slate-500">
+            <div className="text-xs text-muted-foreground">
               Headers `x-locale` and `x-currency` are sent with each request when set.
             </div>
           </CardContent>
@@ -130,7 +130,7 @@ export default function LocalizationSettingsPage() {
             <CardTitle>Preview</CardTitle>
             <CardDescription>Shows formatting with the selected language and currency</CardDescription>
           </CardHeader>
-          <CardContent className="space-y-2 text-sm text-slate-700">
+          <CardContent className="space-y-2 text-sm text-foreground">
             <div>Sample number: {previewQuery.data?.formattedNumber ?? "—"}</div>
             <div>Sample currency: {previewQuery.data?.formattedCurrency ?? "—"}</div>
             <div>Date/time: {previewQuery.data?.formattedDate ?? "—"}</div>
@@ -146,7 +146,7 @@ export default function LocalizationSettingsPage() {
           <CardDescription>Upload translations or download current bundle</CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="text-sm text-slate-500">Contact support to enable translation bundle management for your property.</div>
+          <div className="text-sm text-muted-foreground">Contact support to enable translation bundle management for your property.</div>
         </CardContent>
       </Card>
     </div>

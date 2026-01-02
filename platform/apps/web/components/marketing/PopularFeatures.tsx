@@ -113,10 +113,10 @@ export function PopularFeatures() {
           <h2 className="text-base font-semibold text-emerald-600 tracking-wide uppercase mb-3">
             Popular Features
           </h2>
-          <p className="text-4xl font-bold text-slate-900 mb-4">
+          <p className="text-4xl font-bold text-foreground mb-4">
             The tools campground owners love most
           </p>
-          <p className="text-xl text-slate-600">
+          <p className="text-xl text-muted-foreground">
             Discover the features that make daily operations smoother and guests happier.
           </p>
         </div>
@@ -135,24 +135,24 @@ export function PopularFeatures() {
                   onClick={() => handleSelect(feature)}
                   className={`w-full text-left p-6 rounded-xl border-2 transition-all duration-300 ${isActive
                     ? 'border-emerald-500 bg-emerald-50 shadow-lg'
-                    : 'border-slate-200 bg-white hover:border-emerald-300 hover:shadow-md'
+                    : 'border-border bg-card hover:border-emerald-300 hover:shadow-md'
                     }`}
                 >
                   <div className="flex items-start gap-4">
                     <div
-                      className={`flex-shrink-0 h-12 w-12 rounded-lg flex items-center justify-center ${isActive ? 'bg-emerald-600' : 'bg-slate-100'
+                      className={`flex-shrink-0 h-12 w-12 rounded-lg flex items-center justify-center ${isActive ? 'bg-emerald-600' : 'bg-muted'
                         }`}
                     >
-                      <Icon className={`h-6 w-6 ${isActive ? 'text-white' : 'text-slate-600'}`} />
+                      <Icon className={`h-6 w-6 ${isActive ? 'text-white' : 'text-muted-foreground'}`} />
                     </div>
                     <div className="flex-1 min-w-0">
                       <h3
-                        className={`text-lg font-semibold mb-1 ${isActive ? 'text-emerald-900' : 'text-slate-900'
+                        className={`text-lg font-semibold mb-1 ${isActive ? 'text-emerald-900' : 'text-foreground'
                           }`}
                       >
                         {feature.name}
                       </h3>
-                      <p className={`text-sm ${isActive ? 'text-emerald-700' : 'text-slate-600'}`}>
+                      <p className={`text-sm ${isActive ? 'text-emerald-700' : 'text-muted-foreground'}`}>
                         {feature.description}
                       </p>
                     </div>
@@ -164,9 +164,9 @@ export function PopularFeatures() {
 
           {/* Right: Feature Details */}
           <div ref={detailRef} className="lg:sticky lg:top-24">
-            <div className="bg-white rounded-2xl shadow-xl border border-slate-200 overflow-hidden">
+            <div className="bg-card rounded-2xl shadow-xl border border-border overflow-hidden">
               {/* Feature Image Placeholder */}
-              <div className="aspect-[16/10] relative bg-slate-100">
+              <div className="aspect-[16/10] relative bg-muted">
                 <Image
                   src={activeFeature.image}
                   alt={`${activeFeature.name} Preview`}
@@ -177,14 +177,14 @@ export function PopularFeatures() {
 
               {/* Feature Content */}
               <div className="p-8">
-                <h3 className="text-2xl font-bold text-slate-900 mb-4">
+                <h3 className="text-2xl font-bold text-foreground mb-4">
                   {activeFeature.name}
                 </h3>
-                <p className="text-slate-600 mb-6">{activeFeature.description}</p>
+                <p className="text-muted-foreground mb-6">{activeFeature.description}</p>
 
                 {/* Benefits List */}
                 <div className="space-y-3">
-                  <h4 className="text-sm font-semibold text-slate-900 uppercase tracking-wide">
+                  <h4 className="text-sm font-semibold text-foreground uppercase tracking-wide">
                     Key Benefits
                   </h4>
                   <ul className="space-y-2">
@@ -201,7 +201,7 @@ export function PopularFeatures() {
                             clipRule="evenodd"
                           />
                         </svg>
-                        <span className="text-slate-700">{benefit}</span>
+                        <span className="text-foreground">{benefit}</span>
                       </li>
                     ))}
                   </ul>

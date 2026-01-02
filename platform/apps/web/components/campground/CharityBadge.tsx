@@ -79,7 +79,7 @@ export function CharityBadge({
       >
         <div className="flex-shrink-0">
           {charity.logoUrl ? (
-            <div className="relative w-10 h-10 rounded-full overflow-hidden bg-white border border-rose-100">
+            <div className="relative w-10 h-10 rounded-full overflow-hidden bg-card border border-rose-100">
               <Image
                 src={charity.logoUrl}
                 alt={charity.name}
@@ -128,7 +128,7 @@ export function CharityBadge({
           {/* Charity logo */}
           <div className="flex-shrink-0">
             {charity.logoUrl ? (
-              <div className="relative w-20 h-20 md:w-24 md:h-24 rounded-2xl overflow-hidden bg-white shadow-lg border border-white">
+              <div className="relative w-20 h-20 md:w-24 md:h-24 rounded-2xl overflow-hidden bg-card shadow-lg border border-white">
                 <Image
                   src={charity.logoUrl}
                   alt={charity.name}
@@ -150,11 +150,11 @@ export function CharityBadge({
                 <Gift className="h-3 w-3 mr-1" />
                 We Give Back
               </Badge>
-              <h3 className="text-xl font-bold text-slate-900">
+              <h3 className="text-xl font-bold text-foreground">
                 Supporting {charity.name}
               </h3>
               {charity.description && (
-                <p className="text-sm text-slate-600 mt-1 line-clamp-2">
+                <p className="text-sm text-muted-foreground mt-1 line-clamp-2">
                   {charity.description}
                 </p>
               )}
@@ -172,10 +172,10 @@ export function CharityBadge({
                   <div className="flex items-center gap-2">
                     <TrendingUp className="h-4 w-4 text-rose-500" />
                     <div>
-                      <div className="text-lg font-bold text-slate-900">
+                      <div className="text-lg font-bold text-foreground">
                         {formatCurrency(stats.totalAmountCents)}
                       </div>
-                      <div className="text-xs text-slate-500">Total raised</div>
+                      <div className="text-xs text-muted-foreground">Total raised</div>
                     </div>
                   </div>
                 )}
@@ -183,10 +183,10 @@ export function CharityBadge({
                   <div className="flex items-center gap-2">
                     <Heart className="h-4 w-4 text-rose-500" />
                     <div>
-                      <div className="text-lg font-bold text-slate-900">
+                      <div className="text-lg font-bold text-foreground">
                         {stats.totalDonations}
                       </div>
-                      <div className="text-xs text-slate-500">Donations</div>
+                      <div className="text-xs text-muted-foreground">Donations</div>
                     </div>
                   </div>
                 )}
@@ -194,10 +194,10 @@ export function CharityBadge({
                   <div className="flex items-center gap-2">
                     <Users className="h-4 w-4 text-rose-500" />
                     <div>
-                      <div className="text-lg font-bold text-slate-900">
+                      <div className="text-lg font-bold text-foreground">
                         {stats.donorCount}
                       </div>
-                      <div className="text-xs text-slate-500">Supporters</div>
+                      <div className="text-xs text-muted-foreground">Supporters</div>
                     </div>
                   </div>
                 )}
@@ -238,7 +238,7 @@ export function CharityFloatingBadge({
   return (
     <motion.div
       className={cn(
-        "flex items-center gap-2 bg-white/95 backdrop-blur-sm rounded-full px-4 py-2 shadow-lg",
+        "flex items-center gap-2 bg-card/95 backdrop-blur-sm rounded-full px-4 py-2 shadow-lg",
         className
       )}
       initial={{ opacity: 0, scale: 0.9 }}
@@ -246,7 +246,7 @@ export function CharityFloatingBadge({
       transition={{ delay: 0.5 }}
     >
       <Heart className="h-4 w-4 fill-rose-500 text-rose-500 animate-pulse" />
-      <span className="text-sm font-medium text-slate-900">
+      <span className="text-sm font-medium text-foreground">
         {totalRaised && totalRaised > 0 ? (
           <>
             {formatCurrency(totalRaised)} raised for{" "}

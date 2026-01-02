@@ -7,6 +7,7 @@ import { ReactNode, useCallback, useEffect, useMemo, useRef, useState } from "re
 import { useSession } from "next-auth/react";
 import { cn } from "../../../lib/utils";
 import { AdminTopBar } from "./AdminTopBar";
+import { PageHeader } from "./PageHeader";
 import { apiClient } from "@/lib/api-client";
 import { StaffChat } from "../../StaffChat";
 import { useWhoami } from "@/hooks/use-whoami";
@@ -90,7 +91,7 @@ type NavSection = {
 };
 
 const Icon = ({ name, active }: { name: IconName; active?: boolean }) => {
-  const stroke = active ? "#14b8a6" : "#94a3b8";
+  const stroke = active ? "hsl(var(--action-primary))" : "hsl(var(--muted-foreground))";
   const common = { width: 18, height: 18, strokeWidth: 1.6, stroke, fill: "none", strokeLinecap: "round", strokeLinejoin: "round" } as const;
   switch (name) {
     case "dashboard":
@@ -689,8 +690,8 @@ export function DashboardShell({ children, className, title, subtitle, density =
     <button
       type="button"
       className={cn(
-        "ml-2 inline-flex h-6 w-6 items-center justify-center rounded border text-slate-400 hover:text-white transition-colors",
-        pinned ? "border-amber-300 bg-amber-50/10" : "border-slate-700 bg-slate-900/60 hover:bg-slate-800"
+        "ml-2 inline-flex h-6 w-6 items-center justify-center rounded border text-muted-foreground hover:text-foreground transition-colors",
+        pinned ? "border-amber-200 bg-amber-50 text-amber-700" : "border-border bg-muted/60 hover:bg-muted"
       )}
       aria-label={pinned ? "Unpin from menu" : "Pin to menu"}
       title={pinned ? "Unpin from menu" : "Pin to menu"}
@@ -734,8 +735,8 @@ export function DashboardShell({ children, className, title, subtitle, density =
       <div ref={setNodeRef} style={style}>
         <Link
           className={cn(
-            "flex items-center justify-between rounded-md px-3 py-2.5 text-sm md:text-[15px] text-slate-400 hover:bg-slate-800 hover:text-white transition-colors",
-            isActive && "bg-slate-800 text-white font-semibold",
+            "flex items-center justify-between rounded-md px-3 py-2.5 text-sm md:text-[15px] text-muted-foreground hover:bg-muted hover:text-foreground transition-colors",
+            isActive && "bg-muted text-foreground font-semibold",
             isDragging && "z-50"
           )}
           href={item.href}
@@ -749,7 +750,7 @@ export function DashboardShell({ children, className, title, subtitle, density =
               <span
                 {...attributes}
                 {...listeners}
-                className="cursor-grab active:cursor-grabbing text-slate-500 hover:text-slate-300 mr-1"
+                className="cursor-grab active:cursor-grabbing text-muted-foreground hover:text-foreground mr-1"
                 onClick={(e) => e.preventDefault()}
               >
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
@@ -830,28 +831,28 @@ export function DashboardShell({ children, className, title, subtitle, density =
       >
         <div
           className={cn(
-            "absolute inset-0 bg-slate-900/50 backdrop-blur-sm transition-opacity",
+            "absolute inset-0 bg-black/20 backdrop-blur-sm transition-opacity",
             mobileNavOpen ? "opacity-100" : "opacity-0"
           )}
           onClick={() => setMobileNavOpen(false)}
         />
         <div
           className={cn(
-            "absolute top-0 left-0 h-full w-[78vw] max-w-sm bg-slate-900 text-white shadow-2xl transition-transform duration-200 ease-out",
+            "absolute top-0 left-0 h-full w-[78vw] max-w-sm bg-card text-foreground border-r border-border shadow-2xl transition-transform duration-200 ease-out",
             mobileNavOpen ? "translate-x-0" : "-translate-x-full"
           )}
         >
-          <div className="px-4 py-4 border-b border-slate-800 flex items-center justify-between">
+          <div className="px-4 py-4 border-b border-border flex items-center justify-between">
             <div className="flex items-center gap-2">
               <div className="relative w-8 h-8">
                 <Image src="/logo.png" alt="Camp Everyday" fill sizes="32px" className="object-contain" />
               </div>
-              <span className="font-semibold text-sm text-slate-100">Navigate</span>
+              <span className="font-semibold text-sm text-foreground">Navigate</span>
             </div>
             <button
               type="button"
               onClick={() => setMobileNavOpen(false)}
-              className="rounded-md border border-slate-700 bg-slate-800 p-2 text-slate-200 hover:bg-slate-700"
+              className="rounded-md border border-border bg-muted p-2 text-muted-foreground hover:bg-muted/80 hover:text-foreground"
               aria-label="Close navigation"
             >
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
@@ -861,9 +862,9 @@ export function DashboardShell({ children, className, title, subtitle, density =
           </div>
           <div className="h-full overflow-y-auto px-4 py-4 space-y-4">
             <div className="space-y-2">
-              <div className="text-[11px] uppercase tracking-wide text-slate-400">Menu</div>
+              <div className="text-[11px] uppercase tracking-wide text-muted-foreground">Menu</div>
               {favoritesItems.length === 0 ? (
-                <div className="px-3 py-4 text-sm text-slate-400">
+                <div className="px-3 py-4 text-sm text-muted-foreground">
                   No pages pinned yet. Use "Customize Menu" below to add pages.
                 </div>
               ) : (
@@ -879,7 +880,7 @@ export function DashboardShell({ children, className, title, subtitle, density =
                         aria-current={isActive ? "page" : undefined}
                         className={cn(
                           "flex items-center gap-3 rounded-lg px-3 py-3 text-base",
-                          isActive ? "bg-slate-800 text-white font-semibold" : "bg-slate-800/40 text-slate-100 hover:bg-slate-800"
+                          isActive ? "bg-muted text-foreground font-semibold" : "bg-muted/60 text-foreground hover:bg-muted"
                         )}
                         onClick={() => setMobileNavOpen(false)}
                       >
@@ -893,10 +894,10 @@ export function DashboardShell({ children, className, title, subtitle, density =
             </div>
 
             {/* All Pages link for customization */}
-            <div className="mt-4 pt-4 border-t border-slate-700">
+            <div className="mt-4 pt-4 border-t border-border">
               <Link
                 href="/all-pages"
-                className="flex items-center gap-3 rounded-lg px-3 py-3 text-base bg-slate-800/40 text-slate-100 hover:bg-slate-800"
+                className="flex items-center gap-3 rounded-lg px-3 py-3 text-base bg-muted/60 text-foreground hover:bg-muted"
                 onClick={() => setMobileNavOpen(false)}
               >
                 <svg
@@ -921,11 +922,11 @@ export function DashboardShell({ children, className, title, subtitle, density =
       <div className="flex">
         <aside
           className={cn(
-            "hidden md:flex md:flex-col border-r border-slate-800 bg-slate-900 transition-all h-[calc(100vh-3.5rem)] sticky top-14",
+            "hidden md:flex md:flex-col border-r border-border bg-card transition-all h-[calc(100vh-3.5rem)] sticky top-14",
             collapsed ? "w-16 items-center" : "w-64"
           )}
         >
-          <div className={cn("w-full border-b border-slate-800 flex items-center", collapsed ? "justify-center p-3" : "justify-between p-4 gap-2")}>
+          <div className={cn("w-full border-b border-border flex items-center", collapsed ? "justify-center p-3" : "justify-between p-4 gap-2")}>
             {collapsed ? (
               <div className="relative w-8 h-8">
                 <Image src="/logo.png" alt="Camp Everyday" fill sizes="32px" className="object-contain" />
@@ -935,11 +936,11 @@ export function DashboardShell({ children, className, title, subtitle, density =
                 <div className="relative w-8 h-8">
                   <Image src="/logo.png" alt="Camp Everyday" fill sizes="32px" className="object-contain" />
                 </div>
-                <div className="text-lg font-semibold text-white">Camp Everyday</div>
+                <div className="text-lg font-semibold text-foreground">Camp Everyday</div>
               </div>
             )}
             <button
-              className="rounded-md border border-slate-700 bg-slate-800 p-2 text-slate-400 hover:bg-slate-700 hover:text-white"
+              className="rounded-md border border-border bg-muted p-2 text-muted-foreground hover:bg-muted/80 hover:text-foreground"
               onClick={() => {
                 const newValue = !collapsed;
                 setCollapsed(newValue);
@@ -953,19 +954,19 @@ export function DashboardShell({ children, className, title, subtitle, density =
             </button>
           </div>
           {!collapsed && (
-            <div className="px-4 py-4 border-b border-slate-800">
-              <div className="text-xs text-slate-400">
-                <div className="mb-1 font-semibold text-slate-300">Campground</div>
+            <div className="px-4 py-4 border-b border-border">
+              <div className="text-xs text-muted-foreground">
+                <div className="mb-1 font-semibold text-foreground">Campground</div>
                 {campgroundsLoading ? (
-                  <div className="w-full rounded-md border border-slate-800 bg-slate-800 px-3 py-2 text-sm text-slate-400 animate-pulse">
+                  <div className="w-full rounded-md border border-border bg-muted px-3 py-2 text-sm text-muted-foreground animate-pulse">
                     Loading campgrounds...
                   </div>
                 ) : campgroundsError ? (
                   <div className="space-y-2">
-                    <div className="text-xs text-red-200">{campgroundsError}</div>
+                    <div className="text-xs text-destructive">{campgroundsError}</div>
                     <button
                       type="button"
-                      className="rounded border border-slate-700 bg-slate-800 px-2 py-1 text-xs text-slate-200 hover:bg-slate-700"
+                      className="rounded border border-border bg-muted px-2 py-1 text-xs text-foreground hover:bg-muted/80"
                       onClick={fetchCampgrounds}
                     >
                       Retry
@@ -973,7 +974,7 @@ export function DashboardShell({ children, className, title, subtitle, density =
                   </div>
                 ) : (
                   <select
-                    className="w-full rounded-md border border-slate-700 bg-slate-800 px-2 py-1 text-sm text-slate-200"
+                    className="w-full rounded-md border border-border bg-background px-2 py-1 text-sm text-foreground"
                     value={selected}
                     onChange={(e) => handleCampgroundChange(e.target.value)}
                   >
@@ -990,15 +991,15 @@ export function DashboardShell({ children, className, title, subtitle, density =
           )}
           <nav className={cn("flex-1 px-3 py-4 space-y-4 overflow-y-auto", collapsed && "px-1")}>
             {!collapsed && (
-              <div className="flex items-center justify-between px-1 pb-1 text-xs text-slate-500">
+              <div className="flex items-center justify-between px-1 pb-1 text-xs text-muted-foreground">
                 <span className="uppercase tracking-wide font-semibold">Navigation</span>
                 <button
                   type="button"
                   className={cn(
                     "rounded px-2 py-1 border text-xs transition-colors",
                     pinEditMode
-                      ? "border-emerald-300 text-emerald-200 bg-emerald-900/30"
-                      : "border-slate-700 text-slate-400 bg-slate-800/60 hover:bg-slate-800"
+                      ? "border-emerald-200 text-emerald-700 bg-emerald-50"
+                      : "border-border text-muted-foreground bg-muted/60 hover:bg-muted"
                   )}
                   onClick={() => setPinEditMode((v) => !v)}
                   aria-pressed={pinEditMode}
@@ -1010,14 +1011,14 @@ export function DashboardShell({ children, className, title, subtitle, density =
             {/* Pinned pages with drag-and-drop reordering */}
             <div className="space-y-1">
               {!collapsed && (
-                <div className="px-3 text-[11px] font-semibold uppercase tracking-wide text-slate-500">
+                <div className="px-3 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
                   Menu
                 </div>
               )}
               {favoritesItems.length === 0 && !collapsed && (
-                <div className="px-3 py-4 text-sm text-slate-500">
+                <div className="px-3 py-4 text-sm text-muted-foreground">
                   No pages pinned yet.{" "}
-                  <Link href="/all-pages" className="text-teal-400 hover:underline">
+                  <Link href="/all-pages" className="text-emerald-600 hover:text-emerald-700 hover:underline">
                     Add pages
                   </Link>
                 </div>
@@ -1056,10 +1057,10 @@ export function DashboardShell({ children, className, title, subtitle, density =
 
             {/* All Pages link */}
             {!collapsed && (
-              <div className="mt-6 pt-4 border-t border-slate-700">
+              <div className="mt-6 pt-4 border-t border-border">
                 <Link
                   href="/all-pages"
-                  className="flex items-center gap-2 px-3 py-2 text-sm text-slate-400 hover:text-white hover:bg-slate-800 rounded-md transition-colors"
+                  className="flex items-center gap-2 px-3 py-2 text-sm text-muted-foreground hover:text-foreground hover:bg-muted rounded-md transition-colors"
                 >
                   <svg
                     width="18"
@@ -1085,12 +1086,7 @@ export function DashboardShell({ children, className, title, subtitle, density =
               "mx-auto px-6 py-6 space-y-4",
               density === "full" ? "max-w-none" : "max-w-7xl"
             )}>
-              {(title || subtitle) && (
-                <div className="mb-6">
-                  {title && <h1 className="text-2xl font-bold text-foreground">{title}</h1>}
-                  {subtitle && <p className="text-sm text-muted-foreground mt-1">{subtitle}</p>}
-                </div>
-              )}
+              {title && <PageHeader title={title} subtitle={subtitle} className="mb-6" />}
               {children}
             </div>
           </ErrorBoundary>

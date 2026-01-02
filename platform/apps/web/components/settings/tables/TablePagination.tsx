@@ -34,10 +34,10 @@ export function TablePagination({
         className
       )}
     >
-      <p className="text-sm text-slate-500">
-        Showing <span className="font-medium text-slate-900">{startItem}</span> to{" "}
-        <span className="font-medium text-slate-900">{endItem}</span> of{" "}
-        <span className="font-medium text-slate-900">{totalItems}</span> results
+      <p className="text-sm text-muted-foreground">
+        Showing <span className="font-medium text-foreground">{startItem}</span> to{" "}
+        <span className="font-medium text-foreground">{endItem}</span> of{" "}
+        <span className="font-medium text-foreground">{totalItems}</span> results
       </p>
 
       <div className="flex items-center gap-1">
@@ -66,7 +66,7 @@ export function TablePagination({
         </Button>
 
         {/* Page indicator */}
-        <span className="px-3 text-sm text-slate-700">
+        <span className="px-3 text-sm text-foreground">
           Page <span className="font-medium">{currentPage}</span> of{" "}
           <span className="font-medium">{totalPages}</span>
         </span>

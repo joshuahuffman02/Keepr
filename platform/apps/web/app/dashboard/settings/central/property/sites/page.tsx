@@ -93,13 +93,13 @@ export default function SiteTypesPage() {
     return (
       <div className="max-w-5xl space-y-6">
         <div>
-          <h2 className="text-2xl font-bold text-slate-900">Site Types</h2>
-          <p className="text-slate-500 mt-1">
+          <h2 className="text-2xl font-bold text-foreground">Site Types</h2>
+          <p className="text-muted-foreground mt-1">
             Manage your campground's site classes and individual sites
           </p>
         </div>
         <div className="flex items-center justify-center py-12">
-          <Loader2 className="h-8 w-8 animate-spin text-slate-400" />
+          <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
         </div>
       </div>
     );
@@ -109,15 +109,15 @@ export default function SiteTypesPage() {
     return (
       <div className="max-w-5xl space-y-6">
         <div>
-          <h2 className="text-2xl font-bold text-slate-900">Site Types</h2>
-          <p className="text-slate-500 mt-1">
+          <h2 className="text-2xl font-bold text-foreground">Site Types</h2>
+          <p className="text-muted-foreground mt-1">
             Manage your campground's site classes and individual sites
           </p>
         </div>
         <Card>
           <CardContent className="py-8 text-center">
             <AlertCircle className="h-8 w-8 text-amber-500 mx-auto mb-3" />
-            <p className="text-slate-600">Please select a campground first.</p>
+            <p className="text-muted-foreground">Please select a campground first.</p>
           </CardContent>
         </Card>
       </div>
@@ -129,8 +129,8 @@ export default function SiteTypesPage() {
       {/* Header */}
       <div className="flex items-start justify-between">
         <div>
-          <h2 className="text-2xl font-bold text-slate-900">Site Types</h2>
-          <p className="text-slate-500 mt-1">
+          <h2 className="text-2xl font-bold text-foreground">Site Types</h2>
+          <p className="text-muted-foreground mt-1">
             Manage your campground's site classes and individual sites
           </p>
         </div>
@@ -168,8 +168,8 @@ export default function SiteTypesPage() {
                 <Layers className="h-5 w-5 text-emerald-600" />
               </div>
               <div>
-                <p className="text-2xl font-bold text-slate-900">{siteClasses.length}</p>
-                <p className="text-sm text-slate-500">Site Classes</p>
+                <p className="text-2xl font-bold text-foreground">{siteClasses.length}</p>
+                <p className="text-sm text-muted-foreground">Site Classes</p>
               </div>
             </div>
           </CardContent>
@@ -181,8 +181,8 @@ export default function SiteTypesPage() {
                 <MapPin className="h-5 w-5 text-blue-600" />
               </div>
               <div>
-                <p className="text-2xl font-bold text-slate-900">{sites.length}</p>
-                <p className="text-sm text-slate-500">Total Sites</p>
+                <p className="text-2xl font-bold text-foreground">{sites.length}</p>
+                <p className="text-sm text-muted-foreground">Total Sites</p>
               </div>
             </div>
           </CardContent>
@@ -194,10 +194,10 @@ export default function SiteTypesPage() {
                 <Tent className="h-5 w-5 text-purple-600" />
               </div>
               <div>
-                <p className="text-2xl font-bold text-slate-900">
+                <p className="text-2xl font-bold text-foreground">
                   {sites.filter((s) => s.status === "available").length}
                 </p>
-                <p className="text-sm text-slate-500">Available</p>
+                <p className="text-sm text-muted-foreground">Available</p>
               </div>
             </div>
           </CardContent>
@@ -208,11 +208,11 @@ export default function SiteTypesPage() {
       {siteClasses.length === 0 ? (
         <Card className="border-dashed">
           <CardContent className="py-12 text-center">
-            <Layers className="h-12 w-12 mx-auto text-slate-300 mb-4" />
-            <h3 className="text-lg font-semibold text-slate-900 mb-2">
+            <Layers className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+            <h3 className="text-lg font-semibold text-foreground mb-2">
               No site classes yet
             </h3>
-            <p className="text-slate-500 mb-4 max-w-md mx-auto">
+            <p className="text-muted-foreground mb-4 max-w-md mx-auto">
               Create site classes to organize your camping spots by type,
               amenities, and pricing.
             </p>
@@ -226,7 +226,7 @@ export default function SiteTypesPage() {
         </Card>
       ) : (
         <Card>
-          <CardHeader className="py-3 px-4 bg-slate-50 border-b flex flex-row items-center justify-between">
+          <CardHeader className="py-3 px-4 bg-muted border-b flex flex-row items-center justify-between">
             <CardTitle className="text-sm font-medium">
               Site Classes ({siteClasses.length})
             </CardTitle>
@@ -241,15 +241,15 @@ export default function SiteTypesPage() {
             {siteClasses.map((siteClass) => (
               <div
                 key={siteClass.id}
-                className="flex items-center justify-between px-4 py-3 hover:bg-slate-50 transition-colors group"
+                className="flex items-center justify-between px-4 py-3 hover:bg-muted transition-colors group"
               >
                 <div className="flex items-center gap-3">
                   <div className="p-2 rounded-lg bg-emerald-100">
                     <Tent className="h-5 w-5 text-emerald-600" />
                   </div>
                   <div>
-                    <p className="font-medium text-slate-900">{siteClass.name}</p>
-                    <div className="flex items-center gap-2 text-sm text-slate-500">
+                    <p className="font-medium text-foreground">{siteClass.name}</p>
+                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
                       <span>{formatPrice(siteClass.basePrice)}/night</span>
                       {siteClass.maxOccupancy && (
                         <span>• Max {siteClass.maxOccupancy} guests</span>
@@ -318,8 +318,8 @@ export default function SiteTypesPage() {
                   <MapPin className="h-6 w-6 text-blue-600" />
                 </div>
                 <div>
-                  <h3 className="font-semibold text-slate-900">Individual Sites</h3>
-                  <p className="text-sm text-slate-500 mt-1">
+                  <h3 className="font-semibold text-foreground">Individual Sites</h3>
+                  <p className="text-sm text-muted-foreground mt-1">
                     Manage specific sites, status, and features
                   </p>
                   <Badge variant="outline" className="mt-2">
@@ -327,7 +327,7 @@ export default function SiteTypesPage() {
                   </Badge>
                 </div>
               </div>
-              <ArrowRight className="h-5 w-5 text-slate-400" />
+              <ArrowRight className="h-5 w-5 text-muted-foreground" />
             </Link>
           </CardContent>
         </Card>
@@ -343,8 +343,8 @@ export default function SiteTypesPage() {
                   <Tent className="h-6 w-6 text-purple-600" />
                 </div>
                 <div>
-                  <h3 className="font-semibold text-slate-900">Site Map</h3>
-                  <p className="text-sm text-slate-500 mt-1">
+                  <h3 className="font-semibold text-foreground">Site Map</h3>
+                  <p className="text-sm text-muted-foreground mt-1">
                     View interactive campground layout
                   </p>
                   <Badge variant="outline" className="mt-2">
@@ -352,7 +352,7 @@ export default function SiteTypesPage() {
                   </Badge>
                 </div>
               </div>
-              <ArrowRight className="h-5 w-5 text-slate-400" />
+              <ArrowRight className="h-5 w-5 text-muted-foreground" />
             </Link>
           </CardContent>
         </Card>

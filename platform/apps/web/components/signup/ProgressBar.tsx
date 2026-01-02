@@ -12,7 +12,7 @@ export function ProgressBar({ progress, steps = ["Choose Tier", "Details", "Conf
 
   return (
     <div className="w-full mb-8">
-      <div className="relative h-2 bg-slate-700/50 rounded-full overflow-hidden">
+      <div className="relative h-2 bg-muted/50 rounded-full overflow-hidden">
         <motion.div
           className="absolute inset-y-0 left-0 bg-gradient-to-r from-emerald-500 to-teal-500"
           initial={{ width: 0 }}
@@ -24,14 +24,14 @@ export function ProgressBar({ progress, steps = ["Choose Tier", "Details", "Conf
           }
         />
       </div>
-      <div className="flex justify-between mt-2 text-xs text-slate-500">
+      <div className="flex justify-between mt-2 text-xs text-muted-foreground">
         {steps.map((step, i) => {
           const stepProgress = ((i + 1) / steps.length) * 100;
           const isActive = progress >= stepProgress - 10;
           return (
             <span
               key={step}
-              className={isActive ? "text-emerald-400" : "text-slate-500"}
+              className={isActive ? "text-emerald-400" : "text-muted-foreground"}
             >
               {step}
             </span>

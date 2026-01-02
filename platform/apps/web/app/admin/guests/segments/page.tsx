@@ -104,7 +104,7 @@ function SegmentCard({ segment, onEdit, onCopy, onArchive }: {
   };
 
   return (
-    <Card className="bg-white dark:bg-slate-800/50 border-slate-200 dark:border-slate-700 hover:border-slate-600 transition-colors">
+    <Card className="bg-card dark:bg-muted/50 border-border dark:border-border hover:border-border transition-colors">
       <CardHeader className="pb-2">
         <div className="flex items-start justify-between">
           <div className="space-y-1">
@@ -160,7 +160,7 @@ function SegmentCard({ segment, onEdit, onCopy, onArchive }: {
                 <Badge
                   key={i}
                   variant="secondary"
-                  className="bg-slate-100 dark:bg-slate-700/50 text-slate-700 dark:text-slate-300 flex items-center gap-1"
+                  className="bg-muted dark:bg-muted/50 text-foreground dark:text-muted-foreground flex items-center gap-1"
                 >
                   <Icon className="h-3 w-3" />
                   {criteriaType?.label || criterion.type}: {
@@ -174,20 +174,20 @@ function SegmentCard({ segment, onEdit, onCopy, onArchive }: {
           </div>
 
           {/* Stats row */}
-          <div className="flex items-center justify-between pt-2 border-t border-slate-200 dark:border-slate-700">
+          <div className="flex items-center justify-between pt-2 border-t border-border dark:border-border">
             <div className="flex items-center gap-4">
               <div className="flex items-center gap-1.5">
                 <Users className="h-4 w-4 text-emerald-500" />
-                <span className="text-sm font-medium text-slate-900 dark:text-white">
+                <span className="text-sm font-medium text-foreground dark:text-white">
                   {segment.guestCount.toLocaleString()}
                 </span>
-                <span className="text-xs text-slate-600 dark:text-slate-400">guests</span>
+                <span className="text-xs text-muted-foreground dark:text-muted-foreground">guests</span>
               </div>
               <Badge className={`${scopeColors[segment.scope]} text-xs`}>
                 {scopeLabels[segment.scope]}
               </Badge>
             </div>
-            <span className="text-xs text-slate-500 dark:text-slate-500">
+            <span className="text-xs text-muted-foreground dark:text-muted-foreground">
               Updated {new Date(segment.updatedAt).toLocaleDateString()}
             </span>
           </div>
@@ -396,10 +396,10 @@ export default function GuestSegmentsPage() {
     return (
       <div className="p-8">
         <div className="animate-pulse space-y-6">
-          <div className="h-8 bg-slate-200 dark:bg-slate-800 rounded w-64" />
+          <div className="h-8 bg-muted dark:bg-muted rounded w-64" />
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {[1, 2, 3, 4, 5, 6].map(i => (
-              <div key={i} className="h-48 bg-slate-200 dark:bg-slate-800 rounded-lg" />
+              <div key={i} className="h-48 bg-muted dark:bg-muted rounded-lg" />
             ))}
           </div>
         </div>
@@ -451,9 +451,9 @@ export default function GuestSegmentsPage() {
       <div className="flex items-center justify-between">
         <div>
           <div className="flex items-center gap-3">
-            <h1 className="text-2xl font-bold text-slate-900 dark:text-white">Guest Segments</h1>
+            <h1 className="text-2xl font-bold text-foreground dark:text-white">Guest Segments</h1>
           </div>
-          <p className="text-slate-600 dark:text-slate-400 mt-1">
+          <p className="text-muted-foreground dark:text-muted-foreground mt-1">
             Create and manage guest segments for targeted messaging and insights
           </p>
         </div>
@@ -464,7 +464,7 @@ export default function GuestSegmentsPage() {
               Create Segment
             </Button>
           </DialogTrigger>
-          <DialogContent className="bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700 max-w-lg">
+          <DialogContent className="bg-card dark:bg-muted border-border dark:border-border max-w-lg">
             <DialogHeader>
               <DialogTitle>Create New Segment</DialogTitle>
               <DialogDescription>
@@ -479,7 +479,7 @@ export default function GuestSegmentsPage() {
                   value={newSegment.name}
                   onChange={(e) => setNewSegment({ ...newSegment, name: e.target.value })}
                   placeholder="e.g., Texas Family Campers"
-                  className="bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700"
+                  className="bg-card dark:bg-muted border-border dark:border-border"
                 />
               </div>
               <div className="space-y-2">
@@ -489,7 +489,7 @@ export default function GuestSegmentsPage() {
                   value={newSegment.description}
                   onChange={(e) => setNewSegment({ ...newSegment, description: e.target.value })}
                   placeholder="Brief description of this segment"
-                  className="bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700"
+                  className="bg-card dark:bg-muted border-border dark:border-border"
                 />
               </div>
               <div className="space-y-2">
@@ -500,7 +500,7 @@ export default function GuestSegmentsPage() {
                     setNewSegment({ ...newSegment, scope: value })
                   }
                 >
-                  <SelectTrigger className="bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700">
+                  <SelectTrigger className="bg-card dark:bg-muted border-border dark:border-border">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -516,7 +516,7 @@ export default function GuestSegmentsPage() {
                   {criteriaTypeOptions.slice(0, 6).map(option => (
                     <label
                       key={option.value}
-                      className="flex items-center gap-2 p-2 rounded border border-slate-200 dark:border-slate-700 hover:border-slate-600 cursor-pointer"
+                      className="flex items-center gap-2 p-2 rounded border border-border dark:border-border hover:border-border cursor-pointer"
                     >
                       <Checkbox
                         checked={newSegment.criteria.some(c => c.type === option.value)}
@@ -537,7 +537,7 @@ export default function GuestSegmentsPage() {
                           }
                         }}
                       />
-                      <option.icon className="h-4 w-4 text-slate-600 dark:text-slate-400" />
+                      <option.icon className="h-4 w-4 text-muted-foreground dark:text-muted-foreground" />
                       <span className="text-sm">{option.label}</span>
                     </label>
                   ))}
@@ -562,7 +562,7 @@ export default function GuestSegmentsPage() {
 
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <Card className="bg-white dark:bg-slate-800/50 border-slate-200 dark:border-slate-700">
+        <Card className="bg-card dark:bg-muted/50 border-border dark:border-border">
           <CardContent className="p-4">
             <div className="flex items-center justify-between">
               <Users className="h-8 w-8 text-emerald-500" />
@@ -571,15 +571,15 @@ export default function GuestSegmentsPage() {
               </Badge>
             </div>
             <div className="mt-3">
-              <div className="text-2xl font-bold text-slate-900 dark:text-white">
+              <div className="text-2xl font-bold text-foreground dark:text-white">
                 {segments.filter(s => s.status === "active").length}
               </div>
-              <div className="text-sm text-slate-600 dark:text-slate-400">Active Segments</div>
+              <div className="text-sm text-muted-foreground dark:text-muted-foreground">Active Segments</div>
             </div>
           </CardContent>
         </Card>
 
-        <Card className="bg-white dark:bg-slate-800/50 border-slate-200 dark:border-slate-700">
+        <Card className="bg-card dark:bg-muted/50 border-border dark:border-border">
           <CardContent className="p-4">
             <div className="flex items-center justify-between">
               <Globe className="h-8 w-8 text-blue-500" />
@@ -588,15 +588,15 @@ export default function GuestSegmentsPage() {
               </Badge>
             </div>
             <div className="mt-3">
-              <div className="text-2xl font-bold text-slate-900 dark:text-white">
+              <div className="text-2xl font-bold text-foreground dark:text-white">
                 {segments.filter(s => s.scope === "global" && s.isTemplate).length}
               </div>
-              <div className="text-sm text-slate-600 dark:text-slate-400">Global Templates</div>
+              <div className="text-sm text-muted-foreground dark:text-muted-foreground">Global Templates</div>
             </div>
           </CardContent>
         </Card>
 
-        <Card className="bg-white dark:bg-slate-800/50 border-slate-200 dark:border-slate-700">
+        <Card className="bg-card dark:bg-muted/50 border-border dark:border-border">
           <CardContent className="p-4">
             <div className="flex items-center justify-between">
               <Building2 className="h-8 w-8 text-purple-500" />
@@ -605,15 +605,15 @@ export default function GuestSegmentsPage() {
               </Badge>
             </div>
             <div className="mt-3">
-              <div className="text-2xl font-bold text-slate-900 dark:text-white">
+              <div className="text-2xl font-bold text-foreground dark:text-white">
                 {segments.filter(s => !s.isTemplate).length}
               </div>
-              <div className="text-sm text-slate-600 dark:text-slate-400">Custom Segments</div>
+              <div className="text-sm text-muted-foreground dark:text-muted-foreground">Custom Segments</div>
             </div>
           </CardContent>
         </Card>
 
-        <Card className="bg-white dark:bg-slate-800/50 border-slate-200 dark:border-slate-700">
+        <Card className="bg-card dark:bg-muted/50 border-border dark:border-border">
           <CardContent className="p-4">
             <div className="flex items-center justify-between">
               <TrendingUp className="h-8 w-8 text-amber-500" />
@@ -622,10 +622,10 @@ export default function GuestSegmentsPage() {
               </Badge>
             </div>
             <div className="mt-3">
-              <div className="text-2xl font-bold text-slate-900 dark:text-white">
+              <div className="text-2xl font-bold text-foreground dark:text-white">
                 {segments.reduce((sum, s) => sum + s.guestCount, 0).toLocaleString()}
               </div>
-              <div className="text-sm text-slate-600 dark:text-slate-400">Segmented Guests</div>
+              <div className="text-sm text-muted-foreground dark:text-muted-foreground">Segmented Guests</div>
             </div>
           </CardContent>
         </Card>
@@ -634,16 +634,16 @@ export default function GuestSegmentsPage() {
       {/* Filters */}
       <div className="flex items-center gap-4">
         <div className="relative flex-1 max-w-md">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-600 dark:text-slate-400" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground dark:text-muted-foreground" />
           <Input
             placeholder="Search segments..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-10 bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700"
+            className="pl-10 bg-card dark:bg-muted border-border dark:border-border"
           />
         </div>
         <Select value={scopeFilter} onValueChange={setScopeFilter}>
-          <SelectTrigger className="w-44 bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700">
+          <SelectTrigger className="w-44 bg-card dark:bg-muted border-border dark:border-border">
             <Filter className="h-4 w-4 mr-2" />
             <SelectValue placeholder="Filter by scope" />
           </SelectTrigger>
@@ -670,11 +670,11 @@ export default function GuestSegmentsPage() {
       </div>
 
       {filteredSegments.length === 0 && (
-        <Card className="bg-slate-50 dark:bg-slate-800/30 border-slate-200 dark:border-slate-700">
+        <Card className="bg-muted dark:bg-muted/30 border-border dark:border-border">
           <CardContent className="p-12 text-center">
-            <Users className="h-12 w-12 text-slate-600 mx-auto mb-4" />
-            <h3 className="text-lg font-medium text-slate-700 dark:text-slate-300 mb-2">No segments found</h3>
-            <p className="text-slate-600 dark:text-slate-400 mb-4">
+            <Users className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+            <h3 className="text-lg font-medium text-foreground dark:text-muted-foreground mb-2">No segments found</h3>
+            <p className="text-muted-foreground dark:text-muted-foreground mb-4">
               {searchQuery || scopeFilter !== "all"
                 ? "Try adjusting your search or filters"
                 : "Create your first segment to start grouping guests"}

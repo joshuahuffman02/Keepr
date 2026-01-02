@@ -77,7 +77,7 @@ export default function DynamicPricingPage({ params }: { params: { campgroundId:
         <div className="flex items-start justify-between">
           <div>
             <h1 className="text-2xl font-semibold">Dynamic Pricing</h1>
-            <p className="text-slate-500">
+            <p className="text-muted-foreground">
               Configure occupancy and demand-based pricing adjustments
             </p>
           </div>
@@ -108,7 +108,7 @@ export default function DynamicPricingPage({ params }: { params: { campgroundId:
 
         {loading ? (
           <div className="flex items-center justify-center py-12">
-            <Loader2 className="h-8 w-8 animate-spin text-slate-400" />
+            <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
           </div>
         ) : (
           <>
@@ -122,8 +122,8 @@ export default function DynamicPricingPage({ params }: { params: { campgroundId:
               </CardHeader>
               <CardContent>
                 {demandRules.length === 0 ? (
-                  <div className="text-center py-8 text-slate-500">
-                    <TrendingUp className="h-12 w-12 mx-auto mb-3 text-slate-300" />
+                  <div className="text-center py-8 text-muted-foreground">
+                    <TrendingUp className="h-12 w-12 mx-auto mb-3 text-muted-foreground" />
                     <p className="font-medium">No active demand-based rules</p>
                     <p className="text-sm mt-1">
                       Enable dynamic pricing in Quick Settings to get started
@@ -139,16 +139,16 @@ export default function DynamicPricingPage({ params }: { params: { campgroundId:
                     {demandRules.sort((a, b) => a.priority - b.priority).map((rule) => (
                       <div
                         key={rule.id}
-                        className="flex items-center justify-between p-4 rounded-lg border bg-white"
+                        className="flex items-center justify-between p-4 rounded-lg border bg-card"
                       >
                         <div>
                           <div className="flex items-center gap-2">
-                            <span className="font-semibold text-slate-900">{rule.name}</span>
-                            <span className="text-xs px-2 py-0.5 rounded-full bg-slate-100 text-slate-600">
+                            <span className="font-semibold text-foreground">{rule.name}</span>
+                            <span className="text-xs px-2 py-0.5 rounded-full bg-muted text-muted-foreground">
                               Priority {rule.priority}
                             </span>
                           </div>
-                          <div className="text-sm text-slate-500 mt-1">
+                          <div className="text-sm text-muted-foreground mt-1">
                             {typeLabels[rule.type] || rule.type} • {rule.stackMode}
                           </div>
                         </div>
@@ -186,14 +186,14 @@ export default function DynamicPricingPage({ params }: { params: { campgroundId:
                       <div
                         key={rule.id}
                         className={`flex items-center justify-between p-3 rounded-lg border ${
-                          rule.active ? "bg-white" : "bg-slate-50 opacity-60"
+                          rule.active ? "bg-card" : "bg-muted opacity-60"
                         }`}
                       >
                         <div className="flex items-center gap-3">
-                          <span className={`font-medium ${rule.active ? "text-slate-900" : "text-slate-500"}`}>
+                          <span className={`font-medium ${rule.active ? "text-foreground" : "text-muted-foreground"}`}>
                             {rule.name}
                           </span>
-                          <span className="text-xs px-2 py-0.5 rounded-full bg-slate-100 text-slate-600">
+                          <span className="text-xs px-2 py-0.5 rounded-full bg-muted text-muted-foreground">
                             {typeLabels[rule.type] || rule.type}
                           </span>
                           {!rule.active && (

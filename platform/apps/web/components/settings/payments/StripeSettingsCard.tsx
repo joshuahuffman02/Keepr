@@ -80,7 +80,7 @@ export function StripeSettingsCard({
         <div className="flex items-center justify-between">
           <div>
             <CardTitle className="flex items-center gap-2">
-              <CreditCard className="w-5 h-5 text-slate-400" aria-hidden="true" />
+              <CreditCard className="w-5 h-5 text-muted-foreground" aria-hidden="true" />
               Stripe Settings
             </CardTitle>
             <CardDescription className="mt-1">
@@ -105,23 +105,23 @@ export function StripeSettingsCard({
                 "flex items-center gap-3 p-4 rounded-xl border-2 transition-all text-left",
                 mode === "test"
                   ? "border-blue-500 bg-blue-50"
-                  : "border-slate-200 hover:border-slate-300 bg-white"
+                  : "border-border hover:border-border bg-card"
               )}
             >
               <div className={cn(
                 "w-10 h-10 rounded-full flex items-center justify-center",
-                mode === "test" ? "bg-blue-500 text-white" : "bg-slate-100 text-slate-500"
+                mode === "test" ? "bg-blue-500 text-foreground" : "bg-muted text-muted-foreground"
               )}>
                 <TestTube className="w-5 h-5" aria-hidden="true" />
               </div>
               <div>
                 <p className={cn(
                   "font-medium",
-                  mode === "test" ? "text-blue-900" : "text-slate-700"
+                  mode === "test" ? "text-blue-900" : "text-foreground"
                 )}>
                   Test Mode
                 </p>
-                <p className="text-xs text-slate-500">No real charges</p>
+                <p className="text-xs text-muted-foreground">No real charges</p>
               </div>
             </button>
 
@@ -132,23 +132,23 @@ export function StripeSettingsCard({
                 "flex items-center gap-3 p-4 rounded-xl border-2 transition-all text-left",
                 mode === "prod"
                   ? "border-emerald-500 bg-emerald-50"
-                  : "border-slate-200 hover:border-slate-300 bg-white"
+                  : "border-border hover:border-border bg-card"
               )}
             >
               <div className={cn(
                 "w-10 h-10 rounded-full flex items-center justify-center",
-                mode === "prod" ? "bg-emerald-500 text-white" : "bg-slate-100 text-slate-500"
+                mode === "prod" ? "bg-emerald-500 text-foreground" : "bg-muted text-muted-foreground"
               )}>
                 <Rocket className="w-5 h-5" aria-hidden="true" />
               </div>
               <div>
                 <p className={cn(
                   "font-medium",
-                  mode === "prod" ? "text-emerald-900" : "text-slate-700"
+                  mode === "prod" ? "text-emerald-900" : "text-foreground"
                 )}>
                   Live Mode
                 </p>
-                <p className="text-xs text-slate-500">Real transactions</p>
+                <p className="text-xs text-muted-foreground">Real transactions</p>
               </div>
             </button>
           </div>
@@ -164,19 +164,19 @@ export function StripeSettingsCard({
             <SelectContent>
               <SelectItem value="absorb">
                 <div className="flex items-center gap-2">
-                  <Building2 className="w-4 h-4 text-slate-400" aria-hidden="true" />
+                  <Building2 className="w-4 h-4 text-muted-foreground" aria-hidden="true" />
                   <span>Campground absorbs fees</span>
                 </div>
               </SelectItem>
               <SelectItem value="pass_through">
                 <div className="flex items-center gap-2">
-                  <Users className="w-4 h-4 text-slate-400" aria-hidden="true" />
+                  <Users className="w-4 h-4 text-muted-foreground" aria-hidden="true" />
                   <span>Guest pays fees</span>
                 </div>
               </SelectItem>
             </SelectContent>
           </Select>
-          <p className="text-xs text-slate-500">
+          <p className="text-xs text-muted-foreground">
             {feeMode === "absorb"
               ? "Stripe fees are deducted from your payout."
               : "Stripe fees are added to the guest's total at checkout."}
@@ -184,13 +184,13 @@ export function StripeSettingsCard({
         </div>
 
         {/* Fee summary */}
-        <div className="p-4 bg-slate-50 rounded-xl border border-slate-200">
+        <div className="p-4 bg-muted rounded-xl border border-border">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-slate-700">Processing fee</p>
-              <p className="text-xs text-slate-500">Per transaction</p>
+              <p className="text-sm font-medium text-foreground">Processing fee</p>
+              <p className="text-xs text-muted-foreground">Per transaction</p>
             </div>
-            <p className="text-lg font-semibold text-slate-900">{effectiveFeeLabel}</p>
+            <p className="text-lg font-semibold text-foreground">{effectiveFeeLabel}</p>
           </div>
         </div>
 

@@ -224,7 +224,7 @@ export function BookingFormsSection({
     <div className="space-y-4">
       <div className="flex items-center gap-2">
         <FileText className="h-5 w-5 text-blue-600" />
-        <h3 className="font-semibold text-slate-900">Required Forms</h3>
+        <h3 className="font-semibold text-foreground">Required Forms</h3>
         <Badge variant={allRequiredComplete ? "default" : "destructive"} className="ml-auto">
           {completedForms.size}/{bookingForms.length} Complete
         </Badge>
@@ -252,7 +252,7 @@ export function BookingFormsSection({
                     ) : template.isRequired !== false ? (
                       <AlertCircle className="h-5 w-5 text-amber-500" />
                     ) : (
-                      <FileText className="h-5 w-5 text-slate-400" />
+                      <FileText className="h-5 w-5 text-muted-foreground" />
                     )}
                     <CardTitle className="text-base">{template.title}</CardTitle>
                     {template.isRequired === false && (
@@ -260,31 +260,31 @@ export function BookingFormsSection({
                     )}
                   </div>
                   {isExpanded ? (
-                    <ChevronUp className="h-5 w-5 text-slate-400" />
+                    <ChevronUp className="h-5 w-5 text-muted-foreground" />
                   ) : (
-                    <ChevronDown className="h-5 w-5 text-slate-400" />
+                    <ChevronDown className="h-5 w-5 text-muted-foreground" />
                   )}
                 </div>
                 {template.description && !isExpanded && (
-                  <p className="text-sm text-slate-500 mt-1">{template.description}</p>
+                  <p className="text-sm text-muted-foreground mt-1">{template.description}</p>
                 )}
               </CardHeader>
 
               {isExpanded && (
                 <CardContent className="pt-0 space-y-4">
                   {template.description && (
-                    <p className="text-sm text-slate-600">{template.description}</p>
+                    <p className="text-sm text-muted-foreground">{template.description}</p>
                   )}
 
                   {questions.length === 0 ? (
-                    <div className="text-sm text-slate-500">
+                    <div className="text-sm text-muted-foreground">
                       This form has no questions. Click complete to acknowledge.
                     </div>
                   ) : (
                     <div className="space-y-4">
                       {questions.map((q) => (
                         <div key={q.id} className="space-y-1.5">
-                          <label className="text-sm font-medium text-slate-700">
+                          <label className="text-sm font-medium text-foreground">
                             {q.label}
                             {q.required && <span className="text-red-500 ml-1">*</span>}
                           </label>
@@ -321,7 +321,7 @@ export function BookingFormsSection({
                                 checked={formResponses[template.id]?.[q.id] || false}
                                 onCheckedChange={(checked) => handleInputChange(template.id, q.id, checked)}
                               />
-                              <span className="text-sm text-slate-600">I agree</span>
+                              <span className="text-sm text-muted-foreground">I agree</span>
                             </div>
                           )}
 
@@ -345,7 +345,7 @@ export function BookingFormsSection({
                     </div>
                   )}
 
-                  <div className="flex items-center gap-2 pt-2 border-t border-slate-200">
+                  <div className="flex items-center gap-2 pt-2 border-t border-border">
                     <Button
                       size="sm"
                       onClick={() => handleCompleteForm(template.id)}

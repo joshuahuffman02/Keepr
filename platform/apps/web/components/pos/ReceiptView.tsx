@@ -16,21 +16,21 @@ export function ReceiptView({ order, onNewOrder }: ReceiptViewProps) {
                 </svg>
             </div>
 
-            <h1 className="text-2xl font-bold text-slate-900 mb-2">Order Complete!</h1>
-            <p className="text-slate-500 mb-8">Order #{order.id.slice(0, 8)}</p>
+            <h1 className="text-2xl font-bold text-foreground mb-2">Order Complete!</h1>
+            <p className="text-muted-foreground mb-8">Order #{order.id.slice(0, 8)}</p>
 
-            <div className="w-full bg-white border border-slate-200 rounded-xl p-6 shadow-sm mb-8 space-y-4">
+            <div className="w-full bg-card border border-border rounded-xl p-6 shadow-sm mb-8 space-y-4">
                 <div className="flex justify-between text-sm">
-                    <span className="text-slate-500">Status</span>
+                    <span className="text-muted-foreground">Status</span>
                     <span className="font-medium text-status-success uppercase">{order.status}</span>
                 </div>
                 <div className="flex justify-between text-sm">
-                    <span className="text-slate-500">Payment Method</span>
+                    <span className="text-muted-foreground">Payment Method</span>
                     <span className="font-medium capitalize">{order.paymentMethod || "Card"}</span>
                 </div>
-                <div className="border-t border-slate-100 pt-4 flex justify-between items-center">
-                    <span className="font-semibold text-slate-900">Total Paid</span>
-                    <span className="text-xl font-bold text-slate-900">${(order.totalCents / 100).toFixed(2)}</span>
+                <div className="border-t border-border pt-4 flex justify-between items-center">
+                    <span className="font-semibold text-foreground">Total Paid</span>
+                    <span className="text-xl font-bold text-foreground">${(order.totalCents / 100).toFixed(2)}</span>
                 </div>
             </div>
 

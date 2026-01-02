@@ -31,14 +31,14 @@ interface ValueStackProps {
 
 export function ValueStack({ className }: ValueStackProps) {
   return (
-    <section className={cn("py-16 md:py-20 bg-slate-50", className)}>
+    <section className={cn("py-16 md:py-20 bg-muted", className)}>
       <div className="max-w-7xl mx-auto px-6">
         {/* Section header */}
         <div className="text-center mb-12 md:mb-16">
-          <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold text-slate-900 mb-4">
+          <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold text-foreground mb-4">
             Your Trust is Our Treasure
           </h2>
-          <p className="text-slate-600 max-w-2xl mx-auto">
+          <p className="text-muted-foreground max-w-2xl mx-auto">
             Every great adventure begins with peace of mind. Here's how we make
             your journey magical from the very first click.
           </p>
@@ -49,7 +49,7 @@ export function ValueStack({ className }: ValueStackProps) {
           {pillars.map((pillar, i) => (
             <div
               key={i}
-              className="bg-white rounded-2xl p-6 md:p-8 shadow-lg shadow-slate-900/5 hover:shadow-xl hover:shadow-slate-900/10 transition-all hover:-translate-y-1"
+              className="bg-card rounded-2xl p-6 md:p-8 shadow-lg shadow-slate-900/5 hover:shadow-xl hover:shadow-slate-900/10 transition-all hover:-translate-y-1"
             >
               {/* Icon */}
               <div className="relative w-16 h-16 mb-6">
@@ -63,8 +63,8 @@ export function ValueStack({ className }: ValueStackProps) {
               </div>
 
               {/* Content */}
-              <h3 className="text-xl font-bold text-slate-900 mb-3">{pillar.title}</h3>
-              <p className="text-slate-600 mb-4">{pillar.description}</p>
+              <h3 className="text-xl font-bold text-foreground mb-3">{pillar.title}</h3>
+              <p className="text-muted-foreground mb-4">{pillar.description}</p>
 
               {/* Guarantee badge */}
               <div className="flex items-center gap-2 text-emerald-600">

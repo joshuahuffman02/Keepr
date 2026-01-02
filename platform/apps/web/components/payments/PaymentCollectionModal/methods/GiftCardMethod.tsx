@@ -88,7 +88,7 @@ export default function GiftCardMethod({
       {/* Gift Card Lookup */}
       {!giftCard && (
         <div className="space-y-4">
-          <div className="flex items-center gap-2 text-slate-700">
+          <div className="flex items-center gap-2 text-foreground">
             <Gift className="h-5 w-5" />
             <span className="font-medium">Enter Gift Card Code</span>
           </div>
@@ -157,12 +157,12 @@ export default function GiftCardMethod({
 
           {/* Amount Selection */}
           <div className="space-y-3">
-            <Label className="text-sm font-medium text-slate-700">
+            <Label className="text-sm font-medium text-foreground">
               Amount to Redeem
             </Label>
 
             <div className="space-y-2">
-              <label className="flex items-center gap-3 p-3 border rounded-lg cursor-pointer hover:bg-slate-50">
+              <label className="flex items-center gap-3 p-3 border rounded-lg cursor-pointer hover:bg-muted">
                 <input
                   type="radio"
                   name="redeem-amount"
@@ -171,23 +171,23 @@ export default function GiftCardMethod({
                   className="text-emerald-600 focus:ring-emerald-500"
                 />
                 <div className="flex-1">
-                  <p className="font-medium text-slate-900">
+                  <p className="font-medium text-foreground">
                     Use full balance
                     {giftCard.balanceCents > remainingCents && (
-                      <span className="font-normal text-slate-500">
+                      <span className="font-normal text-muted-foreground">
                         {" "}
                         (${(remainingCents / 100).toFixed(2)} of $
                         {(giftCard.balanceCents / 100).toFixed(2)})
                       </span>
                     )}
                   </p>
-                  <p className="text-sm text-slate-500">
+                  <p className="text-sm text-muted-foreground">
                     Apply ${(maxRedeemable / 100).toFixed(2)} to this payment
                   </p>
                 </div>
               </label>
 
-              <label className="flex items-center gap-3 p-3 border rounded-lg cursor-pointer hover:bg-slate-50">
+              <label className="flex items-center gap-3 p-3 border rounded-lg cursor-pointer hover:bg-muted">
                 <input
                   type="radio"
                   name="redeem-amount"
@@ -196,11 +196,11 @@ export default function GiftCardMethod({
                   className="text-emerald-600 focus:ring-emerald-500"
                 />
                 <div className="flex-1">
-                  <p className="font-medium text-slate-900">Custom amount</p>
+                  <p className="font-medium text-foreground">Custom amount</p>
                   {!useFullBalance && (
                     <div className="mt-2">
                       <div className="relative">
-                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500">
+                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">
                           $
                         </span>
                         <Input
@@ -214,7 +214,7 @@ export default function GiftCardMethod({
                           className="pl-7"
                         />
                       </div>
-                      <p className="mt-1 text-xs text-slate-500">
+                      <p className="mt-1 text-xs text-muted-foreground">
                         Max: ${(maxRedeemable / 100).toFixed(2)}
                       </p>
                     </div>

@@ -319,7 +319,7 @@ export default function PricingRulesV2Page() {
     <div className="space-y-6">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold text-slate-900">Dynamic Pricing Rules</h1>
+            <h1 className="text-2xl font-bold text-foreground">Dynamic Pricing Rules</h1>
             <p className="text-muted-foreground">
               Configure advanced pricing adjustments for seasons, weekends, holidays, events, and demand.
             </p>
@@ -351,9 +351,9 @@ export default function PricingRulesV2Page() {
         {rulesQuery.isLoading ? (
           <div className="text-center py-12 text-muted-foreground">Loading...</div>
         ) : rulesQuery.data?.length === 0 ? (
-          <div className="text-center py-12 border-2 border-dashed border-slate-200 rounded-lg">
-            <TrendingUp className="mx-auto h-12 w-12 text-slate-400" />
-            <h3 className="mt-4 text-lg font-semibold text-slate-900">No pricing rules yet</h3>
+          <div className="text-center py-12 border-2 border-dashed border-border rounded-lg">
+            <TrendingUp className="mx-auto h-12 w-12 text-muted-foreground" />
+            <h3 className="mt-4 text-lg font-semibold text-foreground">No pricing rules yet</h3>
             <p className="mt-2 text-muted-foreground">
               Create dynamic pricing rules to adjust rates based on seasons, demand, and more.
             </p>
@@ -369,17 +369,17 @@ export default function PricingRulesV2Page() {
               return (
                 <div
                   key={rule.id}
-                  className={`border rounded-lg p-4 ${rule.active ? "bg-white" : "bg-slate-50 opacity-60"}`}
+                  className={`border rounded-lg p-4 ${rule.active ? "bg-card" : "bg-muted opacity-60"}`}
                 >
                   <div className="flex items-start justify-between">
                     <div className="flex items-start gap-3">
-                      <div className={`p-2 rounded-lg ${rule.active ? "bg-status-success/15 text-status-success" : "bg-slate-200 text-slate-500"}`}>
+                      <div className={`p-2 rounded-lg ${rule.active ? "bg-status-success/15 text-status-success" : "bg-muted text-muted-foreground"}`}>
                         <TypeIcon className="h-5 w-5" />
                       </div>
                       <div>
                         <div className="flex items-center gap-2">
-                          <h3 className="font-semibold text-slate-900">{rule.name}</h3>
-                          <span className="text-xs px-2 py-0.5 rounded-full bg-slate-100 text-slate-600">
+                          <h3 className="font-semibold text-foreground">{rule.name}</h3>
+                          <span className="text-xs px-2 py-0.5 rounded-full bg-muted text-muted-foreground">
                             Priority {rule.priority}
                           </span>
                           {!rule.active && (
@@ -389,13 +389,13 @@ export default function PricingRulesV2Page() {
                           )}
                         </div>
                         <div className="mt-1 text-sm text-muted-foreground">
-                          <span className="font-medium text-slate-700">{formatAdjustment(rule)}</span>
+                          <span className="font-medium text-foreground">{formatAdjustment(rule)}</span>
                           {" • "}
                           {ruleTypeLabels[rule.type]?.label}
                           {" • "}
                           {stackModeLabels[rule.stackMode]}
                         </div>
-                        <div className="mt-1 text-xs text-slate-500">
+                        <div className="mt-1 text-xs text-muted-foreground">
                           {getSiteClassName(rule.siteClassId)}
                           {rule.startDate && rule.endDate && (
                             <> • {new Date(rule.startDate).toLocaleDateString()} - {new Date(rule.endDate).toLocaleDateString()}</>
@@ -429,8 +429,8 @@ export default function PricingRulesV2Page() {
       {/* Modal */}
       {isModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-          <div className="bg-white rounded-xl shadow-xl w-full max-w-lg max-h-[90vh] overflow-y-auto p-6">
-            <h2 className="text-xl font-bold text-slate-900 mb-4">
+          <div className="bg-card rounded-xl shadow-xl w-full max-w-lg max-h-[90vh] overflow-y-auto p-6">
+            <h2 className="text-xl font-bold text-foreground mb-4">
               {editingRule ? "Edit Pricing Rule" : "Create Pricing Rule"}
             </h2>
 
@@ -445,9 +445,9 @@ export default function PricingRulesV2Page() {
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-1">Type</label>
+                  <label className="block text-sm font-medium text-foreground mb-1">Type</label>
                   <select
-                    className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm"
+                    className="w-full rounded-lg border border-border px-3 py-2 text-sm"
                     {...register("type")}
                   >
                     {Object.entries(ruleTypeLabels).map(([key, val]) => (
@@ -457,7 +457,7 @@ export default function PricingRulesV2Page() {
                 </div>
                 <div>
                   <div className="flex items-center gap-2 mb-1">
-                    <label className="block text-sm font-medium text-slate-700">Priority</label>
+                    <label className="block text-sm font-medium text-foreground">Priority</label>
                     <HelpTooltip
                       title="Priority Order"
                       content={
@@ -489,7 +489,7 @@ export default function PricingRulesV2Page() {
 
               <div>
                 <div className="flex items-center gap-2 mb-1">
-                  <label className="block text-sm font-medium text-slate-700">Stacking Mode</label>
+                  <label className="block text-sm font-medium text-foreground">Stacking Mode</label>
                   <HelpTooltip
                     title="How Rules Combine"
                     content={
@@ -513,7 +513,7 @@ export default function PricingRulesV2Page() {
                   />
                 </div>
                 <select
-                  className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm"
+                  className="w-full rounded-lg border border-border px-3 py-2 text-sm"
                   {...register("stackMode")}
                 >
                   {Object.entries(stackModeLabels).map(([key, label]) => (
@@ -524,9 +524,9 @@ export default function PricingRulesV2Page() {
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-1">Adjustment Type</label>
+                  <label className="block text-sm font-medium text-foreground mb-1">Adjustment Type</label>
                   <select
-                    className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm"
+                    className="w-full rounded-lg border border-border px-3 py-2 text-sm"
                     {...register("adjustmentType")}
                   >
                     <option value="percent">Percentage (%)</option>
@@ -545,9 +545,9 @@ export default function PricingRulesV2Page() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">Site Class</label>
+                <label className="block text-sm font-medium text-foreground mb-1">Site Class</label>
                 <select
-                  className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm"
+                  className="w-full rounded-lg border border-border px-3 py-2 text-sm"
                   {...register("siteClassId")}
                 >
                   <option value="">All Site Classes</option>
@@ -559,7 +559,7 @@ export default function PricingRulesV2Page() {
 
               {formData.type === "weekend" && (
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-2">Days of Week</label>
+                  <label className="block text-sm font-medium text-foreground mb-2">Days of Week</label>
                   <div className="flex gap-2">
                     {daysOfWeek.map((day, idx) => (
                       <button
@@ -569,7 +569,7 @@ export default function PricingRulesV2Page() {
                         className={`px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${
                           (formData.dowMask || []).includes(idx)
                             ? "bg-emerald-600 text-white"
-                            : "bg-slate-100 text-slate-600 hover:bg-slate-200"
+                            : "bg-muted text-muted-foreground hover:bg-muted"
                         }`}
                       >
                         {day}
@@ -601,13 +601,13 @@ export default function PricingRulesV2Page() {
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <div className="flex items-center gap-2 mb-1">
-                    <label className="block text-sm font-medium text-slate-700">Min Rate Cap ($)</label>
+                    <label className="block text-sm font-medium text-foreground">Min Rate Cap ($)</label>
                     <HelpTooltip
                       title="Minimum Rate"
                       content={
                         <div className="space-y-2">
                           <p>Set a floor price to prevent rates from going too low, even with discounts.</p>
-                          <p className="text-xs text-slate-600">Example: If your base rate is $50 and you have a -30% discount, a $40 minimum cap ensures the price never goes below $40.</p>
+                          <p className="text-xs text-muted-foreground">Example: If your base rate is $50 and you have a -30% discount, a $40 minimum cap ensures the price never goes below $40.</p>
                         </div>
                       }
                       side="top"
@@ -626,13 +626,13 @@ export default function PricingRulesV2Page() {
                 </div>
                 <div>
                   <div className="flex items-center gap-2 mb-1">
-                    <label className="block text-sm font-medium text-slate-700">Max Rate Cap ($)</label>
+                    <label className="block text-sm font-medium text-foreground">Max Rate Cap ($)</label>
                     <HelpTooltip
                       title="Maximum Rate"
                       content={
                         <div className="space-y-2">
                           <p>Set a ceiling price to prevent rates from going too high, even with markups.</p>
-                          <p className="text-xs text-slate-600">Example: If your base rate is $50 and you have a +50% markup, a $70 maximum cap ensures the price never exceeds $70.</p>
+                          <p className="text-xs text-muted-foreground">Example: If your base rate is $50 and you have a +50% markup, a $70 maximum cap ensures the price never exceeds $70.</p>
                         </div>
                       }
                       side="top"
@@ -655,10 +655,10 @@ export default function PricingRulesV2Page() {
                 <input
                   type="checkbox"
                   id="active"
-                  className="rounded border-slate-300"
+                  className="rounded border-border"
                   {...register("active")}
                 />
-                <label htmlFor="active" className="text-sm text-slate-700">Active</label>
+                <label htmlFor="active" className="text-sm text-foreground">Active</label>
               </div>
 
               <div className="mt-6 flex justify-end gap-3">

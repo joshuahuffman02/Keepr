@@ -53,11 +53,11 @@ export function KeyboardShortcutsDialog() {
   const getCategoryIcon = (category: string) => {
     switch (category) {
       case "global":
-        return <Command className="h-5 w-5 text-emerald-600" />;
+        return <Command className="h-5 w-5 text-status-success" />;
       case "navigation":
-        return <Navigation className="h-5 w-5 text-blue-600" />;
+        return <Navigation className="h-5 w-5 text-status-info" />;
       case "actions":
-        return <Zap className="h-5 w-5 text-amber-600" />;
+        return <Zap className="h-5 w-5 text-status-warning" />;
       default:
         return null;
     }
@@ -79,13 +79,13 @@ export function KeyboardShortcutsDialog() {
   const getCategoryColor = (category: string) => {
     switch (category) {
       case "global":
-        return "bg-emerald-100";
+        return "bg-status-success-bg";
       case "navigation":
-        return "bg-blue-100";
+        return "bg-status-info-bg";
       case "actions":
-        return "bg-amber-100";
+        return "bg-status-warning-bg";
       default:
-        return "bg-slate-100";
+        return "bg-muted";
     }
   };
 
@@ -93,26 +93,26 @@ export function KeyboardShortcutsDialog() {
     <div className="fixed inset-0 z-[100] flex items-center justify-center">
       {/* Backdrop */}
       <div
-        className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm"
+        className="absolute inset-0 bg-muted/60 backdrop-blur-sm"
         onClick={() => setShowShortcutsDialog(false)}
       />
 
       {/* Dialog */}
-      <div className="relative w-full max-w-4xl mx-4 bg-white rounded-2xl shadow-2xl overflow-hidden max-h-[90vh] flex flex-col">
+      <div className="relative w-full max-w-4xl mx-4 bg-card rounded-2xl shadow-2xl overflow-hidden max-h-[90vh] flex flex-col">
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-5 border-b border-slate-200 bg-gradient-to-r from-slate-50 to-white">
+        <div className="flex items-center justify-between px-6 py-5 border-b border-border bg-card">
           <div>
-            <h2 className="text-2xl font-bold text-slate-900 flex items-center gap-2">
-              <Command className="h-6 w-6 text-emerald-600" />
+            <h2 className="text-2xl font-bold text-foreground flex items-center gap-2">
+              <Command className="h-6 w-6 text-action-primary" />
               Keyboard Shortcuts
             </h2>
-            <p className="text-sm text-slate-600 mt-1">
+            <p className="text-sm text-muted-foreground mt-1">
               Work faster with keyboard shortcuts for common actions
             </p>
           </div>
           <button
             onClick={() => setShowShortcutsDialog(false)}
-            className="p-2 rounded-full hover:bg-slate-100 text-slate-600 transition-colors"
+            className="p-2 rounded-full hover:bg-muted text-muted-foreground transition-colors"
             aria-label="Close shortcuts dialog"
           >
             <X className="h-5 w-5" />
@@ -120,10 +120,10 @@ export function KeyboardShortcutsDialog() {
         </div>
 
         {/* Platform Note */}
-        <div className="px-6 py-3 bg-blue-50 border-b border-blue-100">
+        <div className="px-6 py-3 bg-status-info-bg border-b border-status-info-border">
           <div className="flex items-start gap-3">
-            <Command className="h-4 w-4 text-blue-600 mt-0.5" />
-            <div className="text-xs text-blue-700">
+            <Command className="h-4 w-4 text-status-info mt-0.5" />
+            <div className="text-xs text-status-info-text">
               {isMac ? (
                 <span>
                   <strong>Mac shortcuts:</strong> ⌘ = Command, ⇧ = Shift, ⌥ = Option, ⌃ = Control
@@ -149,7 +149,7 @@ export function KeyboardShortcutsDialog() {
                     <div className={`p-2 ${getCategoryColor(category)} rounded-lg`}>
                       {getCategoryIcon(category)}
                     </div>
-                    <h3 className="text-lg font-semibold text-slate-900">
+                    <h3 className="text-lg font-semibold text-foreground">
                       {getCategoryTitle(category)}
                     </h3>
                   </div>
@@ -158,21 +158,21 @@ export function KeyboardShortcutsDialog() {
                     {categoryShortcuts.map((shortcut) => (
                       <div
                         key={shortcut.id}
-                        className="flex items-center justify-between p-3 rounded-lg bg-slate-50 hover:bg-slate-100 transition-colors"
+                        className="flex items-center justify-between p-3 rounded-lg bg-muted hover:bg-muted transition-colors"
                       >
-                        <span className="text-sm text-slate-700 font-medium">
+                        <span className="text-sm text-foreground font-medium">
                           {shortcut.description}
                         </span>
                         <div className="flex items-center gap-1">
                           {shortcut.keys.map((key, idx) => (
                             <React.Fragment key={idx}>
                               {idx > 0 && !shortcut.sequential && (
-                                <span className="text-slate-400 text-xs mx-0.5">+</span>
+                                <span className="text-muted-foreground text-xs mx-0.5">+</span>
                               )}
                               {idx > 0 && shortcut.sequential && (
-                                <span className="text-slate-400 text-xs mx-1">then</span>
+                                <span className="text-muted-foreground text-xs mx-1">then</span>
                               )}
-                              <kbd className="px-2.5 py-1.5 bg-white border border-slate-200 rounded text-xs font-mono text-slate-900 shadow-sm min-w-[32px] text-center">
+                              <kbd className="px-2.5 py-1.5 bg-card border border-border rounded text-xs font-mono text-foreground shadow-sm min-w-[32px] text-center">
                                 {formatKey(key)}
                               </kbd>
                             </React.Fragment>
@@ -187,37 +187,37 @@ export function KeyboardShortcutsDialog() {
           </div>
 
           {/* Tips Section */}
-          <div className="mt-8 p-5 bg-gradient-to-br from-amber-50 to-orange-50 border-2 border-amber-200 rounded-xl">
-            <h4 className="text-sm font-semibold text-slate-900 mb-3 flex items-center gap-2">
-              <Zap className="h-4 w-4 text-amber-600" />
+          <div className="mt-8 p-5 bg-status-warning-bg border border-status-warning-border rounded-xl">
+            <h4 className="text-sm font-semibold text-foreground mb-3 flex items-center gap-2">
+              <Zap className="h-4 w-4 text-status-warning" />
               Pro Tips
             </h4>
-            <ul className="space-y-2 text-xs text-slate-700">
+            <ul className="space-y-2 text-xs text-foreground">
               <li className="flex items-start gap-2">
-                <span className="text-amber-600 font-bold mt-0.5">•</span>
+                <span className="text-status-warning font-bold mt-0.5">•</span>
                 <span>
-                  Use <kbd className="px-1.5 py-0.5 bg-white rounded border border-slate-200 text-[10px]">{formatKey("cmd")}K</kbd> to
+                  Use <kbd className="px-1.5 py-0.5 bg-card rounded border border-border text-[10px]">{formatKey("cmd")}K</kbd> to
                   quickly search for guests, sites, and reservations
                 </span>
               </li>
               <li className="flex items-start gap-2">
-                <span className="text-amber-600 font-bold mt-0.5">•</span>
+                <span className="text-status-warning font-bold mt-0.5">•</span>
                 <span>
-                  Sequential shortcuts like <kbd className="px-1.5 py-0.5 bg-white rounded border border-slate-200 text-[10px]">G</kbd>{" "}
-                  then <kbd className="px-1.5 py-0.5 bg-white rounded border border-slate-200 text-[10px]">D</kbd> should be pressed one
+                  Sequential shortcuts like <kbd className="px-1.5 py-0.5 bg-card rounded border border-border text-[10px]">G</kbd>{" "}
+                  then <kbd className="px-1.5 py-0.5 bg-card rounded border border-border text-[10px]">D</kbd> should be pressed one
                   after another, not together
                 </span>
               </li>
               <li className="flex items-start gap-2">
-                <span className="text-amber-600 font-bold mt-0.5">•</span>
+                <span className="text-status-warning font-bold mt-0.5">•</span>
                 <span>
                   Most shortcuts are disabled when typing in input fields (except global shortcuts)
                 </span>
               </li>
               <li className="flex items-start gap-2">
-                <span className="text-amber-600 font-bold mt-0.5">•</span>
+                <span className="text-status-warning font-bold mt-0.5">•</span>
                 <span>
-                  Press <kbd className="px-1.5 py-0.5 bg-white rounded border border-slate-200 text-[10px]">?</kbd> anytime to see this
+                  Press <kbd className="px-1.5 py-0.5 bg-card rounded border border-border text-[10px]">?</kbd> anytime to see this
                   reference panel
                 </span>
               </li>
@@ -226,13 +226,13 @@ export function KeyboardShortcutsDialog() {
         </div>
 
         {/* Footer */}
-        <div className="px-6 py-4 border-t border-slate-200 bg-slate-50 flex items-center justify-between">
-          <span className="text-xs text-slate-500">
-            Press <kbd className="px-2 py-0.5 bg-white rounded text-slate-900 border border-slate-200 text-[10px]">ESC</kbd> to close
+        <div className="px-6 py-4 border-t border-border bg-muted flex items-center justify-between">
+          <span className="text-xs text-muted-foreground">
+            Press <kbd className="px-2 py-0.5 bg-card rounded text-foreground border border-border text-[10px]">ESC</kbd> to close
           </span>
           <a
             href="/help/shortcuts"
-            className="text-xs text-emerald-600 hover:text-emerald-700 font-medium"
+            className="text-xs text-action-primary hover:text-action-primary-hover font-medium"
             onClick={() => setShowShortcutsDialog(false)}
           >
             View full documentation →

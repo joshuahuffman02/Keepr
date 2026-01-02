@@ -236,8 +236,8 @@ export default function CustomFieldsPage() {
       {/* Header */}
       <div className="flex items-start justify-between">
         <div>
-          <h2 className="text-2xl font-bold text-slate-900">Custom Fields</h2>
-          <p className="text-slate-500 mt-1">
+          <h2 className="text-2xl font-bold text-foreground">Custom Fields</h2>
+          <p className="text-muted-foreground mt-1">
             Add custom questions to collect additional info from guests
           </p>
         </div>
@@ -279,7 +279,7 @@ export default function CustomFieldsPage() {
                     variant="outline"
                     size="sm"
                     onClick={() => handleAddSuggested(suggestion)}
-                    className="bg-white"
+                    className="bg-card"
                   >
                     <Plus className="h-3 w-3 mr-1" />
                     {suggestion.question}
@@ -295,7 +295,7 @@ export default function CustomFieldsPage() {
         <div className="space-y-4">
           {/* Active Fields */}
           <div className="space-y-2">
-            <h3 className="text-sm font-medium text-slate-700">
+            <h3 className="text-sm font-medium text-foreground">
               Active Fields ({activeFields.length})
             </h3>
             <DndContext
@@ -325,7 +325,7 @@ export default function CustomFieldsPage() {
           {/* Inactive Fields */}
           {inactiveFields.length > 0 && (
             <div className="space-y-2">
-              <h3 className="text-sm font-medium text-slate-500">
+              <h3 className="text-sm font-medium text-muted-foreground">
                 Inactive ({inactiveFields.length})
               </h3>
               <div className="space-y-2">
@@ -345,9 +345,9 @@ export default function CustomFieldsPage() {
       ) : (
         <Card className="border-dashed">
           <CardContent className="py-12 text-center">
-            <FormInput className="h-12 w-12 mx-auto text-slate-400" />
-            <h3 className="mt-4 font-medium text-slate-900">No custom fields yet</h3>
-            <p className="text-sm text-slate-500 mt-1 max-w-sm mx-auto">
+            <FormInput className="h-12 w-12 mx-auto text-muted-foreground" />
+            <h3 className="mt-4 font-medium text-foreground">No custom fields yet</h3>
+            <p className="text-sm text-muted-foreground mt-1 max-w-sm mx-auto">
               Add custom questions to collect additional information from guests during booking
             </p>
             <Button className="mt-4" onClick={() => openEditor(null)}>
@@ -416,7 +416,7 @@ export default function CustomFieldsPage() {
                       "px-3 py-1.5 rounded-full text-sm font-medium border transition-colors",
                       formDisplayAt.includes(option.value)
                         ? "bg-status-success/15 border-status-success/30 text-status-success"
-                        : "bg-white border-slate-200 text-slate-600 hover:border-slate-300"
+                        : "bg-card border-border text-muted-foreground hover:border-border"
                     )}
                   >
                     {option.label}
@@ -429,7 +429,7 @@ export default function CustomFieldsPage() {
             <div className="flex items-center justify-between p-3 rounded-lg border">
               <div>
                 <Label htmlFor="required" className="font-medium">Required</Label>
-                <p className="text-sm text-slate-500">
+                <p className="text-sm text-muted-foreground">
                   Guest must answer to continue
                 </p>
               </div>

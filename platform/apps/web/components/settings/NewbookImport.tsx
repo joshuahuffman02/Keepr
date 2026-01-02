@@ -211,8 +211,8 @@ export function NewbookImport({ campgroundId, onImportComplete }: NewbookImportP
         <Card className="p-6 space-y-4">
             <div className="flex items-center justify-between">
                 <div>
-                    <h2 className="text-lg font-semibold text-slate-900">NewBook Import</h2>
-                    <p className="text-sm text-slate-500">Import reservations from NewBook CSV export</p>
+                    <h2 className="text-lg font-semibold text-foreground">NewBook Import</h2>
+                    <p className="text-sm text-muted-foreground">Import reservations from NewBook CSV export</p>
                 </div>
                 {preview && (
                     <Button variant="outline" size="sm" onClick={reset}>
@@ -224,17 +224,17 @@ export function NewbookImport({ campgroundId, onImportComplete }: NewbookImportP
             {!preview ? (
                 // Upload area
                 <div
-                    className={`border-2 border-dashed rounded-lg p-8 text-center transition-colors ${dragOver ? "border-blue-500 bg-blue-50" : "border-slate-200 hover:border-slate-300"
+                    className={`border-2 border-dashed rounded-lg p-8 text-center transition-colors ${dragOver ? "border-blue-500 bg-blue-50" : "border-border hover:border-border"
                         }`}
                     onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
                     onDragLeave={() => setDragOver(false)}
                     onDrop={handleDrop}
                 >
-                    <Upload className="mx-auto h-10 w-10 text-slate-400 mb-3" />
-                    <p className="text-sm font-medium text-slate-700 mb-1">
+                    <Upload className="mx-auto h-10 w-10 text-muted-foreground mb-3" />
+                    <p className="text-sm font-medium text-foreground mb-1">
                         Drop your NewBook CSV here
                     </p>
-                    <p className="text-xs text-slate-500 mb-3">
+                    <p className="text-xs text-muted-foreground mb-3">
                         or click to select a file
                     </p>
                     <label className="cursor-pointer">
@@ -274,19 +274,19 @@ export function NewbookImport({ campgroundId, onImportComplete }: NewbookImportP
 
                     {/* Site classes to create */}
                     {preview.siteClasses.size > 0 && (
-                        <div className="bg-slate-50 rounded-lg p-4">
-                            <h3 className="text-sm font-medium text-slate-700 mb-2">Site Classes Found</h3>
+                        <div className="bg-muted rounded-lg p-4">
+                            <h3 className="text-sm font-medium text-foreground mb-2">Site Classes Found</h3>
                             <div className="flex flex-wrap gap-2">
                                 {Array.from(preview.siteClasses).map((cls) => (
                                     <span
                                         key={cls}
-                                        className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-white border border-slate-200 text-slate-700"
+                                        className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-card border border-border text-foreground"
                                     >
                                         {cls}
                                     </span>
                                 ))}
                             </div>
-                            <p className="text-xs text-slate-500 mt-2">
+                            <p className="text-xs text-muted-foreground mt-2">
                                 These site classes will need to exist before import
                             </p>
                         </div>
@@ -295,33 +295,33 @@ export function NewbookImport({ campgroundId, onImportComplete }: NewbookImportP
                     {/* Preview table */}
                     <div className="border rounded-lg overflow-hidden">
                         <div className="overflow-x-auto max-h-64">
-                            <table className="min-w-full divide-y divide-slate-200 text-sm">
-                                <thead className="bg-slate-50 sticky top-0">
+                            <table className="min-w-full divide-y divide-border text-sm">
+                                <thead className="bg-muted sticky top-0">
                                     <tr>
-                                        <th className="px-3 py-2 text-left font-medium text-slate-600">Guest</th>
-                                        <th className="px-3 py-2 text-left font-medium text-slate-600">Site</th>
-                                        <th className="px-3 py-2 text-left font-medium text-slate-600">Arrival</th>
-                                        <th className="px-3 py-2 text-left font-medium text-slate-600">Departure</th>
-                                        <th className="px-3 py-2 text-right font-medium text-slate-600">Total</th>
-                                        <th className="px-3 py-2 text-right font-medium text-slate-600">Balance</th>
+                                        <th className="px-3 py-2 text-left font-medium text-muted-foreground">Guest</th>
+                                        <th className="px-3 py-2 text-left font-medium text-muted-foreground">Site</th>
+                                        <th className="px-3 py-2 text-left font-medium text-muted-foreground">Arrival</th>
+                                        <th className="px-3 py-2 text-left font-medium text-muted-foreground">Departure</th>
+                                        <th className="px-3 py-2 text-right font-medium text-muted-foreground">Total</th>
+                                        <th className="px-3 py-2 text-right font-medium text-muted-foreground">Balance</th>
                                     </tr>
                                 </thead>
-                                <tbody className="divide-y divide-slate-100 bg-white">
+                                <tbody className="divide-y divide-border bg-card">
                                     {preview.rows.slice(0, 20).map((row, idx) => (
-                                        <tr key={idx} className="hover:bg-slate-50">
-                                            <td className="px-3 py-2 text-slate-900">{row.guestName}</td>
-                                            <td className="px-3 py-2 text-slate-600">{row.siteName}</td>
-                                            <td className="px-3 py-2 text-slate-600">{row.arrival}</td>
-                                            <td className="px-3 py-2 text-slate-600">{row.departure}</td>
-                                            <td className="px-3 py-2 text-right text-slate-900">${row.total}</td>
-                                            <td className="px-3 py-2 text-right text-slate-600">${row.balance}</td>
+                                        <tr key={idx} className="hover:bg-muted">
+                                            <td className="px-3 py-2 text-foreground">{row.guestName}</td>
+                                            <td className="px-3 py-2 text-muted-foreground">{row.siteName}</td>
+                                            <td className="px-3 py-2 text-muted-foreground">{row.arrival}</td>
+                                            <td className="px-3 py-2 text-muted-foreground">{row.departure}</td>
+                                            <td className="px-3 py-2 text-right text-foreground">${row.total}</td>
+                                            <td className="px-3 py-2 text-right text-muted-foreground">${row.balance}</td>
                                         </tr>
                                     ))}
                                 </tbody>
                             </table>
                         </div>
                         {preview.rows.length > 20 && (
-                            <div className="bg-slate-50 px-3 py-2 text-xs text-slate-500 text-center border-t">
+                            <div className="bg-muted px-3 py-2 text-xs text-muted-foreground text-center border-t">
                                 Showing first 20 of {preview.rows.length} reservations
                             </div>
                         )}

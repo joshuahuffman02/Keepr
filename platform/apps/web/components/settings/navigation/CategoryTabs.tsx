@@ -85,7 +85,7 @@ export function CategoryTabs({ className }: CategoryTabsProps) {
   const activeCategory = getActiveCategory();
 
   return (
-    <div className={cn("border-b bg-white", className)}>
+    <div className={cn("border-b bg-card", className)}>
       <nav
         role="tablist"
         aria-label="Settings categories"
@@ -107,10 +107,10 @@ export function CategoryTabs({ className }: CategoryTabsProps) {
                 "flex items-center gap-2 px-4 py-3 text-sm font-medium",
                 "border-b-2 transition-all duration-200 whitespace-nowrap",
                 "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-inset",
-                "hover:bg-slate-50",
+                "hover:bg-muted",
                 isActive
                   ? "border-emerald-600 text-emerald-700 bg-emerald-50/50"
-                  : "border-transparent text-slate-600 hover:text-slate-900"
+                  : "border-transparent text-muted-foreground hover:text-foreground"
               )}
             >
               <Icon className="h-4 w-4" aria-hidden="true" />

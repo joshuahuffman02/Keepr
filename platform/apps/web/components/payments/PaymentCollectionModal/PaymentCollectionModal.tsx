@@ -98,7 +98,7 @@ function PaymentModalContent() {
           {configLoading && (
             <div className="flex items-center justify-center py-12">
               <Loader2 className="h-8 w-8 animate-spin text-emerald-600" />
-              <span className="ml-2 text-slate-600">Loading payment options...</span>
+              <span className="ml-2 text-muted-foreground">Loading payment options...</span>
             </div>
           )}
 
@@ -157,9 +157,9 @@ function PaymentModalContent() {
           {step === "processing" && (
             <div className="flex flex-col items-center justify-center py-12 space-y-4">
               <Loader2 className="h-12 w-12 animate-spin text-emerald-600" />
-              <p className="text-slate-600">Processing your payment...</p>
+              <p className="text-muted-foreground">Processing your payment...</p>
               {selectedMethod && (
-                <p className="text-sm text-slate-500">
+                <p className="text-sm text-muted-foreground">
                   Using {PAYMENT_METHOD_INFO[selectedMethod].label}
                 </p>
               )}
@@ -219,7 +219,7 @@ function PaymentMethodRenderer({ method }: PaymentMethodRendererProps) {
   const LoadingFallback = (
     <div className="py-12 text-center">
       <Loader2 className="h-8 w-8 animate-spin mx-auto text-emerald-600" />
-      <p className="mt-2 text-slate-600">Loading payment form...</p>
+      <p className="mt-2 text-muted-foreground">Loading payment form...</p>
     </div>
   );
 
@@ -227,12 +227,12 @@ function PaymentMethodRenderer({ method }: PaymentMethodRendererProps) {
   const PlaceholderComponent = () => {
     const methodInfo = PAYMENT_METHOD_INFO[method];
     return (
-      <div className="p-6 border border-slate-200 rounded-lg bg-slate-50">
+      <div className="p-6 border border-border rounded-lg bg-muted">
         <div className="text-center space-y-4">
-          <p className="text-slate-600">
+          <p className="text-muted-foreground">
             {methodInfo.label} payment component coming soon
           </p>
-          <p className="text-sm text-slate-500">{methodInfo.description}</p>
+          <p className="text-sm text-muted-foreground">{methodInfo.description}</p>
           <Button variant="outline" onClick={handleCancel}>
             Back
           </Button>

@@ -302,7 +302,7 @@ export function AdminTopBar({
                             onClick={onToggleNav}
                             aria-pressed={!!mobileNavOpen}
                             aria-label="Toggle navigation"
-                            className="md:hidden inline-flex h-10 w-10 items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-700 hover:bg-slate-50 transition-colors"
+                            className="md:hidden inline-flex h-10 w-10 items-center justify-center rounded-lg border border-border bg-card text-foreground hover:bg-muted/40 transition-colors"
                         >
                             <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                                 {mobileNavOpen ? <path d="M6 18 18 6M6 6l12 12" /> : <path d="M4 6h16M4 12h16M4 18h16" />}
@@ -334,7 +334,7 @@ export function AdminTopBar({
                     <div className="hidden md:flex items-center gap-1 mr-2">
                         <Link
                             href="/check-in-out"
-                            className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-slate-600 hover:text-status-success hover:bg-status-success/15 rounded-lg transition-colors"
+                            className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-muted-foreground hover:text-status-success hover:bg-status-success/15 rounded-lg transition-colors"
                             title="Check In/Out"
                         >
                             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">
@@ -345,7 +345,7 @@ export function AdminTopBar({
                         </Link>
                         <Link
                             href="/booking"
-                            className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-slate-600 hover:text-status-success hover:bg-status-success/15 rounded-lg transition-colors"
+                            className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-muted-foreground hover:text-status-success hover:bg-status-success/15 rounded-lg transition-colors"
                             title="New Booking"
                         >
                             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">
@@ -355,7 +355,7 @@ export function AdminTopBar({
                         </Link>
                         <Link
                             href="/pos"
-                            className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-slate-600 hover:text-status-success hover:bg-status-success/15 rounded-lg transition-colors"
+                            className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-muted-foreground hover:text-status-success hover:bg-status-success/15 rounded-lg transition-colors"
                             title="Point of Sale"
                         >
                             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">
@@ -374,7 +374,7 @@ export function AdminTopBar({
                                 setIsMenuOpen(false);
                                 setIsHelpPanelOpen(false);
                             }}
-                            className="relative p-2 text-slate-500 hover:text-slate-700 hover:bg-slate-100 rounded-lg transition-colors"
+                            className="relative p-2 text-muted-foreground hover:text-foreground hover:bg-muted rounded-lg transition-colors"
                             title="Notifications"
                         >
                             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -462,7 +462,7 @@ export function AdminTopBar({
                                 setIsNotificationsOpen(false);
                                 setIsHelpPanelOpen(false);
                             }}
-                            className="flex items-center gap-2 px-3 py-2 text-slate-600 hover:text-slate-800 hover:bg-slate-100 rounded-lg transition-colors"
+                            className="flex items-center gap-2 px-3 py-2 text-muted-foreground hover:text-foreground hover:bg-muted rounded-lg transition-colors"
                             title="Menu"
                         >
                             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">
@@ -473,14 +473,14 @@ export function AdminTopBar({
                         </button>
 
                         {isMenuOpen && (
-                            <div className="absolute right-0 top-full mt-2 w-56 bg-white rounded-xl shadow-xl border border-slate-200 py-2 z-50">
+                            <div className="absolute right-0 top-full mt-2 w-56 bg-popover rounded-xl shadow-xl border border-border py-2 z-50">
                                 {/* Management */}
                                 <Link
                                     href="/dashboard/management"
-                                    className="flex items-center gap-3 px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50 transition-colors"
+                                    className="flex items-center gap-3 px-4 py-2.5 text-sm text-foreground hover:bg-muted/40 transition-colors"
                                     onClick={() => setIsMenuOpen(false)}
                                 >
-                                    <svg className="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">
+                                    <svg className="w-4 h-4 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">
                                         <path d="M19.4 4.6a5 5 0 0 1-6.8 6.8L8 15l-3-3 3.6-4.6a5 5 0 0 1 6.8-2.8l-3 3 3 3z" />
                                         <path d="M7 14 3.5 17.5" />
                                     </svg>
@@ -490,10 +490,10 @@ export function AdminTopBar({
                                 {/* Settings */}
                                 <Link
                                     href="/dashboard/settings/central"
-                                    className="flex items-center gap-3 px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50 transition-colors"
+                                    className="flex items-center gap-3 px-4 py-2.5 text-sm text-foreground hover:bg-muted/40 transition-colors"
                                     onClick={() => setIsMenuOpen(false)}
                                 >
-                                    <svg className="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">
+                                    <svg className="w-4 h-4 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">
                                         <path d="M12.22 2h-.44a2 2 0 00-2 2v.18a2 2 0 01-1 1.73l-.43.25a2 2 0 01-2 0l-.15-.08a2 2 0 00-2.73.73l-.22.38a2 2 0 00.73 2.73l.15.1a2 2 0 011 1.72v.51a2 2 0 01-1 1.74l-.15.09a2 2 0 00-.73 2.73l.22.38a2 2 0 002.73.73l.15-.08a2 2 0 012 0l.43.25a2 2 0 011 1.73V20a2 2 0 002 2h.44a2 2 0 002-2v-.18a2 2 0 011-1.73l.43-.25a2 2 0 012 0l.15.08a2 2 0 002.73-.73l.22-.39a2 2 0 00-.73-2.73l-.15-.08a2 2 0 01-1-1.74v-.5a2 2 0 011-1.74l.15-.09a2 2 0 00.73-2.73l-.22-.38a2 2 0 00-2.73-.73l-.15.08a2 2 0 01-2 0l-.43-.25a2 2 0 01-1-1.73V4a2 2 0 00-2-2z" />
                                         <circle cx="12" cy="12" r="3" />
                                     </svg>
@@ -503,10 +503,10 @@ export function AdminTopBar({
                                 {/* Billing */}
                                 <Link
                                     href="/dashboard/settings/billing"
-                                    className="flex items-center gap-3 px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50 transition-colors"
+                                    className="flex items-center gap-3 px-4 py-2.5 text-sm text-foreground hover:bg-muted/40 transition-colors"
                                     onClick={() => setIsMenuOpen(false)}
                                 >
-                                    <svg className="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">
+                                    <svg className="w-4 h-4 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">
                                         <rect x="3" y="5" width="18" height="14" rx="2" />
                                         <path d="M3 10h18M7 15h2" />
                                     </svg>
@@ -519,14 +519,14 @@ export function AdminTopBar({
                                         setIsMenuOpen(false);
                                         setShowShortcutsDialog(true);
                                     }}
-                                    className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50 transition-colors"
+                                    className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-foreground hover:bg-muted/40 transition-colors"
                                 >
-                                    <svg className="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">
+                                    <svg className="w-4 h-4 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">
                                         <rect x="2" y="4" width="20" height="16" rx="2" />
                                         <path d="M6 8h.01M10 8h.01M14 8h.01M6 12h.01M10 12h.01M14 12h.01M6 16h.01M10 16h.01M14 16h8" />
                                     </svg>
                                     Keyboard Shortcuts
-                                    <kbd className="ml-auto px-1.5 py-0.5 bg-slate-100 rounded text-[10px] text-slate-400 border border-slate-200">?</kbd>
+                                    <kbd className="ml-auto px-1.5 py-0.5 bg-muted rounded text-[10px] text-muted-foreground/70 border border-border">?</kbd>
                                 </button>
 
                                 {/* Help & Support */}
@@ -535,24 +535,24 @@ export function AdminTopBar({
                                         setIsMenuOpen(false);
                                         setIsHelpPanelOpen(true);
                                     }}
-                                    className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50 transition-colors"
+                                    className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-foreground hover:bg-muted/40 transition-colors"
                                 >
-                                    <svg className="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">
+                                    <svg className="w-4 h-4 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">
                                         <circle cx="12" cy="12" r="10" />
                                         <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" />
                                         <circle cx="12" cy="17" r="0.5" fill="currentColor" />
                                     </svg>
                                     Help & Support
-                                    <kbd className="ml-auto px-1.5 py-0.5 bg-slate-100 rounded text-[10px] text-slate-400 border border-slate-200">⌘/</kbd>
+                                    <kbd className="ml-auto px-1.5 py-0.5 bg-muted rounded text-[10px] text-muted-foreground/70 border border-border">⌘/</kbd>
                                 </button>
 
                                 {/* Divider */}
-                                <div className="my-2 border-t border-slate-100" />
+                                <div className="my-2 border-t border-border/70" />
 
                                 {/* What's New */}
                                 <Link
                                     href="/updates"
-                                    className="flex items-center gap-3 px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50 transition-colors"
+                                    className="flex items-center gap-3 px-4 py-2.5 text-sm text-foreground hover:bg-muted/40 transition-colors"
                                     onClick={() => setIsMenuOpen(false)}
                                 >
                                     <svg className="w-4 h-4 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">
@@ -563,7 +563,7 @@ export function AdminTopBar({
                                 </Link>
 
                                 {/* Divider */}
-                                <div className="my-2 border-t border-slate-100" />
+                                <div className="my-2 border-t border-border/70" />
 
                                 {/* Sign Out */}
                                 <button
@@ -571,7 +571,7 @@ export function AdminTopBar({
                                         localStorage.removeItem("campreserv:authToken");
                                         signOut({ callbackUrl: "/auth/signin" });
                                     }}
-                                    className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-slate-700 hover:bg-rose-50 hover:text-rose-700 transition-colors"
+                                    className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-foreground hover:bg-status-error-bg hover:text-status-error-text transition-colors"
                                 >
                                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">
                                         <path strokeLinecap="round" strokeLinejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
@@ -588,24 +588,24 @@ export function AdminTopBar({
             {isSearchOpen && (
                 <div className="fixed inset-0 z-50 flex items-start justify-center pt-24">
                     {/* Backdrop */}
-                    <div className="absolute inset-0 bg-slate-900/50 backdrop-blur-sm" onClick={() => setIsSearchOpen(false)} />
+                    <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setIsSearchOpen(false)} />
 
                     {/* Modal */}
-                    <div className="relative w-full max-w-2xl mx-4 bg-white rounded-2xl shadow-2xl overflow-hidden">
+                    <div className="relative w-full max-w-2xl mx-4 bg-popover rounded-2xl shadow-2xl overflow-hidden">
                         {/* Search input */}
-                        <div className="flex items-center gap-3 px-5 py-4 border-b border-slate-200">
-                            <svg className="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <div className="flex items-center gap-3 px-5 py-4 border-b border-border">
+                            <svg className="w-5 h-5 text-muted-foreground/70" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                             </svg>
                             <input
                                 ref={searchInputRef}
                                 type="text"
                                 placeholder="Search pages, actions, reports..."
-                                className="flex-1 text-lg text-slate-900 placeholder:text-slate-400 focus:outline-none"
+                                className="flex-1 text-lg text-foreground placeholder:text-muted-foreground/70 focus:outline-none"
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
                             />
-                            <kbd className="px-2 py-1 bg-slate-100 rounded text-xs text-slate-400 border border-slate-200">
+                            <kbd className="px-2 py-1 bg-muted rounded text-xs text-muted-foreground/70 border border-border">
                                 ESC
                             </kbd>
                         </div>
@@ -614,35 +614,35 @@ export function AdminTopBar({
                         <div className="max-h-96 overflow-y-auto">
                             {normalizedQuery && searchSections.totalCount === 0 ? (
                                 <div className="py-12 text-center">
-                                    <svg className="w-12 h-12 text-slate-300 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <svg className="w-12 h-12 text-muted-foreground/40 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                                     </svg>
-                                    <div className="text-sm text-slate-500">No results found for "{searchQuery}"</div>
+                                    <div className="text-sm text-muted-foreground">No results found for "{searchQuery}"</div>
                                 </div>
                             ) : searchSections.sections.length > 0 ? (
                                 <div className="py-2">
                                     {searchSections.sections.map((section) => (
                                         <div key={section.title} className="py-2">
-                                            <div className="px-5 py-1 text-[11px] font-semibold uppercase tracking-wider text-slate-400 flex items-center gap-2">
-                                                <span className="text-slate-400">{getSectionIcon(section.title)}</span>
+                                            <div className="px-5 py-1 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground/70 flex items-center gap-2">
+                                                <span className="text-muted-foreground/70">{getSectionIcon(section.title)}</span>
                                                 {section.title}
                                             </div>
                                             {section.items.map((item) => (
                                                 <button
                                                     key={item.id}
                                                     onClick={() => handleResultClick(item)}
-                                                    className="w-full flex items-center gap-3 px-5 py-3 hover:bg-slate-50 text-left"
+                                                    className="w-full flex items-center gap-3 px-5 py-3 hover:bg-muted/40 text-left"
                                                 >
-                                                    <div className="w-8 h-8 bg-slate-100 rounded-lg flex items-center justify-center text-slate-500">
+                                                    <div className="w-8 h-8 bg-muted rounded-lg flex items-center justify-center text-muted-foreground">
                                                         {getSectionIcon(section.title)}
                                                     </div>
                                                     <div className="flex-1 min-w-0">
-                                                        <div className="text-sm font-medium text-slate-900">{item.label}</div>
+                                                        <div className="text-sm font-medium text-foreground">{item.label}</div>
                                                         {item.subtitle && (
-                                                            <div className="text-xs text-slate-500">{item.subtitle}</div>
+                                                            <div className="text-xs text-muted-foreground">{item.subtitle}</div>
                                                         )}
                                                     </div>
-                                                    <span className="px-2 py-1 bg-slate-100 rounded text-xs text-slate-500">
+                                                    <span className="px-2 py-1 bg-muted rounded text-xs text-muted-foreground">
                                                         {section.title}
                                                     </span>
                                                 </button>
@@ -652,27 +652,27 @@ export function AdminTopBar({
                                 </div>
                             ) : !normalizedQuery ? (
                                 <div className="py-6 px-5">
-                                    <div className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">
+                                    <div className="text-xs font-semibold text-muted-foreground/70 uppercase tracking-wider mb-3">
                                         Quick Actions
                                     </div>
                                     <div className="space-y-1">
                                         <Link
                                             href="/guests"
-                                            className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-slate-50 text-sm text-slate-700"
+                                            className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-muted/40 text-sm text-foreground"
                                         >
-                                            <span className="text-slate-400">→</span> Browse Guests
+                                            <span className="text-muted-foreground/70">→</span> Browse Guests
                                         </Link>
                                         <Link
                                             href="/reservations"
-                                            className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-slate-50 text-sm text-slate-700"
+                                            className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-muted/40 text-sm text-foreground"
                                         >
-                                            <span className="text-slate-400">→</span> View Reservations
+                                            <span className="text-muted-foreground/70">→</span> View Reservations
                                         </Link>
                                         <Link
                                             href="/reports"
-                                            className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-slate-50 text-sm text-slate-700"
+                                            className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-muted/40 text-sm text-foreground"
                                         >
-                                            <span className="text-slate-400">→</span> Open Reports
+                                            <span className="text-muted-foreground/70">→</span> Open Reports
                                         </Link>
                                     </div>
                                 </div>

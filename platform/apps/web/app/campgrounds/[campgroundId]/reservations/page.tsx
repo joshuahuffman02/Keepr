@@ -397,9 +397,9 @@ export default function ReservationsPage() {
       : status === "checked_in"
         ? "bg-status-info/15 text-status-info border-status-info/30"
         : status === "checked_out"
-          ? "bg-slate-100 text-slate-700 border-slate-200"
+          ? "bg-muted text-foreground border-border"
           : status === "cancelled"
-            ? "bg-rose-100 text-rose-700 border-rose-200"
+            ? "bg-status-error/10 text-status-error border-status-error/30"
             : "bg-status-warning/15 text-status-warning border-status-warning/30";
 
   const toggleDetails = useCallback(
@@ -1049,8 +1049,8 @@ export default function ReservationsPage() {
             className={`rounded-md border px-3 py-2 text-sm ${flash.type === "success"
               ? "border-status-success/30 bg-status-success/15 text-status-success"
               : flash.type === "error"
-                ? "border-rose-200 bg-rose-50 text-rose-700"
-                : "border-slate-200 bg-slate-50 text-slate-700"
+                ? "border-status-error/30 bg-status-error/10 text-status-error"
+                : "border-border bg-muted text-foreground"
               }`}
           >
             {flash.message}
@@ -1059,22 +1059,22 @@ export default function ReservationsPage() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
           <Card data-testid="inhouse-card">
             <CardHeader className="pb-2">
-              <CardTitle className="text-sm text-slate-500">In house</CardTitle>
+              <CardTitle className="text-sm text-muted-foreground">In house</CardTitle>
             </CardHeader>
             <CardContent className="pt-0 space-y-1">
-              <div className="text-2xl font-semibold text-slate-900" data-testid="inhouse-count">
+              <div className="text-2xl font-semibold text-foreground" data-testid="inhouse-count">
                 {inHouse.length} / {siteCount || 0}
               </div>
-              <div className="text-xs text-slate-600">{occupancyRate}% occupancy</div>
+              <div className="text-xs text-muted-foreground">{occupancyRate}% occupancy</div>
             </CardContent>
           </Card>
           <Link href="/check-in-out" className="block">
-            <Card data-testid="arrivals-card" className="hover:border-emerald-300 hover:shadow-md transition cursor-pointer">
+            <Card data-testid="arrivals-card" className="hover:border-status-success/30 hover:shadow-md transition cursor-pointer">
               <CardHeader className="pb-2">
-                <CardTitle className="text-sm text-slate-500">Arrivals today</CardTitle>
+                <CardTitle className="text-sm text-muted-foreground">Arrivals today</CardTitle>
               </CardHeader>
               <CardContent className="pt-0 space-y-1">
-                <div className="text-2xl font-semibold text-slate-900" data-testid="arrivals-today">
+                <div className="text-2xl font-semibold text-foreground" data-testid="arrivals-today">
                   {arrivalsToday.length}
                 </div>
                 <div className="text-xs text-status-success font-medium">Click to check in →</div>
@@ -1084,10 +1084,10 @@ export default function ReservationsPage() {
           <Link href="/check-in-out" className="block">
             <Card data-testid="departures-card" className="hover:border-orange-300 hover:shadow-md transition cursor-pointer">
               <CardHeader className="pb-2">
-                <CardTitle className="text-sm text-slate-500">Departures today</CardTitle>
+                <CardTitle className="text-sm text-muted-foreground">Departures today</CardTitle>
               </CardHeader>
               <CardContent className="pt-0 space-y-1">
-                <div className="text-2xl font-semibold text-slate-900" data-testid="departures-today">
+                <div className="text-2xl font-semibold text-foreground" data-testid="departures-today">
                   {departuresToday.length}
                 </div>
                 <div className="text-xs text-orange-600 font-medium">Click to check out →</div>
@@ -1096,19 +1096,19 @@ export default function ReservationsPage() {
           </Link>
           <Card data-testid="balance-due-card">
             <CardHeader className="pb-2">
-              <CardTitle className="text-sm text-slate-500">Balance due</CardTitle>
+              <CardTitle className="text-sm text-muted-foreground">Balance due</CardTitle>
             </CardHeader>
             <CardContent className="pt-0 space-y-1">
-              <div className="text-2xl font-semibold text-slate-900" data-testid="balance-due-value">
+              <div className="text-2xl font-semibold text-foreground" data-testid="balance-due-value">
                 {new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(balanceDueCents / 100)}
               </div>
-              <div className="text-xs text-slate-600">Open receivables</div>
+              <div className="text-xs text-muted-foreground">Open receivables</div>
             </CardContent>
           </Card>
         </div>
 
         <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-          <div className="text-lg font-semibold text-slate-900">Reservations operations</div>
+          <div className="text-lg font-semibold text-foreground">Reservations operations</div>
           <div className="flex flex-wrap gap-2">
             <Button variant="secondary" onClick={() => router.push(`/calendar?campgroundId=${campgroundId}`)}>
               Open calendar
@@ -1119,7 +1119,7 @@ export default function ReservationsPage() {
           </div>
         </div>
 
-        <div className="rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-700">
+        <div className="rounded-lg border border-border bg-muted px-3 py-2 text-sm text-foreground">
           Creating new bookings now lives on the dedicated booking page. Use the dashboard below for arrivals, departures, balances, and guest comms.
         </div>
 
@@ -1129,50 +1129,50 @@ export default function ReservationsPage() {
               <TabsTrigger value="all">All reservations</TabsTrigger>
               <TabsTrigger value="inhouse">In house</TabsTrigger>
             </TabsList>
-            <div className="text-xs text-slate-500">
+            <div className="text-xs text-muted-foreground">
               Showing {tabFilteredReservations.length} of {filteredReservations.length} (filters applied)
             </div>
           </div>
 
           {summary && (
           <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-2">
-            <div className="rounded-lg border border-slate-200 bg-white p-3">
-              <div className="text-xs text-slate-500">Reservations</div>
-              <div className="text-lg font-semibold text-slate-900">{tabFilteredReservations.length}</div>
-              <div className="text-xs text-slate-600">{summary.nights} nights total</div>
+            <div className="rounded-lg border border-border bg-card p-3">
+              <div className="text-xs text-muted-foreground">Reservations</div>
+              <div className="text-lg font-semibold text-foreground">{tabFilteredReservations.length}</div>
+              <div className="text-xs text-muted-foreground">{summary.nights} nights total</div>
             </div>
-            <div className="rounded-lg border border-slate-200 bg-white p-3">
-              <div className="text-xs text-slate-500">Revenue</div>
-              <div className="text-lg font-semibold text-slate-900">
+            <div className="rounded-lg border border-border bg-card p-3">
+              <div className="text-xs text-muted-foreground">Revenue</div>
+              <div className="text-lg font-semibold text-foreground">
                 ${(summary.totalCents / 100).toFixed(2)} / Paid ${(summary.paidCents / 100).toFixed(2)}
               </div>
-              <div className="text-xs text-slate-600">Balance ${(summary.balanceCents / 100).toFixed(2)}</div>
+              <div className="text-xs text-muted-foreground">Balance ${(summary.balanceCents / 100).toFixed(2)}</div>
             </div>
-            <div className="rounded-lg border border-slate-200 bg-white p-3">
-              <div className="text-xs text-slate-500">ADR</div>
-              <div className="text-lg font-semibold text-slate-900">${summary.adr.toFixed(2)}</div>
-              <div className="text-xs text-slate-600">Avg daily rate</div>
+            <div className="rounded-lg border border-border bg-card p-3">
+              <div className="text-xs text-muted-foreground">ADR</div>
+              <div className="text-lg font-semibold text-foreground">${summary.adr.toFixed(2)}</div>
+              <div className="text-xs text-muted-foreground">Avg daily rate</div>
             </div>
-            <div className="rounded-lg border border-slate-200 bg-white p-3">
-              <div className="text-xs text-slate-500">RevPAR</div>
-              <div className="text-lg font-semibold text-slate-900">
+            <div className="rounded-lg border border-border bg-card p-3">
+              <div className="text-xs text-muted-foreground">RevPAR</div>
+              <div className="text-lg font-semibold text-foreground">
                 {siteCount > 0 ? `$${summary.revpar.toFixed(2)}` : "n/a"}
               </div>
-              <div className="text-xs text-slate-600">Per available site</div>
+              <div className="text-xs text-muted-foreground">Per available site</div>
             </div>
           </div>
           )}
 
         <TabsContent value="all" className="space-y-4">
-          <div className="rounded-lg border border-slate-200 bg-white overflow-auto">
+          <div className="rounded-lg border border-border bg-card overflow-auto">
             <table className="min-w-full text-sm">
-              <thead className="bg-slate-50 text-slate-600">
+              <thead className="bg-muted text-muted-foreground">
                 <tr>
                   <th className="px-3 py-2">
                     <input
                       ref={selectAllRef}
                       type="checkbox"
-                      className="h-4 w-4 rounded border-slate-300"
+                      className="h-4 w-4 rounded border-border"
                       checked={allInViewSelected}
                       onChange={toggleAll}
                     />
@@ -1224,26 +1224,26 @@ export default function ReservationsPage() {
                       ? "border-status-warning/30 bg-status-warning/15 text-status-warning"
                       : "border-status-success/30 bg-status-success/15 text-status-success";
                   return (
-                    <tr key={res.id} className="hover:bg-slate-50">
+                    <tr key={res.id} className="hover:bg-muted">
                       <td className="px-3 py-2">
                         <input
                           type="checkbox"
-                          className="h-4 w-4 rounded border-slate-300"
+                          className="h-4 w-4 rounded border-border"
                           checked={selectedIds.includes(res.id)}
                           onChange={() => toggleRow(res.id)}
                         />
                       </td>
-                      <td className="px-3 py-2 text-slate-800">
+                      <td className="px-3 py-2 text-foreground">
                         {arrival.toLocaleDateString()} → {departure.toLocaleDateString()}
                       </td>
-                      <td className="px-3 py-2 text-slate-800">{guestName}</td>
-                      <td className="px-3 py-2 text-slate-800">{res.site?.name || res.site?.siteNumber || "—"}</td>
+                      <td className="px-3 py-2 text-foreground">{guestName}</td>
+                      <td className="px-3 py-2 text-foreground">{res.site?.name || res.site?.siteNumber || "—"}</td>
                       <td className="px-3 py-2">
                         <span className={`rounded-full border px-2 py-0.5 text-xs capitalize ${statusClass}`}>
                           {res.status.replace("_", " ")}
                         </span>
                       </td>
-                      <td className="px-3 py-2 text-slate-800">
+                      <td className="px-3 py-2 text-foreground">
                         <span className={`inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-xs ${balanceClass}`}>
                           Paid ${paid.toFixed(2)} • Bal ${balance.toFixed(2)}
                         </span>
@@ -1284,7 +1284,7 @@ export default function ReservationsPage() {
                             Details
                           </Button>
                         </div>
-                        <div className="flex items-center gap-2 text-xs text-slate-600 mt-1">
+                        <div className="flex items-center gap-2 text-xs text-muted-foreground mt-1">
                           {activeFilterCount > 0 && (
                             <span className="rounded-full bg-status-success/15 text-status-success border border-status-success/30 px-2 py-0.5 text-[11px] font-semibold">
                               {activeFilterCount} filters
@@ -1302,15 +1302,15 @@ export default function ReservationsPage() {
         </TabsContent>
 
         <TabsContent value="inhouse" className="space-y-4">
-          <div className="rounded-lg border border-slate-200 bg-white overflow-auto">
+          <div className="rounded-lg border border-border bg-card overflow-auto">
             <table className="min-w-full text-sm">
-              <thead className="bg-slate-50 text-slate-600">
+              <thead className="bg-muted text-muted-foreground">
                 <tr>
                   <th className="px-3 py-2">
                     <input
                       ref={selectAllRef}
                       type="checkbox"
-                      className="h-4 w-4 rounded border-slate-300"
+                      className="h-4 w-4 rounded border-border"
                       checked={allInViewSelected}
                       onChange={toggleAll}
                     />
@@ -1362,26 +1362,26 @@ export default function ReservationsPage() {
                       ? "border-status-warning/30 bg-status-warning/15 text-status-warning"
                       : "border-status-success/30 bg-status-success/15 text-status-success";
                   return (
-                    <tr key={res.id} className="hover:bg-slate-50">
+                    <tr key={res.id} className="hover:bg-muted">
                       <td className="px-3 py-2">
                         <input
                           type="checkbox"
-                          className="h-4 w-4 rounded border-slate-300"
+                          className="h-4 w-4 rounded border-border"
                           checked={selectedIds.includes(res.id)}
                           onChange={() => toggleRow(res.id)}
                         />
                       </td>
-                      <td className="px-3 py-2 text-slate-800">
+                      <td className="px-3 py-2 text-foreground">
                         {arrival.toLocaleDateString()} → {departure.toLocaleDateString()}
                       </td>
-                      <td className="px-3 py-2 text-slate-800">{guestName}</td>
-                      <td className="px-3 py-2 text-slate-800">{res.site?.name || res.site?.siteNumber || "—"}</td>
+                      <td className="px-3 py-2 text-foreground">{guestName}</td>
+                      <td className="px-3 py-2 text-foreground">{res.site?.name || res.site?.siteNumber || "—"}</td>
                       <td className="px-3 py-2">
                         <span className={`rounded-full border px-2 py-0.5 text-xs capitalize ${statusClass}`}>
                           {res.status.replace("_", " ")}
                         </span>
                       </td>
-                      <td className="px-3 py-2 text-slate-800">
+                      <td className="px-3 py-2 text-foreground">
                         <span className={`inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-xs ${balanceClass}`}>
                           Paid ${paid.toFixed(2)} • Bal ${balance.toFixed(2)}
                         </span>
@@ -1422,7 +1422,7 @@ export default function ReservationsPage() {
                             Details
                           </Button>
                         </div>
-                        <div className="flex items-center gap-2 text-xs text-slate-600 mt-1">
+                        <div className="flex items-center gap-2 text-xs text-muted-foreground mt-1">
                           {activeFilterCount > 0 && (
                             <span className="rounded-full bg-status-success/15 text-status-success border border-status-success/30 px-2 py-0.5 text-[11px] font-semibold">
                               {activeFilterCount} filters
@@ -1477,9 +1477,9 @@ export default function ReservationsPage() {
                 </div>
               </details>
             )}
-            <div className="rounded-lg border border-slate-200 bg-white p-3 space-y-2">
+            <div className="rounded-lg border border-border bg-card p-3 space-y-2">
               <div className="flex items-center justify-between">
-                <div className="text-xs font-semibold uppercase tracking-wide text-slate-500 flex items-center gap-2">
+                <div className="text-xs font-semibold uppercase tracking-wide text-muted-foreground flex items-center gap-2">
                   Filters & exports
                   {activeFilterCount > 0 && (
                     <span className="rounded-full bg-status-success/15 text-status-success border border-status-success/30 px-2 py-0.5 text-[11px] font-semibold">
@@ -1506,25 +1506,25 @@ export default function ReservationsPage() {
               </div>
               <div className="flex flex-wrap items-center gap-2">
                 <input
-                  className="rounded-md border border-slate-200 px-2 py-1 text-sm w-64"
+                  className="rounded-md border border-border px-2 py-1 text-sm w-64"
                   placeholder="Search guest, site, status…"
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
                 />
                 <input
                   type="date"
-                  className="rounded-md border border-slate-200 px-2 py-1 text-sm"
+                  className="rounded-md border border-border px-2 py-1 text-sm"
                   value={startFilter}
                   onChange={(e) => setStartFilter(e.target.value)}
                 />
                 <input
                   type="date"
-                  className="rounded-md border border-slate-200 px-2 py-1 text-sm"
+                  className="rounded-md border border-border px-2 py-1 text-sm"
                   value={endFilter}
                   onChange={(e) => setEndFilter(e.target.value)}
                 />
                 <select
-                  className="rounded-md border border-slate-200 px-2 py-1 text-sm"
+                  className="rounded-md border border-border px-2 py-1 text-sm"
                   value={statusFilter}
                   onChange={(e) => setStatusFilter(e.target.value)}
                 >
@@ -1651,8 +1651,8 @@ export default function ReservationsPage() {
               </div>
               {/* Active filter pills */}
               {activeFilterCount > 0 && (
-                <div className="flex flex-wrap items-center gap-2 pt-2 border-t border-slate-100">
-                  <span className="text-xs text-slate-500 font-medium">Active:</span>
+                <div className="flex flex-wrap items-center gap-2 pt-2 border-t border-border">
+                  <span className="text-xs text-muted-foreground font-medium">Active:</span>
                   {search.trim() && (
                     <FilterChip
                       label={`Search: "${search.trim().length > 20 ? search.trim().slice(0, 20) + '...' : search.trim()}"`}
@@ -1732,10 +1732,10 @@ export default function ReservationsPage() {
                 </div>
               )}
             </div>
-            {reservationsQuery.isLoading && <p className="text-slate-600">Loading…</p>}
+            {reservationsQuery.isLoading && <p className="text-muted-foreground">Loading…</p>}
             {reservationsQuery.error && <p className="text-status-error">Error loading reservations</p>}
             {selectedInView.length > 0 && (
-              <div className="rounded-lg border border-status-info/30 bg-status-info/15 p-3 flex flex-wrap items-center gap-2 text-sm text-slate-800">
+              <div className="rounded-lg border border-status-info/30 bg-status-info/15 p-3 flex flex-wrap items-center gap-2 text-sm text-foreground">
                 <div className="font-semibold">{selectedInView.length} selected</div>
                 <div className="flex flex-wrap gap-2">
                   <Button
@@ -1776,7 +1776,7 @@ export default function ReservationsPage() {
                   </Button>
                 </div>
                 {bulkFeedback && (
-                  <div className="flex items-center gap-2 text-xs text-slate-700">
+                  <div className="flex items-center gap-2 text-xs text-foreground">
                     <span>
                       {bulkFeedback.action}: updated {bulkFeedback.updated}, skipped {bulkFeedback.skipped}
                       {bulkFeedback.failed ? `, failed ${bulkFeedback.failed}` : ""}
@@ -1814,9 +1814,9 @@ export default function ReservationsPage() {
                   : res.status === "checked_in"
                     ? "bg-status-info/15 text-status-info border-status-info/30"
                     : res.status === "checked_out"
-                      ? "bg-slate-100 text-slate-700 border-slate-200"
+                      ? "bg-muted text-foreground border-border"
                       : res.status === "cancelled"
-                        ? "bg-rose-100 text-rose-700 border-rose-200"
+                        ? "bg-status-error/10 text-status-error border-status-error/30"
                         : "bg-status-warning/15 text-status-warning border-status-warning/30";
               const suggestedDeposit =
                 campgroundQuery.data && total
@@ -1861,7 +1861,7 @@ export default function ReservationsPage() {
               return (
                 <div
                   key={res.id}
-                  className={`card p-3 space-y-2 ${highlighted === res.id ? "ring-2 ring-emerald-300" : ""} ${wasSkipped ? "border-amber-300" : ""}`}
+                  className={`card p-3 space-y-2 ${highlighted === res.id ? "ring-2 ring-status-success/40" : ""} ${wasSkipped ? "border-status-warning/30" : ""}`}
                   ref={
                     shouldAutoOpen
                       ? (el) => {
@@ -1871,15 +1871,15 @@ export default function ReservationsPage() {
                   }
                 >
                   <div className="flex flex-wrap items-center justify-between gap-3">
-                    <div className="flex flex-wrap items-center gap-3 text-sm text-slate-800">
+                    <div className="flex flex-wrap items-center gap-3 text-sm text-foreground">
                       <span className={`rounded-full border px-3 py-1 text-xs ${statusColor}`}>{res.status.replace("_", " ")}</span>
-                      <span className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-xs text-slate-700">
+                      <span className="inline-flex items-center gap-2 rounded-full border border-border bg-muted px-3 py-1 text-xs text-foreground">
                         {arrival.toLocaleDateString()} → {departure.toLocaleDateString()} • {nights} night(s)
                       </span>
-                      <span className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-xs text-slate-700">
+                      <span className="inline-flex items-center gap-2 rounded-full border border-border bg-muted px-3 py-1 text-xs text-foreground">
                         Paid ${paid.toFixed(2)} • Bal ${balance.toFixed(2)}
                       </span>
-                      <span className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-xs text-slate-700">
+                      <span className="inline-flex items-center gap-2 rounded-full border border-border bg-muted px-3 py-1 text-xs text-foreground">
                         ADR ${nights > 0 ? (total / nights).toFixed(2) : total.toFixed(2)}
                       </span>
                       {balance > 0 && (
@@ -1887,10 +1887,10 @@ export default function ReservationsPage() {
                           Balance due {new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(balance)}
                         </span>
                       )}
-                      <span className="text-slate-700">
+                      <span className="text-foreground">
                         Site {res.site?.name || res.site?.siteNumber} {siteClassName ? `• ${siteClassName}` : ""}
                       </span>
-                      <span className="text-slate-700">Guest {guestName || "Unassigned"}</span>
+                      <span className="text-foreground">Guest {guestName || "Unassigned"}</span>
                       {suggestedDeposit > 0 && (
                         <span
                           className={`rounded-full border px-2 py-0.5 text-[11px] ${
@@ -1908,7 +1908,7 @@ export default function ReservationsPage() {
                         </span>
                       )}
                       {siteClass?.glCode && (
-                        <span className="rounded-full border border-slate-200 bg-slate-50 px-2 py-1 text-xs text-slate-700">
+                        <span className="rounded-full border border-border bg-muted px-2 py-1 text-xs text-foreground">
                           GL {siteClass.glCode}
                         </span>
                       )}
@@ -1979,23 +1979,23 @@ export default function ReservationsPage() {
                   </div>
 
                   {isOpen && (
-                    <div className="space-y-3 border-t border-slate-200 pt-3">
+                    <div className="space-y-3 border-t border-border pt-3">
                       {conflict?.conflict && (
-                        <div className="rounded-md border border-rose-200 bg-rose-50 px-3 py-2 text-xs text-rose-800">
-                          <div className="text-sm font-semibold text-rose-900">Conflict detected</div>
+                        <div className="rounded-md border border-status-error/30 bg-status-error/10 px-3 py-2 text-xs text-status-error">
+                          <div className="text-sm font-semibold text-status-error">Conflict detected</div>
                           <div className="flex flex-wrap gap-2">
                             {(conflict.reasons || []).map((r) => (
-                              <span key={r} className="rounded-full border border-rose-200 bg-white px-2 py-0.5">
+                              <span key={r} className="rounded-full border border-status-error/30 bg-card px-2 py-0.5">
                                 {r}
                               </span>
                             ))}
                           </div>
-                          <div className="text-[11px] text-rose-700">Resolve conflicts before saving changes.</div>
+                          <div className="text-[11px] text-status-error">Resolve conflicts before saving changes.</div>
                         </div>
                       )}
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                      <div className="rounded-md border border-slate-200 bg-slate-50 px-3 py-2 text-xs text-slate-700 space-y-1">
-                        <div className="text-sm font-semibold text-slate-900">At a glance</div>
+                      <div className="rounded-md border border-border bg-muted px-3 py-2 text-xs text-foreground space-y-1">
+                        <div className="text-sm font-semibold text-foreground">At a glance</div>
                         <div>
                           {arrival.toLocaleDateString()} → {departure.toLocaleDateString()} • {nights} night(s) • Site{" "}
                           {res.site?.name || res.site?.siteNumber}
@@ -2005,16 +2005,16 @@ export default function ReservationsPage() {
                           {paid.toFixed(2)} • Balance ${balance.toFixed(2)}
                         </div>
                         {resMaxOccupancy && (
-                          <div className="text-slate-600">
+                          <div className="text-muted-foreground">
                             Occupancy {resOccupancy} of {resMaxOccupancy} max {resOccupancyOver ? "• over capacity" : ""}
                           </div>
                         )}
-                        <div className="text-slate-600">
+                        <div className="text-muted-foreground">
                           Status {res.status.replace("_", " ")} • Payment {res.paymentStatus || "unpaid"} • GL {siteClass?.glCode || "n/a"}
                           </div>
                         </div>
-                        <div className="rounded-md border border-slate-200 bg-slate-50 px-3 py-2 text-xs text-slate-700 space-y-2">
-                          <div className="text-sm font-semibold text-slate-900">Recent activity</div>
+                        <div className="rounded-md border border-border bg-muted px-3 py-2 text-xs text-foreground space-y-2">
+                          <div className="text-sm font-semibold text-foreground">Recent activity</div>
                           {(() => {
                             const activity: { id: string; label: string; at: string }[] = [];
                             (ledgerByRes[res.id] || []).slice(0, 5).forEach((row: any, idx: number) => {
@@ -2048,7 +2048,7 @@ export default function ReservationsPage() {
                                 {sorted.map((a) => (
                                   <div key={a.id} className="flex items-center justify-between gap-2">
                                     <span className="truncate">{a.label}</span>
-                                    <span className="text-[10px] text-slate-500">{a.at ? new Date(a.at).toLocaleString() : ""}</span>
+                                    <span className="text-[10px] text-muted-foreground">{a.at ? new Date(a.at).toLocaleString() : ""}</span>
                                   </div>
                                 ))}
                               </div>
@@ -2056,11 +2056,11 @@ export default function ReservationsPage() {
                           })()}
                         </div>
                       </div>
-                      <div className="flex flex-wrap items-center gap-2 text-xs text-slate-700">
+                      <div className="flex flex-wrap items-center gap-2 text-xs text-foreground">
                         <label className="flex items-center gap-2">
                           Site
                           <select
-                            className="rounded-md border border-slate-200 px-2 py-1 text-xs"
+                            className="rounded-md border border-border px-2 py-1 text-xs"
                             value={editing[res.id]?.siteId || res.siteId}
                             onChange={(e) =>
                               setEditing((prev) => ({
@@ -2079,7 +2079,7 @@ export default function ReservationsPage() {
                         <label className="flex items-center gap-2">
                           Guest
                           <select
-                            className="rounded-md border border-slate-200 px-2 py-1 text-xs"
+                            className="rounded-md border border-border px-2 py-1 text-xs"
                             value={editing[res.id]?.guestId || res.guestId}
                             onChange={(e) =>
                               setEditing((prev) => ({
@@ -2098,14 +2098,14 @@ export default function ReservationsPage() {
                       </div>
 
                       {matchTargetReservation?.id === res.id && (
-                        <div className="rounded-md border border-slate-200 bg-slate-50 px-3 py-2 text-xs text-slate-700 space-y-2">
+                        <div className="rounded-md border border-border bg-muted px-3 py-2 text-xs text-foreground space-y-2">
                           <div className="flex items-center justify-between">
-                            <div className="text-sm font-semibold text-slate-900">Recommended sites</div>
-                            {matchScoresQuery.isLoading && <span className="text-[11px] text-slate-500">Checking matches…</span>}
-                            {matchScoresQuery.isError && <span className="text-[11px] text-rose-600">Match scoring failed</span>}
+                            <div className="text-sm font-semibold text-foreground">Recommended sites</div>
+                            {matchScoresQuery.isLoading && <span className="text-[11px] text-muted-foreground">Checking matches…</span>}
+                            {matchScoresQuery.isError && <span className="text-[11px] text-status-error">Match scoring failed</span>}
                           </div>
                           {topMatches.length === 0 && !matchScoresQuery.isLoading && (
-                            <div className="text-slate-500">No ranked matches available for this guest.</div>
+                            <div className="text-muted-foreground">No ranked matches available for this guest.</div>
                           )}
                           {topMatches.length > 0 && (
                             <div className="flex flex-wrap gap-2">
@@ -2130,16 +2130,16 @@ export default function ReservationsPage() {
                       )}
 
                       {res.guest && (
-                        <div className="flex flex-col gap-1 text-xs text-slate-600">
+                        <div className="flex flex-col gap-1 text-xs text-muted-foreground">
                           <div className="font-semibold">
                             {res.guest.primaryFirstName} {res.guest.primaryLastName}
                           </div>
-                          <div className="text-[11px] text-slate-500">
+                          <div className="text-[11px] text-muted-foreground">
                             Guest profile ID: {res.guest.id} {res.guest.email ? `• ${res.guest.email}` : ""}
                           </div>
                           <div className="flex flex-wrap gap-2">
                             <input
-                              className="rounded-md border border-slate-200 px-2 py-1"
+                              className="rounded-md border border-border px-2 py-1"
                               placeholder="Email"
                               value={guestEdits[res.guest.id]?.email ?? res.guest.email ?? ""}
                               onChange={(e) =>
@@ -2150,7 +2150,7 @@ export default function ReservationsPage() {
                               }
                             />
                             <input
-                              className="rounded-md border border-slate-200 px-2 py-1"
+                              className="rounded-md border border-border px-2 py-1"
                               placeholder="Phone"
                               value={guestEdits[res.guest.id]?.phone ?? res.guest.phone ?? ""}
                               onChange={(e) =>
@@ -2178,19 +2178,19 @@ export default function ReservationsPage() {
                         </div>
                       )}
 
-                      <div className="grid grid-cols-1 md:grid-cols-3 gap-2 text-sm text-slate-800">
-                        <div className="rounded-md border border-slate-200 bg-slate-50 px-3 py-2">
-                          <div className="text-slate-500 text-xs">Payment</div>
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-2 text-sm text-foreground">
+                        <div className="rounded-md border border-border bg-muted px-3 py-2">
+                          <div className="text-muted-foreground text-xs">Payment</div>
                           <div className="font-semibold">${total.toFixed(2)}</div>
-                          <div className="text-xs text-slate-600">Paid ${paid.toFixed(2)} • Balance ${balance.toFixed(2)}</div>
+                          <div className="text-xs text-muted-foreground">Paid ${paid.toFixed(2)} • Balance ${balance.toFixed(2)}</div>
                           {suggestedDeposit > 0 && (
                             <div className="text-xs text-status-warning mt-1">
                               Deposit: ${suggestedDeposit.toFixed(2)} {paid >= suggestedDeposit ? "✔" : "← due"}
                             </div>
                           )}
                         </div>
-                        <div className="rounded-md border border-slate-200 bg-slate-50 px-3 py-2 flex flex-col gap-1">
-                          <div className="text-slate-500 text-xs">Guests</div>
+                        <div className="rounded-md border border-border bg-muted px-3 py-2 flex flex-col gap-1">
+                          <div className="text-muted-foreground text-xs">Guests</div>
                           <div className="text-sm">Adults {res.adults} • Children {res.children}</div>
                           <div className="flex gap-2 text-xs">
                             <Button
@@ -2244,14 +2244,14 @@ export default function ReservationsPage() {
                             </Button>
                           </div>
                         </div>
-                        <div className="rounded-md border border-slate-200 bg-slate-50 px-3 py-2 flex flex-col gap-1 text-xs">
-                          <div className="text-slate-500 text-xs">Quick payments</div>
+                        <div className="rounded-md border border-border bg-muted px-3 py-2 flex flex-col gap-1 text-xs">
+                          <div className="text-muted-foreground text-xs">Quick payments</div>
                           <div className="flex flex-wrap gap-2">
                             <input
                               type="number"
                               min={0}
                               step="0.01"
-                              className="rounded-md border border-slate-200 px-2 py-1 w-24"
+                              className="rounded-md border border-border px-2 py-1 w-24"
                               placeholder="Add payment"
                               value={
                                 paymentInputs[res.id] !== undefined
@@ -2263,7 +2263,7 @@ export default function ReservationsPage() {
                               }
                             />
                             <select
-                              className="rounded-md border border-slate-200 px-2 py-1 text-xs"
+                              className="rounded-md border border-border px-2 py-1 text-xs"
                               value={paymentTenders[res.id] ?? "card"}
                               onChange={(e) =>
                                 setPaymentTenders((prev) => ({
@@ -2314,7 +2314,7 @@ export default function ReservationsPage() {
                               type="number"
                               min={0}
                               step="0.01"
-                              className="rounded-md border border-rose-200 px-2 py-1 w-24"
+                              className="rounded-md border border-status-error/30 px-2 py-1 w-24"
                               placeholder="Refund"
                               value={refundInputs[res.id] ?? ""}
                               onChange={(e) =>
@@ -2338,12 +2338,12 @@ export default function ReservationsPage() {
                         </div>
                       </div>
 
-                      <div className="grid grid-cols-1 md:grid-cols-3 gap-2 text-sm text-slate-700">
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-2 text-sm text-foreground">
                         <label className="flex items-center gap-2">
                           Adults
                           <input
                             type="number"
-                            className="rounded-md border border-slate-200 px-2 py-1 w-20"
+                            className="rounded-md border border-border px-2 py-1 w-20"
                             value={editing[res.id]?.adults ?? res.adults}
                             onChange={(e) =>
                               setEditing((prev) => ({
@@ -2360,7 +2360,7 @@ export default function ReservationsPage() {
                           Children
                           <input
                             type="number"
-                            className="rounded-md border border-slate-200 px-2 py-1 w-20"
+                            className="rounded-md border border-border px-2 py-1 w-20"
                             value={editing[res.id]?.children ?? res.children}
                             onChange={(e) =>
                               setEditing((prev) => ({
@@ -2377,7 +2377,7 @@ export default function ReservationsPage() {
                           Total $
                           <input
                             type="number"
-                            className="rounded-md border border-slate-200 px-2 py-1 w-28"
+                            className="rounded-md border border-border px-2 py-1 w-28"
                             value={((editing[res.id]?.totalAmount ?? res.totalAmount) / 100).toFixed(2)}
                             onChange={(e) =>
                               setEditing((prev) => ({
@@ -2394,7 +2394,7 @@ export default function ReservationsPage() {
                           Paid $
                           <input
                             type="number"
-                            className="rounded-md border border-slate-200 px-2 py-1 w-28"
+                            className="rounded-md border border-border px-2 py-1 w-28"
                             value={((editing[res.id]?.paidAmount ?? res.paidAmount ?? 0) / 100).toFixed(2)}
                             onChange={(e) =>
                               setEditing((prev) => ({
@@ -2410,7 +2410,7 @@ export default function ReservationsPage() {
                         <label className="flex items-center gap-2">
                           Payment
                           <select
-                            className="rounded-md border border-slate-200 px-2 py-1 text-xs"
+                            className="rounded-md border border-border px-2 py-1 text-xs"
                             value={editing[res.id]?.paymentStatus || res.paymentStatus || "unpaid"}
                             onChange={(e) =>
                               setEditing((prev) => ({
@@ -2429,24 +2429,24 @@ export default function ReservationsPage() {
                         </label>
                       </div>
                       {/* Related reservations */}
-                      <div className="rounded-md border border-slate-200 bg-slate-50 px-3 py-2 text-xs text-slate-700 space-y-2">
-                        <div className="text-sm font-semibold text-slate-900">Related reservations</div>
+                      <div className="rounded-md border border-border bg-muted px-3 py-2 text-xs text-foreground space-y-2">
+                        <div className="text-sm font-semibold text-foreground">Related reservations</div>
                         {(() => {
                           const related = (reservationsQuery.data || [])
                             .filter((r) => r.id !== res.id && r.guestId === res.guestId)
                             .sort((a, b) => new Date(a.arrivalDate).getTime() - new Date(b.arrivalDate).getTime())
                             .slice(0, 3);
                           if (related.length === 0) {
-                            return <div className="text-slate-500">No other stays for this guest.</div>;
+                            return <div className="text-muted-foreground">No other stays for this guest.</div>;
                           }
                           return (
                             <div className="space-y-1">
                               {related.map((r) => (
                                 <div key={r.id} className="flex flex-wrap items-center gap-2">
-                                  <span className="rounded-full border border-slate-200 bg-white px-2 py-0.5">
+                                  <span className="rounded-full border border-border bg-card px-2 py-0.5">
                                     {new Date(r.arrivalDate).toLocaleDateString()} → {new Date(r.departureDate).toLocaleDateString()}
                                   </span>
-                                  <span className="text-slate-700">{r.site?.name || r.site?.siteNumber || r.siteId}</span>
+                                  <span className="text-foreground">{r.site?.name || r.site?.siteNumber || r.siteId}</span>
                                   <span className={`rounded-full border px-2 py-0.5 text-[11px] capitalize ${statusBadge(r.status as ReservationStatus)}`}>
                                     {r.status.replace("_", " ")}
                                   </span>
@@ -2463,12 +2463,12 @@ export default function ReservationsPage() {
                           );
                         })()}
                       </div>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm text-slate-700">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm text-foreground">
                         <label className="flex items-center gap-2">
                           Check-in
                           <input
                             type="datetime-local"
-                            className="rounded-md border border-slate-200 px-2 py-1"
+                            className="rounded-md border border-border px-2 py-1"
                             value={(editing[res.id]?.checkInAt || res.checkInAt || "").toString().slice(0, 16)}
                             onChange={(e) =>
                               setEditing((prev) => ({
@@ -2485,7 +2485,7 @@ export default function ReservationsPage() {
                           Check-out
                           <input
                             type="datetime-local"
-                            className="rounded-md border border-slate-200 px-2 py-1"
+                            className="rounded-md border border-border px-2 py-1"
                             value={(editing[res.id]?.checkOutAt || res.checkOutAt || "").toString().slice(0, 16)}
                             onChange={(e) =>
                               setEditing((prev) => ({
@@ -2501,7 +2501,7 @@ export default function ReservationsPage() {
                       </div>
                       <div>
                         <textarea
-                          className="rounded-md border border-slate-200 px-2 py-1 w-full text-sm"
+                          className="rounded-md border border-border px-2 py-1 w-full text-sm"
                           placeholder="Notes"
                           value={editing[res.id]?.notes ?? res.notes ?? ""}
                           onChange={(e) =>
@@ -2521,7 +2521,7 @@ export default function ReservationsPage() {
                           <div className="text-[11px]">Provide reason and approval to save discount/total changes.</div>
                           <div className="grid md:grid-cols-2 gap-2">
                             <input
-                              className="rounded-md border border-amber-300 px-2 py-1 text-xs"
+                              className="rounded-md border border-status-warning/30 px-2 py-1 text-xs"
                               placeholder="Override reason"
                               value={editing[res.id]?.overrideReason ?? ""}
                               onChange={(e) =>
@@ -2532,7 +2532,7 @@ export default function ReservationsPage() {
                               }
                             />
                             <input
-                              className="rounded-md border border-amber-300 px-2 py-1 text-xs"
+                              className="rounded-md border border-status-warning/30 px-2 py-1 text-xs"
                               placeholder="Approved by"
                               value={editing[res.id]?.overrideApprovedBy ?? ""}
                               onChange={(e) =>
@@ -2617,15 +2617,15 @@ export default function ReservationsPage() {
                         </div>
                       )}
 
-                      <div className="mt-2 rounded-lg border border-slate-200 bg-white p-3 space-y-2 text-sm">
+                      <div className="mt-2 rounded-lg border border-border bg-card p-3 space-y-2 text-sm">
                         <div className="flex items-center justify-between">
-                          <div className="text-xs font-semibold text-slate-700">Communications</div>
+                          <div className="text-xs font-semibold text-foreground">Communications</div>
                           <div className="flex gap-2 items-center flex-wrap">
                             <div className="flex gap-1">
                               {(["all", "messages", "notes", "failed"] as const).map((f) => (
                                 <button
                                   key={f}
-                                  className={`rounded-full border px-2 py-1 text-[11px] ${commsFilter === f ? "border-status-success/30 bg-status-success/15 text-status-success" : "border-slate-200 text-slate-600"}`}
+                                  className={`rounded-full border px-2 py-1 text-[11px] ${commsFilter === f ? "border-status-success/30 bg-status-success/15 text-status-success" : "border-border text-muted-foreground"}`}
                                   onClick={() => setCommsFilter(f)}
                                 >
                                   {f === "failed" ? "Failed" : f === "messages" ? "Messages" : f[0].toUpperCase() + f.slice(1)}
@@ -2640,7 +2640,7 @@ export default function ReservationsPage() {
                             >
                               Failed only
                             </Button>
-                          {commsLoading[res.id] && <div className="text-xs text-slate-500">Loading…</div>}
+                          {commsLoading[res.id] && <div className="text-xs text-muted-foreground">Loading…</div>}
                             <Button
                               size="sm"
                               variant="ghost"
@@ -2667,7 +2667,7 @@ export default function ReservationsPage() {
                         </div>
                         {commsErrors[res.id] && <div className="text-xs text-status-warning">{commsErrors[res.id]}</div>}
                         {!commsLoading[res.id] && (commsByRes[res.id] || []).length === 0 && (
-                          <div className="overflow-hidden rounded border border-slate-200 bg-white">
+                          <div className="overflow-hidden rounded border border-border bg-card">
                             <table className="w-full text-sm">
                               <tbody>
                                 <TableEmpty>No notes or messages yet.</TableEmpty>
@@ -2693,9 +2693,9 @@ export default function ReservationsPage() {
                               ? "bg-status-success/15 text-status-success border border-status-success/30"
                               : status.includes("fail") || status.includes("bounce")
                                 ? "bg-status-error/15 text-status-error border border-status-error/30"
-                                : "bg-slate-100 text-slate-700 border border-slate-200";
+                                : "bg-muted text-foreground border border-border";
                           return (
-                            <div key={c.id} className="rounded border border-slate-100 bg-slate-50 px-2 py-1 text-xs text-slate-700">
+                            <div key={c.id} className="rounded border border-border bg-muted px-2 py-1 text-xs text-foreground">
                               <div className="flex flex-wrap items-center gap-2">
                                 <span className="font-semibold uppercase">{c.type}</span>
                                 <span
@@ -2710,11 +2710,11 @@ export default function ReservationsPage() {
                                 <span className={`px-2 py-0.5 rounded-full text-[10px] font-semibold capitalize ${statusClass}`}>
                                   {status}
                                 </span>
-                                <span className="text-slate-500">{c.createdAt ? new Date(c.createdAt).toLocaleString() : ""}</span>
+                                <span className="text-muted-foreground">{c.createdAt ? new Date(c.createdAt).toLocaleString() : ""}</span>
                               </div>
-                              {c.subject && <div className="text-slate-800">{c.subject}</div>}
-                              {c.body && <div className="text-slate-700 whitespace-pre-wrap">{c.body}</div>}
-                              <div className="text-[11px] text-slate-500 mt-1">
+                              {c.subject && <div className="text-foreground">{c.subject}</div>}
+                              {c.body && <div className="text-foreground whitespace-pre-wrap">{c.body}</div>}
+                              <div className="text-[11px] text-muted-foreground mt-1">
                                 {c.provider ? `Provider: ${c.provider}` : ""}
                                 {c.toAddress ? ` • To: ${c.toAddress}` : ""}
                                 {c.fromAddress ? ` • From: ${c.fromAddress}` : ""}
@@ -2731,11 +2731,11 @@ export default function ReservationsPage() {
                             fromAddress?: string;
                           } = newComm[res.id] || {};
                           return (
-                        <div className="rounded border border-slate-100 bg-slate-50 px-2 py-2 space-y-2">
+                        <div className="rounded border border-border bg-muted px-2 py-2 space-y-2">
                           <div className="flex gap-2 items-center">
-                            <label className="text-xs text-slate-600">Type</label>
+                            <label className="text-xs text-muted-foreground">Type</label>
                             <select
-                              className="rounded-md border border-slate-200 px-2 py-1 text-xs"
+                              className="rounded-md border border-border px-2 py-1 text-xs"
                               value={commDraft.type || "note"}
                               onChange={(e) =>
                                 setNewComm((prev) => ({
@@ -2749,7 +2749,7 @@ export default function ReservationsPage() {
                             </select>
                             {commDraft.type === "email" && (
                               <input
-                                className="flex-1 rounded-md border border-slate-200 px-2 py-1 text-xs"
+                                className="flex-1 rounded-md border border-border px-2 py-1 text-xs"
                                 placeholder="To email"
                                 value={commDraft.toAddress ?? (res as ReservationWithGuest)?.guest?.email ?? ""}
                                 onChange={(e) =>
@@ -2762,13 +2762,13 @@ export default function ReservationsPage() {
                             )}
                           </div>
                           <input
-                            className="w-full rounded-md border border-slate-200 px-2 py-1 text-xs"
+                            className="w-full rounded-md border border-border px-2 py-1 text-xs"
                             placeholder="Subject (optional)"
                             value={commDraft.subject ?? ""}
                             onChange={(e) => setNewComm((prev) => ({ ...prev, [res.id]: { ...(prev[res.id] || { body: "" }), subject: e.target.value } }))}
                           />
                           <textarea
-                            className="w-full rounded-md border border-slate-200 px-2 py-1 text-xs"
+                            className="w-full rounded-md border border-border px-2 py-1 text-xs"
                             placeholder="Add a note or email body"
                             value={commDraft.body ?? ""}
                             onChange={(e) => setNewComm((prev) => ({ ...prev, [res.id]: { ...(prev[res.id] || { subject: "" }), body: e.target.value } }))}

@@ -73,7 +73,7 @@ function ShieldBadge({ level, size = "md" }: { level: SecurityCertificationLevel
   const badgeInfo = getSecurityBadgeInfo(level);
   if (!badgeInfo) {
     return (
-      <div className={cn("rounded-full flex items-center justify-center bg-muted dark:bg-slate-700", sizeClasses[size])}>
+      <div className={cn("rounded-full flex items-center justify-center bg-muted dark:bg-muted", sizeClasses[size])}>
         <Shield className={cn("text-muted-foreground", size === "lg" ? "w-12 h-12" : size === "md" ? "w-8 h-8" : "w-4 h-4")} />
       </div>
     );
@@ -372,7 +372,7 @@ export default function SecurityCertificationPage() {
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.5, opacity: 0 }}
               transition={{ type: "spring", stiffness: 200, damping: 20 }}
-              className="bg-card dark:bg-slate-900 rounded-2xl p-4 sm:p-8 max-w-md mx-4 text-center shadow-2xl relative"
+              className="bg-card dark:bg-muted rounded-2xl p-4 sm:p-8 max-w-md mx-4 text-center shadow-2xl relative"
               onClick={(e) => e.stopPropagation()}
             >
               {/* Close button */}
@@ -380,7 +380,7 @@ export default function SecurityCertificationPage() {
                 variant="ghost"
                 size="icon"
                 onClick={() => setShowTierUnlock(null)}
-                className="absolute top-2 right-2 text-muted-foreground hover:text-muted-foreground dark:hover:text-slate-300 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                className="absolute top-2 right-2 text-muted-foreground hover:text-muted-foreground dark:hover:text-muted-foreground focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
                 aria-label="Close dialog"
               >
                 <X className="w-5 h-5" />
@@ -497,7 +497,7 @@ export default function SecurityCertificationPage() {
                 <h3 className="text-lg font-semibold text-foreground dark:text-white mb-2">
                   Welcome to Security Certification
                 </h3>
-                <p className="text-sm text-foreground dark:text-slate-300 mb-3">
+                <p className="text-sm text-foreground dark:text-muted-foreground mb-3">
                   Don&apos;t worry—you&apos;re not expected to complete everything at once. This checklist helps you build security practices over time. Many items take just minutes to complete, and we provide templates for the rest.
                 </p>
                 <div className="flex items-center gap-2 text-sm text-status-info">
@@ -559,9 +559,9 @@ export default function SecurityCertificationPage() {
                     aria-label={`Toggle completion for ${item.label}`}
                     className={cn(
                       "flex items-center justify-between p-3 rounded-lg border transition-all cursor-pointer",
-                      "bg-card dark:bg-slate-800 border-amber-200 dark:border-amber-700",
-                      "hover:bg-amber-50 dark:hover:bg-slate-700 hover:shadow-md",
-                      "focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2 dark:focus:ring-offset-slate-900"
+                      "bg-card dark:bg-muted border-amber-200 dark:border-amber-700",
+                      "hover:bg-amber-50 dark:hover:bg-muted hover:shadow-md",
+                      "focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2 dark:focus:ring-offset-background"
                     )}
                     onClick={() => {
                       toggleItem(item.id);
@@ -583,7 +583,7 @@ export default function SecurityCertificationPage() {
                         tabIndex={-1}
                       />
                       <div>
-                        <span className="text-sm font-medium text-foreground dark:text-slate-300">{item.label}</span>
+                        <span className="text-sm font-medium text-foreground dark:text-muted-foreground">{item.label}</span>
                         {item.required && (
                           <Badge variant="outline" className="ml-2 text-xs bg-blue-50 dark:bg-blue-950 text-blue-700 dark:text-blue-300 border-blue-200 dark:border-blue-800">
                             Core Practice
@@ -610,7 +610,7 @@ export default function SecurityCertificationPage() {
           <CardContent>
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6">
               {/* Certification Badge */}
-              <div className="flex flex-col items-center text-center p-4 rounded-xl bg-card dark:bg-slate-800 border border-border dark:border-slate-700">
+              <div className="flex flex-col items-center text-center p-4 rounded-xl bg-card dark:bg-muted border border-border dark:border-border">
                 {badgeInfo ? (
                   <>
                     <motion.div
@@ -650,7 +650,7 @@ export default function SecurityCertificationPage() {
                     <span className="font-medium text-foreground dark:text-white">{stats.totalPoints} / {stats.maxPoints}</span>
                   </div>
                   <div
-                    className="h-2 bg-muted dark:bg-slate-700 rounded-full overflow-hidden"
+                    className="h-2 bg-muted dark:bg-muted rounded-full overflow-hidden"
                     role="progressbar"
                     aria-valuenow={stats.totalPoints}
                     aria-valuemax={stats.maxPoints}
@@ -673,7 +673,7 @@ export default function SecurityCertificationPage() {
                     <span className="font-medium text-foreground dark:text-white">{stats.requiredCompleted} / {stats.requiredTotal}</span>
                   </div>
                   <div
-                    className="h-2 bg-muted dark:bg-slate-700 rounded-full overflow-hidden"
+                    className="h-2 bg-muted dark:bg-muted rounded-full overflow-hidden"
                     role="progressbar"
                     aria-valuenow={stats.requiredCompleted}
                     aria-valuemax={stats.requiredTotal}
@@ -690,7 +690,7 @@ export default function SecurityCertificationPage() {
               </div>
 
               {/* Verification Status */}
-              <div className="p-4 rounded-xl bg-card dark:bg-slate-800 border border-border dark:border-slate-700">
+              <div className="p-4 rounded-xl bg-card dark:bg-muted border border-border dark:border-border">
                 <h4 className="font-medium text-foreground dark:text-white mb-2">Verification Status</h4>
                 <div className="flex items-center gap-2 mb-2">
                   {isVerified ? (
@@ -713,7 +713,7 @@ export default function SecurityCertificationPage() {
         </Card>
 
         {/* Certification Tiers - Fixed mobile grid */}
-        <Card className="dark:bg-slate-900 dark:border-slate-700">
+        <Card className="dark:bg-muted dark:border-border">
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-foreground dark:text-white">
               <Award className="w-5 h-5 text-amber-500" />
@@ -745,7 +745,7 @@ export default function SecurityCertificationPage() {
                         ? `${tone.border} ${tone.bg}`
                         : isAchieved
                         ? `${tone.border} ${tone.bg}`
-                        : "border-border dark:border-slate-700 bg-card dark:bg-slate-800"
+                        : "border-border dark:border-border bg-card dark:bg-muted"
                     )}
                   >
                     <div className="flex flex-col items-center text-center">
@@ -796,7 +796,7 @@ export default function SecurityCertificationPage() {
                 return (
                   <div
                     key={protection.id}
-                    className="flex items-start gap-3 p-3 rounded-lg bg-card dark:bg-slate-800 border border-status-success/20"
+                    className="flex items-start gap-3 p-3 rounded-lg bg-card dark:bg-muted border border-status-success/20"
                   >
                     <div className="w-8 h-8 rounded-lg bg-status-success/15 flex items-center justify-center flex-shrink-0">
                       <IconComponent className="w-4 h-4 text-status-success" />
@@ -816,7 +816,7 @@ export default function SecurityCertificationPage() {
         </Card>
 
         {/* Compliance Checklist */}
-        <Card className="dark:bg-slate-900 dark:border-slate-700">
+        <Card className="dark:bg-muted dark:border-border">
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-foreground dark:text-white">
               <FileText className="w-5 h-5 text-blue-500 dark:text-blue-400" />
@@ -836,10 +836,10 @@ export default function SecurityCertificationPage() {
 
               return (
                 <Collapsible key={category} open={isExpanded} onOpenChange={() => toggleCategory(category)}>
-                  <div className="border border-border dark:border-slate-700 rounded-lg overflow-hidden">
+                  <div className="border border-border dark:border-border rounded-lg overflow-hidden">
                     <CollapsibleTrigger asChild>
                       <button
-                        className="w-full p-4 flex items-center justify-between hover:bg-muted/60 dark:hover:bg-slate-800 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-inset"
+                        className="w-full p-4 flex items-center justify-between hover:bg-muted/60 dark:hover:bg-muted transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-inset"
                         aria-expanded={isExpanded}
                       >
                         <div className="flex items-center gap-3">
@@ -877,7 +877,7 @@ export default function SecurityCertificationPage() {
                       </button>
                     </CollapsibleTrigger>
                     <CollapsibleContent>
-                      <div className="border-t border-border dark:border-slate-700 p-4 space-y-3">
+                      <div className="border-t border-border dark:border-border p-4 space-y-3">
                         {/* Category completion message */}
                         {isCategoryComplete && (
                           <div className="mb-3 p-3 rounded-lg bg-emerald-50 dark:bg-emerald-950 border border-emerald-200 dark:border-emerald-800">
@@ -901,7 +901,7 @@ export default function SecurityCertificationPage() {
                               "focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-inset",
                               completedItems.has(item.id)
                                 ? "bg-emerald-50 dark:bg-emerald-950 border border-emerald-200 dark:border-emerald-800"
-                                : "bg-muted/60 dark:bg-slate-800 border border-border dark:border-slate-700 hover:bg-muted dark:hover:bg-slate-700"
+                                : "bg-muted/60 dark:bg-muted border border-border dark:border-border hover:bg-muted dark:hover:bg-muted"
                             )}
                             onClick={() => toggleItem(item.id)}
                             onKeyDown={(e) => {
@@ -933,7 +933,7 @@ export default function SecurityCertificationPage() {
                                     Core Practice
                                   </Badge>
                                 ) : (
-                                  <Badge variant="outline" className="text-xs bg-muted/60 dark:bg-slate-800 text-muted-foreground dark:text-muted-foreground">
+                                  <Badge variant="outline" className="text-xs bg-muted/60 dark:bg-muted text-muted-foreground dark:text-muted-foreground">
                                     Enhanced
                                   </Badge>
                                 )}
@@ -987,7 +987,7 @@ export default function SecurityCertificationPage() {
         </Card>
 
         {/* Third-Party Verification */}
-        <Card className="dark:bg-slate-900 dark:border-slate-700">
+        <Card className="dark:bg-muted dark:border-border">
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-foreground dark:text-white">
               <UserCheck className="w-5 h-5 text-emerald-500 dark:text-emerald-400" />
@@ -999,7 +999,7 @@ export default function SecurityCertificationPage() {
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              <div className="flex items-center gap-3 p-4 rounded-lg bg-muted/60 dark:bg-slate-800 border border-border dark:border-slate-700">
+              <div className="flex items-center gap-3 p-4 rounded-lg bg-muted/60 dark:bg-muted border border-border dark:border-border">
                 <Checkbox
                   id="verified"
                   checked={isVerified}
@@ -1020,7 +1020,7 @@ export default function SecurityCertificationPage() {
                     className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4"
                   >
                     <div className="space-y-2">
-                      <Label htmlFor="auditorName" className="flex items-center gap-2 text-foreground dark:text-slate-300">
+                      <Label htmlFor="auditorName" className="flex items-center gap-2 text-foreground dark:text-muted-foreground">
                         <UserCheck className="w-4 h-4" />
                         Auditor Name
                       </Label>
@@ -1033,7 +1033,7 @@ export default function SecurityCertificationPage() {
                       />
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="auditorOrg" className="flex items-center gap-2 text-foreground dark:text-slate-300">
+                      <Label htmlFor="auditorOrg" className="flex items-center gap-2 text-foreground dark:text-muted-foreground">
                         <Building2 className="w-4 h-4" />
                         Organization
                       </Label>
@@ -1046,7 +1046,7 @@ export default function SecurityCertificationPage() {
                       />
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="auditorEmail" className="flex items-center gap-2 text-foreground dark:text-slate-300">
+                      <Label htmlFor="auditorEmail" className="flex items-center gap-2 text-foreground dark:text-muted-foreground">
                         <Mail className="w-4 h-4" />
                         Contact Email
                       </Label>
@@ -1067,7 +1067,7 @@ export default function SecurityCertificationPage() {
         </Card>
 
         {/* Resources */}
-        <Card className="dark:bg-slate-900 dark:border-slate-700">
+        <Card className="dark:bg-muted dark:border-border">
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-foreground dark:text-white">
               <ExternalLink className="w-5 h-5 text-blue-500 dark:text-blue-400" />
@@ -1085,7 +1085,7 @@ export default function SecurityCertificationPage() {
                   href={resource.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-start gap-3 p-4 rounded-lg bg-muted/60 dark:bg-slate-800 border border-border dark:border-slate-700 hover:bg-muted dark:hover:bg-slate-700 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-slate-900"
+                  className="flex items-start gap-3 p-4 rounded-lg bg-muted/60 dark:bg-muted border border-border dark:border-border hover:bg-muted dark:hover:bg-muted transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-background"
                 >
                   <div className="w-10 h-10 rounded-lg bg-blue-100 dark:bg-blue-900 flex items-center justify-center flex-shrink-0">
                     <ExternalLink className="w-5 h-5 text-blue-600 dark:text-blue-400" />
@@ -1101,7 +1101,7 @@ export default function SecurityCertificationPage() {
         </Card>
 
         {/* Downloadable Templates */}
-        <Card className="dark:bg-slate-900 dark:border-slate-700">
+        <Card className="dark:bg-muted dark:border-border">
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-foreground dark:text-white">
               <Download className="w-5 h-5 text-emerald-500 dark:text-emerald-400" />
@@ -1119,7 +1119,7 @@ export default function SecurityCertificationPage() {
                   href={`/security-templates/${template.filename}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-start gap-3 p-4 rounded-lg bg-muted/60 dark:bg-slate-800 border border-border dark:border-slate-700 hover:bg-muted dark:hover:bg-slate-700 transition-colors focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 dark:focus:ring-offset-slate-900"
+                  className="flex items-start gap-3 p-4 rounded-lg bg-muted/60 dark:bg-muted border border-border dark:border-border hover:bg-muted dark:hover:bg-muted transition-colors focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 dark:focus:ring-offset-background"
                 >
                   <div className="w-10 h-10 rounded-lg bg-emerald-100 dark:bg-emerald-900 flex items-center justify-center flex-shrink-0">
                     <FileText className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />

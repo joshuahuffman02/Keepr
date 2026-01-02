@@ -74,7 +74,7 @@ function StarRating({ rating }: { rating: number }) {
           key={star}
           className={cn(
             "h-4 w-4",
-            star <= rating ? "fill-amber-400 text-amber-400" : "fill-slate-200 text-slate-200"
+            star <= rating ? "fill-amber-400 text-amber-400" : "fill-slate-200 text-muted-foreground"
           )}
         />
       ))}
@@ -92,14 +92,14 @@ export function CamperTestimonials({
   className,
 }: CamperTestimonialsProps) {
   return (
-    <section className={cn("py-16 md:py-20 bg-white", className)}>
+    <section className={cn("py-16 md:py-20 bg-card", className)}>
       <div className="max-w-7xl mx-auto px-6">
         {/* Section header */}
         <div className="text-center mb-12 md:mb-16">
-          <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold text-slate-900 mb-4">
+          <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold text-foreground mb-4">
             What Campers Are Saying
           </h2>
-          <p className="text-slate-600 max-w-2xl mx-auto">
+          <p className="text-muted-foreground max-w-2xl mx-auto">
             Don't just take our word for it. Here's what real campers have to say about booking with Camp Everyday.
           </p>
         </div>
@@ -109,10 +109,10 @@ export function CamperTestimonials({
           {testimonials.map((testimonial) => (
             <div
               key={testimonial.id}
-              className="bg-slate-50 rounded-2xl p-6 relative"
+              className="bg-muted rounded-2xl p-6 relative"
             >
               {/* Quote icon */}
-              <Quote className="absolute top-4 right-4 h-8 w-8 text-slate-200" />
+              <Quote className="absolute top-4 right-4 h-8 w-8 text-muted-foreground" />
 
               {/* Rating */}
               <div className="mb-4">
@@ -120,7 +120,7 @@ export function CamperTestimonials({
               </div>
 
               {/* Quote */}
-              <blockquote className="text-slate-700 mb-4 relative z-10">
+              <blockquote className="text-foreground mb-4 relative z-10">
                 "{testimonial.quote}"
               </blockquote>
 
@@ -135,14 +135,14 @@ export function CamperTestimonials({
 
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2">
-                    <p className="font-semibold text-slate-900 truncate">{testimonial.name}</p>
+                    <p className="font-semibold text-foreground truncate">{testimonial.name}</p>
                     <span className="inline-flex items-center gap-1 text-xs text-emerald-600">
                       <CheckCircle2 className="h-3 w-3" />
                       Verified
                     </span>
                   </div>
                   {testimonial.campground && (
-                    <p className="text-sm text-slate-500 truncate">
+                    <p className="text-sm text-muted-foreground truncate">
                       Stayed at {testimonial.campground}
                     </p>
                   )}
@@ -151,7 +151,7 @@ export function CamperTestimonials({
 
               {/* Stay date */}
               {testimonial.stayDate && (
-                <p className="text-xs text-slate-400 mt-3">{testimonial.stayDate}</p>
+                <p className="text-xs text-muted-foreground mt-3">{testimonial.stayDate}</p>
               )}
             </div>
           ))}
@@ -159,7 +159,7 @@ export function CamperTestimonials({
 
         {/* Bottom CTA */}
         <div className="mt-12 text-center">
-          <p className="text-slate-600 mb-4">Join thousands of happy campers</p>
+          <p className="text-muted-foreground mb-4">Join thousands of happy campers</p>
           <a
             href="#search"
             className="inline-flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold px-6 py-3 rounded-xl transition-colors"
