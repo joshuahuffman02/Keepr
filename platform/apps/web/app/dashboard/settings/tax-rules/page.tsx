@@ -13,6 +13,7 @@ import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/components/ui/use-toast";
 import { apiClient } from "@/lib/api-client";
 import { Plus, Pencil, Trash2, Loader2, Percent, DollarSign, FileX, ArrowRightLeft, Settings } from "lucide-react";
+import { HelpTooltip } from "@/components/ui/help-tooltip";
 import {
     AlertDialog,
     AlertDialogAction,
@@ -498,7 +499,10 @@ export default function TaxRulesSettingsPage() {
                             </div>
                             {formData.type !== "exemption" && (
                                 <div className="space-y-2">
-                                    <Label>{formData.type === "percentage" ? "Rate (%)" : "Amount ($)"}</Label>
+                                    <div className="flex items-center gap-1.5">
+                                        <Label>{formData.type === "percentage" ? "Rate (%)" : "Amount ($)"}</Label>
+                                        <HelpTooltip content="Enter as decimal (e.g., 7.5 for 7.5% or 5.00 for $5.00)" />
+                                    </div>
                                     <Input
                                         type="number"
                                         min="0"
@@ -513,7 +517,10 @@ export default function TaxRulesSettingsPage() {
 
                         <div className="grid grid-cols-2 gap-4">
                             <div className="space-y-2">
-                                <Label>Min Nights (Optional)</Label>
+                                <div className="flex items-center gap-1.5">
+                                    <Label>Min Nights (Optional)</Label>
+                                    <HelpTooltip content="Minimum stay length required for this tax rule to apply" />
+                                </div>
                                 <Input
                                     type="number"
                                     min="1"
@@ -523,7 +530,10 @@ export default function TaxRulesSettingsPage() {
                                 />
                             </div>
                             <div className="space-y-2">
-                                <Label>Max Nights (Optional)</Label>
+                                <div className="flex items-center gap-1.5">
+                                    <Label>Max Nights (Optional)</Label>
+                                    <HelpTooltip content="Maximum stay length for this tax rule to apply" />
+                                </div>
                                 <Input
                                     type="number"
                                     min="1"
@@ -541,6 +551,7 @@ export default function TaxRulesSettingsPage() {
                                 onCheckedChange={(checked) => setFormData({ ...formData, requiresWaiver: checked })}
                             />
                             <Label htmlFor="requires-waiver">Requires Waiver</Label>
+                            <HelpTooltip content="Guest must sign exemption documentation (e.g., for long-term stays or tax-exempt organizations)" />
                         </div>
 
                         {formData.requiresWaiver && (

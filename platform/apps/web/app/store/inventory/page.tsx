@@ -8,10 +8,12 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow, TableEmp
 import { apiClient } from "@/lib/api-client";
 import { Product, ProductCategory } from "@campreserv/shared";
 import { useToast } from "@/components/ui/use-toast";
-import { AlertTriangle, Package } from "lucide-react";
+import { AlertTriangle, Package, Settings } from "lucide-react";
 import { TableSkeleton } from "@/components/ui/skeletons";
 import { Badge } from "@/components/ui/badge";
 import { useCampground } from "@/contexts/CampgroundContext";
+import { EmptyState } from "@/components/ui/empty-state";
+import Link from "next/link";
 
 export default function InventoryPage() {
     const [products, setProducts] = useState<(Product & { category?: ProductCategory | null })[]>([]);
@@ -123,6 +125,17 @@ export default function InventoryPage() {
 
                     {loading ? (
                         <TableSkeleton columns={5} rows={5} />
+                    ) : products.length === 0 ? (
+                        <EmptyState
+                            icon={Package}
+                            title="No inventory tracking enabled"
+                            description="Inventory tracking helps you monitor stock levels and receive alerts when products run low. Enable tracking on individual products to see them here."
+                            action={{
+                                label: "Manage Products",
+                                onClick: () => window.location.href = "/settings/store",
+                                icon: Settings
+                            }}
+                        />
                     ) : (
                         <Table>
                             <TableHeader>
@@ -160,11 +173,6 @@ export default function InventoryPage() {
                                         </TableCell>
                                     </TableRow>
                                 ))}
-                                {products.length === 0 && (
-                                    <TableEmpty colSpan={5}>
-                                        No products with inventory tracking enabled.
-                                    </TableEmpty>
-                                )}
                             </TableBody>
                         </Table>
                     )}

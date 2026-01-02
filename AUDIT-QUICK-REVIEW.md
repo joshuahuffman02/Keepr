@@ -754,6 +754,34 @@ Scope: Targeted review of public payment confirmation, public reservation access
 - Fix: Confirm the intent (or collect via terminal), and only mark `posPayment` as succeeded after `intent.status === "succeeded"`; otherwise keep the cart/payment pending until webhook confirmation.
 - Tests: A PaymentIntent that returns `requires_payment_method` or `requires_action` should not close the cart or mark payment succeeded.
 
+#### ACCT-HIGH-025: POS Stripe fallback charges the platform account instead of the campground
+- Files: `platform/apps/api/src/pos/pos.service.ts:450`
+- Problem: The POS Stripe fallback uses `process.env.STRIPE_ACCOUNT_ID` instead of the campground's connected Stripe account.
+- Impact: Card payments can land in the wrong Stripe account, breaking campground payouts, revenue attribution, and reconciliation.
+- Fix: Use the campground's `stripeAccountId` (or gateway config) for POS charges; block checkout if the campground is not connected.
+- Tests: POS card checkout should create a PaymentIntent on the campground’s connected account.
+
+#### ACCT-HIGH-026: Reservation refund endpoint records card refunds without issuing them
+- Files: `platform/apps/api/src/reservations/reservations.service.ts:2369`, `platform/apps/api/src/reservations/reservations.controller.ts:243`
+- Problem: `refundPayment` updates reservation balances and creates refund records, but for `destination="card"` it does not call Stripe to actually refund the charge.
+- Impact: The system can show refunds that were never issued, causing guest disputes and cash reconciliation failures.
+- Fix: Route card refunds through the Stripe refund service (or restrict this endpoint to wallet/cash with explicit non-card labeling).
+- Tests: A card refund should create a Stripe refund and a matching internal refund record.
+
+#### ACCT-HIGH-027: Refund webhook dedupe uses a non-existent Payment field
+- Files: `platform/apps/api/src/payments/payments.controller.ts:1293`, `platform/apps/api/prisma/schema.prisma:2709`
+- Problem: `charge.refunded` handling checks `payment.externalRef` for idempotency, but `Payment` has no `externalRef` column.
+- Impact: Webhook processing can throw Prisma validation errors or fail to dedupe, leading to missed or duplicated refund records.
+- Fix: Add a `stripeRefundId`/`externalRef` field to `Payment` or dedupe using existing fields (e.g., `stripeChargeId` + refund ID in metadata).
+- Tests: Duplicate refund webhook deliveries should be safely ignored without errors.
+
+#### ACCT-HIGH-028: Dispute updates/closures never reverse balance adjustments
+- Files: `platform/apps/api/src/payments/reconciliation.service.ts:239`
+- Problem: `upsertDispute` only adjusts reservation balances on first creation; `charge.dispute.updated/closed` events do not apply deltas or reverse adjustments when disputes are reduced or won.
+- Impact: Paid amounts remain reduced and chargeback expense remains overstated even after funds are recovered.
+- Fix: Apply delta adjustments on dispute updates and reverse entries when disputes are closed in favor of the campground.
+- Tests: A dispute closed as `won` should restore paidAmount and post reversing ledger entries.
+
 ### Medium
 
 #### ACCT-MED-001: Ledger dedupe can mask partial postings outside transactions
@@ -1050,6 +1078,55 @@ Scope: Targeted review of public payment confirmation, public reservation access
 - Fix: Aggregate `quantity` for `booking_created` events in usage summaries and invoicing.
 - Tests: A booking usage event with quantity 5 should bill 5 units.
 
+#### ACCT-MED-043: Payout reconciliation drops transactions beyond the first 100
+- Files: `platform/apps/api/src/payments/stripe.service.ts:100`, `platform/apps/api/src/payments/reconciliation.service.ts:235`
+- Problem: `listBalanceTransactionsForPayout` requests only the first 100 balance transactions and `ingestPayoutTransactions` does not paginate.
+- Impact: Large payouts are reconciled with missing lines, creating false drift and incomplete fee/chargeback postings.
+- Fix: Paginate through all balance transactions (`has_more`/`starting_after`) or use Stripe auto-pagination.
+- Tests: A payout with >100 transactions should reconcile all lines and totals.
+
+#### ACCT-MED-044: External POS partner API sales/refunds bypass accounting
+- Files: `platform/apps/api/src/partner-api/partner-api.service.ts:155`, `platform/apps/api/src/partner-api/partner-api.service.ts:338`
+- Problem: `recordSale`/`recordRefund` only create `externalPosSale` and inventory movements; no Payment or ledger entries are created.
+- Impact: External POS revenue/refunds never hit the GL or financial reports, causing underreported revenue and reconciliation gaps.
+- Fix: Post payments/ledger entries for external sales and refunds (or explicitly flag these as inventory-only and exclude from financial reports).
+- Tests: Recording an external sale/refund should produce matching ledger activity or a documented reconciliation workflow.
+
+#### ACCT-MED-045: Cancellation fee policies are not enforced in accounting
+- Files: `platform/apps/api/src/reservations/reservations.service.ts:1883`, `platform/apps/api/src/campgrounds/campgrounds.service.ts:1062`
+- Problem: Cancellation policy fields are stored and communicated, but cancellation flows do not apply fees or retain deposits when a reservation is marked `cancelled`.
+- Impact: Expected cancellation revenue is not captured and guest balances do not reflect policy enforcement.
+- Fix: Apply cancellation-fee logic on cancellation, update reservation totals/balance, and post balanced ledger entries.
+- Tests: Cancelling within the fee window should apply the correct fee and update ledger/balance.
+
+#### ACCT-MED-046: Refund webhook can miss earlier refunds on out-of-order delivery
+- Files: `platform/apps/api/src/payments/payments.controller.ts:1252`
+- Problem: `charge.refunded` handling records only the latest refund (`charge.refunds.data[0]`); if older refund events are delivered after a newer refund, the older refund is never recorded.
+- Impact: Missing refund records and balance adjustments, leading to understated refunds and ledger drift.
+- Fix: Process all refunds on the charge, or switch to `refund.created` events and use the refund object from the event payload.
+- Tests: Two partial refunds delivered out-of-order should both be recorded.
+
+#### ACCT-MED-047: Seasonal payment overages are not tracked
+- Files: `platform/apps/api/src/seasonals/seasonals.service.ts:653`
+- Problem: `recordPayment` applies payments only to unpaid installments; any remaining amount after all dues are paid is discarded with no credit or prepayment record.
+- Impact: Overpayments disappear from the seasonal subledger, leading to inaccurate balances and refund exposure.
+- Fix: Record overpayments as credit/prepayment (or apply to future periods) and surface them in payment history.
+- Tests: Overpaying should create a credit or reduce future dues.
+
+#### ACCT-MED-048: Stripe refund bookkeeping can double-count on retries
+- Files: `platform/apps/api/src/stripe-payments/refund.service.ts:165`
+- Problem: `processRefund` updates `refundedAmountCents` before inserting the refund Payment; if a retry returns the same Stripe refund, the update can run again while the Payment insert fails on uniqueness.
+- Impact: Refunded totals can be overstated and refund/ledger records become inconsistent.
+- Fix: Wrap refund bookkeeping in a transaction and dedupe by Stripe refund ID before updating totals.
+- Tests: Retrying the same refund should be idempotent and not change totals.
+
+#### ACCT-MED-049: Store refunds mark orders as refunded even if Stripe refund failed
+- Files: `platform/apps/api/src/store/store.service.ts:783`
+- Problem: `recordRefundOrExchange` updates the order status to `refunded` regardless of `refundStatus` when a Stripe refund fails.
+- Impact: Orders appear refunded in accounting/UI while the payment was not actually returned, leading to cash reconciliation gaps.
+- Fix: Only mark orders refunded after Stripe confirms success; otherwise keep a `refund_failed` state or require retry.
+- Tests: A failed Stripe refund should not set order status to `refunded`.
+
 ### Low / Best Practice
 
 #### ACCT-LOW-001: Overpayment/credit balances are clamped to zero
@@ -1100,3 +1177,17 @@ Scope: Targeted review of public payment confirmation, public reservation access
 - Impact: Manually recorded AI/setup-surcharge usage can show $0 unit prices and understate charges.
 - Fix: Enforce unit pricing per event type or reject unsupported manual event types.
 - Tests: Manual AI/setup-surcharge events should populate unit pricing and totals.
+
+#### ACCT-LOW-008: Financial report uses ledger entry creation time instead of occurrence time
+- Files: `platform/apps/api/src/reports/report-subscription.service.ts:514`
+- Problem: The subscription financial report filters ledger entries by `createdAt`, not `occurredAt`.
+- Impact: Backdated or corrected entries appear in the wrong reporting period, skewing emailed financial summaries.
+- Fix: Filter by `occurredAt` (or make basis configurable between posted vs occurred).
+- Tests: A backdated ledger entry should appear in the period of its `occurredAt`.
+
+#### ACCT-LOW-009: Stored value holds do not auto-expire
+- Files: `platform/apps/api/src/stored-value/stored-value.service.ts:503`
+- Problem: `expireOpenHolds` exists but no scheduled job calls it, so open holds can linger indefinitely.
+- Impact: Available balances remain artificially low and stored value liability stays inflated until manual cleanup.
+- Fix: Add a cron/worker to sweep expired holds and log release counts.
+- Tests: Holds past their TTL should auto-expire and restore availability.

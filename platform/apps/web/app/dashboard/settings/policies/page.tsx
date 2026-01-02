@@ -14,6 +14,7 @@ import { Button } from "../../../../components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../../../../components/ui/card";
 import { useToast } from "../../../../components/ui/use-toast";
 import { Loader2, DollarSign, Calendar, FileText, ArrowRight } from "lucide-react";
+import { HelpTooltip } from "../../../../components/ui/help-tooltip";
 import Link from "next/link";
 
 function FormsInfoBanner() {
@@ -168,7 +169,10 @@ export default function BookingRulesPage() {
                   </Select>
                 </div>
                 <div className="space-y-2">
-                  <Label>Cancel Window (hours before arrival)</Label>
+                  <div className="flex items-center gap-1.5">
+                    <Label>Cancel Window (hours before arrival)</Label>
+                    <HelpTooltip content="Number of hours before arrival when free cancellation is allowed (e.g., 48 hours)" />
+                  </div>
                   <Input
                     type="number"
                     min={0}
@@ -178,7 +182,10 @@ export default function BookingRulesPage() {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label>Fee Type</Label>
+                  <div className="flex items-center gap-1.5">
+                    <Label>Fee Type</Label>
+                    <HelpTooltip content="How the cancellation fee is calculated: none, flat dollar amount, percentage of total, or one night's rate" />
+                  </div>
                   <Select
                     value={policyForm.cancellationFeeType}
                     onValueChange={(v) => setPolicyForm((f) => ({ ...f, cancellationFeeType: v }))}
@@ -193,7 +200,10 @@ export default function BookingRulesPage() {
                   </Select>
                 </div>
                 <div className="space-y-2">
-                  <Label>Flat Fee (cents)</Label>
+                  <div className="flex items-center gap-1.5">
+                    <Label>Flat Fee (cents)</Label>
+                    <HelpTooltip content="Fixed cancellation fee in cents (e.g., 2500 = $25.00)" />
+                  </div>
                   <Input
                     type="number"
                     min={0}
@@ -203,7 +213,10 @@ export default function BookingRulesPage() {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label>Fee Percent (0-100)</Label>
+                  <div className="flex items-center gap-1.5">
+                    <Label>Fee Percent (0-100)</Label>
+                    <HelpTooltip content="Percentage of total reservation cost to charge as cancellation fee (e.g., 25 for 25%)" />
+                  </div>
                   <Input
                     type="number"
                     min={0}

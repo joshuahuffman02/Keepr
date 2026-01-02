@@ -3,6 +3,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../ui/dialog";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import { Label } from "../ui/label";
+import { HelpTooltip } from "../ui/help-tooltip";
 import { Product, ProductCategory } from "@campreserv/shared";
 
 interface ProductModalProps {
@@ -121,7 +122,10 @@ export function ProductModal({ open, onOpenChange, product, categories, onSave }
 
                     <div className="grid grid-cols-3 gap-4">
                         <div className="space-y-2">
-                            <Label htmlFor="price">Price (cents)</Label>
+                            <div className="flex items-center gap-1.5">
+                                <Label htmlFor="price">Price (cents)</Label>
+                                <HelpTooltip content="Enter price in cents (e.g., 999 = $9.99)" />
+                            </div>
                             <Input
                                 id="price"
                                 type="number"
@@ -142,7 +146,10 @@ export function ProductModal({ open, onOpenChange, product, categories, onSave }
                             />
                         </div>
                         <div className="space-y-2">
-                            <Label htmlFor="sku">SKU</Label>
+                            <div className="flex items-center gap-1.5">
+                                <Label htmlFor="sku">SKU</Label>
+                                <HelpTooltip content="Stock Keeping Unit - unique identifier for inventory" />
+                            </div>
                             <Input
                                 id="sku"
                                 value={formData.sku}
@@ -158,6 +165,19 @@ export function ProductModal({ open, onOpenChange, product, categories, onSave }
                             value={formData.imageUrl}
                             onChange={(e) => setFormData({ ...formData, imageUrl: e.target.value })}
                             placeholder="https://..."
+                        />
+                    </div>
+
+                    <div className="space-y-2">
+                        <div className="flex items-center gap-1.5">
+                            <Label htmlFor="glCode">GL Code</Label>
+                            <HelpTooltip content="General Ledger code for accounting integration" />
+                        </div>
+                        <Input
+                            id="glCode"
+                            value={formData.glCode}
+                            onChange={(e) => setFormData({ ...formData, glCode: e.target.value })}
+                            placeholder="e.g., 4000-MERCH"
                         />
                     </div>
 

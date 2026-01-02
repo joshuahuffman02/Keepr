@@ -51,6 +51,8 @@ import {
 import { cn } from "@/lib/utils";
 import { CharityImpactWidget } from "@/components/charity/CharityImpactWidget";
 import { SetupQueueWidget } from "@/components/onboarding/SetupQueueWidget";
+import { Badge } from "@/components/ui/badge";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 type Reservation = {
   id: string;
@@ -65,6 +67,39 @@ type Reservation = {
     primaryLastName?: string;
   };
 };
+
+// NPS score interpretation helper
+function getNpsInterpretation(score: number) {
+  if (score >= 70) {
+    return {
+      label: "Excellent",
+      variant: "success" as const,
+      color: "text-emerald-600 dark:text-emerald-400",
+      description: "Your guests love you! This is world-class service."
+    };
+  } else if (score >= 50) {
+    return {
+      label: "Good",
+      variant: "warning" as const,
+      color: "text-yellow-600 dark:text-yellow-400",
+      description: "Good performance, but there's room for improvement."
+    };
+  } else if (score >= 30) {
+    return {
+      label: "Needs Improvement",
+      variant: "warning" as const,
+      color: "text-orange-600 dark:text-orange-400",
+      description: "Guest satisfaction needs attention. Review feedback to identify issues."
+    };
+  } else {
+    return {
+      label: "Critical",
+      variant: "error" as const,
+      color: "text-red-600 dark:text-red-400",
+      description: "Urgent action needed. Guest experience is suffering significantly."
+    };
+  }
+}
 
 // Time-of-day greeting helper
 function getTimeOfDayGreeting() {
@@ -410,6 +445,9 @@ export default function Dashboard() {
     const inHouse: Reservation[] = [];
     const withBalance: Array<Reservation & { balance: number }> = [];
     let outstandingBalanceCents = 0;
+    let balanceDueToday = 0;
+    let balanceOverdue = 0;
+    let balanceFuture = 0;
     let futureReservationsCount = 0;
 
     // Pre-compute 14-day range for occupancy chart
@@ -452,11 +490,23 @@ export default function Dashboard() {
           futureReservationsCount++;
         }
 
-        // Outstanding balance
+        // Outstanding balance with aging buckets
         const balance = (r.totalAmount ?? 0) - (r.paidAmount ?? 0);
         if (balance > 0) {
           outstandingBalanceCents += balance;
           withBalance.push({ ...r, balance });
+
+          // Calculate aging based on arrival date
+          if (arrivalTime < todayTime) {
+            // Overdue: arrival was in the past
+            balanceOverdue += balance;
+          } else if (arrivalTime === todayTime) {
+            // Due today: arrival is today
+            balanceDueToday += balance;
+          } else {
+            // Future: arrival is in the future
+            balanceFuture += balance;
+          }
         }
 
         // 14-day occupancy (check each day the reservation spans)
@@ -487,6 +537,9 @@ export default function Dashboard() {
       todayDepartures,
       inHouse,
       outstandingBalanceCents,
+      balanceDueToday,
+      balanceOverdue,
+      balanceFuture,
       futureReservationsCount,
       attentionList,
       occupancy14,
@@ -498,6 +551,9 @@ export default function Dashboard() {
     todayDepartures,
     inHouse,
     outstandingBalanceCents,
+    balanceDueToday,
+    balanceOverdue,
+    balanceFuture,
     futureReservationsCount: futureReservations,
     attentionList,
     occupancy14,
@@ -755,7 +811,8 @@ export default function Dashboard() {
                     Percentage of sites currently occupied. High occupancy (90%+) means you're nearly full!
                   </HelpTooltipSection>
                   <HelpTooltipSection title="Balance due">
-                    Total unpaid balances across all active reservations.
+                    Total unpaid balances across all active reservations. The breakdown shows:
+                    Overdue (past arrival date), Due Today (arriving today), and Future (not yet due).
                   </HelpTooltipSection>
                 </HelpTooltipContent>
               }
@@ -776,7 +833,21 @@ export default function Dashboard() {
               <OpsCard label="Departures" value={todayDepartures.length} href="/check-in-out" icon={<LogOut className="h-4 w-4" />} tone="amber" index={1} prefersReducedMotion={prefersReducedMotion} />
               <OpsCard label="In-house" value={inHouse.length} href="/reservations" icon={<Users className="h-4 w-4" />} tone="blue" index={2} prefersReducedMotion={prefersReducedMotion} />
               <OpsCard label="Occupancy" value={`${occupancyRate}%`} href="/calendar" icon={<Calendar className="h-4 w-4" />} tone="purple" index={3} prefersReducedMotion={prefersReducedMotion} celebrate={occupancyRate >= 90} />
-              <OpsCard label="Balance due" value={formatMoney(outstandingBalanceCents)} href="/billing/repeat-charges" icon={<DollarSign className="h-4 w-4" />} tone={outstandingBalanceCents === 0 ? "emerald" : "rose"} index={4} prefersReducedMotion={prefersReducedMotion} celebrate={outstandingBalanceCents === 0 && (reservations?.length ?? 0) > 0} />
+              <OpsCard
+                label="Balance due"
+                value={formatMoney(outstandingBalanceCents)}
+                href="/billing/repeat-charges"
+                icon={<DollarSign className="h-4 w-4" />}
+                tone={outstandingBalanceCents === 0 ? "emerald" : "rose"}
+                index={4}
+                prefersReducedMotion={prefersReducedMotion}
+                celebrate={outstandingBalanceCents === 0 && (reservations?.length ?? 0) > 0}
+                breakdown={outstandingBalanceCents > 0 ? [
+                  ...(balanceOverdue > 0 ? [{ label: "overdue", value: formatMoney(balanceOverdue), tone: "danger" as const }] : []),
+                  ...(balanceDueToday > 0 ? [{ label: "due today", value: formatMoney(balanceDueToday), tone: "warning" as const }] : []),
+                  ...(balanceFuture > 0 ? [{ label: "future", value: formatMoney(balanceFuture), tone: "success" as const }] : []),
+                ] : undefined}
+              />
             </div>
           )}
 
@@ -806,6 +877,144 @@ export default function Dashboard() {
               <ClipboardList className="h-3 w-3" /> View reservations list
             </Link>
           </div>
+        </motion.div>
+
+        {/* ═══════════════════════════════════════════════════════════════════ */}
+        {/* REVENUE SNAPSHOT - Key financial metrics */}
+        {/* ═══════════════════════════════════════════════════════════════════ */}
+        <motion.div
+          className={cn(
+            "rounded-2xl p-5 space-y-4 transition-colors",
+            "bg-gradient-to-br from-emerald-50 to-teal-50 border-2 border-emerald-200",
+            "dark:from-emerald-950/30 dark:to-teal-950/30 dark:border-emerald-800"
+          )}
+          {...motionProps}
+          transition={{ ...SPRING_CONFIG, delay: 0.125 }}
+        >
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2 text-sm font-semibold uppercase tracking-wide text-foreground">
+              <DollarSign className="h-4 w-4" />
+              Revenue Snapshot
+              <HelpTooltip
+                title="Revenue Metrics"
+                content={
+                  <HelpTooltipContent>
+                    <HelpTooltipSection>
+                      Track your financial performance at a glance:
+                    </HelpTooltipSection>
+                    <HelpTooltipSection title="Today">
+                      Revenue received from completed payouts today
+                    </HelpTooltipSection>
+                    <HelpTooltipSection title="This Week">
+                      Total revenue this week (Monday-Sunday)
+                    </HelpTooltipSection>
+                    <HelpTooltipSection title="This Month">
+                      Monthly revenue with trend comparison to last month
+                    </HelpTooltipSection>
+                  </HelpTooltipContent>
+                }
+                side="bottom"
+                maxWidth={380}
+              />
+            </div>
+            <Link
+              href="/finance"
+              className={cn(
+                "inline-flex items-center gap-1 text-sm font-semibold text-emerald-600 hover:text-emerald-500 dark:text-emerald-400 dark:hover:text-emerald-300",
+                "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2 rounded"
+              )}
+            >
+              View details <ArrowRight className="h-4 w-4" />
+            </Link>
+          </div>
+
+          {payoutsQuery.isLoading ? (
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              {[1, 2, 3].map((i) => (
+                <SkeletonCard key={i} />
+              ))}
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <motion.div
+                initial={prefersReducedMotion ? { opacity: 0 } : { opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ ...SPRING_CONFIG, delay: 0.15 }}
+                className={cn(
+                  "rounded-xl border-2 p-4 transition-all",
+                  "bg-white dark:bg-slate-900",
+                  "border-emerald-200 dark:border-emerald-800"
+                )}
+              >
+                <div className="text-xs font-semibold uppercase tracking-wide text-muted-foreground mb-2">
+                  Today
+                </div>
+                <div className="text-2xl font-bold text-foreground">
+                  {formatMoney(revenueMetrics.todayRevenue)}
+                </div>
+                <div className="text-xs text-muted-foreground mt-1">
+                  Revenue received today
+                </div>
+              </motion.div>
+
+              <motion.div
+                initial={prefersReducedMotion ? { opacity: 0 } : { opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ ...SPRING_CONFIG, delay: 0.2 }}
+                className={cn(
+                  "rounded-xl border-2 p-4 transition-all",
+                  "bg-white dark:bg-slate-900",
+                  "border-emerald-200 dark:border-emerald-800"
+                )}
+              >
+                <div className="text-xs font-semibold uppercase tracking-wide text-muted-foreground mb-2">
+                  This Week
+                </div>
+                <div className="text-2xl font-bold text-foreground">
+                  {formatMoney(revenueMetrics.weekRevenue)}
+                </div>
+                <div className="text-xs text-muted-foreground mt-1">
+                  Week to date
+                </div>
+              </motion.div>
+
+              <motion.div
+                initial={prefersReducedMotion ? { opacity: 0 } : { opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ ...SPRING_CONFIG, delay: 0.25 }}
+                className={cn(
+                  "rounded-xl border-2 p-4 transition-all",
+                  "bg-white dark:bg-slate-900",
+                  "border-emerald-200 dark:border-emerald-800"
+                )}
+              >
+                <div className="text-xs font-semibold uppercase tracking-wide text-muted-foreground mb-2">
+                  This Month
+                </div>
+                <div className="flex items-baseline gap-2">
+                  <div className="text-2xl font-bold text-foreground">
+                    {formatMoney(revenueMetrics.monthRevenue)}
+                  </div>
+                  {revenueMetrics.monthTrend !== 0 && (
+                    <Badge
+                      className={cn(
+                        "text-xs",
+                        revenueMetrics.monthTrend > 0
+                          ? "bg-status-success/15 text-status-success border-status-success"
+                          : "bg-status-error/15 text-status-error border-status-error"
+                      )}
+                    >
+                      {revenueMetrics.monthTrend > 0 ? "+" : ""}
+                      {revenueMetrics.monthTrend.toFixed(0)}%
+                    </Badge>
+                  )}
+                </div>
+                <div className="text-xs text-muted-foreground mt-1">
+                  {revenueMetrics.monthTrend !== 0 ? "vs last month" : "Month to date"}
+                </div>
+              </motion.div>
+            </div>
+          )}
         </motion.div>
 
         {/* ═══════════════════════════════════════════════════════════════════ */}
@@ -1108,12 +1317,67 @@ export default function Dashboard() {
             )}
             <div className="pt-3 border-t border-border space-y-2">
               <StatCard label="Future bookings" value={futureReservations} hint="Upcoming arrivals" icon={<ClipboardList className="h-4 w-4" />} />
-              <StatCard
-                label="NPS"
-                value={npsQuery.data?.nps ?? "—"}
-                hint={`${npsQuery.data?.totalResponses ?? 0} responses · ${npsQuery.data?.responseRate ?? "—"}% rate`}
-                icon={<MessageCircle className="h-4 w-4" />}
-              />
+              {/* NPS Card with Interpretation */}
+              {(() => {
+                const npsScore = npsQuery.data?.nps;
+                const npsValue = typeof npsScore === 'number' ? npsScore : null;
+                const npsInterpretation = npsValue !== null ? getNpsInterpretation(npsValue) : null;
+
+                return (
+                  <TooltipProvider>
+                    <div className={cn(
+                      "rounded-lg p-4 shadow-sm transition-colors",
+                      "border border-border bg-card"
+                    )}>
+                      <div className="flex items-center justify-between mb-2">
+                        <div className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">NPS</div>
+                        <span className={cn(
+                          "rounded-md p-2",
+                          "bg-muted text-muted-foreground"
+                        )}>
+                          <MessageCircle className="h-4 w-4" />
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-2 mb-2">
+                        <div className="text-2xl font-bold text-foreground">{npsValue ?? "—"}</div>
+                        {npsInterpretation && (
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <div>
+                                <Badge variant={npsInterpretation.variant} className="cursor-help">
+                                  {npsInterpretation.label}
+                                </Badge>
+                              </div>
+                            </TooltipTrigger>
+                            <TooltipContent side="right" className="max-w-xs">
+                              <div className="space-y-2">
+                                <p className="font-semibold">What is NPS?</p>
+                                <p className="text-xs">
+                                  Net Promoter Score measures guest loyalty on a scale from -100 to 100.
+                                </p>
+                                <div className="text-xs space-y-1 border-t border-border pt-2">
+                                  <p><strong>70+:</strong> Excellent - World-class</p>
+                                  <p><strong>50-69:</strong> Good - Room to improve</p>
+                                  <p><strong>30-49:</strong> Needs attention</p>
+                                  <p><strong>&lt;30:</strong> Critical - Urgent action</p>
+                                </div>
+                                <div className="text-xs border-t border-border pt-2">
+                                  <p className={npsInterpretation.color}>
+                                    {npsInterpretation.description}
+                                  </p>
+                                </div>
+                              </div>
+                            </TooltipContent>
+                          </Tooltip>
+                        )}
+                      </div>
+                      <div className="text-xs text-muted-foreground mt-1">
+                        {npsQuery.data?.totalResponses ?? 0} responses · {npsQuery.data?.responseRate ?? "—"}% rate
+                      </div>
+                    </div>
+                  </TooltipProvider>
+                );
+              })()}
             </div>
           </div>
 
@@ -1287,7 +1551,8 @@ function OpsCard({
   tone,
   index,
   prefersReducedMotion,
-  celebrate = false
+  celebrate = false,
+  breakdown
 }: {
   label: string;
   value: string | number;
@@ -1297,6 +1562,7 @@ function OpsCard({
   index: number;
   prefersReducedMotion: boolean | null;
   celebrate?: boolean;
+  breakdown?: Array<{ label: string; value: string; tone?: "success" | "warning" | "danger" }>;
 }) {
   const [isHovered, setIsHovered] = useState(false);
 
@@ -1344,7 +1610,7 @@ function OpsCard({
           "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2"
         )}
       >
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3 flex-1">
           <motion.span
             className={cn(
               "rounded-lg p-2",
@@ -1359,9 +1625,28 @@ function OpsCard({
           >
             {icon}
           </motion.span>
-          <div>
+          <div className="flex-1">
             <div className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">{label}</div>
             <div className="text-xl font-bold text-foreground">{value}</div>
+            {breakdown && breakdown.length > 0 && (
+              <div className="mt-1.5 flex flex-wrap gap-1.5 text-xs">
+                {breakdown.map((item, idx) => (
+                  <span
+                    key={idx}
+                    className={cn(
+                      "inline-flex items-center gap-1 px-1.5 py-0.5 rounded",
+                      item.tone === "danger" && "bg-red-100 text-red-700 dark:bg-red-950/50 dark:text-red-400",
+                      item.tone === "warning" && "bg-amber-100 text-amber-700 dark:bg-amber-950/50 dark:text-amber-400",
+                      item.tone === "success" && "bg-emerald-100 text-emerald-700 dark:bg-emerald-950/50 dark:text-emerald-400",
+                      !item.tone && "bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-400"
+                    )}
+                  >
+                    <span className="font-semibold">{item.value}</span>
+                    <span className="opacity-80">{item.label}</span>
+                  </span>
+                ))}
+              </div>
+            )}
           </div>
         </div>
         {celebrate ? (

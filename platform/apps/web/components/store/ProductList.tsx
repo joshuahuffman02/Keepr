@@ -15,6 +15,8 @@ import {
 import { ProductModal } from "./ProductModal";
 import { ProductImportExport } from "./ProductImportExport";
 import { Product, ProductCategory } from "@campreserv/shared";
+import { EmptyState } from "../ui/empty-state";
+import { Package, Plus } from "lucide-react";
 
 interface ProductListProps {
     campgroundId: string;
@@ -132,8 +134,17 @@ export function ProductList({ campgroundId }: ProductListProps) {
                     );
                 })}
                 {products.length === 0 && (
-                    <div className="col-span-full text-center py-8 text-slate-500 border border-dashed border-slate-200 rounded-lg">
-                        No products found. Create one to get started.
+                    <div className="col-span-full">
+                        <EmptyState
+                            icon={Package}
+                            title="No products yet"
+                            description="Create your first product to start selling items at your campground. Products can include firewood, merchandise, snacks, and more."
+                            action={{
+                                label: "Create First Product",
+                                onClick: handleCreate,
+                                icon: Plus
+                            }}
+                        />
                     </div>
                 )}
             </div>

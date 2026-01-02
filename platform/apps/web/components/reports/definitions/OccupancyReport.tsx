@@ -4,6 +4,8 @@ import { apiClient } from "@/lib/api-client";
 import { format, eachDayOfInterval, startOfDay, endOfDay, isWithinInterval } from "date-fns";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
+import { EmptyState } from "@/components/ui/empty-state";
+import { CalendarDays, TrendingUp } from "lucide-react";
 
 interface OccupancyReportProps {
     campgroundId: string;
@@ -77,6 +79,45 @@ export function OccupancyReport({ campgroundId, dateRange }: OccupancyReportProp
 
     if (sites.length === 0) {
         return <div className="text-sm text-slate-500">No sites configured for this campground. Cannot calculate occupancy.</div>;
+    }
+
+    // Check if there's any data in the selected period
+    const hasData = data.length > 0 && data.some(d => d.count > 0);
+
+    if (!hasData && data.length > 0) {
+        return (
+            <div className="space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <Card>
+                        <CardHeader className="pb-2">
+                            <CardTitle className="text-sm font-medium text-slate-500">Avg. Occupancy</CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                            <div className="text-2xl font-bold">0%</div>
+                            <p className="text-xs text-slate-500">for selected period</p>
+                        </CardContent>
+                    </Card>
+                    <Card>
+                        <CardHeader className="pb-2">
+                            <CardTitle className="text-sm font-medium text-slate-500">Total Capacity</CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                            <div className="text-2xl font-bold">{sites.length}</div>
+                            <p className="text-xs text-slate-500">bookable sites</p>
+                        </CardContent>
+                    </Card>
+                </div>
+
+                <Card className="p-6">
+                    <EmptyState
+                        icon={CalendarDays}
+                        title="No occupancy data for this period"
+                        description="There are no reservations during the selected date range. Try adjusting the date range to see occupancy trends, or check back after bookings are made."
+                        size="md"
+                    />
+                </Card>
+            </div>
+        );
     }
 
     return (

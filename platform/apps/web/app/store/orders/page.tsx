@@ -6,9 +6,9 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { CheckCircle, Eye, RefreshCw, Check, Truck, List } from "lucide-react";
+import { CheckCircle, Eye, RefreshCw, Check, Truck, List, ShoppingCart, Filter, Calendar } from "lucide-react";
 import { TableSkeleton } from "@/components/ui/skeletons";
-import { InlineEmpty } from "@/components/ui/empty-state";
+import { EmptyState } from "@/components/ui/empty-state";
 import { useToast } from "@/components/ui/use-toast";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
@@ -173,7 +173,33 @@ export default function StoreOrdersPage() {
           {loading ? (
             <TableSkeleton columns={7} rows={5} />
           ) : orders.length === 0 ? (
-            <InlineEmpty>No orders yet.</InlineEmpty>
+            <EmptyState
+              icon={statusFilter === "pending" ? ShoppingCart : statusFilter === "completed" ? CheckCircle : Filter}
+              title={
+                statusFilter === "pending"
+                  ? "No pending orders"
+                  : statusFilter === "completed"
+                    ? "No completed orders yet"
+                    : "No orders found"
+              }
+              description={
+                statusFilter === "pending"
+                  ? "New orders from guests will appear here. Orders are placed through the guest portal or staff can create them manually."
+                  : statusFilter === "completed"
+                    ? "Completed orders will appear here once they've been fulfilled and delivered to guests."
+                    : "No orders match your current filter. Try adjusting the filter or check back later."
+              }
+              action={
+                statusFilter !== "all"
+                  ? {
+                      label: "View All Orders",
+                      onClick: () => setStatusFilter("all"),
+                      icon: List
+                    }
+                  : undefined
+              }
+              size="md"
+            />
           ) : (
             <Table>
               <TableHeader>

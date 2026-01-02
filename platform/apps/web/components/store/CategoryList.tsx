@@ -14,6 +14,8 @@ import {
 } from "../ui/alert-dialog";
 import { CategoryModal } from "./CategoryModal";
 import { ProductCategory } from "@campreserv/shared";
+import { EmptyState } from "../ui/empty-state";
+import { FolderOpen, Plus } from "lucide-react";
 
 interface CategoryListProps {
     campgroundId: string;
@@ -104,9 +106,16 @@ export function CategoryList({ campgroundId }: CategoryListProps) {
                     </div>
                 ))}
                 {categories.length === 0 && (
-                    <div className="text-center py-8 text-slate-500 border border-dashed border-slate-200 rounded-lg">
-                        No categories found. Create one to organize your products.
-                    </div>
+                    <EmptyState
+                        icon={FolderOpen}
+                        title="No categories yet"
+                        description="Categories help organize your products and make them easier to find. Create categories like 'Food & Beverages', 'Camping Supplies', or 'Merchandise'."
+                        action={{
+                            label: "Create First Category",
+                            onClick: handleCreate,
+                            icon: Plus
+                        }}
+                    />
                 )}
             </div>
 
