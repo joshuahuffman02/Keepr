@@ -101,7 +101,9 @@ export function RevenueBySiteTypeReport({ campgroundId, dateRange }: RevenueBySi
                                     fill="#8884d8"
                                     dataKey="revenue"
                                     nameKey="name"
-                                    label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                                    label={({ name, percent }: { name?: string; percent?: number }) =>
+                                        `${name ?? "Unknown"} ${((percent ?? 0) * 100).toFixed(0)}%`
+                                    }
                                 >
                                     {reportData.map((entry, index) => (
                                         <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
