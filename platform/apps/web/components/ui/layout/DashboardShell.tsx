@@ -1088,7 +1088,7 @@ export function DashboardShell({ children, className, title, subtitle, density =
               {(title || subtitle) && (
                 <div className="mb-6">
                   {title && <h1 className="text-2xl font-bold text-foreground">{title}</h1>}
-                  {subtitle && <p className="text-sm text-slate-500 mt-1">{subtitle}</p>}
+                  {subtitle && <p className="text-sm text-muted-foreground mt-1">{subtitle}</p>}
                 </div>
               )}
               {children}

@@ -423,14 +423,14 @@ export default function CalendarPage() {
           <div className="flex flex-col xl:flex-row xl:items-end xl:justify-between gap-4">
             <div className="space-y-2">
               <div className="flex items-center gap-3">
-                <div className="h-11 w-11 rounded-2xl bg-emerald-600/10 text-emerald-700 flex items-center justify-center">
+                <div className="h-11 w-11 rounded-2xl bg-status-success/15 text-status-success flex items-center justify-center">
                   <CalendarDays className="h-5 w-5" />
                 </div>
                 <div>
                   <div className="flex items-center gap-2">
-                    <h1 className="text-3xl font-black tracking-tight text-slate-900">Booking Calendar</h1>
+                    <h1 className="text-2xl font-semibold tracking-tight text-foreground">Booking Calendar</h1>
                   </div>
-                  <p className="text-sm text-slate-500 font-medium">
+                  <p className="text-sm text-muted-foreground">
                     Drag across dates to build a stay. Release to preview pricing and availability.
                   </p>
                 </div>
@@ -438,15 +438,15 @@ export default function CalendarPage() {
             </div>
 
             <div className="flex flex-wrap items-center gap-3">
-              <div className="flex items-center bg-white rounded-xl border border-slate-200 shadow-sm p-1">
+              <div className="flex items-center bg-card rounded-xl border border-border shadow-sm p-1">
                 {DAY_RANGES.map((range) => (
                   <Button
                     key={range}
                     variant="ghost"
                     size="sm"
                     className={cn(
-                      "h-8 px-3 text-[10px] font-black uppercase tracking-wider",
-                      state.dayCount === range ? "bg-slate-100 text-emerald-700" : "text-slate-500"
+                      "h-8 px-3 text-[11px] font-semibold",
+                      state.dayCount === range ? "bg-status-success/10 text-status-success" : "text-muted-foreground"
                     )}
                     onClick={() => actions.setDayCount(range)}
                   >
@@ -455,30 +455,30 @@ export default function CalendarPage() {
                 ))}
               </div>
 
-              <div className="flex items-center bg-white rounded-xl border border-slate-200 shadow-sm p-1">
-                <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-600" onClick={handlePrev}>
+              <div className="flex items-center bg-card rounded-xl border border-border shadow-sm p-1">
+                <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground" onClick={handlePrev}>
                   <ChevronLeft className="h-4 w-4" />
                 </Button>
                 <Button
                   variant="ghost"
                   size="sm"
-                  className="h-8 px-3 text-xs font-black uppercase tracking-wider"
+                  className="h-8 px-3 text-xs font-semibold"
                   onClick={() => actions.setStartDate(formatLocalDateInput(new Date()))}
                 >
                   Today
                 </Button>
-                <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-600" onClick={handleNext}>
+                <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground" onClick={handleNext}>
                   <ChevronRight className="h-4 w-4" />
                 </Button>
               </div>
 
-              <div className="flex items-center gap-2 bg-slate-100 rounded-xl px-3 py-2 text-xs font-semibold text-slate-600">
-                <CalendarCheck className="h-4 w-4 text-emerald-600" />
+              <div className="flex items-center gap-2 bg-muted rounded-xl px-3 py-2 text-xs font-semibold text-muted-foreground">
+                <CalendarCheck className="h-4 w-4 text-status-success" />
                 <span>{rangeLabel}</span>
               </div>
 
               {/* Density Toggle */}
-              <div className="flex items-center bg-white rounded-xl border border-slate-200 shadow-sm p-1">
+              <div className="flex items-center bg-card rounded-xl border border-border shadow-sm p-1">
                 {(Object.keys(DENSITY_CONFIG) as DensityMode[]).map((mode) => {
                   const config = DENSITY_CONFIG[mode];
                   const Icon = config.icon;
@@ -489,13 +489,13 @@ export default function CalendarPage() {
                       size="sm"
                       className={cn(
                         "h-8 px-2.5 gap-1.5",
-                        density === mode ? "bg-slate-100 text-emerald-700" : "text-slate-500"
+                        density === mode ? "bg-status-success/10 text-status-success" : "text-muted-foreground"
                       )}
                       onClick={() => setDensity(mode)}
                       title={`${config.label} view`}
                     >
                       <Icon className="h-4 w-4" />
-                      <span className="text-[10px] font-bold uppercase tracking-wider hidden sm:inline">
+                      <span className="text-[11px] font-semibold hidden sm:inline">
                         {config.label}
                       </span>
                     </Button>
@@ -505,9 +505,9 @@ export default function CalendarPage() {
 
               {/* Inline Campground Selector */}
               {campgrounds.length > 0 && (
-                <div className="flex items-center bg-white rounded-xl border border-slate-200 shadow-sm">
+                <div className="flex items-center bg-card rounded-xl border border-border shadow-sm">
                   <div className="flex items-center gap-2 pl-3 pr-1">
-                    <Building2 className="h-4 w-4 text-slate-400" />
+                    <Building2 className="h-4 w-4 text-muted-foreground" />
                   </div>
                   <Select
                     value={state.selectedCampground || ""}

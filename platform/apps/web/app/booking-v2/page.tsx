@@ -90,7 +90,7 @@ const PAYMENT_METHODS = [
 
 export default function BookingPage() {
   return (
-    <Suspense fallback={<div className="p-8 text-sm text-slate-500">Loading booking...</div>}>
+    <Suspense fallback={<div className="p-8 text-sm text-muted-foreground">Loading booking...</div>}>
       <BookingPageInner />
     </Suspense>
   );
@@ -810,22 +810,22 @@ function BookingPageInner() {
               >
                 <ArrowLeft className="h-5 w-5" />
               </Button>
-              <div className="h-11 w-11 rounded-2xl bg-emerald-600/10 text-emerald-700 flex items-center justify-center">
+              <div className="h-11 w-11 rounded-2xl bg-status-success/15 text-status-success flex items-center justify-center">
                 <CalendarDays className="h-5 w-5" />
               </div>
               <div>
                 <div className="flex items-center gap-2">
-                  <h1 className="text-3xl font-black tracking-tight text-slate-900">New Booking</h1>
+                  <h1 className="text-2xl font-semibold tracking-tight text-foreground">New Booking</h1>
                 </div>
-                <p className="text-sm text-slate-500 font-medium">
+                <p className="text-sm text-muted-foreground">
                   Build a reservation in one flow - guest, stay, site, pricing, and payment.
                 </p>
               </div>
             </div>
 
             {selectedCampground && (
-              <div className="flex items-center gap-2 rounded-xl border border-slate-200 bg-card px-4 py-2 text-xs font-semibold text-slate-600">
-                <MapPin className="h-4 w-4 text-emerald-600" />
+              <div className="flex items-center gap-2 rounded-xl border border-border bg-card px-4 py-2 text-xs font-semibold text-muted-foreground">
+                <MapPin className="h-4 w-4 text-status-success" />
                 <span>{selectedCampground.name}</span>
               </div>
             )}
@@ -833,7 +833,7 @@ function BookingPageInner() {
         </div>
 
         {!selectedCampground && (
-          <Card className="p-6 border-dashed border-slate-200 text-center text-slate-500">
+          <Card className="p-6 border-dashed border-border text-center text-muted-foreground">
             Choose a campground from the global selector to start a booking.
           </Card>
         )}
