@@ -154,7 +154,7 @@ function ActivityCard({
             onMouseLeave={() => setIsHovered(false)}
         >
             {/* Image or Placeholder */}
-            <div className="relative h-40 bg-gradient-to-br from-emerald-100 to-teal-50 overflow-hidden">
+            <div className="relative h-40 bg-status-success/10 overflow-hidden">
                 {activity.imageUrl ? (
                     <img
                         src={activity.imageUrl}
@@ -216,7 +216,7 @@ function ActivityCard({
 
                 {/* Hover overlay */}
                 <div className={cn(
-                    "absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent",
+                    "absolute inset-0 bg-black/40",
                     "opacity-0 group-hover:opacity-100 transition-opacity duration-300",
                     "flex items-end justify-center gap-2 pb-4"
                 )}>
@@ -363,7 +363,7 @@ function SuccessCelebration({
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/20 backdrop-blur-sm">
             <div className="bg-white rounded-2xl shadow-2xl p-8 text-center motion-safe:animate-in motion-safe:zoom-in-95 motion-safe:fade-in duration-300 max-w-md mx-4">
-                <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-br from-emerald-400 to-teal-500 text-white mb-4 motion-safe:animate-bounce">
+                <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-status-success text-white mb-4 motion-safe:animate-bounce">
                     <PartyPopper className="h-8 w-8" />
                 </div>
                 <h3 className="text-xl font-bold text-slate-900 mb-2">
@@ -392,7 +392,7 @@ function SuccessCelebration({
                     </Button>
                     {onScheduleSessions && (
                         <Button
-                            className="bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600"
+                            className="bg-status-success hover:bg-status-success/90"
                             onClick={() => {
                                 onClose();
                                 onScheduleSessions();
@@ -412,13 +412,13 @@ function SuccessCelebration({
 function EmptyActivitiesState({ onCreateClick }: { onCreateClick: () => void }) {
     return (
         <div className="col-span-full">
-            <div className="relative overflow-hidden rounded-2xl border-2 border-dashed border-slate-200 bg-gradient-to-br from-slate-50 to-white p-12 text-center">
+            <div className="relative overflow-hidden rounded-2xl border-2 border-dashed border-slate-200 bg-muted p-12 text-center">
                 {/* Decorative elements */}
-                <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-emerald-100/50 to-teal-100/50 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
-                <div className="absolute bottom-0 left-0 w-48 h-48 bg-gradient-to-br from-amber-100/50 to-orange-100/50 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2" />
+                <div className="absolute top-0 right-0 w-64 h-64 bg-status-success/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
+                <div className="absolute bottom-0 left-0 w-48 h-48 bg-status-warning/10 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2" />
 
                 <div className="relative">
-                    <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-gradient-to-br from-emerald-100 to-teal-100 text-emerald-600 mb-6">
+                    <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-status-success/10 text-status-success mb-6">
                         <Sparkles className="h-10 w-10" />
                     </div>
 
@@ -433,7 +433,7 @@ function EmptyActivitiesState({ onCreateClick }: { onCreateClick: () => void }) 
                     <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
                         <Button
                             size="lg"
-                            className="bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white shadow-lg shadow-emerald-500/25 transition-all duration-200 hover:shadow-xl hover:shadow-emerald-500/30 hover:-translate-y-0.5"
+                            className="bg-status-success text-white shadow-sm transition-all duration-200 hover:shadow-md hover:-translate-y-0.5"
                             onClick={onCreateClick}
                         >
                             <Plus className="h-5 w-5 mr-2" />
@@ -700,7 +700,7 @@ export default function ActivitiesPage() {
                                         setSelectedActivityForSessions(null);
                                         setScheduleWizardOpen(true);
                                     }}
-                                    className="bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600"
+                                    className="bg-status-success hover:bg-status-success/90"
                                 >
                                     <CalendarPlus className="h-4 w-4 mr-2" />
                                     Bulk Schedule
@@ -709,7 +709,7 @@ export default function ActivitiesPage() {
                         </div>
                     </DialogHeader>
                     <div className="grid gap-6 py-4">
-                        <div className="border rounded-lg p-4 bg-gradient-to-br from-emerald-50 to-teal-50 space-y-4">
+                        <div className="border rounded-lg p-4 bg-status-success/10 space-y-4">
                             <h4 className="font-medium text-sm flex items-center gap-2">
                                 <Plus className="h-4 w-4" />
                                 Add Single Session
@@ -1079,7 +1079,7 @@ export default function ActivitiesPage() {
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                     <div>
                         <h1 className="text-2xl font-bold text-slate-900 flex items-center gap-2">
-                            <span className="inline-flex items-center justify-center w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-400 to-teal-500 text-white shadow-lg shadow-emerald-500/25">
+                            <span className="inline-flex items-center justify-center w-10 h-10 rounded-xl bg-status-success/15 text-status-success shadow-sm">
                                 <Star className="h-5 w-5" />
                             </span>
                             Activities & Events
@@ -1091,7 +1091,7 @@ export default function ActivitiesPage() {
                     {viewMode !== "bundles" && (
                         <Button
                             onClick={() => viewMode === "cards" ? setIsCreateOpen(true) : setIsCreateEventOpen(true)}
-                            className="bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white shadow-lg shadow-emerald-500/25 transition-all duration-200 hover:shadow-xl hover:-translate-y-0.5"
+                            className="bg-status-success text-white shadow-sm transition-all duration-200 hover:shadow-md hover:-translate-y-0.5"
                         >
                             <Plus className="h-4 w-4 mr-2" />
                             {viewMode === "cards" ? "New Activity" : "Add Event"}

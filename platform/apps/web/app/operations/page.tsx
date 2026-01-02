@@ -2003,27 +2003,27 @@ function LeaderboardTab({
     <div className="space-y-6">
       {/* My Stats Card */}
       {myStats && (
-        <div className="bg-gradient-to-r from-emerald-500 to-teal-600 rounded-2xl p-6 text-white">
+        <div className="bg-card border border-border rounded-2xl p-6">
           <div className="flex items-center justify-between mb-4">
             <div>
-              <p className="text-emerald-100 text-sm">Your Stats</p>
-              <h3 className="text-2xl font-bold">{myStats.userName || "You"}</h3>
+              <p className="text-muted-foreground text-sm">Your Stats</p>
+              <h3 className="text-2xl font-bold text-foreground">{myStats.userName || "You"}</h3>
             </div>
             <div className="text-right">
-              <div className="text-4xl font-bold">Level {myStats.level}</div>
-              <p className="text-emerald-100 text-sm">{LEVEL_TITLES[myStats.level - 1] || "Superstar"}</p>
+              <div className="text-4xl font-bold text-foreground">Level {myStats.level}</div>
+              <p className="text-muted-foreground text-sm">{LEVEL_TITLES[myStats.level - 1] || "Superstar"}</p>
             </div>
           </div>
 
           {/* XP Progress Bar */}
           <div className="mb-4">
-            <div className="flex justify-between text-sm text-emerald-100 mb-1">
+            <div className="flex justify-between text-sm text-muted-foreground mb-1">
               <span>{myStats.totalPoints} XP</span>
               <span>{myStats.xpToNextLevel} to next level</span>
             </div>
-            <div className="h-3 bg-white/20 rounded-full overflow-hidden">
+            <div className="h-3 bg-muted rounded-full overflow-hidden">
               <div
-                className="h-full bg-white rounded-full transition-all duration-500"
+                className="h-full bg-status-success rounded-full transition-all duration-500"
                 style={{ width: `${Math.min(100, (myStats.totalPoints / (myStats.totalPoints + myStats.xpToNextLevel)) * 100)}%` }}
               />
             </div>
@@ -2031,28 +2031,28 @@ function LeaderboardTab({
 
           {/* Stats Grid */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <div className="bg-white/10 rounded-lg p-3 text-center">
-              <div className="text-2xl font-bold">{myStats.totalTasksCompleted}</div>
-              <div className="text-sm text-emerald-100">Tasks Done</div>
+            <div className="bg-muted rounded-lg p-3 text-center">
+              <div className="text-2xl font-bold text-foreground">{myStats.totalTasksCompleted}</div>
+              <div className="text-sm text-muted-foreground">Tasks Done</div>
             </div>
-            <div className="bg-white/10 rounded-lg p-3 text-center">
-              <div className="text-2xl font-bold">{myStats.currentStreak} days</div>
-              <div className="text-sm text-emerald-100">Day Streak</div>
+            <div className="bg-muted rounded-lg p-3 text-center">
+              <div className="text-2xl font-bold text-foreground">{myStats.currentStreak} days</div>
+              <div className="text-sm text-muted-foreground">Day Streak</div>
             </div>
-            <div className="bg-white/10 rounded-lg p-3 text-center">
-              <div className="text-2xl font-bold">{Math.round(myStats.slaComplianceRate)}%</div>
-              <div className="text-sm text-emerald-100">On Time</div>
+            <div className="bg-muted rounded-lg p-3 text-center">
+              <div className="text-2xl font-bold text-foreground">{Math.round(myStats.slaComplianceRate)}%</div>
+              <div className="text-sm text-muted-foreground">On Time</div>
             </div>
-            <div className="bg-white/10 rounded-lg p-3 text-center">
-              <div className="text-2xl font-bold">{myStats.badges.length}</div>
-              <div className="text-sm text-emerald-100">Badges</div>
+            <div className="bg-muted rounded-lg p-3 text-center">
+              <div className="text-2xl font-bold text-foreground">{myStats.badges.length}</div>
+              <div className="text-sm text-muted-foreground">Badges</div>
             </div>
           </div>
 
           {/* My Badges */}
           {myStats.badges.length > 0 && (
-            <div className="mt-4 pt-4 border-t border-white/20">
-              <p className="text-sm text-emerald-100 mb-2">Your Badges</p>
+            <div className="mt-4 pt-4 border-t border-border">
+              <p className="text-sm text-muted-foreground mb-2">Your Badges</p>
               <div className="flex flex-wrap gap-2">
                 {myStats.badges.map(badge => (
                   <span

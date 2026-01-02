@@ -303,8 +303,8 @@ export default function IncidentsPage() {
         >
           <div>
             <h1 className="text-3xl font-bold text-foreground flex items-center gap-3">
-              <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-red-500 to-orange-500 flex items-center justify-center">
-                <Shield className="h-5 w-5 text-white" />
+              <div className="h-10 w-10 rounded-xl bg-status-error/15 flex items-center justify-center">
+                <Shield className="h-5 w-5 text-status-error" />
               </div>
               Incidents
             </h1>
@@ -570,7 +570,7 @@ export default function IncidentsPage() {
               <Button
                 onClick={submitIncident}
                 disabled={submitting || !campgroundId}
-                className="w-full gap-2 bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700"
+                className="w-full gap-2 bg-status-success hover:bg-status-success/90"
               >
                 {submitting ? (
                   <>

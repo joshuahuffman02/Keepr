@@ -139,7 +139,7 @@ function ContractStatsDashboard({ stats, isLoading }: { stats: ContractStats | n
   return (
     <div className="space-y-4">
       {/* Main Progress */}
-      <div className="bg-gradient-to-r from-emerald-50 to-teal-50 rounded-xl p-6 border border-emerald-200">
+      <div className="bg-status-success/10 rounded-xl p-6 border border-status-success/20">
         <div className="flex items-center justify-between mb-3">
           <div>
             <h3 className="text-lg font-semibold text-slate-900">Contract Completion</h3>
@@ -754,7 +754,7 @@ export function ContractsTab({ campgroundId }: { campgroundId: string | null }) 
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
               <CardTitle className="flex items-center gap-2">
-                <span className="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-gradient-to-br from-blue-400 to-indigo-500 text-white">
+                <span className="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-status-info/15 text-status-info">
                   <FileSignature className="h-4 w-4" />
                 </span>
                 Seasonal & Long-Term Contracts
@@ -765,7 +765,7 @@ export function ContractsTab({ campgroundId }: { campgroundId: string | null }) 
             </div>
             <Button
               onClick={() => setShowRenewalModal(true)}
-              className="bg-gradient-to-r from-blue-500 to-indigo-500"
+              className="bg-status-info hover:bg-status-info/90"
             >
               <Megaphone className="h-4 w-4 mr-2" />
               Send Renewal Campaign

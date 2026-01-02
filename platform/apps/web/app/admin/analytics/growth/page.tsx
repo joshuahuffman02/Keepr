@@ -237,7 +237,7 @@ export default function PlatformGrowthPage() {
       </div>
 
       {/* Founding Members Highlight */}
-      <Card className="bg-gradient-to-r from-amber-100 to-amber-50 dark:from-amber-900/30 dark:to-amber-800/20 border-amber-300 dark:border-amber-700/50">
+      <Card className="bg-status-warning/10 border-status-warning/20">
         <CardContent className="py-6">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">

@@ -1371,14 +1371,14 @@ function FirstFormCelebration({ open, onClose, formName }: { open: boolean; onCl
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/20 backdrop-blur-sm">
       <div className="bg-white rounded-2xl shadow-2xl p-8 text-center motion-safe:animate-in motion-safe:zoom-in-95 motion-safe:fade-in duration-300 max-w-md mx-4">
-        <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-br from-emerald-400 to-teal-500 text-white mb-4 motion-safe:animate-bounce">
+        <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-status-success text-white mb-4 motion-safe:animate-bounce">
           <PartyPopper className="h-8 w-8" />
         </div>
         <h3 className="text-xl font-bold text-slate-900 mb-2">Your First Form is Ready!</h3>
         <p className="text-slate-600 mb-6">
           <span className="font-medium text-status-success">{formName}</span> is now available.
         </p>
-        <Button onClick={onClose} className="bg-gradient-to-r from-emerald-500 to-teal-500">Got it!</Button>
+        <Button onClick={onClose} className="bg-status-success hover:bg-status-success/90">Got it!</Button>
       </div>
     </div>
   );
@@ -1441,10 +1441,10 @@ function FormPreview({ open, onClose, form }: { open: boolean; onClose: () => vo
 // Empty state
 function EmptyFormsState({ onCreateClick, onTemplateClick }: { onCreateClick: () => void; onTemplateClick: (t: any) => void; }) {
   return (
-    <div className="relative overflow-hidden rounded-xl border-2 border-dashed border-slate-200 bg-gradient-to-br from-slate-50 to-white p-8">
-      <div className="absolute top-0 right-0 w-48 h-48 bg-gradient-to-br from-emerald-100/40 to-teal-100/40 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
+    <div className="relative overflow-hidden rounded-xl border-2 border-dashed border-slate-200 bg-muted p-8">
+      <div className="absolute top-0 right-0 w-48 h-48 bg-status-success/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
       <div className="relative text-center mb-8">
-        <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-br from-status-success/15 to-teal-100 text-status-success mb-4">
+        <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-status-success/15 text-status-success mb-4">
           <FileText className="h-8 w-8" />
         </div>
         <h3 className="text-xl font-bold text-slate-900 mb-2">Create Your First Form</h3>
@@ -1597,7 +1597,7 @@ export default function FormsPage() {
           // Check if we're editing a policy or converting a form to a policy
           const existingTemplate = allTemplates.find(t => t.id === editingId);
           if (existingTemplate?._backend === "policy") {
-            return apiClient.updatePolicyTemplate(editingId, policyPayload);
+            return apiClient.updatePolicyTemplate(editingId, policyPayload, campgroundId!);
           }
           // If converting from form to policy, create new policy and optionally delete old form
           // For now, just create a new policy (user can manually delete old form if needed)
@@ -1666,7 +1666,7 @@ export default function FormsPage() {
       // Find the template to determine which backend to use
       const template = allTemplates.find(t => t.id === id);
       if (template?._backend === "policy") {
-        return apiClient.deletePolicyTemplate(id);
+        return apiClient.deletePolicyTemplate(id, campgroundId!);
       }
       return apiClient.deleteFormTemplate(id);
     },
@@ -1823,7 +1823,7 @@ export default function FormsPage() {
           <CardHeader className="flex flex-row items-center justify-between">
             <div>
               <CardTitle className="flex items-center gap-2">
-                <span className="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-gradient-to-br from-emerald-400 to-teal-500 text-white">
+                <span className="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-status-success/15 text-status-success">
                   <FileText className="h-4 w-4" />
                 </span>
                 Forms & Documents
@@ -1831,7 +1831,7 @@ export default function FormsPage() {
               <CardDescription>Create forms, legal documents, and configure auto-attach rules.</CardDescription>
             </div>
             {campgroundId && !isLoading && allTemplates.length > 0 && (
-              <Button onClick={openCreate} className="bg-gradient-to-r from-emerald-500 to-teal-500">
+              <Button onClick={openCreate} className="bg-status-success hover:bg-status-success/90">
                 <Plus className="h-4 w-4 mr-2" />
                 New form
               </Button>

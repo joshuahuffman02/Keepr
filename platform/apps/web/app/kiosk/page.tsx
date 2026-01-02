@@ -825,7 +825,7 @@ export default function KioskPage() {
 
     return (
         <div
-            className="min-h-screen bg-gradient-to-br from-green-900 via-green-800 to-emerald-900 flex items-center justify-center p-6 md:p-8"
+            className="min-h-screen bg-muted flex items-center justify-center p-6 md:p-8"
             onClick={handleActivity}
         >
             {/* Screen reader announcements */}

@@ -39,7 +39,7 @@ const TIER_COLORS: Record<string, string> = {
     Bronze: "bg-amber-600",
     Silver: "bg-slate-400",
     Gold: "bg-yellow-500",
-    Platinum: "bg-gradient-to-r from-slate-300 to-slate-500"
+    Platinum: "bg-slate-500"
 };
 
 type GuestWithReservations = Guest & {

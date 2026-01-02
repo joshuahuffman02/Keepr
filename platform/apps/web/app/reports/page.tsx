@@ -4058,7 +4058,7 @@ function ReportsPageInner() {
           </div>
 
           {/* Report Catalog - Collapsible Browse All */}
-          <div className="border border-slate-200 rounded-xl bg-gradient-to-r from-slate-50 to-white">
+          <div className="border border-slate-200 rounded-xl bg-muted">
             <button
               onClick={() => setShowCatalog(!showCatalog)}
               className="w-full px-4 py-3 flex items-center justify-between text-left hover:bg-slate-50/50 transition-colors rounded-xl"
@@ -4445,7 +4445,7 @@ function ReportsPageInner() {
 
           {/* Report Catalog - Collapsible Browse All */}
           {campgroundId && (
-            <div className="border border-slate-200 rounded-xl bg-gradient-to-r from-slate-50 to-white">
+            <div className="border border-slate-200 rounded-xl bg-muted">
               <button
                 onClick={() => setShowCatalog(!showCatalog)}
                 className="w-full px-4 py-3 flex items-center justify-between text-left hover:bg-slate-50/50 transition-colors rounded-xl"
@@ -4990,7 +4990,7 @@ function ReportsPageInner() {
                               <div className="w-20 text-xs text-slate-600 flex-shrink-0">{month}</div>
                               <div className="flex-1 h-8 bg-slate-100 rounded relative overflow-hidden">
                                 <div
-                                  className="h-full bg-gradient-to-r from-emerald-500 to-emerald-600 transition-all duration-500"
+                                  className="h-full bg-status-success transition-all duration-500"
                                   style={{ width: `${width}%` }}
                                 />
                                 <div className="absolute inset-0 flex items-center px-2">
@@ -5102,7 +5102,7 @@ function ReportsPageInner() {
                               <div className="w-20 text-xs text-slate-600 flex-shrink-0">{month}</div>
                               <div className="flex-1 h-8 bg-slate-100 rounded relative overflow-hidden">
                                 <div
-                                  className="h-full bg-gradient-to-r from-purple-500 to-purple-600 transition-all duration-500"
+                                  className="h-full bg-purple-500 transition-all duration-500"
                                   style={{ width: `${width}%` }}
                                 />
                                 <div className="absolute inset-0 flex items-center px-2">
@@ -5153,16 +5153,16 @@ function ReportsPageInner() {
                           const maxOccupancy = Math.max(...occupancyTrends.map(t => parseFloat(t.occupancy)), 1);
                           const width = (parseFloat(occupancy) / maxOccupancy) * 100;
                           const occupancyNum = parseFloat(occupancy);
-                          const colorClass = occupancyNum >= 80 ? 'from-emerald-500 to-emerald-600' :
-                            occupancyNum >= 60 ? 'from-blue-500 to-blue-600' :
-                              occupancyNum >= 40 ? 'from-amber-500 to-amber-600' :
-                                'from-slate-400 to-slate-500';
+                          const colorClass = occupancyNum >= 80 ? 'bg-emerald-500' :
+                            occupancyNum >= 60 ? 'bg-blue-500' :
+                              occupancyNum >= 40 ? 'bg-amber-500' :
+                                'bg-slate-400';
                           return (
                             <div key={month} className="flex items-center gap-2">
                               <div className="w-20 text-xs text-slate-600 flex-shrink-0">{month}</div>
                               <div className="flex-1 h-8 bg-slate-100 rounded relative overflow-hidden">
                                 <div
-                                  className={`h-full bg-gradient-to-r ${colorClass} transition-all duration-500`}
+                                  className={`h-full ${colorClass} transition-all duration-500`}
                                   style={{ width: `${width}%` }}
                                 />
                                 <div className="absolute inset-0 flex items-center px-2">
@@ -5263,10 +5263,10 @@ function ReportsPageInner() {
                       <div className="space-y-2">
                         {occupancyBySiteClass.map((cls) => {
                           const occupancyNum = parseFloat(cls.occupancy);
-                          const colorClass = occupancyNum >= 80 ? 'from-emerald-500 to-emerald-600' :
-                            occupancyNum >= 60 ? 'from-blue-500 to-blue-600' :
-                              occupancyNum >= 40 ? 'from-amber-500 to-amber-600' :
-                                'from-slate-400 to-slate-500';
+                          const colorClass = occupancyNum >= 80 ? 'bg-emerald-500' :
+                            occupancyNum >= 60 ? 'bg-blue-500' :
+                              occupancyNum >= 40 ? 'bg-amber-500' :
+                                'bg-slate-400';
                           return (
                             <div key={cls.className} className="space-y-1">
                               <div className="flex items-center justify-between text-sm">
@@ -5275,7 +5275,7 @@ function ReportsPageInner() {
                               </div>
                               <div className="h-8 bg-slate-100 rounded relative overflow-hidden">
                                 <div
-                                  className={`h-full bg-gradient-to-r ${colorClass} transition-all duration-500`}
+                                  className={`h-full ${colorClass} transition-all duration-500`}
                                   style={{ width: `${occupancyNum}%` }}
                                 />
                                 <div className="absolute inset-0 flex items-center px-2">
@@ -5440,7 +5440,7 @@ function ReportsPageInner() {
                                     <div className="flex items-center gap-2">
                                       <div className="flex-1 h-6 bg-slate-100 rounded relative overflow-hidden">
                                         <div
-                                          className="h-full bg-gradient-to-r from-blue-400 to-blue-600 transition-all duration-500"
+                                          className="h-full bg-blue-500 transition-all duration-500"
                                           style={{ width: `${percentage}%` }}
                                         />
                                         <div className="absolute inset-0 flex items-center px-2">
@@ -5679,7 +5679,7 @@ function ReportsPageInner() {
                               </div>
                               <div className="h-2 bg-slate-100 rounded overflow-hidden">
                                 <div
-                                  className="h-full bg-gradient-to-r from-purple-500 to-purple-600"
+                                  className="h-full bg-purple-500"
                                   style={{ width: `${percentage}%` }}
                                 />
                               </div>
@@ -6047,7 +6047,7 @@ function ReportsPageInner() {
                       </div>
                       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
                         {revenueForecast.map(({ month, revenue, bookings }) => (
-                          <div key={month} className="rounded-lg border border-slate-200 bg-gradient-to-br from-blue-50 to-cyan-50 p-4 space-y-2">
+                          <div key={month} className="rounded-lg border border-slate-200 bg-status-info/10 p-4 space-y-2">
                             <div className="text-sm font-bold text-blue-900">{month}</div>
                             <div>
                               <div className="text-xs text-slate-600">Projected Revenue</div>
@@ -6079,7 +6079,7 @@ function ReportsPageInner() {
                           <div className="w-24 text-xs text-slate-600">0-30 days</div>
                           <div className="flex-1 h-10 bg-slate-100 rounded relative overflow-hidden">
                             <div
-                              className="h-full bg-gradient-to-r from-blue-500 to-blue-600"
+                              className="h-full bg-blue-500"
                               style={{ width: `${(bookingPaceStats.next30Days / bookingPaceStats.total) * 100}%` }}
                             />
                             <div className="absolute inset-0 flex items-center px-2">
@@ -6091,7 +6091,7 @@ function ReportsPageInner() {
                           <div className="w-24 text-xs text-slate-600">31-60 days</div>
                           <div className="flex-1 h-10 bg-slate-100 rounded relative overflow-hidden">
                             <div
-                              className="h-full bg-gradient-to-r from-cyan-500 to-cyan-600"
+                              className="h-full bg-cyan-500"
                               style={{ width: `${(bookingPaceStats.next60Days / bookingPaceStats.total) * 100}%` }}
                             />
                             <div className="absolute inset-0 flex items-center px-2">
@@ -6103,7 +6103,7 @@ function ReportsPageInner() {
                           <div className="w-24 text-xs text-slate-600">61-90 days</div>
                           <div className="flex-1 h-10 bg-slate-100 rounded relative overflow-hidden">
                             <div
-                              className="h-full bg-gradient-to-r from-teal-500 to-teal-600"
+                              className="h-full bg-teal-500"
                               style={{ width: `${(bookingPaceStats.next90Days / bookingPaceStats.total) * 100}%` }}
                             />
                             <div className="absolute inset-0 flex items-center px-2">
@@ -6285,10 +6285,10 @@ function ReportsPageInner() {
                                     <div className="flex items-center gap-2">
                                       <div className="flex-1 h-6 bg-slate-100 rounded relative overflow-hidden max-w-xs">
                                         <div
-                                          className={`h-full transition-all duration-500 ${day.occupancy >= 80 ? 'bg-gradient-to-r from-emerald-500 to-emerald-600' :
-                                            day.occupancy >= 60 ? 'bg-gradient-to-r from-blue-500 to-blue-600' :
-                                              day.occupancy >= 40 ? 'bg-gradient-to-r from-amber-500 to-amber-600' :
-                                                'bg-gradient-to-r from-red-500 to-red-600'
+                                          className={`h-full transition-all duration-500 ${day.occupancy >= 80 ? 'bg-status-success' :
+                                            day.occupancy >= 60 ? 'bg-blue-500' :
+                                              day.occupancy >= 40 ? 'bg-amber-500' :
+                                                'bg-red-500'
                                             }`}
                                           style={{ width: `${day.occupancy}%` }}
                                         />

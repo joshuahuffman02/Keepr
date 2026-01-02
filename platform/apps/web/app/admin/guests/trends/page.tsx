@@ -475,7 +475,7 @@ export default function GuestTrendsPage() {
 
       {/* Snowbird Migration Trends */}
       {hasData && trendsData.snowbirdTrends.length > 0 && (
-      <Card className="bg-gradient-to-r from-blue-50 to-slate-50 dark:from-blue-900/30 dark:to-slate-800/50 border-slate-200 dark:border-slate-700">
+      <Card className="bg-status-info/10 border-border">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <MapPin className="h-5 w-5 text-blue-600 dark:text-blue-400" />
