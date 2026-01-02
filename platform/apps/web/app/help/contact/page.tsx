@@ -8,14 +8,24 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import {
   Mail,
-  MessageCircle,
-  Phone,
   Clock,
   CheckCircle2,
   FileText,
   HelpCircle,
   ExternalLink,
+  LifeBuoy,
 } from "lucide-react";
+
+type TicketCategory = "issue" | "question" | "feature" | "other";
+
+const CATEGORY_MAP: Record<string, TicketCategory> = {
+  general: "question",
+  billing: "issue",
+  technical: "issue",
+  feature: "feature",
+  account: "issue",
+  other: "other",
+};
 
 export default function ContactSupportPage() {
   const [formState, setFormState] = useState({
@@ -27,16 +37,48 @@ export default function ContactSupportPage() {
   });
   const [submitted, setSubmitted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [ticketId, setTicketId] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSubmitting(true);
+    setErrorMessage(null);
 
-    // Simulate form submission
-    await new Promise((resolve) => setTimeout(resolve, 1000));
+    try {
+      const payload = {
+        title: formState.subject.trim() || "Support request",
+        notes: formState.message.trim(),
+        category: CATEGORY_MAP[formState.category] ?? "question",
+        area: "support",
+        submitter: {
+          name: formState.name.trim(),
+          email: formState.email.trim(),
+        },
+        extra: {
+          topic: formState.category,
+          source: "help-contact",
+        },
+      };
 
-    setSubmitting(false);
-    setSubmitted(true);
+      const response = await fetch("/api/tickets", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+
+      if (!response.ok) {
+        throw new Error("Request failed");
+      }
+
+      const data = await response.json();
+      setTicketId(data?.id ?? null);
+      setSubmitted(true);
+    } catch (error) {
+      setErrorMessage("We could not send your message. Please try again or email support@campeveryday.com.");
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   if (submitted) {
@@ -61,11 +103,18 @@ export default function ContactSupportPage() {
               We received your support request and will respond within 24 hours.
               Check your email for a confirmation with your ticket number.
             </p>
+            {ticketId && (
+              <p className="text-sm text-slate-500 mb-6">
+                Ticket ID: {ticketId}
+              </p>
+            )}
             <div className="flex items-center justify-center gap-3">
               <Button
                 variant="outline"
                 onClick={() => {
                   setSubmitted(false);
+                  setTicketId(null);
+                  setErrorMessage(null);
                   setFormState({
                     name: "",
                     email: "",
@@ -215,6 +264,12 @@ export default function ContactSupportPage() {
                   />
                 </div>
 
+                {errorMessage && (
+                  <div className="rounded-lg border border-status-error-border bg-status-error-bg px-4 py-3 text-sm text-status-error-text">
+                    {errorMessage}
+                  </div>
+                )}
+
                 <Button
                   type="submit"
                   className="w-full"
@@ -231,25 +286,19 @@ export default function ContactSupportPage() {
             <Card className="p-5">
               <h2 className="font-semibold text-slate-900 mb-4 flex items-center gap-2">
                 <Clock className="h-4 w-4 text-emerald-600" />
-                Response Times
+                Support expectations
               </h2>
               <div className="space-y-3 text-sm">
                 <div className="flex justify-between">
-                  <span className="text-slate-600">Email Support</span>
+                  <span className="text-slate-600">Standard support</span>
                   <span className="font-medium text-slate-900">
-                    Within 24 hours
+                    Within 1 business day
                   </span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-slate-600">Priority Support</span>
+                  <span className="text-slate-600">Urgent issues</span>
                   <span className="font-medium text-slate-900">
-                    Within 4 hours
-                  </span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-slate-600">Emergency</span>
-                  <span className="font-medium text-slate-900">
-                    Within 1 hour
+                    Mark subject as urgent
                   </span>
                 </div>
               </div>
@@ -261,7 +310,7 @@ export default function ContactSupportPage() {
               </h2>
               <div className="space-y-4">
                 <a
-                  href="mailto:support@campreserv.com"
+                  href="mailto:support@campeveryday.com"
                   className="flex items-center gap-3 text-sm text-slate-600 hover:text-emerald-600 transition-colors"
                 >
                   <div className="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center">
@@ -269,37 +318,30 @@ export default function ContactSupportPage() {
                   </div>
                   <div>
                     <div className="font-medium text-slate-900">Email</div>
-                    <div className="text-xs">support@campreserv.com</div>
+                    <div className="text-xs">support@campeveryday.com</div>
                   </div>
                 </a>
-                <a
-                  href="tel:+18005551234"
+                <div className="flex items-center gap-3 text-sm text-slate-600">
+                  <div className="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center">
+                    <LifeBuoy className="h-4 w-4" />
+                  </div>
+                  <div>
+                    <div className="font-medium text-slate-900">In-app chat</div>
+                    <div className="text-xs">Open the help widget in the bottom right.</div>
+                  </div>
+                </div>
+                <Link
+                  href="/help"
                   className="flex items-center gap-3 text-sm text-slate-600 hover:text-emerald-600 transition-colors"
                 >
                   <div className="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center">
-                    <Phone className="h-4 w-4" />
+                    <HelpCircle className="h-4 w-4" />
                   </div>
                   <div>
-                    <div className="font-medium text-slate-900">Phone</div>
-                    <div className="text-xs">1-800-555-1234</div>
+                    <div className="font-medium text-slate-900">Help Center</div>
+                    <div className="text-xs">Browse guides and FAQs</div>
                   </div>
-                </a>
-                <button
-                  type="button"
-                  className="flex items-center gap-3 text-sm text-slate-600 hover:text-emerald-600 transition-colors w-full text-left"
-                  onClick={() => {
-                    // In a real app, this would open a chat widget
-                    alert("Chat support coming soon!");
-                  }}
-                >
-                  <div className="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center">
-                    <MessageCircle className="h-4 w-4" />
-                  </div>
-                  <div>
-                    <div className="font-medium text-slate-900">Live Chat</div>
-                    <div className="text-xs">Available 9am-5pm EST</div>
-                  </div>
-                </button>
+                </Link>
               </div>
             </Card>
 

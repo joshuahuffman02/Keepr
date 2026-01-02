@@ -8,7 +8,6 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { formatDistanceToNow } from "date-fns";
 import { HelpPanel } from "../../help/HelpPanel";
 import { useKeyboardShortcuts } from "@/contexts/KeyboardShortcutsContext";
-import { ThemeToggle } from "@/components/theme/ThemeToggle";
 import { apiClient } from "@/lib/api-client";
 
 type AdminTopBarProps = {
@@ -329,13 +328,8 @@ export function AdminTopBar({
                     </button>
                 </div>
 
-                {/* Right - Theme, Operations, Notifications & Menu */}
+                {/* Right - Operations, Notifications & Menu */}
                 <div className="flex items-center gap-2">
-                    {/* Theme Toggle */}
-                    <div className="hidden sm:block">
-                        <ThemeToggle />
-                    </div>
-
                     {/* Operations Quick Actions */}
                     <div className="hidden md:flex items-center gap-1 mr-2">
                         <Link

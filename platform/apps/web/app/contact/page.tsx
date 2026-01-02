@@ -1,7 +1,19 @@
 "use client";
 
-import { useState } from "react";
-import { Mail, Phone, MapPin, Send } from "lucide-react";
+import { useMemo, useState } from "react";
+import Link from "next/link";
+import { Mail, LifeBuoy, Clock, Send } from "lucide-react";
+
+type TicketCategory = "issue" | "question" | "feature" | "other";
+
+const topicOptions: { value: string; label: string; category: TicketCategory }[] = [
+    { value: "booking", label: "Booking question", category: "question" },
+    { value: "account", label: "Account support", category: "issue" },
+    { value: "host", label: "Campground owner inquiry", category: "question" },
+    { value: "partnership", label: "Partnership opportunity", category: "other" },
+    { value: "feedback", label: "Product feedback", category: "feature" },
+    { value: "other", label: "Other", category: "other" },
+];
 
 export default function ContactPage() {
     const [formData, setFormData] = useState({
@@ -11,11 +23,54 @@ export default function ContactPage() {
         message: "",
     });
     const [submitted, setSubmitted] = useState(false);
+    const [submitting, setSubmitting] = useState(false);
+    const [errorMessage, setErrorMessage] = useState<string | null>(null);
+    const [ticketId, setTicketId] = useState<string | null>(null);
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const selectedTopic = useMemo(
+        () => topicOptions.find((option) => option.value === formData.subject),
+        [formData.subject]
+    );
+
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        // In production, this would send to an API
-        setSubmitted(true);
+        setSubmitting(true);
+        setErrorMessage(null);
+
+        try {
+            const payload = {
+                title: selectedTopic?.label ?? "General inquiry",
+                notes: formData.message.trim(),
+                category: selectedTopic?.category ?? "question",
+                area: "public-contact",
+                submitter: {
+                    name: formData.name.trim(),
+                    email: formData.email.trim(),
+                },
+                extra: {
+                    topic: formData.subject,
+                    source: "contact-page",
+                },
+            };
+
+            const response = await fetch("/api/tickets", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(payload),
+            });
+
+            if (!response.ok) {
+                throw new Error("Request failed");
+            }
+
+            const data = await response.json();
+            setTicketId(data?.id ?? null);
+            setSubmitted(true);
+        } catch (error) {
+            setErrorMessage("We could not send your message. Please try again or email hello@campeveryday.com.");
+        } finally {
+            setSubmitting(false);
+        }
     };
 
     return (
@@ -34,73 +89,74 @@ export default function ContactPage() {
                 <div className="grid lg:grid-cols-3 gap-8">
                     {/* Contact Info */}
                     <div className="space-y-6">
-                        <div className="bg-white rounded-xl p-6 shadow-lg">
-                            <div className="flex items-center gap-4 mb-4">
+                        <div className="bg-white rounded-xl p-6 border border-slate-200 shadow-sm">
+                            <div className="flex items-center gap-4 mb-2">
                                 <div className="w-12 h-12 bg-emerald-100 rounded-lg flex items-center justify-center">
                                     <Mail className="w-6 h-6 text-emerald-600" />
                                 </div>
                                 <div>
-                                    <h3 className="font-semibold text-slate-900">Email</h3>
+                                    <h3 className="font-semibold text-slate-900">General inquiries</h3>
                                     <a href="mailto:hello@campeveryday.com" className="text-emerald-600 hover:underline">
                                         hello@campeveryday.com
                                     </a>
                                 </div>
                             </div>
+                            <p className="text-sm text-slate-500">
+                                Partnerships, press, and general questions.
+                            </p>
                         </div>
 
-                        <div className="bg-white rounded-xl p-6 shadow-lg">
-                            <div className="flex items-center gap-4 mb-4">
-                                <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
-                                    <Phone className="w-6 h-6 text-blue-600" />
+                        <div className="bg-white rounded-xl p-6 border border-slate-200 shadow-sm">
+                            <div className="flex items-center gap-4 mb-2">
+                                <div className="w-12 h-12 bg-slate-100 rounded-lg flex items-center justify-center">
+                                    <LifeBuoy className="w-6 h-6 text-slate-600" />
                                 </div>
                                 <div>
-                                    <h3 className="font-semibold text-slate-900">Phone</h3>
-                                    <a href="tel:+18005552267" className="text-blue-600 hover:underline">
-                                        (800) 555-CAMP
+                                    <h3 className="font-semibold text-slate-900">Product support</h3>
+                                    <a href="mailto:support@campeveryday.com" className="text-emerald-600 hover:underline">
+                                        support@campeveryday.com
                                     </a>
                                 </div>
                             </div>
-                        </div>
-
-                        <div className="bg-white rounded-xl p-6 shadow-lg">
-                            <div className="flex items-center gap-4 mb-4">
-                                <div className="w-12 h-12 bg-amber-100 rounded-lg flex items-center justify-center">
-                                    <MapPin className="w-6 h-6 text-amber-600" />
-                                </div>
-                                <div>
-                                    <h3 className="font-semibold text-slate-900">Office</h3>
-                                    <p className="text-slate-600 text-sm">
-                                        123 Adventure Lane<br />
-                                        Boulder, CO 80301
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div className="bg-gradient-to-br from-emerald-500 to-teal-600 rounded-xl p-6 text-white">
-                            <h3 className="font-semibold mb-2">Support Hours</h3>
-                            <p className="text-emerald-100 text-sm">
-                                Monday - Friday: 8am - 8pm ET<br />
-                                Saturday - Sunday: 9am - 5pm ET
+                            <p className="text-sm text-slate-500">
+                                For campground operators needing help in the app.
                             </p>
+                        </div>
+
+                        <div className="bg-slate-100 rounded-xl p-6 border border-slate-200">
+                            <div className="flex items-center gap-3 mb-3">
+                                <Clock className="w-5 h-5 text-slate-600" />
+                                <h3 className="font-semibold text-slate-900">Response time</h3>
+                            </div>
+                            <p className="text-sm text-slate-600 mb-3">
+                                Typical response within one business day.
+                            </p>
+                            <Link href="/help" className="text-sm font-semibold text-emerald-600 hover:underline">
+                                Visit the help center
+                            </Link>
                         </div>
                     </div>
 
                     {/* Contact Form */}
                     <div className="lg:col-span-2">
-                        <div className="bg-white rounded-2xl shadow-lg p-8">
+                        <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-8">
                             {submitted ? (
                                 <div className="text-center py-12">
                                     <div className="w-16 h-16 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-6">
                                         <Send className="w-8 h-8 text-emerald-600" />
                                     </div>
                                     <h2 className="text-2xl font-bold text-slate-900 mb-2">Message Sent!</h2>
-                                    <p className="text-slate-600 mb-6">
+                                    <p className="text-slate-600 mb-2">
                                         Thank you for reaching out. We&apos;ll get back to you within 24 hours.
                                     </p>
+                                    {ticketId && (
+                                        <p className="text-sm text-slate-500 mb-6">Ticket ID: {ticketId}</p>
+                                    )}
                                     <button
                                         onClick={() => {
                                             setSubmitted(false);
+                                            setTicketId(null);
+                                            setErrorMessage(null);
                                             setFormData({ name: "", email: "", subject: "", message: "" });
                                         }}
                                         className="text-emerald-600 font-semibold hover:underline"
@@ -143,7 +199,7 @@ export default function ContactPage() {
 
                                     <div>
                                         <label htmlFor="subject" className="block text-sm font-medium text-slate-700 mb-2">
-                                            Subject
+                                            Topic
                                         </label>
                                         <select
                                             id="subject"
@@ -153,12 +209,11 @@ export default function ContactPage() {
                                             className="w-full px-4 py-3 rounded-lg border border-slate-200 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 outline-none transition-all"
                                         >
                                             <option value="">Select a topic...</option>
-                                            <option value="booking">Booking Question</option>
-                                            <option value="account">Account Support</option>
-                                            <option value="host">Campground Owner Inquiry</option>
-                                            <option value="partnership">Partnership Opportunity</option>
-                                            <option value="feedback">Feedback</option>
-                                            <option value="other">Other</option>
+                                            {topicOptions.map((option) => (
+                                                <option key={option.value} value={option.value}>
+                                                    {option.label}
+                                                </option>
+                                            ))}
                                         </select>
                                     </div>
 
@@ -177,11 +232,18 @@ export default function ContactPage() {
                                         />
                                     </div>
 
+                                    {errorMessage && (
+                                        <div className="rounded-lg border border-status-error-border bg-status-error-bg px-4 py-3 text-sm text-status-error-text">
+                                            {errorMessage}
+                                        </div>
+                                    )}
+
                                     <button
                                         type="submit"
-                                        className="w-full py-4 bg-gradient-to-r from-emerald-600 to-teal-600 text-white font-semibold rounded-lg hover:from-emerald-500 hover:to-teal-500 transition-all shadow-lg shadow-emerald-500/20"
+                                        className="w-full py-4 bg-action-primary text-action-primary-foreground font-semibold rounded-lg hover:bg-action-primary-hover transition-all disabled:opacity-60 disabled:cursor-not-allowed"
+                                        disabled={submitting}
                                     >
-                                        Send Message
+                                        {submitting ? "Sending..." : "Send Message"}
                                     </button>
                                 </form>
                             )}

@@ -30,7 +30,7 @@ interface UseThemePreferencesReturn extends ThemePreferences {
 const STORAGE_KEY = "campreserv:theme-preferences";
 
 const DEFAULT_PREFERENCES: ThemePreferences = {
-  colorMode: "system",
+  colorMode: "light",
   accentColor: "emerald",
   reducedMotion: false,
   highContrast: false,
@@ -84,22 +84,21 @@ export const ACCENT_COLORS: Record<AccentColor, { primary: string; hover: string
 
 /**
  * Hook for managing user theme preferences.
- * Supports color mode (light/dark/system), accent colors, and accessibility options.
+ * Color mode is locked to light; accent colors and accessibility options remain configurable.
  *
  * @example
  * const { colorMode, setColorMode, accentColor, setAccentColor } = useThemePreferences();
  *
  * // In a settings UI
- * <Select value={colorMode} onValueChange={setColorMode}>
- *   <SelectItem value="light">Light</SelectItem>
- *   <SelectItem value="dark">Dark</SelectItem>
- *   <SelectItem value="system">System</SelectItem>
+ * <Select value={accentColor} onValueChange={setAccentColor}>
+ *   <SelectItem value="emerald">Emerald</SelectItem>
+ *   <SelectItem value="blue">Blue</SelectItem>
  * </Select>
  */
 export function useThemePreferences(): UseThemePreferencesReturn {
   const [preferences, setPreferences] = useState<ThemePreferences>(DEFAULT_PREFERENCES);
-  const [resolvedColorMode, setResolvedColorMode] = useState<"light" | "dark">("light");
   const [mounted, setMounted] = useState(false);
+  const resolvedColorMode: "light" | "dark" = "light";
 
   // Load preferences from storage
   useEffect(() => {
@@ -109,7 +108,7 @@ export function useThemePreferences(): UseThemePreferencesReturn {
       const stored = localStorage.getItem(STORAGE_KEY);
       if (stored) {
         const parsed = JSON.parse(stored);
-        setPreferences({ ...DEFAULT_PREFERENCES, ...parsed });
+        setPreferences({ ...DEFAULT_PREFERENCES, ...parsed, colorMode: "light" });
       }
     } catch {
       // Ignore parsing errors
@@ -117,28 +116,6 @@ export function useThemePreferences(): UseThemePreferencesReturn {
 
     setMounted(true);
   }, []);
-
-  // Resolve system color mode
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-
-    const updateResolvedMode = () => {
-      if (preferences.colorMode === "system") {
-        const isDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
-        setResolvedColorMode(isDark ? "dark" : "light");
-      } else {
-        setResolvedColorMode(preferences.colorMode);
-      }
-    };
-
-    updateResolvedMode();
-
-    // Listen for system preference changes
-    const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
-    mediaQuery.addEventListener("change", updateResolvedMode);
-
-    return () => mediaQuery.removeEventListener("change", updateResolvedMode);
-  }, [preferences.colorMode]);
 
   // Apply theme to document
   useEffect(() => {
@@ -173,10 +150,11 @@ export function useThemePreferences(): UseThemePreferencesReturn {
 
   // Save preferences
   const savePreferences = useCallback((newPrefs: ThemePreferences) => {
-    setPreferences(newPrefs);
+    const normalized = { ...newPrefs, colorMode: "light" as const };
+    setPreferences(normalized);
     if (typeof window !== "undefined") {
       try {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(newPrefs));
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(normalized));
       } catch {
         // Ignore storage errors
       }
@@ -184,8 +162,8 @@ export function useThemePreferences(): UseThemePreferencesReturn {
   }, []);
 
   const setColorMode = useCallback(
-    (mode: ColorMode) => {
-      savePreferences({ ...preferences, colorMode: mode });
+    (_mode: ColorMode) => {
+      savePreferences({ ...preferences, colorMode: "light" });
     },
     [preferences, savePreferences]
   );

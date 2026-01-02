@@ -6,10 +6,10 @@ Scope: Brand, marketing pages, and in-app UX (not tied to any single feature).
 Use this as a QA list before launch and as a guiding rubric for new UI work.
 
 ## 1) Visual system consistency
-- [ ] A defined typography pairing (headline + body) with a documented type scale.
-  - NOTE: Only body font is defined in `platform/apps/web/app/globals.css:145`; no documented type scale found.
-- [ ] Color tokens for brand, neutrals, semantic states, and data viz.
-  - NOTE: Core UI tokens exist, but no data viz palette found in `platform/apps/web/tailwind.config.ts:15`.
+- [x] A defined typography pairing (headline + body) with a documented type scale.
+  - NOTE: Documented in `docs/typography-scale.md`; font tokens set in `platform/apps/web/app/globals.css`.
+- [x] Color tokens for brand, neutrals, semantic states, and data viz.
+  - NOTE: Data viz palette added to `platform/apps/web/app/globals.css` and `platform/apps/web/tailwind.config.ts`.
 - [ ] Consistent spacing scale (4/8/12/16/24/32/48/64).
   - NOTE: Non-scale spacing is used (e.g., `p-5`) in `platform/apps/web/app/booking-lab/page.tsx:668`.
 - [x] Grid and container widths defined per breakpoint.
@@ -56,7 +56,7 @@ INCONSISTENCIES PREVENT COMPLETION - requires standardization:
 
 ## 6) Conversion UX polish
 - [ ] All CTAs have a single, predictable flow (no dead ends).
-  - NOTE: `/contact` and `/help/contact` links exist but routes are missing.
+  - NOTE: `/contact` and `/help/contact` now submit real tickets via `/api/tickets`; remaining CTAs still need audit.
 - [ ] Forms are short, progressive, and include validation feedback.
   - NOTE: Checkout forms excellent (ValidatedFormField), marketing forms need inline validation
 - [ ] Live scheduling or demo request feels premium (no generic forms).
@@ -220,18 +220,14 @@ Each status has 5 variants for maximum flexibility:
 
 #### 4. Data Visualization Colors
 
-Currently using the semantic status palette (success/warning/error/info).
+Chart and heatmap tokens now exist and are mapped through Tailwind.
 
-**INCOMPLETE - Needs Expansion:**
-- Chart series colors (6-8 distinct, accessible colors)
-- Heatmap gradients (low to high)
-- Category colors for different data types
-- Contrast-tested combinations for overlays
+- Chart series: `chart-1` through `chart-8`
+- Heatmap: `heatmap-low`, `heatmap-mid`, `heatmap-high`
 
-**Recommendation for future expansion:**
-- Add Violet, Cyan, Orange, Pink, Indigo for multi-series charts
-- Sequential palettes for metrics over time
-- Diverging palettes for positive/negative comparisons
+Remaining gaps:
+- Diverging palette for positive/negative comparisons
+- Contrast testing on chart overlays and annotations
 
 ### Usage Patterns
 

@@ -27,6 +27,8 @@
     --input: 214 32% 91%;
     --ring: 217 91% 60%;
     --radius: 0.5rem;
+    --font-body: "Inter", "Geist", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    --font-display: "Inter", "Geist", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 
     /* ============================================
        SEMANTIC COLOR TOKENS
@@ -79,6 +81,19 @@
     --status-info-bg: 214 100% 97%; /* blue-50 */
     --status-info-border: 213 97% 87%; /* blue-200 */
     --status-info-text: 221 83% 45%; /* blue-700 - text on light bg */
+
+    /* Data visualization tokens */
+    --chart-1: 217 91% 60%; /* blue-500 */
+    --chart-2: 158 64% 52%; /* emerald-600 */
+    --chart-3: 38 92% 50%; /* amber-500 */
+    --chart-4: 0 84% 60%; /* red-500 */
+    --chart-5: 262 83% 58%; /* violet-500 */
+    --chart-6: 192 91% 36%; /* cyan-600 */
+    --chart-7: 24 94% 50%; /* orange-500 */
+    --chart-8: 340 82% 52%; /* rose-500 */
+    --heatmap-low: 210 40% 96%; /* slate-100 */
+    --heatmap-mid: 158 64% 90%; /* emerald-100 */
+    --heatmap-high: 158 64% 42%; /* emerald-700 */
   }
 
   .dark {
@@ -134,6 +149,18 @@
     --status-info-bg: 222 84% 12%; /* blue-950 */
     --status-info-border: 217 91% 22%; /* blue-800 */
     --status-info-text: 213 94% 68%; /* blue-400 - text on dark bg */
+
+    --chart-1: 217 91% 60%;
+    --chart-2: 158 64% 52%;
+    --chart-3: 38 92% 50%;
+    --chart-4: 0 84% 60%;
+    --chart-5: 262 83% 58%;
+    --chart-6: 192 91% 36%;
+    --chart-7: 24 94% 50%;
+    --chart-8: 340 82% 52%;
+    --heatmap-low: 223 47% 11%;
+    --heatmap-mid: 158 64% 24%;
+    --heatmap-high: 158 64% 52%;
   }
 }
 
@@ -143,7 +170,7 @@
   }
   body {
     @apply bg-background text-foreground;
-    font-family: "Inter", "Geist", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    font-family: var(--font-body);
   }
 }
 

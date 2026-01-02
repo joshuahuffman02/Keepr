@@ -89,7 +89,26 @@ const config: Config = {
           bg: "hsl(var(--status-info-bg))",
           border: "hsl(var(--status-info-border))",
           text: "hsl(var(--status-info-text))"
+        },
+        chart: {
+          1: "hsl(var(--chart-1))",
+          2: "hsl(var(--chart-2))",
+          3: "hsl(var(--chart-3))",
+          4: "hsl(var(--chart-4))",
+          5: "hsl(var(--chart-5))",
+          6: "hsl(var(--chart-6))",
+          7: "hsl(var(--chart-7))",
+          8: "hsl(var(--chart-8))"
+        },
+        heatmap: {
+          low: "hsl(var(--heatmap-low))",
+          mid: "hsl(var(--heatmap-mid))",
+          high: "hsl(var(--heatmap-high))"
         }
+      },
+      fontFamily: {
+        sans: ["var(--font-body)"],
+        display: ["var(--font-display)"]
       },
       borderRadius: {
         lg: "var(--radius)",
