@@ -409,19 +409,40 @@ export default function Dashboard() {
   });
 
   const today = useMemo(() => {
+    if (!hasMounted) return null;
     const d = new Date();
     d.setHours(0, 0, 0, 0);
     return d;
-  }, []);
+  }, [hasMounted]);
+
+  const todayLabel = useMemo(() => {
+    if (!today) return "Today";
+    return today.toLocaleDateString(undefined, { weekday: "long", month: "long", day: "numeric" });
+  }, [today]);
 
   const reservations = reservationsQuery.data as Reservation[] | undefined;
-  const isLoading = reservationsQuery.isLoading || sitesQuery.isLoading;
+  const isLoading = !hasMounted || reservationsQuery.isLoading || sitesQuery.isLoading;
   const isError = reservationsQuery.isError || sitesQuery.isError;
   const totalSites = sitesQuery.data?.length ?? 0;
   const yieldMetrics = yieldMetricsQuery.data;
 
   // Single-pass computation of all dashboard metrics
   const dashboardMetrics = useMemo(() => {
+    if (!today) {
+      return {
+        todayArrivals: [],
+        todayDepartures: [],
+        inHouse: [],
+        outstandingBalanceCents: 0,
+        balanceDueToday: 0,
+        balanceOverdue: 0,
+        balanceFuture: 0,
+        futureReservationsCount: 0,
+        attentionList: [],
+        occupancy14: [],
+      };
+    }
+
     const todayTime = today.getTime();
     const todayArrivals: Reservation[] = [];
     const todayDepartures: Reservation[] = [];
@@ -644,7 +665,7 @@ export default function Dashboard() {
               </motion.div>
 
               <div className="text-sm text-muted-foreground">
-                {today.toLocaleDateString(undefined, { weekday: "long", month: "long", day: "numeric" })} · {selectedCampground?.name ?? "Loading campground"}
+                {todayLabel} · {selectedCampground?.name ?? "Loading campground"}
               </div>
 
               <p className="text-sm text-muted-foreground font-medium">
@@ -930,7 +951,16 @@ export default function Dashboard() {
                   <div className="text-sm font-semibold text-foreground">Occupancy outlook</div>
                   <span className="text-xs text-muted-foreground">Next 14 days</span>
                 </div>
-                {occupancy14.length === 0 ? (
+                {isLoading ? (
+                  <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-2">
+                    {Array.from({ length: 7 }).map((_, index) => (
+                      <div
+                        key={`occupancy-skeleton-${index}`}
+                        className="h-16 rounded-lg bg-muted animate-pulse"
+                      />
+                    ))}
+                  </div>
+                ) : occupancy14.length === 0 ? (
                   <div className={cn(
                     "rounded-lg p-6 text-center space-y-3",
                     "border border-dashed border-border bg-muted/40"
@@ -1006,68 +1036,72 @@ export default function Dashboard() {
                   </div>
                 )}
               </div>
-            </motion.div>
 
-            <motion.div
-              className={cn(
-                "rounded-2xl p-6 space-y-6 shadow-sm transition-colors",
-                "bg-card border border-border"
-              )}
-              {...motionProps}
-              transition={{ ...SPRING_CONFIG, delay: 0.18 }}
-            >
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2 text-sm font-semibold text-foreground">
-                  <UserCheck className="h-4 w-4 text-muted-foreground" />
-                  Guest flow
-                </div>
-                <Link
-                  href="/check-in-out"
-                  className={cn(
-                    "text-xs font-semibold text-emerald-600 hover:text-emerald-500 flex items-center gap-1",
-                    "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2 rounded"
-                  )}
-                >
-                  Open check-in/out <ArrowRight className="h-4 w-4" />
-                </Link>
-              </div>
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                <BoardCard
-                  title="Arrivals"
-                  count={todayArrivals.length}
-                  ctaLabel="Open arrivals"
-                  ctaHref="/check-in-out"
-                  rows={todayArrivals}
-                  prefersReducedMotion={prefersReducedMotion}
-                  isLoading={isLoading}
-                />
-                <BoardCard
-                  title="Departures"
-                  count={todayDepartures.length}
-                  ctaLabel="Open departures"
-                  ctaHref="/check-in-out"
-                  rows={todayDepartures}
-                  tone="amber"
-                  prefersReducedMotion={prefersReducedMotion}
-                  isLoading={isLoading}
-                />
-              </div>
-              <div className="border-t border-border pt-4 space-y-3">
+              <div className="border-t border-border pt-6 space-y-6">
                 <div className="flex items-center justify-between">
-                  <div className="text-sm font-semibold text-foreground">Recent movement</div>
+                  <div className="flex items-center gap-2 text-sm font-semibold text-foreground">
+                    <UserCheck className="h-4 w-4 text-muted-foreground" />
+                    Guest flow
+                  </div>
                   <Link
-                    href="/reservations"
+                    href="/check-in-out"
                     className={cn(
                       "text-xs font-semibold text-emerald-600 hover:text-emerald-500 flex items-center gap-1",
                       "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2 rounded"
                     )}
                   >
-                    View reservations <ArrowRight className="h-4 w-4" />
+                    Open check-in/out <ArrowRight className="h-4 w-4" />
                   </Link>
                 </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                  <ActivityList title="Arrivals" tone="emerald" rows={todayArrivals.slice(0, 6)} prefersReducedMotion={prefersReducedMotion} />
-                  <ActivityList title="Departures" tone="amber" rows={todayDepartures.slice(0, 6)} prefersReducedMotion={prefersReducedMotion} />
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                  <BoardCard
+                    title="Arrivals"
+                    count={todayArrivals.length}
+                    ctaLabel="Open arrivals"
+                    ctaHref="/check-in-out"
+                    rows={todayArrivals}
+                    prefersReducedMotion={prefersReducedMotion}
+                    isLoading={isLoading}
+                  />
+                  <BoardCard
+                    title="Departures"
+                    count={todayDepartures.length}
+                    ctaLabel="Open departures"
+                    ctaHref="/check-in-out"
+                    rows={todayDepartures}
+                    tone="amber"
+                    prefersReducedMotion={prefersReducedMotion}
+                    isLoading={isLoading}
+                  />
+                </div>
+                <div className="border-t border-border pt-4 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <div className="text-sm font-semibold text-foreground">Recent movement</div>
+                    <Link
+                      href="/reservations"
+                      className={cn(
+                        "text-xs font-semibold text-emerald-600 hover:text-emerald-500 flex items-center gap-1",
+                        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2 rounded"
+                      )}
+                    >
+                      View reservations <ArrowRight className="h-4 w-4" />
+                    </Link>
+                  </div>
+                  {isLoading ? (
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                      {Array.from({ length: 2 }).map((_, index) => (
+                        <div
+                          key={`movement-skeleton-${index}`}
+                          className="h-40 rounded-xl border border-border/70 bg-muted/30 animate-pulse"
+                        />
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                      <ActivityList title="Arrivals" tone="emerald" rows={todayArrivals.slice(0, 6)} prefersReducedMotion={prefersReducedMotion} />
+                      <ActivityList title="Departures" tone="amber" rows={todayDepartures.slice(0, 6)} prefersReducedMotion={prefersReducedMotion} />
+                    </div>
+                  )}
                 </div>
               </div>
             </motion.div>
@@ -1113,7 +1147,7 @@ export default function Dashboard() {
 
                 <div className={cn(
                   "rounded-xl p-4 space-y-4 transition-colors",
-                  "border border-border/70 bg-muted/30"
+                  "border border-border/70 bg-card"
                 )}>
                   <div className="flex items-center justify-between">
                     <div>
@@ -1693,7 +1727,7 @@ function QuickActionButton({
         href={href}
         aria-label={label}
         className={cn(
-          "flex h-full min-h-[88px] flex-col items-center justify-center gap-2 rounded-xl border border-border/70 bg-muted/30 px-3 py-3 text-center transition-colors",
+          "flex h-full min-h-[104px] flex-col items-center justify-center gap-2.5 rounded-xl border border-border/70 bg-muted/30 px-4 py-4 text-center transition-colors",
           "hover:bg-muted/50 hover:border-muted-foreground/30",
           "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2"
         )}
@@ -1701,7 +1735,7 @@ function QuickActionButton({
         <span className={cn("rounded-lg p-2 bg-muted", toneMap[tone])}>
           {icon}
         </span>
-        <span className="text-sm font-semibold text-foreground leading-snug whitespace-normal break-words">
+        <span className="text-sm font-semibold text-foreground leading-tight line-clamp-2">
           {label}
         </span>
       </Link>
@@ -1765,7 +1799,7 @@ function NpsSummaryCard({
         <NpsGauge
           score={score}
           loading={isLoading}
-          size="sm"
+          size="lg"
           title="Guest NPS Score"
         />
       ) : (
