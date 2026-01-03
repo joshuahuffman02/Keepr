@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState, useCallback, useRef } from "react";
 import Link from "next/link";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { useMutation, useQuery, useQueryClient, useQueries } from "@tanstack/react-query";
-import { CalendarDays, Info, Plus } from "lucide-react";
+import { CalendarDays, Info, Plus, Users, LogIn, LogOut, DollarSign } from "lucide-react";
 import { apiClient } from "../../../../lib/api-client";
 import { Breadcrumbs } from "@/components/breadcrumbs";
 import { Button } from "../../../../components/ui/button";
@@ -1048,7 +1048,15 @@ export default function ReservationsPage() {
           ]}
         />
         <PageHeader
-          title="Reservations"
+          eyebrow="Reservations"
+          title={(
+            <span className="flex items-center gap-3">
+              <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-muted text-foreground">
+                <CalendarDays className="h-5 w-5" />
+              </span>
+              <span>Reservations</span>
+            </span>
+          )}
           subtitle="Track arrivals, departures, balances, and guest communications."
           actions={(
             <>
@@ -1074,9 +1082,12 @@ export default function ReservationsPage() {
           </div>
         )}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          <Card data-testid="inhouse-card">
+          <Card data-testid="inhouse-card" className="border-border shadow-sm">
             <CardHeader className="pb-3">
-              <CardTitle className="text-sm text-muted-foreground">In house</CardTitle>
+              <CardTitle className="text-sm text-muted-foreground flex items-center gap-2">
+                <Users className="h-4 w-4 text-muted-foreground" />
+                In house
+              </CardTitle>
             </CardHeader>
             <CardContent className="pt-0 space-y-2">
               <div className="text-2xl font-semibold text-foreground" data-testid="inhouse-count">
@@ -1086,34 +1097,43 @@ export default function ReservationsPage() {
             </CardContent>
           </Card>
           <Link href="/check-in-out" className="block">
-            <Card data-testid="arrivals-card" className="hover:border-status-success/30 hover:shadow-md transition cursor-pointer">
+            <Card data-testid="arrivals-card" className="border-border shadow-sm hover:shadow-md transition cursor-pointer">
               <CardHeader className="pb-3">
-                <CardTitle className="text-sm text-muted-foreground">Arrivals today</CardTitle>
+                <CardTitle className="text-sm text-muted-foreground flex items-center gap-2">
+                  <LogIn className="h-4 w-4 text-muted-foreground" />
+                  Arrivals today
+                </CardTitle>
               </CardHeader>
               <CardContent className="pt-0 space-y-2">
                 <div className="text-2xl font-semibold text-foreground" data-testid="arrivals-today">
                   {arrivalsToday.length}
                 </div>
-                <div className="text-xs text-status-success font-medium">Click to check in →</div>
+                <div className="text-xs text-muted-foreground">Open check-in board</div>
               </CardContent>
             </Card>
           </Link>
           <Link href="/check-in-out" className="block">
-            <Card data-testid="departures-card" className="hover:border-orange-300 hover:shadow-md transition cursor-pointer">
+            <Card data-testid="departures-card" className="border-border shadow-sm hover:shadow-md transition cursor-pointer">
               <CardHeader className="pb-3">
-                <CardTitle className="text-sm text-muted-foreground">Departures today</CardTitle>
+                <CardTitle className="text-sm text-muted-foreground flex items-center gap-2">
+                  <LogOut className="h-4 w-4 text-muted-foreground" />
+                  Departures today
+                </CardTitle>
               </CardHeader>
               <CardContent className="pt-0 space-y-2">
                 <div className="text-2xl font-semibold text-foreground" data-testid="departures-today">
                   {departuresToday.length}
                 </div>
-                <div className="text-xs text-orange-600 font-medium">Click to check out →</div>
+                <div className="text-xs text-muted-foreground">Open check-out board</div>
               </CardContent>
             </Card>
           </Link>
-          <Card data-testid="balance-due-card">
+          <Card data-testid="balance-due-card" className="border-border shadow-sm">
             <CardHeader className="pb-3">
-              <CardTitle className="text-sm text-muted-foreground">Balance due</CardTitle>
+              <CardTitle className="text-sm text-muted-foreground flex items-center gap-2">
+                <DollarSign className="h-4 w-4 text-muted-foreground" />
+                Balance due
+              </CardTitle>
             </CardHeader>
             <CardContent className="pt-0 space-y-2">
               <div className="text-2xl font-semibold text-foreground" data-testid="balance-due-value">
@@ -1488,75 +1508,78 @@ export default function ReservationsPage() {
                 </div>
               </details>
             )}
-            <div className="rounded-lg border border-border bg-card p-4 space-y-3">
-              <div className="flex items-center justify-between">
-                <div className="text-xs font-semibold uppercase tracking-wide text-muted-foreground flex items-center gap-2">
-                  Filters & exports
-                  {activeFilterCount > 0 && (
-                    <span className="rounded-full bg-status-success/15 text-status-success border border-status-success/30 px-2 py-0.5 text-[11px] font-semibold">
-                      {activeFilterCount} on
-                    </span>
-                  )}
+            <Card className="border-border shadow-sm">
+              <CardHeader className="pb-3">
+                <div className="flex items-center justify-between">
+                  <div className="text-sm font-semibold text-foreground flex items-center gap-2">
+                    Filters & exports
+                    {activeFilterCount > 0 && (
+                      <span className="rounded-full bg-status-success/15 text-status-success border border-status-success/30 px-2 py-0.5 text-[11px] font-semibold">
+                        {activeFilterCount} on
+                      </span>
+                    )}
+                  </div>
+                  <div className="flex gap-2">
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      disabled={!hasFilters && !filterDepositsDue}
+                      onClick={() => {
+                        setSearch("");
+                        setStatusFilter("all");
+                        setStartFilter("");
+                        setEndFilter("");
+                        setFilterDepositsDue(false);
+                      }}
+                    >
+                      Clear all filters
+                    </Button>
+                  </div>
                 </div>
-                <div className="flex gap-2">
-                  <Button
-                    size="sm"
-                    variant="ghost"
-                    disabled={!hasFilters && !filterDepositsDue}
-                    onClick={() => {
-                      setSearch("");
-                      setStatusFilter("all");
-                      setStartFilter("");
-                      setEndFilter("");
-                      setFilterDepositsDue(false);
-                    }}
-                  >
-                    Clear all filters
-                  </Button>
+              </CardHeader>
+              <CardContent className="pt-0 space-y-3">
+                <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
+                  <div className="space-y-1">
+                    <div className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">Search</div>
+                    <Input
+                      placeholder="Search guest, site, status..."
+                      value={search}
+                      onChange={(e) => setSearch(e.target.value)}
+                    />
+                  </div>
+                  <div className="space-y-1">
+                    <div className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">Start date</div>
+                    <Input
+                      type="date"
+                      value={startFilter}
+                      onChange={(e) => setStartFilter(e.target.value)}
+                    />
+                  </div>
+                  <div className="space-y-1">
+                    <div className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">End date</div>
+                    <Input
+                      type="date"
+                      value={endFilter}
+                      onChange={(e) => setEndFilter(e.target.value)}
+                    />
+                  </div>
+                  <div className="space-y-1">
+                    <div className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">Status</div>
+                    <Select value={statusFilter} onValueChange={setStatusFilter}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="All statuses" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">All statuses</SelectItem>
+                        <SelectItem value="pending">Pending</SelectItem>
+                        <SelectItem value="confirmed">Confirmed</SelectItem>
+                        <SelectItem value="checked_in">Checked in</SelectItem>
+                        <SelectItem value="checked_out">Checked out</SelectItem>
+                        <SelectItem value="cancelled">Cancelled</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
                 </div>
-              </div>
-              <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
-                <div className="space-y-1">
-                  <div className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">Search</div>
-                  <Input
-                    placeholder="Search guest, site, status..."
-                    value={search}
-                    onChange={(e) => setSearch(e.target.value)}
-                  />
-                </div>
-                <div className="space-y-1">
-                  <div className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">Start date</div>
-                  <Input
-                    type="date"
-                    value={startFilter}
-                    onChange={(e) => setStartFilter(e.target.value)}
-                  />
-                </div>
-                <div className="space-y-1">
-                  <div className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">End date</div>
-                  <Input
-                    type="date"
-                    value={endFilter}
-                    onChange={(e) => setEndFilter(e.target.value)}
-                  />
-                </div>
-                <div className="space-y-1">
-                  <div className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">Status</div>
-                  <Select value={statusFilter} onValueChange={setStatusFilter}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="All statuses" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">All statuses</SelectItem>
-                      <SelectItem value="pending">Pending</SelectItem>
-                      <SelectItem value="confirmed">Confirmed</SelectItem>
-                      <SelectItem value="checked_in">Checked in</SelectItem>
-                      <SelectItem value="checked_out">Checked out</SelectItem>
-                      <SelectItem value="cancelled">Cancelled</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
 
               <div className="flex flex-wrap gap-2">
                 <Button
@@ -1664,100 +1687,101 @@ export default function ReservationsPage() {
                 </Button>
               </div>
 
-              <div className="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-border">
-                <div className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Exports</div>
-                <div className="flex gap-2">
-                  <Button size="sm" variant="secondary" onClick={() => handleExport("csv")} disabled={!filteredReservations.length}>
-                    Export CSV
-                  </Button>
-                  <Button size="sm" variant="ghost" onClick={() => handleExport("json")} disabled={!filteredReservations.length}>
-                    Export JSON
-                  </Button>
-                </div>
-              </div>
-              {/* Active filter pills */}
-              {activeFilterCount > 0 && (
-                <div className="flex flex-wrap items-center gap-2 pt-2 border-t border-border">
-                  <span className="text-xs text-muted-foreground font-medium">Active:</span>
-                  {search.trim() && (
-                    <FilterChip
-                      label={`Search: "${search.trim().length > 20 ? search.trim().slice(0, 20) + '...' : search.trim()}"`}
-                      selected
-                      removable
-                      onRemove={() => setSearch("")}
-                      variant="subtle"
-                    />
-                  )}
-                  {statusFilter !== "all" && (
-                    <FilterChip
-                      label={`Status: ${statusFilter.replace("_", " ").replace(/\b\w/g, (c) => c.toUpperCase())}`}
-                      selected
-                      removable
-                      onRemove={() => setStatusFilter("all")}
-                      variant="subtle"
-                    />
-                  )}
-                  {startFilter && endFilter && startFilter === endFilter ? (
-                    <FilterChip
-                      label={`Date: ${new Date(startFilter + "T00:00:00").toLocaleDateString()}`}
-                      selected
-                      removable
-                      onRemove={() => {
-                        setStartFilter("");
-                        setEndFilter("");
-                      }}
-                      variant="subtle"
-                    />
-                  ) : (
-                    <>
-                      {startFilter && (
-                        <FilterChip
-                          label={`From: ${new Date(startFilter + "T00:00:00").toLocaleDateString()}`}
-                          selected
-                          removable
-                          onRemove={() => setStartFilter("")}
-                          variant="subtle"
-                        />
-                      )}
-                      {endFilter && (
-                        <FilterChip
-                          label={`To: ${new Date(endFilter + "T00:00:00").toLocaleDateString()}`}
-                          selected
-                          removable
-                          onRemove={() => setEndFilter("")}
-                          variant="subtle"
-                        />
-                      )}
-                    </>
-                  )}
-                  {filterDepositsDue && (
-                    <FilterChip
-                      label="Deposits due"
-                      selected
-                      removable
-                      onRemove={() => setFilterDepositsDue(false)}
-                      variant="subtle"
-                    />
-                  )}
-                  {activeFilterCount > 1 && (
-                    <Button
-                      size="sm"
-                      variant="ghost"
-                      className="text-xs h-7 px-2"
-                      onClick={() => {
-                        setSearch("");
-                        setStatusFilter("all");
-                        setStartFilter("");
-                        setEndFilter("");
-                        setFilterDepositsDue(false);
-                      }}
-                    >
-                      Clear all
+                <div className="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-border">
+                  <div className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Exports</div>
+                  <div className="flex gap-2">
+                    <Button size="sm" variant="secondary" onClick={() => handleExport("csv")} disabled={!filteredReservations.length}>
+                      Export CSV
                     </Button>
-                  )}
+                    <Button size="sm" variant="ghost" onClick={() => handleExport("json")} disabled={!filteredReservations.length}>
+                      Export JSON
+                    </Button>
+                  </div>
                 </div>
-              )}
-            </div>
+                {/* Active filter pills */}
+                {activeFilterCount > 0 && (
+                  <div className="flex flex-wrap items-center gap-2 pt-2 border-t border-border">
+                    <span className="text-xs text-muted-foreground font-medium">Active:</span>
+                    {search.trim() && (
+                      <FilterChip
+                        label={`Search: "${search.trim().length > 20 ? search.trim().slice(0, 20) + '...' : search.trim()}"`}
+                        selected
+                        removable
+                        onRemove={() => setSearch("")}
+                        variant="subtle"
+                      />
+                    )}
+                    {statusFilter !== "all" && (
+                      <FilterChip
+                        label={`Status: ${statusFilter.replace("_", " ").replace(/\b\w/g, (c) => c.toUpperCase())}`}
+                        selected
+                        removable
+                        onRemove={() => setStatusFilter("all")}
+                        variant="subtle"
+                      />
+                    )}
+                    {startFilter && endFilter && startFilter === endFilter ? (
+                      <FilterChip
+                        label={`Date: ${new Date(startFilter + "T00:00:00").toLocaleDateString()}`}
+                        selected
+                        removable
+                        onRemove={() => {
+                          setStartFilter("");
+                          setEndFilter("");
+                        }}
+                        variant="subtle"
+                      />
+                    ) : (
+                      <>
+                        {startFilter && (
+                          <FilterChip
+                            label={`From: ${new Date(startFilter + "T00:00:00").toLocaleDateString()}`}
+                            selected
+                            removable
+                            onRemove={() => setStartFilter("")}
+                            variant="subtle"
+                          />
+                        )}
+                        {endFilter && (
+                          <FilterChip
+                            label={`To: ${new Date(endFilter + "T00:00:00").toLocaleDateString()}`}
+                            selected
+                            removable
+                            onRemove={() => setEndFilter("")}
+                            variant="subtle"
+                          />
+                        )}
+                      </>
+                    )}
+                    {filterDepositsDue && (
+                      <FilterChip
+                        label="Deposits due"
+                        selected
+                        removable
+                        onRemove={() => setFilterDepositsDue(false)}
+                        variant="subtle"
+                      />
+                    )}
+                    {activeFilterCount > 1 && (
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        className="text-xs h-7 px-2"
+                        onClick={() => {
+                          setSearch("");
+                          setStatusFilter("all");
+                          setStartFilter("");
+                          setEndFilter("");
+                          setFilterDepositsDue(false);
+                        }}
+                      >
+                        Clear all
+                      </Button>
+                    )}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
             {reservationsQuery.isLoading && <p className="text-muted-foreground">Loading…</p>}
             {reservationsQuery.error && <p className="text-status-error">Error loading reservations</p>}
             {selectedInView.length > 0 && (

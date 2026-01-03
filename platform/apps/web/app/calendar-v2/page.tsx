@@ -37,7 +37,7 @@ import { DashboardShell } from "../../components/ui/layout/DashboardShell";
 import { PageHeader } from "../../components/ui/layout/PageHeader";
 import { Breadcrumbs } from "@/components/breadcrumbs";
 import { Button } from "../../components/ui/button";
-import { Card } from "../../components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/card";
 import { Input } from "../../components/ui/input";
 import { Label } from "../../components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../components/ui/select";
@@ -429,9 +429,10 @@ export default function CalendarPage() {
         />
 
         <PageHeader
+          eyebrow="Reservations"
           title={(
             <span className="flex items-center gap-3">
-              <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-status-success/15 text-status-success">
+              <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-muted text-foreground">
                 <CalendarDays className="h-5 w-5" />
               </span>
               <span>Booking Calendar</span>
@@ -534,103 +535,107 @@ export default function CalendarPage() {
           )}
         />
 
-        <Card className="p-4 border-border shadow-sm">
-          <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
-            <div className="flex items-center gap-2">
-              <span className="text-sm font-semibold text-foreground">Filters & Search</span>
-              {hasFilters && (
-                <span className="rounded-full border border-border bg-muted px-2 py-0.5 text-[11px] font-semibold text-muted-foreground">
-                  {activeFilterCount} on
-                </span>
-              )}
-            </div>
-            {hasFilters && (
-              <Button
-                variant="ghost"
-                size="sm"
-                className="h-8 text-xs"
-                onClick={() => {
-                  actions.setGuestSearch("");
-                  actions.setStatusFilter("all");
-                  actions.setSiteTypeFilter("all");
-                  actions.setArrivalsNowOnly(false);
-                }}
-              >
-                Clear filters
-              </Button>
-            )}
-          </div>
-          <div className="grid gap-4 md:grid-cols-4">
-            <div className="space-y-2 md:col-span-2">
-              <Label className="text-xs font-medium text-muted-foreground">Search guests</Label>
-              <div className="relative">
-                <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground/70" />
-                <Input
-                  ref={searchInputRef}
-                  className="h-10 pl-9"
-                  placeholder="Name, phone, email... (Press / to search)"
-                  value={state.guestSearch}
-                  onChange={(e) => actions.setGuestSearch(e.target.value)}
-                />
-              </div>
-              {state.guestSearch && (
-                <div className="text-[11px] text-muted-foreground">
-                  {queries.guests.isLoading
-                    ? "Searching guests..."
-                    : guestSearchStats.count > 0
-                      ? `Matches ${guestSearchStats.count} guests`
-                      : "No guests found"}
-                </div>
-              )}
-            </div>
-
-            <div className="space-y-2">
-              <Label className="text-xs font-medium text-muted-foreground">Status</Label>
-              <Select value={state.statusFilter} onValueChange={actions.setStatusFilter}>
-                <SelectTrigger className="h-10">
-                  <SelectValue placeholder="All statuses" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All</SelectItem>
-                  <SelectItem value="confirmed">Confirmed</SelectItem>
-                  <SelectItem value="checked_in">Checked In</SelectItem>
-                  <SelectItem value="pending">Pending / Hold</SelectItem>
-                  <SelectItem value="cancelled">Cancelled</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div className="space-y-2">
-              <Label className="text-xs font-medium text-muted-foreground">Site type</Label>
-              <Select value={state.siteTypeFilter} onValueChange={actions.setSiteTypeFilter}>
-                <SelectTrigger className="h-10">
-                  <SelectValue placeholder="All types" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All</SelectItem>
-                  <SelectItem value="rv">RV</SelectItem>
-                  <SelectItem value="tent">Tent</SelectItem>
-                  <SelectItem value="cabin">Cabin</SelectItem>
-                  <SelectItem value="group">Group</SelectItem>
-                  <SelectItem value="glamping">Glamping</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-
-          <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
-            <div className="flex items-center gap-3 text-xs font-semibold text-muted-foreground">
+        <Card className="border-border shadow-sm">
+          <CardHeader className="pb-3">
+            <div className="flex flex-wrap items-center justify-between gap-2">
               <div className="flex items-center gap-2">
-                <Switch checked={state.arrivalsNowOnly} onCheckedChange={actions.setArrivalsNowOnly} />
-                <span>Arrivals today only</span>
+                <CardTitle className="text-sm font-semibold text-foreground">Filters & Search</CardTitle>
+                {hasFilters && (
+                  <span className="rounded-full border border-border bg-muted px-2 py-0.5 text-[11px] font-semibold text-muted-foreground">
+                    {activeFilterCount} on
+                  </span>
+                )}
+              </div>
+              {hasFilters && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-8 text-xs"
+                  onClick={() => {
+                    actions.setGuestSearch("");
+                    actions.setStatusFilter("all");
+                    actions.setSiteTypeFilter("all");
+                    actions.setArrivalsNowOnly(false);
+                  }}
+                >
+                  Clear filters
+                </Button>
+              )}
+            </div>
+          </CardHeader>
+          <CardContent className="pt-0 space-y-4">
+            <div className="grid gap-4 md:grid-cols-4">
+              <div className="space-y-2 md:col-span-2">
+                <Label className="text-xs font-medium text-muted-foreground">Search guests</Label>
+                <div className="relative">
+                  <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground/70" />
+                  <Input
+                    ref={searchInputRef}
+                    className="h-10 pl-9"
+                    placeholder="Name, phone, email... (Press / to search)"
+                    value={state.guestSearch}
+                    onChange={(e) => actions.setGuestSearch(e.target.value)}
+                  />
+                </div>
+                {state.guestSearch && (
+                  <div className="text-[11px] text-muted-foreground">
+                    {queries.guests.isLoading
+                      ? "Searching guests..."
+                      : guestSearchStats.count > 0
+                        ? `Matches ${guestSearchStats.count} guests`
+                        : "No guests found"}
+                  </div>
+                )}
+              </div>
+
+              <div className="space-y-2">
+                <Label className="text-xs font-medium text-muted-foreground">Status</Label>
+                <Select value={state.statusFilter} onValueChange={actions.setStatusFilter}>
+                  <SelectTrigger className="h-10">
+                    <SelectValue placeholder="All statuses" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All</SelectItem>
+                    <SelectItem value="confirmed">Confirmed</SelectItem>
+                    <SelectItem value="checked_in">Checked In</SelectItem>
+                    <SelectItem value="pending">Pending / Hold</SelectItem>
+                    <SelectItem value="cancelled">Cancelled</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-2">
+                <Label className="text-xs font-medium text-muted-foreground">Site type</Label>
+                <Select value={state.siteTypeFilter} onValueChange={actions.setSiteTypeFilter}>
+                  <SelectTrigger className="h-10">
+                    <SelectValue placeholder="All types" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All</SelectItem>
+                    <SelectItem value="rv">RV</SelectItem>
+                    <SelectItem value="tent">Tent</SelectItem>
+                    <SelectItem value="cabin">Cabin</SelectItem>
+                    <SelectItem value="group">Group</SelectItem>
+                    <SelectItem value="glamping">Glamping</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
             </div>
-            <div className="text-xs text-muted-foreground font-medium">
-              {state.guestSearch || state.statusFilter !== "all" || state.siteTypeFilter !== "all" || state.arrivalsNowOnly
-                ? `${visibleReservations.length} stays match filters`
-                : `${visibleReservations.length} stays in view`}
+
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <div className="flex items-center gap-3 text-xs font-semibold text-muted-foreground">
+                <div className="flex items-center gap-2">
+                  <Switch checked={state.arrivalsNowOnly} onCheckedChange={actions.setArrivalsNowOnly} />
+                  <span>Arrivals today only</span>
+                </div>
+              </div>
+              <div className="text-xs text-muted-foreground font-medium">
+                {state.guestSearch || state.statusFilter !== "all" || state.siteTypeFilter !== "all" || state.arrivalsNowOnly
+                  ? `${visibleReservations.length} stays match filters`
+                  : `${visibleReservations.length} stays in view`}
+              </div>
             </div>
-          </div>
+          </CardContent>
         </Card>
 
         {!state.selectedCampground && (

@@ -453,7 +453,7 @@ export default function ReservationDetailPage() {
     confirmed: { bg: "bg-status-success/15", text: "text-status-success", border: "border-status-success/20" },
     checked_in: { bg: "bg-status-info/15", text: "text-status-info", border: "border-status-info/20" },
     checked_out: { bg: "bg-muted", text: "text-muted-foreground", border: "border-border" },
-    cancelled: { bg: "bg-rose-50", text: "text-rose-700", border: "border-rose-200" },
+    cancelled: { bg: "bg-status-error/10", text: "text-status-error", border: "border-status-error/20" },
     pending: { bg: "bg-status-warning/15", text: "text-status-warning", border: "border-status-warning/20" }
   };
   const status = statusConfig[reservation.status] || statusConfig.pending;
@@ -463,7 +463,7 @@ export default function ReservationDetailPage() {
       {/* ═══════════════════════════════════════════════════════════════════════ */}
       {/* STICKY HEADER - Always visible with key info and actions */}
       {/* ═══════════════════════════════════════════════════════════════════════ */}
-      <div className="sticky top-0 z-40 -mx-4 -mt-4 mb-6 bg-background/95 backdrop-blur-sm border-b border-border px-4 py-4 shadow-sm">
+      <div className="sticky top-0 z-40 -mx-4 -mt-4 mb-6 bg-card border-b border-border px-4 py-4 shadow-sm">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
           {/* Left: Back button + Guest info */}
           <div className="flex items-center gap-3">
@@ -523,7 +523,7 @@ export default function ReservationDetailPage() {
             {reservation.status === "confirmed" && (
               <AlertDialog>
                 <AlertDialogTrigger asChild>
-                  <Button size="lg" className="bg-blue-600 hover:bg-blue-700">
+                  <Button size="lg" className="bg-action-primary text-action-primary-foreground hover:bg-action-primary-hover">
                     <CheckCircle className="h-4 w-4 mr-2" />
                     Check In
                   </Button>
@@ -572,7 +572,7 @@ export default function ReservationDetailPage() {
                     <AlertDialogCancel>Cancel</AlertDialogCancel>
                     <AlertDialogAction
                       onClick={() => updateReservation.mutate({ status: "checked_in" })}
-                      className="bg-blue-600 hover:bg-blue-700"
+                      className="bg-action-primary text-action-primary-foreground hover:bg-action-primary-hover"
                       disabled={updateReservation.isPending}
                     >
                       {updateReservation.isPending ? (

@@ -743,6 +743,36 @@ export default function MessagesPage() {
     });
 
     const totalUnread = conversations.reduce((acc, c) => acc + c.unreadCount, 0);
+    const firstUnreadConversation = conversations.find((conv) => conv.unreadCount > 0);
+    const firstOverdueConversation = overdueConversations[0];
+    const isAllGuestView = activeTab === "guests" && guestFilter === "all";
+    const isOverdueView = activeTab === "guests" && guestFilter === "overdue";
+
+    const resetGuestFilters = () => {
+        setActiveTab("guests");
+        setGuestFilter("all");
+        setSearchTerm("");
+        setStatusFilter("all");
+        setDateRange({ start: "", end: "" });
+    };
+
+    const handleUnreadFocus = () => {
+        resetGuestFilters();
+        if (firstUnreadConversation) {
+            handleSelectConversation(firstUnreadConversation);
+        }
+    };
+
+    const handleNeedsReplyFocus = () => {
+        setActiveTab("guests");
+        setGuestFilter("overdue");
+        setSearchTerm("");
+        setStatusFilter("all");
+        setDateRange({ start: "", end: "" });
+        if (firstOverdueConversation) {
+            handleSelectConversation(firstOverdueConversation);
+        }
+    };
 
     if (!campground) {
         return (
@@ -766,7 +796,15 @@ export default function MessagesPage() {
                     transition={SPRING_CONFIG}
                 >
                     <PageHeader
-                        title="Messages"
+                        eyebrow="Guest communications"
+                        title={(
+                            <span className="flex items-center gap-3">
+                                <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-muted text-foreground">
+                                    <MessageSquare className="h-5 w-5" />
+                                </span>
+                                <span>Messages</span>
+                            </span>
+                        )}
                         subtitle="Stay ahead of guest requests and team updates."
                         actions={(
                             <>
@@ -792,10 +830,21 @@ export default function MessagesPage() {
                     transition={{ ...SPRING_CONFIG, delay: 0.05 }}
                     className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3"
                 >
-                    <Card className="group hover:shadow-md transition-shadow">
+                    <button
+                        type="button"
+                        onClick={() => {
+                            resetGuestFilters();
+                        }}
+                        aria-pressed={isAllGuestView}
+                        className={cn(
+                            "text-left rounded-xl border border-border bg-card shadow-sm transition",
+                            "hover:border-muted-foreground/30 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-action-primary focus-visible:ring-offset-2",
+                            isAllGuestView && "border-action-primary/40 ring-1 ring-action-primary/20"
+                        )}
+                    >
                         <CardHeader className="pb-2">
                             <CardTitle className="text-sm text-muted-foreground flex items-center gap-2">
-                                <MessageSquare className="h-4 w-4 transition-colors group-hover:text-status-info" />
+                                <MessageSquare className="h-4 w-4 text-muted-foreground" />
                                 Conversations
                             </CardTitle>
                         </CardHeader>
@@ -803,27 +852,43 @@ export default function MessagesPage() {
                             <div className="text-2xl font-semibold text-foreground">{totalConversations}</div>
                             <div className="text-xs text-muted-foreground">Total active</div>
                         </CardContent>
-                    </Card>
-                    <Card className="group hover:shadow-md transition-shadow">
+                    </button>
+                    <button
+                        type="button"
+                        onClick={handleUnreadFocus}
+                        aria-pressed={Boolean(firstUnreadConversation) && isAllGuestView}
+                        className={cn(
+                            "text-left rounded-xl border border-border bg-card shadow-sm transition",
+                            "hover:border-muted-foreground/30 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-action-primary focus-visible:ring-offset-2"
+                        )}
+                    >
                         <CardHeader className="pb-2">
-                            <CardTitle className="text-sm text-muted-foreground">Unread</CardTitle>
+                            <CardTitle className="text-sm text-muted-foreground flex items-center gap-2">
+                                <Mail className="h-4 w-4 text-muted-foreground" />
+                                Unread
+                            </CardTitle>
                         </CardHeader>
                         <CardContent className="pt-0">
                             <div className="text-2xl font-semibold text-foreground">{unreadCount}</div>
                             <div className="text-xs text-muted-foreground">Guest messages unseen</div>
                         </CardContent>
-                    </Card>
-                    <Card className={cn(
-                        "group transition-all",
-                        overdueCount > 0
-                            ? "border-status-warning/30 bg-status-warning/15 hover:shadow-status-warning/20"
-                            : "hover:shadow-md"
-                    )}>
+                    </button>
+                    <button
+                        type="button"
+                        onClick={handleNeedsReplyFocus}
+                        aria-pressed={isOverdueView}
+                        className={cn(
+                            "text-left rounded-xl border bg-card shadow-sm transition",
+                            overdueCount > 0 ? "border-status-warning/40" : "border-border",
+                            "hover:border-muted-foreground/30 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-action-primary focus-visible:ring-offset-2",
+                            isOverdueView && "ring-1 ring-status-warning/20"
+                        )}
+                    >
                         <CardHeader className="pb-2">
                             <CardTitle className="text-sm text-muted-foreground flex items-center gap-2">
                                 <Clock className={cn(
-                                    "h-4 w-4 transition-colors",
-                                    overdueCount > 0 ? "text-status-warning" : "group-hover:text-status-success"
+                                    "h-4 w-4",
+                                    overdueCount > 0 ? "text-status-warning" : "text-muted-foreground"
                                 )} />
                                 Needs reply
                             </CardTitle>
@@ -840,21 +905,8 @@ export default function MessagesPage() {
                             <div className="text-xs text-muted-foreground">
                                 {overdueCount > 0 ? `Over ${SLA_MINUTES} min SLA` : `Within ${SLA_MINUTES} min SLA`}
                             </div>
-                            {overdueCount > 0 && (
-                                <Button
-                                    size="sm"
-                                    variant="outline"
-                                    className="mt-2 w-full border-status-warning/30 text-status-warning hover:bg-status-warning/15 text-xs"
-                                    onClick={() => {
-                                        setActiveTab("guests");
-                                        setGuestFilter("overdue");
-                                    }}
-                                >
-                                    View overdue
-                                </Button>
-                            )}
                         </CardContent>
-                    </Card>
+                    </button>
                 </motion.div>
 
                 {/* Mobile quick actions */}
