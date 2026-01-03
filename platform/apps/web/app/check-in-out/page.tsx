@@ -26,6 +26,7 @@ import {
   ChevronDown
 } from "lucide-react";
 import { DashboardShell } from "@/components/ui/layout/DashboardShell";
+import { PageHeader } from "@/components/ui/layout/PageHeader";
 import { apiClient } from "@/lib/api-client";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -357,35 +358,33 @@ export default function CheckInOutPage() {
   };
 
   return (
-    <DashboardShell>
+    <DashboardShell density="full">
       <div className="space-y-5">
         {/* Header */}
-        <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
-          <div>
-            <div className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Operations · {date}</div>
-            <h1 className="text-3xl font-bold text-foreground">Arrivals & Departures</h1>
-            <p className="text-sm text-muted-foreground">
-              Move guests smoothly with balances, site status, and quick actions.
-            </p>
-          </div>
-          <div className="flex flex-wrap gap-2">
-            <div className="relative">
-              <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <input
-                type="date"
-                value={date}
-                onChange={(e) => setDate(e.target.value)}
-                className="pl-9 pr-4 py-2 border border-border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
-              />
-            </div>
-            <Button variant="outline" onClick={() => {
-              const d = new Date();
-              setDate(`${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`);
-            }}>
-              Today
-            </Button>
-          </div>
-        </div>
+        <PageHeader
+          eyebrow={`Operations · ${date}`}
+          title="Arrivals & Departures"
+          subtitle="Move guests smoothly with balances, site status, and quick actions."
+          actions={(
+            <>
+              <div className="relative">
+                <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <input
+                  type="date"
+                  value={date}
+                  onChange={(e) => setDate(e.target.value)}
+                  className="pl-9 pr-4 py-2 border border-border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                />
+              </div>
+              <Button variant="outline" onClick={() => {
+                const d = new Date();
+                setDate(`${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`);
+              }}>
+                Today
+              </Button>
+            </>
+          )}
+        />
 
         {/* Summary strip */}
         <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-5 gap-3">

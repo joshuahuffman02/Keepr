@@ -669,6 +669,31 @@ export default function Dashboard() {
           ]}
         />
 
+        {/* Impact highlights: NPS + Charity */}
+        <motion.div
+          className="grid gap-4 lg:grid-cols-2"
+          {...motionProps}
+          transition={{ ...SPRING_CONFIG, delay: 0.02 }}
+        >
+          <NpsSummaryCard npsData={npsQuery.data} />
+          <div className="h-full flex flex-col">
+            {hasMounted && selectedId ? (
+              <CharityImpactWidget campgroundId={selectedId} />
+            ) : (
+              <div className={cn(
+                "rounded-2xl p-6 animate-pulse",
+                "border border-border bg-card"
+              )}>
+                <div className="space-y-3">
+                  <div className="h-5 w-32 bg-muted rounded" />
+                  <div className="h-10 w-20 bg-muted rounded" />
+                  <div className="h-4 w-40 bg-muted rounded" />
+                </div>
+              </div>
+            )}
+          </div>
+        </motion.div>
+
         {/* ═══════════════════════════════════════════════════════════════════ */}
         {/* PERSONALIZED HERO - Time-of-day greeting */}
         {/* ═══════════════════════════════════════════════════════════════════ */}
@@ -778,11 +803,6 @@ export default function Dashboard() {
             reservationsCount={reservations?.length ?? 0}
             prefersReducedMotion={prefersReducedMotion}
           />
-        )}
-
-        {/* Charity Impact Widget - only render after hydration to prevent flash */}
-        {hasMounted && selectedId && (
-          <CharityImpactWidget campgroundId={selectedId} />
         )}
 
         {/* Setup Queue Widget - shows pending feature configurations */}
@@ -1239,67 +1259,6 @@ export default function Dashboard() {
             )}
             <div className="pt-3 border-t border-border space-y-2">
               <StatCard label="Future bookings" value={futureReservations} hint="Upcoming arrivals" icon={<ClipboardList className="h-4 w-4" />} />
-              {/* NPS Card with Interpretation */}
-              {(() => {
-                const npsScore = npsQuery.data?.nps;
-                const npsValue = typeof npsScore === 'number' ? npsScore : null;
-                const npsInterpretation = npsValue !== null ? getNpsInterpretation(npsValue) : null;
-
-                return (
-                  <TooltipProvider>
-                    <div className={cn(
-                      "rounded-lg p-4 shadow-sm transition-colors",
-                      "border border-border bg-card"
-                    )}>
-                      <div className="flex items-center justify-between mb-2">
-                        <div className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">NPS</div>
-                        <span className={cn(
-                          "rounded-md p-2",
-                          "bg-muted text-muted-foreground"
-                        )}>
-                          <MessageCircle className="h-4 w-4" />
-                        </span>
-                      </div>
-                      <div className="flex items-center gap-2 mb-2">
-                        <div className="text-2xl font-bold text-foreground">{npsValue ?? "—"}</div>
-                        {npsInterpretation && (
-                          <Tooltip>
-                            <TooltipTrigger asChild>
-                              <div>
-                                <Badge variant={npsInterpretation.variant} className="cursor-help">
-                                  {npsInterpretation.label}
-                                </Badge>
-                              </div>
-                            </TooltipTrigger>
-                            <TooltipContent side="right" className="max-w-xs">
-                              <div className="space-y-2">
-                                <p className="font-semibold">What is NPS?</p>
-                                <p className="text-xs">
-                                  Net Promoter Score measures guest loyalty on a scale from -100 to 100.
-                                </p>
-                                <div className="text-xs space-y-1 border-t border-border pt-2">
-                                  <p><strong>70+:</strong> Excellent - World-class</p>
-                                  <p><strong>50-69:</strong> Good - Room to improve</p>
-                                  <p><strong>30-49:</strong> Needs attention</p>
-                                  <p><strong>&lt;30:</strong> Critical - Urgent action</p>
-                                </div>
-                                <div className="text-xs border-t border-border pt-2">
-                                  <p className={npsInterpretation.color}>
-                                    {npsInterpretation.description}
-                                  </p>
-                                </div>
-                              </div>
-                            </TooltipContent>
-                          </Tooltip>
-                        )}
-                      </div>
-                      <div className="text-xs text-muted-foreground mt-1">
-                        {npsQuery.data?.totalResponses ?? 0} responses · {npsQuery.data?.responseRate ?? "—"}% rate
-                      </div>
-                    </div>
-                  </TooltipProvider>
-                );
-              })()}
             </div>
           </div>
 
@@ -1856,6 +1815,75 @@ function StatCard({
       <div className="text-2xl font-bold text-foreground">{value}</div>
       <div className="text-xs text-muted-foreground mt-1">{hint}</div>
     </div>
+  );
+}
+
+function NpsSummaryCard({
+  npsData
+}: {
+  npsData?: { nps?: number; totalResponses?: number; responseRate?: number };
+}) {
+  const npsScore = npsData?.nps;
+  const npsValue = typeof npsScore === "number" ? npsScore : null;
+  const npsInterpretation = npsValue !== null ? getNpsInterpretation(npsValue) : null;
+
+  return (
+    <TooltipProvider>
+      <div className={cn(
+        "rounded-2xl p-6 shadow-sm transition-colors",
+        "border border-border bg-card"
+      )}>
+        <div className="flex items-center justify-between mb-4">
+          <div>
+            <div className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">NPS</div>
+            <div className="text-2xl font-bold text-foreground mt-1">{npsValue ?? "—"}</div>
+          </div>
+          <span className={cn(
+            "rounded-xl p-3",
+            "bg-muted text-muted-foreground"
+          )}>
+            <MessageCircle className="h-5 w-5" />
+          </span>
+        </div>
+        <div className="flex items-center gap-2 mb-2">
+          {npsInterpretation ? (
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <div>
+                  <Badge variant={npsInterpretation.variant} className="cursor-help">
+                    {npsInterpretation.label}
+                  </Badge>
+                </div>
+              </TooltipTrigger>
+              <TooltipContent side="right" className="max-w-xs">
+                <div className="space-y-2">
+                  <p className="font-semibold">What is NPS?</p>
+                  <p className="text-xs">
+                    Net Promoter Score measures guest loyalty on a scale from -100 to 100.
+                  </p>
+                  <div className="text-xs space-y-1 border-t border-border pt-2">
+                    <p><strong>70+:</strong> Excellent - World-class</p>
+                    <p><strong>50-69:</strong> Good - Room to improve</p>
+                    <p><strong>30-49:</strong> Needs attention</p>
+                    <p><strong>&lt;30:</strong> Critical - Urgent action</p>
+                  </div>
+                  <div className="text-xs border-t border-border pt-2">
+                    <p className={npsInterpretation.color}>
+                      {npsInterpretation.description}
+                    </p>
+                  </div>
+                </div>
+              </TooltipContent>
+            </Tooltip>
+          ) : (
+            <Badge variant="secondary">No data yet</Badge>
+          )}
+        </div>
+        <div className="text-xs text-muted-foreground">
+          {npsData?.totalResponses ?? 0} responses · {npsData?.responseRate ?? "—"}% rate
+        </div>
+      </div>
+    </TooltipProvider>
   );
 }
 

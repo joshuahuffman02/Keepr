@@ -399,6 +399,14 @@ export default function CalendarPage() {
   }, [state.startDate, state.dayCount, actions]);
 
   const bookingDraft = state.reservationDraft;
+  const hasFilters = Boolean(
+    state.guestSearch || state.statusFilter !== "all" || state.siteTypeFilter !== "all" || state.arrivalsNowOnly
+  );
+  const activeFilterCount =
+    (state.guestSearch ? 1 : 0) +
+    (state.statusFilter !== "all" ? 1 : 0) +
+    (state.siteTypeFilter !== "all" ? 1 : 0) +
+    (state.arrivalsNowOnly ? 1 : 0);
 
   const handleBookNow = useCallback(() => {
     if (!bookingDraft) return;
@@ -527,6 +535,31 @@ export default function CalendarPage() {
         />
 
         <Card className="p-4 border-border shadow-sm">
+          <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
+            <div className="flex items-center gap-2">
+              <span className="text-sm font-semibold text-foreground">Filters</span>
+              {hasFilters && (
+                <span className="rounded-full border border-border bg-muted px-2 py-0.5 text-[11px] font-semibold text-muted-foreground">
+                  {activeFilterCount} on
+                </span>
+              )}
+            </div>
+            {hasFilters && (
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-8 text-xs"
+                onClick={() => {
+                  actions.setGuestSearch("");
+                  actions.setStatusFilter("all");
+                  actions.setSiteTypeFilter("all");
+                  actions.setArrivalsNowOnly(false);
+                }}
+              >
+                Clear filters
+              </Button>
+            )}
+          </div>
           <div className="grid gap-4 md:grid-cols-3">
             <div className="space-y-2">
               <Label className="text-xs font-medium text-muted-foreground">Search guests</Label>
@@ -591,21 +624,6 @@ export default function CalendarPage() {
                 <Switch checked={state.arrivalsNowOnly} onCheckedChange={actions.setArrivalsNowOnly} />
                 <span>Arrivals today only</span>
               </div>
-              {(state.guestSearch || state.statusFilter !== "all" || state.siteTypeFilter !== "all" || state.arrivalsNowOnly) && (
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="h-8 text-xs"
-                  onClick={() => {
-                    actions.setGuestSearch("");
-                    actions.setStatusFilter("all");
-                    actions.setSiteTypeFilter("all");
-                    actions.setArrivalsNowOnly(false);
-                  }}
-                >
-                  Clear filters
-                </Button>
-              )}
             </div>
             <div className="text-xs text-muted-foreground font-medium">
               {state.guestSearch || state.statusFilter !== "all" || state.siteTypeFilter !== "all" || state.arrivalsNowOnly
@@ -925,7 +943,7 @@ function StatCard({ label, value, sub, icon }: { label: string; value: string; s
       </div>
       <div>
         <div className="text-xs font-medium text-muted-foreground">{label}</div>
-        <div className="text-lg font-black text-foreground">{value}</div>
+        <div className="text-lg font-semibold text-foreground">{value}</div>
         <div className="text-xs text-muted-foreground">{sub}</div>
       </div>
     </Card>

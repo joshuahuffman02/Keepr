@@ -4,12 +4,13 @@ import { useEffect, useMemo, useState, useCallback, useRef } from "react";
 import Link from "next/link";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { useMutation, useQuery, useQueryClient, useQueries } from "@tanstack/react-query";
-import { CalendarDays, Plus } from "lucide-react";
+import { CalendarDays, Info, Plus } from "lucide-react";
 import { apiClient } from "../../../../lib/api-client";
 import { Breadcrumbs } from "@/components/breadcrumbs";
 import { Button } from "../../../../components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "../../../../components/ui/card";
 import { DashboardShell } from "../../../../components/ui/layout/DashboardShell";
+import { PageHeader } from "../../../../components/ui/layout/PageHeader";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../../../components/ui/tabs";
 import { TableEmpty } from "../../../../components/ui/table";
 import { ReservationSchema, computeDepositDue, CreateCommunicationSchema, DepositConfig } from "@campreserv/shared";
@@ -1035,7 +1036,7 @@ export default function ReservationsPage() {
   }, [campgroundId]);
 
   return (
-    <DashboardShell>
+    <DashboardShell density="full">
       <div className="space-y-6">
         <Breadcrumbs
           items={[
@@ -1044,22 +1045,20 @@ export default function ReservationsPage() {
             { label: "Reservations" }
           ]}
         />
-        <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
-          <div className="space-y-1">
-            <h1 className="text-2xl font-semibold text-foreground">Reservations</h1>
-            <p className="text-sm text-muted-foreground">
-              Track arrivals, departures, balances, and guest communications.
-            </p>
-          </div>
-          <div className="flex flex-wrap gap-2">
-            <Button variant="secondary" onClick={() => router.push(`/calendar?campgroundId=${campgroundId}`)}>
-              Open calendar
-            </Button>
-            <Button onClick={() => router.push(`/booking?campgroundId=${campgroundId}`)}>
-              Go to booking
-            </Button>
-          </div>
-        </div>
+        <PageHeader
+          title="Reservations"
+          subtitle="Track arrivals, departures, balances, and guest communications."
+          actions={(
+            <>
+              <Button variant="secondary" onClick={() => router.push(`/calendar?campgroundId=${campgroundId}`)}>
+                Open calendar
+              </Button>
+              <Button onClick={() => router.push(`/booking?campgroundId=${campgroundId}`)}>
+                Go to booking
+              </Button>
+            </>
+          )}
+        />
         {flash && (
           <div
             className={`rounded-md border px-3 py-2 text-sm ${flash.type === "success"
@@ -1123,9 +1122,15 @@ export default function ReservationsPage() {
           </Card>
         </div>
 
-        <div className="rounded-lg border border-border bg-card px-3 py-2 text-sm text-muted-foreground">
-          Creating new bookings now lives on the dedicated booking page. Use the dashboard below for arrivals, departures, balances, and guest comms.
-        </div>
+        <Card>
+          <CardContent className="flex items-start gap-3 p-4 text-sm text-muted-foreground">
+            <Info className="mt-0.5 h-4 w-4 text-muted-foreground" />
+            <span>
+              Creating new bookings now lives on the dedicated booking page. Use the dashboard below for arrivals,
+              departures, balances, and guest comms.
+            </span>
+          </CardContent>
+        </Card>
 
         <Tabs value={listTab} onValueChange={(v) => setListTab((v as "all" | "inhouse") || "all")} className="space-y-4">
           <div className="flex items-center justify-between">

@@ -398,7 +398,7 @@ export default function ReservationDetailPage() {
   // Loading state
   if (reservationQuery.isLoading) {
     return (
-      <DashboardShell>
+      <DashboardShell density="full">
         <div className="flex h-80 items-center justify-center">
           <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
         </div>
@@ -409,7 +409,7 @@ export default function ReservationDetailPage() {
   // Not found state
   if (!reservation) {
     return (
-      <DashboardShell>
+      <DashboardShell density="full">
         <div className="flex h-80 flex-col items-center justify-center gap-4 text-muted-foreground">
           <div>Reservation not found</div>
           <Button onClick={() => router.push(`/campgrounds/${campgroundId}/reservations`)}>
@@ -459,7 +459,7 @@ export default function ReservationDetailPage() {
   const status = statusConfig[reservation.status] || statusConfig.pending;
 
   return (
-    <DashboardShell>
+    <DashboardShell density="full">
       {/* ═══════════════════════════════════════════════════════════════════════ */}
       {/* STICKY HEADER - Always visible with key info and actions */}
       {/* ═══════════════════════════════════════════════════════════════════════ */}

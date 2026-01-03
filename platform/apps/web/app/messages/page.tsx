@@ -6,6 +6,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 import { apiClient } from "@/lib/api-client";
 import { DashboardShell } from "@/components/ui/layout/DashboardShell";
+import { PageHeader } from "@/components/ui/layout/PageHeader";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { TableEmpty } from "@/components/ui/table";
@@ -745,7 +746,7 @@ export default function MessagesPage() {
 
     if (!campground) {
         return (
-            <DashboardShell>
+            <DashboardShell density="full">
                 <div className="flex items-center justify-center min-h-[60vh]">
                     <div className="text-center">
                         <h2 className="text-2xl font-bold text-foreground mb-2">No Campground Selected</h2>
@@ -757,32 +758,32 @@ export default function MessagesPage() {
     }
 
     return (
-        <DashboardShell>
+        <DashboardShell density="full">
             <div className="space-y-4 pb-24 md:pb-10" id="messages-shell">
                 <motion.div
                     initial={{ opacity: 0, y: -10 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={SPRING_CONFIG}
-                    className="flex items-center justify-between mb-2"
                 >
-                    <div className="flex items-center gap-3">
-                        <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-status-info/15 text-status-info">
-                            <MessageSquare className="h-5 w-5" />
-                        </div>
-                        <h1 className="text-2xl font-bold text-foreground">Messages</h1>
-                    </div>
-                    <div className="flex items-center gap-4">
-                        <div className="text-xs text-muted-foreground hidden md:block">
-                            Shortcuts: <kbd className="px-1.5 py-0.5 bg-muted border border-border rounded text-[10px] font-mono">⌘K</kbd> search • <kbd className="px-1.5 py-0.5 bg-muted border border-border rounded text-[10px] font-mono">GN</kbd> needs reply
-                        </div>
-                        <Button
-                            onClick={() => setIsComposeOpen(true)}
-                            className="flex items-center gap-2"
-                        >
-                            <PenSquare className="h-4 w-4" />
-                            <span className="hidden sm:inline">Compose</span>
-                        </Button>
-                    </div>
+                    <PageHeader
+                        title="Messages"
+                        subtitle="Stay ahead of guest requests and team updates."
+                        actions={(
+                            <>
+                                <div className="text-xs text-muted-foreground hidden md:block">
+                                    Shortcuts: <kbd className="px-1.5 py-0.5 bg-muted border border-border rounded text-[10px] font-mono">⌘K</kbd> search •{" "}
+                                    <kbd className="px-1.5 py-0.5 bg-muted border border-border rounded text-[10px] font-mono">GN</kbd> needs reply
+                                </div>
+                                <Button
+                                    onClick={() => setIsComposeOpen(true)}
+                                    className="flex items-center gap-2"
+                                >
+                                    <PenSquare className="h-4 w-4" />
+                                    <span className="hidden sm:inline">Compose</span>
+                                </Button>
+                            </>
+                        )}
+                    />
                 </motion.div>
 
                 <motion.div
