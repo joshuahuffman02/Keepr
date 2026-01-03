@@ -11,6 +11,8 @@ import { Button } from "../../../../components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "../../../../components/ui/card";
 import { DashboardShell } from "../../../../components/ui/layout/DashboardShell";
 import { PageHeader } from "../../../../components/ui/layout/PageHeader";
+import { Input } from "../../../../components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../../../components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../../../components/ui/tabs";
 import { TableEmpty } from "../../../../components/ui/table";
 import { ReservationSchema, computeDepositDue, CreateCommunicationSchema, DepositConfig } from "@campreserv/shared";
@@ -1486,7 +1488,7 @@ export default function ReservationsPage() {
                 </div>
               </details>
             )}
-            <div className="rounded-lg border border-border bg-card p-3 space-y-2">
+            <div className="rounded-lg border border-border bg-card p-4 space-y-3">
               <div className="flex items-center justify-between">
                 <div className="text-xs font-semibold uppercase tracking-wide text-muted-foreground flex items-center gap-2">
                   Filters & exports
@@ -1513,142 +1515,157 @@ export default function ReservationsPage() {
                   </Button>
                 </div>
               </div>
-              <div className="flex flex-wrap items-center gap-2">
-                <input
-                  className="rounded-md border border-border px-2 py-1 text-sm w-64"
-                  placeholder="Search guest, site, status…"
-                  value={search}
-                  onChange={(e) => setSearch(e.target.value)}
-                />
-                <input
-                  type="date"
-                  className="rounded-md border border-border px-2 py-1 text-sm"
-                  value={startFilter}
-                  onChange={(e) => setStartFilter(e.target.value)}
-                />
-                <input
-                  type="date"
-                  className="rounded-md border border-border px-2 py-1 text-sm"
-                  value={endFilter}
-                  onChange={(e) => setEndFilter(e.target.value)}
-                />
-                <select
-                  className="rounded-md border border-border px-2 py-1 text-sm"
-                  value={statusFilter}
-                  onChange={(e) => setStatusFilter(e.target.value)}
-                >
-                  <option value="all">All statuses</option>
-                  <option value="pending">Pending</option>
-                  <option value="confirmed">Confirmed</option>
-                  <option value="checked_in">Checked in</option>
-                  <option value="checked_out">Checked out</option>
-                  <option value="cancelled">Cancelled</option>
-                </select>
-                <div className="flex flex-wrap gap-2">
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={() => {
-                      const todayStr = new Date().toISOString().slice(0, 10);
-                      setStartFilter(todayStr);
-                      setEndFilter(todayStr);
-                      setStatusFilter("confirmed");
-                    }}
-                  >
-                    Arrivals today
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={() => {
-                      const todayStr = new Date().toISOString().slice(0, 10);
-                      setStartFilter(todayStr);
-                      setEndFilter(todayStr);
-                      setStatusFilter("checked_in");
-                    }}
-                  >
-                    Departures today
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={() => {
-                      const d = new Date();
-                      d.setDate(d.getDate() + 1);
-                      const tomorrowStr = d.toISOString().slice(0, 10);
-                      setStartFilter(tomorrowStr);
-                      setEndFilter(tomorrowStr);
-                      setStatusFilter("confirmed");
-                    }}
-                  >
-                    Arrivals tomorrow
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant={filterDepositsDue ? "secondary" : "outline"}
-                    onClick={() => setFilterDepositsDue((v) => !v)}
-                  >
-                    Deposits due
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={() => {
-                      const today = new Date();
-                      const start = new Date(today);
-                      const end = new Date(today);
-                      end.setDate(end.getDate() + 6);
-                      setStartFilter(start.toISOString().slice(0, 10));
-                      setEndFilter(end.toISOString().slice(0, 10));
-                      setStatusFilter("all");
-                    }}
-                  >
-                    Next 7 days
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant={sortBy === "created" ? "secondary" : "outline"}
-                    onClick={() => {
-                      setSortBy("created");
-                      setSortDir("desc");
-                      setStartFilter("");
-                      setEndFilter("");
-                      setStatusFilter("all");
-                    }}
-                  >
-                    Recently Booked
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={() => {
-                      const today = new Date();
-                      const day = today.getDay();
-                      const saturdayOffset = (6 - day + 7) % 7;
-                      const sundayOffset = (7 - day + 7) % 7;
-                      const start = new Date(today);
-                      const end = new Date(today);
-                      start.setDate(start.getDate() + saturdayOffset);
-                      end.setDate(end.getDate() + sundayOffset);
-                      setStartFilter(start.toISOString().slice(0, 10));
-                      setEndFilter(end.toISOString().slice(0, 10));
-                      setStatusFilter("all");
-                    }}
-                  >
-                    This weekend
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant="ghost"
-                    onClick={() => {
-                      setStartFilter("");
-                      setEndFilter("");
-                      setFilterDepositsDue(false);
-                    }}
-                  >
-                    Clear dates
-                  </Button>
+              <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
+                <div className="space-y-1">
+                  <div className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">Search</div>
+                  <Input
+                    placeholder="Search guest, site, status..."
+                    value={search}
+                    onChange={(e) => setSearch(e.target.value)}
+                  />
                 </div>
+                <div className="space-y-1">
+                  <div className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">Start date</div>
+                  <Input
+                    type="date"
+                    value={startFilter}
+                    onChange={(e) => setStartFilter(e.target.value)}
+                  />
+                </div>
+                <div className="space-y-1">
+                  <div className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">End date</div>
+                  <Input
+                    type="date"
+                    value={endFilter}
+                    onChange={(e) => setEndFilter(e.target.value)}
+                  />
+                </div>
+                <div className="space-y-1">
+                  <div className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">Status</div>
+                  <Select value={statusFilter} onValueChange={setStatusFilter}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="All statuses" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">All statuses</SelectItem>
+                      <SelectItem value="pending">Pending</SelectItem>
+                      <SelectItem value="confirmed">Confirmed</SelectItem>
+                      <SelectItem value="checked_in">Checked in</SelectItem>
+                      <SelectItem value="checked_out">Checked out</SelectItem>
+                      <SelectItem value="cancelled">Cancelled</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+
+              <div className="flex flex-wrap gap-2">
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => {
+                    const todayStr = new Date().toISOString().slice(0, 10);
+                    setStartFilter(todayStr);
+                    setEndFilter(todayStr);
+                    setStatusFilter("confirmed");
+                  }}
+                >
+                  Arrivals today
+                </Button>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => {
+                    const todayStr = new Date().toISOString().slice(0, 10);
+                    setStartFilter(todayStr);
+                    setEndFilter(todayStr);
+                    setStatusFilter("checked_in");
+                  }}
+                >
+                  Departures today
+                </Button>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => {
+                    const d = new Date();
+                    d.setDate(d.getDate() + 1);
+                    const tomorrowStr = d.toISOString().slice(0, 10);
+                    setStartFilter(tomorrowStr);
+                    setEndFilter(tomorrowStr);
+                    setStatusFilter("confirmed");
+                  }}
+                >
+                  Arrivals tomorrow
+                </Button>
+                <Button
+                  size="sm"
+                  variant={filterDepositsDue ? "secondary" : "outline"}
+                  onClick={() => setFilterDepositsDue((v) => !v)}
+                >
+                  Deposits due
+                </Button>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => {
+                    const today = new Date();
+                    const start = new Date(today);
+                    const end = new Date(today);
+                    end.setDate(end.getDate() + 6);
+                    setStartFilter(start.toISOString().slice(0, 10));
+                    setEndFilter(end.toISOString().slice(0, 10));
+                    setStatusFilter("all");
+                  }}
+                >
+                  Next 7 days
+                </Button>
+                <Button
+                  size="sm"
+                  variant={sortBy === "created" ? "secondary" : "outline"}
+                  onClick={() => {
+                    setSortBy("created");
+                    setSortDir("desc");
+                    setStartFilter("");
+                    setEndFilter("");
+                    setStatusFilter("all");
+                  }}
+                >
+                  Recently booked
+                </Button>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => {
+                    const today = new Date();
+                    const day = today.getDay();
+                    const saturdayOffset = (6 - day + 7) % 7;
+                    const sundayOffset = (7 - day + 7) % 7;
+                    const start = new Date(today);
+                    const end = new Date(today);
+                    start.setDate(start.getDate() + saturdayOffset);
+                    end.setDate(end.getDate() + sundayOffset);
+                    setStartFilter(start.toISOString().slice(0, 10));
+                    setEndFilter(end.toISOString().slice(0, 10));
+                    setStatusFilter("all");
+                  }}
+                >
+                  This weekend
+                </Button>
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  onClick={() => {
+                    setStartFilter("");
+                    setEndFilter("");
+                    setFilterDepositsDue(false);
+                  }}
+                >
+                  Clear dates
+                </Button>
+              </div>
+
+              <div className="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-border">
+                <div className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Exports</div>
                 <div className="flex gap-2">
                   <Button size="sm" variant="secondary" onClick={() => handleExport("csv")} disabled={!filteredReservations.length}>
                     Export CSV

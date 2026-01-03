@@ -570,16 +570,22 @@ export default function CheckInOutPage() {
           ) : (
             filteredList.map((res) => {
               const isSelected = selectedIds.has(res.id);
+              const needsPayment = (res.balanceAmount ?? 0) > 0;
+              const needsSite = !res.siteId;
+              const readinessLabel = tab === "departures" ? "Ready to check out" : "Ready to check in";
 
               return (
-              <Card key={res.id} className={`overflow-hidden border ${
-                isSelected
-                  ? "border-blue-300 bg-blue-50/40"
-                  : res.balanceAmount > 0
-                  ? "border-amber-200 bg-amber-50/40"
-                  : "border-border"
-              } shadow-sm`}>
-                <div className="p-4 flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+                <Card
+                  key={res.id}
+                  className={`overflow-hidden border ${
+                    isSelected
+                      ? "border-blue-300 bg-blue-50/40"
+                      : needsPayment || needsSite
+                      ? "border-amber-200 bg-amber-50/40"
+                      : "border-border"
+                  } shadow-sm`}
+                >
+                  <div className="p-4 flex flex-col lg:flex-row lg:items-center justify-between gap-4">
                   <div className="flex items-start gap-3">
                     <div className="pt-1">
                       <Checkbox
@@ -607,14 +613,19 @@ export default function CheckInOutPage() {
                         <h3 className="font-semibold text-lg text-foreground">
                           {res.guest.primaryFirstName} {res.guest.primaryLastName}
                         </h3>
-                        {res.balanceAmount > 0 && (
-                          <Badge variant="destructive" className="h-5 px-1.5 text-[10px] uppercase tracking-wider">
+                        {needsPayment && (
+                          <Badge className="h-5 px-1.5 text-[10px] uppercase tracking-wider border border-amber-200 bg-amber-50 text-amber-700">
                             Balance Due
                           </Badge>
                         )}
-                        {!res.siteId && (
-                          <Badge variant="outline" className="h-5 px-1.5 text-[10px] uppercase tracking-wider text-amber-700 border-amber-200">
+                        {needsSite && (
+                          <Badge className="h-5 px-1.5 text-[10px] uppercase tracking-wider border border-amber-200 bg-amber-50 text-amber-700">
                             Assign site
+                          </Badge>
+                        )}
+                        {!needsPayment && !needsSite && tab !== "onsite" && (
+                          <Badge className="h-5 px-1.5 text-[10px] uppercase tracking-wider border border-emerald-200 bg-emerald-50 text-emerald-700">
+                            {readinessLabel}
                           </Badge>
                         )}
                       </div>
