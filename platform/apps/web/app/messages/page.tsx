@@ -1666,12 +1666,42 @@ export default function MessagesPage() {
                                 <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                                     <div>
                                         <CardTitle>{selectedConversation.guestName}</CardTitle>
-                                        <CardDescription>{selectedConversation.siteName}</CardDescription>
+                                        <CardDescription className="space-y-1">
+                                            <div>{selectedConversation.siteName}</div>
+                                            <div className="flex flex-wrap items-center gap-3 text-xs text-muted-foreground">
+                                                {selectedConversation.arrivalDate && selectedConversation.departureDate && (
+                                                    <span className="flex items-center gap-1">
+                                                        <Calendar className="h-3 w-3" />
+                                                        {format(new Date(selectedConversation.arrivalDate), "MMM d")} - {format(new Date(selectedConversation.departureDate), "MMM d")}
+                                                    </span>
+                                                )}
+                                                {selectedConversation.totalAmountCents !== null && (
+                                                    <span className="flex items-center gap-1">
+                                                        <DollarSign className="h-3 w-3" />
+                                                        ${(selectedConversation.totalAmountCents / 100).toFixed(2)}
+                                                    </span>
+                                                )}
+                                                {selectedConversation.pets !== null && selectedConversation.pets > 0 && (
+                                                    <span className="flex items-center gap-1">
+                                                        <PawPrint className="h-3 w-3" />
+                                                        {selectedConversation.pets} pet{selectedConversation.pets !== 1 ? "s" : ""}
+                                                    </span>
+                                                )}
+                                            </div>
+                                        </CardDescription>
                                     </div>
                                     <div className="flex items-center gap-2">
                                         <Badge variant={selectedConversation.status === "checked_in" ? "default" : "secondary"}>
                                             {selectedConversation.status.replace("_", " ")}
                                         </Badge>
+                                        <Button
+                                            variant="outline"
+                                            size="sm"
+                                            className="hidden sm:inline-flex"
+                                            onClick={() => window.open(`/reservations/${selectedConversation.reservationId}`, "_blank")}
+                                        >
+                                            View reservation
+                                        </Button>
                                         <Button
                                             variant="ghost"
                                             size="sm"
