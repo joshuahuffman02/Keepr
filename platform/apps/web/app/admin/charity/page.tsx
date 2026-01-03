@@ -224,7 +224,7 @@ export default function CharityAdminPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-white flex items-center gap-2">
+          <h1 className="text-2xl font-bold text-foreground flex items-center gap-2">
             <Heart className="h-6 w-6 text-rose-400" />
             Charity Round-Up
           </h1>
@@ -256,7 +256,7 @@ export default function CharityAdminPage() {
               </div>
               <div>
                 <p className="text-sm text-muted-foreground">Total Raised</p>
-                <p className="text-2xl font-bold text-white">
+                <p className="text-2xl font-bold text-foreground">
                   {stats ? formatCurrency(stats.totalAmountCents) : "$0.00"}
                 </p>
               </div>
@@ -272,7 +272,7 @@ export default function CharityAdminPage() {
               </div>
               <div>
                 <p className="text-sm text-muted-foreground">Total Donors</p>
-                <p className="text-2xl font-bold text-white">
+                <p className="text-2xl font-bold text-foreground">
                   {stats?.donorCount.toLocaleString() ?? 0}
                 </p>
               </div>
@@ -288,7 +288,7 @@ export default function CharityAdminPage() {
               </div>
               <div>
                 <p className="text-sm text-muted-foreground">Avg Donation</p>
-                <p className="text-2xl font-bold text-white">
+                <p className="text-2xl font-bold text-foreground">
                   {stats ? formatCurrency(stats.averageDonationCents) : "$0.00"}
                 </p>
               </div>
@@ -304,7 +304,7 @@ export default function CharityAdminPage() {
               </div>
               <div>
                 <p className="text-sm text-muted-foreground">Active Charities</p>
-                <p className="text-2xl font-bold text-white">
+                <p className="text-2xl font-bold text-foreground">
                   {charities.filter((c) => c.isActive).length}
                 </p>
               </div>
@@ -317,7 +317,7 @@ export default function CharityAdminPage() {
       {stats && stats.byCharity.length > 0 && (
         <Card className="bg-muted border-border">
           <CardHeader>
-            <CardTitle className="text-white text-lg">Top Charities by Donations</CardTitle>
+            <CardTitle className="text-foreground text-lg">Top Charities by Donations</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-3">
@@ -336,10 +336,10 @@ export default function CharityAdminPage() {
                         <Heart className="h-4 w-4 text-rose-400" />
                       </div>
                     )}
-                    <span className="text-white">{item.charity.name}</span>
+                    <span className="text-foreground">{item.charity.name}</span>
                   </div>
                   <div className="text-right">
-                    <p className="text-white font-medium">{formatCurrency(item.amountCents)}</p>
+                    <p className="text-foreground font-medium">{formatCurrency(item.amountCents)}</p>
                     <p className="text-xs text-muted-foreground">{item.count} donations</p>
                   </div>
                 </div>
@@ -402,7 +402,7 @@ export default function CharityAdminPage() {
                     )}
                     <div className="flex-1">
                       <div className="flex items-center gap-2">
-                        <h3 className="text-lg font-semibold text-white">{charity.name}</h3>
+                        <h3 className="text-lg font-semibold text-foreground">{charity.name}</h3>
                         {charity.isVerified && (
                           <Badge className="bg-green-600/20 text-green-400 border-green-600/50">
                             <CheckCircle className="h-3 w-3 mr-1" />
@@ -453,7 +453,7 @@ export default function CharityAdminPage() {
                         variant="ghost"
                         size="sm"
                         onClick={() => openEdit(charity)}
-                        className="text-muted-foreground hover:text-white"
+                        className="text-muted-foreground hover:text-foreground"
                       >
                         <Edit className="h-4 w-4" />
                       </Button>
@@ -583,7 +583,7 @@ export default function CharityAdminPage() {
       <AlertDialog open={!!deleteConfirmId} onOpenChange={(open) => !open && setDeleteConfirmId(null)}>
         <AlertDialogContent className="bg-muted border-border">
           <AlertDialogHeader>
-            <AlertDialogTitle className="text-white">Deactivate Charity</AlertDialogTitle>
+            <AlertDialogTitle className="text-foreground">Deactivate Charity</AlertDialogTitle>
             <AlertDialogDescription className="text-muted-foreground">
               Are you sure you want to deactivate this charity? This action can be reversed.
             </AlertDialogDescription>

@@ -148,7 +148,7 @@ export default function SupportStaffDirectoryPage() {
     return (
       <div>
         <div className="space-y-3">
-          <div className="text-xl font-semibold text-white">Support staff</div>
+          <div className="text-xl font-semibold text-foreground">Support staff</div>
           <div className="rounded-lg border border-amber-200/20 bg-amber-500/10 text-amber-400 p-4">
             You do not have permission to view or edit support staff scope.
           </div>

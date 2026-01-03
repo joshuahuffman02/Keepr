@@ -172,7 +172,7 @@ export default function SupportAnalyticsPage() {
       <div>
         <div className="space-y-3">
           <div className="text-xs uppercase font-semibold text-muted-foreground">Support</div>
-          <h1 className="text-2xl font-bold text-white">Support analytics</h1>
+          <h1 className="text-2xl font-bold text-foreground">Support analytics</h1>
           <div className="rounded-lg border border-status-warning/30 bg-status-warning/15 text-status-warning p-4">
             You do not have permission to view support analytics.
           </div>

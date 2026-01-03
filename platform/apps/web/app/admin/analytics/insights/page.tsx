@@ -293,7 +293,7 @@ export default function AiInsightsPage() {
       <div className="flex items-center justify-between">
         <div>
           <div className="flex items-center gap-3">
-            <h1 className="text-2xl font-bold text-white">AI Insights</h1>
+            <h1 className="text-2xl font-bold text-foreground">AI Insights</h1>
             <Badge className="bg-purple-600/20 text-purple-400 border border-purple-600/50">
               <Sparkles className="h-3 w-3 mr-1" /> AI-Powered
             </Badge>
@@ -317,7 +317,7 @@ export default function AiInsightsPage() {
                 <Lightbulb className="h-5 w-5 text-purple-400" />
               </div>
               <div>
-                <p className="text-2xl font-bold text-white">{totalSuggestions}</p>
+                <p className="text-2xl font-bold text-foreground">{totalSuggestions}</p>
                 <p className="text-sm text-muted-foreground">Total Suggestions</p>
               </div>
             </div>
@@ -343,7 +343,7 @@ export default function AiInsightsPage() {
                 <Building2 className="h-5 w-5 text-amber-400" />
               </div>
               <div>
-                <p className="text-2xl font-bold text-white">{suggestions.length}</p>
+                <p className="text-2xl font-bold text-foreground">{suggestions.length}</p>
                 <p className="text-sm text-muted-foreground">Parks Need Help</p>
               </div>
             </div>
@@ -356,7 +356,7 @@ export default function AiInsightsPage() {
                 <AlertTriangle className="h-5 w-5 text-red-400" />
               </div>
               <div>
-                <p className="text-2xl font-bold text-white">{anomalies.length}</p>
+                <p className="text-2xl font-bold text-foreground">{anomalies.length}</p>
                 <p className="text-sm text-muted-foreground">Anomalies Detected</p>
               </div>
             </div>
@@ -368,7 +368,7 @@ export default function AiInsightsPage() {
       {anomalies.length > 0 && (
         <Card className="bg-red-500/5 border-red-500/20">
           <CardHeader>
-            <CardTitle className="text-lg text-white flex items-center gap-2">
+            <CardTitle className="text-lg text-foreground flex items-center gap-2">
               <AlertTriangle className="h-5 w-5 text-red-400" />
               Anomalies Detected
             </CardTitle>
@@ -395,7 +395,7 @@ export default function AiInsightsPage() {
                           <span className="text-muted-foreground">{anomaly.campgroundName}</span>
                         )}
                       </div>
-                      <p className="font-medium text-white">{formatMessage(anomaly.message)}</p>
+                      <p className="font-medium text-foreground">{formatMessage(anomaly.message)}</p>
                     </div>
                     <div className="text-right">
                       <p className="text-2xl font-bold text-red-400">
@@ -427,7 +427,7 @@ export default function AiInsightsPage() {
 
       {/* Improvement Suggestions by Campground */}
       <div className="space-y-4">
-        <h2 className="text-lg font-semibold text-white flex items-center gap-2">
+        <h2 className="text-lg font-semibold text-foreground flex items-center gap-2">
           <Zap className="h-5 w-5 text-amber-400" />
           Improvement Plans by Campground
         </h2>
@@ -446,7 +446,7 @@ export default function AiInsightsPage() {
                     <p className="text-xs text-muted-foreground">NPS</p>
                   </div>
                   <div>
-                    <CardTitle className="text-white">{cg.campgroundName}</CardTitle>
+                    <CardTitle className="text-foreground">{cg.campgroundName}</CardTitle>
                     <div className="flex items-center gap-2 mt-1">
                       <span className="text-sm text-muted-foreground">{cg.detractorCount} detractors</span>
                       <span className="text-muted-foreground">•</span>
@@ -506,7 +506,7 @@ export default function AiInsightsPage() {
                           </div>
                           {getEffortBadge(suggestion.estimatedEffort)}
                         </div>
-                        <h5 className="font-medium text-white mb-1">{suggestion.title}</h5>
+                        <h5 className="font-medium text-foreground mb-1">{suggestion.title}</h5>
                         <p className="text-sm text-muted-foreground mb-2">{suggestion.description}</p>
                         <p className="text-xs text-green-400">
                           <Zap className="h-3 w-3 inline mr-1" />

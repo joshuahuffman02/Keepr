@@ -231,7 +231,7 @@ export default function ExecutiveDashboardPage() {
       <div className="flex items-center justify-between">
         <div>
           <div className="flex items-center gap-3">
-            <h1 className="text-2xl font-bold text-white">Executive Dashboard</h1>
+            <h1 className="text-2xl font-bold text-foreground">Executive Dashboard</h1>
             {isUsingMockData && (
               <Badge className="bg-amber-600/20 text-amber-400 border border-amber-600/50">
                 Demo Data
@@ -291,7 +291,7 @@ export default function ExecutiveDashboardPage() {
         {/* Alerts & Issues */}
         <Card className="bg-muted/50 border-border">
           <CardHeader>
-            <CardTitle className="text-lg text-white flex items-center gap-2">
+            <CardTitle className="text-lg text-foreground flex items-center gap-2">
               <AlertTriangle className="h-5 w-5 text-amber-400" />
               Active Alerts
             </CardTitle>
@@ -336,7 +336,7 @@ export default function ExecutiveDashboardPage() {
         {/* Top Performers */}
         <Card className="bg-muted/50 border-border">
           <CardHeader>
-            <CardTitle className="text-lg text-white flex items-center gap-2">
+            <CardTitle className="text-lg text-foreground flex items-center gap-2">
               <Star className="h-5 w-5 text-amber-400" />
               Top Performers
             </CardTitle>
@@ -354,7 +354,7 @@ export default function ExecutiveDashboardPage() {
                     }`}>
                       {p.rank}
                     </span>
-                    <span className="text-sm text-white">{p.campgroundName}</span>
+                    <span className="text-sm text-foreground">{p.campgroundName}</span>
                   </div>
                   <span className="text-sm font-medium text-green-400">
                     ${(p.value / 1000).toFixed(0)}K
@@ -368,7 +368,7 @@ export default function ExecutiveDashboardPage() {
         {/* Recent Activity */}
         <Card className="bg-muted/50 border-border">
           <CardHeader>
-            <CardTitle className="text-lg text-white flex items-center gap-2">
+            <CardTitle className="text-lg text-foreground flex items-center gap-2">
               <Activity className="h-5 w-5 text-blue-400" />
               Recent Activity
             </CardTitle>
@@ -411,7 +411,7 @@ export default function ExecutiveDashboardPage() {
       {data.needsAttention.length > 0 && (
         <Card className="bg-muted/50 border-border">
           <CardHeader>
-            <CardTitle className="text-lg text-white flex items-center gap-2">
+            <CardTitle className="text-lg text-foreground flex items-center gap-2">
               <Building2 className="h-5 w-5 text-red-400" />
               Campgrounds Needing Attention
             </CardTitle>
@@ -432,7 +432,7 @@ export default function ExecutiveDashboardPage() {
                   {data.needsAttention.map((item, idx) => (
                     <tr key={item.campgroundId} className={idx % 2 === 0 ? "bg-muted/30" : ""}>
                       <td className="py-3 px-4">
-                        <span className="text-sm text-white">{item.campgroundName}</span>
+                        <span className="text-sm text-foreground">{item.campgroundName}</span>
                       </td>
                       <td className="py-3 px-4">
                         <Badge className={item.severity === "critical" ? "bg-red-500/20 text-red-400" : "bg-amber-500/20 text-amber-400"}>
@@ -460,7 +460,7 @@ export default function ExecutiveDashboardPage() {
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <div className="bg-muted/30 rounded-lg p-4 border border-border">
           <p className="text-xs text-muted-foreground">Total Campgrounds</p>
-          <p className="text-2xl font-bold text-white">47</p>
+          <p className="text-2xl font-bold text-foreground">47</p>
         </div>
         <div className="bg-muted/30 rounded-lg p-4 border border-border">
           <p className="text-xs text-muted-foreground">Healthy (NPS 30+)</p>

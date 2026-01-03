@@ -167,7 +167,7 @@ export default function SystemHealthPage() {
         <div className="space-y-6">
             <div className="flex items-center justify-between">
                 <div>
-                    <h1 className="text-2xl font-bold text-white">System Health</h1>
+                    <h1 className="text-2xl font-bold text-foreground">System Health</h1>
                     <p className="text-muted-foreground mt-1">
                         Real-time status of platform services
                     </p>
@@ -188,7 +188,7 @@ export default function SystemHealthPage() {
                     <div className="flex items-center gap-4">
                         <StatusIcon status={overallStatus} />
                         <div>
-                            <div className="text-lg font-semibold text-white">
+                            <div className="text-lg font-semibold text-foreground">
                                 {overallStatus === "healthy" && "All Systems Operational"}
                                 {overallStatus === "degraded" && "Partial System Degradation"}
                                 {overallStatus === "down" && "System Outage Detected"}
@@ -199,7 +199,7 @@ export default function SystemHealthPage() {
                         </div>
                     </div>
                     <div className="text-right">
-                        <div className="text-2xl font-bold text-white">{avgLatency}ms</div>
+                        <div className="text-2xl font-bold text-foreground">{avgLatency}ms</div>
                         <div className="text-sm text-muted-foreground">Avg Response</div>
                     </div>
                 </div>
@@ -219,7 +219,7 @@ export default function SystemHealthPage() {
                                 {check.name === "Auth Service" && <Activity className="h-5 w-5 text-muted-foreground" />}
                                 {check.name === "Local Storage" && <Clock className="h-5 w-5 text-muted-foreground" />}
                                 <div>
-                                    <div className="font-medium text-white">{check.name}</div>
+                                    <div className="font-medium text-foreground">{check.name}</div>
                                     <div className="text-sm text-muted-foreground">{check.message}</div>
                                 </div>
                             </div>

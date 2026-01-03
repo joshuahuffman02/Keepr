@@ -221,7 +221,7 @@ function CreateGoalModal({
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
       <div className="bg-muted rounded-lg p-6 w-full max-w-lg mx-4 border border-border">
         <div className="flex items-center justify-between mb-6">
-          <h2 className="text-xl font-semibold text-white">Create New Goal</h2>
+          <h2 className="text-xl font-semibold text-foreground">Create New Goal</h2>
           <button
             onClick={onClose}
             className="p-1 hover:bg-muted rounded-lg transition-colors"
@@ -494,7 +494,7 @@ export default function GoalsPage() {
       <div className="flex items-center justify-between">
         <div>
           <div className="flex items-center gap-3">
-            <h1 className="text-2xl font-bold text-white">Goal Tracking</h1>
+            <h1 className="text-2xl font-bold text-foreground">Goal Tracking</h1>
             {isUsingMockData && (
               <Badge className="bg-amber-600/20 text-amber-400 border border-amber-600/50">
                 Demo Data
@@ -579,7 +579,7 @@ export default function GoalsPage() {
           <Card className="bg-muted/50 border-border">
             <CardContent className="p-8 text-center">
               <Target className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-              <h3 className="text-lg font-medium text-white mb-2">No goals yet</h3>
+              <h3 className="text-lg font-medium text-foreground mb-2">No goals yet</h3>
               <p className="text-muted-foreground mb-4">
                 Create your first goal to start tracking platform objectives.
               </p>
@@ -609,7 +609,7 @@ export default function GoalsPage() {
                       </div>
                       <div>
                         <div className="flex items-center gap-2 mb-1">
-                          <h3 className="font-semibold text-white">{goal.name}</h3>
+                          <h3 className="font-semibold text-foreground">{goal.name}</h3>
                           {getStatusBadge(goal.status)}
                         </div>
                         {goal.description && (
@@ -664,7 +664,7 @@ export default function GoalsPage() {
       {/* Quick Add Goals Suggestions */}
       <Card className="bg-muted/50 border-border">
         <CardHeader>
-          <CardTitle className="text-lg text-white">Suggested Goals</CardTitle>
+          <CardTitle className="text-lg text-foreground">Suggested Goals</CardTitle>
           <p className="text-sm text-muted-foreground">Based on common industry objectives</p>
         </CardHeader>
         <CardContent>
@@ -675,7 +675,7 @@ export default function GoalsPage() {
             >
               <div className="flex items-center gap-2 mb-2">
                 <DollarSign className="h-4 w-4 text-green-400" />
-                <span className="font-medium text-white">Revenue Stretch Goal</span>
+                <span className="font-medium text-foreground">Revenue Stretch Goal</span>
               </div>
               <p className="text-xs text-muted-foreground">Increase Q1 2025 revenue by 20% YoY</p>
             </div>
@@ -685,7 +685,7 @@ export default function GoalsPage() {
             >
               <div className="flex items-center gap-2 mb-2">
                 <Star className="h-4 w-4 text-amber-400" />
-                <span className="font-medium text-white">NPS Improvement</span>
+                <span className="font-medium text-foreground">NPS Improvement</span>
               </div>
               <p className="text-xs text-muted-foreground">Get 3 struggling campgrounds above NPS 30</p>
             </div>
@@ -695,7 +695,7 @@ export default function GoalsPage() {
             >
               <div className="flex items-center gap-2 mb-2">
                 <Users className="h-4 w-4 text-purple-400" />
-                <span className="font-medium text-white">Guest Retention</span>
+                <span className="font-medium text-foreground">Guest Retention</span>
               </div>
               <p className="text-xs text-muted-foreground">Increase first-to-repeat conversion by 15%</p>
             </div>
@@ -714,7 +714,7 @@ export default function GoalsPage() {
       <AlertDialog open={!!deleteConfirmId} onOpenChange={(open) => !open && setDeleteConfirmId(null)}>
         <AlertDialogContent className="bg-muted border-border">
           <AlertDialogHeader>
-            <AlertDialogTitle className="text-white">Delete Goal</AlertDialogTitle>
+            <AlertDialogTitle className="text-foreground">Delete Goal</AlertDialogTitle>
             <AlertDialogDescription className="text-muted-foreground">
               Are you sure you want to delete this goal? This action cannot be undone.
             </AlertDialogDescription>

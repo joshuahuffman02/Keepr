@@ -181,7 +181,7 @@ The platform demonstrates healthy fundamentals with opportunities for optimizati
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-white">Export Analytics</h1>
+          <h1 className="text-2xl font-bold text-foreground">Export Analytics</h1>
           <p className="text-muted-foreground mt-1">
             Export data for AI analysis, reports, and external tools
           </p>
@@ -197,7 +197,7 @@ The platform demonstrates healthy fundamentals with opportunities for optimizati
             <CardHeader>
               <div className="flex items-center justify-between">
                 <div>
-                  <CardTitle className="text-lg text-white">Select Modules</CardTitle>
+                  <CardTitle className="text-lg text-foreground">Select Modules</CardTitle>
                   <CardDescription>Choose which analytics to include</CardDescription>
                 </div>
                 <div className="flex gap-2">
@@ -227,7 +227,7 @@ The platform demonstrates healthy fundamentals with opportunities for optimizati
                       onCheckedChange={() => toggleModule(module.id)}
                     />
                     <div>
-                      <p className="text-white font-medium">{module.name}</p>
+                      <p className="text-foreground font-medium">{module.name}</p>
                       <p className="text-sm text-muted-foreground">{module.description}</p>
                     </div>
                   </div>
@@ -239,7 +239,7 @@ The platform demonstrates healthy fundamentals with opportunities for optimizati
           {/* Format Selection */}
           <Card className="bg-muted/50 border-border">
             <CardHeader>
-              <CardTitle className="text-lg text-white">Export Format</CardTitle>
+              <CardTitle className="text-lg text-foreground">Export Format</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-2 gap-4">
@@ -253,7 +253,7 @@ The platform demonstrates healthy fundamentals with opportunities for optimizati
                 >
                   <div className="flex items-center gap-3 mb-2">
                     <FileJson className="h-6 w-6 text-blue-400" />
-                    <span className="text-white font-medium">JSON</span>
+                    <span className="text-foreground font-medium">JSON</span>
                     <Badge className="bg-blue-600/20 text-blue-400 border-0">Recommended</Badge>
                   </div>
                   <p className="text-sm text-muted-foreground">
@@ -270,7 +270,7 @@ The platform demonstrates healthy fundamentals with opportunities for optimizati
                 >
                   <div className="flex items-center gap-3 mb-2">
                     <FileText className="h-6 w-6 text-green-400" />
-                    <span className="text-white font-medium">Markdown</span>
+                    <span className="text-foreground font-medium">Markdown</span>
                   </div>
                   <p className="text-sm text-muted-foreground">
                     Human-readable report format with tables and summaries
@@ -291,7 +291,7 @@ The platform demonstrates healthy fundamentals with opportunities for optimizati
                   <Checkbox checked={includeAiSummary} onCheckedChange={() => setIncludeAiSummary(!includeAiSummary)} />
                   <Sparkles className="h-5 w-5 text-purple-400" />
                   <div>
-                    <span className="text-white font-medium">Generate AI Summary</span>
+                    <span className="text-foreground font-medium">Generate AI Summary</span>
                     <p className="text-sm text-muted-foreground">
                       Include an AI-generated executive summary and insights
                     </p>
@@ -306,16 +306,16 @@ The platform demonstrates healthy fundamentals with opportunities for optimizati
         <div className="space-y-6">
           <Card className="bg-muted/50 border-border">
             <CardHeader>
-              <CardTitle className="text-lg text-white">Export</CardTitle>
+              <CardTitle className="text-lg text-foreground">Export</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="p-3 bg-muted/50 rounded-lg">
                 <p className="text-sm text-muted-foreground">Selected Modules</p>
-                <p className="text-2xl font-bold text-white">{selectedModules.length}</p>
+                <p className="text-2xl font-bold text-foreground">{selectedModules.length}</p>
               </div>
               <div className="p-3 bg-muted/50 rounded-lg">
                 <p className="text-sm text-muted-foreground">Format</p>
-                <p className="text-lg font-medium text-white uppercase">{exportFormat}</p>
+                <p className="text-lg font-medium text-foreground uppercase">{exportFormat}</p>
               </div>
 
               <Button
@@ -374,7 +374,7 @@ The platform demonstrates healthy fundamentals with opportunities for optimizati
           {exportComplete && exportData && (
             <Card className="bg-muted/50 border-border">
               <CardHeader>
-                <CardTitle className="text-lg text-white flex items-center gap-2">
+                <CardTitle className="text-lg text-foreground flex items-center gap-2">
                   <Sparkles className="h-5 w-5 text-purple-400" />
                   AI Analysis
                 </CardTitle>
@@ -411,7 +411,7 @@ The platform demonstrates healthy fundamentals with opportunities for optimizati
         <Card className="bg-muted/50 border-border">
           <CardHeader>
             <div className="flex items-center justify-between">
-              <CardTitle className="text-lg text-white flex items-center gap-2">
+              <CardTitle className="text-lg text-foreground flex items-center gap-2">
                 <Sparkles className="h-5 w-5 text-purple-400" />
                 AI-Generated Executive Summary
               </CardTitle>
@@ -452,7 +452,7 @@ The platform demonstrates healthy fundamentals with opportunities for optimizati
         <Card className="bg-muted/50 border-border">
           <CardHeader>
             <div className="flex items-center justify-between">
-              <CardTitle className="text-lg text-white">Export Preview</CardTitle>
+              <CardTitle className="text-lg text-foreground">Export Preview</CardTitle>
               <Badge className="bg-green-600/20 text-green-400 border-0">Ready</Badge>
             </div>
           </CardHeader>

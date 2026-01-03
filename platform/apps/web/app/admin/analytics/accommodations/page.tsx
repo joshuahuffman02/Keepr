@@ -62,7 +62,7 @@ export default function AccommodationsPage() {
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold text-white">Accommodation Mix</h1>
+            <h1 className="text-2xl font-bold text-foreground">Accommodation Mix</h1>
             <p className="text-muted-foreground mt-1">
               Site types, RV breakdown, and utilization analysis
             </p>
@@ -71,7 +71,7 @@ export default function AccommodationsPage() {
         </div>
         <div className="flex flex-col items-center justify-center py-12 text-center">
           <Building2 className="h-16 w-16 text-muted-foreground mb-4" />
-          <h3 className="text-lg font-medium text-white mb-2">No Accommodation Data Available</h3>
+          <h3 className="text-lg font-medium text-foreground mb-2">No Accommodation Data Available</h3>
           <p className="text-muted-foreground max-w-md">
             There is no accommodation data for the selected time period. Data will appear here once sites are configured.
           </p>
@@ -85,7 +85,7 @@ export default function AccommodationsPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-white">Accommodation Mix</h1>
+          <h1 className="text-2xl font-bold text-foreground">Accommodation Mix</h1>
           <p className="text-muted-foreground mt-1">
             Site types, RV breakdown, and utilization analysis
           </p>

@@ -95,7 +95,7 @@ export default function AuditLogPage() {
         <div className="space-y-6">
             <div className="flex items-center justify-between">
                 <div>
-                    <h1 className="text-2xl font-bold text-white">Audit Log</h1>
+                    <h1 className="text-2xl font-bold text-foreground">Audit Log</h1>
                     <p className="text-muted-foreground mt-1">
                         Track all admin actions and system events
                     </p>
@@ -179,7 +179,7 @@ export default function AuditLogPage() {
                                             <span className={`px-2 py-0.5 text-xs font-medium rounded ${actionColors[entry.action] || "bg-muted text-muted-foreground"}`}>
                                                 {entry.action}
                                             </span>
-                                            <span className="text-white font-medium">{entry.resource}</span>
+                                            <span className="text-foreground font-medium">{entry.resource}</span>
                                             {entry.resourceId && (
                                                 <span className="text-muted-foreground text-sm font-mono">{entry.resourceId}</span>
                                             )}

@@ -177,13 +177,13 @@ Note: The admin will be required to change their password on first login.`;
                         <div className="p-2 bg-status-success/15 rounded-full">
                             <Check className="h-6 w-6 text-status-success" />
                         </div>
-                        <h2 className="text-xl font-bold text-white">Campground Created!</h2>
+                        <h2 className="text-xl font-bold text-foreground">Campground Created!</h2>
                     </div>
 
                     <div className="bg-muted rounded-lg p-4 space-y-3 mb-4">
                         <div>
                             <div className="text-xs text-muted-foreground uppercase">Campground</div>
-                            <div className="text-white font-medium">{createdData.campgroundName}</div>
+                            <div className="text-foreground font-medium">{createdData.campgroundName}</div>
                         </div>
                         <div>
                             <div className="text-xs text-muted-foreground uppercase">Public URL</div>
@@ -192,7 +192,7 @@ Note: The admin will be required to change their password on first login.`;
                         <hr className="border-border" />
                         <div>
                             <div className="text-xs text-muted-foreground uppercase">Admin Email</div>
-                            <div className="text-white font-mono">{createdData.adminEmail}</div>
+                            <div className="text-foreground font-mono">{createdData.adminEmail}</div>
                         </div>
                         <div>
                             <div className="text-xs text-muted-foreground uppercase">Temporary Password</div>
@@ -242,7 +242,7 @@ Note: The admin will be required to change their password on first login.`;
                     <ArrowLeft className="h-5 w-5" />
                 </Link>
                 <div>
-                    <h1 className="text-2xl font-bold text-white">Create Campground</h1>
+                    <h1 className="text-2xl font-bold text-foreground">Create Campground</h1>
                     <p className="text-muted-foreground mt-1">Add a new campground with an admin user</p>
                 </div>
             </div>
@@ -258,7 +258,7 @@ Note: The admin will be required to change their password on first login.`;
                 <div className="bg-muted rounded-lg border border-border p-6 space-y-4">
                     <div className="flex items-center gap-3 mb-4">
                         <Building2 className="h-5 w-5 text-muted-foreground" />
-                        <h2 className="text-lg font-semibold text-white">Campground Info</h2>
+                        <h2 className="text-lg font-semibold text-foreground">Campground Info</h2>
                     </div>
 
                     <div>
@@ -372,7 +372,7 @@ Note: The admin will be required to change their password on first login.`;
                     <div className="flex items-center gap-3 mb-4">
                         <User className="h-5 w-5 text-muted-foreground" />
                         <div>
-                            <h2 className="text-lg font-semibold text-white">Admin User</h2>
+                            <h2 className="text-lg font-semibold text-foreground">Admin User</h2>
                             <p className="text-sm text-muted-foreground">Create the campground administrator account</p>
                         </div>
                     </div>

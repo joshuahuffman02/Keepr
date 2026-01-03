@@ -163,7 +163,7 @@ export default function EarlyAccessAdminPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-white">Early Access Management</h1>
+          <h1 className="text-2xl font-bold text-foreground">Early Access Management</h1>
           <p className="text-muted-foreground mt-1">
             Monitor signups, resend emails, and track conversion
           </p>
@@ -192,10 +192,10 @@ export default function EarlyAccessAdminPage() {
                 <CardHeader className="pb-2">
                   <div className="flex items-center gap-3">
                     <div className={`${TIER_COLORS[tier.tier] || "bg-muted0"} p-2 rounded-lg`}>
-                      <Sparkles className="h-5 w-5 text-white" />
+                      <Sparkles className="h-5 w-5 text-foreground" />
                     </div>
                     <div>
-                      <CardTitle className="text-white text-lg">
+                      <CardTitle className="text-foreground text-lg">
                         {TIER_LABELS[tier.tier] || tier.tier}
                       </CardTitle>
                       <CardDescription className="text-muted-foreground">
@@ -227,7 +227,7 @@ export default function EarlyAccessAdminPage() {
           {/* Onboarding Conversion */}
           <Card className="bg-muted border-border">
             <CardHeader>
-              <CardTitle className="text-white flex items-center gap-2">
+              <CardTitle className="text-foreground flex items-center gap-2">
                 <TrendingUp className="h-5 w-5" />
                 Onboarding Conversion
               </CardTitle>
@@ -242,7 +242,7 @@ export default function EarlyAccessAdminPage() {
                     <Timer className="h-6 w-6 text-status-warning" />
                   </div>
                   <div>
-                    <p className="text-2xl font-bold text-white">{stats?.onboarding.pending || 0}</p>
+                    <p className="text-2xl font-bold text-foreground">{stats?.onboarding.pending || 0}</p>
                     <p className="text-sm text-muted-foreground">Pending Signups</p>
                   </div>
                 </div>
@@ -252,7 +252,7 @@ export default function EarlyAccessAdminPage() {
                     <UserCheck className="h-6 w-6 text-status-success" />
                   </div>
                   <div>
-                    <p className="text-2xl font-bold text-white">{stats?.onboarding.completed || 0}</p>
+                    <p className="text-2xl font-bold text-foreground">{stats?.onboarding.completed || 0}</p>
                     <p className="text-sm text-muted-foreground">Completed</p>
                   </div>
                 </div>
@@ -262,7 +262,7 @@ export default function EarlyAccessAdminPage() {
                     <TrendingUp className="h-6 w-6 text-status-info" />
                   </div>
                   <div>
-                    <p className="text-2xl font-bold text-white">{stats?.onboarding.conversionRate || 0}%</p>
+                    <p className="text-2xl font-bold text-foreground">{stats?.onboarding.conversionRate || 0}%</p>
                     <p className="text-sm text-muted-foreground">Conversion Rate</p>
                   </div>
                 </div>
@@ -273,7 +273,7 @@ export default function EarlyAccessAdminPage() {
           {/* Pending Onboardings Table */}
           <Card className="bg-muted border-border">
             <CardHeader>
-              <CardTitle className="text-white flex items-center gap-2">
+              <CardTitle className="text-foreground flex items-center gap-2">
                 <Users className="h-5 w-5" />
                 Pending Signups
               </CardTitle>
@@ -301,7 +301,7 @@ export default function EarlyAccessAdminPage() {
                       <div className="flex items-start justify-between gap-4">
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-2 mb-1">
-                            <p className="text-sm font-semibold text-white truncate">
+                            <p className="text-sm font-semibold text-foreground truncate">
                               {item.campgroundName}
                             </p>
                             <Badge

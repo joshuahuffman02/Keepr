@@ -85,7 +85,7 @@ function IssueCard({
       <div className="flex items-start gap-2">
         <AlertTriangle className={`h-4 w-4 mt-0.5 flex-shrink-0 ${priority.text}`} />
         <div className="flex-1 min-w-0">
-          <p className="text-sm text-white font-medium line-clamp-2">{issue.title}</p>
+          <p className="text-sm text-foreground font-medium line-clamp-2">{issue.title}</p>
           <div className="flex flex-wrap gap-1.5 mt-2">
             <span className={`text-xs px-1.5 py-0.5 rounded ${priority.bg} ${priority.text}`}>
               {priority.label}
@@ -138,7 +138,7 @@ function KanbanColumn({
       <div className="p-3 border-b border-border flex items-center justify-between">
         <div className="flex items-center gap-2">
           <StatusIcon className={`h-4 w-4 ${status.color}`} />
-          <span className="font-medium text-white">{status.label}</span>
+          <span className="font-medium text-foreground">{status.label}</span>
         </div>
         <span className="text-xs px-2 py-0.5 bg-muted text-muted-foreground rounded-full">
           {issues.length}
@@ -247,7 +247,7 @@ export default function IssuesPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-white flex items-center gap-2">
+          <h1 className="text-2xl font-bold text-foreground flex items-center gap-2">
             <Bug className="h-6 w-6 text-blue-400" />
             Issue Tracking
           </h1>
@@ -264,7 +264,7 @@ export default function IssuesPage() {
             <RefreshCw className={`h-4 w-4 ${loading ? "animate-spin" : ""}`} />
           </button>
           <div className="text-right">
-            <div className="text-2xl font-bold text-white">
+            <div className="text-2xl font-bold text-foreground">
               {doneIssues}/{totalIssues}
             </div>
             <div className="text-sm text-muted-foreground">Resolved</div>

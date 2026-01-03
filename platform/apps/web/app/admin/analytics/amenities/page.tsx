@@ -94,7 +94,7 @@ export default function AmenitiesPage() {
       <div className="flex items-center justify-between">
         <div>
           <div className="flex items-center gap-3">
-            <h1 className="text-2xl font-bold text-white">Amenity Analytics</h1>
+            <h1 className="text-2xl font-bold text-foreground">Amenity Analytics</h1>
             {isUsingMockData && (
               <Badge className="bg-amber-600/20 text-amber-400 border border-amber-600/50">
                 Demo Data
@@ -141,7 +141,7 @@ export default function AmenitiesPage() {
       {/* Hookup Analysis */}
       <Card className="bg-muted/50 border-border">
         <CardHeader>
-          <CardTitle className="text-lg text-white flex items-center gap-2">
+          <CardTitle className="text-lg text-foreground flex items-center gap-2">
             <Droplets className="h-5 w-5 text-cyan-400" />
             Hookup Analysis
           </CardTitle>
@@ -154,7 +154,7 @@ export default function AmenitiesPage() {
             {data.hookupAnalysis.map((hookup, idx) => (
               <div key={idx} className="p-4 bg-muted/50 rounded-lg">
                 <p className="text-sm text-muted-foreground mb-1">{hookup.hookupType}</p>
-                <p className="text-2xl font-bold text-white">{formatCurrency(hookup.averageNightlyRate)}</p>
+                <p className="text-2xl font-bold text-foreground">{formatCurrency(hookup.averageNightlyRate)}</p>
                 <p className="text-xs text-muted-foreground">/night avg</p>
                 <div className="mt-2 pt-2 border-t border-border">
                   <p className="text-xs text-muted-foreground">{hookup.siteCount} sites</p>
@@ -169,7 +169,7 @@ export default function AmenitiesPage() {
       {/* Revenue Correlation */}
       <Card className="bg-muted/50 border-border">
         <CardHeader>
-          <CardTitle className="text-lg text-white">Amenity Revenue Impact</CardTitle>
+          <CardTitle className="text-lg text-foreground">Amenity Revenue Impact</CardTitle>
           <p className="text-sm text-muted-foreground">
             How amenities affect nightly rates (sorted by impact)
           </p>

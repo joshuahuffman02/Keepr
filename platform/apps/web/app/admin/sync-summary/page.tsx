@@ -58,7 +58,7 @@ export default function SyncSummaryPage() {
       <div className="space-y-4">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-semibold text-white">Sync Summary</h1>
+            <h1 className="text-2xl font-semibold text-foreground">Sync Summary</h1>
             <p className="text-muted-foreground text-sm">Queue health across offline flows.</p>
           </div>
           <Link href="/pwa/sync-log" className="text-sm text-blue-400 hover:underline">

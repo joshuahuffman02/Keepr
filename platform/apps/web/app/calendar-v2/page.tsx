@@ -423,7 +423,7 @@ export default function CalendarPage() {
         <PageHeader
           title={(
             <span className="flex items-center gap-3">
-              <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-status-success/15 text-status-success">
+              <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-status-success/15 text-status-success">
                 <CalendarDays className="h-5 w-5" />
               </span>
               <span>Booking Calendar</span>
@@ -432,7 +432,7 @@ export default function CalendarPage() {
           subtitle="Drag across dates to build a stay. Release to preview pricing and availability."
           actions={(
             <div className="flex flex-wrap items-center gap-3">
-              <div className="flex items-center bg-card rounded-xl border border-border shadow-sm p-1">
+              <div className="flex items-center bg-card rounded-xl border border-border p-1">
                 {DAY_RANGES.map((range) => (
                   <Button
                     key={range}
@@ -449,7 +449,7 @@ export default function CalendarPage() {
                 ))}
               </div>
 
-              <div className="flex items-center bg-card rounded-xl border border-border shadow-sm p-1">
+              <div className="flex items-center bg-card rounded-xl border border-border p-1">
                 <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground" onClick={handlePrev}>
                   <ChevronLeft className="h-4 w-4" />
                 </Button>
@@ -466,13 +466,13 @@ export default function CalendarPage() {
                 </Button>
               </div>
 
-              <div className="flex items-center gap-2 bg-muted rounded-xl px-3 py-2 text-xs font-semibold text-muted-foreground">
+              <div className="flex items-center gap-2 rounded-xl border border-border bg-card px-3 py-2 text-xs font-semibold text-muted-foreground">
                 <CalendarCheck className="h-4 w-4 text-status-success" />
                 <span>{rangeLabel}</span>
               </div>
 
               {/* Density Toggle */}
-              <div className="flex items-center bg-card rounded-xl border border-border shadow-sm p-1">
+              <div className="flex items-center bg-card rounded-xl border border-border p-1">
                 {(Object.keys(DENSITY_CONFIG) as DensityMode[]).map((mode) => {
                   const config = DENSITY_CONFIG[mode];
                   const Icon = config.icon;
@@ -499,7 +499,7 @@ export default function CalendarPage() {
 
               {/* Inline Campground Selector */}
               {campgrounds.length > 0 && (
-                <div className="flex items-center bg-card rounded-xl border border-border shadow-sm">
+                <div className="flex items-center bg-card rounded-xl border border-border">
                   <div className="flex items-center gap-2 pl-3 pr-1">
                     <Building2 className="h-4 w-4 text-muted-foreground" />
                   </div>
@@ -624,7 +624,7 @@ export default function CalendarPage() {
         {state.selectedCampground && (
           <div className="space-y-4">
             {bookingDraft ? (
-              <Card className="p-4 border-emerald-200 shadow-[0_20px_50px_-30px_rgba(16,185,129,0.35)]">
+              <Card className="p-4 border-emerald-200 shadow-sm">
                 <div className="flex flex-wrap items-center justify-between gap-3">
                   <div className="space-y-1">
                     <div className="text-xs font-medium text-emerald-700">Draft booking</div>

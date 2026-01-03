@@ -274,7 +274,7 @@ export default function AnalyticsOverviewPage() {
       <div className="flex items-center justify-between">
         <div>
           <div className="flex items-center gap-3">
-            <h1 className="text-2xl font-bold text-white">Analytics Hub</h1>
+            <h1 className="text-2xl font-bold text-foreground">Analytics Hub</h1>
             {!hasData && !loading && (
               <Badge className="bg-muted/20 text-muted-foreground border border-border/50">
                 No Data Yet
@@ -323,7 +323,7 @@ export default function AnalyticsOverviewPage() {
 
       {/* Revenue KPIs */}
       <div>
-        <h2 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+        <h2 className="text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
           <DollarSign className="h-5 w-5 text-green-400" />
           Revenue Intelligence
         </h2>
@@ -365,7 +365,7 @@ export default function AnalyticsOverviewPage() {
       {/* Guest & Booking KPIs */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div>
-          <h2 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+          <h2 className="text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
             <Users className="h-5 w-5 text-blue-400" />
             Guest Insights
           </h2>
@@ -398,7 +398,7 @@ export default function AnalyticsOverviewPage() {
         </div>
 
         <div>
-          <h2 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+          <h2 className="text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
             <Clock className="h-5 w-5 text-purple-400" />
             Booking Behavior
           </h2>
@@ -506,7 +506,7 @@ export default function AnalyticsOverviewPage() {
         />
       ) : (
         <div className="bg-muted/50 border border-border rounded-lg p-6">
-          <h3 className="text-lg font-semibold text-white mb-2">Top Performing Campgrounds</h3>
+          <h3 className="text-lg font-semibold text-foreground mb-2">Top Performing Campgrounds</h3>
           <p className="text-muted-foreground">No campground performance data available yet. Rankings will appear once you have active campgrounds with bookings.</p>
         </div>
       )}
@@ -514,25 +514,25 @@ export default function AnalyticsOverviewPage() {
       {/* Quick Stats Footer */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 pt-4 border-t border-border">
         <div className="text-center">
-          <p className="text-2xl font-bold text-white">
+          <p className="text-2xl font-bold text-foreground">
             {data?.accommodations.totalSites?.toLocaleString() || "—"}
           </p>
           <p className="text-sm text-muted-foreground">Total Sites</p>
         </div>
         <div className="text-center">
-          <p className="text-2xl font-bold text-white">
+          <p className="text-2xl font-bold text-foreground">
             {data?.los.weeklyStayPercentage?.toFixed(1) || "—"}%
           </p>
           <p className="text-sm text-muted-foreground">Weekly Stays</p>
         </div>
         <div className="text-center">
-          <p className="text-2xl font-bold text-white">
+          <p className="text-2xl font-bold text-foreground">
             {data?.booking.lastMinutePercentage?.toFixed(1) || "—"}%
           </p>
           <p className="text-sm text-muted-foreground">Last-Minute Bookings</p>
         </div>
         <div className="text-center">
-          <p className="text-2xl font-bold text-white capitalize">
+          <p className="text-2xl font-bold text-foreground capitalize">
             {data?.accommodations.topPerformingType || "—"}
           </p>
           <p className="text-sm text-muted-foreground">Top Site Type</p>

@@ -68,7 +68,7 @@ export default function AdminCampgroundsListPage() {
         <div className="space-y-6">
             <div className="flex items-center justify-between">
                 <div>
-                    <h1 className="text-2xl font-bold text-white">All Campgrounds</h1>
+                    <h1 className="text-2xl font-bold text-foreground">All Campgrounds</h1>
                     <p className="text-muted-foreground mt-1">
                         Manage all campgrounds on the platform
                     </p>
@@ -133,7 +133,7 @@ export default function AdminCampgroundsListPage() {
                                 </div>
                                 <div>
                                     <div className="flex items-center gap-2">
-                                        <h3 className="font-semibold text-white">{campground.name}</h3>
+                                        <h3 className="font-semibold text-foreground">{campground.name}</h3>
                                         {campground.isActive === false && (
                                             <span className="px-2 py-0.5 text-xs bg-status-error/15 text-status-error rounded">
                                                 Inactive

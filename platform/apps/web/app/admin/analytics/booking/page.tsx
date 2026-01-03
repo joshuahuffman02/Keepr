@@ -122,7 +122,7 @@ export default function BookingBehaviorPage() {
       <div className="flex items-center justify-between">
         <div>
           <div className="flex items-center gap-3">
-            <h1 className="text-2xl font-bold text-white">Booking Behavior</h1>
+            <h1 className="text-2xl font-bold text-foreground">Booking Behavior</h1>
             {isUsingMockData && (
               <Badge className="bg-amber-600/20 text-amber-400 border border-amber-600/50">
                 Demo Data
@@ -231,7 +231,7 @@ export default function BookingBehaviorPage() {
       {/* Cancellation Analysis */}
       <Card className="bg-muted/50 border-border">
         <CardHeader>
-          <CardTitle className="text-lg text-white flex items-center gap-2">
+          <CardTitle className="text-lg text-foreground flex items-center gap-2">
             <TrendingDown className="h-5 w-5 text-red-400" />
             Cancellation Analysis
           </CardTitle>
@@ -239,15 +239,15 @@ export default function BookingBehaviorPage() {
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
             <div className="p-4 bg-red-500/10 border border-red-500/30 rounded-lg text-center">
-              <p className="text-3xl font-bold text-white">{data.cancellationAnalysis.overallRate}%</p>
+              <p className="text-3xl font-bold text-foreground">{data.cancellationAnalysis.overallRate}%</p>
               <p className="text-sm text-muted-foreground">Overall Rate</p>
             </div>
             <div className="p-4 bg-muted/50 rounded-lg text-center">
-              <p className="text-3xl font-bold text-white">{data.cancellationAnalysis.totalCancelled.toLocaleString()}</p>
+              <p className="text-3xl font-bold text-foreground">{data.cancellationAnalysis.totalCancelled.toLocaleString()}</p>
               <p className="text-sm text-muted-foreground">Total Cancelled</p>
             </div>
             <div className="p-4 bg-muted/50 rounded-lg text-center">
-              <p className="text-3xl font-bold text-white">{formatCurrency(data.cancellationAnalysis.lostRevenue)}</p>
+              <p className="text-3xl font-bold text-foreground">{formatCurrency(data.cancellationAnalysis.lostRevenue)}</p>
               <p className="text-sm text-muted-foreground">Lost Revenue</p>
             </div>
           </div>

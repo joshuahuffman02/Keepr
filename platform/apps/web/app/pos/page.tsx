@@ -628,11 +628,11 @@ export default function POSPage() {
 
     return (
         <DashboardShell className="h-screen overflow-hidden flex flex-col">
-            <div className="flex h-full gap-6 p-3 sm:p-6">
+            <div className="flex h-full gap-6 p-4 sm:p-6">
                 <div className="flex-1 flex flex-col gap-4 sm:gap-6 min-w-0">
                     <div className="flex items-center justify-between flex-wrap gap-3">
                         <div className="flex items-center gap-3">
-                            <h1 className="text-xl sm:text-2xl font-bold text-foreground">Point of Sale</h1>
+                            <h1 className="text-2xl font-semibold tracking-tight text-foreground">Point of Sale</h1>
                             {locations.length > 1 && (
                                 <select
                                     value={selectedLocationId || ""}
@@ -692,13 +692,13 @@ export default function POSPage() {
                     <div className="relative">
                         <div className="flex items-center gap-2">
                             <div className="relative flex-1 max-w-md">
-                                <input
+                                <Input
                                     ref={searchInputRef}
                                     type="text"
                                     placeholder="Search products..."
                                     value={searchQuery}
                                     onChange={(e) => setSearchQuery(e.target.value)}
-                                    className="w-full pl-10 pr-4 py-2 border border-border rounded-lg text-sm focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition-shadow"
+                                    className="h-10 w-full pl-10 pr-10 text-sm"
                                 />
                                 <svg
                                     className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground"
@@ -711,7 +711,7 @@ export default function POSPage() {
                                 {searchQuery && (
                                     <button
                                         onClick={() => setSearchQuery("")}
-                                        className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-muted-foreground"
+                                        className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
                                         aria-label="Clear search"
                                     >
                                         <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

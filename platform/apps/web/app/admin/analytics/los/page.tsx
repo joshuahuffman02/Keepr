@@ -111,7 +111,7 @@ export default function LengthOfStayPage() {
       <div className="flex items-center justify-between">
         <div>
           <div className="flex items-center gap-3">
-            <h1 className="text-2xl font-bold text-white">Length of Stay Analysis</h1>
+            <h1 className="text-2xl font-bold text-foreground">Length of Stay Analysis</h1>
             {isUsingMockData && (
               <Badge className="bg-amber-600/20 text-amber-400 border border-amber-600/50">
                 Demo Data

@@ -122,7 +122,7 @@ export default function AnnouncementsPage() {
         <div className="space-y-6">
             <div className="flex items-center justify-between">
                 <div>
-                    <h1 className="text-2xl font-bold text-white">Platform Announcements</h1>
+                    <h1 className="text-2xl font-bold text-foreground">Platform Announcements</h1>
                     <p className="text-muted-foreground mt-1">
                         Broadcast messages to staff across all campgrounds
                     </p>
@@ -155,8 +155,8 @@ export default function AnnouncementsPage() {
             {showNew && (
                 <div className="bg-muted rounded-lg border border-border p-6 space-y-4">
                     <div className="flex items-center justify-between">
-                        <h2 className="text-lg font-semibold text-white">Create Announcement</h2>
-                        <button onClick={() => setShowNew(false)} className="text-muted-foreground hover:text-white">
+                        <h2 className="text-lg font-semibold text-foreground">Create Announcement</h2>
+                        <button onClick={() => setShowNew(false)} className="text-muted-foreground hover:text-foreground">
                             <X className="h-5 w-5" />
                         </button>
                     </div>
@@ -216,7 +216,7 @@ export default function AnnouncementsPage() {
                     <div className="flex justify-end gap-3">
                         <button
                             onClick={() => setShowNew(false)}
-                            className="px-4 py-2 text-muted-foreground hover:text-white transition-colors"
+                            className="px-4 py-2 text-muted-foreground hover:text-foreground transition-colors"
                         >
                             Cancel
                         </button>

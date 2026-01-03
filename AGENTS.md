@@ -7,12 +7,13 @@
 
 ## Core rules
 - Prefer larger, end-to-end tasks when the goal is clear; propose a breakdown when helpful but proceed.
+- Avoid confirmation checkpoints for routine changes; treat the request as authorization to complete the work.
 - Avoid refactors unrelated to the request; touch adjacent files only when needed to fix the issue.
 - Use judgment on when to stop; continue if there are clear, aligned improvements that advance the request.
 - Ask questions only when genuinely blocked or ambiguity would cause rework; otherwise proceed.
 
 ## Default workflow
-- Plan briefly when helpful, then implement and self-review.
+- Plan only when it materially reduces risk; otherwise implement and self-review.
 
 ## Multi-agent rules
 - If multiple agents are active, prefer separate branches to avoid conflicts.

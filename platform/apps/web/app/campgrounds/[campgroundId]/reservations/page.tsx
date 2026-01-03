@@ -1036,7 +1036,7 @@ export default function ReservationsPage() {
 
   return (
     <DashboardShell>
-      <div className="space-y-4">
+      <div className="space-y-6">
         <Breadcrumbs
           items={[
             { label: "Campgrounds", href: "/campgrounds?all=true" },
@@ -1044,6 +1044,22 @@ export default function ReservationsPage() {
             { label: "Reservations" }
           ]}
         />
+        <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
+          <div className="space-y-1">
+            <h1 className="text-2xl font-semibold text-foreground">Reservations</h1>
+            <p className="text-sm text-muted-foreground">
+              Track arrivals, departures, balances, and guest communications.
+            </p>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            <Button variant="secondary" onClick={() => router.push(`/calendar?campgroundId=${campgroundId}`)}>
+              Open calendar
+            </Button>
+            <Button onClick={() => router.push(`/booking?campgroundId=${campgroundId}`)}>
+              Go to booking
+            </Button>
+          </div>
+        </div>
         {flash && (
           <div
             className={`rounded-md border px-3 py-2 text-sm ${flash.type === "success"
@@ -1056,12 +1072,12 @@ export default function ReservationsPage() {
             {flash.message}
           </div>
         )}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           <Card data-testid="inhouse-card">
-            <CardHeader className="pb-2">
+            <CardHeader className="pb-3">
               <CardTitle className="text-sm text-muted-foreground">In house</CardTitle>
             </CardHeader>
-            <CardContent className="pt-0 space-y-1">
+            <CardContent className="pt-0 space-y-2">
               <div className="text-2xl font-semibold text-foreground" data-testid="inhouse-count">
                 {inHouse.length} / {siteCount || 0}
               </div>
@@ -1070,10 +1086,10 @@ export default function ReservationsPage() {
           </Card>
           <Link href="/check-in-out" className="block">
             <Card data-testid="arrivals-card" className="hover:border-status-success/30 hover:shadow-md transition cursor-pointer">
-              <CardHeader className="pb-2">
+              <CardHeader className="pb-3">
                 <CardTitle className="text-sm text-muted-foreground">Arrivals today</CardTitle>
               </CardHeader>
-              <CardContent className="pt-0 space-y-1">
+              <CardContent className="pt-0 space-y-2">
                 <div className="text-2xl font-semibold text-foreground" data-testid="arrivals-today">
                   {arrivalsToday.length}
                 </div>
@@ -1083,10 +1099,10 @@ export default function ReservationsPage() {
           </Link>
           <Link href="/check-in-out" className="block">
             <Card data-testid="departures-card" className="hover:border-orange-300 hover:shadow-md transition cursor-pointer">
-              <CardHeader className="pb-2">
+              <CardHeader className="pb-3">
                 <CardTitle className="text-sm text-muted-foreground">Departures today</CardTitle>
               </CardHeader>
-              <CardContent className="pt-0 space-y-1">
+              <CardContent className="pt-0 space-y-2">
                 <div className="text-2xl font-semibold text-foreground" data-testid="departures-today">
                   {departuresToday.length}
                 </div>
@@ -1095,10 +1111,10 @@ export default function ReservationsPage() {
             </Card>
           </Link>
           <Card data-testid="balance-due-card">
-            <CardHeader className="pb-2">
+            <CardHeader className="pb-3">
               <CardTitle className="text-sm text-muted-foreground">Balance due</CardTitle>
             </CardHeader>
-            <CardContent className="pt-0 space-y-1">
+            <CardContent className="pt-0 space-y-2">
               <div className="text-2xl font-semibold text-foreground" data-testid="balance-due-value">
                 {new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(balanceDueCents / 100)}
               </div>
@@ -1107,19 +1123,7 @@ export default function ReservationsPage() {
           </Card>
         </div>
 
-        <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-          <div className="text-lg font-semibold text-foreground">Reservations operations</div>
-          <div className="flex flex-wrap gap-2">
-            <Button variant="secondary" onClick={() => router.push(`/calendar?campgroundId=${campgroundId}`)}>
-              Open calendar
-            </Button>
-            <Button onClick={() => router.push(`/booking?campgroundId=${campgroundId}`)}>
-              Go to booking
-            </Button>
-          </div>
-        </div>
-
-        <div className="rounded-lg border border-border bg-muted px-3 py-2 text-sm text-foreground">
+        <div className="rounded-lg border border-border bg-card px-3 py-2 text-sm text-muted-foreground">
           Creating new bookings now lives on the dedicated booking page. Use the dashboard below for arrivals, departures, balances, and guest comms.
         </div>
 
@@ -1135,25 +1139,25 @@ export default function ReservationsPage() {
           </div>
 
           {summary && (
-          <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-2">
-            <div className="rounded-lg border border-border bg-card p-3">
+          <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-3">
+            <div className="rounded-lg border border-border bg-card p-4">
               <div className="text-xs text-muted-foreground">Reservations</div>
               <div className="text-lg font-semibold text-foreground">{tabFilteredReservations.length}</div>
               <div className="text-xs text-muted-foreground">{summary.nights} nights total</div>
             </div>
-            <div className="rounded-lg border border-border bg-card p-3">
+            <div className="rounded-lg border border-border bg-card p-4">
               <div className="text-xs text-muted-foreground">Revenue</div>
               <div className="text-lg font-semibold text-foreground">
                 ${(summary.totalCents / 100).toFixed(2)} / Paid ${(summary.paidCents / 100).toFixed(2)}
               </div>
               <div className="text-xs text-muted-foreground">Balance ${(summary.balanceCents / 100).toFixed(2)}</div>
             </div>
-            <div className="rounded-lg border border-border bg-card p-3">
+            <div className="rounded-lg border border-border bg-card p-4">
               <div className="text-xs text-muted-foreground">ADR</div>
               <div className="text-lg font-semibold text-foreground">${summary.adr.toFixed(2)}</div>
               <div className="text-xs text-muted-foreground">Avg daily rate</div>
             </div>
-            <div className="rounded-lg border border-border bg-card p-3">
+            <div className="rounded-lg border border-border bg-card p-4">
               <div className="text-xs text-muted-foreground">RevPAR</div>
               <div className="text-lg font-semibold text-foreground">
                 {siteCount > 0 ? `$${summary.revpar.toFixed(2)}` : "n/a"}

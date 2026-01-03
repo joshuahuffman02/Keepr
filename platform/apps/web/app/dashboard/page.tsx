@@ -315,7 +315,7 @@ function CelebrationBadge({
       className={cn(
         "inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold",
         "bg-emerald-600 text-white",
-        "shadow-lg shadow-emerald-500/30"
+        "shadow-sm"
       )}
     >
       <motion.div
@@ -623,7 +623,7 @@ export default function Dashboard() {
       />
 
       <motion.div
-        className="space-y-6"
+        className="space-y-8"
         initial="initial"
         animate="animate"
         variants={staggerContainer}
@@ -698,7 +698,7 @@ export default function Dashboard() {
                 {today.toLocaleDateString(undefined, { weekday: 'long', month: 'long', day: 'numeric' })} · {selectedCampground?.name ?? "Loading campground"}
               </div>
 
-              <p className="text-base text-foreground/80 font-medium">
+              <p className="text-base text-muted-foreground font-medium">
                 {timeOfDay.message}
               </p>
             </div>
@@ -789,7 +789,7 @@ export default function Dashboard() {
         {/* ═══════════════════════════════════════════════════════════════════ */}
         <motion.div
           className={cn(
-            "rounded-2xl p-5 space-y-4 transition-colors",
+            "rounded-2xl p-6 space-y-5 transition-colors",
             "bg-muted border border-border"
           )}
           {...motionProps}
@@ -833,13 +833,13 @@ export default function Dashboard() {
           </div>
 
           {isLoading ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
               {[1, 2, 3, 4, 5, 6].map((i) => (
                 <SkeletonCard key={i} />
               ))}
             </div>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
               <OpsCard label="Arrivals" value={todayArrivals.length} href="/check-in-out" icon={<UserCheck className="h-4 w-4" />} tone="emerald" index={0} prefersReducedMotion={prefersReducedMotion} celebrate={todayArrivals.length >= 5} />
               <OpsCard label="Departures" value={todayDepartures.length} href="/check-in-out" icon={<LogOut className="h-4 w-4" />} tone="amber" index={1} prefersReducedMotion={prefersReducedMotion} />
               <OpsCard label="In-house" value={inHouse.length} href="/reservations" icon={<Users className="h-4 w-4" />} tone="blue" index={2} prefersReducedMotion={prefersReducedMotion} />
@@ -915,7 +915,7 @@ export default function Dashboard() {
           {...motionProps}
           transition={{ ...SPRING_CONFIG, delay: 0.15 }}
         >
-          <div className="flex items-center gap-2 text-sm font-semibold uppercase tracking-wide text-foreground pl-1">
+          <div className="flex items-center gap-2 text-sm font-semibold uppercase tracking-wide text-muted-foreground pl-1">
             <ClipboardList className="h-4 w-4" />
             Action Items
             <HelpTooltip
@@ -934,7 +934,7 @@ export default function Dashboard() {
           </div>
 
           <div className={cn(
-            "rounded-xl p-5 space-y-4 backdrop-blur-sm transition-colors",
+            "rounded-xl p-6 space-y-4 backdrop-blur-sm transition-colors",
             "border-2 bg-card",
             attentionList.length > 0
               ? "border-amber-200"

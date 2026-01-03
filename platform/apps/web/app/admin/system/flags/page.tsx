@@ -86,7 +86,7 @@ export default function FeatureFlagsPage() {
         <div className="space-y-6">
             <div className="flex items-center justify-between">
                 <div>
-                    <h1 className="text-2xl font-bold text-white">Feature Flags</h1>
+                    <h1 className="text-2xl font-bold text-foreground">Feature Flags</h1>
                     <p className="text-muted-foreground mt-1">
                         Enable or disable features across the platform
                     </p>
@@ -100,7 +100,7 @@ export default function FeatureFlagsPage() {
                         <RefreshCw className={`h-4 w-4 ${loading ? "animate-spin" : ""}`} />
                     </button>
                     <div className="text-right">
-                        <div className="text-2xl font-bold text-white">{enabledCount}/{flags.length}</div>
+                        <div className="text-2xl font-bold text-foreground">{enabledCount}/{flags.length}</div>
                         <div className="text-sm text-muted-foreground">Features enabled</div>
                     </div>
                 </div>
@@ -160,7 +160,7 @@ export default function FeatureFlagsPage() {
                                 </div>
                                 <div>
                                     <div className="flex items-center gap-2">
-                                        <span className="font-medium text-white">{flag.name}</span>
+                                        <span className="font-medium text-foreground">{flag.name}</span>
                                         <span className="text-xs font-mono text-muted-foreground">{flag.key}</span>
                                     </div>
                                     <p className="text-sm text-muted-foreground mt-1">{flag.description || "No description"}</p>
