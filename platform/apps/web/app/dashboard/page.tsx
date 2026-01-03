@@ -4,7 +4,6 @@ import Link from "next/link";
 import { useMemo, useState, useEffect } from "react";
 import { useQuery, keepPreviousData } from "@tanstack/react-query";
 import { motion, useReducedMotion } from "framer-motion";
-import { useSession } from "next-auth/react";
 import {
   AlertCircle,
   ArrowRight,
@@ -25,7 +24,6 @@ import {
   RefreshCw,
   Scale,
   Search,
-  Settings,
   ShoppingBag,
   Sparkles,
   Sun,
@@ -37,7 +35,6 @@ import {
   TrendingUp,
   Trophy,
   UserCheck,
-  UserCircle,
   Users
 } from "lucide-react";
 import { DashboardShell } from "@/components/ui/layout/DashboardShell";
@@ -310,7 +307,6 @@ function CelebrationBadge({
 export default function Dashboard() {
   const [search, setSearch] = useState("");
   const prefersReducedMotion = useReducedMotion();
-  const { data: session } = useSession();
 
   // Onboarding tour for new users
   const tour = useTour({
@@ -330,28 +326,6 @@ export default function Dashboard() {
   // Track when client-side hydration is complete to avoid hydration mismatch
   const [hasMounted, setHasMounted] = useState(false);
   const [selectedId, setSelectedId] = useState<string>("");
-
-  const sessionUser = session?.user as {
-    name?: string | null;
-    email?: string | null;
-    firstName?: string | null;
-    lastName?: string | null;
-  } | undefined;
-  const displayName =
-    sessionUser?.name ||
-    [sessionUser?.firstName, sessionUser?.lastName].filter(Boolean).join(" ") ||
-    sessionUser?.email ||
-    "Signed in";
-  const displayEmail = sessionUser?.email || "";
-  const initialsSource = displayName === "Signed in" ? displayEmail : displayName;
-  const initials = initialsSource
-    ? initialsSource
-        .split(" ")
-        .filter(Boolean)
-        .slice(0, 2)
-        .map((part) => part[0]?.toUpperCase())
-        .join("")
-    : "?";
 
   // After mount, read from localStorage and set up selection
   useEffect(() => {
@@ -699,31 +673,6 @@ export default function Dashboard() {
             </div>
 
             <div className="flex flex-wrap items-center gap-3">
-              <Link
-                href="/dashboard/settings/users"
-                aria-label={`Signed in as ${displayName}`}
-                className={cn(
-                  "flex items-center gap-3 rounded-xl border border-border bg-muted/30 px-3 py-2 text-left",
-                  "hover:border-muted-foreground/30 hover:bg-muted/60 transition-colors",
-                  "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-action-primary focus-visible:ring-offset-2"
-                )}
-              >
-                <div className="flex h-9 w-9 items-center justify-center rounded-full bg-muted text-foreground text-xs font-semibold">
-                  {initials}
-                </div>
-                <div className="leading-tight">
-                  <div className="text-[11px] font-semibold text-muted-foreground">Signed in as</div>
-                  <div className="text-sm font-semibold text-foreground max-w-[160px] truncate">
-                    {displayName}
-                  </div>
-                  {displayEmail && (
-                    <div className="text-[11px] text-muted-foreground max-w-[160px] truncate">
-                      {displayEmail}
-                    </div>
-                  )}
-                </div>
-                <UserCircle className="h-4 w-4 text-muted-foreground" />
-              </Link>
               <motion.div {...hoverScale} whileTap={{ scale: 0.95 }}>
                 <Link
                   href="/booking"
@@ -757,8 +706,8 @@ export default function Dashboard() {
               </motion.div>
               <motion.div {...hoverScale} whileTap={{ scale: 0.95 }}>
                 <Link
-                  href="/dashboard/settings/central/property/profile"
-                  aria-label="Open profile settings"
+                  href="/calendar"
+                  aria-label="Open the calendar"
                   className={cn(
                     "inline-flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-semibold",
                     "border border-border bg-muted/30 text-foreground",
@@ -767,8 +716,8 @@ export default function Dashboard() {
                     "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-action-primary focus-visible:ring-offset-2"
                   )}
                 >
-                  <Settings className="h-4 w-4" />
-                  Profile settings
+                  <Calendar className="h-4 w-4" />
+                  View calendar
                 </Link>
               </motion.div>
             </div>
@@ -1777,15 +1726,15 @@ function QuickActionButton({
         href={href}
         aria-label={label}
         className={cn(
-          "flex h-full min-h-[108px] flex-col items-center justify-center gap-2.5 rounded-xl border border-border/70 bg-muted/30 px-3 py-4 text-center transition-colors",
-          "hover:bg-muted/50 hover:border-muted-foreground/30",
+          "group flex h-full min-h-[120px] flex-col items-center justify-center gap-2.5 rounded-xl border border-border/70 bg-muted/30 px-3 py-4 text-center transition-all",
+          "hover:-translate-y-0.5 hover:bg-muted/50 hover:border-muted-foreground/30 hover:shadow-md",
           "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2"
         )}
       >
         <span className={cn("rounded-lg p-2 bg-muted", toneMap[tone])}>
           {icon}
         </span>
-        <span className="text-sm font-semibold text-foreground leading-snug whitespace-normal break-words text-balance max-w-[10rem]">
+        <span className="text-[13px] font-semibold text-foreground leading-snug whitespace-normal break-words text-center w-full min-h-[32px]">
           {label}
         </span>
       </Link>
@@ -1844,12 +1793,12 @@ function NpsSummaryCard({
   );
 
   return (
-    <div className="grid gap-4">
+    <div className="grid gap-4 md:grid-cols-2">
       {hasScore || isLoading ? (
         <NpsGauge
           score={score}
           loading={isLoading}
-          size="lg"
+          size="md"
           title="Guest NPS Score"
         />
       ) : (

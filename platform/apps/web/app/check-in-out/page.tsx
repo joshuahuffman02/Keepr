@@ -1162,10 +1162,11 @@ function SummaryCard({ label, value, icon, href, onClick, highlight }: { label: 
   const content = (
     <div
       className={cn(
-        "flex items-center justify-between rounded-xl border p-4 shadow-sm transition-colors",
+        "flex items-center justify-between rounded-xl border p-4 shadow-sm transition-all",
+        "group-hover:-translate-y-0.5 group-hover:shadow-md",
         highlight
           ? "border-emerald-200 bg-emerald-50"
-          : "border-border bg-card hover:border-muted-foreground/30"
+          : "border-border bg-card group-hover:border-muted-foreground/30"
       )}
     >
       <div className="flex items-center gap-3">
@@ -1195,14 +1196,18 @@ function SummaryCard({ label, value, icon, href, onClick, highlight }: { label: 
   );
   if (href) {
     return (
-      <Link href={href} className="block hover:shadow-md transition">
+      <Link href={href} className="group block w-full rounded-xl text-left transition">
         {content}
       </Link>
     );
   }
   if (onClick) {
     return (
-      <button type="button" onClick={onClick} className="block w-full text-left hover:shadow-md transition">
+      <button
+        type="button"
+        onClick={onClick}
+        className="group block w-full rounded-xl text-left transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2"
+      >
         {content}
       </button>
     );

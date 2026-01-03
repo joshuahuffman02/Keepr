@@ -3,8 +3,9 @@
 import Link from "next/link";
 import { useState, useEffect } from "react";
 import { DashboardShell } from "@/components/ui/layout/DashboardShell";
+import { PageHeader } from "@/components/ui/layout/PageHeader";
 import { Button } from "@/components/ui/button";
-import { Plus, Filter, ClipboardList, MessageSquare, HeartPulse, ClipboardCheck, Play, CheckCircle, RotateCcw, StickyNote, Pencil } from "lucide-react";
+import { Plus, ClipboardList, MessageSquare, HeartPulse, ClipboardCheck, Play, CheckCircle, RotateCcw, StickyNote, Pencil, ArrowRight } from "lucide-react";
 import { apiClient } from "@/lib/api-client";
 import { Maintenance } from "@campreserv/shared";
 import { format } from "date-fns";
@@ -134,37 +135,59 @@ export default function MaintenancePage() {
 
   return (
     <DashboardShell>
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between mb-6 pb-2 md:pb-0">
-        <div>
-          <div className="flex items-center gap-2">
-            <h1 className="text-2xl font-bold text-foreground">Maintenance</h1>
-            <HelpAnchor topicId="maintenance-work-orders" label="Maintenance help" />
-          </div>
-          <p className="text-muted-foreground">Track repairs, work orders, and site maintenance.</p>
-        </div>
-        <Button onClick={() => setIsCreateOpen(true)}>
-          <Plus className="h-4 w-4 mr-2" />
-          New Ticket
-        </Button>
-      </div>
+      <div className="space-y-4">
+        <PageHeader
+          eyebrow="Operations"
+          title={(
+            <span className="flex items-center gap-3">
+              <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-status-warning/15 text-status-warning">
+                <ClipboardList className="h-5 w-5" />
+              </span>
+              <span>Maintenance</span>
+            </span>
+          )}
+          subtitle="Track repairs, work orders, and site maintenance without losing momentum."
+          actions={(
+            <>
+              <HelpAnchor topicId="maintenance-work-orders" label="Maintenance help" />
+              <Button onClick={() => setIsCreateOpen(true)}>
+                <Plus className="h-4 w-4 mr-2" />
+                New Ticket
+              </Button>
+            </>
+          )}
+        />
 
-      <div className="grid gap-2 mb-4 md:hidden">
-        <Card>
-          <CardContent className="p-3 flex items-center justify-between">
-            <div className="text-sm text-muted-foreground">Open / In progress</div>
-            <div className="text-lg font-semibold text-foreground">
-              {tickets.filter((t) => t.status !== "closed").length}
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="p-3 flex items-center justify-between">
-            <div className="text-sm text-muted-foreground">Closed today</div>
-            <div className="text-lg font-semibold text-foreground">
-              {tickets.filter((t) => t.status === "closed").length}
-            </div>
-          </CardContent>
-        </Card>
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+          <SummaryCard
+            label="Open"
+            value={tickets.filter((t) => t.status === "open").length}
+            icon={<ClipboardList className="h-4 w-4" />}
+            highlight={activeTab === "open"}
+            onClick={() => setActiveTab("open")}
+          />
+          <SummaryCard
+            label="In progress"
+            value={tickets.filter((t) => t.status === "in_progress").length}
+            icon={<Play className="h-4 w-4" />}
+            highlight={activeTab === "in_progress"}
+            onClick={() => setActiveTab("in_progress")}
+          />
+          <SummaryCard
+            label="Closed"
+            value={tickets.filter((t) => t.status === "closed").length}
+            icon={<CheckCircle className="h-4 w-4" />}
+            highlight={activeTab === "closed"}
+            onClick={() => setActiveTab("closed")}
+          />
+          <SummaryCard
+            label="All tickets"
+            value={tickets.length}
+            icon={<ClipboardCheck className="h-4 w-4" />}
+            highlight={activeTab === "all"}
+            onClick={() => setActiveTab("all")}
+          />
+        </div>
       </div>
 
       <Tabs value={activeTab} defaultValue="open" onValueChange={setActiveTab} className="w-full pb-24 md:pb-10" id="maintenance-list">
@@ -380,5 +403,64 @@ export default function MaintenancePage() {
         ]}
       />
     </DashboardShell>
+  );
+}
+
+function SummaryCard({
+  label,
+  value,
+  icon,
+  highlight,
+  onClick
+}: {
+  label: string;
+  value: number;
+  icon: React.ReactNode;
+  highlight?: boolean;
+  onClick?: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={cn(
+        "group w-full text-left rounded-xl transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-status-warning focus-visible:ring-offset-2",
+        onClick ? "cursor-pointer" : "cursor-default"
+      )}
+    >
+      <div
+        className={cn(
+          "flex items-center justify-between rounded-xl border p-4 shadow-sm transition-all",
+          "group-hover:-translate-y-0.5 group-hover:shadow-md",
+          highlight
+            ? "border-status-warning/30 bg-status-warning/10"
+            : "border-border bg-card group-hover:border-muted-foreground/30"
+        )}
+      >
+        <div className="flex items-center gap-3">
+          <span className={cn(
+            "rounded-lg p-2",
+            highlight ? "bg-status-warning/20 text-status-warning" : "bg-muted text-muted-foreground"
+          )}>
+            {icon}
+          </span>
+          <div>
+            <div className={cn(
+              "text-xs font-semibold tracking-wide",
+              highlight ? "text-status-warning" : "text-muted-foreground"
+            )}>
+              {label}
+            </div>
+            <div className={cn(
+              "text-xl font-bold",
+              highlight ? "text-status-warning" : "text-foreground"
+            )}>
+              {value}
+            </div>
+          </div>
+        </div>
+        <ArrowRight className={cn("h-4 w-4", highlight ? "text-status-warning" : "text-muted-foreground")} />
+      </div>
+    </button>
   );
 }

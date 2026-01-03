@@ -217,6 +217,17 @@ export function AdminTopBar({
     const { data: session } = useSession();
     const queryClient = useQueryClient();
     const userId = session?.user?.id;
+    const userName = session?.user?.name?.trim();
+    const userEmail = session?.user?.email?.trim();
+    const displayName = userName || userEmail || "Signed in";
+    const displayEmail = userName && userEmail && userEmail !== userName ? userEmail : "";
+    const initialsSource = userName || userEmail || "U";
+    const initials = initialsSource
+        .split(" ")
+        .filter(Boolean)
+        .slice(0, 2)
+        .map((part) => part[0]?.toUpperCase())
+        .join("") || initialsSource.slice(0, 2).toUpperCase();
 
     // Track when the API token becomes available in localStorage (set by DashboardShell)
     const [hasApiToken, setHasApiToken] = useState(false);
@@ -330,6 +341,34 @@ export function AdminTopBar({
 
                 {/* Right - Operations, Notifications & Menu */}
                 <div className="flex items-center gap-2">
+                    <Link
+                        href="/dashboard/settings/account"
+                        className="flex h-9 w-9 items-center justify-center rounded-full border border-border bg-muted text-foreground text-xs font-semibold transition-colors hover:bg-muted/80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-action-primary focus-visible:ring-offset-2 sm:hidden"
+                        aria-label="View profile"
+                        title={displayEmail ? `${displayName} · ${displayEmail}` : displayName}
+                    >
+                        {initials}
+                    </Link>
+                    <Link
+                        href="/dashboard/settings/account"
+                        className="hidden sm:flex items-center gap-2 rounded-lg border border-border bg-muted/30 px-2.5 py-1.5 text-left transition-colors hover:bg-muted/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-action-primary focus-visible:ring-offset-2"
+                        title={displayEmail ? `${displayName} · ${displayEmail}` : displayName}
+                    >
+                        <div className="flex h-7 w-7 items-center justify-center rounded-full bg-muted text-foreground text-xs font-semibold">
+                            {initials}
+                        </div>
+                        <div className="min-w-0 leading-tight">
+                            <div className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">Signed in</div>
+                            <div className="text-sm font-semibold text-foreground max-w-[140px] truncate">
+                                {displayName}
+                            </div>
+                            {displayEmail && (
+                                <div className="text-[11px] text-muted-foreground max-w-[140px] truncate">
+                                    {displayEmail}
+                                </div>
+                            )}
+                        </div>
+                    </Link>
                     {/* Operations Quick Actions */}
                     <div className="hidden md:flex items-center gap-1 mr-2">
                         <Link
@@ -498,6 +537,19 @@ export function AdminTopBar({
                                         <circle cx="12" cy="12" r="3" />
                                     </svg>
                                     Settings
+                                </Link>
+
+                                {/* My Profile */}
+                                <Link
+                                    href="/dashboard/settings/account"
+                                    className="flex items-center gap-3 px-4 py-2.5 text-sm text-foreground hover:bg-muted/40 transition-colors"
+                                    onClick={() => setIsMenuOpen(false)}
+                                >
+                                    <svg className="w-4 h-4 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">
+                                        <circle cx="12" cy="8" r="4" />
+                                        <path d="M4 20c0-4.418 3.582-8 8-8s8 3.582 8 8" />
+                                    </svg>
+                                    My Profile
                                 </Link>
 
                                 {/* Billing */}

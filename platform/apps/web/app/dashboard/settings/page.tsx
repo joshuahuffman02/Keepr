@@ -123,6 +123,11 @@ const settingsCategories: SettingCategory[] = [
     color: "red",
     links: [
       {
+        name: "My Profile",
+        href: "/dashboard/settings/account",
+        description: "Review your account details and access scope",
+      },
+      {
         name: "Users & Roles",
         href: "/dashboard/settings/users",
         description: "Manage staff users and their roles",

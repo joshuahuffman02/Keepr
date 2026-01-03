@@ -126,7 +126,7 @@ export function CharityImpactWidget({ campgroundId }: CharityImpactWidgetProps) 
   // Only show full skeleton while initial settings load
   if (loadingSettings && !charitySettings) {
     return (
-      <div className="grid gap-4">
+      <div className="grid gap-4 md:grid-cols-2">
         <Card className="border-border">
           <CardContent className="p-6">
             <div className="animate-pulse space-y-4">
@@ -201,7 +201,7 @@ export function CharityImpactWidget({ campgroundId }: CharityImpactWidgetProps) 
   const optInDisplay = stats ? `${optInRate.toFixed(0)}%` : "—";
 
   return (
-    <div className="grid gap-4">
+    <div className="grid gap-4 md:grid-cols-2">
       <Card className="border-border">
         <CardContent className="p-6">
           <div className="flex items-start justify-between gap-4">

@@ -1,8 +1,10 @@
 "use client";
 
-import { useEffect, useState, useCallback, useMemo } from "react";
+import { useEffect, useState, useCallback, useMemo, type ReactNode } from "react";
 import { apiClient } from "@/lib/api-client";
 import { DashboardShell } from "@/components/ui/layout/DashboardShell";
+import { PageHeader } from "@/components/ui/layout/PageHeader";
+import { AlertTriangle, CheckCircle2, ClipboardList, Clock, RefreshCw } from "lucide-react";
 
 // Types matching the new unified op-tasks schema
 type OpTaskCategory = "turnover" | "housekeeping" | "maintenance" | "inspection" | "grounds" | "pool" | "front_desk" | "custom";
@@ -320,37 +322,45 @@ export default function OperationsPage() {
   return (
     <DashboardShell>
       <div className="p-4 md:p-6 max-w-[1800px] mx-auto">
-        {/* Header - stacks on mobile */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
-          <div>
-            <h1 className="text-xl md:text-2xl font-bold text-foreground">Operations</h1>
-            <p className="text-muted-foreground mt-1 text-sm md:text-base hidden sm:block">Manage tasks, turnovers, maintenance, and team assignments</p>
-          </div>
-          <div className="flex gap-2">
-            {activeTab === "templates" && (
+        <PageHeader
+          eyebrow="Operations"
+          title={(
+            <span className="flex items-center gap-3">
+              <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-status-info/15 text-status-info">
+                <ClipboardList className="h-5 w-5" />
+              </span>
+              <span>Operations</span>
+            </span>
+          )}
+          subtitle="Manage tasks, turnovers, maintenance, and team assignments."
+          actions={(
+            <div className="flex flex-wrap gap-2">
+              {activeTab === "templates" && (
+                <button
+                  onClick={() => setShowTemplateModal(true)}
+                  className="px-3 md:px-4 py-2 border border-border bg-card text-foreground rounded-lg font-medium hover:bg-muted transition-colors flex items-center gap-2 text-sm"
+                >
+                  <span>+</span> <span className="hidden sm:inline">New</span> Template
+                </button>
+              )}
+              {activeTab === "teams" && (
+                <button
+                  onClick={() => setShowTeamModal(true)}
+                  className="px-3 md:px-4 py-2 border border-border bg-card text-foreground rounded-lg font-medium hover:bg-muted transition-colors flex items-center gap-2 text-sm"
+                >
+                  <span>+</span> <span className="hidden sm:inline">New</span> Team
+                </button>
+              )}
               <button
-                onClick={() => setShowTemplateModal(true)}
-                className="px-3 md:px-4 py-2 border border-border bg-card text-foreground rounded-lg font-medium hover:bg-muted transition-colors flex items-center gap-2 text-sm"
+                onClick={() => setShowCreateModal(true)}
+                className="px-3 md:px-4 py-2 bg-emerald-600 text-white rounded-lg font-medium hover:bg-emerald-700 transition-colors flex items-center gap-2 text-sm min-h-[44px]"
               >
-                <span>+</span> <span className="hidden sm:inline">New</span> Template
+                <span>+</span> <span className="hidden sm:inline">New</span> Task
               </button>
-            )}
-            {activeTab === "teams" && (
-              <button
-                onClick={() => setShowTeamModal(true)}
-                className="px-3 md:px-4 py-2 border border-border bg-card text-foreground rounded-lg font-medium hover:bg-muted transition-colors flex items-center gap-2 text-sm"
-              >
-                <span>+</span> <span className="hidden sm:inline">New</span> Team
-              </button>
-            )}
-            <button
-              onClick={() => setShowCreateModal(true)}
-              className="px-3 md:px-4 py-2 bg-emerald-600 text-white rounded-lg font-medium hover:bg-emerald-700 transition-colors flex items-center gap-2 text-sm min-h-[44px]"
-            >
-              <span>+</span> <span className="hidden sm:inline">New</span> Task
-            </button>
-          </div>
-        </div>
+            </div>
+          )}
+          className="mb-6"
+        />
 
         {/* Tabs - horizontally scrollable on mobile */}
         <div className="flex gap-1 mb-6 border-b border-border overflow-x-auto scrollbar-hide -mx-4 px-4 md:mx-0 md:px-0">
@@ -523,26 +533,27 @@ function TaskBoardTab({
         <StatsCard
           label="Active"
           value={stats.total}
-          icon=""
+          icon={<ClipboardList className="h-4 w-4 text-muted-foreground" />}
         />
         <StatsCard
           label="Pending"
           value={stats.pending}
-          icon=""
-          color="text-amber-600"
+          icon={<Clock className="h-4 w-4 text-amber-600" />}
+          tone="text-amber-600"
         />
         <StatsCard
           label="In Progress"
           value={stats.inProgress}
-          icon=""
-          color="text-blue-600"
+          icon={<RefreshCw className="h-4 w-4 text-blue-600" />}
+          tone="text-blue-600"
         />
         <StatsCard
           label="Breached"
           value={stats.breached}
-          icon=""
-          color="text-red-600"
+          icon={<AlertTriangle className="h-4 w-4 text-rose-600" />}
+          tone="text-rose-600"
           subtext={stats.atRisk > 0 ? `${stats.atRisk} at risk` : undefined}
+          subtextTone="text-amber-600"
         />
         <StatsCard
           label="Done Today"
@@ -551,78 +562,80 @@ function TaskBoardTab({
             t.completedAt &&
             new Date(t.completedAt).toDateString() === new Date().toDateString()
           ).length}
-          icon=""
-          color="text-emerald-600"
+          icon={<CheckCircle2 className="h-4 w-4 text-emerald-600" />}
+          tone="text-emerald-600"
         />
       </div>
 
       {/* Filters - scrollable on mobile */}
-      <div className="flex flex-wrap gap-2 md:gap-3 mb-4 md:mb-6">
-        {/* View mode toggle */}
-        <div className="flex bg-muted rounded-lg p-1 mr-auto md:mr-2">
-          <button
-            onClick={() => setViewMode('board')}
-            className={`px-3 py-1.5 text-xs font-medium rounded transition-colors min-h-[36px] ${
-              viewMode === 'board' ? 'bg-card shadow text-foreground' : 'text-muted-foreground'
-            }`}
-          >
-            <span className="hidden sm:inline">Board</span>
-            <span className="sm:hidden">B</span>
-          </button>
-          <button
-            onClick={() => setViewMode('list')}
-            className={`px-3 py-1.5 text-xs font-medium rounded transition-colors min-h-[36px] ${
-              viewMode === 'list' ? 'bg-card shadow text-foreground' : 'text-muted-foreground'
-            }`}
-          >
-            <span className="hidden sm:inline">List</span>
-            <span className="sm:hidden">L</span>
-          </button>
-        </div>
+      <div className="mb-4 md:mb-6 rounded-xl border border-border bg-card p-3 md:p-4">
+        <div className="flex flex-wrap items-center gap-2 md:gap-3">
+          {/* View mode toggle */}
+          <div className="flex bg-muted/60 rounded-lg p-1 mr-auto md:mr-2">
+            <button
+              onClick={() => setViewMode('board')}
+              className={`px-3 py-1.5 text-xs font-medium rounded transition-colors min-h-[36px] ${
+                viewMode === 'board' ? 'bg-card shadow text-foreground' : 'text-muted-foreground'
+              }`}
+            >
+              <span className="hidden sm:inline">Board</span>
+              <span className="sm:hidden">B</span>
+            </button>
+            <button
+              onClick={() => setViewMode('list')}
+              className={`px-3 py-1.5 text-xs font-medium rounded transition-colors min-h-[36px] ${
+                viewMode === 'list' ? 'bg-card shadow text-foreground' : 'text-muted-foreground'
+              }`}
+            >
+              <span className="hidden sm:inline">List</span>
+              <span className="sm:hidden">L</span>
+            </button>
+          </div>
 
-        <select
-          value={filter.category ?? ""}
-          onChange={e => setFilter((f: any) => ({ ...f, category: e.target.value || undefined }))}
-          className="px-2 md:px-3 py-2 bg-card border border-border rounded-lg text-sm min-h-[44px]"
-        >
-          <option value="">All Types</option>
-          {Object.entries(CATEGORY_CONFIG).map(([key, config]) => (
-            <option key={key} value={key}>{config.icon} {config.label}</option>
-          ))}
-        </select>
-
-        <select
-          value={filter.slaStatus ?? ""}
-          onChange={e => setFilter((f: any) => ({ ...f, slaStatus: e.target.value || undefined }))}
-          className="px-2 md:px-3 py-2 bg-card border border-border rounded-lg text-sm min-h-[44px]"
-        >
-          <option value="">All SLA</option>
-          <option value="on_track">On Track</option>
-          <option value="at_risk">At Risk</option>
-          <option value="breached">Breached</option>
-        </select>
-
-        {teams.length > 0 && (
           <select
-            value={filter.assignedToTeamId ?? ""}
-            onChange={e => setFilter((f: any) => ({ ...f, assignedToTeamId: e.target.value || undefined }))}
-            className="px-2 md:px-3 py-2 bg-card border border-border rounded-lg text-sm min-h-[44px] hidden sm:block"
+            value={filter.category ?? ""}
+            onChange={e => setFilter((f: any) => ({ ...f, category: e.target.value || undefined }))}
+            className="px-2 md:px-3 py-2 bg-muted/30 border border-border rounded-lg text-sm min-h-[44px]"
           >
-            <option value="">All Teams</option>
-            {teams.map(team => (
-              <option key={team.id} value={team.id}>{team.name}</option>
+            <option value="">All Types</option>
+            {Object.entries(CATEGORY_CONFIG).map(([key, config]) => (
+              <option key={key} value={key}>{config.icon} {config.label}</option>
             ))}
           </select>
-        )}
 
-        {Object.keys(filter).length > 0 && (
-          <button
-            onClick={() => setFilter({})}
-            className="px-3 py-2 text-muted-foreground hover:text-foreground text-sm min-h-[44px]"
+          <select
+            value={filter.slaStatus ?? ""}
+            onChange={e => setFilter((f: any) => ({ ...f, slaStatus: e.target.value || undefined }))}
+            className="px-2 md:px-3 py-2 bg-muted/30 border border-border rounded-lg text-sm min-h-[44px]"
           >
-            Clear
-          </button>
-        )}
+            <option value="">All SLA</option>
+            <option value="on_track">On Track</option>
+            <option value="at_risk">At Risk</option>
+            <option value="breached">Breached</option>
+          </select>
+
+          {teams.length > 0 && (
+            <select
+              value={filter.assignedToTeamId ?? ""}
+              onChange={e => setFilter((f: any) => ({ ...f, assignedToTeamId: e.target.value || undefined }))}
+              className="px-2 md:px-3 py-2 bg-muted/30 border border-border rounded-lg text-sm min-h-[44px] hidden sm:block"
+            >
+              <option value="">All Teams</option>
+              {teams.map(team => (
+                <option key={team.id} value={team.id}>{team.name}</option>
+              ))}
+            </select>
+          )}
+
+          {Object.keys(filter).length > 0 && (
+            <button
+              onClick={() => setFilter({})}
+              className="px-3 py-2 text-muted-foreground hover:text-foreground text-sm font-medium min-h-[44px]"
+            >
+              Clear
+            </button>
+          )}
+        </div>
       </div>
 
       {/* Board View */}
@@ -725,24 +738,30 @@ function StatsCard({
   label,
   value,
   icon,
-  color = "text-foreground",
-  subtext
+  tone = "text-foreground",
+  subtext,
+  subtextTone = "text-muted-foreground"
 }: {
   label: string;
   value: number;
-  icon: string;
-  color?: string;
+  icon?: ReactNode;
+  tone?: string;
   subtext?: string;
+  subtextTone?: string;
 }) {
   return (
-    <div className="bg-card rounded-xl border border-border p-3 md:p-4">
-      <div className="flex items-center gap-1.5 md:gap-2 mb-0.5 md:mb-1">
-        <span className="text-base md:text-lg">{icon}</span>
-        <span className="text-xs md:text-sm text-muted-foreground">{label}</span>
+    <div className="bg-card rounded-xl border border-border p-3 md:p-4 shadow-sm transition-colors">
+      <div className="flex items-center justify-between">
+        <span className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">{label}</span>
+        {icon && (
+          <span className="rounded-lg bg-muted/60 p-2">
+            {icon}
+          </span>
+        )}
       </div>
-      <div className="flex items-baseline gap-1.5 md:gap-2">
-        <span className={`text-xl md:text-2xl font-bold ${color}`}>{value}</span>
-        {subtext && <span className="text-[10px] md:text-xs text-amber-600">{subtext}</span>}
+      <div className="mt-2 flex items-baseline gap-2">
+        <span className={`text-xl md:text-2xl font-semibold ${tone}`}>{value}</span>
+        {subtext && <span className={`text-[11px] md:text-xs font-semibold ${subtextTone}`}>{subtext}</span>}
       </div>
     </div>
   );

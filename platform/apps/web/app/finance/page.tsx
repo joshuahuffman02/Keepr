@@ -5,7 +5,7 @@ import { useQuery } from "@tanstack/react-query";
 import Link from "next/link";
 import { motion, useReducedMotion } from "framer-motion";
 import { DashboardShell } from "@/components/ui/layout/DashboardShell";
-import { Breadcrumbs } from "@/components/breadcrumbs";
+import { PageHeader } from "@/components/ui/layout/PageHeader";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -158,15 +158,11 @@ export default function FinancePage() {
   if (!campgroundId) {
     return (
       <DashboardShell>
-        <Breadcrumbs items={[{ label: "Finance", href: "/finance" }]} />
-        <div className="mb-6">
-          <h1 className="text-2xl font-semibold text-foreground">
-            Financial Overview
-          </h1>
-          <p className="text-sm text-muted-foreground">
-            Track revenue, payouts, and manage disputes
-          </p>
-        </div>
+        <PageHeader
+          eyebrow="Finance"
+          title="Financial Overview"
+          subtitle="Track revenue, payouts, and manage disputes"
+        />
         <Card className="border-border">
           <CardContent className="py-16 text-center">
             <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-muted">
@@ -186,31 +182,33 @@ export default function FinancePage() {
 
   return (
     <DashboardShell>
-      <Breadcrumbs items={[{ label: "Finance", href: "/finance" }]} />
-
-      <div className="mb-6 flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-semibold text-foreground">
-            Financial Overview
-          </h1>
-          <p className="text-sm text-muted-foreground">
-            Track revenue, payouts, and manage disputes
-          </p>
-        </div>
-        <Button
-          size="sm"
-          variant="outline"
-          disabled={isRefreshing}
-          onClick={() => {
-            payoutsQuery.refetch();
-            disputesQuery.refetch();
-          }}
-          className="transition-all duration-200 hover:border-emerald-300 hover:bg-emerald-50"
-        >
-          <RefreshCw className={`h-4 w-4 mr-2 ${isRefreshing ? "animate-spin" : ""}`} />
-          Refresh
-        </Button>
-      </div>
+      <PageHeader
+        eyebrow="Finance"
+        title={(
+          <span className="flex items-center gap-3">
+            <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-100 text-emerald-700">
+              <DollarSign className="h-5 w-5" />
+            </span>
+            <span>Financial Overview</span>
+          </span>
+        )}
+        subtitle="Track revenue, payouts, and manage disputes"
+        actions={(
+          <Button
+            size="sm"
+            variant="outline"
+            disabled={isRefreshing}
+            onClick={() => {
+              payoutsQuery.refetch();
+              disputesQuery.refetch();
+            }}
+            className="transition-all duration-200 hover:border-emerald-300 hover:bg-emerald-50"
+          >
+            <RefreshCw className={`h-4 w-4 mr-2 ${isRefreshing ? "animate-spin" : ""}`} />
+            Refresh
+          </Button>
+        )}
+      />
 
       {/* Loading State */}
       {isLoading ? (
