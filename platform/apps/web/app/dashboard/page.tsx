@@ -1693,7 +1693,7 @@ function QuickActionButton({
         href={href}
         aria-label={label}
         className={cn(
-          "flex items-start gap-3 rounded-xl border border-border/70 bg-muted/30 px-4 py-3 transition-colors sm:items-center",
+          "flex h-full min-h-[88px] flex-col items-center justify-center gap-2 rounded-xl border border-border/70 bg-muted/30 px-3 py-3 text-center transition-colors",
           "hover:bg-muted/50 hover:border-muted-foreground/30",
           "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2"
         )}
@@ -1701,7 +1701,7 @@ function QuickActionButton({
         <span className={cn("rounded-lg p-2 bg-muted", toneMap[tone])}>
           {icon}
         </span>
-        <span className="text-sm font-semibold text-foreground leading-tight flex-1 min-w-0 whitespace-normal break-words">
+        <span className="text-sm font-semibold text-foreground leading-snug whitespace-normal break-words">
           {label}
         </span>
       </Link>
