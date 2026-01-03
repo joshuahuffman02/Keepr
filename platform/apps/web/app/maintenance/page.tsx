@@ -19,6 +19,7 @@ import { useToast } from "@/components/ui/use-toast";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
+import { cn } from "@/lib/utils";
 
 type MaintenanceStatus = Maintenance["status"];
 type MaintenancePriority = Maintenance["priority"];
