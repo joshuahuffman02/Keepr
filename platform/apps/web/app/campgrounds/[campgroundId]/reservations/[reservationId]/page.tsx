@@ -720,6 +720,50 @@ export default function ReservationDetailPage() {
         )}
       </AnimatePresence>
 
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Balance due</CardTitle>
+          </CardHeader>
+          <CardContent className="pt-0">
+            <div className={cn(
+              "text-xl font-bold",
+              balanceCents > 0 ? "text-status-warning" : "text-status-success"
+            )}>
+              {formatCurrency(balanceCents)}
+            </div>
+            <div className="text-xs text-muted-foreground">{balanceCents > 0 ? "Outstanding" : "Paid in full"}</div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Paid to date</CardTitle>
+          </CardHeader>
+          <CardContent className="pt-0">
+            <div className="text-xl font-bold text-foreground">{formatCurrency(paidCents)}</div>
+            <div className="text-xs text-muted-foreground">{formatCurrency(totalCents)} total</div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Stay length</CardTitle>
+          </CardHeader>
+          <CardContent className="pt-0">
+            <div className="text-xl font-bold text-foreground">{nights}</div>
+            <div className="text-xs text-muted-foreground">Night{nights !== 1 ? "s" : ""} · {reservation.site?.siteClass?.name || "Standard"}</div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Status</CardTitle>
+          </CardHeader>
+          <CardContent className="pt-0">
+            <div className="text-xl font-bold text-foreground capitalize">{reservation.status?.replace("_", " ") || "pending"}</div>
+            <div className="text-xs text-muted-foreground">Updated {formatDateTime(reservation.updatedAt)}</div>
+          </CardContent>
+        </Card>
+      </div>
+
       {/* ═══════════════════════════════════════════════════════════════════════ */}
       {/* TABBED CONTENT */}
       {/* ═══════════════════════════════════════════════════════════════════════ */}

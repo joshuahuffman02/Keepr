@@ -537,7 +537,7 @@ export default function CalendarPage() {
         <Card className="p-4 border-border shadow-sm">
           <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
             <div className="flex items-center gap-2">
-              <span className="text-sm font-semibold text-foreground">Filters</span>
+              <span className="text-sm font-semibold text-foreground">Filters & Search</span>
               {hasFilters && (
                 <span className="rounded-full border border-border bg-muted px-2 py-0.5 text-[11px] font-semibold text-muted-foreground">
                   {activeFilterCount} on
@@ -560,8 +560,8 @@ export default function CalendarPage() {
               </Button>
             )}
           </div>
-          <div className="grid gap-4 md:grid-cols-3">
-            <div className="space-y-2">
+          <div className="grid gap-4 md:grid-cols-4">
+            <div className="space-y-2 md:col-span-2">
               <Label className="text-xs font-medium text-muted-foreground">Search guests</Label>
               <div className="relative">
                 <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground/70" />
